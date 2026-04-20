@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Checkout | Alban Andrieu</title>
+		<meta name="robots" content="noindex, nofollow" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="assets/nabla/nabla-4.svg" />
+
+		<!-- Resume Schema Reference for Machine-Readable Tools -->
+		<link rel="alternate" type="application/json" href="/cv/schema.json" title="Resume Schema (JSONResume format)" />
+
+		<!-- Font Awesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			type="text/css"
+		/>
+
+		<script
+			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+			data-auto-replace-svg="nest"
+		></script>
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+		<!-- Theme toggle script - load early to prevent flash -->
+		<script src="../theme-toggle.js"></script>
+
+		<!-- Custom CSS -->
+		<link rel="stylesheet" href="landing-sections.css" />
+
+		<link rel="stylesheet" href="wireframe.css" />
+		<link rel="stylesheet" href="arf.css" />
+		<link rel="stylesheet" href="theme.css" />
+
+		<link rel="stylesheet" href="style.css" />
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="site-content-page.css" />
+
+		<link rel="stylesheet" href="checkout.css" />
+	</head>
+	<body class="site-content-page">
+		<a name="top"></a>
+		<!-- Skip to main content link for accessibility -->
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<!-- Main Content -->
+		<main id="main-content" class="checkout-page">
+			<section class="checkout-card">
+				<div class="product">
+					<img src="https://dr-alban.com/assets/nabla/nabla-4.svg" alt="Nabla" width="64" height="64" />
+					<div class="description">
+						<h2 class="checkout-title">Payment</h2>
+						<p class="checkout-subtitle">One-time payment via Stripe. Secure checkout.</p>
+					</div>
+				</div>
+				<figure class="checkout-qr">
+					<img
+						src="assets/stripe/tjm-stripe.png"
+						alt="QR code to open this Stripe payment on your phone"
+						width="880"
+						height="1055"
+						decoding="async"
+					/>
+					<figcaption class="checkout-qr-caption">Or scan this QR code to pay on your phone</figcaption>
+				</figure>
+				<form action="/api/create-checkout-session" method="POST" class="checkout-form">
+					<button type="submit" id="checkout-button" class="checkout-button">
+						<i class="fa-solid fa-lock" aria-hidden="true"></i> Proceed to checkout
+					</button>
+				</form>
+				<p class="checkout-footer">
+					<a href="/">Back to site</a>
+				</p>
+			</section>
+		</main>
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					href="https://www.linkedin.com/in/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="LinkedIn"
+					><i class="fab fa-linkedin-in"></i
+				></a>
+				<a
+					href="https://calendly.com/alban-andrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Calendly"
+					><i class="fa fa-calendar-plus"></i
+				></a>
+				<a
+					href="https://github.com/AlbanAndrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="GitHub"
+					><i class="fab fa-github"></i
+				></a>
+				<a
+					href="https://hub.docker.com/u/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Docker Hub"
+					><i class="fab fa-docker"></i
+				></a>
+				<a
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Stack Exchange"
+					><i class="fab fa-stack-exchange"></i
+				></a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer" class="text-muted">Cookies</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<script src="/site-widgets.js" defer data-no-print-pdf data-no-coffee-fab></script>
+	</body>
+</html>

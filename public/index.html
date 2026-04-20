@@ -1,0 +1,634 @@
+<!doctype html>
+<!--
+<meta http-equiv="REFRESH" content="0;url=/sample/index.html">
+-->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- PAGE settings -->
+		<title>Alban Andrieu — Freelance DevSecOps &amp; Cloud Architect (AWS, Azure, OVH)</title>
+		<meta
+			name="description"
+			content="Freelance DevSecOps engineer and cloud architect with 20+ years of experience. I help startups and enterprises secure, automate and scale AWS, Azure and OVH platforms, with a focus on AI workloads, security and compliance (ISO 27001 / SOC 2)."
+		/>
+		<meta
+			name="keywords"
+			content="freelance DevSecOps engineer, freelance cloud architect, AWS, Azure, OVH, DevSecOps consultant, cloud security consultant, DevSecOps for AI startups, Alban Andrieu"
+		/>
+		<meta name="author" content="Alban Andrieu" />
+
+		<meta name="image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:url" content="https://dr-alban.com/" />
+		<meta property="og:title" content="Alban Andrieu — Freelance DevSecOps &amp; Cloud Architect" />
+		<meta
+			property="og:description"
+			content="Freelance DevSecOps and cloud architect. Secure, automate and scale AWS, Azure and OVH platforms for AI-driven and security-critical products."
+		/>
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- twitter card tags additive with the og: tags -->
+		<meta property="twitter:card" content="summary" />
+		<meta property="twitter:domain" content="dr-alban.com" />
+		<meta property="twitter:title" content="Alban Andrieu — Freelance DevSecOps &amp; Cloud Architect" />
+		<meta
+			property="twitter:description"
+			content="Freelance cloud security consultant and DevSecOps engineer. AWS, Azure, OVH — AI infra, compliance, CI/CD and IaC."
+		/>
+		<meta property="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+		<meta property="twitter:url" content="https://dr-alban.com" />
+		<meta name="twitter:label1" value="Cloud architect" />
+		<meta name="twitter:data1" value="AI architect" />
+		<meta name="twitter:label2" value="DevSecOps" />
+		<meta name="referrer" content="always" />
+		<meta name="color-scheme" content="light dark" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="assets/nabla/nabla-4.svg" />
+
+		<!-- Font Awesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			type="text/css"
+		/>
+
+		<script
+			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+			data-auto-replace-svg="nest"
+		></script>
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+		<link rel="stylesheet" href="landing-sections.css" />
+
+		<link rel="stylesheet" href="wireframe.css" />
+		<link rel="stylesheet" href="arf.css" />
+		<link rel="stylesheet" href="theme.css" />
+		<link rel="stylesheet" href="style.css" />
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="site-content-page.css" />
+		<link rel="stylesheet" href="timeline.css" />
+		<link rel="stylesheet" href="education.css" />
+
+		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
+		<script src="obs-connection.js"></script>
+
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+		<!-- Cloudflare -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+			integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+			integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+
+		<link rel="alternate" hreflang="x-default" href="https://dr-alban.com/" />
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="dr-alban.com — site feed"
+			href="https://dr-alban.com/feed.xml"
+		/>
+		<link rel="canonical" href="https://dr-alban.com/" />
+
+		<!-- JSON-LD Structured Data for SEO and Crawlers -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Alban Andrieu",
+				"jobTitle": "Freelance DevSecOps Engineer & Cloud Architect",
+				"description": "Freelance DevSecOps engineer and cloud architect (AWS, Azure, OVH). Cloud security consultant for AI-driven and security-critical products; ISO 27001, SOC 2, GDPR-aligned delivery.",
+				"url": "https://dr-alban.com/",
+				"email": "job@dr-alban.com",
+				"sameAs": [
+					"https://www.linkedin.com/in/nabla/",
+					"https://twitter.com/AlbanAndrieu",
+					"https://github.com/AlbanAndrieu"
+				],
+				"knowsAbout": [
+					"Freelance DevSecOps",
+					"Cloud architecture",
+					"AWS",
+					"Azure",
+					"OVHcloud",
+					"Cloud security",
+					"AI infrastructure",
+					"MLOps",
+					"ISO 27001",
+					"SOC 2"
+				],
+				"hasCredential": [
+					{
+						"@type": "EducationalOccupationalCredential",
+						"name": "LinkedIn Professional Profile",
+						"url": "https://www.linkedin.com/in/nabla/"
+					}
+				],
+				"subjectOf": [
+					{
+						"@type": "DigitalDocument",
+						"name": "LaTeX Resume PDF",
+						"description": "Traditional formatted resume in PDF format",
+						"url": "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+						"encodingFormat": "application/pdf"
+					},
+					{
+						"@type": "DigitalDocument",
+						"name": "LinkedIn Resume PDF",
+						"description": "LinkedIn profile exported as PDF",
+						"url": "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+						"encodingFormat": "application/pdf"
+					},
+					{
+						"@type": "WebPage",
+						"name": "Online CV Landing Page",
+						"description": "Interactive web-based CV and professional profile",
+						"url": "https://dr-alban.com/cv"
+					}
+				]
+			}
+		</script>
+		<script src="theme-toggle.js"></script>
+		<script src="site-google-translate.js" defer></script>
+		<script src="site-analytics.js" data-analytics-mode="home" data-ahrefs-key="tg3zLMS/bebJFl0LxctiCw"></script>
+	</head>
+	<body class="page-dark home-page">
+		<a name="top"></a>
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<!-- Main content area -->
+		<main id="main-content" role="main">
+			<!-- Hero Section -->
+			<section class="hero-section" id="home" aria-labelledby="hero-heading">
+				<div class="hero-content">
+					<h1 class="hero-title" id="hero-heading">
+						Independent Cloud &amp; DevSecOps Architect for AI-driven and security-critical products
+					</h1>
+					<p class="hero-subtitle">
+						Freelance cloud architect and DevSecOps engineer — I help startups and scale-ups secure, automate and scale
+						their platforms on AWS, Azure and OVH so they ship faster without trading off compliance.
+					</p>
+					<ul class="hero-value-list">
+						<li>
+							I was in charge to reduce incident risk and improve compliance posture (ISO 27001 / SOC 2) at
+							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"
+								><img
+									src="assets/nabla/jusmundi-favicon.ico"
+									alt=""
+									width="16"
+									height="16"
+									class="jusmundi-link-icon"
+									decoding="async"
+									aria-hidden="true"
+								/>Jus Mundi</a
+							>.
+						</li>
+						<li>Cut cloud and tooling spend through architecture, FinOps-minded design and automation.</li>
+						<li>Accelerate delivery with robust CI/CD, IaC and observable production systems.</li>
+					</ul>
+					<div class="cta-buttons">
+						<a
+							href="https://calendly.com/alban-andrieu"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="btn btn-primary"
+						>
+							<i class="fa fa-calendar-plus"></i> Book a 30-minute consultation
+						</a>
+						<a href="/startup.html" class="btn btn-outline-light">
+							<i class="fas fa-rocket" aria-hidden="true"></i> Start your project!
+						</a>
+						<a href="/cv/cv-full-en.html" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+							<i class="fas fa-file-pdf"></i> Download one-page profile (PDF)
+						</a>
+						<a
+							href="https://www.linkedin.com/in/nabla/"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="btn btn-secondary"
+						>
+							<i class="fab fa-linkedin"></i> View LinkedIn
+						</a>
+						<a href="/expertise.html" class="btn btn-secondary">
+							<i class="fas fa-layer-group" aria-hidden="true"></i> Services &amp; technical expertise
+						</a>
+						<!--
+						<a
+							href="https://github.com/AlbanAndrieu"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="btn btn-secondary"
+						>
+							<i class="fab fa-github"></i> View GitHub
+						</a>
+					  -->
+					</div>
+				</div>
+			</section>
+
+			<section class="proof-section" id="outcomes" aria-labelledby="outcomes-heading">
+				<h2 class="section-title" id="outcomes-heading">Selected outcomes</h2>
+				<p class="section-subtitle">
+					Representative engagements — details under NDA; happy to discuss similar contexts on a call.
+				</p>
+				<div class="proof-grid">
+					<div class="proof-card">
+						<h3>Legal-tech AI scale-up</h3>
+						<p class="proof-context">International product, heavy compliance expectations.</p>
+						<ul>
+							<li>Cloud architecture on AWS and OVH with security-by-design.</li>
+							<li>Automation and controls supporting ISO 27001, SOC 2 and GDPR-aligned operations.</li>
+							<li>CI/CD and IaC so teams ship frequently with guardrails.</li>
+						</ul>
+					</div>
+					<div class="proof-card">
+						<h3>Enterprise DevSecOps</h3>
+						<p class="proof-context">Fortune 500 and mid-market clients (consulting period).</p>
+						<ul>
+							<li>Pipeline security, container platforms and Kubernetes operations.</li>
+							<li>Bridging development, security and ops with practical playbooks.</li>
+							<li>Legacy-to-cloud migration patterns without stopping delivery.</li>
+						</ul>
+					</div>
+					<div class="proof-card">
+						<h3>Platform hardening &amp; clarity</h3>
+						<p class="proof-context">Cross-industry — financial services background.</p>
+						<ul>
+							<li>Microservices and automated testing in regulated-style environments.</li>
+							<li>Monitoring and observability foundations for incident response.</li>
+							<li>Cost-aware architecture and operational standards.</li>
+						</ul>
+					</div>
+				</div>
+				<p class="section-subtitle mt-4 mb-0">
+					<a href="/expertise.html">More detail on selected outcomes</a>
+				</p>
+			</section>
+
+			<!-- Experience Section -->
+			<section class="timeline-section" id="timeline">
+				<h2 class="section-title">Professional Experience</h2>
+				<p class="section-subtitle">20+ years of experience delivering enterprise solutions</p>
+				<div class="timeline">
+					<div class="timeline-item">
+						<div class="timeline-node">
+							<div class="timeline-node-icon" aria-hidden="true">
+								<i class="fas fa-briefcase"></i>
+							</div>
+							<span class="timeline-node-date">Freelance</span>
+						</div>
+						<div class="timeline-content">
+							<div class="timeline-header">
+								<h3>Freelance - Coming soon</h3>
+							</div>
+							<p class="timeline-description">
+								Open for fractional DevSecOps / cloud architecture, short audits and project-based delivery — cloud
+								security, AI infrastructure, compliance-oriented delivery and automation (separate from full-time roles
+								below).
+							</p>
+						</div>
+					</div>
+
+					<div class="timeline-item">
+						<div class="timeline-node">
+							<div class="timeline-node-icon" aria-hidden="true">
+								<i class="fas fa-cloud"></i>
+							</div>
+							<time class="timeline-node-date" datetime="2022-03">March 2022 – Present</time>
+						</div>
+						<div class="timeline-content">
+							<div class="timeline-header">
+								<h3>DevSecOps Cloud Architect</h3>
+								<a class="timeline-company" href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"
+									><img
+										src="assets/nabla/jusmundi-favicon.ico"
+										alt=""
+										width="16"
+										height="16"
+										class="jusmundi-link-icon"
+										decoding="async"
+										aria-hidden="true"
+									/>Jus Mundi</a
+								>
+							</div>
+							<p class="timeline-description">
+								Leading DevSecOps initiatives and cloud architecture for a international legal AI driven startup.
+								Implementing secure, scalable infrastructure on AWS / OVH with focus on automation, security compliance
+								(ISO 27001 / 42001, SOC 2, GDPR), and operational excellence.
+							</p>
+							<div class="timeline-achievements">
+								<span class="achievement-tag">AWS Cloud Architecture</span>
+								<span class="achievement-tag">Security Compliance</span>
+								<span class="achievement-tag">Infrastructure as Code</span>
+								<span class="achievement-tag">SDLC Automation</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="timeline-item">
+						<div class="timeline-node">
+							<div class="timeline-node-icon" aria-hidden="true">
+								<i class="fas fa-handshake"></i>
+							</div>
+							<time class="timeline-node-date" datetime="2015-01">2015 – Feb 2022</time>
+						</div>
+						<div class="timeline-content">
+							<div class="timeline-header">
+								<h3>DevSecOps Engineer</h3>
+								<span class="timeline-company">Various Enterprise Clients</span>
+							</div>
+							<p class="timeline-description">
+								Provided expert consulting services to Fortune 500 companies or Startup, implementing DevSecOps
+								practices, SDLC pipelines, and cloud migrations. Specialized in SDLC, Security automation, Docker
+								containerization, and Kubernetes orchestration.
+							</p>
+							<div class="timeline-achievements">
+								<span class="achievement-tag">Security lead</span>
+								<span class="achievement-tag">C++, Java and Python development</span>
+								<span class="achievement-tag">Docker, Kubernetes, Nomad, Rancher, Zone, Cloudflare</span>
+								<span class="achievement-tag">Jenkins & GitHub Actions</span>
+								<span class="achievement-tag">OnPremise & Cloud administration</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="timeline-item">
+						<div class="timeline-node">
+							<div class="timeline-node-icon" aria-hidden="true">
+								<i class="fas fa-code"></i>
+							</div>
+							<time class="timeline-node-date" datetime="2005-01">2005 – 2015</time>
+						</div>
+						<div class="timeline-content">
+							<div class="timeline-header">
+								<h3>Senior Software Engineer</h3>
+								<span class="timeline-company">Financial Services Sector</span>
+							</div>
+							<p class="timeline-description">
+								Full-stack software development and DevOps transformation in banking and financial services. Led
+								migration from monolithic to microservices architecture, implementing automated testing and continuous
+								deployment practices.
+							</p>
+							<div class="timeline-achievements">
+								<span class="achievement-tag">Java/C++ Enterprise</span>
+								<span class="achievement-tag">Python Development</span>
+								<span class="achievement-tag">Microservices</span>
+								<span class="achievement-tag">Agile Methodologies</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="timeline-item">
+						<div class="timeline-node">
+							<div class="timeline-node-icon" aria-hidden="true">
+								<i class="fas fa-graduation-cap"></i>
+							</div>
+							<time class="timeline-node-date" datetime="2004">2004</time>
+						</div>
+						<div class="timeline-content">
+							<div class="timeline-header">
+								<h3>Engineering degree</h3>
+								<span class="timeline-company">Computer Science & Software Engineering</span>
+							</div>
+							<p class="timeline-description">
+								Graduated with a strong foundation in software engineering, algorithms, and system design — the base for
+								everything that followed.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="cta-buttons">
+					<a href="/cv" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+						<i class="fas fa-file"></i> View Full CVs
+					</a>
+				</div>
+			</section>
+
+			<!-- Education & Certifications Section -->
+			<section class="education-section" id="education">
+				<h2 class="section-title">Education & Certifications</h2>
+				<div class="education-grid">
+					<div class="education-card education-card--featured">
+						<div class="education-icon">
+							<i class="fas fa-globe" aria-hidden="true"></i>
+						</div>
+						<h3>International collaboration</h3>
+						<p class="education-institution">20+ years in global, cross-location settings</p>
+						<p class="education-details">
+							Delivery and leadership with teams and stakeholders across countries and time zones. Professional working
+							language <strong>English</strong>; used daily with distributed engineering, security, and product partners
+							in multinational environments.
+						</p>
+					</div>
+
+					<div class="education-card">
+						<div class="education-icon">
+							<i class="fas fa-graduation-cap"></i>
+						</div>
+						<h3>Engineering Degree</h3>
+						<p class="education-institution">Computer Science & Software Engineering</p>
+						<p class="education-details">Strong foundation in software engineering, algorithms, and system design</p>
+					</div>
+
+					<div class="education-card">
+						<div class="education-icon">
+							<i class="fas fa-certificate"></i>
+						</div>
+						<h3>ISO &amp; SOC certifications</h3>
+						<p class="education-institution">Security, compliance &amp; data protection</p>
+						<p class="education-details">
+							<strong>ISO 27001 &amp; GDPR</strong> — implementing and maintaining information-security and
+							data-protection frameworks. <strong>ISO 42001</strong> — lead implementer for AI management systems.
+							<strong>SOC 2 Type II</strong>
+							— security controls and attestation in line with trust services criteria. See also
+							<a href="/security.html#security-standards-compliance">Security standards &amp; compliance</a>.
+						</p>
+					</div>
+
+					<div class="education-card">
+						<div class="education-icon">
+							<i class="fas fa-cloud"></i>
+						</div>
+						<h3>Cloud Certifications</h3>
+						<p class="education-institution">AWS, Azure, Kubernetes, Nomad</p>
+						<p class="education-details">Multiple cloud platform and orchestration certifications</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Contact Section -->
+			<section class="contact-section" id="contact" aria-labelledby="contact-heading">
+				<div class="contact-container">
+					<h2 class="section-title" id="contact-heading">Work with me</h2>
+					<p class="section-subtitle">
+						Ready to improve your cloud platform or DevSecOps practices? Book a free 30-minute consultation, or email a
+						short note about your context — I typically reply within one business day.
+					</p>
+
+					<div class="cta-buttons contact-hero-ctas">
+						<a
+							href="https://calendly.com/alban-andrieu"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="btn btn-primary"
+						>
+							<i class="fa fa-calendar-plus"></i> Schedule a call (Calendly)
+						</a>
+						<a href="mailto:job@dr-alban.com" class="btn btn-secondary"> <i class="fas fa-envelope"></i> Email me </a>
+					</div>
+
+					<div class="contact-methods">
+						<a href="mailto:job@dr-alban.com" class="contact-method">
+							<div class="contact-icon">
+								<i class="fas fa-envelope"></i>
+							</div>
+							<div class="contact-info">
+								<h3>Email</h3>
+								<p>job@dr-alban.com</p>
+							</div>
+						</a>
+
+						<a
+							href="https://www.linkedin.com/in/nabla"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="contact-method"
+						>
+							<div class="contact-icon">
+								<i class="fab fa-linkedin"></i>
+							</div>
+							<div class="contact-info">
+								<h4>LinkedIn</h4>
+								<p>Connect with me</p>
+							</div>
+						</a>
+
+						<a
+							href="https://calendly.com/alban-andrieu"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="contact-method"
+						>
+							<div class="contact-icon">
+								<i class="fa fa-calendar-plus"></i>
+							</div>
+							<div class="contact-info">
+								<h3>Calendly</h3>
+								<p>Book a time</p>
+							</div>
+						</a>
+
+						<a href="https://github.com/AlbanAndrieu" target="_blank" rel="noopener noreferrer" class="contact-method">
+							<div class="contact-icon">
+								<i class="fab fa-github"></i>
+							</div>
+							<div class="contact-info">
+								<h3>GitHub</h3>
+								<p>View my work</p>
+							</div>
+						</a>
+					</div>
+
+					<div class="contact-logo-wrap">
+						<img src="assets/nabla/nabla-4.svg" alt="Nabla Logo" class="contact-logo" width="120" height="120" />
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Footer -->
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					href="https://www.linkedin.com/in/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="LinkedIn"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					href="https://calendly.com/alban-andrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Calendly"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					href="https://github.com/AlbanAndrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="GitHub"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					href="https://hub.docker.com/u/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Docker Hub"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Stack Exchange"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+				<a href="/feed.xml" class="social-link" aria-label="RSS feed for this site">
+					<i class="fa fa-rss" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<!-- End footer section -->
+
+		<div style="display: none">
+			<a href="https://www.pkts.ca:443/cgi-bin/corinthianenzyme.cgi?doc_id=2561">north-puny</a>
+		</div>
+
+		<script
+			src="https://uptime.betterstack.com/widgets/announcement.js"
+			data-id="150620"
+			async="async"
+			type="text/javascript"
+		></script>
+		<script src="site-widgets.js" defer data-print-pdf data-no-coffee-fab></script>
+	</body>
+</html>

@@ -1,0 +1,9 @@
+---
+overrides:
+  - files: "*.md"
+    options:
+      tabWidth: 2
+  # Avoid splitting anchor tags so the closing ">" is on its own line (causes visible ">" in some contexts)
+  - files: "*.html"
+    options:
+      printWidth: 120

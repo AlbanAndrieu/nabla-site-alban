@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- PAGE settings -->
+		<title>FreeNas Infrastructure & Workstation Services | Nabla - Alban Andrieu</title>
+		<meta
+			name="description"
+			content="Self-hosted FreeNas infrastructure with 40+ applications including Portainer, Grafana, n8n, Vaultwarden, and Ubuntu workstation services for DevSecOps."
+		/>
+		<meta
+			name="keywords"
+			content="freenas, self-hosted, homelab, portainer, grafana, kubernetes, docker, devsecops, alban andrieu, ubuntu, monitoring"
+		/>
+
+		<meta name="author" content="Alban Andrieu" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="color-scheme" content="light dark" />
+
+		<!-- Open Graph Protocol -->
+		<meta property="og:title" content="FreeNas Infrastructure & Services - Nabla" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://dr-alban.com/freenas.html" />
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+		<meta
+			property="og:description"
+			content="Self-hosted FreeNas infrastructure with 40+ applications for DevSecOps and home automation"
+		/>
+		<meta property="og:site_name" content="Nabla - Alban Andrieu" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="FreeNas Infrastructure & Services" />
+		<meta name="twitter:description" content="Self-hosted applications running on FreeNas and Ubuntu workstation" />
+		<meta name="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://dr-alban.com/freenas.html" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="assets/nabla/nabla-4.svg" />
+
+		<link rel="stylesheet" href="landing-sections.css" />
+		<link rel="stylesheet" href="wireframe.css" />
+		<link rel="stylesheet" href="theme.css" />
+		<link rel="stylesheet" href="style.css" />
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="site-content-page.css" />
+		<link rel="stylesheet" href="arf.css" />
+
+		<!-- Font Awesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			type="text/css"
+		/>
+
+		<script
+			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+			data-auto-replace-svg="nest"
+		></script>
+
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+		<!-- Theme toggle script - load early to prevent flash -->
+
+		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
+		<script src="obs-connection.js"></script>
+
+		<!-- Ahrefs Web Analytics -->
+		<script src="https://analytics.ahrefs.com/analytics.js" data-key="tg3zLMS/bebJFl0LxctiCw" async></script>
+		<script src="theme-toggle.js"></script>
+		<script src="site-google-translate.js" defer></script>
+		<script src="site-analytics.js" data-analytics-mode="marketing"></script>
+	</head>
+	<body class="site-content-page page-dark">
+		<a name="top"></a>
+		<!-- Google Tag Manager (noscript) -->
+		<noscript
+			><iframe
+				src="https://www.googletagmanager.com/ns.html?id=GTM-W7XNV7K6"
+				height="0"
+				width="0"
+				style="display: none; visibility: hidden"
+			></iframe
+		></noscript>
+
+		<!-- Skip to main content link for accessibility -->
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="/" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+			<span class="text-muted mx-2" aria-hidden="true">·</span>
+			<a href="/truenas.html" class="text-decoration-none">TrueNAS</a>
+			<span class="text-muted mx-2" aria-hidden="true">·</span>
+			<span class="text-muted">FreeNAS (archive)</span>
+		</nav>
+
+		<!-- Header / Hero Section -->
+		<header>
+			<!-- FreeNas Section -->
+			<section class="stack-page-hero py-5" aria-labelledby="freenas-heading">
+				<div class="container">
+					<div class="row mb-4">
+						<div class="col-12 text-center">
+							<h2 id="freenas-heading" class="display-4 mb-3">FreeNAS Infrastructure</h2>
+							<p class="lead mb-0 stack-page-hero__lead">
+								Self-hosted applications and services running on FreeNAS (archived).
+							</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img class="card-img-top" src="assets/jenkins-basic.png" alt="Jenkins SDLC Platform" />
+								<div class="card-body">
+									<h5 class="">
+										<b>Nabla <a href="https://jenkins.io/" target="_blank">Jenkins</a></b>
+									</h5>
+									<p class="card-text">Jenkins <b>Freestyle</b> jobs</p>
+									<div class="d-flex justify-content-between align-items-center">
+										<div class="d-flex justify-content-between align-items-center">
+											<button type="button" class="btn btn-sm btn-outline-secondary">
+												<a href="http://albandrieu.com/jenkins" target="_blank">Jenkins</a>
+											</button>
+											<div class="btn-group btn-group-sm">
+												<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Tools&nbsp;</button>
+												<div class="dropdown-menu">
+													<a class="dropdown-item" href="http://albandrieu.com/jenkins/pluginusage" target="_blank"
+														>Plugin Usage</a
+													>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" href="http://albandrieu.com/jenkins/script" target="_blank"
+														>Script Console</a
+													>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" href="http://albandrieu.com/jenkins/computer" target="_blank"
+														>Slave Nodes</a
+													>
+													<div class="dropdown-divider"></div>
+													<a
+														class="dropdown-item"
+														href="https://sonarcloud.io/organizations/albanandrieu-github/projects"
+														target="_blank"
+														>Sonar</a
+													>
+												</div>
+											</div>
+											<button type="button" class="btn btn-sm btn-outline-secondary">
+												<a href="/nabla.html">Report</a>
+											</button>
+											<div class="btn-group btn-group-sm">
+												<button class="btn dropdown-toggle btn-success" data-toggle="dropdown">Download&nbsp;</button>
+												<div class="dropdown-menu">
+													<a class="dropdown-item" download href="/cv/cv-aandrieu-XX-XX-2021.tex">*.tex</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" download href="/cv/index.html">*.pdf</a>
+													<div class="dropdown-divider"></div>
+													<a class="dropdown-item" download href="/nabla.html">*.html</a>
+													<div class="dropdown-divider"></div>
+													<!--
+		                    <a class="dropdown-item" download href="/reports/monitoring_report.html">*.txt</a>
+		                    <div class="dropdown-divider"></div>
+		                    <a class="dropdown-item" download href="/reports/monitoring_report.html">*.zip</a>
+		                    <div class="dropdown-divider"></div>
+		                    -->
+													<a
+														class="dropdown-item"
+														download
+														href="http://albandrieu.com/jenkins/jnlpJars/jenkins-cli.jar"
+														>Jenkins CLI</a
+													>
+												</div>
+											</div>
+											<div class="btn-group"></div>
+										</div>
+										<div class="btn-group"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/logo-freenas.png"
+									width="140"
+									alt="FreeNAS Storage Platform"
+								/>
+								<div class="card-body">
+									<h5 class="">
+										<b>Nabla <a href="https://www.freenas.org/" target="_blank">FreeNAS</a></b>
+									</h5>
+									<p class="card-text">FreeNAS <b>® © 2020 - iXsystems, Inc</b></p>
+									<div class="d-flex justify-content-between align-items-center">
+										<div class="d-flex justify-content-between align-items-center">
+											<button type="button" class="btn btn-sm btn-outline-secondary">
+												<a href="https://albandrieu.com:7000/ui/dashboard" target="_blank">HTTPS UI</a>
+											</button>
+											<button type="button" class="btn btn-sm btn-outline-secondary">
+												<a href="https://albandrieu.com:81/" target="_blank">HTTP UI</a>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/logo-iocage-simple.png"
+									width="100"
+									alt="iocage"
+								/>
+								<div class="card-body">
+									<h5 class="">
+										<b
+											>Nabla
+											<a href="https://www.freenas.org/" target="_blank">FreeNAS</a>
+											Iocage</b
+										>
+									</h5>
+									<p class="card-text">
+										Freenas <b>Iocage</b> <a href="https://www.freenas.org/plugins/" target="_blank">Plugins</a> 
+									</p>
+									<div class="btn-group-vertical btn-group-sm">
+										<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+										<div class="dropdown-menu">
+											<a class="dropdown-item" href="https://albandrieu.com:7000/ui/plugins" target="_blank">Plugins</a>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.58:32400/web" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-plexmedia-simple.png"
+													width="100"
+												/>Plex</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.24:8181" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-tautulli-simple.png"
+													width="100"
+												/>Tautulli</a
+											>
+
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.24:7878" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-radarr-simple.png"
+													width="100"
+												/>Radarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.24:8989" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-sonarr-simple.png"
+													width="100"
+												/>Sonarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.24:8683" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-lidarr-simple.png"
+													width="100"
+												/>Lidarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.24:9001" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-organizr-simple.png"
+													width="100"
+												/>Organizr</a
+											>
+
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.66:9117" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-jackett-simple.png"
+													width="100"
+												/>Jackett</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.67:8080" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-sabnzbd-simple.png"
+													width="100"
+												/>Sabnzbd</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.70:9091" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-transmission-simple.png"
+													width="100"
+												/>Transmission</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://192.168.1.69:8112" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-deluge-simple.png"
+													width="100"
+												/>Deluge</a
+											>
+										</div>
+									</div>
+									<div class="btn-group-vertical btn-group-sm">
+										<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">External&nbsp;</button>
+										<div class="dropdown-menu">
+											<a class="dropdown-item" href="https://albandrieu.com:7000/ui/plugins" target="_blank">Plugins</a>
+											<!--<div class="dropdown-divider"></div><a class="dropdown-item" href="http://192.168.1.58:32400/web" target="_blank"><img class="img-fluid d-block mx-auto my-1" src="assets/logo-plexmedia-simple.png" width="100">Plex</a>-->
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:8181" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-tautulli-simple.png"
+													width="100"
+												/>Tautulli</a
+											>
+
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:7878" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-radarr-simple.png"
+													width="100"
+												/>Radarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:8989" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-sonarr-simple.png"
+													width="100"
+												/>Sonarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:8683" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-lidarr-simple.png"
+													width="100"
+												/>Lidarr</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:9001" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-organizr-simple.png"
+													width="100"
+												/>Organizr</a
+											>
+
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:9117" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-jackett-simple.png"
+													width="100"
+												/>Jackett</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:8090" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-sabnzbd-simple.png"
+													width="100"
+												/>Sabnzbd</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:9091" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-transmission-simple.png"
+													width="100"
+												/>Transmission</a
+											>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="http://albandrieu.com:8112" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto my-1"
+													src="assets/logo-deluge-simple.png"
+													width="100"
+												/>Deluge</a
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<div class="card-body">
+									<h5 class="card-title"><b>TrueNAS</b></h5>
+									<p class="card-text">Storage management UI</p>
+									<div class="d-flex justify-content-between align-items-center">
+										<a
+											href="https://freenas.albandrieu.com"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="btn btn-sm btn-outline-primary"
+										>
+											<i class="fas fa-database" aria-hidden="true"></i> Open TrueNAS
+										</a>
+										<small class="text-muted">Port: 7000</small>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<div class="card-body">
+									<h5 class="card-title"><b>pfSense</b></h5>
+									<p class="card-text">Firewall and router</p>
+									<div class="d-flex justify-content-between align-items-center">
+										<a
+											href="https://pfsense.albandrieu.com"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="btn btn-sm btn-outline-primary"
+										>
+											<i class="fas fa-fire" aria-hidden="true"></i> Open pfSense
+										</a>
+										<small class="text-muted">Port: 10443</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</header>
+
+		<!-- Main content area -->
+		<main id="main-content" role="main" class="mb-5">
+			<!-- Workstation Section -->
+			<section class="stack-page-section stack-page-section--alt py-5" aria-labelledby="workstation-heading">
+				<div class="container">
+					<div class="row mb-4">
+						<div class="col-12 text-center">
+							<h2 id="workstation-heading" class="display-4 mb-3 stack-page-section__title">Workstation Services</h2>
+							<p class="lead mb-0 stack-page-hero__lead">Ubuntu-based development and entertainment applications</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/logo-devops.png"
+									width="160"
+									alt="DevOps Tools"
+								/>
+								<div class="card-body">
+									<h5 class="">
+										<b>Nabla DevOps Tools</b>
+									</h5>
+									<p class="card-text">Development and SDLC tools on Ubuntu workstation</p>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<a class="dropdown-item" href="https://albandrieu.com:7000/ui/plugins" target="_blank"
+													>Plugins</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.62:80/jenkins/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-jenkins-simple.png"
+														width="100"
+													/>Jenkins</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.24:8081/nexus/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-nexus-simple.png"
+														width="100"
+													/>Nexus</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.61:80" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-apache-simple.png"
+														width="100"
+													/>Apache</a
+												>
+												<!--
+                    http://192.168.1.61/server-status
+                    http://192.168.1.61/server-info
+                    -->
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.61:7075" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-apache-simple.png"
+														width="100"
+													/>Apache Debug</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.61:5678/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-bower-simple.svg"
+														width="100"
+													/>Bower</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://192.168.1.61:10000/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-webmin-simple.png"
+														width="100"
+													/>Webmin</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.61:7075/download/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-apache-simple.png"
+														width="100"
+													/>Download</a
+												>
+											</div>
+										</div>
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">External&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://albandrieu.com/jenkins/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-jenkins-simple.png"
+														width="100"
+													/>Jenkins</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://nexus.albandrieu.com/nexus/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-nexus-simple.png"
+														width="100"
+													/>Nexus</a
+												>
+												<!--<div class="dropdown-divider"></div><a class="dropdown-item" href="http://albandrieu.com:80" target="_blank"><img class="img-fluid d-block mx-auto my-1" src="assets/logo-apache-simple.png" width="100">Apache</a>-->
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://albandrieu.com:5678/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-bower-simple.svg"
+														width="100"
+													/>Bower</a
+												>
+												<!--TO reduce attack <div class="dropdown-divider"></div><a class="dropdown-item" href="https://albandrieu.com:10000/" target="_blank"><img class="img-fluid d-block mx-auto my-1" src="assets/logo-webmin-simple.png" width="100">Webmin</a>-->
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<p class="card-text">Ubuntu</p>
+									</div>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:8686/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-jenkins-simple.png"
+														width="100"
+													/>Jenkins</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:8087" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-deptrack-simple.png"
+														width="100"
+													/>Dependency Track</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:8081/nexus/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-nexus-simple.png"
+														width="100"
+													/>Nexus</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:7075/index/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-apache-simple.png"
+														width="100"
+													/>Apache</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://172.17.0.57:10000/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-webmin-simple.png"
+														width="100"
+													/>Webmin</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:6532/harbor/projects" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-harbor-simple.png"
+														width="100"
+													/>Harbor</a
+												>
+											</div>
+										</div>
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">External&nbsp;</button>
+											<div class="dropdown-menu">
+												<!--
+                    <div class="dropdown-divider"></div><a class="dropdown-item" href="http://albandrieu.com/jenkins/" target="_blank"><img class="img-fluid d-block mx-auto my-1" src="assets/logo-jenkins-simple.png" width="100">Jenkins</a>
+                    <div class="dropdown-divider"></div><a class="dropdown-item" href="https://nexus.albandrieu.com/nexus/" target="_blank"><img class="img-fluid d-block mx-auto my-1" src="assets/logo-nexus-simple.png" width="100">Nexus</a>
+                    -->
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://albandrieu.com:80" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-apache-simple.png"
+														width="100"
+													/>Apache</a
+												>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/logo-monitoring-simple.png"
+									width="150"
+									alt="Monitoring Tools"
+								/>
+								<div class="card-body">
+									<h5 class="">
+										<b>Nabla Monitoring</b>
+									</h5>
+									<p class="card-text">System and application monitoring on Ubuntu</p>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a
+													class="dropdown-item"
+													href="https://192.168.1.61:10000/webalizer/view_log.cgi/%252Fvar%252Flog%252Fhttpd%252Dalbandrieu%252Ecom%252Daccess%252Elog/index.html"
+													target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-awstats-simple.png"
+														width="100"
+													/>Awstats</a
+												>
+											</div>
+										</div>
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">External&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://albandrieu.com/nabla/webalizer/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-awstats-simple.png"
+														width="100"
+													/>Awstats</a
+												>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<p class="card-text">LiveBox</p>
+									</div>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://192.168.1.1/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-livebox-simple.png"
+														width="100"
+													/>LiveBox</a
+												>
+											</div>
+										</div>
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">External&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://82.124.241.189:10007/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-livebox-simple.png"
+														width="100"
+													/>LiveBox</a
+												>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<p class="card-text">Ubuntu</p>
+									</div>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:9091/targets" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-prometheus-simple.png"
+														width="100"
+													/>Prometheus</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:9200/_cat/nodes?v&pretty" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-elasticsearch-simple.png"
+														width="100"
+													/>Elasticsearch</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:5001/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-elastichq-simple.png"
+														width="100"
+													/>Elasticsearch-HQ</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:7777/containers/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-cadvisor-simple.png"
+														width="100"
+													/>Cadvisor</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:5601/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-kibana-simple.png"
+														width="100"
+													/>Kibana</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="http://172.17.0.57:3000/login" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-grafana-simple.png"
+														width="100"
+													/>Grafana</a
+												>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4 p-3">
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/logo-gaming-simple.png"
+									width="140"
+									alt="Gaming Platform"
+								/>
+								<div class="card-body">
+									<h5 class=""><b>Nabla Gaming</b></h5>
+									<p class="card-text">Gaming platforms and launchers</p>
+									<div class="col-md-4">
+										<div class="btn-group-vertical btn-group-sm">
+											<button class="btn dropdown-toggle btn-light" data-toggle="dropdown">Internal&nbsp;</button>
+											<div class="dropdown-menu">
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://lutris.net/user/AlbanAndrieu/library/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-lutris-simple.png"
+														width="100"
+													/>Lutris</a
+												>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item" href="https://store.steampowered.com/" target="_blank"
+													><img
+														class="img-fluid d-block mx-auto my-1"
+														src="assets/logo-steam-simple.png"
+														width="100"
+													/>Steam</a
+												>
+											</div>
+										</div>
+										<!--
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
+                  <button type="button" class="btn btn-sm btn-outline-secondary"><a href="https://lutris.net/" target="_blank">Lutris</a></button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary"><a href="https://store.steampowered.com/" target="_blank">Steam</a></button>
+                </div>
+              </div>
+              -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="stack-page-section py-4" aria-labelledby="freenas-nabla-card-heading">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-4 p-3">
+							<h2 id="freenas-nabla-card-heading" class="visually-hidden">Nabla</h2>
+							<div class="card box-shadow">
+								<img
+									class="img-fluid d-block mx-auto py-2"
+									src="assets/nabla/nabla-4.svg"
+									width="140"
+									height="140"
+									alt="Nabla logo"
+								/>
+								<div class="card-body">
+									<h5 class=""><b>Nabla Application</b></h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="stack-page-section py-4" aria-labelledby="freenas-summary-heading">
+				<div class="container">
+					<div class="row align-items-center g-3">
+						<div class="col-md-2 text-center text-md-start">
+							<img
+								class="img-fluid d-block mx-auto my-2 my-md-4"
+								src="assets/big-icon-jenkins.png"
+								width="120"
+								height="120"
+								alt=""
+							/>
+						</div>
+						<div class="col-md-10">
+							<div class="stack-page-legacy-banner mb-3">
+								<h2 id="freenas-summary-heading" class="h2">Overall summary reports</h2>
+							</div>
+							<div class="card box-shadow border-secondary">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item bg-transparent">
+										<i class="fa mr-2 fa-clipboard" aria-hidden="true"></i>
+										ALL
+										<b
+											><a href="/truenas.html" target="_blank" rel="noopener noreferrer">[click]</a> ONLINE /
+											OFFLINE</b
+										>
+										nodes assigned to Jenkins instances
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="stack-page-section stack-page-section--alt py-4" aria-label="Legacy infrastructure shortcuts">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-4">
+											<h1>Build</h1>
+										</div>
+										<div class="col-md-4">
+											<img class="img-fluid d-block mx-auto py-2" src="assets/logo-jira-simple.png" width="50" />
+										</div>
+										<div class="col-md-4">
+											<img class="img-fluid d-block mx-auto py-2" src="assets/logo-bitbucket-simple.png" width="50" />
+										</div>
+										<div class="col-md-4"></div>
+										<div class="col-md-4">
+											<img
+												class="img-fluid d-block mx-auto py-2"
+												src="assets/logo-confluence-simple.png"
+												style=""
+												width="50"
+											/>
+										</div>
+										<div class="col-md-4">
+											<a href="https://start.atlassian.com/" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto py-2"
+													src="assets/logo-atlassian-simple.png"
+													style=""
+													width="50"
+											/></a>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-4">
+											<a href="https://sonarcloud.io/organizations/albanandrieu-github/projects" target="_blank"
+												><img class="img-fluid d-block mx-auto my-1" src="assets/logo-sonar.png" width="150"
+											/></a>
+										</div>
+										<div class="col-md-4">
+											<a href="https://nexus.albandrieu.com/nexus/index.html#welcome" target="_blank"
+												><img class="img-fluid d-block mx-auto py-2" src="assets/logo-nexus.png" width="100"
+											/></a>
+										</div>
+										<div class="col-md-4">
+											<a href="http://albandrieu.com/jenkins/" target="_blank"
+												><img class="img-fluid d-block mx-auto py-2" src="assets/logo-jenkins.png" width="70"
+											/></a>
+										</div>
+										<div class="col-md-4">
+											<img class="img-fluid d-block mx-auto py-1" src="assets/logo-aspera.png" width="120" />
+										</div>
+
+										<div class="col-md-4">
+											<a href="http://86.242.254.92:5678/" target="_blank"
+												><img class="img-fluid d-block mx-auto py-2" src="assets/logo-bower-simple.svg" width="70"
+											/></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-4">
+											<h1>Tools</h1>
+										</div>
+										<div class="col-md-4">
+											<a href="https://86.242.254.92:7000/ui/sessions/signin" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto py-2"
+													src="assets/logo-freenas-community-simple.png"
+													width="70"
+											/></a>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-4">
+											<a href="https://travis-ci.org/AlbanAndrieu/" target="_blank"
+												><img class="img-fluid d-block mx-auto my-1" src="assets/logo-travis-ci-simple.png" width="100"
+											/></a>
+										</div>
+										<div class="col-md-4">
+											<a href="https://github.com/AlbanAndrieu/" target="_blank"
+												><img class="img-fluid d-block mx-auto py-2" src="assets/logo-github-simple.png" width="50"
+											/></a>
+										</div>
+										<div class="col-md-4">
+											<a href="https://hub.docker.com/u/nabla" target="_blank"
+												><img
+													class="img-fluid d-block mx-auto py-2"
+													src="assets/logo-docker-hub-simple.png"
+													width="100"
+											/></a>
+										</div>
+										<!--https://my.noip.com>
+									<!--<div class="col-md-4"><a href="http://86.242.254.92:5678/" target="_blank"><img class="img-fluid d-block mx-auto py-2" src="assets/logo-bower-simple.svg" width="70"></a></div>-->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="stack-exchange-badge">
+					<a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer">
+						<img
+							src="https://stackexchange.com/users/flair/4652074.png"
+							width="208"
+							height="58"
+							alt="Stack Exchange profile for AlbanAndrieu"
+							loading="lazy"
+							decoding="async"
+						/>
+					</a>
+				</div>
+			</section>
+		</main>
+
+		<a href="https://www.pkts.ca:443/cgi-bin/corinthianenzyme.cgi?doc_id=2561" style="display: none">north-puny</a>
+
+		<script type="text/javascript" src="d3.v3.min.js"></script>
+		<script src="arf.js"></script>
+
+		<!-- Footer -->
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					href="https://www.linkedin.com/in/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="LinkedIn"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					href="https://calendly.com/alban-andrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Calendly"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					href="https://github.com/AlbanAndrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="GitHub"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					href="https://hub.docker.com/u/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Docker Hub"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Stack Exchange"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+			</div>
+
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+			</div>
+
+			<p class="text-md-center mt-3">
+				<a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<!-- End footer section -->
+
+		<script
+			src="https://uptime.betterstack.com/widgets/announcement.js"
+			data-id="150620"
+			async="async"
+			type="text/javascript"
+		></script>
+		<script
+			src="site-widgets.js"
+			defer
+			data-scroll-reveal=".contact-card,.social-card"
+			data-reveal-effect="opacity"
+			data-axeptio
+			data-print-pdf
+			data-coffee-fab
+		></script>
+	</body>
+</html>

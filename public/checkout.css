@@ -1,0 +1,305 @@
+/**
+ * Stripe checkout flow: checkout.html, success.html, cancel.html, payment.html.
+ * Pairs with body.site-content-page + main.checkout-page; colors from theme.css / landing-sections.
+ */
+
+/* Column layout: vertically center the card, pin full site footer to bottom */
+body.site-content-page:has(main.checkout-page) {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	margin: 0;
+}
+
+body.site-content-page:has(main.checkout-page) > .footer {
+	width: 100%;
+	margin-top: auto;
+	flex-shrink: 0;
+}
+
+/* Override site-content-page.css #main-content max-width so the card can center in the viewport */
+body.site-content-page:has(main.checkout-page) #main-content.checkout-page {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	max-width: none;
+	margin: 0;
+	padding: 1.5rem 1rem;
+	box-sizing: border-box;
+}
+
+/* payment.html — stacked cards + intro */
+body.site-content-page:has(main.checkout-page.payment-options)
+#main-content.checkout-page.payment-options {
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+main.checkout-page.payment-options .payment-options-intro {
+	width: 100%;
+	max-width: 420px;
+	text-align: center;
+	color: var(--text-secondary);
+	font-size: 0.9375rem;
+	line-height: 1.5;
+}
+
+main.checkout-page.payment-options .payment-options-intro h1 {
+	font-size: 1.35rem;
+	margin: 0 0 0.5rem;
+	color: var(--text-primary);
+}
+
+.checkout-page section {
+	background: var(--bg-card);
+	color: var(--text-primary);
+	border: 1px solid var(--border-color);
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 420px;
+	min-height: 200px;
+	border-radius: 12px;
+	justify-content: space-between;
+	box-shadow: 0 4px 20px var(--shadow-color);
+	box-sizing: border-box;
+}
+
+.checkout-page section.checkout-card {
+	padding: 1.5rem;
+	min-height: 240px;
+}
+
+.checkout-page section.checkout-result {
+	padding: 2rem 1.5rem;
+	text-align: center;
+	align-items: center;
+}
+
+.checkout-page section.checkout-result .checkout-title {
+	margin: 0 0 0.75rem;
+	font-size: 1.25rem;
+}
+
+.checkout-page section.checkout-result .checkout-message {
+	margin: 0 0 0.75rem;
+	padding: 0;
+	text-align: center;
+	color: var(--text-secondary);
+	line-height: 1.5;
+}
+
+.checkout-page section.checkout-result .checkout-message a {
+	color: var(--link-color);
+}
+
+.checkout-page section.checkout-result .checkout-message a:hover {
+	color: var(--link-hover);
+}
+
+.checkout-page section.checkout-result .checkout-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	justify-content: center;
+	margin: 1.5rem 0 0;
+	padding: 0;
+}
+
+.checkout-page section.checkout-result .checkout-actions .checkout-button {
+	min-width: 140px;
+	width: auto;
+}
+
+.checkout-result .result-icon {
+	font-size: 3rem;
+	margin-bottom: 0.5rem;
+	line-height: 1;
+}
+
+.checkout-result .result-icon.result-success {
+	color: var(--alert-success-text);
+}
+
+.checkout-result .result-icon.result-cancel {
+	color: var(--alert-warning-text);
+}
+
+.checkout-title {
+	font-size: 1.15rem;
+	margin: 0 0 0.25rem;
+	color: var(--text-primary);
+}
+
+.checkout-subtitle {
+	font-size: 0.875rem;
+	margin: 0;
+	color: var(--text-secondary);
+}
+
+.checkout-form {
+	margin: 1rem 0 0;
+}
+
+.checkout-footer {
+	margin: 1rem 0 0;
+	text-align: center;
+}
+
+.checkout-footer a {
+	color: var(--link-color);
+	text-decoration: none;
+}
+
+.checkout-footer a:hover {
+	color: var(--link-hover);
+	text-decoration: underline;
+}
+
+.checkout-page .product {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+/* Stripe Payment Link / Buy Button embed (e.g. checkout-tjm.html) */
+.checkout-page .checkout-stripe-buy {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 0.25rem 0 0;
+	box-sizing: border-box;
+}
+
+.checkout-page .checkout-stripe-buy stripe-buy-button {
+	display: block;
+	width: 100%;
+	max-width: min(100%, 400px);
+	margin-inline: auto;
+}
+
+/* QR (assets/stripe/tjm-stripe.png) on checkout pages */
+.checkout-page .checkout-qr {
+	margin: 1.25rem 0 0;
+	text-align: center;
+}
+
+.checkout-page .checkout-qr img {
+	display: block;
+	max-width: min(100%, 280px);
+	width: 100%;
+	height: auto;
+	margin-inline: auto;
+	border-radius: 8px;
+}
+
+.checkout-page .checkout-qr .checkout-qr-caption {
+	margin: 0.5rem 0 0;
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+	line-height: 1.4;
+}
+
+.checkout-page .description {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.25rem;
+}
+
+/* Primary actions: submit button or result links */
+.checkout-page .checkout-button {
+	height: 44px;
+	padding: 0 1rem;
+	border-radius: 8px;
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	font-family: inherit;
+	line-height: 1.2;
+	cursor: pointer;
+	border: 2px solid transparent;
+	background: var(--button-bg);
+	color: var(--button-text);
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease,
+		border-color 0.2s ease;
+	box-sizing: border-box;
+}
+
+.checkout-page .checkout-button:hover {
+	background: var(--button-hover);
+}
+
+.checkout-page .checkout-button:focus-visible {
+	outline: 2px solid var(--link-color);
+	outline-offset: 2px;
+}
+
+.checkout-page a.checkout-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+}
+
+.checkout-page .checkout-button-secondary {
+	background: transparent;
+	color: var(--primary-color);
+	border-color: var(--primary-color);
+}
+
+.checkout-page .checkout-button-secondary:hover {
+	background: var(--primary-color);
+	color: var(--button-text);
+	border-color: var(--primary-color);
+}
+
+.checkout-form .checkout-button,
+.checkout-page form button#checkout-button {
+	width: 100%;
+}
+
+.checkout-error {
+	margin: 0.75rem 0 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: 8px;
+	font-size: 0.875rem;
+	color: var(--alert-warning-text);
+	background: var(--alert-warning-bg);
+	border: 1px solid var(--alert-warning-border);
+}
+
+.checkout-fallback-note {
+	margin-top: 0.75rem;
+	font-size: 0.9rem;
+	opacity: 0.9;
+}
+
+.checkout-fallback-note .checkout-fallback-link {
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.checkout-fallback-note.checkout-fallback-emphasized {
+	opacity: 1;
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	border: 1px solid var(--bs-warning, #f59e0b);
+	background: color-mix(in srgb, var(--bs-warning, #f59e0b) 12%, transparent);
+}
+
+.checkout-session-ref {
+	color: var(--text-muted);
+	font-size: 0.8125rem;
+}
+
+.checkout-form button[aria-busy="true"] {
+	opacity: 0.85;
+	cursor: wait;
+}

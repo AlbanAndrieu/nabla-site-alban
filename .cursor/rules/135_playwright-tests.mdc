@@ -1,0 +1,18 @@
+# Playwright tests
+
+When changing HTML, CSS, or site structure in `public/`, ensure **Playwright tests pass**.
+
+## Running tests
+
+- From project root: `npm run test` (or `npx playwright test`). The config starts the static server on port 8001 and uses it as `baseURL`; override with `BASE_URL` if needed.
+- Tests live in `tests/` and target the site at the configured `baseURL`.
+
+## Before committing
+
+- Run the test suite and fix any failing tests.
+- Do not commit changes that break `tests/accessibility.spec.ts` or `tests/homepage.spec.ts` (and other specs in `tests/`).
+
+## When tests fail
+
+- Fix the **site content or markup** (e.g. single h1, heading hierarchy, alt text, ARIA, visible nav) rather than weakening assertions unless the assertion is wrong or out of scope (e.g. third-party widgets).
+- For third-party injected content (e.g. Google Translate, Turnstile), tests may be scoped to exclude such content; keep accessibility requirements for our own markup.

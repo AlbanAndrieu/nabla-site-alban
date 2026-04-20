@@ -1,0 +1,129 @@
+/**
+ * CV theme: accessibility & readability
+ * WCAG 2.1 AA contrast (4.5:1 normal text, 3:1 large text).
+ * Light mode (default) and dark mode via prefers-color-scheme.
+ */
+
+/* Light mode (default) */
+:root {
+	--cv-bg-page: #e5e6e8;
+	--cv-bg-container: #ffffff;
+	--cv-bg-card: #f2f3f4;
+	--cv-bg-highlight: #e3f2fd;
+	--cv-bg-warning: #fff8e1;
+	--cv-text: #1a1a1a;
+	--cv-text-secondary: #505050;
+	--cv-heading: #1a1a1a;
+	--cv-heading-accent: #0d47a1;
+	--cv-border: #b0b4b8;
+	--cv-border-light: #d8dadc;
+	--cv-link: #1565c0;
+	--cv-link-hover: #0d47a1;
+	--cv-btn-bg: #1565c0;
+	--cv-btn-bg-hover: #0d47a1;
+	--cv-btn-text: #ffffff;
+	--cv-shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode (system preference) */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--cv-bg-page: #121212;
+		--cv-bg-container: #1e1e1e;
+		--cv-bg-card: #2d2d2d;
+		--cv-bg-highlight: #1e3a5f;
+		--cv-bg-warning: #5d4e37;
+		--cv-text: #e8e8e8;
+		--cv-text-secondary: #b8b8b8;
+		--cv-heading: #e8e8e8;
+		--cv-heading-accent: #90caf9;
+		--cv-border: #505050;
+		--cv-border-light: #3a3a3a;
+		--cv-link: #90caf9;
+		--cv-link-hover: #bbdefb;
+		--cv-btn-bg: #1976d2;
+		--cv-btn-bg-hover: #42a5f5;
+		--cv-btn-text: #ffffff;
+		--cv-shadow: rgba(0, 0, 0, 0.3);
+	}
+}
+
+/* Align CV tokens with theme-toggle.js (manual light / dark / auto) */
+html[data-theme="light"] {
+	--cv-bg-page: #e5e6e8;
+	--cv-bg-container: #ffffff;
+	--cv-bg-card: #f2f3f4;
+	--cv-bg-highlight: #e3f2fd;
+	--cv-bg-warning: #fff8e1;
+	--cv-text: #1a1a1a;
+	--cv-text-secondary: #505050;
+	--cv-heading: #1a1a1a;
+	--cv-heading-accent: #0d47a1;
+	--cv-border: #b0b4b8;
+	--cv-border-light: #d8dadc;
+	--cv-link: #1565c0;
+	--cv-link-hover: #0d47a1;
+	--cv-btn-bg: #1565c0;
+	--cv-btn-bg-hover: #0d47a1;
+	--cv-btn-text: #ffffff;
+	--cv-shadow: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="dark"] {
+	--cv-bg-page: #121212;
+	--cv-bg-container: #1e1e1e;
+	--cv-bg-card: #2d2d2d;
+	--cv-bg-highlight: #1e3a5f;
+	--cv-bg-warning: #5d4e37;
+	--cv-text: #e8e8e8;
+	--cv-text-secondary: #b8b8b8;
+	--cv-heading: #e8e8e8;
+	--cv-heading-accent: #90caf9;
+	--cv-border: #505050;
+	--cv-border-light: #3a3a3a;
+	--cv-link: #90caf9;
+	--cv-link-hover: #bbdefb;
+	--cv-btn-bg: #1976d2;
+	--cv-btn-bg-hover: #42a5f5;
+	--cv-btn-text: #ffffff;
+	--cv-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Base readability (apply on body or .cv-container parent) */
+.cv-page-body {
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+		Arial, sans-serif;
+	line-height: 1.6;
+	color: var(--cv-text);
+	background-color: var(--cv-bg-page);
+}
+
+/* Focus visible for keyboard users (accessibility) */
+.cv-page-body a:focus-visible,
+.cv-page-body button:focus-visible {
+	outline: 2px solid var(--cv-heading-accent);
+	outline-offset: 2px;
+}
+
+.cv-page-body .back-link:focus-visible {
+	outline: 2px solid var(--cv-btn-text);
+	outline-offset: 2px;
+}
+
+/* Skip link / reduce motion (optional) */
+@media (prefers-reduced-motion: reduce) {
+	.cv-page-body * {
+		animation-duration: 0.01ms;
+		transition-duration: 0.01ms;
+	}
+}
+
+/* Jus Mundi external links: favicon-sized mark beside the label */
+.jusmundi-link-icon {
+	width: 1em;
+	height: 1em;
+	vertical-align: -0.15em;
+	margin-right: 0.35em;
+	object-fit: contain;
+}

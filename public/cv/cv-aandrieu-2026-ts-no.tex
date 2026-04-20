@@ -1,0 +1,154 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Twenty Seconds Resume/CV
+% LaTeX Template
+% Version 1.0 (14/7/16)
+%
+% Original author:
+% Carmine Spagnuolo (cspagnuolo@unisa.it) with major modifications by
+% Vel (vel@LaTeXTemplates.com) and Harsh (harsh.gadgil@gmail.com)
+%
+% License:
+% The MIT License (see included LICENSE file)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[letterpaper]{twentysecondcv} % a4paper for A4
+
+\renewcommand{\cvSidebarTechnicalSkills}{Tekniske ferdigheter}
+\renewcommand{\cvSidebarOverview}{Oversikt}
+\renewcommand{\cvskillshublabel}{\textbf{Programmering}}
+\renewcommand{\cvSidebarEducation}{Utdanning}
+
+\newcommand\skills{
+~
+  \cvSkillsBubblesWrap{%
+	\smartdiagram[bubble diagram]{
+        \textbf{SDLC}\\\textbf{DevOps},
+        \textbf{~~~~~~~~Sikkerhet~~~~~~~~~},
+        \textbf{~~~~~~Container~~~~~~}\\\textbf{~~(Docker/K8s)~~},
+        \textbf{~~~~~Automatisering~~~~~},
+        \textbf{~~~~~~KI~~~~~~}\\\textbf{\& data},
+        \textbf{~~~~Programmering~~~~}\\\textbf{\& Java, C++, Python, Shell}
+    }%
+  }
+}
+
+% Programming skill bars (format: {label / level}; one "/" per item separates label from level 0--6)
+\programming{{Python Shell Java C++ / 3}, { Sikkerhet overvåking / 5}, {Docker Kubernetes SDLC / 4}, {KI LLM RAG MLOps / 3}}
+
+% Education
+\education{
+\textbf{Diplôme d'Ingénieur, Informatikk} \\
+EFREI - École d'Ingénieurs Généralistes \\
+1999 - 2004 | Paris, Frankrike
+
+\textbf{Baccalauréat} (Realfag, Matematikk) \\
+1999 | Frankrike
+}
+
+%----------------------------------------------------------------------------------------
+%	 PERSONAL INFORMATION
+%----------------------------------------------------------------------------------------
+
+\cvname{Alban ANDRIEU}
+\cvjobtitle{Cloud DevSecOps-arkitekt}
+
+\cvlinkedin{/in/nabla}
+\cvgithub{AlbanAndrieu}
+\cvnumberphone{+33 6 95 43 53 XX}
+\cvsite{dr-alban.com}
+\cvmail{job@dr-alban.com}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\makeprofile % Print the sidebar
+
+%----------------------------------------------------------------------------------------
+%	 EXPERIENCE
+%----------------------------------------------------------------------------------------
+
+\section{Yrkeserfaring}
+
+\begin{twentytimeline}
+	\twentyitemtimeline{\faCloud}
+		{2022 -}
+		{Nå}
+		{Cloud-, integrasjonsarkitekt (DevSecOps)}
+		{\href{https://www.jusmundi.com}{Jus Mundi}}
+		{Paris, Frankrike}
+		{\begin{itemize}
+		\item \textbf{Fokus:} AI-transisjon og nettsidehosting for internasjonal rett \& voldgiftsplattform (jusmundi.com)
+		\item \textbf{Infrastruktursikkerhet:} Sårbarhetsskanning, hemmelighetshåndtering, tilgangskontroll
+		\item \textbf{Containerisering \& Kubernetes:} Docker-images, K8s-klustre for produksjon (nettverk, lagring, overvåking)
+		\item \textbf{SDLC:} Prosessstandardisering, kvalitetsmål, tverrteam-koordinering med Dev og Data Science
+		\item \textbf{Stack:} Mikrotjenester i Python, Go, Nuxt, PHP; JusMundi AI og optimalisert søk for internasjonal juridisk innhold
+		\item Forretningskontinuitet, høye sikkerhetsstandarder, støtte for AI-levering på tvers av Engineering og Data Science
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faUsers}
+		{2012 -}
+		{2022}
+		{Skyintegrasjonsarkitekt}
+		{\href{https://finastra.com}{Finastra} (tidl. Misys / Thomson Reuters)}
+		{Paris, Frankrike}
+		{\begin{itemize}
+		\item \textbf{Fokus:} Digital transformasjon og skymigrering — Treasury \& kapitalmarkeder (finastra.com)
+		\item Innføring av kontinuerlig integrasjon og automatisering
+		\item Jenkins-pipelines og Ansible; 60\,\% færre integrasjonsproblemer
+		\item Sikkerhet: SAST/DAST, Klocwork, Fuzzing, hemmelighetsdeteksjon, sårbarhetshåndtering
+		\item Samarbeid med utvikling, QA og drift for DevSecOps best practice
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faCode}
+		{2007 -}
+		{2012}
+		{Senior programvareingeniør}
+		{\href{https://finastra.com}{Finastra}}
+		{Paris, Frankrike}
+		{\begin{itemize}
+		\item \textbf{Fokus:} Lager- og regnskapsmoduler — Kondor+ Back-Office (K+TP)
+		\item 3-lags arkitektur: C++-forretningslogikk, Java J2EE, CORBA-mellomvare
+		\item Lagerstyring med sanntidsbeholdning; automatiske balanse- og utenforbalanseføringer (regulatorisk overholdelse)
+		\item Ytelsesoptimalisering for høyvolum transaksjonsbehandling
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faBriefcase}
+		{2005 -}
+		{2010}
+		{Softwareingeniør}
+		{Société Générale Corporate \& Investment Banking (via ESN)}
+		{Paris, Frankrike}
+		{\begin{itemize}
+		\item \textbf{Fokus:} Backoffice-informasjonssystemer (EOLE, GATE)
+		\item Utvikling og vedlikehold i C, PL/SQL, Java; Oracle 8i til 10g migrering; True64 til Sun Solaris migrering
+		\item Nivå 2-support, produksjonshendelser, kravanalyse med forretningsanalytikere
+		\end{itemize}}
+\end{twentytimeline}
+
+
+%----------------------------------------------------------------------------------------
+%	 LANGUAGES
+%----------------------------------------------------------------------------------------
+\section{Språk}
+
+\textbf{Fransk} — Morsmål | \textbf{Engelsk} — Profesjonell (TOEIC 750) | \textbf{Tysk} — Grunnleggende | \textbf{Norsk} — Grunnleggende
+
+%----------------------------------------------------------------------------------------
+%	 ADDITIONAL INFORMATION
+%----------------------------------------------------------------------------------------
+\section{Tilleggsinformasjon}
+
+Tilgjengelighet: Åpen for konsulentoppdrag og kontrakter. Arbeidstillatelse: Frankrike og EU. Fjernarbeid og distribuerte team. Omflytting åpen for diskusjon (f.eks. Frankfurt).
+
+%----------------------------------------------------------------------------------------
+%	 PROFESSIONAL SUMMARY
+%----------------------------------------------------------------------------------------
+
+
+\end{document}

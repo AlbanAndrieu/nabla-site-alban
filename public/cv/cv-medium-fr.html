@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Alban Andrieu - CV (Moyen) - Français</title>
+		<meta name="description" content="Alban Andrieu - Architecte Cloud, Intégration (DevSecOps) - CV détaillé" />
+		<meta name="keywords" content="DevSecOps, DevOps, Cloud, SDLC, Kubernetes, Docker, Jenkins, Alban Andrieu" />
+		<meta name="author" content="alban.andrieu@dr-alban.com" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="color-scheme" content="light dark" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:url" content="https://albandrieu.com/cv/" />
+		<meta property="og:title" content="Alban Andrieu - Architecte Cloud, Intégration (DevSecOps)" />
+		<meta
+			property="og:description"
+			content="Architecte Cloud et Intégration (DevSecOps) expérimenté, spécialisé SDLC, infrastructure cloud et développement logiciel"
+		/>
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary" />
+		<meta property="twitter:url" content="https://albandrieu.com/cv/" />
+		<meta property="twitter:title" content="Alban Andrieu - CV Ingénieur DevSecOps" />
+		<meta
+			property="twitter:description"
+			content="Architecte Cloud et Intégration (DevSecOps) expérimenté, spécialisé SDLC, infrastructure cloud et développement logiciel"
+		/>
+		<meta property="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="../assets/nabla/nabla-4.svg" />
+
+		<link rel="stylesheet" href="../wireframe.css" />
+		<link rel="stylesheet" href="cv-theme.css" />
+
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="../print.css" />
+
+		<style>
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+				line-height: 1.6;
+				color: var(--cv-text);
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: var(--cv-bg-page);
+			}
+			body.cv-page-body a {
+				color: var(--cv-link);
+			}
+			body.cv-page-body a:hover {
+				color: var(--cv-link-hover);
+			}
+			.cv-container {
+				background-color: var(--cv-bg-container);
+				padding: 40px;
+				box-shadow: 0 0 10px var(--cv-shadow);
+			}
+			h1 {
+				color: var(--cv-heading);
+				border-bottom: 3px solid var(--cv-heading-accent);
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+			}
+			h2 {
+				color: var(--cv-heading-accent);
+				margin-top: 30px;
+				margin-bottom: 15px;
+				font-size: 1.4em;
+				border-left: 4px solid var(--cv-heading-accent);
+				padding-left: 10px;
+			}
+			h3 {
+				color: var(--cv-heading);
+				font-size: 1.1em;
+				margin-top: 15px;
+				margin-bottom: 10px;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 35px;
+			}
+			.title {
+				font-size: 1.3em;
+				color: var(--cv-text-secondary);
+				margin-top: 5px;
+				font-weight: bold;
+			}
+			.contact {
+				margin-top: 15px;
+				font-size: 0.95em;
+			}
+			.section {
+				margin-bottom: 30px;
+			}
+			.job-entry {
+				margin-bottom: 25px;
+				padding-left: 15px;
+				border-left: 2px solid var(--cv-border-light);
+			}
+			.job-header {
+				margin-bottom: 10px;
+			}
+			.company {
+				font-weight: bold;
+				font-size: 1.05em;
+			}
+			.period {
+				color: var(--cv-text-secondary);
+				font-style: italic;
+			}
+			ul {
+				padding-left: 20px;
+			}
+			li {
+				margin-bottom: 8px;
+			}
+			.skills-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 15px;
+				margin-top: 15px;
+			}
+			.skill-category {
+				background-color: var(--cv-bg-card);
+				padding: 15px;
+				border-radius: 5px;
+			}
+			.skill-category h4 {
+				color: var(--cv-heading-accent);
+				margin-top: 0;
+				margin-bottom: 10px;
+				font-size: 1em;
+			}
+			.back-link {
+				display: inline-block;
+				margin-top: 25px;
+				padding: 10px 20px;
+				background-color: var(--cv-btn-bg);
+				color: var(--cv-btn-text);
+				text-decoration: none;
+				border-radius: 5px;
+			}
+			.back-link:hover {
+				background-color: var(--cv-btn-bg-hover);
+			}
+			.languages-two-col {
+				column-count: 2;
+				column-gap: 2em;
+			}
+		</style>
+
+		<!-- CV Markdown Export Script -->
+		<script src="../cv-markdown-export.js"></script>
+		<!-- Print Menu Script -->
+		<script src="../print-menu.js"></script>
+		<script src="../theme-toggle.js"></script>
+		<script src="../site-google-translate.js" defer></script>
+		<script src="../site-analytics.js"></script>
+	</head>
+	<body class="cv-page-body">
+		<a name="top"></a>
+		<!-- Combined Print/Export Menu Button (hidden when printing) -->
+		<div class="print-menu-container">
+			<button
+				class="print-menu-button"
+				onclick="togglePrintMenu(event)"
+				aria-label="Menu Imprimer / Exporter"
+				aria-haspopup="true"
+				aria-expanded="false"
+			>
+				<i class="fas fa-print"></i>
+				<span>Imprimer / Enregistrer en PDF</span>
+				<i class="fas fa-chevron-up dropdown-arrow"></i>
+			</button>
+			<div
+				id="print-menu-dropdown"
+				class="print-menu-dropdown"
+				role="menu"
+				aria-label="Options d'impression et d'export"
+			>
+				<button class="primary-option" onclick="handlePrintPDF()" role="menuitem">
+					<i class="fas fa-file-pdf"></i>
+					<span>Imprimer / Enregistrer en PDF</span>
+				</button>
+				<button class="secondary-option" onclick="handleExportMarkdown()" role="menuitem">
+					<i class="fas fa-file-code"></i>
+					<span>Télécharger en Markdown</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="cv-container">
+			<div class="header">
+				<h1>Alban ANDRIEU</h1>
+				<div class="title">Architecte Cloud DevSecOps</div>
+				<div class="contact">
+					<p>
+						📧 alban.andrieu@dr-alban.com | 📱 +33 6 95 43 53 XX | 🔗
+						<a href="https://linkedin.com/in/nabla/" target="_blank">LinkedIn</a>
+						| 🌐
+						<a href="https://dr-alban.com" target="_blank">dr-alban.com</a>
+					</p>
+					<p>📍 Basé à Paris, France</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Résumé professionnel</h2>
+				<p>
+					Architecte Cloud expérimenté avec plus de 20 ans en ingénierie logicielle et automatisation d'infrastructure.
+					Spécialisé en transformation digitale, intégration cloud, mise en œuvre de pipelines SDLC et déploiement
+					d'infrastructures sécurisées. Solide expérience en conteneurisation, orchestration Kubernetes, Nomad pour
+					services IA avec OpenAI, LLM personnalisés et pratiques DevSecOps sur plusieurs stacks technologiques.
+				</p>
+			</div>
+
+			<div class="section">
+				<h2>Expérience professionnelle</h2>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">
+							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"><img src="../assets/nabla/jusmundi-favicon.ico" alt="" width="16" height="16" class="jusmundi-link-icon" decoding="async" aria-hidden="true" />Jus Mundi</a>
+						</div>
+						<div class="period">Depuis mars 2022 - Paris, France</div>
+					</div>
+
+					<h3>Architecte Cloud</h3>
+					<ul>
+						<li>
+							Déploiement de l'IA en entreprise avec OpenAI, FastAPI MCP, LangFuse, n8n ou modèles LLM hébergés pour un
+							meilleur contrôle coût / qualité
+						</li>
+						<li>
+							Automatisation de la sécurité et de la conformité en environnements cloud. Conformité ISO 27001 / 42001,
+							SOC2, RGPD
+						</li>
+						<li>Pilotage d'initiatives infrastructure as code avec Ansible, Terraform et ArgoCD</li>
+						<li>
+							Optimisation des flux SDLC pour l'efficacité du déploiement et la sécurité, en collaboration avec les
+							développeurs et data scientists
+						</li>
+						<li>
+							Conception et maintenance de l'architecture des systèmes cloud, garantie de disponibilité, pas de perte de
+							données et haute confidentialité pour les avocats
+						</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Finastra (ex-Misys puis Thomson Reuters)</div>
+						<div class="period">2007-2022 - Paris, France</div>
+					</div>
+
+					<h3>Architecte d'intégration cloud (2017-2022)</h3>
+					<ul>
+						<li>Pilotage d'initiatives de transformation digitale vers l'infrastructure cloud</li>
+						<li>Mise en place de mesures de sécurité pour l'infrastructure de déploiement</li>
+						<li>Conteneurisation des applications avec Docker et déploiement orchestré avec Kubernetes</li>
+						<li>Unification de l'environnement SDLC sur plusieurs équipes</li>
+						<li>Définition des processus de livraison et mise en place d'indicateurs qualité</li>
+						<li>
+							Coordination inter-équipes pour le build, les tests, le packaging et l'automatisation de la livraison
+						</li>
+					</ul>
+
+					<h3>Ingénieur d'intégration cloud (2012-2017)</h3>
+					<ul>
+						<li>Introduction de l'intégration continue avec les pipelines Jenkins</li>
+						<li>Mise en œuvre de pratiques GitOps avec Ansible sur Unix, Windows, Solaris, AIX et macOS</li>
+						<li>Gestion d'applications multi-langages : C/C++, Objective-C, Java, JavaScript, Python</li>
+						<li>Automatisation des processus de build et déploiement</li>
+					</ul>
+
+					<h3>Ingénieur logiciel senior (2007-2012)</h3>
+					<ul>
+						<li>Développement des modules stock et comptabilité pour la suite Kondor+ Back-Office</li>
+						<li>Travail sur une architecture web 3 tiers avec services métier C++ et Java J2EE via CORBA</li>
+						<li>Mise en œuvre de la gestion des positions et de la gestion des stocks matériels</li>
+						<li>Création de la génération automatique des écritures comptables bilan et hors bilan</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Société Générale Corporate & Investment Banking (via ESN)</div>
+						<div class="period">2005-2010 - Paris, France</div>
+					</div>
+
+					<h3>Ingénieur logiciel</h3>
+					<ul>
+						<li>
+							Maintenance et évolution des systèmes d'information (EOLE et GATE) pour les opérations d'achat/vente en
+							Back Office
+						</li>
+						<li>Développement et évolution du code en C, PL/SQL et Java</li>
+						<li>Gestion de la migration Oracle (8i vers 10g) et migration OS (True 64 vers Sun Solaris)</li>
+						<li>Support niveau 2 et support production</li>
+						<li>Analyse des besoins fonctionnels</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Compétences techniques</h2>
+				<div class="skills-grid">
+					<div class="skill-category">
+						<h4>Cloud et conteneurisation</h4>
+						<ul>
+							<li>AWS, Azure, OVH</li>
+							<li>Docker, Kubernetes</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>SDLC et automatisation</h4>
+						<ul>
+							<li>Ansible, Terraform, GitOps</li>
+							<li>Contrôle de version Git</li>
+							<li>Jenkins, Gitlab</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Langages de programmation</h4>
+						<ul>
+							<li>Python, Shell</li>
+							<li>Java, C/C++</li>
+							<li>Perl, PL/SQL</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Systèmes d'exploitation</h4>
+						<ul>
+							<li>Linux</li>
+							<li>macOS, Solaris, AIX</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Méthodologies</h4>
+						<ul>
+							<li>Agile, Scrum</li>
+							<li>UML, Design Patterns</li>
+							<li>Pratiques DevSecOps</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Outils et plateformes</h4>
+						<ul>
+							<li>ELK Stack (Elasticsearch, Logstash, Kibana)</li>
+							<li>CORBA</li>
+							<li>Oracle Database</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Formation</h2>
+				<div class="job-entry">
+					<h3>Diplôme d'ingénieur en informatique</h3>
+					<p class="company">EFREI - École d'Ingénieurs Généralistes</p>
+					<p class="period">1999-2004 - Paris, France</p>
+					<ul>
+						<li>Programme d'échange universitaire à Londres (2002)</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<h3>Baccalauréat</h3>
+					<p class="period">1999</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Langues</h2>
+				<ul class="languages-two-col">
+					<li><strong>Français :</strong> Langue maternelle</li>
+					<li><strong>Anglais :</strong> Niveau architecte (TOEIC 750)</li>
+					<li><strong>Allemand :</strong> Notions de base</li>
+					<li><strong>Norvégien :</strong> Notions de base</li>
+				</ul>
+			</div>
+
+			<div class="section">
+				<h2>Centres d'intérêt</h2>
+				<p>Course à pied (semi-marathon), Ski (alpin)</p>
+			</div>
+
+			<a href="/cv" class="back-link">← Retour à l'index des CV</a>
+		</div>
+		<script src="../site-widgets.js" defer data-print-pdf data-coffee-fab></script>
+	</body>
+</html>

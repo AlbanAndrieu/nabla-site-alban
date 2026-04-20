@@ -1,0 +1,166 @@
+%\documentclass[11pt,a4paper,sans]{moderncv}
+\documentclass[11pt,a4paper]{moderncv}
+%\documentclass[11pt,a4paper,colorlinks,linkcolor=true]{moderncv}
+
+%\moderncvstyle[blue]{banking} % [blue]{banking} % casual banking fancy
+\moderncvstyle{banking}
+\moderncvhead{1}
+
+\moderncvcolor{blue}
+
+\renewcommand*{\namefont}{\fontsize{20}{20}\mdseries\upshape}
+\renewcommand*{\titlefont}{\fontsize{22}{20}\mdseries\upshape}
+
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8]{geometry}
+%\usepackage{tabularx}
+
+
+\firstname{Alban}
+\familyname{ANDRIEU}
+\title{DevSecOps}
+%\title{Senior software engineer}
+
+\address{Paris, France}
+\phone[mobile]{+33 6~95~43~53~53}
+\email{job@dr-alban.com}
+\homepage{dr-alban.com}
+\social[linkedin]  {nabla}
+%\social[github]{AlbanAndrieu}
+%\photo[100pt][0pt]{alban-andrieu-19-12-2017.png}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Professional Experience}
+
+\cventry{Since 2022}{Legal Tech AI Agent}{\href{https://www.jusmundi.com}{Jus Mundi}}{Paris}{}{}
+{
+\textit{https://jusmundi.com}
+\bigskip
+
+\textbf{Cloud Architect} \hfill 2022-2026
+	\begin{itemize}%
+		\item AI transition
+			\begin{itemize}%
+				\item Use of OpenAI with FastAPI MCP, LangFuse, n8n and in-house LLM for better quality and cost control
+				\item Automation of security and compliance processes in the cloud environment. Compliant ISO 27001 / 42001, SOC2, GDPR
+				\item Infrastructure as code with Ansible, Terraform and ArgoCD
+				\item Optimisation of SDLC workflows for efficient deployment and security, working closely with developers and data scientists
+				\item Design and maintenance of cloud systems architecture, ensuring high availability, scalability and high confidentiality for lawyers
+			\end{itemize}
+	\end{itemize}
+}
+\bigskip
+\cventry{2007-2022}{Financial software publisher}{Finastra (formerly Thomson Reuters)}{Paris}{}{}
+{
+\textit{https://finastra.com/solutions/treasury-capital-markets}
+\bigskip
+
+\textbf{Cloud Integration Engineer} \hfill 2017-2021
+\bigskip
+	\begin{itemize}%
+		\item Digital transformation towards the cloud
+			\begin{itemize}%
+				\item Securing the deployment infrastructure
+				\item Containerisation of applications with Docker and deployment with Kubernetes
+			\end{itemize}
+	\end{itemize}
+\bigskip
+	\begin{itemize}%
+	\item	Integration project to unify the SDLC environment
+		\begin{itemize}%
+				\item Definition of delivery processes, addition of quality metrics
+				\item Unification of infrastructure and SDLC system under Jenkins
+				\item Coordination with multiple teams for build, test, package and delivery
+		\end{itemize}
+	\end{itemize}
+\bigskip
+ \textbf{Build, Release and Integration Engineer}: \textit{Introduction of continuous integration} \hfill 2012-2017
+\bigskip
+			\begin{itemize}%
+				\item Continuous integration with Jenkins pipelines and automation
+                \item Introduction of GitOps via Ansible for Unix, Windows, Solaris, AIX, macOS
+				\item Management of multiple applications in C/C++/ObjC, Java, JavaScript, Python
+					\begin{itemize}
+						\item C/C++, ObjC
+						\item Java, JavaScript
+						\item Python, Perl, Shell
+					\end{itemize}
+				\end{itemize}
+\bigskip
+\textbf{Senior Software Engineer}: \textit{Development of stock and accounting module} \hfill 2007-2012
+
+\bigskip
+			\begin{itemize}
+				\item Integration within the K+TP team, Kondor+ Back-Office suite. 3-tier web architecture centred on C++ business services and Java J2EE via CORBA.
+				\item Position management, material stock management
+				\item Automatic generation of balance sheet and off-balance sheet accounting entries
+			\end{itemize}
+}
+
+\newpage
+
+\cventry{2005--2010}{Société Générale Corporate \& Investment Banking via ESN}{SGCIB}{Paris}{}{}
+{
+	\textit{https://wholesale.banking.societegenerale.com/en/}
+
+	\bigskip
+	\textbf{Software Engineer}
+\bigskip
+\begin{itemize}
+\item Maintenance and improvement of information systems (EOLE and GATE) for securities purchase/sale operations in a Back Office context
+	\begin{itemize}
+		\item Code evolution in C / PL/SQL / Java
+		\item Oracle migration (8i to 10g) and OS migration (True 64 to Sun Solaris)
+		\item Level 2 support and production support
+\end{itemize}
+\bigskip
+\item Functional requirements analysis
+	\begin{itemize}
+		\item Settlement and delivery processes (purchase/sale, lending/borrowing, SWIFT, RELIT, cross border)
+		\item Reconciliation with custodians (status updates, settlements, suspense)
+		\item Automatic generation of daily and monthly accounting entries
+	\end{itemize}
+\end{itemize}
+}
+\bigskip
+\cventry{2004}{Société Générale Corporate \& Investment Banking}{SGCIB}{Paris}{}{}
+{
+\bigskip
+\textbf{Engineering internship (development)}
+\bigskip
+\begin{itemize}
+	\item Maintenance and improvement of an information system for securities and cash holdings management in a back-office context
+\end{itemize}
+}
+\section{Education}
+\cventry{1999-2004}{Engineering degree in computer science, information systems option}{EFREI}{Paris}{}{}
+
+\cventry{2002}{Study abroad at Birkbeck College}{}{London, United Kingdom}{}{}
+
+\cventry{1999}{Baccalauréat (scientific track, physics-chemistry specialty)}{Lycée ITEC Boisfleury}{Grenoble}{}{}
+
+\section{Languages}
+%\cvitemwithcomment{French}{Native}{}
+\cvitemwithcomment{English}{Fluent}{International environment (London, Poland, India). TOEIC 750}
+\cvitemwithcomment{German, Norwegian}{Basic}{}
+
+\section{Technical Skills}
+\bigskip
+
+\cvitem{Methodologies}{Agile (Scrum, Kanban), UML, Design patterns}
+\cvitem{Languages}{\textbf{C/C++, ObjC, Java, JavaScript, PL/SQL, Python}, Perl, Shell}
+\cvitem{Tools}{\textbf{Docker, Kubernetes, Jenkins, ELK}, JIRA, Git}
+\cvitem{Environment}{Windows, Linux (RHEL, Ubuntu), macOS, Solaris, AIX, VMware}
+\cvitem{Cloud}{Rancher, AWS, Azure}
+%\cvitem{Certification}{ \href{https://scrum.org/user/156131}{\underline{PSM 1}},
+%	 \href{https://youracclaim.com/badges/fe9582c4-2f76-4f03-90fd-896041d397b2}{\underline{Safe Agilist}} }
+
+
+\section{Interests}
+\bigskip
+Running, Skiing, Information security
+
+\end{document}

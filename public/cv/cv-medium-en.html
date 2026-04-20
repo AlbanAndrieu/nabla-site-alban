@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Alban Andrieu - CV (Medium) - English</title>
+		<meta name="description" content="Alban Andrieu - Cloud, Integration Architect (DevSecOps) - Detailed CV" />
+		<meta name="keywords" content="DevSecOps, DevOps, Cloud, SDLC, Kubernetes, Docker, Jenkins, Alban Andrieu" />
+		<meta name="author" content="alban.andrieu@dr-alban.com" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="color-scheme" content="light dark" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:url" content="https://albandrieu.com/cv/" />
+		<meta property="og:title" content="Alban Andrieu - Cloud, Integration Architect (DevSecOps)" />
+		<meta
+			property="og:description"
+			content="Experienced Cloud, Integration Architect (DevSecOps), Engineer specializing in SDLC, Cloud Infrastructure, and Software Development"
+		/>
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary" />
+		<meta property="twitter:url" content="https://albandrieu.com/cv/" />
+		<meta property="twitter:title" content="Alban Andrieu - DevSecOps Engineer CV" />
+		<meta
+			property="twitter:description"
+			content="Experienced Cloud, Integration Architect (DevSecOps), Engineer specializing in SDLC, Cloud Infrastructure, and Software Development"
+		/>
+		<meta property="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="../assets/nabla/nabla-4.svg" />
+
+		<link rel="stylesheet" href="../wireframe.css" />
+		<link rel="stylesheet" href="cv-theme.css" />
+
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="../print.css" />
+
+		<style>
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+				line-height: 1.6;
+				color: var(--cv-text);
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: var(--cv-bg-page);
+			}
+			body.cv-page-body a {
+				color: var(--cv-link);
+			}
+			body.cv-page-body a:hover {
+				color: var(--cv-link-hover);
+			}
+			.cv-container {
+				background-color: var(--cv-bg-container);
+				padding: 40px;
+				box-shadow: 0 0 10px var(--cv-shadow);
+			}
+			h1 {
+				color: var(--cv-heading);
+				border-bottom: 3px solid var(--cv-heading-accent);
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+			}
+			h2 {
+				color: var(--cv-heading-accent);
+				margin-top: 30px;
+				margin-bottom: 15px;
+				font-size: 1.4em;
+				border-left: 4px solid var(--cv-heading-accent);
+				padding-left: 10px;
+			}
+			h3 {
+				color: var(--cv-heading);
+				font-size: 1.1em;
+				margin-top: 15px;
+				margin-bottom: 10px;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 35px;
+			}
+			.title {
+				font-size: 1.3em;
+				color: var(--cv-text-secondary);
+				margin-top: 5px;
+				font-weight: bold;
+			}
+			.contact {
+				margin-top: 15px;
+				font-size: 0.95em;
+			}
+			.section {
+				margin-bottom: 30px;
+			}
+			.job-entry {
+				margin-bottom: 25px;
+				padding-left: 15px;
+				border-left: 2px solid var(--cv-border-light);
+			}
+			.job-header {
+				margin-bottom: 10px;
+			}
+			.company {
+				font-weight: bold;
+				font-size: 1.05em;
+			}
+			.period {
+				color: var(--cv-text-secondary);
+				font-style: italic;
+			}
+			ul {
+				padding-left: 20px;
+			}
+			li {
+				margin-bottom: 8px;
+			}
+			.skills-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 15px;
+				margin-top: 15px;
+			}
+			.skill-category {
+				background-color: var(--cv-bg-card);
+				padding: 15px;
+				border-radius: 5px;
+			}
+			.skill-category h4 {
+				color: var(--cv-heading-accent);
+				margin-top: 0;
+				margin-bottom: 10px;
+				font-size: 1em;
+			}
+			.back-link {
+				display: inline-block;
+				margin-top: 25px;
+				padding: 10px 20px;
+				background-color: var(--cv-btn-bg);
+				color: var(--cv-btn-text);
+				text-decoration: none;
+				border-radius: 5px;
+			}
+			.back-link:hover {
+				background-color: var(--cv-btn-bg-hover);
+			}
+			.languages-two-col {
+				column-count: 2;
+				column-gap: 2em;
+			}
+		</style>
+
+		<!-- CV Markdown Export Script -->
+		<script src="../cv-markdown-export.js"></script>
+		<!-- Print Menu Script -->
+		<script src="../print-menu.js"></script>
+		<script src="../theme-toggle.js"></script>
+		<script src="../site-google-translate.js" defer></script>
+		<script src="../site-analytics.js"></script>
+	</head>
+	<body class="cv-page-body">
+		<a name="top"></a>
+		<!-- Combined Print/Export Menu Button (hidden when printing) -->
+		<div class="print-menu-container">
+			<button
+				class="print-menu-button"
+				onclick="togglePrintMenu(event)"
+				aria-label="Print or Export Menu"
+				aria-haspopup="true"
+				aria-expanded="false"
+			>
+				<i class="fas fa-print"></i>
+				<span>Print / Save as PDF</span>
+				<i class="fas fa-chevron-up dropdown-arrow"></i>
+			</button>
+			<div id="print-menu-dropdown" class="print-menu-dropdown" role="menu" aria-label="Print and Export Options">
+				<button class="primary-option" onclick="handlePrintPDF()" role="menuitem">
+					<i class="fas fa-file-pdf"></i>
+					<span>Print / Save as PDF</span>
+				</button>
+				<button class="secondary-option" onclick="handleExportMarkdown()" role="menuitem">
+					<i class="fas fa-file-code"></i>
+					<span>Download as Markdown</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="cv-container">
+			<div class="header">
+				<h1>Alban ANDRIEU</h1>
+				<div class="title">DevSecOps Cloud Architect</div>
+				<div class="contact">
+					<p>
+						📧 alban.andrieu@dr-alban.com | 📱 +33 6 95 43 53 XX | 🔗
+						<a href="https://linkedin.com/in/nabla/" target="_blank">LinkedIn</a>
+						| 🌐
+						<a href="https://dr-alban.com" target="_blank">dr-alban.com</a>
+					</p>
+					<p>📍 Based in Paris, France</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Professional Summary</h2>
+				<p>
+					Experienced Cloud Architect with 20+ years in software engineering and infrastructure automation. Specialized
+					in digital transformation, cloud integration, SDLC pipeline implementation, and secure infrastructure
+					deployment. Proven track record in containerization, Kubernetes orchestration, Nomad for AI services with
+					OpenAI, Customized LLM, and DevSecOps practices across multiple technology stacks.
+				</p>
+			</div>
+
+			<div class="section">
+				<h2>Professional Experience</h2>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">
+							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"><img src="../assets/nabla/jusmundi-favicon.ico" alt="" width="16" height="16" class="jusmundi-link-icon" decoding="async" aria-hidden="true" />Jus Mundi</a>
+						</div>
+						<div class="period">Since March 2022 - Paris, France</div>
+					</div>
+
+					<h3>Cloud Architect</h3>
+					<ul>
+						<li>
+							Setting up IA across Business, using OpenAI with tools like FastAPI MCP, LangFuse, n8n or Hosted custom
+							LLM Model for better cost / quality control
+						</li>
+						<li>
+							Automate security and compliance processes within cloud environments. Compliant ISP 27001 / 42001, SOC2,
+							RGPD
+						</li>
+						<li>Lead infrastructure as code initiatives using Ansible, Terraform and ArgoCD</li>
+						<li>
+							Optimize SDLC workflows for deployment efficiency and security working closely with Developpers and Data
+							Scientists
+						</li>
+						<li>
+							Design and maintain cloud systems architecture, ensure no downtime, no scrapping and high confidentiality
+							for Lawyers
+						</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Finastra ( Formerly Misys then Thomson Reuters)</div>
+						<div class="period">2007-2022 - Paris, France</div>
+					</div>
+
+					<h3>Cloud Integration Architect (2017-2022)</h3>
+					<ul>
+						<li>Led digital transformation initiatives towards cloud infrastructure</li>
+						<li>Implemented security measures for deployment infrastructure</li>
+						<li>Containerized applications using Docker and orchestrated deployment with Kubernetes</li>
+						<li>Unified SDLC environment across multiple teams</li>
+						<li>Defined delivery processes and implemented quality metrics</li>
+						<li>Coordinated cross-team efforts for build, test, package, and delivery automation</li>
+					</ul>
+
+					<h3>Cloud Integration Engineer (2012-2017)</h3>
+					<ul>
+						<li>Introduced continuous integration using Jenkins pipelines</li>
+						<li>Implemented GitOps practices with Ansible across Unix, Windows, Solaris, AIX, and OSX</li>
+						<li>Managed multi-language applications: C/C++, Objective-C, Java, JavaScript, Python</li>
+						<li>Automated build and deployment processes</li>
+					</ul>
+
+					<h3>Senior Software Engineer (2007-2012)</h3>
+					<ul>
+						<li>Developed stock and accounting modules for Kondor+ Back-Office suite</li>
+						<li>Worked with 3-tier web architecture using C++ business services and Java J2EE via CORBA</li>
+						<li>Implemented position management and material stock management</li>
+						<li>Created automatic generation of balance sheet accounting entries</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Société Générale Corporate & Investment Banking (via ESN)</div>
+						<div class="period">2005-2010 - Paris, France</div>
+					</div>
+
+					<h3>Software Engineer</h3>
+					<ul>
+						<li>
+							Maintained and improved information systems (EOLE and GATE) for purchase/sale operations in Back Office
+						</li>
+						<li>Developed and evolved code in C, PL/SQL, and Java</li>
+						<li>Managed Oracle migration (8i to 10g) and OS migration (True 64 to Sun Solaris)</li>
+						<li>Provided Level 2 support and production support</li>
+						<li>Analyzed functional requirements</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Technical Skills</h2>
+				<div class="skills-grid">
+					<div class="skill-category">
+						<h4>Cloud & Containerization</h4>
+						<ul>
+							<li>AWS, Azure, OVH</li>
+							<li>Docker, Kubernetes</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>SDLC & Automation</h4>
+						<ul>
+							<li>Ansible, Terraform, GitOps</li>
+							<li>Git version control</li>
+							<li>Jenkins, Gitlab</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Programming Languages</h4>
+						<ul>
+							<li>Python, Shell</li>
+							<li>Java, C/C++</li>
+							<li>Perl, PL/SQL</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Operating Systems</h4>
+						<ul>
+							<li>Linux</li>
+							<li>macOS, Solaris, AIX</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Methodologies</h4>
+						<ul>
+							<li>Agile, Scrum</li>
+							<li>UML, Design Patterns</li>
+							<li>DevSecOps practices</li>
+						</ul>
+					</div>
+
+					<div class="skill-category">
+						<h4>Tools & Platforms</h4>
+						<ul>
+							<li>ELK Stack (Elasticsearch, Logstash, Kibana)</li>
+							<li>CORBA</li>
+							<li>Oracle Database</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Education</h2>
+				<div class="job-entry">
+					<h3>Engineering Degree in Computer Science</h3>
+					<p class="company">EFREI - École d'Ingénieurs Généralistes</p>
+					<p class="period">1999-2004 - Paris, France</p>
+					<ul>
+						<li>University exchange program in London (2002)</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<h3>Baccalauréat (High School Diploma)</h3>
+					<p class="period">1999</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Languages</h2>
+				<ul class="languages-two-col">
+					<li><strong>French:</strong> Native speaker</li>
+					<li><strong>English:</strong> Work proficiency (TOEIC 750)</li>
+					<li><strong>German:</strong> Basic knowledge</li>
+					<li><strong>Norwegian:</strong> Basic knowledge</li>
+				</ul>
+			</div>
+
+			<div class="section">
+				<h2>Interests</h2>
+				<p>Running (half marathon), Skiing (alpine)</p>
+			</div>
+
+			<a href="/cv" class="back-link">← Back to CV Index</a>
+		</div>
+		<script src="../site-widgets.js" defer data-print-pdf data-coffee-fab></script>
+	</body>
+</html>

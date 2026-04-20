@@ -1,0 +1,674 @@
+/* Best Practices (ai.html, nabla.html) — scoped so hero/resource/footer do not affect other pages */
+body.page-nabla-best-practices {
+	--primary-color: #007bff;
+	--secondary-color: #6610f2;
+	--success-color: #28a745;
+	--info-color: #17a2b8;
+	--warning-color: #ffc107;
+	--danger-color: #dc3545;
+	--dark-color: #343a40;
+	--light-color: #f8f9fa;
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+		Arial, sans-serif;
+	line-height: 1.6;
+	color: var(--text-primary);
+}
+
+body.page-nabla-best-practices:not(.page-dark) {
+	background-color: var(--bg-primary);
+}
+
+body.page-nabla-best-practices .nabla-wip-callout {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+	text-align: left;
+	margin: 1rem 0 1.25rem;
+	padding: 0.85rem 1rem;
+	border-radius: 8px;
+	border: 1px dashed var(--accent-color, #f59e0b);
+	background: color-mix(
+		in srgb,
+		var(--accent-color, #f59e0b) 14%,
+		var(--bg-secondary, #f1f5f9)
+	);
+	font-size: 0.95rem;
+	line-height: 1.5;
+	color: var(--text-primary);
+}
+
+body.page-nabla-best-practices .nabla-wip-callout__icon {
+	color: var(--accent-color, #f59e0b);
+	margin-top: 0.12rem;
+	flex-shrink: 0;
+	font-size: 1.25rem;
+}
+
+body.page-nabla-best-practices .nabla-wip-callout strong {
+	display: block;
+	margin-bottom: 0.25rem;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	font-size: 0.7rem;
+	color: var(--accent-color, #f59e0b);
+}
+
+body.page-nabla-best-practices .nabla-contact-logo-wrap {
+	margin-top: 3rem;
+}
+
+body.page-nabla-best-practices .nabla-contact-logo {
+	width: 120px;
+	height: auto;
+	opacity: 0.6;
+}
+
+/* Homepage + nabla.html: flat blue→violet band, no grid animation (see landing-sections .hero-section default) */
+body.page-nabla-best-practices .hero-section,
+body.home-page.page-dark .hero-section {
+	text-align: center;
+	padding: 4rem 2rem;
+	min-height: 0;
+	display: block;
+	background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+	color: #fff;
+	position: relative;
+	overflow: hidden;
+}
+
+body.page-nabla-best-practices .hero-section::before,
+body.home-page.page-dark .hero-section::before {
+	display: none;
+}
+
+body.page-nabla-best-practices .hero-title,
+body.home-page.page-dark .hero-title {
+	font-size: 3rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+	animation: none;
+}
+
+body.page-nabla-best-practices .hero-subtitle,
+body.home-page.page-dark .hero-subtitle {
+	font-size: 1.5rem;
+	margin-bottom: 1rem;
+	opacity: 0.95;
+	animation: none;
+}
+
+body.page-nabla-best-practices .hero-description,
+body.home-page.page-dark .hero-description {
+	font-size: 1.1rem;
+	max-width: 800px;
+	margin: 0 auto 2rem;
+	line-height: 1.6;
+	opacity: 0.95;
+	animation: none;
+}
+
+body.page-nabla-best-practices .content-section {
+	padding: 4rem 2rem;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+body.page-nabla-best-practices .resource-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+	gap: 2rem;
+	margin-bottom: 3rem;
+}
+
+body.page-nabla-best-practices .resource-card {
+	background: var(--bg-card);
+	border-radius: 12px;
+	padding: 2rem;
+	box-shadow: 0 4px 12px var(--shadow-color);
+	transition:
+		transform 0.3s ease,
+		box-shadow 0.3s ease;
+	border: 1px solid var(--border-color);
+	border-left: 4px solid var(--primary-color);
+}
+
+body.page-nabla-best-practices .resource-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 24px var(--shadow-hover);
+}
+
+body.page-nabla-best-practices .resource-card h3 {
+	font-size: 1.5rem;
+	margin-bottom: 1rem;
+	color: var(--primary-color);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+body.page-nabla-best-practices .resource-card-icon {
+	font-size: 2rem;
+	color: var(--primary-color);
+}
+
+body.page-nabla-best-practices .resource-card p {
+	color: var(--text-secondary);
+	margin-bottom: 1rem;
+	line-height: 1.6;
+}
+
+body.page-nabla-best-practices .resource-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--link-color);
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.3s ease;
+}
+
+body.page-nabla-best-practices .resource-link:hover {
+	color: var(--link-hover);
+	text-decoration: underline;
+}
+
+body.page-nabla-best-practices .resource-link i {
+	font-size: 1rem;
+}
+
+/* OSS / product logos (ai.html: useful links & document pipeline) */
+body.page-nabla-best-practices .ai-oss-logo {
+	width: 2rem;
+	height: 2rem;
+	object-fit: contain;
+	flex-shrink: 0;
+}
+
+body.page-nabla-best-practices .ai-oss-logo--wide {
+	width: auto;
+	max-width: 6.5rem;
+	max-height: 2rem;
+}
+
+html[data-theme="dark"] body.page-nabla-best-practices .ai-oss-logo--invert {
+	filter: invert(1) brightness(1.12);
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline > li {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	padding: 1.25rem 1.5rem;
+	background: var(--bg-card);
+	border-radius: 12px;
+	border: 1px solid var(--border-color);
+	box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__body {
+	color: var(--text-secondary);
+	line-height: 1.65;
+	flex: 1;
+	min-width: 0;
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__body strong {
+	display: block;
+	margin-bottom: 0.35rem;
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__body strong a {
+	color: var(--primary-color);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__body strong a:hover {
+	text-decoration: underline;
+	color: var(--link-hover);
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__body a:not(strong a) {
+	color: var(--link-color);
+	font-weight: 600;
+}
+
+body.page-nabla-best-practices .ai-doc-pipeline__sep {
+	display: none;
+}
+
+body.page-nabla-best-practices .intro-section {
+	background: var(--bg-secondary);
+	border-radius: 12px;
+	padding: 2rem;
+	margin-bottom: 3rem;
+}
+
+body.page-nabla-best-practices .intro-section p {
+	font-size: 1.1rem;
+	line-height: 1.8;
+	color: var(--text-secondary);
+	margin-bottom: 1rem;
+}
+
+body.page-nabla-best-practices .intro-section p:last-child {
+	margin-bottom: 0;
+}
+
+body.page-nabla-best-practices .intro-section__heading {
+	color: var(--primary-color);
+	margin-bottom: 1rem;
+}
+
+body.page-nabla-best-practices .intro-section__list {
+	font-size: 1.1rem;
+	line-height: 1.8;
+	color: var(--text-secondary);
+}
+
+/* Beats print.css @media screen .print-button (later sheet, lower specificity) */
+body.page-nabla-best-practices .print-button {
+	position: fixed;
+	bottom: 5rem;
+	right: 2rem;
+	z-index: 999;
+	background: var(--site-fab-bg, #28a745);
+	color: var(--site-fab-fg, #fff);
+	border: var(--site-fab-border, none);
+	padding: 0.75rem 1.5rem;
+	border-radius: 25px;
+	cursor: pointer;
+	box-shadow: var(
+		--site-fab-shadow,
+		0 2px 10px var(--shadow-color, rgba(0, 0, 0, 0.1))
+	);
+	transition:
+		background 0.3s ease,
+		color 0.3s ease,
+		box-shadow 0.3s ease;
+	transform: none;
+	font-size: inherit;
+	font-weight: 600;
+}
+
+body.page-nabla-best-practices .print-button:hover {
+	background: var(--site-fab-hover-bg, #17a2b8);
+	color: var(--site-fab-hover-fg, var(--site-fab-fg, #fff));
+	transform: none;
+}
+
+@media (max-width: 575.98px) {
+	body.page-nabla-best-practices .print-button {
+		width: 2.75rem;
+		height: 2.75rem;
+		min-width: 2.75rem;
+		padding: 0;
+		border-radius: 50%;
+		font-size: 0;
+		bottom: 12px;
+		right: 12px;
+	}
+
+	body.page-nabla-best-practices .print-button__label {
+		display: none;
+	}
+
+	body.page-nabla-best-practices .print-button__icon {
+		margin-right: 0;
+		width: 22px;
+		height: 22px;
+	}
+}
+
+@media (max-width: 768px) {
+	body.page-nabla-best-practices .hero-title,
+	body.home-page.page-dark .hero-title {
+		font-size: 2rem;
+	}
+
+	body.page-nabla-best-practices .hero-subtitle,
+	body.home-page.page-dark .hero-subtitle {
+		font-size: 1.2rem;
+	}
+
+	body.page-nabla-best-practices .resource-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Platforms showcase (shared: ai.html, nabla.html) */
+.nabla-platforms-hero {
+	display: grid;
+	grid-template-columns: minmax(200px, 300px) 1fr;
+	gap: 2rem;
+	align-items: center;
+	margin-bottom: 2.5rem;
+	padding: 2rem 2rem 2rem 1.75rem;
+	border-radius: 16px;
+	background: linear-gradient(
+		145deg,
+		var(--bg-secondary) 0%,
+		var(--bg-card) 100%
+	);
+	border: 1px solid var(--border-color);
+	overflow: hidden;
+	position: relative;
+}
+
+.nabla-platforms-hero::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(
+			ellipse 90% 70% at 15% 35%,
+			rgba(0, 123, 255, 0.14),
+			transparent 55%
+		),
+		radial-gradient(
+			ellipse 70% 60% at 88% 75%,
+			rgba(102, 16, 242, 0.12),
+			transparent 50%
+		);
+	pointer-events: none;
+}
+
+.nabla-platforms-visual-wrap {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+}
+
+.nabla-platforms-visual-wrap .nabla-platforms-orbit {
+	position: absolute;
+	width: 280px;
+	height: 280px;
+	border: 1px dashed var(--border-color);
+	border-radius: 50%;
+	opacity: 0.45;
+	pointer-events: none;
+}
+
+.nabla-platforms-figure {
+	position: relative;
+	z-index: 2;
+	margin: 0;
+	padding: 1.25rem;
+	border-radius: 20px;
+	background: linear-gradient(
+		160deg,
+		var(--bg-card) 0%,
+		var(--bg-secondary) 100%
+	);
+	box-shadow:
+		0 4px 24px var(--shadow-color),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	border: 1px solid var(--border-color);
+}
+
+.nabla-platforms-figure img {
+	display: block;
+	width: min(200px, 100%);
+	height: auto;
+	transition: transform 0.4s ease;
+}
+
+.nabla-platforms-visual-wrap:hover .nabla-platforms-figure img {
+	transform: scale(1.06);
+}
+
+.nabla-platforms-caption {
+	position: relative;
+	z-index: 2;
+	font-size: 0.8rem;
+	color: var(--text-secondary);
+	text-align: center;
+	max-width: 14rem;
+	line-height: 1.45;
+	margin: 0;
+}
+
+.nabla-platforms-lede {
+	position: relative;
+	z-index: 1;
+}
+
+.nabla-platforms-lede h3 {
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: var(--text-primary);
+	margin-bottom: 0.75rem;
+}
+
+.nabla-platforms-lede p {
+	font-size: 1.05rem;
+	color: var(--text-secondary);
+	margin-bottom: 0;
+	line-height: 1.75;
+}
+
+.nabla-platforms-matrix {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+	gap: 1.25rem;
+}
+
+.nabla-platform-pillar {
+	--pillar-accent: var(--primary-color);
+	background: var(--bg-card);
+	border-radius: 14px;
+	padding: 1.25rem 1.35rem;
+	border: 1px solid var(--border-color);
+	box-shadow: 0 2px 12px var(--shadow-color);
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+	border-top: 3px solid var(--pillar-accent);
+}
+
+.nabla-platform-pillar:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 10px 28px var(--shadow-hover);
+}
+
+.nabla-platform-pillar h3 {
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 0 0 0.9rem;
+	color: var(--text-primary);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.nabla-platform-pillar h3 i {
+	color: var(--pillar-accent);
+	font-size: 1.1rem;
+}
+
+.nabla-tool-tags {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+}
+
+.nabla-tool-tags li {
+	font-size: 0.84rem;
+	padding: 0.38rem 0.72rem;
+	border-radius: 999px;
+	background: var(--bg-secondary);
+	color: var(--text-secondary);
+	border: 1px solid var(--border-color);
+	line-height: 1.3;
+}
+
+/* Homelab entry points (Cloudflare Tunnel); port in title only */
+.nabla-tool-tags li.nabla-tool-tag-li-link {
+	padding: 0;
+	border: none;
+	background: transparent;
+}
+
+.nabla-tool-tags .nabla-tool-tag-link {
+	display: inline-block;
+	font-size: inherit;
+	padding: 0.38rem 0.72rem;
+	border-radius: 999px;
+	background: var(--bg-secondary);
+	color: var(--text-secondary);
+	border: 1px solid var(--border-color);
+	line-height: 1.3;
+	text-decoration: none;
+	transition:
+		color 0.2s ease,
+		border-color 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.nabla-tool-tags .nabla-tool-tag-link:hover {
+	color: var(--pillar-accent, var(--primary-color));
+	border-color: var(--pillar-accent, var(--primary-color));
+}
+
+.nabla-tool-tags .nabla-tool-tag-link:focus-visible {
+	outline: 2px solid var(--pillar-accent, var(--primary-color));
+	outline-offset: 2px;
+}
+
+/* HTTPS links: padlock (Font Awesome 7 solid U+F023) */
+body.page-nabla-best-practices a.nabla-tool-tag-link[href^="https://"]::before,
+body.page-nabla-best-practices
+	.homelab-service-card
+	a:not(.btn)[href^="https://"]::before {
+	display: inline-block;
+	font-family: "Font Awesome 7 Free", sans-serif;
+	font-weight: 900;
+	font-style: normal;
+	content: "\f023";
+	margin-right: 0.32em;
+	font-size: 0.88em;
+	line-height: 1;
+	color: var(--success-color, #28a745);
+	-webkit-font-smoothing: antialiased;
+	vertical-align: -0.06em;
+}
+
+/* TrueNAS / homelab service cards (nabla.html) */
+.page-nabla-best-practices .nabla-homelab-services__lead {
+	max-width: 48rem;
+}
+
+/* Reachability dots for tool-tag links (nabla-service-status.js); homelab cards use site-content-page.css */
+.page-nabla-best-practices .nabla-tool-tags li.nabla-tool-tag-li-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	flex-wrap: wrap;
+	max-width: 100%;
+}
+
+@media (max-width: 768px) {
+	.nabla-platforms-hero {
+		grid-template-columns: 1fr;
+		padding: 1.75rem;
+		text-align: center;
+	}
+
+	.nabla-platforms-lede {
+		text-align: left;
+	}
+
+	.nabla-platforms-visual-wrap .nabla-platforms-orbit {
+		width: 240px;
+		height: 240px;
+	}
+}
+
+/* Category Sections */
+.category-section {
+	margin-bottom: 4rem;
+}
+
+.category-title {
+	font-size: 2rem;
+	font-weight: 700;
+	margin-bottom: 1.5rem;
+	color: var(--text-primary);
+	border-bottom: 3px solid var(--primary-color);
+	padding-bottom: 0.5rem;
+}
+
+/* DevSecOps toolchain map (SVG) */
+.tools-section-intro {
+	max-width: 42rem;
+	margin: 0 auto 1.75rem;
+	text-align: center;
+	color: var(--text-light);
+	line-height: 1.65;
+	font-size: 1.05rem;
+}
+
+.devsecops-map-wrap {
+	max-width: 1200px;
+	margin: 0 auto 2.5rem;
+	padding: 0 1rem;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.devsecops-map__heading {
+	font-size: 1.15rem;
+	font-weight: 700;
+	color: var(--text-dark);
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.devsecops-map-figure {
+	margin: 0;
+}
+
+.devsecops-map {
+	display: block;
+	width: 100%;
+	min-width: 720px;
+	max-width: 1160px;
+	height: auto;
+	margin: 0 auto;
+}
+
+.devsecops-map-caption {
+	text-align: center;
+	font-size: 0.875rem;
+	color: var(--text-light);
+	margin-top: 0.85rem;
+	max-width: 44rem;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 1.5;
+}
+
+.tools-grid-heading {
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: var(--text-dark);
+	text-align: center;
+	margin: 2.5rem 0 1.25rem;
+}

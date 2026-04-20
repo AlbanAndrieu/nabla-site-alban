@@ -1,0 +1,116 @@
+---
+description: Project description and best practices for improving static HTML content (UI/UX, accessibility, C.V., responsive)
+globs: public/**/*.html,public/**/*.css
+alwaysApply: true
+---
+
+# nabla-site-alban — Static HTML project
+
+Static HTML site promoting **Alban Andrieu** as a DevSecOps professional. Main content lives in `public/`: homepage `index.html`, contact, AI, security pages, and a **C.V. section** under `public/cv/`.
+
+<details>
+<summary><b>Project directory structure</b></summary>
+
+The repository layout looks like this (main items):
+
+```
+📁 .
+├── ⚙️ .cursor/rules/                  <- LLM instructions for Cursor IDE (*.mdc)
+├── 🧑‍💻 .github/
+│   ├── 📄 copilot-instructions.md, github-actions-best-practices.md, hugo-best-practices.md, vercel-deployment-instructions.md
+│   └── ⚡ workflows/                 <- Playwright, Mega-Linter, Docker build, PDF build, OpenCommit
+├── 💻 .vscode/                       <- Settings, MCP config, copilot-instructions
+├── 📁 api/                           <- API (e.g. honeypot)
+├── 📁 archetypes/                    <- Hugo archetypes (if used)
+├── 📁 content/                      <- Hugo content (if used)
+├── 📚 docs/                          <- Project documentation
+├── 📁 etc/                           <- Config / scripts
+├── 🐳 Dockerfile                     <- Docker image for the project
+├── 📁 layouts/                       <- Hugo layouts (if used)
+├── 👷‍♂️ Makefile                       <- Build, test, format, deploy commands
+├── 📦 package.json                   <- Node deps, scripts (start-python, test Playwright)
+├── 📄 playwright.config.ts           <- Playwright test config (baseURL, webServer)
+├── 📁 public/                        <- Static site root (served as web root)
+│   ├── 📄 index.html                 <- Homepage
+│   ├── 📄 contact.html, ai.html, security.html, ciso.html, login.html, ...
+│   ├── 📄 theme.css, landing-sections.css, wireframe.css, print.css
+│   ├── 📄 theme-toggle.js, google-translate-config.js
+│   ├── 📁 assets/                    <- Fonts, images, icons (e.g. fontawesome, nabla)
+│   ├── 📁 cv/                        <- C.V. landing page + multi-language HTML/PDF
+│   │   ├── 📄 index.html             <- C.V. landing
+│   │   ├── 📄 cv-small-{en,fr,de,no}.html, cv-medium-*, cv-large-*, cv-full-*
+│   │   ├── 📄 schema.json, cv-theme.css
+│   │   └── 📄 *.tex                  <- LaTeX CV source
+│   ├── 📁 checklist/                 <- Checklist app (Qwik/build)
+│   ├── 📁 policy/                    <- Policy pages (privacy, terms)
+│   └── 📁 reports/                   <- Report HTML (e.g. snort, pgbadger)
+├── 📁 scripts/                       <- Utility scripts
+├── 📁 static/                        <- Static assets for Hugo (if used)
+├── 🧪 tests/                         <- Playwright tests
+│   ├── accessibility.spec.ts         <- A11y (labels, alt, theme toggle, etc.)
+│   ├── homepage.spec.ts, navigation.spec.ts, responsive.spec.ts, 404.spec.ts
+│   └── README.md
+├── 📁 vendor/                        <- Composer/PHP deps (if used)
+├── 👩‍⚖️ LICENSE
+├── 📰 README.md
+├── 📄 vercel.json, wrangler.jsonc    <- Deployment (Vercel, Cloudflare)
+└── 📄 .gitignore, .pre-commit-config.yaml, commitlint.config.ts, ...
+```
+
+</details>
+
+## General best practices
+
+- Always look for existing code to iterate on instead of creating new code.
+- Do not drastically change patterns before trying to iterate on existing patterns.
+- Always prefer simple solutions.
+- Avoid duplication of code whenever possible; check for other areas of the codebase that might already have similar code and functionality.
+- Only make changes that are requested or that you are confident are well understood and related to the change being requested.
+- When fixing an issue or bug, do not introduce a new pattern or technology without first exhausting all options for the existing implementation. If you do introduce something new, remove the old implementation afterwards so we don't have duplicate logic.
+- Keep the codebase very clean and organized.
+- Avoid writing scripts in files when possible, especially if the script is likely only to be run once.
+- Avoid having files over 200–300 lines of code; refactor at that point.
+- Never overwrite `.env` without first asking and confirming.
+- Focus on the areas of code relevant to the task; do not touch code that is unrelated to the task.
+- Write thorough tests for all major functionality.
+- Avoid making major changes to the patterns and architecture of how a feature works after it has shown to work well, unless explicitly instructed.
+- Always think about what other methods and areas of code might be affected by code changes.
+
+## Best practices for improving static HTML content
+
+- **Iterate on existing code**: Prefer reusing and extending current patterns (e.g. `public/theme.css`, `public/landing-sections.css`, `theme-toggle.js`) instead of introducing new ones.
+- **Avoid duplication**: Reuse shared CSS, scripts, and structure; check for similar markup before adding new blocks.
+- **Keep it simple**: Prefer small, clear changes; avoid new frameworks or patterns unless necessary.
+- **Scope changes**: Only modify code relevant to the task; leave unrelated files and logic untouched.
+- **File size**: Refactor when files exceed ~200–300 lines; split into logical sections or shared includes where possible.
+- **Scripts**: Prefer external JS files over large inline scripts; avoid one-off scripts in HTML.
+- **Do not** overwrite `.env` or sensitive config without explicit confirmation.
+
+## C.V. section (`public/cv/`)
+
+- **Landing page**: `public/cv/index.html` is the C.V. landing page. It lists profile, contact, and links to all CV formats and languages. Main content must stay inside `<main id="main-content" role="main">`.
+- **Multi-language CVs**: HTML CVs exist in **EN**, **FR**, **DE**, **NO** with three detail levels: **Small** (`cv-small-{lang}.html`), **Medium** (`cv-medium-{lang}.html`), **Large/Full** (`cv-large-{lang}.html`, `cv-full-{lang}.html`). Keep language variants consistent in structure and section order.
+- **LaTeX / PDF**: Source in `.tex`; generated PDFs are linked from the landing page. Do not change LaTeX build flow unless asked.
+- **Structured data**: `public/cv/schema.json` (JSONResume-style) is linked for crawlers; keep it aligned with the HTML CV content when editing.
+- **Improving the C.V.**:
+  - Use clear heading hierarchy (one `h1` per page, then `h2`/`h3`); keep section titles consistent across languages.
+  - Use semantic sections (`<section>`, `<article>`) and list groups for experience, education, skills.
+  - Preserve `itemscope`/`itemtype` and `itemprop` where used for schema.org (Person, etc.).
+  - Ensure every language variant has the same sections and comparable content; fix broken or outdated links when touching the C.V.
+
+## UI, UX, accessibility and responsive design
+
+- **Professional and readable**: Clear typography, sufficient contrast (see `public/theme.css` and `public/cv/cv-theme.css`), consistent spacing and alignment. Prefer existing CSS variables (e.g. `--cv-*`, theme tokens) for colors and spacing.
+- **Accessibility (WCAG-oriented)**:
+  - **Images**: Every `img` must have an `alt` attribute (empty `alt=""` only for decorative images).
+  - **Forms**: Every `input` (text, email, password, search) and `textarea` in main content must have an accessible name: either a `<label for="id">` matching the input `id`, or `aria-label` / `aria-labelledby`.
+  - **Landmarks**: Use `<main id="main-content" role="main">` for primary content; keep skip links or main landmark where present.
+  - **Interactive elements**: Buttons and links must be keyboard-focusable; theme toggle and key controls should have clear `aria-label`/`title`.
+  - **Color**: Do not rely on color alone to convey information; ensure text/background contrast for readability.
+- **Responsive (mobile and desktop)**:
+  - Use mobile-first, fluid layouts; test at narrow (e.g. 320px) and wide viewports.
+  - Use existing responsive patterns (e.g. Bootstrap grid in `public/`, or flex/grid in custom CSS) rather than introducing new breakpoint systems.
+  - Touch targets and tap areas should be large enough on small screens; avoid hover-only critical actions.
+- **Theme**: The site supports light/dark via `theme-toggle.js` and `data-theme` on `<html>`. New UI should respect theme variables so it works in both modes.
+
+When changing HTML or CSS, preserve existing accessibility and responsive behavior; fix any new issues (e.g. missing labels, low contrast) as part of the change.

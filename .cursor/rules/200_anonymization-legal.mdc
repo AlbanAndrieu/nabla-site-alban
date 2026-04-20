@@ -1,0 +1,25 @@
+---
+description: Anonymization rules for legal and public content; never use real names for the child or parents.
+globs: public/**/*.html,public/**/*.md,.cursor/artifacts/**/*
+alwaysApply: true
+---
+# Anonymization (legal and public content)
+
+When creating or editing content in this project (especially legal documents, NRE pages, complaints, or public-facing text), **anonymize** as follows.
+
+## Child (daughter)
+
+- **Never use:** Éléonore, Céleste, ANDRIEU-BROOKE, or any full or partial real name.
+- **Always use instead:** *Bababou*, *my daughter*, or *the child* (use *the child* in legal-style documents).
+
+## Father
+
+- **Never use:** Alban, Eric, Alexandre, ANDRIEU.
+- **Use instead:** *the father* (prefer *Mr A* in legal documents), otherwise use Alban Andrieu.
+
+## Mother
+
+- **Never use:** Rachael, Elaine, BROOKE (first or family names).
+- **Use instead:** *the mother* or *Ms B* (prefer *Ms B* in legal documents).
+
+Apply these replacements in generated text, suggested copy, and when proposing edits to existing content. Existing pages that already use real names (e.g. for personal context) may be updated in a separate pass to comply with this rule where appropriate.

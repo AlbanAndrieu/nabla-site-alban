@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="no">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Alban Andrieu - CV (Kort) - Norsk</title>
+		<meta name="description" content="Alban Andrieu - Sky-, integrasjonsarkitekt (DevSecOps) - Kort CV" />
+		<meta name="keywords" content="DevSecOps, DevOps, Cloud, SDLC, Kubernetes, Docker, Jenkins, Alban Andrieu" />
+		<meta name="author" content="alban.andrieu@dr-alban.com" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="color-scheme" content="light dark" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:url" content="https://albandrieu.com/cv/" />
+		<meta property="og:title" content="Alban Andrieu - Sky-, integrasjonsarkitekt (DevSecOps)" />
+		<meta
+			property="og:description"
+			content="Erfaren sky-, integrasjonsarkitekt (DevSecOps), ingeniør med spesialisering innen SDLC, skyinfrastruktur og programvareutvikling"
+		/>
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary" />
+		<meta property="twitter:url" content="https://albandrieu.com/cv/" />
+		<meta property="twitter:title" content="Alban Andrieu - DevSecOps-ingeniør CV" />
+		<meta
+			property="twitter:description"
+			content="Erfaren sky-, integrasjonsarkitekt (DevSecOps), ingeniør med spesialisering innen SDLC, skyinfrastruktur og programvareutvikling"
+		/>
+		<meta property="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<!-- Favicon -->
+		<link rel="icon" href="../assets/nabla/nabla-4.svg" />
+
+		<link rel="stylesheet" href="../wireframe.css" />
+		<link rel="stylesheet" href="cv-theme.css" />
+
+		<!-- Print Styles for PDF Export -->
+		<link rel="stylesheet" href="../print.css" />
+
+		<style>
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+				line-height: 1.6;
+				color: var(--cv-text);
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: var(--cv-bg-page);
+			}
+			body.cv-page-body a {
+				color: var(--cv-link);
+			}
+			body.cv-page-body a:hover {
+				color: var(--cv-link-hover);
+			}
+			.cv-container {
+				background-color: var(--cv-bg-container);
+				padding: 30px;
+				box-shadow: 0 0 10px var(--cv-shadow);
+			}
+			h1 {
+				color: var(--cv-heading);
+				border-bottom: 3px solid var(--cv-heading-accent);
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+			}
+			h2 {
+				color: var(--cv-heading-accent);
+				margin-top: 25px;
+				margin-bottom: 15px;
+				font-size: 1.3em;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 30px;
+			}
+			.title {
+				font-size: 1.2em;
+				color: var(--cv-text-secondary);
+				margin-top: 5px;
+			}
+			.contact {
+				margin-top: 15px;
+				font-size: 0.95em;
+			}
+			.section {
+				margin-bottom: 25px;
+			}
+			h3 {
+				color: var(--cv-heading);
+				font-size: 1.05em;
+				margin-top: 12px;
+				margin-bottom: 8px;
+			}
+			.job-entry {
+				margin-bottom: 20px;
+				padding-left: 12px;
+				border-left: 2px solid var(--cv-border-light);
+			}
+			.job-header {
+				margin-bottom: 6px;
+			}
+			.company {
+				font-weight: bold;
+				font-size: 1em;
+			}
+			.period {
+				color: var(--cv-text-secondary);
+				font-style: italic;
+				font-size: 0.95em;
+			}
+			ul {
+				padding-left: 20px;
+			}
+			li {
+				margin-bottom: 5px;
+			}
+			.back-link {
+				display: inline-block;
+				margin-top: 20px;
+				padding: 10px 15px;
+				background-color: var(--cv-btn-bg);
+				color: var(--cv-btn-text);
+				text-decoration: none;
+				border-radius: 5px;
+			}
+			.back-link:hover {
+				background-color: var(--cv-btn-bg-hover);
+			}
+		</style>
+
+		<!-- CV Markdown Export Script -->
+		<script src="../cv-markdown-export.js"></script>
+		<!-- Print Menu Script -->
+		<script src="../print-menu.js"></script>
+		<script src="../theme-toggle.js"></script>
+		<script src="../site-google-translate.js" defer></script>
+		<script src="../site-analytics.js"></script>
+	</head>
+	<body class="cv-page-body">
+		<a name="top"></a>
+		<!-- Combined Print/Export Menu Button (hidden when printing) -->
+		<div class="print-menu-container">
+			<button
+				class="print-menu-button"
+				onclick="togglePrintMenu(event)"
+				aria-label="Skriv ut eller eksportmeny"
+				aria-haspopup="true"
+				aria-expanded="false"
+			>
+				<i class="fas fa-print"></i>
+				<span>Skriv ut / Lagre som PDF</span>
+				<i class="fas fa-chevron-up dropdown-arrow"></i>
+			</button>
+			<div id="print-menu-dropdown" class="print-menu-dropdown" role="menu" aria-label="Utskrifts- og eksportvalg">
+				<button class="primary-option" onclick="handlePrintPDF()" role="menuitem">
+					<i class="fas fa-file-pdf"></i>
+					<span>Skriv ut / Lagre som PDF</span>
+				</button>
+				<button class="secondary-option" onclick="handleExportMarkdown()" role="menuitem">
+					<i class="fas fa-file-code"></i>
+					<span>Last ned som Markdown</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="cv-container">
+			<div class="header">
+				<h1>Alban ANDRIEU</h1>
+				<div class="title">DevSecOps-fagperson</div>
+				<div class="contact">
+					<p>
+						📧 alban.andrieu@dr-alban.com | 📱 +33 6 95 43 53 XX | 🔗
+						<a href="https://linkedin.com/in/nabla/" target="_blank">LinkedIn</a>
+					</p>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Yrkeserfaring – Sammendrag</h2>
+				<p>
+					20 års erfaring som skyarkitekt med spesialisering innen skyintegrasjon, SDLC-automatisering og sikker
+					infrastrukturoppsett. Fokus på containerisering, Kubernetes, Nomad for AI (FastAPI med OpenAI) tjenester med
+					tilpassede LLM-er og DevSecOps-praksis.
+				</p>
+			</div>
+
+			<div class="section">
+				<h2>Yrkeserfaring</h2>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">
+							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"><img src="../assets/nabla/jusmundi-favicon.ico" alt="" width="16" height="16" class="jusmundi-link-icon" decoding="async" aria-hidden="true" />Jus Mundi</a>
+						</div>
+						<div class="period">Siden mars 2022 — Paris, Frankrike</div>
+					</div>
+					<h3>DevSecOps skyarkitekt</h3>
+					<ul>
+						<li>
+							Utrulling av AI i hele virksomheten med OpenAI, LangFuse, n8n eller hostede LLM-er for bedre
+							kostnads-/kvalitetskontroll
+						</li>
+						<li>Sikkerhets- og compliance-automatisering i multi-cloud (ISO 27001 / 42001, SOC2, GDPR)</li>
+						<li>Infrastructure as code med Ansible, Terraform, ArgoCD; Nomad og Kubernetes</li>
+						<li>Skyystemarkitektur, tilgjengelighet og høy konfidensialitet for advokater</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Finastra (tidligere Misys, deretter Thomson Reuters)</div>
+						<div class="period">2017-2022 — Paris, Frankrike</div>
+					</div>
+					<h3>Skyintegrasjonsarkitekt</h3>
+					<ul>
+						<li>Digital transformasjon mot skyinfrastruktur; sikkerhetstiltak for utrulling</li>
+						<li>Containerisering med Docker, orkestrert utrulling med Kubernetes</li>
+						<li>SDLC-samarbeid og Jenkins-pipelines; leveringsprosesser og kvalitetsmål</li>
+						<li>Tverrteam-koordinering for build, test, pakking og leveringsautomatisering</li>
+					</ul>
+				</div>
+
+				<div class="job-entry">
+					<div class="job-header">
+						<div class="company">Société Générale CIB (via ESN)</div>
+						<div class="period">2005-2010 — Paris, Frankrike</div>
+					</div>
+					<h3>Softwareingeniør</h3>
+					<ul>
+						<li>Vedlikehold og videreutvikling av backoffice-systemer (EOLE, GATE); C, PL/SQL, Java</li>
+						<li>Oracle-migrering, nivå 2- og produksjonssupport</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Kjerneferdigheter</h2>
+				<ul>
+					<li>Skyteknologier: Docker, Kubernetes, AWS, Azure, OVH</li>
+					<li>DevSecOps: Infrastruktursikkerhet, automatisering og overvåking</li>
+					<li>SDLC: GitLab, GitOps, Ansible, Terraform</li>
+					<li>Programmering: Python, Java, C++</li>
+					<li>Evne til å jobbe tett med CTO, CISO, utviklere og dataforskere</li>
+				</ul>
+			</div>
+
+			<div class="section">
+				<h2>Utdanning</h2>
+				<p><strong>Sivilingeniørgrad i informatikk</strong> — EFREI - École d'Ingénieurs (1999-2004)</p>
+			</div>
+
+			<div class="section">
+				<h2>Språk</h2>
+				<p>Fransk (morsmål), engelsk (profesjonelt)</p>
+			</div>
+
+			<a href="/cv" class="back-link">← Tilbake til CV-indeks</a>
+		</div>
+		<script src="../site-widgets.js" defer data-print-pdf data-coffee-fab></script>
+	</body>
+</html>

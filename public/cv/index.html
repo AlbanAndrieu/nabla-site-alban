@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<!--
+<meta http-equiv="REFRESH" content="0;url=/sample/index.html">
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- PAGE settings -->
+    <title>INDEX for albandrieu.com</title>
+    <meta name="description"
+      content="Alban Andrieu - Experienced DevSecOps Engineer, SDLC Expert, and Cloud Infrastructure Specialist. View my professional CV and credentials." />
+    <meta name="keywords"
+      content="Alban Andrieu, DevSecOps, SDLC, Cloud Infrastructure, Software Engineer, Resume, CV" />
+    <meta name="author" content="Alban Andrieu" />
+    <meta name="robots" content="index, follow" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content="https://albandrieu.com/cv/" />
+    <meta property="og:title" content="Alban Andrieu - DevSecOps Engineer CV" />
+    <meta property="og:description"
+      content="Experienced DevSecOps Engineer specializing in SDLC, Cloud Infrastructure, and Software Development" />
+    <meta property="og:image" content="https://albandrieu.com/assets/nabla/nabla-4.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://albandrieu.com/cv/" />
+    <meta property="twitter:title" content="Alban Andrieu - DevSecOps Engineer CV" />
+    <meta property="twitter:description"
+      content="Experienced DevSecOps Engineer specializing in SDLC, Cloud Infrastructure, and Software Development" />
+    <meta property="twitter:image" content="https://albandrieu.com/assets/nabla/nabla-4.svg" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/nabla/nabla-4.svg" />
+
+    <!-- Resume Schema Reference for Machine-Readable Tools -->
+    <link rel="alternate" type="application/json" href="./schema.json" title="Resume Schema (JSONResume format)" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+      type="text/css" />
+
+    <script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+      data-auto-replace-svg="nest"></script>
+    <script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+    <script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+    <!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+    <link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+    <link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+    <!-- Theme toggle script - load early to prevent flash -->
+
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../landing-sections.css" />
+
+    <link rel="stylesheet" href="../wireframe.css" />
+    <link rel="stylesheet" href="../arf.css" />
+    <link rel="stylesheet" href="../theme.css" />
+
+    <link rel="stylesheet" href="../style.css" />
+    <!-- Print Styles for PDF Export -->
+    <link rel="stylesheet" href="../print.css" />
+    <link rel="stylesheet" href="../site-content-page.css" />
+
+    <!-- Custom CV Styles (accessibility & light/dark) -->
+    <style>
+      /* Modern CV Styling with theme variables */
+      .cv-card {
+        border: none;
+        box-shadow: 0 4px 6px var(--cv-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cv-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px var(--cv-shadow);
+      }
+
+      .cv-card .card-header {
+        background: linear-gradient(135deg, var(--cv-btn-bg) 0%, var(--cv-heading-accent) 100%);
+        border: none;
+        padding: 2rem;
+      }
+
+      .cv-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .cv-section h3 {
+        color: var(--cv-heading-accent);
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .cv-section .border-bottom {
+        border-color: var(--cv-border-light) !important;
+      }
+
+      .list-group-item {
+        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .list-group-item:hover {
+        border-left-color: var(--cv-heading-accent);
+        background-color: var(--cv-bg-card);
+      }
+
+      .badge-pill {
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+      }
+
+      footer {
+        border-top: 1px solid var(--cv-border-light);
+      }
+
+      /* Accessibility: focus visible for keyboard users */
+      .cv-page-body a:focus-visible,
+      .cv-page-body button:focus-visible {
+        outline: 2px solid var(--cv-heading-accent);
+        outline-offset: 2px;
+      }
+
+      /* Print styles for CV */
+      @media print {
+        .cv-card {
+          box-shadow: none;
+          page-break-inside: avoid;
+        }
+
+        footer,
+        nav {
+          display: none;
+        }
+      }
+
+      /* CV landing: language buttons align on narrow viewports */
+      .cv-detail-row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .cv-detail-row {
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .cv-detail-row .cv-lang-btns {
+          justify-content: flex-end;
+        }
+      }
+
+      .cv-lang-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      @media (min-width: 768px) {
+        .cv-lang-btns {
+          width: auto;
+          max-width: 100%;
+          flex: 1 1 auto;
+        }
+      }
+
+      .cv-lang-btns .btn {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 0;
+        text-align: center;
+      }
+
+      @media (min-width: 576px) {
+        .cv-lang-btns .btn {
+          flex: 0 1 auto;
+          min-width: 7.5rem;
+        }
+      }
+
+      .cv-latex-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+      }
+
+      .cv-latex-style-row .cv-lang-btns .btn {
+        flex: 1 1 calc(50% - 0.25rem);
+      }
+
+      @media (min-width: 576px) {
+        .cv-latex-style-row .cv-lang-btns .btn {
+          flex: 0 1 auto;
+          min-width: 9rem;
+        }
+      }
+
+      .cv-lang-flag {
+        margin-right: 0.25rem;
+      }
+    </style>
+
+    		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
+		<script src="obs-connection.js"></script>
+
+
+
+    <!-- Cloudflare -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+      integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+      integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="alternate" hreflang="x-default" href="https://dr-alban.com/" />
+    <link rel="canonical" href="https://dr-alban.com/" />
+
+    <!-- JSON-LD Structured Data for SEO and Crawlers -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Alban Andrieu",
+        "jobTitle": "DevSecOps Engineer",
+        "description": "Experienced DevSecOps architect specializing in SDLC, Cloud Infrastructure, and Software Development",
+        "url": "https://dr-alban.com/cv/",
+        "email": "alban.andrieu@dr-alban.com",
+        "sameAs": [
+          "https://www.linkedin.com/in/nabla/",
+          "https://twitter.com/AlbanAndrieu",
+          "https://github.com/AlbanAndrieu"
+        ],
+        "knowsAbout": [
+          "DevSecOps",
+          "SDLC",
+          "SDLC",
+          "Cloud Infrastructure",
+          "Software Engineering",
+          "DevOps",
+          "Security",
+          "Automation"
+        ],
+        "hasCredential": [
+          {
+            "@type": "EducationalOccupationalCredential",
+            "name": "LinkedIn Professional Profile",
+            "url": "https://www.linkedin.com/in/nabla/"
+          }
+        ],
+        "subjectOf": [
+          {
+            "@type": "DigitalDocument",
+            "name": "LaTeX Resume French PDF",
+            "description": "Traditional formatted French resume in PDF format",
+            "url": "https://dr-alban.com/cv/cv-aandrieu-2026-fr.pdf",
+            "encodingFormat": "application/pdf"
+          },
+          {
+            "@type": "DigitalDocument",
+            "name": "LaTeX Resume English PDF",
+            "description": "Traditional formatted English resume in PDF format",
+            "url": "https://dr-alban.com/cv/cv-aandrieu-2026-en.pdf",
+            "encodingFormat": "application/pdf"
+          },
+          {
+            "@type": "DigitalDocument",
+            "name": "LinkedIn Resume English PDF",
+            "description": "LinkedIn profile exported as PDF",
+            "url": "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01-en.pdf",
+            "encodingFormat": "application/pdf"
+          },
+          {
+            "@type": "WebPage",
+            "name": "Online CV Landing Page",
+            "description": "Interactive web-based CV and professional profile",
+            "url": "https://dr-alban.com/cv"
+          },
+          {
+            "@type": "WebPage",
+            "name": "Online Small CV Page",
+            "description": "Interactive web-based small CV page",
+            "url": "https://dr-alban.com/cv/cv-small-en.html"
+          },
+          {
+            "@type": "WebPage",
+            "name": "Online Medium CV Page",
+            "description": "Interactive web-based medium CV page",
+            "url": "https://dr-alban.com/cv/cv-medium-en.html"
+          },
+          {
+            "@type": "WebPage",
+            "name": "Online Large CV Page",
+            "description": "Interactive web-based large CV page",
+            "url": "https://dr-alban.com/cv/cv-large-en.html"
+          }
+        ]
+      }
+      </script>
+		<script src="../theme-toggle.js"></script>
+		<script src="../site-google-translate.js" defer></script>
+		<script src="../site-analytics.js"></script>
+
+	</head>
+
+  <body class="site-content-page cv-page-body">
+
+  	<a name="top"></a>
+<!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W7XNV7K6" height="0" width="0"
+        style="display: none; visibility: hidden"></iframe></noscript>
+
+    <div class="collapse bg-dark" id="navbarHeader">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-7 py-4">
+            <h4>About</h4>
+            <p class="text-info">INDEX for albandrieu.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <main id="main-content" role="main">
+      <section class="py-3" itemscope itemtype="https://schema.org/Person">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <article class="cv-card card box-shadow">
+                <header class="card-header bg-primary text-white">
+                  <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                      <img class="img-fluid rounded-circle" src="../assets/nabla/nabla-4.svg"
+                        alt="Alban Andrieu Profile" width="120" itemprop="image" />
+                    </div>
+                    <div class="col-md-10">
+                      <h1 class="display-4 mb-2" itemprop="name">Alban Andrieu</h1>
+                      <h2 class="h4 mb-2" itemprop="jobTitle">DevSecOps Engineer</h2>
+                      <p class="lead mb-0" itemprop="description">
+                        Experienced professional specializing in SDLC, Cloud Infrastructure, and Software
+                        Development
+                      </p>
+                    </div>
+                  </div>
+                </header>
+
+                <div class="card-body">
+                  <section class="cv-section mb-4">
+                    <h3 class="h5 border-bottom pb-2 mb-3">
+                      <i class="fa fa-user text-primary mr-2"></i>Contact Information
+                    </h3>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <p>
+                          <strong>Email:</strong>
+                          <a href="mailto:alban.andrieu@dr-alban.com" itemprop="email">alban.andrieu@dr-alban.com</a>
+                        </p>
+                      </div>
+                      <div class="col-md-6">
+                        <p>
+                          <strong>Website:</strong>
+                          <a href="https://dr-alban.com" target="_blank" rel="noopener"
+                            itemprop="url">dr-alban.com</a>
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="cv-section mb-4">
+                    <h3 class="h5 border-bottom pb-2 mb-3">
+                      <i class="fa fa-file-text text-primary mr-2"></i>Professional Profiles & CV Documents
+                    </h3>
+
+                    <div class="list-group list-group-flush">
+                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <i class="fa fa-linkedin text-primary mr-2"></i>
+                          <strong>LinkedIn Profile</strong>
+                          <p class="mb-0 text-muted small">Complete professional history and network</p>
+                        </div>
+                        <div>
+                          <a href="https://www.linkedin.com/in/nabla/"
+                            class="btn btn-sm btn-outline-primary mr-2" target="_blank" rel="noopener"
+                            itemprop="sameAs">View Online</a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <i class="fa fa-linkedin text-primary mr-2"></i>
+                          <strong>Reactive Resume Profile</strong>
+                          <p class="mb-0 text-muted small">AI Optimized Resume</p>
+                        </div>
+                        <div>
+                          <a href="https://reactive-resume.albandrieu.com/"
+                            class="btn btn-sm btn-outline-primary mr-2" target="_blank" rel="noopener"
+                            itemprop="sameAs">View Online</a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+
+                      <div class="list-group-item d-flex flex-column">
+                        <div class="mb-2">
+                          <i class="fa fa-file-pdf-o text-primary mr-2"></i>
+                          <strong>(Choose by Detail Level) C.V:</strong>
+                          <p class="mb-0 text-muted small">Traditional formatted HTML resume — English (EN), French (FR), German (DE), Norwegian (NO)</p>
+                        </div>
+
+                        <div class="cv-detail-row">
+                          <div class="cv-detail-label">
+                            <i class="fa mr-2 fa-file-text text-success"></i> <strong>Small C.V</strong>
+                          </div>
+                          <div class="cv-lang-btns" role="group" aria-label="Small CV languages">
+                            <a href="/cv/cv-small-en.html" class="btn btn-sm btn-outline-primary" aria-label="View small CV in English"><span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>View page</a>
+                            <a href="/cv/cv-small-fr.html" class="btn btn-sm btn-outline-primary" aria-label="View small CV in French"><span class="cv-lang-flag" aria-hidden="true">🇫🇷</span>View page</a>
+                            <a href="/cv/cv-small-de.html" class="btn btn-sm btn-outline-primary" aria-label="View small CV in German"><span class="cv-lang-flag" aria-hidden="true">🇩🇪</span>View page</a>
+                            <a href="/cv/cv-small-no.html" class="btn btn-sm btn-outline-primary" aria-label="View small CV in Norwegian"><span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>View page</a>
+                          </div>
+                        </div>
+
+                        <div class="cv-detail-row">
+                          <div class="cv-detail-label">
+                            <i class="fa mr-2 fa-file-text text-primary"></i> <strong>Medium C.V</strong>
+                          </div>
+                          <div class="cv-lang-btns" role="group" aria-label="Medium CV languages">
+                            <a href="/cv/cv-medium-en.html" class="btn btn-sm btn-outline-primary" aria-label="View medium CV in English"><span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>View page</a>
+                            <a href="/cv/cv-medium-fr.html" class="btn btn-sm btn-outline-primary" aria-label="View medium CV in French"><span class="cv-lang-flag" aria-hidden="true">🇫🇷</span>View page</a>
+                            <a href="/cv/cv-medium-de.html" class="btn btn-sm btn-outline-primary" aria-label="View medium CV in German"><span class="cv-lang-flag" aria-hidden="true">🇩🇪</span>View page</a>
+                            <a href="/cv/cv-medium-no.html" class="btn btn-sm btn-outline-primary" aria-label="View medium CV in Norwegian"><span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>View page</a>
+                          </div>
+                        </div>
+
+                        <div class="cv-detail-row">
+                          <div class="cv-detail-label">
+                            <i class="fa mr-2 fa-file-text text-info"></i> <strong>Large C.V</strong>
+                          </div>
+                          <div class="cv-lang-btns" role="group" aria-label="Large CV languages">
+                            <a href="/cv/cv-large-en.html" class="btn btn-sm btn-outline-primary" aria-label="View large CV in English"><span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>View page</a>
+                            <a href="/cv/cv-large-fr.html" class="btn btn-sm btn-outline-primary" aria-label="View large CV in French"><span class="cv-lang-flag" aria-hidden="true">🇫🇷</span>View page</a>
+                            <a href="/cv/cv-large-de.html" class="btn btn-sm btn-outline-primary" aria-label="View large CV in German"><span class="cv-lang-flag" aria-hidden="true">🇩🇪</span>View page</a>
+                            <a href="/cv/cv-large-no.html" class="btn btn-sm btn-outline-primary" aria-label="View large CV in Norwegian"><span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>View page</a>
+                          </div>
+                        </div>
+
+                      </div>
+
+
+                      <div class="list-group-item d-flex flex-column flex-md-row align-items-md-start gap-3">
+                        <div class="flex-shrink-0">
+                          <i class="fa fa-file-pdf-o text-primary mr-2"></i>
+                          <strong>LaTeX CV</strong>
+                          <p class="mb-0 text-muted small">Traditional formatted LaTeX resume</p>
+                        </div>
+                        <div class="cv-latex-block flex-grow-1">
+                          <div class="cv-latex-style-row">
+                            <p class="mb-1 text-muted small">Basic style</p>
+                            <div class="cv-lang-btns" role="group" aria-label="LaTeX CV basic style by language">
+                              <a href="/cv/cv-full-en.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="en" aria-label="Download English LaTeX CV PDF, basic style">Download <span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>PDF</a>
+                              <a href="/cv/cv-full-fr.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="fr" aria-label="Télécharger le CV LaTeX PDF en français, style basique">Télécharger <span class="cv-lang-flag" aria-hidden="true">🇫🇷</span>PDF</a>
+                              <a href="/cv/cv-full-de.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="de" aria-label="LaTeX-Lebenslauf als PDF auf Deutsch herunterladen, Basis-Stil">Herunterladen <span class="cv-lang-flag" aria-hidden="true">🇩🇪</span>PDF</a>
+                              <a href="/cv/cv-full-no.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="no" aria-label="Last ned norsk LaTeX-CV som PDF, grunnleggende stil">Last ned <span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>PDF</a>
+                            </div>
+                          </div>
+                          <div class="cv-latex-style-row">
+                            <p class="mb-1 text-muted small">20 Seconds style</p>
+                            <div class="cv-lang-btns" role="group" aria-label="LaTeX CV 20 seconds style by language">
+                              <a href="/cv/cv-medium-en.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="en" aria-label="Download English LaTeX CV PDF, 20 seconds style">Download <span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>PDF</a>
+                              <a href="/cv/cv-medium-fr.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="fr" aria-label="Télécharger le CV LaTeX PDF en français, style 20 secondes">Télécharger <span class="cv-lang-flag" aria-hidden="true">🇫🇷</span>PDF</a>
+                              <a href="/cv/cv-medium-de.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="de" aria-label="LaTeX-Lebenslauf als PDF auf Deutsch herunterladen, 20-Sekunden-Stil">Herunterladen <span class="cv-lang-flag" aria-hidden="true">🇩🇪</span>PDF</a>
+                              <a href="/cv/cv-medium-no.html" class="btn btn-sm btn-primary"
+                                target="_blank" download lang="no" aria-label="Last ned norsk LaTeX-CV som PDF, 20 sekunder-stil">Last ned <span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>PDF</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </section>
+
+                  <section class="cv-section mb-4">
+                    <h3 class="h5 border-bottom pb-2 mb-3">
+                      <i class="fa fa-code text-primary mr-2"></i>Old C.V
+                    </h3>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <i class="fa fa-linkedin text-danger mr-2"></i>
+                        <strong>LinkedIn Profile</strong>
+                        <p class="mb-0 text-muted small">Complete professional history and network</p>
+                      </div>
+                      <div>
+                        <a href="./linkedin/cv-aandrieu-linkedin-2026-01-01-en.pdf"
+                          class="btn btn-sm btn-primary" target="_blank" download aria-label="Download LinkedIn profile PDF in English">Download <span class="cv-lang-flag" aria-hidden="true">🇬🇧</span>PDF</a>
+                      </div>
+                      <div>
+                        <i class="fa fa-file-pdf-o text-danger mr-2"></i>
+                        <strong>FlowCV Profile</strong>
+                        <p class="mb-0 text-muted small">Interactive modern CV format</p>
+                      </div>
+                      <div>
+                        <a href="https://flowcv.com/resume/cojup4q8oq92/"
+                          class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">View
+                          Online</a>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-4">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading"><i class="fa fa-info-circle mr-2"></i>About This CV</h4>
+                <p class="mb-0">
+                  This page is optimized for search engines and web crawlers with structured data markup.
+                  For the best viewing experience and detailed information, please visit the LinkedIn profile
+                  or download the PDF versions above.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/nabla" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://calendly.com/alban-andrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Calendly"><i class="fa fa-calendar-plus"></i></a>
+        <a href="https://github.com/AlbanAndrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://hub.docker.com/u/nabla" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Docker Hub"><i class="fab fa-docker"></i></a>
+        <a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Stack Exchange"><i class="fab fa-stack-exchange"></i></a>
+      </div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+			</div>
+      <p class="text-md-center mt-3">
+        <a href="mailto:job@dr-alban.com" class="btn btn-sm btn-outline-secondary"><i class="fas fa-envelope" aria-hidden="true"></i> Email</a>
+        <a href="/" class="btn btn-sm btn-outline-secondary ms-2">Return to home</a>
+        <a href="#top" class="btn btn-sm btn-outline-secondary ms-2" aria-label="Back to top of page">Back to top</a>
+      </p>
+      <p class="footer-copyright"></p>
+    </footer>
+    <!-- End footer section -->
+
+
+    <div style="display: none;"><a href="https://www.pkts.ca:443/cgi-bin/corinthianenzyme.cgi?doc_id=2561">north-puny</a></div>
+
+    <script src="../arf.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"></script>
+		<script src="../site-widgets.js" defer data-scroll-reveal=".service-card,.skill-category,.tool-item" data-reveal-effect="animation" data-reveal-animation="fadeInUp 0.6s ease forwards" data-axeptio data-print-pdf data-coffee-fab></script>
+
+	</body>
+</html>

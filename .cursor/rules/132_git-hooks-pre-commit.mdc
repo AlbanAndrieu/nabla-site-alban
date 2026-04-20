@@ -1,0 +1,64 @@
+---
+description: Pre-commit hooks configuration and usage guide
+globs: *pre-commit*
+alwaysApply: false
+---
+
+# GitHooks & Pre-Commit
+
+This project makes use of `pre-commit` for quality assurance. If pre-commit changes any files, it is okay to re-add and re-commit. If there are any errors, you should fix them before doing so.
+
+## Useful Commands
+
+```bash
+# Test hooks without committing
+pre-commit run --all-files
+
+# Biome only (lint/format/safe fixes — same as CI pre-commit hook)
+pre-commit run biome-check --all-files
+
+# Prettier only (YAML, HTML, SCSS per .pre-commit-config.yaml)
+pre-commit run prettier --all-files
+
+# Biome + Prettier together (typical pass before commit for web/JS stacks)
+pre-commit run biome-check prettier --all-files
+
+# Commit without running a hook
+SKIP=<hook-id> git commit
+```
+
+## Biome (`biome-check`)
+
+When fixing or checking JavaScript/TypeScript/CSS for this repo, **run Biome the same way pre-commit does** so results match CI:
+
+```bash
+pre-commit run biome-check --all-files
+```
+
+If it fails, **fix the reported issues** (or adjust `biome.json` when a rule is intentionally relaxed for a path) and re-run until the hook exits successfully. Do not only run `npx biome` or a different Biome version unless you are debugging; the hook pins `@biomejs/biome` via `.pre-commit-config.yaml`.
+
+When checking formatting broadly, **run Biome and Prettier via pre-commit** so both match CI:
+
+```bash
+pre-commit run biome-check prettier --all-files
+```
+
+## Prettier (`prettier`)
+
+Pre-commit runs Prettier on **YAML, HTML, and SCSS** (`types_or` in `.pre-commit-config.yaml`), with excludes for large or generated trees. **Invoke it the same way CI does:**
+
+```bash
+pre-commit run prettier --all-files
+```
+
+If it fails or rewrites files, **fix or accept the diff**, re-stage, and re-run until the hook passes. Prefer this over ad-hoc `npx prettier` so the Prettier version matches the hook’s `additional_dependencies`.
+
+## Hook Categories
+
+The pre-commit configuration includes several categories of hooks:
+
+- Security Tools
+- Code Quality Tools
+- Filesystem tools
+- Git quality
+- Tests

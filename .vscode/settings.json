@@ -1,0 +1,59 @@
+{
+	"files.associations": {
+		"wrangler.json": "jsonc"
+	},
+	"latex-workshop.latex.tools": [
+		{
+			"name": "latexmk-xelatex",
+			"command": "latexmk",
+			"args": [
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"-xelatex",
+				"-outdir=%OUTDIR%",
+				"%DOC%"
+			],
+			"env": {}
+		},
+		{
+			"name": "xelatex",
+			"command": "xelatex",
+			"args": [
+				"-shell-escape",
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"%DOC%"
+			],
+			"env": {}
+		},
+		{
+			"name": "pdflatex",
+			"command": "pdflatex",
+			"args": [
+				"-shell-escape",
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"%DOC%"
+			],
+			"env": {}
+		}
+	],
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "latexmk (xelatex)",
+			"tools": ["latexmk-xelatex"]
+		},
+		{
+			"name": "xelatex",
+			"tools": ["xelatex"]
+		},
+		{
+			"name": "pdflatex",
+			"tools": ["pdflatex"]
+		}
+	],
+	"latex-workshop.latex.recipe.default": "latexmk (xelatex)"
+}

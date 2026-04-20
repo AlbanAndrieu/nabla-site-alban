@@ -1,0 +1,149 @@
+%\documentclass[11pt,a4paper,sans]{moderncv}
+\documentclass[11pt,a4paper]{moderncv}
+%\documentclass[11pt,a4paper,colorlinks,linkcolor=true]{moderncv}
+
+%\moderncvstyle[blue]{banking} % [blue]{banking} % casual banking fancy
+\moderncvstyle{banking}
+\moderncvhead{1}
+
+\moderncvcolor{blue}
+
+\renewcommand*{\namefont}{\fontsize{20}{20}\mdseries\upshape}
+\renewcommand*{\titlefont}{\fontsize{22}{20}\mdseries\upshape}
+
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8]{geometry}
+%\usepackage{tabularx}
+
+
+\firstname{Alban}
+\familyname{ANDRIEU}
+\title{DevSecOps}
+%\title{Senior software engineer}
+
+\address{Located in Paris area}{}{France}
+\phone[mobile]{+33 6~95~43~53~XX}
+\email{job@dr-alban.com}
+\homepage{dr-alban.com}
+\social[linkedin]  {nabla}
+%\social[github]{AlbanAndrieu}
+%\photo[100pt][0pt]{alban-andrieu-19-12-2017.png}
+
+\begin{document}
+
+\makecvtitle
+
+\section{Expérience professionnelle}
+
+
+\cventry{Depuis 2007}{Éditeur de logiciel financier}{Finastra (Ex Thomson Reuters)}{Paris}{}{}
+{
+\textit(https://finastra.com/solutions/treasury-capital-markets)
+\bigskip
+
+\textbf{Ingénieur intégration Cloud} \hfill 2017-2021
+\bigskip
+	\begin{itemize}%
+		\item Transformation digitale vers le cloud
+			\begin{itemize}%
+				\item Sécurisation de l'infrastructure de déploiement
+				\item Containérisation de l'application sous Docker et réaliser le déploiement sous Kubernetes
+			\end{itemize}
+	\end{itemize}
+\bigskip
+	\begin{itemize}%
+	\item	Projet d’intégration pour unifier l'environnement de SDLC
+		\begin{itemize}%
+				\item Définition des processus livraison, ajout de métrique de qualité
+				\item Unification de l'infrastructure et du système de SDLC sous Jenkins
+				\item Coordination avec plusieurs équipes pour effectuer builder, tester, packager  et livrer
+		\end{itemize}
+	\end{itemize}
+\bigskip
+ \textbf{Build, Release et Intégration Ingénieur} : \textit{Introduction de l'intégration continue} \hfill 2012-2017
+\bigskip
+			\begin{itemize}%
+				\item Intégration continue avec Jenkins pipeline et automatisation
+                \item Introduction la notion de GitOps via Ansible pour Unix, Windows, Solaris, AIX. OSX
+				\item Gestion de multiple applications, en C/C++/ObjC, Java, Javascript. Python
+					\begin{itemize}
+						\item C/C++, ObjC
+						\item Java, Javascript
+						\item Python, perl, Shell
+					\end{itemize}
+				\end{itemize}
+\bigskip
+\textbf{Ingénieur logiciel senior} : \textit{Développement du module stock et comptabilité} \hfill 2007-2012
+
+\bigskip
+			\begin{itemize}
+				\item Intégration au sein de l’équipe K+TP, progiciel de Back-Office de la suite Kondor+. Architecture web 3 niveaux centrée autour de services métiers C++ et interfacés par du Java J2EE via Corba.
+				\item Gestion de position, stocks matière et gestion
+				\item Génération automatique des écritures comptables bilan/hors-bilan
+			\end{itemize}
+}
+
+\newpage
+
+\cventry{2005--2010}{Société Générale Banque et Investissement via ESN}{SGCIB}{Paris}{}{}
+{
+	\textit(https://wholesale.banking.societegenerale.com/fr/)
+
+	\bigskip
+	\textbf{Ingénieur d'étude}
+\bigskip
+\begin{itemize}
+\item Suivi et amélioration de systèmes d’informations (EOLE et GATE) de gestion des opérations d’achat/vente sur titre dans le cadre d’un Back Office
+	\begin{itemize}
+		\item Évolution du code C / PLSQL / Java
+		\item Migration Oracle (de 8i à 10g) et OS de (True 64 à Sun Solaris)
+		\item Support niveau 2 et production
+\end{itemize}
+\bigskip
+\item Étude des besoins fonctionnels
+	\begin{itemize}
+		\item Processus règlement livraison (achat/vente, prêt/emprunt, SWIFT, RELIT, cross border)
+		\item Rapprochement avec les dépositaires (évolution des statuts, dénouements, suspens)
+		\item La génération automatique des écritures comptables quotidiennes et mensuelles
+	\end{itemize}
+\end{itemize}
+}
+\bigskip
+\cventry{2004}{Société Générale Banque et Investissement}{SGCIB}{paris}{}{}
+{
+\bigskip
+\textbf{Stage d’ingénieur études et développement}
+\bigskip
+\begin{itemize}
+	\item Suivi et amélioration d’un système d’information de gestion des avoirs titres et espèces dans le cadre d’un back-office
+\end{itemize}
+}
+\section{Formation}
+\cventry{1999-2004}{Diplôme d'ingénieur en informatique, option système d'information}{EFREI}{Paris}{}{}
+
+\cventry{2002}{Immersion à l'Université de Birbeck College}{}{Londres, Royaume-Uni}{}{}
+
+\cventry{1999}{Baccalauréat scientifique, spécialité physique-chimie}{Lycée ITEC Boisfleury}{Grenoble}{}{}
+
+\section{Langues}
+%\cvitemwithcomment{Français}{Langue maternelle}{}
+\cvitemwithcomment{Anglais}{Courant}{Environnement international (Londres, Pologne, Inde). TOEIC 750}
+\cvitemwithcomment{Allemand, Norvégien}{Connaissance}{}
+
+\section{Compétences informatiques}
+\bigskip
+
+\cvitem{Méthodes}{ Méthodes agiles (Scrum, kanban), UML, Design patterns}
+\cvitem{Langages }{\textbf{C/C++, ObjC, Java, Javascript, PLSQL, Python}, Perl, Shell}
+\cvitem{Outils}{\textbf{Docker, Kubernetes, Jenkins, ELK}, JIRA, GIT}
+\cvitem{Environnement}{Windows, Linux (RHEL, Ubuntu), OSX, Solaris, AIX, VMware}
+\cvitem{Cloud}{Rancher, AWS, Azure}
+%\cvitem{Certification}{ \href{https://scrum.org/user/156131}{\underline{PSM 1}},
+%	 \href{https://youracclaim.com/badges/fe9582c4-2f76-4f03-90fd-896041d397b2}{\underline{Safe Agilist}} }
+
+
+\section{Centres d'intérêts}
+\bigskip
+Course à pied, Ski, Sécurité informatique
+
+\end{document}

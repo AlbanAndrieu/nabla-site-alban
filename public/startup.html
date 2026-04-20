@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Start your project — Alban Andrieu</title>
+		<meta
+			name="description"
+			content="Tell me about your startup or product: cloud, DevSecOps, security and compliance. I will reply at job@dr-alban.com."
+		/>
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href="https://dr-alban.com/startup.html" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://dr-alban.com/startup.html" />
+		<meta property="og:title" content="Start your project — Alban Andrieu" />
+		<meta
+			property="og:description"
+			content="Short form to describe your context; submissions are sent to job@dr-alban.com."
+		/>
+		<meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
+
+		<link rel="icon" href="assets/nabla/nabla-4.svg" />
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+		<link rel="stylesheet" href="landing-sections.css" />
+		<link rel="stylesheet" href="wireframe.css" />
+		<link rel="stylesheet" href="theme.css" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="site-content-page.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+			integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+			integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+
+		<!--
+			Form delivery: FormSubmit (https://formsubmit.co) forwards POSTs to job@dr-alban.com.
+			On first use, FormSubmit may send you a confirmation link to activate the endpoint.
+		-->
+		<script src="theme-toggle.js"></script>
+		<script src="site-google-translate.js" defer></script>
+		<script src="site-analytics.js" data-analytics-mode="vercel"></script>
+	</head>
+	<body class="site-content-page page-dark">
+		<a name="top"></a>
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="/" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+			<span class="text-muted mx-2" aria-hidden="true">·</span>
+			<span class="text-muted mx-2" aria-hidden="true">·</span>
+			<a href="/contact.html" class="text-decoration-none">Contact</a>
+		</nav>
+
+		<main id="main-content" role="main" class="container py-4 pb-5 col-lg-8">
+			<header class="mb-4">
+				<h1 class="h2 mb-2">Start your project</h1>
+				<p class="lead text-secondary mb-0">
+					Share a short brief — cloud platform, security, compliance, or delivery. I typically answer within one
+					business day at <a href="mailto:job@dr-alban.com">job@dr-alban.com</a>. You can also
+					<a href="https://calendly.com/alban-andrieu" target="_blank" rel="noopener noreferrer"
+						>book a 30-minute call</a
+					>.
+				</p>
+			</header>
+
+			<div class="card border-secondary bg-body-secondary shadow-sm">
+				<div class="card-body p-4">
+					<form
+						class="startup-inquiry-form"
+						action="https://formsubmit.co/job@dr-alban.com"
+						method="post"
+						aria-labelledby="startup-form-heading"
+					>
+						<h2 id="startup-form-heading" class="h5 mb-3">Project brief</h2>
+
+						<input type="hidden" name="_subject" value="[dr-alban.com] Startup / project inquiry" />
+						<input type="hidden" name="_next" value="https://dr-alban.com/startup-thanks.html" />
+						<input type="hidden" name="_captcha" value="true" />
+						<input type="hidden" name="_template" value="table" />
+
+						<input
+							type="text"
+							name="_honey"
+							value=""
+							tabindex="-1"
+							autocomplete="off"
+							aria-hidden="true"
+							class="position-absolute"
+							style="left: -9999px; width: 1px; height: 1px; opacity: 0"
+						/>
+
+						<div class="mb-3">
+							<label for="startup-name" class="form-label">Your name <span class="text-danger">*</span></label>
+							<input
+								type="text"
+								class="form-control"
+								id="startup-name"
+								name="name"
+								required
+								autocomplete="name"
+								placeholder="Jane Doe"
+							/>
+						</div>
+
+						<div class="mb-3">
+							<label for="startup-email" class="form-label">Work email <span class="text-danger">*</span></label>
+							<input
+								type="email"
+								class="form-control"
+								id="startup-email"
+								name="email"
+								required
+								autocomplete="email"
+								placeholder="you@company.com"
+							/>
+						</div>
+
+						<div class="mb-3">
+							<label for="startup-company" class="form-label">Company or product</label>
+							<input
+								type="text"
+								class="form-control"
+								id="startup-company"
+								name="company"
+								autocomplete="organization"
+								placeholder="e.g. Acme AI"
+							/>
+						</div>
+
+						<div class="mb-3">
+							<label for="startup-context" class="form-label"
+								>What do you need help with? <span class="text-danger">*</span></label
+							>
+							<textarea
+								class="form-control"
+								id="startup-context"
+								name="message"
+								rows="6"
+								required
+								placeholder="Stack (AWS, Azure, OVH…), AI needs, timeline, and any Security compliance goals (ISO 27001, SOC 2…)."
+							></textarea>
+						</div>
+
+						<p class="small text-secondary mb-3">
+							By sending this form you agree that your message is used only to respond to your request, as described in
+							the <a href="/policy/legal.html">legal notices</a> and
+							<a href="/policy/privacy_policy.html">privacy policy</a>.
+						</p>
+
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to job@dr-alban.com
+						</button>
+					</form>
+				</div>
+			</div>
+		</main>
+
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					href="https://www.linkedin.com/in/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="LinkedIn"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					href="https://calendly.com/alban-andrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Calendly"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					href="https://github.com/AlbanAndrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="GitHub"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					href="https://hub.docker.com/u/nabla"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Docker Hub"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="social-link"
+					aria-label="Stack Exchange"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<script src="site-widgets.js" defer data-print-pdf data-coffee-fab></script>
+	</body>
+</html>

@@ -1,0 +1,197 @@
+# robots.txt file of https://dr-alban.com/
+
+# www.robotstxt.org/
+# www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
+
+# If you wish to crawl this website, please obtain explicit permission first.
+# Contact us via email at alban.andrieu@dr-alban.com for authorization.
+
+User-agent: 008
+Disallow: /
+
+# Google and Brave
+User-agent: Googlebot
+Allow: /
+Disallow: /*/document/h/*
+Disallow: /*/decision/pdf/*
+Disallow: /*/other/pdf/*
+# deny dynamic URLs which contain a '?'
+Disallow: /*?*
+Disallow: /payment.html
+Disallow: /checkout.html
+Disallow: /success.html
+Disallow: /cancel.html
+
+User-agent: Google Mobile
+Allow: /
+
+User-agent: Google Smartphone
+Allow: /
+
+# MSN
+User-agent: msnbot
+Allow: /
+
+User-agent: msnbot-media
+Allow: /
+
+# BING & Ecosia
+User-agent: bingbot
+Allow: /
+Disallow: /payment.html
+Disallow: /checkout.html
+Disallow: /success.html
+Disallow: /cancel.html
+
+# Yahoo
+User-agent: Yahoo! Slurp
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Qwant
+User-agent: Qwantify
+Allow: /
+
+# rambler.ru
+User-agent: StackRambler
+Allow: /
+
+# Yandex
+User-agent: Yandex
+Allow: /
+
+# Apple
+User-agent: Applebot
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Seznam.cz
+# https://napoveda.seznam.cz/en/seznambot-crawler/
+User-agent: SeznamBot
+Allow: /
+
+User-agent: FreshBot
+Allow: /
+Crawl-delay: 10
+
+# Sogou.com
+User-agent: Sogou web spider
+Allow: /
+
+# Baidu
+User-agent: Baiduspider
+Allow: /
+
+# cocolyze
+User-agent: cocolyzebot
+Allow: /
+Crawl-delay: 10
+
+# Semrush
+User-agent: SemrushBot
+Allow: /
+Crawl-delay: 10
+
+# Semrush On Page SEO
+User-agent: SemrushBot-SI
+Allow: /
+Crawl-delay: 10
+
+# Semrush audit
+User-agent: SiteAuditBot
+Allow: /
+Crawl-delay: 10
+
+# Screaming Frog
+User-agent: Screaming Frog SEO Spider
+Allow: /
+Crawl-delay: 10
+
+# AI bots
+User-agent: AI2Bot
+User-agent: Ai2Bot-Dolma
+User-agent: Amazonbot
+User-agent: anthropic-ai
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: Brightbot 1.0
+User-agent: Bytespider
+User-agent: CCBot
+User-agent: ChatGPT-User
+User-agent: Claude-Web
+User-agent: ClaudeBot
+User-agent: cohere-ai
+User-agent: cohere-training-data-crawler
+User-agent: Crawlspace
+User-agent: Diffbot
+User-agent: DuckAssistBot
+User-agent: FacebookBot
+User-agent: FriendlyCrawler
+User-agent: Google-Extended
+User-agent: GoogleOther
+User-agent: GoogleOther-Image
+User-agent: GoogleOther-Video
+User-agent: GPTBot
+User-agent: iaskspider/2.0
+User-agent: ICC-Crawler
+User-agent: ImagesiftBot
+User-agent: img2dataset
+User-agent: ISSCyberRiskCrawler
+User-agent: Kangaroo Bot
+User-agent: Meta-ExternalAgent
+User-agent: Meta-ExternalFetcher
+User-agent: OAI-SearchBot
+User-agent: omgili
+User-agent: omgilibot
+User-agent: PanguBot
+User-agent: PerplexityBot
+User-agent: PetalBot
+User-agent: Scrapy
+User-agent: SemrushBot-OCOB
+User-agent: SemrushBot-SWA
+User-agent: Sidetrade indexer bot
+User-agent: Timpibot
+User-agent: VelenPublicWebCrawler
+User-agent: Webzio-Extended
+User-agent: YouBot
+Allow: /nabla/index.html
+Crawl-delay: 10
+
+# Other User-agent : Allow all execpt
+User-agent: *
+allow: /
+Disallow: /*?*
+
+Disallow: /cdn-cgi/
+Disallow: /wp-admin/
+Disallow: /api/
+Disallow: /test/
+Crawl-delay: 10
+
+# Disallow test and login pages (noindex/nofollow)
+Disallow: /test.html
+Disallow: /login.html
+
+# Payment / Stripe checkout flow (noindex/nofollow)
+Disallow: /payment.html
+Disallow: /checkout.html
+Disallow: /success.html
+Disallow: /cancel.html
+
+# Disallow technical signup pages
+Allow: /login/$
+Allow: /signup/$
+Disallow: /login/*
+Disallow: /signup/*
+
+Disallow: /*/?*
+Crawl-delay: 20
+
+# sitemap index
+Sitemap: https://dr-alban.com/sitemap.xml
+# curl https://www.google.com/ping??sitemap=https://dr-alban.com/sitemap.xml

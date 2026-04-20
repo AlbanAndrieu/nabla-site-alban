@@ -1,0 +1,168 @@
+<!doctype html>
+<!--
+<meta http-equiv="REFRESH" content="0;url=/sample/index.html">
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- PAGE settings -->
+    <link rel="icon" href="assets/nabla/nabla-4.svg" />
+    <title>Nabla - Login</title>
+    <meta name="description" content="logi." />
+    <meta name="keywords" content="login" />
+    <meta name="author" content="alban.andrieu@dr-alban.com" />
+
+		<!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+      type="text/css"
+    />
+
+		<script src="/assets/fontawesome-free-7.1.0-web/js/fontawesome.js" data-auto-replace-svg="nest"></script>
+		<script src="/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+		<link rel="stylesheet" href="landing-sections.css" />
+		<link rel="stylesheet" href="wireframe.css" />
+		<link rel="stylesheet" href="theme.css" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="site-content-page.css" />
+		<link rel="stylesheet" href="page-layouts.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+			integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+
+		<script
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+			async
+			defer
+		></script>
+		<script src="theme-toggle.js"></script>
+		<script src="site-google-translate.js" defer></script>
+		<script src="site-analytics.js" data-analytics-mode="vercel"></script>
+
+	</head>
+	<body class="site-content-page page-login page-dark">
+		<a name="top"></a>
+
+    <div class="">
+      <div class="container">
+        <div class="row">
+          <a href="https://hostedscan.com"
+            ><img
+              src="https://hostedscan.com/hostedscan-badge-light.svg"
+              alt="HostedScan | An automated vulnerability scanner"
+              height="81px"
+              width="284px"
+          /></a>
+        </div>
+        <div class="row">
+          <main id="main-content" role="main" class="form-signin">
+            <form method="POST" action="/handler">
+              <h2 class="h3 mb-3 fw-normal">Turnstile &dash; Login</h2>
+
+              <div class="form-floating">
+                <input type="text" id="user" class="form-control" />
+                <label for="user">User name</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="password"
+                  id="pass"
+                  class="form-control"
+                  autocomplete="off"
+                  readonly
+                  value="CorrectHorseBatteryStaple"
+                />
+                <label for="pass">Password (dummy)</label>
+              </div>
+
+              <div class="checkbox mb-3">
+                <!-- The following line controls and configures the Turnstile widget. -->
+                <div
+                  class="cf-turnstile"
+                  data-sitekey="0x4AAAAAAABU6iWSRkSavdni"
+                  data-callback="javascriptCallback"
+                  data-theme="light"
+                ></div>
+                <!-- end. -->
+              </div>
+              <button class="w-100 btn btn-lg btn-primary" type="submit">
+                Sign in
+              </button>
+            </form>
+          </main>
+        </div>
+        <div class="row">
+          <main class="pre-clearance-demo">
+            <h2>Pre-clearance Demo</h2>
+            <button id="fetchBtn">Fetch Data</button>
+            <div id="response"></div>
+          </main>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/nabla" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://calendly.com/alban-andrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Calendly"><i class="fa fa-calendar-plus"></i></a>
+        <a href="https://github.com/AlbanAndrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://hub.docker.com/u/nabla" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Docker Hub"><i class="fab fa-docker"></i></a>
+        <a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Stack Exchange"><i class="fab fa-stack-exchange"></i></a>
+      </div>
+      <div class="footer-links">
+        <a href="/policy/legal.html">Legal notices</a>
+        <a href="javascript:openAxeptioCookies()" rel="noopener noreferrer" class="text-muted">Cookies</a>
+      </div>
+      <p class="text-md-center mt-3">
+        <a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+        <a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
+      </p>
+      <p class="footer-copyright"></p>
+    </footer>
+		<!-- End footer section -->
+
+		<script
+			src="https://uptime.betterstack.com/widgets/announcement.js"
+			data-id="150620"
+			async="async"
+			type="text/javascript"
+		></script>
+
+    <script>
+      const button = document.getElementById("fetchBtn");
+      const responseDiv = document.getElementById("response");
+      button.addEventListener("click", async () => {
+        try {
+          let result = await fetch("/v1/nabla-api");
+          if (result.ok) {
+            let data = await result.json();
+            responseDiv.textContent = JSON.stringify(data);
+          } else {
+            responseDiv.textContent = "Error fetching data";
+          }
+        } catch (error) {
+          responseDiv.textContent = "Network error";
+        }
+      });
+    </script>
+		<script src="site-widgets.js" defer data-scroll-reveal=".service-card,.skill-category,.tool-item" data-reveal-effect="animation" data-reveal-animation="fadeInUp 0.6s ease forwards" data-axeptio data-coffee-fab></script>
+
+	</body>
+</html>

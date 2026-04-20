@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//class_vcard from TroyWolf.com//NONSGML Version 1//EN
+REV:2023-11-13 12:54:12
+FN:Alban Andrieu
+N:Andrieu;Alban;;;
+NICKNAME:Nabla
+
+ADR;TYPE=home:;Paris;;;;;
+URL;TYPE=work:https://gravatar.com/albanandrieu
+TZ:+0000
+END:VCARD

@@ -1,0 +1,8 @@
+/* Reserved for app-level overrides; site styles load from /public via layout <link>. */
+
+.google-translate-widget {
+	position: fixed;
+	top: 0.75rem;
+	right: 0.75rem;
+	z-index: 9999;
+}

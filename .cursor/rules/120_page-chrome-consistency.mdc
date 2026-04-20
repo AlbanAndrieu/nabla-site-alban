@@ -1,0 +1,125 @@
+---
+description: Page chrome — script order (head/body), body class, top anchor, theme toggle, Google Translate, print, modern style, sections/cards, site-widgets, layout, footer, back link, sitemap. 404 and minimal-chrome exclusions.
+globs: public/**/*.html
+alwaysApply: false
+---
+
+# Page chrome and consistency
+
+When creating or editing HTML pages in `public/`, follow the rules below. **`public/404.html`** (and any similar **minimal-chrome** page you add) is exempt from the usual head scripts, from print/Ko‑fi widget flags, and from the **`#top`** anchor — see **§1 Minimal / error pages** and *Reference files* — but it still uses the same **`<body class="page-dark">`** opening tag as other pages.
+
+## Body element
+
+### Standard content pages (not minimal / error pages)
+
+- Open the document body as **`<body class="page-dark">`** on **every** normal HTML file under `public/` and generated templates (e.g. `scripts/pdf-to-html-ca.py`). Immediately inside `<body>`, add **`<a name="top"></a>`** as the first line of content (before skip link, GTM, styles, etc.) so **`#top`** remains a valid scroll target.
+- **`name="top"`** on that anchor — scroll target for the back-to-top control from `site-widgets.js` and any `#top` links.
+- **`class="page-dark"`** — shared dark layout and theme-toggle behavior from `theme.css` when that stylesheet is linked (required for consistency even if a page loads extra inline CSS).
+### Minimal / error pages (e.g. `public/404.html`)
+
+- Use **`class="page-dark"`** on `<body>` as usual.
+- **Do not** add **`<a name="top"></a>`**. These pages use **`data-minimal-chrome`** on `site-widgets.js` and do not inject back-to-top, so a **`#top`** target is unnecessary; keep the first in-body node as real content (e.g. inline `<style>`, skip link, or main wrapper) per that page’s layout.
+
+## 1. Required script placement
+
+### Standard content pages
+
+**Relative `src` for site-owned scripts:** `theme-toggle.js`, `site-google-translate.js`, `site-analytics.js`, and `site-widgets.js` all live next to `index.html` under `public/`. Resolve them **from the HTML file’s directory** (same rule as CSS). **Do not** use root-absolute URLs such as `/site-widgets.js` or `/site-analytics.js`: they fail for pages not served from domain root (e.g. `file://`, path-based previews, mirrors). Use only the basename or `../` / `../../` prefixes per depth:
+
+| Page location | Example `src` for `site-analytics.js` |
+|---------------|----------------------------------------|
+| `public/*.html` | `site-analytics.js` |
+| One level down (`public/cv/`, `public/policy/`, …) | `../site-analytics.js` |
+| Two levels down (`public/cv/jusmundi/`, …) | `../../site-analytics.js` |
+
+Apply the **same prefix** to `theme-toggle.js`, `site-google-translate.js`, and `site-widgets.js`.
+
+**End of `<head>` (last elements before `</head>`):** these three tags in **this exact order**:
+
+1. `<script src="…theme-toggle.js"></script>` (path per table above)
+2. `<script src="…site-google-translate.js" defer></script>`
+3. `<script src="…site-analytics.js"></script>` — add `data-analytics-mode="…"` only when a page needs a non-default mode (match sibling pages). Do **not** put Ahrefs `data-key` on this tag.
+
+Optional **Ahrefs** remains a **separate** script (full URL is fine), placed **immediately above** that trio when used, e.g. `<script src="https://analytics.ahrefs.com/analytics.js" data-key="…" async></script>` — see `public/index.html`.
+
+**End of `<body>` (immediately before `</body>`):**
+`<script src="…site-widgets.js" defer data-print-pdf data-coffee-fab></script>` (path per table).
+If the page already uses different widget flags, keep those instead (e.g. `data-no-print-pdf`, `data-no-coffee-fab`, `data-axeptio`). Do not put unrelated attributes on this tag (e.g. Font Awesome `data-auto-replace-svg` belongs on Font Awesome’s own script).
+
+### Minimal / error pages (e.g. `public/404.html`)
+
+Use this pattern for dedicated error or ultra-minimal pages that must not load analytics, translate, or the usual chrome.
+
+- **Do not** include any of these in `<head>`: `theme-toggle.js`, `site-google-translate.js`, `site-analytics.js`.
+- **End of `<body>` (immediately before `</body>`):** a single widgets script only:
+  - `<script src="…site-widgets.js" defer data-minimal-chrome></script>` (path per depth, same prefix rules as above).
+- **Do not** add **`data-print-pdf`** or **`data-coffee-fab`** on these pages. `data-minimal-chrome` tells `site-widgets.js` to skip injecting theme toggle control, Google Translate, print PDF control, back-to-top, Ko‑fi, and Axeptio; the visitor’s stored theme still applies to `<html>` / `data-theme` where the script applies it.
+- **Do not** add **`<a name="top"></a>`** (no **`#top`** scroll target on these pages).
+
+To bulk-fix placement and paths, run from repo root: `node scripts/sync-html-page-scripts.mjs` (excludes `public/assets/nabla/signature/` and `public/node_modules/`).
+
+## 2. Theme toggle, Font Awesome JS, Google Translate, and widgets (`site-widgets.js`)
+
+- Use a **single** script in `<head>` : **`site-widgets.js`** with the correct relative `src` for folder depth (e.g. `site-widgets.js`, `../site-widgets.js`, `../../../../site-widgets.js`). **Do not** use `defer` on this tag so theme applies before first paint and paths resolve consistently.
+- **`site-widgets.js`** includes: theme toggle (formerly `theme-toggle.js`), Font Awesome kit JS (`fontawesome.js` + `solid.js` + `brands.js`), Google Translate bootstrap (formerly `site-google-translate.js`), plus print/back-to-top/coffee/Axeptio/etc. Optional opt-outs: **`data-no-google-translate`**, **`data-no-font-awesome`** (rare).
+- The theme script creates the button with id **`theme-toggle-btn`** automatically; no extra markup required.
+
+## 3. Google Translate widget
+
+- **Do not** add separate `site-google-translate.js` or `google-translate-config.js` tags; translation is started from **`site-widgets.js`** unless `data-no-google-translate` is set.
+- In `<body>`: a wrapper div with class **`google-translate-widget`** containing **`<div id="google_translate_element"></div>`** (or let the script create the wrapper if missing).
+- Use the same fixed positioning styles as on `index.html` / `people-contacted.html` (top-right, z-index 9999).
+
+## 4. Print / Save as PDF (and Markdown when relevant)
+
+- Provide **Print / Save as PDF** via **`site-widgets.js`**, not inline buttons: on the **`site-widgets.js`** tag add **`data-print-pdf`** (empty attribute is OK). The script injects `#nabla-print-pdf-btn` with class `print-button` and calls `window.print()`. Labels follow `document.documentElement.lang` (French vs English) unless overridden with `data-print-pdf-lang` or `data-print-pdf-label`.
+- **Back to top:** `site-widgets.js` injects **`#nabla-back-to-top`** with class **`back-to-top`** (styled in **`style.css`**, bottom-center pair with **`#coffee-fab`**). Disable with **`data-no-back-to-top`** if needed. Optional **`data-back-to-top-label`** / **`data-back-to-top-aria`**. On **standard** pages, keep **`<a name="top"></a>`** immediately after `<body>` so links to **`#top`** resolve to the page top. **Minimal / error pages** (e.g. `404.html`) omit that anchor — see **Body element → Minimal / error pages**.
+- Include **`print.css`** in `<head>` so on-screen button placement and print layout stay correct.
+- When the page is meant to be exported as markdown, keep structure and semantics suitable for that (headings, lists, clear sections).
+
+## 5. Modern style and layout
+
+- **Prefer the site’s default dark, modern style** for all content pages:
+  - Use **`class="page-dark"`** on `<body>`. On standard pages, follow with **`<a name="top"></a>`** on the next line. This applies the shared dark background (#0f172a with blue gradients), nav, cards, and light-theme overrides defined in `theme.css`. The theme toggle (default: dark) still lets users switch to light or auto. **Minimal / error pages** use `page-dark` but **no** top anchor.
+  - Do **not** add page-specific inline styles that duplicate the page-dark look; add any new shared patterns to `theme.css` under `.page-dark` instead.
+- All content pages use the same stack as `index.html` / `test.html`: **wireframe.css**, **arf.css**, **theme.css**, **style.css**, **landing-sections.css**, **print.css** (plus Font Awesome JS/CSS and Bootstrap as on those files). Paths adjust by folder depth.
+  - Typical order: Bootstrap → Bootstrap Icons → Font Awesome (CDN + `/assets/fontawesome/css/`) → wireframe → arf → theme → style → landing-sections → page CSS (e.g. `nre.css`, `email-style.css`) → **print.css last**. After bulk `<head>` edits, run `python3 scripts/sync-head-fontawesome-css.py` and/or `python3 scripts/normalize-html-css-order.py`.
+  - `<link rel="stylesheet" href="landing-sections.css" />` (use `../landing-sections.css` from `public/policy/`, or `../../theme.css` etc. from deeper `ca/` paths).
+  - Keep `theme.css`, `wireframe.css`, `print.css` where already used so theme toggle and print work.
+- Use **section and card** structure when it fits the content:
+  - Wrap major content blocks in `<section class="py-4" aria-labelledby="…">` with a heading id for accessibility.
+  - Use Bootstrap-style cards where appropriate: `<div class="card …">`, `<div class="card-body">`, `card-text`, etc., consistent with `index.html` and `abduction-norway.html`.
+
+## 6. Footer consistency
+
+- **Footers must be consistent** across the site. Use the same structure and links as the homepage (`index.html`) or `people-contacted.html`:
+  - `<footer class="footer">` with:
+    - Social links (e.g. Calendly, GitHub).
+    - Footer links: Terms of Use, Cookies, Privacy Policy (paths adjusted for subdirectory when needed).
+    - Optional “Return to home” where relevant; **do not** duplicate “Back to top” in the footer — `site-widgets.js` injects `#nabla-back-to-top` (class `back-to-top`).
+    - Copyright line.
+- For pages in `public/policy/`, use relative links for Terms/Privacy (e.g. `service_terms.html`, `privacy_policy.html`) and the same social + return-home (optional) + copyright pattern.
+- Do not introduce a different footer layout or link set without aligning with this pattern.
+
+## 7. Link back to main page / home
+
+- Every non-homepage content page must have a **link back to the main page**:
+  - Pages in **`public/`** (root): use `<a href="/">… Back to home</a>` (or “Home”) so links match Next.js and extensionless URLs. Prefer a small nav block at the top, e.g. `<nav class="page-nav" aria-label="Breadcrumb">` with “Back to home” as on `people-contacted.html` and `for-fathers.html`.
+  - Pages in **`public/policy/`**: use `<a href="/">… Back to home</a>` in the same way.
+- The **homepage** (`index.html`) does not need a “back to home” link. “Back to top” is provided by `site-widgets.js`, not footer markup.
+
+## 8. Sitemap
+
+- **Update the sitemap** whenever:
+  - A **new page** is added to the site (add a `<url>` entry with `<loc>`, `<lastmod>`, and optionally `<changefreq>` and `<priority>`).
+  - A page’s **content changes significantly** (update that entry’s `<lastmod>` to the current date in `YYYY-MM-DD` format).
+- Sitemap file: `public/sitemap.xml`. Follow the existing XML structure; `robots.txt` references it for crawlers.
+
+## Reference files
+
+- Theme + Translate + Print + **page-dark** + sections/cards + footer: `public/index.html`, `public/abduction-norway.html`, `public/people-contacted.html`, `public/for-fathers.html`.
+- Shared page-dark styles: `public/theme.css` (`.page-dark` section).
+- Back link pattern: `public/people-contacted.html` (nav with “Back to home”), `public/for-fathers.html`, `public/nre-fr.html` / `public/nre-en.html` (back link).
+- Footer markup: `public/index.html` (lines ~1375–1419), `public/people-contacted.html` (footer block).
+- **Exclusion**: `public/404.html` — no shared footer; dedicated layout and a “Home” link only. **No** **`a name="top"`** as first body content. **No** `theme-toggle.js`, `site-google-translate.js`, or `site-analytics.js` in `<head>`. At end of `<body>`: **`site-widgets.js`** with **`defer`** and **`data-minimal-chrome`** only — **no** `data-print-pdf` or `data-coffee-fab` (see **§1 Minimal / error pages** and **Body element → Minimal / error pages**).
+- Sitemap: `public/sitemap.xml`.

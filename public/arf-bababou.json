@@ -1,0 +1,477 @@
+{
+	"children": [
+		{
+			"children": [
+				{
+					"children": [
+						{
+							"children": [
+								{
+									"name": "Central",
+									"comment": "ignoring me",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.politiet.no/en/om/organisasjonen/police-districts/oslo-politidistrikt/"
+								},
+								{
+									"name": "Greenland Police Station",
+									"comment": "ignoring me",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.politiet.no/en/om/organisasjonen/police-districts/oslo-politidistrikt/gronland-politistasjon/"
+								},
+								{
+									"name": "Oslo Airport Police Station",
+									"comment": "ignoring me",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.politiet.no/en/om/organisasjonen/police-districts/oslo-politidistrikt/"
+								},
+								{
+									"name": "Majorstuen Police Station",
+									"comment": "ignoring me",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.politiet.no/en/om/organisasjonen/police-districts/oslo-politidistrikt/majorstuen-politistasjon//"
+								}
+							],
+							"name": "Police",
+							"type": "folder"
+						},
+						{
+							"children": [
+								{
+									"name": "Oslo District Court (Tingret)",
+									"comment": "asking ransome, refusing appealing, ignoring me",
+									"end": "2 fake trials",
+									"type": "url",
+									"url": "https://www.domstol.no/en/Enkelt-domstol/Oslo-District-Court/"
+								}
+							],
+							"name": "Justice",
+							"type": "folder"
+						},
+						{
+							"name": "Norwegian population registry",
+							"comment": "made a complaint, ignoring me, but change law",
+							"end": "law",
+							"type": "url",
+							"url": "https://www.skatteetaten.no/en/person/national-registry/"
+						}
+					],
+					"name": "Authorities",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "Norwegian Directorate for Children, Youth and Family Affairs",
+							"comment": "calling police to arrest me, ignoring me",
+							"end": "nowhere",
+							"type": "url",
+							"url": "https://www.domstol.no/en/Enkelt-domstol/Oslo-District-Court/"
+						},
+						{
+							"name": "Oslo Stallen barnehage",
+							"comment": "ignoring me",
+							"end": "nowhere",
+							"type": "url",
+							"url": "https://www.oslo.kommune.no/barnehage/finn-barnehage-i-oslo/stallen-barnehage/"
+						},
+						{
+							"name": "Oslo Lycée Français",
+							"comment": "ignoring me",
+							"end": "nowhere",
+							"type": "url",
+							"url": "https://lfo.no/"
+						}
+					],
+					"name": "School",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "Christian A. Kramer",
+							"email": "ck@frykmankramer.no",
+							"comment": "did not ask to judge abuse/kidnapping/custody , refusing appealing, ignoring me",
+							"end": "30000 euro lost for 2 fakes trials",
+							"type": "url",
+							"url": "http://www.frykmankramer.no/~frykmank/about-us"
+						}
+					],
+					"name": "Lawyers",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "Mannsforum",
+							"email": "https://www.facebook.com/mannsforum.no/about",
+							"comment": "association",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://mannsforum.no/"
+						}
+					],
+					"name": "Associations",
+					"type": "folder"
+				}
+			],
+			"name": "Norway",
+			"type": "folder"
+		},
+		{
+			"children": [
+				{
+					"children": [
+						{
+							"children": [
+								{
+									"name": "Asnieres-sur-Seine",
+									"comment": "ignoring me, the first year, but registered the abduction after complaining to IGN",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://TODO"
+								},
+								{
+									"name": "Nanterre",
+									"comment": "Registered quickly the abuse and registered (NRE) that the mother is not sowing up with kid",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://TODO"
+								},
+								{
+									"name": "IGPN",
+									"comment": "ignoring me, did nothing",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.police-nationale.interieur.gouv.fr/Organisation/Inspection-generale-de-la-Police-nationale/Signalement-IGPN"
+								}
+							],
+							"name": "Police",
+							"type": "folder"
+						},
+						{
+							"children": [
+								{
+									"name": "Procureur de la république de Nanterre",
+									"comment": "ignoring me, did nothing",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://demarchesadministratives.fr/tgi-grande-instance/nanterre-92000"
+								},
+								{
+									"name": "Bureau du droit de l'Union, du droit international privé et de l'entraide civile",
+									"comment": "Help for abduction contact",
+									"end": "trial",
+									"type": "url",
+									"url": "http://www.justice.gouv.fr/justice-civile-11861/enlevement-parental-12063/lautorite-centrale-21099.html"
+								}
+							],
+							"name": "Justice",
+							"type": "folder"
+						}
+					],
+					"name": "Auhtorities",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "SOS Papa",
+							"email": "delegation67@sospapa.net",
+							"comment": "association",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://sospapa.net/delegations-sos-papa"
+						},
+						{
+							"name": "Collectif La Grue Jaune",
+							"email": "TODO",
+							"comment": "association",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://www.facebook.com/lagruejaune/"
+						},
+						{
+							"name": "Paternet",
+							"email": "TODO",
+							"comment": "association",
+							"end": "newsletter",
+							"type": "url",
+							"url": "http://paternet.fr/"
+						},
+						{
+							"name": "Marche egalite parentale",
+							"email": "contact@marche-egalite-parentale.com",
+							"comment": "useless",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://www.justice-familiale.fr/"
+						},
+						{
+							"name": "Paternites imposees",
+							"email": "paternitesimposees@hotmail.fr",
+							"comment": "association",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://www.justice-familiale.fr/"
+						}
+					],
+					"name": "Associations",
+					"type": "folder"
+				}
+			],
+			"name": "France",
+			"type": "folder"
+		},
+		{
+			"children": [
+				{
+					"children": [
+						{
+							"children": [
+								{
+									"name": "Frankfurt Police (Polizeipräsidium)",
+									"comment": "help me once to see eleonore 2h, did nothing",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://ppffm.polizei.hessen.de/Startseite/"
+								},
+								{
+									"name": "Frankfurt Police of police (k12)",
+									"email": "k12.ppfm@polizei.hessen.de",
+									"comment": "did nothing",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://k.polizei.hessen.de/"
+								}
+							],
+							"name": "Justice",
+							"type": "folder"
+						},
+						{
+							"children": [
+								{
+									"name": "Frankfurt Palais de Justice",
+									"comment": "ignoring me, did nothing",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://www.alamyimages.fr/photo-image-Frankfurt-sur-le-palais-de-justice-batiment-a-haute-cour-regionale-tribunal-de-district-ministere-public-du-district-50927537.html"
+								}
+							],
+							"name": "Justice",
+							"type": "folder"
+						},
+						{
+							"name": "Frankfurt population registry",
+							"comment": "checked, no entry",
+							"end": "nowhere",
+							"type": "url",
+							"url": "TODO"
+						}
+					],
+					"name": "Auhtorities",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "AEFE",
+							"comment": "complaint, ignoring me",
+							"end": "nowhere",
+							"type": "url",
+							"url": "https://www.aefe.fr/"
+						},
+						{
+							"name": "Frankfurt Lycée Français Victor Hugo",
+							"comment": "ignoring me",
+							"end": "nowhere",
+							"type": "url",
+							"url": "https://www.lfvh.net//"
+						}
+					],
+					"name": "School",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"name": "Väter ohne Rechte",
+							"email": "https://www.facebook.com/groups/vaeterohnerechte/about",
+							"comment": "association",
+							"end": "psychological support",
+							"type": "url",
+							"url": "https://www.vaeter-ohne-rechte.at/"
+						}
+					],
+					"name": "Associations",
+					"type": "folder"
+				}
+			],
+			"name": "Germany",
+			"type": "folder"
+		},
+		{
+			"children": [
+				{
+					"children": [
+						{
+							"children": [
+								{
+									"children": [
+										{
+											"name": "TODO",
+											"comment": "Never gathered any evidences in Norways, ignored French evidences",
+											"end": "abduction trial, asked ransom and refused appealing",
+											"type": "url",
+											"url": "https://TODO"
+										}
+									],
+									"name": "Norwegian Hague Convention",
+									"type": "folder"
+								}
+							],
+							"name": "Norway",
+							"type": "folder"
+						},
+						{
+							"children": [
+								{
+									"children": [
+										{
+											"name": "Bureau d entraide civile internationale",
+											"email": "entraide-civile-internationale@justice.gouv.f",
+											"comment": "BDIP/38DE2016 NORVEGE : No power",
+											"end": "nowhere",
+											"type": "url",
+											"url": "http://www.justice.gouv.fr/justice-civile-11861/enlevement-parental-12063/lautorite-centrale-21099.html"
+										}
+									],
+									"name": "French Hague Convention",
+									"type": "folder"
+								}
+							],
+							"name": "France",
+							"type": "folder"
+						},
+						{
+							"children": [
+								{
+									"children": [
+										{
+											"name": "TODO",
+											"comment": "Never gathered any evidences in Germany",
+											"end": "todo",
+											"type": "url",
+											"url": "https://TODO"
+										}
+									],
+									"name": "German Hague Convention",
+									"type": "folder"
+								}
+							],
+							"name": "Germany",
+							"type": "folder"
+						}
+					],
+					"name": "Hague Convention",
+					"type": "folder"
+				},
+				{
+					"children": [
+						{
+							"children": [
+								{
+									"name": "Conseil Europeen",
+									"email": "TODO",
+									"comment": "Answered quickly that Norway is not under their responsability",
+									"end": "nowhere",
+									"type": "url",
+									"url": "https://TODO"
+								}
+							],
+							"name": "France",
+							"type": "folder"
+						}
+					],
+					"name": "European council",
+					"type": "folder"
+				}
+			],
+			"name": "International",
+			"type": "folder"
+		},
+		{
+			"children": [
+				{
+					"name": "Mannsforum",
+					"email": "https://www.facebook.com/mannsforum.no/about",
+					"comment": "association",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://mannsforum.no/"
+				},
+				{
+					"name": "Väter ohne Rechte",
+					"email": "https://www.facebook.com/groups/vaeterohnerechte/about",
+					"comment": "association",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://www.vaeter-ohne-rechte.at/"
+				},
+				{
+					"name": "SOS Papa",
+					"email": "delegation67@sospapa.net",
+					"comment": "association",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://sospapa.net/delegations-sos-papa"
+				},
+				{
+					"name": "Collectif La Grue Jaune",
+					"email": "TODO",
+					"comment": "association",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://www.facebook.com/lagruejaune/"
+				},
+				{
+					"name": "Paternet",
+					"email": "TODO",
+					"comment": "association",
+					"end": "newsletter",
+					"type": "url",
+					"url": "http://paternet.fr/"
+				},
+				{
+					"name": "Marche egalite parentale",
+					"email": "contact@marche-egalite-parentale.com",
+					"comment": "useless",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://www.justice-familiale.fr/"
+				},
+				{
+					"name": "Paternites imposees",
+					"email": "paternitesimposees@hotmail.fr",
+					"comment": "association",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://www.justice-familiale.fr/"
+				},
+				{
+					"name": "Exclusion parentale",
+					"email": "sosexclusionparentale@gmail.com",
+					"comment": "association, mythe grec de Médée",
+					"end": "psychological support",
+					"type": "url",
+					"url": "https://www.facebook.com/sosexclusionparentale/"
+				}
+			],
+			"name": "Associations",
+			"type": "folder"
+		}
+	]
+}

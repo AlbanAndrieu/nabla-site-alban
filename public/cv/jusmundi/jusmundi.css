@@ -1,0 +1,790 @@
+/**
+ * Jusmundi CV section — shared styles for index and review pages.
+ * Depends on: landing-sections.css, theme.css, cv-theme.css (--cv-* variables).
+ * Google Translate widget and print hiding are in theme.css.
+ */
+
+.jusmundi-page {
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+		Arial, sans-serif;
+	line-height: 1.6;
+}
+
+/* CV-only pages (no site shell) */
+.jusmundi-page:not(.page-dark) {
+	color: var(--cv-text);
+	background-color: var(--cv-bg-page);
+}
+
+/* Index: align with site page-dark (theme.css) — body gradient + footer from theme */
+.jusmundi-page.page-dark {
+	color: var(--text-primary, #e2e8f0);
+	background: transparent;
+	min-height: 100vh;
+}
+
+.jusmundi-page:not(.page-dark) a {
+	color: var(--cv-link);
+}
+
+.jusmundi-page:not(.page-dark) a:hover {
+	color: var(--cv-link-hover);
+}
+
+/* Scope theme links to content chrome only (not footer / social) */
+.jusmundi-page.page-dark main a:not(.service-card):not(.btn) {
+	color: var(--link-color, var(--cv-link));
+}
+
+.jusmundi-page.page-dark nav.page-nav a:hover,
+.jusmundi-page.page-dark main a:not(.service-card):not(.btn):hover {
+	color: var(--link-hover, var(--cv-link-hover));
+}
+
+.jusmundi-page.page-dark main a.service-card {
+	color: inherit;
+}
+
+.jusmundi-page a:focus-visible,
+.jusmundi-page button:focus-visible {
+	outline: 2px solid var(--cv-heading-accent);
+	outline-offset: 2px;
+}
+
+.jusmundi-page.page-dark nav.page-nav a:focus-visible,
+.jusmundi-page.page-dark main a:focus-visible,
+.jusmundi-page.page-dark main button:focus-visible {
+	outline-color: var(--link-color, var(--cv-heading-accent));
+}
+
+.jusmundi-hero {
+	background: linear-gradient(
+		135deg,
+		var(--cv-btn-bg) 0%,
+		var(--cv-heading-accent) 100%
+	);
+	color: #fff;
+	padding: 2.5rem 1.5rem;
+	text-align: center;
+	border-radius: 0.5rem;
+	margin-bottom: 2rem;
+}
+
+.jusmundi-hero h1 {
+	margin: 0 0 0.5rem;
+	font-size: 1.75rem;
+}
+
+.jusmundi-hero .subtitle {
+	opacity: 0.95;
+	font-size: 1rem;
+}
+
+.jusmundi-section {
+	margin-bottom: 2.5rem;
+}
+
+.jusmundi-section h2 {
+	color: var(--cv-heading-accent);
+	font-size: 1.35rem;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 2px solid var(--cv-border-light);
+}
+
+.jusmundi-section h3 {
+	color: var(--cv-heading);
+	font-size: 1.1rem;
+	margin: 1.25rem 0 0.5rem;
+}
+
+.jusmundi-section-title {
+	text-align: center;
+	font-size: 1.75rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+	color: var(--cv-heading);
+}
+
+.jusmundi-section-subtitle {
+	text-align: center;
+	font-size: 1rem;
+	color: var(--cv-text-secondary);
+	margin-bottom: 1.5rem;
+}
+
+.jusmundi-section ul {
+	padding-left: 1.5rem;
+	margin: 0.5rem 0;
+}
+
+.jusmundi-section li {
+	margin-bottom: 0.35rem;
+}
+
+.back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1.5rem;
+	padding: 0.5rem 0;
+	color: var(--cv-link);
+	text-decoration: none;
+}
+
+.back-link:hover {
+	color: var(--cv-link-hover);
+	text-decoration: underline;
+}
+
+/* Jusmundi index (page-dark): glass panels like other site-content pages */
+.jusmundi-page.page-dark .services-section,
+.jusmundi-page.page-dark .proof-section {
+	background: transparent;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.jusmundi-page.page-dark .section-title {
+	color: var(--text-primary, var(--text-dark));
+}
+
+.jusmundi-page.page-dark .section-subtitle {
+	color: var(--text-secondary, var(--text-light));
+}
+
+.jusmundi-page.page-dark .service-card {
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(71, 85, 105, 0.4);
+	backdrop-filter: blur(6px);
+	color: var(--text-primary, #e2e8f0);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.jusmundi-page.page-dark .service-card h3 {
+	color: var(--text-primary, #e2e8f0);
+}
+
+.jusmundi-page.page-dark .service-card p,
+.jusmundi-page.page-dark .service-card ul.service-bullets {
+	color: var(--text-secondary, #b8b8b8);
+}
+
+.jusmundi-page.page-dark .service-card .service-lead {
+	color: var(--text-primary, #e2e8f0);
+}
+
+.jusmundi-page.page-dark .service-icon {
+	color: var(--link-color, #66b3ff);
+}
+
+.jusmundi-page.page-dark a.service-card.jusmundi-doc-card {
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(71, 85, 105, 0.4);
+	backdrop-filter: blur(6px);
+}
+
+.jusmundi-page.page-dark a.service-card.jusmundi-doc-card:hover {
+	border-color: rgba(96, 165, 250, 0.55);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.jusmundi-page.page-dark .kpi-card {
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(71, 85, 105, 0.4);
+	backdrop-filter: blur(6px);
+}
+
+.jusmundi-page.page-dark .kpi-card .label {
+	color: var(--text-secondary, var(--cv-text-secondary));
+}
+
+.jusmundi-page.page-dark .jusmundi-source-notice {
+	background: rgba(30, 41, 59, 0.55);
+	border-color: rgba(71, 85, 105, 0.45);
+	color: var(--text-primary, var(--cv-text));
+}
+
+.jusmundi-page.page-dark .jusmundi-source-notice strong {
+	color: var(--text-primary, var(--cv-heading));
+}
+
+.jusmundi-page.page-dark .jusmundi-table-card {
+	background: rgba(30, 41, 59, 0.7);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .service-card,
+html[data-theme="light"]
+	.jusmundi-page.page-dark
+	a.service-card.jusmundi-doc-card,
+html[data-theme="light"] .jusmundi-page.page-dark .kpi-card,
+html[data-theme="light"] .jusmundi-page.page-dark .jusmundi-table-card {
+	background: rgba(255, 255, 255, 0.85);
+	border-color: rgba(226, 232, 240, 0.9);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .service-card h3,
+html[data-theme="light"] .jusmundi-page.page-dark .service-card .service-lead {
+	color: var(--text-primary, #0f172a);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .service-card p,
+html[data-theme="light"]
+	.jusmundi-page.page-dark
+	.service-card
+	ul.service-bullets {
+	color: var(--text-secondary, #475569);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .service-icon {
+	color: var(--primary-color, #2563eb);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .jusmundi-source-notice {
+	background: var(--bg-secondary, #f1f5f9);
+	border-color: var(--border-color, #e2e8f0);
+	color: var(--text-primary);
+}
+
+html[data-theme="light"]
+	.jusmundi-page.page-dark
+	.jusmundi-source-notice
+	strong {
+	color: var(--text-primary);
+}
+
+/* Infrastructure costs page — tables in page-dark shell */
+.jusmundi-page.page-dark .infra-table-wrap {
+	background: rgba(30, 41, 59, 0.7);
+	border-color: rgba(71, 85, 105, 0.4);
+	backdrop-filter: blur(6px);
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .infra-table-wrap {
+	background: rgba(255, 255, 255, 0.85);
+	border-color: rgba(226, 232, 240, 0.9);
+}
+
+.jusmundi-page.page-dark .kpi-table {
+	color: var(--text-primary, var(--cv-text));
+}
+
+.jusmundi-page.page-dark .kpi-table th {
+	color: var(--text-primary, var(--cv-heading));
+	border-color: var(--border-color, var(--cv-border-light));
+}
+
+.jusmundi-page.page-dark .kpi-table td {
+	border-color: var(--border-color, var(--cv-border-light));
+}
+
+html[data-theme="light"] .jusmundi-page.page-dark .kpi-table,
+html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
+	color: var(--text-primary, #0f172a);
+}
+
+/* KPI grid (index) */
+.kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	gap: 1.25rem;
+	margin: 1rem 0;
+}
+
+.kpi-card {
+	background: var(--cv-bg-card);
+	border: 1px solid var(--cv-border-light);
+	border-radius: 12px;
+	padding: 1.5rem 1rem;
+	text-align: center;
+	box-shadow: 0 2px 10px var(--cv-shadow);
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 20px var(--cv-shadow);
+}
+
+.kpi-card .value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--cv-heading-accent);
+}
+
+.kpi-card .label {
+	font-size: 0.85rem;
+	color: var(--cv-text-secondary);
+	margin-top: 0.25rem;
+}
+
+/* KPI table (review pages) */
+.kpi-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1rem 0;
+	font-size: 0.95rem;
+}
+
+.kpi-table th,
+.kpi-table td {
+	border: 1px solid var(--cv-border-light);
+	padding: 0.6rem 0.75rem;
+	text-align: left;
+}
+
+.kpi-table th {
+	background: var(--cv-bg-highlight);
+	color: var(--cv-heading-accent);
+	font-weight: 600;
+}
+
+.kpi-table tbody tr:nth-child(even) {
+	background: var(--cv-bg-card);
+}
+
+.scorecard-pre {
+	font-family: ui-monospace, monospace;
+	font-size: 0.85rem;
+	background: var(--cv-bg-card);
+	border: 1px solid var(--cv-border-light);
+	border-radius: 8px;
+	padding: 1rem;
+	overflow-x: auto;
+	white-space: pre;
+}
+
+/* Lists */
+.achievement-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.achievement-list li {
+	padding: 0.5rem 0 0.5rem 1.75rem;
+	position: relative;
+	border-bottom: 1px solid var(--cv-border-light);
+}
+
+.achievement-list li:last-child {
+	border-bottom: none;
+}
+
+.achievement-list li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0.75rem;
+	width: 0.5rem;
+	height: 0.5rem;
+	background: var(--cv-heading-accent);
+	border-radius: 50%;
+}
+
+.badge-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0.75rem 0;
+}
+
+.badge {
+	display: inline-block;
+	padding: 0.35rem 0.75rem;
+	font-size: 0.8rem;
+	font-weight: 600;
+	border-radius: 9999px;
+	background: var(--cv-bg-highlight);
+	color: var(--cv-heading-accent);
+	border: 1px solid var(--cv-border-light);
+}
+
+.summary-list {
+	list-style: none;
+	padding-left: 0;
+}
+
+.summary-list li {
+	padding-left: 1.5rem;
+	position: relative;
+	margin-bottom: 0.5rem;
+}
+
+.summary-list li::before {
+	content: "✓";
+	position: absolute;
+	left: 0;
+	color: var(--cv-heading-accent);
+	font-weight: bold;
+}
+
+/* Cards grid */
+.jusmundi-card {
+	background: var(--cv-bg-card);
+	padding: 1.75rem;
+	border-radius: 12px;
+	box-shadow: 0 2px 10px var(--cv-shadow);
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+	border: 1px solid var(--cv-border-light);
+}
+
+.jusmundi-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 20px var(--cv-shadow);
+}
+
+.jusmundi-card .jusmundi-card-icon {
+	font-size: 2rem;
+	color: var(--cv-heading-accent);
+	margin-bottom: 0.75rem;
+}
+
+.jusmundi-card h3 {
+	font-size: 1.25rem;
+	color: var(--cv-heading-accent);
+	margin-bottom: 0.5rem;
+}
+
+.jusmundi-card-subtitle {
+	font-size: 0.95rem;
+	color: var(--cv-text-secondary);
+	margin-bottom: 1rem;
+}
+
+.jusmundi-card-h4 {
+	font-size: 1.05rem;
+	color: var(--cv-heading);
+	margin: 1.25rem 0 0.5rem;
+	font-weight: 600;
+}
+
+.jusmundi-card-h4:first-of-type {
+	margin-top: 0.5rem;
+}
+
+.jusmundi-cards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1.5rem;
+}
+
+/* AI / Notion source notice (Jusmundi review pages) */
+.jusmundi-source-notice {
+	margin: 0 0 1.75rem;
+	padding: 1rem 1.25rem;
+	border-radius: 10px;
+	border: 1px solid var(--cv-border-light);
+	background: var(--cv-bg-highlight);
+	color: var(--cv-text);
+	font-size: 0.95rem;
+	line-height: 1.55;
+}
+
+.jusmundi-source-notice strong {
+	color: var(--cv-heading);
+}
+
+.jusmundi-source-notice a {
+	font-weight: 600;
+}
+
+.jusmundi-source-notice p {
+	margin: 0;
+}
+
+/* Jusmundi HTML pages — index.html-style hero + services/proof sections (excludes cv-*.html CVs) */
+.jusmundi-landing-page .jusmundi-landing-content.services-section,
+.jusmundi-landing-page .jusmundi-landing-content.proof-section {
+	padding: 2.75rem 0;
+	margin-bottom: 0;
+}
+
+.jusmundi-landing-page .jusmundi-landing-content .section-title {
+	font-size: clamp(1.65rem, 3.5vw, 2.25rem);
+	margin-bottom: 1rem;
+}
+
+.jusmundi-landing-page .jusmundi-landing-content .section-subtitle {
+	margin-bottom: 1.5rem;
+}
+
+.jusmundi-landing-page .hero-section.jusmundi-hero-compact {
+	min-height: auto;
+	padding: 3rem 1.25rem;
+	border-radius: 12px;
+	margin-bottom: 2rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.jusmundi-landing-page .jusmundi-hero-compact .hero-content {
+	padding: 0 0.75rem;
+}
+
+.jusmundi-landing-page .jusmundi-hero-compact .hero-title {
+	font-size: clamp(1.65rem, 4vw, 2.65rem);
+	margin-bottom: 1rem;
+	animation: none;
+}
+
+.jusmundi-landing-page .jusmundi-hero-compact .hero-subtitle {
+	font-size: 1.1rem;
+	max-width: 42rem;
+	margin-left: auto;
+	margin-right: auto;
+	animation: none;
+}
+
+.jusmundi-landing-page .jusmundi-service-card-wide {
+	text-align: left;
+}
+
+.jusmundi-landing-page .jusmundi-service-card-wide h3 {
+	text-align: left;
+}
+
+.jusmundi-landing-page .jusmundi-service-card-wide .service-bullets,
+.jusmundi-landing-page .jusmundi-service-card-wide ul.service-bullets {
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.jusmundi-landing-page a.service-card.jusmundi-doc-card {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	text-align: center;
+}
+
+.jusmundi-landing-page a.service-card.jusmundi-doc-card:hover {
+	color: inherit;
+}
+
+.jusmundi-landing-page .jusmundi-table-card {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	border-radius: 10px;
+	border: 1px solid var(--border-color, var(--cv-border-light));
+	margin-top: 0.75rem;
+	box-shadow: 0 2px 8px var(--shadow-color, var(--cv-shadow));
+	background: var(--bg-white, var(--cv-bg-card));
+}
+
+.jusmundi-landing-page .jusmundi-table-card .kpi-table {
+	margin: 0;
+}
+
+.jusmundi-landing-page .jusmundi-kpi-section .kpi-grid {
+	margin-top: 0.25rem;
+}
+
+.jusmundi-landing-page .service-card .badge-row {
+	justify-content: center;
+}
+
+.jusmundi-landing-page .jusmundi-service-card-wide .badge-row {
+	justify-content: flex-start;
+}
+
+/* Skip link (accessibility) */
+.skip-link {
+	position: absolute;
+	top: -100px;
+	left: 0.5rem;
+	padding: 0.5rem 1rem;
+	background: var(--cv-heading-accent);
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	z-index: 10000;
+	border-radius: 0 0 4px 0;
+	transition: top 0.2s;
+}
+
+.skip-link:focus {
+	top: 0;
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+/* Infrastructure costs page — align with index.html landing sections */
+.infra-costs-page .infra-hero-landing {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	box-shadow: 0 12px 40px rgba(102, 126, 234, 0.35);
+}
+
+.infra-costs-page .infra-costs-section.services-section {
+	padding: 2.5rem 0;
+	margin-bottom: 0;
+}
+
+.infra-costs-page .infra-costs-section.proof-section {
+	padding: 2.5rem 0;
+	margin-bottom: 0;
+}
+
+.infra-costs-page .infra-costs-section .section-title {
+	font-size: 2rem;
+}
+
+.infra-costs-page .infra-costs-section .section-subtitle {
+	margin-bottom: 1.5rem;
+}
+
+.infra-costs-page .infra-costs-note.section-subtitle {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 0 1rem 1.5rem;
+	max-width: 40rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.infra-costs-page .infra-table-wrap {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	border-radius: 12px;
+	border: 1px solid var(--border-color, var(--cv-border-light));
+	box-shadow: 0 2px 10px var(--shadow-color, var(--cv-shadow));
+	background: var(--bg-white, var(--cv-bg-card));
+}
+
+.infra-costs-page .infra-table-wrap .kpi-table {
+	margin: 0;
+}
+
+.infra-migration-band {
+	margin: 0 0 2rem;
+	padding: 2rem 1.25rem;
+	background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 45%, #1e3a8a 100%);
+	border-radius: 12px;
+	color: #fff;
+	box-shadow: 0 8px 28px rgba(37, 99, 235, 0.35);
+}
+
+.infra-migration-band .engagement-block {
+	margin: 0 auto;
+}
+
+.infra-migration-band .engagement-block .infra-migration-lead {
+	font-size: 1.05rem;
+	margin: 0 0 0.75rem;
+	line-height: 1.5;
+	opacity: 0.98;
+	color: #fff;
+}
+
+.infra-migration-band .engagement-block ul {
+	color: rgba(255, 255, 255, 0.95);
+}
+
+/* Featured “Top #1 achievement” band (Jusmundi index + infrastructure-costs) */
+.infra-migration-band-layout {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.25rem;
+}
+
+.infra-migration-band-figure {
+	flex-shrink: 0;
+	width: 4rem;
+	height: 4rem;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.65rem;
+	line-height: 1;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+	color: #fff;
+}
+
+.infra-migration-band-body.engagement-block {
+	flex: 1;
+	min-width: 0;
+}
+
+.infra-top-achievement-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	margin: 0 0 0.65rem;
+	padding: 0.35rem 0.85rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.2;
+	color: #1e3a8a;
+	background: #fff;
+	border-radius: 999px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.infra-top-achievement-pill i {
+	font-size: 0.95rem;
+	color: #1d4ed8;
+	opacity: 0.95;
+}
+
+.infra-migration-band .engagement-block h3 {
+	margin: 0 0 0.65rem;
+	font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+	font-weight: 700;
+	line-height: 1.35;
+	color: #fff;
+}
+
+@media (max-width: 576px) {
+	.infra-migration-band-layout {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.infra-migration-band-body.engagement-block {
+		text-align: center;
+	}
+
+	.infra-top-achievement-pill {
+		margin-inline: auto;
+	}
+
+	.infra-migration-band .engagement-block ul {
+		text-align: left;
+	}
+}
+
+@media (max-width: 768px) {
+	.kpi-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.jusmundi-cards-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.kpi-table {
+		font-size: 0.8rem;
+	}
+
+	.kpi-table th,
+	.kpi-table td {
+		padding: 0.4rem;
+	}
+
+	.infra-costs-page .infra-costs-section.services-section,
+	.infra-costs-page .infra-costs-section.proof-section {
+		padding: 1.75rem 0;
+	}
+}

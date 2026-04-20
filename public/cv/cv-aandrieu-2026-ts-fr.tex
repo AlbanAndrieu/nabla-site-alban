@@ -1,0 +1,154 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Twenty Seconds Resume/CV
+% LaTeX Template — Version française
+% Version 1.0 (14/7/16)
+%
+% Original author:
+% Carmine Spagnuolo (cspagnuolo@unisa.it) with major modifications by
+% Vel (vel@LaTeXTemplates.com) and Harsh (harsh.gadgil@gmail.com)
+%
+% License:
+% The MIT License (see included LICENSE file)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[letterpaper]{twentysecondcv} % a4paper for A4
+
+\renewcommand{\cvSidebarTechnicalSkills}{Compétences techniques}
+\renewcommand{\cvSidebarOverview}{Vue d'ensemble}
+\renewcommand{\cvskillshublabel}{\textbf{Programmation}}
+\renewcommand{\cvSidebarEducation}{Formation}
+
+\newcommand\skills{
+~
+  \cvSkillsBubblesWrap{%
+	\smartdiagram[bubble diagram]{
+        \textbf{SDLC}\\\textbf{DevOps},
+        \textbf{~~~~~~~~Sécurité~~~~~~~~~},
+        \textbf{~~~~~~Conteneurs~~~~~~}\\\textbf{~~(Docker/K8s)~~},
+        \textbf{~~~~~Automatisation~~~~~},
+        \textbf{~~~~~~IA~~~~~~}\\\textbf{\& données},
+				\textbf{~~~~Programmation~~~~}\\\textbf{\& Java, C++, Python, Shell}
+    }%
+  }
+}
+
+% Barres de compétences (niveau 0--6 ; même échelle que la largeur de la barre)
+\programming{{Python Shell Java C++ / 3}, {Sécurité Monitoring / 5}, {Docker Kubernetes SDLC / 4}, {IA LLM RAG MLOps / 3}}
+
+% Formation
+\education{
+\textbf{Diplôme d'Ingénieur, Informatique} \\
+EFREI - École d'Ingénieurs Généralistes \\
+1999 - 2004 | Paris, France
+
+\textbf{Baccalauréat} (Série scientifique, Mathématiques) \\
+1999 | France
+}
+
+%----------------------------------------------------------------------------------------
+%	 INFORMATIONS PERSONNELLES
+%----------------------------------------------------------------------------------------
+
+\cvname{Alban ANDRIEU}
+\cvjobtitle{Architecte Cloud DevSecOps}
+
+\cvlinkedin{/in/nabla}
+\cvgithub{AlbanAndrieu} % laisser vide si non utilisé
+\cvnumberphone{+33 6 95 43 53 XX}
+\cvsite{dr-alban.com}
+\cvmail{job@dr-alban.com}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\makeprofile % Afficher la barre latérale
+
+%----------------------------------------------------------------------------------------
+%	 EXPÉRIENCE
+%----------------------------------------------------------------------------------------
+
+\section{Expérience}
+
+\begin{twentytimeline}
+	\twentyitemtimeline{\faCloud}
+		{2022 -}
+		{Présent}
+		{Architecte Cloud, Intégration (DevSecOps)}
+		{\href{https://www.jusmundi.com}{Jus Mundi}}
+		{Paris, France}
+		{\begin{itemize}
+		\item \textbf{Mission :} Transition IA et hébergement du site pour la plateforme droit international \& arbitrage (jusmundi.com)
+		\item \textbf{Sécurité infrastructure :} Analyse de vulnérabilités, gestion des secrets, contrôles d'accès
+		\item \textbf{Conteneurisation \& Kubernetes :} Images Docker, clusters K8s en production (réseau, stockage, supervision)
+		\item \textbf{SDLC :} Standardisation des processus, indicateurs qualité, coordination inter-équipes avec Dev et Data Science
+		\item \textbf{Stack :} Microservices en Python, Go, Nuxt, PHP ; IA JusMundi et recherche optimisée pour le contenu juridique international
+		\item Continuité d'activité, exigences de sécurité élevées, accompagnement du déploiement IA (Engineering et Data Science)
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faUsers}
+		{2012 -}
+		{2022}
+		{Architecte Intégration Cloud}
+		{\href{https://finastra.com}{Finastra} (ex-Misys / Thomson Reuters)}
+		{Paris, France}
+		{\begin{itemize}
+		\item \textbf{Mission :} Transformation digitale et migration cloud — Trésorerie \& Marchés de capitaux (finastra.com)
+		\item Mise en place de l'intégration continue et de l'automatisation
+		\item Déploiement des pipelines Jenkins et Ansible ; réduction de 60\,\% des incidents d'intégration
+		\item Sécurité : SAST/DAST, Klocwork, Fuzzing, détection de secrets, gestion des vulnérabilités
+		\item Collaboration avec les équipes développement, QA et opérations pour les bonnes pratiques DevSecOps
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faCode}
+		{2007 -}
+		{2012}
+		{Ingénieur Logiciel Senior}
+		{\href{https://finastra.com}{Finastra}}
+		{Paris, France}
+		{\begin{itemize}
+		\item \textbf{Mission :} Modules stock et comptabilité — Kondor+ Back-Office (K+TP)
+		\item Architecture 3 tiers : services métier C++, Java J2EE, middleware CORBA
+		\item Gestion des stocks en temps réel ; génération automatique des écritures bilancielles et hors bilan (conformité réglementaire)
+		\item Optimisation des performances pour le traitement à fort volume
+		\end{itemize}}
+	\\
+	\twentyitemtimeline{\faBriefcase}
+		{2005 -}
+		{2010}
+		{Ingénieur Logiciel}
+		{Société Générale Corporate \& Investment Banking (via ESN)}
+		{Paris, France}
+		{\begin{itemize}
+		\item \textbf{Mission :} Systèmes d'information back-office (EOLE, GATE)
+		\item Développement et maintenance en C, PL/SQL, Java ; migration Oracle 8i vers 10g ; migration True64 vers Sun Solaris
+		\item Support niveau 2, gestion des incidents de production, analyse des besoins avec les analystes métier
+		\end{itemize}}
+\end{twentytimeline}
+
+
+%----------------------------------------------------------------------------------------
+%	 LANGUES
+%----------------------------------------------------------------------------------------
+\section{Langues}
+
+\textbf{Français} — Langue maternelle | \textbf{Anglais} — Professionnel (TOEIC 750)
+
+%----------------------------------------------------------------------------------------
+%	 INFORMATIONS COMPLÉMENTAIRES
+%----------------------------------------------------------------------------------------
+\section{Informations complémentaires}
+
+Disponibilité : ouvert aux missions en conseil et en contrat. Autorisation de travail : France et UE. Expérience du télétravail et des équipes distribuées. Mobilité envisageable (ex. Francfort).
+
+%----------------------------------------------------------------------------------------
+%	 RÉSUMÉ PROFESSIONNEL
+%----------------------------------------------------------------------------------------
+
+
+\end{document}

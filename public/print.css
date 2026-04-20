@@ -1,0 +1,612 @@
+/* Print Styles for PDF Export
+ * Optimizes all pages and CV for printing as PDF
+ */
+
+@media print {
+	/* Page Setup - no running header/footer; disable "Headers and footers" in print dialog for clean PDF */
+	@page {
+		size: A4;
+		margin: 1.5cm 1cm;
+	}
+
+	/* Reset basic styles */
+	*,
+	*::before,
+	*::after {
+		background: transparent;
+		color: #000;
+		box-shadow: none;
+		text-shadow: none;
+	}
+
+	/* Body and basic elements */
+	html,
+	body {
+		width: 100%;
+		height: auto;
+		font-size: 12pt;
+		line-height: 1.4;
+		background: white;
+		color: black;
+	}
+
+	/* Hide elements not needed in print (PDF) — site chrome only:
+	   use body > header/footer so nested <header>/<footer> in articles/blockquotes stay visible */
+	nav,
+	.navbar,
+	.nav,
+	.navigation,
+	header.navbar,
+	body > header,
+	body > footer,
+	.skip-to-main,
+	.page-nav,
+	.hero-section,
+	.contact-section,
+	.google-translate-widget,
+	/* Axeptio cookie / CMP (overlay, trigger, SDK UI) */
+		[id^="axeptio"],
+	iframe[src*="axept.io"],
+	.btn,
+	.cta-buttons,
+	.social-links,
+	.theme-toggle,
+	button,
+	.print-menu-container,
+	.back-link,
+	#navbarHeader,
+	.collapse,
+	[role="navigation"],
+	.footer-links,
+	.social-media-icons,
+	.contact-methods,
+	.back-to-top,
+	#coffee-fab,
+	#coffeeModal,
+	[href="#"],
+	script,
+	noscript {
+		display: none;
+	}
+
+	/* Show important content */
+	main,
+	article,
+	section,
+	.content,
+	.main-content {
+		display: block;
+		width: 100%;
+	}
+
+	/* Typography */
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		page-break-after: avoid;
+		page-break-inside: avoid;
+		font-weight: bold;
+		color: #000;
+	}
+
+	h1 {
+		font-size: 20pt;
+		margin-top: 0;
+		margin-bottom: 12pt;
+	}
+
+	h2 {
+		font-size: 16pt;
+		margin-top: 12pt;
+		margin-bottom: 8pt;
+	}
+
+	h3 {
+		font-size: 14pt;
+		margin-top: 10pt;
+		margin-bottom: 6pt;
+	}
+
+	p,
+	li {
+		orphans: 3;
+		widows: 3;
+		line-height: 1.5;
+	}
+
+	/* Links */
+	a {
+		color: #000;
+		text-decoration: underline;
+	}
+
+	/* Show URLs for important external links only */
+	a[href^="http"]:not([href*="localhost"]):not([href*="#"]):after,
+	a[href^="mailto:"]:after {
+		content: " (" attr(href) ")";
+		font-size: 90%;
+		color: #666;
+		word-break: break-all;
+	}
+
+	/* Don't show URLs for internal links, anchors, or javascript */
+	a[href^="#"]:after,
+	a[href^="javascript:"]:after,
+	a[href=""]:after {
+		content: "";
+	}
+
+	/* Images */
+	img {
+		max-width: 100%;
+		page-break-inside: avoid;
+		display: block;
+	}
+
+	.profile-image,
+	.img-fluid {
+		border: 1px solid #ddd;
+		max-width: 150px;
+		height: auto;
+	}
+
+	/* Lists */
+	ul,
+	ol {
+		page-break-inside: avoid;
+	}
+
+	li {
+		page-break-inside: avoid;
+	}
+
+	/* Tables */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		page-break-inside: avoid;
+	}
+
+	thead {
+		display: table-header-group;
+	}
+
+	tr {
+		page-break-inside: avoid;
+	}
+
+	td,
+	th {
+		border: 1px solid #ddd;
+		padding: 8pt;
+	}
+
+	/* Sections and Cards (hero/contact hidden above) */
+	.services-section,
+	.skills-section,
+	.tools-section {
+		page-break-inside: avoid;
+		padding: 0;
+		margin-bottom: 20pt;
+		background: white;
+	}
+
+	.service-card,
+	.skill-category,
+	.card {
+		page-break-inside: avoid;
+		border: 1px solid #ddd;
+		box-shadow: none;
+		margin-bottom: 10pt;
+		padding: 10pt;
+		background: white;
+	}
+
+	.card-body {
+		padding: 10pt;
+	}
+
+	/* Containers */
+	.container,
+	.container-fluid {
+		width: 100%;
+		max-width: 100%;
+		padding: 0;
+		margin: 0;
+	}
+
+	.row {
+		display: block;
+		width: 100%;
+	}
+
+	.col,
+	.col-md-1,
+	.col-md-2,
+	.col-md-3,
+	.col-md-4,
+	.col-md-5,
+	.col-md-6,
+	.col-md-7,
+	.col-md-8,
+	.col-md-9,
+	.col-md-10,
+	.col-md-11,
+	.col-md-12 {
+		width: 100%;
+		float: none;
+		display: block;
+	}
+
+	/* CV Specific Styles */
+	.list-group-item {
+		border: 1px solid #ddd;
+		padding: 8pt;
+		margin-bottom: 2pt;
+	}
+
+	.badge {
+		border: 1px solid #000;
+		padding: 2pt 4pt;
+	}
+
+	/* Skills and tags */
+	.skill-tags,
+	.skills-grid {
+		display: block;
+	}
+
+	.skill-tag {
+		display: inline-block;
+		border: 1px solid #ddd;
+		padding: 2pt 6pt;
+		margin: 2pt;
+		background: white;
+	}
+
+	/* Avoid breaking */
+	pre,
+	blockquote,
+	img,
+	figure {
+		page-break-inside: avoid;
+	}
+
+	/* Hero section for CV */
+	.hero-title {
+		margin-bottom: 10pt;
+	}
+
+	.hero-subtitle {
+		margin-bottom: 8pt;
+	}
+
+	.hero-description {
+		margin-bottom: 12pt;
+	}
+
+	/* Icon handling */
+	.fa,
+	.fas,
+	.far,
+	.fab,
+	i[class*="fa-"] {
+		color: #000;
+		font-size: 10pt;
+	}
+
+	/* Grid layouts */
+	.services-grid,
+	.tools-grid {
+		display: block;
+	}
+
+	.service-card,
+	.tool-item {
+		margin-bottom: 10pt;
+	}
+
+	/* Remove animations and transitions */
+	*,
+	*::before,
+	*::after {
+		animation: none;
+		transition: none;
+	}
+
+	/* Contact info */
+	.contact-method {
+		page-break-inside: avoid;
+		margin-bottom: 10pt;
+		border: 1px solid #ddd;
+		padding: 8pt;
+	}
+
+	/* Better spacing for print */
+	.py-5,
+	.my-5 {
+		padding-top: 15pt;
+		padding-bottom: 15pt;
+	}
+
+	.mt-3,
+	.my-3 {
+		margin-top: 10pt;
+	}
+
+	.mb-3,
+	.my-3 {
+		margin-bottom: 10pt;
+	}
+
+	/* Section titles */
+	.section-title {
+		font-size: 18pt;
+		margin-bottom: 10pt;
+		color: #000;
+	}
+
+	.section-subtitle {
+		font-size: 12pt;
+		margin-bottom: 8pt;
+		color: #333;
+	}
+
+	/* Background colors to white */
+	.bg-primary,
+	.bg-secondary,
+	.bg-dark,
+	.bg-light,
+	.bg-warning,
+	.bg-info,
+	.bg-success,
+	.bg-danger {
+		background-color: white;
+		color: #000;
+	}
+
+	/* Ensure good contrast */
+	.text-light,
+	.text-muted {
+		color: #333;
+	}
+
+	/* LinkedIn and social media sections */
+	.list-group {
+		border: none;
+	}
+
+	/* Make sure logos are visible but not too large */
+	.tool-item img,
+	img[src*="logo"] {
+		max-width: 80px;
+		height: auto;
+		filter: grayscale(100%);
+	}
+
+	/* Page breaks for better layout */
+	.page-break {
+		page-break-after: always;
+	}
+
+	.page-break-before {
+		page-break-before: always;
+	}
+
+	.no-page-break {
+		page-break-inside: avoid;
+	}
+}
+
+/* Print and Markdown button styles - visible on screen only */
+@media screen {
+	.print-button {
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		padding: 12px 24px;
+		background-color: var(--site-fab-bg, #2563eb);
+		color: var(--site-fab-fg, #fff);
+		border: var(--site-fab-border, none);
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		box-shadow: var(--site-fab-shadow, 0 4px 12px rgba(37, 99, 235, 0.3));
+		z-index: 1000;
+		transition:
+			background-color 0.3s ease,
+			color 0.3s ease,
+			box-shadow 0.3s ease,
+			transform 0.3s ease;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.print-button__icon {
+		margin-right: 8px;
+		flex-shrink: 0;
+	}
+
+	.print-button:hover {
+		background-color: var(--site-fab-hover-bg, #1d4ed8);
+		color: var(--site-fab-hover-fg, var(--site-fab-fg, #fff));
+		transform: translateY(-2px);
+		box-shadow: var(--site-fab-shadow, 0 6px 16px rgba(37, 99, 235, 0.4));
+	}
+
+	.print-button i {
+		margin-right: 8px;
+	}
+
+	.markdown-button {
+		position: fixed;
+		bottom: 80px;
+		right: 20px;
+		padding: 12px 24px;
+		background-color: #10b981;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+		z-index: 1000;
+		transition: all 0.3s ease;
+	}
+
+	.markdown-button:hover {
+		background-color: #059669;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+	}
+
+	.markdown-button i {
+		margin-right: 8px;
+	}
+
+	/* Mobile: icon-only FAB (full phrase in aria-label / title) */
+	@media (max-width: 575.98px) {
+		.print-button {
+			bottom: 12px;
+			right: 12px;
+			width: 2.75rem;
+			height: 2.75rem;
+			min-width: 2.75rem;
+			padding: 0;
+			border-radius: 50%;
+			font-size: 0;
+			max-width: none;
+			box-sizing: border-box;
+		}
+
+		.print-button__label {
+			display: none;
+		}
+
+		.print-button__icon {
+			margin-right: 0;
+			width: 22px;
+			height: 22px;
+		}
+	}
+
+	/* Alternative inline print link style */
+	.print-link {
+		display: inline-flex;
+		align-items: center;
+		padding: 8px 16px;
+		background-color: #f3f4f6;
+		color: #1f2937;
+		text-decoration: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		border: 1px solid #e5e7eb;
+	}
+
+	.print-link:hover {
+		background-color: #e5e7eb;
+		color: #111827;
+		text-decoration: none;
+	}
+
+	.print-link i {
+		margin-right: 6px;
+	}
+
+	/* Combined Print Menu Button with Dropdown */
+	.print-menu-container {
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		z-index: 1000;
+	}
+
+	.print-menu-button {
+		display: flex;
+		align-items: center;
+		padding: 12px 24px;
+		background-color: #2563eb;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+		transition: all 0.3s ease;
+		gap: 8px;
+	}
+
+	.print-menu-button:hover {
+		background-color: #1d4ed8;
+		box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+	}
+
+	.print-menu-button i {
+		margin-right: 4px;
+	}
+
+	.print-menu-button .dropdown-arrow {
+		margin-left: 4px;
+		font-size: 12px;
+		transition: transform 0.3s ease;
+	}
+
+	.print-menu-dropdown {
+		display: none;
+		position: absolute;
+		bottom: 100%;
+		right: 0;
+		margin-bottom: 8px;
+		background-color: white;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		min-width: 220px;
+		overflow: hidden;
+	}
+
+	.print-menu-dropdown button {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: 12px 16px;
+		background-color: white;
+		color: #1f2937;
+		border: none;
+		text-align: left;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		gap: 10px;
+	}
+
+	.print-menu-dropdown button:hover {
+		background-color: #f3f4f6;
+	}
+
+	.print-menu-dropdown button i {
+		width: 20px;
+		color: #6b7280;
+	}
+
+	.print-menu-dropdown button.primary-option {
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.print-menu-dropdown button.primary-option i {
+		color: #2563eb;
+	}
+
+	.print-menu-dropdown button.secondary-option i {
+		color: #10b981;
+	}
+}
