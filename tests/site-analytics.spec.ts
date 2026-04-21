@@ -1,4 +1,19 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+async function injectSiteAnalytics(
+	page: Page,
+	attrs: Record<string, string> = {},
+) {
+	await page.evaluate((injectedAttrs) => {
+		const script = document.createElement("script");
+		script.src = "/site-analytics.js";
+		script.setAttribute("data-test-injected", "true");
+		Object.entries(injectedAttrs).forEach(([name, value]) => {
+			script.setAttribute(name, value);
+		});
+		document.head.appendChild(script);
+	}, attrs);
+}
 
 test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
@@ -79,4 +94,6 @@ test.describe("Site analytics loader regression tests", () => {
 		await expect(ahrefs).toHaveCount(1);
 		await expect(ahrefs).toHaveAttribute("data-key", "tg3zLMS/bebJFl0LxctiCw");
 	});
+
 });
+

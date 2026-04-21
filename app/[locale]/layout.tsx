@@ -61,9 +61,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="referrer" content="always" />
 			</head>
 			<body className="page-dark">
-				<div className="google-translate-widget">
-					<div id="google_translate_element" />
-				</div>
+				{/* Google Translate DOM comes from /site-widgets.js (toggle + panel on small viewports). */}
 				<NextIntlClientProvider messages={messages}>
 					{children}
 					<SiteFooter />

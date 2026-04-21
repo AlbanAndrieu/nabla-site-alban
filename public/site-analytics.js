@@ -36,7 +36,7 @@
 			return /(?:^|[?&])nablaEnableThirdParty=1(?:&|$)/.test(
 				location.search || "",
 			);
-		} catch (_e) {
+		} catch {
 			return false;
 		}
 	}
@@ -49,7 +49,7 @@
 				h === "127.0.0.1" ||
 				h === "[::1]"
 			);
-		} catch (_e2) {
+		} catch {
 			return false;
 		}
 	}
