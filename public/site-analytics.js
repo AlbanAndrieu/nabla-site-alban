@@ -48,8 +48,8 @@
 					function g(a, d) {
 						var b = d.split(".");
 						2 === b.length && ((a = a[b[0]]), (d = b[1]));
-						a[d] = () => {
-							a.push([d].concat(Array.prototype.slice.call(arguments, 0)));
+						a[d] = (...args) => {
+							a.push([d].concat(args));
 						};
 					}
 					var a = b;
@@ -68,19 +68,15 @@
 						);
 					for (h = 0; h < i.length; h++) g(a, i[h]);
 					var j = "set set_once union unset remove delete".split(" ");
-					a.get_group = () => {
+					a.get_group = (...getGroupArgs) => {
 						function b(c) {
-							d[c] = () => {
-								call2_args = arguments;
-								call2 = [c].concat(Array.prototype.slice.call(call2_args, 0));
-								a.push([e, call2]);
+							d[c] = (...callArgs) => {
+								a.push([e, [c].concat(callArgs)]);
 							};
 						}
 						for (
 							var d = {},
-								_e = ["get_group"].concat(
-									Array.prototype.slice.call(arguments, 0),
-								),
+								_e = ["get_group"].concat(getGroupArgs),
 								c = 0;
 							c < j.length;
 							c++
@@ -171,14 +167,14 @@
 	function vercel() {
 		window.va =
 			window.va ||
-			(() => {
+			function () {
 				(window.vaq = window.vaq || []).push(arguments);
-			});
+			};
 		window.si =
 			window.si ||
-			(() => {
+			function () {
 				(window.siq = window.siq || []).push(arguments);
-			});
+			};
 		loadDefer("/_vercel/insights/script.js");
 		loadDefer("/_vercel/speed-insights/script.js");
 	}
@@ -379,8 +375,8 @@
 				function g(t, e) {
 					var o = e.split(".");
 					2 === o.length && ((t = t[o[0]]), (e = o[1])),
-						(t[e] = () => {
-							t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+						(t[e] = (...args) => {
+							t.push([e].concat(args));
 						});
 				}
 				((p = t.createElement("script")).type = "text/javascript"),
@@ -459,8 +455,7 @@
 					"clearPageviewProperties",
 					"trackPageview",
 				],
-				i = (e) => () => {
-					var t = Array.prototype.slice.call(arguments, 0);
+				i = (e) => (...t) => {
 					window.heapReadyCb.push({
 						name: e,
 						fn: () => {

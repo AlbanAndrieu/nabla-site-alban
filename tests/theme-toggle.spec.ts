@@ -1,6 +1,17 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/** Home layout injects `site-widgets.js` via Next `<Script strategy="afterInteractive">`; `load` can fire before it runs. */
+async function expectThemeToggleMounted(page: Page) {
+	const root = page.locator("#theme-toggle-root");
+	await expect(root).toBeAttached({ timeout: 15_000 });
+	await expect(root).toBeVisible();
+	return root;
+}
 
 test.describe("Theme Toggle Tests", () => {
+	/* Avoid hammering `next dev` with parallel `/` navigations; Turbopack + afterInteractive can skip widget inject. */
+	test.describe.configure({ mode: "serial" });
+
 	test("should have theme toggle button", async ({ page }) => {
 		await page.goto("/");
 
@@ -18,8 +29,7 @@ test.describe("Theme Toggle Tests", () => {
 	}) => {
 		await page.goto("/");
 
-		const root = page.locator("#theme-toggle-root");
-		await expect(root).toBeVisible();
+		const root = await expectThemeToggleMounted(page);
 		await expect(root).toHaveAttribute("role", "region");
 		await expect(root).toHaveAttribute("aria-label", "Display theme");
 
@@ -51,7 +61,7 @@ test.describe("Theme Toggle Tests", () => {
 		await page.goto("/");
 
 		await expect(
-			page.locator('#theme-toggle-root [data-theme="auto"]'),
+			(await expectThemeToggleMounted(page)).locator('[data-theme="auto"]'),
 		).toHaveAttribute("aria-pressed", "true");
 
 		const resolvedPreference = await page.evaluate(() => {
@@ -63,12 +73,9 @@ test.describe("Theme Toggle Tests", () => {
 	test("should toggle between light and dark theme", async ({ page }) => {
 		await page.goto("/");
 
-		const lightBtn = page.locator(
-			'#theme-toggle-root .theme-toggle__btn[data-theme="light"]',
-		);
-		const darkBtn = page.locator(
-			'#theme-toggle-root .theme-toggle__btn[data-theme="dark"]',
-		);
+		const root = await expectThemeToggleMounted(page);
+		const lightBtn = root.locator('.theme-toggle__btn[data-theme="light"]');
+		const darkBtn = root.locator('.theme-toggle__btn[data-theme="dark"]');
 
 		await expect(lightBtn).toHaveCount(1);
 		await expect(darkBtn).toHaveCount(1);
@@ -101,9 +108,8 @@ test.describe("Theme Toggle Tests", () => {
 	test("should persist theme preference", async ({ page }) => {
 		await page.goto("/");
 
-		const darkBtn = page.locator(
-			'#theme-toggle-root .theme-toggle__btn[data-theme="dark"]',
-		);
+		const root = await expectThemeToggleMounted(page);
+		const darkBtn = root.locator('.theme-toggle__btn[data-theme="dark"]');
 		await expect(darkBtn).toBeVisible();
 		await darkBtn.scrollIntoViewIfNeeded();
 		await darkBtn.click({ force: true });
@@ -136,8 +142,7 @@ test.describe("Theme Toggle Tests", () => {
 	test("should apply correct styles in dark mode", async ({ page }) => {
 		await page.goto("/");
 
-		const root = page.locator("#theme-toggle-root");
-		await expect(root).toBeVisible();
+		const root = await expectThemeToggleMounted(page);
 		const lightBtn = root.locator('.theme-toggle__btn[data-theme="light"]');
 		const darkBtn = root.locator('.theme-toggle__btn[data-theme="dark"]');
 

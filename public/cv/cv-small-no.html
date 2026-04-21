@@ -34,6 +34,7 @@
 		<link rel="icon" href="../assets/nabla/nabla-4.svg" />
 
 		<link rel="stylesheet" href="../wireframe.css" />
+		<link rel="stylesheet" href="../theme.css" />
 		<link rel="stylesheet" href="cv-theme.css" />
 
 		<!-- Print Styles for PDF Export -->
@@ -131,41 +132,12 @@
 			}
 		</style>
 
-		<!-- CV Markdown Export Script -->
-		<script src="../cv-markdown-export.js"></script>
-		<!-- Print Menu Script -->
-		<script src="../print-menu.js"></script>
 		<script src="../theme-toggle.js"></script>
-		<script src="../site-google-translate.js" defer></script>
 		<script src="../site-analytics.js"></script>
 	</head>
 	<body class="cv-page-body">
 		<a name="top"></a>
 		<!-- Combined Print/Export Menu Button (hidden when printing) -->
-		<div class="print-menu-container">
-			<button
-				class="print-menu-button"
-				onclick="togglePrintMenu(event)"
-				aria-label="Skriv ut eller eksportmeny"
-				aria-haspopup="true"
-				aria-expanded="false"
-			>
-				<i class="fas fa-print"></i>
-				<span>Skriv ut / Lagre som PDF</span>
-				<i class="fas fa-chevron-up dropdown-arrow"></i>
-			</button>
-			<div id="print-menu-dropdown" class="print-menu-dropdown" role="menu" aria-label="Utskrifts- og eksportvalg">
-				<button class="primary-option" onclick="handlePrintPDF()" role="menuitem">
-					<i class="fas fa-file-pdf"></i>
-					<span>Skriv ut / Lagre som PDF</span>
-				</button>
-				<button class="secondary-option" onclick="handleExportMarkdown()" role="menuitem">
-					<i class="fas fa-file-code"></i>
-					<span>Last ned som Markdown</span>
-				</button>
-			</div>
-		</div>
-
 		<div class="cv-container">
 			<div class="header">
 				<h1>Alban ANDRIEU</h1>
@@ -193,7 +165,17 @@
 				<div class="job-entry">
 					<div class="job-header">
 						<div class="company">
-							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"><img src="../assets/nabla/jusmundi-favicon.ico" alt="" width="16" height="16" class="jusmundi-link-icon" decoding="async" aria-hidden="true" />Jus Mundi</a>
+							<a href="https://www.jusmundi.com" target="_blank" rel="noopener noreferrer"
+								><img
+									src="../assets/nabla/jusmundi-favicon.ico"
+									alt=""
+									width="16"
+									height="16"
+									class="jusmundi-link-icon"
+									decoding="async"
+									aria-hidden="true"
+								/>Jus Mundi</a
+							>
 						</div>
 						<div class="period">Siden mars 2022 — Paris, Frankrike</div>
 					</div>
@@ -259,6 +241,6 @@
 
 			<a href="/cv" class="back-link">← Tilbake til CV-indeks</a>
 		</div>
-		<script src="../site-widgets.js" defer data-print-pdf data-coffee-fab></script>
+		<script src="../site-widgets.js" defer data-print-pdf data-no-coffee-fab data-no-google-translate></script>
 	</body>
 </html>

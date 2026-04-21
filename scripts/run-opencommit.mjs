@@ -4,8 +4,8 @@
  * `PWD` is often unset in non-interactive shells, which breaks detection. Pin both here.
  */
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const cli = path.join(root, "node_modules", "opencommit", "out", "cli.cjs");
