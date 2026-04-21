@@ -17,16 +17,13 @@ The repository layout looks like this (main items):
 📁 .
 ├── ⚙️ .cursor/rules/                  <- LLM instructions for Cursor IDE (*.mdc)
 ├── 🧑‍💻 .github/
-│   ├── 📄 copilot-instructions.md, github-actions-best-practices.md, hugo-best-practices.md, vercel-deployment-instructions.md
+│   ├── 📄 copilot-instructions.md, github-actions-best-practices.md, vercel-deployment-instructions.md
 │   └── ⚡ workflows/                 <- Playwright, Mega-Linter, Docker build, PDF build, OpenCommit
 ├── 💻 .vscode/                       <- Settings, MCP config, copilot-instructions
-├── 📁 api/                           <- API (e.g. honeypot)
-├── 📁 archetypes/                    <- Hugo archetypes (if used)
-├── 📁 content/                      <- Hugo content (if used)
+├── 📁 api/                           <- Vercel serverless API (Node.js, e.g. Stripe)
 ├── 📚 docs/                          <- Project documentation
 ├── 📁 etc/                           <- Config / scripts
-├── 🐳 Dockerfile                     <- Docker image for the project
-├── 📁 layouts/                       <- Hugo layouts (if used)
+├── 🐳 Dockerfile                     <- Static site image (nginx + public/)
 ├── 👷‍♂️ Makefile                       <- Build, test, format, deploy commands
 ├── 📦 package.json                   <- Node deps, scripts (start-python, test Playwright)
 ├── 📄 playwright.config.ts           <- Playwright test config (baseURL, webServer)
@@ -45,12 +42,11 @@ The repository layout looks like this (main items):
 │   ├── 📁 policy/                    <- Policy pages (privacy, terms)
 │   └── 📁 reports/                   <- Report HTML (e.g. snort, pgbadger)
 ├── 📁 scripts/                       <- Utility scripts
-├── 📁 static/                        <- Static assets for Hugo (if used)
 ├── 🧪 tests/                         <- Playwright tests
 │   ├── accessibility.spec.ts         <- A11y (labels, alt, theme toggle, etc.)
 │   ├── homepage.spec.ts, navigation.spec.ts, responsive.spec.ts, 404.spec.ts
 │   └── README.md
-├── 📁 vendor/                        <- Composer/PHP deps (if used)
+├── 📁 vendor/                        <- Optional third-party dir (gitignored if present)
 ├── 👩‍⚖️ LICENSE
 ├── 📰 README.md
 ├── 📄 vercel.json, wrangler.jsonc    <- Deployment (Vercel, Cloudflare)

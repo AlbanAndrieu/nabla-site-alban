@@ -27,7 +27,7 @@ This is the nabla-site-nabla repository, a static website project for "nabla" cr
 ### Key Directories
 - `public/` - Static assets directory served by Cloudflare/Vercel (HTML, CSS, JS, JSON)
 - `my-app/` - Next.js application (separate package with its own package.json)
-- `api/` - API functions (contains `index.php`)
+- `api/` - Vercel serverless API (Node.js, e.g. `create-checkout-session.js`)
 - `scripts/` - Utility scripts (e.g., `run-wicked.sh`)
 - `.github/workflows/` - SDLC workflows (OpenCommit action)
 
