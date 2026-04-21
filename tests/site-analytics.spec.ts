@@ -4,7 +4,7 @@ test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
 		page,
 	}) => {
-		await page.goto("/");
+		await page.goto("/expertise.html?nablaEnableThirdParty=1");
 
 		await expect
 			.poll(async () => {
@@ -19,7 +19,7 @@ test.describe("Site analytics loader regression tests", () => {
 			page.locator('script[src*="/_vercel/insights/script.js"]'),
 		).toHaveCount(1);
 		await expect(
-			page.locator('script[src="/_vercel/speed-insights/script.js"]'),
+			page.locator('script[src*="/_vercel/speed-insights/script.js"]'),
 		).toHaveCount(1);
 	});
 
@@ -71,7 +71,7 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should load Ahrefs script when key is provided", async ({ page }) => {
-		await page.goto("/test.html");
+		await page.goto("/test.html?nablaEnableThirdParty=1");
 
 		const ahrefs = page.locator(
 			'script[src="https://analytics.ahrefs.com/analytics.js"][data-key]',

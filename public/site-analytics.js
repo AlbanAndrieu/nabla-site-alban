@@ -9,6 +9,9 @@
  *   - "home": Mixpanel loader, GTM + gtag, then same as "full" (use this instead of a duplicate Mixpanel inline snippet in HTML)
  *
  * Optional: data-ahrefs-key="…" — loads Ahrefs Web Analytics (any mode).
+ * Local dev: on localhost / 127.0.0.1 / ::1, Ahrefs and Vercel insight `<script src>` tags
+ * are skipped (Ahrefs ignores localhost anyway; `/_vercel/*` often serves HTML in `next dev`).
+ * E2E that must assert those tags: open the page with `?nablaEnableThirdParty=1`.
  * Optional: data-gtm-id, data-ga-measurement-id — override default GTM container and GA4 id.
  * Optional: window.NABLA_ANALYTICS_PRESET = { gtmContainerId, gaMeasurementId } when no script attrs.
  *
@@ -28,7 +31,35 @@
 	var gtmInjected = false;
 	var gtagInjected = false;
 
+	function thirdPartyAnalyticsBypassLocal() {
+		try {
+			return /(?:^|[?&])nablaEnableThirdParty=1(?:&|$)/.test(
+				location.search || "",
+			);
+		} catch (_e) {
+			return false;
+		}
+	}
+
+	function isLikelyLocalHost() {
+		try {
+			var h = location.hostname;
+			return (
+				h === "localhost" ||
+				h === "127.0.0.1" ||
+				h === "[::1]"
+			);
+		} catch (_e2) {
+			return false;
+		}
+	}
+
+	function skipRemoteAnalyticsOnLocalDev() {
+		return isLikelyLocalHost() && !thirdPartyAnalyticsBypassLocal();
+	}
+
 	function loadAhrefsFromAttr() {
+		if (skipRemoteAnalyticsOnLocalDev()) return;
 		var key = root?.getAttribute("data-ahrefs-key");
 		if (!key) return;
 		var s = document.createElement("script");
@@ -175,8 +206,10 @@
 			function () {
 				(window.siq = window.siq || []).push(arguments);
 			};
-		loadDefer("/_vercel/insights/script.js");
-		loadDefer("/_vercel/speed-insights/script.js");
+		if (!skipRemoteAnalyticsOnLocalDev()) {
+			loadDefer("/_vercel/insights/script.js");
+			loadDefer("/_vercel/speed-insights/script.js");
+		}
 	}
 
 	loadAhrefsFromAttr();
