@@ -79,14 +79,14 @@ test.describe("Responsive Design Tests", () => {
 	test("should adapt layout between mobile and desktop", async ({ page }) => {
 		// Check mobile layout
 		await page.setViewportSize({ width: 375, height: 667 });
-		await page.goto("/");
+		await page.goto("/", { waitUntil: "domcontentloaded" });
 		const mobileBodyWidth = await page.evaluate(
 			() => document.body.offsetWidth,
 		);
 
 		// Check desktop layout
 		await page.setViewportSize({ width: 1920, height: 1080 });
-		await page.goto("/");
+		await page.goto("/", { waitUntil: "domcontentloaded" });
 		const desktopBodyWidth = await page.evaluate(
 			() => document.body.offsetWidth,
 		);
@@ -107,7 +107,7 @@ test.describe("Responsive Design Tests", () => {
 				width: viewport.width,
 				height: viewport.height,
 			});
-			await page.goto("/");
+			await page.goto("/", { waitUntil: "domcontentloaded" });
 
 			// Check that body text is visible and has reasonable font size
 			const fontSize = await page.evaluate(() => {
