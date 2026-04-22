@@ -16,8 +16,6 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 This is a simple HTML project for Nabla company that promotes Alban Andrieu as an experienced DevSecOps professional.
 
-Default nabla files for apache
-
 ### GitHub Actions
 The repository currently includes these workflows:
 
@@ -28,8 +26,6 @@ The repository currently includes these workflows:
 5. OpenCommit Action (`.github/workflows/opencommit.yml`)
 6. Copilot Setup Steps (`.github/workflows/copilot-setup-steps.yml`)
 
-There is no `.github/workflows/hugo-deploy.yml` file in this repository. Hugo scripts are available for local use via `npm run hugo:build` and `npm run hugo:dev`.
-
 Workflow secrets currently used:
 - `DOCKER_USERNAME`, `DOCKER_PASSWORD` (Docker CI)
 - `OCO_API_KEY` (OpenCommit)
@@ -39,7 +35,7 @@ Workflow secrets currently used:
 
 This repository contains multiple deployable projects:
 
-1. **Root Project** - PHP API + Static HTML site
+1. **Root Project** - Static HTML site in `public/` plus Vercel serverless API routes in `api/` (Node.js)
 2. **my-app/** - Next.js application (separate Vercel deployment)
 3. **vue-client/** - Vue/Vite application (separate Vercel deployment)
 
@@ -55,31 +51,22 @@ For analytics mode selection, shared widget attributes, script integration examp
 
 ## Deployment
 
-### Root Project (PHP + Static Site)
+### Root project (static site + Vercel API)
 
 ```bash
-npm run start-python
+npm run start:python
 # Cloudflare wrangler
 npm run start
 ```
 
-For vercel
+For Vercel:
 
 ```
 vc build
 vercel dev
 
 vercel deploy
-# php -S localhost:8000 api/index.php
 vercel --prod
-```
-
-For vercel [php](https://github.com/vercel-community/php)
-
-```bash
-composer install --ignore-platform-req=ext-mbstring
-
-php -S localhost:8000 api/index.php
 ```
 
 ### Stripe Checkout
@@ -107,16 +94,13 @@ Details: `docs/checkout-support-runbook.md`.
 
 ### Local Apache deployment
 
-For Apache
+Point the virtual host `DocumentRoot` at the `public/` directory, then for example:
 
 ```bash
 aa-teardown
 sudo service apache2 restart
-sudo service php8.4-fpm restart
 tail -f /var/log/apache2/error.log
 ```
-
-[php-framework-symfony-microservice](https://github.com/contributte/vercel-examples/tree/master/php-framework-symfony-microservice)
 
 ```bash
 # Python 2

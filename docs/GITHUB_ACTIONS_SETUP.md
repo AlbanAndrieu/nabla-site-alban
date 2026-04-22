@@ -13,8 +13,6 @@ The repository currently includes:
 5. `opencommit.yml` — automated commit message helper.
 6. `copilot-setup-steps.yml` — setup flow for Copilot coding agent runs.
 
-There is no `hugo-deploy.yml` workflow in the repository.
-
 ## Required GitHub secrets
 
 ### 1. `DOCKER_USERNAME`

@@ -4,10 +4,9 @@ test.describe("Google Translate Widget Tests", () => {
 	test("should have Google Translate widget container", async ({ page }) => {
 		await page.goto("/");
 
-		// Container is in the DOM; content may load async from Google so we assert attached.
-		// The wrapper .google-translate-widget has min size so the page region is visible.
+		// Wrapper is injected by /site-widgets.js (Next Script afterInteractive), not SSR.
 		const wrapper = page.locator(".google-translate-widget");
-		await expect(wrapper).toBeVisible();
+		await expect(wrapper).toBeVisible({ timeout: 15_000 });
 		const translateElement = page.locator("#google_translate_element");
 		await expect(translateElement).toBeAttached();
 	});
@@ -50,7 +49,10 @@ test.describe("Google Translate Widget Tests", () => {
 		if ((await translateElement.count()) > 0) {
 			const vw = page.viewportSize()?.width ?? 1280;
 			if (vw <= 575) {
-				await page.locator(".google-translate-widget__toggle").click();
+				const toggle = page.locator(".google-translate-widget__toggle");
+				await expect(toggle).toBeAttached({ timeout: 15_000 });
+				await expect(toggle).toBeVisible();
+				await toggle.click();
 			}
 
 			await expect(translateElement).toBeInViewport();

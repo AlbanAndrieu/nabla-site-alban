@@ -1,29 +1,18 @@
-# Static Directory
+# Public web root
 
-This directory contains static assets that Hugo copies directly to the output without processing.
+This directory is the **static site root** for the project: HTML, CSS, client scripts, and assets served by Vercel, Cloudflare, or a local static file server (`public/` is the document root).
 
-## Usage
+## Layout
 
-Files in this directory are copied to the root of the generated site:
-
-```
-static/
-├── css/
-├── js/
-├── images/
-└── favicon.ico
-```
-
-Becomes:
+Typical layout:
 
 ```
 public/
-├── css/
-├── js/
-├── images/
-└── favicon.ico
+├── index.html, *.html
+├── theme.css, …
+├── assets/
+├── cv/
+└── …
 ```
 
-## Migration Note
-
-During migration, assets from `public/assets/` will be moved here to be managed by Hugo's build process.
+Add new pages and static assets here unless they belong to a separate app (for example `my-app/` for Next.js).

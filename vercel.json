@@ -1,7 +1,7 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"version": 2,
-	"devCommand": "node server.cjs",
+	"devCommand": "npm run dev",
 	"regions": ["fra1"],
 	"github": {
 		"silent": true,

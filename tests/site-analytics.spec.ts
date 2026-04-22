@@ -1,10 +1,25 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+async function injectSiteAnalytics(
+	page: Page,
+	attrs: Record<string, string> = {},
+) {
+	await page.evaluate((injectedAttrs) => {
+		const script = document.createElement("script");
+		script.src = "/site-analytics.js";
+		script.setAttribute("data-test-injected", "true");
+		Object.entries(injectedAttrs).forEach(([name, value]) => {
+			script.setAttribute(name, value);
+		});
+		document.head.appendChild(script);
+	}, attrs);
+}
 
 test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
 		page,
 	}) => {
-		await page.goto("/");
+		await page.goto("/expertise.html?nablaEnableThirdParty=1");
 
 		await expect
 			.poll(async () => {
@@ -19,7 +34,7 @@ test.describe("Site analytics loader regression tests", () => {
 			page.locator('script[src*="/_vercel/insights/script.js"]'),
 		).toHaveCount(1);
 		await expect(
-			page.locator('script[src="/_vercel/speed-insights/script.js"]'),
+			page.locator('script[src*="/_vercel/speed-insights/script.js"]'),
 		).toHaveCount(1);
 	});
 
@@ -71,7 +86,7 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should load Ahrefs script when key is provided", async ({ page }) => {
-		await page.goto("/test.html");
+		await page.goto("/test.html?nablaEnableThirdParty=1");
 
 		const ahrefs = page.locator(
 			'script[src="https://analytics.ahrefs.com/analytics.js"][data-key]',
@@ -79,4 +94,6 @@ test.describe("Site analytics loader regression tests", () => {
 		await expect(ahrefs).toHaveCount(1);
 		await expect(ahrefs).toHaveAttribute("data-key", "tg3zLMS/bebJFl0LxctiCw");
 	});
+
 });
+

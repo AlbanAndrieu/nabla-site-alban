@@ -1,0 +1,81 @@
+name: Build CV PDFs
+on: [push, pull_request]
+
+jobs:
+  build-cv-pdfs:
+    name: Build CV PDFs (EN / FR / DE / NO)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install TeX Live
+        run: sudo apt update && sudo apt install texlive-full fonts-font-awesome
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build PDF (English)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-en.tex -output-directory=./public/cv
+      - name: Scan log (English)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-en.log
+
+      - name: Build PDF (French)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-fr.tex -output-directory=./public/cv
+      - name: Scan log (French)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-fr.log
+
+      - name: Build PDF (German)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-de.tex -output-directory=./public/cv
+      - name: Scan log (German)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-de.log
+
+      - name: Build PDF (Norwegian)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-no.tex -output-directory=./public/cv
+      - name: Scan log (Norwegian)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-no.log
+
+      - name: Build 20 secs PDF (English)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-en.tex -aux-directory=./public/cv -output-directory=./public/cv
+      - name: Scan 20 secs PDF log (English)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-en.log
+
+      - name: Build 20 secs PDF (French)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-fr.tex -aux-directory=./public/cv -output-directory=./public/cv
+      - name: Scan 20 secs PDF log (French)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-fr.log
+
+      - name: Build 20 secs PDF (German)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-de.tex -aux-directory=./public/cv -output-directory=./public/cv
+      - name: Scan 20 secs PDF log (German)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-de.log
+
+      - name: Build 20 secs PDF (Norwegian)
+        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-no.tex -aux-directory=./public/cv -output-directory=./public/cv
+      - name: Scan 20 secs PDF log (Norwegian)
+        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-no.log
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdfs
+          path: |
+            ./public/cv/cv-aandrieu-2026-en.pdf
+            ./public/cv/cv-aandrieu-2026-fr.pdf
+            ./public/cv/cv-aandrieu-2026-de.pdf
+            ./public/cv/cv-aandrieu-2026-no.pdf
+            ./public/cv/cv-aandrieu-2026-ts-en.pdf
+            ./public/cv/cv-aandrieu-2026-ts-fr.pdf
+            ./public/cv/cv-aandrieu-2026-ts-de.pdf
+            ./public/cv/cv-aandrieu-2026-ts-no.pdf
+
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-logs
+          path: |
+            ./public/cv/cv-aandrieu-2026-en.log
+            ./public/cv/cv-aandrieu-2026-fr.log
+            ./public/cv/cv-aandrieu-2026-de.log
+            ./public/cv/cv-aandrieu-2026-no.log
+            ./public/cv/cv-aandrieu-2026-ts-en.log
+            ./public/cv/cv-aandrieu-2026-ts-fr.log
+            ./public/cv/cv-aandrieu-2026-ts-de.log
+            ./public/cv/cv-aandrieu-2026-ts-no.log

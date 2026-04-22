@@ -21,11 +21,11 @@ test.describe("Homepage Tests", () => {
 			/Freelance DevSecOps engineer and cloud architect with 20\+ years/,
 		);
 
-		// Check meta keywords
+		// Check meta keywords (static HTML uses ", "; Next Metadata joins with "," only)
 		const keywords = page.locator('meta[name="keywords"]');
 		await expect(keywords).toHaveAttribute(
 			"content",
-			/freelance DevSecOps engineer, freelance cloud architect, AWS, Azure, OVH/,
+			/freelance DevSecOps engineer.*freelance cloud architect.*AWS.*Azure.*OVH/,
 		);
 
 		// Check author
@@ -58,12 +58,15 @@ test.describe("Homepage Tests", () => {
 	test("should have Twitter Card meta tags", async ({ page }) => {
 		await page.goto("/");
 
-		// Check Twitter card
-		const twitterCard = page.locator('meta[property="twitter:card"]');
+		// Next emits name="twitter:*"; static HTML used property="twitter:*"
+		const twitterCard = page.locator(
+			'meta[name="twitter:card"], meta[property="twitter:card"]',
+		);
 		await expect(twitterCard).toHaveAttribute("content", /summary/);
 
-		// Check Twitter title
-		const twitterTitle = page.locator('meta[property="twitter:title"]');
+		const twitterTitle = page.locator(
+			'meta[name="twitter:title"], meta[property="twitter:title"]',
+		);
 		await expect(twitterTitle).toHaveAttribute("content", /Alban Andrieu/);
 	});
 

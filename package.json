@@ -30,7 +30,6 @@
 		"dev:cf": "wrangler dev",
 		"start:wrangler": "wrangler dev",
 		"start:python": "npx http-server public -p 8001",
-		"start:php:": "php -S localhost:8000 api/index.php",
 		"start:stripe": "node server.cjs",
 		"test": "playwright test",
 		"test:ui": "playwright test --ui",
@@ -39,7 +38,9 @@
 		"test:report": "playwright show-report",
 		"test:unit": "node --import tsx --test \"unit-tests/**/*.test.ts\"",
 		"build:includes": "node scripts/build-html-includes.js",
-		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs"
+		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs",
+		"oco": "node scripts/run-opencommit.mjs",
+		"opencommit": "node scripts/run-opencommit.mjs"
 	},
 	"dependencies": {
 		"@astrojs/vercel": "^10.0.2",

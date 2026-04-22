@@ -43,9 +43,14 @@
 	var root = document.currentScript;
 	var preset = window.NABLA_WIDGETS || {};
 
+	/** Next.js <Script> and other injectors often leave currentScript null; resolve the real tag for data-* config. */
+	function widgetsScriptTag() {
+		return root || document.querySelector('script[src*="site-widgets.js"]');
+	}
+
 	function minimalChrome() {
 		return (
-			root?.hasAttribute("data-minimal-chrome") ||
+			widgetsScriptTag()?.hasAttribute("data-minimal-chrome") ||
 			preset.minimalChrome === true ||
 			String(preset.minimalChrome || "").toLowerCase() === "true"
 		);
@@ -260,7 +265,7 @@
 	})();
 
 	function siteOriginFromScript() {
-		var el = root || document.querySelector('script[src*="site-widgets.js"]');
+		var el = widgetsScriptTag();
 		if (!el || !el.src) {
 			return "";
 		}
@@ -276,7 +281,7 @@
 	}
 
 	function injectFontAwesome() {
-		if (root?.hasAttribute("data-no-font-awesome")) return;
+		if (widgetsScriptTag()?.hasAttribute("data-no-font-awesome")) return;
 		if (preset.noFontAwesome) return;
 		var base = siteOriginFromScript();
 		if (!base) return;
@@ -323,7 +328,7 @@
 
 	function initGoogleTranslate() {
 		if (minimalChrome()) return;
-		if (root?.hasAttribute("data-no-google-translate")) return;
+		if (widgetsScriptTag()?.hasAttribute("data-no-google-translate")) return;
 		if (preset.noGoogleTranslate) return;
 		if (window.__NABLA_GOOGLE_TRANSLATE_STARTED) return;
 		window.__NABLA_GOOGLE_TRANSLATE_STARTED = true;
@@ -353,7 +358,34 @@
 
 		function ensureMount() {
 			var el = document.getElementById("google_translate_element");
-			if (el) return el;
+			if (el) {
+				var existingWrap = el.closest(".google-translate-widget");
+				if (
+					existingWrap &&
+					existingWrap.querySelector(".google-translate-widget__toggle")
+				) {
+					return el;
+				}
+				if (existingWrap) {
+					var upToggle = document.createElement("button");
+					upToggle.type = "button";
+					upToggle.className = "google-translate-widget__toggle";
+					upToggle.setAttribute("aria-expanded", "false");
+					upToggle.setAttribute("aria-controls", "google_translate_element");
+					upToggle.setAttribute("aria-label", "Choose translation language");
+					upToggle.innerHTML = TOGGLE_SVG;
+
+					var upPanel = document.createElement("div");
+					upPanel.className = "google-translate-widget__panel";
+
+					existingWrap.insertBefore(upToggle, el);
+					upPanel.appendChild(el);
+					existingWrap.appendChild(upPanel);
+					bindMobileToggle(existingWrap, upToggle);
+					return el;
+				}
+				return el;
+			}
 			var wrap = document.createElement("div");
 			wrap.className = "google-translate-widget";
 			wrap.setAttribute("aria-label", "Language translation options");
@@ -437,12 +469,13 @@
 	injectFontAwesome();
 	initGoogleTranslate();
 	function has(name) {
-		return !!root?.hasAttribute(name);
+		return !!widgetsScriptTag()?.hasAttribute(name);
 	}
 
 	function _attr(name, fallback) {
-		if (root?.hasAttribute(name)) {
-			var v = root.getAttribute(name);
+		var w = widgetsScriptTag();
+		if (w?.hasAttribute(name)) {
+			var v = w.getAttribute(name);
 			return v === "" ? true : v;
 		}
 		return fallback;
@@ -494,19 +527,21 @@
 		if (has("data-no-scroll-reveal") || preset.noScrollReveal) return;
 
 		var explicit =
-			root?.getAttribute("data-scroll-reveal") || preset.scrollReveal || null;
+			widgetsScriptTag()?.getAttribute("data-scroll-reveal") ||
+			preset.scrollReveal ||
+			null;
 		var selectors = explicit
 			? String(explicit).trim()
 			: DEFAULT_REVEAL_SELECTORS;
 		if (!selectors) return;
 
 		var effect = String(
-			root?.getAttribute("data-reveal-effect") ||
+			widgetsScriptTag()?.getAttribute("data-reveal-effect") ||
 				preset.revealEffect ||
 				"opacity",
 		).toLowerCase();
 		var anim = String(
-			root?.getAttribute("data-reveal-animation") ||
+			widgetsScriptTag()?.getAttribute("data-reveal-animation") ||
 				preset.revealAnimation ||
 				"fadeInUp 0.6s ease forwards",
 		);
@@ -547,7 +582,7 @@
 	}
 
 	function kofiUserFromConfig() {
-		var fromAttr = root?.getAttribute("data-coffee-kofi-user");
+		var fromAttr = widgetsScriptTag()?.getAttribute("data-coffee-kofi-user");
 		if (fromAttr != null && String(fromAttr).trim() !== "") {
 			return sanitizeKofiUser(fromAttr);
 		}
@@ -666,7 +701,7 @@
 		'<svg class="print-button__icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zM8 5h8v3H8V5zm8 14H8v-4h8v4zm3-6v-2H5v2H3v-4c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v4h-2z"/></svg>';
 
 	function printPdfLangCode() {
-		var o = root?.getAttribute("data-print-pdf-lang");
+		var o = widgetsScriptTag()?.getAttribute("data-print-pdf-lang");
 		if (o != null && String(o).trim() !== "") {
 			return String(o).trim().toLowerCase().slice(0, 2);
 		}
@@ -677,8 +712,8 @@
 	}
 
 	function printPdfLabels() {
-		var custom = root?.getAttribute("data-print-pdf-label");
-		var customAria = root?.getAttribute("data-print-pdf-aria");
+		var custom = widgetsScriptTag()?.getAttribute("data-print-pdf-label");
+		var customAria = widgetsScriptTag()?.getAttribute("data-print-pdf-aria");
 		var ariaTrim =
 			customAria != null && String(customAria).trim() !== ""
 				? String(customAria).trim()
@@ -743,8 +778,8 @@
 	var BACK_TO_TOP_BTN_ID = "nabla-back-to-top";
 
 	function backToTopLabels() {
-		var custom = root?.getAttribute("data-back-to-top-label");
-		var customAria = root?.getAttribute("data-back-to-top-aria");
+		var custom = widgetsScriptTag()?.getAttribute("data-back-to-top-label");
+		var customAria = widgetsScriptTag()?.getAttribute("data-back-to-top-aria");
 		var ariaTrim =
 			customAria != null && String(customAria).trim() !== ""
 				? String(customAria).trim()
@@ -819,18 +854,19 @@
 	}
 	function initAxeptio() {
 		if (minimalChrome()) return;
+		var wTag = widgetsScriptTag();
 		var force =
-			(root &&
-				(has("data-axeptio") || root.getAttribute("data-axeptio-client-id"))) ||
+			(wTag &&
+				(has("data-axeptio") || wTag.getAttribute("data-axeptio-client-id"))) ||
 			preset.axeptio;
 		if (!force) return;
 		var clientId = String(
-			root?.getAttribute("data-axeptio-client-id") ||
+			wTag?.getAttribute("data-axeptio-client-id") ||
 				preset.axeptioClientId ||
 				DEFAULT_AXEPTIO_CLIENT,
 		);
 		var ver = String(
-			root?.getAttribute("data-axeptio-cookies-version") ||
+			wTag?.getAttribute("data-axeptio-cookies-version") ||
 				preset.axeptioCookiesVersion ||
 				DEFAULT_AXEPTIO_VER,
 		);
@@ -917,7 +953,7 @@
 	}
 
 	function initMainWidgets() {
-		if (!(root && has("data-no-smooth-scroll")) && !preset.noSmoothScroll) {
+		if (!has("data-no-smooth-scroll") && !preset.noSmoothScroll) {
 			initSmoothScroll();
 		}
 
@@ -930,7 +966,7 @@
 		initAxeptio();
 
 		var intercomId =
-			root?.getAttribute("data-intercom-app-id") ||
+			widgetsScriptTag()?.getAttribute("data-intercom-app-id") ||
 			preset.intercomAppId ||
 			preset.intercomAppID;
 		if (intercomId) {

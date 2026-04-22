@@ -33,9 +33,9 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. Must match webServer url when using webServer. */
-		baseURL: process.env.BASE_URL || "http://localhost:8001",
+		baseURL: process.env.BASE_URL || "http://localhost:3000",
 
-		/* Heavy pages + parallel tests against python http.server; keep below global `timeout` */
+		/* Heavy pages + parallel tests against Next dev; keep below global `timeout` */
 		navigationTimeout: 30_000,
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
@@ -78,8 +78,8 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: "npm run start:python",
-		url: "http://localhost:8001",
+		command: "npm run dev",
+		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
 		timeout: 120 * 1000,
 	},

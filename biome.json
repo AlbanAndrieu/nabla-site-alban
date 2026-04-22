@@ -1,6 +1,12 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
-	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
 	"linter": { "enabled": true, "rules": { "recommended": true } },
 	"formatter": { "enabled": true, "indentStyle": "tab" },
 	"json": { "parser": { "allowComments": true, "allowTrailingCommas": true } },
