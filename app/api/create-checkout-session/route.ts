@@ -4,7 +4,7 @@ import Stripe from "stripe";
 export const runtime = "nodejs";
 
 /** Parse env DOMAIN into a safe origin (scheme + host only). Never use request Host headers — open redirect risk. */
-function originFromDomainEnv(raw: string): string | null {
+export function originFromDomainEnv(raw: string): string | null {
 	const trimmed = raw.replace(/\/$/, "").trim();
 	if (!trimmed) return null;
 	try {
@@ -21,7 +21,7 @@ function originFromDomainEnv(raw: string): string | null {
  * Trusted origin for Stripe success/cancel URLs only from server-controlled config:
  * DOMAIN (allowlisted format), or VERCEL_URL (set by Vercel), or localhost in non-production.
  */
-function getTrustedOrigin():
+export function getTrustedOrigin():
 	| { ok: true; origin: string }
 	| { ok: false; error: string } {
 	const domainRaw = (process.env.DOMAIN || "").trim();
@@ -54,7 +54,7 @@ function getTrustedOrigin():
 	};
 }
 
-function wantsJson(req: NextRequest): boolean {
+export function wantsJson(req: NextRequest): boolean {
 	const accept = req.headers.get("accept") || "";
 	return accept.includes("application/json");
 }
