@@ -11,6 +11,7 @@ exclude_dirs:
     ".venv",
     ".direnv",
     "megalinter-reports",
+    "scripts/",
   ]
 
 skips: ["B101", "B404", "B607", "B603", "B113"]
