@@ -2,7 +2,12 @@ import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Metadata } from "next";
 
-export type HtmlExtractMode = "main" | "headerMain" | "mainOuter";
+export type HtmlExtractMode =
+	| "main"
+	| "headerMain"
+	/** Breadcrumb `<nav class="…page-nav…">` through `</main>` (TrueNAS: homelab cards live in `<header>`). */
+	| "navHeaderMain"
+	| "mainOuter";
 export type SiteLocale = "en" | "fr";
 
 const DEFAULT_LOCALE: SiteLocale = "en";
@@ -65,22 +70,12 @@ function rewriteOneHref(
 		return `href=${quote}${raw}${quote}`;
 	}
 
-	const noExt = pathPart.slice(0, -5);
-	const segments = noExt.split("/").filter(Boolean);
-	const last = segments[segments.length - 1];
-	let out: string;
-	if (last === "index") {
-		segments.pop();
-		out = segments.length ? `/${segments.join("/")}` : "/";
-	} else {
-		out = `/${noExt.replace(/^\/+/, "")}`;
-	}
-
-	const localizedOut = withLocalePrefix(out, locale);
+	/** Keep static-style `.html` URLs; only add locale prefix when needed (Next rewrites these to `[locale]/[slug]`). */
+	const localizedOut = withLocalePrefix(pathPart, locale);
 	return `href=${quote}${localizedOut}${query}${hash}${quote}`;
 }
 
-/** Rewrite internal *.html links to clean paths for the Next.js app. */
+/** Rewrite internal *.html links: add locale prefix only (paths stay `*.html`). */
 export function rewriteLegacyHtmlHrefs(
 	fragment: string,
 	locale?: string,
@@ -134,6 +129,11 @@ export async function loadPublicHtmlFragment(
 			/<header[^>]*>[\s\S]*?<\/header>\s*<main[^>]*>[\s\S]*?<\/main>/i,
 		);
 		fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
+	} else if (mode === "navHeaderMain") {
+		const m = html.match(
+			/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i,
+		);
+		fragment = m?.[0] ?? "";
 	} else {
 		const m = html.match(/<main[^>]*>[\s\S]*?<\/main>/i);
 		fragment = m?.[0] ?? "";

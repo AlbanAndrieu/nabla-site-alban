@@ -56,6 +56,11 @@
 		);
 	}
 
+	/** Next.js App Router shell (see app/[locale]/layout.tsx); use next-intl instead of Google Translate. */
+	function isNextIntlAppShell() {
+		return document.documentElement.getAttribute("data-nabla-app") === "next-intl";
+	}
+
 	// ----- Theme (aligned with theme-toggle.js) -----
 	(() => {
 		const THEMES = {
@@ -329,6 +334,7 @@
 	function initGoogleTranslate() {
 		if (minimalChrome()) return;
 		if (widgetsScriptTag()?.hasAttribute("data-no-google-translate")) return;
+		if (isNextIntlAppShell()) return;
 		if (preset.noGoogleTranslate) return;
 		if (window.__NABLA_GOOGLE_TRANSLATE_STARTED) return;
 		window.__NABLA_GOOGLE_TRANSLATE_STARTED = true;
@@ -438,6 +444,7 @@
 
 		window.googleTranslateElementInit = () => {
 			if (minimalChrome()) return;
+			if (isNextIntlAppShell()) return;
 			if (window.__NABLA_GOOGLE_TRANSLATE_READY) return;
 			if (
 				!window.google ||

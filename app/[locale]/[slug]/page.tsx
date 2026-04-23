@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import HomelabServicesScripts from "@/components/HomelabServicesScripts";
 import { routing } from "@/i18n/routing";
 import {
 	loadPublicHtmlFragment,
 	metadataFromPublicHtml,
 } from "@/lib/htmlFromPublic";
 import { MARKETING_PAGES } from "@/lib/marketingPages";
+
+/** Static HTML loads these after `</main>`; App Router only embeds the fragment, so we attach them here. */
+const HOMELAB_SERVICES_SLUGS = new Set(["nabla", "truenas"]);
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -23,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const normalizedLocale = routing.locales.includes(locale as "en" | "fr")
 		? locale
 		: routing.defaultLocale;
-	return metadataFromPublicHtml(spec.file, `/${slug}`, normalizedLocale);
+	return metadataFromPublicHtml(spec.file, `/${slug}.html`, normalizedLocale);
 }
 
 export default async function MarketingSlugPage({ params }: Props) {
@@ -50,8 +54,10 @@ export default async function MarketingSlugPage({ params }: Props) {
 			</a>
 			<div
 				className={spec.bodyClass}
+				suppressHydrationWarning
 				dangerouslySetInnerHTML={{ __html: html }}
 			/>
+			{HOMELAB_SERVICES_SLUGS.has(slug) ? <HomelabServicesScripts /> : null}
 		</>
 	);
 }

@@ -18,6 +18,18 @@
 		return c;
 	}
 
+	/** Local app logos under `public/assets/` (see .cursor/rules for sourcing from selfh.st/icons). */
+	function safeIconSrc(src) {
+		const s = String(src ?? "").trim();
+		if (!s || s.indexOf("..") >= 0 || s.includes("//")) {
+			return "";
+		}
+		if (!/^assets\/[a-zA-Z0-9_.\-/]+$/.test(s)) {
+			return "";
+		}
+		return s;
+	}
+
 	function iconsHtml(icons) {
 		if (!icons || !icons.length) {
 			return '<i class="fas fa-circle homelab-service-card__icon" aria-hidden="true"></i>';
@@ -28,6 +40,14 @@
 					`<i class="${safeIconClass(c)} homelab-service-card__icon" aria-hidden="true"></i>`,
 			)
 			.join("");
+	}
+
+	function titleIconMarkup(s) {
+		const src = safeIconSrc(s.iconSrc);
+		if (src) {
+			return `<img src="${esc(src)}" class="homelab-service-card__logo" width="24" height="24" alt="" decoding="async" aria-hidden="true" />`;
+		}
+		return iconsHtml(s.icons);
 	}
 
 	function defaultInternalTitle(variant, internalSecure) {
@@ -93,7 +113,7 @@
 
 	function renderServiceCard(s, variant) {
 		const name = esc(s.name);
-		const icons = iconsHtml(s.icons);
+		const icons = titleIconMarkup(s);
 		const intHref = safeHref(buildInternalUrl(s));
 		const tunHref = safeHref(s.tunnelUrl);
 		const intTitle = esc(
@@ -134,13 +154,23 @@
 		</div>`;
 	}
 
+	/** Root-absolute fetch URL so JSON loads under App Router paths like `/en/nabla` (not `/en/homelab-services.json`). */
+	function resolveHomelabJsonUrl(raw) {
+		const p = String(raw ?? "homelab-services.json").trim();
+		if (!p) return "/homelab-services.json";
+		if (/^https?:\/\//i.test(p)) return p;
+		if (p.startsWith("/")) return p;
+		return `/${p.replace(/^\.\//, "")}`;
+	}
+
 	async function run() {
 		const roots = document.querySelectorAll("[data-homelab-services-root]");
 		if (!roots.length) {
 			return;
 		}
-		const jsonPath =
-			roots[0].getAttribute("data-homelab-json") || "homelab-services.json";
+		const jsonPath = resolveHomelabJsonUrl(
+			roots[0].getAttribute("data-homelab-json"),
+		);
 		let data;
 		try {
 			const res = await fetch(jsonPath, { cache: "no-store" });

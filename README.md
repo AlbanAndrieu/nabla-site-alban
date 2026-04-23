@@ -16,6 +16,8 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 This is a simple HTML project for Nabla company that promotes Alban Andrieu as an experienced DevSecOps professional.
 
+Default nabla files for apache
+
 ### GitHub Actions
 The repository currently includes these workflows:
 
@@ -92,15 +94,9 @@ Deployment note: Vercel serves `POST /create-checkout-session` via `api/create-c
 
 Details: `docs/checkout-support-runbook.md`.
 
-### Local Apache deployment
+### Local Python deployment
 
 Point the virtual host `DocumentRoot` at the `public/` directory, then for example:
-
-```bash
-aa-teardown
-sudo service apache2 restart
-tail -f /var/log/apache2/error.log
-```
 
 ```bash
 # Python 2

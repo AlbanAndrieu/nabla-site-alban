@@ -1,4 +1,4 @@
-import type { HtmlExtractMode } from "@/lib/htmlFromPublic";
+import type { HtmlExtractMode } from "./htmlFromPublic";
 
 export type MarketingPageSpec = {
 	file: string;
@@ -95,18 +95,13 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	},
 	truenas: {
 		file: "truenas.html",
-		mode: "mainOuter",
+		mode: "navHeaderMain",
 		bodyClass: "site-content-page page-dark truenas-page",
 	},
 	test: {
 		file: "test.html",
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
-	},
-	"example-js": {
-		file: "example-js.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page",
 	},
 	"email-contact-addresses": {
 		file: "email-contact-addresses.html",

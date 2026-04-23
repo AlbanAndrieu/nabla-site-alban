@@ -1,0 +1,24 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+
+		{
+			"name": "Next.js: dev (port 3000)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run", "dev", "--", "-p", "3000"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"env": {
+				"PORT": "3000"
+			},
+			"serverReadyAction": {
+				"action": "openExternally",
+				"pattern": "Local:\\s+https?://localhost:([0-9]+)",
+				"uriFormat": "http://localhost:%s"
+			}
+		}
+	]
+}

@@ -3,7 +3,9 @@
 	"services": [
 		{
 			"name": "TrueNAS",
-			"icons": ["fas fa-server"],
+			"icons": [
+				"fas fa-server"
+			],
 			"description": "Storage management UI",
 			"internalHost": "172.17.0.24",
 			"internalPort": 7000,
@@ -11,11 +13,14 @@
 			"tunnelUrl": "https://truenas.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/truenas-scale.png"
 		},
 		{
 			"name": "pfSense",
-			"icons": ["fas fa-shield-halved"],
+			"icons": [
+				"fas fa-shield-halved"
+			],
 			"description": "Firewall and router",
 			"internalHost": "172.17.0.1",
 			"internalPort": 10443,
@@ -25,11 +30,14 @@
 			"tunnelSecure": true,
 			"internalTitle": "pfSense web UI on LAN gateway (172.17.0.1:10443); certificate may be self-signed",
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/pfsense.png"
 		},
 		{
 			"name": "AdGuard Home",
-			"icons": ["fas fa-shield-virus"],
+			"icons": [
+				"fas fa-shield-virus"
+			],
 			"description": "Network-wide ad blocking",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30004,
@@ -37,11 +45,14 @@
 			"tunnelUrl": "https://adguardhome.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/adguard-home.png"
 		},
 		{
 			"name": "Heimdall",
-			"icons": ["fas fa-table-cells-large"],
+			"icons": [
+				"fas fa-table-cells-large"
+			],
 			"description": "Application dashboard",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30120,
@@ -49,11 +60,14 @@
 			"tunnelUrl": "https://heimdall.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/heimdall.png"
 		},
 		{
 			"name": "Domain Watchdog",
-			"icons": ["fas fa-globe"],
+			"icons": [
+				"fas fa-globe"
+			],
 			"description": "Domain monitoring service",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30317,
@@ -61,11 +75,14 @@
 			"tunnelUrl": "https://domain-watchdog.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/domain-watchdog.png"
 		},
 		{
 			"name": "Prometheus",
-			"icons": ["fas fa-fire-flame-curved"],
+			"icons": [
+				"fas fa-fire-flame-curved"
+			],
 			"description": "Monitoring and alerting",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30104,
@@ -73,11 +90,14 @@
 			"tunnelUrl": "https://prometheus.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/prometheus.png"
 		},
 		{
 			"name": "PortTracker",
-			"icons": ["fas fa-network-wired"],
+			"icons": [
+				"fas fa-network-wired"
+			],
 			"description": "Port tracking service",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30233,
@@ -85,11 +105,14 @@
 			"tunnelUrl": "https://portracker.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/portracker.png"
 		},
 		{
 			"name": "OpenSpeedTest",
-			"icons": ["fas fa-gauge-high"],
+			"icons": [
+				"fas fa-gauge-high"
+			],
 			"description": "Network speed testing",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30117,
@@ -97,11 +120,14 @@
 			"tunnelUrl": "https://open-speed-test.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/openspeedtest.png"
 		},
 		{
 			"name": "Portainer",
-			"icons": ["fab fa-docker"],
+			"icons": [
+				"fab fa-docker"
+			],
 			"description": "Container management",
 			"internalHost": "172.17.0.24",
 			"internalPort": 31015,
@@ -109,11 +135,14 @@
 			"tunnelUrl": "https://portainer.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/portainer.png"
 		},
 		{
 			"name": "Scrutiny",
-			"icons": ["fas fa-hard-drive"],
+			"icons": [
+				"fas fa-hard-drive"
+			],
 			"description": "Hard drive health monitoring",
 			"internalHost": "172.17.0.24",
 			"internalPort": 31054,
@@ -121,11 +150,14 @@
 			"tunnelUrl": "https://scrutiny.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/scrutiny.png"
 		},
 		{
 			"name": "IT Tools",
-			"icons": ["fas fa-screwdriver-wrench"],
+			"icons": [
+				"fas fa-screwdriver-wrench"
+			],
 			"description": "Developer utilities collection",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30063,
@@ -133,11 +165,14 @@
 			"tunnelUrl": "https://it-tools.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/it-tools.png"
 		},
 		{
 			"name": "Uptime Kuma",
-			"icons": ["fas fa-heart-pulse"],
+			"icons": [
+				"fas fa-heart-pulse"
+			],
 			"description": "Uptime monitoring",
 			"internalHost": "172.17.0.24",
 			"internalPort": 31050,
@@ -145,11 +180,14 @@
 			"tunnelUrl": "https://uptime-kuma.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/uptime-kuma.png"
 		},
 		{
 			"name": "Vaultwarden",
-			"icons": ["fas fa-lock"],
+			"icons": [
+				"fas fa-lock"
+			],
 			"description": "Password manager",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30032,
@@ -157,11 +195,14 @@
 			"tunnelUrl": "https://vaultwarden.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/vaultwarden.png"
 		},
 		{
 			"name": "2FAuth",
-			"icons": ["fas fa-mobile-screen-button"],
+			"icons": [
+				"fas fa-mobile-screen-button"
+			],
 			"description": "Two-factor codes manager",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30081,
@@ -169,11 +210,14 @@
 			"tunnelUrl": "https://2fauth.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/2fauth.png"
 		},
 		{
 			"name": "LocalAI",
-			"icons": ["fas fa-robot"],
+			"icons": [
+				"fas fa-robot"
+			],
 			"description": "Local AI models",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30286,
@@ -181,11 +225,14 @@
 			"tunnelUrl": "https://localai.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/localai.png"
 		},
 		{
 			"name": "Ollama",
-			"icons": ["fas fa-comment-dots"],
+			"icons": [
+				"fas fa-comment-dots"
+			],
 			"description": "Large language models",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30068,
@@ -193,11 +240,14 @@
 			"tunnelUrl": "https://ollama.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/ollama.png"
 		},
 		{
 			"name": "n8n",
-			"icons": ["fas fa-diagram-project"],
+			"icons": [
+				"fas fa-diagram-project"
+			],
 			"description": "Workflow automation",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30109,
@@ -205,11 +255,14 @@
 			"tunnelUrl": "https://n8n.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/n8n.png"
 		},
 		{
 			"name": "Grafana",
-			"icons": ["fas fa-chart-area"],
+			"icons": [
+				"fas fa-chart-area"
+			],
 			"description": "Analytics and monitoring",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30037,
@@ -217,11 +270,14 @@
 			"tunnelUrl": "https://grafana.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/grafana.png"
 		},
 		{
 			"name": "Keycloak",
-			"icons": ["fas fa-user-shield"],
+			"icons": [
+				"fas fa-user-shield"
+			],
 			"description": "Identity and access management",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30238,
@@ -229,11 +285,14 @@
 			"tunnelUrl": "https://keycloak.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/keycloak.png"
 		},
 		{
 			"name": "ClamAV",
-			"icons": ["fas fa-virus-slash"],
+			"icons": [
+				"fas fa-virus-slash"
+			],
 			"description": "Antivirus engine",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3310,
@@ -241,11 +300,14 @@
 			"tunnelUrl": "https://clamav.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/clamav.png"
 		},
 		{
 			"name": "Homarr",
-			"icons": ["fas fa-house-chimney"],
+			"icons": [
+				"fas fa-house-chimney"
+			],
 			"description": "Homepage dashboard",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30100,
@@ -253,11 +315,14 @@
 			"tunnelUrl": "https://homarr.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/homarr.png"
 		},
 		{
 			"name": "Gatus",
-			"icons": ["fas fa-signal"],
+			"icons": [
+				"fas fa-signal"
+			],
 			"description": "Health dashboard",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30287,
@@ -265,11 +330,14 @@
 			"tunnelUrl": "https://gatus.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/gatus.png"
 		},
 		{
 			"name": "DDNS Updater",
-			"icons": ["fas fa-arrows-rotate"],
+			"icons": [
+				"fas fa-arrows-rotate"
+			],
 			"description": "Dynamic DNS updates",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30007,
@@ -277,11 +345,14 @@
 			"tunnelUrl": "https://ddns-updater.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/ddns-updater.png"
 		},
 		{
 			"name": "Paperless AI",
-			"icons": ["fas fa-wand-magic-sparkles"],
+			"icons": [
+				"fas fa-wand-magic-sparkles"
+			],
 			"description": "Document management with AI",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30226,
@@ -289,11 +360,14 @@
 			"tunnelUrl": "https://paperless-ai.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/paperless-ai.png"
 		},
 		{
 			"name": "Transmission",
-			"icons": ["fas fa-download"],
+			"icons": [
+				"fas fa-download"
+			],
 			"description": "BitTorrent client",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30096,
@@ -301,11 +375,14 @@
 			"tunnelUrl": "https://transmission.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/transmission.png"
 		},
 		{
 			"name": "Sonarr",
-			"icons": ["fas fa-tv"],
+			"icons": [
+				"fas fa-tv"
+			],
 			"description": "TV series management",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30113,
@@ -313,11 +390,14 @@
 			"tunnelUrl": "https://sonarr.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/sonarr.png"
 		},
 		{
 			"name": "Radarr",
-			"icons": ["fas fa-film"],
+			"icons": [
+				"fas fa-film"
+			],
 			"description": "Movie collection manager",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30025,
@@ -325,11 +405,14 @@
 			"tunnelUrl": "https://radarr.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/radarr.png"
 		},
 		{
 			"name": "Lidarr",
-			"icons": ["fas fa-music"],
+			"icons": [
+				"fas fa-music"
+			],
 			"description": "Music collection manager",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30071,
@@ -337,11 +420,14 @@
 			"tunnelUrl": "https://lidarr.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/lidarr.png"
 		},
 		{
 			"name": "Prowlarr",
-			"icons": ["fas fa-magnifying-glass"],
+			"icons": [
+				"fas fa-magnifying-glass"
+			],
 			"description": "Indexer manager",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30050,
@@ -349,11 +435,14 @@
 			"tunnelUrl": "https://prowlarr.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/prowlarr.png"
 		},
 		{
 			"name": "Paperless-ngx",
-			"icons": ["fas fa-folder-open"],
+			"icons": [
+				"fas fa-folder-open"
+			],
 			"description": "Document management system",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30070,
@@ -361,11 +450,14 @@
 			"tunnelUrl": "https://paperless-ngx.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/paperless-ngx.png"
 		},
 		{
 			"name": "Netbootxyz",
-			"icons": ["fas fa-ethernet"],
+			"icons": [
+				"fas fa-ethernet"
+			],
 			"description": "Network boot utility",
 			"internalHost": "172.17.0.24",
 			"internalPort": 31010,
@@ -373,11 +465,14 @@
 			"tunnelUrl": "https://netbootxyz.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/netboot-xyz.png"
 		},
 		{
 			"name": "Affine",
-			"icons": ["fas fa-pen-to-square"],
+			"icons": [
+				"fas fa-pen-to-square"
+			],
 			"description": "Knowledge base and notes",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30169,
@@ -385,11 +480,14 @@
 			"tunnelUrl": "https://affine.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/affine.png"
 		},
 		{
 			"name": "ConvertX",
-			"icons": ["fas fa-file-export"],
+			"icons": [
+				"fas fa-file-export"
+			],
 			"description": "File conversion service",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30154,
@@ -397,11 +495,14 @@
 			"tunnelUrl": "https://convertx.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/convertx.png"
 		},
 		{
 			"name": "Bichon",
-			"icons": ["fas fa-paw"],
+			"icons": [
+				"fas fa-paw"
+			],
 			"description": "Custom application",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30313,
@@ -409,11 +510,14 @@
 			"tunnelUrl": "https://bichon.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/bichon.png"
 		},
 		{
 			"name": "OpenArchiver",
-			"icons": ["fas fa-box-archive"],
+			"icons": [
+				"fas fa-box-archive"
+			],
 			"description": "Archive management",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30288,
@@ -421,11 +525,14 @@
 			"tunnelUrl": "https://openarchiver.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/open-archiver.png"
 		},
 		{
 			"name": "pgAdmin",
-			"icons": ["fas fa-table-columns"],
+			"icons": [
+				"fas fa-table-columns"
+			],
 			"description": "PostgreSQL administration",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30056,
@@ -433,11 +540,14 @@
 			"tunnelUrl": "https://pgadmin.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/pgadmin.png"
 		},
 		{
 			"name": "PostgreSQL",
-			"icons": ["fas fa-database"],
+			"icons": [
+				"fas fa-database"
+			],
 			"description": "Database server (TCP — use a Postgres client, not a normal web browser tab)",
 			"internalHost": "172.17.0.24",
 			"internalPort": 5432,
@@ -448,11 +558,14 @@
 			"newTabTunnel": false,
 			"internalTitle": "Postgres on Docker bridge 172.17.0.24:5432",
 			"tunnelTitle": "Postgres via Cloudflare Tunnel (TCP)",
-			"portHtml": "Port 5432 · <code class=\"user-select-all\">172.17.0.24:5432</code> · <code class=\"user-select-all\">postgres.albandrieu.com:5432</code>"
+			"portHtml": "Port 5432 · <code class=\"user-select-all\">172.17.0.24:5432</code> · <code class=\"user-select-all\">postgres.albandrieu.com:5432</code>",
+			"iconSrc": "assets/selfh-icons/postgresql.png"
 		},
 		{
 			"name": "KaraKeep",
-			"icons": ["fas fa-microphone-lines"],
+			"icons": [
+				"fas fa-microphone-lines"
+			],
 			"description": "Karaoke management",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30147,
@@ -460,11 +573,14 @@
 			"tunnelUrl": "https://karakeep.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/karakeep.png"
 		},
 		{
 			"name": "SABnzbd",
-			"icons": ["fas fa-newspaper"],
+			"icons": [
+				"fas fa-newspaper"
+			],
 			"description": "Usenet downloader",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30055,
@@ -472,11 +588,14 @@
 			"tunnelUrl": "https://sabnzbd.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/sabnzbd.png"
 		},
 		{
 			"name": "Stirling PDF",
-			"icons": ["fas fa-file-pdf"],
+			"icons": [
+				"fas fa-file-pdf"
+			],
 			"description": "PDF toolkit",
 			"internalHost": "172.17.0.24",
 			"internalPort": 30124,
@@ -484,7 +603,8 @@
 			"tunnelUrl": "https://stirling.albandrieu.com",
 			"tunnelSecure": true,
 			"newTabInternal": true,
-			"newTabTunnel": true
+			"newTabTunnel": true,
+			"iconSrc": "assets/selfh-icons/stirling-pdf.png"
 		}
 	]
 }

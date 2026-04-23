@@ -25,7 +25,7 @@ export default async function RootLayout({ children, params }: Props) {
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale}>
+		<html lang={locale} data-nabla-app="next-intl" suppressHydrationWarning>
 			<head>
 				<link rel="icon" href="/assets/nabla/nabla-4.svg" />
 				<link
@@ -60,8 +60,8 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="color-scheme" content="light dark" />
 				<meta name="referrer" content="always" />
 			</head>
-			<body className="page-dark">
-				{/* Google Translate DOM comes from /site-widgets.js (toggle + panel on small viewports). */}
+			<body className="page-dark" suppressHydrationWarning>
+				{/* Static HTML uses Google Translate via /site-widgets.js; Next uses next-intl (see data-no-google-translate). */}
 				<NextIntlClientProvider messages={messages}>
 					{children}
 					<SiteFooter />
@@ -71,6 +71,7 @@ export default async function RootLayout({ children, params }: Props) {
 					strategy="afterInteractive"
 					data-print-pdf
 					data-no-coffee-fab
+					data-no-google-translate
 				/>
 			</body>
 		</html>

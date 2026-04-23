@@ -17,9 +17,8 @@ This document provides comprehensive guidelines for deploying the Nabla site to 
 ## Overview
 
 The Nabla site is deployed to Vercel with the following architecture:
-- **Root Project**: Static HTML from `public/` plus Node.js serverless routes in `api/` (Vercel)
-- **my-app**: Next.js application (separate deployment)
-- **vue-client**: Vue/Vite application (separate deployment)
+- **Root project** (this repository): Next.js (`npm run build` / `next build`), serverless handlers under `api/`, and static assets under `public/` (see root `vercel.json`).
+- **app**: Next.js application (separate deployment), if present in your fork or layout.
 
 ## Prerequisites
 
@@ -77,7 +76,7 @@ Access your project settings at: `https://vercel.com/[your-account]/[project-nam
 
 #### General Settings
 - **Build & Development Settings**:
-  - Build Command: Leave empty for a static `public/` root, or set to your framework command (for example `npm run build` in `my-app/`)
+  - Build Command: Leave empty for a static `public/` root, or set to your framework command (for example `npm run build` in `app/`)
   - Output Directory: `public`
   - Install Command: `npm install`
 
@@ -331,31 +330,21 @@ Monitor deployments:
 
 #### Issue: "Build failed" in GitHub Actions
 
-**Cause**: Failing CI job (tests, lint, Docker, and so on) or missing dependencies
+**Cause**: Failing test or build step (Node, Playwright, TeX, Docker, and so on).
 
 **Solution**:
-1. Open the failed workflow run in GitHub Actions and read the failing step log
-2. Reproduce locally with the same command (for example `npm ci`, `npm test`, `npm run build`)
-3. Fix dependency or config issues and push again
+1. Open the failed workflow run and read the job log for the first red step.
+2. Reproduce locally with the same command (for example `npm ci`, `npm run build`, `npm test`).
+3. For Playwright, ensure browsers are installed (`npx playwright install`) and `baseURL` matches your app.
 
 #### Issue: "404 Not Found" after deployment
 
-**Cause**: Output directory or routing misconfiguration
+**Cause**: Output directory or routing misconfiguration.
 
 **Solution**:
-1. Verify Vercel **Output Directory** is `public` for the root static project
-2. Confirm `vercel.json` routes match your API and static paths
-3. Ensure expected HTML and assets exist under `public/`
+1. Confirm the Vercel project **Framework Preset** and **Output Directory** match how this app builds (Next.js defaults differ from a plain `public/` static root).
+2. Review `vercel.json` routes (for example `/api/*`) and that static files exist under `public/` where you expect them.
 
-#### Issue: "Function execution timed out"
-
-**Cause**: A Node.js serverless function exceeded the platform time limit
-
-**Solution**:
-1. Optimize handler code and external HTTP calls
-2. Consider increasing timeout on supported plans
-3. Review function logs in the Vercel dashboard
-4. Check for infinite loops or slow downstream dependencies
 
 #### Issue: Preview deployments not created for PRs
 

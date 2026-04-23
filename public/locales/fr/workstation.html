@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Workstation Docker Compose | Nabla - Alban Andrieu</title>
+<meta content="Piles Docker Compose sur le poste de travail : services auto-hébergés, chemin de migration depuis TrueNAS Scale, liens vers nabla-compose et ansible-workstation." name="description"/>
+<meta content="docker compose, workstation, self-hosted, devsecops, homelab, truenas, portainer, grafana, sentry, alban andrieu" name="keywords"/>
+<meta content="Alban Andrieu" name="author"/>
+<meta content="noindex, nofollow" name="robots"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Station de travail Docker Compose - Nabla" property="og:title"/>
+<meta content="website" property="og:type"/>
+<meta content="https://dr-alban.com/workstation.html" property="og:url"/>
+<meta content="https://dr-alban.com/assets/nabla/nabla-4.png" property="og:image"/>
+<meta content="Services Docker Compose auto-hébergés sur le poste de travail ;les dépôts et les raccourcis localhost." property="og:description"/>
+<meta content="Nabla - Alban Andrieu" property="og:site_name"/>
+<meta content="en_US" property="og:locale"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Workstation Docker Compose" name="twitter:title"/>
+<meta content="Docker Compose on the workstation: stacks, repos, and localhost links." name="twitter:description"/>
+<meta content="https://dr-alban.com/assets/nabla/nabla-4.svg" name="twitter:image"/>
+<link href="https://dr-alban.com/workstation.html" rel="canonical"/>
+<link href="assets/nabla/nabla-4.svg" rel="icon"/>
+<link href="landing-sections.css" rel="stylesheet"/>
+<link href="wireframe.css" rel="stylesheet"/>
+<link href="theme.css" rel="stylesheet"/>
+<link href="style.css" rel="stylesheet"/>
+<link href="print.css" rel="stylesheet"/>
+<link href="site-content-page.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css" rel="stylesheet" type="text/css"/>
+<script data-auto-replace-svg="nest" src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"></script>
+<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet"/>
+<link href="/assets/fontawesome/css/brands.css" rel="stylesheet"/>
+<link href="/assets/fontawesome/css/solid.css" rel="stylesheet"/>
+<script src="obs-connection.js"></script>
+<script async="" data-key="tg3zLMS/bebJFl0LxctiCw" src="https://analytics.ahrefs.com/analytics.js"></script>
+<script src="theme-toggle.js"></script>
+<script defer="" src="site-google-translate.js"></script>
+<script data-analytics-mode="marketing" src="site-analytics.js"></script>
+</head>
+<body class="site-content-page page-dark truenas-page workstation-page">
+<a name="top"></a>
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-W7XNV7K6" style="display: none; visibility: hidden" width="0"></iframe></noscript>
+<a class="skip-to-main" href="#main-content">Skip to main content</a>
+<nav aria-label="Breadcrumb" class="page-nav container py-3">
+<a class="text-decoration-none" href="/"><i aria-hidden="true" class="fas fa-home"></i> Back to home</a>
+<span aria-hidden="true" class="text-muted mx-2">·</span>
+<a class="text-decoration-none" href="/truenas.html">TrueNAS Scale</a>
+<span aria-hidden="true" class="text-muted mx-2">·</span>
+<span class="text-muted">Workstation</span>
+</nav>
+<!-- Header / hero — same pattern as truenas.html (truenas-page-apps) -->
+<header>
+<section aria-labelledby="workstation-compose-heading" class="py-5 bg-light truenas-page-apps">
+<div class="container">
+<div class="row mb-4">
+<div class="col-12 text-center">
+<h2 class="display-4 mb-3" id="workstation-compose-heading">Docker Compose Services</h2>
+<p class="lead text-secondary mb-0 truenas-page-apps__lead">
+								Self-hosted applications and services running on my Workstation and to migrate TrueNAS Scale.
+							</p>
+<p class="text-secondary mb-0 mt-3">
+								For the NAS-side catalog, see
+								<a href="/truenas.html">TrueNAS Scale services</a>.
+							</p>
+</div>
+</div>
+<div class="row">
+<div class="col-lg-6 p-3">
+<div class="card box-shadow h-100">
+<div class="card-body d-flex flex-column">
+<h3 class="h5 card-title">
+<i aria-hidden="true" class="fab fa-github me-2 text-primary"></i>nabla-compose
+									</h3>
+<p class="card-text flex-grow-1">Docker Compose files for workstation and related deployments.</p>
+<a class="btn btn-sm btn-outline-primary align-self-start" href="https://github.com/AlbanAndrieu/nabla-compose" rel="noopener noreferrer" target="_blank">
+<i aria-hidden="true" class="fab fa-github"></i> Open nabla-compose
+									</a>
+</div>
+</div>
+</div>
+<div class="col-lg-6 p-3">
+<div class="card box-shadow h-100">
+<div class="card-body d-flex flex-column">
+<h3 class="h5 card-title">
+<i aria-hidden="true" class="fab fa-github me-2 text-primary"></i>ansible-workstation
+									</h3>
+<p class="card-text flex-grow-1">
+										Ansible role and playbooks to provision this Ubuntu workstation (packages, optional desktop
+										tooling).
+									</p>
+<a class="btn btn-sm btn-outline-primary align-self-start" href="https://github.com/AlbanAndrieu/ansible-workstation" rel="noopener noreferrer" target="_blank">
+<i aria-hidden="true" class="fab fa-github"></i> Open ansible-workstation
+									</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</header>
+<main class="mb-5" id="main-content" role="main">
+<!-- Edge & control -->
+<section aria-labelledby="edge-heading" class="workstation-section py-5 workstation-section--apps">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="edge-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-shield-halved"></i></span>Bord et contrôle</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Trafic</b></h3>
+<p class="card-text">Proxy inverse et point d'entrée TLS</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:80">
+<i aria-hidden="true" class="fas fa-route"></i>Ouvrir HTTP</a>
+<small class="text-muted">:80 / :443</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Portainer</b></h3>
+<p class="card-text">Interface utilisateur de gestion des conteneurs</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="https://localhost:9443">
+<i aria-hidden="true" class="fas fa-server"></i>OuvrirPortainer</a>
+<small class="text-muted">:9443</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Dockage</b></h3>
+<p class="card-text">Composer le gestionnaire de pile</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:5001">
+<i aria-hidden="true" class="fas fa-cubes"></i>Ouvrir le Dock</a>
+<small class="text-muted">:5001</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Tour de guet</b></h3>
+<p class="card-text">Mises à jour automatiques des images (pas d'interface utilisateur publiée sur cet hôte)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<button class="btn btn-sm btn-outline-secondary" disabled="" type="button">Service d'arrière-plan</button>
+<small class="text-muted">—</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Observability -->
+<section aria-labelledby="obs-heading" class="workstation-section workstation-section--alt py-5">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="obs-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-chart-line"></i></span>Observabilité</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Grafana</b></h3>
+<p class="card-text">Tableaux de bord et alertes</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3009">
+<i aria-hidden="true" class="fas fa-chart-area"></i>Ouvrir Grafana</a>
+<small class="text-muted">:3009</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Prométhée</b></h3>
+<p class="card-text">Métriques et séries chronologiques</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:9090">
+<i aria-hidden="true" class="fas fa-database"></i>Ouvrir Prométhée</a>
+<small class="text-muted">:9090</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Loki</b></h3>
+<p class="card-text">API d'agrégation de journaux</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3100">
+<i aria-hidden="true" class="fas fa-stream"></i>Ouvrir Loki</a>
+<small class="text-muted">:3100</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Journal gris</b></h3>
+<p class="card-text">Gestion et recherche centralisées des journaux</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:9000/">
+<i aria-hidden="true" class="fas fa-magnifying-glass-chart"></i>Ouvrir Graylog</a>
+<small class="text-muted">:9000</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Jaeger</b></h3>
+<p class="card-text">Interface utilisateur de traçage distribuée</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:16686">
+<i aria-hidden="true" class="fas fa-project-diagram"></i>Ouvrir Jaeger</a>
+<small class="text-muted">:16686</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Exportateur GitHub</b></h3>
+<p class="card-text">Métriques Prometheus pour GitHub</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:9171/metrics">
+<i aria-hidden="true" class="fab fa-github"></i>Métrique</a>
+<small class="text-muted">:9171</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Pyroscope</b></h3>
+<p class="card-text">Interface utilisateur de profilage continu</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:4040">
+<i aria-hidden="true" class="fas fa-fire"></i>Pyroscope ouvert</a>
+<small class="text-muted">:4040</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>cConseiller</b></h3>
+<p class="card-text">Métriques des ressources du conteneur</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:9092">
+<i aria-hidden="true" class="fas fa-gauge-high"></i>Ouvrir cAdvisor</a>
+<small class="text-muted">:9092</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Nabla / Plumber app -->
+<section aria-labelledby="nabla-stack-heading" class="workstation-section py-5 workstation-section--apps">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="nabla-stack-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-layer-group"></i></span>Application Nabla / Plombier</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>API back-end</b></h3>
+<p class="card-text">Back-end des applications</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3003">
+<i aria-hidden="true" class="fas fa-code"></i>API ouverte</a>
+<small class="text-muted">:3003</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>L'extrémité avant</b></h3>
+<p class="card-text">Interface utilisateur Web</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3001">
+<i aria-hidden="true" class="fas fa-window-maximize"></i>Ouvrir l'interface utilisateur</a>
+<small class="text-muted">:3001</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Jupiter</b></h3>
+<p class="card-text">Cahier de science des données</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:8889">
+<i aria-hidden="true" class="fas fa-book"></i>Jupiter ouvert</a>
+<small class="text-muted">:8889</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Productivity & utilities -->
+<section aria-labelledby="tools-heading" class="workstation-section workstation-section--alt py-5">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="tools-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-toolbox"></i></span>Productivité et services publics</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Gardien du coffre-fort</b></h3>
+<p class="card-text">Gestionnaire de mots de passe (lié au bouclage)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://127.0.0.1:8007">
+<i aria-hidden="true" class="fas fa-key"></i>Ouvrir le gardien du coffre-fort</a>
+<small class="text-muted">:8007</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Temps de disponibilité Kuma</b></h3>
+<p class="card-text">Surveillance de la disponibilité</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3011">
+<i aria-hidden="true" class="fas fa-heartbeat"></i>Ouvrir à nouveau</a>
+<small class="text-muted">:3011</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>PortTracker</b></h3>
+<p class="card-text">Interface utilisateur de l'inventaire portuaire</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:4999">
+<i aria-hidden="true" class="fas fa-network-wired"></i>Ouvrir PortTracker</a>
+<small class="text-muted">:4999</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>PDF sur Stirling</b></h3>
+<p class="card-text">Boîte à outils PDF</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:8085">
+<i aria-hidden="true" class="fas fa-file-pdf"></i>Ouvrir Stirling</a>
+<small class="text-muted">:8085</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>ConvertX</b></h3>
+<p class="card-text">Conversion de fichiers</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:3444">
+<i aria-hidden="true" class="fas fa-exchange-alt"></i>Ouvrir ConvertX</a>
+<small class="text-muted">:3444</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Outil de langue</b></h3>
+<p class="card-text">API de grammaire et de style</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:8010/v2/languages">
+<i aria-hidden="true" class="fas fa-spell-check"></i>Outil de langage ouvert</a>
+<small class="text-muted">:8010</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>LiteLLM</b></h3>
+<p class="card-text">Proxy/passerelle LLM</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:4100/ui/login/">
+<i aria-hidden="true" class="fas fa-robot"></i>Ouvrir LiteLLM</a>
+<small class="text-muted">:4100</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Inspecteur MCP</b></h3>
+<p class="card-text">Débogueur de protocole de contexte de modèle</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://127.0.0.1:6274">
+<i aria-hidden="true" class="fas fa-bug"></i>Ouvrir l'inspecteur</a>
+<small class="text-muted">:6274</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Temporal</b></h3>
+<p class="card-text">Moteur de workflow (ports UI/gRPC sur cet hôte)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:8005">
+<i aria-hidden="true" class="fas fa-clock"></i>Ouvert :8005</a>
+<small class="text-muted">:8005 · :7238</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Data & clients -->
+<section aria-labelledby="data-heading" class="workstation-section py-5 workstation-section--apps">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="data-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-database"></i></span>Magasins de données et clients</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>PostgreSQL</b></h3>
+<p class="card-text">Base de données principale (connexion client)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-secondary" href="tcp://localhost:5432">
+<i aria-hidden="true" class="fas fa-plug"></i>Connexion</a>
+<small class="text-muted">:5432</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>PgBouncer</b></h3>
+<p class="card-text">Pool de connexions</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-secondary" href="tcp://localhost:6432">
+<i aria-hidden="true" class="fas fa-link"></i>Connexion</a>
+<small class="text-muted">:6432</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>PostgreSQL en veille</b></h3>
+<p class="card-text">Instance de réplication</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-secondary" href="tcp://localhost:5433">
+<i aria-hidden="true" class="fas fa-copy"></i>Connexion</a>
+<small class="text-muted">:5433</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Navigateur Neo4j</b></h3>
+<p class="card-text">Navigateur de graphiques (port par défaut ; utilisez Traefik s'il n'est pas lié)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:7474">
+<i aria-hidden="true" class="fas fa-circle-nodes"></i>Ouvrir le navigateur</a>
+<small class="text-muted">:7474 · Boulon :7687</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Network visibility -->
+<section aria-labelledby="net-heading" class="workstation-section workstation-section--alt py-5">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="net-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-wifi"></i></span>Visibilité du réseau</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>ntopng</b></h3>
+<p class="card-text">Analyse du trafic (réseau hôte — port d'interface utilisateur par défaut)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:4000">
+<i aria-hidden="true" class="fas fa-chart-pie"></i>Ouvrir ntopng</a>
+<small class="text-muted">:4000</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>NetAlertX</b></h3>
+<p class="card-text">Surveillance de la présence du réseau (réseau hôte)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:20211">
+<i aria-hidden="true" class="fas fa-tower-broadcast"></i>Ouvrir NetAlertX</a>
+<small class="text-muted">:20211</small>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Examen minutieux</b></h3>
+<p class="card-text">Collecteur SMART (pas d'interface utilisateur hôte dans ce déploiement)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<button class="btn btn-sm btn-outline-secondary" disabled="" type="button">Collectionneur uniquement</button>
+<small class="text-muted">—</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sentry -->
+<section aria-labelledby="sentry-heading" class="workstation-section py-5 workstation-section--apps">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="sentry-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-life-ring"></i></span>Sentry auto-hébergé</h2>
+<div class="row">
+<div class="col-md-4 p-3">
+<div class="card workstation-service-card box-shadow h-100">
+<div class="card-body">
+<h3 class="h5 card-title"><b>Toile de sentinelle</b></h3>
+<p class="card-text">Interface utilisateur de suivi des erreurs : port hôte de votre composition Sentry (souvent<code class="text-body">:9000</code>lorsque Graylog ne l'utilise pas).</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+<a class="btn btn-sm btn-outline-primary" href="http://localhost:9000">
+<i aria-hidden="true" class="fas fa-triangle-exclamation"></i>Sentinelle ouverte</a>
+<small class="text-muted">:9000</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p class="text-secondary small mt-3 mb-0">Workers, Snuba, ClickHouse, Kafka et autres conteneurs Sentry se trouvent généralement uniquement sur le réseau Docker ;utiliser
+l'interface utilisateur Web ou les itinéraires Traefik pour un accès quotidien.Graylog est répertorié ci-dessus sur<code class="text-body">:9000</code>- si les deux piles publient ce port, remapper un dans Compose ou utiliser
+Traefik.</p>
+</div>
+</section>
+<!-- Related -->
+<section aria-labelledby="workstation-related-heading" class="workstation-section workstation-section--alt py-5 border-top border-secondary">
+<div class="container">
+<h2 class="workstation-section-title h3 mb-4" id="workstation-related-heading">
+<span aria-hidden="true" class="workstation-section-title__icon"><i class="fas fa-link"></i></span>En rapport</h2>
+<div class="row g-4">
+<div class="col-md-6">
+<div class="card workstation-service-card box-shadow h-100 border-secondary">
+<div class="card-body">
+<h3 class="h6 card-title">Échelle TrueNAS</h3>
+<p class="card-text text-muted small mb-0">Applications et matériel Homelab sur le NAS.</p>
+<a class="btn btn-sm btn-outline-primary mt-3" href="/truenas.html">Ouvrir la page TrueNAS</a>
+</div>
+</div>
+</div>
+<div class="col-md-6">
+<div class="card workstation-service-card box-shadow h-100 border-secondary">
+<div class="card-body">
+<h3 class="h6 card-title">Nabla</h3>
+<p class="card-text text-muted small mb-0">Contexte du projet sur ce site.</p>
+<a class="btn btn-sm btn-outline-primary mt-3" href="/nabla.html">Ouvrir Nabla</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer" role="contentinfo">
+<div class="social-links">
+<a aria-label="LinkedIn" class="social-link" href="https://www.linkedin.com/in/nabla" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-linkedin-in"></i>
+</a>
+<a aria-label="Calendly" class="social-link" href="https://calendly.com/alban-andrieu" rel="noopener noreferrer" target="_blank">
+<i class="fa fa-calendar-plus"></i>
+</a>
+<a aria-label="GitHub" class="social-link" href="https://github.com/AlbanAndrieu" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-github"></i>
+</a>
+<a aria-label="Docker Hub" class="social-link" href="https://hub.docker.com/u/nabla" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-docker"></i>
+</a>
+<a aria-label="Stack Exchange" class="social-link" href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-stack-exchange"></i>
+</a>
+</div>
+<div class="footer-links">
+<a href="/policy/legal.html">Legal notices</a>
+<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+</div>
+<p class="text-md-center mt-3">
+<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
+<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
+</p>
+<p class="footer-copyright"></p>
+</footer>
+<script async="async" data-id="150620" src="https://uptime.betterstack.com/widgets/announcement.js" type="text/javascript"></script>
+<script data-axeptio="" data-coffee-fab="" data-print-pdf="" data-reveal-effect="opacity" data-scroll-reveal=".workstation-service-card" defer="" src="site-widgets.js"></script>
+</body>
+</html>

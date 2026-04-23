@@ -44,6 +44,7 @@ export default async function CheckoutPage({ params }: Props) {
 			</a>
 			<div
 				className="site-content-page"
+				suppressHydrationWarning
 				dangerouslySetInnerHTML={{ __html: html }}
 			/>
 		</>
