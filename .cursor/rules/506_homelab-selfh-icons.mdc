@@ -1,0 +1,13 @@
+---
+description: Homelab service cards — source app icons from selfh.st and keep assets under public/
+globs: public/homelab-services.json,public/homelab-services-render.js,public/truenas.html,public/nabla.html,public/assets/selfh-icons/*
+alwaysApply: false
+---
+
+When adding or updating **homelab service cards** (`homelab-services.json`, `homelab-services-render.js`, `truenas.html`, `nabla.html`):
+
+1. **Find icons first** on [selfh.st/icons](https://selfh.st/icons/) and match the app name to the CDN slug used by [selfhst/icons](https://github.com/selfhst/icons) (PNG path pattern: `https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/<slug>.png`).
+2. **Vendor into the repo** under `public/assets/selfh-icons/` (kebab-case filename, e.g. `portainer.png`); do not hotlink third-party CDNs in production HTML for card icons.
+3. In `homelab-services.json`, set **`iconSrc`** to a path under `assets/` only (e.g. `assets/selfh-icons/portainer.png`). The renderer rejects paths outside `assets/` or containing `..`.
+4. Keep **`icons`** as a Font Awesome fallback (used if `iconSrc` is missing or invalid).
+5. When editing copy around the homelab grids, include a reader link to [selfh.st/apps](https://selfh.st/apps/) for discovering more FOSS / self-hosted applications.

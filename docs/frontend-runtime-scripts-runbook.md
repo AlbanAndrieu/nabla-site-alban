@@ -124,7 +124,8 @@ Top-level payload:
 Per-service fields used by renderer:
 
 - `name` (required): card title.
-- `icons` (optional): list of Font Awesome classes; validated against `^[\\w.\\- ]+$`. Invalid class falls back to `fas fa-circle`.
+- `iconSrc` (optional): path to a **local** image under `assets/` (e.g. `assets/selfh-icons/grafana.png`). Validated: must start with `assets/`, ASCII letters/digits/`._-/`, no `..` or `//`. When set, the card title shows this image instead of Font Awesome. Prefer icons discovered on [selfh.st/icons](https://selfh.st/icons/) and vendored into `public/assets/selfh-icons/` (see `.cursor/rules/506_homelab-selfh-icons.mdc`).
+- `icons` (optional): list of Font Awesome classes; validated against `^[\\w.\\- ]+$`. Invalid class falls back to `fas fa-circle`. Used when `iconSrc` is absent or invalid.
 - `description` (optional): short summary text.
 - `internalHost` + `internalPort` (required for usable internal button): compose internal URL.
 - `internalSecure` (optional boolean): `https` when true, `http` when false.

@@ -641,6 +641,13 @@ body.site-content-page .homelab-service-card .homelab-service-card__icon {
 	color: inherit;
 }
 
+body.site-content-page .homelab-service-card .homelab-service-card__logo {
+	width: 1.5rem;
+	height: 1.5rem;
+	object-fit: contain;
+	flex-shrink: 0;
+}
+
 body.site-content-page .homelab-service-card a.btn {
 	display: inline-flex;
 	align-items: center;
