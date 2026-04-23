@@ -5,7 +5,7 @@
 This is the nabla-site-nabla repository, a static website project for "nabla" created for Job search. The repository contains:
 
 - A static website in the `public/` directory
-- A Next.js application in the `my-app/` directory
+- A Next.js application in the `app/` directory
 - Cloudflare Workers configuration for deployment
 - Vercel deployment configuration
 
@@ -19,15 +19,15 @@ This is the nabla-site-nabla repository, a static website project for "nabla" cr
 
 ### Root Directory Files
 - `package.json` - Root package configuration with build scripts and dependencies
-- `vercel.json` - Vercel deployment configuration (output: `public/`)
+- `vercel.json` - Vercel deployment configuration (`rootDirectory`: `app` for Next.js)
 - `wrangler.jsonc` - Cloudflare Workers configuration (assets: `./public`)
 - `eslint.config.js` - ESLint configuration for the project
 - `commitlint.config.ts` - Commitlint configuration with emoji support
 
 ### Key Directories
 - `public/` - Static assets directory served by Cloudflare/Vercel (HTML, CSS, JS, JSON)
-- `my-app/` - Next.js application (separate package with its own package.json)
-- `api/` - Vercel serverless API (Node.js, e.g. `create-checkout-session.js`)
+- `app/` - Next.js application (separate package with its own package.json)
+- `api/` - Optional Vercel serverless handlers (for example `hello.js`); not PHP
 - `scripts/` - Utility scripts (e.g., `run-wicked.sh`)
 - `.github/workflows/` - SDLC workflows (OpenCommit action)
 
@@ -48,8 +48,8 @@ pnpm install
 # OR
 npm install
 
-# For my-app Next.js project
-cd my-app && pnpm install
+# For app Next.js project
+cd app && pnpm install
 ```
 
 The postinstall script automatically:
@@ -70,9 +70,9 @@ npm run dev
 wrangler dev
 ```
 
-**Next.js App (my-app/):**
+**Next.js App (app/):**
 ```bash
-cd my-app
+cd app
 npm run dev
 # Opens at http://localhost:3000
 ```
@@ -83,8 +83,8 @@ npm run dev
 # Root project ESLint
 npm run lint
 
-# my-app ESLint
-cd my-app && npm run lint
+# app ESLint
+cd app && npm run lint
 ```
 
 The project has extensive pre-commit hooks configured in `.pre-commit-config.yaml` that run automatically on commit, including:
@@ -98,7 +98,7 @@ The project has extensive pre-commit hooks configured in `.pre-commit-config.yam
 
 **Next.js App:**
 ```bash
-cd my-app
+cd app
 npm run build
 ```
 
@@ -174,7 +174,7 @@ fix(scope): fix bug in component
 ### ESLint Ignores
 The following directories are ignored by ESLint (see `eslint.config.js`):
 - `node_modules/`, `.next/`, `out/`, `build/`, `dist/`, `.turbo/`
-- `my-app/node_modules/`, `my-app/.next/`, `.vercel/`, `.cache/`, `.pnpm/`
+- `app/node_modules/`, `app/.next/`, `.vercel/`, `.cache/`, `.pnpm/`
 - `public/**/*.min.js`, `public/d3.v3.min.js`, `public/index.js`, `public/arf.js`
 - `api/**`, `index/**`
 
@@ -194,7 +194,7 @@ The `scripts/run-wicked.sh` script is excluded from some linting checks (bashate
 Before submitting a PR:
 1. Run `pnpm install` to ensure dependencies are up to date
 2. Run `npm run lint` to check for linting errors
-3. For Next.js changes: `cd my-app && npm run build` to verify builds successfully
+3. For Next.js changes: `cd app && npm run build` to verify builds successfully
 4. Test locally with `npm run start` (Cloudflare) or `npm run start-python` (Python server)
 5. Verify pre-commit hooks pass (if installed)
 
@@ -210,7 +210,7 @@ Before submitting a PR:
 
 When exploring the codebase:
 - Static site files: Look in `public/` directory
-- Next.js app: Look in `my-app/` directory
+- Next.js app: Look in `app/` directory
 - API endpoints: Look in `api/` directory
 - Build configurations: Check root-level config files (package.json, vercel.json, wrangler.jsonc)
 - Linting configs: Check `.eslintrc`, `.mega-linter.yml`, `.pre-commit-config.yaml`
@@ -585,8 +585,8 @@ When exploring the codebase:
 
 4. **Current Sitemap Pages**
    - `https://dr-alban.com/` (homepage - note: actual sitemap uses /index.html)
-   - `/policy/privacy_policy.html`
-   - `/policy/service_terms.html`
+   - `https://dr-alban.com/policy/privacy_policy.html`
+   - `https://dr-alban.com/policy/service_terms.html`
    - `https://dr-alban.com/policy/gnu_general_public_license.txt`
    - `https://status.albandrieu.com/` (external status page - note: typically external domains should not be in sitemap)
 
