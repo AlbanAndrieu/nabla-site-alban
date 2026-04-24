@@ -32,6 +32,20 @@
 			"reacheableFromOutside": false
 		},
 		{
+			"name": "Home",
+			"icons": [
+				"fas fa-house"
+			],
+			"description": "Gateway admin UI (home hostname)",
+			"internalHost": "172.17.0.1",
+			"internalPort": 10443,
+			"internalSecure": true,
+			"tunnelUrl": "https://home.albandrieu.com:10443",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/pfsense.png",
+			"reacheableFromOutside": false
+		},
+		{
 			"name": "AdGuard Home",
 			"icons": [
 				"fas fa-shield-virus"
@@ -608,6 +622,62 @@
 			"iconSrc": "assets/selfh-icons/anythingllm.png",
 			"reacheableFromOutside": false
 		},
+		{
+			"name": "AnythingLLM - albandrieu",
+			"icons": [
+				"fas fa-comments"
+			],
+			"description": "Private LLM workspace and RAG",
+			"internalHost": "172.17.0.57",
+			"internalPort": 3007,
+			"internalSecure": true,
+			"tunnelUrl": "https://anythingllm-albandrieu.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/anythingllm.png",
+			"reacheableFromOutside": false
+		},		
+		{
+			"name": "Reactive Resume - albandrieu",
+			"icons": [
+				"fas fa-comments"
+			],
+			"description": "Reactive Resume",
+			"internalHost": "172.17.0.57",
+			"internalPort": 3008,
+			"internalSecure": true,
+			"tunnelUrl": "https://reactive-resume.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/anythingllm.png",
+			"reacheableFromOutside": false
+		},				
+		{
+			"name": "Plumber",
+			"icons": [
+				"fas fa-comments"
+			],
+			"description": "GitLab Security check",
+			"internalHost": "172.17.0.57",
+			"internalPort": 3001,
+			"internalSecure": true,
+			"tunnelUrl": "https://plumber.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/plumber.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Plumber API",
+			"icons": [
+				"fas fa-comments"
+			],
+			"description": "GitLab Security check",
+			"internalHost": "172.17.0.57",
+			"internalPort": 3003,
+			"internalSecure": true,
+			"tunnelUrl": "https://plumber-api.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/plumber.png",
+			"reacheableFromOutside": true
+		},		
 		{
 			"name": "Graylog",
 			"icons": [
