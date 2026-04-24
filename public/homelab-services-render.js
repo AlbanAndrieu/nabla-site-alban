@@ -72,12 +72,7 @@
 		return "Tunnel endpoint";
 	}
 
-	function linkAttrs(newTab) {
-		if (newTab === false) {
-			return "";
-		}
-		return ' target="_blank" rel="noopener noreferrer"';
-	}
+	const externalLinkAttrs = ' target="_blank" rel="noopener noreferrer"';
 
 	function safeHref(url) {
 		const u = String(url || "");
@@ -111,6 +106,31 @@
 		return `${scheme}://${host}:${port}${path}`;
 	}
 
+	/**
+	 * Padlock next to Internal / Tunnel when JSON marks HTTPS; color set client-side
+	 * from favicon probe (same limits as nabla-service-status.js).
+	 */
+	function homelabTlsLockMarkup(secureFlag, href) {
+		if (secureFlag !== true) {
+			return "";
+		}
+		const h = String(href || "");
+		if (!h || h === "#") {
+			return "";
+		}
+		let origin = "";
+		try {
+			const u = new URL(h, window.location.href);
+			if (u.protocol !== "https:") {
+				return "";
+			}
+			origin = u.origin;
+		} catch {
+			return "";
+		}
+		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
+	}
+
 	function renderServiceCard(s, variant) {
 		const name = esc(s.name);
 		const icons = titleIconMarkup(s);
@@ -130,13 +150,23 @@
 			? `<p class="card-text text-muted small mb-2 flex-grow-0">${desc}</p>`
 			: "";
 
+		const intLock = homelabTlsLockMarkup(s.internalSecure === true, intHref);
+		const tunLock = homelabTlsLockMarkup(s.tunnelSecure === true, tunHref);
+
+		const reachableOutside =
+			s.reacheableFromOutside === true ? "true" : "false";
+		const tunProbe =
+			typeof tunHref === "string" &&
+			(tunHref.startsWith("https:") || tunHref.startsWith("http:"));
+		const tunTabStateClass = tunProbe ? " homelab-tunnel-tab--pending" : "";
+
 		const group = `<div class="truenas-app-actions d-grid gap-2 mt-2">
 			<div class="btn-group btn-group-sm w-100" role="group" aria-label="${aria}">
-				<a href="${intHref}" class="btn btn-outline-secondary"${linkAttrs(s.newTabInternal)} title="${intTitle}">
-					<i class="fas fa-house-laptop" aria-hidden="true"></i><span class="ms-1">Internal</span>
+				<a href="${intHref}" class="btn btn-outline-secondary homelab-service-btn-internal"${externalLinkAttrs} title="${intTitle}">
+					<i class="fas fa-house-laptop" aria-hidden="true"></i><span class="ms-1">Internal</span>${intLock}
 				</a>
-				<a href="${tunHref}" class="btn btn-outline-primary"${linkAttrs(s.newTabTunnel)} title="${tunTitle}">
-					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>
+				<a href="${tunHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${tunTabStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${tunTitle}">
+					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
 				</a>
 			</div>
 		</div>`;
@@ -197,6 +227,12 @@
 			window.initHomelabServiceCardPings();
 		} else if (typeof window.initNablaHomelabServicePings === "function") {
 			window.initNablaHomelabServicePings();
+		}
+		if (typeof window.initHomelabTlsLockIndicators === "function") {
+			window.initHomelabTlsLockIndicators();
+		}
+		if (typeof window.initHomelabTunnelTabIndicators === "function") {
+			window.initHomelabTunnelTabIndicators();
 		}
 	}
 

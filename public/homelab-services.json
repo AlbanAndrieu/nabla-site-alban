@@ -12,9 +12,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://truenas.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/truenas-scale.png"
+			"iconSrc": "assets/selfh-icons/truenas-scale.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "pfSense",
@@ -29,9 +28,8 @@
 			"tunnelUrl": "https://pfsense.albandrieu.com",
 			"tunnelSecure": true,
 			"internalTitle": "pfSense web UI on LAN gateway (172.17.0.1:10443); certificate may be self-signed",
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/pfsense.png"
+			"iconSrc": "assets/selfh-icons/pfsense.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "AdGuard Home",
@@ -44,9 +42,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://adguardhome.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/adguard-home.png"
+			"iconSrc": "assets/selfh-icons/adguard-home.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Heimdall",
@@ -59,9 +56,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://heimdall.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/heimdall.png"
+			"iconSrc": "assets/selfh-icons/heimdall.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "Domain Watchdog",
@@ -74,9 +70,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://domain-watchdog.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/domain-watchdog.png"
+			"iconSrc": "assets/selfh-icons/domain-watchdog.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Prometheus",
@@ -89,9 +84,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://prometheus.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/prometheus.png"
+			"iconSrc": "assets/selfh-icons/prometheus.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "PortTracker",
@@ -104,9 +98,22 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://portracker.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/portracker.png"
+			"iconSrc": "assets/selfh-icons/portracker.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "PortTracker - albandrieu",
+			"icons": [
+				"fas fa-network-wired"
+			],
+			"description": "Port tracking service",
+			"internalHost": "172.17.0.57",
+			"internalPort": 4999,
+			"internalSecure": true,
+			"tunnelUrl": "https://portracker-albandrieu.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/portracker.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "OpenSpeedTest",
@@ -119,9 +126,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://open-speed-test.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/openspeedtest.png"
+			"iconSrc": "assets/selfh-icons/openspeedtest.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Portainer",
@@ -134,9 +140,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://portainer.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/portainer.png"
+			"iconSrc": "assets/selfh-icons/portainer.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Scrutiny",
@@ -149,9 +154,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://scrutiny.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/scrutiny.png"
+			"iconSrc": "assets/selfh-icons/scrutiny.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "IT Tools",
@@ -164,9 +168,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://it-tools.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/it-tools.png"
+			"iconSrc": "assets/selfh-icons/it-tools.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "Uptime Kuma",
@@ -179,9 +182,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://uptime-kuma.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/uptime-kuma.png"
+			"iconSrc": "assets/selfh-icons/uptime-kuma.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Vaultwarden",
@@ -194,9 +196,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://vaultwarden.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/vaultwarden.png"
+			"iconSrc": "assets/selfh-icons/vaultwarden.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "2FAuth",
@@ -209,9 +210,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://2fauth.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/2fauth.png"
+			"iconSrc": "assets/selfh-icons/2fauth.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "LocalAI",
@@ -224,9 +224,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://localai.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/localai.png"
+			"iconSrc": "assets/selfh-icons/localai.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Ollama",
@@ -239,9 +238,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://ollama.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/ollama.png"
+			"iconSrc": "assets/selfh-icons/ollama.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "n8n",
@@ -254,9 +252,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://n8n.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/n8n.png"
+			"iconSrc": "assets/selfh-icons/n8n.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Grafana",
@@ -269,9 +266,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://grafana.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/grafana.png"
+			"iconSrc": "assets/selfh-icons/grafana.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Keycloak",
@@ -284,9 +280,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://keycloak.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/keycloak.png"
+			"iconSrc": "assets/selfh-icons/keycloak.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "ClamAV",
@@ -299,9 +294,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://clamav.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/clamav.png"
+			"iconSrc": "assets/selfh-icons/clamav.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Homarr",
@@ -314,9 +308,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://homarr.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/homarr.png"
+			"iconSrc": "assets/selfh-icons/homarr.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "Gatus",
@@ -329,9 +322,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://gatus.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/gatus.png"
+			"iconSrc": "assets/selfh-icons/gatus.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "DDNS Updater",
@@ -344,9 +336,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://ddns-updater.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/ddns-updater.png"
+			"iconSrc": "assets/selfh-icons/ddns-updater.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Paperless AI",
@@ -359,9 +350,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://paperless-ai.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/paperless-ai.png"
+			"iconSrc": "assets/selfh-icons/paperless-ai.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Transmission",
@@ -374,9 +364,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://transmission.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/transmission.png"
+			"iconSrc": "assets/selfh-icons/transmission.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Sonarr",
@@ -389,9 +378,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://sonarr.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/sonarr.png"
+			"iconSrc": "assets/selfh-icons/sonarr.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Radarr",
@@ -404,9 +392,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://radarr.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/radarr.png"
+			"iconSrc": "assets/selfh-icons/radarr.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Lidarr",
@@ -419,9 +406,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://lidarr.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/lidarr.png"
+			"iconSrc": "assets/selfh-icons/lidarr.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Prowlarr",
@@ -434,9 +420,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://prowlarr.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/prowlarr.png"
+			"iconSrc": "assets/selfh-icons/prowlarr.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Paperless-ngx",
@@ -449,9 +434,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://paperless-ngx.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/paperless-ngx.png"
+			"iconSrc": "assets/selfh-icons/paperless-ngx.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Netbootxyz",
@@ -464,9 +448,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://netbootxyz.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/netboot-xyz.png"
+			"iconSrc": "assets/selfh-icons/netboot-xyz.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Affine",
@@ -479,9 +462,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://affine.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/affine.png"
+			"iconSrc": "assets/selfh-icons/affine.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "ConvertX",
@@ -494,9 +476,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://convertx.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/convertx.png"
+			"iconSrc": "assets/selfh-icons/convertx.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Bichon",
@@ -509,9 +490,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://bichon.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/bichon.png"
+			"iconSrc": "assets/selfh-icons/bichon.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "OpenArchiver",
@@ -524,9 +504,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://openarchiver.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/open-archiver.png"
+			"iconSrc": "assets/selfh-icons/open-archiver.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "pgAdmin",
@@ -539,9 +518,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://pgadmin.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/pgadmin.png"
+			"iconSrc": "assets/selfh-icons/pgadmin.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "PostgreSQL",
@@ -554,12 +532,11 @@
 			"internalSecure": false,
 			"tunnelSecure": false,
 			"tunnelUrl": "postgres://postgres.albandrieu.com:5432/",
-			"newTabInternal": false,
-			"newTabTunnel": false,
 			"internalTitle": "Postgres on Docker bridge 172.17.0.24:5432",
 			"tunnelTitle": "Postgres via Cloudflare Tunnel (TCP)",
 			"portHtml": "Port 5432 · <code class=\"user-select-all\">172.17.0.24:5432</code> · <code class=\"user-select-all\">postgres.albandrieu.com:5432</code>",
-			"iconSrc": "assets/selfh-icons/postgresql.png"
+			"iconSrc": "assets/selfh-icons/postgresql.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "KaraKeep",
@@ -572,9 +549,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://karakeep.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/karakeep.png"
+			"iconSrc": "assets/selfh-icons/karakeep.png",
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "SABnzbd",
@@ -587,9 +563,8 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://sabnzbd.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/sabnzbd.png"
+			"iconSrc": "assets/selfh-icons/sabnzbd.png",
+			"reacheableFromOutside": false
 		},
 		{
 			"name": "Stirling PDF",
@@ -602,9 +577,176 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://stirling.albandrieu.com",
 			"tunnelSecure": true,
-			"newTabInternal": true,
-			"newTabTunnel": true,
-			"iconSrc": "assets/selfh-icons/stirling-pdf.png"
+			"iconSrc": "assets/selfh-icons/stirling-pdf.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Stirling PDF - albandrieu",
+			"icons": [
+				"fas fa-file-pdf"
+			],
+			"description": "PDF toolkit",
+			"internalHost": "172.17.0.57",
+			"internalPort": 8085,
+			"internalSecure": true,
+			"tunnelUrl": "https://stirling-albandrieu.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/stirling-pdf.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "AnythingLLM",
+			"icons": [
+				"fas fa-comments"
+			],
+			"description": "Private LLM workspace and RAG",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30318,
+			"internalSecure": true,
+			"tunnelUrl": "https://anythingllm.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/anythingllm.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Graylog",
+			"icons": [
+				"fas fa-magnifying-glass-chart"
+			],
+			"description": "Log management and analysis",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30319,
+			"internalSecure": true,
+			"tunnelUrl": "https://graylog.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/graylog.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "LocalAI (GPU)",
+			"icons": [
+				"fas fa-robot"
+			],
+			"description": "Local AI models (GPU instance)",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30320,
+			"internalSecure": true,
+			"tunnelUrl": "https://localai-gpu.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/localai.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "NetAlertX",
+			"icons": [
+				"fas fa-bell"
+			],
+			"description": "Network presence and alerts",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30321,
+			"internalSecure": true,
+			"tunnelUrl": "https://netalertx.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/netalertx.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "ntopng",
+			"icons": [
+				"fas fa-network-wired"
+			],
+			"description": "Network traffic visibility",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30322,
+			"internalSecure": true,
+			"tunnelUrl": "https://ntopng.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/ntopng.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Ollama (GPU)",
+			"icons": [
+				"fas fa-comment-dots"
+			],
+			"description": "Large language models (GPU instance)",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30323,
+			"internalSecure": true,
+			"tunnelUrl": "https://ollama-gpu.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/ollama.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Open WebUI",
+			"icons": [
+				"fas fa-window-maximize"
+			],
+			"description": "Web interface for chat models",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30324,
+			"internalSecure": true,
+			"tunnelUrl": "https://open-webui.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/open-webui.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "OpenClaw",
+			"icons": [
+				"fas fa-terminal"
+			],
+			"description": "OpenClaw service",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30325,
+			"internalSecure": true,
+			"tunnelUrl": "https://openclaw.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/openclaw.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Prometheus (ECK)",
+			"icons": [
+				"fas fa-fire-flame-curved"
+			],
+			"description": "Prometheus on ECK (tunnel path)",
+			"internalHost": "172.17.0.24",
+			"internalPort": 30326,
+			"internalSecure": true,
+			"tunnelUrl": "https://prometheus.albandrieu.com/eck",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/prometheus.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Nexus",
+			"icons": [
+				"fas fa-cubes"
+			],
+			"description": "Sonatype Nexus Repository",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8081,
+			"internalSecure": true,
+			"tunnelUrl": "https://nexus.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/sonatype-nexus-repository.png",
+			"reacheableFromOutside": true
+		},
+		{
+			"name": "LiteLLM",
+			"icons": [
+				"fas fa-robot"
+			],
+			"description": "LLM proxy and gateway",
+			"internalHost": "172.17.0.24",
+			"internalPort": 4100,
+			"internalSecure": true,
+			"tunnelUrl": "https://litellm.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/litellm.png",
+			"reacheableFromOutside": true
 		}
 	]
 }

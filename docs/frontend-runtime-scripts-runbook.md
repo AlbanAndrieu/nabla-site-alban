@@ -14,6 +14,7 @@ This runbook documents the shared frontend runtime scripts that were consolidate
 - `public/homelab-services-render.js`
 - `public/homelab-services.json`
 - `public/nabla-service-status.js`
+- `app/api/homelab-tunnel-check/route.ts` (server-side tunnel HTTP/TLS probe for homelab cards)
 - `public/site-content-page.css` (homelab card + ping indicator styles)
 - `lib/marketingPages.ts`
 - `app/[locale]/page.tsx`
@@ -90,9 +91,10 @@ Default behavior to remember:
 
 1. Page defines one or more roots using `data-homelab-services-root`.
 2. `public/homelab-services-render.js` fetches JSON (`homelab-services.json` by default, or `data-homelab-json` override).
-3. Script renders a responsive card grid with Internal and Tunnel actions for each service.
-4. After render, script calls `window.initHomelabServiceCardPings()` when available.
-5. `public/nabla-service-status.js` probes each card origin and appends status dots.
+3. Script renders a responsive card grid with Internal and Tunnel actions for each service (optional `fa-lock` spans when `internalSecure` / `tunnelSecure` are true and the URL is `https:`).
+4. After render, the script calls `window.initHomelabServiceCardPings()`, `window.initHomelabTlsLockIndicators()`, and `window.initHomelabTunnelTabIndicators()` when available.
+5. `public/nabla-service-status.js` runs favicon probes: reachability dots on each button origin, and padlock color (green/red) for each HTTPS lock span (`data-homelab-tls-origin`), with the same false-negative caveats as favicon probing.
+6. Tunnel buttons (`data-homelab-reachable-outside`) call `GET /api/homelab-tunnel-check?url=…` (same-origin). The API performs a server-side `HEAD` (fallback `GET` with `Range`) against allowlisted tunnel hosts and returns HTTP status; the client tints the Tunnel button green / yellow / red from status + `reacheableFromOutside`. Static-only hosts without Next return “unknown” (gray) when the API is missing.
 
 ### Root attributes (public interface)
 
@@ -128,10 +130,12 @@ Per-service fields used by renderer:
 - `icons` (optional): list of Font Awesome classes; validated against `^[\\w.\\- ]+$`. Invalid class falls back to `fas fa-circle`. Used when `iconSrc` is absent or invalid.
 - `description` (optional): short summary text.
 - `internalHost` + `internalPort` (required for usable internal button): compose internal URL.
-- `internalSecure` (optional boolean): `https` when true, `http` when false.
+- `internalSecure` (optional boolean): `https` when true, `http` when false. When exactly `true` and the built internal URL is `https:`, a padlock icon is rendered on the Internal button and later colored by a client-side probe.
+- `tunnelSecure` (optional boolean): metadata paired with `tunnelUrl`; when exactly `true` and the tunnel URL is `https:`, a padlock is shown on the Tunnel button and probed the same way.
 - `internalPath` (optional): appended path; if present and missing leading slash, renderer adds it.
 - `tunnelUrl` (required for tunnel button): external URL, can be `https://...` or `postgres://...`.
-- `newTabInternal` and `newTabTunnel` (optional booleans): default open in new tab unless explicitly `false`.
+- `reacheableFromOutside` (boolean): public-exposure intent for the tunnel URL. When `true`, a green Tunnel tab requires HTTP **2xx** or **304** from `/api/homelab-tunnel-check` and a successful TLS handshake on the server. When `false`, **yellow** means “blocked or unavailable as expected” (**401**, **403**, **404**, **429**, **502**, **503**, or network failure / status **0**); **red** means an unexpected success (**2xx**/**304**) or another HTTP code. Host allowlist defaults to `*.albandrieu.com`; override with `HOMELAB_TUNNEL_CHECK_HOSTS` (comma-separated hostnames, no scheme).
+- Internal and tunnel links always open in a new tab (`target="_blank"` with `rel="noopener noreferrer"`).
 - `internalTitle` and `tunnelTitle` (optional): override button tooltip text.
 - `portHtml` (optional): custom HTML rendered in card footer (used for protocol-specific hints like Postgres).
 
