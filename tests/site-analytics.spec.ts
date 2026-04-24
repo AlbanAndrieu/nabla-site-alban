@@ -101,4 +101,3 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 });
-
