@@ -19,7 +19,9 @@ test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
 		page,
 	}) => {
-		await page.goto("/expertise.html?nablaEnableThirdParty=1");
+		// Root `*.html` slugs in `MARKETING_PAGES` are rewritten to App Router pages without
+		// the original `<head>` scripts; use static `/404.html` (default `vercel` analytics mode).
+		await page.goto("/404.html?nablaEnableThirdParty=1");
 
 		await expect
 			.poll(async () => {
@@ -39,8 +41,9 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should keep GTM and gtag init idempotent", async ({ page }) => {
-		// Home uses data-analytics-mode="home" and already injects GTM/gtag; use vercel-only page
-		await page.goto("/expertise.html");
+		// Home uses data-analytics-mode="home" and already injects GTM/gtag; use vercel-only page.
+		// Same rewrite caveat as above: prefer static `/404.html` over marketed `/expertise.html`.
+		await page.goto("/404.html");
 
 		await expect
 			.poll(async () => {
@@ -86,10 +89,12 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should load Ahrefs script when key is provided", async ({ page }) => {
-		await page.goto("/test.html?nablaEnableThirdParty=1");
+		// `/test.html` is rewritten to the App Router marketing page (see `MARKETING_PAGES` + `next.config.ts`);
+		// use static `index.html`, which is not rewritten and includes `data-ahrefs-key` on `site-analytics.js`.
+		await page.goto("/index.html?nablaEnableThirdParty=1");
 
 		const ahrefs = page.locator(
-			'script[src="https://analytics.ahrefs.com/analytics.js"][data-key]',
+			'script[src*="analytics.ahrefs.com/analytics.js"][data-key]',
 		);
 		await expect(ahrefs).toHaveCount(1);
 		await expect(ahrefs).toHaveAttribute("data-key", "tg3zLMS/bebJFl0LxctiCw");
