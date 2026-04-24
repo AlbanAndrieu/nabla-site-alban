@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import HomelabServicesScripts from "@/components/HomelabServicesScripts";
 import { routing } from "@/i18n/routing";
@@ -45,9 +46,17 @@ export default async function MarketingSlugPage({ params }: Props) {
 		spec.mode,
 		normalizedLocale,
 	);
+	const analyticsMode = spec.analyticsMode ?? "vercel";
 
 	return (
 		<>
+			<Script
+				id={`site-analytics-${slug}`}
+				src="/site-analytics.js"
+				strategy="afterInteractive"
+				data-analytics-mode={analyticsMode}
+				data-ahrefs-key={spec.ahrefsKey}
+			/>
 			<div id="top" />
 			<a href="#main-content" className="skip-to-main">
 				{t("skipToMainContent")}

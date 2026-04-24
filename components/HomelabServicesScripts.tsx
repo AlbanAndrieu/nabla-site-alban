@@ -18,6 +18,16 @@ function appendScriptOnce(src: string) {
 	});
 }
 
+function afterWindowLoad() {
+	return new Promise<void>((resolve) => {
+		if (document.readyState === "complete") {
+			resolve();
+			return;
+		}
+		window.addEventListener("load", () => resolve(), { once: true });
+	});
+}
+
 /**
  * Static `nabla.html` / `truenas.html` load these after `</main>`; the App Router only embeds `<main>`.
  * Load after mount so React hydration does not replace client-filled `[data-homelab-services-root]` markup.
@@ -29,6 +39,8 @@ export default function HomelabServicesScripts() {
 	useEffect(() => {
 		void (async () => {
 			try {
+				// Avoid delaying navigation "load": these scripts probe many remote origins via images.
+				await afterWindowLoad();
 				await appendScriptOnce("/nabla-service-status.js");
 				await appendScriptOnce("/homelab-services-render.js");
 			} catch (e) {
