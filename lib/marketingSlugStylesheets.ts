@@ -8,8 +8,8 @@ const LEAFLET_CSS =
  * add these so injected `<main>` markup matches standalone `public/*.html`.
  */
 const SLUG_STYLESHEETS: Record<string, readonly string[]> = {
-	contact: ["/site-content-page.css", "/page-layouts.css", LEAFLET_CSS],
-	ai: ["/site-content-page.css", "/nabla.css"],
+	contact: ["/landing-sections.css", "wireframe.css", "/theme.css", "/style.css", "/print.css", "/site-content-page.css", "/page-layouts.css", LEAFLET_CSS],
+	ai: ["/site-content-page.css", "/arf.css"],
 	security: ["/site-content-page.css", "/arf.css", "/page-layouts.css"],
 	expertise: ["/site-content-page.css", "/arf.css"],
 	workstation: ["/site-content-page.css"],

@@ -1,3 +1,4 @@
+@import 'tailwindcss';
 /* Reserved for app-level overrides; site styles load from /public via layout <link>. */
 
 .google-translate-widget {

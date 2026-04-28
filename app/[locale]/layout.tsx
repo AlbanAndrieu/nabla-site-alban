@@ -6,6 +6,9 @@ import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import { routing } from "@/i18n/routing";
 
+//import '../globals.css'
+import '@/app/globals.css';
+
 export const metadata: Metadata = {
 	metadataBase: new URL("https://dr-alban.com"),
 };
@@ -41,11 +44,23 @@ export default async function RootLayout({ children, params }: Props) {
 				<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
 				<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
 				<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+				
+				{/* 
+				<link
+					rel="stylesheet"
+					href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+					type="text/css"
+				/>*/}
+				
 				<link rel="stylesheet" href="/landing-sections.css" />
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />
 				<link rel="stylesheet" href="/style.css" />
 				<link rel="stylesheet" href="/print.css" />
+				<link rel="stylesheet" href="/arf.css" />
+				<link rel="stylesheet" href="/site-content-page.css" />
+				<link rel="stylesheet" href="/page-layouts.css" />
+				<link rel="stylesheet" href="/nabla.css" />		
 				<link rel="stylesheet" href="/timeline.css" />
 				<link rel="stylesheet" href="/education.css" />
 				<link
@@ -65,7 +80,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="color-scheme" content="light dark" />
 				<meta name="referrer" content="always" />
 			</head>
-			<body className="page-dark" suppressHydrationWarning>
+			<body className="site-content-page page-contact page-nabla-best-practices page-dark" suppressHydrationWarning>
 				{/* Static HTML uses Google Translate via /site-widgets.js; Next uses next-intl (see data-no-google-translate). */}
 				<NextIntlClientProvider messages={messages}>
 					{children}

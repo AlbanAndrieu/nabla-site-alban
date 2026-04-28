@@ -12,12 +12,12 @@ export type MarketingPageSpec = {
 export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	contact: {
 		file: "contact.html",
-		mode: "headerMain",
-		bodyClass: "site-content-page page-contact",
+		mode: "mainOuter",
+		bodyClass: "site-content-page page-dark page-nabla-best-practices",
 	},
 	ai: {
 		file: "ai.html",
-		mode: "headerMain",
+		mode: "navHeaderMain",
 		bodyClass: "site-content-page page-nabla-best-practices",
 	},
 	security: {

@@ -55,20 +55,8 @@
 		<link rel="stylesheet" href="print.css" />
 		<link rel="stylesheet" href="arf.css" />
 		<link rel="stylesheet" href="site-content-page.css" />
-		<link rel="stylesheet" href="nabla.css" />
+		<!--<link rel="stylesheet" href="nabla.css" />-->
 
-		<!-- Font Awesome (CDN + JS) -->
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
-			type="text/css"
-		/>
-		<script
-			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
-			data-auto-replace-svg="nest"
-		></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
 		<!-- Bootstrap -->
 		<link
 			rel="stylesheet"
@@ -119,7 +107,12 @@
 	</head>
 	<body class="site-content-page page-nabla-best-practices">
 		<a name="top"></a>
-		<!-- Google Translate Widget (styled via theme.css) -->
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="index.html" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+		</nav>
+
 		<!-- Header / Hero Section -->
 		<header>
 			<section class="hero-section" id="home">
@@ -865,10 +858,9 @@
 			</div>
 			<div class="footer-links">
 				<a href="/policy/legal.html">Legal notices</a>
-				<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer" class="text-muted">Cookies</a>
 			</div>
 			<p class="text-md-center mt-3">
-				<a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+				<a href="index.html" class="btn btn-sm btn-outline-secondary">Back to Home</a>
 				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
 			</p>
 			<p class="footer-copyright"></p>
