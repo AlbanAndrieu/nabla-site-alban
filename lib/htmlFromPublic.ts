@@ -75,6 +75,31 @@ function rewriteOneHref(
 	return `href=${quote}${localizedOut}${query}${hash}${quote}`;
 }
 
+function rewriteOneSrc(
+	quote: '"' | "'",
+	raw: string,
+): string {
+	const src = raw.trim();
+	if (
+		/^(https?:|mailto:|tel:|#|javascript:|data:)/i.test(src) ||
+		src.length === 0 ||
+		src.startsWith("/")
+	) {
+		return `src=${quote}${raw}${quote}`;
+	}
+
+	let pathPart = src;
+	const ref = src.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
+	if (ref) pathPart = ref[1] ?? src;
+	const query = ref?.[2] ?? "";
+	const hash = ref?.[3] ?? "";
+
+	while (pathPart.startsWith("../")) pathPart = pathPart.slice(3);
+	while (pathPart.startsWith("./")) pathPart = pathPart.slice(2);
+
+	return `src=${quote}/${pathPart}${query}${hash}${quote}`;
+}
+
 /** Rewrite internal *.html links: add locale prefix only (paths stay `*.html`). */
 export function rewriteLegacyHtmlHrefs(
 	fragment: string,
@@ -85,6 +110,12 @@ export function rewriteLegacyHtmlHrefs(
 	);
 	out = out.replace(/\bhref='([^']*)'/gi, (_full, raw: string) =>
 		rewriteOneHref("'", raw, locale),
+	);
+	out = out.replace(/\bsrc="([^"]*)"/gi, (_full, raw: string) =>
+		rewriteOneSrc('"', raw),
+	);
+	out = out.replace(/\bsrc='([^']*)'/gi, (_full, raw: string) =>
+		rewriteOneSrc("'", raw),
 	);
 	return out;
 }
@@ -125,8 +156,9 @@ export async function loadPublicHtmlFragment(
 		const m = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
 		fragment = m?.[1] ?? "";
 	} else if (mode === "headerMain") {
+		// Allow comments/other nodes between </header> and <main>.
 		const m = html.match(
-			/<header[^>]*>[\s\S]*?<\/header>\s*<main[^>]*>[\s\S]*?<\/main>/i,
+			/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
 		);
 		fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
 	} else if (mode === "navHeaderMain") {
