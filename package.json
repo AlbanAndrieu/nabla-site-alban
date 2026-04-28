@@ -50,6 +50,7 @@
 		"@stripe/stripe-js": "^9.1.0",
 		"@vercel/analytics": "^1.5.0",
 		"@vercel/speed-insights": "^1.2.0",
+		"@vercel/toolbar": "^0.2.2",
 		"crypto": "^1.0.1",
 		"express": "^4.21.0",
 		"lodash-es": "^4.18.1",

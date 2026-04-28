@@ -126,3 +126,9 @@ jobs:
             ./public/cv/cv-aandrieu-2026-ts-fr.log
             ./public/cv/cv-aandrieu-2026-ts-de.log
             ./public/cv/cv-aandrieu-2026-ts-no.log
+
+      - name: 'notify vercel'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: Vercel - nabla-site-alban: lint
+    
