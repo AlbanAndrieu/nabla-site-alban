@@ -54,17 +54,8 @@ body.page-nabla-best-practices .nabla-wip-callout strong {
 	color: var(--accent-color, #f59e0b);
 }
 
-body.page-nabla-best-practices .nabla-contact-logo-wrap {
-	margin-top: 3rem;
-}
-
-body.page-nabla-best-practices .nabla-contact-logo {
-	width: 120px;
-	height: auto;
-	opacity: 0.6;
-}
-
 /* Homepage + nabla.html: flat blue→violet band, no grid animation (see landing-sections .hero-section default) */
+/*
 body.page-nabla-best-practices .hero-section,
 body.home-page.page-dark .hero-section {
 	text-align: center;
@@ -75,13 +66,13 @@ body.home-page.page-dark .hero-section {
 	color: #fff;
 	position: relative;
 	overflow: hidden;
-}
+}*/
 
 body.page-nabla-best-practices .hero-section::before,
 body.home-page.page-dark .hero-section::before {
 	display: none;
 }
-
+/*
 body.page-nabla-best-practices .hero-title,
 body.home-page.page-dark .hero-title {
 	font-size: 3rem;
@@ -98,7 +89,7 @@ body.home-page.page-dark .hero-subtitle {
 	animation: none;
 }
 
-body.page-nabla-best-practices .hero-description,
+page-nabla-best-practices .hero-description,
 body.home-page.page-dark .hero-description {
 	font-size: 1.1rem;
 	max-width: 800px;
@@ -107,7 +98,7 @@ body.home-page.page-dark .hero-description {
 	opacity: 0.95;
 	animation: none;
 }
-
+*/
 body.page-nabla-best-practices .content-section {
 	padding: 4rem 2rem;
 	max-width: 1200px;

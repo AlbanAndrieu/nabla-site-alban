@@ -67,157 +67,8 @@
     <link rel="stylesheet" href="../print.css" />
     <link rel="stylesheet" href="../site-content-page.css" />
 
-    <!-- Custom CV Styles (accessibility & light/dark) -->
-    <style>
-      /* Modern CV Styling with theme variables */
-      .cv-card {
-        border: none;
-        box-shadow: 0 4px 6px var(--cv-shadow);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .cv-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px var(--cv-shadow);
-      }
-
-      .cv-card .card-header {
-        background: linear-gradient(135deg, var(--cv-btn-bg) 0%, var(--cv-heading-accent) 100%);
-        border: none;
-        padding: 2rem;
-      }
-
-      .cv-section {
-        margin-bottom: 1.5rem;
-      }
-
-      .cv-section h3 {
-        color: var(--cv-heading-accent);
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
-
-      .cv-section .border-bottom {
-        border-color: var(--cv-border-light) !important;
-      }
-
-      .list-group-item {
-        border-left: 3px solid transparent;
-        transition: all 0.2s ease;
-      }
-
-      .list-group-item:hover {
-        border-left-color: var(--cv-heading-accent);
-        background-color: var(--cv-bg-card);
-      }
-
-      .badge-pill {
-        font-weight: 500;
-        font-size: 0.875rem;
-        padding: 0.5rem 1rem;
-      }
-
-      footer {
-        border-top: 1px solid var(--cv-border-light);
-      }
-
-      /* Accessibility: focus visible for keyboard users */
-      .cv-page-body a:focus-visible,
-      .cv-page-body button:focus-visible {
-        outline: 2px solid var(--cv-heading-accent);
-        outline-offset: 2px;
-      }
-
-      /* Print styles for CV */
-      @media print {
-        .cv-card {
-          box-shadow: none;
-          page-break-inside: avoid;
-        }
-
-        footer,
-        nav {
-          display: none;
-        }
-      }
-
-      /* CV landing: language buttons align on narrow viewports */
-      .cv-detail-row {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-      }
-
-      @media (min-width: 768px) {
-        .cv-detail-row {
-          flex-direction: row;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .cv-detail-row .cv-lang-btns {
-          justify-content: flex-end;
-        }
-      }
-
-      .cv-lang-btns {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        width: 100%;
-      }
-
-      @media (min-width: 768px) {
-        .cv-lang-btns {
-          width: auto;
-          max-width: 100%;
-          flex: 1 1 auto;
-        }
-      }
-
-      .cv-lang-btns .btn {
-        flex: 1 1 calc(50% - 0.25rem);
-        min-width: 0;
-        text-align: center;
-      }
-
-      @media (min-width: 576px) {
-        .cv-lang-btns .btn {
-          flex: 0 1 auto;
-          min-width: 7.5rem;
-        }
-      }
-
-      .cv-latex-block {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        width: 100%;
-      }
-
-      .cv-latex-style-row .cv-lang-btns .btn {
-        flex: 1 1 calc(50% - 0.25rem);
-      }
-
-      @media (min-width: 576px) {
-        .cv-latex-style-row .cv-lang-btns .btn {
-          flex: 0 1 auto;
-          min-width: 9rem;
-        }
-      }
-
-      .cv-lang-flag {
-        margin-right: 0.25rem;
-      }
-    </style>
-
-    		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
+    <!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
 		<script src="obs-connection.js"></script>
-
-
 
     <!-- Cloudflare -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
@@ -388,7 +239,7 @@
                     </h3>
 
                     <div class="list-group list-group-flush">
-                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                      <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
                         <div>
                           <i class="fa fa-linkedin text-primary mr-2"></i>
                           <strong>LinkedIn Profile</strong>
@@ -403,7 +254,7 @@
                     </div>
 
                     <div class="list-group list-group-flush">
-                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                      <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
                         <div>
                           <i class="fa fa-linkedin text-primary mr-2"></i>
                           <strong>Reactive Resume Profile</strong>
@@ -419,7 +270,7 @@
 
                     <div class="list-group list-group-flush">
 
-                      <div class="list-group-item d-flex flex-column">
+                      <div class="list-group-item bg-transparent d-flex flex-column">
                         <div class="mb-2">
                           <i class="fa fa-file-pdf-o text-primary mr-2"></i>
                           <strong>(Choose by Detail Level) C.V:</strong>
@@ -461,11 +312,9 @@
                             <a href="/cv/cv-large-no.html" class="btn btn-sm btn-outline-primary" aria-label="View large CV in Norwegian"><span class="cv-lang-flag" aria-hidden="true">🇳🇴</span>View page</a>
                           </div>
                         </div>
-
                       </div>
 
-
-                      <div class="list-group-item d-flex flex-column flex-md-row align-items-md-start gap-3">
+                      <div class="list-group-item bg-transparent d-flex flex-column flex-md-row align-items-md-start gap-3">
                         <div class="flex-shrink-0">
                           <i class="fa fa-file-pdf-o text-primary mr-2"></i>
                           <strong>LaTeX CV</strong>
@@ -510,7 +359,7 @@
                     <h3 class="h5 border-bottom pb-2 mb-3">
                       <i class="fa fa-code text-primary mr-2"></i>Old C.V
                     </h3>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
                       <div>
                         <i class="fa fa-linkedin text-danger mr-2"></i>
                         <strong>LinkedIn Profile</strong>

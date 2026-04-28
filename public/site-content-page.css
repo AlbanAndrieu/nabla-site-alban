@@ -14,22 +14,24 @@ body.site-content-page {
 }
 
 /* Jusmundi / CV chrome pages bring their own surface (cv-theme, jusmundi.css). */
+
 body.site-content-page:not(.jusmundi-page):not(.page-dark) {
 	background-color: var(--bg-white);
 }
-
+/*
 body.site-content-page #main-content {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding-bottom: 3rem;
 }
-
+*/
 body.site-content-page #main-content.container {
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
 
 /* Optional title band (homepage hero gradient) */
+/*
 body.site-content-page .site-page-hero {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #fff;
@@ -55,7 +57,7 @@ body.site-content-page .site-page-hero .site-page-hero-lead {
 	margin-left: auto;
 	margin-right: auto;
 }
-
+ */
 /* Policy / long-form prose */
 body.site-content-page.policy-legal #main-content h1 {
 	font-size: 2rem;

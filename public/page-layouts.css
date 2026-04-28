@@ -93,10 +93,6 @@ html[data-theme="dark"] body.site-content-page.page-contact .contact-info-item {
 	background: var(--bg-secondary, #2d2d2d);
 }
 
-html[data-theme="dark"] body.site-content-page.page-contact .cv-section {
-	background: var(--bg-secondary, #2d2d2d);
-}
-
 body.site-content-page.page-contact .section-subtitle {
 	text-align: center;
 	font-size: 1.2rem;
@@ -187,7 +183,7 @@ body.site-content-page.page-contact .social-card small {
 }
 
 body.site-content-page.page-contact .cv-section {
-	background: var(--contact-light);
+	
 	border-radius: 12px;
 	padding: 2rem;
 	margin: 3rem 0;
