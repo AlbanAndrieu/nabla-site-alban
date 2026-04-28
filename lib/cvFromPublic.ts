@@ -19,19 +19,14 @@ async function exists(filePath: string): Promise<boolean> {
 	}
 }
 
-function extractSlugBase(filename: string): string {
-	// cv-full-en.html -> cv-full
-	const m = filename.match(/^(.*)-(en|fr)\.html$/);
-	return m?.[1] ?? filename.replace(/\.html$/, "");
-}
-
 export async function resolveCvPublicFilePath(
 	urlPath: string[],
 	locale?: string,
 ): Promise<string | null> {
 	const normalizedLocale = normalizeCvLocale(locale);
 
-	const rel = urlPath.length === 0 ? "cv/index.html" : `cv/${urlPath.join("/")}`;
+	const rel =
+		urlPath.length === 0 ? "cv/index.html" : `cv/${urlPath.join("/")}`;
 
 	// Keep nested directories (e.g. cv/jusmundi/index.html) as-is.
 	if (rel.includes("/")) {
@@ -99,7 +94,8 @@ export async function metadataFromCvHtml(
 		title,
 		description,
 		alternates: { canonical },
-		openGraph: title ? { title, description, url: canonical } : { url: canonical },
+		openGraph: title
+			? { title, description, url: canonical }
+			: { url: canonical },
 	};
 }
-

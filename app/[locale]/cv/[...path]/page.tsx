@@ -40,4 +40,3 @@ export default async function CvPathPage({ params }: Props) {
 		notFound();
 	}
 }
-
