@@ -1,13 +1,16 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { MARKETING_PAGES } from "./lib/marketingPages";
+import { MARKETING_PAGES } from "./lib/marketingPages.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-const localePrefixes = ["en", "fr"] as const;
+const localePrefixes = ["en", "fr"];
 
 const marketingSlugs = Object.keys(MARKETING_PAGES);
 
@@ -42,11 +45,12 @@ const localizedPolicyRewrites = localePrefixes.flatMap((locale) =>
 	})),
 );
 
-const nextConfig: NextConfig = {
+const nextConfig = {
 	reactStrictMode: true,
+	allowedDevOrigins: ["172.17.0.57"],
 	/** Parent `package-lock.json` exists; pin app root so Turbopack does not infer the wrong workspace. */
 	turbopack: {
-		root: path.resolve(process.cwd()),
+		root: __dirname,
 	},
 	async redirects() {
 		return marketingHtmlRedirects;

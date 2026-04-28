@@ -68,6 +68,8 @@ vc build
 vercel dev
 
 vercel deploy
+# To override prod deployment https://vercel.com/albanandrieus-projects/nabla-site-alban/settings/build-and-deployment
+# Development Command: node server.cjs
 vercel --prod
 ```
 

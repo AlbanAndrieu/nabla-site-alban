@@ -756,21 +756,126 @@ body.site-content-page
 	line-height: 1.25;
 }
 
-/* HTTPS homelab buttons: padlock (Font Awesome 7 solid U+F023) */
-body.site-content-page .homelab-service-card
-	.truenas-app-actions
-	a.btn[href^="https://"]::before {
-	display: inline-block;
-	font-family: "Font Awesome 7 Free", sans-serif;
-	font-weight: 900;
-	font-style: normal;
-	content: "\f023";
-	margin-right: 0.28em;
+/*
+ * Tunnel button: HTTP status vs JSON reacheableFromOutside
+ * (nabla-service-status.js + GET /api/homelab-tunnel-check).
+ */
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--ok {
+	border-color: #22c55e !important;
+	color: #16a34a !important;
+	background-color: transparent !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--ok:hover,
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--ok:focus {
+	color: #14532d !important;
+	border-color: #15803d !important;
+	background-color: color-mix(in srgb, #22c55e 12%, transparent) !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--warn {
+	border-color: #eab308 !important;
+	color: #ca8a04 !important;
+	background-color: transparent !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--warn:hover,
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--warn:focus {
+	color: #854d0e !important;
+	border-color: #a16207 !important;
+	background-color: color-mix(in srgb, #eab308 14%, transparent) !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--fail {
+	border-color: #ef4444 !important;
+	color: #dc2626 !important;
+	background-color: transparent !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--fail:hover,
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--fail:focus {
+	color: #991b1b !important;
+	border-color: #b91c1c !important;
+	background-color: color-mix(in srgb, #ef4444 12%, transparent) !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--unknown {
+	border-color: #64748b !important;
+	color: #64748b !important;
+	background-color: transparent !important;
+}
+
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--unknown:hover,
+body.site-content-page
+	.homelab-service-card
+	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--unknown:focus {
+	color: #475569 !important;
+	border-color: #475569 !important;
+	background-color: color-mix(in srgb, #64748b 10%, transparent) !important;
+}
+
+/* Homelab HTTPS padlocks (homelab-services-render.js + nabla-service-status.js probe) */
+body.site-content-page .homelab-service-card .homelab-tls-lock {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	margin-left: 0.2em;
 	font-size: 0.82em;
 	line-height: 1;
-	color: var(--bs-success, #198754);
-	-webkit-font-smoothing: antialiased;
-	vertical-align: -0.05em;
+	vertical-align: middle;
+}
+
+body.site-content-page .homelab-service-card .homelab-tls-lock i {
+	color: inherit;
+}
+
+body.site-content-page .homelab-service-card .homelab-tls-lock--pending {
+	color: #94a3b8;
+	animation: homelab-tls-lock-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes homelab-tls-lock-pulse {
+	50% {
+		opacity: 0.45;
+	}
+}
+
+body.site-content-page .homelab-service-card .homelab-tls-lock--ok {
+	color: #22c55e;
+}
+
+body.site-content-page .homelab-service-card .homelab-tls-lock--fail {
+	color: #ef4444;
+}
+
+html[data-theme="light"] body.site-content-page .homelab-service-card .homelab-tls-lock--ok {
+	color: #16a34a;
+}
+
+html[data-theme="light"] body.site-content-page .homelab-service-card .homelab-tls-lock--fail {
+	color: #dc2626;
 }
 
 body.site-content-page.truenas-page

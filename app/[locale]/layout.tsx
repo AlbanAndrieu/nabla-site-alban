@@ -25,7 +25,12 @@ export default async function RootLayout({ children, params }: Props) {
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale} data-nabla-app="next-intl" suppressHydrationWarning>
+		<html
+			lang={locale}
+			data-nabla-app="next-intl"
+			data-scroll-behavior="smooth"
+			suppressHydrationWarning
+		>
 			<head>
 				<link rel="icon" href="/assets/nabla/nabla-4.svg" />
 				<link
