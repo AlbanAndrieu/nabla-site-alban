@@ -69,7 +69,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<link rel="stylesheet" href="/opensource.css" />
 
 				<link rel="stylesheet" href="/print.css" />
-				
+
 				<link
 					rel="stylesheet"
 					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"

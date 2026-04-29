@@ -119,12 +119,12 @@
 	#coffee-fab,
 	#coffeeModal,
 	[href="#"],
-	script,	
+	script,
 	noscript {
 		display: none;
 	}
 
-	/* Show important content 
+	/* Show important content
 	main,
 	article,
 	section,
@@ -185,7 +185,7 @@
 		font-size: 90%;
 		color: #666;
 		word-break: break-all;
-	} 
+	}
 
 	/* Don't show URLs for internal links, anchors, or javascript */
 	a[href^="#"]:after,
