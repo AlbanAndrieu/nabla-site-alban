@@ -87,8 +87,9 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="color-scheme" content="light dark" />
 				<meta name="referrer" content="always" />
 			</head>
+			{ /* TODO use className page-login page-ciso page-ctid page-truenas page-workstation page-contact page-security only when appropriate */}
 			<body
-				className="site-content-page page-contact page-nabla-best-practices page-dark"
+				className="site-content-page page-contact page-nabla-best-practices page-ciso page-ctid page-login page-dark"
 				suppressHydrationWarning
 			>
 				{/* Static HTML uses Google Translate via /site-widgets.js; Next uses next-intl (see data-no-google-translate). */}

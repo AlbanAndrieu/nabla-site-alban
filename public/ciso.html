@@ -114,7 +114,13 @@
 	</head>
 	<body class="site-content-page page-ciso page-dark">
 		<a name="top"></a>
-		<!-- Hero Section -->
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="index.html" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+		</nav>
+
+		<!-- Header / Hero Section -->
 		<header class="hero-section">
 			<div class="container">
 				<h1><i class="fa-solid fa-shield-halved"></i> CISO Dashboard</h1>
@@ -135,47 +141,52 @@
 		</header>
 
 		<!-- Main Content -->
-		<main class="dashboard-container">
-			<!-- Compliance Overview -->
-			<section class="dashboard-section">
-				<h2><i class="fa-solid fa-certificate"></i> Compliance & Risk Monitoring</h2>
-				<p>Track your organization's compliance posture:</p>
-				<ul>
-					<li>GDPR: <strong>95% Compliant</strong></li>
-					<li>ISO 27001: <strong>100% Compliant</strong></li>
-					<li>ISO 42001: <strong>100% Compliant</strong></li>
-					<li>SOC 2: <strong>In Progress</strong></li>
-					<li>PCI-DSS: <strong>10% Compliant</strong></li>
-				</ul>
-				<p>Regular audits scheduled for Q1 2025.</p>
+		<main>
+			<div class="dashboard-container">
+				<!-- Compliance Overview -->
+				<section class="dashboard-section">
+					<h2><i class="fa-solid fa-certificate"></i> Compliance & Risk Monitoring</h2>
+					<p>Track your organization's compliance posture:</p>
+					<ul>
+						<li>GDPR: <strong>95% Compliant</strong></li>
+						<li>ISO 27001: <strong>100% Compliant</strong></li>
+						<li>ISO 42001: <strong>100% Compliant</strong></li>
+						<li>SOC 2: <strong>In Progress</strong></li>
+						<li>PCI-DSS: <strong>10% Compliant</strong></li>
+					</ul>
+					<p>Regular audits scheduled for Q1 2025.</p>
 
-				<a href="/checklist/">Security Checklist</a>
-			</section>
+					<a href="/checklist/">Security Checklist</a>
+				</section>
 
-			<!-- Key Metrics Section -->
-			<section class="dashboard-section">
-				<h2><i class="fa-solid fa-chart-line"></i> Key Security Metrics</h2>
-				<div class="metrics-container">
-					<div class="metric-box">
-						<h3>Incident Response Time</h3>
-						<p>15 min</p>
+				<!-- Key Metrics Section -->
+				<section class="dashboard-section">
+					<h2><i class="fa-solid fa-chart-line"></i> Key Security Metrics</h2>
+					<div class="metrics-container">
+						<div class="metric-box">
+							<h3>Incident Response Time</h3>
+							<p>15 min</p>
+						</div>
+						<div class="metric-box">
+							<h3>Patching Effectiveness</h3>
+							<p>92%</p>
+						</div>
+						<div class="metric-box">
+							<h3>Risk Rating</h3>
+							<p>Medium</p>
+						</div>
 					</div>
-					<div class="metric-box">
-						<h3>Patching Effectiveness</h3>
-						<p>92%</p>
-					</div>
-					<div class="metric-box">
-						<h3>Risk Rating</h3>
-						<p>Medium</p>
-					</div>
-				</div>
-			</section>
+				</section>
+			</div>
 
-			<!-- Threat Intelligence Section -->
-			<section class="dashboard-section">
-				<h2><i class="fa-solid fa-globe"></i> Threat Intelligence</h2>
-				<div id="threatIntelligence"></div>
-			</section>
+			<div class="dashboard-container">
+
+				<!-- Threat Intelligence Section -->
+				<section class="dashboard-section">
+					<h2><i class="fa-solid fa-globe"></i> Threat Intelligence</h2>
+					<div id="threatIntelligence"></div>
+				</section>
+			</div>
 		</main>
 
 		<!-- Footer -->

@@ -213,7 +213,7 @@ export default async function HomePage({ params }: Props) {
 	const inner = await loadPublicHtmlFragment("index.html", "main", locale);
 
 	return (
-		<div className="home-page">
+		<div className="page-home">
 			<script
 				type="application/ld+json"
 				// eslint-disable-next-line react/no-danger

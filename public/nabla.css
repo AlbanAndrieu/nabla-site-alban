@@ -57,7 +57,7 @@ body.page-nabla-best-practices .nabla-wip-callout strong {
 /* Homepage + nabla.html: flat blue→violet band, no grid animation (see landing-sections .hero-section default) */
 /*
 body.page-nabla-best-practices .hero-section,
-body.home-page.page-dark .hero-section {
+body.page-home.page-dark .hero-section {
 	text-align: center;
 	padding: 4rem 2rem;
 	min-height: 0;
@@ -69,12 +69,12 @@ body.home-page.page-dark .hero-section {
 }*/
 
 body.page-nabla-best-practices .hero-section::before,
-body.home-page.page-dark .hero-section::before {
+body.page-home.page-dark .hero-section::before {
 	display: none;
 }
 /*
 body.page-nabla-best-practices .hero-title,
-body.home-page.page-dark .hero-title {
+body.page-home.page-dark .hero-title {
 	font-size: 3rem;
 	font-weight: 700;
 	margin-bottom: 0.5rem;
@@ -82,7 +82,7 @@ body.home-page.page-dark .hero-title {
 }
 
 body.page-nabla-best-practices .hero-subtitle,
-body.home-page.page-dark .hero-subtitle {
+body.page-home.page-dark .hero-subtitle {
 	font-size: 1.5rem;
 	margin-bottom: 1rem;
 	opacity: 0.95;
@@ -90,7 +90,7 @@ body.home-page.page-dark .hero-subtitle {
 }
 
 page-nabla-best-practices .hero-description,
-body.home-page.page-dark .hero-description {
+body.page-home.page-dark .hero-description {
 	font-size: 1.1rem;
 	max-width: 800px;
 	margin: 0 auto 2rem;
@@ -323,12 +323,12 @@ body.page-nabla-best-practices .print-button:hover {
 
 @media (max-width: 768px) {
 	body.page-nabla-best-practices .hero-title,
-	body.home-page.page-dark .hero-title {
+	body.page-home.page-dark .hero-title {
 		font-size: 2rem;
 	}
 
 	body.page-nabla-best-practices .hero-subtitle,
-	body.home-page.page-dark .hero-subtitle {
+	body.page-home.page-dark .hero-subtitle {
 		font-size: 1.2rem;
 	}
 
