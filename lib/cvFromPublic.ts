@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import { rewriteLegacyHtmlHrefs } from "@/lib/htmlFromPublic";
 
+
 export type CvLocale = "en" | "fr";
 
 function normalizeCvLocale(locale?: string): CvLocale {
@@ -49,7 +50,7 @@ export async function resolveCvPublicFilePath(
 	return null;
 }
 
-/*
+/* TODO remove loadCvHtmlFragment */
 export async function loadCvHtmlFragment(
 	urlPath: string[],
 	locale?: string,
@@ -70,7 +71,6 @@ export async function loadCvHtmlFragment(
 		html: rewriteLegacyHtmlHrefs(body, locale),
 	};
 }
-*/
 
 export async function metadataFromCvHtml(
 	urlPath: string[],

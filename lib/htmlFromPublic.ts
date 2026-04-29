@@ -13,6 +13,112 @@ export type SiteLocale = "en" | "fr";
 const DEFAULT_LOCALE: SiteLocale = "en";
 const SUPPORTED_LOCALES: readonly SiteLocale[] = ["en", "fr"];
 
+
+export const HOME_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	name: "Alban Andrieu",
+	jobTitle: "Freelance DevSecOps Engineer & Cloud Architect",
+	description:
+		"Freelance DevSecOps engineer and cloud architect (AWS, Azure, OVH). Cloud security consultant for AI-driven and security-critical products; ISO 27001, SOC 2, GDPR-aligned delivery.",
+	url: "https://dr-alban.com/",
+	email: "job@dr-alban.com",
+	sameAs: [
+		"https://www.linkedin.com/in/nabla/",
+		"https://twitter.com/AlbanAndrieu",
+		"https://github.com/AlbanAndrieu",
+	],
+	knowsAbout: [
+		"Freelance DevSecOps",
+		"Cloud architecture",
+		"AWS",
+		"Azure",
+		"OVHcloud",
+		"Cloud security",
+		"AI infrastructure",
+		"MLOps",
+		"ISO 27001",
+		"SOC 2",
+	],
+	hasCredential: [
+		{
+			"@type": "EducationalOccupationalCredential",
+			name: "LinkedIn Professional Profile",
+			url: "https://www.linkedin.com/in/nabla/",
+		},
+	],
+	subjectOf: [
+		{
+			"@type": "DigitalDocument",
+			name: "LaTeX Resume PDF",
+			description: "Traditional formatted resume in PDF format",
+			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "DigitalDocument",
+			name: "LinkedIn Resume PDF",
+			description: "LinkedIn profile exported as PDF",
+			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "WebPage",
+			name: "Online CV Landing Page",
+			description: "Interactive web-based CV and professional profile",
+			url: "https://dr-alban.com/cv/index.html",
+		},
+	],
+};
+
+export const HOME_JSON_LD_FR = {
+	...HOME_JSON_LD,
+	jobTitle: "Ingénieur DevSecOps freelance et architecte cloud",
+	description:
+		"Ingénieur DevSecOps freelance et architecte cloud (AWS, Azure, OVH). Consultant en sécurité cloud pour produits pilotés par l’IA et à enjeux sécurité ; livraisons alignées ISO 27001, SOC 2 et RGPD.",
+	knowsAbout: [
+		"DevSecOps freelance",
+		"Architecture cloud",
+		"AWS",
+		"Azure",
+		"OVHcloud",
+		"Sécurité cloud",
+		"Infrastructure IA",
+		"MLOps",
+		"ISO 27001",
+		"SOC 2",
+	],
+	hasCredential: [
+		{
+			"@type": "EducationalOccupationalCredential",
+			name: "Profil professionnel LinkedIn",
+			url: "https://www.linkedin.com/in/nabla/",
+		},
+	],
+	subjectOf: [
+		{
+			"@type": "DigitalDocument",
+			name: "CV LaTeX (PDF)",
+			description: "CV classique au format PDF",
+			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "DigitalDocument",
+			name: "CV LinkedIn (PDF)",
+			description: "Profil LinkedIn exporté en PDF",
+			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "WebPage",
+			name: "Page CV en ligne",
+			description: "CV interactif et profil professionnel",
+			url: "https://dr-alban.com/cv/index.html",
+		},
+	],
+};
+
 function decodeBasicEntities(text: string): string {
 	return text
 		.replace(/&amp;/g, "&")
