@@ -13,8 +13,9 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	index: {
 		file: "index.html",
 		mode: "navHeaderMain",
-		bodyClass: "site-content-page page-home page-dark page-nabla-best-practices",
-	},	
+		bodyClass:
+			"site-content-page page-home page-dark page-nabla-best-practices",
+	},
 	contact: {
 		file: "contact.html",
 		mode: "navHeaderMain",
@@ -117,7 +118,7 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		analyticsMode: "home",
 		ahrefsKey: "tg3zLMS/bebJFl0LxctiCw",
 	},
-	"email": {
+	email: {
 		file: "email.html",
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
