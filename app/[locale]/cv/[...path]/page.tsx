@@ -27,7 +27,7 @@ export default async function CvPathPage({ params }: Props) {
 	setRequestLocale(normalizedLocale);
 
 	try {
-		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
+		// const { html } = await loadCvHtmlFragment(path, normalizedLocale);
 		return (
 			<div
 				className="cv-page"

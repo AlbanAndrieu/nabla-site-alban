@@ -90,7 +90,7 @@ html[data-theme="dark"] {
 }
 
 /* Base readability (apply on body or .cv-container parent) */
-.cv-page-body {
+.page-cv {
 	font-family:
 		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
 		Arial, sans-serif;
@@ -100,20 +100,20 @@ html[data-theme="dark"] {
 }
 
 /* Focus visible for keyboard users (accessibility) */
-.cv-page-body a:focus-visible,
-.cv-page-body button:focus-visible {
+.page-cv a:focus-visible,
+.page-cv button:focus-visible {
 	outline: 2px solid var(--cv-heading-accent);
 	outline-offset: 2px;
 }
 
-.cv-page-body .back-link:focus-visible {
+.page-cv .back-link:focus-visible {
 	outline: 2px solid var(--cv-btn-text);
 	outline-offset: 2px;
 }
 
 /* Skip link / reduce motion (optional) */
 @media (prefers-reduced-motion: reduce) {
-	.cv-page-body * {
+	.page-cv * {
 		animation-duration: 0.01ms;
 		transition-duration: 0.01ms;
 	}
@@ -128,10 +128,10 @@ body {
 	padding: 20px;
 	background-color: var(--cv-bg-page);
 }
-body.cv-page-body a {
+body.page-cv a {
 	color: var(--cv-link);
 }
-body.cv-page-body a:hover {
+body.page-cv a:hover {
 	color: var(--cv-link-hover);
 }
 .cv-container {

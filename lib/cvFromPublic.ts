@@ -49,6 +49,7 @@ export async function resolveCvPublicFilePath(
 	return null;
 }
 
+/*
 export async function loadCvHtmlFragment(
 	urlPath: string[],
 	locale?: string,
@@ -69,6 +70,7 @@ export async function loadCvHtmlFragment(
 		html: rewriteLegacyHtmlHrefs(body, locale),
 	};
 }
+*/
 
 export async function metadataFromCvHtml(
 	urlPath: string[],

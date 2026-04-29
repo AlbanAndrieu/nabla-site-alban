@@ -5,7 +5,7 @@ export default function SiteFooter() {
 	const t = useTranslations("site");
 
 	return (
-		<footer className="footer" >
+		<footer className="footer">
 			<div className="social-links">
 				<a
 					href="https://www.linkedin.com/in/nabla"
@@ -55,8 +55,10 @@ export default function SiteFooter() {
 			</div>
 			<div className="footer-links">
 				<Link href="/policy/legal">{t("legalNotices")}</Link>
+        <Link href="javascript:openAxeptioCookies()" rel="noopener noreferrer" className="text-muted">Cookies</Link>
 			</div>
 			<p className="text-md-center mt-3">
+				<a href="/" className="btn btn-sm btn-outline-secondary">Back to Home</a>			
 				<a
 					href="#top"
 					className="btn btn-sm btn-outline-secondary"
