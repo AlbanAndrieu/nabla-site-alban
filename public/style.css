@@ -162,14 +162,6 @@ html[data-theme="dark"] {
 	}
 }
 
-@media print {
-	.back-to-top,
-	#coffee-fab,
-	#coffeeModal {
-		display: none;
-	}
-}
-
 /* Back-to-top FAB - same style/behavior as blog.stephane-robert.info */
 .back-to-top {
 	position: fixed;

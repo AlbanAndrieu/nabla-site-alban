@@ -1266,30 +1266,8 @@ html[data-theme="light"] .social-link:hover {
 }
 
 /* ============================================
-   Print Styles
+   Print Styles (see print.css)
    ============================================ */
-@media print {
-	.theme-toggle,
-	.google-translate-widget,
-	.print-button {
-		display: none;
-	}
-
-	.coffee-fab-btn,
-	#coffeeModal {
-		display: none;
-	}
-
-	body {
-		background-color: white;
-		color: black;
-	}
-
-	a {
-		color: black;
-		text-decoration: underline;
-	}
-}
 
 /* ============================================
    High Contrast Mode Support

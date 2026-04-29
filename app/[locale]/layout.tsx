@@ -55,7 +55,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />
 				<link rel="stylesheet" href="/style.css" />
-				<link rel="stylesheet" href="/print.css" />
+
 				{/* arf is for test page */}
 				<link rel="stylesheet" href="/arf.css" />
 				<link rel="stylesheet" href="/site-content-page.css" />
@@ -67,7 +67,9 @@ export default async function RootLayout({ children, params }: Props) {
 				<link rel="stylesheet" href="/education.css" />
 				{/* opensource is for nabla page */}
 				<link rel="stylesheet" href="/opensource.css" />
-				<link rel="stylesheet" href="/cv/cv-theme.css" />
+
+				<link rel="stylesheet" href="/print.css" />
+				
 				<link
 					rel="stylesheet"
 					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"

@@ -653,45 +653,6 @@ html {
 	border: 1px solid var(--border-color);
 }
 
-/* Print Styles for PDF Export */
-@media print {
-	/* Hide non-essential elements */
-	.hero-section::before,
-	.cta-buttons,
-	.social-links,
-	.footer-links,
-	button {
-		display: none;
-	}
-
-	/* Reset backgrounds and colors for print */
-	body {
-		background: white;
-		color: black;
-	}
-
-	.hero-section {
-		background: white;
-		color: black;
-		min-height: auto;
-		padding: 20pt 0;
-	}
-
-	.services-section,
-	.skills-section,
-	.tools-section,
-	.contact-section {
-		background: white;
-		page-break-inside: avoid;
-	}
-
-	.service-card,
-	.skill-category {
-		box-shadow: none;
-		border: 1px solid #ddd;
-	}
-}
-
 /* Standalone pricing page (pricing.html) */
 .pricing-page .pricing-tier-grid {
 	display: grid;
