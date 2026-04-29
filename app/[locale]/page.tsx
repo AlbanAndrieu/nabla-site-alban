@@ -57,7 +57,7 @@ const HOME_JSON_LD = {
 			"@type": "WebPage",
 			name: "Online CV Landing Page",
 			description: "Interactive web-based CV and professional profile",
-			url: "https://dr-alban.com/cv",
+			url: "https://dr-alban.com/cv/index.html",
 		},
 	],
 };
@@ -105,7 +105,7 @@ const HOME_JSON_LD_FR = {
 			"@type": "WebPage",
 			name: "Page CV en ligne",
 			description: "CV interactif et profil professionnel",
-			url: "https://dr-alban.com/cv",
+			url: "https://dr-alban.com/cv/index.html",
 		},
 	],
 };
