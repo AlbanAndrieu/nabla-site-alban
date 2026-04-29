@@ -3,16 +3,17 @@
 # vercel do not like .python-version
 .python-version
 !api
+!lib
+!app
+!components
+!messages
+!i18n
 node_modules
 !public
-!cv
-!html
 !vercel.json
 !package.json
 !package-lock.json
 !*.html
-index.cgi
-index.pl
 !README.md
 packages/*/test/**
 ./public/others/*
