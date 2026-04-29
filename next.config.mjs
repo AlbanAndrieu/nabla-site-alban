@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { MARKETING_PAGES } from "./lib/marketingPages.ts";
+import { MARKETING_PAGE_SLUGS } from "./lib/marketingPages.config.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,13 +12,19 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const localePrefixes = ["en", "fr"];
 
-const marketingSlugs = Object.keys(MARKETING_PAGES);
+const marketingSlugs = MARKETING_PAGE_SLUGS;
 
 /** Serve marketing HTML under `*.html` URLs: rewrite to App Router before `public/*.html` wins. */
 const marketingHtmlBeforeFiles = marketingSlugs.flatMap((slug) => [
 	{ source: `/${slug}.html`, destination: `/en/${slug}` },
 	{ source: `/fr/${slug}.html`, destination: `/fr/${slug}` },
 ]);
+
+/** Home legacy URLs → localized home routes. */
+const homeHtmlBeforeFiles = [
+	{ source: "/index.html", destination: "/en" },
+	{ source: "/fr/index.html", destination: "/fr" },
+];
 
 /** Extensionless marketing URLs → canonical `*.html` (browser URL matches static hosting). */
 const marketingHtmlRedirects = marketingSlugs.flatMap((slug) => [
@@ -57,7 +63,7 @@ const nextConfig = {
 	},
 	async rewrites() {
 		return {
-			beforeFiles: marketingHtmlBeforeFiles,
+			beforeFiles: [...homeHtmlBeforeFiles, ...marketingHtmlBeforeFiles],
 			afterFiles: [...localizedPolicyRewrites, ...policyRewrites],
 		};
 	},

@@ -10,14 +10,20 @@ export type MarketingPageSpec = {
 
 /** Root-level HTML pages (slug → source under public/). Excludes index and 404. */
 export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
+	index: {
+		file: "index.html",
+		mode: "navHeaderMain",
+		bodyClass:
+			"site-content-page page-home page-dark page-nabla-best-practices",
+	},
 	contact: {
 		file: "contact.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-contact",
+		mode: "navHeaderMain",
+		bodyClass: "site-content-page page-dark page-nabla-best-practices",
 	},
 	ai: {
 		file: "ai.html",
-		mode: "mainOuter",
+		mode: "navHeaderMain",
 		bodyClass: "site-content-page page-nabla-best-practices",
 	},
 	security: {
@@ -33,7 +39,7 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	workstation: {
 		file: "workstation.html",
 		mode: "mainOuter",
-		bodyClass: "site-content-page page-dark truenas-page workstation-page",
+		bodyClass: "site-content-page page-dark page-truenas page-workstation",
 		analyticsMode: "marketing",
 	},
 	startup: {
@@ -68,12 +74,12 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	},
 	ciso: {
 		file: "ciso.html",
-		mode: "mainOuter",
+		mode: "navHeaderMain",
 		bodyClass: "site-content-page page-ciso page-dark",
 	},
 	nabla: {
 		file: "nabla.html",
-		mode: "mainOuter",
+		mode: "navHeaderMain",
 		bodyClass: "site-content-page page-dark page-nabla-best-practices",
 		analyticsMode: "full",
 	},
@@ -102,7 +108,7 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	truenas: {
 		file: "truenas.html",
 		mode: "navHeaderMain",
-		bodyClass: "site-content-page page-dark truenas-page",
+		bodyClass: "site-content-page page-dark page-truenas",
 		analyticsMode: "marketing",
 	},
 	test: {
@@ -112,8 +118,8 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		analyticsMode: "home",
 		ahrefsKey: "tg3zLMS/bebJFl0LxctiCw",
 	},
-	"email-contact-addresses": {
-		file: "email-contact-addresses.html",
+	email: {
+		file: "email.html",
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
 	},

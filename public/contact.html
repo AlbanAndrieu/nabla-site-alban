@@ -53,19 +53,6 @@
 		<link rel="stylesheet" href="site-content-page.css" />
 		<link rel="stylesheet" href="page-layouts.css" />
 
-		<!-- Font Awesome (CDN + JS) -->
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
-			type="text/css"
-		/>
-		<script
-			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
-			data-auto-replace-svg="nest"
-		></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
-
 		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
 		<!-- Bootstrap -->
 		<link
@@ -137,8 +124,12 @@
 	</head>
 	<body class="site-content-page page-contact">
 		<a name="top"></a>
-		<!-- Skip to main content link for accessibility -->
 		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="index.html" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+		</nav>
+
 		<!-- Header / Hero Section -->
 		<header>
 			<section class="hero-section" id="home">
@@ -151,8 +142,7 @@
 					<h1 class="hero-title">Alban Andrieu</h1>
 					<p class="hero-subtitle">DevSecOps Cloud Architect | Independent Consultant</p>
 					<p class="hero-description">
-						Currently architecting secure cloud solutions at
-						<a
+						Currently architecting securing cloud solutions at <a
 							href="https://www.jusmundi.com"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -165,15 +155,15 @@
 								class="jusmundi-link-icon"
 								decoding="async"
 								aria-hidden="true"
-								style="vertical-align: middle; margin-right: 0.35em"
-							/>Jus Mundi</a
-						>. With 20+ years of experience in enterprise environments, I specialize in transforming businesses through
+								style="vertical-align: middle; margin-right: 0.35em"/>Jus Mundi</a>.
+						<br />
+						With 20+ years of experience in enterprise environments, I specialize in transforming businesses through
 						DevOps automation, cloud security, and infrastructure as code.
 					</p>
 					<p class="hero-description">Open to challenges around AI Integration, MLOps, and Security.</p>
 					<div class="cta-buttons">
 						<a href="#contact-details" class="btn btn-light btn-lg"> <i class="fas fa-envelope"></i> Get in Touch </a>
-						<a href="/cv/" target="_blank" class="btn btn-outline-light btn-lg">
+						<a href="/cv/index.html" target="_blank" class="btn btn-outline-light btn-lg">
 							<i class="fas fa-file-pdf"></i> View My CV
 						</a>
 					</div>
@@ -182,7 +172,7 @@
 		</header>
 
 		<!-- Main Content -->
-		<main id="main-content">
+		<main id="main-content" role="main">
 			<!-- Contact Information Section -->
 			<section class="contact-section" id="contact-details">
 				<h2 class="section-title">Contact Information</h2>
@@ -239,7 +229,7 @@
 					<h3 class="section-title" style="font-size: 2rem">Curriculum Vitae</h3>
 					<p style="text-align: center; color: #666">Download or view my CV in different formats</p>
 					<div class="cv-links">
-						<a href="/cv/" class="btn btn-primary btn-lg" target="_blank">
+						<a href="/cv/index.html" class="btn btn-primary btn-lg" target="_blank">
 							<i class="fas fa-globe"></i> View Full CV Online
 						</a>
 						<a href="/cv/cv-full-en.html" class="btn btn-outline-primary" target="_blank">
@@ -527,7 +517,7 @@
 				</article>
 
 				<!-- Stack Exchange Badge -->
-				<div style="margin-top: 3rem; text-align: center">
+				<div style="margin-top: 3rem; text-align: center; display: flex; justify-content: center;">
 					<a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer">
 						<img
 							src="https://stackexchange.com/users/flair/4652074.png"

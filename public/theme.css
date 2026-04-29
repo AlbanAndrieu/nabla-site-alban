@@ -1266,30 +1266,8 @@ html[data-theme="light"] .social-link:hover {
 }
 
 /* ============================================
-   Print Styles
+   Print Styles (see print.css)
    ============================================ */
-@media print {
-	.theme-toggle,
-	.google-translate-widget,
-	.print-button {
-		display: none;
-	}
-
-	.coffee-fab-btn,
-	#coffeeModal {
-		display: none;
-	}
-
-	body {
-		background-color: white;
-		color: black;
-	}
-
-	a {
-		color: black;
-		text-decoration: underline;
-	}
-}
 
 /* ============================================
    High Contrast Mode Support
@@ -1310,10 +1288,13 @@ html[data-theme="light"] .social-link:hover {
 }
 
 /* Jus Mundi external links: favicon-sized mark beside the label */
+
 .jusmundi-link-icon {
 	width: 1em;
 	height: 1em;
 	vertical-align: -0.15em;
+	margin-left: 0.35em;
 	margin-right: 0.35em;
 	object-fit: contain;
+	display: inline;
 }

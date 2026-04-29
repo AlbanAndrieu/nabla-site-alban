@@ -55,5 +55,9 @@
 			"tools": ["pdflatex"]
 		}
 	],
-	"latex-workshop.latex.recipe.default": "latexmk (xelatex)"
+	"latex-workshop.latex.recipe.default": "latexmk (xelatex)",
+	"github.copilot.advanced": {
+    "debug.overrideProxyUrl": "http://localhost:4100",
+    "debug.testOverrideProxyUrl": "http://localhost:4100"
+  }
 }

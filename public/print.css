@@ -2,6 +2,57 @@
  * Optimizes all pages and CV for printing as PDF
  */
 
+/*
+@media print {
+	.theme-toggle,
+	.google-translate-widget,
+	.print-button {
+		display: none;
+	}
+
+	.coffee-fab-btn,
+	#coffeeModal {
+		display: none;
+	}
+
+	body {
+		background-color: white;
+		color: black;
+	}
+
+	a {
+		color: black;
+		text-decoration: underline;
+	}
+}*/
+
+/* Print Styles for PDF Export */
+/*
+@media print {
+
+	.hero-section {
+		background: white;
+		color: black;
+		min-height: auto;
+		padding: 20pt 0;
+	}
+
+	.services-section,
+	.skills-section,
+	.tools-section,
+	.contact-section {
+		background: white;
+		page-break-inside: avoid;
+	}
+
+	.service-card,
+	.skill-category {
+		box-shadow: none;
+		border: 1px solid #ddd;
+	}
+}
+*/
+
 @media print {
 	/* Page Setup - no running header/footer; disable "Headers and footers" in print dialog for clean PDF */
 	@page {
@@ -20,6 +71,7 @@
 	}
 
 	/* Body and basic elements */
+	/* Reset backgrounds and colors for print */
 	html,
 	body {
 		width: 100%;
@@ -41,6 +93,7 @@
 	body > footer,
 	.skip-to-main,
 	.page-nav,
+	.hero-section::before,
 	.hero-section,
 	.contact-section,
 	.google-translate-widget,
@@ -51,9 +104,10 @@
 	.cta-buttons,
 	.social-links,
 	.theme-toggle,
+	.locale-switcher,
 	button,
 	.print-menu-container,
-	.back-link,
+	a.back-link,
 	#navbarHeader,
 	.collapse,
 	[role="navigation"],
@@ -69,7 +123,7 @@
 		display: none;
 	}
 
-	/* Show important content */
+	/* Show important content
 	main,
 	article,
 	section,
@@ -77,7 +131,7 @@
 	.main-content {
 		display: block;
 		width: 100%;
-	}
+	}*/
 
 	/* Typography */
 	h1,
@@ -239,13 +293,6 @@
 		width: 100%;
 		float: none;
 		display: block;
-	}
-
-	/* CV Specific Styles */
-	.list-group-item {
-		border: 1px solid #ddd;
-		padding: 8pt;
-		margin-bottom: 2pt;
 	}
 
 	.badge {
