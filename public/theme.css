@@ -1310,10 +1310,13 @@ html[data-theme="light"] .social-link:hover {
 }
 
 /* Jus Mundi external links: favicon-sized mark beside the label */
+
 .jusmundi-link-icon {
 	width: 1em;
 	height: 1em;
 	vertical-align: -0.15em;
+	margin-left: 0.35em;	
 	margin-right: 0.35em;
 	object-fit: contain;
+	display: inline
 }

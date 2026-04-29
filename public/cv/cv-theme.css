@@ -119,11 +119,92 @@ html[data-theme="dark"] {
 	}
 }
 
-/* Jus Mundi external links: favicon-sized mark beside the label */
-.jusmundi-link-icon {
-	width: 1em;
-	height: 1em;
-	vertical-align: -0.15em;
-	margin-right: 0.35em;
-	object-fit: contain;
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+	line-height: 1.6;
+	color: var(--cv-text);
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: var(--cv-bg-page);
+}
+body.cv-page-body a {
+	color: var(--cv-link);
+}
+body.cv-page-body a:hover {
+	color: var(--cv-link-hover);
+}
+.cv-container {
+	background-color: var(--cv-bg-container);
+	padding: 30px;
+	box-shadow: 0 0 10px var(--cv-shadow);
+}
+h1 {
+	color: var(--cv-heading);
+	border-bottom: 3px solid var(--cv-heading-accent);
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+h2 {
+	color: var(--cv-heading-accent);
+	margin-top: 25px;
+	margin-bottom: 15px;
+	font-size: 1.3em;
+}
+.header {
+	text-align: center;
+	margin-bottom: 30px;
+}
+.title {
+	font-size: 1.2em;
+	color: var(--cv-text-secondary);
+	margin-top: 5px;
+}
+.contact {
+	margin-top: 15px;
+	font-size: 0.95em;
+}
+.section {
+	margin-bottom: 25px;
+}
+h3 {
+	color: var(--cv-heading);
+	font-size: 1.05em;
+	margin-top: 12px;
+	margin-bottom: 8px;
+}
+.job-entry {
+	margin-bottom: 20px;
+	padding-left: 12px;
+	border-left: 2px solid var(--cv-border-light);
+}
+.job-header {
+	margin-bottom: 6px;
+}
+.company {
+	font-weight: bold;
+	font-size: 1em;
+}
+.period {
+	color: var(--cv-text-secondary);
+	font-style: italic;
+	font-size: 0.95em;
+}
+ul {
+	padding-left: 20px;
+}
+li {
+	margin-bottom: 5px;
+}
+.back-link {
+	display: inline-block;
+	margin-top: 20px;
+	padding: 10px 15px;
+	background-color: var(--cv-btn-bg);
+	color: var(--cv-btn-text);
+	text-decoration: none;
+	border-radius: 5px;
+}
+.back-link:hover {
+	background-color: var(--cv-btn-bg-hover);
 }

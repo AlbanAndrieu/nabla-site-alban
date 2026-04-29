@@ -5,7 +5,7 @@ export default function SiteFooter() {
 	const t = useTranslations("site");
 
 	return (
-		<footer className="footer">
+		<footer className="footer" role="contentinfo">
 			<div className="social-links">
 				<a
 					href="https://www.linkedin.com/in/nabla"

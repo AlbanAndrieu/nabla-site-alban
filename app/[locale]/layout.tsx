@@ -67,6 +67,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<link rel="stylesheet" href="/education.css" />
 				{/* opensource is for nabla page */}
 				<link rel="stylesheet" href="/opensource.css" />
+				<link rel="stylesheet" href="/cv/cv-theme.css" />
 				<link
 					rel="stylesheet"
 					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
