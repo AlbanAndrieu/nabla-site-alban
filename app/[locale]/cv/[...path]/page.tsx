@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const canonicalPath = `/${normalizedLocale}/cv/${path.join("/")}`;
 	return metadataFromCvHtml(path, canonicalPath, normalizedLocale);
 }
-/*
+
 export default async function CvPathPage({ params }: Props) {
 	const { locale, path } = await params;
 	const normalizedLocale = hasLocale(routing.locales, locale)
@@ -32,9 +32,9 @@ export default async function CvPathPage({ params }: Props) {
 	setRequestLocale(normalizedLocale);
 
 	try {
-		// const { html } = await loadCvHtmlFragment(path, normalizedLocale);
-		const { html } =
+		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
 		return (
+
 			<div
 				className="page-cv"
 				suppressHydrationWarning
@@ -46,8 +46,8 @@ export default async function CvPathPage({ params }: Props) {
 		notFound();
 	}
 }
-*/
 
+/*
 export default async function HomePage({ params }: Props) {
 	const { locale: requestedLocale } = await params;
 	const locale = hasLocale(["en", "fr"], requestedLocale)
@@ -97,3 +97,4 @@ export default async function HomePage({ params }: Props) {
 		</div>
 	);
 }
+*/

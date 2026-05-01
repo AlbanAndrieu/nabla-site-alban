@@ -1,8 +1,21 @@
 # Ignore everything (folders and files) on root only
-/*
+#/*
+.vc-config.json
+node_modules
+.next
+.gitignore
+ts
+#*
+.env
+.DS_Store
+tsconfig.js
+server.cjs
+/vendor
+/.idea
 # vercel do not like .python-version
 .python-version
-!api
+#!api
+api
 !lib
 !app
 !components
@@ -11,9 +24,10 @@
 node_modules
 !public
 !vercel.json
+!tsconfig.tsbuildinfo
 !package.json
 !package-lock.json
 !*.html
 !README.md
 packages/*/test/**
-./public/others/*
+
