@@ -14,22 +14,24 @@ body.site-content-page {
 }
 
 /* Jusmundi / CV chrome pages bring their own surface (cv-theme, jusmundi.css). */
+
 body.site-content-page:not(.jusmundi-page):not(.page-dark) {
 	background-color: var(--bg-white);
 }
-
+/*
 body.site-content-page #main-content {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding-bottom: 3rem;
 }
-
+*/
 body.site-content-page #main-content.container {
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
 
 /* Optional title band (homepage hero gradient) */
+/*
 body.site-content-page .site-page-hero {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #fff;
@@ -55,7 +57,7 @@ body.site-content-page .site-page-hero .site-page-hero-lead {
 	margin-left: auto;
 	margin-right: auto;
 }
-
+ */
 /* Policy / long-form prose */
 body.site-content-page.policy-legal #main-content h1 {
 	font-size: 2rem;
@@ -659,26 +661,26 @@ body.site-content-page .homelab-service-card a.btn {
  * TrueNAS page: wireframe Bootstrap fork sets .text-primary and .btn-outline-primary to ~#cdcdcd.
  * Restore theme primary blue for homelab Tunnel buttons, section icons, etc.
  */
-body.site-content-page.truenas-page i.text-primary,
-body.site-content-page.truenas-page .text-primary {
+body.site-content-page.page-truenas i.text-primary,
+body.site-content-page.page-truenas .text-primary {
 	color: var(--primary-color, #2563eb);
 }
 
-body.site-content-page.truenas-page .btn-outline-primary {
+body.site-content-page.page-truenas .btn-outline-primary {
 	color: var(--primary-color, #2563eb);
 	border-color: var(--primary-color, #2563eb);
 	background-color: transparent;
 }
 
-body.site-content-page.truenas-page .btn-outline-primary:hover,
-body.site-content-page.truenas-page .btn-outline-primary:focus {
+body.site-content-page.page-truenas .btn-outline-primary:hover,
+body.site-content-page.page-truenas .btn-outline-primary:focus {
 	color: var(--button-text, #fff);
 	background-color: var(--primary-color, #2563eb);
 	border-color: var(--primary-color, #2563eb);
 }
 
-body.site-content-page.truenas-page .btn-outline-primary:focus,
-body.site-content-page.truenas-page .btn-outline-primary.focus {
+body.site-content-page.page-truenas .btn-outline-primary:focus,
+body.site-content-page.page-truenas .btn-outline-primary.focus {
 	box-shadow: 0 0 0 0.2rem
 		color-mix(in srgb, var(--primary-color, #2563eb) 35%, transparent);
 }
@@ -878,10 +880,10 @@ html[data-theme="light"] body.site-content-page .homelab-service-card .homelab-t
 	color: #dc2626;
 }
 
-body.site-content-page.truenas-page
-	.truenas-page-secondary
+body.site-content-page.page-truenas
+	.page-truenas-secondary
 	.card.border-secondary,
-body.site-content-page.truenas-page .truenas-page-tools .border-secondary {
+body.site-content-page.page-truenas .page-truenas-tools .border-secondary {
 	border-color: var(--border-color);
 }
 
@@ -889,7 +891,7 @@ body.site-content-page.truenas-page .truenas-page-tools .border-secondary {
    Workstation page (workstation.html) — sections, elevated cards
    -------------------------------------------------------------------------- */
 
-body.site-content-page.workstation-page .workstation-service-card {
+body.site-content-page.page-workstation .workstation-service-card {
 	box-shadow:
 		0 0.35rem 1rem rgba(0, 0, 0, 0.08),
 		0 0.12rem 0.35rem rgba(0, 0, 0, 0.06);
@@ -901,7 +903,7 @@ body.site-content-page.workstation-page .workstation-service-card {
 }
 
 @media (hover: hover) and (pointer: fine) {
-	body.site-content-page.workstation-page .workstation-service-card:hover {
+	body.site-content-page.page-workstation .workstation-service-card:hover {
 		box-shadow:
 			0 0.55rem 1.35rem rgba(0, 0, 0, 0.12),
 			0 0.2rem 0.5rem rgba(0, 0, 0, 0.08);
@@ -914,7 +916,7 @@ body.site-content-page.workstation-page .workstation-service-card {
 	}
 }
 
-body.site-content-page.workstation-page .workstation-section-title {
+body.site-content-page.page-workstation .workstation-section-title {
 	display: flex;
 	align-items: center;
 	gap: 0.65rem;
@@ -922,7 +924,7 @@ body.site-content-page.workstation-page .workstation-section-title {
 	color: var(--text-primary);
 }
 
-body.site-content-page.workstation-page .workstation-section-title__icon {
+body.site-content-page.page-workstation .workstation-section-title__icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -934,7 +936,7 @@ body.site-content-page.workstation-page .workstation-section-title__icon {
 	font-size: 1.15rem;
 }
 
-body.site-content-page.workstation-page .workstation-section--alt {
+body.site-content-page.page-workstation .workstation-section--alt {
 	background: color-mix(
 		in srgb,
 		var(--bg-secondary) 88%,
@@ -944,28 +946,28 @@ body.site-content-page.workstation-page .workstation-section--alt {
 	border-bottom: 1px solid var(--border-color);
 }
 
-body.site-content-page.workstation-page .workstation-section--apps {
+body.site-content-page.page-workstation .workstation-section--apps {
 	background: var(--bg-primary);
 }
 
-body.site-content-page.workstation-page .workstation-repo-list {
+body.site-content-page.page-workstation .workstation-repo-list {
 	columns: 1;
 }
 
 @media (min-width: 576px) {
-	body.site-content-page.workstation-page .workstation-repo-list {
+	body.site-content-page.page-workstation .workstation-repo-list {
 		columns: 2;
 		column-gap: 1.5rem;
 	}
 }
 
-body.site-content-page.workstation-page .workstation-repo-list li {
+body.site-content-page.page-workstation .workstation-repo-list li {
 	break-inside: avoid;
 	margin-bottom: 0.35rem;
 }
 
 html[data-theme="light"]
-	body.site-content-page.workstation-page
+	body.site-content-page.page-workstation
 	.workstation-service-card {
 	box-shadow:
 		0 0.4rem 1.1rem rgba(15, 23, 42, 0.07),

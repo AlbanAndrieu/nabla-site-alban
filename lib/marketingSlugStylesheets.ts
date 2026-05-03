@@ -9,17 +9,17 @@ const LEAFLET_CSS =
  */
 const SLUG_STYLESHEETS: Record<string, readonly string[]> = {
 	contact: ["/site-content-page.css", "/page-layouts.css", LEAFLET_CSS],
-	ai: ["/site-content-page.css", "/nabla.css"],
-	security: ["/site-content-page.css", "/arf.css", "/page-layouts.css"],
-	expertise: ["/site-content-page.css", "/arf.css"],
+	ai: ["/site-content-page.css"],
+	security: ["/site-content-page.css", "/page-layouts.css"],
+	expertise: ["/site-content-page.css"],
 	workstation: ["/site-content-page.css"],
 	startup: ["/site-content-page.css"],
-	"startup-thanks": ["/site-content-page.css", "/arf.css"],
+	"startup-thanks": ["/site-content-page.css"],
 	pricing: ["/site-content-page.css"],
-	success: ["/site-content-page.css", "/arf.css", "/checkout.css"],
-	cancel: ["/site-content-page.css", "/arf.css", "/checkout.css"],
+	success: ["/site-content-page.css", "/checkout.css"],
+	cancel: ["/site-content-page.css", "/checkout.css"],
 	payment: ["/site-content-page.css", "/checkout.css"],
-	ciso: ["/site-content-page.css", "/arf.css", "/page-layouts.css"],
+	ciso: ["/site-content-page.css", "/page-layouts.css"],
 	nabla: [
 		"/site-content-page.css",
 		"/arf.css",
@@ -29,10 +29,10 @@ const SLUG_STYLESHEETS: Record<string, readonly string[]> = {
 	login: ["/site-content-page.css", "/page-layouts.css"],
 	link: ["/site-content-page.css"],
 	ctid: ["/site-content-page.css", "/page-layouts.css"],
-	freenas: ["/site-content-page.css", "/arf.css"],
-	truenas: ["/site-content-page.css", "/arf.css"],
+	freenas: ["/site-content-page.css"],
+	truenas: ["/site-content-page.css"],
 	test: ["/site-content-page.css", "/arf.css"],
-	"email-contact-addresses": ["/site-content-page.css"],
+	email: ["/site-content-page.css"],
 };
 
 export function marketingSlugStylesheets(slug: string): readonly string[] {

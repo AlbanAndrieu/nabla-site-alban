@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import { routing } from "@/i18n/routing";
 
+import "@/app/globals.css";
+
 export const metadata: Metadata = {
 	metadataBase: new URL("https://dr-alban.com"),
 };
@@ -41,13 +43,33 @@ export default async function RootLayout({ children, params }: Props) {
 				<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
 				<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
 				<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+
+				{/* For contact page */}
+				<link
+					rel="stylesheet"
+					href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+					type="text/css"
+				/>
+
 				<link rel="stylesheet" href="/landing-sections.css" />
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />
 				<link rel="stylesheet" href="/style.css" />
-				<link rel="stylesheet" href="/print.css" />
+
+				{/* arf is for test page */}
+				<link rel="stylesheet" href="/arf.css" />
+				<link rel="stylesheet" href="/site-content-page.css" />
+				{/* page-layouts is for test contact in body class page-contact */}
+				<link rel="stylesheet" href="/page-layouts.css" />
+				{/* nabla is for ai page */}
+				<link rel="stylesheet" href="/nabla.css" />
 				<link rel="stylesheet" href="/timeline.css" />
 				<link rel="stylesheet" href="/education.css" />
+				{/* opensource is for nabla page */}
+				<link rel="stylesheet" href="/opensource.css" />
+
+				<link rel="stylesheet" href="/print.css" />
+
 				<link
 					rel="stylesheet"
 					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
@@ -65,7 +87,11 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="color-scheme" content="light dark" />
 				<meta name="referrer" content="always" />
 			</head>
-			<body className="page-dark" suppressHydrationWarning>
+			{ /* TODO use className page-login page-ciso page-ctid page-truenas page-workstation page-contact page-security only when appropriate */}
+			<body
+				className="site-content-page page-contact page-nabla-best-practices page-ciso page-ctid page-login page-dark"
+				suppressHydrationWarning
+			>
 				{/* Static HTML uses Google Translate via /site-widgets.js; Next uses next-intl (see data-no-google-translate). */}
 				<NextIntlClientProvider messages={messages}>
 					{children}

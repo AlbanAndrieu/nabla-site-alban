@@ -13,6 +13,112 @@ export type SiteLocale = "en" | "fr";
 const DEFAULT_LOCALE: SiteLocale = "en";
 const SUPPORTED_LOCALES: readonly SiteLocale[] = ["en", "fr"];
 
+
+export const HOME_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	name: "Alban Andrieu",
+	jobTitle: "Freelance DevSecOps Engineer & Cloud Architect",
+	description:
+		"Freelance DevSecOps engineer and cloud architect (AWS, Azure, OVH). Cloud security consultant for AI-driven and security-critical products; ISO 27001, SOC 2, GDPR-aligned delivery.",
+	url: "https://dr-alban.com/",
+	email: "job@dr-alban.com",
+	sameAs: [
+		"https://www.linkedin.com/in/nabla/",
+		"https://twitter.com/AlbanAndrieu",
+		"https://github.com/AlbanAndrieu",
+	],
+	knowsAbout: [
+		"Freelance DevSecOps",
+		"Cloud architecture",
+		"AWS",
+		"Azure",
+		"OVHcloud",
+		"Cloud security",
+		"AI infrastructure",
+		"MLOps",
+		"ISO 27001",
+		"SOC 2",
+	],
+	hasCredential: [
+		{
+			"@type": "EducationalOccupationalCredential",
+			name: "LinkedIn Professional Profile",
+			url: "https://www.linkedin.com/in/nabla/",
+		},
+	],
+	subjectOf: [
+		{
+			"@type": "DigitalDocument",
+			name: "LaTeX Resume PDF",
+			description: "Traditional formatted resume in PDF format",
+			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "DigitalDocument",
+			name: "LinkedIn Resume PDF",
+			description: "LinkedIn profile exported as PDF",
+			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "WebPage",
+			name: "Online CV Landing Page",
+			description: "Interactive web-based CV and professional profile",
+			url: "https://dr-alban.com/cv/index.html",
+		},
+	],
+};
+
+export const HOME_JSON_LD_FR = {
+	...HOME_JSON_LD,
+	jobTitle: "Ingénieur DevSecOps freelance et architecte cloud",
+	description:
+		"Ingénieur DevSecOps freelance et architecte cloud (AWS, Azure, OVH). Consultant en sécurité cloud pour produits pilotés par l’IA et à enjeux sécurité ; livraisons alignées ISO 27001, SOC 2 et RGPD.",
+	knowsAbout: [
+		"DevSecOps freelance",
+		"Architecture cloud",
+		"AWS",
+		"Azure",
+		"OVHcloud",
+		"Sécurité cloud",
+		"Infrastructure IA",
+		"MLOps",
+		"ISO 27001",
+		"SOC 2",
+	],
+	hasCredential: [
+		{
+			"@type": "EducationalOccupationalCredential",
+			name: "Profil professionnel LinkedIn",
+			url: "https://www.linkedin.com/in/nabla/",
+		},
+	],
+	subjectOf: [
+		{
+			"@type": "DigitalDocument",
+			name: "CV LaTeX (PDF)",
+			description: "CV classique au format PDF",
+			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "DigitalDocument",
+			name: "CV LinkedIn (PDF)",
+			description: "Profil LinkedIn exporté en PDF",
+			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			encodingFormat: "application/pdf",
+		},
+		{
+			"@type": "WebPage",
+			name: "Page CV en ligne",
+			description: "CV interactif et profil professionnel",
+			url: "https://dr-alban.com/cv/index.html",
+		},
+	],
+};
+
 function decodeBasicEntities(text: string): string {
 	return text
 		.replace(/&amp;/g, "&")
@@ -75,6 +181,31 @@ function rewriteOneHref(
 	return `href=${quote}${localizedOut}${query}${hash}${quote}`;
 }
 
+function rewriteOneSrc(
+	quote: '"' | "'",
+	raw: string,
+): string {
+	const src = raw.trim();
+	if (
+		/^(https?:|mailto:|tel:|#|javascript:|data:)/i.test(src) ||
+		src.length === 0 ||
+		src.startsWith("/")
+	) {
+		return `src=${quote}${raw}${quote}`;
+	}
+
+	let pathPart = src;
+	const ref = src.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
+	if (ref) pathPart = ref[1] ?? src;
+	const query = ref?.[2] ?? "";
+	const hash = ref?.[3] ?? "";
+
+	while (pathPart.startsWith("../")) pathPart = pathPart.slice(3);
+	while (pathPart.startsWith("./")) pathPart = pathPart.slice(2);
+
+	return `src=${quote}/${pathPart}${query}${hash}${quote}`;
+}
+
 /** Rewrite internal *.html links: add locale prefix only (paths stay `*.html`). */
 export function rewriteLegacyHtmlHrefs(
 	fragment: string,
@@ -85,6 +216,12 @@ export function rewriteLegacyHtmlHrefs(
 	);
 	out = out.replace(/\bhref='([^']*)'/gi, (_full, raw: string) =>
 		rewriteOneHref("'", raw, locale),
+	);
+	out = out.replace(/\bsrc="([^"]*)"/gi, (_full, raw: string) =>
+		rewriteOneSrc('"', raw),
+	);
+	out = out.replace(/\bsrc='([^']*)'/gi, (_full, raw: string) =>
+		rewriteOneSrc("'", raw),
 	);
 	return out;
 }
@@ -125,8 +262,9 @@ export async function loadPublicHtmlFragment(
 		const m = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
 		fragment = m?.[1] ?? "";
 	} else if (mode === "headerMain") {
+		// Allow comments/other nodes between </header> and <main>.
 		const m = html.match(
-			/<header[^>]*>[\s\S]*?<\/header>\s*<main[^>]*>[\s\S]*?<\/main>/i,
+			/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
 		);
 		fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
 	} else if (mode === "navHeaderMain") {

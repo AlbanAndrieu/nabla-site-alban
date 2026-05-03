@@ -19,7 +19,7 @@
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="article" />
-		<meta property="og:url" content="https://dr-alban.com/ai-best-practices.html" />
+		<meta property="og:url" content="https://dr-alban.com/ai.html" />
 		<meta property="og:title" content="AI Best Practices - Tools and Resources" />
 		<meta
 			property="og:description"
@@ -30,7 +30,7 @@
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:url" content="https://dr-alban.com/ai-best-practices.html" />
+		<meta property="twitter:url" content="https://dr-alban.com/ai.html" />
 		<meta property="twitter:title" content="AI Best Practices - Tools and Resources" />
 		<meta
 			property="twitter:description"
@@ -39,7 +39,7 @@
 		<meta property="twitter:image" content="https://dr-alban.com/assets/nabla/nabla-4.svg" />
 
 		<!-- Canonical URL -->
-		<link rel="canonical" href="https://dr-alban.com/ai-best-practices.html" />
+		<link rel="canonical" href="https://dr-alban.com/ai.html" />
 
 		<!-- Favicon -->
 		<link rel="icon" href="assets/nabla/nabla-4.svg" />
@@ -53,21 +53,10 @@
 		<link rel="stylesheet" href="theme.css" />
 		<link rel="stylesheet" href="style.css" />
 		<link rel="stylesheet" href="print.css" />
+		<link rel="stylesheet" href="arf.css" />
 		<link rel="stylesheet" href="site-content-page.css" />
 		<link rel="stylesheet" href="nabla.css" />
 
-		<!-- Font Awesome (CDN + JS) -->
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
-			type="text/css"
-		/>
-		<script
-			src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
-			data-auto-replace-svg="nest"
-		></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-		<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
 		<!-- Bootstrap -->
 		<link
 			rel="stylesheet"
@@ -108,7 +97,7 @@
 				"description": "Comprehensive guide to AI best practices, tools, and resources for developers and DevSecOps professionals",
 				"mainEntityOfPage": {
 					"@type": "WebPage",
-					"@id": "https://dr-alban.com/ai-best-practices.html"
+					"@id": "https://dr-alban.com/ai.html"
 				}
 			}
 		</script>
@@ -118,7 +107,12 @@
 	</head>
 	<body class="site-content-page page-nabla-best-practices">
 		<a name="top"></a>
-		<!-- Google Translate Widget (styled via theme.css) -->
+		<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+		<nav class="page-nav container py-3" aria-label="Breadcrumb">
+			<a href="index.html" class="text-decoration-none"><i class="fas fa-home" aria-hidden="true"></i> Back to home</a>
+		</nav>
+
 		<!-- Header / Hero Section -->
 		<header>
 			<section class="hero-section" id="home">
@@ -792,12 +786,12 @@
 						</a>
 					</div>
 
-					<div style="margin-top: 3rem">
-						<img src="assets/nabla/nabla-4.svg" alt="Nabla Logo" style="width: 120px; opacity: 0.6" />
+					<div class="contact-logo-wrap">
+						<img src="assets/nabla/nabla-4.svg" alt="Nabla Logo" class="contact-logo" width="120" />
 					</div>
 
 					<!-- Stack Exchange Badge -->
-					<div style="margin-top: 3rem; text-align: center">
+					<div style="margin-top: 3rem; text-align: center; display: flex; justify-content: center;">
 						<a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer">
 							<img
 								src="https://stackexchange.com/users/flair/4652074.png"
@@ -864,10 +858,9 @@
 			</div>
 			<div class="footer-links">
 				<a href="/policy/legal.html">Legal notices</a>
-				<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer" class="text-muted">Cookies</a>
 			</div>
 			<p class="text-md-center mt-3">
-				<a href="/" class="btn btn-sm btn-outline-secondary">Back to Home</a>
+				<a href="index.html" class="btn btn-sm btn-outline-secondary">Back to Home</a>
 				<a href="#top" class="btn btn-sm btn-outline-secondary" aria-label="Back to top of page">Back to top</a>
 			</p>
 			<p class="footer-copyright"></p>
@@ -886,7 +879,6 @@
 			defer
 			data-scroll-reveal=".resource-card"
 			data-reveal-effect="opacity"
-			data-axeptio
 			data-print-pdf
 			data-coffee-fab
 		></script>

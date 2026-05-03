@@ -84,6 +84,14 @@ For ad-hoc LaTeX-to-HTML conversion:
 htlatex cv-aandrieu-2026-en.tex html "" -dSomeDir "--interaction=nonstopmode -shell-escape"
 ```
 
+### 04.04 Optional Word export from LaTeX
+
+For ad-hoc LaTeX-to-Word conversion:
+
+```bash
+pandoc -s cv-aandrieu-2026-ts-fr.tex -o cv-aandrieu-2026-ts.docx
+```
+
 ## 05 CI Workflow
 
 CI builds all eight PDF variants in `.github/workflows/build-pdf.yml` and uploads:

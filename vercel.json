@@ -2,16 +2,11 @@
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"version": 2,
 	"regions": ["fra1"],
+	"framework": "nextjs",
 	"github": {
 		"silent": true,
 		"autoJobCancelation": true
 	},
-	"functions": {
-		"api/**/*.js": {
-			"excludeFiles": "{.next,*.cache,.node_cache,.cursor,.ansible,node_modules,.venv,.direnv,public,reports/2025/*,reports/2026/*,index/*.bmp,public/assets/fontawesome-free-7.1.0-web/}/**"
-		}
-	},
-	"routes": [{ "src": "/api/(.*)", "dest": "/api/$1.js" }],
 	"env": {
 		"STRIPE_PRICE_ID": "price_1TIuNgQR8aaUqJtoydBY5Fmw"
 	}

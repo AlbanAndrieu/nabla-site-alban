@@ -19,7 +19,7 @@ export default function LocaleSwitcher() {
 	return (
 		<label
 			htmlFor="locale-switcher"
-			className="d-inline-flex align-items-center gap-2 text-light small"
+			className="locale-switcher"
 		>
 			<span>{t("localeSwitcherLabel")}</span>
 			<select
