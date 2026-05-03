@@ -47,7 +47,6 @@ export default async function CvIndexPage({ params }: Props) {
 }
 */
 
-
 export default async function HomePage({ params }: Props) {
 	const { locale: requestedLocale } = await params;
 	const locale = hasLocale(["en", "fr"], requestedLocale)

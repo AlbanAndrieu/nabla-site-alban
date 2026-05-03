@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { loadPublicHtmlFragment, type SiteLocale } from "@/lib/htmlFromPublic";
-
 import { routing } from "@/i18n/routing";
 import { loadCvHtmlFragment, metadataFromCvHtml } from "@/lib/cvFromPublic";
-
-import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
+import {
+	HOME_JSON_LD,
+	HOME_JSON_LD_FR,
+	loadPublicHtmlFragment,
+	type SiteLocale,
+} from "@/lib/htmlFromPublic";
 
 type Props = {
 	params: Promise<{ locale: string; path: string[] }>;
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const canonicalPath = `/${normalizedLocale}/cv/${path.join("/")}`;
 	return metadataFromCvHtml(path, canonicalPath, normalizedLocale);
 }
-/*
+
 export default async function CvPathPage({ params }: Props) {
 	const { locale, path } = await params;
 	const normalizedLocale = hasLocale(routing.locales, locale)
@@ -32,8 +34,7 @@ export default async function CvPathPage({ params }: Props) {
 	setRequestLocale(normalizedLocale);
 
 	try {
-		// const { html } = await loadCvHtmlFragment(path, normalizedLocale);
-		const { html } =
+		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
 		return (
 			<div
 				className="page-cv"
@@ -46,8 +47,8 @@ export default async function CvPathPage({ params }: Props) {
 		notFound();
 	}
 }
-*/
 
+/*
 export default async function HomePage({ params }: Props) {
 	const { locale: requestedLocale } = await params;
 	const locale = hasLocale(["en", "fr"], requestedLocale)
@@ -97,3 +98,4 @@ export default async function HomePage({ params }: Props) {
 		</div>
 	);
 }
+*/
