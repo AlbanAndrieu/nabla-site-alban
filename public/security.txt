@@ -1,6 +1,6 @@
 Contact: mailto:security@albandrieu.com
 Expires: 2026-10-12T00:00:00Z
-Canonical: https://dr-alban.com/security.txt
+Canonical: https://albanandrieu.com/security.txt
 Preferred-Languages: en,fr
 Acknowledgments: https://github.com/AlbanAndrieu/nabla-site-alban#readme
-Policy: https://dr-alban.com/policy/privacy.html
+Policy: https://albanandrieu.com/policy/privacy.html

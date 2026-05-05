@@ -145,7 +145,7 @@ Fix: update both representations when the same information is expected in both.
 ### 07.03 Metadata domain mismatch
 
 Some CV pages still include metadata URLs on `albandrieu.com` while canonical
-links now generally use `dr-alban.com`. Keep metadata domains consistent when
+links now generally use `albanandrieu.com`. Keep metadata domains consistent when
 touching page head tags.
 
 ### 07.04 Resume schema drift
