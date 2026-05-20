@@ -11,6 +11,7 @@ logs
 
 public/cv/cv-*.done
 public/cv/cv-*.out
+public/cv/cv-*.xdv
 
 vendor/
 webalizer

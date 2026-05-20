@@ -2,10 +2,10 @@
 	"basics": {
 		"name": "Alban Andrieu",
 		"label": "DevSecOps Engineer",
-		"image": "https://dr-alban.com/assets/nabla/nabla-4.svg",
-		"email": "alban.andrieu@dr-alban.com",
+		"image": "https://albanandrieu.com/assets/nabla/nabla-4.svg",
+		"email": "alban.andrieu@albanandrieu.com",
 		"phone": "",
-		"url": "https://dr-alban.com",
+		"url": "https://albanandrieu.com",
 		"summary": "Experienced DevSecOps professional specializing in SDLC, Cloud Infrastructure, and Software Development. Proven track record in implementing automation, security best practices, and modern development workflows across diverse enterprise environments.",
 		"location": {
 			"address": "",
@@ -156,7 +156,7 @@
 	"references": [],
 	"projects": [],
 	"meta": {
-		"canonical": "https://dr-alban.com/cv/schema.json",
+		"canonical": "https://albanandrieu.com/cv/schema.json",
 		"version": "v1.0.0",
 		"lastModified": "2026-01-24",
 		"schema": "JSONResume",
@@ -165,19 +165,19 @@
 	"resumes": {
 		"latex": {
 			"name": "LaTeX Resume PDF",
-			"url": "https://dr-alban.com/cv/cv-aandrieu-2026-en.pdf",
+			"url": "https://albanandrieu.com/cv/cv-aandrieu-2026-en.pdf",
 			"format": "application/pdf",
 			"description": "Traditional formatted resume"
 		},
 		"linkedin": {
 			"name": "LinkedIn Resume PDF",
-			"url": "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			"url": "https://albanandrieu.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
 			"format": "application/pdf",
 			"description": "LinkedIn profile exported as PDF"
 		},
 		"web": {
 			"name": "Online CV Landing Page",
-			"url": "https://dr-alban.com/cv/index.html",
+			"url": "https://albanandrieu.com/cv/index.html",
 			"format": "text/html",
 			"description": "Interactive web-based CV"
 		}

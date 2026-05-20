@@ -1,10 +1,10 @@
-# robots.txt file of https://dr-alban.com/
+# robots.txt file of https://albanandrieu.com/
 
 # www.robotstxt.org/
 # www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
 
 # If you wish to crawl this website, please obtain explicit permission first.
-# Contact us via email at alban.andrieu@dr-alban.com for authorization.
+# Contact us via email at alban.andrieu@albanandrieu.com for authorization.
 
 User-agent: 008
 Disallow: /
@@ -193,5 +193,5 @@ Disallow: /*/?*
 Crawl-delay: 20
 
 # sitemap index
-Sitemap: https://dr-alban.com/sitemap.xml
-# curl https://www.google.com/ping??sitemap=https://dr-alban.com/sitemap.xml
+Sitemap: https://albanandrieu.com/sitemap.xml
+# curl https://www.google.com/ping??sitemap=https://albanandrieu.com/sitemap.xml

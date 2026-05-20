@@ -1,142 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-		<title><![CDATA[Alban Andrieu — dr-alban.com]]></title>
-		<link>https://dr-alban.com/</link>
-		<description><![CDATA[Highlights from dr-alban.com: DevSecOps and cloud architecture services, C.V., security and AI resources, homelab notes, and contact. Pub dates follow the site sitemap lastmod values.]]></description>
+		<title><![CDATA[Alban Andrieu — albanandrieu.com]]></title>
+		<link>https://albanandrieu.com/</link>
+		<description><![CDATA[Highlights from albanandrieu.com: DevSecOps and cloud architecture services, C.V., security and AI resources, homelab notes, and contact. Pub dates follow the site sitemap lastmod values.]]></description>
 		<language>en</language>
 		<lastBuildDate>Fri, 10 Apr 2026 00:00:00 GMT</lastBuildDate>
-		<atom:link href="https://dr-alban.com/feed.xml" rel="self" type="application/rss+xml" />
+		<atom:link href="https://albanandrieu.com/feed.xml" rel="self" type="application/rss+xml" />
 		<item>
 			<title><![CDATA[Workstation Docker Compose | Nabla - Alban Andrieu]]></title>
-			<link>https://dr-alban.com/workstation</link>
-			<guid isPermaLink="true">https://dr-alban.com/workstation</guid>
+			<link>https://albanandrieu.com/workstation</link>
+			<guid isPermaLink="true">https://albanandrieu.com/workstation</guid>
 			<pubDate>Mon, 06 Apr 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Docker Compose setup for the primary workstation.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Security Resources & Tools - DevSecOps Best Practices by Alban Andrieu]]></title>
-			<link>https://dr-alban.com/security</link>
-			<guid isPermaLink="true">https://dr-alban.com/security</guid>
+			<link>https://albanandrieu.com/security</link>
+			<guid isPermaLink="true">https://albanandrieu.com/security</guid>
 			<pubDate>Thu, 02 Apr 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Security resources and DevSecOps tooling notes.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[AI Best Practices - Alban Andrieu DevSecOps]]></title>
-			<link>https://dr-alban.com/ai</link>
-			<guid isPermaLink="true">https://dr-alban.com/ai</guid>
+			<link>https://albanandrieu.com/ai</link>
+			<guid isPermaLink="true">https://albanandrieu.com/ai</guid>
 			<pubDate>Thu, 02 Apr 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[AI workload and platform practices from a DevSecOps perspective.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Legal notices | Alban Andrieu]]></title>
-			<link>https://dr-alban.com/policy/legal</link>
-			<guid isPermaLink="true">https://dr-alban.com/policy/legal</guid>
+			<link>https://albanandrieu.com/policy/legal</link>
+			<guid isPermaLink="true">https://albanandrieu.com/policy/legal</guid>
 			<pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Legal notices and site publisher information.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Services & technical expertise — Alban Andrieu]]></title>
-			<link>https://dr-alban.com/expertise</link>
-			<guid isPermaLink="true">https://dr-alban.com/expertise</guid>
+			<link>https://albanandrieu.com/expertise</link>
+			<guid isPermaLink="true">https://albanandrieu.com/expertise</guid>
 			<pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Consulting services and technical expertise overview.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Start your project — Alban Andrieu]]></title>
-			<link>https://dr-alban.com/startup</link>
-			<guid isPermaLink="true">https://dr-alban.com/startup</guid>
+			<link>https://albanandrieu.com/startup</link>
+			<guid isPermaLink="true">https://albanandrieu.com/startup</guid>
 			<pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[How to start an engagement or project.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Email address update — alban.andrieu@free.fr discontinued]]></title>
-			<link>https://dr-alban.com/email</link>
-			<guid isPermaLink="true">https://dr-alban.com/email</guid>
+			<link>https://albanandrieu.com/email</link>
+			<guid isPermaLink="true">https://albanandrieu.com/email</guid>
 			<pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Current contact email addresses and legacy address notice.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Profiles & registries in use — Alban Andrieu]]></title>
-			<link>https://dr-alban.com/link</link>
-			<guid isPermaLink="true">https://dr-alban.com/link</guid>
+			<link>https://albanandrieu.com/link</link>
+			<guid isPermaLink="true">https://albanandrieu.com/link</guid>
 			<pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Directory of public profiles and container registries.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Consulting pricing & engagement options — Alban Andrieu]]></title>
-			<link>https://dr-alban.com/pricing</link>
-			<guid isPermaLink="true">https://dr-alban.com/pricing</guid>
+			<link>https://albanandrieu.com/pricing</link>
+			<guid isPermaLink="true">https://albanandrieu.com/pricing</guid>
 			<pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Pricing and engagement models for consulting work.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Alban Andrieu — Freelance DevSecOps & Cloud Architect (AWS, Azure, OVH)]]></title>
-			<link>https://dr-alban.com/</link>
-			<guid isPermaLink="true">https://dr-alban.com/</guid>
+			<link>https://albanandrieu.com/</link>
+			<guid isPermaLink="true">https://albanandrieu.com/</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Homepage: freelance DevSecOps, cloud architecture, and contact entry points.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[TrueNAS Scale Homelab & Hardware | Nabla - Alban Andrieu]]></title>
-			<link>https://dr-alban.com/truenas</link>
-			<guid isPermaLink="true">https://dr-alban.com/truenas</guid>
+			<link>https://albanandrieu.com/truenas</link>
+			<guid isPermaLink="true">https://albanandrieu.com/truenas</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[TrueNAS Scale homelab hardware and configuration notes.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Alban Andrieu - Independent DevSecOps Professional]]></title>
-			<link>https://dr-alban.com/nabla</link>
-			<guid isPermaLink="true">https://dr-alban.com/nabla</guid>
+			<link>https://albanandrieu.com/nabla</link>
+			<guid isPermaLink="true">https://albanandrieu.com/nabla</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Nabla / independent practice overview.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Privacy Policy | Alban Andrieu]]></title>
-			<link>https://dr-alban.com/policy/privacy_policy</link>
-			<guid isPermaLink="true">https://dr-alban.com/policy/privacy_policy</guid>
+			<link>https://albanandrieu.com/policy/privacy_policy</link>
+			<guid isPermaLink="true">https://albanandrieu.com/policy/privacy_policy</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
-			<description><![CDATA[Privacy policy for dr-alban.com.]]></description>
+			<description><![CDATA[Privacy policy for albanandrieu.com.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Terms of Service | Alban Andrieu]]></title>
-			<link>https://dr-alban.com/policy/service_terms</link>
-			<guid isPermaLink="true">https://dr-alban.com/policy/service_terms</guid>
+			<link>https://albanandrieu.com/policy/service_terms</link>
+			<guid isPermaLink="true">https://albanandrieu.com/policy/service_terms</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Terms of service for the site.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[System Monitoring Report]]></title>
-			<link>https://dr-alban.com/reports/monitoring_report.html</link>
-			<guid isPermaLink="true">https://dr-alban.com/reports/monitoring_report.html</guid>
+			<link>https://albanandrieu.com/reports/monitoring_report.html</link>
+			<guid isPermaLink="true">https://albanandrieu.com/reports/monitoring_report.html</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Public monitoring report page.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Curriculum vitae — formats and downloads]]></title>
-			<link>https://dr-alban.com/cv</link>
-			<guid isPermaLink="true">https://dr-alban.com/cv</guid>
+			<link>https://albanandrieu.com/cv</link>
+			<guid isPermaLink="true">https://albanandrieu.com/cv</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[C.V. landing page with HTML and PDF variants.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[CISO Dashboard - Real-time Security Intelligence by Alban Andrieu]]></title>
-			<link>https://dr-alban.com/ciso</link>
-			<guid isPermaLink="true">https://dr-alban.com/ciso</guid>
+			<link>https://albanandrieu.com/ciso</link>
+			<guid isPermaLink="true">https://albanandrieu.com/ciso</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Security intelligence dashboard demo page.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Contact Alban Andrieu - DevSecOps Professional]]></title>
-			<link>https://dr-alban.com/contact</link>
-			<guid isPermaLink="true">https://dr-alban.com/contact</guid>
+			<link>https://albanandrieu.com/contact</link>
+			<guid isPermaLink="true">https://albanandrieu.com/contact</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Contact channels and enquiry form.]]></description>
 		</item>
 		<item>
 			<title><![CDATA[Digital Defense]]></title>
-			<link>https://dr-alban.com/checklist/</link>
-			<guid isPermaLink="true">https://dr-alban.com/checklist/</guid>
+			<link>https://albanandrieu.com/checklist/</link>
+			<guid isPermaLink="true">https://albanandrieu.com/checklist/</guid>
 			<pubDate>Wed, 28 Jan 2026 00:00:00 GMT</pubDate>
 			<description><![CDATA[Personal digital security checklist (Qwik app).]]></description>
 		</item>

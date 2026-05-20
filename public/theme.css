@@ -212,7 +212,7 @@ html[data-theme="dark"] {
 html body {
 	background-color: var(--bg-primary);
 	color: var(--text-primary);
-	/* After wireframe.css: wireframe uses font-weight 200; align with Bootstrap reboot / dr-alban.com */
+	/* After wireframe.css: wireframe uses font-weight 200; align with Bootstrap reboot / albanandrieu.com */
 	font-weight: 400;
 	line-height: 1.5;
 	transition:

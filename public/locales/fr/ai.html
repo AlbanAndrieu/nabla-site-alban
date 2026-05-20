@@ -1,52 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<!-- PAGE settings -->
-<title>AI Best Practices - Alban Andrieu DevSecOps</title>
-<meta content="Guide complet des meilleures pratiques, outils et ressources d'IA pour les développeurs et les professionnels DevSecOps.Comprend l'automatisation des flux de travail, le raisonnement LLM, le déploiement de modèles, etc." name="description"/>
-<meta content="AI Best Practices, Machine Learning, LLM, Artificial Intelligence, OpenCommit, n8n Workflows, Opik, Nvidia Nemotron, MCP Servers, OpenShell, Open Terminal, AI Tools, DevSecOps" name="keywords"/>
-<meta content="job@dr-alban.com" name="author"/>
-<meta content="index, follow" name="robots"/>
-<!-- Open Graph / Facebook -->
-<meta content="article" property="og:type"/>
-<meta content="https://dr-alban.com/ai-best-practices.html" property="og:url"/>
-<meta content="Meilleures pratiques en matière d'IA – Outils et ressources" property="og:title"/>
-<meta content="Explorez les meilleures pratiques, outils et ressources d'IA sélectionnés pour les flux de travail de développement modernes, notamment l'automatisation, les LLM et le déploiement de modèles." property="og:description"/>
-<meta content="https://dr-alban.com/assets/nabla/nabla-4.svg" property="og:image"/>
-<meta content="Nabla - Alban Andrieu" property="og:site_name"/>
-<!-- Twitter -->
-<meta content="summary_large_image" property="twitter:card"/>
-<meta content="https://dr-alban.com/ai.html" property="twitter:url"/>
-<meta content="Meilleures pratiques en matière d'IA – Outils et ressources" property="twitter:title"/>
-<meta content="Explorez les meilleures pratiques, outils et ressources d'IA sélectionnés pour les flux de travail de développement modernes" property="twitter:description"/>
-<meta content="https://dr-alban.com/assets/nabla/nabla-4.svg" property="twitter:image"/>
-<!-- Canonical URL -->
-<link href="https://dr-alban.com/ai.html" rel="canonical"/>
-<!-- Favicon -->
-<link href="assets/nabla/nabla-4.svg" rel="icon"/>
-<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/brands.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/solid.css" rel="stylesheet"/>
-<link href="landing-sections.css" rel="stylesheet"/>
-<link href="wireframe.css" rel="stylesheet"/>
-<link href="theme.css" rel="stylesheet"/>
-<link href="style.css" rel="stylesheet"/>
-<link href="print.css" rel="stylesheet"/>
-<link href="site-content-page.css" rel="stylesheet"/>
-<link href="nabla.css" rel="stylesheet"/>
-<!-- Font Awesome (CDN + JS) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css" rel="stylesheet" type="text/css"/>
-<script data-auto-replace-svg="nest" src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"></script>
-<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
-<!-- Bootstrap -->
-<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css" integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg==" referrerpolicy="no-referrer" rel="stylesheet"/>
-<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA==" referrerpolicy="no-referrer" rel="stylesheet"/>
-<!-- JSON-LD Structured Data for SEO -->
-<script type="application/ld+json">
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<!-- PAGE settings -->
+		<title>AI Best Practices - Alban Andrieu DevSecOps</title>
+		<meta
+			content="Guide complet des meilleures pratiques, outils et ressources d'IA pour les développeurs et les professionnels DevSecOps.Comprend l'automatisation des flux de travail, le raisonnement LLM, le déploiement de modèles, etc."
+			name="description"
+		/>
+		<meta
+			content="AI Best Practices, Machine Learning, LLM, Artificial Intelligence, OpenCommit, n8n Workflows, Opik, Nvidia Nemotron, MCP Servers, OpenShell, Open Terminal, AI Tools, DevSecOps"
+			name="keywords"
+		/>
+		<meta content="job@albanandrieu.com" name="author" />
+		<meta content="index, follow" name="robots" />
+		<!-- Open Graph / Facebook -->
+		<meta content="article" property="og:type" />
+		<meta content="https://albanandrieu.com/ai-best-practices.html" property="og:url" />
+		<meta content="Meilleures pratiques en matière d'IA – Outils et ressources" property="og:title" />
+		<meta
+			content="Explorez les meilleures pratiques, outils et ressources d'IA sélectionnés pour les flux de travail de développement modernes, notamment l'automatisation, les LLM et le déploiement de modèles."
+			property="og:description"
+		/>
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="og:image" />
+		<meta content="Nabla - Alban Andrieu" property="og:site_name" />
+		<!-- Twitter -->
+		<meta content="summary_large_image" property="twitter:card" />
+		<meta content="https://albanandrieu.com/ai.html" property="twitter:url" />
+		<meta content="Meilleures pratiques en matière d'IA – Outils et ressources" property="twitter:title" />
+		<meta
+			content="Explorez les meilleures pratiques, outils et ressources d'IA sélectionnés pour les flux de travail de développement modernes"
+			property="twitter:description"
+		/>
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="twitter:image" />
+		<!-- Canonical URL -->
+		<link href="https://albanandrieu.com/ai.html" rel="canonical" />
+		<!-- Favicon -->
+		<link href="assets/nabla/nabla-4.svg" rel="icon" />
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+		<link href="landing-sections.css" rel="stylesheet" />
+		<link href="wireframe.css" rel="stylesheet" />
+		<link href="theme.css" rel="stylesheet" />
+		<link href="style.css" rel="stylesheet" />
+		<link href="print.css" rel="stylesheet" />
+		<link href="site-content-page.css" rel="stylesheet" />
+		<link href="nabla.css" rel="stylesheet" />
+		<!-- Font Awesome (CDN + JS) -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<script
+			data-auto-replace-svg="nest"
+			src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+		></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+		<!-- Bootstrap -->
+		<link
+			crossorigin="anonymous"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+			integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+			referrerpolicy="no-referrer"
+			rel="stylesheet"
+		/>
+		<link
+			crossorigin="anonymous"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+			integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+			referrerpolicy="no-referrer"
+			rel="stylesheet"
+		/>
+		<!-- JSON-LD Structured Data for SEO -->
+		<script type="application/ld+json">
 			{
 				"@context": "https://schema.org",
 				"@type": "Article",
@@ -54,14 +85,14 @@
 				"author": {
 					"@type": "Person",
 					"name": "Alban Andrieu",
-					"url": "https://dr-alban.com"
+					"url": "https://albanandrieu.com"
 				},
 				"publisher": {
 					"@type": "Organization",
 					"name": "Nabla - Alban Andrieu",
 					"logo": {
 						"@type": "ImageObject",
-						"url": "https://dr-alban.com/assets/nabla/nabla-4.svg"
+						"url": "https://albanandrieu.com/assets/nabla/nabla-4.svg"
 					}
 				},
 				"datePublished": "2026-01-28",
@@ -69,464 +100,738 @@
 				"description": "Comprehensive guide to AI best practices, tools, and resources for developers and DevSecOps professionals",
 				"mainEntityOfPage": {
 					"@type": "WebPage",
-					"@id": "https://dr-alban.com/ai.html"
+					"@id": "https://albanandrieu.com/ai.html"
 				}
 			}
 		</script>
-<script src="theme-toggle.js"></script>
-<script defer="" src="site-google-translate.js"></script>
-<script data-analytics-mode="vercel" src="site-analytics.js"></script>
-</head>
-<body class="site-content-page page-nabla-best-practices">
-<a name="top"></a>
-<!-- Google Translate Widget (styled via theme.css) -->
-<!-- Header / Hero Section -->
-<header>
-<section class="hero-section" id="home">
-<div class="hero-content">
-<h1 class="hero-title"><i class="fas fa-brain"></i> AI Best Practices</h1>
-<p class="hero-subtitle">Tools, Resources, and Guidelines for AI-Driven Development</p>
-<p class="hero-description">
+		<script src="theme-toggle.js"></script>
+		<script defer="" src="site-google-translate.js"></script>
+		<script data-analytics-mode="vercel" src="site-analytics.js"></script>
+	</head>
+	<body class="site-content-page page-nabla-best-practices">
+		<a name="top"></a>
+		<!-- Google Translate Widget (styled via theme.css) -->
+		<!-- Header / Hero Section -->
+		<header>
+			<section class="hero-section" id="home">
+				<div class="hero-content">
+					<h1 class="hero-title"><i class="fas fa-brain"></i> AI Best Practices</h1>
+					<p class="hero-subtitle">Tools, Resources, and Guidelines for AI-Driven Development</p>
+					<p class="hero-description">
 						A curated collection of essential AI tools, frameworks, and best practices to enhance your development
 						workflow. From automated workflows to cutting-edge language models, discover the resources that can
 						transform your approach to AI development.
 					</p>
-</div>
-</section>
-</header>
-<!-- Main Content -->
-<main class="mb-5" id="main-content" role="main">
-<section aria-label="Aperçu et ressources des meilleures pratiques en matière d'IA" class="content-section">
-<!-- Introduction -->
-<article class="intro-section" id="introduction">
-<p>Alors que l'intelligence artificielle continue de révolutionner le développement de logiciels, rester informé des
-Les derniers outils, frameworks et méthodologies sont cruciaux pour les développeurs et les professionnels DevSecOps.Cette page
-rassemble certaines des ressources d'IA les plus percutantes disponibles aujourd'hui.</p>
-<p>Que vous automatisiez des flux de travail, travailliez avec de grands modèles de langage ou déployiez des solutions d'IA, ces
-des ressources soigneusement sélectionnées vous aideront à mettre en œuvre les meilleures pratiques d’IA dans vos projets.</p>
-</article>
-<!-- Workflow Automation & Tools -->
-<section aria-labelledby="workflow-automation-heading" class="category-section" id="workflow-automation-ai-tools">
-<h2 class="category-title" id="workflow-automation-heading">
-<i class="fas fa-robot"></i>Outils d'automatisation des flux de travail et d'IA</h2>
-<div class="resource-grid">
-<!-- n8n Workflows Collection -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-project-diagram resource-card-icon"></i>Collection de flux de travail n8n</h3>
-<p>Découvrez une collection complète de plus de 4 000 workflows d'automatisation pour n8n, le logiciel gratuit et open source
-outil d'automatisation du flux de travail.Ces flux de travail prêts à l'emploi peuvent accélérer considérablement votre automatisation
-projets et inspirer des solutions personnalisées.</p>
-<a class="resource-link" href="https://korben.info/n8n-workflows-collection-4000-automatisations-gith.html" rel="noopener noreferrer" target="_blank">
-<i class="fas fa-external-link-alt"></i>Explorez les flux de travail n8n</a>
-</article>
-<!-- OpenCommit -->
-<article class="resource-card">
-<h3>
-<i class="fab fa-git-alt resource-card-icon"></i>OuvrirCommit</h3>
-<p>Un générateur de messages de validation Git alimenté par l'IA qui utilise des modèles GPT pour créer des messages significatifs et conventionnels.
-valider les messages automatiquement.Gagnez du temps et maintenez des normes de validation cohérentes dans tous vos projets
-avec prise en charge de plusieurs langues et formats de sortie personnalisables.</p>
-<a class="resource-link" href="https://github.com/di-sukharev/opencommit" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>Voir sur GitHub</a>
-</article>
-<!-- Opik -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-chart-line resource-card-icon"></i>Opik par Comet</h3>
-<p>Opik est une plateforme open source pour évaluer, tester et surveiller les applications LLM.Il fournit
-des outils complets pour suivre les expériences, comparer les résultats des modèles et garantir vos applications d'IA
-fonctionner de manière fiable en production.</p>
-<a class="resource-link" href="https://www.comet.com/docs/opik/" rel="noopener noreferrer" target="_blank">
-<i class="fas fa-book"></i>Lire la documentation</a>
-</article>
-<!-- NVIDIA OpenShell -->
-<article class="resource-card" id="nvidia-openshell">
-<h3>
-<i class="fas fa-shield-halved resource-card-icon"></i>NVIDIA OpenShell</h3>
-<p>Un environnement d'exécution en bac à sable pour les agents d'IA autonomes : conteneurs isolés, politiques YAML déclaratives pour
-le système de fichiers, le réseau, les processus et le routage d'inférence, ainsi que les fournisseurs d'informations d'identification afin que les clés restent hors du
-système de fichiers sandbox.Utile lorsque vous avez besoin d’une sortie gouvernée et d’une limite claire autour des outils d’agent.</p>
-<a class="resource-link" href="https://github.com/NVIDIA/OpenShell" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>Voir sur GitHub</a>
-</article>
-<!-- Open Terminal (open-webui) -->
-<article class="resource-card" id="open-terminal">
-<h3>
-<i class="fas fa-terminal resource-card-icon"></i>Terminal ouvert</h3>
-<p>Un terminal léger et auto-hébergé exposé sur une simple API REST afin que les agents d'IA et l'automatisation puissent s'exécuter
-commandes, gérer des fichiers et exécuter du code.Exécutez-le dans Docker pour l'isolation ou sur du métal nu pour un hôte complet
-accès lors du développement local.</p>
-<a class="resource-link" href="https://github.com/open-webui/open-terminal" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>Voir sur GitHub</a>
-</article>
-</div>
-</section>
-<!-- AI Models & Frameworks -->
-<section aria-labelledby="ai-models-frameworks-heading" class="category-section" id="ai-models-frameworks">
-<h2 class="category-title" id="ai-models-frameworks-heading">
-<i class="fas fa-microchip"></i>Modèles et cadres d'IA</h2>
-<div class="resource-grid">
-<!-- Nvidia Nemotron -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-server resource-card-icon"></i>Nvidia Nemotron 3 Nano</h3>
-<p>Le Nemotron 3 Nano de Nvidia est un modèle d'IA open source compact mais puissant conçu pour le déploiement en périphérie et
-environnements aux ressources limitées.Découvrez ce modèle efficace qui apporte une IA de niveau entreprise
-capacités à des facteurs de forme plus petits.</p>
-<a class="resource-link" href="https://korben.info/nvidia-nemotron-3-nano-modele-ia-open-source-2.html" rel="noopener noreferrer" target="_blank">
-<i class="fas fa-external-link-alt"></i>Apprendre encore plus</a>
-</article>
-<!-- Context7 -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-code resource-card-icon"></i>Contexte7</h3>
-<p>Context7 fournit une gestion avancée du contexte pour les applications d'IA, aidant ainsi les développeurs à en créer davantage.
-systèmes intelligents et contextuels.Indispensable pour créer des solutions d'IA sophistiquées qui comprennent
-et maintenir le contexte à travers les interactions.</p>
-<a class="resource-link" href="https://context7.com/" rel="noopener noreferrer" target="_blank">
-<i class="fas fa-globe"></i>Visitez le site Web</a>
-</article>
-<!-- Awesome MCP Servers -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-list resource-card-icon"></i>Super serveurs MCP</h3>
-<p>Une liste organisée de serveurs, d'outils et de ressources Model Context Protocol (MCP).Ce complet
-La collection aide les développeurs à découvrir et à intégrer des serveurs MCP pour créer de puissants outils améliorés par l'IA.
-applications avec partage de contexte standardisé.</p>
-<a class="resource-link" href="https://github.com/punkpeye/awesome-mcp-servers" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>Afficher le référentiel</a>
-</article>
-</div>
-</section>
-<!-- Learning Resources -->
-<section aria-labelledby="learning-understanding-heading" class="category-section" id="learning-understanding">
-<h2 class="category-title" id="learning-understanding-heading">
-<i class="fas fa-graduation-cap"></i>Apprendre et comprendre</h2>
-<div class="resource-grid">
-<!-- Visual Guide to Reasoning LLMs -->
-<article class="resource-card">
-<h3>
-<i class="fas fa-brain resource-card-icon"></i>Guide visuel des LLM de raisonnement</h3>
-<p>Un guide visuel détaillé qui démystifie le fonctionnement du raisonnement dans les grands modèles linguistiques.Parfait pour
-développeurs et passionnés d'IA qui souhaitent comprendre le fonctionnement interne des LLM modernes et comment ils
-aborder des tâches de raisonnement complexes.</p>
-<a class="resource-link" href="https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-reasoning-llms" rel="noopener noreferrer" target="_blank">
-<i class="fas fa-newspaper"></i>Lire l'article</a>
-</article>
-</div>
-</section>
-<!-- Best Practices Section -->
-<section aria-labelledby="general-best-practices-heading" class="category-section" id="general-best-practices">
-<h2 class="category-title" id="general-best-practices-heading">
-<i class="fas fa-check-circle"></i>Meilleures pratiques générales</h2>
-<article class="intro-section">
-<h3 class="intro-section__heading">Principes clés pour le développement de l'IA</h3>
-<ul class="intro-section__list">
-<li>
-<strong>Commencez avec des objectifs clairs :</strong>Définir à quoi ressemble le succès avant de mettre en œuvre l'IA
-solutions.</li>
-<li>
-<strong>Surveiller et évaluer :</strong>Suivez en permanence les performances du modèle et itérez en fonction de
-résultats du monde réel.</li>
-<li>
-<strong>Tenez compte de l’éthique et des préjugés :</strong>Auditez régulièrement vos systèmes d’IA pour en vérifier l’équité et les imprévus.
-préjugés.</li>
-<li>
-<strong>Automatisez de manière responsable :</strong>Utilisez des outils d'automatisation comme n8n et OpenCommit pour améliorer
-efficacité tout en maintenant la qualité du code.</li>
-<li>
-<strong>Restez à jour :</strong>Le paysage de l'IA évolue rapidement ;continuez à apprendre et à adapter votre
-pratiques.</li>
-<li>
-<strong>Testez minutieusement :</strong>Mettre en œuvre des cadres de tests complets pour les composants d'IA,
-surtout lors du déploiement en production.</li>
-<li>
-<strong>Documentez tout :</strong>Maintenir une documentation claire des versions de modèle, des données de formation et
-configurations de déploiement.</li>
-</ul>
-</article>
-</section>
-<!-- Popular AI platforms & tools -->
-<section aria-labelledby="nabla-platforms-heading" class="category-section nabla-platforms-section" id="popular-ai-platforms-tools">
-<h2 class="category-title" id="nabla-platforms-heading">
-<i aria-hidden="true" class="fas fa-layer-group"></i>Plateformes et outils d'IA populaires</h2>
-<div class="nabla-platforms-hero">
-<div class="nabla-platforms-visual-wrap">
-<span aria-hidden="true" class="nabla-platforms-orbit"></span>
-<figure class="nabla-platforms-figure">
-<img alt="Logo du site Nabla" decoding="async" height="200" loading="lazy" src="assets/nabla/nabla-4.svg" width="200"/>
-<figcaption class="nabla-platforms-caption">Un aperçu de l’écosystème que les équipes utilisent le plus souvent en 2025-2026.</figcaption>
-</figure>
-</div>
-<div class="nabla-platforms-lede">
-<h3>Des API aux modèles locaux</h3>
-<p>Outils d'IA utilisés : LLM hébergés, assistants de codage, plates-formes cloud ML, piles de récupération, orchestration et
-observabilité.Considérez cela comme une boussole et non comme une approbation d’un seul fournisseur.</p>
-</div>
-</div>
-<div class="nabla-platforms-matrix">
-<div class="nabla-platform-pillar" style="--pillar-accent: #0d6efd">
-<h3><i aria-hidden="true" class="fas fa-comments"></i>API LLM et chat</h3>
-<ul class="nabla-tool-tags">
-<li>OpenAI</li>
-<!--
+				</div>
+			</section>
+		</header>
+		<!-- Main Content -->
+		<main class="mb-5" id="main-content" role="main">
+			<section aria-label="Aperçu et ressources des meilleures pratiques en matière d'IA" class="content-section">
+				<!-- Introduction -->
+				<article class="intro-section" id="introduction">
+					<p>
+						Alors que l'intelligence artificielle continue de révolutionner le développement de logiciels, rester
+						informé des Les derniers outils, frameworks et méthodologies sont cruciaux pour les développeurs et les
+						professionnels DevSecOps.Cette page rassemble certaines des ressources d'IA les plus percutantes disponibles
+						aujourd'hui.
+					</p>
+					<p>
+						Que vous automatisiez des flux de travail, travailliez avec de grands modèles de langage ou déployiez des
+						solutions d'IA, ces des ressources soigneusement sélectionnées vous aideront à mettre en œuvre les
+						meilleures pratiques d’IA dans vos projets.
+					</p>
+				</article>
+				<!-- Workflow Automation & Tools -->
+				<section
+					aria-labelledby="workflow-automation-heading"
+					class="category-section"
+					id="workflow-automation-ai-tools"
+				>
+					<h2 class="category-title" id="workflow-automation-heading">
+						<i class="fas fa-robot"></i>Outils d'automatisation des flux de travail et d'IA
+					</h2>
+					<div class="resource-grid">
+						<!-- n8n Workflows Collection -->
+						<article class="resource-card">
+							<h3><i class="fas fa-project-diagram resource-card-icon"></i>Collection de flux de travail n8n</h3>
+							<p>
+								Découvrez une collection complète de plus de 4 000 workflows d'automatisation pour n8n, le logiciel
+								gratuit et open source outil d'automatisation du flux de travail.Ces flux de travail prêts à l'emploi
+								peuvent accélérer considérablement votre automatisation projets et inspirer des solutions
+								personnalisées.
+							</p>
+							<a
+								class="resource-link"
+								href="https://korben.info/n8n-workflows-collection-4000-automatisations-gith.html"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fas fa-external-link-alt"></i>Explorez les flux de travail n8n</a
+							>
+						</article>
+						<!-- OpenCommit -->
+						<article class="resource-card">
+							<h3><i class="fab fa-git-alt resource-card-icon"></i>OuvrirCommit</h3>
+							<p>
+								Un générateur de messages de validation Git alimenté par l'IA qui utilise des modèles GPT pour créer des
+								messages significatifs et conventionnels. valider les messages automatiquement.Gagnez du temps et
+								maintenez des normes de validation cohérentes dans tous vos projets avec prise en charge de plusieurs
+								langues et formats de sortie personnalisables.
+							</p>
+							<a
+								class="resource-link"
+								href="https://github.com/di-sukharev/opencommit"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fab fa-github"></i>Voir sur GitHub</a
+							>
+						</article>
+						<!-- Opik -->
+						<article class="resource-card">
+							<h3><i class="fas fa-chart-line resource-card-icon"></i>Opik par Comet</h3>
+							<p>
+								Opik est une plateforme open source pour évaluer, tester et surveiller les applications LLM.Il fournit
+								des outils complets pour suivre les expériences, comparer les résultats des modèles et garantir vos
+								applications d'IA fonctionner de manière fiable en production.
+							</p>
+							<a
+								class="resource-link"
+								href="https://www.comet.com/docs/opik/"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fas fa-book"></i>Lire la documentation</a
+							>
+						</article>
+						<!-- NVIDIA OpenShell -->
+						<article class="resource-card" id="nvidia-openshell">
+							<h3><i class="fas fa-shield-halved resource-card-icon"></i>NVIDIA OpenShell</h3>
+							<p>
+								Un environnement d'exécution en bac à sable pour les agents d'IA autonomes : conteneurs isolés,
+								politiques YAML déclaratives pour le système de fichiers, le réseau, les processus et le routage
+								d'inférence, ainsi que les fournisseurs d'informations d'identification afin que les clés restent hors
+								du système de fichiers sandbox.Utile lorsque vous avez besoin d’une sortie gouvernée et d’une limite
+								claire autour des outils d’agent.
+							</p>
+							<a
+								class="resource-link"
+								href="https://github.com/NVIDIA/OpenShell"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fab fa-github"></i>Voir sur GitHub</a
+							>
+						</article>
+						<!-- Open Terminal (open-webui) -->
+						<article class="resource-card" id="open-terminal">
+							<h3><i class="fas fa-terminal resource-card-icon"></i>Terminal ouvert</h3>
+							<p>
+								Un terminal léger et auto-hébergé exposé sur une simple API REST afin que les agents d'IA et
+								l'automatisation puissent s'exécuter commandes, gérer des fichiers et exécuter du code.Exécutez-le dans
+								Docker pour l'isolation ou sur du métal nu pour un hôte complet accès lors du développement local.
+							</p>
+							<a
+								class="resource-link"
+								href="https://github.com/open-webui/open-terminal"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fab fa-github"></i>Voir sur GitHub</a
+							>
+						</article>
+					</div>
+				</section>
+				<!-- AI Models & Frameworks -->
+				<section aria-labelledby="ai-models-frameworks-heading" class="category-section" id="ai-models-frameworks">
+					<h2 class="category-title" id="ai-models-frameworks-heading">
+						<i class="fas fa-microchip"></i>Modèles et cadres d'IA
+					</h2>
+					<div class="resource-grid">
+						<!-- Nvidia Nemotron -->
+						<article class="resource-card">
+							<h3><i class="fas fa-server resource-card-icon"></i>Nvidia Nemotron 3 Nano</h3>
+							<p>
+								Le Nemotron 3 Nano de Nvidia est un modèle d'IA open source compact mais puissant conçu pour le
+								déploiement en périphérie et environnements aux ressources limitées.Découvrez ce modèle efficace qui
+								apporte une IA de niveau entreprise capacités à des facteurs de forme plus petits.
+							</p>
+							<a
+								class="resource-link"
+								href="https://korben.info/nvidia-nemotron-3-nano-modele-ia-open-source-2.html"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fas fa-external-link-alt"></i>Apprendre encore plus</a
+							>
+						</article>
+						<!-- Context7 -->
+						<article class="resource-card">
+							<h3><i class="fas fa-code resource-card-icon"></i>Contexte7</h3>
+							<p>
+								Context7 fournit une gestion avancée du contexte pour les applications d'IA, aidant ainsi les
+								développeurs à en créer davantage. systèmes intelligents et contextuels.Indispensable pour créer des
+								solutions d'IA sophistiquées qui comprennent et maintenir le contexte à travers les interactions.
+							</p>
+							<a class="resource-link" href="https://context7.com/" rel="noopener noreferrer" target="_blank">
+								<i class="fas fa-globe"></i>Visitez le site Web</a
+							>
+						</article>
+						<!-- Awesome MCP Servers -->
+						<article class="resource-card">
+							<h3><i class="fas fa-list resource-card-icon"></i>Super serveurs MCP</h3>
+							<p>
+								Une liste organisée de serveurs, d'outils et de ressources Model Context Protocol (MCP).Ce complet La
+								collection aide les développeurs à découvrir et à intégrer des serveurs MCP pour créer de puissants
+								outils améliorés par l'IA. applications avec partage de contexte standardisé.
+							</p>
+							<a
+								class="resource-link"
+								href="https://github.com/punkpeye/awesome-mcp-servers"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fab fa-github"></i>Afficher le référentiel</a
+							>
+						</article>
+					</div>
+				</section>
+				<!-- Learning Resources -->
+				<section aria-labelledby="learning-understanding-heading" class="category-section" id="learning-understanding">
+					<h2 class="category-title" id="learning-understanding-heading">
+						<i class="fas fa-graduation-cap"></i>Apprendre et comprendre
+					</h2>
+					<div class="resource-grid">
+						<!-- Visual Guide to Reasoning LLMs -->
+						<article class="resource-card">
+							<h3><i class="fas fa-brain resource-card-icon"></i>Guide visuel des LLM de raisonnement</h3>
+							<p>
+								Un guide visuel détaillé qui démystifie le fonctionnement du raisonnement dans les grands modèles
+								linguistiques.Parfait pour développeurs et passionnés d'IA qui souhaitent comprendre le fonctionnement
+								interne des LLM modernes et comment ils aborder des tâches de raisonnement complexes.
+							</p>
+							<a
+								class="resource-link"
+								href="https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-reasoning-llms"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i class="fas fa-newspaper"></i>Lire l'article</a
+							>
+						</article>
+					</div>
+				</section>
+				<!-- Best Practices Section -->
+				<section aria-labelledby="general-best-practices-heading" class="category-section" id="general-best-practices">
+					<h2 class="category-title" id="general-best-practices-heading">
+						<i class="fas fa-check-circle"></i>Meilleures pratiques générales
+					</h2>
+					<article class="intro-section">
+						<h3 class="intro-section__heading">Principes clés pour le développement de l'IA</h3>
+						<ul class="intro-section__list">
+							<li>
+								<strong>Commencez avec des objectifs clairs :</strong>Définir à quoi ressemble le succès avant de mettre
+								en œuvre l'IA solutions.
+							</li>
+							<li>
+								<strong>Surveiller et évaluer :</strong>Suivez en permanence les performances du modèle et itérez en
+								fonction de résultats du monde réel.
+							</li>
+							<li>
+								<strong>Tenez compte de l’éthique et des préjugés :</strong>Auditez régulièrement vos systèmes d’IA pour
+								en vérifier l’équité et les imprévus. préjugés.
+							</li>
+							<li>
+								<strong>Automatisez de manière responsable :</strong>Utilisez des outils d'automatisation comme n8n et
+								OpenCommit pour améliorer efficacité tout en maintenant la qualité du code.
+							</li>
+							<li>
+								<strong>Restez à jour :</strong>Le paysage de l'IA évolue rapidement ;continuez à apprendre et à adapter
+								votre pratiques.
+							</li>
+							<li>
+								<strong>Testez minutieusement :</strong>Mettre en œuvre des cadres de tests complets pour les composants
+								d'IA, surtout lors du déploiement en production.
+							</li>
+							<li>
+								<strong>Documentez tout :</strong>Maintenir une documentation claire des versions de modèle, des données
+								de formation et configurations de déploiement.
+							</li>
+						</ul>
+					</article>
+				</section>
+				<!-- Popular AI platforms & tools -->
+				<section
+					aria-labelledby="nabla-platforms-heading"
+					class="category-section nabla-platforms-section"
+					id="popular-ai-platforms-tools"
+				>
+					<h2 class="category-title" id="nabla-platforms-heading">
+						<i aria-hidden="true" class="fas fa-layer-group"></i>Plateformes et outils d'IA populaires
+					</h2>
+					<div class="nabla-platforms-hero">
+						<div class="nabla-platforms-visual-wrap">
+							<span aria-hidden="true" class="nabla-platforms-orbit"></span>
+							<figure class="nabla-platforms-figure">
+								<img
+									alt="Logo du site Nabla"
+									decoding="async"
+									height="200"
+									loading="lazy"
+									src="assets/nabla/nabla-4.svg"
+									width="200"
+								/>
+								<figcaption class="nabla-platforms-caption">
+									Un aperçu de l’écosystème que les équipes utilisent le plus souvent en 2025-2026.
+								</figcaption>
+							</figure>
+						</div>
+						<div class="nabla-platforms-lede">
+							<h3>Des API aux modèles locaux</h3>
+							<p>
+								Outils d'IA utilisés : LLM hébergés, assistants de codage, plates-formes cloud ML, piles de
+								récupération, orchestration et observabilité.Considérez cela comme une boussole et non comme une
+								approbation d’un seul fournisseur.
+							</p>
+						</div>
+					</div>
+					<div class="nabla-platforms-matrix">
+						<div class="nabla-platform-pillar" style="--pillar-accent: #0d6efd">
+							<h3><i aria-hidden="true" class="fas fa-comments"></i>API LLM et chat</h3>
+							<ul class="nabla-tool-tags">
+								<li>OpenAI</li>
+								<!--
 								<li>Groq</li>
 								<li>Cohere</li>
 								<li>Anthropic (Claude)</li>
 								<li>Google Gemini</li>
 								<li>Mistral AI</li>
 						  	-->
-<li>Azure OpenAI</li>
-<li>Ouvrir l'interface Web</li>
-<li>IA locale</li>
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #6f42c1">
-<h3><i aria-hidden="true" class="fas fa-code"></i>Assistants de codage et AIDE</h3>
-<ul class="nabla-tool-tags">
-<li>Copilote GitHub</li>
-<li>Curseur</li>
-<li>Développeur Amazon Q</li>
-<li>Poussière</li>
-<!--<li>Continue.dev</li>-->
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #0dcaf0">
-<h3><i aria-hidden="true" class="fas fa-cloud"></i>Cloud ML et blocs-notes</h3>
-<ul class="nabla-tool-tags">
-<li>Apprentissage automatique Azure</li>
-<li>Visage câlin</li>
-<!--
+								<li>Azure OpenAI</li>
+								<li>Ouvrir l'interface Web</li>
+								<li>IA locale</li>
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #6f42c1">
+							<h3><i aria-hidden="true" class="fas fa-code"></i>Assistants de codage et AIDE</h3>
+							<ul class="nabla-tool-tags">
+								<li>Copilote GitHub</li>
+								<li>Curseur</li>
+								<li>Développeur Amazon Q</li>
+								<li>Poussière</li>
+								<!--<li>Continue.dev</li>-->
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #0dcaf0">
+							<h3><i aria-hidden="true" class="fas fa-cloud"></i>Cloud ML et blocs-notes</h3>
+							<ul class="nabla-tool-tags">
+								<li>Apprentissage automatique Azure</li>
+								<li>Visage câlin</li>
+								<!--
 								<li>AWS SageMaker</li>
 								<li>Google Vertex AI</li>
 								-->
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #198754">
-<h3><i aria-hidden="true" class="fas fa-database"></i>RAG, vecteurs et frameworks</h3>
-<ul class="nabla-tool-tags">
-<li>LangChaîne</li>
-<li>PGvecteur</li>
-<li>Recherche élastique</li>
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #fd7e14">
-<h3><i aria-hidden="true" class="fas fa-diagram-project"></i>Agents et automatisation</h3>
-<ul class="nabla-tool-tags">
-<li>n8n</li>
-<li>LangGraph</li>
-<li>Zapier.HubSpot</li>
-<li>ÉquipageAI</li>
-<li>Temporal</li>
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #d63384">
-<h3><i aria-hidden="true" class="fas fa-eye"></i>Évaluations, traces et surveillance</h3>
-<ul class="nabla-tool-tags">
-<!--<li>LangSmith</li>-->
-<li>Pondérations et biais</li>
-<li>LangFuse</li>
-<li>OpenTélémétrie</li>
-</ul>
-</div>
-<div class="nabla-platform-pillar" style="--pillar-accent: #20c997">
-<h3><i aria-hidden="true" class="fas fa-microchip"></i>Inférence locale et ouverte</h3>
-<ul class="nabla-tool-tags">
-<li>Être</li>
-<li>LiteLLM</li>
-<!--<li>vLLM</li>
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #198754">
+							<h3><i aria-hidden="true" class="fas fa-database"></i>RAG, vecteurs et frameworks</h3>
+							<ul class="nabla-tool-tags">
+								<li>LangChaîne</li>
+								<li>PGvecteur</li>
+								<li>Recherche élastique</li>
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #fd7e14">
+							<h3><i aria-hidden="true" class="fas fa-diagram-project"></i>Agents et automatisation</h3>
+							<ul class="nabla-tool-tags">
+								<li>n8n</li>
+								<li>LangGraph</li>
+								<li>Zapier.HubSpot</li>
+								<li>ÉquipageAI</li>
+								<li>Temporal</li>
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #d63384">
+							<h3><i aria-hidden="true" class="fas fa-eye"></i>Évaluations, traces et surveillance</h3>
+							<ul class="nabla-tool-tags">
+								<!--<li>LangSmith</li>-->
+								<li>Pondérations et biais</li>
+								<li>LangFuse</li>
+								<li>OpenTélémétrie</li>
+							</ul>
+						</div>
+						<div class="nabla-platform-pillar" style="--pillar-accent: #20c997">
+							<h3><i aria-hidden="true" class="fas fa-microchip"></i>Inférence locale et ouverte</h3>
+							<ul class="nabla-tool-tags">
+								<li>Être</li>
+								<li>LiteLLM</li>
+								<!--<li>vLLM</li>
 								<li>llama.cpp</li>-->
-<li>LM Studio / AnythingsLLM</li>
-<li>OuvrirRAG</li>
-<li>OpenTerminal/Warp</li>
-</ul>
-</div>
-</div>
-</section>
-<!-- FinOps-style visibility & governance for LLM token spend -->
-<section aria-labelledby="ai-token-finops-heading" class="category-section" id="ai-token-finops">
-<h2 class="category-title" id="ai-token-finops-heading">
-<i aria-hidden="true" class="fas fa-chart-pie"></i>Dépenses en jetons et contrôle FinOps</h2>
-<p style="margin-bottom: 1.5rem; color: var(--text-secondary); line-height: 1.65">Traitez l'utilisation du modèle comme les dépenses cloud : voyez qui brûle les jetons, définissez les budgets et acheminez le trafic via un compteur.
-passerelle : discipline FinOps appliquée à l'inférence LLM plutôt qu'aux seules machines virtuelles et compartiments.</p>
-<div class="resource-grid">
-<article class="resource-card">
-<h3>
-<img alt="" class="ai-oss-logo ai-oss-logo--invert" decoding="async" height="32" src="assets/logo-cursor-simple.svg" width="32"/>Analyse de l'utilisation du curseur</h3>
-<p>La vue analytique du tableau de bord du curseur vous aide à examiner les modèles de jetons et d'utilisation de votre compte afin que vous puissiez
-voyez combien vous consommez au fil du temps et ajustez les flux de travail ou les plans en conséquence.</p>
-<a class="resource-link" href="https://cursor.com/dashboard/analytics" rel="noopener noreferrer" target="_blank">
-<i aria-hidden="true" class="fas fa-external-link-alt"></i>Analyse du curseur ouvert</a>
-</article>
-<article class="resource-card">
-<h3>
-<img alt="" class="ai-oss-logo" decoding="async" height="32" src="assets/logo-litellm-simple.png" width="32"/>LiteLLM</h3>
-<p>Passerelle AI open source et SDK Python pour accéder à de nombreux fournisseurs dans un format compatible OpenAI, avec
-le routage, les solutions de secours, les budgets et les hooks d'observabilité : utiles lorsque vous souhaitez une surface d'intégration pour
-de nombreux modèles.Consultez le site du projet pour connaître les fonctionnalités et les options de déploiement.</p>
-<a class="resource-link" href="https://www.litellm.ai/" rel="noopener noreferrer" target="_blank">
-<i aria-hidden="true" class="fas fa-external-link-alt"></i>LiteLLM</a>
-</article>
-</div>
-</section>
-<!-- Document ingestion pipeline -->
-<section aria-labelledby="document-pipeline-heading" class="category-section" id="document-pipeline">
-<h2 class="category-title" id="document-pipeline-heading">
-<i aria-hidden="true" class="fas fa-file-pdf"></i>Mon pipeline de documents</h2>
-<p style="margin-bottom: 1.5rem; color: var(--text-secondary); line-height: 1.65">Un flux PDF-connaissance pratique : normalisez les PDF localement, archivez et OCR dans Paperless, enrichissez avec
-Paperless-AI, exécutez éventuellement un résumé et une traduction via des flux de travail temporels durables, puis travaillez
-avec le corpus dans AnythingLLM (avec Paperless-ngx connecté pour des vérifications rapides).Enfin, chargez le
-connaissances consolidées dans<a href="https://github.com/langflow-ai/openrag" rel="noopener noreferrer" target="_blank">OuvrirRAG</a>et
-exposez-le via un outil MCP développé en interne afin que tous les autres agents ou clients de chat puissent réutiliser la même récupération
-surface.</p>
-<ol class="ai-doc-pipeline">
-<li>
-<img alt="" class="ai-oss-logo" decoding="async" height="36" src="assets/logo-stirling-pdf-simple.svg" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://github.com/Stirling-Tools/Stirling-PDF" rel="noopener noreferrer" target="_blank">PDF sur Stirling</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Divisez, fusionnez, faites pivoter ou nettoyez localement les PDF avant l'ingestion afin que les téléchargements soient cohérents et plus petits.</div>
-</li>
-<li>
-<img alt="" class="ai-oss-logo ai-oss-logo--invert" decoding="async" height="36" src="assets/logo-paperless-ngx-simple.svg" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://docs.paperless-ngx.com/" rel="noopener noreferrer" target="_blank">Sans papier-ngx</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Téléchargez les PDF préparés ;Paperless-ngx stocke, indexe et exécute la consommation de documents (balises,
-correspondants, archives consultables).</div>
-</li>
-<li>
-<img alt="" class="ai-oss-logo" decoding="async" height="36" src="assets/logo-paperless-ai-simple.png" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://github.com/clusterzx/paperless-ai" rel="noopener noreferrer" target="_blank">IA sans papier</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Laissez Paperless-AI traiter les documents après leur ingestion (classification, métadonnées, workflows orientés RAG,
-selon votre configuration);attendez la fin du traitement avant de vous fier au texte ou aux balises extraites.</div>
-</li>
-<li>
-<img alt="" class="ai-oss-logo ai-oss-logo--invert" decoding="async" height="36" src="assets/logo-temporal-simple.svg" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://temporal.io/" rel="noopener noreferrer" target="_blank">Temporal</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Orchestrez un flux de travail de suivi : résumez des documents longs, traduisez le contenu dans d'autres langues,
-enchaînez les étapes humaines et réessayez les activités de manière fiable.Temporal conserve l'état et les minuteries pour vous
-ces pipelines survivent aux redémarrages et restent observables.<a href="https://github.com/temporalio/temporal" rel="noopener noreferrer" target="_blank">temporalio/temporel</a>est le serveur open source ;associez-le à des travailleurs qui appellent votre LLM ou vos API de traduction.</div>
-</li>
-<li>
-<img alt="" class="ai-oss-logo ai-oss-logo--wide" decoding="async" height="36" src="assets/logo-anythingllm-simple.png" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://github.com/AlbanAndrieu/anything-llm/blob/master/docker/HOW_TO_USE_DOCKER.md" rel="noopener noreferrer" target="_blank">N'importe quoiLLM (Docker)</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Utilisez un serveur auto-hébergé<a href="https://github.com/mintplex-labs/anything-llm" rel="noopener noreferrer" target="_blank">N'importe quoiLLM</a>instance (par exemple via Docker) pour extraire le contenu traité dans un espace de travail de discussion/RAG privé.Comme
-Paperless-ngx est intégré à AnythingLLM, vous pouvez parcourir et interroger le même ensemble de documents à partir du
-discutez dans l'interface utilisateur et vérifiez rapidement que l'OCR, les balises et les résumés ou traductions en aval semblent corrects.Le
-Le guide lié couvre les montages de stockage, les variables d'environnement et l'accès aux services hôte à partir du
-conteneur.</div>
-</li>
-<li>
-<img alt="" class="ai-oss-logo ai-oss-logo--invert" decoding="async" height="36" src="assets/logo-openrag-langflow-simple.svg" width="36"/>
-<div class="ai-doc-pipeline__body">
-<strong><a href="https://github.com/langflow-ai/openrag" rel="noopener noreferrer" target="_blank">OuvrirRAG</a></strong>
-<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Transférez le corpus complet et vérifié dans OpenRAG : la pile en amont combine les workflows Langflow, Docling
-l'analyse et la récupération basée sur OpenSearch afin que vous obteniez un seul package pour l'ingestion, la recherche et le chat
-sur vos documents.De là, connectez un<strong>serveur MCP personnalisé</strong>que vous possédez (enveloppez les API d'OpenRAG ou suivez le même contexte de modèle
-Modèles de protocole en tant que projet<code>openrag-mcp</code>helper) et enregistrez-le dans Cursor, Claude
-Desktop ou tout autre hôte compatible MCP.Plus tard, tous les autres agents ou assistants IA pourront appeler ces outils
-au lieu de réimplémenter l’accès à votre base de connaissances.</div>
-</li>
-</ol>
-</section>
-</section>
-<!-- Contact Section -->
-<section class="contact-section" id="contact">
-<div class="contact-container">
-<h2 class="section-title">Travaillons ensemble</h2>
-<p class="section-subtitle">Prêt à transformer vos pratiques DevOps ?Prenez contact pour discuter de votre projet.</p>
-<div class="contact-methods">
-<a class="contact-method" href="mailto:job@dr-alban.com">
-<div class="contact-icon">
-<i class="fas fa-envelope"></i>
-</div>
-<div class="contact-info">
-<h4>E-mail</h4>
-<p>job@dr-alban.com</p>
-</div>
-</a>
-<a class="contact-method" href="https://www.linkedin.com/in/nabla" target="_blank">
-<div class="contact-icon">
-<i class="fab fa-linkedin"></i>
-</div>
-<div class="contact-info">
-<h4>LinkedIn</h4>
-<p>Connectez-vous avec moi</p>
-</div>
-</a>
-<a class="contact-method" href="https://calendly.com/alban-andrieu" target="_blank">
-<div class="contact-icon">
-<i class="fa fa-calendar-plus"></i>
-</div>
-<div class="contact-info">
-<h4>Calendement</h4>
-<p>Avoir un appel</p>
-</div>
-</a>
-<a class="contact-method" href="https://github.com/AlbanAndrieu" target="_blank">
-<div class="contact-icon">
-<i class="fab fa-github"></i>
-</div>
-<div class="contact-info">
-<h4>GitHub</h4>
-<p>Voir mon travail</p>
-</div>
-</a>
-</div>
-<div style="margin-top: 3rem">
-<img alt="Nabla Logo" src="assets/nabla/nabla-4.svg" style="width: 120px; opacity: 0.6"/>
-</div>
-				<!-- Stack Exchange Badge -->
-				<div style="margin-top: 3rem; text-align: center; display: flex; justify-content: center;">
-					<a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer">
-						<img
-							src="https://stackexchange.com/users/flair/4652074.png"
-							width="208"
-							height="58"
-							alt="Stack Exchange profile for AlbanAndrieu"
-							title="Stack Exchange profile for AlbanAndrieu"
-						/>
-					</a>
+								<li>LM Studio / AnythingsLLM</li>
+								<li>OuvrirRAG</li>
+								<li>OpenTerminal/Warp</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- FinOps-style visibility & governance for LLM token spend -->
+				<section aria-labelledby="ai-token-finops-heading" class="category-section" id="ai-token-finops">
+					<h2 class="category-title" id="ai-token-finops-heading">
+						<i aria-hidden="true" class="fas fa-chart-pie"></i>Dépenses en jetons et contrôle FinOps
+					</h2>
+					<p style="margin-bottom: 1.5rem; color: var(--text-secondary); line-height: 1.65">
+						Traitez l'utilisation du modèle comme les dépenses cloud : voyez qui brûle les jetons, définissez les
+						budgets et acheminez le trafic via un compteur. passerelle : discipline FinOps appliquée à l'inférence LLM
+						plutôt qu'aux seules machines virtuelles et compartiments.
+					</p>
+					<div class="resource-grid">
+						<article class="resource-card">
+							<h3>
+								<img
+									alt=""
+									class="ai-oss-logo ai-oss-logo--invert"
+									decoding="async"
+									height="32"
+									src="assets/logo-cursor-simple.svg"
+									width="32"
+								/>Analyse de l'utilisation du curseur
+							</h3>
+							<p>
+								La vue analytique du tableau de bord du curseur vous aide à examiner les modèles de jetons et
+								d'utilisation de votre compte afin que vous puissiez voyez combien vous consommez au fil du temps et
+								ajustez les flux de travail ou les plans en conséquence.
+							</p>
+							<a
+								class="resource-link"
+								href="https://cursor.com/dashboard/analytics"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<i aria-hidden="true" class="fas fa-external-link-alt"></i>Analyse du curseur ouvert</a
+							>
+						</article>
+						<article class="resource-card">
+							<h3>
+								<img
+									alt=""
+									class="ai-oss-logo"
+									decoding="async"
+									height="32"
+									src="assets/logo-litellm-simple.png"
+									width="32"
+								/>LiteLLM
+							</h3>
+							<p>
+								Passerelle AI open source et SDK Python pour accéder à de nombreux fournisseurs dans un format
+								compatible OpenAI, avec le routage, les solutions de secours, les budgets et les hooks d'observabilité :
+								utiles lorsque vous souhaitez une surface d'intégration pour de nombreux modèles.Consultez le site du
+								projet pour connaître les fonctionnalités et les options de déploiement.
+							</p>
+							<a class="resource-link" href="https://www.litellm.ai/" rel="noopener noreferrer" target="_blank">
+								<i aria-hidden="true" class="fas fa-external-link-alt"></i>LiteLLM</a
+							>
+						</article>
+					</div>
+				</section>
+				<!-- Document ingestion pipeline -->
+				<section aria-labelledby="document-pipeline-heading" class="category-section" id="document-pipeline">
+					<h2 class="category-title" id="document-pipeline-heading">
+						<i aria-hidden="true" class="fas fa-file-pdf"></i>Mon pipeline de documents
+					</h2>
+					<p style="margin-bottom: 1.5rem; color: var(--text-secondary); line-height: 1.65">
+						Un flux PDF-connaissance pratique : normalisez les PDF localement, archivez et OCR dans Paperless,
+						enrichissez avec Paperless-AI, exécutez éventuellement un résumé et une traduction via des flux de travail
+						temporels durables, puis travaillez avec le corpus dans AnythingLLM (avec Paperless-ngx connecté pour des
+						vérifications rapides).Enfin, chargez le connaissances consolidées dans<a
+							href="https://github.com/langflow-ai/openrag"
+							rel="noopener noreferrer"
+							target="_blank"
+							>OuvrirRAG</a
+						>et exposez-le via un outil MCP développé en interne afin que tous les autres agents ou clients de chat
+						puissent réutiliser la même récupération surface.
+					</p>
+					<ol class="ai-doc-pipeline">
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo"
+								decoding="async"
+								height="36"
+								src="assets/logo-stirling-pdf-simple.svg"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong
+									><a href="https://github.com/Stirling-Tools/Stirling-PDF" rel="noopener noreferrer" target="_blank"
+										>PDF sur Stirling</a
+									></strong
+								>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Divisez, fusionnez, faites pivoter ou
+								nettoyez localement les PDF avant l'ingestion afin que les téléchargements soient cohérents et plus
+								petits.
+							</div>
+						</li>
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo ai-oss-logo--invert"
+								decoding="async"
+								height="36"
+								src="assets/logo-paperless-ngx-simple.svg"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong
+									><a href="https://docs.paperless-ngx.com/" rel="noopener noreferrer" target="_blank"
+										>Sans papier-ngx</a
+									></strong
+								>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Téléchargez les PDF préparés ;Paperless-ngx
+								stocke, indexe et exécute la consommation de documents (balises, correspondants, archives consultables).
+							</div>
+						</li>
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo"
+								decoding="async"
+								height="36"
+								src="assets/logo-paperless-ai-simple.png"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong
+									><a href="https://github.com/clusterzx/paperless-ai" rel="noopener noreferrer" target="_blank"
+										>IA sans papier</a
+									></strong
+								>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Laissez Paperless-AI traiter les documents
+								après leur ingestion (classification, métadonnées, workflows orientés RAG, selon votre
+								configuration);attendez la fin du traitement avant de vous fier au texte ou aux balises extraites.
+							</div>
+						</li>
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo ai-oss-logo--invert"
+								decoding="async"
+								height="36"
+								src="assets/logo-temporal-simple.svg"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong><a href="https://temporal.io/" rel="noopener noreferrer" target="_blank">Temporal</a></strong>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Orchestrez un flux de travail de suivi :
+								résumez des documents longs, traduisez le contenu dans d'autres langues, enchaînez les étapes humaines
+								et réessayez les activités de manière fiable.Temporal conserve l'état et les minuteries pour vous ces
+								pipelines survivent aux redémarrages et restent observables.<a
+									href="https://github.com/temporalio/temporal"
+									rel="noopener noreferrer"
+									target="_blank"
+									>temporalio/temporel</a
+								>est le serveur open source ;associez-le à des travailleurs qui appellent votre LLM ou vos API de
+								traduction.
+							</div>
+						</li>
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo ai-oss-logo--wide"
+								decoding="async"
+								height="36"
+								src="assets/logo-anythingllm-simple.png"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong
+									><a
+										href="https://github.com/AlbanAndrieu/anything-llm/blob/master/docker/HOW_TO_USE_DOCKER.md"
+										rel="noopener noreferrer"
+										target="_blank"
+										>N'importe quoiLLM (Docker)</a
+									></strong
+								>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Utilisez un serveur auto-hébergé<a
+									href="https://github.com/mintplex-labs/anything-llm"
+									rel="noopener noreferrer"
+									target="_blank"
+									>N'importe quoiLLM</a
+								>instance (par exemple via Docker) pour extraire le contenu traité dans un espace de travail de
+								discussion/RAG privé.Comme Paperless-ngx est intégré à AnythingLLM, vous pouvez parcourir et interroger
+								le même ensemble de documents à partir du discutez dans l'interface utilisateur et vérifiez rapidement
+								que l'OCR, les balises et les résumés ou traductions en aval semblent corrects.Le Le guide lié couvre
+								les montages de stockage, les variables d'environnement et l'accès aux services hôte à partir du
+								conteneur.
+							</div>
+						</li>
+						<li>
+							<img
+								alt=""
+								class="ai-oss-logo ai-oss-logo--invert"
+								decoding="async"
+								height="36"
+								src="assets/logo-openrag-langflow-simple.svg"
+								width="36"
+							/>
+							<div class="ai-doc-pipeline__body">
+								<strong
+									><a href="https://github.com/langflow-ai/openrag" rel="noopener noreferrer" target="_blank"
+										>OuvrirRAG</a
+									></strong
+								>
+								<span aria-hidden="true" class="ai-doc-pipeline__sep"></span>Transférez le corpus complet et vérifié
+								dans OpenRAG : la pile en amont combine les workflows Langflow, Docling l'analyse et la récupération
+								basée sur OpenSearch afin que vous obteniez un seul package pour l'ingestion, la recherche et le chat
+								sur vos documents.De là, connectez un<strong>serveur MCP personnalisé</strong>que vous possédez
+								(enveloppez les API d'OpenRAG ou suivez le même contexte de modèle Modèles de protocole en tant que
+								projet<code>openrag-mcp</code>helper) et enregistrez-le dans Cursor, Claude Desktop ou tout autre hôte
+								compatible MCP.Plus tard, tous les autres agents ou assistants IA pourront appeler ces outils au lieu de
+								réimplémenter l’accès à votre base de connaissances.
+							</div>
+						</li>
+					</ol>
+				</section>
+			</section>
+			<!-- Contact Section -->
+			<section class="contact-section" id="contact">
+				<div class="contact-container">
+					<h2 class="section-title">Travaillons ensemble</h2>
+					<p class="section-subtitle">
+						Prêt à transformer vos pratiques DevOps ?Prenez contact pour discuter de votre projet.
+					</p>
+					<div class="contact-methods">
+						<a class="contact-method" href="mailto:job@albanandrieu.com">
+							<div class="contact-icon">
+								<i class="fas fa-envelope"></i>
+							</div>
+							<div class="contact-info">
+								<h4>E-mail</h4>
+								<p>job@albanandrieu.com</p>
+							</div>
+						</a>
+						<a class="contact-method" href="https://www.linkedin.com/in/nabla" target="_blank">
+							<div class="contact-icon">
+								<i class="fab fa-linkedin"></i>
+							</div>
+							<div class="contact-info">
+								<h4>LinkedIn</h4>
+								<p>Connectez-vous avec moi</p>
+							</div>
+						</a>
+						<a class="contact-method" href="https://calendly.com/alban-andrieu" target="_blank">
+							<div class="contact-icon">
+								<i class="fa fa-calendar-plus"></i>
+							</div>
+							<div class="contact-info">
+								<h4>Calendly</h4>
+								<p>Avoir un appel</p>
+							</div>
+						</a>
+						<a class="contact-method" href="https://github.com/AlbanAndrieu" target="_blank">
+							<div class="contact-icon">
+								<i class="fab fa-github"></i>
+							</div>
+							<div class="contact-info">
+								<h4>GitHub</h4>
+								<p>Voir mon travail</p>
+							</div>
+						</a>
+					</div>
+					<div style="margin-top: 3rem">
+						<img alt="Nabla Logo" src="assets/nabla/nabla-4.svg" style="width: 120px; opacity: 0.6" />
+					</div>
+					<!-- Stack Exchange Badge -->
+					<div style="margin-top: 3rem; text-align: center; display: flex; justify-content: center">
+						<a href="https://stackexchange.com/users/4652074/albanandrieu" target="_blank" rel="noopener noreferrer">
+							<img
+								src="https://stackexchange.com/users/flair/4652074.png"
+								width="208"
+								height="58"
+								alt="Stack Exchange profile for AlbanAndrieu"
+								title="Stack Exchange profile for AlbanAndrieu"
+							/>
+						</a>
+					</div>
+					<!-- End of Stack Exchange Badge -->
 				</div>
-				<!-- End of Stack Exchange Badge -->
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="footer" role="contentinfo">
-<div class="social-links">
-<a aria-label="LinkedIn" class="social-link" href="https://www.linkedin.com/in/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-linkedin-in"></i>
-</a>
-<a aria-label="Calendly" class="social-link" href="https://calendly.com/alban-andrieu" rel="noopener noreferrer" target="_blank">
-<i class="fa fa-calendar-plus"></i>
-</a>
-<a aria-label="GitHub" class="social-link" href="https://github.com/AlbanAndrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>
-</a>
-<a aria-label="Docker Hub" class="social-link" href="https://hub.docker.com/u/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-docker"></i>
-</a>
-<a aria-label="Stack Exchange" class="social-link" href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-stack-exchange"></i>
-</a>
-</div>
-<div class="footer-links">
-<a href="/policy/legal.html">Legal notices</a>
-<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
-</div>
-<p class="text-md-center mt-3">
-<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
-<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
-</p>
-<p class="footer-copyright"></p>
-</footer>
-<!-- End footer section -->
-<!-- Bootstrap JS -->
-<script crossorigin="anonymous" integrity="sha512-1TK5EkM3S/pmOdAMlRjBH+Ja3EAWv5VdxgAV7qXJ8SgZaHvPxOAUAe7hPcPtQ5Gs+XLsUHMgJNhpBUYEOCfV1w==" referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.bundle.min.js"></script>
-<script data-axeptio="" data-coffee-fab="" data-print-pdf="" data-reveal-effect="opacity" data-scroll-reveal=".resource-card" defer="" src="site-widgets.js"></script>
-</body>
+			</section>
+		</main>
+		<!-- Footer -->
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					aria-label="LinkedIn"
+					class="social-link"
+					href="https://www.linkedin.com/in/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					aria-label="Calendly"
+					class="social-link"
+					href="https://calendly.com/alban-andrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					aria-label="GitHub"
+					class="social-link"
+					href="https://github.com/AlbanAndrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					aria-label="Docker Hub"
+					class="social-link"
+					href="https://hub.docker.com/u/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					aria-label="Stack Exchange"
+					class="social-link"
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
+				<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<!-- End footer section -->
+		<!-- Bootstrap JS -->
+		<script
+			crossorigin="anonymous"
+			integrity="sha512-1TK5EkM3S/pmOdAMlRjBH+Ja3EAWv5VdxgAV7qXJ8SgZaHvPxOAUAe7hPcPtQ5Gs+XLsUHMgJNhpBUYEOCfV1w=="
+			referrerpolicy="no-referrer"
+			src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.bundle.min.js"
+		></script>
+		<script
+			data-axeptio=""
+			data-coffee-fab=""
+			data-print-pdf=""
+			data-reveal-effect="opacity"
+			data-scroll-reveal=".resource-card"
+			defer=""
+			src="site-widgets.js"
+		></script>
+	</body>
 </html>

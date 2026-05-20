@@ -1,82 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Checkout | Alban Andrieu</title>
-<meta content="noindex, nofollow" name="robots"/>
-<!-- Favicon -->
-<link href="assets/nabla/nabla-4.svg" rel="icon"/>
-<!-- Resume Schema Reference for Machine-Readable Tools -->
-<link href="/cv/schema.json" rel="alternate" title="Resume Schema (JSONResume format)" type="application/json"/>
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css" rel="stylesheet" type="text/css"/>
-<script data-auto-replace-svg="nest" src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"></script>
-<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-<script src="https://dr-alban.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
-<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
-<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/brands.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/solid.css" rel="stylesheet"/>
-<!-- Theme toggle script - load early to prevent flash -->
-<script src="../theme-toggle.js"></script>
-<!-- Custom CSS -->
-<link href="landing-sections.css" rel="stylesheet"/>
-<link href="wireframe.css" rel="stylesheet"/>
-<link href="arf.css" rel="stylesheet"/>
-<link href="theme.css" rel="stylesheet"/>
-<link href="style.css" rel="stylesheet"/>
-<!-- Print Styles for PDF Export -->
-<link href="print.css" rel="stylesheet"/>
-<link href="site-content-page.css" rel="stylesheet"/>
-<link href="checkout.css" rel="stylesheet"/>
-</head>
-<body class="site-content-page">
-<a name="top"></a>
-<!-- Skip to main content link for accessibility -->
-<a class="skip-to-main" href="#main-content">Skip to main content</a>
-<!-- Main Content -->
-<main class="checkout-page" id="main-content">
-<section class="checkout-card">
-<div class="product">
-<img alt="Nabla" height="64" src="https://dr-alban.com/assets/nabla/nabla-4.svg" width="64"/>
-<div class="description">
-<h2 class="checkout-title">Paiement</h2>
-<p class="checkout-subtitle">Paiement unique via Stripe.Paiement sécurisé.</p>
-</div>
-</div>
-<figure class="checkout-qr">
-<img alt="Code QR pour ouvrir ce paiement Stripe sur votre téléphone" decoding="async" height="1055" src="assets/stripe/tjm-stripe.png" width="880"/>
-<figcaption class="checkout-qr-caption">Ou scannez ce QR code pour payer sur votre téléphone</figcaption>
-</figure>
-<form action="/api/create-checkout-session" class="checkout-form" method="POST">
-<button class="checkout-button" id="checkout-button" type="submit">
-<i aria-hidden="true" class="fa-solid fa-lock"></i>Passer à la caisse</button>
-</form>
-<p class="checkout-footer">
-<a href="/">Retour au site</a>
-</p>
-</section>
-</main>
-<footer class="footer" role="contentinfo">
-<div class="social-links">
-<a aria-label="LinkedIn" class="social-link" href="https://www.linkedin.com/in/nabla" rel="noopener noreferrer" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-<a aria-label="Calendly" class="social-link" href="https://calendly.com/alban-andrieu" rel="noopener noreferrer" target="_blank"><i class="fa fa-calendar-plus"></i></a>
-<a aria-label="GitHub" class="social-link" href="https://github.com/AlbanAndrieu" rel="noopener noreferrer" target="_blank"><i class="fab fa-github"></i></a>
-<a aria-label="Docker Hub" class="social-link" href="https://hub.docker.com/u/nabla" rel="noopener noreferrer" target="_blank"><i class="fab fa-docker"></i></a>
-<a aria-label="Stack Exchange" class="social-link" href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank"><i class="fab fa-stack-exchange"></i></a>
-</div>
-<div class="footer-links">
-<a href="/policy/legal.html">Legal notices</a>
-<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
-</div>
-<p class="text-md-center mt-3">
-<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
-<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
-</p>
-<p class="footer-copyright"></p>
-</footer>
-<script data-no-coffee-fab="" data-no-print-pdf="" defer="" src="/site-widgets.js"></script>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<title>Checkout | Alban Andrieu</title>
+		<meta content="noindex, nofollow" name="robots" />
+		<!-- Favicon -->
+		<link href="assets/nabla/nabla-4.svg" rel="icon" />
+		<!-- Resume Schema Reference for Machine-Readable Tools -->
+		<link href="/cv/schema.json" rel="alternate" title="Resume Schema (JSONResume format)" type="application/json" />
+		<!-- Font Awesome -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<script
+			data-auto-replace-svg="nest"
+			src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+		></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+		<!-- Theme toggle script - load early to prevent flash -->
+		<script src="../theme-toggle.js"></script>
+		<!-- Custom CSS -->
+		<link href="landing-sections.css" rel="stylesheet" />
+		<link href="wireframe.css" rel="stylesheet" />
+		<link href="arf.css" rel="stylesheet" />
+		<link href="theme.css" rel="stylesheet" />
+		<link href="style.css" rel="stylesheet" />
+		<!-- Print Styles for PDF Export -->
+		<link href="print.css" rel="stylesheet" />
+		<link href="site-content-page.css" rel="stylesheet" />
+		<link href="checkout.css" rel="stylesheet" />
+	</head>
+	<body class="site-content-page">
+		<a name="top"></a>
+		<!-- Skip to main content link for accessibility -->
+		<a class="skip-to-main" href="#main-content">Skip to main content</a>
+		<!-- Main Content -->
+		<main class="checkout-page" id="main-content">
+			<section class="checkout-card">
+				<div class="product">
+					<img alt="Nabla" height="64" src="https://albanandrieu.com/assets/nabla/nabla-4.svg" width="64" />
+					<div class="description">
+						<h2 class="checkout-title">Paiement</h2>
+						<p class="checkout-subtitle">Paiement unique via Stripe.Paiement sécurisé.</p>
+					</div>
+				</div>
+				<figure class="checkout-qr">
+					<img
+						alt="Code QR pour ouvrir ce paiement Stripe sur votre téléphone"
+						decoding="async"
+						height="1055"
+						src="assets/stripe/tjm-stripe.png"
+						width="880"
+					/>
+					<figcaption class="checkout-qr-caption">Ou scannez ce QR code pour payer sur votre téléphone</figcaption>
+				</figure>
+				<form action="/api/create-checkout-session" class="checkout-form" method="POST">
+					<button class="checkout-button" id="checkout-button" type="submit">
+						<i aria-hidden="true" class="fa-solid fa-lock"></i>Passer à la caisse
+					</button>
+				</form>
+				<p class="checkout-footer">
+					<a href="/">Retour au site</a>
+				</p>
+			</section>
+		</main>
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					aria-label="LinkedIn"
+					class="social-link"
+					href="https://www.linkedin.com/in/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+					><i class="fab fa-linkedin-in"></i
+				></a>
+				<a
+					aria-label="Calendly"
+					class="social-link"
+					href="https://calendly.com/alban-andrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+					><i class="fa fa-calendar-plus"></i
+				></a>
+				<a
+					aria-label="GitHub"
+					class="social-link"
+					href="https://github.com/AlbanAndrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+					><i class="fab fa-github"></i
+				></a>
+				<a
+					aria-label="Docker Hub"
+					class="social-link"
+					href="https://hub.docker.com/u/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+					><i class="fab fa-docker"></i
+				></a>
+				<a
+					aria-label="Stack Exchange"
+					class="social-link"
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+					><i class="fab fa-stack-exchange"></i
+				></a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
+				<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<script data-no-coffee-fab="" data-no-print-pdf="" defer="" src="/site-widgets.js"></script>
+	</body>
 </html>

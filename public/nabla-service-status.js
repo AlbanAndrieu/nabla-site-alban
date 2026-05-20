@@ -30,7 +30,7 @@
 	}
 
 	function probeOrigin(origin) {
-		var paths = ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"];
+		var paths = ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]; // TODO don ot check only image but first "/health", "/metrics", "/ping"
 		var i = 0;
 		var base = origin.replace(/\/$/, "");
 		function attempt() {
@@ -223,9 +223,7 @@
 		if (!keys.length) {
 			return;
 		}
-		var queue = keys.map(function (origin) {
-			return { origin: origin, els: seen[origin] };
-		});
+		var queue = keys.map((origin) => ({ origin: origin, els: seen[origin] }));
 		function setTlsLockState(els, ok) {
 			var cls = ok ? "homelab-tls-lock--ok" : "homelab-tls-lock--fail";
 			var titleOk =
@@ -254,7 +252,7 @@
 			if (!job) {
 				return Promise.resolve();
 			}
-			return probeOrigin(job.origin).then(function (ok) {
+			return probeOrigin(job.origin).then((ok) => {
 				setTlsLockState(job.els, ok);
 				return worker();
 			});
@@ -263,7 +261,7 @@
 		for (var w = 0; w < CONCURRENCY; w++) {
 			workers.push(worker());
 		}
-		Promise.all(workers).catch(function () {});
+		Promise.all(workers).catch(() => {});
 	}
 
 	/**
@@ -285,6 +283,9 @@
 			if (status === 304) {
 				return "ok";
 			}
+			// if (status === 307) {
+			// 	return "ok";
+			// }
 			return "fail";
 		}
 		if (status >= 200 && status <= 299) {
@@ -328,7 +329,7 @@
 
 	function fetchTunnelCheck(url) {
 		var qs = "/api/homelab-tunnel-check?url=" + encodeURIComponent(url);
-		return fetch(qs, { cache: "no-store" }).then(function (res) {
+		return fetch(qs, { cache: "no-store" }).then((res) => {
 			if (res.status === 404) {
 				return { apiMissing: true };
 			}
@@ -339,14 +340,12 @@
 					httpError: res.status,
 				};
 			}
-			return res.json().catch(function () {
-				return {
-					status: 0,
-					tlsError: false,
-					parseError: true,
-					httpError: res.status,
-				};
-			});
+			return res.json().catch(() => ({
+				status: 0,
+				tlsError: false,
+				parseError: true,
+				httpError: res.status,
+			}));
 		});
 	}
 
@@ -368,7 +367,8 @@
 				byUrl[href] = { anchors: [], reachable: "false" };
 			}
 			byUrl[href].anchors.push(a);
-			byUrl[href].reachable = a.getAttribute("data-homelab-reachable-outside") || "false";
+			byUrl[href].reachable =
+				a.getAttribute("data-homelab-reachable-outside") || "false";
 		}
 		var urls = Object.keys(byUrl);
 		if (!urls.length) {
@@ -381,7 +381,7 @@
 				return Promise.resolve();
 			}
 			var job = byUrl[u];
-			return fetchTunnelCheck(u).then(function (data) {
+			return fetchTunnelCheck(u).then((data) => {
 				var state;
 				var title;
 				if (data.apiMissing) {
@@ -393,8 +393,7 @@
 					title = "Tunnel check returned an unreadable response.";
 				} else if (data.httpError && !data.status) {
 					state = "unknown";
-					title =
-						"Tunnel check API returned HTTP " + data.httpError + ".";
+					title = "Tunnel check API returned HTTP " + data.httpError + ".";
 				} else {
 					state = classifyTunnelTab(job.reachable, data);
 					var st = data.status != null ? data.status : "?";
@@ -403,13 +402,7 @@
 							? "reacheableFromOutside=true (expect public 2xx/304)"
 							: "reacheableFromOutside=false (expect 401/403/404/429/502/503 or unreachable)";
 					title =
-						"Tunnel probe: HTTP " +
-						st +
-						". " +
-						pol +
-						". Class: " +
-						state +
-						".";
+						"Tunnel probe: HTTP " + st + ". " + pol + ". Class: " + state + ".";
 				}
 				for (var j = 0; j < job.anchors.length; j++) {
 					setTunnelTabVisual(job.anchors[j], state, title);
@@ -421,7 +414,7 @@
 		for (var w = 0; w < CONCURRENCY; w++) {
 			workers.push(worker());
 		}
-		Promise.all(workers).catch(function () {});
+		Promise.all(workers).catch(() => {});
 	}
 
 	window.initHomelabServiceCardPings = initHomelabServiceCardPings;
