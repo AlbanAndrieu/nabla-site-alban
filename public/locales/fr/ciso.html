@@ -1,53 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<!-- PAGE settings -->
-<title>Tableau de bord RSSI - Intelligence de sécurité en temps réel par Alban Andrieu</title>
-<meta content="Un tableau de bord RSSI conçu pour les renseignements en temps réel sur les menaces, les mesures de sécurité et la surveillance de la conformité.Suivez la posture de sécurité, la réponse aux incidents et l’état de conformité." name="description"/>
-<meta content="CISO, Dashboard, Cybersecurity, Compliance, Threat Intelligence, Alban Andrieu, Security Metrics, Risk Management, DevSecOps" name="keywords"/>
-<meta content="alban.andrieu@albanandrieu.com" name="author"/>
-<meta content="noindex, nofollow" name="robots"/>
-<!-- Open Graph / Facebook -->
-<meta content="website" property="og:type"/>
-<meta content="https://albanandrieu.com/ciso.html" property="og:url"/>
-<meta content="Tableau de bord RSSI - Intelligence de sécurité en temps réel" property="og:title"/>
-<meta content="Tableau de bord de renseignements sur les menaces en temps réel pour la surveillance de la cybersécurité, le suivi de la conformité et les mesures de sécurité." property="og:description"/>
-<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="og:image"/>
-<meta content="Nabla - Alban Andrieu" property="og:site_name"/>
-<!-- Twitter -->
-<meta content="summary_large_image" property="twitter:card"/>
-<meta content="https://albanandrieu.com/ciso.html" property="twitter:url"/>
-<meta content="Tableau de bord RSSI - Intelligence de sécurité en temps réel" property="twitter:title"/>
-<meta content="Tableau de bord de renseignements sur les menaces en temps réel pour les professionnels de la cybersécurité" property="twitter:description"/>
-<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="twitter:image"/>
-<!-- Canonical URL -->
-<link href="https://albanandrieu.com/ciso.html" rel="canonical"/>
-<!-- Favicon -->
-<link href="assets/nabla/nabla-4.svg" rel="icon"/>
-<!-- Custom CSS -->
-<link href="landing-sections.css" rel="stylesheet"/>
-<link href="wireframe.css" rel="stylesheet"/>
-<link href="theme.css" rel="stylesheet"/>
-<link href="style.css" rel="stylesheet"/>
-<!-- Print Styles for PDF Export -->
-<link href="print.css" rel="stylesheet"/>
-<link href="site-content-page.css" rel="stylesheet"/>
-<link href="page-layouts.css" rel="stylesheet"/>
-<link href="arf.css" rel="stylesheet"/>
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css" rel="stylesheet" type="text/css"/>
-<script data-auto-replace-svg="nest" src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"></script>
-<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
-<!-- Theme toggle script - load early to prevent flash -->
-<!-- Bootstrap -->
-<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css" integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg==" referrerpolicy="no-referrer" rel="stylesheet"/>
-<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA==" referrerpolicy="no-referrer" rel="stylesheet"/>
-<!-- JSON-LD Structured Data for SEO -->
-<script type="application/ld+json">
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<!-- PAGE settings -->
+		<title>Tableau de bord RSSI - Intelligence de sécurité en temps réel par Alban Andrieu</title>
+		<meta
+			content="Un tableau de bord RSSI conçu pour les renseignements en temps réel sur les menaces, les mesures de sécurité et la surveillance de la conformité.Suivez la posture de sécurité, la réponse aux incidents et l’état de conformité."
+			name="description"
+		/>
+		<meta
+			content="CISO, Dashboard, Cybersecurity, Compliance, Threat Intelligence, Alban Andrieu, Security Metrics, Risk Management, DevSecOps"
+			name="keywords"
+		/>
+		<meta content="alban.andrieu@albanandrieu.com" name="author" />
+		<meta content="noindex, nofollow" name="robots" />
+		<!-- Open Graph / Facebook -->
+		<meta content="website" property="og:type" />
+		<meta content="https://albanandrieu.com/ciso.html" property="og:url" />
+		<meta content="Tableau de bord RSSI - Intelligence de sécurité en temps réel" property="og:title" />
+		<meta
+			content="Tableau de bord de renseignements sur les menaces en temps réel pour la surveillance de la cybersécurité, le suivi de la conformité et les mesures de sécurité."
+			property="og:description"
+		/>
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="og:image" />
+		<meta content="Nabla - Alban Andrieu" property="og:site_name" />
+		<!-- Twitter -->
+		<meta content="summary_large_image" property="twitter:card" />
+		<meta content="https://albanandrieu.com/ciso.html" property="twitter:url" />
+		<meta content="Tableau de bord RSSI - Intelligence de sécurité en temps réel" property="twitter:title" />
+		<meta
+			content="Tableau de bord de renseignements sur les menaces en temps réel pour les professionnels de la cybersécurité"
+			property="twitter:description"
+		/>
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" property="twitter:image" />
+		<!-- Canonical URL -->
+		<link href="https://albanandrieu.com/ciso.html" rel="canonical" />
+		<!-- Favicon -->
+		<link href="assets/nabla/nabla-4.svg" rel="icon" />
+		<!-- Custom CSS -->
+		<link href="landing-sections.css" rel="stylesheet" />
+		<link href="wireframe.css" rel="stylesheet" />
+		<link href="theme.css" rel="stylesheet" />
+		<link href="style.css" rel="stylesheet" />
+		<!-- Print Styles for PDF Export -->
+		<link href="print.css" rel="stylesheet" />
+		<link href="site-content-page.css" rel="stylesheet" />
+		<link href="page-layouts.css" rel="stylesheet" />
+		<link href="arf.css" rel="stylesheet" />
+		<!-- Font Awesome -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<script
+			data-auto-replace-svg="nest"
+			src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+		></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+		<!-- Theme toggle script - load early to prevent flash -->
+		<!-- Bootstrap -->
+		<link
+			crossorigin="anonymous"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
+			integrity="sha512-siwe/oXMhSjGCwLn+scraPOWrJxHlUgMBMZXdPe2Tnk3I0x3ESCoLz7WZ5NTH6SZrywMY+PB1cjyqJ5jAluCOg=="
+			referrerpolicy="no-referrer"
+			rel="stylesheet"
+		/>
+		<link
+			crossorigin="anonymous"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+			integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+			referrerpolicy="no-referrer"
+			rel="stylesheet"
+		/>
+		<!-- JSON-LD Structured Data for SEO -->
+		<script type="application/ld+json">
 			{
 				"@context": "https://schema.org",
 				"@type": "WebPage",
@@ -66,101 +97,140 @@
 				}
 			}
 		</script>
-<script src="theme-toggle.js"></script>
-<script defer="" src="site-google-translate.js"></script>
-<script data-analytics-mode="vercel" src="site-analytics.js"></script>
-</head>
-<body class="site-content-page page-ciso page-dark">
-<a name="top"></a>
-<!-- Hero Section -->
-<header class="hero-section">
-<div class="container">
-<h1><i class="fa-solid fa-shield-halved"></i> CISO Dashboard</h1>
-<p>Real-time Threat Intelligence &amp; Security Monitoring</p>
-<p>
+		<script src="theme-toggle.js"></script>
+		<script defer="" src="site-google-translate.js"></script>
+		<script data-analytics-mode="vercel" src="site-analytics.js"></script>
+	</head>
+	<body class="site-content-page page-ciso page-dark">
+		<a name="top"></a>
+		<!-- Hero Section -->
+		<header class="hero-section">
+			<div class="container">
+				<h1><i class="fa-solid fa-shield-halved"></i> CISO Dashboard</h1>
+				<p>Real-time Threat Intelligence &amp; Security Monitoring</p>
+				<p>
 					Curated by
-					<a href="/contact.html" style="
+					<a
+						href="/contact.html"
+						style="
 							color: rgba(255, 255, 255, 0.95);
 							text-decoration: underline;
 							text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-						">Alban Andrieu</a>
-</p>
-</div>
-</header>
-<!-- Main Content -->
-<main class="dashboard-container">
-<!-- Compliance Overview -->
-<section class="dashboard-section">
-<h2><i class="fa-solid fa-certificate"></i>Conformité et surveillance des risques</h2>
-<p>Suivez la situation de conformité de votre organisation :</p>
-<ul>
-<li>RGPD :<strong>Conforme à 95 %</strong></li>
-<li>ISO27001 :<strong>100% conforme</strong></li>
-<li>ISO 42001 :<strong>100% conforme</strong></li>
-<li>SOC2 :<strong>En cours</strong></li>
-<li>PCI-DSS :<strong>10 % conforme</strong></li>
-</ul>
-<p>Audits réguliers prévus pour le premier trimestre 2025.</p>
-<a href="https://checklist.albandrieu.com/" target="_blank">Liste de contrôle de sécurité</a>
-</section>
-<!-- Key Metrics Section -->
-<section class="dashboard-section">
-<h2><i class="fa-solid fa-chart-line"></i>Mesures de sécurité clés</h2>
-<div class="metrics-container">
-<div class="metric-box">
-<h3>Temps de réponse aux incidents</h3>
-<p>15 minutes</p>
-</div>
-<div class="metric-box">
-<h3>Efficacité des correctifs</h3>
-<p>92%</p>
-</div>
-<div class="metric-box">
-<h3>Évaluation du risque</h3>
-<p>Moyen</p>
-</div>
-</div>
-</section>
-<!-- Threat Intelligence Section -->
-<section class="dashboard-section">
-<h2><i class="fa-solid fa-globe"></i>Renseignements sur les menaces</h2>
-<div id="threatIntelligence"></div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="footer" role="contentinfo">
-<div class="social-links">
-<a aria-label="LinkedIn" class="social-link" href="https://www.linkedin.com/in/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-linkedin-in"></i>
-</a>
-<a aria-label="Calendly" class="social-link" href="https://calendly.com/alban-andrieu" rel="noopener noreferrer" target="_blank">
-<i class="fa fa-calendar-plus"></i>
-</a>
-<a aria-label="GitHub" class="social-link" href="https://github.com/AlbanAndrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>
-</a>
-<a aria-label="Docker Hub" class="social-link" href="https://hub.docker.com/u/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-docker"></i>
-</a>
-<a aria-label="Stack Exchange" class="social-link" href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-stack-exchange"></i>
-</a>
-</div>
-<div class="footer-links">
-<a href="/policy/legal.html">Legal notices</a>
-<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
-</div>
-<p class="text-md-center mt-3">
-<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
-<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
-</p>
-<p class="footer-copyright"></p>
-<div class="emoji">🚨⚠️</div>
-</footer>
-<!-- End footer section -->
-<!-- Bootstrap JS -->
-<script crossorigin="anonymous" integrity="sha512-1TK5EkM3S/pmOdAMlRjBH+Ja3EAWv5VdxgAV7qXJ8SgZaHvPxOAUAe7hPcPtQ5Gs+XLsUHMgJNhpBUYEOCfV1w==" referrerpolicy="no-referrer" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.bundle.min.js"></script>
-<script>
+						"
+						>Alban Andrieu</a
+					>
+				</p>
+			</div>
+		</header>
+		<!-- Main Content -->
+		<main class="dashboard-container">
+			<!-- Compliance Overview -->
+			<section class="dashboard-section">
+				<h2><i class="fa-solid fa-certificate"></i>Conformité et surveillance des risques</h2>
+				<p>Suivez la situation de conformité de votre organisation :</p>
+				<ul>
+					<li>RGPD :<strong>Conforme à 95 %</strong></li>
+					<li>ISO27001 :<strong>100% conforme</strong></li>
+					<li>ISO 42001 :<strong>100% conforme</strong></li>
+					<li>SOC2 :<strong>En cours</strong></li>
+					<li>PCI-DSS :<strong>10 % conforme</strong></li>
+				</ul>
+				<p>Audits réguliers prévus pour le premier trimestre 2025.</p>
+				<a href="https://checklist.albandrieu.com/" target="_blank">Liste de contrôle de sécurité</a>
+			</section>
+			<!-- Key Metrics Section -->
+			<section class="dashboard-section">
+				<h2><i class="fa-solid fa-chart-line"></i>Mesures de sécurité clés</h2>
+				<div class="metrics-container">
+					<div class="metric-box">
+						<h3>Temps de réponse aux incidents</h3>
+						<p>15 minutes</p>
+					</div>
+					<div class="metric-box">
+						<h3>Efficacité des correctifs</h3>
+						<p>92%</p>
+					</div>
+					<div class="metric-box">
+						<h3>Évaluation du risque</h3>
+						<p>Moyen</p>
+					</div>
+				</div>
+			</section>
+			<!-- Threat Intelligence Section -->
+			<section class="dashboard-section">
+				<h2><i class="fa-solid fa-globe"></i>Renseignements sur les menaces</h2>
+				<div id="threatIntelligence"></div>
+			</section>
+		</main>
+		<!-- Footer -->
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					aria-label="LinkedIn"
+					class="social-link"
+					href="https://www.linkedin.com/in/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					aria-label="Calendly"
+					class="social-link"
+					href="https://calendly.com/alban-andrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					aria-label="GitHub"
+					class="social-link"
+					href="https://github.com/AlbanAndrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					aria-label="Docker Hub"
+					class="social-link"
+					href="https://hub.docker.com/u/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					aria-label="Stack Exchange"
+					class="social-link"
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a class="text-muted" href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
+				<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+			<div class="emoji">🚨⚠️</div>
+		</footer>
+		<!-- End footer section -->
+		<!-- Bootstrap JS -->
+		<script
+			crossorigin="anonymous"
+			integrity="sha512-1TK5EkM3S/pmOdAMlRjBH+Ja3EAWv5VdxgAV7qXJ8SgZaHvPxOAUAe7hPcPtQ5Gs+XLsUHMgJNhpBUYEOCfV1w=="
+			referrerpolicy="no-referrer"
+			src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.bundle.min.js"
+		></script>
+		<script>
 			const threatIntelligenceElement = document.getElementById("threatIntelligence");
 			const rssFeeds = [
 				"https://www.us-cert.gov/ncas/alerts.xml",
@@ -338,6 +408,12 @@
 			// Refresh threat intelligence every 10 minutes
 			setInterval(fetchThreatIntelligence, 600000);
 		</script>
-<script data-coffee-fab="" data-print-pdf="" data-print-pdf-aria="Print or save dashboard as PDF" defer="" src="site-widgets.js"></script>
-</body>
+		<script
+			data-coffee-fab=""
+			data-print-pdf=""
+			data-print-pdf-aria="Print or save dashboard as PDF"
+			defer=""
+			src="site-widgets.js"
+		></script>
+	</body>
 </html>

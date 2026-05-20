@@ -1,302 +1,454 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<!-- PAGE settings -->
-<title>Homelab et matériel à l'échelle TrueNAS |Nabla - Alban Andrieu</title>
-<meta content="TrueNAS Scale homelab : plate-forme matérielle, applications auto-hébergées (Portainer, Grafana, n8n, Home Assistant), outils de sécurité et services liés à l'IA." name="description"/>
-<meta content="truenas, self-hosted, homelab, portainer, grafana, kubernetes, docker, devsecops, alban andrieu, ubuntu, monitoring" name="keywords"/>
-<meta content="Alban Andrieu" name="author"/>
-<meta content="noindex, nofollow" name="robots"/>
-<meta content="light dark" name="color-scheme"/>
-<!-- Open Graph Protocol -->
-<meta content="TrueNAS Scale Homelab et matériel - Nabla" property="og:title"/>
-<meta content="website" property="og:type"/>
-<meta content="https://albanandrieu.com/truenas.html" property="og:url"/>
-<meta content="https://albanandrieu.com/assets/nabla/nabla-4.png" property="og:image"/>
-<meta content="TrueNAS Scale homelab : notes sur le matériel, applications auto-hébergées, domotique, sécurité et outils d'IA" property="og:description"/>
-<meta content="Nabla - Alban Andrieu" property="og:site_name"/>
-<meta content="en_US" property="og:locale"/>
-<!-- Twitter Card -->
-<meta content="summary_large_image" name="twitter:card"/>
-<meta content="TrueNAS Scale Homelab &amp; Hardware" name="twitter:title"/>
-<meta content="TrueNAS Scale homelab: hardware, automation, security, and AI-related self-hosted apps" name="twitter:description"/>
-<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" name="twitter:image"/>
-<!-- Canonical URL -->
-<link href="https://albanandrieu.com/truenas.html" rel="canonical"/>
-<!-- Favicon -->
-<link href="assets/nabla/nabla-4.svg" rel="icon"/>
-<link href="landing-sections.css" rel="stylesheet"/>
-<link href="wireframe.css" rel="stylesheet"/>
-<link href="arf.css" rel="stylesheet"/>
-<link href="theme.css" rel="stylesheet"/>
-<link href="style.css" rel="stylesheet"/>
-<!-- Print Styles for PDF Export -->
-<link href="print.css" rel="stylesheet"/>
-<link href="site-content-page.css" rel="stylesheet"/>
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css" rel="stylesheet" type="text/css"/>
-<script data-auto-replace-svg="nest" src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"></script>
-<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
-<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
-<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
-<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/brands.css" rel="stylesheet"/>
-<link href="/assets/fontawesome/css/solid.css" rel="stylesheet"/>
-<!-- Theme toggle script - load early to prevent flash -->
-<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
-<script src="obs-connection.js"></script>
-<!-- Ahrefs Web Analytics -->
-<script async="" data-key="tg3zLMS/bebJFl0LxctiCw" src="https://analytics.ahrefs.com/analytics.js"></script>
-<script src="theme-toggle.js"></script>
-<script defer="" src="site-google-translate.js"></script>
-<script data-analytics-mode="marketing" src="site-analytics.js"></script>
-</head>
-<body class="site-content-page page-dark page-truenas">
-<a name="top"></a>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-W7XNV7K6" style="display: none; visibility: hidden" width="0"></iframe></noscript>
-<!-- Skip to main content link for accessibility -->
-<a class="skip-to-main" href="#main-content">Skip to main content</a>
-<nav aria-label="Breadcrumb" class="page-nav container py-3">
-<a class="text-decoration-none" href="/"><i aria-hidden="true" class="fas fa-home"></i> Back to home</a>
-<span aria-hidden="true" class="text-muted mx-2">·</span>
-<a class="text-decoration-none" href="/freenas.html">FreeNAS (archive)</a>
-<span aria-hidden="true" class="text-muted mx-2">·</span>
-<span class="text-muted">TrueNAS Scale</span>
-</nav>
-<!-- Header / Hero Section -->
-<header>
-<!-- TrueNAS apps & services -->
-<section aria-labelledby="truenas-heading" class="stack-page-hero py-5 page-truenas-apps">
-<div class="container">
-<div class="row mb-4">
-<div class="col-12 text-center">
-<h2 class="display-4 mb-3" id="truenas-heading">TrueNAS Services</h2>
-<p class="lead mb-2 stack-page-hero__lead">Self-hosted applications on TrueNAS Scale.</p>
-<p class="small text-secondary homelab-services-foss-note mb-0">
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<!-- PAGE settings -->
+		<title>Homelab et matériel à l'échelle TrueNAS |Nabla - Alban Andrieu</title>
+		<meta
+			content="TrueNAS Scale homelab : plate-forme matérielle, applications auto-hébergées (Portainer, Grafana, n8n, Home Assistant), outils de sécurité et services liés à l'IA."
+			name="description"
+		/>
+		<meta
+			content="truenas, self-hosted, homelab, portainer, grafana, kubernetes, docker, devsecops, alban andrieu, ubuntu, monitoring"
+			name="keywords"
+		/>
+		<meta content="Alban Andrieu" name="author" />
+		<meta content="noindex, nofollow" name="robots" />
+		<meta content="light dark" name="color-scheme" />
+		<!-- Open Graph Protocol -->
+		<meta content="TrueNAS Scale Homelab et matériel - Nabla" property="og:title" />
+		<meta content="website" property="og:type" />
+		<meta content="https://albanandrieu.com/truenas.html" property="og:url" />
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.png" property="og:image" />
+		<meta
+			content="TrueNAS Scale homelab : notes sur le matériel, applications auto-hébergées, domotique, sécurité et outils d'IA"
+			property="og:description"
+		/>
+		<meta content="Nabla - Alban Andrieu" property="og:site_name" />
+		<meta content="en_US" property="og:locale" />
+		<!-- Twitter Card -->
+		<meta content="summary_large_image" name="twitter:card" />
+		<meta content="TrueNAS Scale Homelab &amp; Hardware" name="twitter:title" />
+		<meta
+			content="TrueNAS Scale homelab: hardware, automation, security, and AI-related self-hosted apps"
+			name="twitter:description"
+		/>
+		<meta content="https://albanandrieu.com/assets/nabla/nabla-4.svg" name="twitter:image" />
+		<!-- Canonical URL -->
+		<link href="https://albanandrieu.com/truenas.html" rel="canonical" />
+		<!-- Favicon -->
+		<link href="assets/nabla/nabla-4.svg" rel="icon" />
+		<link href="landing-sections.css" rel="stylesheet" />
+		<link href="wireframe.css" rel="stylesheet" />
+		<link href="arf.css" rel="stylesheet" />
+		<link href="theme.css" rel="stylesheet" />
+		<link href="style.css" rel="stylesheet" />
+		<!-- Print Styles for PDF Export -->
+		<link href="print.css" rel="stylesheet" />
+		<link href="site-content-page.css" rel="stylesheet" />
+		<!-- Font Awesome -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<script
+			data-auto-replace-svg="nest"
+			src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/fontawesome.js"
+		></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
+		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
+		<!-- Theme toggle script - load early to prevent flash -->
+		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
+		<script src="obs-connection.js"></script>
+		<!-- Ahrefs Web Analytics -->
+		<script async="" data-key="tg3zLMS/bebJFl0LxctiCw" src="https://analytics.ahrefs.com/analytics.js"></script>
+		<script src="theme-toggle.js"></script>
+		<script defer="" src="site-google-translate.js"></script>
+		<script data-analytics-mode="marketing" src="site-analytics.js"></script>
+	</head>
+	<body class="site-content-page page-dark page-truenas">
+		<a name="top"></a>
+		<!-- Google Tag Manager (noscript) -->
+		<noscript
+			><iframe
+				height="0"
+				src="https://www.googletagmanager.com/ns.html?id=GTM-W7XNV7K6"
+				style="display: none; visibility: hidden"
+				width="0"
+			></iframe
+		></noscript>
+		<!-- Skip to main content link for accessibility -->
+		<a class="skip-to-main" href="#main-content">Skip to main content</a>
+		<nav aria-label="Breadcrumb" class="page-nav container py-3">
+			<a class="text-decoration-none" href="/"><i aria-hidden="true" class="fas fa-home"></i> Back to home</a>
+			<span aria-hidden="true" class="text-muted mx-2">·</span>
+			<a class="text-decoration-none" href="/freenas.html">FreeNAS (archive)</a>
+			<span aria-hidden="true" class="text-muted mx-2">·</span>
+			<span class="text-muted">TrueNAS Scale</span>
+		</nav>
+		<!-- Header / Hero Section -->
+		<header>
+			<!-- TrueNAS apps & services -->
+			<section aria-labelledby="truenas-heading" class="stack-page-hero py-5 page-truenas-apps">
+				<div class="container">
+					<div class="row mb-4">
+						<div class="col-12 text-center">
+							<h2 class="display-4 mb-3" id="truenas-heading">TrueNAS Services</h2>
+							<p class="lead mb-2 stack-page-hero__lead">Self-hosted applications on TrueNAS Scale.</p>
+							<p class="small text-secondary homelab-services-foss-note mb-0">
 								Service icons are vendored from
 								<a href="https://selfh.st/icons/" rel="noopener noreferrer" target="_blank">selfh.st/icons</a>
 								(selfhst/icons). For more open-source self-hosted ideas, see
 								<a href="https://selfh.st/apps/" rel="noopener noreferrer" target="_blank">selfh.st/apps</a>.
 							</p>
-</div>
-</div>
-<div class="row" data-homelab-json="homelab-services.json" data-homelab-services-root="" data-homelab-variant="truenas"></div>
-</div>
-</section>
-</header>
-<!-- Main content area -->
-<main class="mb-5" id="main-content" role="main">
-<section aria-labelledby="nabla-on-stack-heading" class="py-4 page-truenas-secondary">
-<div class="container">
-<h2 class="h4 mb-3" id="nabla-on-stack-heading">
-<i aria-hidden="true" class="fas fa-layer-group text-primary me-2"></i>Laboratoire à domicile pour projets indépendants</h2>
-<p class="text-secondary mb-4">Ce service de laboratoire à domicile a été construit pour accueillir les prochains projets et services de l'entreprise Nabla.</p>
-<div class="row justify-content-center">
-<div class="col-md-6 col-lg-4">
-<div class="card box-shadow h-100 border-secondary">
-<img alt="Logo Nabla" class="img-fluid d-block mx-auto p-4" height="140" src="assets/nabla/nabla-4.svg" width="140"/>
-<div class="card-body text-center border-top border-secondary">
-<h3 class="h5 card-title mb-1">Nabla</h3>
-<p class="card-text text-muted small mb-0">Nabla &amp; projet</p>
-<a class="btn btn-sm btn-outline-primary mt-3" href="/nabla.html">Ouvrir le projet nabla</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Hardware / homelab context -->
-<section aria-labelledby="hardware-heading" class="py-5 hardware-section">
-<div class="container">
-<div class="row mb-4">
-<div class="col-12">
-<h2 class="hardware-heading-with-icon display-4" id="hardware-heading">
-<span aria-hidden="true" class="hardware-heading-with-icon__glyph"><i class="fas fa-server"></i></span>
-<span class="hardware-heading-with-icon__text">Matériel</span>
-</h2>
-<div class="hardware-platform-band">
-<p class="hardware-platform-band__tagline text-center" id="hardware-tagline">Un examen physique<strong>Mini-ITX</strong>système en cours d'exécution<strong>Échelle TrueNAS</strong>: fiable<strong>ZFS</strong>stockage plus un hôte homelab pour les applications, la domotique, les outils de sécurité et
-tâches gourmandes en calcul, y compris les charges de travail de type IA lorsque vous en avez besoin.</p>
-<ul aria-label="A quoi sert cette plateforme" class="hardware-pill-grid" role="list">
-<li class="hardware-pill">
-<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-database"></i></span>
-<span class="hardware-pill__text">
-<span class="hardware-pill__title">ZFS et ensembles de données</span>
-<span class="hardware-pill__sub">Pools, instantanés, réplication</span>
-</span>
-</li>
-<li class="hardware-pill">
-<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-house-laptop"></i></span>
-<span class="hardware-pill__text">
-<span class="hardware-pill__title">Hôte du Homelab</span>
-<span class="hardware-pill__sub">Applications, VM, services internes</span>
-</span>
-</li>
-<li class="hardware-pill">
-<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-shield-halved"></i></span>
-<span class="hardware-pill__text">
-<span class="hardware-pill__title">Pile de sécurité</span>
-<span class="hardware-pill__sub">Outillage &amp; suivi</span>
-</span>
-</li>
-<li class="hardware-pill">
-<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-microchip"></i></span>
-<span class="hardware-pill__text">
-<span class="hardware-pill__title">IA et calcul</span>
-<span class="hardware-pill__sub">Marge AM5 pour les modèles et les travaux</span>
-</span>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="row justify-content-center">
-<div class="col-lg-8">
-<div class="card box-shadow">
-<div class="card-body">
-<p class="card-text hardware-bom-intro mb-0">
-<span aria-hidden="true" class="hardware-bom-intro__icon"><i class="fas fa-screwdriver-wrench"></i></span>
-<span class="hardware-bom-intro__text">Après sept années de bons services, mon<a href="/freenas.html">NAS gratuit</a>le serveur est mort.L'objectif est d'étendre la configuration au-delà d'un seul NAS : un<strong>laboratoire à domicile</strong>sur<strong>Échelle TrueNAS</strong>, avec des applications pour la domotique comme<strong>Assistante à domicile</strong>, ainsi que des outils de sécurité et d'IA, comme indiqué ci-dessous sur cette page.</span>
-</p>
-<h3 class="h5 mt-4 hardware-bom-heading">
-<span aria-hidden="true" class="hardware-bom-heading__icon"><i class="fas fa-clipboard-list"></i></span>
-<span>Nomenclature</span>
-</h3>
-<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
-<span aria-hidden="true" class="hardware-bom-heading__icon"><i class="fas fa-recycle"></i></span>
-<span>Réutilisé</span>
-</h4>
-<ul class="list-group list-group-flush hardware-bom-list mb-3">
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-cube"></i></span>
-<span class="hardware-bom-li__body">Cas : châssis iXsystems précédent, devrait être de 170 mm × 170 mm, format mini-ITX</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-plug"></i></span>
-<span class="hardware-bom-li__body">Bloc d'alimentation : ancien bloc d'alimentation de 200 W</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-hard-drive"></i></span>
-<span class="hardware-bom-li__body">SSD mSATA Kingston SKC600MS — 256 Go TLC 3D NAND.83€</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-hdd"></i></span>
-<span class="hardware-bom-li__body">Stockage : 4 × Western Digital Red WD30EFRX — 3 To chacun, SATA 6 Gb/s</span>
-</li>
-</ul>
-<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
-<span aria-hidden="true" class="hardware-bom-heading__icon"><i class="fas fa-basket-shopping"></i></span>
-<span>Nouveaux achats</span>
-</h4>
-<ul class="list-group list-group-flush hardware-bom-list">
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-server"></i></span>
-<span class="hardware-bom-li__body">
-<a href="https://www.amazon.fr/dp/B0BHCRX6K7" rel="noopener noreferrer" target="_blank">MSI MPG B650I Bord WiFi</a>— Mini-ITX AM5, DDR5, PCIe 4.0, M.2, Wi‑Fi 6E (ordinateur de bureau Ryzen 7000).174,67 €</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-usb"></i></span>
-<span class="hardware-bom-li__body">
-<a href="https://www.amazon.fr/dp/B0CKP48DMB" rel="noopener noreferrer" target="_blank">Boîtier SSD ORICO mSATA (USB 3.0, 5 Gbit/s)</a>— adaptateur sans outil pour SSD mSATA 50 × 30 mm, jusqu'à 2 To.17,99 €</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-fan"></i></span>
-<span class="hardware-bom-li__body">
-<a href="https://www.amazon.fr/dp/B0BNL8ZM1T" rel="noopener noreferrer" target="_blank">Une blague que nous faisons</a>- Refroidisseur de processeur discret pour AMD AM5.</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-microchip"></i></span>
-<span class="hardware-bom-li__body">
-<a href="https://www.amazon.fr/dp/B0C3T39N6P" rel="noopener noreferrer" target="_blank">AMD Ryzen 7 7700</a>— 3,8 GHz, 32 Mo L3.212,75 €</span>
-</li>
-<li class="list-group-item hardware-bom-li">
-<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-memory"></i></span>
-<span class="hardware-bom-li__body">
-<a href="https://www.amazon.fr/dp/B0DSQP6YR9" rel="noopener noreferrer" target="_blank">Crucial DDR5 64 Go 5 600 MHz</a>— CL46 (CT64G56C46U5 ; également 5 200/4 800 MHz).679,00 €</span>
-</li>
-</ul>
-<p class="hardware-bom-total mt-3 mb-0" role="status">
-<span class="hardware-bom-total__label">Prix ​​total</span>
-<span class="hardware-bom-total__amount">1 084,41 €</span>
-<span class="hardware-bom-total__note">Somme de la carte mère, du boîtier, du processeur et de la RAM.La gamme de refroidisseurs de processeur n'a pas de prix ici.</span>
-</p>
-<div class="hardware-bom-upgrade-note mt-3">
-<p class="hardware-bom-upgrade-note__title mb-2">Pièce à ajouter plus tard</p>
-<ul class="hardware-bom-upgrade-note__list mb-0">
-<li>
-<strong>64 Go de RAM supplémentaires</strong>-DDR5<strong>UDIMM</strong>, facteur de forme<strong>DIMM/UDIMM 288 broches</strong>(modules de bureau sans tampon).Lorsque vous magasinez, faites<strong>pas</strong>mélanger<strong>SO-DIMM</strong>(format ordinateur portable) ou<strong>RDIMM</strong>(format serveur enregistré) : ils ne rentreront pas dans cette carte.</li>
-<li>
-<strong>SSD NVMe</strong>- disque M.2 NVMe supplémentaire pour un stockage rapide en pool ou de type cache (choisissez un
-modèle qui correspond aux spécifications M.2 de votre carte et à l’utilisation prévue).</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section aria-labelledby="truenas-tools-heading" class="py-4 page-truenas-tools border-top border-secondary">
-<div class="container">
-<h2 class="h4 mb-4" id="truenas-tools-heading">
-<i aria-hidden="true" class="fas fa-screwdriver-wrench text-primary me-2"></i>Outils et connexion</h2>
-<div class="row align-items-center g-4">
-<div class="col-md-6">
-<a class="stack-tool-link d-flex align-items-center gap-3 text-decoration-none p-3 rounded border border-secondary" href="https://truenas.albandrieu.com" rel="noopener noreferrer" target="_blank">
-<img alt="" class="rounded flex-shrink-0" height="72" src="assets/logo-freenas-community-simple.jpeg" width="72"/>
-<span>
-<span class="d-block fw-semibold text-body">Interface utilisateur Web TrueNAS</span>
-<span class="d-block small text-muted">Connexion principale (même hôte que ci-dessus)</span>
-</span>
-</a>
-</div>
-</div>
-<div class="stack-exchange-badge">
-<a href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
-<img alt="Profil Stack Exchange pour AlbanAndrieu" decoding="async" height="58" loading="lazy" src="https://stackexchange.com/users/flair/4652074.png" width="208"/>
-</a>
-</div>
-</div>
-</section>
-</main>
-<a href="https://www.pkts.ca:443/cgi-bin/corinthianenzyme.cgi?doc_id=2561" style="display: none">north-puny</a>
-<!-- Footer -->
-<footer class="footer" role="contentinfo">
-<div class="social-links">
-<a aria-label="LinkedIn" class="social-link" href="https://www.linkedin.com/in/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-linkedin-in"></i>
-</a>
-<a aria-label="Calendly" class="social-link" href="https://calendly.com/alban-andrieu" rel="noopener noreferrer" target="_blank">
-<i class="fa fa-calendar-plus"></i>
-</a>
-<a aria-label="GitHub" class="social-link" href="https://github.com/AlbanAndrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-github"></i>
-</a>
-<a aria-label="Docker Hub" class="social-link" href="https://hub.docker.com/u/nabla" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-docker"></i>
-</a>
-<a aria-label="Stack Exchange" class="social-link" href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
-<i class="fab fa-stack-exchange"></i>
-</a>
-</div>
-<div class="footer-links">
-<a href="/policy/legal.html">Legal notices</a>
-<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
-</div>
-<p class="text-md-center mt-3">
-<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
-<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
-</p>
-<p class="footer-copyright"></p>
-</footer>
-<!-- End footer section -->
-<script async="async" data-id="150620" src="https://uptime.betterstack.com/widgets/announcement.js" type="text/javascript"></script>
-<script defer="" src="nabla-service-status.js"></script>
-<script defer="" src="homelab-services-render.js"></script>
-<script data-axeptio="" data-coffee-fab="" data-print-pdf="" data-reveal-effect="opacity" data-scroll-reveal=".contact-card,.social-card" defer="" src="site-widgets.js"></script>
-</body>
+						</div>
+					</div>
+					<div
+						class="row"
+						data-homelab-json="homelab-services.json"
+						data-homelab-services-root=""
+						data-homelab-variant="truenas"
+					></div>
+				</div>
+			</section>
+		</header>
+		<!-- Main content area -->
+		<main class="mb-5" id="main-content" role="main">
+			<section aria-labelledby="nabla-on-stack-heading" class="py-4 page-truenas-secondary">
+				<div class="container">
+					<h2 class="h4 mb-3" id="nabla-on-stack-heading">
+						<i aria-hidden="true" class="fas fa-layer-group text-primary me-2"></i>Laboratoire à domicile pour projets
+						indépendants
+					</h2>
+					<p class="text-secondary mb-4">
+						Ce service de laboratoire à domicile a été construit pour accueillir les prochains projets et services de
+						l'entreprise Nabla.
+					</p>
+					<div class="row justify-content-center">
+						<div class="col-md-6 col-lg-4">
+							<div class="card box-shadow h-100 border-secondary">
+								<img
+									alt="Logo Nabla"
+									class="img-fluid d-block mx-auto p-4"
+									height="140"
+									src="assets/nabla/nabla-4.svg"
+									width="140"
+								/>
+								<div class="card-body text-center border-top border-secondary">
+									<h3 class="h5 card-title mb-1">Nabla</h3>
+									<p class="card-text text-muted small mb-0">Nabla &amp; projet</p>
+									<a class="btn btn-sm btn-outline-primary mt-3" href="/nabla.html">Ouvrir le projet nabla</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- Hardware / homelab context -->
+			<section aria-labelledby="hardware-heading" class="py-5 hardware-section">
+				<div class="container">
+					<div class="row mb-4">
+						<div class="col-12">
+							<h2 class="hardware-heading-with-icon display-4" id="hardware-heading">
+								<span aria-hidden="true" class="hardware-heading-with-icon__glyph"><i class="fas fa-server"></i></span>
+								<span class="hardware-heading-with-icon__text">Matériel</span>
+							</h2>
+							<div class="hardware-platform-band">
+								<p class="hardware-platform-band__tagline text-center" id="hardware-tagline">
+									Un examen physique<strong>Mini-ITX</strong>système en cours d'exécution<strong>Échelle TrueNAS</strong
+									>: fiable<strong>ZFS</strong>stockage plus un hôte homelab pour les applications, la domotique, les
+									outils de sécurité et tâches gourmandes en calcul, y compris les charges de travail de type IA lorsque
+									vous en avez besoin.
+								</p>
+								<ul aria-label="A quoi sert cette plateforme" class="hardware-pill-grid" role="list">
+									<li class="hardware-pill">
+										<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-database"></i></span>
+										<span class="hardware-pill__text">
+											<span class="hardware-pill__title">ZFS et ensembles de données</span>
+											<span class="hardware-pill__sub">Pools, instantanés, réplication</span>
+										</span>
+									</li>
+									<li class="hardware-pill">
+										<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-house-laptop"></i></span>
+										<span class="hardware-pill__text">
+											<span class="hardware-pill__title">Hôte du Homelab</span>
+											<span class="hardware-pill__sub">Applications, VM, services internes</span>
+										</span>
+									</li>
+									<li class="hardware-pill">
+										<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-shield-halved"></i></span>
+										<span class="hardware-pill__text">
+											<span class="hardware-pill__title">Pile de sécurité</span>
+											<span class="hardware-pill__sub">Outillage &amp; suivi</span>
+										</span>
+									</li>
+									<li class="hardware-pill">
+										<span aria-hidden="true" class="hardware-pill__icon"><i class="fas fa-microchip"></i></span>
+										<span class="hardware-pill__text">
+											<span class="hardware-pill__title">IA et calcul</span>
+											<span class="hardware-pill__sub">Marge AM5 pour les modèles et les travaux</span>
+										</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-lg-8">
+							<div class="card box-shadow">
+								<div class="card-body">
+									<p class="card-text hardware-bom-intro mb-0">
+										<span aria-hidden="true" class="hardware-bom-intro__icon"
+											><i class="fas fa-screwdriver-wrench"></i
+										></span>
+										<span class="hardware-bom-intro__text"
+											>Après sept années de bons services, mon<a href="/freenas.html">NAS gratuit</a>le serveur est
+											mort.L'objectif est d'étendre la configuration au-delà d'un seul NAS : un<strong
+												>laboratoire à domicile</strong
+											>sur<strong>Échelle TrueNAS</strong>, avec des applications pour la domotique comme<strong
+												>Assistante à domicile</strong
+											>, ainsi que des outils de sécurité et d'IA, comme indiqué ci-dessous sur cette page.</span
+										>
+									</p>
+									<h3 class="h5 mt-4 hardware-bom-heading">
+										<span aria-hidden="true" class="hardware-bom-heading__icon"
+											><i class="fas fa-clipboard-list"></i
+										></span>
+										<span>Nomenclature</span>
+									</h3>
+									<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
+										<span aria-hidden="true" class="hardware-bom-heading__icon"><i class="fas fa-recycle"></i></span>
+										<span>Réutilisé</span>
+									</h4>
+									<ul class="list-group list-group-flush hardware-bom-list mb-3">
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-cube"></i></span>
+											<span class="hardware-bom-li__body"
+												>Cas : châssis iXsystems précédent, devrait être de 170 mm × 170 mm, format mini-ITX</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-plug"></i></span>
+											<span class="hardware-bom-li__body"
+												>Bloc d'alimentation : ancien bloc d'alimentation de 200 W</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-hard-drive"></i></span>
+											<span class="hardware-bom-li__body">SSD mSATA Kingston SKC600MS — 256 Go TLC 3D NAND.83€</span>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-hdd"></i></span>
+											<span class="hardware-bom-li__body"
+												>Stockage : 4 × Western Digital Red WD30EFRX — 3 To chacun, SATA 6 Gb/s</span
+											>
+										</li>
+									</ul>
+									<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
+										<span aria-hidden="true" class="hardware-bom-heading__icon"
+											><i class="fas fa-basket-shopping"></i
+										></span>
+										<span>Nouveaux achats</span>
+									</h4>
+									<ul class="list-group list-group-flush hardware-bom-list">
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-server"></i></span>
+											<span class="hardware-bom-li__body">
+												<a href="https://www.amazon.fr/dp/B0BHCRX6K7" rel="noopener noreferrer" target="_blank"
+													>MSI MPG B650I Bord WiFi</a
+												>— Mini-ITX AM5, DDR5, PCIe 4.0, M.2, Wi‑Fi 6E (ordinateur de bureau Ryzen 7000).174,67 €</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-usb"></i></span>
+											<span class="hardware-bom-li__body">
+												<a href="https://www.amazon.fr/dp/B0CKP48DMB" rel="noopener noreferrer" target="_blank"
+													>Boîtier SSD ORICO mSATA (USB 3.0, 5 Gbit/s)</a
+												>— adaptateur sans outil pour SSD mSATA 50 × 30 mm, jusqu'à 2 To.17,99 €</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-fan"></i></span>
+											<span class="hardware-bom-li__body">
+												<a href="https://www.amazon.fr/dp/B0BNL8ZM1T" rel="noopener noreferrer" target="_blank"
+													>Une blague que nous faisons</a
+												>- Refroidisseur de processeur discret pour AMD AM5.</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-microchip"></i></span>
+											<span class="hardware-bom-li__body">
+												<a href="https://www.amazon.fr/dp/B0C3T39N6P" rel="noopener noreferrer" target="_blank"
+													>AMD Ryzen 7 7700</a
+												>— 3,8 GHz, 32 Mo L3.212,75 €</span
+											>
+										</li>
+										<li class="list-group-item hardware-bom-li">
+											<span aria-hidden="true" class="hardware-bom-li__icon"><i class="fas fa-memory"></i></span>
+											<span class="hardware-bom-li__body">
+												<a href="https://www.amazon.fr/dp/B0DSQP6YR9" rel="noopener noreferrer" target="_blank"
+													>Crucial DDR5 64 Go 5 600 MHz</a
+												>— CL46 (CT64G56C46U5 ; également 5 200/4 800 MHz).679,00 €</span
+											>
+										</li>
+									</ul>
+									<p class="hardware-bom-total mt-3 mb-0" role="status">
+										<span class="hardware-bom-total__label">Prix ​​total</span>
+										<span class="hardware-bom-total__amount">1 084,41 €</span>
+										<span class="hardware-bom-total__note"
+											>Somme de la carte mère, du boîtier, du processeur et de la RAM.La gamme de refroidisseurs de
+											processeur n'a pas de prix ici.</span
+										>
+									</p>
+									<div class="hardware-bom-upgrade-note mt-3">
+										<p class="hardware-bom-upgrade-note__title mb-2">Pièce à ajouter plus tard</p>
+										<ul class="hardware-bom-upgrade-note__list mb-0">
+											<li>
+												<strong>64 Go de RAM supplémentaires</strong>-DDR5<strong>UDIMM</strong>, facteur de
+												forme<strong>DIMM/UDIMM 288 broches</strong>(modules de bureau sans tampon).Lorsque vous
+												magasinez, faites<strong>pas</strong>mélanger<strong>SO-DIMM</strong>(format ordinateur
+												portable) ou<strong>RDIMM</strong>(format serveur enregistré) : ils ne rentreront pas dans cette
+												carte.
+											</li>
+											<li>
+												<strong>SSD NVMe</strong>- disque M.2 NVMe supplémentaire pour un stockage rapide en pool ou de
+												type cache (choisissez un modèle qui correspond aux spécifications M.2 de votre carte et à
+												l’utilisation prévue).
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section aria-labelledby="truenas-tools-heading" class="py-4 page-truenas-tools border-top border-secondary">
+				<div class="container">
+					<h2 class="h4 mb-4" id="truenas-tools-heading">
+						<i aria-hidden="true" class="fas fa-screwdriver-wrench text-primary me-2"></i>Outils et connexion
+					</h2>
+					<div class="row align-items-center g-4">
+						<div class="col-md-6">
+							<a
+								class="stack-tool-link d-flex align-items-center gap-3 text-decoration-none p-3 rounded border border-secondary"
+								href="https://truenas.albandrieu.com"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<img
+									alt=""
+									class="rounded flex-shrink-0"
+									height="72"
+									src="assets/logo-freenas-community-simple.jpeg"
+									width="72"
+								/>
+								<span>
+									<span class="d-block fw-semibold text-body">Interface utilisateur Web TrueNAS</span>
+									<span class="d-block small text-muted">Connexion principale (même hôte que ci-dessus)</span>
+								</span>
+							</a>
+						</div>
+					</div>
+					<div class="stack-exchange-badge">
+						<a href="https://stackexchange.com/users/4652074/albanandrieu" rel="noopener noreferrer" target="_blank">
+							<img
+								alt="Profil Stack Exchange pour AlbanAndrieu"
+								decoding="async"
+								height="58"
+								loading="lazy"
+								src="https://stackexchange.com/users/flair/4652074.png"
+								width="208"
+							/>
+						</a>
+					</div>
+				</div>
+			</section>
+		</main>
+		<a href="https://www.pkts.ca:443/cgi-bin/corinthianenzyme.cgi?doc_id=2561" style="display: none">north-puny</a>
+		<!-- Footer -->
+		<footer class="footer" role="contentinfo">
+			<div class="social-links">
+				<a
+					aria-label="LinkedIn"
+					class="social-link"
+					href="https://www.linkedin.com/in/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a
+					aria-label="Calendly"
+					class="social-link"
+					href="https://calendly.com/alban-andrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fa fa-calendar-plus"></i>
+				</a>
+				<a
+					aria-label="GitHub"
+					class="social-link"
+					href="https://github.com/AlbanAndrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-github"></i>
+				</a>
+				<a
+					aria-label="Docker Hub"
+					class="social-link"
+					href="https://hub.docker.com/u/nabla"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-docker"></i>
+				</a>
+				<a
+					aria-label="Stack Exchange"
+					class="social-link"
+					href="https://stackexchange.com/users/4652074/albanandrieu"
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<i class="fab fa-stack-exchange"></i>
+				</a>
+			</div>
+			<div class="footer-links">
+				<a href="/policy/legal.html">Legal notices</a>
+				<a href="javascript:openAxeptioCookies()" rel="noopener noreferrer">Cookies</a>
+			</div>
+			<p class="text-md-center mt-3">
+				<a class="btn btn-sm btn-outline-secondary" href="/">Back to Home</a>
+				<a aria-label="Back to top of page" class="btn btn-sm btn-outline-secondary" href="#top">Back to top</a>
+			</p>
+			<p class="footer-copyright"></p>
+		</footer>
+		<!-- End footer section -->
+		<script
+			async="async"
+			data-id="150620"
+			src="https://uptime.betterstack.com/widgets/announcement.js"
+			type="text/javascript"
+		></script>
+		<script defer="" src="nabla-service-status.js"></script>
+		<script defer="" src="homelab-services-render.js"></script>
+		<script
+			data-axeptio=""
+			data-coffee-fab=""
+			data-print-pdf=""
+			data-reveal-effect="opacity"
+			data-scroll-reveal=".contact-card,.social-card"
+			defer=""
+			src="site-widgets.js"
+		></script>
+	</body>
 </html>
