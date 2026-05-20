@@ -5,9 +5,8 @@
  */
 
 .jusmundi-page {
-	font-family:
-		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-		Arial, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
 	line-height: 1.6;
 }
 
@@ -179,13 +178,15 @@
 	color: var(--link-color, #66b3ff);
 }
 
-.jusmundi-page.page-dark a.service-card.jusmundi-doc-card {
+.jusmundi-page.page-dark a.service-card.jusmundi-doc-card,
+.jusmundi-page.page-dark article.service-card.jusmundi-doc-card {
 	background: rgba(30, 41, 59, 0.7);
 	border: 1px solid rgba(71, 85, 105, 0.4);
 	backdrop-filter: blur(6px);
 }
 
-.jusmundi-page.page-dark a.service-card.jusmundi-doc-card:hover {
+.jusmundi-page.page-dark a.service-card.jusmundi-doc-card:hover,
+.jusmundi-page.page-dark article.service-card.jusmundi-doc-card:hover {
 	border-color: rgba(96, 165, 250, 0.55);
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
@@ -200,16 +201,6 @@
 	color: var(--text-secondary, var(--cv-text-secondary));
 }
 
-.jusmundi-page.page-dark .jusmundi-source-notice {
-	background: rgba(30, 41, 59, 0.55);
-	border-color: rgba(71, 85, 105, 0.45);
-	color: var(--text-primary, var(--cv-text));
-}
-
-.jusmundi-page.page-dark .jusmundi-source-notice strong {
-	color: var(--text-primary, var(--cv-heading));
-}
-
 .jusmundi-page.page-dark .jusmundi-table-card {
 	background: rgba(30, 41, 59, 0.7);
 	border-color: rgba(71, 85, 105, 0.4);
@@ -219,6 +210,9 @@ html[data-theme="light"] .jusmundi-page.page-dark .service-card,
 html[data-theme="light"]
 	.jusmundi-page.page-dark
 	a.service-card.jusmundi-doc-card,
+html[data-theme="light"]
+	.jusmundi-page.page-dark
+	article.service-card.jusmundi-doc-card,
 html[data-theme="light"] .jusmundi-page.page-dark .kpi-card,
 html[data-theme="light"] .jusmundi-page.page-dark .jusmundi-table-card {
 	background: rgba(255, 255, 255, 0.85);
@@ -300,9 +294,7 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 	padding: 1.5rem 1rem;
 	text-align: center;
 	box-shadow: 0 2px 10px var(--cv-shadow);
-	transition:
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .kpi-card:hover {
@@ -429,9 +421,7 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 	padding: 1.75rem;
 	border-radius: 12px;
 	box-shadow: 0 2px 10px var(--cv-shadow);
-	transition:
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	border: 1px solid var(--cv-border-light);
 }
 
@@ -475,7 +465,7 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 	gap: 1.5rem;
 }
 
-/* AI / Notion source notice (Jusmundi review pages) */
+/* AI / source notice (Jusmundi review pages) */
 .jusmundi-source-notice {
 	margin: 0 0 1.75rem;
 	padding: 1rem 1.25rem;
@@ -568,6 +558,41 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 	color: inherit;
 }
 
+.jusmundi-landing-page article.service-card.jusmundi-doc-card {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	text-align: center;
+}
+
+.jusmundi-landing-page article.service-card.jusmundi-doc-card:hover {
+	color: inherit;
+}
+
+.jusmundi-landing-page article.service-card.jusmundi-doc-card h3 a {
+	color: inherit;
+}
+
+/* Jus Connect (jusconnect.com) inline links with external-tab icon */
+.jusmundi-landing-page a.jusconnect-product-link {
+	text-decoration: none;
+}
+
+.jusmundi-landing-page a.jusconnect-product-link:hover {
+	text-decoration: underline;
+}
+
+.jusmundi-landing-page a.jusconnect-product-link .fa-up-right-from-square {
+	font-size: 0.72em;
+	opacity: 0.88;
+	vertical-align: 0.1em;
+}
+
+.jusmundi-doc-card a.jusconnect-product-link {
+	position: relative;
+	z-index: 2;
+}
+
 .jusmundi-landing-page .jusmundi-table-card {
 	overflow-x: auto;
 	-webkit-overflow-scrolling: touch;
@@ -592,6 +617,18 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 
 .jusmundi-landing-page .jusmundi-service-card-wide .badge-row {
 	justify-content: flex-start;
+}
+
+/* Achievements by area: row 1 SEO | SLA, row 2 Security | Platform (two fixed columns) */
+.jusmundi-landing-page .services-grid.jusmundi-achievements-by-area-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+}
+
+@media (max-width: 768px) {
+	.jusmundi-landing-page .services-grid.jusmundi-achievements-by-area-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* Skip link (accessibility) */
@@ -743,6 +780,18 @@ html[data-theme="light"] .jusmundi-page.page-dark .kpi-table th {
 	font-weight: 700;
 	line-height: 1.35;
 	color: #fff;
+}
+
+/* Second spotlight band (infrastructure / K8s) — distinct gradient from security #1 */
+.infra-migration-band--k8s {
+	background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #134e4a 100%);
+	box-shadow: 0 8px 28px rgba(15, 118, 110, 0.32);
+}
+
+/* Third spotlight band (AI / ISO 42001) */
+.infra-migration-band--ai {
+	background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 45%, #4c1d95 100%);
+	box-shadow: 0 8px 28px rgba(91, 33, 182, 0.35);
 }
 
 @media (max-width: 576px) {
