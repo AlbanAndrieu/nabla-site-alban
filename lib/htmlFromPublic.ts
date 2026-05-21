@@ -13,7 +13,6 @@ export type SiteLocale = "en" | "fr";
 const DEFAULT_LOCALE: SiteLocale = "en";
 const SUPPORTED_LOCALES: readonly SiteLocale[] = ["en", "fr"];
 
-
 export const HOME_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "Person",
@@ -21,8 +20,8 @@ export const HOME_JSON_LD = {
 	jobTitle: "Freelance DevSecOps Engineer & Cloud Architect",
 	description:
 		"Freelance DevSecOps engineer and cloud architect (AWS, Azure, OVH). Cloud security consultant for AI-driven and security-critical products; ISO 27001, SOC 2, GDPR-aligned delivery.",
-	url: "https://dr-alban.com/",
-	email: "job@dr-alban.com",
+	url: "https://albandrieu.com/",
+	email: "job@albandrieu.com",
 	sameAs: [
 		"https://www.linkedin.com/in/nabla/",
 		"https://twitter.com/AlbanAndrieu",
@@ -52,21 +51,21 @@ export const HOME_JSON_LD = {
 			"@type": "DigitalDocument",
 			name: "LaTeX Resume PDF",
 			description: "Traditional formatted resume in PDF format",
-			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			url: "https://albandrieu.com/cv/cv-aandrieu-2026.pdf",
 			encodingFormat: "application/pdf",
 		},
 		{
 			"@type": "DigitalDocument",
 			name: "LinkedIn Resume PDF",
 			description: "LinkedIn profile exported as PDF",
-			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			url: "https://albandrieu.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
 			encodingFormat: "application/pdf",
 		},
 		{
 			"@type": "WebPage",
 			name: "Online CV Landing Page",
 			description: "Interactive web-based CV and professional profile",
-			url: "https://dr-alban.com/cv/index.html",
+			url: "https://albandrieu.com/cv/index.html",
 		},
 	],
 };
@@ -100,21 +99,21 @@ export const HOME_JSON_LD_FR = {
 			"@type": "DigitalDocument",
 			name: "CV LaTeX (PDF)",
 			description: "CV classique au format PDF",
-			url: "https://dr-alban.com/cv/cv-aandrieu-2026.pdf",
+			url: "https://albandrieu.com/cv/cv-aandrieu-2026.pdf",
 			encodingFormat: "application/pdf",
 		},
 		{
 			"@type": "DigitalDocument",
 			name: "CV LinkedIn (PDF)",
 			description: "Profil LinkedIn exporté en PDF",
-			url: "https://dr-alban.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+			url: "https://albandrieu.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
 			encodingFormat: "application/pdf",
 		},
 		{
 			"@type": "WebPage",
 			name: "Page CV en ligne",
 			description: "CV interactif et profil professionnel",
-			url: "https://dr-alban.com/cv/index.html",
+			url: "https://albandrieu.com/cv/index.html",
 		},
 	],
 };
@@ -181,10 +180,7 @@ function rewriteOneHref(
 	return `href=${quote}${localizedOut}${query}${hash}${quote}`;
 }
 
-function rewriteOneSrc(
-	quote: '"' | "'",
-	raw: string,
-): string {
+function rewriteOneSrc(quote: '"' | "'", raw: string): string {
 	const src = raw.trim();
 	if (
 		/^(https?:|mailto:|tel:|#|javascript:|data:)/i.test(src) ||
@@ -268,9 +264,7 @@ export async function loadPublicHtmlFragment(
 		);
 		fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
 	} else if (mode === "navHeaderMain") {
-		const m = html.match(
-			/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i,
-		);
+		const m = html.match(/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i);
 		fragment = m?.[0] ?? "";
 	} else {
 		const m = html.match(/<main[^>]*>[\s\S]*?<\/main>/i);
@@ -301,7 +295,7 @@ export async function metadataFromPublicHtml(
 	const normalizedPath = canonicalPath.startsWith("/")
 		? canonicalPath
 		: `/${canonicalPath}`;
-	const canonical = `https://dr-alban.com${withLocalePrefix(normalizedPath, locale)}`;
+	const canonical = `https://albandrieu.com${withLocalePrefix(normalizedPath, locale)}`;
 
 	return {
 		title,

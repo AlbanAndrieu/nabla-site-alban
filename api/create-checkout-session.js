@@ -15,7 +15,7 @@ function getOrigin(req) {
 	const host = (req.headers["x-forwarded-host"] || req.headers.host || "")
 		.split(",")[0]
 		.trim();
-	if (!host) return "https://www.dr-alban.com";
+	if (!host) return "https://www.albandrieu.com";
 	return `${proto}://${host}`;
 }
 

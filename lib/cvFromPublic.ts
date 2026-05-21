@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 
 import { rewriteLegacyHtmlHrefs } from "@/lib/htmlFromPublic";
 
-
 export type CvLocale = "en" | "fr";
 
 function normalizeCvLocale(locale?: string): CvLocale {
@@ -90,7 +89,7 @@ export async function metadataFromCvHtml(
 	const normalizedPath = canonicalPath.startsWith("/")
 		? canonicalPath
 		: `/${canonicalPath}`;
-	const canonical = `https://dr-alban.com${normalizedPath}`;
+	const canonical = `https://albandrieu.com${normalizedPath}`;
 
 	return {
 		title,

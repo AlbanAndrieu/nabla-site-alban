@@ -9,7 +9,7 @@ import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-	metadataBase: new URL("https://dr-alban.com"),
+	metadataBase: new URL("https://albandrieu.com"),
 };
 
 type Props = {
@@ -87,7 +87,7 @@ export default async function RootLayout({ children, params }: Props) {
 				<meta name="color-scheme" content="light dark" />
 				<meta name="referrer" content="always" />
 			</head>
-			{ /* TODO use className page-login page-ciso page-ctid page-truenas page-workstation page-contact page-security only when appropriate */}
+			{/* TODO use className page-login page-ciso page-ctid page-truenas page-workstation page-contact page-security only when appropriate */}
 			<body
 				className="site-content-page page-contact page-nabla-best-practices page-ciso page-ctid page-login page-dark"
 				suppressHydrationWarning

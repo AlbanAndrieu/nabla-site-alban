@@ -45,16 +45,16 @@ test("metadataFromPublicHtml decodes entities and builds canonical url", async (
 		metadata.title,
 		"Alban Andrieu — Freelance DevSecOps & Cloud Architect (AWS, Azure, OVH)",
 	);
-	assert.equal(metadata.alternates?.canonical, "https://dr-alban.com/");
-	assert.equal(metadata.openGraph?.url, "https://dr-alban.com/");
+	assert.equal(metadata.alternates?.canonical, "https://albandrieu.com/");
+	assert.equal(metadata.openGraph?.url, "https://albandrieu.com/");
 });
 
 test("metadataFromPublicHtml uses locale-specific source when available", async () => {
 	const metadata = await metadataFromPublicHtml("index.html", "/", "fr");
 
 	assert.equal(metadata.title, "Accueil | Alban Andrieu");
-	assert.equal(metadata.alternates?.canonical, "https://dr-alban.com/fr");
-	assert.equal(metadata.openGraph?.url, "https://dr-alban.com/fr");
+	assert.equal(metadata.alternates?.canonical, "https://albandrieu.com/fr");
+	assert.equal(metadata.openGraph?.url, "https://albandrieu.com/fr");
 });
 
 test("metadataFromPublicHtml falls back to english source and normalizes locale", async () => {
@@ -68,7 +68,10 @@ test("metadataFromPublicHtml falls back to english source and normalizes locale"
 		metadata.title,
 		"Contact Alban Andrieu - DevSecOps Professional",
 	);
-	assert.equal(metadata.alternates?.canonical, "https://dr-alban.com/contact");
+	assert.equal(
+		metadata.alternates?.canonical,
+		"https://albandrieu.com/contact",
+	);
 });
 
 test("loadPublicHtmlFragment returns inner main content for localized page", async () => {

@@ -31,7 +31,7 @@ export function getTrustedOrigin():
 			return {
 				ok: false,
 				error:
-					"Invalid DOMAIN: use a full http(s) origin with no trailing slash, path, or credentials (e.g. https://www.dr-alban.com).",
+					"Invalid DOMAIN: use a full http(s) origin with no trailing slash, path, or credentials (e.g. https://www.albandrieu.com).",
 			};
 		}
 		return { ok: true, origin };

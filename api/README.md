@@ -4,7 +4,7 @@
 
 Text can be **bold**, _italic_, or ~~strikethrough~~.
 
-# [![Nabla](https://dr-alban.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) nabla-site-alban
+# [![Nabla](https://albandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) nabla-site-alban
 
 [![License: APACHE](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
@@ -17,8 +17,8 @@ Node.js handlers for [Vercel serverless functions](https://vercel.com/docs/funct
 
 Includes Stripe Checkout (`create-checkout-session.js`) and other small endpoints. Install dependencies from the repository root (`npm install`); Vercel bundles `api/` for deployment.
 
-[info](https://dr-alban.com/info)
-[test](https://dr-alban.com/test)
+[info](https://albandrieu.com/info)
+[test](https://albandrieu.com/test)
 
 # Contributing
 

@@ -3,9 +3,12 @@ import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { loadPublicHtmlFragment, type SiteLocale } from "@/lib/htmlFromPublic";
-
-import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
+import {
+	HOME_JSON_LD,
+	HOME_JSON_LD_FR,
+	loadPublicHtmlFragment,
+	type SiteLocale,
+} from "@/lib/htmlFromPublic";
 
 type Props = {
 	params: Promise<{ locale: SiteLocale }>;
@@ -34,25 +37,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			authors: [{ name: "Alban Andrieu" }],
 			openGraph: {
 				type: "profile",
-				url: "https://dr-alban.com/fr",
-				title: "Alban Andrieu — Ingénieur DevSecOps freelance et architecte cloud",
+				url: "https://albandrieu.com/fr",
+				title:
+					"Alban Andrieu — Ingénieur DevSecOps freelance et architecte cloud",
 				description:
 					"Ingénieur DevSecOps freelance et architecte cloud. Sécuriser, automatiser et faire évoluer les plateformes AWS, Azure et OVH pour produits critiques et pilotés par l’IA.",
-				images: [{ url: "https://dr-alban.com/assets/nabla/nabla-4.svg" }],
+				images: [{ url: "https://albandrieu.com/assets/nabla/nabla-4.svg" }],
 			},
 			twitter: {
 				card: "summary",
-				title: "Alban Andrieu — Ingénieur DevSecOps freelance et architecte cloud",
+				title:
+					"Alban Andrieu — Ingénieur DevSecOps freelance et architecte cloud",
 				description:
 					"Consultant en sécurité cloud et ingénieur DevSecOps freelance. AWS, Azure, OVH — infra IA, conformité, CI/CD et IaC.",
-				images: ["https://dr-alban.com/assets/nabla/nabla-4.svg"],
+				images: ["https://albandrieu.com/assets/nabla/nabla-4.svg"],
 			},
 			alternates: {
-				canonical: "https://dr-alban.com/fr",
+				canonical: "https://albandrieu.com/fr",
 				languages: {
-					en: "https://dr-alban.com/",
-					fr: "https://dr-alban.com/fr",
-					"x-default": "https://dr-alban.com/",
+					en: "https://albandrieu.com/",
+					fr: "https://albandrieu.com/fr",
+					"x-default": "https://albandrieu.com/",
 				},
 			},
 		};
@@ -76,25 +81,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		authors: [{ name: "Alban Andrieu" }],
 		openGraph: {
 			type: "profile",
-			url: "https://dr-alban.com/",
+			url: "https://albandrieu.com/",
 			title: "Alban Andrieu — Freelance DevSecOps & Cloud Architect",
 			description:
 				"Freelance DevSecOps and cloud architect. Secure, automate and scale AWS, Azure and OVH platforms for AI-driven and security-critical products.",
-			images: [{ url: "https://dr-alban.com/assets/nabla/nabla-4.svg" }],
+			images: [{ url: "https://albandrieu.com/assets/nabla/nabla-4.svg" }],
 		},
 		twitter: {
 			card: "summary",
 			title: "Alban Andrieu — Freelance DevSecOps & Cloud Architect",
 			description:
 				"Freelance cloud security consultant and DevSecOps engineer. AWS, Azure, OVH — AI infra, compliance, CI/CD and IaC.",
-			images: ["https://dr-alban.com/assets/nabla/nabla-4.svg"],
+			images: ["https://albandrieu.com/assets/nabla/nabla-4.svg"],
 		},
 		alternates: {
-			canonical: "https://dr-alban.com/",
+			canonical: "https://albandrieu.com/",
 			languages: {
-				en: "https://dr-alban.com/",
-				fr: "https://dr-alban.com/fr",
-				"x-default": "https://dr-alban.com/",
+				en: "https://albandrieu.com/",
+				fr: "https://albandrieu.com/fr",
+				"x-default": "https://albandrieu.com/",
 			},
 		},
 	};
