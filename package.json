@@ -54,12 +54,12 @@
 		"crypto": "^1.0.1",
 		"express": "^4.21.0",
 		"lodash-es": "^4.18.1",
-		"next": "^16.2.3",
+		"next": "^16.2.6",
 		"next-intl": "^4.9.2",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"stripe": "^20.4.1",
-		"vercel": "^51.8.0",
+		"vercel": "^52.2.0",
 		"webdriver-manager": "^12.1.9"
 	},
 	"devDependencies": {
