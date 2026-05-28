@@ -894,7 +894,7 @@
 			container.removeChild(container.firstChild);
 		}
 		var user = "alban" + "." + "andrieu";
-		var domain = "dr-alban" + "." + "com";
+		var domain = "albanandrieu" + "." + "com";
 		var email = user + "@" + domain;
 		var link = document.createElement("a");
 		link.href = "mailto:" + email;

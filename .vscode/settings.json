@@ -59,5 +59,6 @@
 	"github.copilot.advanced": {
     "debug.overrideProxyUrl": "http://localhost:4100",
     "debug.testOverrideProxyUrl": "http://localhost:4100"
-  }
+	},
+	"aws.telemetry": false
 }

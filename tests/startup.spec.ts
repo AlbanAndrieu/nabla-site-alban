@@ -9,7 +9,7 @@ test.describe("Startup inquiry page", () => {
 		await expect(form).toBeVisible();
 		await expect(form).toHaveAttribute(
 			"action",
-			/formsubmit\.co\/job@dr-alban\.com/,
+			/formsubmit\.co\/job@albanandrieu\.com/,
 		);
 		await expect(form).toHaveAttribute("method", "post");
 
