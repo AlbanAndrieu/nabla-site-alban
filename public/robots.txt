@@ -4,7 +4,7 @@
 # www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
 
 # If you wish to crawl this website, please obtain explicit permission first.
-# Contact us via email at alban.andrieu@albanandrieu.com for authorization.
+# Contact us via email at job@albandrieu.com for authorization.
 
 User-agent: 008
 Disallow: /
