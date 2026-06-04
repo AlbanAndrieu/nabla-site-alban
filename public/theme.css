@@ -775,7 +775,7 @@ img {
 	position: absolute;
 	top: -40px;
 	left: 0;
-	background: var(--button-bg);
+	/*background: var(--button-bg);*/
 	color: var(--button-text);
 	padding: 8px;
 	text-decoration: none;

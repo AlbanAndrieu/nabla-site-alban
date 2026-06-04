@@ -40,6 +40,7 @@
 /* eslint-env browser */
 /* global gtag, google */
 (() => {
+
 	var root = document.currentScript;
 	var preset = window.NABLA_WIDGETS || {};
 
@@ -894,8 +895,7 @@
 			container.removeChild(container.firstChild);
 		}
 		var user = "alban" + "." + "andrieu";
-		var domain = "albanandrieu" + "." + "com";
-		var email = user + "@" + domain;
+		var email = user + "@albandrieu.com";
 		var link = document.createElement("a");
 		link.href = "mailto:" + email;
 		link.className = "contact-me-card__link";

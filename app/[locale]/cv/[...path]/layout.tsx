@@ -45,6 +45,13 @@ export default async function CVLayout({ children, params }: Props) {
 				<NextIntlClientProvider messages={messages}>
 					{children}
 				</NextIntlClientProvider>
+				<Script
+					src="/site-widgets.js"
+					strategy="afterInteractive"
+					data-print-pdf
+					data-no-coffee-fab
+					data-no-google-translate
+				/>
 			</body>
 		</html>
 	);

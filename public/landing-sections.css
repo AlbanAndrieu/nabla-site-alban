@@ -632,7 +632,7 @@ html[data-theme="light"] .tool-item:hover img {
 html {
 	scroll-behavior: smooth;
 }
-
+ 
 /* Loading Animation */
 @keyframes pulse {
 	0%,

@@ -1732,6 +1732,7 @@ pre code {
 	-webkit-overflow-scrolling: touch;
 	-ms-overflow-style: -ms-autohiding-scrollbar;
 }
+
 .table-responsive > .table-bordered {
 	border: 0;
 }

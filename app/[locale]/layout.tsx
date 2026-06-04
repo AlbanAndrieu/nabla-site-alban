@@ -100,9 +100,11 @@ export default async function RootLayout({ children, params }: Props) {
 				<Script
 					src="/site-widgets.js"
 					strategy="afterInteractive"
-					data-print-pdf
+					data-no-print-pdf
 					data-no-coffee-fab
 					data-no-google-translate
+					data-no-smooth-scroll
+					data-no-scroll-reveal
 				/>
 			</body>
 		</html>
