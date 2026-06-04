@@ -13,6 +13,14 @@
 	--shadow-hover-color: rgba(0, 0, 0, 0.15);
 }
 
+/* Make text fit into the button */
+.btn:first-child:hover {
+	width: auto;
+	max-width: none;
+	white-space: normal;
+	height: auto;
+}
+
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -632,7 +640,7 @@ html[data-theme="light"] .tool-item:hover img {
 html {
 	scroll-behavior: smooth;
 }
- 
+
 /* Loading Animation */
 @keyframes pulse {
 	0%,
