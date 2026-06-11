@@ -43,6 +43,38 @@ test.describe("Site widgets integration", () => {
 		expect(sawScrollTop).toBeTruthy();
 	});
 
+	test("should scroll to top when back-to-top control has href '#'", async ({ page }) => {
+		await page.goto("/");
+		await page.evaluate(() => {
+			const button = document.getElementById("nabla-back-to-top");
+			if (button) {
+				button.setAttribute("href", "#");
+			}
+		});
+
+		await page.evaluate(() => {
+			const calls: Array<[number, number]> = [];
+			(
+				window as unknown as { __scrollCalls?: Array<[number, number]> }
+			).__scrollCalls = calls;
+			const original = window.scrollTo.bind(window);
+			window.scrollTo = ((x: number, y: number) => {
+				calls.push([x, y]);
+				original(x, y);
+			}) as typeof window.scrollTo;
+		});
+
+		await page.locator("#nabla-back-to-top").click();
+
+		const sawScrollTop = await page.evaluate(() => {
+			const calls = (
+				window as unknown as { __scrollCalls?: Array<[number, number]> }
+			).__scrollCalls;
+			return !!calls?.some(([x, y]) => x === 0 && y === 0);
+		});
+		expect(sawScrollTop).toBeTruthy();
+	});
+
 	test("should keep 404 in minimal chrome mode while still applying stored theme", async ({
 		page,
 	}) => {
