@@ -514,7 +514,7 @@ When exploring the codebase:
      - Allow legitimate search engine crawlers (Googlebot, Bingbot, etc.)
      - Block AI scrapers and unwanted bots (listed in current robots.txt)
      - Use `Crawl-delay` to prevent server overload
-     - Always reference the sitemap: `Sitemap: https://dr-alban.com/sitemap-albandrieu-com.xml`
+     - Always reference the sitemap: `Sitemap: https://albanandrieu.com/sitemap.xml`
      - Submit sitemap via Google Search Console (recommended over deprecated ping service)
 
 2. **Sitemap Requirements**
@@ -555,7 +555,7 @@ When exploring the codebase:
    <?xml version="1.0" encoding="UTF-8"?>
    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
      <url>
-       <loc>https://dr-alban.com/path/to/page.html</loc>
+       <loc>https://albanandrieu.com/path/to/page.html</loc>
        <changefreq>monthly</changefreq>
        <priority>0.8</priority>
        <lastmod>YYYY-MM-DD</lastmod>
@@ -584,17 +584,17 @@ When exploring the codebase:
      - Homepage: `weekly`
 
 4. **Current Sitemap Pages**
-   - `https://dr-alban.com/` (homepage - note: actual sitemap uses /index.html)
-   - `https://dr-alban.com/policy/privacy_policy.html`
-   - `https://dr-alban.com/policy/service_terms.html`
-   - `https://dr-alban.com/policy/gnu_general_public_license.txt`
+   - `https://albanandrieu.com/` (homepage - note: actual sitemap uses /index.html)
+   - `https://albanandrieu.com/policy/privacy_policy.html`
+   - `https://albanandrieu.com/policy/service_terms.html`
+   - `https://albanandrieu.com/policy/gnu_general_public_license.txt`
    - `https://status.albandrieu.com/` (external status page - note: typically external domains should not be in sitemap)
 
    **Note**: Consider updating the sitemap to use canonical URLs (remove /index.html for homepage) and evaluate whether external status page should be included.
 
 5. **Sitemap Validation**
    - Validate XML structure before committing
-   - Test sitemap URL is accessible: `https://dr-alban.com/sitemap-albandrieu-com.xml`
+   - Test sitemap URL is accessible: `https://albanandrieu.com/sitemap-albandrieu-com.xml`
    - Submit to Google Search Console after updates
    - Verify all URLs in sitemap return HTTP 200 status
    - Keep sitemap size under 50MB and 50,000 URLs
@@ -612,10 +612,10 @@ When exploring the codebase:
    ```html
    <!-- facebook open graph tags -->
    <meta property="og:type" content="website" />
-   <meta property="og:url" content="https://dr-alban.com" />
+   <meta property="og:url" content="https://albanandrieu.com" />
    <meta property="og:title" content="Page Title - 60 characters max" />
    <meta property="og:description" content="Clear description - 200 characters max" />
-   <meta property="og:image" content="https://dr-alban.com/path/to/image.jpg" />
+   <meta property="og:image" content="https://albanandrieu.com/path/to/image.jpg" />
    <meta property="og:image:alt" content="Description of image for accessibility" />
    <meta property="og:site_name" content="Site Name" />
    <meta property="og:locale" content="en_US" />
@@ -628,7 +628,7 @@ When exploring the codebase:
    - Formats: JPG, PNG, WebP
    - Use absolute URLs (include full domain)
    - Ensure image is publicly accessible (not behind authentication)
-   - Current example: `https://dr-alban.com/nabla/assets/miss-and-love-you-quote.jpeg`
+   - Current example: `https://albanandrieu.com/nabla/assets/miss-and-love-you-quote.jpeg`
 
 3. **Twitter Card Tags**
    ```html
@@ -637,7 +637,7 @@ When exploring the codebase:
    <meta name="twitter:site" content="@username">
    <meta name="twitter:title" content="Page Title">
    <meta name="twitter:description" content="Page description">
-   <meta name="twitter:image" content="https://dr-alban.com/path/to/image.jpg">
+   <meta name="twitter:image" content="https://albanandrieu.com/path/to/image.jpg">
    ```
 
 4. **Page-Specific Open Graph**

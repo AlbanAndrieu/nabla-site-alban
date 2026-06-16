@@ -809,19 +809,6 @@
 		return { aria: "Back to top of page", title: "Back to top" };
 	}
 
-	function scrollToTopOfPage() {
-		/* Instant + window + html + body + scrollingElement: fragment #top / overflow-x on
-		   html leave scrollingElement.scrollTo(smooth) ineffective in common WebKit/Chromium cases. */
-		try {
-			window.scrollTo({
-				top: 0,
-				behavior: 'smooth'
-			});
-		} catch (_e) {
-			/* ignore */
-		}
-	}
-
 	function removeLegacyBackToTopFabs() {
 		document
 			.querySelectorAll("a.back-to-top, button.back-to-top")
@@ -845,10 +832,12 @@
 		link.title = labels.title;
 		link.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>';
 
-		link.addEventListener("click", (e) => {
+		link.addEventListener('click', (e) => {
 			e.preventDefault();
-			e.stopPropagation();
-			scrollToTopOfPage();
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+			document.body.scrollTo({ top: 0, behavior: 'smooth' });
+			// Also target documentElement for cross-browser compatibility
+			document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
 		});
 		document.body.appendChild(link);
 	}
@@ -888,7 +877,8 @@
 			container.removeChild(container.firstChild);
 		}
 		var user = "alban" + "." + "andrieu";
-		var email = user + "@albandrieu.com";
+		var domain = "albandrieu" + "." + "com";
+		var email = user + "@" + domain;
 		var link = document.createElement("a");
 		link.href = "mailto:" + email;
 		link.className = "contact-me-card__link";

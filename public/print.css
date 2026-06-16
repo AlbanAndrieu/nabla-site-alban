@@ -2,57 +2,6 @@
  * Optimizes all pages and CV for printing as PDF
  */
 
-/*
-@media print {
-	.theme-toggle,
-	.google-translate-widget,
-	.print-button {
-		display: none;
-	}
-
-	.coffee-fab-btn,
-	#coffeeModal {
-		display: none;
-	}
-
-	body {
-		background-color: white;
-		color: black;
-	}
-
-	a {
-		color: black;
-		text-decoration: underline;
-	}
-}*/
-
-/* Print Styles for PDF Export */
-/*
-@media print {
-
-	.hero-section {
-		background: white;
-		color: black;
-		min-height: auto;
-		padding: 20pt 0;
-	}
-
-	.services-section,
-	.skills-section,
-	.tools-section,
-	.contact-section {
-		background: white;
-		page-break-inside: avoid;
-	}
-
-	.service-card,
-	.skill-category {
-		box-shadow: none;
-		border: 1px solid #ddd;
-	}
-}
-*/
-
 @media print {
 	/* Page Setup - no running header/footer; disable "Headers and footers" in print dialog for clean PDF */
 	@page {
@@ -122,16 +71,6 @@
 	noscript {
 		display: none;
 	}
-
-	/* Show important content
-	main,
-	article,
-	section,
-	.content,
-	.main-content {
-		display: block;
-		width: 100%;
-	}*/
 
 	/* Typography */
 	h1,

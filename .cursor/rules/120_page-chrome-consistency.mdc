@@ -104,8 +104,8 @@ To bulk-fix placement and paths, run from repo root: `node scripts/sync-html-pag
 ## 7. Link back to main page / home
 
 - Every non-homepage content page must have a **link back to the main page**:
-  - Pages in **`public/`** (root): use `<a href="/">… Back to home</a>` (or “Home”) so links match Next.js and extensionless URLs. Prefer a small nav block at the top, e.g. `<nav class="page-nav" aria-label="Breadcrumb">` with “Back to home” as on `people-contacted.html` and `for-fathers.html`.
-  - Pages in **`public/policy/`**: use `<a href="/">… Back to home</a>` in the same way.
+  - Pages in **`public/`** (root): use `<a href="index.html">… Back to home</a>` (or “Home”). Prefer a small nav block at the top, e.g. `<nav class="page-nav" aria-label="Breadcrumb">` with “Back to home” as on `people-contacted.html` and `for-fathers.html`.
+  - Pages in **`public/policy/`**: use `<a href="../index.html">… Back to home</a>` in the same way.
 - The **homepage** (`index.html`) does not need a “back to home” link. “Back to top” is provided by `site-widgets.js`, not footer markup.
 
 ## 8. Sitemap

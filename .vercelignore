@@ -1,5 +1,5 @@
 # Ignore everything (folders and files) on root only
-#/*
+# /*
 .vc-config.json
 node_modules
 .next
@@ -21,7 +21,6 @@ api
 !components
 !messages
 !i18n
-node_modules
 !public
 !vercel.json
 !tsconfig.tsbuildinfo
