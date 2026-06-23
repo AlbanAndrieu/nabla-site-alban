@@ -625,3 +625,14 @@ body.page-nabla-best-practices
 	text-align: center;
 	margin: 2.5rem 0 1.25rem;
 }
+
+.jusmundi-link {
+    color: #dbe5e6; /* violet Jus Mundi */
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.jusmundi-link:hover {
+    color: #f1dc1c;
+    text-decoration: underline;
+}
