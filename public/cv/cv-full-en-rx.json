@@ -1,7 +1,7 @@
 {
   "picture": {
     "hidden": false,
-    "url": "",
+    "url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782313434045.jpeg",
     "size": 80,
     "rotation": 0,
     "aspectRatio": 1,
@@ -16,7 +16,7 @@
     "headline": "DevSecOps Cloud Architect",
     "email": "job@albandrieu.com",
     "phone": "+33 6 95 43 53 53",
-    "location": "Based in Paris, France",
+    "location": "Paris, France",
     "website": {
       "url": "https://albanandrieu.com",
       "label": "albanandrieu.com"
@@ -24,9 +24,15 @@
     "customFields": [
       {
         "id": "1c9cfb0e-7e0e-4bf5-bbc7-2382a2f0a2e4",
-        "icon": "",
-        "text": "linkedin.com/in/nabla",
+        "icon": "linkedin-logo",
+        "text": "nabla",
         "link": "https://linkedin.com/in/nabla/"
+      },
+      {
+        "id": "019efa4a-a710-776b-8a23-9c94f27c39c9",
+        "icon": "github-logo",
+        "text": "AlbanAndrieu",
+        "link": "https://github.com/AlbanAndrieu"
       }
     ]
   },
@@ -35,7 +41,7 @@
     "icon": "article",
     "columns": 1,
     "hidden": false,
-    "content": "<p>Highly experienced Cloud Architect with over 20 years of expertise in software engineering, cloud infrastructure, and SDLC automation. Specialized in digital transformation initiatives, containerization technologies, and secure deployment practices. Proven track record of successfully leading complex integration projects, implementing GitOps workflows, and coordinating cross-functional teams in enterprise environments. Expert in building and maintaining robust SDLC pipelines using Jenkins, GitLab, Docker, Kubernetes, and Ansible across diverse technology stacks including C/C++, Java, JavaScript, PHP, Go and Python. Strong background in financial services industry with deep knowledge of back-office systems and regulatory requirements.</p>"
+    "content": "<p><strong>Highly experienced Cloud Architect </strong>with over 20 years of expertise in software engineering, cloud infrastructure, and SDLC automation. Specialized in digital transformation initiatives, containerization technologies, and <u>secure deployment</u> practices. Proven track record of successfully leading complex integration projects, implementing GitOps workflows, and coordinating cross-functional teams. Expert in building and maintaining robust SDLC pipelines using Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform and Ansible across diverse technology stacks including C/C++, Java, JavaScript, PHP, Go and Python. Strong background in financial services industry with deep knowledge of back-office systems and regulatory requirements.</p>"
   },
   "sections": {
     "profiles": {
@@ -47,13 +53,39 @@
         {
           "id": "fb162be2-248f-4d22-b836-e6d31da7191e",
           "hidden": false,
-          "icon": "",
+          "icon": "linkedin-logo",
           "iconColor": "",
           "network": "LinkedIn",
           "username": "nabla",
           "website": {
             "url": "https://linkedin.com/in/nabla/",
             "label": "linkedin.com/in/nabla",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019efa53-b92a-753d-b5c2-da02b8870ec3",
+          "hidden": false,
+          "icon": "github-logo",
+          "iconColor": "",
+          "network": "Github",
+          "username": "AlbanAndrieu",
+          "website": {
+            "url": "https://github.com/AlbanAndrieu",
+            "label": "",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019efa50-3e34-7643-b2b4-c057a707d011",
+          "hidden": false,
+          "icon": "globe",
+          "iconColor": "",
+          "network": "Website",
+          "username": "albanandrieu.com",
+          "website": {
+            "url": "https://albanandrieu.com",
+            "label": "",
             "inlineLink": false
           }
         }
@@ -71,13 +103,13 @@
           "company": "Jus Mundi",
           "position": "Cloud, Integration Architect (DevSecOps)",
           "location": "Paris, France",
-          "period": "2022-2026",
+          "period": "2022 - Present",
           "website": {
             "url": "https://www.jusmundi.com",
             "label": "jusmundi.com",
             "inlineLink": false
           },
-          "description": "<p>Focus: Support AI Transition and Website hosting</p><p>Project: AI Agent for International Law and Arbitration (jusmundi.com)</p><p>Digital Transformation Initiatives:</p><ul><li>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</li><li>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</li><li>Kubernetes Orchestration: Designed and deployed Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</li></ul><p>SDLC Integration Project:</p><ul><li>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</li><li>Cross-Team Coordination: Collaborated with development, Data Scientist to implement end-to-end automation for build, test, package, and delivery workflows</li><li>Metrics & Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</li></ul><p>Technical Environment:</p><ul><li>Architecture: Micro services architectures in Python, GO, Nuxt and PhP</li><li>Product: Jus Mundi provide AI and Optimized Search for International Legal content</li></ul><p>Key Responsibilities:</p><ul><li>Business Continuity: Ensure website availability and fast delivery of feature and fixes</li><li>Security: Push for High security standard and protection</li><li>AI Support: Support delivery of AI Tools across Engineer and Data Scientist</li></ul>",
+          "description": "<ul><li><p>Focus: Support AI Transition and Website hosting</p></li><li><p>Project: AI Agent for International Law and Arbitration (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://jusmundi.com\">jusmundi.com</a>)</p></li><li><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Protect business: With anti-scraping, Keycloak identity and authorization, no friction for legitimate customers, first IA tech implementing and maintaining ISO 42001, 27001, SOC II</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Nomad and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul></li><li><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Cross-Team Coordination: Collaborated with development, Data Scientist to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul></li><li><p>Technical Environment:</p><ul><li><p>Architecture: Micro services architectures in Python, GO, Nuxt and PhP</p></li><li><p>Product: Jus Mundi (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.jusmundi.com\">https://www.jusmundi.com</a>) provide AI and Optimized Search for International Legal content</p></li></ul></li><li><p>Key Responsibilities:</p><ul><li><p>Business Continuity: Ensure website availability and fast delivery of feature and fixes</p></li><li><p>Security: Push for High security standard and protection</p></li><li><p>AI Support: Support delivery of AI Tools across Engineer and Data Scientist</p></li></ul></li></ul><p></p>",
           "roles": []
         },
         {
@@ -92,7 +124,7 @@
             "label": "finastra.com",
             "inlineLink": false
           },
-          "description": "<p>Focus: Digital Transformation and Cloud Migration</p><p>Leading DevSecOps initiatives for legal tech platform</p><p>Project: Treasury and Capital Markets Solutions</p><p>Digital Transformation Initiatives:</p><ul><li>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</li><li>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</li><li>Kubernetes Orchestration: Designed and deployed Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</li></ul><p>SDLC Integration Project:</p><ul><li>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</li><li>Infrastructure Unification: Consolidated disparate SDLC systems under a unified Jenkins-based platform</li><li>Cross-Team Coordination: Collaborated with development, QA, and operations teams to implement end-to-end automation for build, test, package, and delivery workflows</li><li>Metrics & Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</li></ul><p>Key Responsibilities:</p><ul><li>Pipeline Management: Design, implement, and maintain comprehensive DevSecOps pipelines integrating security scanning, automated testing, and continuous deployment</li><li>Cloud Systems Integration: Architect and maintain cloud-based infrastructure ensuring high availability, scalability, and security</li><li>Security Automation: Implement automated security and compliance checks within cloud environments, including vulnerability scanning, secrets management, and access control automation</li><li>Infrastructure as Code: Lead infrastructure automation initiatives using Ansible, Terraform, and other IaC tools for consistent and reproducible deployments</li><li>SDLC Optimization: Continuously improve build, test, and deployment workflows to enhance efficiency, reliability, and security</li><li>Team Collaboration: Work closely with development, operations, and security teams to implement DevSecOps best practices and foster a culture of shared responsibility</li></ul><p>Technologies & Tools:</p><ul><li>Security Tools: SAST/DAST scanning, Klocwork, Fuzzing, Secret Detection, vulnerability management</li><li>Automation: Ansible, Terraform</li><li>Cloud Platforms: AWS, Azure</li><li>Containerization: Docker, Kubernetes for orchestration</li><li>SDLC: Jenkins pipelines</li></ul>",
+          "description": "<p>Focus: Digital Transformation and Cloud Migration</p><p>Leading DevSecOps initiatives for legal tech platform</p><p>Project: Treasury and Capital Markets Solutions</p><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Solaris and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Infrastructure Unification: Consolidated disparate SDLC systems under a unified Jenkins-based platform</p></li><li><p>Cross-Team Coordination: Collaborated with development, QA, and operations teams to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul><p>Key Responsibilities:</p><ul><li><p>Pipeline Management: Design, implement, and maintain comprehensive DevSecOps pipelines integrating security scanning, automated testing, and continuous deployment</p></li><li><p>Cloud Systems Integration: Architect and maintain cloud-based infrastructure ensuring high availability, scalability, and security</p></li><li><p>Security Automation: Implement automated security and compliance checks within cloud environments, including vulnerability scanning, secrets management, and access control automation</p></li><li><p>Infrastructure as Code: Lead infrastructure automation initiatives using Ansible, Terraform, and other IaC tools for consistent and reproducible deployments</p></li><li><p>SDLC Optimization: Continuously improve build, test, and deployment workflows to enhance efficiency, reliability, and security</p></li><li><p>Team Collaboration: Work closely with development, operations, and security teams to implement DevSecOps best practices and foster a culture of shared responsibility</p></li></ul><p>Technologies &amp; Tools:</p><ul><li><p>Security Tools: SAST/DAST scanning, Klocwork, Fuzzing, Secret Detection, vulnerability management</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul><p></p>",
           "roles": []
         },
         {
@@ -103,7 +135,7 @@
           "location": "Paris, France",
           "period": "2012-2017",
           "website": {
-            "url": "",
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
             "label": "",
             "inlineLink": false
           },
@@ -118,7 +150,7 @@
           "location": "Paris, France",
           "period": "2007-2012",
           "website": {
-            "url": "",
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
             "label": "",
             "inlineLink": false
           },
@@ -133,7 +165,7 @@
           "location": "Paris, France",
           "period": "2005-2010",
           "website": {
-            "url": "",
+            "url": "https://wholesale.banking.societegenerale.com/en/",
             "label": "",
             "inlineLink": false
           },
@@ -153,16 +185,16 @@
           "hidden": false,
           "school": "EFREI - École d'Ingénieurs Généralistes",
           "degree": "Engineering Degree in Computer Science (Diplôme d'Ingénieur)",
-          "area": "Computer Science and Information Systems",
+          "area": "Computer Science",
           "grade": "",
           "location": "Paris, France",
           "period": "1999-2004",
           "website": {
-            "url": "",
+            "url": "https://www.efrei.fr/",
             "label": "",
             "inlineLink": false
           },
-          "description": "<p>Specialization: Computer Science and Information Systems</p><p>International Experience: University exchange program in London, United Kingdom (2002)</p><p>Key Courses: Software Engineering, Database Systems, Network Architecture, Algorithms & Data Structures, Object-Oriented Programming</p>"
+          "description": "<ul><li><p>Key Courses: Software Engineering, Database Systems, Network Architecture, Algorithms &amp; Data Structures, Object-Oriented Programming</p></li></ul><p></p>"
         }
       ]
     },
@@ -186,7 +218,7 @@
           "iconColor": "",
           "name": "Cloud & Containerization",
           "proficiency": "",
-          "level": 0,
+          "level": 4,
           "keywords": [
             "Docker (image creation, optimization)",
             "Kubernetes (deployments, services, ingress)",
@@ -204,7 +236,7 @@
           "iconColor": "",
           "name": "SDLC & DevOps",
           "proficiency": "",
-          "level": 0,
+          "level": 5,
           "keywords": [
             "Jenkins",
             "GitLab",
@@ -224,7 +256,7 @@
           "iconColor": "",
           "name": "Programming Languages",
           "proficiency": "",
-          "level": 0,
+          "level": 3,
           "keywords": [
             "Python (scripting, automation)",
             "Shell scripting (Bash, sh)",
@@ -241,7 +273,7 @@
           "iconColor": "",
           "name": "Operating Systems",
           "proficiency": "",
-          "level": 0,
+          "level": 4,
           "keywords": [
             "Linux (Ubuntu, CentOS, RHEL)",
             "MacOS",
@@ -257,7 +289,7 @@
           "iconColor": "",
           "name": "Monitoring & Logging",
           "proficiency": "",
-          "level": 0,
+          "level": 5,
           "keywords": [
             "Prometheus",
             "Grafana",
@@ -273,7 +305,7 @@
           "iconColor": "",
           "name": "Databases",
           "proficiency": "",
-          "level": 0,
+          "level": 3,
           "keywords": [
             "PostgreSQL",
             "Oracle Database (8i, 10g, 11g)",
@@ -285,11 +317,11 @@
         {
           "id": "2ac6658d-25f9-4e04-818b-bf335660e41b",
           "hidden": false,
-          "icon": "",
+          "icon": "wall",
           "iconColor": "",
           "name": "Security & Compliance",
           "proficiency": "",
-          "level": 0,
+          "level": 5,
           "keywords": [
             "Secrets management",
             "Security hardening",
@@ -308,7 +340,7 @@
           "iconColor": "",
           "name": "Methodologies",
           "proficiency": "",
-          "level": 0,
+          "level": 2,
           "keywords": [
             "Agile/Scrum",
             "UML modeling",
@@ -325,7 +357,7 @@
           "iconColor": "",
           "name": "Additional Tools",
           "proficiency": "",
-          "level": 0,
+          "level": 5,
           "keywords": [
             "SonarQube (code quality)",
             "Artifactory/Nexus/Harbor",
@@ -385,18 +417,17 @@
         {
           "id": "ea2ff475-0d9f-4eae-8190-6af54ea71244",
           "hidden": false,
-          "icon": "",
+          "icon": "person-simple-run",
           "iconColor": "",
           "name": "Running",
           "keywords": [
-            "Active runner participating in half-marathons",
-            "demonstrating discipline and endurance"
+            "Active runner participating in half-marathons demonstrating discipline and endurance"
           ]
         },
         {
           "id": "401f65e0-da1a-4d41-bdfd-479e945acf78",
           "hidden": false,
-          "icon": "",
+          "icon": "person-simple-ski",
           "iconColor": "",
           "name": "Skiing",
           "keywords": [
@@ -407,12 +438,11 @@
         {
           "id": "93159cee-6485-4ddc-b6d6-64b53ef428b3",
           "hidden": false,
-          "icon": "",
+          "icon": "lock",
           "iconColor": "",
           "name": "Information Security",
           "keywords": [
-            "Continuous learning in cybersecurity",
-            "following latest trends in application security, infrastructure hardening, and threat intelligence"
+            "Continuous learning in cybersecurity following latest trends in application security infrastructure hardening, and threat intelligence"
           ]
         },
         {
@@ -471,7 +501,21 @@
       "icon": "phone",
       "columns": 1,
       "hidden": false,
-      "items": []
+      "items": [
+        {
+          "id": "019efa42-c621-7748-b765-c76a85465aae",
+          "hidden": false,
+          "name": "Available upon request",
+          "position": "",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "phone": "",
+          "description": ""
+        }
+      ]
     }
   },
   "customSections": [],

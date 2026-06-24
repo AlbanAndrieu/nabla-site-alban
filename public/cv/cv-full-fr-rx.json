@@ -1,7 +1,7 @@
 {
   "picture": {
     "hidden": false,
-    "url": "",
+    "url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782313434045.jpeg",
     "size": 80,
     "rotation": 0,
     "aspectRatio": 1,
@@ -13,22 +13,35 @@
   },
   "basics": {
     "name": "Alban ANDRIEU",
-    "headline": "DevSecOps Cloud Architect",
+    "headline": "Architecte Cloud Securité et AI",
     "email": "job@albandrieu.com",
     "phone": "+33 6 95 43 53 53",
-    "location": "Basé à Paris, France",
+    "location": "Nanterre, France",
     "website": {
       "url": "https://albanandrieu.com",
       "label": "albanandrieu.com"
     },
-    "customFields": []
+    "customFields": [
+      {
+        "id": "019efa4c-e5e0-71ec-8f4f-8dc68bad2299",
+        "icon": "linkedin-logo",
+        "text": "nabla",
+        "link": "https://www.linkedin.com/in/nabla/"
+      },
+      {
+        "id": "019efa49-bcc6-73db-901c-e7a25c859f8c",
+        "icon": "github-logo",
+        "text": "AlbanAndrieu",
+        "link": "https://github.com/AlbanAndrieu"
+      }
+    ]
   },
   "summary": {
     "title": "Résumé professionnel",
     "icon": "article",
     "columns": 1,
     "hidden": false,
-    "content": "<p>Architecte Cloud très expérimenté avec plus de 20 ans d'expertise en ingénierie logicielle, infrastructure cloud et automatisation SDLC. Spécialisé dans les initiatives de transformation digitale, les technologies de conteneurisation et les pratiques de déploiement sécurisé. Solide expérience dans le pilotage de projets d'intégration complexes, la mise en œuvre de flux GitOps et la coordination d'équipes pluridisciplinaires en environnement entreprise. Expert en conception et maintenance de pipelines SDLC robustes avec Jenkins, GitLab, Docker, Kubernetes et Ansible sur des stacks variés (C/C++, Java, JavaScript, PHP, Go, Python). Forte expérience dans les services financiers avec une connaissance approfondie des systèmes back-office et des exigences réglementaires.</p>"
+    "content": "<p><strong>Architecte Cloud expérimenté</strong> avec plus de 20 ans d'expertise en ingénierie logicielle, infrastructure cloud et automatisation SDLC. Spécialisé dans les initiatives de transformation digitale, les technologies de conteneurisation et les pratiques de <u>déploiement sécurisé</u>. Solide expérience dans le pilotage de projets d'intégration complexes, la mise en œuvre de flux GitOps et la coordination d'équipes pluridisciplinaires. Expert en conception et maintenance de pipelines SDLC robustes avec Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform et Ansible sur des stacks variés (C/C++, Java, JavaScript, PHP, Go, Python). Forte expérience dans les services financiers avec une connaissance approfondie des systèmes back-office et des exigences réglementaires.</p>"
   },
   "sections": {
     "profiles": {
@@ -40,13 +53,39 @@
         {
           "id": "43bbd7ef-2149-4898-83aa-9e96665fee67",
           "hidden": false,
-          "icon": "",
+          "icon": "linkedin-logo",
           "iconColor": "",
           "network": "LinkedIn",
           "username": "nabla",
           "website": {
             "url": "https://linkedin.com/in/nabla/",
             "label": "linkedin.com/in/nabla/",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019efa54-dd68-7199-8365-5a16af9a9ab8",
+          "hidden": false,
+          "icon": "github-logo",
+          "iconColor": "",
+          "network": "GitHub",
+          "username": "AlbanAndrieu",
+          "website": {
+            "url": "https://github.com/AlbanAndrieu",
+            "label": "",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019efa51-2db0-77aa-a2ab-70c99f9f9de4",
+          "hidden": false,
+          "icon": "globe",
+          "iconColor": "",
+          "network": "Website",
+          "username": "albanandrieu.com",
+          "website": {
+            "url": "https://albanandrieu.com",
+            "label": "",
             "inlineLink": false
           }
         }
@@ -64,13 +103,13 @@
           "company": "Jus Mundi",
           "position": "Architecte Cloud, Intégration (DevSecOps)",
           "location": "Paris, France",
-          "period": "2022-2026",
+          "period": "2022 - Present",
           "website": {
             "url": "https://www.jusmundi.com",
             "label": "jusmundi.com",
             "inlineLink": false
           },
-          "description": "<ul><li>Focus : Accompagnement de la transition IA et hébergement du site</li><li>Projet : Agent IA pour le droit international et l'arbitrage (jusmundi.com)</li><li>Initiatives de transformation digitale :<ul><li>Sécurité de l'infrastructure : Mise en place de mesures de sécurité complètes pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</li><li>Conteneurisation : Pilotage de la conteneurisation avec Docker, création d'images optimisées et bonnes pratiques sécurité et performance</li><li>Orchestration Kubernetes : Conception et déploiement de clusters Kubernetes pour les charges de production (réseau, stockage, monitoring)</li></ul></li><li>Projet d'intégration SDLC :<ul><li>Standardisation des processus : Définition et documentation des processus de livraison, indicateurs qualité et KPIs</li><li>Coordination inter-équipes : Collaboration avec le développement et les Data Scientists pour l'automatisation build, test, package et livraison</li><li>Métriques et reporting : Mise en place de monitoring et reporting (taux de succès des builds, fréquence de déploiement, lead time)</li></ul></li><li>Environnement technique :<ul><li>Architecture : Architectures microservices en Python, GO, Nuxt et PHP</li><li>Produit : Jus Mundi propose l'IA et la recherche optimisée pour le contenu juridique international</li></ul></li><li>Responsabilités clés :<ul><li>Continuité d'activité : Garantir la disponibilité du site et la livraison rapide des évolutions et correctifs</li><li>Sécurité : Promouvoir un haut niveau de sécurité et de protection</li><li>Support IA : Accompagner la livraison des outils IA auprès des ingénieurs et data scientists</li></ul></li></ul>",
+          "description": "<ul><li><p>Focus : Accompagnement de la transition IA et hébergement du site</p></li><li><p>Projet : Agent IA pour le droit international et l'arbitrage (jusmundi.com)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité complètes pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Protection métier : Renforcement de la sécurité applicative grâce à des mécanismes anti-scraping et à la gestion centralisée des identités et des accès avec Keycloak, tout en préservant la fluidité du parcours utilisateur, première legal tech à obtenir les certifications ISO 42001, 27001, SOC II</p></li><li><p>Conteneurisation : Pilotage de la conteneurisation avec Docker, création d'images optimisées et bonnes pratiques sécurité et performance</p></li><li><p>Orchestration : Conception et déploiement de clusters Nomad et Kubernetes pour les charges de production (réseau, stockage, monitoring)</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation des processus : Définition et documentation des processus de livraison, indicateurs qualité et KPIs</p></li><li><p>Coordination inter-équipes : Collaboration avec le développement et les Data Scientists pour l'automatisation build, test, package et livraison</p></li><li><p>Métriques et reporting : Mise en place de monitoring et reporting (taux de succès des builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architectures microservices en Python, GO, Nuxt et PHP</p></li><li><p>Produit : Jus Mundi propose l'IA et la recherche optimisée pour le contenu juridique international</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Continuité d'activité : Garantir la disponibilité du site et la livraison rapide des évolutions et correctifs</p></li><li><p>Sécurité : Promouvoir un haut niveau de sécurité et de protection</p></li><li><p>Support IA : Accompagner la livraison des outils IA auprès des ingénieurs et data scientists</p></li></ul></li></ul><p></p>",
           "roles": []
         },
         {
@@ -81,11 +120,11 @@
           "location": "Paris, France",
           "period": "2017-2022",
           "website": {
-            "url": "",
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
             "label": "",
             "inlineLink": false
           },
-          "description": "<ul><li>Focus : Transformation digitale et migration cloud</li><li>Pilotage des initiatives DevSecOps pour plateforme legal tech</li><li>Projet : Solutions Trésorerie et Marchés de capitaux (finastra.com/solutions/treasury-capital-markets)</li><li>Initiatives de transformation digitale :<ul><li>Sécurité de l'infrastructure : Mise en place de mesures de sécurité pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</li><li>Conteneurisation : Pilotage avec Docker, images optimisées et bonnes pratiques</li><li>Orchestration Kubernetes : Conception et déploiement de clusters pour la production</li></ul></li><li>Projet d'intégration SDLC :<ul><li>Standardisation : Processus de livraison et KPIs</li><li>Unification : Consolidation des systèmes SDLC sur une plateforme Jenkins unifiée</li><li>Coordination : Collaboration avec dev, QA et opérations pour l'automatisation complète</li><li>Métriques : Monitoring et reporting (builds, fréquence de déploiement, lead time)</li></ul></li><li>Responsabilités clés :<ul><li>Pipelines : Conception, mise en œuvre et maintenance de pipelines DevSecOps (sécurité, tests, déploiement)</li><li>Intégration cloud : Architecture et maintenance d'infrastructure cloud (haute disponibilité, scalabilité, sécurité)</li><li>Automatisation sécurité : Contrôles de sécurité et conformité automatisés (vulnérabilités, secrets, accès)</li><li>Infrastructure as Code : Ansible, Terraform et autres outils IaC pour des déploiements reproductibles</li><li>Optimisation SDLC : Amélioration continue des flux build, test et déploiement</li><li>Collaboration : Travail avec dev, ops et sécurité pour les bonnes pratiques DevSecOps</li></ul></li><li>Technologies et outils :<ul><li>Sécurité : SAST/DAST, Klocwork, Fuzzing, Secret Detection, gestion des vulnérabilités</li><li>Automatisation : Ansible, Terraform</li><li>Cloud : AWS, Azure</li><li>Conteneurisation : Docker, Kubernetes</li><li>SDLC : Pipelines Jenkins</li></ul></li></ul>",
+          "description": "<ul><li><p>Focus : Transformation digitale et migration cloud</p></li><li><p>Pilotage des initiatives DevSecOps pour plateforme legal tech</p></li><li><p>Projet : Solutions Trésorerie et Marchés de capitaux (finastra.com/solutions/treasury-capital-markets)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Conteneurisation : Pilotage avec Docker, Zone Solaris, images optimisées et bonnes pratiques</p></li><li><p>Orchestration Solaris et Kubernetes : Conception et déploiement de clusters</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation : Processus de livraison et KPIs</p></li><li><p>Unification : Consolidation des systèmes SDLC sur une plateforme Jenkins unifiée</p></li><li><p>Coordination : Collaboration avec dev, qa, sécurité et opérations pour l'automatisation complète</p></li><li><p>Métriques : Monitoring et reporting (builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Pipelines : Conception, mise en œuvre et maintenance de pipelines DevSecOps (sécurité, tests, déploiement)</p></li><li><p>Intégration cloud : Architecture et maintenance d'infrastructure cloud (haute disponibilité, scalabilité, sécurité)</p></li><li><p>Automatisation sécurité : Contrôles de sécurité et conformité automatisés (vulnérabilités, secrets, accès)</p></li><li><p>Infrastructure as Code : Ansible, Terraform et autres outils IaC pour des déploiements reproductibles</p></li><li><p>Optimisation SDLC : Amélioration continue des flux build, test et déploiement</p></li><li><p>Collaboration : Travail avec dev, ops et sécurité pour les bonnes pratiques DevSecOps</p></li></ul></li><li><p>Technologies et outils :</p><ul><li><p>Sécurité : SAST/DAST, Klocwork, Fuzzing, Secret Detection, gestion des vulnérabilités</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>",
           "roles": []
         },
         {
@@ -96,7 +135,7 @@
           "location": "Paris, France",
           "period": "2012-2017",
           "website": {
-            "url": "",
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
             "label": "",
             "inlineLink": false
           },
@@ -111,7 +150,7 @@
           "location": "Paris, France",
           "period": "2007-2012",
           "website": {
-            "url": "",
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
             "label": "",
             "inlineLink": false
           },
@@ -126,7 +165,7 @@
           "location": "Paris, France",
           "period": "2005-2010",
           "website": {
-            "url": "",
+            "url": "https://wholesale.banking.societegenerale.com/en/",
             "label": "",
             "inlineLink": false
           },
@@ -151,11 +190,27 @@
           "location": "Paris, France",
           "period": "1999-2004 (5 ans)",
           "website": {
-            "url": "",
+            "url": "https://www.efrei.fr/",
             "label": "",
             "inlineLink": false
           },
           "description": "<ul><li>Spécialisation : Informatique et systèmes d'information</li><li>Expérience internationale : Programme d'échange universitaire à Londres, Royaume-Uni (2002)</li><li>Principaux enseignements : Génie logiciel, bases de données, architecture réseau, algorithmes et structures de données, programmation orientée objet</li></ul>"
+        },
+        {
+          "id": "019efa02-31d2-77ef-98b9-0ae7d426de79",
+          "hidden": false,
+          "school": "Lycée ITEC Boisfleury",
+          "degree": "Baccalauréat",
+          "area": "spécialité physique-chimie",
+          "grade": "",
+          "location": "Grenoble",
+          "period": "1999",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": ""
         }
       ]
     },
@@ -173,26 +228,6 @@
       "hidden": false,
       "items": [
         {
-          "id": "588f9df2-76cf-4399-9f93-2bdb94db498f",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Jenkins",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "3c17d290-6213-4a94-84a2-6cce360f11ce",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "GitLab",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
           "id": "a9d011f0-1953-459b-b6c5-673f5ca6c9cd",
           "hidden": false,
           "icon": "",
@@ -203,13 +238,43 @@
           "keywords": []
         },
         {
-          "id": "73c2b9a8-e28f-4aca-9b14-4292a2aacd5a",
+          "id": "019ef9ec-9a26-7748-8400-c72df0edbd95",
           "hidden": false,
-          "icon": "",
+          "icon": "acorn",
+          "iconColor": "",
+          "name": "Nomad",
+          "proficiency": "",
+          "level": 5,
+          "keywords": []
+        },
+        {
+          "id": "019ef9ef-73db-7559-9c25-0681ea4e74a4",
+          "hidden": false,
+          "icon": "acorn",
           "iconColor": "",
           "name": "Kubernetes",
           "proficiency": "",
-          "level": 0,
+          "level": 3,
+          "keywords": []
+        },
+        {
+          "id": "588f9df2-76cf-4399-9f93-2bdb94db498f",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "Jenkins",
+          "proficiency": "",
+          "level": 5,
+          "keywords": []
+        },
+        {
+          "id": "3c17d290-6213-4a94-84a2-6cce360f11ce",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "GitLab",
+          "proficiency": "",
+          "level": 4,
           "keywords": []
         },
         {
@@ -219,87 +284,7 @@
           "iconColor": "",
           "name": "Ansible",
           "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "fca7e9a9-3120-45f4-9672-6ea6a99be6e3",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "C/C++",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "b27bd8ae-6979-4361-958d-8b7de1ff3936",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Java",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "e926e710-274f-409e-b01a-44e3455af8ec",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "JavaScript",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "662d2d09-e126-41cd-b15d-4e188da95a8a",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "PHP",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "c5c1175e-c06a-45e4-9efe-785ce004fa8a",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Go",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "28ce7f5f-03e8-44c8-8cb0-725278221704",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Python",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "8050a111-804a-4721-b978-3a525184aeac",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "AWS",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "0c8a2749-722e-4855-bd3b-9153c1ae439a",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Azure",
-          "proficiency": "",
-          "level": 0,
+          "level": 5,
           "keywords": []
         },
         {
@@ -309,37 +294,17 @@
           "iconColor": "",
           "name": "SAST/DAST",
           "proficiency": "",
-          "level": 0,
+          "level": 4,
           "keywords": []
         },
         {
-          "id": "1a3bc26d-a2b8-44c9-8c66-312ef1679836",
+          "id": "019ef9f0-2221-7261-bb02-ad1283b06b57",
           "hidden": false,
-          "icon": "",
+          "icon": "acorn",
           "iconColor": "",
-          "name": "Klocwork",
+          "name": "WAF / Firewall",
           "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "76a8f612-22ac-4f14-bb7b-97bd090815bc",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Fuzzing",
-          "proficiency": "",
-          "level": 0,
-          "keywords": []
-        },
-        {
-          "id": "41127ac4-87d4-40b7-a914-19cbc898556a",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Secret Detection",
-          "proficiency": "",
-          "level": 0,
+          "level": 4,
           "keywords": []
         },
         {
@@ -349,7 +314,67 @@
           "iconColor": "",
           "name": "Terraform",
           "proficiency": "",
-          "level": 0,
+          "level": 4,
+          "keywords": []
+        },
+        {
+          "id": "8050a111-804a-4721-b978-3a525184aeac",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "AWS",
+          "proficiency": "",
+          "level": 3,
+          "keywords": []
+        },
+        {
+          "id": "0c8a2749-722e-4855-bd3b-9153c1ae439a",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "Azure",
+          "proficiency": "",
+          "level": 2,
+          "keywords": []
+        },
+        {
+          "id": "41127ac4-87d4-40b7-a914-19cbc898556a",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "Secret Detection",
+          "proficiency": "",
+          "level": 4,
+          "keywords": []
+        },
+        {
+          "id": "28ce7f5f-03e8-44c8-8cb0-725278221704",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "Python",
+          "proficiency": "",
+          "level": 3,
+          "keywords": []
+        },
+        {
+          "id": "b27bd8ae-6979-4361-958d-8b7de1ff3936",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "Java",
+          "proficiency": "",
+          "level": 4,
+          "keywords": []
+        },
+        {
+          "id": "fca7e9a9-3120-45f4-9672-6ea6a99be6e3",
+          "hidden": false,
+          "icon": "",
+          "iconColor": "",
+          "name": "C/C++",
+          "proficiency": "",
+          "level": 3,
           "keywords": []
         }
       ]
@@ -359,7 +384,36 @@
       "icon": "translate",
       "columns": 1,
       "hidden": false,
-      "items": []
+      "items": [
+        {
+          "id": "019ef9f0-ee01-741c-a635-8894b722c731",
+          "hidden": false,
+          "language": "Français",
+          "fluency": "Langue maternelle",
+          "level": 5
+        },
+        {
+          "id": "019ef9f1-2cce-746f-8370-4d4d97423d95",
+          "hidden": false,
+          "language": "Anglais",
+          "fluency": "Maîtrise professionnelle complète à l'écrit et à l'oral, TOEIC : 750",
+          "level": 4
+        },
+        {
+          "id": "019ef9fe-77d6-719b-930a-f21e07d10ae9",
+          "hidden": false,
+          "language": "Allemand",
+          "fluency": "Niveau élémentaire, Conversation et compréhension écrite de base",
+          "level": 1
+        },
+        {
+          "id": "019ef9fe-b9c7-763b-8755-aadf66873672",
+          "hidden": false,
+          "language": "Norvégien",
+          "fluency": "Niveau élémentaire, Conversation et compréhension écrite de base",
+          "level": 1
+        }
+      ]
     },
     "interests": {
       "title": "Centres d'intérêt professionnels",
@@ -370,7 +424,7 @@
         {
           "id": "ae68721e-c668-43c3-a639-d74d2ae618e1",
           "hidden": false,
-          "icon": "",
+          "icon": "person-simple-run",
           "iconColor": "",
           "name": "Course à pied",
           "keywords": [
@@ -381,7 +435,7 @@
         {
           "id": "d2ed9ae6-b620-4024-ac20-35eb029a2b13",
           "hidden": false,
-          "icon": "",
+          "icon": "person-simple-ski",
           "iconColor": "",
           "name": "Ski",
           "keywords": [
@@ -393,25 +447,13 @@
         {
           "id": "b63accc6-57a2-49ea-98bb-c2c84a469920",
           "hidden": false,
-          "icon": "",
+          "icon": "lock",
           "iconColor": "",
           "name": "Sécurité de l'information",
           "keywords": [
             "Veille cybersécurité",
             "sécurité applicative",
             "durcissement infrastructure"
-          ]
-        },
-        {
-          "id": "794e9785-cd75-4be2-997b-80e297c82982",
-          "hidden": false,
-          "icon": "",
-          "iconColor": "",
-          "name": "Veille technologique",
-          "keywords": [
-            "Cloud",
-            "conteneurisation",
-            "pratiques DevOps"
           ]
         },
         {
