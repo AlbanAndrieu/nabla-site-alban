@@ -773,6 +773,31 @@
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/freshrss.png",
 			"reacheableFromOutside": false
+		},
+		{
+			"name": "Hello",
+			"icons": ["fas fa-terminal"],
+			"description": "Hello World NGINX service",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8099,
+			"internalSecure": true,
+			"tunnelUrl": "https://hello.int.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/nginx.png",
+			"reacheableFromOutside": false
+		},		
+		{
+			"name": "garage",
+			"icons": ["fas fa-terminal"],
+			"description": "Garage service",
+			"internalHost": "172.17.0.24",
+			"internalPort": 3909,
+			"internalSecure": true,
+			"tunnelUrl": "https://garage.int.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/garage.png",
+			"reacheableFromOutside": false
 		}
+
 	]
 }
