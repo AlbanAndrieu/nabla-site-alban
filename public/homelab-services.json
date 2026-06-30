@@ -785,7 +785,7 @@
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/nginx.png",
 			"reacheableFromOutside": false
-		},		
+		},
 		{
 			"name": "garage",
 			"icons": ["fas fa-terminal"],
@@ -798,6 +798,5 @@
 			"iconSrc": "assets/selfh-icons/garage.png",
 			"reacheableFromOutside": false
 		}
-
 	]
 }

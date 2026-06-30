@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 /* Reserved for app-level overrides; site styles load from /public via layout <link>. */
 
 .google-translate-widget {
@@ -10,8 +10,8 @@
 
 /*d-inline-flex align-items-center gap-2 text-light small*/
 .locale-switcher {
-  display: inline-flex;
+	display: inline-flex;
 	align-items: center;
-  column-gap: 0.25rem;
-  text-light:smalld1d1;
+	column-gap: 0.25rem;
+	text-light: smalld1d1;
 }

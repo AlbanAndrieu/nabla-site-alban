@@ -55,13 +55,16 @@ test("homelab tunnel check rejects missing, invalid, and unsafe URLs before fetc
 
 	const unsupportedScheme = await GET(requestFor("file:///etc/passwd"));
 	assert.equal(unsupportedScheme.status, 403);
-	assert.deepEqual(await unsupportedScheme.json(), { error: "host not allowed" });
+	assert.deepEqual(await unsupportedScheme.json(), {
+		error: "host not allowed",
+	});
 	assert.equal(fetchCalls, 0);
 });
 
 test("homelab tunnel check allows configured host suffixes and falls back from HEAD to ranged GET", async () => {
 	setHosts("example.com, tunnel.example.net");
-	const calls: Array<{ url: string; method?: string; headers?: HeadersInit }> = [];
+	const calls: Array<{ url: string; method?: string; headers?: HeadersInit }> =
+		[];
 	globalThis.fetch = (async (input, init) => {
 		calls.push({
 			url: String(input),
@@ -85,18 +88,9 @@ test("homelab tunnel check allows configured host suffixes and falls back from H
 		calls.map((call) => call.method),
 		["HEAD", "GET"],
 	);
-	assert.equal(
-		calls[0].url,
-		"https://app.tunnel.example.net/status?health=1",
-	);
-	assert.equal(
-		calls[1].url,
-		"https://app.tunnel.example.net/status?health=1",
-	);
-	assert.equal(
-		(calls[1].headers as Record<string, string>).Range,
-		"bytes=0-0",
-	);
+	assert.equal(calls[0].url, "https://app.tunnel.example.net/status?health=1");
+	assert.equal(calls[1].url, "https://app.tunnel.example.net/status?health=1");
+	assert.equal((calls[1].headers as Record<string, string>).Range, "bytes=0-0");
 });
 
 test("homelab tunnel check reports TLS-like fetch failures without caching", async () => {

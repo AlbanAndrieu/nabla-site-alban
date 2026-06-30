@@ -22,26 +22,20 @@ export default async function CVLayout({ children, params }: Props) {
 	const messages = await getMessages();
 
 	// Determine if this is a sub-page (e.g., cv-small-fr.html)
-	const isSubPage = path && path.length === 1 && path[0].startsWith('cv-');
+	const isSubPage = path && path.length === 1 && path[0].startsWith("cv-");
 
 	// Set body classes based on page type
 	const bodyClassName = isSubPage
-		? 'page-cv'
-		: 'site-content-page page-cv page-dark page-nabla-best-practices';
+		? "page-cv"
+		: "site-content-page page-cv page-dark page-nabla-best-practices";
 
 	return (
 		<html>
-      <head>
+			<head>
 				{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
-				{isSubPage && (
-					<link rel="stylesheet" href="/cv/cv-theme.css" />
-				)}
-
+				{isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}
 			</head>
-			<body
-				className={bodyClassName}
-				suppressHydrationWarning
-			>
+			<body className={bodyClassName} suppressHydrationWarning>
 				<NextIntlClientProvider messages={messages}>
 					{children}
 				</NextIntlClientProvider>

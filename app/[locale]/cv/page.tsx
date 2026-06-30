@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { loadPublicHtmlFragment, type SiteLocale } from "@/lib/htmlFromPublic";
-
 import { routing } from "@/i18n/routing";
 import { loadCvHtmlFragment, metadataFromCvHtml } from "@/lib/cvFromPublic";
-
-import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
+import {
+	HOME_JSON_LD,
+	HOME_JSON_LD_FR,
+	loadPublicHtmlFragment,
+	type SiteLocale,
+} from "@/lib/htmlFromPublic";
 
 type Props = {
 	params: Promise<{ locale: string }>;

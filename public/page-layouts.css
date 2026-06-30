@@ -3,16 +3,21 @@
  * Load after site-content-page.css. Selectors are scoped with body.site-content-page.page-* .
  */
 
-
 /* remove double scroll */
-body.site-content-page.page-contact { /* the element was body.site-content-page.page-contact.page-nabla-best-practices.page-ciso.page-ctid.page-login.page-dark */
-  overflow-y: visible;
-  overflow: visible;
+body.site-content-page.page-contact {
+	/* the element was body.site-content-page.page-contact.page-nabla-best-practices.page-ciso.page-ctid.page-login.page-dark */
+	overflow-y: visible;
+	overflow: visible;
 }
 
-html:not([data-lt-script-installed]):not(.__lt-dummy-1):not(.__lt-dummy-2):not(.__lt-dummy-3):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(.__lt-dummy-wxyz1234) { /* the element was html.fontawesome-i2svg-active.fontawesome-i2svg-complete */
-  overflow-y: auto;
-  height: auto;
+html:not([data-lt-script-installed]):not(.__lt-dummy-1):not(.__lt-dummy-2):not(
+		.__lt-dummy-3
+	):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(
+		.__lt-dummy-wxyz1234
+	) {
+	/* the element was html.fontawesome-i2svg-active.fontawesome-i2svg-complete */
+	overflow-y: auto;
+	height: auto;
 }
 
 /* ----- Contact (contact.html) ----- */

@@ -39,7 +39,10 @@ test.after(() => {
 });
 
 test("originFromDomainEnv keeps only safe scheme and host", () => {
-	assert.equal(originFromDomainEnv(" https://example.com/ "), "https://example.com");
+	assert.equal(
+		originFromDomainEnv(" https://example.com/ "),
+		"https://example.com",
+	);
 	assert.equal(
 		originFromDomainEnv("http://example.com:8080/path?x=1"),
 		"http://example.com:8080",

@@ -79,9 +79,7 @@ export async function GET(req: NextRequest) {
 		clearTimeout(timer);
 		const msg = e instanceof Error ? e.message : String(e);
 		const tls =
-			/certificate|CERT_|TLS|SSL|unable to verify|UNABLE_TO_VERIFY/i.test(
-				msg,
-			);
+			/certificate|CERT_|TLS|SSL|unable to verify|UNABLE_TO_VERIFY/i.test(msg);
 		return NextResponse.json(
 			{ status: 0, tlsError: tls, error: msg.slice(0, 240) },
 			{ headers: { "Cache-Control": "no-store" } },
