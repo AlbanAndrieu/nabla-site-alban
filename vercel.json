@@ -9,5 +9,8 @@
 	},
 	"env": {
 		"STRIPE_PRICE_ID": "price_1TIuNgQR8aaUqJtoydBY5Fmw"
-	}
+	},
+	"rewrites": [
+		{ "source": "/jm", "destination": "/jm/index.html" }
+	]
 }

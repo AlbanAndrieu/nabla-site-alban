@@ -823,6 +823,18 @@
 			"reacheableFromOutside": true
 		},
 		{
+			"name": "Language Tool",
+			"icons": ["fas fa-screwdriver-wrench"],
+			"description": "languagetool",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8010,
+			"internalSecure": true,
+			"tunnelUrl": "https://languagetool.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/languagetool.png",
+			"reacheableFromOutside": true
+		},		
+		{
 			"name": "Garage",
 			"icons": ["fas fa-terminal"],
 			"description": "Garage service",
