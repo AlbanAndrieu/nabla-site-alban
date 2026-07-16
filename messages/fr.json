@@ -1,18 +1,151 @@
 {
-	"site": {
-		"skipToMainContent": "Aller au contenu principal",
-		"legalNotices": "Mentions légales",
-		"backToTop": "Retour en haut",
-		"backToTopAria": "Retour en haut de la page",
-		"localeSwitcherLabel": "Langue",
-		"languageName": {
-			"en": "Anglais",
-			"fr": "Français"
-		},
-		"switchLanguage": "Changer de langue"
-	},
-	"checkout": {
-		"sessionCreateError": "Impossible de créer la session de paiement.",
-		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
-	}
+  "site": {
+    "skipToMainContent": "Aller au contenu principal",
+    "legalNotices": "Mentions légales",
+    "backToTop": "Retour en haut",
+    "backToTopAria": "Retour en haut de la page",
+    "localeSwitcherLabel": "Langue",
+    "languageName": { "en": "Anglais", "fr": "Français" },
+    "switchLanguage": "Changer de langue"
+  },
+  "checkout": {
+    "sessionCreateError": "Impossible de créer la session de paiement.",
+    "missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+  },
+  "jm": {
+    "pageTitle": "Jusmundi — 4 ans d'impact & KPIs clés | Alban Andrieu",
+    "heroTitle": "Jusmundi — 4 ans de rétrospective",
+    "heroSubtitle": "KPIs et réalisations majeures (2022–2025) · Bilan de mon travail DevSecOps et contributions impactantes de mes collègues",
+    "kpisHeading": "Indicateurs de performance clés",
+    "kpisSubtitle": "Livraisons, fiabilité et impact (2022–2025)",
+    "kpiTasksCompleted": "325+",
+    "kpiPlatformUptime": "99.9%+",
+    "kpiSecurityBreaches": "0",
+    "kpiMttrP1": "~30 min",
+    "kpiAlertNoiseReduction": "60%",
+    "kpiAnnualSavings": "€50K+",
+    "securityBandHeading": "Sécurité prioritaire — anti-scraping, Keycloak pour identité et autorisation, absence de friction pour les clients légitimes",
+    "securityBandLead": "Priorité donnée à la sécurité : protection contre le scraping abusif et mise en place d'une identité robuste avec Keycloak, sans ralentir ni bloquer les clients légitimes, partenaires ou crawlers approuvés.",
+    "securityBand": [
+      "Scraping et abus — Cloudflare WAF, limites de débit et robots configurés pour que les vrais utilisateurs et outils SEO continuent de fonctionner pendant que le scraping automatisé baisse nettement.",
+      "Keycloak — SSO, authentification gateway API pour microservices, HA entre régions, et politiques (2FA, protection contre la force brute) alignées sur l'expérience produit.",
+      "Accès légitime — déploiement monitoré pour que la sécurité n'altère pas la confiance ou la conversion des utilisateurs payants."
+    ],
+    "infraBandHeading": "Migration de l'infrastructure vers Kubernetes de pointe aux États-Unis avec optimisation réseau",
+    "infraBandLead": "Hébergement US et modernisation de plateforme : DNS, Kubernetes et réseau, transition de Nomad vers Kubernetes avec optimisation des coûts et possibilité de montée en charge régionale.",
+    "infraBand": [
+      "Migration Kubernetes — audit, conception de clusters et déploiement aligné sur la disponibilité produit et le rythme des releases.",
+      "Présence US — hébergement et connectivité pour la latence, la conformité et la propriété opérationnelle.",
+      "Réseau — Magic WAN, VPC peering, VPN et Cloudflare WARP pour garder bureaux et cloud accessibles et monitorés."
+    ],
+    "aiBandHeading": "Soutenir la transition business et tech vers l'IA — hébergement de modèles juridiques ...",
+    "aiBandLead": "Transition IA : hébergement des modèles juridiques, conformité infra, accompagnement des équipes.",
+    "aiBand": [
+      "Hébergement IA — modèles juridiques déployés sur une infrastructure flexible et fiable.",
+      "Conformité — certification ISO 42001, SOC 2 maintenue sur les nouvelles charges.",
+      "Collaboration — accompagner les équipes pour adopter les nouveaux outils juridiques et analytiques."
+    ],
+    "achievementsHeading": "Réalisations par domaine",
+    "achievementsSubtitle": "Sécurité, fiabilité et livraison plateforme (2022–2025) - Objectif principal : garantir une plateforme sécurisée, fiable et qui délivre le produit",
+    "achievements": {
+      "seo": {
+        "title": "Améliorations SEO",
+        "lead": "WAF et politique crawler adaptées à la visibilité sur les moteurs",
+        "bullets": [
+          "Anti-scraping et WAF adaptés pour préserver le SEO : crawlers légitimes acceptés (AhRefs, SemRush, Oncrawl, Google Analytics, etc.).",
+          "Suivi du comportement WAF et de l'impact SEO pendant le déploiement ; le trafic bot réduit de ~75% sans effet sur les vrais utilisateurs ou la visibilité search.",
+          "Problèmes de chute SEO identifiés et résolus ; depuis l'arrivée des bots IA, SEO stable et amélioré sur plusieurs années."
+        ]
+      },
+      "sla": {
+        "title": "SLA et fiabilité",
+        "lead": "Uptime, alertes et réponse incidents",
+        "bullets": [
+          "Alertes fondées sur SLA pour les services critiques ; alerting SLO pour la surveillance dispo.",
+          "Disponibilité plateforme maintenue à 99.9%+ pour la recherche juridique critique ; objectif 99.9% core services.",
+          "MTTR passé de plusieurs heures à quelques minutes (P1 ~30 min) grâce à observabilité et runbooks.",
+          "Réduction du bruit d'alertes de ~60% par filtrage intelligent."
+        ]
+      },
+      "security": {
+        "title": "Sécurité & conformité",
+        "lead": "Gestion vulnérabilités, SSO IdP, certifications",
+        "badges": [
+          "Réduction CVE/vulnérabilités",
+          "SSO Keycloak",
+          "ISO 27001",
+          "ISO 42001",
+          "SOC2 Type II",
+          "TLS 1.3"
+        ],
+        "vulnTitle": "Réduction vulnérabilités & CVE",
+        "vulnBullets": [
+          "Objectif remediation <7j pour CVE critiques ; réussite scan containers >95%.",
+          "Gestion vulnérabilités : scans hebdo et correction des vulnérabilités critiques. OpenVAS, Trivy, Semgrep.",
+          "Semgrep SAST, GitLeaks pour secrets, Mega-Linter et GitLab Ultima Sec pour sécurité code.",
+          "Cloudflare WAF et protection DDoS ; limitation de débit et détection bots.",
+          "Vault pour secrets, rotation, certif automatisée et chiffrement en transit des documents utilisateurs"
+        ],
+        "idpTitle": "SSO IdP avec Keycloak",
+        "idpBullets": [
+          "Modernisation auth Keycloak : migration depuis auth legacy et upgrade sur 4 versions majeures.",
+          "SSO intégré Microsoft Entra ID et autres services internes ; 2FA et protection force brute activées.",
+          "Keycloak en HA ; problèmes expiration token et latence résolus en prod et régions multiples.",
+          "Utilisation Keycloak en mode API Gateway pour auth et autorisation microservices."
+        ],
+        "complianceTitle": "ISO, SOC & conformité",
+        "complianceBullets": [
+          "Préparation ISO 27001 et support ; sécurisation serveur, firewall reviews.",
+          "Plateforme alignée sur SOC II obtenu par Jusmundi.",
+          "Première IA Tech implémentant et maintenant le cadre ISO 42001 pour IA.",
+          "Revue annuelle firewall, contrôle accès, agents EDR/XDR sur nouveaux serveurs."
+        ]
+      },
+      "platform": {
+        "title": "Plateforme & infrastructure",
+        "lead": "Cloud, data, CI/CD, fondations IA",
+        "bullets": [
+          "Audit migration infra, hébergement US (DNS, Kubernetes, réseau), optimisation coûts et migration Nomad -> Kubernetes.",
+          "Observabilité: Victoria Metrics, Loki, dashboards Grafana, DataDog APM et tracing services.",
+          "Réseau : migration Magic WAN, VPC peering, VPN et Cloudflare WARP.",
+          "DB : tuning PostgreSQL, autovacuum/cache hit ; résolution incidents espace disque critiques.",
+          "Support Jus AI : clusters Elasticsearch, nodes GPU, assistant, doc classification services.",
+          "CI/CD : pipelines optimisées automatisées, scan containers, lint code ; Infra as Code (Terraform/Ansible) — ~90% réduction erreurs config manuelles."
+        ]
+      }
+    },
+    "overallHeading": "Estimation générale des personnes à supporter, mon chef (débutant) et moi",
+    "overallBullets": [
+      "~100–115 personnes totales en ~15+ équipes/sous-équipes",
+      "Départements principaux : Revenue/Sales, Tech (30%), Marketing/Product"
+    ],
+    "relatedDocumentsHeading": "Documents associés",
+    "relatedDocumentsSubtitle": "Synthèses et revues complètes",
+    "relatedDocuments": [
+      {
+        "title": "Bilan global JusMundi (2022–2025)",
+        "link": "4-years-review-jusmundi.html",
+        "iconClass": "fas fa-building",
+        "description": "Vue d'ensemble société, financements, lancements produit (Jus Connect, Jus AI), expansion géographique, réalisation IA",
+        "externalLink": {
+          "label": "Jus Connect",
+          "href": "https://jusconnect.com/"
+        }
+      },
+      {
+        "title": "Bilan performance 4 ans — Alban Andrieu",
+        "link": "4-years-review-aandrieu.html",
+        "iconClass": "fas fa-user-tie",
+        "description": "325+ tâches, infra, sécurité, bases, CI/CD, IA, observabilité (2022–2025)"
+      }
+    ],
+    "footer": {
+      "pricing": "Tarifs",
+      "legal": "Mentions légales",
+      "cookies": "Cookies",
+      "returnToCv": "Retour à l'accueil",
+      "backToTop": "Retour en haut",
+      "summary": "Synthèse issue des revues Jusmundi sur 4 ans (2022–2025)."
+    }
+  }
 }

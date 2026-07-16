@@ -1,20 +1,49 @@
 {
-	"version": 1,
-	"skills": {
-		"stripe-best-practices": {
-			"source": "docs.stripe.com",
-			"sourceType": "well-known",
-			"computedHash": "ae5889d45a1e29668b672290ca8d3d833fa30ff0634be85c30918ca0385dd1c6"
-		},
-		"stripe-projects": {
-			"source": "docs.stripe.com",
-			"sourceType": "well-known",
-			"computedHash": "74b5f9e1e24d7662000c28d6572e438ac71847d60ea0a8704b088441355e3371"
-		},
-		"upgrade-stripe": {
-			"source": "docs.stripe.com",
-			"sourceType": "well-known",
-			"computedHash": "06c5c3fd85657ff9aaadff65bd2d63f606da8e44802dc1f9aaf42c73263a11b7"
-		}
-	}
+  "version": 1,
+  "skills": {
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "ecc7641aea05f85ca3b11e7759d32aaf52fe05946ab4b63739c7bf78a41237a2"
+    },
+    "next-cache-components-adoption": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-cache-components-adoption/SKILL.md",
+      "computedHash": "aaee0946eff1ddcdeee10525953d32a11310e470ef4a13a2ebb3aa79bc1ae769"
+    },
+    "next-cache-components-optimizer": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-cache-components-optimizer/SKILL.md",
+      "computedHash": "b8d757a1fe10ebe7b10de1d5ee83f9bcdbd1de1e1147efc68cf249377f471067"
+    },
+    "next-dev-loop": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-dev-loop/SKILL.md",
+      "computedHash": "aad97b32ba6efd31e92d063ec77120a694fe0d4a9401daf9af4c205cd5e21b07"
+    },
+    "stripe-best-practices": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "7ff3b3441a1b1396584f85c3c7304ca4c28f2af5622a1932a046c86739063fd3"
+    },
+    "stripe-directory": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "58d8c458beaa92877ed2f0a622af65a0a91e2804efcc4188ac87a35780015361"
+    },
+    "stripe-projects": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "c084f4044a8d267c096e8391935e5547004a9ab003eaf34ee606041d2485f6c3"
+    },
+    "upgrade-stripe": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "46bb3c16878f93b953ed901b950686d64f04f90c67400bf31e1a0d7790d889df"
+    }
+  }
 }
