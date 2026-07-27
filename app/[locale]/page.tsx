@@ -165,7 +165,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 							</p>
 						</TimelineItem>
 						<TimelineItem icon="fa-circle" date="" title="">
-							{/* Passer un fragment vide pour satisfaire children obligatoire */}
+							<span aria-hidden="true" />
 						</TimelineItem>
 					</div>
 					<div className="cta-buttons">

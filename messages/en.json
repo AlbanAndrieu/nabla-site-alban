@@ -263,8 +263,8 @@
 	},
 	"home": {
 		"hero": {
-			"title": "Cloud & DevSecOps Architect, 20+ years experience",
-			"subtitle": "Cloud architect and DevSecOps engineer — I help startups and scale-ups secure, automate and scale their platforms so they ship faster without trading off compliance.",
+			"title": "Cybersecurity & DevSecOps Engineer — 20+ years of experience",
+			"subtitle": "I help teams secure cloud environments, automate controls, and make platforms reliable from code to production.",
 			"cta": {
 				"book": "Book a 30-minute consultation",
 				"start": "Start your project!",
@@ -272,14 +272,14 @@
 				"linkedin": "View LinkedIn"
 			},
 			"stats": {
-				"ia": "4+ years of IA",
+				"ia": "4+ years in AI",
 				"security": "7+ years in cybersecurity",
 				"infra": "10+ years in infrastructure",
 				"dev": "10+ years of development"
 			},
 			"lastexp": "My last experience at",
 			"jusmundi": "JusMundi",
-			"lastexp1": "Own infrastructure and support IA initiative.",
+			"lastexp1": "Owned infrastructure and secured AI initiatives.",
 			"lastexp2": "Reduce incident risk and improve compliance posture.",
 			"lastexp3": "Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
 			"lastexp4": "Accelerate delivery with robust CI/CD, IaC and observable production systems.",
@@ -316,14 +316,14 @@
 			"title": "Professional Experience",
 			"subtitle": "20+ years of experience delivering enterprise solutions",
 			"freelance": {
-				"title": "Freelance - Coming soon",
-				"date": "Freelance",
-				"desc": "Open for full time, short audits on project delivering — security, cloud infrastructure, compliance-oriented delivery and automation for AI."
+				"title": "Independent Cybersecurity & DevSecOps Engineer",
+				"date": "Since 2026",
+				"desc": "Available for DevSecOps, cloud security, control automation, and secure AI platform engagements."
 			},
 			"architect": {
 				"title": "DevSecOps Cloud Architect",
-				"date": "March 2022 – Present",
-				"desc": "Leading DevSecOps initiatives and cloud architecture for a international legal AI driven startup. Implementing secure, scalable infrastructure on AWS / OVH with focus on automation, security compliance (ISO 27001 / 42001, SOC 2, GDPR), and operational excellence.",
+				"date": "2022 – 2025",
+				"desc": "Led DevSecOps and cloud architecture for an international legal-tech company. Secured and scaled AWS and OVH platforms through automation, observability, and controls aligned with ISO 27001, ISO 42001, SOC 2, and GDPR.",
 				"more": "More here",
 				"ach1": "Cloud Architecture",
 				"ach2": "Security Compliance",
