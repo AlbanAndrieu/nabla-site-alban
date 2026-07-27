@@ -41,11 +41,11 @@ const copy = {
 } as const;
 
 const compliance = [
-	["GDPR / RGPD", "95%"],
-	["ISO 27001", "100%"],
-	["ISO 42001", "100%"],
-	["SOC 2", "In progress"],
-	["PCI DSS", "10%"],
+	["fa-user-shield", "GDPR / RGPD", "95%"],
+	["fa-shield-halved", "ISO 27001", "100%"],
+	["fa-brain", "ISO 42001", "100%"],
+	["fa-clipboard-check", "SOC 2", "In progress"],
+	["fa-credit-card", "PCI DSS", "10%"],
 ] as const;
 
 const metrics = {
@@ -102,16 +102,22 @@ export default async function CisoPage({ params }: Props) {
 				</section>
 
 				<div className="ciso-content">
-					<section className="ciso-card" aria-labelledby="compliance-heading">
+					<section
+						className="ciso-card ciso-card--wide ciso-card--centered"
+						aria-labelledby="compliance-heading"
+					>
 						<h2 id="compliance-heading">
 							<i className="fa-solid fa-certificate" aria-hidden="true" />{" "}
 							{t.compliance}
 						</h2>
 						<p>{t.complianceIntro}</p>
 						<dl className="ciso-compliance-grid">
-							{compliance.map(([label, value]) => (
+							{compliance.map(([icon, label, value]) => (
 								<div key={label}>
-									<dt>{label}</dt>
+									<dt>
+										<i className={`fa-solid ${icon}`} aria-hidden="true" />
+										<span>{label}</span>
+									</dt>
 									<dd>
 										{value === "In progress" && locale === "fr"
 											? "En cours"
@@ -135,7 +141,10 @@ export default async function CisoPage({ params }: Props) {
 						</a>
 					</section>
 
-					<section className="ciso-card" aria-labelledby="metrics-heading">
+					<section
+						className="ciso-card ciso-card--wide ciso-card--centered"
+						aria-labelledby="metrics-heading"
+					>
 						<h2 id="metrics-heading">
 							<i className="fa-solid fa-chart-line" aria-hidden="true" />{" "}
 							{t.metrics}

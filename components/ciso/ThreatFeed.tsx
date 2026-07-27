@@ -2,14 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const FEEDS = [
-	"https://www.bleepingcomputer.com/feed/",
-	"https://krebsonsecurity.com/feed/",
-	"https://www.securityweek.com/rss",
-	"https://feeds.feedburner.com/TheHackersNews",
-	"https://www.tenable.com/blog/feed",
-	"https://blog.rapid7.com/rss/",
-] as const;
+const FEEDS_CONFIG_URL = "/ciso-rss-feeds.json";
+const FEED_CONCURRENCY = 8;
+const MAX_VISIBLE_ITEMS = 24;
 
 type FeedItem = {
 	link: string;
@@ -26,6 +21,91 @@ function safeExternalUrl(value: unknown): string | null {
 	} catch {
 		return null;
 	}
+}
+
+function safeFeedUrl(value: unknown): string | null {
+	if (typeof value !== "string") return null;
+	try {
+		const url = new URL(value.replaceAll("&amp;", "&"));
+		return url.protocol === "https:" || url.protocol === "http:"
+			? url.href
+			: null;
+	} catch {
+		return null;
+	}
+}
+
+async function loadFeedUrls(signal?: AbortSignal): Promise<string[]> {
+	const response = await fetch(FEEDS_CONFIG_URL, { signal });
+	if (!response.ok) {
+		throw new Error(`RSS configuration request failed: ${response.status}`);
+	}
+
+	const data = (await response.json()) as { feeds?: unknown };
+	if (!Array.isArray(data.feeds)) {
+		throw new Error("RSS configuration does not contain a feeds array");
+	}
+
+	return Array.from(
+		new Set(data.feeds.flatMap((value) => safeFeedUrl(value) ?? [])),
+	);
+}
+
+async function fetchFeed(
+	feedUrl: string,
+	signal?: AbortSignal,
+): Promise<FeedItem[]> {
+	const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+	const response = await fetch(endpoint, { signal });
+	if (!response.ok) throw new Error(`RSS request failed: ${response.status}`);
+
+	const data = (await response.json()) as {
+		feed?: { title?: string };
+		items?: Array<{ link?: unknown; pubDate?: string; title?: unknown }>;
+	};
+
+	return (data.items ?? []).slice(0, 2).flatMap((item) => {
+		const link = safeExternalUrl(item.link);
+		if (!link || typeof item.title !== "string" || !item.title.trim())
+			return [];
+		return [
+			{
+				link,
+				pubDate: item.pubDate,
+				source: data.feed?.title ?? new URL(feedUrl).hostname,
+				title: item.title.trim(),
+			},
+		];
+	});
+}
+
+async function fetchFeedsWithLimit(feedUrls: string[], signal?: AbortSignal) {
+	const collected: FeedItem[] = [];
+	let nextIndex = 0;
+
+	async function worker() {
+		while (!signal?.aborted) {
+			const index = nextIndex++;
+			if (index >= feedUrls.length) return;
+			try {
+				collected.push(...(await fetchFeed(feedUrls[index], signal)));
+			} catch {
+				// A stale or unavailable source must not hide healthy feeds.
+			}
+		}
+	}
+
+	await Promise.all(
+		Array.from({ length: Math.min(FEED_CONCURRENCY, feedUrls.length) }, () =>
+			worker(),
+		),
+	);
+
+	return Array.from(
+		new Map(collected.map((item) => [item.link, item])).values(),
+	)
+		.sort((a, b) => Date.parse(b.pubDate ?? "") - Date.parse(a.pubDate ?? ""))
+		.slice(0, MAX_VISIBLE_ITEMS);
 }
 
 function formatFeedDate(value: string | undefined, locale: "en" | "fr") {
@@ -49,36 +129,15 @@ export default function ThreatFeed({ locale }: { locale: "en" | "fr" }) {
 
 	const loadFeeds = useCallback(async (signal?: AbortSignal) => {
 		setStatus("loading");
-		const responses = await Promise.allSettled(
-			FEEDS.map(async (feedUrl) => {
-				const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-				const response = await fetch(endpoint, { signal });
-				if (!response.ok)
-					throw new Error(`RSS request failed: ${response.status}`);
-				const data = (await response.json()) as {
-					feed?: { title?: string };
-					items?: Array<{ link?: unknown; pubDate?: string; title?: string }>;
-				};
-				return (data.items ?? []).slice(0, 2).flatMap((item) => {
-					const link = safeExternalUrl(item.link);
-					if (!link || !item.title) return [];
-					return [
-						{
-							link,
-							pubDate: item.pubDate,
-							source: data.feed?.title ?? new URL(feedUrl).hostname,
-							title: item.title,
-						},
-					];
-				});
-			}),
-		);
-		if (signal?.aborted) return;
-		const nextItems = responses.flatMap((result) =>
-			result.status === "fulfilled" ? result.value : [],
-		);
-		setItems(nextItems);
-		setStatus(nextItems.length ? "ready" : "error");
+		try {
+			const feedUrls = await loadFeedUrls(signal);
+			const nextItems = await fetchFeedsWithLimit(feedUrls, signal);
+			if (signal?.aborted) return;
+			setItems(nextItems);
+			setStatus(nextItems.length ? "ready" : "error");
+		} catch {
+			if (!signal?.aborted) setStatus("error");
+		}
 	}, []);
 
 	useEffect(() => {

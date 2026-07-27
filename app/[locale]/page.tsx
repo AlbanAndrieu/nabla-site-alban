@@ -53,6 +53,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 				</section>
 
 				<section className="timeline-section" id="timeline">
+					<br />
 					<h2 className="section-title">{t("timeline.title")}</h2>
 					<p className="section-subtitle">{t("timeline.subtitle")}</p>
 					<div className="timeline">
@@ -163,12 +164,16 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 								{t("timeline.degree.desc")}
 							</p>
 						</TimelineItem>
+						<TimelineItem icon="fa-circle" date="" title="">
+							{/* Passer un fragment vide pour satisfaire children obligatoire */}
+						</TimelineItem>
 					</div>
 					<div className="cta-buttons">
 						<a className="btn btn-primary" href={`${prefix}/cv`}>
 							<i className="fas fa-file" /> {t("timeline.cvcta")}
 						</a>
 					</div>
+					<br />
 				</section>
 
 				<section className="education-section" id="education">
@@ -299,6 +304,29 @@ function TimelineItem({
 	company?: React.ReactNode;
 	children: React.ReactNode;
 }) {
+	// Pour TimelineItem d'intro (fa-circle), ne rendre que l'icône sans timeline-content ni header
+	if (icon === "fa-circle") {
+		return (
+			<div className="timeline-item">
+				<div className="timeline-node">
+					<div className="timeline-node-icon" aria-hidden="true">
+						<i className={`fas ${icon}`} />
+					</div>
+					<span className="timeline-node-date"></span>
+				</div>
+				<div
+					className="timeline-content"
+					style={{
+						display: "none",
+						height: 0,
+						minHeight: 0,
+						padding: 0,
+						margin: 0,
+					}}
+				/>
+			</div>
+		);
+	}
 	return (
 		<div className="timeline-item">
 			<div className="timeline-node">
