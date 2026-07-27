@@ -108,10 +108,6 @@ python -m SimpleHTTPServer 8001
 python -m http.server 8001
 ```
 
-### Terraform
-
-[terraform-s3-static-website-hosting](https://www.alexhyett.com/terraform-s3-static-website-hosting)
-
 ## Testing
 
 This project uses [Playwright](https://playwright.dev/) for end-to-end testing. The test suite includes:

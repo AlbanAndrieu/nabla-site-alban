@@ -176,6 +176,11 @@
 		{#1}
 	}
 }
+\newcommand\interest[1]{
+	\renewcommand{\interest}{
+		{#1}
+	}
+}
 
 %----------------------------------------------------------------------------------------
 %  SIDEBAR LAYOUT
@@ -268,6 +273,11 @@
         \profilesection{\cvSidebarEducation}{3cm}
 
         \education
+
+        \vspace{7mm}
+        \profilesection{\cvSidebarInterest}{3cm}
+
+        \interest
 
   \end{textblock}
 }
@@ -428,6 +438,8 @@
 \providecommand{\cvSidebarTechnicalSkills}{Technical Skills}
 \providecommand{\cvSidebarOverview}{Overview}
 \providecommand{\cvSidebarEducation}{Education}
+\providecommand{\cvSidebarInterest}{Interest}
+
 % Backdrop bubble + “Programming” heading above skill bars (same string)
 \providecommand{\cvskillshublabel}{\textbf{Programming}}
 \newcommand{\cvSkillsBubblesWrap}[1]{%

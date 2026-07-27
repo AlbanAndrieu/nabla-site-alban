@@ -1,5 +1,6 @@
-import "server-only";
-
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+export function getStripeClient(): Stripe | null {
+	const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_KEY;
+	return key ? new Stripe(key) : null;
+}

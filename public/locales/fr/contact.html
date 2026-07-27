@@ -127,7 +127,8 @@
 	<body class="site-content-page page-contact">
 		<a name="top"></a>
 		<!-- Skip to main content link for accessibility -->
-		<a class="skip-to-main" href="#main-content">Skip to main content</a>
+		<a class="skip-to-main" href="#main-content">Aller au contenu principal</a>
+<nav class="page-nav container py-3" aria-label="Breadcrumb"></nav>
 		<!-- Header / Hero Section -->
 		<header>
 			<section class="hero-section" id="home">
@@ -178,6 +179,23 @@
 					Prêt à transformer vos pratiques DevOps ?Plusieurs façons de me joindre ci-dessous.
 				</p>
 				<div class="contact-grid">
+
+					<!-- All info Contact -->
+					<article class="contact-card">
+						<div class="contact-card-icon">
+							<i class="fas fa-address-book""></i>
+						</div>
+						<h3>All info</h3>
+						<ul class="contact-info-list">
+							<li class="contact-info-item">
+								<a href="/contact.html" class="btn btn-sm btn-outline-primary" target="_blank">
+									<img class="img-fluid" src="../assets/nabla/signature/qr_albanandrieu_contact_logo.png"
+														alt="Alban Andrieu contact info" width="120" itemprop="image" />
+								</a>
+							</li>
+						</ul>
+					</article>
+
 					<!-- Email Contact -->
 					<article class="contact-card">
 						<div class="contact-card-icon">
@@ -200,7 +218,7 @@
 						<ul class="contact-info-list">
 							<li class="contact-info-item">
 								<i class="fas fa-mobile-alt"></i>
-								<span itemprop="telephone">06 95 43 53XX</span>
+								<span itemprop="telephone">06 95 43 53 53</span>
 							</li>
 						</ul>
 					</article>
@@ -226,7 +244,7 @@
 					<p style="text-align: center; color: #666">Téléchargez ou consultez mon CV dans différents formats</p>
 					<div class="cv-links">
 						<a class="btn btn-primary btn-lg" href="/cv/index.html" target="_blank">
-							<i class="fas fa-globe"></i>Voir le CV complet en ligne</a
+							<i class="fas fa-globe"></i>Voir tout les CV en ligne</a
 						>
 						<a class="btn btn-outline-primary" href="/cv/cv-full-en.html" target="_blank">
 							<i class="fas fa-file-alt"></i>CV complet</a
@@ -237,13 +255,19 @@
 						<a class="btn btn-outline-primary" href="/cv/cv-small-en.html" target="_blank">
 							<i class="fas fa-file-alt"></i>CV court</a
 						>
+						<a href="/cv/cv-small-en.html" class="btn btn-outline-primary" target="_blank">
+							<i class="fab fa-linkedin"></i> LinkedIn
+							<img class="img-fluid rounded-circle" src="../assets/nabla/signature/qr-code-linkedin-nabla.jpg"
+                        alt="Alban Andrieu LinkedIn Profile" width="120" itemprop="image" />
+						</a>
 					</div>
 				</article>
 				<!-- Social Media Section -->
 				<article class="social-links-section" id="social-media">
 					<h3 class="section-title" style="font-size: 2rem">Connectez-vous sur les réseaux sociaux</h3>
 					<p class="section-subtitle">Suivez-moi et restez informé de mes derniers travaux</p>
-					<div class="social-grid">
+
+					<div class="social-grid" style="max-width: 960px; margin: 0 auto 1.5rem">
 						<a
 							class="social-card"
 							href="https://www.linkedin.com/in/nabla/"
@@ -255,6 +279,32 @@
 							<span class="social-name">LinkedIn</span>
 							<small>Réseau professionnel</small>
 						</a>
+
+						<a
+							class="social-card"
+							href="https://twitter.com/AlbanAndrieu"
+							itemprop="sameAs"
+							rel="noopener noreferrer me"
+							target="_blank"
+						>
+							<i class="fab fa-twitter"></i>
+							<span class="social-name">Twitter</span>
+							<small>Mises à jour techniques</small>
+						</a>
+						<a
+							class="social-card"
+							href="https://www.xing.com/profile/Alban_Andrieu"
+							itemprop="sameAs"
+							rel="noopener noreferrer me"
+							target="_blank"
+						>
+							<i class="fab fa-xing"></i>
+							<span class="social-name">Xing</span>
+							<small>Réseau professionnel</small>
+						</a>
+
+					</div>
+					<div class="social-grid" style="max-width: 960px; margin: 0 auto 1.5rem">
 						<a
 							class="social-card"
 							href="https://github.com/AlbanAndrieu"
@@ -274,7 +324,7 @@
 							target="_blank"
 						>
 							<i class="fab fa-docker"></i>
-							<span class="social-name">Centre Docker</span>
+							<span class="social-name">Docker Hub</span>
 							<small>Images de conteneurs</small>
 						</a>
 						<a
@@ -285,31 +335,13 @@
 							target="_blank"
 						>
 							<i class="fab fa-stack-exchange"></i>
-							<span class="social-name">Échange de pile</span>
+							<span class="social-name">Stack Exchange</span>
 							<small>Contributions aux questions et réponses</small>
 						</a>
-						<a
-							class="social-card"
-							href="https://twitter.com/AlbanAndrieu"
-							itemprop="sameAs"
-							rel="noopener noreferrer me"
-							target="_blank"
-						>
-							<i class="fab fa-twitter"></i>
-							<span class="social-name">Gazouillement</span>
-							<small>Mises à jour techniques</small>
-						</a>
-						<a
-							class="social-card"
-							href="https://www.xing.com/profile/Alban_Andrieu"
-							itemprop="sameAs"
-							rel="noopener noreferrer me"
-							target="_blank"
-						>
-							<i class="fab fa-xing"></i>
-							<span class="social-name">Xing</span>
-							<small>Réseau professionnel</small>
-						</a>
+
+					</div>
+					<div class="social-grid" style="max-width: 960px; margin: 0 auto 1.5rem">
+
 						<a
 							class="social-card"
 							href="https://www.facebook.com/alban.andrieu"
@@ -338,15 +370,7 @@
 							<small>Planifier une réunion</small>
 						</a>
 					</div>
-				</article>
 
-				<!-- Nabla team channels (Slack + Discord) -->
-				<article aria-labelledby="nabla-channels-heading" class="social-links-section" id="nabla-channels">
-					<h3 class="section-title" id="nabla-channels-heading" style="font-size: 2rem">Chaînes de l'équipe Nabla</h3>
-					<p class="section-subtitle">
-						Collaboration avec l'équipe Slack pour Nabla ;Discord pour atteindre le bot dans le canal lié ;RSS pour les
-						mises à jour du site.
-					</p>
 					<div class="social-grid" style="max-width: 960px; margin: 0 auto 1.5rem">
 						<a
 							aria-label="Ouvrir l'espace de travail Nabla Slack (nouvel onglet)"
@@ -383,6 +407,7 @@
 							<small>Mises à jour du site (XML)</small>
 						</a>
 					</div>
+					<!--
 					<p class="section-subtitle" style="margin-bottom: 1rem; font-size: 1rem">
 						Aperçu du serveur Discord en direct.
 					</p>
@@ -395,6 +420,7 @@
 							title="Widget du serveur Discord – membres en ligne et invitation"
 						></iframe>
 					</div>
+
 					<div
 						aria-atomic="true"
 						aria-live="polite"
@@ -402,7 +428,9 @@
 						id="contact-channel-status"
 						role="status"
 					></div>
+					-->
 				</article>
+
 				<!-- Location Section -->
 				<article
 					class="location-section"

@@ -1,0 +1,21 @@
+---
+creation_rules:
+  - path_regex: .*\.env\.sops$
+    input_type: dotenv
+    output_type: dotenv
+    key_groups:
+      # First key group
+      - age:
+          - age1t8wn2gqcpzxwvwhjwxwtdwp0tvr6k2z9j39v4q2fr55qhmqz7f2qvn25cp
+  - path_regex: .*\.ya?ml$
+    age: age1t8wn2gqcpzxwvwhjwxwtdwp0tvr6k2z9j39v4q2fr55qhmqz7f2qvn25cp
+
+  - path_regex: .*\.json$
+    age: age1t8wn2gqcpzxwvwhjwxwtdwp0tvr6k2z9j39v4q2fr55qhmqz7f2qvn25cp
+  - path_regex: secrets.*\.yaml
+    key_groups:
+      # First key group
+      - age:
+          - age1t8wn2gqcpzxwvwhjwxwtdwp0tvr6k2z9j39v4q2fr55qhmqz7f2qvn25cp
+        kms:
+          - arn: arn:aws:kms:us-east-1:783876277037:key/b083c3c1-0971-4bcc-910f-2468b352852d

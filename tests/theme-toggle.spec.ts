@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 /** Home layout injects `site-widgets.js` via Next `<Script strategy="afterInteractive">`; `load` can fire before it runs. */
 async function expectThemeToggleMounted(page: Page) {

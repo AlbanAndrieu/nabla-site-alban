@@ -8,6 +8,7 @@ relative /assets paths so pages work under /fr/*.
 from __future__ import annotations
 
 import re
+import sys
 import time
 from pathlib import Path
 
@@ -93,9 +94,12 @@ def meta_content_should_translate(tag) -> bool:
     itemprop = (tag.get("itemprop") or "").lower()
     if name == "description" or itemprop == "description":
         return True
-    if prop in {"og:title", "og:description", "twitter:title", "twitter:description"}:
-        return True
-    return False
+    return prop in {
+        "og:title",
+        "og:description",
+        "twitter:title",
+        "twitter:description",
+    }
 
 
 def collect_attr_jobs(soup: BeautifulSoup, root=None) -> list[tuple[object, str, str]]:
@@ -157,7 +161,11 @@ def batched_translate(
                 res = translator.translate(batch, dest=dest)
                 out.extend([t.text for t in res])
                 break
-            except Exception:
+            except Exception as e:  # noqa: BLE001  # Broad exception for resilient API retries
+                print(
+                    f"Translation batch failed (attempt {attempt + 1}): {e}",
+                    file=sys.stderr,
+                )
                 time.sleep(1.2 * (attempt + 1))
         else:
             # last resort: per-string
@@ -166,7 +174,11 @@ def batched_translate(
                     try:
                         out.append(translator.translate(s, dest=dest).text)
                         break
-                    except Exception:
+                    except Exception as e:  # noqa: BLE001  # Broad exception for resilient API retries
+                        print(
+                            f"Single translation failed (attempt {attempt + 1}): {e}",
+                            file=sys.stderr,
+                        )
                         time.sleep(1.0 * (attempt + 1))
                 else:
                     out.append(s)
@@ -233,8 +245,8 @@ def translate_file(path: Path, translator: Translator) -> None:
                 fr_title = translator.translate(title_text, dest="fr").text
                 title_tag.clear()
                 title_tag.append(NavigableString(fr_title))  # noqa: B110 # nosec
-            except Exception:
-                pass
+            except Exception as e:  # noqa: BLE001  # Fallback in case unusual title update error
+                print(f"Failed to update title tag: {e}", file=sys.stderr)
 
     out_html = str(soup)
     out_html = prefix_root_assets(out_html)

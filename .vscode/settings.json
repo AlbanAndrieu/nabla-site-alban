@@ -57,8 +57,19 @@
 	],
 	"latex-workshop.latex.recipe.default": "latexmk (xelatex)",
 	"github.copilot.advanced": {
-    "debug.overrideProxyUrl": "http://localhost:4100",
-    "debug.testOverrideProxyUrl": "http://localhost:4100"
+		"debug.overrideProxyUrl": "http://localhost:4100",
+		"debug.testOverrideProxyUrl": "http://localhost:4100"
 	},
-	"aws.telemetry": false
+	"aws.telemetry": false,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "Biome.biome-vscode",
+	"[javascript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[typescript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[typescriptreact]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[json]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[markdown]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[css]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"[html]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+	"eslint.format.enable": false,
+	"prettier.enable": false
 }

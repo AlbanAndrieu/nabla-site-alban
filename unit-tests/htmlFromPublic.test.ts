@@ -52,7 +52,10 @@ test("metadataFromPublicHtml decodes entities and builds canonical url", async (
 test("metadataFromPublicHtml uses locale-specific source when available", async () => {
 	const metadata = await metadataFromPublicHtml("index.html", "/", "fr");
 
-	assert.equal(metadata.title, "Accueil | Alban Andrieu");
+	assert.equal(
+		metadata.title,
+		"Alban Andrieu — Freelance DevSecOps & Cloud Architect (AWS, Azure, OVH)",
+	);
 	assert.equal(metadata.alternates?.canonical, "https://albandrieu.com/fr");
 	assert.equal(metadata.openGraph?.url, "https://albandrieu.com/fr");
 });
@@ -77,6 +80,17 @@ test("metadataFromPublicHtml falls back to english source and normalizes locale"
 test("loadPublicHtmlFragment returns inner main content for localized page", async () => {
 	const fragment = await loadPublicHtmlFragment("index.html", "main", "fr");
 
-	assert.match(fragment, /Ingénieur DevSecOps freelance/);
+	assert.match(fragment, /Architecte Cloud et DevSecOps/);
 	assert.doesNotMatch(fragment, /<main/i);
+});
+
+test("loadPublicHtmlFragment removes legacy page navigation", async () => {
+	const fragment = await loadPublicHtmlFragment(
+		"ai.html",
+		"navHeaderMain",
+		"fr",
+	);
+
+	assert.match(fragment, /AI Best Practices/);
+	assert.doesNotMatch(fragment, /<nav[^>]*page-nav/i);
 });

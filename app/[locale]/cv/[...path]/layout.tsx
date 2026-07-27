@@ -1,7 +1,5 @@
-import type { Metadata } from "next";
 import Script from "next/script";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { routing } from "@/i18n/routing";
 
@@ -19,40 +17,27 @@ export function generateStaticParams() {
 export default async function CVLayout({ children, params }: Props) {
 	const { locale, path } = await params;
 	setRequestLocale(locale);
-	const messages = await getMessages();
 
 	// Determine if this is a sub-page (e.g., cv-small-fr.html)
-	const isSubPage = path && path.length === 1 && path[0].startsWith('cv-');
+	const isSubPage = path && path.length === 1 && path[0].startsWith("cv-");
 
 	// Set body classes based on page type
 	const bodyClassName = isSubPage
-		? 'page-cv'
-		: 'site-content-page page-cv page-dark page-nabla-best-practices';
+		? "page-cv"
+		: "site-content-page page-cv page-dark page-nabla-best-practices";
 
 	return (
-		<html>
-      <head>
-				{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
-				{isSubPage && (
-					<link rel="stylesheet" href="/cv/cv-theme.css" />
-				)}
-
-			</head>
-			<body
-				className={bodyClassName}
-				suppressHydrationWarning
-			>
-				<NextIntlClientProvider messages={messages}>
-					{children}
-				</NextIntlClientProvider>
-				<Script
-					src="/site-widgets.js"
-					strategy="afterInteractive"
-					data-print-pdf
-					data-no-coffee-fab
-					data-no-google-translate
-				/>
-			</body>
-		</html>
+		<div className={bodyClassName} suppressHydrationWarning>
+			{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
+			{isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}
+			{children}
+			<Script
+				src="/site-widgets.js"
+				strategy="afterInteractive"
+				data-print-pdf
+				data-no-coffee-fab
+				data-no-google-translate
+			/>
+		</div>
 	);
 }

@@ -2,10 +2,27 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { NextRequest } from "next/server";
 import {
+	checkoutLocale,
+	checkoutReturnUrls,
 	getTrustedOrigin,
 	originFromDomainEnv,
 	wantsJson,
 } from "../app/api/create-checkout-session/route";
+
+test("checkoutLocale only accepts supported locales", () => {
+	assert.equal(checkoutLocale("fr"), "fr");
+	assert.equal(checkoutLocale("en"), "en");
+	assert.equal(checkoutLocale("de"), "en");
+	assert.equal(checkoutLocale(null), "en");
+});
+
+test("checkoutReturnUrls preserve the checkout locale", () => {
+	assert.deepEqual(checkoutReturnUrls("https://example.com", "fr"), {
+		successUrl:
+			"https://example.com/fr/success?session_id={CHECKOUT_SESSION_ID}",
+		cancelUrl: "https://example.com/fr/cancel",
+	});
+});
 
 const ENV_KEYS = ["DOMAIN", "VERCEL_URL", "NODE_ENV"] as const;
 const ORIGINAL_ENV = Object.fromEntries(
@@ -39,7 +56,10 @@ test.after(() => {
 });
 
 test("originFromDomainEnv keeps only safe scheme and host", () => {
-	assert.equal(originFromDomainEnv(" https://example.com/ "), "https://example.com");
+	assert.equal(
+		originFromDomainEnv(" https://example.com/ "),
+		"https://example.com",
+	);
 	assert.equal(
 		originFromDomainEnv("http://example.com:8080/path?x=1"),
 		"http://example.com:8080",

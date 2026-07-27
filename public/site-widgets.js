@@ -40,7 +40,6 @@
 /* eslint-env browser */
 /* global gtag, google */
 (() => {
-
 	var root = document.currentScript;
 	var preset = window.NABLA_WIDGETS || {};
 
@@ -59,7 +58,9 @@
 
 	/** Next.js App Router shell (see app/[locale]/layout.tsx); use next-intl instead of Google Translate. */
 	function isNextIntlAppShell() {
-		return document.documentElement.getAttribute("data-nabla-app") === "next-intl";
+		return (
+			document.documentElement.getAttribute("data-nabla-app") === "next-intl"
+		);
 	}
 
 	// ----- Theme (aligned with theme-toggle.js) -----
@@ -367,10 +368,7 @@
 			var el = document.getElementById("google_translate_element");
 			if (el) {
 				var existingWrap = el.closest(".google-translate-widget");
-				if (
-					existingWrap &&
-					existingWrap.querySelector(".google-translate-widget__toggle")
-				) {
+				if (existingWrap?.querySelector(".google-translate-widget__toggle")) {
 					return el;
 				}
 				if (existingWrap) {
@@ -832,12 +830,12 @@
 		link.title = labels.title;
 		link.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>';
 
-		link.addEventListener('click', (e) => {
+		link.addEventListener("click", (e) => {
 			e.preventDefault();
-			window.scrollTo({ top: 0, behavior: 'smooth' });
-			document.body.scrollTo({ top: 0, behavior: 'smooth' });
+			window.scrollTo({ top: 0, behavior: "smooth" });
+			document.body.scrollTo({ top: 0, behavior: "smooth" });
 			// Also target documentElement for cross-browser compatibility
-			document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+			document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
 		});
 		document.body.appendChild(link);
 	}

@@ -7,7 +7,8 @@
 (() => {
 	var root = document.currentScript;
 	/* Next.js app uses next-intl (see app/[locale]/layout.tsx data-nabla-app). */
-	if (document.documentElement.getAttribute("data-nabla-app") === "next-intl") return;
+	if (document.documentElement.getAttribute("data-nabla-app") === "next-intl")
+		return;
 	if (root?.hasAttribute("data-no-google-translate")) return;
 	if (window.__NABLA_GOOGLE_TRANSLATE_STARTED) return;
 	window.__NABLA_GOOGLE_TRANSLATE_STARTED = true;
@@ -39,10 +40,7 @@
 		var el = document.getElementById("google_translate_element");
 		if (el) {
 			var existingWrap = el.closest(".google-translate-widget");
-			if (
-				existingWrap &&
-				existingWrap.querySelector(".google-translate-widget__toggle")
-			) {
+			if (existingWrap?.querySelector(".google-translate-widget__toggle")) {
 				return el;
 			}
 			if (existingWrap) {

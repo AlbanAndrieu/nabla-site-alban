@@ -39,17 +39,15 @@
 		<meta property="twitter:image" content="https://albanandrieu.com/assets/nabla/nabla-4.svg" />
 
 		<link rel="icon" href="assets/nabla/nabla-4.svg" />
-		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
-		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
-		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
 
 		<link rel="stylesheet" href="landing-sections.css" />
 		<link rel="stylesheet" href="wireframe.css" />
+
 		<link rel="stylesheet" href="theme.css" />
 		<link rel="stylesheet" href="style.css" />
 		<link rel="stylesheet" href="print.css" />
 		<link rel="stylesheet" href="site-content-page.css" />
-		<link rel="stylesheet" href="arf.css" />
+
 		<link rel="stylesheet" href="nabla.css" />
 		<link rel="stylesheet" href="opensource.css" />
 
@@ -66,6 +64,11 @@
 		></script>
 		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/solid.js"></script>
 		<script src="https://albanandrieu.com/assets/fontawesome-free-7.1.0-web/js/brands.js"></script>
+
+		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
+		<link href="/assets/fontawesome/css/fontawesome.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/brands.css" rel="stylesheet" />
+		<link href="/assets/fontawesome/css/solid.css" rel="stylesheet" />
 
 		<!-- our project is using icons from Solid, Sharp Thin, Sharp Duotone Thin + Brands -->
 		<!-- Obs.js connection hints: obs-connection.js (https://github.com/csswizardry/Obs.js) -->
@@ -576,32 +579,110 @@
 							</ul>
 						</div>
 					</div>
-					<section
-						class="nabla-homelab-services mt-5 pt-4 border-top border-secondary border-opacity-25"
-						aria-labelledby="nabla-homelab-heading"
-					>
-						<h3 class="h4 mb-2" id="nabla-homelab-heading">
-							<i class="fas fa-database me-2 text-primary" aria-hidden="true"></i>TrueNAS Scale services
-						</h3>
-						<p class="text-secondary small mb-2">
-							Full Truenas services listed:
-							<a href="/truenas.html" target="_blank" rel="noopener noreferrer" class="link-secondary text-break"
-								>here</a
-							>
-						</p>
-						<p class="text-secondary small homelab-services-foss-note mb-3">
-							Service icons are vendored from
-							<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">selfh.st/icons</a>
-							(selfhst/icons). For more open-source self-hosted ideas, see
-							<a href="https://selfh.st/apps/" target="_blank" rel="noopener noreferrer">selfh.st/apps</a>.
-						</p>
 
-						<div
-							data-homelab-services-root
-							data-homelab-variant="nabla"
-							data-homelab-json="homelab-services.json"
-						></div>
-					</section>
+				</section>
+
+				<!-- Hardware / homelab context -->
+				<!--<section class="py-5 hardware-section" aria-labelledby="hardware-heading">-->
+				<section class="category-section nabla-platforms-section hardware-section" aria-labelledby="nabla-platforms-heading">
+					<div class="container">
+						<div class="row mb-4">
+							<div class="col-12">
+								<h2 id="hardware-heading" class="hardware-heading-with-icon display-4">
+									<span class="hardware-heading-with-icon__glyph" aria-hidden="true"><i class="fas fa-server"></i></span>
+									<span class="hardware-heading-with-icon__text">Hardware</span>
+								</h2>
+
+								<h3 class="h4 mb-2" id="nabla-homelab-heading">
+									<i class="fas fa-database me-2 text-primary" aria-hidden="true"></i>TrueNAS Scale services
+								</h3>
+								<p class="text-secondary small mb-2">
+									Full Truenas services listed:
+									<a href="/truenas.html" target="_blank" rel="noopener noreferrer" class="link-secondary text-break"
+										>here</a
+									>
+								</p>
+								<p class="text-secondary small homelab-services-foss-note mb-3">
+									Service icons are vendored from
+									<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">selfh.st/icons</a>
+									(selfhst/icons). For more open-source self-hosted ideas, see
+									<a href="https://selfh.st/apps/" target="_blank" rel="noopener noreferrer">selfh.st/apps</a>.
+								</p>
+
+								<div
+									data-homelab-services-root
+									data-homelab-variant="nabla"
+									data-homelab-json="homelab-services.json"
+								></div>
+
+								<h3 class="h4 mb-2" id="nabla-homelab-heading">
+									<i class="fas fa-database me-2 text-primary" aria-hidden="true"></i>Workstation
+								</h3>
+
+								<div class="row justify-content-center">
+								<div class="col-lg-8">
+									<div class="card box-shadow">
+										<div class="card-body">
+											<p class="card-text hardware-bom-intro mb-0">
+												<span class="hardware-bom-intro__icon" aria-hidden="true"
+													><i class="fas fa-screwdriver-wrench"></i
+												></span>
+												<span class="hardware-bom-intro__text">
+													After seven years of good service, my workstation is getting old. The goal is to fix hard drive failure and use the GPU RTX 2060 for LLM.
+												</span>
+											</p>
+											<h3 class="h5 mt-4 hardware-bom-heading">
+												<span class="hardware-bom-heading__icon" aria-hidden="true"
+													><i class="fas fa-clipboard-list"></i
+												></span>
+												<span>Bill of materials</span>
+											</h3>
+											<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
+												<span class="hardware-bom-heading__icon" aria-hidden="true"><i class="fas fa-recycle"></i></span>
+												<span>Reused</span>
+											</h4>
+
+											<ul class="list-group list-group-flush hardware-bom-list mb-3">
+												<li class="list-group-item hardware-bom-li">
+													<span class="hardware-bom-li__icon" aria-hidden="true"><i class="fas fa-server"></i></span>
+													<span class="hardware-bom-li__body">
+														<a href="https://www.amazon.fr/dp/B0C3T39N6P" target="_blank" rel="noopener noreferrer"
+															>Workstation</a
+														>
+														— Intel Core i7-9700K + ASUS ROG STRIX Z390-F GAMING + SSD Samsung 860 EVO M.2 500 Go. 767,77&nbsp;€
+													</span>
+												</li>
+												<li class="list-group-item hardware-bom-li">
+													<span class="hardware-bom-li__icon" aria-hidden="true"><i class="fas fa-microchip"></i></span>
+													<span class="hardware-bom-li__body">
+														<a href="https://www.amazon.fr/dp/B0C3T39N6P" target="_blank" rel="noopener noreferrer"
+															>Gigabyte GeForce RTX 2060</a
+														>
+														— 3.8&nbsp;GHz, 32&nbsp;MB L3. 212.75&nbsp;€
+													</span>
+												</li>
+											</ul>
+
+											<h4 class="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
+												<span class="hardware-bom-heading__icon" aria-hidden="true"
+													><i class="fas fa-basket-shopping"></i
+												></span>
+												<span>New purchases</span>
+											</h4>
+											<ul class="list-group list-group-flush hardware-bom-list">
+												<li class="list-group-item hardware-bom-li">
+													<span class="hardware-bom-li__icon" aria-hidden="true"><i class="fas fa-hdd"></i></span>
+													<span class="hardware-bom-li__body">
+														Storage: 2×Seagate BarraCuda — 2&nbsp;TB each, SATA 6&nbsp;Gb/s. 2×109,99&nbsp;€
+													</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</section>
 
 				<!-- Open Source Contributions Section -->

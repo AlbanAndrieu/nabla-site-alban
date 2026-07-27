@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-async function injectSiteAnalytics(
+async function _injectSiteAnalytics(
 	page: Page,
 	attrs: Record<string, string> = {},
 ) {
@@ -99,5 +99,4 @@ test.describe("Site analytics loader regression tests", () => {
 		await expect(ahrefs).toHaveCount(1);
 		await expect(ahrefs).toHaveAttribute("data-key", "tg3zLMS/bebJFl0LxctiCw");
 	});
-
 });

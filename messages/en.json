@@ -2,6 +2,7 @@
 	"site": {
 		"skipToMainContent": "Skip to main content",
 		"legalNotices": "Legal notices",
+		"backHome": "Back to home",
 		"backToTop": "Back to top",
 		"backToTopAria": "Back to top of page",
 		"localeSwitcherLabel": "Language",
@@ -14,5 +15,606 @@
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
 		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+	},
+	"jm": {
+		"4years": {
+			"headline": "4-Year Performance Summary: Alban Andrieu (2022–2025)",
+			"lead": "Executive summary & year-by-year delivery at Jusmundi",
+			"executive_title": "Executive summary",
+			"executive_copy": "Over the past 4 years, I have completed 300+ tracked tasks across infrastructure, security, databases, CI/CD, and platform engineering—demonstrating consistent delivery and technical leadership in cloud platform operations. With no significant downtime, night and weekend workload.",
+			"key_achievements": "Key achievements by strategic theme",
+			"strategy": {
+				"cloud": "Infrastructure modernization & cloud platform",
+				"security": "Security & compliance",
+				"db": "Database excellence",
+				"cicd": "CI/CD & DevOps excellence",
+				"aiml": "AI/ML platform support",
+				"observability": "Observability & site reliability"
+			},
+			"standout": "Standout technical achievements",
+			"career": "Career progression evidence",
+			"numbers": "Performance summary by numbers"
+		},
+		"pageTitle": "Jusmundi — 4 Years Key Achievements & KPIs | Alban Andrieu",
+		"heroTitle": "Jusmundi — 4 Years in Review",
+		"heroSubtitle": "Key KPIs & Achievements (2022–2025) · Highlighting my work as DevSecOps and colleagues' work & impactful contributions",
+		"kpisHeading": "Key performance indicators",
+		"kpisSubtitle": "Delivery, reliability, and impact (2022–2025)",
+		"kpiTasksCompleted": "325+",
+		"kpiPlatformUptime": "99.9%+",
+		"kpiSecurityBreaches": "0",
+		"kpiMttrP1": "~30 min",
+		"kpiAlertNoiseReduction": "60%",
+		"kpiAnnualSavings": "€50K+",
+		"securityBandHeading": "Security-first — anti-scraping, Keycloak identity and authorization, no friction for legitimate customers",
+		"securityBandLead": "Primary focus on security: protecting the business from abusive scraping and delivering robust identity and authorization with Keycloak—without slowing down or blocking legitimate customers, partners, or approved crawlers.",
+		"securityBand": [
+			"Scraping and abuse — Cloudflare WAF, rate limits, and bot controls tuned so real users and whitelisted SEO tools keep working while automated scraping drops sharply.",
+			"Keycloak — SSO, API gateway authentication for microservices, HA across regions, and policies (2FA, brute-force protection) aligned with the product experience.",
+			"Legitimate access — changes rolled out with monitoring so security hardening does not degrade trust or conversion for paying users."
+		],
+		"infraBandHeading": "Migrating infrastructure to a state-of-the-art Kubernetes in the US with network refunding",
+		"infraBandLead": "US hosting and platform refresh: DNS, Kubernetes, and network modernisation—moving from Nomad to Kubernetes with cost optimisation and a clearer path for regional scale.",
+		"infraBand": [
+			"Kubernetes migration — assessment, cluster design, and rollout aligned with product availability and release cadence.",
+			"US footprint — hosting and connectivity choices that support latency, compliance, and operational ownership across teams.",
+			"Network — Magic WAN, VPC peering, VPN, and Cloudflare WARP so offices and cloud environments stay reachable and observable."
+		],
+		"aiBandHeading": "Supporting business and tech through the transition to an AI company — hosting tuned legal models with ...",
+		"aiBandLead": "Transitioning to AI: hosting legal models, keeping infra compliant, and supporting team adaptation.",
+		"aiBand": [
+			"AI model hosting — legal AI models deployed on elastic, reliable infrastructure.",
+			"Compliance — maintained ISO 42001, SOC 2 across new workloads.",
+			"Collaboration — supported teams to adopt new analytics and hosted legal tools."
+		],
+		"achievementsHeading": "Achievements by area",
+		"achievementsSubtitle": "Security, reliability, and platform delivery (2022–2025) - My main focus : ensuring the platform is secure, reliable and delivering the product",
+		"achievements": {
+			"seo": {
+				"title": "SEO improvements",
+				"lead": "WAF and crawler policy tuned for search visibility",
+				"bullets": [
+					"Anti-scraping and WAF implementation tuned to preserve SEO: legitimate crawlers whitelisted (AhRefs, SemRush, Oncrawl, Google Analytics, etc.).",
+					"WAF behaviour and SEO impact monitored throughout rollout; bot traffic reduced by ~75% without impacting real users or search visibility.",
+					"SEO drop issues investigated and addressed; since AI bots shift, SEO has been stable and improved over the years."
+				]
+			},
+			"sla": {
+				"title": "SLA & reliability improvements",
+				"lead": "Uptime, alerting, and incident response",
+				"bullets": [
+					"Alerts based on SLAs for critical services; SLO-based alerting for availability monitoring.",
+					"Platform availability maintained at 99.9%+ for critical legal research; target 99.9% uptime for core services.",
+					"MTTR reduced from hours to minutes (P1 ~30 min average) through observability and runbooks.",
+					"Alert noise reduced by ~60% via intelligent filtering."
+				]
+			},
+			"security": {
+				"title": "Security & compliance",
+				"lead": "Vulnerability management, IdP SSO, and certifications",
+				"badges": [
+					"CVE & vulnerability reduction",
+					"Keycloak IdP SSO",
+					"ISO 27001",
+					"ISO 42001",
+					"SOC2 Type II",
+					"TLS 1.3"
+				],
+				"vulnTitle": "Vulnerability & CVE reduction",
+				"vulnBullets": [
+					"Vulnerability remediation target: <7 days for critical CVEs; container scan pass rate >95%.",
+					"Vulnerability management: weekly vulnerability scanning and remediation of critical vulnerabilities. Using OpenVAS, Trivy and Semgrep.",
+					"Semgrep SAST, GitLeaks secret scanning, Mega-Linter and GitLab Ultima Sec for code security.",
+					"Implement Cloudflare WAF and DDoS protection for the website, rate limiting and bot detection.",
+					"Use Vault for secrets management, secret rotation, certificate automation and in transit encryption for user documents"
+				],
+				"idpTitle": "IdP SSO with Keycloak",
+				"idpBullets": [
+					"Keycloak authentication modernisation: migrated from legacy auth and upgraded through 4 major versions.",
+					"SSO integration with Microsoft Entra ID and other internal services; 2FA and brute-force protection enabled.",
+					"Keycloak in HA mode; token expiration and high-latency incidents resolved in production, and across multiple regions.",
+					"Use of Keycloak in API Gateway mode for authentication and authorization of microservices."
+				],
+				"complianceTitle": "ISO, SOC & compliance",
+				"complianceBullets": [
+					"ISO 27001 preparation and support; Server hardening and firewall reviews.",
+					"Platform aligned with SOC II certifications achieved by Jusmundi.",
+					"First IA Tech implementing and maintaining ISO 42001 compliant security frameworks for IA.",
+					"Annual firewall reviews, access control, and EDR/XDR agents on new servers."
+				]
+			},
+			"platform": {
+				"title": "Platform & infrastructure",
+				"lead": "Cloud, data, CI/CD, and AI platform foundations",
+				"bullets": [
+					"Infrastructure migration assessment, US hosting (DNS, Kubernetes, network), cost optimisation and Kubernetes migration from Nomad to Kubernetes.",
+					"Observability: Victoria Metrics, Loki, Grafana dashboards, DataDog APM and tracing across services.",
+					"Network: Migration to Magic WAN, VPC peering and VPN and Cloudflare WARP.",
+					"Database: PostgreSQL tuning, autovacuum and cache hit improvements; 20+ critical disk-space incidents resolved.",
+					"Jus AI support: Elasticsearch clusters, GPU nodes, assistant and document-classification services.",
+					"CI/CD: pipelines optimised, automated with templating, container scanning, code linting; Infrastructure as Code (Terraform and Ansible) with ~90% reduction in manual configuration errors."
+				]
+			}
+		},
+		"overallHeading": "Overall estimate of people to Support, my Boss an entry level and I",
+		"overallBullets": [
+			"~100–115 people total across ~15+ teams/sub-teams",
+			"The largest departments are Revenue/Sales, Tech (30%), and Marketing/Product"
+		],
+		"relatedDocumentsHeading": "Related documents",
+		"relatedDocumentsSubtitle": "Full reviews and task summaries",
+		"relatedDocuments": [
+			{
+				"title": "JusMundi global achievements (2022–2025)",
+				"link": "4-years-review-jusmundi.html",
+				"iconClass": "fas fa-building",
+				"description": "Company overview, funding, product launches (Jus Connect, Jus AI), geographic expansion, AI achievements",
+				"externalLink": {
+					"label": "Jus Connect",
+					"href": "https://jusconnect.com/",
+					"home": {
+						"title": "Cloud & DevSecOps Architect, 20+ years experience",
+						"subtitle": "Cloud architect and DevSecOps engineer — I help startups and scale-ups secure, automate and scale their platforms so they ship faster without trading off compliance.",
+						"stats": {
+							"ia": "4+ years of IA",
+							"security": "7+ years in cybersecurity",
+							"infra": "10+ years in infrastructure",
+							"dev": "10+ years of development"
+						},
+						"cta": {
+							"book": "Book a 30-minute consultation",
+							"start": "Start your project!",
+							"pdf": "Download my profile",
+							"linkedin": "View LinkedIn"
+						},
+						"lastExp": {
+							"intro": "My last experience at",
+							"company": "JusMundi",
+							"linkLabel": "JusMundi",
+							"wasTo": "was to:",
+							"items": [
+								"Own infrastructure and support IA initiative.",
+								"Reduce incident risk and improve compliance posture.",
+								"Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
+								"Accelerate delivery with robust CI/CD, IaC and observable production systems."
+							]
+						},
+						"servicesTitle": "Services & technical expertise",
+						"outcomes": {
+							"title": "Example of delivered projects",
+							"subtitle": "Representative engagements — details under NDA; happy to discuss similar contexts on a call.",
+							"legal": {
+								"title": "Legal-tech AI scale-up",
+								"context": "International product, heavy compliance expectations.",
+								"bullets": [
+									"Cloud architecture on AWS and OVH with security-by-design.",
+									"Automation and controls supporting ISO 27001, SOC 2 and GDPR-aligned operations.",
+									"CI/CD and IaC so teams ship frequently with guardrails."
+								]
+							},
+							"devops": {
+								"title": "DevSecOps, Architecte, SRE, developer",
+								"context": "Fortune 500 and startup clients.",
+								"bullets": [
+									"Pipeline security, container platforms and Kubernetes operations.",
+									"Bridging development, security and ops with practical playbooks.",
+									"Legacy-to-cloud migration patterns without stopping delivery."
+								]
+							},
+							"platform": {
+								"title": "Platform hardening & clarity",
+								"context": "Cross-industry — financial services background.",
+								"bullets": [
+									"Microservices and automated testing in regulated-style environments.",
+									"Monitoring and observability foundations for incident response.",
+									"Cost-aware architecture and operational standards."
+								]
+							},
+							"more": "More detail on selected outcomes"
+						},
+						"cv": "View Full CVs",
+						"professionalExperience": "Professional Experience",
+						"yearsExperience": "20+ years of experience delivering enterprise solutions",
+						"education": {
+							"section": "Education & Certifications",
+							"internationalCollab": "International collaboration",
+							"internationalText": "20+ years in global, cross-location settings. Delivery and leadership with teams and stakeholders across countries and time zones. Professional working language English; used daily with distributed engineering, security, and product partners in multinational environments.",
+							"degreeTitle": "Engineering Degree",
+							"degreeInst": "Computer Science & Software Engineering",
+							"degreeDesc": "Strong foundation in software engineering, algorithms, and system design",
+							"isoTitle": "ISO & SOC certifications",
+							"isoInst": "Security, compliance & data protection",
+							"isoDesc1": "ISO 27001 & GDPR — implementing and maintaining information-security and data-protection frameworks.",
+							"isoDesc2": "ISO 42001 — lead implementer for AI management systems.",
+							"isoDesc3": "SOC 2 Type II — security controls and attestation in line with trust services criteria.",
+							"isoSeeAlso": "See also Security standards & compliance",
+							"cloudTitle": "Cloud Certifications",
+							"cloudInst": "AWS, Azure, Kubernetes, Nomad",
+							"cloudDesc": "Multiple cloud platform and orchestration certifications"
+						},
+						"contact": {
+							"workWithMe": "Work with me",
+							"subtitle": "Ready to improve your cloud platform or DevSecOps practices? Book a free 30-minute consultation, or email a short note about your context — I typically reply within two business day.",
+							"ctaSchedule": "Schedule a call (Calendly)",
+							"ctaEmail": "Email me",
+							"email": "job@albandrieu.com",
+							"linkedin": "Connect with me",
+							"calendly": "Book a time",
+							"github": "View my work"
+						}
+					}
+				}
+			},
+			{
+				"title": "4-year performance summary — Alban Andrieu",
+				"link": "4-years-review-aandrieu.html",
+				"iconClass": "fas fa-user-tie",
+				"description": "325+ tasks, infrastructure, security, databases, CI/CD, AI, observability (2022–2025)"
+			}
+		],
+		"footer": {
+			"pricing": "Pricing",
+			"legal": "Legal notices",
+			"cookies": "Cookies",
+			"returnToCv": "Back to Main",
+			"backToTop": "Back to top",
+			"summary": "Summary derived from Jusmundi 4-year review materials (2022–2025)."
+		}
+	},
+	"home": {
+		"hero": {
+			"title": "Cloud & DevSecOps Architect, 20+ years experience",
+			"subtitle": "Cloud architect and DevSecOps engineer — I help startups and scale-ups secure, automate and scale their platforms so they ship faster without trading off compliance.",
+			"cta": {
+				"book": "Book a 30-minute consultation",
+				"start": "Start your project!",
+				"pdf": "Download my profile",
+				"linkedin": "View LinkedIn"
+			},
+			"stats": {
+				"ia": "4+ years of IA",
+				"security": "7+ years in cybersecurity",
+				"infra": "10+ years in infrastructure",
+				"dev": "10+ years of development"
+			},
+			"lastexp": "My last experience at",
+			"jusmundi": "JusMundi",
+			"lastexp1": "Own infrastructure and support IA initiative.",
+			"lastexp2": "Reduce incident risk and improve compliance posture.",
+			"lastexp3": "Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
+			"lastexp4": "Accelerate delivery with robust CI/CD, IaC and observable production systems.",
+			"purpose": "was to:",
+			"services": "Services & technical expertise"
+		},
+		"outcomes": {
+			"title": "Example of delivered projects",
+			"engagements": "Representative engagements — details under NDA; happy to discuss similar contexts on a call.",
+			"legal": {
+				"title": "Legal-tech AI scale-up",
+				"context": "International product, heavy compliance expectations.",
+				"pt1": "Cloud architecture on AWS and OVH with security-by-design.",
+				"pt2": "Automation and controls supporting ISO 27001, SOC 2 and GDPR-aligned operations.",
+				"pt3": "CI/CD and IaC so teams ship frequently with guardrails."
+			},
+			"devops": {
+				"title": "DevSecOps, Architecte, SRE, developer",
+				"context": "Fortune 500 and startup clients.",
+				"pt1": "Pipeline security, container platforms and Kubernetes operations.",
+				"pt2": "Bridging development, security and ops with practical playbooks.",
+				"pt3": "Legacy-to-cloud migration patterns without stopping delivery."
+			},
+			"platform": {
+				"title": "Platform hardening & clarity",
+				"context": "Cross-industry — financial services background.",
+				"pt1": "Microservices and automated testing in regulated-style environments.",
+				"pt2": "Monitoring and observability foundations for incident response.",
+				"pt3": "Cost-aware architecture and operational standards."
+			},
+			"detail": "More detail on selected outcomes"
+		},
+		"timeline": {
+			"title": "Professional Experience",
+			"subtitle": "20+ years of experience delivering enterprise solutions",
+			"freelance": {
+				"title": "Freelance - Coming soon",
+				"date": "Freelance",
+				"desc": "Open for full time, short audits on project delivering — security, cloud infrastructure, compliance-oriented delivery and automation for AI."
+			},
+			"architect": {
+				"title": "DevSecOps Cloud Architect",
+				"date": "March 2022 – Present",
+				"desc": "Leading DevSecOps initiatives and cloud architecture for a international legal AI driven startup. Implementing secure, scalable infrastructure on AWS / OVH with focus on automation, security compliance (ISO 27001 / 42001, SOC 2, GDPR), and operational excellence.",
+				"more": "More here",
+				"ach1": "Cloud Architecture",
+				"ach2": "Security Compliance",
+				"ach3": "Infrastructure as Code",
+				"ach4": "SDLC Automation"
+			},
+			"company": {
+				"jusmundi": "Jus Mundi"
+			},
+			"engineer": {
+				"title": "DevSecOps Engineer",
+				"date": "2015 – Feb 2022",
+				"company": "Various Enterprise Clients",
+				"desc": "Provided expert consulting services to Fortune 500 companies or Startup, implementing DevSecOps practices, SDLC pipelines, and cloud migrations. Specialized in SDLC, Security automation, Docker containerization, and Kubernetes orchestration.",
+				"ach1": "Security lead",
+				"ach2": "C++, Java and Python development",
+				"ach3": "Docker, Kubernetes, Nomad, Rancher, Zone, Cloudflare",
+				"ach4": "Jenkins & GitHub Actions",
+				"ach5": "OnPremise & Cloud administration"
+			},
+			"senior": {
+				"title": "Senior Software Engineer",
+				"date": "2005 – 2015",
+				"company": "Financial Services Sector",
+				"desc": "Full-stack software development and DevOps transformation in banking and financial services. Led migration from monolithic to microservices architecture, implementing automated testing and continuous deployment practices.",
+				"ach1": "Java/C++ Enterprise",
+				"ach2": "Python Development",
+				"ach3": "Microservices",
+				"ach4": "Agile Methodologies"
+			},
+			"degree": {
+				"title": "Engineering degree",
+				"date": "2004",
+				"company": "Computer Science & Software Engineering",
+				"desc": "Graduated with a strong foundation in software engineering, algorithms, and system design — the base for everything that followed."
+			},
+			"cvcta": "View Full CVs"
+		},
+		"education": {
+			"title": "Education & Certifications",
+			"international": {
+				"title": "International collaboration",
+				"org": "20+ years in global, cross-location settings",
+				"details": "Delivery and leadership with teams and stakeholders across countries and time zones. Professional working language <strong>English</strong>; used daily with distributed engineering, security, and product partners in multinational environments."
+			},
+			"engineering": {
+				"title": "Engineering Degree",
+				"org": "Computer Science & Software Engineering",
+				"details": "Strong foundation in software engineering, algorithms, and system design"
+			},
+			"iso": {
+				"title": "ISO & SOC certifications",
+				"org": "Security, compliance & data protection",
+				"details": "<strong>ISO 27001 & GDPR</strong> — implementing and maintaining information-security and data-protection frameworks. <strong>ISO 42001</strong> — lead implementer for AI management systems. <strong>SOC 2 Type II</strong> — security controls and attestation in line with trust services criteria. See also <link>Security standards & compliance</link>."
+			},
+			"cloud": {
+				"title": "Cloud Certifications",
+				"org": "AWS, Azure, Kubernetes, Nomad",
+				"details": "Multiple cloud platform and orchestration certifications"
+			}
+		},
+		"contact": {
+			"title": "Work with me",
+			"subtitle": "Ready to improve your cloud platform or DevSecOps practices? Book a free 30-minute consultation, or email a short note about your context — I typically reply within two business day.",
+			"cta": {
+				"calendly": "Schedule a call (Calendly)",
+				"email": "Email me"
+			},
+			"email": {
+				"label": "Email",
+				"value": "job@albandrieu.com"
+			},
+			"linkedin": {
+				"label": "LinkedIn",
+				"value": "Connect with me"
+			},
+			"calendly": {
+				"label": "Calendly",
+				"value": "Book a time"
+			},
+			"github": {
+				"label": "GitHub",
+				"value": "View my work"
+			},
+			"logo": {
+				"alt": "Nabla Logo"
+			}
+		}
+	},
+	"aiPage": {
+		"meta": {
+			"title": "AI best practices and resources | Alban Andrieu",
+			"description": "Tools, resources and guidelines for reliable AI-driven development."
+		},
+		"title": "AI Best Practices",
+		"subtitle": "Tools, resources, and guidelines for AI-driven development",
+		"directoryLabel": "AI resource directory",
+		"sections": {
+			"apis": {
+				"title": "LLM APIs and chat",
+				"description": "Hosted foundation models and managed conversational AI services."
+			},
+			"coding": {
+				"title": "Coding assistants and IDEs",
+				"description": "Developer tools for assisted coding, review and software delivery."
+			},
+			"rag": {
+				"title": "RAG, vectors and frameworks",
+				"description": "Retrieval, embeddings and orchestration foundations for grounded applications."
+			},
+			"agents": {
+				"title": "Agents and automation",
+				"description": "Workflow engines and frameworks for reliable agentic systems."
+			},
+			"observability": {
+				"title": "Evaluations, traces and monitoring",
+				"description": "Measure quality, cost and production behaviour throughout the AI lifecycle."
+			},
+			"local": {
+				"title": "Local and open inference",
+				"description": "Run open models locally or on controlled infrastructure."
+			}
+		},
+		"principles": {
+			"title": "Key principles for AI development",
+			"security": "Treat prompts, retrieved content and model output as untrusted input.",
+			"evaluation": "Define repeatable evaluations before changing models or prompts.",
+			"observability": "Trace requests, latency, token usage, cost and quality signals.",
+			"privacy": "Minimize sensitive data and document provider retention policies.",
+			"cost": "Select models according to quality, latency and cost requirements."
+		}
+	},
+	"securityPage": {
+		"meta": {
+			"title": "Security resources and DevSecOps tools | Alban Andrieu",
+			"description": "Security standards, hardening, vulnerability management and cloud security resources."
+		},
+		"title": "Security Resources & Tools",
+		"subtitle": "A practical collection of security resources for DevSecOps professionals",
+		"directoryLabel": "Security resource directory",
+		"sections": {
+			"owasp": {
+				"title": "OWASP application security",
+				"description": "Standards, verification guidance and tools for secure web applications."
+			},
+			"hardening": {
+				"title": "System and SSH hardening",
+				"description": "Benchmarks and practical guidance for reducing system attack surfaces."
+			},
+			"compliance": {
+				"title": "Security standards and compliance",
+				"description": "Industry standards and regulatory frameworks for security governance."
+			},
+			"vulnerability": {
+				"title": "Vulnerability management and scanning",
+				"description": "Tools for identifying, assessing and prioritizing vulnerabilities."
+			},
+			"devsecops": {
+				"title": "DevSecOps tools and practices",
+				"description": "Integrate code, dependency, secret and infrastructure scanning into delivery pipelines."
+			},
+			"cloud": {
+				"title": "Cloud security resources",
+				"description": "Guidance and services for securing cloud and Kubernetes environments."
+			}
+		},
+		"posture": {
+			"title": "Build security into delivery",
+			"description": "Combine preventive controls, continuous verification, observable production systems and clear incident response ownership."
+		}
+	},
+	"contactPage": {
+		"meta": {
+			"title": "Contact Alban Andrieu — DevSecOps Cloud Architect",
+			"description": "Contact Alban Andrieu for cloud architecture, DevSecOps, AI infrastructure and security consulting."
+		},
+		"role": "DevSecOps Cloud Architect | Independent Consultant",
+		"intro": "Open to challenges around AI integration, MLOps, cloud platforms and security.",
+		"hero": {
+			"current": "Currently architecting secure cloud solutions at",
+			"experience": "With more than 20 years of experience in enterprise environments, I transform businesses through DevOps automation, cloud security and infrastructure as code.",
+			"contactCta": "Get in touch",
+			"cvCta": "View my CV"
+		},
+		"information": {
+			"title": "Contact information",
+			"subtitle": "Ready to improve your DevOps practices? Choose the most convenient way to reach me."
+		},
+		"methods": {
+			"email": { "title": "Email", "value": "job@albandrieu.com" },
+			"phone": { "title": "Phone", "value": "+33 6 95 43 53 53" },
+			"calendar": {
+				"title": "Schedule a meeting",
+				"value": "Book a 30-minute call"
+			}
+		},
+		"allInfo": "All contact information",
+		"allInfoAlt": "QR code for Alban Andrieu's contact information",
+		"linkedinQrAlt": "QR code for Alban Andrieu's LinkedIn profile",
+		"cv": {
+			"title": "Curriculum Vitae",
+			"description": "Download or view my CV in several formats and languages.",
+			"cta": "View all CV formats",
+			"full": "Full CV",
+			"medium": "Medium CV",
+			"small": "Short CV"
+		},
+		"social": {
+			"title": "Connect on social media",
+			"subtitle": "Follow my latest work and open-source projects.",
+			"channels": {
+				"linkedin": "Professional network",
+				"twitter": "Tech updates",
+				"xing": "Professional network",
+				"github": "Code repositories",
+				"docker": "Container images",
+				"stack": "Q&A contributions",
+				"facebook": "Social network",
+				"instagram": "Photos and stories",
+				"calendly": "Schedule a meeting",
+				"slack": "Nabla team collaboration",
+				"discord": "Talk to the bot",
+				"rss": "Site updates (XML)"
+			}
+		},
+		"location": {
+			"title": "Location",
+			"district": "La Défense business district",
+			"description": "Greater Paris — west of the city centre: the La Défense and Nanterre business corridor. Available for remote and on-site consulting across the region.",
+			"mapTitle": "Map of La Défense, Puteaux and western Paris",
+			"caption": "Overview of western Paris and its inner suburbs, centred on La Défense in Puteaux and the Nanterre business corridor. Map data ©",
+			"contributors": "contributors."
+		},
+		"opensource": {
+			"title": "Open source projects",
+			"description": "Explore my open-source work, the source of this website and my public contributions.",
+			"site": "View this site on GitHub",
+			"all": "All repositories",
+			"stars": "GitHub stars",
+			"forks": "GitHub forks",
+			"sponsor": "Sponsor Alban Andrieu",
+			"stackAlt": "Stack Exchange profile for Alban Andrieu"
+		}
+	},
+	"cvPage": {
+		"meta": {
+			"title": "Alban Andrieu — Curriculum Vitae",
+			"description": "DevSecOps and cloud architecture CV in PDF, HTML and ATS-friendly formats."
+		},
+		"role": "DevSecOps Engineer and Cloud Architect",
+		"intro": "More than 20 years of experience in software engineering, infrastructure, security and delivery automation.",
+		"contact": {
+			"title": "Contact information",
+			"cta": "Contact information",
+			"qrAlt": "QR code for Alban Andrieu's contact information"
+		},
+		"latex": {
+			"title": "LaTeX profiles",
+			"description": "Traditional formatted LaTeX resumes in four languages.",
+			"basic": "Basic style",
+			"quick": "20 Seconds style",
+			"export": "Export the LaTeX CV to other formats with"
+		},
+		"professional": {
+			"title": "Professional profiles and CV documents",
+			"network": "Complete professional history, freelance profile and network.",
+			"linkedinAlt": "QR code for Alban Andrieu's LinkedIn profile",
+			"maltAlt": "QR code for Alban Andrieu's Malt profile",
+			"cvdesignr": "ATS-scored English and French CVs.",
+			"atsTest": "Test ATS compatibility with",
+			"reactive": "AI/ATS-optimized resumes. Access to generated CVs may be restricted."
+		},
+		"html": {
+			"title": "HTML profiles",
+			"description": "Choose a detail level and language: English, French, German or Norwegian."
+		},
+		"sizes": {
+			"small": "Small CV",
+			"medium": "Medium CV",
+			"large": "Large CV",
+			"full": "Full CV"
+		},
+		"archive": {
+			"title": "Older CV formats",
+			"linkedin": "LinkedIn profile exported as PDF.",
+			"flowcv": "Interactive modern CV format."
+		},
+		"viewOnline": "View online",
+		"about": {
+			"title": "About this CV",
+			"description": "This page provides structured access to every current CV format and professional profile. Choose the PDF, ATS or browser version that best fits your needs."
+		}
 	}
 }

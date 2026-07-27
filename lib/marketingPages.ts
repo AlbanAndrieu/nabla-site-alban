@@ -16,21 +16,6 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		bodyClass:
 			"site-content-page page-home page-dark page-nabla-best-practices",
 	},
-	contact: {
-		file: "contact.html",
-		mode: "navHeaderMain",
-		bodyClass: "site-content-page page-dark page-nabla-best-practices",
-	},
-	ai: {
-		file: "ai.html",
-		mode: "navHeaderMain",
-		bodyClass: "site-content-page page-nabla-best-practices",
-	},
-	security: {
-		file: "security.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-security page-dark",
-	},
 	expertise: {
 		file: "expertise.html",
 		mode: "mainOuter",
@@ -52,31 +37,6 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
 	},
-	pricing: {
-		file: "pricing.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-dark",
-	},
-	success: {
-		file: "success.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page",
-	},
-	cancel: {
-		file: "cancel.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page",
-	},
-	payment: {
-		file: "payment.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-dark",
-	},
-	ciso: {
-		file: "ciso.html",
-		mode: "navHeaderMain",
-		bodyClass: "site-content-page page-ciso page-dark",
-	},
 	nabla: {
 		file: "nabla.html",
 		mode: "navHeaderMain",
@@ -96,7 +56,7 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 	},
 	ctid: {
 		file: "ctid.html",
-		mode: "mainOuter",
+		mode: "body",
 		bodyClass: "site-content-page page-ctid page-dark",
 	},
 	freenas: {

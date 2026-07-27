@@ -17,10 +17,7 @@ export default function LocaleSwitcher() {
 	}
 
 	return (
-		<label
-			htmlFor="locale-switcher"
-			className="locale-switcher"
-		>
+		<label htmlFor="locale-switcher" className="locale-switcher">
 			<span>{t("localeSwitcherLabel")}</span>
 			<select
 				id="locale-switcher"

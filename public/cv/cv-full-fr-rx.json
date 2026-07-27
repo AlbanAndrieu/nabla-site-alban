@@ -1,0 +1,621 @@
+{
+	"picture": {
+		"hidden": false,
+		"url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782313434045.jpeg",
+		"size": 80,
+		"rotation": 0,
+		"aspectRatio": 1,
+		"borderRadius": 0,
+		"borderColor": "rgba(0, 0, 0, 0.5)",
+		"borderWidth": 0,
+		"shadowColor": "rgba(0, 0, 0, 0.5)",
+		"shadowWidth": 0
+	},
+	"basics": {
+		"name": "Alban ANDRIEU",
+		"headline": "Architecte Cloud Securité et AI",
+		"email": "job@albandrieu.com",
+		"phone": "+33 6 95 43 53 53",
+		"location": "Nanterre, France",
+		"website": {
+			"url": "https://albanandrieu.com",
+			"label": "albanandrieu.com"
+		},
+		"customFields": [
+			{
+				"id": "019efa4c-e5e0-71ec-8f4f-8dc68bad2299",
+				"icon": "linkedin-logo",
+				"text": "nabla",
+				"link": "https://www.linkedin.com/in/nabla/"
+			},
+			{
+				"id": "019efa49-bcc6-73db-901c-e7a25c859f8c",
+				"icon": "github-logo",
+				"text": "AlbanAndrieu",
+				"link": "https://github.com/AlbanAndrieu"
+			}
+		]
+	},
+	"summary": {
+		"title": "Résumé professionnel",
+		"icon": "article",
+		"columns": 1,
+		"hidden": false,
+		"content": "<p><strong>Architecte Cloud expérimenté</strong> avec plus de 20 ans d'expertise en ingénierie logicielle, infrastructure cloud et automatisation SDLC. Spécialisé dans les initiatives de transformation digitale, les technologies de conteneurisation et les pratiques de <u>déploiement sécurisé</u>. Solide expérience dans le pilotage de projets d'intégration complexes, la mise en œuvre de flux GitOps et la coordination d'équipes pluridisciplinaires. Expert en conception et maintenance de pipelines SDLC robustes avec Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform et Ansible sur des stacks variés (C/C++, Java, JavaScript, PHP, Go, Python). Forte expérience dans les services financiers avec une connaissance approfondie des systèmes back-office et des exigences réglementaires.</p>"
+	},
+	"sections": {
+		"profiles": {
+			"title": "Profils",
+			"icon": "messenger-logo",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "43bbd7ef-2149-4898-83aa-9e96665fee67",
+					"hidden": false,
+					"icon": "linkedin-logo",
+					"iconColor": "",
+					"network": "LinkedIn",
+					"username": "nabla",
+					"website": {
+						"url": "https://linkedin.com/in/nabla/",
+						"label": "linkedin.com/in/nabla/",
+						"inlineLink": false
+					}
+				},
+				{
+					"id": "019efa54-dd68-7199-8365-5a16af9a9ab8",
+					"hidden": false,
+					"icon": "github-logo",
+					"iconColor": "",
+					"network": "GitHub",
+					"username": "AlbanAndrieu",
+					"website": {
+						"url": "https://github.com/AlbanAndrieu",
+						"label": "",
+						"inlineLink": false
+					}
+				},
+				{
+					"id": "019efa51-2db0-77aa-a2ab-70c99f9f9de4",
+					"hidden": false,
+					"icon": "globe",
+					"iconColor": "",
+					"network": "Website",
+					"username": "albanandrieu.com",
+					"website": {
+						"url": "https://albanandrieu.com",
+						"label": "",
+						"inlineLink": false
+					}
+				}
+			]
+		},
+		"experience": {
+			"title": "Expérience professionnelle",
+			"icon": "briefcase",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "f4d8835e-0465-4e46-bb13-50f8eecfa484",
+					"hidden": false,
+					"company": "Jus Mundi",
+					"position": "Architecte Cloud, Intégration (DevSecOps)",
+					"location": "Paris, France",
+					"period": "2022 - Present",
+					"website": {
+						"url": "https://www.jusmundi.com",
+						"label": "jusmundi.com",
+						"inlineLink": false
+					},
+					"description": "<ul><li><p>Focus : Accompagnement de la transition IA et hébergement du site</p></li><li><p>Projet : Agent IA pour le droit international et l'arbitrage (jusmundi.com)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité complètes pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Protection métier : Renforcement de la sécurité applicative grâce à des mécanismes anti-scraping et à la gestion centralisée des identités et des accès avec Keycloak, tout en préservant la fluidité du parcours utilisateur, première legal tech à obtenir les certifications ISO 42001, 27001, SOC II</p></li><li><p>Conteneurisation : Pilotage de la conteneurisation avec Docker, création d'images optimisées et bonnes pratiques sécurité et performance</p></li><li><p>Orchestration : Conception et déploiement de clusters Nomad et Kubernetes pour les charges de production (réseau, stockage, monitoring)</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation des processus : Définition et documentation des processus de livraison, indicateurs qualité et KPIs</p></li><li><p>Coordination inter-équipes : Collaboration avec le développement et les Data Scientists pour l'automatisation build, test, package et livraison</p></li><li><p>Métriques et reporting : Mise en place de monitoring et reporting (taux de succès des builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architectures microservices en Python, GO, Nuxt et PHP</p></li><li><p>Produit : Jus Mundi propose l'IA et la recherche optimisée pour le contenu juridique international</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Continuité d'activité : Garantir la disponibilité du site et la livraison rapide des évolutions et correctifs</p></li><li><p>Sécurité : Promouvoir un haut niveau de sécurité et de protection</p></li><li><p>Support IA : Accompagner la livraison des outils IA auprès des ingénieurs et data scientists</p></li></ul></li></ul><p></p>",
+					"roles": []
+				},
+				{
+					"id": "e38c9a1e-13e8-439d-995e-c7e92b0edc43",
+					"hidden": false,
+					"company": "Finastra (ex-Misys puis Thomson Reuters)",
+					"position": "Architecte d'intégration cloud",
+					"location": "Paris, France",
+					"period": "2017-2022",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li><p>Focus : Transformation digitale et migration cloud</p></li><li><p>Pilotage des initiatives DevSecOps pour plateforme legal tech</p></li><li><p>Projet : Solutions Trésorerie et Marchés de capitaux (finastra.com/solutions/treasury-capital-markets)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Conteneurisation : Pilotage avec Docker, Zone Solaris, images optimisées et bonnes pratiques</p></li><li><p>Orchestration Solaris et Kubernetes : Conception et déploiement de clusters</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation : Processus de livraison et KPIs</p></li><li><p>Unification : Consolidation des systèmes SDLC sur une plateforme Jenkins unifiée</p></li><li><p>Coordination : Collaboration avec dev, qa, sécurité et opérations pour l'automatisation complète</p></li><li><p>Métriques : Monitoring et reporting (builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Pipelines : Conception, mise en œuvre et maintenance de pipelines DevSecOps (sécurité, tests, déploiement)</p></li><li><p>Intégration cloud : Architecture et maintenance d'infrastructure cloud (haute disponibilité, scalabilité, sécurité)</p></li><li><p>Automatisation sécurité : Contrôles de sécurité et conformité automatisés (vulnérabilités, secrets, accès)</p></li><li><p>Infrastructure as Code : Ansible, Terraform et autres outils IaC pour des déploiements reproductibles</p></li><li><p>Optimisation SDLC : Amélioration continue des flux build, test et déploiement</p></li><li><p>Collaboration : Travail avec dev, ops et sécurité pour les bonnes pratiques DevSecOps</p></li></ul></li><li><p>Technologies et outils :</p><ul><li><p>Sécurité : SAST/DAST, Klocwork, Fuzzing, Secret Detection, gestion des vulnérabilités</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>",
+					"roles": []
+				},
+				{
+					"id": "e0e451ba-8e5b-4577-bbef-22519377e01d",
+					"hidden": false,
+					"company": "Finastra (ex-Misys puis Thomson Reuters)",
+					"position": "Ingénieur d'intégration cloud",
+					"location": "Paris, France",
+					"period": "2012-2017",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus : Introduction de l'intégration continue et de l'automatisation</li><li>Réalisations clés :</li><li>Mise en œuvre SDLC : Adoption de l'intégration continue avec Jenkins et Ansible, réduction de 60 % des problèmes d'intégration</li><li>Pratiques GitOps : Infrastructure as code avec Ansible sur Unix, Windows, Solaris, AIX et macOS</li><li>Support multi-langages : Systèmes de build pour :</li><ul><li>C/C++ Applications natives</li><li>Objective-C Applications macOS et iOS</li><li>Java Applications avec Maven et Gradle</li><li>JavaScript Frontend npm et Angular</li><li>Python Scripts et outils d'automatisation</li><li>Shell/Perl Scripts d'administration</li></ul><li>Automatisation : Frameworks de tests et scripts de déploiement, réduction du temps de déploiement manuel</li><li>Contrôle de version : Migration des équipes vers Git, formation et stratégies de branches</li></ul>",
+					"roles": []
+				},
+				{
+					"id": "dee76a1b-bcfb-4aea-bb8e-6b90739cf7d7",
+					"hidden": false,
+					"company": "Finastra (ex-Misys puis Thomson Reuters)",
+					"position": "Ingénieur logiciel senior",
+					"location": "Paris, France",
+					"period": "2007-2012",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus : Développement des modules stock et comptabilité</li><li>Environnement technique :</li><ul><li>Architecture : Architecture web 3 tiers (services métier C++, Java J2EE via CORBA)</li><li>Produit : Suite Kondor+ Back-Office (K+TP) - plateforme trésorerie et trading</li></ul><li>Responsabilités clés :</li><ul><li>Gestion des stocks : Gestion des stocks matériels avec suivi d'inventaire en temps réel</li><li>Automatisation comptable : Génération automatique des écritures comptables bilan et hors bilan, conformité réglementaire</li><li>Optimisation : Requêtes et logique applicative pour le traitement à fort volume</li></ul></ul>",
+					"roles": []
+				},
+				{
+					"id": "b7a4f2ea-1e57-4eca-bcb9-efb39360e571",
+					"hidden": false,
+					"company": "Société Générale Corporate & Investment Banking (via ESN)",
+					"position": "Ingénieur logiciel",
+					"location": "Paris, France",
+					"period": "2005-2010",
+					"website": {
+						"url": "https://wholesale.banking.societegenerale.com/en/",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus : Systèmes d'information Back-Office</li><li>Maintenance et évolution des systèmes :</li><ul><li>Système EOLE : Maintenance et évolution du système back-office pour les opérations d'achat/vente de titres</li><li>Système GATE : Développement pour la gestion des trades et des opérations de règlement</li></ul><li>Activités techniques :</li><ul><li>Développement : Nouvelles fonctionnalités et correctifs en C, PL/SQL et Java</li><li>Migration base de données : Migration Oracle 8i vers 10g, sans perte de données et temps d'arrêt minimal</li><li>Migration OS : Migration True 64 Unix vers Sun Solaris (recompilation et tests)</li><li>Support : Support technique niveau 2 et gestion des incidents de production</li><li>Analyse des besoins : Collaboration avec les analystes métier pour recueillir et documenter les besoins fonctionnels</li></ul></ul>",
+					"roles": []
+				}
+			]
+		},
+		"education": {
+			"title": "Formation et certifications",
+			"icon": "graduation-cap",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "a8e3b4bc-8f3f-4a85-b6bb-052b41b11665",
+					"hidden": false,
+					"school": "EFREI - École d'Ingénieurs Généralistes",
+					"degree": "Diplôme d'ingénieur en informatique",
+					"area": "Informatique et systèmes d'information",
+					"grade": "",
+					"location": "Paris, France",
+					"period": "1999-2004 (5 ans)",
+					"website": {
+						"url": "https://www.efrei.fr/",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Spécialisation : Informatique et systèmes d'information</li><li>Expérience internationale : Programme d'échange universitaire à Londres, Royaume-Uni (2002)</li><li>Principaux enseignements : Génie logiciel, bases de données, architecture réseau, algorithmes et structures de données, programmation orientée objet</li></ul>"
+				},
+				{
+					"id": "019efa02-31d2-77ef-98b9-0ae7d426de79",
+					"hidden": false,
+					"school": "Lycée ITEC Boisfleury",
+					"degree": "Baccalauréat",
+					"area": "spécialité physique-chimie",
+					"grade": "",
+					"location": "Grenoble",
+					"period": "1999",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": ""
+				}
+			]
+		},
+		"projects": {
+			"title": "",
+			"icon": "code-simple",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"skills": {
+			"title": "Compétences techniques et expertise",
+			"icon": "compass-tool",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "a9d011f0-1953-459b-b6c5-673f5ca6c9cd",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Docker",
+					"proficiency": "",
+					"level": 0,
+					"keywords": []
+				},
+				{
+					"id": "019ef9ec-9a26-7748-8400-c72df0edbd95",
+					"hidden": false,
+					"icon": "acorn",
+					"iconColor": "",
+					"name": "Nomad",
+					"proficiency": "",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "019ef9ef-73db-7559-9c25-0681ea4e74a4",
+					"hidden": false,
+					"icon": "acorn",
+					"iconColor": "",
+					"name": "Kubernetes",
+					"proficiency": "",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "588f9df2-76cf-4399-9f93-2bdb94db498f",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Jenkins",
+					"proficiency": "",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "3c17d290-6213-4a94-84a2-6cce360f11ce",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "GitLab",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "34342225-4010-4456-8be3-720dc3579b39",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Ansible",
+					"proficiency": "",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "88c413b5-e262-490b-9716-0a1d15ab9ec2",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "SAST/DAST",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "019ef9f0-2221-7261-bb02-ad1283b06b57",
+					"hidden": false,
+					"icon": "acorn",
+					"iconColor": "",
+					"name": "WAF / Firewall",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "f2784e93-ba66-4342-af77-ae3af10d8d22",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Terraform",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "8050a111-804a-4721-b978-3a525184aeac",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "AWS",
+					"proficiency": "",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "0c8a2749-722e-4855-bd3b-9153c1ae439a",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Azure",
+					"proficiency": "",
+					"level": 2,
+					"keywords": []
+				},
+				{
+					"id": "41127ac4-87d4-40b7-a914-19cbc898556a",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Secret Detection",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "28ce7f5f-03e8-44c8-8cb0-725278221704",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Python",
+					"proficiency": "",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "b27bd8ae-6979-4361-958d-8b7de1ff3936",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Java",
+					"proficiency": "",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "fca7e9a9-3120-45f4-9672-6ea6a99be6e3",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "C/C++",
+					"proficiency": "",
+					"level": 3,
+					"keywords": []
+				}
+			]
+		},
+		"languages": {
+			"title": "Langues",
+			"icon": "translate",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "019ef9f0-ee01-741c-a635-8894b722c731",
+					"hidden": false,
+					"language": "Français",
+					"fluency": "Langue maternelle",
+					"level": 5
+				},
+				{
+					"id": "019ef9f1-2cce-746f-8370-4d4d97423d95",
+					"hidden": false,
+					"language": "Anglais",
+					"fluency": "Maîtrise professionnelle complète à l'écrit et à l'oral, TOEIC : 750",
+					"level": 4
+				},
+				{
+					"id": "019ef9fe-77d6-719b-930a-f21e07d10ae9",
+					"hidden": false,
+					"language": "Allemand",
+					"fluency": "Niveau élémentaire, Conversation et compréhension écrite de base",
+					"level": 1
+				},
+				{
+					"id": "019ef9fe-b9c7-763b-8755-aadf66873672",
+					"hidden": false,
+					"language": "Norvégien",
+					"fluency": "Niveau élémentaire, Conversation et compréhension écrite de base",
+					"level": 1
+				}
+			]
+		},
+		"interests": {
+			"title": "Centres d'intérêt professionnels",
+			"icon": "football",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "ae68721e-c668-43c3-a639-d74d2ae618e1",
+					"hidden": false,
+					"icon": "person-simple-run",
+					"iconColor": "",
+					"name": "Course à pied",
+					"keywords": ["Pratique régulière", "semi-marathons"]
+				},
+				{
+					"id": "d2ed9ae6-b620-4024-ac20-35eb029a2b13",
+					"hidden": false,
+					"icon": "person-simple-ski",
+					"iconColor": "",
+					"name": "Ski",
+					"keywords": ["Ski alpin", "loisir", "compétition"]
+				},
+				{
+					"id": "b63accc6-57a2-49ea-98bb-c2c84a469920",
+					"hidden": false,
+					"icon": "lock",
+					"iconColor": "",
+					"name": "Sécurité de l'information",
+					"keywords": [
+						"Veille cybersécurité",
+						"sécurité applicative",
+						"durcissement infrastructure"
+					]
+				},
+				{
+					"id": "481ca808-5aa9-4ea8-bfb4-b3cc505ce992",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Communauté",
+					"keywords": [
+						"Contribution à l'open source",
+						"participation à des communautés techniques"
+					]
+				}
+			]
+		},
+		"awards": {
+			"title": "",
+			"icon": "trophy",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"certifications": {
+			"title": "Informations complémentaires",
+			"icon": "certificate",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "3105e1fe-d6f2-4342-8d48-a8deaa4082f9",
+					"hidden": false,
+					"title": "Disponibilité",
+					"issuer": "",
+					"date": "",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "Ouvert aux missions en conseil et contrats"
+				},
+				{
+					"id": "14d26e61-5b69-4712-b2ad-3d872a4daaaf",
+					"hidden": false,
+					"title": "Autorisation de travail",
+					"issuer": "",
+					"date": "",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "Autorisé à travailler en France et dans l'Union européenne"
+				},
+				{
+					"id": "995e8c89-2242-4011-9f8d-bd53dce1d479",
+					"hidden": false,
+					"title": "Mobilité",
+					"issuer": "",
+					"date": "",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "Ouvert à la discussion pour une opportunité à Francfort"
+				},
+				{
+					"id": "5721e5b0-e9c9-44d1-a12a-40e11676d743",
+					"hidden": false,
+					"title": "Télétravail",
+					"issuer": "",
+					"date": "",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "Expérience en collaboration à distance et équipes distribuées"
+				}
+			]
+		},
+		"publications": {
+			"title": "",
+			"icon": "books",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"volunteer": {
+			"title": "",
+			"icon": "hand-heart",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"references": {
+			"title": "",
+			"icon": "phone",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		}
+	},
+	"customSections": [],
+	"metadata": {
+		"template": "onyx",
+		"layout": {
+			"sidebarWidth": 35,
+			"pages": [
+				{
+					"fullWidth": false,
+					"main": [
+						"profiles",
+						"summary",
+						"education",
+						"experience",
+						"projects",
+						"volunteer",
+						"references"
+					],
+					"sidebar": [
+						"skills",
+						"certifications",
+						"awards",
+						"languages",
+						"interests",
+						"publications"
+					]
+				}
+			]
+		},
+		"page": {
+			"gapX": 4,
+			"gapY": 6,
+			"marginX": 14,
+			"marginY": 12,
+			"format": "a4",
+			"locale": "en-US",
+			"hideLinkUnderline": false,
+			"hideIcons": false,
+			"hideSectionIcons": true
+		},
+		"design": {
+			"level": {
+				"icon": "star",
+				"type": "circle"
+			},
+			"colors": {
+				"primary": "rgba(220, 38, 38, 1)",
+				"text": "rgba(0, 0, 0, 1)",
+				"background": "rgba(255, 255, 255, 1)"
+			}
+		},
+		"typography": {
+			"body": {
+				"fontFamily": "IBM Plex Serif",
+				"fontWeights": ["400", "500"],
+				"fontSize": 10,
+				"lineHeight": 1.5
+			},
+			"heading": {
+				"fontFamily": "IBM Plex Serif",
+				"fontWeights": ["600"],
+				"fontSize": 14,
+				"lineHeight": 1.5
+			}
+		},
+		"notes": "",
+		"styleRules": []
+	}
+}

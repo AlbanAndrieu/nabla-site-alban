@@ -1,0 +1,558 @@
+{
+	"picture": {
+		"hidden": false,
+		"url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782313434045.jpeg",
+		"size": 80,
+		"rotation": 0,
+		"aspectRatio": 1,
+		"borderRadius": 0,
+		"borderColor": "rgba(0, 0, 0, 0.5)",
+		"borderWidth": 0,
+		"shadowColor": "rgba(0, 0, 0, 0.5)",
+		"shadowWidth": 0
+	},
+	"basics": {
+		"name": "Alban ANDRIEU",
+		"headline": "DevSecOps Cloud Architect",
+		"email": "job@albandrieu.com",
+		"phone": "+33 6 95 43 53 53",
+		"location": "Paris, France",
+		"website": {
+			"url": "https://albanandrieu.com",
+			"label": "albanandrieu.com"
+		},
+		"customFields": [
+			{
+				"id": "7e000f7b-7b38-4dca-8800-8f0df0e4313c",
+				"icon": "linkedin-logo",
+				"text": "nabla",
+				"link": "https://linkedin.com/in/nabla/"
+			},
+			{
+				"id": "019efa4b-673f-736e-b627-a861f2ac1b62",
+				"icon": "github-logo",
+				"text": "AlbanAndrieu",
+				"link": "https://github.com/AlbanAndrieu"
+			}
+		]
+	},
+	"summary": {
+		"title": "Professional Summary",
+		"icon": "article",
+		"columns": 1,
+		"hidden": false,
+		"content": "<p><strong>Highly experienced Cloud Architect </strong>with over 20 years of expertise in software engineering, cloud infrastructure, and SDLC automation. Specialized in digital transformation initiatives, containerization technologies, and <u>secure deployment</u> practices. Proven track record of successfully leading complex integration projects, implementing GitOps workflows, and coordinating cross-functional teams. Expert in building and maintaining robust SDLC pipelines using Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform and Ansible across diverse technology stacks including C/C++, Java, JavaScript, PHP, Go and Python. Strong background in financial services industry with deep knowledge of back-office systems and regulatory requirements.</p>"
+	},
+	"sections": {
+		"profiles": {
+			"title": "",
+			"icon": "messenger-logo",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "7577b2b8-ab26-4557-a4a1-3c3bc96e69ec",
+					"hidden": false,
+					"icon": "linkedin-logo",
+					"iconColor": "",
+					"network": "LinkedIn",
+					"username": "nabla",
+					"website": {
+						"url": "https://linkedin.com/in/nabla/",
+						"label": "linkedin.com/in/nabla/",
+						"inlineLink": false
+					}
+				},
+				{
+					"id": "019efa54-8358-764c-8de4-79314fabf196",
+					"hidden": false,
+					"icon": "github-logo",
+					"iconColor": "",
+					"network": "GitHub",
+					"username": "AlbanAndrieu",
+					"website": {
+						"url": "https://github.com/AlbanAndrieu",
+						"label": "",
+						"inlineLink": false
+					}
+				},
+				{
+					"id": "c1a0f639-6633-4d62-b0bf-3e8b44b62d1f",
+					"hidden": false,
+					"icon": "globe",
+					"iconColor": "",
+					"network": "Website",
+					"username": "albanandrieu.com",
+					"website": {
+						"url": "https://albanandrieu.com",
+						"label": "albanandrieu.com",
+						"inlineLink": false
+					}
+				}
+			]
+		},
+		"experience": {
+			"title": "Professional Experience",
+			"icon": "briefcase",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "58e8d2a6-d6a0-40e8-b216-961e7ce9ea9f",
+					"hidden": false,
+					"company": "Jus Mundi",
+					"position": "Cloud, Integration Architect (DevSecOps)",
+					"location": "Paris, France",
+					"period": "2022 - Present",
+					"website": {
+						"url": "https://www.jusmundi.com",
+						"label": "jusmundi.com",
+						"inlineLink": false
+					},
+					"description": "<ul><li><p>Focus: Support AI Transition and Website hosting</p></li><li><p>Project: AI Agent for International Law and Arbitration (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://jusmundi.com\">jusmundi.com</a>)</p></li><li><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Protect business: With anti-scraping, Keycloak identity and authorization, no friction for legitimate customers, first IA tech implementing and maintaining ISO 42001, 27001, SOC II</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Nomad and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul></li><li><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Cross-Team Coordination: Collaborated with development, Data Scientist to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul></li><li><p>Technical Environment:</p><ul><li><p>Architecture: Micro services architectures in Python, GO, Nuxt and PhP</p></li><li><p>Product: Jus Mundi (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.jusmundi.com\">https://www.jusmundi.com</a>) provide AI and Optimized Search for International Legal content</p></li></ul></li><li><p>Key Responsibilities:</p><ul><li><p>Business Continuity: Ensure website availability and fast delivery of feature and fixes</p></li><li><p>Security: Push for High security standard and protection</p></li><li><p>AI Support: Support delivery of AI Tools across Engineer and Data Scientist</p></li></ul></li></ul><p></p>",
+					"roles": []
+				},
+				{
+					"id": "de793cfc-9fe6-4263-bf3b-f620354e384f",
+					"hidden": false,
+					"company": "Finastra (formerly Misys then Thomson Reuters)",
+					"position": "Cloud Integration Architect",
+					"location": "Paris, France",
+					"period": "2017-2022",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "finastra.com/solutions/treasury-capital-markets",
+						"inlineLink": false
+					},
+					"description": "<ul><li><p>Focus: Digital Transformation and Cloud Migration</p></li><li><p>Leading DevSecOps initiatives for legal tech platform</p></li><li><p>Project: Treasury and Capital Markets Solutions (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://finastra.com/solutions/treasury-capital-markets\">finastra.com/solutions/treasury-capital-markets</a>)</p></li><li><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Solaris and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul></li><li><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Infrastructure Unification: Consolidated disparate SDLC systems under a unified Jenkins-based platform</p></li><li><p>Cross-Team Coordination: Collaborated with development, QA, and operations teams to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul></li><li><p>Key Responsibilities:</p><ul><li><p>Pipeline Management: Design, implement, and maintain comprehensive DevSecOps pipelines integrating security scanning, automated testing, and continuous deployment</p></li><li><p>Cloud Systems Integration: Architect and maintain cloud-based infrastructure ensuring high availability, scalability, and security</p></li><li><p>Security Automation: Implement automated security and compliance checks within cloud environments, including vulnerability scanning, secrets management, and access control automation</p></li><li><p>Infrastructure as Code: Lead infrastructure automation initiatives using Ansible, Terraform, and other IaC tools for consistent and reproducible deployments</p></li><li><p>SDLC Optimization: Continuously improve build, test, and deployment workflows to enhance efficiency, reliability, and security</p></li><li><p>Team Collaboration: Work closely with development, operations, and security teams to implement DevSecOps best practices and foster a culture of shared responsibility</p></li></ul></li><li><p>Technologies &amp; Tools:</p><ul><li><p>Security Tools: SAST/DAST scanning, Klocwork, Fuzzing, Secret Detection, vulnerability management</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>",
+					"roles": []
+				},
+				{
+					"id": "b8e07b30-4cd2-489c-bc5c-6689e2e9e3f4",
+					"hidden": false,
+					"company": "Finastra (formerly Misys then Thomson Reuters)",
+					"position": "Cloud Integration Engineer",
+					"location": "Paris, France",
+					"period": "2012-2017",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus: Introduction of Continuous Integration and Automation</li><li>Key Achievements:<ul><li>SDLC Implementation: Pioneered the adoption of continuous integration using Jenkins pipelines and Ansible, reducing integration issues by 60%</li><li>GitOps Practices: Introduced infrastructure-as-code using Ansible, managing configurations across Unix, Windows, Solaris, AIX, and macOS platforms</li><li>Multi-Language Support: Developed and maintained build systems for:<ul><li>C/C++ Native applications with complex build dependencies</li><li>Objective-C macOS and iOS applications</li><li>Java Enterprise applications with Maven and Gradle</li><li>JavaScript Frontend applications with npm and Angular</li><li>Python Automation scripts and tools</li><li>Shell/Perl System administration scripts</li></ul></li><li>Automation: Created automated testing frameworks and deployment scripts, reducing manual deployment time from hours to minutes</li><li>Version Control: Migrated teams from legacy VCS to Git, providing training and establishing branching strategies</li></ul></li></ul>",
+					"roles": []
+				},
+				{
+					"id": "cca16432-e02c-4ae5-90aa-1e6844b9b366",
+					"hidden": false,
+					"company": "Finastra (formerly Misys then Thomson Reuters)",
+					"position": "Senior Software Engineer",
+					"location": "Paris, France",
+					"period": "2007-2012",
+					"website": {
+						"url": "https://finastra.com/solutions/treasury-capital-markets",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus: Development of Stock and Accounting Modules</li><li>Technical Environment:<ul><li>Architecture: 3-tier web architecture centered around C++ business services, interfaced via Java J2EE through CORBA middleware</li><li>Product: Kondor+ Back-Office suite (K+TP) - comprehensive treasury and trading platform</li></ul></li><li>Key Responsibilities:<ul><li>Stock Management: Implemented material stock management functionality with real-time inventory tracking</li><li>Accounting Automation: Created automatic generation system for balance sheet and off-balance sheet accounting entries, ensuring compliance with financial regulations</li><li>Performance Optimization: Optimized database queries and application logic to handle high-volume transaction processing</li></ul></li></ul>",
+					"roles": []
+				},
+				{
+					"id": "38e3f375-aa19-4e87-911b-a2c01737e87c",
+					"hidden": false,
+					"company": "Société Générale Corporate & Investment Banking (via ESN)",
+					"position": "Software Engineer",
+					"location": "Paris, France",
+					"period": "2005-2010",
+					"website": {
+						"url": "https://wholesale.banking.societegenerale.com/en/",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Focus: Back-Office Information Systems</li><li>Systems Maintenance & Enhancement:<ul><li>EOLE System: Maintained and enhanced back-office system for securities purchase/sale operations</li><li>GATE System: Developed features for trade management and settlement operations</li></ul></li><li>Technical Activities:<ul><li>Code Development: Implemented new features and bug fixes in C, PL/SQL, and Java</li><li>Database Migration: Successfully migrated Oracle databases from version 8i to 10g, ensuring zero data loss and minimal downtime</li><li>OS Migration: Led migration from True 64 Unix to Sun Solaris, including application recompilation and testing</li><li>Support: Provided Level 2 technical support and production incident management</li><li>Requirements Analysis: Collaborated with business analysts to gather and document functional requirements</li></ul></li></ul>",
+					"roles": []
+				}
+			]
+		},
+		"education": {
+			"title": "Education & Certifications",
+			"icon": "graduation-cap",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "2fa4f689-16e9-45c5-89a3-f9f7c554ae7c",
+					"hidden": false,
+					"school": "EFREI - École d'Ingénieurs Généralistes",
+					"degree": "Engineering Degree in Computer Science (Diplôme d'Ingénieur)",
+					"area": "Computer Science and Information Systems",
+					"grade": "",
+					"location": "Paris, France",
+					"period": "1999-2004 (5 years)",
+					"website": {
+						"url": "https://www.efrei.fr/",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<ul><li>Specialization: Computer Science and Information Systems</li><li>International Experience: University exchange program in London, United Kingdom (2002)</li><li>Key Courses: Software Engineering, Database Systems, Network Architecture, Algorithms & Data Structures, Object-Oriented Programming</li></ul>"
+				}
+			]
+		},
+		"projects": {
+			"title": "",
+			"icon": "code-simple",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"skills": {
+			"title": "Technical Skills & Expertise",
+			"icon": "compass-tool",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "c9b7a0f8-44d2-4ad6-b73c-2a65effbddc6",
+					"hidden": false,
+					"icon": "image",
+					"iconColor": "",
+					"name": "Docker",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": ["image creation", "optimization"]
+				},
+				{
+					"id": "d4e260fa-6a01-4edc-bda6-7a196b1884ca",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Nomad",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "9f67e67c-373e-4f5d-945d-3dcd7a06c43b",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Kubernetes",
+					"proficiency": "Advanced",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "ba52b1c6-c84c-456c-92c8-eeccb179ecd5",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Jenkins",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "2bd8fc82-93ac-4555-827a-438a89b2e489",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "GitLab",
+					"proficiency": "Advanced",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "6b4eb6a7-2f62-4b7b-b7d0-b33891ae06c1",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Ansible",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "1426e9b4-43e7-49ae-a9e3-feb561ce3a09",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Terraform",
+					"proficiency": "Advanced",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "9d92c7f8-ec13-41e2-b5c0-6d521a7ce8cd",
+					"hidden": false,
+					"icon": "wall",
+					"iconColor": "",
+					"name": "SAST/DAST scanning",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": []
+				},
+				{
+					"id": "019efad5-f4b8-74a8-a96d-7ab2021d8e50",
+					"hidden": false,
+					"icon": "wall",
+					"iconColor": "",
+					"name": "WAF / Firewall",
+					"proficiency": "Advanced",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "019efad6-6c8a-7197-88a8-5ed33b153786",
+					"hidden": false,
+					"icon": "cloud",
+					"iconColor": "",
+					"name": "OVH",
+					"proficiency": "Advanced",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "a33864b2-667d-477a-972c-30bf7566ad70",
+					"hidden": false,
+					"icon": "cloud",
+					"iconColor": "",
+					"name": "Amazon Web Services (AWS)",
+					"proficiency": "Intermediate",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "34cb7f3c-ecd2-4cf8-9668-7246ee0844e6",
+					"hidden": false,
+					"icon": "cloud",
+					"iconColor": "",
+					"name": "Microsoft Azure",
+					"proficiency": "Intermediate",
+					"level": 2,
+					"keywords": []
+				},
+				{
+					"id": "f5162e44-bd21-4b6b-bc89-a6b954cbcb21",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "C/C++",
+					"proficiency": "Advanced",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "c1a879c9-ae9c-4c38-a6de-94a1f1ef2f41",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Java",
+					"proficiency": "Advanced",
+					"level": 4,
+					"keywords": []
+				},
+				{
+					"id": "a54e3db7-c989-4087-b08e-2a162e47dbf6",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Python",
+					"proficiency": "Intermediate",
+					"level": 3,
+					"keywords": []
+				},
+				{
+					"id": "ec47bfdf-7191-4418-95ac-a0c8e090a7ed",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Secret Detection",
+					"proficiency": "Expert",
+					"level": 5,
+					"keywords": []
+				}
+			]
+		},
+		"languages": {
+			"title": "Languages",
+			"icon": "translate",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"interests": {
+			"title": "Professional Interests",
+			"icon": "football",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "6f8e7769-21cd-49e2-b69a-6560591aafaf",
+					"hidden": false,
+					"icon": "person-simple-run",
+					"iconColor": "",
+					"name": "Running",
+					"keywords": [
+						"Active runner participating in half-marathons, demonstrating discipline and endurance"
+					]
+				},
+				{
+					"id": "e7cd9213-5f47-4a6d-91c5-839ebcc60acb",
+					"hidden": false,
+					"icon": "person-simple-ski",
+					"iconColor": "",
+					"name": "Skiing",
+					"keywords": [
+						"Passionate alpine skier, enjoying both recreational and competitive skiing"
+					]
+				},
+				{
+					"id": "16043f24-dab3-4b7c-9c61-f69ad51ac8e5",
+					"hidden": false,
+					"icon": "lock",
+					"iconColor": "",
+					"name": "Information Security",
+					"keywords": [
+						"Continuous learning in cybersecurity, following latest trends in application security, infrastructure hardening, and threat intelligence"
+					]
+				},
+				{
+					"id": "49ddabf8-b41c-4345-adbe-482ca115d1f1",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Technology Research",
+					"keywords": [
+						"Staying current with emerging technologies in cloud computing, containerization, and DevOps practices"
+					]
+				},
+				{
+					"id": "e0761a72-3e8d-4790-8591-0cbbf3077c15",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Community Engagement",
+					"keywords": [
+						"Contributing to open-source projects and participating in technical communities"
+					]
+				}
+			]
+		},
+		"awards": {
+			"title": "",
+			"icon": "trophy",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"certifications": {
+			"title": "",
+			"icon": "certificate",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"publications": {
+			"title": "",
+			"icon": "books",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"volunteer": {
+			"title": "",
+			"icon": "hand-heart",
+			"columns": 1,
+			"hidden": false,
+			"items": []
+		},
+		"references": {
+			"title": "",
+			"icon": "phone",
+			"columns": 1,
+			"hidden": false,
+			"items": [
+				{
+					"id": "019efa42-effd-77bf-ac0a-cbd704969c6a",
+					"hidden": false,
+					"name": "Available upon request",
+					"position": "",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"phone": "",
+					"description": ""
+				}
+			]
+		}
+	},
+	"customSections": [],
+	"metadata": {
+		"template": "onyx",
+		"layout": {
+			"sidebarWidth": 35,
+			"pages": [
+				{
+					"fullWidth": false,
+					"main": [
+						"profiles",
+						"summary",
+						"education",
+						"experience",
+						"projects",
+						"volunteer",
+						"references"
+					],
+					"sidebar": [
+						"skills",
+						"certifications",
+						"awards",
+						"languages",
+						"interests",
+						"publications"
+					]
+				}
+			]
+		},
+		"page": {
+			"gapX": 4,
+			"gapY": 6,
+			"marginX": 14,
+			"marginY": 12,
+			"format": "a4",
+			"locale": "en-US",
+			"hideLinkUnderline": false,
+			"hideIcons": false,
+			"hideSectionIcons": true
+		},
+		"design": {
+			"level": {
+				"icon": "star",
+				"type": "circle"
+			},
+			"colors": {
+				"primary": "rgba(220, 38, 38, 1)",
+				"text": "rgba(0, 0, 0, 1)",
+				"background": "rgba(255, 255, 255, 1)"
+			}
+		},
+		"typography": {
+			"body": {
+				"fontFamily": "IBM Plex Serif",
+				"fontWeights": ["400", "500"],
+				"fontSize": 10,
+				"lineHeight": 1.5
+			},
+			"heading": {
+				"fontFamily": "IBM Plex Serif",
+				"fontWeights": ["600"],
+				"fontSize": 14,
+				"lineHeight": 1.5
+			}
+		},
+		"notes": "",
+		"styleRules": []
+	}
+}

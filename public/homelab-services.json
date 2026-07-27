@@ -190,7 +190,7 @@
 			"internalHost": "172.17.0.24",
 			"internalPort": 30063,
 			"internalSecure": false,
-			"tunnelUrl": "https://it-tools.albandrieu.com",
+			"tunnelUrl": "https://ittools.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/it-tools.png",
 			"reacheableFromOutside": true
@@ -700,7 +700,7 @@
 			"tunnelUrl": "https://open-webui.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/open-webui.png",
-			"reacheableFromOutside": false
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "OpenClaw",
@@ -731,7 +731,7 @@
 			"icons": ["fas fa-robot"],
 			"description": "LLM proxy and gateway",
 			"internalHost": "172.17.0.24",
-			"internalPort": 4100,
+			"internalPort": 4000,
 			"internalSecure": true,
 			"tunnelUrl": "https://litellm.albandrieu.com",
 			"tunnelSecure": true,
@@ -743,7 +743,7 @@
 			"icons": ["fas fa-robot"],
 			"description": "LLM proxy and gateway",
 			"internalHost": "172.17.0.57",
-			"internalPort": 4100,
+			"internalPort": 4000,
 			"internalSecure": true,
 			"tunnelUrl": "https://litellm-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
@@ -760,7 +760,7 @@
 			"tunnelUrl": "https://searxng.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/searxng.png",
-			"reacheableFromOutside": false
+			"reacheableFromOutside": true
 		},
 		{
 			"name": "FreshRSS",
@@ -772,6 +772,78 @@
 			"tunnelUrl": "https://freshrss.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/freshrss.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Hello",
+			"icons": ["fas fa-terminal"],
+			"description": "Hello World NGINX service",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8099,
+			"internalSecure": true,
+			"tunnelUrl": "https://hello.int.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/nginx.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Clickhouse",
+			"icons": ["fas fa-screwdriver-wrench"],
+			"description": "Clickhouse",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8123,
+			"internalSecure": true,
+			"tunnelUrl": "https://clickhouse.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/clickhouse.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Minio",
+			"icons": ["fas fa-screwdriver-wrench"],
+			"description": "Minio",
+			"internalHost": "172.17.0.24",
+			"internalPort": 9091,
+			"internalSecure": false,
+			"tunnelUrl": "https://minio.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/minio.png",
+			"reacheableFromOutside": false
+		},
+		{
+			"name": "Langfuse",
+			"icons": ["fas fa-screwdriver-wrench"],
+			"description": "langfuse",
+			"internalHost": "172.17.0.24",
+			"internalPort": 3000,
+			"internalSecure": true,
+			"tunnelUrl": "https://langfuse.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/langfuse.png",
+			"reacheableFromOutside": true
+		},
+		{
+			"name": "Language Tool",
+			"icons": ["fas fa-screwdriver-wrench"],
+			"description": "languagetool",
+			"internalHost": "172.17.0.24",
+			"internalPort": 8010,
+			"internalSecure": true,
+			"tunnelUrl": "https://languagetool.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/languagetool.png",
+			"reacheableFromOutside": true
+		},
+		{
+			"name": "Garage",
+			"icons": ["fas fa-terminal"],
+			"description": "Garage service",
+			"internalHost": "172.17.0.24",
+			"internalPort": 3909,
+			"internalSecure": true,
+			"tunnelUrl": "https://garage.int.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/garage.png",
 			"reacheableFromOutside": false
 		}
 	]

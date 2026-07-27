@@ -2,7 +2,15 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Site widgets integration", () => {
 	test("should inject print, back-to-top on homepage", async ({ page }) => {
-		await page.goto("/");
+		await page.goto("/", { waitUntil: "networkidle" });
+
+		await page.waitForFunction(
+			() =>
+				document.querySelector("#nabla-print-pdf-btn") &&
+				document.querySelector("#nabla-back-to-top"),
+			null,
+			{ timeout: 30000 },
+		);
 
 		const printButton = page.locator("#nabla-print-pdf-btn");
 		await expect(printButton).toHaveCount(1);
@@ -43,7 +51,9 @@ test.describe("Site widgets integration", () => {
 		expect(sawScrollTop).toBeTruthy();
 	});
 
-	test("should scroll to top when back-to-top control has href '#'", async ({ page }) => {
+	test("should scroll to top when back-to-top control has href '#'", async ({
+		page,
+	}) => {
 		await page.goto("/");
 		await page.evaluate(() => {
 			const button = document.getElementById("nabla-back-to-top");
@@ -95,7 +105,15 @@ test.describe("Site widgets integration", () => {
 	test("injects print and back-to-top controls on homepage", async ({
 		page,
 	}) => {
-		await page.goto("/");
+		await page.goto("/", { waitUntil: "networkidle" });
+
+		await page.waitForFunction(
+			() =>
+				document.querySelector("#nabla-print-pdf-btn") &&
+				document.querySelector("#nabla-back-to-top"),
+			null,
+			{ timeout: 30000 },
+		);
 
 		const printBtn = page.locator("#nabla-print-pdf-btn");
 		const backToTop = page.locator("#nabla-back-to-top");
@@ -114,7 +132,13 @@ test.describe("Site widgets integration", () => {
 			};
 		});
 
-		await page.goto("/");
+		await page.goto("/", { waitUntil: "networkidle" });
+
+		await page.waitForFunction(
+			() => document.querySelector("#nabla-print-pdf-btn"),
+			null,
+			{ timeout: 30000 },
+		);
 
 		const printBtn = page.locator("#nabla-print-pdf-btn");
 		await expect(printBtn).toBeVisible();

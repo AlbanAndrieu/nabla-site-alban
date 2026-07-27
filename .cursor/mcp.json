@@ -78,6 +78,10 @@
 			"env": {
 				"ALLOW_ONLY_NON_DESTRUCTIVE_TOOLS": "true"
 			}
+		},
+		"next-devtools": {
+			"command": "npx",
+			"args": ["-y", "next-devtools-mcp@latest"]
 		}
 	}
 }

@@ -3,16 +3,21 @@
  * Load after site-content-page.css. Selectors are scoped with body.site-content-page.page-* .
  */
 
-
 /* remove double scroll */
-body.site-content-page.page-contact { /* the element was body.site-content-page.page-contact.page-nabla-best-practices.page-ciso.page-ctid.page-login.page-dark */
-  overflow-y: visible;
-  overflow: visible;
+body.site-content-page.page-contact {
+	/* the element was body.site-content-page.page-contact.page-nabla-best-practices.page-ciso.page-ctid.page-login.page-dark */
+	overflow-y: visible;
+	overflow: visible;
 }
 
-html:not([data-lt-script-installed]):not(.__lt-dummy-1):not(.__lt-dummy-2):not(.__lt-dummy-3):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(.__lt-dummy-wxyz1234) { /* the element was html.fontawesome-i2svg-active.fontawesome-i2svg-complete */
-  overflow-y: auto;
-  height: auto;
+html:not([data-lt-script-installed]):not(.__lt-dummy-1):not(.__lt-dummy-2):not(
+		.__lt-dummy-3
+	):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(
+		.__lt-dummy-wxyz1234
+	) {
+	/* the element was html.fontawesome-i2svg-active.fontawesome-i2svg-complete */
+	overflow-y: auto;
+	height: auto;
 }
 
 /* ----- Contact (contact.html) ----- */
@@ -111,6 +116,9 @@ body.site-content-page.page-contact .section-subtitle {
 	color: #666;
 	margin-bottom: 3rem;
 }
+html[data-theme="dark"] body.site-content-page.page-contact .section-subtitle {
+	color: var(--text-secondary, #b8b8b8);
+}
 
 body.site-content-page.page-contact .contact-section {
 	padding: 4rem 2rem;
@@ -132,6 +140,11 @@ body.site-content-page.page-contact .contact-card {
 	transition:
 		transform 0.3s ease,
 		box-shadow 0.3s ease;
+}
+html[data-theme="dark"] body.site-content-page.page-contact .contact-card,
+html[data-theme="dark"] body.site-content-page.page-contact .social-card {
+	background: var(--bg-card, #252525);
+	color: var(--text-primary, #e4e4e4);
 }
 
 body.site-content-page.page-contact .contact-card:hover {
@@ -163,10 +176,10 @@ body.site-content-page.page-contact .social-card {
 	padding: 1.5rem;
 	text-align: center;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	transition: all 0.3s ease;
-	text-decoration: none;
-	color: inherit;
-	display: block;
+}
+html[data-theme="dark"] body.site-content-page.page-contact .social-card {
+	background: var(--bg-card, #252525);
+	color: var(--text-primary, #e4e4e4);
 }
 
 body.site-content-page.page-contact .social-card:hover {
@@ -648,6 +661,214 @@ body.site-content-page.page-ciso .feed-item p {
 	font-size: 0.9rem;
 	color: var(--text-secondary);
 	margin: 0.5rem 0;
+}
+
+/* Next.js CISO dashboard — aligned with AI and homelab content cards. */
+.page-ciso .ciso-hero {
+	min-height: auto;
+	padding: clamp(3rem, 8vw, 5rem) 1.5rem;
+	text-align: center;
+}
+
+.page-ciso .ciso-hero .hero-content {
+	width: min(100%, 900px);
+	margin-inline: auto;
+}
+
+.page-ciso .ciso-hero .hero-description,
+.page-ciso .ciso-hero .hero-description a {
+	color: rgb(255 255 255 / 90%);
+}
+
+.page-ciso .ciso-hero .hero-description a {
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.page-ciso .ciso-content {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+	width: min(100% - 2rem, 1200px);
+	margin: 2rem auto 4rem;
+}
+
+.page-ciso .ciso-card {
+	padding: clamp(1.25rem, 3vw, 2rem);
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-left: 4px solid var(--primary-color);
+	border-radius: 12px;
+	box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.page-ciso .ciso-card--wide {
+	grid-column: 1 / -1;
+}
+
+.page-ciso .ciso-card--centered {
+	text-align: center;
+}
+
+.page-ciso .ciso-card--centered > p {
+	max-width: 760px;
+	margin-inline: auto;
+}
+
+.page-ciso .ciso-card--centered > .resource-link {
+	display: inline-block;
+}
+
+.page-ciso .ciso-card h2 {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	margin: 0 0 1rem;
+	color: var(--primary-color);
+	font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+.page-ciso .ciso-card--centered h2 {
+	justify-content: center;
+}
+
+.page-ciso .ciso-card > p,
+.page-ciso .ciso-feed-status {
+	color: var(--text-secondary);
+	line-height: 1.65;
+}
+
+.page-ciso .ciso-compliance-grid {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1.25rem;
+	margin: 2rem 0;
+}
+
+.page-ciso .ciso-compliance-grid > div,
+.page-ciso .ciso-metric {
+	flex: 0 1 250px;
+	width: min(100%, 250px);
+	padding: 2rem 1.5rem;
+	background: var(--bg-white, var(--bg-card));
+	border: 2px solid var(--accent-color, #f59e0b);
+	border-radius: 16px;
+	box-shadow: 0 4px 20px
+		color-mix(in srgb, var(--accent-color, #f59e0b) 18%, transparent);
+	text-align: center;
+	transition:
+		transform 0.3s ease,
+		box-shadow 0.3s ease;
+}
+
+.page-ciso .ciso-compliance-grid > div:hover,
+.page-ciso .ciso-metric:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 10px 30px var(--shadow-hover-color, var(--shadow-color));
+}
+
+.page-ciso .ciso-compliance-grid dt,
+.page-ciso .ciso-metric h3 {
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.page-ciso .ciso-compliance-grid dt {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.85rem;
+}
+
+.page-ciso .ciso-compliance-grid dt i {
+	color: var(--accent-color, #f59e0b);
+	font-size: 3rem;
+}
+
+.page-ciso .ciso-compliance-grid dd {
+	margin: 0.75rem 0 0;
+	color: var(--accent-color, #f59e0b);
+	font-size: 1.25rem;
+	font-weight: 700;
+}
+
+.page-ciso .ciso-metrics {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 1.25rem;
+	margin-top: 2rem;
+}
+
+.page-ciso .ciso-metric {
+	text-align: center;
+}
+
+.page-ciso .ciso-metric-icon {
+	margin-bottom: 1rem;
+	color: var(--accent-color, #f59e0b);
+	font-size: 3rem;
+}
+
+.page-ciso .ciso-metric p {
+	margin: 0.5rem 0 0;
+	color: var(--text-primary);
+	font-size: 1.65rem;
+	font-weight: 700;
+}
+
+.page-ciso .ciso-feed-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 0 1.5rem;
+	margin-top: 1rem;
+}
+
+.page-ciso .ciso-feed-item {
+	padding: 1rem 0;
+	background: transparent;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.page-ciso .ciso-feed-meta {
+	margin: 0 0 0.4rem;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+}
+
+.page-ciso .ciso-feed-item h3 {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+.page-ciso .ciso-feed-item a,
+.page-ciso .resource-link {
+	color: var(--link-color);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.page-ciso .ciso-feed-item a:hover,
+.page-ciso .resource-link:hover {
+	color: var(--link-hover);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+@media (max-width: 760px) {
+	.page-ciso .ciso-content {
+		grid-template-columns: 1fr;
+	}
+
+	.page-ciso .ciso-compliance-grid > div,
+	.page-ciso .ciso-metric {
+		width: min(100%, 320px);
+	}
 }
 
 /* ----- Login (login.html) ----- */

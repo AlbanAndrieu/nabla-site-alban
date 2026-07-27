@@ -181,7 +181,7 @@ repos:
         name: "🔒 security · Detect private keys"
 
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v4.6.0
+    rev: v4.6.1
     hooks:
     -   id: validate_manifest
         name: "🤖 manifest · Validate manifest scripts"
@@ -207,7 +207,7 @@ repos:
     -   id: pyupgrade
         name: "🐍 python · Py Upgrade"
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.17
+    rev: v0.16.0
     hooks:
     -   id: ruff-format
         name: "🐍 python · Format with Ruff"
@@ -326,7 +326,7 @@ repos:
 
     ### Javascript & Web Tools ###
 -   repo: https://github.com/biomejs/pre-commit
-    rev: "v2.5.0"
+    rev: "v2.5.5"
     hooks:
     -   id: biome-check
         name: "🟨 javascript · Lint, format, and safe fixes with Biome"
@@ -408,7 +408,7 @@ repos:
 
     ### Data & Config Validation ###
 -   repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.3
+    rev: 0.37.4
     hooks:
     -   id: check-github-workflows
         name: "🧩 github-actions · Validate gh workflow files"
