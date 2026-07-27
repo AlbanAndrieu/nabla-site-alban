@@ -116,6 +116,9 @@ body.site-content-page.page-contact .section-subtitle {
 	color: #666;
 	margin-bottom: 3rem;
 }
+html[data-theme="dark"] body.site-content-page.page-contact .section-subtitle {
+	color: var(--text-secondary, #b8b8b8);
+}
 
 body.site-content-page.page-contact .contact-section {
 	padding: 4rem 2rem;
@@ -137,6 +140,11 @@ body.site-content-page.page-contact .contact-card {
 	transition:
 		transform 0.3s ease,
 		box-shadow 0.3s ease;
+}
+html[data-theme="dark"] body.site-content-page.page-contact .contact-card,
+html[data-theme="dark"] body.site-content-page.page-contact .social-card {
+	background: var(--bg-card, #252525);
+	color: var(--text-primary, #e4e4e4);
 }
 
 body.site-content-page.page-contact .contact-card:hover {
@@ -168,10 +176,10 @@ body.site-content-page.page-contact .social-card {
 	padding: 1.5rem;
 	text-align: center;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	transition: all 0.3s ease;
-	text-decoration: none;
-	color: inherit;
-	display: block;
+}
+html[data-theme="dark"] body.site-content-page.page-contact .social-card {
+	background: var(--bg-card, #252525);
+	color: var(--text-primary, #e4e4e4);
 }
 
 body.site-content-page.page-contact .social-card:hover {

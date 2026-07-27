@@ -89,8 +89,8 @@ export default async function JusmundiPage({
 								</h3>
 								<p className="infra-migration-lead">{jm("securityBandLead")}</p>
 								<ul>
-									{jm.raw("securityBand").map((entry: string, idx: number) => (
-										<li key={idx}>{entry}</li>
+									{jm.raw("securityBand").map((entry: string) => (
+										<li key={entry}>{entry}</li>
 									))}
 								</ul>
 							</div>
@@ -114,8 +114,8 @@ export default async function JusmundiPage({
 								<h3 id="infra-k8s-us-heading">{jm("infraBandHeading")}</h3>
 								<p className="infra-migration-lead">{jm("infraBandLead")}</p>
 								<ul>
-									{jm.raw("infraBand").map((entry: string, idx: number) => (
-										<li key={idx}>{entry}</li>
+									{jm.raw("infraBand").map((entry: string) => (
+										<li key={entry}>{entry}</li>
 									))}
 								</ul>
 							</div>
@@ -141,8 +141,8 @@ export default async function JusmundiPage({
 								</h3>
 								<p className="infra-migration-lead">{jm("aiBandLead")}</p>
 								<ul>
-									{jm.raw("aiBand").map((entry: string, idx: number) => (
-										<li key={idx}>{entry}</li>
+									{jm.raw("aiBand").map((entry: string) => (
+										<li key={entry}>{entry}</li>
 									))}
 								</ul>
 							</div>
@@ -167,11 +167,9 @@ export default async function JusmundiPage({
 								<h3 id="seo-heading">{jm("achievements.seo.title")}</h3>
 								<p className="service-lead">{jm("achievements.seo.lead")}</p>
 								<ul className="service-bullets">
-									{jm
-										.raw("achievements.seo.bullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
-										))}
+									{jm.raw("achievements.seo.bullets").map((entry: string) => (
+										<li key={entry}>{entry}</li>
+									))}
 								</ul>
 							</div>
 							{/* SLA Card */}
@@ -182,11 +180,9 @@ export default async function JusmundiPage({
 								<h3 id="sla-heading">{jm("achievements.sla.title")}</h3>
 								<p className="service-lead">{jm("achievements.sla.lead")}</p>
 								<ul className="service-bullets">
-									{jm
-										.raw("achievements.sla.bullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
-										))}
+									{jm.raw("achievements.sla.bullets").map((entry: string) => (
+										<li key={entry}>{entry}</li>
+									))}
 								</ul>
 							</div>
 							{/* Security & Compliance Card */}
@@ -203,8 +199,8 @@ export default async function JusmundiPage({
 								<div className="badge-row">
 									{jm
 										.raw("achievements.security.badges")
-										.map((badge: string, idx: number) => (
-											<span className="badge" key={idx}>
+										.map((badge: string) => (
+											<span className="badge" key={badge}>
 												{badge}
 											</span>
 										))}
@@ -215,8 +211,8 @@ export default async function JusmundiPage({
 								<ul className="service-bullets">
 									{jm
 										.raw("achievements.security.vulnBullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
+										.map((entry: string) => (
+											<li key={entry}>{entry}</li>
 										))}
 								</ul>
 								<h4 className="jusmundi-card-h4">
@@ -225,8 +221,8 @@ export default async function JusmundiPage({
 								<ul className="service-bullets">
 									{jm
 										.raw("achievements.security.idpBullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
+										.map((entry: string) => (
+											<li key={entry}>{entry}</li>
 										))}
 								</ul>
 								<h4 className="jusmundi-card-h4">
@@ -235,8 +231,8 @@ export default async function JusmundiPage({
 								<ul className="service-bullets">
 									{jm
 										.raw("achievements.security.complianceBullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
+										.map((entry: string) => (
+											<li key={entry}>{entry}</li>
 										))}
 								</ul>
 							</div>
@@ -252,8 +248,8 @@ export default async function JusmundiPage({
 								<ul className="service-bullets">
 									{jm
 										.raw("achievements.platform.bullets")
-										.map((entry: string, idx: number) => (
-											<li key={idx}>{entry}</li>
+										.map((entry: string) => (
+											<li key={entry}>{entry}</li>
 										))}
 								</ul>
 							</div>
@@ -270,8 +266,8 @@ export default async function JusmundiPage({
 						</h2>
 						<div className="service-card jusmundi-service-card-wide">
 							<ul>
-								{jm.raw("overallBullets").map((entry: string, idx: number) => (
-									<li key={idx}>{entry}</li>
+								{jm.raw("overallBullets").map((entry: string) => (
+									<li key={entry}>{entry}</li>
 								))}
 							</ul>
 						</div>

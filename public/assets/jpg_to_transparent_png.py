@@ -64,7 +64,7 @@ def make_transparent(
         im.putdata(new_data)
         im.save(out_path, "PNG")
         return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001  # Catch-all for robust batch processing
         print(f"Skip {path}: {e}", file=sys.stderr)
         return False
 

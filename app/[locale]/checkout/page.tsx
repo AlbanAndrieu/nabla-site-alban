@@ -1,6 +1,7 @@
 // app/[locale]/checkout/page.tsx
 
 import Head from "next/head";
+import Image from "next/image";
 
 export default function CheckoutPage({
 	params,
@@ -30,11 +31,12 @@ export default function CheckoutPage({
 			>
 				<section className="checkout-card" style={{ margin: "auto" }}>
 					<div className="product">
-						<img
+						<Image
 							src="https://albanandrieu.com/assets/nabla/nabla-4.svg"
 							alt={isFr ? "Nabla" : "Nabla"}
 							width={64}
 							height={64}
+							priority
 						/>
 						<div className="description">
 							<h2 className="checkout-title">
@@ -48,7 +50,7 @@ export default function CheckoutPage({
 						</div>
 					</div>
 					<figure className="checkout-qr">
-						<img
+						<Image
 							src="/assets/stripe/tjm-stripe.png"
 							alt={
 								isFr
@@ -57,7 +59,7 @@ export default function CheckoutPage({
 							}
 							width={880}
 							height={1055}
-							decoding="async"
+							priority
 						/>
 						<figcaption className="checkout-qr-caption">
 							{isFr

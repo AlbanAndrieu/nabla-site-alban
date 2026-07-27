@@ -44,11 +44,7 @@
 	function isLikelyLocalHost() {
 		try {
 			var h = location.hostname;
-			return (
-				h === "localhost" ||
-				h === "127.0.0.1" ||
-				h === "[::1]"
-			);
+			return h === "localhost" || h === "127.0.0.1" || h === "[::1]";
 		} catch {
 			return false;
 		}
@@ -106,9 +102,7 @@
 							};
 						}
 						for (
-							var d = {},
-								_e = ["get_group"].concat(getGroupArgs),
-								c = 0;
+							var d = {}, _e = ["get_group"].concat(getGroupArgs), c = 0;
 							c < j.length;
 							c++
 						)
@@ -198,14 +192,14 @@
 	function vercel() {
 		window.va =
 			window.va ||
-			function () {
+			(() => {
 				(window.vaq = window.vaq || []).push(arguments);
-			};
+			});
 		window.si =
 			window.si ||
-			function () {
+			(() => {
 				(window.siq = window.siq || []).push(arguments);
-			};
+			});
 		if (!skipRemoteAnalyticsOnLocalDev()) {
 			loadDefer("/_vercel/insights/script.js");
 			loadDefer("/_vercel/speed-insights/script.js");
@@ -488,14 +482,16 @@
 					"clearPageviewProperties",
 					"trackPageview",
 				],
-				i = (e) => (...t) => {
-					window.heapReadyCb.push({
-						name: e,
-						fn: () => {
-							heap[e]?.apply(heap, t);
-						},
-					});
-				};
+				i =
+					(e) =>
+					(...t) => {
+						window.heapReadyCb.push({
+							name: e,
+							fn: () => {
+								heap[e]?.apply(heap, t);
+							},
+						});
+					};
 			for (var p = 0; p < n.length; p++) heap[n[p]] = i(n[p]);
 		});
 	heap.load("724068705");

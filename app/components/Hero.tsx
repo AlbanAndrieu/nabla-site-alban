@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import React from "react";
 
 export default function Hero() {
 	const t = useTranslations();
@@ -67,11 +67,10 @@ export default function Hero() {
 							rel="noopener noreferrer"
 							target="_blank"
 						>
-							<img
+							<Image
 								alt=""
 								aria-hidden="true"
 								className="jusmundi-link-icon"
-								decoding="async"
 								height={16}
 								src="/assets/nabla/jusmundi-favicon.ico"
 								width={16}

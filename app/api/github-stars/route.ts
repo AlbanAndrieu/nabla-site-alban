@@ -1,4 +1,3 @@
-import React from "react";
 import { fetchGithubStars } from "../../fetchGithubStars";
 
 export const dynamic = "force-dynamic";

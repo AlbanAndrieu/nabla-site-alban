@@ -20,7 +20,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
 			</a>
-			<main id="main-content" role="main">
+			<main id="main-content">
 				<Hero />
 
 				<section

@@ -764,9 +764,9 @@ body.site-content-page
  */
 body.site-content-page .homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--ok {
-	border-color: #22c55e !important;
-	color: #16a34a !important;
-	background-color: transparent !important;
+	border-color: #22c55e;
+	color: #16a34a;
+	background-color: transparent;
 }
 
 body.site-content-page
@@ -775,17 +775,17 @@ body.site-content-page
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--ok:focus {
-	color: #14532d !important;
-	border-color: #15803d !important;
-	background-color: color-mix(in srgb, #22c55e 12%, transparent) !important;
+	color: #14532d;
+	border-color: #15803d;
+	background-color: color-mix(in srgb, #22c55e 12%, transparent);
 }
 
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--warn {
-	border-color: #eab308 !important;
-	color: #ca8a04 !important;
-	background-color: transparent !important;
+	border-color: #eab308;
+	color: #ca8a04;
+	background-color: transparent;
 }
 
 body.site-content-page
@@ -794,17 +794,17 @@ body.site-content-page
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--warn:focus {
-	color: #854d0e !important;
-	border-color: #a16207 !important;
-	background-color: color-mix(in srgb, #eab308 14%, transparent) !important;
+	color: #854d0e;
+	border-color: #a16207;
+	background-color: color-mix(in srgb, #eab308 14%, transparent);
 }
 
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--fail {
-	border-color: #ef4444 !important;
-	color: #dc2626 !important;
-	background-color: transparent !important;
+	border-color: #ef4444;
+	color: #dc2626;
+	background-color: transparent;
 }
 
 body.site-content-page
@@ -813,17 +813,17 @@ body.site-content-page
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--fail:focus {
-	color: #991b1b !important;
-	border-color: #b91c1c !important;
-	background-color: color-mix(in srgb, #ef4444 12%, transparent) !important;
+	color: #991b1b;
+	border-color: #b91c1c;
+	background-color: color-mix(in srgb, #ef4444 12%, transparent);
 }
 
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--unknown {
-	border-color: #64748b !important;
-	color: #64748b !important;
-	background-color: transparent !important;
+	border-color: #64748b;
+	color: #64748b;
+	background-color: transparent;
 }
 
 body.site-content-page
@@ -832,9 +832,9 @@ body.site-content-page
 body.site-content-page
 	.homelab-service-card
 	a.btn.homelab-service-btn-tunnel.homelab-tunnel-tab--unknown:focus {
-	color: #475569 !important;
-	border-color: #475569 !important;
-	background-color: color-mix(in srgb, #64748b 10%, transparent) !important;
+	color: #475569;
+	border-color: #475569;
+	background-color: color-mix(in srgb, #64748b 10%, transparent);
 }
 
 /* Homelab HTTPS padlocks (homelab-services-render.js + nabla-service-status.js probe) */
