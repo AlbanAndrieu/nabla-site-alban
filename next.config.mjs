@@ -17,6 +17,7 @@ const marketingSlugs = MARKETING_PAGE_SLUGS;
 /** Serve marketing HTML under `*.html` URLs: rewrite to App Router before `public/*.html` wins. */
 const marketingHtmlBeforeFiles = marketingSlugs.flatMap((slug) => [
 	{ source: `/${slug}.html`, destination: `/en/${slug}` },
+	{ source: `/en/${slug}.html`, destination: `/en/${slug}` },
 	{ source: `/fr/${slug}.html`, destination: `/fr/${slug}` },
 ]);
 

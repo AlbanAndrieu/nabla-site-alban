@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import {
 	loadPublicHtmlFragment,
@@ -38,7 +39,7 @@ export default async function CheckoutPage({ params }: Props) {
 
 	return (
 		<>
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{t("skipToMainContent")}
 			</a>

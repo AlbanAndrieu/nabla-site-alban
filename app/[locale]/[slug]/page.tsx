@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import HomelabServicesScripts from "@/components/HomelabServicesScripts";
+import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import {
 	loadPublicHtmlFragment,
@@ -57,7 +58,7 @@ export default async function MarketingSlugPage({ params }: Props) {
 				data-analytics-mode={analyticsMode}
 				data-ahrefs-key={spec.ahrefsKey}
 			/>
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{t("skipToMainContent")}
 			</a>

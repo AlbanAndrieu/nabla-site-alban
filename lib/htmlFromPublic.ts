@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 
 export type HtmlExtractMode =
+	| "body"
 	| "main"
 	| "headerMain"
 	/** Breadcrumb `<nav class="…page-nav…">` through `</main>` (TrueNAS: homelab cards live in `<header>`). */
@@ -254,22 +255,46 @@ export async function loadPublicHtmlFragment(
 	const html = await readFile(full, "utf8");
 	let fragment = "";
 
-	if (mode === "main") {
-		const m = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-		fragment = m?.[1] ?? "";
-	} else if (mode === "headerMain") {
-		// Allow comments/other nodes between </header> and <main>.
-		const m = html.match(
-			/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
+	try {
+		if (mode === "body") {
+			const m = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+			fragment = (m?.[1] ?? "").replace(
+				/<footer\b[^>]*>[\s\S]*?<\/footer>/gi,
+				"",
+			);
+		} else if (mode === "main") {
+			const m = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+			fragment = m?.[1] ?? "";
+		} else if (mode === "headerMain") {
+			// Allow comments/other nodes between <\/header> and <main>.
+			const m = html.match(
+				/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
+			);
+			fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
+		} else if (mode === "navHeaderMain") {
+			const m = html.match(/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i);
+			fragment = m?.[0] ?? "";
+		} else {
+			const m = html.match(/<main[^>]*>[\s\S]*?<\/main>/i);
+			fragment = m?.[0] ?? "";
+		}
+	} catch (err) {
+		console.error(
+			`Error extracting HTML for file: ${file}, mode: ${mode}, locale: ${locale}`,
+			err,
 		);
-		fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
-	} else if (mode === "navHeaderMain") {
-		const m = html.match(/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i);
-		fragment = m?.[0] ?? "";
-	} else {
-		const m = html.match(/<main[^>]*>[\s\S]*?<\/main>/i);
-		fragment = m?.[0] ?? "";
+		throw err;
 	}
+
+	if (!fragment) {
+		console.warn(
+			`[loadPublicHtmlFragment] EMPTY FRAGMENT for file: ${file} (mode: ${mode}, locale: ${locale})`,
+		);
+	}
+
+	console.log(
+		`[loadPublicHtmlFragment] file: ${file} mode: ${mode} locale: ${locale} => extracted length: ${fragment.length}`,
+	);
 
 	return rewriteLegacyHtmlHrefs(fragment, locale);
 }

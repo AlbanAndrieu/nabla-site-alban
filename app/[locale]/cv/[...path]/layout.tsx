@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -30,7 +29,7 @@ export default async function CVLayout({ children, params }: Props) {
 		: "site-content-page page-cv page-dark page-nabla-best-practices";
 
 	return (
-		<html>
+		<html lang={locale}>
 			<head>
 				{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
 				{isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}

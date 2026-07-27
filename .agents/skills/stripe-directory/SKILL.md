@@ -55,7 +55,7 @@ Always report the exact queries (and filters) you ran so the user can keep itera
 MPP-supported results are payable directly. Don’t drive to purchase unprompted. When the user wants to buy, **present the full menu of payment methods and ask which they’d like to use** before doing anything:
 
 > "Which payment method would you like to use?
-> 
+>
 > - **Link CLI** — Stripe-native, test mode available (recommended)
 - **Tempo** — crypto wallet
 - **Privy Agent Wallet CLI** — crypto wallet

@@ -833,7 +833,7 @@
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/languagetool.png",
 			"reacheableFromOutside": true
-		},		
+		},
 		{
 			"name": "Garage",
 			"icons": ["fas fa-terminal"],
