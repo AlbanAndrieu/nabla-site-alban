@@ -44,7 +44,7 @@
 		"opencommit": "node scripts/run-opencommit.mjs"
 	},
 	"dependencies": {
-		"@astrojs/vercel": "^10.0.2",
+		"@astrojs/vercel": "^8.0.4",
 		"@datadog/browser-rum": "^6.24.1",
 		"@opentelemetry/api": "^1.9.1",
 		"@opentelemetry/api-logs": "^0.220.0",
@@ -59,13 +59,13 @@
 		"crypto": "^1.0.1",
 		"express": "^4.21.0",
 		"lodash-es": "^4.18.1",
-		"next": "^16.3.0-canary.97",
+		"next": "^16.2.12",
 		"next-devtools-mcp": "^0.4.0",
 		"next-intl": "^4.9.2",
-		"react": "^19.2.8",
-		"react-dom": "^19.2.8",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4",
 		"stripe": "^20.4.1",
-		"vercel": "^55.0.0",
+		"vercel": "^54.17.3",
 		"webdriver-manager": "^12.1.9"
 	},
 	"devDependencies": {
@@ -75,19 +75,19 @@
 		"@tailwindcss/postcss": "^4.2.4",
 		"@types/express": "5.0.0",
 		"@types/node": "^20.11.17",
-		"@types/react": "^19.2.17",
+		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"copyfiles": "2.4.1",
+		"copyfiles": "^1.0.0",
 		"d3": "7.9.0",
-		"eslint": "^9.39.1",
-		"eslint-config-next": "^16.3.0-canary.97",
-		"eslint-formatter-gitlab": "^6.0.1",
-		"opencommit": "^3.3.9",
+		"eslint": "^10.8.0",
+		"eslint-config-next": "^0.2.4",
+		"eslint-formatter-gitlab": "^7.2.0",
+		"opencommit": "^3.2.14",
 		"playwright": "^1.58.0",
 		"tailwindcss": "^4.2.4",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.47.0",
-		"wrangler": "^4.59.1"
+		"wrangler": "^4.114.0"
 	}
 }
