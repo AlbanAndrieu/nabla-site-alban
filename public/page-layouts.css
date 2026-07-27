@@ -655,6 +655,162 @@ body.site-content-page.page-ciso .feed-item p {
 	margin: 0.5rem 0;
 }
 
+/* Next.js CISO dashboard — aligned with AI and homelab content cards. */
+.page-ciso .ciso-hero {
+	min-height: auto;
+	padding: clamp(3rem, 8vw, 5rem) 1.5rem;
+	text-align: center;
+}
+
+.page-ciso .ciso-hero .hero-content {
+	width: min(100%, 900px);
+	margin-inline: auto;
+}
+
+.page-ciso .ciso-hero .hero-description,
+.page-ciso .ciso-hero .hero-description a {
+	color: rgb(255 255 255 / 90%);
+}
+
+.page-ciso .ciso-hero .hero-description a {
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.page-ciso .ciso-content {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+	width: min(100% - 2rem, 1200px);
+	margin: 2rem auto 4rem;
+}
+
+.page-ciso .ciso-card {
+	padding: clamp(1.25rem, 3vw, 2rem);
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-left: 4px solid var(--primary-color);
+	border-radius: 12px;
+	box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.page-ciso .ciso-card--wide {
+	grid-column: 1 / -1;
+}
+
+.page-ciso .ciso-card h2 {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	margin: 0 0 1rem;
+	color: var(--primary-color);
+	font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+.page-ciso .ciso-card > p,
+.page-ciso .ciso-feed-status {
+	color: var(--text-secondary);
+	line-height: 1.65;
+}
+
+.page-ciso .ciso-compliance-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+	gap: 0.75rem;
+	margin: 1.5rem 0;
+}
+
+.page-ciso .ciso-compliance-grid > div,
+.page-ciso .ciso-metric {
+	padding: 1rem;
+	background: var(--bg-secondary);
+	border: 1px solid var(--border-color);
+	border-radius: 10px;
+}
+
+.page-ciso .ciso-compliance-grid dt,
+.page-ciso .ciso-metric h3 {
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.page-ciso .ciso-compliance-grid dd {
+	margin: 0.35rem 0 0;
+	color: var(--text-secondary);
+	font-weight: 700;
+}
+
+.page-ciso .ciso-metrics {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 0.75rem;
+}
+
+.page-ciso .ciso-metric {
+	text-align: center;
+}
+
+.page-ciso .ciso-metric-icon {
+	margin-bottom: 0.75rem;
+	color: var(--primary-color);
+	font-size: 1.5rem;
+}
+
+.page-ciso .ciso-metric p {
+	margin: 0.5rem 0 0;
+	color: var(--text-primary);
+	font-size: 1.65rem;
+	font-weight: 700;
+}
+
+.page-ciso .ciso-feed-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 0 1.5rem;
+	margin-top: 1rem;
+}
+
+.page-ciso .ciso-feed-item {
+	padding: 1rem 0;
+	background: transparent;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.page-ciso .ciso-feed-meta {
+	margin: 0 0 0.4rem;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+}
+
+.page-ciso .ciso-feed-item h3 {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+.page-ciso .ciso-feed-item a,
+.page-ciso .resource-link {
+	color: var(--link-color);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.page-ciso .ciso-feed-item a:hover,
+.page-ciso .resource-link:hover {
+	color: var(--link-hover);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+@media (max-width: 760px) {
+	.page-ciso .ciso-content {
+		grid-template-columns: 1fr;
+	}
+}
+
 /* ----- Login (login.html) ----- */
 body.site-content-page.page-login .form-signin {
 	width: 100%;

@@ -155,11 +155,31 @@ When `.html` URLs must remain public, use explicit `beforeFiles` rewrites so App
 
 Choose one canonical URL policy. Use redirects only when changing the visible canonical URL is intended; use rewrites when preserving it is required. Test direct entry, locale switching, and internal navigation.
 
+## Gestion des secrets et sécurité Stripe
+
+- Ne JAMAIS commit ni exposer la valeur de STRIPE_SECRET_KEY ou NEXT_PUBLIC_STRIPE_SECRET_KEY dans git ou dans les logs.
+- La clé peut se trouver dans `.env.secrets` ou `.env.local`, sous le nom STRIPE_SECRET_KEY ou NEXT_PUBLIC_STRIPE_SECRET_KEY (préfixe NEXT_PUBLIC_ inutile ici pour une clé strictement serveur).
+- Toujours vérifier la présence de la clé côté backend/rendu serveur sur les environnements prod/dev, et que la route d’API Stripe utilise `process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY`.
+- Vérifier que les fichiers secrets sont dans `.gitignore` et ne sont pas poussés en production par un pipeline CI/CD.
+- Si une clé manque : afficher une erreur claire niveau process, mais ne jamais "filler" ou générer de clé test automatique.
+- Pour la QA, ne jamais générer de faux paiement Stripe : utiliser les test keys Stripe fournies par le dashboard Stripe dev.
+
 ## Avoid broad filesystem tracing
 
 Do not pass arbitrary user-controlled or route-derived paths to `readFile`, `path.join(process.cwd(), "public", dynamicValue)`, dynamic imports, or `require`. Turbopack may trace the entire project or public tree.
 
 Use explicit allowlists that map supported page identifiers to statically scoped paths. Reject unknown files before access. Apply the same rule to metadata loaders and nested CV/document routes. Keep path traversal impossible even when the route is statically generated.
+
+## Log Analysis Step (QA prerequisite before runtime or Playwright tests)
+
+Before running any Playwright or end-to-end browser test after a migration, you **must**:
+
+1. Redémarrer Next.js avec `npm run dev` (ou build).
+2. Inspecter les logs Next.js dans `.next/dev/logs/next-development.log` (ou l’output terminal).
+3. S’assurer qu’il n’y a AUCUNE erreur SSR, import, 500, hydration, ou warning critique dans les logs.
+4. Si une erreur est détectée, stopper la migration pour cette page et la corriger avant n’importe quel test browser/Playwright.
+
+Automatisation recommandée : `grep -iE "err|fail|hydration|500" .next/dev/logs/next-development.log` après chaque migration.
 
 ## Verify the migration
 

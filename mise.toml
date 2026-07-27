@@ -1,0 +1,14 @@
+min_version = "2024.9.5"
+
+[tools]
+node = "25.4.0"
+pre-commit = "latest"
+
+
+[settings]
+lockfile = true
+
+[env]
+_.file = [".env.secrets", ".env.local"]
+
+ENV = "dev"

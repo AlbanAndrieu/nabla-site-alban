@@ -26,6 +26,8 @@ const marketingHtmlBeforeFiles = marketingSlugs
 		{ source: `/fr/ai.html`, destination: `/fr/ai` },
 		{ source: `/cancel.html`, destination: `/en/cancel` },
 		{ source: `/fr/cancel.html`, destination: `/fr/cancel` },
+		{ source: `/ciso.html`, destination: `/en/ciso` },
+		{ source: `/fr/ciso.html`, destination: `/fr/ciso` },
 	]);
 
 /** Home legacy URLs → localized home routes. */

@@ -37,11 +37,6 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
 	},
-	ciso: {
-		file: "ciso.html",
-		mode: "headerMain",
-		bodyClass: "site-content-page page-ciso page-dark",
-	},
 	nabla: {
 		file: "nabla.html",
 		mode: "navHeaderMain",

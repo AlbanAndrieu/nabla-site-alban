@@ -1,59 +1,68 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-import PaymentShell from "@/components/payments/PaymentShell";
-import { routing } from "@/i18n/routing";
-import { paymentCopy, paymentLocale } from "@/lib/paymentPages";
+// app/[locale]/checkout/page.tsx
 
-type Props = { params: Promise<{ locale: string }> };
+import Head from "next/head";
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-	const { locale: rawLocale } = await params;
-	const locale = paymentLocale(rawLocale);
-	return {
-		title:
-			locale === "fr"
-				? "Paiement sécurisé | Alban Andrieu"
-				: "Secure checkout | Alban Andrieu",
-		description: paymentCopy[locale].checkoutSubtitle,
-		robots: { index: false, follow: false },
-	};
-}
-
-export default async function CheckoutPage({ params }: Props) {
-	const { locale: rawLocale } = await params;
-	if (!hasLocale(routing.locales, rawLocale)) notFound();
-	const locale = paymentLocale(rawLocale);
-	setRequestLocale(locale);
-	const copy = paymentCopy[locale];
+export default function CheckoutPage({
+	params,
+}: {
+	params: { locale: string };
+}) {
+	const isFr = params.locale === "fr";
 
 	return (
-		<PaymentShell locale={locale}>
-			<main id="main-content" className="checkout-page">
-				<section className="checkout-card">
+		<>
+			<Head>
+				<title>
+					{isFr ? "Checkout | Alban Andrieu" : "Checkout | Alban Andrieu"}
+				</title>
+				<meta name="robots" content="noindex, nofollow" />
+			</Head>
+			<main
+				id="main-content"
+				className="checkout-page site-content-page"
+				style={{
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					justifyContent: "center",
+					minHeight: "80vh",
+				}}
+			>
+				<section className="checkout-card" style={{ margin: "auto" }}>
 					<div className="product">
-						<Image
-							src="/assets/nabla/nabla-4.svg"
-							alt="Nabla"
+						<img
+							src="https://albanandrieu.com/assets/nabla/nabla-4.svg"
+							alt={isFr ? "Nabla" : "Nabla"}
 							width={64}
 							height={64}
 						/>
 						<div className="description">
-							<h1 className="checkout-title">{copy.checkoutTitle}</h1>
-							<p className="checkout-subtitle">{copy.checkoutSubtitle}</p>
+							<h2 className="checkout-title">
+								{isFr ? "Paiement" : "Payment"}
+							</h2>
+							<p className="checkout-subtitle">
+								{isFr
+									? "Paiement unique via Stripe. Paiement sécurisé."
+									: "One-time payment via Stripe. Secure checkout."}
+							</p>
 						</div>
 					</div>
 					<figure className="checkout-qr">
-						<Image
+						<img
 							src="/assets/stripe/tjm-stripe.png"
-							alt={copy.qrAlt}
-							width={440}
-							height={528}
+							alt={
+								isFr
+									? "Code QR pour ouvrir ce paiement Stripe sur votre téléphone"
+									: "QR code to open this Stripe payment on your phone"
+							}
+							width={880}
+							height={1055}
+							decoding="async"
 						/>
 						<figcaption className="checkout-qr-caption">
-							{copy.qrCaption}
+							{isFr
+								? "Ou scannez ce QR code pour payer sur votre téléphone"
+								: "Or scan this QR code to pay on your phone"}
 						</figcaption>
 					</figure>
 					<form
@@ -61,21 +70,18 @@ export default async function CheckoutPage({ params }: Props) {
 						method="POST"
 						className="checkout-form"
 					>
-						<input type="hidden" name="locale" value={locale} />
 						<button
 							type="submit"
 							id="checkout-button"
 							className="checkout-button"
 						>
-							<i className="fa-solid fa-lock" aria-hidden="true" />{" "}
-							{copy.checkoutButton}
+							<i className="fa-solid fa-lock" aria-hidden="true"></i>
+							{isFr ? " Passer à la caisse" : " Proceed to checkout"}
 						</button>
 					</form>
-					<p className="checkout-footer">
-						<a href={`/${locale}`}>{copy.back}</a>
-					</p>
+					{/* lien back to site supprimé comme demandé */}
 				</section>
 			</main>
-		</PaymentShell>
+		</>
 	);
 }
