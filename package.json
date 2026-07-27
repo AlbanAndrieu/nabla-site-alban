@@ -44,7 +44,7 @@
 		"opencommit": "node scripts/run-opencommit.mjs"
 	},
 	"dependencies": {
-		"@astrojs/vercel": "^10.0.2",
+		"@astrojs/vercel": "^11.0.3",
 		"@datadog/browser-rum": "^6.24.1",
 		"@opentelemetry/api": "^1.9.1",
 		"@opentelemetry/api-logs": "^0.220.0",
@@ -88,6 +88,6 @@
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.47.0",
-		"wrangler": "^4.59.1"
+		"wrangler": "^4.114.0"
 	}
 }
