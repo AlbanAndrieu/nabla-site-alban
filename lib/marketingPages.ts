@@ -37,26 +37,6 @@ export const MARKETING_PAGES: Record<string, MarketingPageSpec> = {
 		mode: "mainOuter",
 		bodyClass: "site-content-page page-dark",
 	},
-	pricing: {
-		file: "pricing.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-dark",
-	},
-	success: {
-		file: "success.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page",
-	},
-	cancel: {
-		file: "cancel.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page",
-	},
-	payment: {
-		file: "payment.html",
-		mode: "mainOuter",
-		bodyClass: "site-content-page page-dark",
-	},
 	ciso: {
 		file: "ciso.html",
 		mode: "headerMain",

@@ -14,6 +14,62 @@
 	align-items: center;
 	column-gap: 0.25rem;
 }
+
+.route-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	min-height: 3.75rem;
+	padding: 0.65rem clamp(1rem, 3vw, 2rem);
+	border-bottom: 1px solid var(--border-color, rgb(255 255 255 / 14%));
+	background: var(--bg-secondary, #20242b);
+	color: var(--text-primary, #f8f9fa);
+}
+.route-header__nav,
+.route-header__home,
+.route-header__parent,
+.route-header__locale {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+.route-header__nav {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+}
+.route-header__home,
+.route-header__parent {
+	color: inherit;
+	font-weight: 600;
+	text-decoration: none;
+}
+.route-header__home:hover,
+.route-header__parent:hover {
+	color: var(--link-hover, #8ec5ff);
+}
+.route-header__separator {
+	color: var(--text-secondary, #adb5bd);
+}
+.route-header__locale {
+	flex: 0 0 auto;
+}
+.route-header__locale .form-select {
+	width: auto;
+}
+.route-header--root {
+	justify-content: flex-end;
+}
+@media (max-width: 640px) {
+	.route-header {
+		align-items: stretch;
+		flex-direction: column;
+	}
+	.route-header__locale {
+		justify-content: space-between;
+	}
+}
 .cv-page-identity {
 	display: flex;
 	align-items: center;

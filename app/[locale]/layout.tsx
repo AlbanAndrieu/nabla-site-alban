@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import Footer from "@/app/components/Footer";
+import RouteHeader from "@/components/RouteHeader";
 import { routing } from "@/i18n/routing";
 
 export function generateStaticParams() {
@@ -26,6 +27,7 @@ export default async function LocaleLayout({
 
 	return (
 		<NextIntlClientProvider locale={locale} messages={messages}>
+			<RouteHeader />
 			{children}
 			<Footer
 				backHome={site.backHome}

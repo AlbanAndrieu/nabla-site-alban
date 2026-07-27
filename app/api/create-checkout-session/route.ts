@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripeClient } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
@@ -59,12 +59,22 @@ export function wantsJson(req: NextRequest): boolean {
 	return accept.includes("application/json");
 }
 
-export async function POST(req: NextRequest) {
-	const stripeSecret =
-		process.env.STRIPE_SECRET_KEY || process.env.STRIPE_KEY || "";
-	const priceId = process.env.STRIPE_PRICE_ID || process.env.PRICE_ID || "";
+export function checkoutLocale(value: unknown): "en" | "fr" {
+	return value === "fr" ? "fr" : "en";
+}
 
-	if (!stripeSecret) {
+export function checkoutReturnUrls(origin: string, locale: "en" | "fr") {
+	return {
+		successUrl: `${origin}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
+		cancelUrl: `${origin}/${locale}/cancel`,
+	};
+}
+
+export async function POST(req: NextRequest) {
+	const priceId = process.env.STRIPE_PRICE_ID || process.env.PRICE_ID || "";
+	const stripe = getStripeClient();
+
+	if (!stripe) {
 		const msg =
 			"Missing STRIPE_SECRET_KEY. Set it in the Vercel project environment.";
 		return wantsJson(req)
@@ -87,20 +97,27 @@ export async function POST(req: NextRequest) {
 	}
 	const origin = trusted.origin;
 
+	let locale: "en" | "fr" = "en";
 	try {
-		await req.json();
+		if (req.headers.get("content-type")?.includes("application/json")) {
+			const body = (await req.json()) as { locale?: unknown };
+			locale = checkoutLocale(body.locale);
+		} else {
+			const form = await req.formData();
+			locale = checkoutLocale(form.get("locale"));
+		}
 	} catch {
-		// Form POST or empty body
+		// Keep the default locale for empty or malformed bodies.
 	}
-
-	const stripe = new Stripe(stripeSecret);
+	const returnUrls = checkoutReturnUrls(origin, locale);
 
 	try {
 		const session = await stripe.checkout.sessions.create({
 			line_items: [{ price: priceId, quantity: 1 }],
 			mode: "payment",
-			success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-			cancel_url: `${origin}/cancel`,
+			success_url: returnUrls.successUrl,
+			cancel_url: returnUrls.cancelUrl,
+			metadata: { locale },
 		});
 
 		if (!session.url) {
@@ -116,8 +133,7 @@ export async function POST(req: NextRequest) {
 		return NextResponse.redirect(session.url, 303);
 	} catch (err: unknown) {
 		console.error("create-checkout-session:", err);
-		const message =
-			err instanceof Error ? err.message : "Checkout session failed.";
+		const message = "Could not create checkout session. Please try again.";
 		return wantsJson(req)
 			? NextResponse.json({ error: message }, { status: 500 })
 			: new NextResponse(message, { status: 500 });

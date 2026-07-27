@@ -1,6 +1,6 @@
 "use server";
 
-import { stripe } from "@/lib/stripe";
+import { getStripeClient } from "@/lib/stripe";
 
 type CatalogProduct = {
 	name: string;
@@ -23,6 +23,8 @@ async function getProduct(productId: string): Promise<CatalogProduct> {
 
 export async function startCheckoutSession(productId: string) {
 	const product = await getProduct(productId);
+	const stripe = getStripeClient();
+	if (!stripe) throw new Error("Stripe is not configured.");
 
 	// Create Checkout Sessions from body params.
 	const session = await stripe.checkout.sessions.create({

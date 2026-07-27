@@ -15,11 +15,18 @@ const localePrefixes = ["en", "fr"];
 const marketingSlugs = MARKETING_PAGE_SLUGS;
 
 /** Serve marketing HTML under `*.html` URLs: rewrite to App Router before `public/*.html` wins. */
-const marketingHtmlBeforeFiles = marketingSlugs.flatMap((slug) => [
-	{ source: `/${slug}.html`, destination: `/en/${slug}` },
-	{ source: `/en/${slug}.html`, destination: `/en/${slug}` },
-	{ source: `/fr/${slug}.html`, destination: `/fr/${slug}` },
-]);
+const marketingHtmlBeforeFiles = marketingSlugs
+	.flatMap((slug) => [
+		{ source: `/${slug}.html`, destination: `/en/${slug}` },
+		{ source: `/en/${slug}.html`, destination: `/en/${slug}` },
+		{ source: `/fr/${slug}.html`, destination: `/fr/${slug}` },
+	])
+	.concat([
+		{ source: `/ai.html`, destination: `/en/ai` },
+		{ source: `/fr/ai.html`, destination: `/fr/ai` },
+		{ source: `/cancel.html`, destination: `/en/cancel` },
+		{ source: `/fr/cancel.html`, destination: `/fr/cancel` },
+	]);
 
 /** Home legacy URLs → localized home routes. */
 const homeHtmlBeforeFiles = [

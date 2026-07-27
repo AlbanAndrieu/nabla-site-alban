@@ -22,18 +22,6 @@ export default async function JusmundiPage({
 				<a href="#main-content" className="skip-link">
 					{site("skipToMainContent")}
 				</a>
-				<nav
-					className="page-nav container py-3 d-flex flex-wrap align-items-center gap-2"
-					aria-label="Breadcrumb"
-				>
-					<Link
-						href={`/${locale}`}
-						className="text-decoration-none"
-						aria-label="Back to Main"
-					>
-						<span aria-hidden="true">←</span> {jm("footer.returnToCv")}
-					</Link>
-				</nav>
 				<main id="main-content" className="container py-4 pb-5">
 					<section
 						className="hero-section jusmundi-hero-compact"

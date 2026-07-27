@@ -94,7 +94,7 @@ export default async function RootLayout({
 			<body>
 				{children}
 				{/* Next.js way to load scripts post-hydration */}
-				<Script src="/site-widgets.js" strategy="afterInteractive" />
+				<Script src="/site-widgets.js" strategy="beforeInteractive" />
 				<Script
 					src="/site-analytics.js"
 					data-analytics-mode="home"

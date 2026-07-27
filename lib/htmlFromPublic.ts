@@ -1,5 +1,4 @@
 import { access, readFile } from "node:fs/promises";
-import path from "node:path";
 import type { Metadata } from "next";
 
 export type HtmlExtractMode =
@@ -13,6 +12,43 @@ export type SiteLocale = "en" | "fr";
 
 const DEFAULT_LOCALE: SiteLocale = "en";
 const SUPPORTED_LOCALES: readonly SiteLocale[] = ["en", "fr"];
+
+const PUBLIC_HTML_FILES = [
+	"ai.html",
+	"cancel.html",
+	"checkout.html",
+	"ciso.html",
+	"contact.html",
+	"ctid.html",
+	"cv/index.html",
+	"email.html",
+	"expertise.html",
+	"freenas.html",
+	"index.html",
+	"link.html",
+	"login.html",
+	"nabla.html",
+	"payment.html",
+	"pricing.html",
+	"security.html",
+	"startup-thanks.html",
+	"startup.html",
+	"success.html",
+	"test.html",
+	"truenas.html",
+	"workstation.html",
+] as const;
+
+type PublicHtmlFile = (typeof PUBLIC_HTML_FILES)[number];
+
+function isPublicHtmlFile(file: string): file is PublicHtmlFile {
+	return PUBLIC_HTML_FILES.includes(file as PublicHtmlFile);
+}
+
+function publicHtmlUrl(file: PublicHtmlFile, locale: SiteLocale): URL {
+	const base = locale === "fr" ? "../public/locales/fr/" : "../public/";
+	return new URL(`${base}${file}`, import.meta.url);
+}
 
 export const HOME_JSON_LD = {
 	"@context": "https://schema.org",
@@ -176,8 +212,9 @@ function rewriteOneHref(
 		return `href=${quote}${raw}${quote}`;
 	}
 
-	/** Keep static-style `.html` URLs; only add locale prefix when needed (Next rewrites these to `[locale]/[slug]`). */
-	const localizedOut = withLocalePrefix(pathPart, locale);
+	pathPart = `/${pathPart.replace(/^\/+/, "")}`;
+	pathPart = pathPart.replace(/\/index\.html$/i, "").replace(/\.html$/i, "");
+	const localizedOut = withLocalePrefix(pathPart || "/", locale);
 	return `href=${quote}${localizedOut}${query}${hash}${quote}`;
 }
 
@@ -226,16 +263,13 @@ export function rewriteLegacyHtmlHrefs(
 async function resolvePublicFilePath(
 	file: string,
 	locale?: string,
-): Promise<string> {
+): Promise<URL> {
+	if (!isPublicHtmlFile(file)) {
+		throw new Error(`Unsupported public HTML file: ${file}`);
+	}
 	const normalizedLocale = normalizeLocale(locale);
 	if (normalizedLocale !== DEFAULT_LOCALE) {
-		const localized = path.join(
-			process.cwd(),
-			"public",
-			"locales",
-			normalizedLocale,
-			file,
-		);
+		const localized = publicHtmlUrl(file, normalizedLocale);
 		try {
 			await access(localized);
 			return localized;
@@ -243,7 +277,7 @@ async function resolvePublicFilePath(
 			// Fallback to English source under public/.
 		}
 	}
-	return path.join(process.cwd(), "public", file);
+	return publicHtmlUrl(file, DEFAULT_LOCALE);
 }
 
 export async function loadPublicHtmlFragment(
@@ -291,6 +325,12 @@ export async function loadPublicHtmlFragment(
 			`[loadPublicHtmlFragment] EMPTY FRAGMENT for file: ${file} (mode: ${mode}, locale: ${locale})`,
 		);
 	}
+
+	// App Router supplies the consistent route header; remove legacy page breadcrumbs.
+	fragment = fragment.replace(
+		/<nav\b[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/nav>/gi,
+		"",
+	);
 
 	console.log(
 		`[loadPublicHtmlFragment] file: ${file} mode: ${mode} locale: ${locale} => extracted length: ${fragment.length}`,

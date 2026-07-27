@@ -8,7 +8,11 @@ export default function Hero() {
 	const locale = useLocale();
 	const localePrefix = locale === "fr" ? "/fr" : "";
 	return (
-		<section className="hero-section" id="home" aria-labelledby="hero-heading">
+		<section
+			className="hero-section home-hero"
+			id="home"
+			aria-labelledby="hero-heading"
+		>
 			<div className="hero-content">
 				<h1 className="hero-title" id="hero-heading">
 					{t("home.hero.title")}

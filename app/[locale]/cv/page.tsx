@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 type Link = { href: string; label: string; flag?: string; download?: boolean };
 
@@ -164,7 +163,6 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 	const contact = await getTranslations("contactPage");
 	return (
 		<main id="main-content" className="site-content-page page-cv page-dark">
-			<LocaleSwitcher />
 			<ContactHero
 				contactCta={contact("hero.contactCta")}
 				contactHref={`/${locale}/contact`}

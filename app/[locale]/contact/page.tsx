@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 const socials = [
 	[
@@ -69,7 +68,6 @@ export default async function ContactPage({
 			className="site-content-page page-contact page-dark"
 		>
 			<span id="top" />
-			<LocaleSwitcher />
 			<ContactHero
 				contactCta={t("hero.contactCta")}
 				contactHref="#contact-details"

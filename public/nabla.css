@@ -1,5 +1,5 @@
 /* Best Practices (ai.html, nabla.html) — scoped so hero/resource/footer do not affect other pages */
-body.page-nabla-best-practices {
+.page-nabla-best-practices {
 	--primary-color: #007bff;
 	--secondary-color: #6610f2;
 	--success-color: #28a745;
@@ -15,11 +15,11 @@ body.page-nabla-best-practices {
 	color: var(--text-primary);
 }
 
-body.page-nabla-best-practices:not(.page-dark) {
+.page-nabla-best-practices:not(.page-dark) {
 	background-color: var(--bg-primary);
 }
 
-body.page-nabla-best-practices .nabla-wip-callout {
+.page-nabla-best-practices .nabla-wip-callout {
 	display: flex;
 	gap: 0.75rem;
 	align-items: flex-start;
@@ -38,14 +38,14 @@ body.page-nabla-best-practices .nabla-wip-callout {
 	color: var(--text-primary);
 }
 
-body.page-nabla-best-practices .nabla-wip-callout__icon {
+.page-nabla-best-practices .nabla-wip-callout__icon {
 	color: var(--accent-color, #f59e0b);
 	margin-top: 0.12rem;
 	flex-shrink: 0;
 	font-size: 1.25rem;
 }
 
-body.page-nabla-best-practices .nabla-wip-callout strong {
+.page-nabla-best-practices .nabla-wip-callout strong {
 	display: block;
 	margin-bottom: 0.25rem;
 	letter-spacing: 0.02em;
@@ -56,25 +56,25 @@ body.page-nabla-best-practices .nabla-wip-callout strong {
 
 /* Homepage + nabla.html: flat blue→violet band, no grid animation (see landing-sections .hero-section default) */
 
-body.page-nabla-best-practices .hero-section::before,
-body.page-home.page-dark .hero-section::before {
+.page-nabla-best-practices .hero-section::before,
+.page-home.page-dark .hero-section::before {
 	display: none;
 }
 
-body.page-nabla-best-practices .content-section {
+.page-nabla-best-practices .content-section {
 	padding: 4rem 2rem;
 	max-width: 1200px;
 	margin: 0 auto;
 }
 
-body.page-nabla-best-practices .resource-grid {
+.page-nabla-best-practices .resource-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 	gap: 2rem;
 	margin-bottom: 3rem;
 }
 
-body.page-nabla-best-practices .resource-card {
+.page-nabla-best-practices .resource-card {
 	background: var(--bg-card);
 	border-radius: 12px;
 	padding: 2rem;
@@ -86,12 +86,12 @@ body.page-nabla-best-practices .resource-card {
 	border-left: 4px solid var(--primary-color);
 }
 
-body.page-nabla-best-practices .resource-card:hover {
+.page-nabla-best-practices .resource-card:hover {
 	transform: translateY(-5px);
 	box-shadow: 0 8px 24px var(--shadow-hover);
 }
 
-body.page-nabla-best-practices .resource-card h3 {
+.page-nabla-best-practices .resource-card h3 {
 	font-size: 1.5rem;
 	margin-bottom: 1rem;
 	color: var(--primary-color);
@@ -100,18 +100,18 @@ body.page-nabla-best-practices .resource-card h3 {
 	gap: 0.5rem;
 }
 
-body.page-nabla-best-practices .resource-card-icon {
+.page-nabla-best-practices .resource-card-icon {
 	font-size: 2rem;
 	color: var(--primary-color);
 }
 
-body.page-nabla-best-practices .resource-card p {
+.page-nabla-best-practices .resource-card p {
 	color: var(--text-secondary);
 	margin-bottom: 1rem;
 	line-height: 1.6;
 }
 
-body.page-nabla-best-practices .resource-link {
+.page-nabla-best-practices .resource-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -121,34 +121,34 @@ body.page-nabla-best-practices .resource-link {
 	transition: color 0.3s ease;
 }
 
-body.page-nabla-best-practices .resource-link:hover {
+.page-nabla-best-practices .resource-link:hover {
 	color: var(--link-hover);
 	text-decoration: underline;
 }
 
-body.page-nabla-best-practices .resource-link i {
+.page-nabla-best-practices .resource-link i {
 	font-size: 1rem;
 }
 
 /* OSS / product logos (ai.html: useful links & document pipeline) */
-body.page-nabla-best-practices .ai-oss-logo {
+.page-nabla-best-practices .ai-oss-logo {
 	width: 2rem;
 	height: 2rem;
 	object-fit: contain;
 	flex-shrink: 0;
 }
 
-body.page-nabla-best-practices .ai-oss-logo--wide {
+.page-nabla-best-practices .ai-oss-logo--wide {
 	width: auto;
 	max-width: 6.5rem;
 	max-height: 2rem;
 }
 
-html[data-theme="dark"] body.page-nabla-best-practices .ai-oss-logo--invert {
+html[data-theme="dark"] .page-nabla-best-practices .ai-oss-logo--invert {
 	filter: invert(1) brightness(1.12);
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline {
+.page-nabla-best-practices .ai-doc-pipeline {
 	list-style: none;
 	padding: 0;
 	margin: 0 0 2rem;
@@ -157,7 +157,7 @@ body.page-nabla-best-practices .ai-doc-pipeline {
 	gap: 1.25rem;
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline > li {
+.page-nabla-best-practices .ai-doc-pipeline > li {
 	display: flex;
 	align-items: flex-start;
 	gap: 1rem;
@@ -168,69 +168,69 @@ body.page-nabla-best-practices .ai-doc-pipeline > li {
 	box-shadow: 0 2px 8px var(--shadow-color);
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__body {
+.page-nabla-best-practices .ai-doc-pipeline__body {
 	color: var(--text-secondary);
 	line-height: 1.65;
 	flex: 1;
 	min-width: 0;
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__body strong {
+.page-nabla-best-practices .ai-doc-pipeline__body strong {
 	display: block;
 	margin-bottom: 0.35rem;
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__body strong a {
+.page-nabla-best-practices .ai-doc-pipeline__body strong a {
 	color: var(--primary-color);
 	font-weight: 700;
 	text-decoration: none;
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__body strong a:hover {
+.page-nabla-best-practices .ai-doc-pipeline__body strong a:hover {
 	text-decoration: underline;
 	color: var(--link-hover);
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__body a:not(strong a) {
+.page-nabla-best-practices .ai-doc-pipeline__body a:not(strong a) {
 	color: var(--link-color);
 	font-weight: 600;
 }
 
-body.page-nabla-best-practices .ai-doc-pipeline__sep {
+.page-nabla-best-practices .ai-doc-pipeline__sep {
 	display: none;
 }
 
-body.page-nabla-best-practices .intro-section {
+.page-nabla-best-practices .intro-section {
 	background: var(--bg-secondary);
 	border-radius: 12px;
 	padding: 2rem;
 	margin-bottom: 3rem;
 }
 
-body.page-nabla-best-practices .intro-section p {
+.page-nabla-best-practices .intro-section p {
 	font-size: 1.1rem;
 	line-height: 1.8;
 	color: var(--text-secondary);
 	margin-bottom: 1rem;
 }
 
-body.page-nabla-best-practices .intro-section p:last-child {
+.page-nabla-best-practices .intro-section p:last-child {
 	margin-bottom: 0;
 }
 
-body.page-nabla-best-practices .intro-section__heading {
+.page-nabla-best-practices .intro-section__heading {
 	color: var(--primary-color);
 	margin-bottom: 1rem;
 }
 
-body.page-nabla-best-practices .intro-section__list {
+.page-nabla-best-practices .intro-section__list {
 	font-size: 1.1rem;
 	line-height: 1.8;
 	color: var(--text-secondary);
 }
 
 /* Beats print.css @media screen .print-button (later sheet, lower specificity) */
-body.page-nabla-best-practices .print-button {
+.page-nabla-best-practices .print-button {
 	position: fixed;
 	bottom: 5rem;
 	right: 2rem;
@@ -254,14 +254,14 @@ body.page-nabla-best-practices .print-button {
 	font-weight: 600;
 }
 
-body.page-nabla-best-practices .print-button:hover {
+.page-nabla-best-practices .print-button:hover {
 	background: var(--site-fab-hover-bg, #17a2b8);
 	color: var(--site-fab-hover-fg, var(--site-fab-fg, #fff));
 	transform: none;
 }
 
 @media (max-width: 575.98px) {
-	body.page-nabla-best-practices .print-button {
+	.page-nabla-best-practices .print-button {
 		width: 2.75rem;
 		height: 2.75rem;
 		min-width: 2.75rem;
@@ -272,11 +272,11 @@ body.page-nabla-best-practices .print-button:hover {
 		right: 12px;
 	}
 
-	body.page-nabla-best-practices .print-button__label {
+	.page-nabla-best-practices .print-button__label {
 		display: none;
 	}
 
-	body.page-nabla-best-practices .print-button__icon {
+	.page-nabla-best-practices .print-button__icon {
 		margin-right: 0;
 		width: 22px;
 		height: 22px;
@@ -284,17 +284,17 @@ body.page-nabla-best-practices .print-button:hover {
 }
 
 @media (max-width: 768px) {
-	body.page-nabla-best-practices .hero-title,
-	body.page-home.page-dark .hero-title {
+	.page-nabla-best-practices .hero-title,
+	.page-home.page-dark .hero-title {
 		font-size: 2rem;
 	}
 
-	body.page-nabla-best-practices .hero-subtitle,
-	body.page-home.page-dark .hero-subtitle {
+	.page-nabla-best-practices .hero-subtitle,
+	.page-home.page-dark .hero-subtitle {
 		font-size: 1.2rem;
 	}
 
-	body.page-nabla-best-practices .resource-grid {
+	.page-nabla-best-practices .resource-grid {
 		grid-template-columns: 1fr;
 	}
 }
@@ -506,8 +506,8 @@ body.page-nabla-best-practices .print-button:hover {
 }
 
 /* HTTPS links: padlock (Font Awesome 7 solid U+F023) */
-body.page-nabla-best-practices a.nabla-tool-tag-link[href^="https://"]::before,
-body.page-nabla-best-practices
+.page-nabla-best-practices a.nabla-tool-tag-link[href^="https://"]::before,
+.page-nabla-best-practices
 	.homelab-service-card
 	a:not(.btn)[href^="https://"]::before {
 	display: inline-block;

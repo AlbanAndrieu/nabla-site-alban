@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { setRequestLocale } from "next-intl/server";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 import {
 	loadPublicHtmlFragment,
 	metadataFromPublicHtml,
@@ -26,7 +25,6 @@ export default async function SecurityPage({
 	);
 	return (
 		<>
-			<LocaleSwitcher />
 			<div
 				className="site-content-page page-security page-dark"
 				dangerouslySetInnerHTML={{ __html: html }}

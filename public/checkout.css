@@ -4,21 +4,21 @@
  */
 
 /* Column layout: vertically center the card, pin full site footer to bottom */
-body.site-content-page:has(main.checkout-page) {
+.payment-flow {
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	min-height: calc(100vh - 8rem);
 	margin: 0;
 }
 
-body.site-content-page:has(main.checkout-page) > .footer {
+.payment-flow > .footer {
 	width: 100%;
 	margin-top: auto;
 	flex-shrink: 0;
 }
 
 /* Override site-content-page.css #main-content max-width so the card can center in the viewport */
-body.site-content-page:has(main.checkout-page) #main-content.checkout-page {
+.payment-flow #main-content.checkout-page {
 	flex: 1;
 	display: flex;
 	align-items: center;
@@ -31,8 +31,7 @@ body.site-content-page:has(main.checkout-page) #main-content.checkout-page {
 }
 
 /* payment.html — stacked cards + intro */
-body.site-content-page:has(main.checkout-page.payment-options)
-#main-content.checkout-page.payment-options {
+.payment-flow #main-content.checkout-page.payment-options {
 	flex-direction: column;
 	gap: 1.25rem;
 }

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Hero from "@/app/components/Hero";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 
@@ -21,7 +20,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
 			</a>
-			<LocaleSwitcher />
 			<main id="main-content" role="main">
 				<Hero />
 
