@@ -2,8 +2,9 @@ import "./globals.css";
 import Script from "next/script";
 
 export const metadata = {
-	title: "Nabla Site Alban",
-	description: "Jusmundi Case Studies and Reviews (2022–2025)",
+	title: "Alban Andrieu — Cybersecurity & DevSecOps Engineer",
+	description:
+		"Cybersecurity and DevSecOps engineer securing cloud and AI platforms through automation, reliable infrastructure, and pragmatic compliance.",
 };
 
 export default async function RootLayout({
@@ -29,28 +30,29 @@ export default async function RootLayout({
 				<meta name="author" content="Alban Andrieu" />
 				<meta
 					name="image"
-					content="https://albanandrieu.com/assets/nabla/nabla-4.svg"
+					content="https://www.albanandrieu.com/assets/nabla/nabla-4.png"
 				/>
 				<meta property="og:type" content="profile" />
 				<meta property="og:url" content="https://albanandrieu.com/" />
 				<meta
 					property="og:title"
-					content="Alban Andrieu — Freelance DevSecOps & Cloud Architect"
+					content="Alban Andrieu — Cybersecurity & DevSecOps Engineer"
 				/>
 				<meta
 					property="og:description"
-					content="Freelance DevSecOps and cloud architect. Secure, automate and scale AWS, Azure and OVH platforms for AI-driven and security-critical products."
+					content="Cybersecurity and DevSecOps expertise for secure, automated and reliable cloud and AI platforms."
 				/>
 				<meta
 					property="og:image"
-					content="https://albanandrieu.com/assets/nabla/nabla-4.svg"
+					content="https://www.albanandrieu.com/assets/nabla/nabla-4.png"
 				/>
+				<meta property="og:image:type" content="image/png" />
 				<meta property="og:site_name" content="Alban Andrieu's C.V" />
-				<meta property="twitter:card" content="summary" />
+				<meta property="twitter:card" content="summary_large_image" />
 				<meta property="twitter:domain" content="albanandrieu.com" />
 				<meta
 					property="twitter:title"
-					content="Alban Andrieu — Freelance DevSecOps & Cloud Architect"
+					content="Alban Andrieu — Cybersecurity & DevSecOps Engineer"
 				/>
 				<meta
 					property="twitter:description"
@@ -58,7 +60,7 @@ export default async function RootLayout({
 				/>
 				<meta
 					property="twitter:image"
-					content="https://albanandrieu.com/assets/nabla/nabla-4.svg"
+					content="https://www.albanandrieu.com/assets/nabla/nabla-4.png"
 				/>
 				<meta property="twitter:url" content="https://albanandrieu.com" />
 				<meta name="twitter:label1" content="Cloud architect" />
@@ -99,7 +101,7 @@ export default async function RootLayout({
 				<Script
 					src="/site-analytics.js"
 					data-analytics-mode="home"
-					data-ahrefs-key="tg3zLMS/bebJFl0LxctiCw"
+					data-ahrefs-key={process.env.AHREFS_ANALYTICS_KEY}
 					strategy="afterInteractive"
 				/>
 			</body>
