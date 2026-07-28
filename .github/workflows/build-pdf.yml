@@ -10,7 +10,7 @@ jobs:
         run: sudo apt update && sudo apt install texlive-full fonts-font-awesome
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Build PDF (English)
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-en.tex -output-directory=./public/cv
@@ -100,7 +100,7 @@ jobs:
           exit 0
 
       - name: Upload PDF artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cv-pdfs
           path: |
@@ -114,7 +114,7 @@ jobs:
             ./public/cv/cv-aandrieu-2026-ts-no.pdf
 
       - name: Upload log artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cv-logs
           path: |

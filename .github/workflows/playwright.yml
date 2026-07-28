@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: "npm"
@@ -45,7 +45,6 @@ jobs:
         run: npm test
         env:
           CI: true
-        continue-on-error: true
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -56,7 +55,7 @@ jobs:
           fail_on: "test failures"
 
       - name: Upload Playwright Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -65,7 +64,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-test-results
@@ -74,7 +73,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload Test Traces
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: playwright-traces

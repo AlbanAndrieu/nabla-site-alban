@@ -36,9 +36,9 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Install Node.Js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install npm package
         run: npm install -g markdown-toc@latest secretlint@latest
