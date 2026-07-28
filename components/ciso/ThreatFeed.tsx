@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback, useEffect, useState } from "react";
 
 const FEEDS_CONFIG_URL = "/ciso-rss-feeds.json";
@@ -11,6 +10,13 @@ type FeedItem = {
 	pubDate?: string;
 	source: string;
 	title: string;
+};
+
+type Labels = {
+	loading?: string;
+	error?: string;
+	retry?: string;
+	opensInNewTab?: string;
 };
 
 function safeExternalUrl(value: unknown): string | null {
@@ -26,7 +32,7 @@ function safeExternalUrl(value: unknown): string | null {
 function safeFeedUrl(value: unknown): string | null {
 	if (typeof value !== "string") return null;
 	try {
-		const url = new URL(value.replaceAll("&amp;", "&"));
+		const url = new URL(value.replaceAll("&", "&"));
 		return url.protocol === "https:" || url.protocol === "http:"
 			? url.href
 			: null;
@@ -121,11 +127,31 @@ function formatFeedDate(value: string | undefined, locale: "en" | "fr") {
 	};
 }
 
-export default function ThreatFeed({ locale }: { locale: "en" | "fr" }) {
+export default function ThreatFeed({
+	locale,
+	labels = {},
+}: {
+	locale: "en" | "fr";
+	labels?: Labels;
+}) {
 	const [items, setItems] = useState<FeedItem[]>([]);
 	const [status, setStatus] = useState<"loading" | "ready" | "error">(
 		"loading",
 	);
+
+	const defaultLabels: Required<Labels> = {
+		loading:
+			locale === "fr"
+				? "Chargement des actualités de sécurité…"
+				: "Loading security news…",
+		error:
+			locale === "fr"
+				? "Les flux sont temporairement indisponibles."
+				: "Threat feeds are temporarily unavailable.",
+		retry: locale === "fr" ? "Réessayer" : "Retry",
+		opensInNewTab: locale === "fr" ? "nouvel onglet" : "opens in a new tab",
+	};
+	const usedLabels = { ...defaultLabels, ...labels };
 
 	const loadFeeds = useCallback(async (signal?: AbortSignal) => {
 		setStatus("loading");
@@ -156,26 +182,20 @@ export default function ThreatFeed({ locale }: { locale: "en" | "fr" }) {
 	if (status === "loading" && !items.length) {
 		return (
 			<p className="ciso-feed-status" role="status">
-				{locale === "fr"
-					? "Chargement des actualités de sécurité…"
-					: "Loading security news…"}
+				{usedLabels.loading}
 			</p>
 		);
 	}
 	if (status === "error") {
 		return (
 			<div className="ciso-feed-status" role="alert">
-				<p>
-					{locale === "fr"
-						? "Les flux sont temporairement indisponibles."
-						: "Threat feeds are temporarily unavailable."}
-				</p>
+				<p>{usedLabels.error}</p>
 				<button
 					className="btn btn-outline-primary btn-sm"
 					type="button"
 					onClick={() => void loadFeeds()}
 				>
-					{locale === "fr" ? "Réessayer" : "Retry"}
+					{usedLabels.retry}
 				</button>
 			</div>
 		);
@@ -203,7 +223,7 @@ export default function ThreatFeed({ locale }: { locale: "en" | "fr" }) {
 							<a href={item.link} target="_blank" rel="noopener noreferrer">
 								{item.title}
 								<span className="visually-hidden">
-									({locale === "fr" ? "nouvel onglet" : "opens in a new tab"})
+									({usedLabels.opensInNewTab})
 								</span>
 							</a>
 						</h3>

@@ -702,5 +702,63 @@
 				]
 			}
 		]
+	},
+	"ctid": {
+		"threatFeed": {
+			"loading": "Loading security news…",
+			"error": "Threat feeds are temporarily unavailable.",
+			"retry": "Retry",
+			"opensInNewTab": "opens in a new tab"
+		},
+		"title": "Cybersecurity Threat Intelligence Dashboard",
+		"hero": "💀🛡️",
+		"subtitle": "Aggregated sources for real-time monitoring and analysis",
+		"threatFeedTitle": "Threat intelligence",
+		"threatFeedIntro": "Recent headlines from recognized cybersecurity sources."
+	},
+	"email": {
+		"title": "Email address update",
+		"reason": "The address <strong>alban.andrieu@free.fr</strong> is discontinued. Google is changing how Gmail works with third-party accounts (Gmailify and POP “check mail from other accounts”); see <a href=\"https://support.google.com/mail/answer/16604719\" rel=\"noopener noreferrer\" target=\"_blank\">Learn about upcoming changes to Gmailify & POP in Gmail</a> (Google Help). That policy shift is why this mailbox will no longer be used.",
+		"useTheseAddresses": "Please use these addresses",
+		"cards": [
+			{
+				"title": "Job / work (independent)",
+				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+			},
+			{
+				"title": "Job / work",
+				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+			},
+			{
+				"title": "Website security",
+				"desc": "<a href=\"mailto:security@albandrieu.com\">security@albandrieu.com</a>"
+			},
+			{
+				"title": "Invoices",
+				"desc": "For all invoice-related matters (billing, payment questions, VAT or purchase orders), use <a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a> — do not send invoices to the job or general contact addresses above."
+			},
+			{
+				"title": "Other topics",
+				"desc": "<a href=\"mailto:contact@albandrieu.com\">contact@albandrieu.com</a>"
+			},
+			{
+				"title": "Bababou",
+				"desc": "<a href=\"mailto:alban.andrieu@bababou.com\">alban.andrieu@bababou.com</a>"
+			}
+		],
+		"automatedHeading": "Automated or triaged replies",
+		"automatedDesc": "If you receive mail from any of the following, it usually means your message did not meet the requirements to be read by a human (me), or it was handled by automated triage:",
+		"automatedList": [
+			"<a href=\"mailto:no-reply@albanandrieu.com\">no-reply@albanandrieu.com</a>",
+			"<a href=\"mailto:no-reply@albandrieu.com\">no-reply@albandrieu.com</a>",
+			"<a href=\"mailto:no-reply@bababou.com\">no-reply@bababou.com</a>",
+			"<a href=\"mailto:openclaw@albandrieu.com\">openclaw@albandrieu.com</a>",
+			"<a href=\"mailto:assistant@albandrieu.com\">assistant@albandrieu.com</a>",
+			"<a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a>"
+		],
+		"reasonLine1": "The address",
+		"reasonLine2": "is discontinued. Google is changing how Gmail works with third-party accounts (Gmailify and POP “check mail from other accounts”); see",
+		"reasonLine3": "Learn about upcoming changes to Gmailify & POP in Gmail",
+		"reasonLine4": " (Google Help). That policy shift is why this mailbox will no longer be used."
 	}
 }

@@ -615,7 +615,7 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://plumber-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
-			"iconSrc": "assets/selfh-icons/plumber.png",
+			"iconSrc": "assets/selfh-icons/plumber.svg",
 			"reacheableFromOutside": false
 		},
 		{
@@ -627,7 +627,7 @@
 			"internalSecure": true,
 			"tunnelUrl": "https://plumber-api-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
-			"iconSrc": "assets/selfh-icons/plumber.png",
+			"iconSrc": "assets/selfh-icons/plumber.svg",
 			"reacheableFromOutside": true
 		},
 		{

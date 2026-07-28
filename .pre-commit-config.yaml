@@ -1,3 +1,4 @@
+---
 fail_fast: true
 minimum_pre_commit_version: 4.2.0
 exclude: |
@@ -165,6 +166,7 @@ repos:
             public/assets/fontawesome/.*|
             public/assets/.*.png|
             public/other/.*.png|
+            public/assets/.*.svg|
             public/other/nabla-build-architecture.jpg|
             public/checklist/article/index.html|
             public/cv/alban-andrieu-19-12-2017.png|
