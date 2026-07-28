@@ -1,168 +1,131 @@
-## <!-- markdown-link-check-disable-next-line -->
+<!-- markdown-link-check-disable-next-line -->
 
-## layout: default
-
-Text can be **bold**, _italic_, or ~~strikethrough~~.
-
-# [![Nabla](https://albandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) nabla-site-alban
-
-[![License: APACHE](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
+# [![Nabla](https://albandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) Nabla — Alban Andrieu
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S61UUL97)
 
 [CHANGELOG](./CHANGELOG.html).
 
-## Project Goal
+Portfolio bilingue d’Alban Andrieu, ingénieur cybersécurité et DevSecOps. Le
+site présente son expérience, ses services, ses projets cloud/IA, son CV et des
+ressources techniques.
 
-This is a simple HTML project for Nabla company that promotes Alban Andrieu as an experienced DevSecOps professional.
+Le site principal est une application **Next.js 16 App Router**, avec React 19,
+TypeScript et `next-intl`. Le dossier `public/` contient encore des pages et
+assets historiques progressivement migrés vers les composants de `app/`.
 
-Default nabla files for apache
+## Prérequis
 
-### GitHub Actions
-The repository currently includes these workflows:
+- Node.js 24.11 ou supérieur
+- npm 11.6 ou supérieur
 
-1. Playwright Tests (`.github/workflows/playwright.yml`)
-2. Docker CI (`.github/workflows/docker-build.yml`)
-3. MegaLinter (`.github/workflows/mega-linter.yml`)
-4. Build CV PDFs (`.github/workflows/build-pdf.yml`)
-5. OpenCommit Action (`.github/workflows/opencommit.yml`)
-6. Copilot Setup Steps (`.github/workflows/copilot-setup-steps.yml`)
-
-Workflow secrets currently used:
-- `DOCKER_USERNAME`, `DOCKER_PASSWORD` (Docker CI)
-- `OCO_API_KEY` (OpenCommit)
-- Optional `PAT` for MegaLinter auto-commit/PR steps (falls back to `GITHUB_TOKEN` where applicable)
-
-## Monorepo Structure
-
-This repository contains multiple deployable projects:
-
-1. **Root Project** - Static HTML site in `public/` plus Vercel serverless API routes in `api/` (Node.js)
-2. **my-app/** - Next.js application (separate Vercel deployment)
-3. **vue-client/** - Vue/Vite application (separate Vercel deployment)
-
-### CV Documentation
-
-For CV architecture, build workflow, and troubleshooting, see
-[`public/cv/README.md`](public/cv/README.md).
-
-### Frontend Runtime Documentation
-
-For analytics mode selection, shared widget attributes, script integration examples, and troubleshooting, see
-[`docs/frontend-runtime-scripts-runbook.md`](docs/frontend-runtime-scripts-runbook.md).
-
-## Deployment
-
-### Root project (static site + Vercel API)
+## Démarrage local
 
 ```bash
-npm run start:python
-# Cloudflare wrangler
-npm run start
-```
-
-For Vercel:
-
-```
-vc build
-vercel dev
-
-vercel deploy
-# To override prod deployment https://vercel.com/albanandrieus-projects/nabla-site-alban/settings/build-and-deployment
-# Development Command: node server.cjs
-vercel --prod
-```
-
-### Stripe Checkout
-
-Pages:
-
-- `public/checkout.html` — starts hosted Checkout (`public/create-checkout-session.js` + `POST /create-checkout-session`)
-- `public/success.html` — return URL after payment (`session_id` query param when configured on the server)
-- `public/cancel.html` — return URL if the customer abandons Checkout
-
-Backend (local / your own Node host):
-
-```bash
-export STRIPE_SECRET_KEY=sk_test_...
-export STRIPE_PRICE_ID=price_...
-export DOMAIN=http://localhost:4242
-npm run start:stripe
-```
-
-Then open `http://localhost:4242/checkout.html`. The secret key and Price ID come from the [Stripe Dashboard](https://dashboard.stripe.com/); `DOMAIN` must match the origin users use (no trailing slash).
-
-Deployment note: Vercel serves `POST /create-checkout-session` via `api/create-checkout-session.js`, routed by the catch-all `vercel.json` route (`/(.*)` → `/api/$1`). Set `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` in the Vercel project. Local dev still uses `npm run start:stripe` (`server.cjs`).
-
-Details: `docs/checkout-support-runbook.md`.
-
-### Local Python deployment
-
-Point the virtual host `DocumentRoot` at the `public/` directory, then for example:
-
-```bash
-# Python 2
-python -m SimpleHTTPServer 8001
-
-# Python 3
-python -m http.server 8001
-```
-
-## Testing
-
-This project uses [Playwright](https://playwright.dev/) for end-to-end testing. The test suite includes:
-
-- **Homepage Tests**: Validates meta tags, Open Graph tags, and page structure
-- **Accessibility Tests**: Checks WCAG compliance, keyboard navigation, and theme support
-- **Responsive Design Tests**: Ensures proper mobile, tablet, and desktop layouts
-- **Navigation Tests**: Verifies internal/external links and navigation structure
-
-### Running Tests Locally
-
-```bash
-# Install dependencies (includes Playwright)
 npm install
-
-# Install Playwright browsers (first time only)
-npx playwright install
-
-# Run all tests
-npm test
-
-# Run tests in headed mode (see browser)
-npm run test:headed
-
-# Run tests in interactive UI mode
-npm run test:ui
-
-# Debug tests
-npm run test:debug
-
-# View test report
-npm run test:report
+npm run dev
 ```
 
-### SDLC Integration
+L’application est ensuite disponible sur <http://localhost:3000>.
 
-Tests run automatically on GitHub Actions for all push and pull request events. The workflow:
+## Commandes principales
 
-1. Sets up Node.js environment
-2. Installs dependencies
-3. Installs Playwright browsers
-4. Runs the test suite
-5. Uploads test reports and traces as artifacts
+```bash
+npm run dev         # serveur de développement Next.js
+npm run check       # lint JS/CSS, TypeScript, tests unitaires et build
+npm run test:unit   # tests Node.js
+npm test            # tests Playwright multi-navigateurs
+npm run build       # build de production Next.js
+npm start           # serveur Next.js de production
+```
 
-See `.github/workflows/playwright.yml` for the complete workflow configuration.
+Les rapports Playwright sont écrits dans `playwright-report/` et les résultats
+CI dans `test-results/`.
 
-# Contributing
+## Architecture
 
-The [issue tracker](https://github.com/AlbanAndrieu/nabla-site-alban/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
+```text
+app/                 routes, layouts, composants et Route Handlers Next.js
+components/          composants partagés en cours de consolidation
+i18n/                configuration de next-intl
+messages/            catalogues anglais et français
+lib/                 chargement des contenus et logique métier partagée
+public/              assets et pages HTML historiques
+tests/               tests end-to-end Playwright
+unit-tests/          tests unitaires Node.js
+docs/                runbooks d’exploitation et d’intégration
+```
 
-For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <http://editorconfig.org>.
+La route par défaut est anglaise (`/`) et la version française utilise le
+préfixe `/fr`. Les anciennes URLs en `.html` restent temporairement prises en
+charge par les redirections et réécritures de `next.config.mjs`.
 
-## License
+## Variables d’environnement
 
-[Apache v2](http://www.apache.org/licenses/LICENSE-2.0.html)
+Les secrets ne doivent jamais être commités. Utiliser `.env.local` en local et
+le gestionnaire de secrets de la plateforme en production.
+
+Variables utilisées selon les fonctionnalités :
+
+- `STRIPE_SECRET_KEY` ou, de préférence, une clé Stripe restreinte adaptée ;
+- `STRIPE_PRICE_ID` ;
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ;
+- `DOMAIN`, origine publique utilisée pour les retours Stripe ;
+- `AHREFS_ANALYTICS_KEY`, facultative.
+
+Voir [docs/checkout-support-runbook.md](docs/checkout-support-runbook.md) pour
+le parcours Stripe et
+[docs/frontend-runtime-scripts-runbook.md](docs/frontend-runtime-scripts-runbook.md)
+pour les scripts côté navigateur.
+
+## Déploiement
+
+`vercel.json` configure le déploiement Next.js sur Vercel. `wrangler.jsonc`
+conserve une cible Cloudflare dédiée aux assets statiques historiques ; elle ne
+remplace pas le runtime Next.js complet.
+
+Avant un déploiement :
+
+```bash
+npm run check
+```
+
+## Internationalisation
+
+Les textes natifs sont stockés dans `messages/en.json` et `messages/fr.json`.
+Les deux catalogues doivent conserver les mêmes clés. Les pages qui injectent
+encore du HTML depuis `public/` sont transitoires et doivent être migrées vers
+des Server Components typés.
+
+Le processus LibreTranslate est décrit dans
+[docs/i18n-weblate-libretranslate.md](docs/i18n-weblate-libretranslate.md).
+
+## CI
+
+Les workflows GitHub Actions couvrent notamment :
+
+- les tests Playwright ;
+- le build Docker ;
+- MegaLinter ;
+- la génération des PDF du CV ;
+- les contrôles de configuration pour les assistants de développement.
+
+Les secrets CI actuellement documentés sont `DOCKER_USERNAME`,
+`DOCKER_PASSWORD`, `OCO_API_KEY` et, facultativement, `PAT`.
+
+## Documentation du CV
+
+Voir [public/cv/README.md](public/cv/README.md) pour l’architecture et la
+génération des documents du CV.
+
+## Contribution
+
+Les bugs et propositions peuvent être soumis dans le
+[gestionnaire d’issues GitHub](https://github.com/AlbanAndrieu/nabla-site-alban/issues).
+
+## Licence
+
+[Apache License 2.0](LICENSE).
 
 ---
 

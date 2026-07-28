@@ -43,11 +43,16 @@ test.describe("Accessibility Tests", () => {
 	}) => {
 		await page.goto("/");
 
-		// Look for skip links or main content landmarks
-		const main = page.locator('main, [role="main"]');
-		// Check if main landmark exists
-		const mainCount = await main.count();
-		expect(mainCount).toBeGreaterThanOrEqual(0); // May or may not have main, just checking structure
+		const skipLink = page.locator('a.skip-to-main[href="#main-content"]');
+		await expect(skipLink).toHaveCount(1);
+		await expect(page.locator("main#main-content")).toHaveCount(1);
+
+		for (let attempt = 0; attempt < 5; attempt++) {
+			await page.keyboard.press("Tab");
+			if (await skipLink.evaluate((element) => document.activeElement === element))
+				break;
+		}
+		await expect(skipLink).toBeFocused();
 	});
 
 	test("should support keyboard navigation", async ({ page }) => {
@@ -234,41 +239,31 @@ test.describe("Accessibility Tests", () => {
 		}
 	});
 
-	test("should have good color contrast", async ({ page }) => {
-		await page.goto("/");
-
-		// Basic check - ensure body has visible text
-		const body = page.locator("body");
-		await expect(body).toBeVisible();
-
-		// Check computed styles for text visibility
-		const hasVisibleText = await page.evaluate(() => {
-			const body = document.body;
-			const styles = window.getComputedStyle(body);
-			const color = styles.color;
-			const backgroundColor = styles.backgroundColor;
-
-			// Basic check - color should be different from background
-			return color !== backgroundColor;
-		});
-
-		expect(hasVisibleText).toBeTruthy();
-	});
-
 	test("should have sufficient color contrast", async ({ page }) => {
 		await page.goto("/");
 
-		// This is a basic check - for thorough contrast checking, use axe-core
-		const { backgroundColor, color } = await page.evaluate(() => {
+		const contrastRatio = await page.evaluate(() => {
 			const s = window.getComputedStyle(document.body);
-			return { backgroundColor: s.backgroundColor, color: s.color };
+			const channels = (value: string) =>
+				(value.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+			const luminance = (value: string) => {
+				const rgb = channels(value).map((channel) => {
+					const normalized = channel / 255;
+					return normalized <= 0.04045
+						? normalized / 12.92
+						: ((normalized + 0.055) / 1.055) ** 2.4;
+				});
+				return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+			};
+			const foreground = luminance(s.color);
+			const background = luminance(s.backgroundColor);
+			return (
+				(Math.max(foreground, background) + 0.05) /
+				(Math.min(foreground, background) + 0.05)
+			);
 		});
 
-		// Both must be set and non-transparent (non-empty and not fully transparent)
-		expect(backgroundColor).toBeTruthy();
-		expect(color).toBeTruthy();
-		expect(backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
-		expect(backgroundColor).not.toBe("transparent");
+		expect(contrastRatio).toBeGreaterThanOrEqual(4.5);
 	});
 
 	test("should be keyboard navigable", async ({ page }) => {
@@ -339,10 +334,8 @@ test.describe("Accessibility Tests", () => {
 	test("should have focus indicators", async ({ page }) => {
 		await page.goto("/");
 
-		// Skip link / first `a` in DOM is often not focusable the same way in WebKit; use a visible control
-		const focusTarget = page.locator(
-			'#theme-toggle-root .theme-toggle__btn[data-theme="light"]',
-		);
+		// Use the server-rendered locale switcher instead of a widget injected asynchronously.
+		const focusTarget = page.locator("#route-header-locale");
 		await expect(focusTarget).toBeVisible();
 		await focusTarget.focus();
 
@@ -350,17 +343,5 @@ test.describe("Accessibility Tests", () => {
 			return document.activeElement === el;
 		});
 		expect(hasFocus).toBeTruthy();
-	});
-	test("should not have any invalid ARIA attributes", async ({ page }) => {
-		await page.goto("/");
-
-		// Check for common ARIA attributes
-		const elementsWithAria = page.locator(
-			"[role], [aria-label], [aria-labelledby], [aria-describedby]",
-		);
-		const count = await elementsWithAria.count();
-
-		// Just verify elements with ARIA exist and page loads correctly
-		expect(count).toBeGreaterThanOrEqual(0);
 	});
 });

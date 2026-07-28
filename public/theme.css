@@ -79,6 +79,9 @@
 
 		--link-color: #66b3ff;
 		--link-hover: #99ccff;
+		--bs-link-color: #60a5fa;
+		--bs-link-hover-color: #93c5fd;
+		--primary-color: #60a5fa;
 		--button-bg: #0d6efd;
 		--button-hover: #0a58ca;
 		--button-text: #ffffff;
@@ -109,6 +112,14 @@
 		--site-fab-border: none;
 		--site-fab-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 		--site-fab-steam: rgba(255, 255, 255, 0.5);
+	}
+
+	/* Bootstrap is loaded after this stylesheet and resets its :root link tokens. */
+	html:not([data-theme="light"]) {
+		--bs-link-color: #60a5fa;
+		--bs-link-color-rgb: 96, 165, 250;
+		--bs-link-hover-color: #93c5fd;
+		--bs-link-hover-color-rgb: 147, 197, 253;
 	}
 }
 
@@ -173,6 +184,11 @@ html[data-theme="dark"] {
 
 	--link-color: #66b3ff;
 	--link-hover: #99ccff;
+	--bs-link-color: #60a5fa;
+	--bs-link-color-rgb: 96, 165, 250;
+	--bs-link-hover-color: #93c5fd;
+	--bs-link-hover-color-rgb: 147, 197, 253;
+	--primary-color: #60a5fa;
 	--button-bg: #0d6efd;
 	--button-hover: #0a58ca;
 	--button-text: #ffffff;
@@ -1190,6 +1206,18 @@ html[data-theme="light"] .page-dark .email {
 
 html[data-theme="dark"] .footer {
 	background: #020617;
+}
+
+@media (prefers-color-scheme: dark) {
+	.footer .btn-outline-secondary {
+		color: #cbd5e1;
+		border-color: #94a3b8;
+	}
+}
+
+html[data-theme="dark"] .footer .btn-outline-secondary {
+	color: #cbd5e1;
+	border-color: #94a3b8;
 }
 
 html[data-theme="light"] .footer {
