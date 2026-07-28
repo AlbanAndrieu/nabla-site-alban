@@ -17,6 +17,8 @@
 		color: #000;
 		box-shadow: none;
 		text-shadow: none;
+		animation: none;
+		transition: none;
 	}
 
 	/* Body and basic elements */
@@ -293,14 +295,6 @@
 	.service-card,
 	.tool-item {
 		margin-bottom: 10pt;
-	}
-
-	/* Remove animations and transitions */
-	*,
-	*::before,
-	*::after {
-		animation: none;
-		transition: none;
 	}
 
 	/* Contact info */

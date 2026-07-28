@@ -22,6 +22,9 @@
 		"sessionCreateError": "Impossible de créer la session de paiement.",
 		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
 	},
+	"checkoutTjm": {
+		"qrCaption": "Scannez ce QR code pour ouvrir la page de paiement Stripe sécurisée."
+	},
 	"jm": {
 		"4years": {
 			"headline": "Bilan de 4 ans : Alban Andrieu (2022–2025)",

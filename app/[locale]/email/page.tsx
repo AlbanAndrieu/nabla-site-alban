@@ -1,13 +1,12 @@
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-
 export default async function EmailPage({
 	params,
 }: {
 	params: { locale: string };
 }) {
-	const { locale } = params;
+	const { locale } = await params;
 	setRequestLocale(locale);
 	const t = await getTranslations("email");
 	const tSite = await getTranslations("site");
@@ -40,8 +39,8 @@ export default async function EmailPage({
 						{t("useTheseAddresses")}
 					</h2>
 					<div className="row g-3">
-{cards.map((card) => (
-									<div key={card.title} className="col-md-6">
+						{cards.map((card) => (
+							<div key={card.title} className="col-md-6">
 								<div className="card h-100 bg-body-secondary border-secondary">
 									<div className="card-body">
 										<h3 className="h6 card-title">{card.title}</h3>

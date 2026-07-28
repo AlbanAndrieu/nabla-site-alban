@@ -5,6 +5,9 @@
 	--contact-note-bg: #eef2ff;
 	--contact-note-border: #c7d2fe;
 	--contact-note-text: #3730a3;
+	--fab-pair-gap: 0.75rem;
+	--fab-coffee-size: 56px;
+	--fab-back-size: 56px;
 }
 
 /* Dark Mode Support */
@@ -29,13 +32,6 @@ html[data-theme="dark"] {
 	--contact-note-bg: #312e81;
 	--contact-note-border: #4338ca;
 	--contact-note-text: #c7d2fe;
-}
-
-/* Coffee + back-to-top: centered pair at bottom, side by side with a gap */
-:root {
-	--fab-pair-gap: 0.75rem;
-	--fab-coffee-size: 56px;
-	--fab-back-size: 56px;
 }
 
 /* Coffee FAB - same style/behavior as blog.stephane-robert.info coffee-fab */

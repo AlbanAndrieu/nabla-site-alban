@@ -106,3 +106,4 @@ playwright/.cache/
 *-old.html
 
 .env*.local
+.env.sops.secrets

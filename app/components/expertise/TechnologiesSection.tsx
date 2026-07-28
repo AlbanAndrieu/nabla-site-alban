@@ -1,5 +1,3 @@
-import type React from "react";
-
 function LogoRow({
 	title,
 	children,
@@ -32,7 +30,7 @@ export default function TechnologiesSection() {
 				Technologies & Stack
 			</h2>
 			<p className="section-subtitle">
-				Below are a glimpse of technologies I used to work with.
+				Here is a selection of technologies I use in production.
 			</p>
 			<div className="services-grid ai-mlops-grid">
 				<div className="service-card ai-mlops-wide-card">

@@ -26,13 +26,15 @@ export default [
 	},
 	js.configs.recommended,
 	{
-		files: ["scripts/**/*.mjs", "server.cjs"],
+		files: ["scripts/**/*.{cjs,mjs}", "*.config.{cjs,js,mjs}", "server.cjs"],
 		languageOptions: {
 			globals: {
 				__dirname: "readonly",
 				console: "readonly",
 				fetch: "readonly",
+				module: "readonly",
 				process: "readonly",
+				require: "readonly",
 			},
 		},
 	},

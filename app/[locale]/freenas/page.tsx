@@ -1,8 +1,8 @@
-
-
+import Script from "next/script";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import HeroSection from "../../components/freenas/HeroSection";
-import MainCardsSection from "../../components/freenas/MainCardsSection";
-// À compléter avec les autres sections
+import JenkinsAndPluginsSection from "../../components/freenas/JenkinsAndPluginsSection";
+import MonitoringAndGamingSection from "../../components/freenas/MonitoringAndGamingSection";
 
 export default async function FreenasPage({
 	params,
@@ -10,15 +10,25 @@ export default async function FreenasPage({
 	params: Promise<{ locale: string }>;
 }) {
 	const { locale } = await params;
+	const tSite = await getTranslations("site");
 	setRequestLocale(locale);
-	// t = getTranslations("freenas") prêt pour l'i18n sur chaque bloc
 	return (
 		<div className="site-content-page page-dark">
+			<div id="top" />
+			<a href="#main-content" className="skip-to-main">
+				{tSite("skipToMainContent")}
+			</a>
 			<main id="main-content" className="container py-4 pb-5">
 				<HeroSection />
-				<MainCardsSection />
-				{/* PluginsSection, MonitoringSection, GamingSection... */}
+				<JenkinsAndPluginsSection />
+				<MonitoringAndGamingSection />
 			</main>
+			<Script
+				src="/site-widgets.js"
+				strategy="afterInteractive"
+				data-print-pdf=""
+				data-coffee-fab=""
+			/>
 		</div>
 	);
 }

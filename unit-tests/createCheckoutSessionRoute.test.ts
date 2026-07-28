@@ -34,12 +34,12 @@ function setEnv(values: Partial<Record<(typeof ENV_KEYS)[number], string>>) {
 		if (Object.hasOwn(values, key)) {
 			const value = values[key];
 			if (value === undefined) {
-				delete process.env[key];
+				Reflect.deleteProperty(process.env, key);
 			} else {
-				process.env[key] = value;
+				Reflect.set(process.env, key, value);
 			}
 		} else {
-			delete process.env[key];
+			Reflect.deleteProperty(process.env, key);
 		}
 	}
 }
@@ -48,9 +48,9 @@ test.after(() => {
 	for (const key of ENV_KEYS) {
 		const value = ORIGINAL_ENV[key];
 		if (value === undefined) {
-			delete process.env[key];
+			Reflect.deleteProperty(process.env, key);
 		} else {
-			process.env[key] = value;
+			Reflect.set(process.env, key, value);
 		}
 	}
 });

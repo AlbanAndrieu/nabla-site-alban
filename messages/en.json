@@ -22,6 +22,9 @@
 		"sessionCreateError": "Could not create checkout session.",
 		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
 	},
+	"checkoutTjm": {
+		"qrCaption": "Scan this QR code to open the secure Stripe payment page."
+	},
 	"jm": {
 		"4years": {
 			"headline": "4-Year Performance Summary: Alban Andrieu (2022–2025)",

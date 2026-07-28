@@ -15,12 +15,11 @@ export default function HomeLabSection() {
 					Home lab for Security, AI and Freelance projects
 				</h2>
 				<p className="text-secondary mb-4">
-					This home lab has been build to host the coming Nabla company projects
-					and services.
+					This home lab was built to host upcoming Nabla projects and services.
 				</p>
 				<p>
-					Goal is to test integration of Security and AI services and
-					experiences attacks performed on my domains.
+					Its purpose is to test Security and AI service integrations and to
+					reproduce attacks targeting my domains.
 				</p>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">

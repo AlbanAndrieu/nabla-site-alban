@@ -1,5 +1,4 @@
 import Script from "next/script";
-
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
 import ServicesSection from "../../components/expertise/ServicesSection";
