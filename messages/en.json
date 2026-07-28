@@ -1,4 +1,10 @@
 {
+	"404": {
+		"title": "404",
+		"heading": "We can't find that page",
+		"message": "We're fairly sure that page used to be here, but seems to have gone missing. We do apologise on its behalf.",
+		"backHome": "Back to home"
+	},
 	"site": {
 		"skipToMainContent": "Skip to main content",
 		"legalNotices": "Legal notices",
@@ -513,8 +519,14 @@
 			"subtitle": "Ready to improve your DevOps practices? Choose the most convenient way to reach me."
 		},
 		"methods": {
-			"email": { "title": "Email", "value": "job@albandrieu.com" },
-			"phone": { "title": "Phone", "value": "+33 6 95 43 53 53" },
+			"email": {
+				"title": "Email",
+				"value": "job@albandrieu.com"
+			},
+			"phone": {
+				"title": "Phone",
+				"value": "+33 6 95 43 53 53"
+			},
 			"calendar": {
 				"title": "Schedule a meeting",
 				"value": "Book a 30-minute call"
@@ -616,5 +628,79 @@
 			"title": "About this CV",
 			"description": "This page provides structured access to every current CV format and professional profile. Choose the PDF, ATS or browser version that best fits your needs."
 		}
+	},
+	"freenas": {
+		"pageTitle": "FreeNAS Infrastructure & Workstation Services | Nabla",
+		"headerTitle": "FreeNAS Infrastructure",
+		"headerSubtitle": "Self-hosted applications and services running on FreeNAS (archived).",
+		"workstationSection": {
+			"title": "Workstation Services",
+			"subtitle": "Ubuntu-based development and entertainment applications"
+		},
+		"mainCards": [
+			{
+				"title": "Nabla Jenkins",
+				"desc": "Jenkins Freestyle jobs",
+				"buttons": [
+					"Jenkins",
+					"Tools",
+					"Plugin Usage",
+					"Script Console",
+					"Slave Nodes",
+					"Sonar",
+					"Report",
+					"Download",
+					"Jenkins CLI"
+				]
+			},
+			{
+				"title": "FreeNAS",
+				"desc": "FreeNAS ® © 2020 - iXsystems, Inc",
+				"buttons": ["HTTPS UI", "HTTP UI"]
+			},
+			{
+				"title": "FreeNAS Iocage",
+				"desc": "Freenas Iocage Plugins",
+				"buttons": [
+					"Plugins",
+					"Plex",
+					"Tautulli",
+					"Radarr",
+					"Sonarr",
+					"Lidarr",
+					"Organizr",
+					"Jackett",
+					"Sabnzbd",
+					"Transmission",
+					"Deluge"
+				]
+			},
+			{
+				"title": "TrueNAS",
+				"desc": "Storage management UI",
+				"buttons": ["Open TrueNAS"]
+			},
+			{
+				"title": "pfSense",
+				"desc": "Firewall and router",
+				"buttons": ["Open pfSense"]
+			},
+			{
+				"title": "Nabla DevOps Tools",
+				"desc": "Development and SDLC tools on Ubuntu workstation",
+				"buttons": [
+					"Internal",
+					"External",
+					"Plugins",
+					"Jenkins",
+					"Nexus",
+					"Apache",
+					"Apache Debug",
+					"Bower",
+					"Webmin",
+					"Download"
+				]
+			}
+		]
 	}
 }

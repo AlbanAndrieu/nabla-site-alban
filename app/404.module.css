@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@800&family=Roboto:wght@100;300&display=swap");
+
+:root {
+	--button: #b3b3b3;
+	--button-color: #0a0a0a;
+	--shadow: #000;
+	--bg: #737373;
+	--header: #7a7a7a;
+	--color: #fafafa;
+	--lit-header: #e6e6e6;
+}
+
+/* plus de propriete animée ni @property/boucle JS */
+
+.pageDark {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: var(--bg);
+	color: var(--color);
+	font-family: "Roboto", sans-serif;
+	perspective: 1200px;
+	box-sizing: border-box;
+}
+
+.error404 {
+	position: relative;
+	font-family: "Open Sans", sans-serif;
+	font-size: clamp(5rem, 40vmin, 20rem);
+	margin: 0;
+	margin-bottom: 1rem;
+	letter-spacing: 1rem;
+	padding: 0 0.65em 0 0.7em;
+	background:
+		radial-gradient(var(--lit-header), var(--header) 45%) 50% 100% / 200% 200%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+.error404::after {
+	content: "404";
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: var(--shadow);
+	filter: blur(1.5vmin);
+	transform: scale(1.05) translate3d(0, 12%, -10vmin);
+	pointer-events: none;
+	z-index: -1;
+}
+/* Cloak effet visuel */
+.cloakWrapper,
+.cloak__wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+	z-index: 0;
+}
+.cloakContainer,
+.cloak__container {
+	height: 250vmax;
+	width: 250vmax;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.cloak {
+	height: 100%;
+	width: 100%;
+	transform-origin: 50% 30%;
+	background: radial-gradient(40% 40% at 50% 42%, transparent, #000 35%);
+	z-index: 0;
+}
+
+/* Info container styles */
+.info {
+	text-align: center;
+	line-height: 1.5;
+	max-width: clamp(16rem, 90vmin, 25rem);
+	margin-top: 3rem;
+	background: rgba(20, 20, 25, 0.65);
+	padding: 2rem 2.5vw;
+	border-radius: 1rem;
+	box-shadow: 0 0 6vw #0005 inset;
+	z-index: 1;
+	position: relative;
+}
+.info > h2 {
+	font-weight: 700;
+	margin-bottom: 0.5em;
+	font-size: 2.2em;
+	color: #fff;
+}
+.info p {
+	color: #e0e0e0;
+	font-size: 1.13em;
+	font-weight: 100;
+	margin: 0 0 2em 0;
+}
+.homeLink {
+	text-transform: uppercase;
+	text-decoration: none;
+	background: var(--button);
+	color: var(--button-color);
+	padding: 1rem 4rem;
+	border-radius: 4rem;
+	font-size: 0.96rem;
+	letter-spacing: 0.02em;
+	display: inline-block;
+	font-weight: 700;
+	box-shadow: 0 4px 32px 0 rgba(22, 22, 22, 0.23);
+	transition:
+		background 0.18s,
+		color 0.18s,
+		box-shadow 0.18s;
+}
+.homeLink:hover,
+.homeLink:focus {
+	background: #fafafa;
+	color: #111;
+	box-shadow: 0 6px 48px 0 #0004;
+}

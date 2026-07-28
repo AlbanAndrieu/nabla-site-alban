@@ -44,7 +44,7 @@
 		"opencommit": "node scripts/run-opencommit.mjs"
 	},
 	"dependencies": {
-		"@astrojs/vercel": "^8.0.4",
+		"@astrojs/vercel": "^10.0.2",
 		"@datadog/browser-rum": "^6.24.1",
 		"@opentelemetry/api": "^1.9.1",
 		"@opentelemetry/api-logs": "^0.220.0",

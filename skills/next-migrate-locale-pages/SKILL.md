@@ -9,6 +9,32 @@ Migrate pages into `app/[locale]/<route>/page.tsx` without losing information or
 
 ---
 
+## IMPORTANT: i18n message file update best-practices
+
+**Never overwrite the global translation file!**
+
+When adding translations for a specific page:
+- Always parse the existing `messages/en.json` and `messages/fr.json` in full, and MERGE or APPEND only the key you want to add or update (i.e. `"email"` or `"ctid"` or `"pricing"`) for your new/migrated page.
+- Never overwrite or truncate other translation keys/sections unrelated to the page. These JSON files are _global registries_ for all locale strings (used by all pages and components).
+- You must use a workflow that always reads and merges the full file before writing.
+- **The official and ONLY supported tool for manipulating these JSON files in this repository is the script:**
+  ```
+  node scripts/merge-i18n-message.js messages/en.json patch.json
+  ```
+  where `patch.json` contains only the key(s) you want to ADD/UPDATE (example: `{ "404": { ... } }`).
+  This script guarantees a deep merge and preserves all other i18n blocks.
+  All automation or human intervention must use this script for i18n append/merge.
+- All automation/scripts must do a read-modify-write (append not replace).
+
+**Rule:**
+> Any script, manual edit, or automation must only update the subtree relevant to the page/component being migrated and must NEVER destroy or replace the other data of the file.
+
+This prevents breakages of translations on the entire site and guarantees that every page, old et nouvelle, conserve leur accessibilité multilingue.
+
+If unsure: always review via diff or use a YAML/JSON linter/hook in your workflow.
+
+---
+
 ## Migration traps: rewrites, redirects & legacy HTML
 
 **Always check for rewrites or redirects that might shadow your React app with static HTML or legacy content!**
@@ -111,5 +137,20 @@ Adapt locale validation to the repository's routing configuration. Call `setRequ
 Use the App Router metadata API. Do not use `next/head`. Preserve localized title, description, canonical URL, Open Graph data, alternates, and JSON-LD where applicable.
 
 Keep shared navigation, footer, consent UI, analytics, and widgets in their existing layout or shared component. Include page-specific navigation or calls to action when they are part of the reference page rather than global chrome.
+
+---
+
+### KEY RULE FOR TRANSLATION FILES (messages/en.json, fr.json, …)
+
+Whenever you add a new page, translation key, or migrate an additional block, you **must** always:
+- Parse and merge the *entire* translation file,
+- Append/merge only the relevant page/block/key,
+- Never remove, overwrite, or truncate any other unrelated translation data in the file.
+
+This guarantees all legacy translations, page blocks, UI sections, or components remain available, and makes all batch/script/manual edits safe.
+
+If you update messages via script, add a review/validation that diffs before/after: every unrelated translation key should remain unchanged.
+
+Copy this rule to any migration skill, migration README, or onboarding doc as a contract for anyone performing translation or migration work.
 
 ---
