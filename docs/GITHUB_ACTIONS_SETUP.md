@@ -67,4 +67,10 @@ For browser parity with CI, install the three Playwright engines once:
 
 ```bash
 npx playwright install chromium firefox webkit
+npm run build
+CI=true npm test
 ```
+
+Playwright démarre `npm run dev:test` en local. En CI, le build est réalisé en
+amont puis Playwright démarre `npm run start:test`, afin de tester le même serveur
+de production que celui qui sera déployé.
