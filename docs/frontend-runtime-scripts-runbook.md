@@ -16,7 +16,8 @@ This runbook documents the shared frontend runtime scripts that were consolidate
 - `public/nabla-service-status.js`
 - `app/api/homelab-tunnel-check/route.ts` (server-side tunnel HTTP/TLS probe for homelab cards)
 - `public/site-content-page.css` (homelab card + ping indicator styles)
-- `lib/marketingPages.ts`
+- `lib/htmlContentPages.ts`
+- `lib/sitePageCatalog.ts`
 - `app/[locale]/page.tsx`
 - `app/[locale]/[slug]/page.tsx`
 - `lib/htmlFromPublic.ts`
@@ -39,7 +40,7 @@ Use `data-analytics-mode` on the script tag:
 
 - `vercel` (default): Vercel analytics + Vercel speed insights.
 - `full`: GTM + GA4 + VWO + PostHog + Heap + Datadog RUM + Vercel.
-- `marketing`: same as `full` without Datadog RUM.
+- `showcase`: same as `full` without Datadog RUM.
 - `home`: Mixpanel + everything in `full`.
 
 Optional analytics attributes:
@@ -54,7 +55,7 @@ Programmatic fallback is also supported through `window.NABLA_ANALYTICS_PRESET`.
 
 - `home`: `public/index.html`
 - `full`: `public/link.html`, `public/nabla.html`, `public/cv/index.html`
-- `marketing`: `public/truenas.html`, `public/freenas.html`
+- `showcase`: `public/truenas.html`, `public/freenas.html`, `public/workstation.html`
 - `vercel`: `public/ai.html`, `public/contact.html`, `public/security.html`, `public/pricing.html`
 
 ## Shared UI Attributes (`site-widgets.js`)
@@ -167,22 +168,26 @@ Important limitations:
 - False negatives happen when a service is up but does not expose a favicon or blocks hotlinking.
 - LAN-only addresses can fail for remote users even if service is healthy internally.
 
-## Next.js Marketing Slug Bridge
+## Next.js HTML Content Bridge
 
-`lib/marketingPages.ts` is the source-of-truth map for root marketing pages exposed as extensionless routes in Next.js.
+`lib/htmlContentPages.ts` maps the root HTML fragments still rendered through the
+App Router. This rendering concern is intentionally separate from SEO policy.
+`lib/sitePageCatalog.ts` owns functional categories and the strict sitemap allowlist.
 
 Workflow:
 
-1. Add or update entry in `MARKETING_PAGES` (slug, `public/*.html` file, extract mode, body class).
+1. Add or update an entry in `HTML_CONTENT_PAGES` (slug, `public/*.html` file, extract mode, body class).
 2. `app/[locale]/[slug]/page.tsx` generates static params from this map and loads the fragment via `loadPublicHtmlFragment()`.
 3. `lib/htmlFromPublic.ts` rewrites internal `.html` links to extensionless paths for runtime navigation.
 
 ### Practical constraints
 
 - Keep slugs stable when possible to avoid breaking existing URLs.
-- Ajouter l’entrée à `lib/marketingPages.ts` (`MARKETING_PAGES`) et conserver
-  `lib/marketingPages.config.mjs` en phase avec les URLs historiques réécrites
-  par `next.config.mjs`.
+- Ajouter l’entrée à `lib/htmlContentPages.ts` (`HTML_CONTENT_PAGES`) et conserver
+  `lib/htmlRoutes.config.mjs` en phase avec les URLs historiques réécrites par
+  `next.config.mjs`.
+- N’ajouter une page à `SEO_PAGE_SLUGS` que si elle doit réellement apparaître
+  dans `sitemap.xml`.
 - Use relative script paths in `public/*.html`; rewrite tooling is for links, not script `src`.
 
 ## Recommended Integration Pattern

@@ -1,11 +1,11 @@
 /**
  * Site analytics (Vercel, optional VWO / PostHog / Heap / Datadog RUM, Google Tag Manager, gtag).
- * Load in <head> without async/defer so VWO anti-flicker can run early (home/full/marketing).
+ * Load in <head> without async/defer so VWO anti-flicker can run early (home/full/showcase).
  *
  * data-analytics-mode:
  *   - "vercel" (default): Vercel Web Analytics + Speed Insights only
  *   - "full": GTM + gtag, then VWO, PostHog, Heap, Datadog RUM, then Vercel
- *   - "marketing": GTM + gtag, then VWO, PostHog, Heap, then Vercel (no Datadog)
+ *   - "showcase": GTM + gtag, then VWO, PostHog, Heap, then Vercel (no Datadog)
  *   - "home": Mixpanel loader, GTM + gtag, then same as "full" (use this instead of a duplicate Mixpanel inline snippet in HTML)
  *
  * Optional: data-ahrefs-key="…" — loads Ahrefs Web Analytics (any mode).
@@ -23,7 +23,7 @@
 		? root.getAttribute("data-analytics-mode") || "vercel"
 		: window.NABLA_ANALYTICS_MODE || "vercel";
 
-	var heavy = mode === "full" || mode === "marketing" || mode === "home";
+	var heavy = mode === "full" || mode === "showcase" || mode === "home";
 
 	var preset = window.NABLA_ANALYTICS_PRESET || {};
 	var DEFAULT_GTM_CONTAINER_ID = "GTM-W7XNV7K6";

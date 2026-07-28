@@ -19,7 +19,7 @@ test.describe("Google Translate vs Next.js i18n", () => {
 		).toHaveCount(0);
 	});
 
-	test("marketing page via .html rewrite has no Google Translate widget", async ({
+	test("HTML content page rewrite has no Google Translate widget", async ({
 		page,
 	}) => {
 		const res = await page.goto("/nabla.html");

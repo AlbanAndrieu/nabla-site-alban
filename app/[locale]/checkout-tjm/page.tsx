@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
+
+export const metadata: Metadata = {
+	robots: NON_INDEXABLE_ROBOTS,
+};
 
 export default async function CheckoutTjmPage({
 	params,

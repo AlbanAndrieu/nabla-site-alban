@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { paymentLocale } from "@/lib/paymentPages";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -155,6 +156,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	return {
 		title: `${content[locale].title} — Alban Andrieu`,
 		description: content[locale].intro,
+		robots: NON_INDEXABLE_ROBOTS,
 	};
 }
 

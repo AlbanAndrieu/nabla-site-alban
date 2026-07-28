@@ -19,7 +19,7 @@ test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
 		page,
 	}) => {
-		// Root `*.html` slugs in `MARKETING_PAGES` are rewritten to App Router pages without
+		// Root `*.html` slugs are rewritten to App Router content pages without
 		// the original `<head>` scripts; use static `/404.html` (default `vercel` analytics mode).
 		await page.goto("/404.html?nablaEnableThirdParty=1");
 

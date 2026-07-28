@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 export async function generateMetadata({
 	params,
@@ -18,6 +19,7 @@ export async function generateMetadata({
 			canonical: isFrench ? "/fr/startup.html" : "/startup.html",
 			languages: { en: "/startup.html", fr: "/fr/startup.html" },
 		},
+		robots: NON_INDEXABLE_ROBOTS,
 	};
 }
 

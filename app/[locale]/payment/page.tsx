@@ -6,6 +6,7 @@ import { setRequestLocale } from "next-intl/server";
 import PaymentShell from "@/components/payments/PaymentShell";
 import { routing } from "@/i18n/routing";
 import { DIRECT_STRIPE_PAYMENT_LINK, paymentLocale } from "@/lib/paymentPages";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -16,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			locale === "fr"
 				? "Options de paiement — Alban Andrieu"
 				: "Payment options — Alban Andrieu",
+		robots: NON_INDEXABLE_ROBOTS,
 	};
 }
 
