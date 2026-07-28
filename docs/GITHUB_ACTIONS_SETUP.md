@@ -74,3 +74,7 @@ CI=true npm test
 Playwright démarre `npm run dev:test` en local. En CI, le build est réalisé en
 amont puis Playwright démarre `npm run start:test`, afin de tester le même serveur
 de production que celui qui sera déployé.
+
+Le job ne masque pas les échecs Playwright avec `continue-on-error`. Les rapports
+et résultats sont tout de même publiés après un échec grâce aux conditions
+`always()` et `!cancelled()` du workflow.
