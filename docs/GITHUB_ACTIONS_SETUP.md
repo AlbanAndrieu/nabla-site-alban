@@ -77,3 +77,5 @@ de production que celui qui sera déployé. Le serveur et la sonde Playwright
 utilisent tous deux `127.0.0.1:3000` pour éviter une résolution IPv6 différente de
 `localhost` sur certains runners. La sonde attend la route localisée `/fr`, qui
 répond directement en `200` et ne dépend pas de la négociation de langue de `/`.
+Le port `3000` reste la valeur par défaut. S'il est déjà occupé en local, utilisez
+par exemple `PLAYWRIGHT_PORT=3100 npm test` sans modifier la configuration CI.

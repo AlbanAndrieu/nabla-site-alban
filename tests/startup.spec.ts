@@ -7,9 +7,8 @@ test.describe("Startup inquiry page", () => {
 		await expect(page).toHaveTitle(/Start your project/i);
 		const form = page.locator("form.startup-inquiry-form");
 		await expect(form).toBeVisible();
-		await expect(form).toHaveAttribute(
-			"action",
-			/formsubmit\.co\/job@albanandrieu\.com/,
+		expect(await form.getAttribute("action")).toBe(
+			"https://formsubmit.co/job@albandrieu.com",
 		);
 		await expect(form).toHaveAttribute("method", "post");
 

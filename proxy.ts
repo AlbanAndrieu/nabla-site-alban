@@ -5,6 +5,11 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
+const defaultLocaleRewriteTargets = new Set([
+	`/${routing.defaultLocale}`,
+	`/${routing.defaultLocale}/checkout`,
+	`/${routing.defaultLocale}/checkout-tjm`,
+]);
 
 /**
  * Next.js 16+ uses the `proxy` convention (formerly `middleware`).
@@ -17,11 +22,11 @@ export default function proxy(request: NextRequest) {
 
 	/*
 	 * Next.js 16.3 preview can run the proxy again for next-intl's internal
-	 * rewrite from `/` to `/en`. Let that internal/default-locale route reach
-	 * the App Router instead of normalizing it back to `/`, which would create
-	 * a 307 self-redirect loop. Metadata still declares `/` as canonical.
+	 * rewrites to default-locale routes. Let the affected internal targets reach
+	 * the App Router instead of normalizing them again, which would create 307
+	 * redirect loops. Metadata continues to declare unprefixed canonical URLs.
 	 */
-	if (request.nextUrl.pathname === `/${routing.defaultLocale}`) {
+	if (defaultLocaleRewriteTargets.has(request.nextUrl.pathname)) {
 		return NextResponse.next();
 	}
 

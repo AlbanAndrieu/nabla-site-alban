@@ -1,4 +1,25 @@
+import type { Metadata } from "next";
 import Script from "next/script";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/startup">): Promise<Metadata> {
+	const { locale } = await params;
+	const isFrench = locale === "fr";
+
+	return {
+		title: isFrench
+			? "Démarrer votre projet — Alban Andrieu"
+			: "Start your project — Alban Andrieu",
+		description: isFrench
+			? "Présentez votre projet cloud, cybersécurité, conformité ou livraison à Alban Andrieu."
+			: "Share your cloud, cybersecurity, compliance or delivery project with Alban Andrieu.",
+		alternates: {
+			canonical: isFrench ? "/fr/startup.html" : "/startup.html",
+			languages: { en: "/startup.html", fr: "/fr/startup.html" },
+		},
+	};
+}
 
 export default function StartupPage() {
 	return (

@@ -1,23 +1,21 @@
 // app/[locale]/checkout/page.tsx
 
-import Head from "next/head";
+import type { Metadata } from "next";
 import Image from "next/image";
 
-export default function CheckoutPage({
+export const metadata: Metadata = {
+	title: "Checkout | Alban Andrieu",
+	robots: { index: false, follow: false },
+};
+
+export default async function CheckoutPage({
 	params,
-}: {
-	params: { locale: string };
-}) {
-	const isFr = params.locale === "fr";
+}: PageProps<"/[locale]/checkout">) {
+	const { locale } = await params;
+	const isFr = locale === "fr";
 
 	return (
 		<>
-			<Head>
-				<title>
-					{isFr ? "Checkout | Alban Andrieu" : "Checkout | Alban Andrieu"}
-				</title>
-				<meta name="robots" content="noindex, nofollow" />
-			</Head>
 			<main
 				id="main-content"
 				className="checkout-page site-content-page"
