@@ -59,6 +59,10 @@ const localizedPolicyRewrites = localePrefixes.flatMap((locale) =>
 
 const nextConfig = {
 	reactStrictMode: true,
+	experimental: {
+		/** Required because the root layout lives below the dynamic `[locale]` segment. */
+		globalNotFound: true,
+	},
 	allowedDevOrigins: ["172.17.0.57"],
 	/** Parent `package-lock.json` exists; pin app root so Turbopack does not infer the wrong workspace. */
 	turbopack: {

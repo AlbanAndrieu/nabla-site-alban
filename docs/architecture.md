@@ -16,8 +16,13 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 - `proxy.ts` applique la négociation `next-intl` aux routes hors API/assets.
 - `next.config.mjs` conserve les redirections et réécritures des anciennes URLs
   `.html`.
-- `app/[locale]/[slug]/page.tsx` est un pont temporaire vers certains fragments
-  HTML de `public/`.
+- Chaque URL publique possède désormais une route App Router dédiée. Les routes
+  `ai`, `security`, `workstation` et certains CV chargent encore temporairement
+  des fragments HTML de `public/`.
+- `app/global-not-found.tsx` gère les URL inconnues hors du root layout
+  dynamique `[locale]`. Cette page complète reste exclue de l’indexation et
+  réutilise le rendu statique de `public/404.html`. Les scripts du fragment sont
+  retirés puis montés par Next pour conserver l'observabilité sans doublon.
 
 ## Données et APIs
 

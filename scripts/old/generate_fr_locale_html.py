@@ -19,7 +19,7 @@ REPO = Path(__file__).resolve().parents[1]
 PUBLIC = REPO / "public"
 OUT = PUBLIC / "locales" / "fr"
 
-# Keep in sync with lib/htmlContentPages.ts + app routes using loadPublicHtmlFragment.
+# Keep in sync with dedicated app routes using loadPublicHtmlFragment.
 FILES = sorted(
     {
         "index.html",

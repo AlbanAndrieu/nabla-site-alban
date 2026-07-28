@@ -2,8 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import sitemap from "../app/sitemap";
-import { HTML_CONTENT_PAGES } from "../lib/htmlContentPages";
-import { HTML_ROUTE_SLUGS } from "../lib/htmlRoutes.config.mjs";
 import {
 	canonicalPagePath,
 	PAGE_CATEGORIES,
@@ -47,18 +45,6 @@ test("every catalog page belongs to exactly one derived category", () => {
 
 	assert.equal(categorizedSlugs.length, Object.keys(SITE_PAGES).length);
 	assert.equal(new Set(categorizedSlugs).size, categorizedSlugs.length);
-});
-
-test("HTML content pages are covered by legacy route compatibility", () => {
-	const compatibleSlugs = new Set(HTML_ROUTE_SLUGS);
-
-	for (const slug of Object.keys(HTML_CONTENT_PAGES)) {
-		assert.equal(
-			compatibleSlugs.has(slug),
-			true,
-			`Missing HTML route: ${slug}`,
-		);
-	}
 });
 
 test("sitemap uses localized canonical URLs", () => {

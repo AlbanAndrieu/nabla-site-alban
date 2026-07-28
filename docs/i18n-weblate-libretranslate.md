@@ -28,9 +28,9 @@ la même structure de clés.
 1. `public/locales/fr/<page>.html` pour le français ;
 2. `public/<page>.html` comme source anglaise ou fallback.
 
-`app/[locale]/[slug]/page.tsx` injecte ces fragments. Ce mécanisme est
-transitoire : préférer un composant React et les catalogues JSON pour toute
-nouvelle page.
+Les routes dédiées `ai`, `security`, `workstation` et certains CV injectent
+encore ces fragments. Ce mécanisme est transitoire : préférer un composant React
+et les catalogues JSON pour toute nouvelle page.
 
 ## LibreTranslate
 

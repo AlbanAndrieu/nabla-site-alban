@@ -16,10 +16,9 @@ This runbook documents the shared frontend runtime scripts that were consolidate
 - `public/nabla-service-status.js`
 - `app/api/homelab-tunnel-check/route.ts` (server-side tunnel HTTP/TLS probe for homelab cards)
 - `public/site-content-page.css` (homelab card + ping indicator styles)
-- `lib/htmlContentPages.ts`
 - `lib/sitePageCatalog.ts`
 - `app/[locale]/page.tsx`
-- `app/[locale]/[slug]/page.tsx`
+- `app/[locale]/workstation/page.tsx`
 - `lib/htmlFromPublic.ts`
 - `public/*.html` pages that load these scripts (for integration examples)
 
@@ -168,24 +167,25 @@ Important limitations:
 - False negatives happen when a service is up but does not expose a favicon or blocks hotlinking.
 - LAN-only addresses can fail for remote users even if service is healthy internally.
 
-## Next.js HTML Content Bridge
+## Next.js HTML Content Migration
 
-`lib/htmlContentPages.ts` maps the root HTML fragments still rendered through the
-App Router. This rendering concern is intentionally separate from SEO policy.
-`lib/sitePageCatalog.ts` owns functional categories and the strict sitemap allowlist.
+Each migrated URL has a dedicated App Router page. A few dedicated routes still
+load a fragment from `public/` through `lib/htmlFromPublic.ts` (`ai`, `security`,
+`workstation` and some CV pages). `lib/sitePageCatalog.ts` separately owns
+functional categories and the strict sitemap allowlist.
 
 Workflow:
 
-1. Add or update an entry in `HTML_CONTENT_PAGES` (slug, `public/*.html` file, extract mode, body class).
-2. `app/[locale]/[slug]/page.tsx` generates static params from this map and loads the fragment via `loadPublicHtmlFragment()`.
-3. `lib/htmlFromPublic.ts` rewrites internal `.html` links to extensionless paths for runtime navigation.
+1. Create a dedicated `app/[locale]/<slug>/page.tsx` route.
+2. During migration only, load its `public/*.html` fragment with `loadPublicHtmlFragment()`.
+3. Replace the fragment progressively with typed React components and next-intl messages.
+4. `lib/htmlFromPublic.ts` rewrites legacy internal links during the transition.
 
 ### Practical constraints
 
 - Keep slugs stable when possible to avoid breaking existing URLs.
-- Ajouter l’entrée à `lib/htmlContentPages.ts` (`HTML_CONTENT_PAGES`) et conserver
-  `lib/htmlRoutes.config.mjs` en phase avec les URLs historiques réécrites par
-  `next.config.mjs`.
+- Conserver `lib/htmlRoutes.config.mjs` en phase avec les URLs historiques
+  réécrites par `next.config.mjs`.
 - N’ajouter une page à `SEO_PAGE_SLUGS` que si elle doit réellement apparaître
   dans `sitemap.xml`.
 - Use relative script paths in `public/*.html`; rewrite tooling is for links, not script `src`.
