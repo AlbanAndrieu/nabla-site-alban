@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const localTestUrl = "http://127.0.0.1:3000";
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -33,7 +35,7 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. Must match webServer url when using webServer. */
-		baseURL: process.env.BASE_URL || "http://localhost:3000",
+		baseURL: process.env.BASE_URL || localTestUrl,
 
 		/* Heavy pages + parallel tests against Next dev; keep below global `timeout` */
 		navigationTimeout: 30_000,
@@ -80,7 +82,7 @@ export default defineConfig({
 	/* Run your local dev server before starting the tests */
 	webServer: {
 		command: process.env.CI ? "npm run start:test" : "npm run dev:test",
-		url: "http://localhost:3000",
+		url: `${localTestUrl}/fr`,
 		reuseExistingServer: !process.env.CI,
 		timeout: 120 * 1000,
 	},

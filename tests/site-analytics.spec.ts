@@ -89,9 +89,10 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should load Ahrefs script when key is provided", async ({ page }) => {
-		// `/test.html` is rewritten to the App Router marketing page (see `MARKETING_PAGES` + `next.config.ts`);
-		// use static `index.html`, which is not rewritten and includes `data-ahrefs-key` on `site-analytics.js`.
-		await page.goto("/index.html?nablaEnableThirdParty=1");
+		await page.goto("/404.html?nablaEnableThirdParty=1");
+		await _injectSiteAnalytics(page, {
+			"data-ahrefs-key": "tg3zLMS/bebJFl0LxctiCw",
+		});
 
 		const ahrefs = page.locator(
 			'script[src*="analytics.ahrefs.com/analytics.js"][data-key]',

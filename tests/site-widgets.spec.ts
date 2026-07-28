@@ -27,28 +27,12 @@ test.describe("Site widgets integration", () => {
 		page,
 	}) => {
 		await page.goto("/");
-
-		await page.evaluate(() => {
-			const calls: Array<[number, number]> = [];
-			(
-				window as unknown as { __scrollCalls?: Array<[number, number]> }
-			).__scrollCalls = calls;
-			const original = window.scrollTo.bind(window);
-			window.scrollTo = ((x: number, y: number) => {
-				calls.push([x, y]);
-				original(x, y);
-			}) as typeof window.scrollTo;
-		});
+		await page.locator("#nabla-back-to-top").waitFor();
+		await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 
 		await page.locator("#nabla-back-to-top").click();
-
-		const sawScrollTop = await page.evaluate(() => {
-			const calls = (
-				window as unknown as { __scrollCalls?: Array<[number, number]> }
-			).__scrollCalls;
-			return !!calls?.some(([x, y]) => x === 0 && y === 0);
-		});
-		expect(sawScrollTop).toBeTruthy();
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 	});
 
 	test("should scroll to top when back-to-top control has href '#'", async ({
@@ -60,29 +44,12 @@ test.describe("Site widgets integration", () => {
 			if (button) {
 				button.setAttribute("href", "#");
 			}
+			window.scrollTo(0, document.body.scrollHeight);
 		});
-
-		await page.evaluate(() => {
-			const calls: Array<[number, number]> = [];
-			(
-				window as unknown as { __scrollCalls?: Array<[number, number]> }
-			).__scrollCalls = calls;
-			const original = window.scrollTo.bind(window);
-			window.scrollTo = ((x: number, y: number) => {
-				calls.push([x, y]);
-				original(x, y);
-			}) as typeof window.scrollTo;
-		});
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 
 		await page.locator("#nabla-back-to-top").click();
-
-		const sawScrollTop = await page.evaluate(() => {
-			const calls = (
-				window as unknown as { __scrollCalls?: Array<[number, number]> }
-			).__scrollCalls;
-			return !!calls?.some(([x, y]) => x === 0 && y === 0);
-		});
-		expect(sawScrollTop).toBeTruthy();
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 	});
 
 	test("should keep 404 in minimal chrome mode while still applying stored theme", async ({

@@ -73,4 +73,7 @@ CI=true npm test
 
 Playwright démarre `npm run dev:test` en local. En CI, le build est réalisé en
 amont puis Playwright démarre `npm run start:test`, afin de tester le même serveur
-de production que celui qui sera déployé.
+de production que celui qui sera déployé. Le serveur et la sonde Playwright
+utilisent tous deux `127.0.0.1:3000` pour éviter une résolution IPv6 différente de
+`localhost` sur certains runners. La sonde attend la route localisée `/fr`, qui
+répond directement en `200` et ne dépend pas de la négociation de langue de `/`.

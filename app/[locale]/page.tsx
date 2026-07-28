@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Hero from "@/app/components/Hero";
@@ -287,6 +288,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 					</div>
 				</section>
 			</main>
+			<Script
+				src="/site-widgets.js"
+				strategy="afterInteractive"
+				data-print-pdf=""
+			/>
 		</>
 	);
 }
