@@ -21,6 +21,18 @@
 	height: auto;
 }
 
+/* Responsive fix for CTA buttons on mobile: ensure long text wraps inside button */
+@media (max-width: 600px) {
+	.cta-buttons .btn {
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		white-space: normal;
+		padding: 0.75rem 1rem;
+		margin-bottom: 0.5rem;
+	}
+}
+
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
 	:root {

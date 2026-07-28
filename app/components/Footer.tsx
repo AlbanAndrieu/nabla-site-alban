@@ -85,7 +85,7 @@ export default function Footer({
 					{backToTop}
 				</a>
 			</p>
-			<p className="footer-copyright"></p>
+			<p className="footer-copyright">© {new Date().getFullYear()} Alban Andrieu. Independent DevSecOps Professional.</p>
 		</footer>
 	);
 }
