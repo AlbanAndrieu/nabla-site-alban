@@ -47,6 +47,7 @@ export default defineConfig({
 	expect: { timeout: 5000 },
 	/* Per-test cap includes navigation; CI is slower (cold cache, CPU). */
 	timeout: process.env.CI ? 60_000 : 30_000,
+	globalTimeout: 3_600_000, // 1 hour
 
 	/* Configure projects for major browsers */
 	projects: [
@@ -78,7 +79,7 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: "npm run dev",
+		command: process.env.CI ? "npm run start:test" : "npm run dev:test",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
 		timeout: 120 * 1000,

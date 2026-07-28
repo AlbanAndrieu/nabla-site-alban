@@ -185,7 +185,7 @@ variables:
   # RENOVATE_BASE_DIR: $CI_PROJECT_DIR/renovate
   RENOVATE_PLATFORM: gitlab
   RENOVATE_ONBOARDING_CONFIG: '{"$$schema": "https://docs.renovatebot.com/renovate-schema.json", "extends": ["config:recommended"] }'
-  # RENOVATE_GIT_AUTHOR: "alban.andrieu@dr-alban.com"
+  # RENOVATE_GIT_AUTHOR: "aa@albandrieu.com"
   RENOVATE_OPTIMIZE_FOR_DISABLED: "true"
   RENOVATE_REPOSITORY_CACHE: "true"
   RENOVATE_LOG_FILE: renovate-log.ndjson

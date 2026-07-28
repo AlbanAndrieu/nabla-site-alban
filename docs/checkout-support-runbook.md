@@ -1,108 +1,67 @@
-# Checkout and Support Flow Runbook
+# Checkout et support Stripe
 
-## Scope
+## Implémentation principale
 
-The repository currently has two checkout implementations:
+Le formulaire de `app/[locale]/checkout/page.tsx` envoie un `POST` à
+`/api/create-checkout-session`. Le Route Handler
+`app/api/create-checkout-session/route.ts` crée une Checkout Session Stripe et
+répond par une redirection `303`, ou par du JSON si le client demande
+`application/json`.
 
-- Static HTML hosted checkout flow (`public/checkout.html` + server endpoint)
-- Next.js embedded checkout flow (`app/components/checkout.tsx` + server action)
+Routes de retour :
 
-This runbook documents both so support and dev teams can quickly identify which path is active in a deployment.
+- `/{locale}/success?session_id={CHECKOUT_SESSION_ID}` ;
+- `/{locale}/cancel`.
 
-## Code paths
+La locale acceptée est `en` ou `fr`; toute autre valeur retombe sur `en`.
 
-### Static hosted checkout (legacy/public flow)
+## Embedded Checkout
 
-- `public/checkout.html` (form posts to `/api/create-checkout-session`)
-- `public/success.html`
-- `public/cancel.html`
-- `public/checkout.css`
-- `api/create-checkout-session.js` (Vercel serverless handler)
-- `server.cjs` (local Express server with `/create-checkout-session`)
+`app/components/checkout.tsx` et `app/actions/stripe.ts` constituent une seconde
+surface native : le Server Action crée une session avec `ui_mode: "embedded"`
+et renvoie son `client_secret`. Cette surface utilise un petit catalogue local
+et n’est pas le formulaire principal de `/checkout`.
 
-### Next.js checkout (app router flow)
+## Stripe Buy Button
 
-- `app/components/checkout.tsx` (Stripe `EmbeddedCheckoutProvider`)
-- `app/actions/stripe.ts` (`startCheckoutSession(productId)`, server action)
-- `app/[locale]/checkout/page.tsx` (localized route wrapper)
-- `app/[locale]/checkout/layout.tsx` (checkout-specific CSS)
-- `app/api/create-checkout-session/route.ts` (Next.js API route, currently separate from server action path)
+`app/[locale]/checkout-tjm/page.tsx` intègre un Stripe Buy Button et un QR code.
+La clé `pk_` est publiable et peut être exposée au navigateur. Une clé secrète
+`sk_` ou restreinte `rk_` ne doit jamais apparaître dans le code client.
 
-## Endpoint contracts
+## Variables d’environnement
 
-### `POST /api/create-checkout-session` (`api/create-checkout-session.js`)
+| Variable | Usage |
+| --- | --- |
+| `STRIPE_SECRET_KEY` ou `STRIPE_KEY` | API Stripe côté serveur |
+| `STRIPE_PRICE_ID` ou `PRICE_ID` | prix du Checkout hébergé |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Embedded Checkout navigateur |
+| `DOMAIN` | origine de confiance des URLs de retour |
+| `VERCEL_URL` | fallback fourni par Vercel |
 
-- `Accept: application/json` -> `200 { "url": "https://checkout.stripe.com/..." }`
-- non-JSON form POST -> `303` redirect to Stripe Checkout URL
-- error -> `500` JSON or text depending on `Accept`
+Préférer une clé Stripe restreinte avec les permissions minimales lorsque le
+cas d’usage le permet. Les environnements test et production doivent utiliser
+des clés différentes.
 
-### `POST /create-checkout-session` (`server.cjs`, local only)
+## Test local
 
-- Same response contract as above, but mounted on Express local server and used when running `npm run start:stripe`
+```bash
+npm run dev
+```
 
-### Embedded checkout session creation (`app/actions/stripe.ts`)
+Tester `/checkout`, `/fr/checkout`, `/checkout-tjm` et `/fr/checkout-tjm` avec
+les cartes de test Stripe. En production, vérifier aussi que `DOMAIN` correspond
+exactement à l’origine publique.
 
-- Returns `session.client_secret` for Stripe embedded checkout (`ui_mode: "embedded"`)
-- Uses inline `price_data` from a local catalog map (currently `default` only, USD 750 cents)
-- Does not use `STRIPE_PRICE_ID`
+## Chemins historiques
 
-## Environment
+`public/checkout.html`, `api/create-checkout-session.js` et `server.cjs` sont
+encore présents pour compatibilité. Ils ne doivent pas être étendus : toute
+nouvelle fonctionnalité doit cibler le Route Handler App Router.
 
-### Hosted checkout endpoints (`server.cjs`, `api/create-checkout-session.js`, `app/api/create-checkout-session/route.ts`)
+## Diagnostic
 
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `STRIPE_SECRET_KEY` or `STRIPE_KEY` | Yes | Server-side Stripe API key |
-| `STRIPE_PRICE_ID` or `PRICE_ID` | Yes | Stripe Price ID for hosted checkout |
-| `DOMAIN` | Optional, recommended | Public origin for success/cancel URLs |
-| `PORT` | Local only | Express listen port (`server.cjs`, default `4242`) |
-
-### Embedded checkout UI (`app/components/checkout.tsx`)
-
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Browser Stripe key for embedded checkout |
-| `STRIPE_SECRET_KEY` or `STRIPE_KEY` | Yes | Needed server-side by `app/actions/stripe.ts` |
-
-## Local testing
-
-### Static hosted checkout
-
-1. Export hosted-checkout env vars
-2. Run `npm run start:stripe`
-3. Open `http://localhost:4242/checkout.html`
-4. Use [Stripe test cards](https://docs.stripe.com/testing)
-
-`npm run start:python` (or any static-only server) does not provide `/create-checkout-session`, so checkout submission fails unless an API endpoint is separately running.
-
-### Next.js localized checkout route
-
-1. Export `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` and Stripe secret key
-2. Run `npm run dev`
-3. Open `/checkout` and `/fr/checkout`
-4. Confirm embedded checkout mounts (or explicit missing-key alert appears)
-
-## Redirect URLs and support references
-
-Hosted endpoints currently set:
-
-- success: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}` (or `/success` in `app/api/create-checkout-session/route.ts`)
-- cancel: `${origin}/cancel.html` (or `/cancel` in `app/api/create-checkout-session/route.ts`)
-
-`public/success.html` displays `session_id` for support reference only. It does not verify payment status server-side.
-
-To verify payment state, add an authenticated backend check with `stripe.checkout.sessions.retrieve(session_id)` and validate `payment_status`.
-
-## Current operational pitfalls
-
-- `public/create-checkout-session.js` contains server-side Express code instead of browser fetch logic; treat it as stale/non-runtime until corrected.
-- `vercel.json` currently routes `/api/(.*)` to `api/$1.js`, while `public/checkout.html` posts to `/api/create-checkout-session`; keep those aligned when changing endpoint paths.
-- There are two server checkout endpoints (`api/create-checkout-session.js` and `app/api/create-checkout-session/route.ts`) with different origin rules and redirect targets; choose one canonical path before extending checkout behavior.
-
-## Troubleshooting
-
-- `500 Missing STRIPE_PRICE_ID`: set a valid Stripe Price ID for hosted checkout endpoints.
-- `500 Missing STRIPE_SECRET_KEY`: missing secret key in runtime environment.
-- `500 No such price`: test/live key mismatch with the configured price.
-- Embedded checkout shows unavailable message: set `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
-- Redirect path mismatch (`/success` vs `/success.html`): verify which server endpoint handled the request and align links/pages accordingly.
+- `Missing STRIPE_SECRET_KEY` : clé serveur absente.
+- `Missing STRIPE_PRICE_ID` : Price ID absent ou incorrect.
+- `No such price` : mélange test/live entre clé et Price ID.
+- `Invalid DOMAIN` : fournir une origine HTTP(S), sans chemin ni credentials.
+- retour dans la mauvaise langue : vérifier le champ `locale` envoyé au POST.

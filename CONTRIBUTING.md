@@ -11,7 +11,7 @@ Please be respectful and constructive in all interactions.
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/nabla-site-alban.git
+   git clone https://github.com/AlbanAndrieu/nabla-site-alban.git
    cd nabla-site-alban
    ```
 3. **Install dependencies**:

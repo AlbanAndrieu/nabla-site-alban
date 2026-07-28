@@ -41,6 +41,8 @@ Used by `opencommit.yml` (`di-sukharev/opencommit`) for model access.
 ## Behavior notes
 
 - Playwright tests run on push and pull request for `main`, `master`, and `develop`.
+- The Playwright workflow installs dependencies with `npm ci`, builds Next.js,
+  then runs the complete browser suite.
 - Docker CI and MegaLinter skip markdown-only changes because of `paths-ignore`.
 - CV PDF build runs on push and pull request.
 - OpenCommit runs on push for non-protected branches (`branches-ignore` includes `main`, `master`, `dev`, `development`, `release`).
@@ -50,3 +52,19 @@ Used by `opencommit.yml` (`di-sukharev/opencommit`) for model access.
 - Do not commit secret values to the repository.
 - Rotate long-lived tokens periodically.
 - Scope tokens to minimum required permissions.
+- Dependabot/npm audit findings must be reviewed before applying breaking
+  `--force` upgrades.
+
+## Local parity check
+
+Before pushing a code or dependency change, run:
+
+```bash
+npm run check
+```
+
+For browser parity with CI, install the three Playwright engines once:
+
+```bash
+npx playwright install chromium firefox webkit
+```

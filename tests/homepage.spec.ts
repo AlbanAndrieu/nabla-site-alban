@@ -18,14 +18,14 @@ test.describe("Homepage Tests", () => {
 		const description = page.locator('meta[name="description"]');
 		await expect(description.first()).toHaveAttribute(
 			"content",
-			"Freelance DevSecOps engineer and cloud architect with 20+ years of experience. I help startups and enterprises secure, automate and scale AWS, Azure and OVH platforms, with a focus on AI workloads, security and compliance (ISO 27001 / SOC 2).",
+			"Cybersecurity and DevSecOps engineer securing cloud and AI platforms through automation, reliable infrastructure, and pragmatic compliance.",
 		);
 
 		// Check meta keywords (static HTML uses ", "; Next Metadata joins with "," only)
 		const keywords = page.locator('meta[name="keywords"]');
 		await expect(keywords).toHaveAttribute(
 			"content",
-			/freelance DevSecOps engineer.*freelance cloud architect.*AWS.*Azure.*OVH/,
+			/DevSecOps engineer.*cloud architect.*AWS.*Azure.*OVHcloud/,
 		);
 
 		// Check author
@@ -51,7 +51,7 @@ test.describe("Homepage Tests", () => {
 		const ogDescription = page.locator('meta[property="og:description"]');
 		await expect(ogDescription).toHaveAttribute(
 			"content",
-			/Cybersecurity and DevSecOps expertise for secure, automated and reliable cloud and AI platforms./,
+			/Cybersecurity and DevSecOps engineer securing cloud and AI platforms through automation, reliable infrastructure, and pragmatic compliance./,
 		);
 	});
 

@@ -98,7 +98,7 @@ YAML_V8R_FILE_NAMES_REGEX:
 EXCLUDED_DIRECTORIES:
   [".github", ".gitlab-ci", "node_modules", ".venv", ".direnv", ".mypy_cache"]
 SHOW_ELAPSED_TIME: true
-EMAIL_REPORTER_EMAIL: alban.andrieu@dr-alban.com
+EMAIL_REPORTER_EMAIL: aa@albandrieu.com
 JSON_REPORTER: true
 SARIF_REPORTER: true
 FILEIO_REPORTER: false

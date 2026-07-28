@@ -339,10 +339,8 @@ test.describe("Accessibility Tests", () => {
 	test("should have focus indicators", async ({ page }) => {
 		await page.goto("/");
 
-		// Skip link / first `a` in DOM is often not focusable the same way in WebKit; use a visible control
-		const focusTarget = page.locator(
-			'#theme-toggle-root .theme-toggle__btn[data-theme="light"]',
-		);
+		// Use the server-rendered locale switcher instead of a widget injected asynchronously.
+		const focusTarget = page.locator("#route-header-locale");
 		await expect(focusTarget).toBeVisible();
 		await focusTarget.focus();
 
