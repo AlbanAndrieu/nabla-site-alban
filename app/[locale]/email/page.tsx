@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
 
 export default async function EmailPage({
 	params,
@@ -14,7 +15,7 @@ export default async function EmailPage({
 	const automatedList: string[] = t.raw("automatedList") as string[];
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{tSite("skipToMainContent")}
 			</a>

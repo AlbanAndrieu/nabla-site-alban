@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { loadCvHtmlFragment, metadataFromCvHtml } from "@/lib/cvFromPublic";
 
@@ -27,15 +27,18 @@ export default async function CvPathPage({ params }: Props) {
 		: routing.defaultLocale;
 	setRequestLocale(normalizedLocale);
 
+	const site = await getTranslations("site");
 	try {
 		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
 		return (
-			<div
-				className="page-cv"
-				suppressHydrationWarning
-				// eslint-disable-next-line react/no-danger
-				dangerouslySetInnerHTML={{ __html: html }}
-			/>
+			<div className="page-cv" suppressHydrationWarning>
+				<TopAnchor />
+				<a href="#main-content" className="skip-to-main">
+					{site("skipToMainContent")}
+				</a>
+				{/* eslint-disable-next-line react/no-danger */}
+				<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
+			</div>
 		);
 	} catch {
 		notFound();
@@ -79,9 +82,9 @@ export default async function HomePage({ params }: Props) {
 				strategy="lazyOnload"
 				data-id="150620"
 			/>
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				{t("skipToMainContent")}
+				{site("skipToMainContent")}
 			</a>
 			<LocaleSwitcher />
 			<main

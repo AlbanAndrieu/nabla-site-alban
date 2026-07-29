@@ -26,12 +26,16 @@ export async function generateMetadata({
 	};
 }
 
-export default function ExpertisePage() {
+import { getTranslations } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+
+export default async function ExpertisePage() {
+	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				Skip to main content
+				{site("skipToMainContent")}
 			</a>
 			<main id="main-content">
 				<HeroSection />

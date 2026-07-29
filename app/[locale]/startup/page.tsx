@@ -23,12 +23,16 @@ export async function generateMetadata({
 	};
 }
 
-export default function StartupPage() {
+import { getTranslations } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+
+export default async function StartupPage() {
+	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				Skip to main content
+				{site("skipToMainContent")}
 			</a>
 			<nav className="page-nav container py-3" aria-label="Breadcrumb">
 				<a href="/" className="text-decoration-none">

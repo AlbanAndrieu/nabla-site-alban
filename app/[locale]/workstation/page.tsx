@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-
+import AppsSection from "@/app/components/truenas/AppsSection";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import {
@@ -11,12 +11,12 @@ import {
 	metadataFromPublicHtml,
 } from "@/lib/htmlFromPublic";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
+import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
+import HardwareSection from "../../components/workstation/HardwareSection";
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata({
-	params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 
@@ -28,9 +28,7 @@ export async function generateMetadata({
 	return { ...metadata, robots: NON_INDEXABLE_ROBOTS };
 }
 
-export default async function WorkstationPage({
-	params,
-}: Props) {
+export default async function WorkstationPage({ params }: Props) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 
@@ -44,20 +42,30 @@ export default async function WorkstationPage({
 
 	return (
 		<>
-			<Script
-				id="site-analytics-workstation"
-				src="/site-analytics.js"
-				strategy="afterInteractive"
-				data-analytics-mode="showcase"
-			/>
-			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
-			<div
-				className="site-content-page page-dark page-truenas page-workstation"
-				dangerouslySetInnerHTML={{ __html: html }}
-			/>
+			<div className="site-content-page page-dark">
+				<Script
+					id="site-analytics-workstation"
+					src="/site-analytics.js"
+					strategy="afterInteractive"
+					data-analytics-mode="showcase"
+				/>
+				<TopAnchor />
+				<a href="#main-content" className="skip-to-main">
+					{site("skipToMainContent")}
+				</a>
+				<div
+					className="site-content-page page-dark page-truenas page-workstation"
+					dangerouslySetInnerHTML={{ __html: html }}
+				/>
+
+				<main id="main-content">
+					<div className="hardware-section-bg">
+						<HardwareSection />
+						<BillOfMaterialsSection />
+					</div>
+				</main>
+				<Script src="/site-widgets.js" strategy="afterInteractive" />
+			</div>
 		</>
 	);
 }

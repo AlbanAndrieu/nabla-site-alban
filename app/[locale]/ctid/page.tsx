@@ -1,7 +1,7 @@
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-
 import ThreatFeed from "@/components/ciso/ThreatFeed";
+import TopAnchor from "@/components/TopAnchor";
 
 export default async function CTIDPage({
 	params,
@@ -14,7 +14,7 @@ export default async function CTIDPage({
 	// On retire tout le <nav> local
 	return (
 		<div className="site-content-page page-ciso page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<main id="main-content">
 				<section
 					className="hero-section ciso-hero"

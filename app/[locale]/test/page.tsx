@@ -1,13 +1,16 @@
 import Image from "next/image";
 import Script from "next/script";
+import { getTranslations } from "next-intl/server";
 import React from "react";
+import TopAnchor from "@/components/TopAnchor";
 
-export default function TestPage() {
+export default async function TestPage() {
+	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				Skip to main content
+				{site("skipToMainContent")}
 			</a>
 			<main id="main-content" role="main" className="mb-5">
 				<section className="services-section" aria-labelledby="people-heading">
@@ -105,8 +108,7 @@ export default function TestPage() {
 								<p>View my work</p>
 							</div>
 						</a>
-					</div>
-					<div style={{ marginTop: "3rem" }}>
+
 						<Image
 							src="/assets/nabla/nabla-4.svg"
 							alt="Nabla Logo"

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Script from "next/script";
 import { useState } from "react";
+import TopAnchor from "@/components/TopAnchor";
 
 export default function LoginPage() {
 	const [fetchResult, setFetchResult] = useState<string | null>(null);
@@ -21,7 +22,10 @@ export default function LoginPage() {
 	};
 	return (
 		<div className="site-content-page page-login page-dark">
-			<div id="top" />
+			<TopAnchor />
+			<a href="#main-content" className="skip-to-main">
+				Skip to main content
+			</a>
 			<div className="">
 				<div className="container">
 					<div className="row">
