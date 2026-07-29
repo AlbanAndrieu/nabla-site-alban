@@ -76,7 +76,7 @@ export default async function PricingPage({ params }: Props) {
 	const site = await getTranslations("site");
 
 	return (
-		<div className="site-content-page page-dark">
+		<div className="site- -page page-dark">
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}

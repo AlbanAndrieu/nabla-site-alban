@@ -16,7 +16,38 @@
 			"en": "English",
 			"fr": "French"
 		},
-		"switchLanguage": "Switch language"
+		"switchLanguage": "Switch language",
+		"services": {
+			"search": {
+				"title": "Optimized custom search",
+				"description": "Custom search used by home made IA."
+			},
+			"iac": {
+				"title": "Infrastructure as Code",
+				"description": "Implementing IaC solutions using Terraform, Ansible, and other tools to manage infrastructure efficiently and consistently.",
+				"wipLabel": "Under construction",
+				"wipDescription": "This blurb is still in a feature branch: the full story is not merged yet and not quite ready for production traffic. Watch this space after the next rollout."
+			},
+			"fastapi": {
+				"title": "FastAPI Cloud sample",
+				"description": "A custom sample used to test CI, security access from outside my network and deployment with a personal MCP aimed to access my personal information.",
+				"openSample": "Open sample",
+				"adminUI": "Admin UI",
+				"viewSource": "View source on GitLab"
+			}
+		},
+		"opensource": {
+			"nabla": {
+				"title": "Nabla DevSecOps Platform",
+				"description": "Comprehensive DevSecOps platform combining SDLC, security scanning, infrastructure automation, and monitoring tools in a unified solution.",
+				"linkLabel": "Learn More"
+			},
+			"docker": {
+				"title": "Docker Images",
+				"description": "Optimized and security-hardened Docker images for development and production environments, available on Docker Hub.",
+				"linkLabel": "View on Docker Hub"
+			}
+		}
 	},
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
@@ -763,5 +794,75 @@
 		"reasonLine2": "is discontinued. Google is changing how Gmail works with third-party accounts (Gmailify and POP “check mail from other accounts”); see",
 		"reasonLine3": "Learn about upcoming changes to Gmailify & POP in Gmail",
 		"reasonLine4": " (Google Help). That policy shift is why this mailbox will no longer be used."
+	},
+	"nabla": {
+		"collaborate": {
+			"heading": "Collaboration Tools",
+			"subtitle": "Centralize your DevSecOps workflows with these core tools for communication and development."
+		},
+		"platforms": {
+			"heading": "Popular DevSecOps Platforms & Tools",
+			"intro1": "A curated stack for modern delivery—collaborate, build, ship, secure, observe. Your stack should match risk, compliance, and your team's skillset.",
+			"intro2": "This home lab was built to host Nabla company projects/services. Main goals are to test security/AI integrations and simulate attacks.",
+			"logoCtaLabel": "Open nabla project"
+		},
+		"opensource": {
+			"ansible": {
+				"title": "Ansible Roles & Playbooks",
+				"description": "Extensive collection of Ansible automation including roles for Jenkins, Docker, Eclipse, and complete development environment setup. Used by teams worldwide.",
+				"linkLabel": "View on GitHub"
+			},
+			"nabla": {
+				"title": "Nabla DevSecOps Platform",
+				"description": "Comprehensive DevSecOps platform combining SDLC, security scanning, infrastructure automation, and monitoring tools in a unified solution.",
+				"linkLabel": "Learn More"
+			},
+			"docker": {
+				"title": "Docker Images",
+				"description": "Optimized and security-hardened Docker images for development and production environments, available on Docker Hub.",
+				"linkLabel": "View on Docker Hub"
+			}
+		},
+		"services": {
+			"search": {
+				"title": "Optimized custom search",
+				"description": "Custom search used by home made IA."
+			},
+			"iac": {
+				"title": "Infrastructure as Code",
+				"description": "Implementing IaC solutions using Terraform, Ansible, and other tools to manage infrastructure efficiently and consistently.",
+				"wipLabel": "Under construction",
+				"wipDescription": "This blurb is still in a feature branch: the full story is not merged yet and not quite ready for production traffic. Watch this space after the next rollout."
+			},
+			"fastapi": {
+				"title": "FastAPI Cloud sample",
+				"description": "A custom sample used to test CI, security access from outside my network and deployment with a personal MCP aimed to access my personal information.",
+				"openSample": "Open sample",
+				"adminUI": "Admin UI",
+				"viewSource": "View source on GitLab"
+			}
+		},
+		"contact": {
+			"email": {
+				"label": "Email",
+				"value": "job@albandrieu.com",
+				"href": "mailto:job@albandrieu.com"
+			},
+			"linkedin": {
+				"label": "LinkedIn",
+				"value": "Connect with me",
+				"href": "https://www.linkedin.com/in/nabla"
+			},
+			"calendly": {
+				"label": "Calendly",
+				"value": "Have a call",
+				"href": "https://calendly.com/alban-andrieu"
+			},
+			"github": {
+				"label": "GitHub",
+				"value": "View my work",
+				"href": "https://github.com/AlbanAndrieu"
+			}
+		}
 	}
 }
