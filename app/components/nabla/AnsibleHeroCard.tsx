@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 type Props = {
 	title: string;
@@ -25,13 +25,13 @@ export default function AnsibleHeroCard({
 			>
 				<div className="text-center pt-4 pb-2">
 					{imageSrc ? (
-						<img
+						<Image
 							src={imageSrc}
 							alt={imageAlt || "Ansible logo"}
 							width={64}
 							height={64}
 							className="mb-2 mx-auto d-block"
-							style={{ maxHeight: 70 }}
+							style={{ maxHeight: 70, height: "auto" }}
 						/>
 					) : (
 						<span

@@ -16,14 +16,16 @@ test.describe("localized not-found page", () => {
 			page.getByRole("heading", { level: 1, name: "404" }),
 		).toBeVisible();
 		await expect(page.getByText("We're fairly sure that page")).toBeVisible();
-		await expect(page.locator('script[src="/site-analytics.js"]')).toHaveCount(1);
+		await expect(page.locator('script[src="/site-analytics.js"]')).toHaveCount(
+			1,
+		);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 			"content",
 			/noindex/,
 		);
-		expect(
-			consoleErrors.filter((message) => /hydrat/i.test(message)),
-		).toEqual([]);
+		expect(consoleErrors.filter((message) => /hydrat/i.test(message))).toEqual(
+			[],
+		);
 	});
 
 	test("unknown localized slug uses the same global 404", async ({ page }) => {

@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { paymentLocale } from "@/lib/paymentPages";
+import { PRICING_TIERS } from "@/lib/pricingTiers";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -54,10 +55,6 @@ const content = {
 	},
 } as const;
 
-const tiers = {
-	/* ...unchanged... */
-};
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const locale = paymentLocale((await params).locale);
 	return {
@@ -76,7 +73,7 @@ export default async function PricingPage({ params }: Props) {
 	const site = await getTranslations("site");
 
 	return (
-		<div className="site- -page page-dark">
+		<div className="site-content-page page-dark">
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
@@ -103,7 +100,7 @@ export default async function PricingPage({ params }: Props) {
 					}
 				>
 					<div className="pricing-tier-grid">
-						{tiers[locale].map((tier) => (
+						{PRICING_TIERS[locale].map((tier) => (
 							<article
 								className="pricing-tier-card card h-100 bg-body-secondary border-secondary"
 								id={tier.id}

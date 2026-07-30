@@ -349,9 +349,7 @@ export function extractHtmlFragment(
 			const fragment = html.match(
 				/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
 			)?.[0];
-			return fragment
-				? `<div class="site-content-page">${fragment}</div>`
-				: "";
+			return fragment ? `<div class="site-content-page">${fragment}</div>` : "";
 		}
 		case "navHeaderMain":
 			return (

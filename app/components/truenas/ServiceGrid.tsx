@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 type HomelabService = {
 	name: string;
@@ -15,14 +15,20 @@ type HomelabService = {
 import homelabData from "../../../public/homelab-services.json";
 
 function lockerIcon(color: string) {
-	return <i className="fas fa-lock" style={{ color, marginRight: 5 }}></i>;
+	return (
+		<i
+			className="fas fa-lock"
+			style={{ color, marginRight: 5 }}
+			aria-hidden="true"
+		/>
+	);
 }
 
 export default function ServiceGrid() {
 	const services = (homelabData.services as HomelabService[]) || [];
 	return (
 		<div className="row service-grid">
-			{services.map((svc, i) => {
+			{services.map((svc) => {
 				const hasTunnel =
 					typeof svc.tunnelUrl === "string" && svc.tunnelUrl.length > 0;
 				const tunnelIsHttps = hasTunnel && svc.tunnelUrl!.startsWith("https");
@@ -41,15 +47,18 @@ export default function ServiceGrid() {
 					else locker = lockerIcon("limegreen");
 				}
 				return (
-					<div className="col-md-4 p-3" key={svc.name + i}>
+					<div
+						className="col-md-4 p-3"
+						key={`${svc.name}:${svc.tunnelUrl ?? svc.internalHost ?? "local"}`}
+					>
 						<div className="card box-shadow h-100 service-card-ux">
-							<img
+							<Image
 								className="img-fluid d-block mx-auto p-4"
 								src={iconPath}
 								width={80}
 								height={80}
 								alt={svc.name}
-								style={{ minHeight: 60, minWidth: 60 }}
+								style={{ minHeight: 60, minWidth: 60, height: "auto" }}
 							/>
 							<div className="card-body text-center border-top border-secondary">
 								<h3 className="h5 card-title mb-1">{svc.name}</h3>
@@ -86,7 +95,8 @@ export default function ServiceGrid() {
 												<i
 													className="fas fa-lock"
 													style={{ color: "limegreen", marginRight: 5 }}
-												></i>
+													aria-hidden="true"
+												/>
 											)}
 											Internal ({svc.internalHost}:{svc.internalPort})
 										</a>

@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 export default function HomeLabSection() {
 	return (
@@ -24,12 +24,13 @@ export default function HomeLabSection() {
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
-							<img
+							<Image
 								className="img-fluid d-block mx-auto p-4"
 								src="/assets/nabla/nabla-4.svg"
 								width={140}
 								height={140}
 								alt="Nabla logo"
+								style={{ height: "auto" }}
 							/>
 							<div className="card-body text-center border-top border-secondary">
 								<h3 className="h5 card-title mb-1">Nabla</h3>

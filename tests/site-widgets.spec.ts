@@ -29,7 +29,9 @@ test.describe("Site widgets integration", () => {
 		await page.goto("/");
 		await page.locator("#nabla-back-to-top").waitFor();
 		await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+		await expect
+			.poll(() => page.evaluate(() => window.scrollY))
+			.toBeGreaterThan(0);
 
 		await page.locator("#nabla-back-to-top").click();
 		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
@@ -46,7 +48,9 @@ test.describe("Site widgets integration", () => {
 			}
 			window.scrollTo(0, document.body.scrollHeight);
 		});
-		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+		await expect
+			.poll(() => page.evaluate(() => window.scrollY))
+			.toBeGreaterThan(0);
 
 		await page.locator("#nabla-back-to-top").click();
 		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);

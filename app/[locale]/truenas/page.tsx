@@ -12,6 +12,8 @@ import HardwareSection from "../../components/truenas/HardwareSection";
 import HomeLabSection from "../../components/truenas/HomeLabSection";
 import ToolsSection from "../../components/truenas/ToolsSection";
 
+type Props = { params: Promise<{ locale: string }> };
+
 export default async function TruenasPage({ params }: Props) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();

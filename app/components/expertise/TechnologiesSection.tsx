@@ -11,7 +11,13 @@ function LogoRow({ title, technologies }: TechnologyGroup) {
 			<h3 style={{ fontWeight: 700, margin: "0 0 8px" }}>{title}</h3>
 			<ul
 				className="skill-tags"
-				style={{ display: "flex", flexWrap: "wrap", gap: 8, listStyle: "none", padding: 0 }}
+				style={{
+					display: "flex",
+					flexWrap: "wrap",
+					gap: 8,
+					listStyle: "none",
+					padding: 0,
+				}}
 			>
 				{technologies.map(({ name, href, icon }) => (
 					<li key={name}>

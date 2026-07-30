@@ -49,7 +49,7 @@
 	.contact-section,
 	.google-translate-widget,
 	/* Axeptio cookie / CMP (overlay, trigger, SDK UI) */
-		[id^="axeptio"],
+	[id^="axeptio"],
 	iframe[src*="axept.io"],
 	.btn,
 	.cta-buttons,

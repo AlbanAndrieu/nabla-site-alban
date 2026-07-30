@@ -13,12 +13,17 @@ const expectedSitemapUrls = [
 ];
 
 test.describe("SEO indexing policy", () => {
-	test("sitemap exposes only the explicit SEO allowlist", async ({ request }) => {
+	test("sitemap exposes only the explicit SEO allowlist", async ({
+		request,
+	}) => {
 		const response = await request.get("/sitemap.xml");
 		expect(response.ok()).toBeTruthy();
 
 		const xml = await response.text();
-		const urls = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g), ([, url]) => url);
+		const urls = Array.from(
+			xml.matchAll(/<loc>([^<]+)<\/loc>/g),
+			([, url]) => url,
+		);
 
 		expect(urls).toEqual(expectedSitemapUrls);
 		expect(xml).not.toContain("/startup");
@@ -36,7 +41,9 @@ test.describe("SEO indexing policy", () => {
 		);
 	});
 
-	test("non-indexed showcase pages stay outside search results", async ({ page }) => {
+	test("non-indexed showcase pages stay outside search results", async ({
+		page,
+	}) => {
 		await page.goto("/workstation.html");
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 			"content",

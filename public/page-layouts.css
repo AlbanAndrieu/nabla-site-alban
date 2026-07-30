@@ -21,10 +21,10 @@ body.site-content-page.page-contact {
 }
 
 html:not([data-lt-script-installed]):not(.__lt-dummy-1):not(.__lt-dummy-2):not(
-		.__lt-dummy-3
-	):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(
-		.__lt-dummy-wxyz1234
-	) {
+	.__lt-dummy-3
+):not(.__lt-dummy-4):not(.__lt-dummy-5):not(.__lt-dummy-6):not(
+	.__lt-dummy-wxyz1234
+) {
 	/* the element was html.fontawesome-i2svg-active.fontawesome-i2svg-complete */
 	overflow-y: auto;
 	height: auto;

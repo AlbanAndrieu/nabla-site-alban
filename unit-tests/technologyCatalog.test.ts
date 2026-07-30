@@ -15,11 +15,7 @@ test("technology catalog has unique entries and local icons", async () => {
 	await Promise.all(
 		technologies.flatMap(({ icon }) =>
 			icon
-				? [
-						access(
-							path.join(process.cwd(), "public", icon.replace(/^\//, "")),
-						),
-					]
+				? [access(path.join(process.cwd(), "public", icon.replace(/^\//, "")))]
 				: [],
 		),
 	);

@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 export default function ToolsSection() {
 	return (
@@ -22,12 +22,13 @@ export default function ToolsSection() {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<img
+							<Image
 								src="/assets/logo-freenas-community-simple.jpeg"
 								width="72"
 								height="72"
 								className="rounded flex-shrink-0"
 								alt=""
+								style={{ height: "auto" }}
 							/>
 							<span>
 								<span className="d-block fw-semibold text-body">

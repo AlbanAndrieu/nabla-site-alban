@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-	extractHtmlFragment,
 	extractDocumentMetadata,
+	extractHtmlFragment,
 	loadPublicHtmlFragment,
 	metadataFromPublicHtml,
 	rewriteLegacyHtmlHrefs,

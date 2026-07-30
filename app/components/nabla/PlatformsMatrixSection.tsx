@@ -1,4 +1,5 @@
-import React from "react";
+import Image from "next/image";
+import type { CSSProperties } from "react";
 
 /**
  * Data/shape:
@@ -29,13 +30,12 @@ const PlatformsMatrixSection = ({ pillars }: PlatformsMatrixSectionProps) => (
 			<div className="nabla-platforms-visual-wrap">
 				<span className="nabla-platforms-orbit" aria-hidden="true"></span>
 				<figure className="nabla-platforms-figure">
-					<img
+					<Image
 						src="/assets/nabla/nabla-4.svg"
 						width={200}
 						height={200}
 						alt="Nabla site logo"
-						loading="lazy"
-						decoding="async"
+						style={{ height: "auto" }}
 					/>
 					<figcaption className="nabla-platforms-caption">
 						A representative DevSecOps toolchain: plan, build, ship, run,
@@ -61,15 +61,15 @@ const PlatformsMatrixSection = ({ pillars }: PlatformsMatrixSectionProps) => (
 				<div
 					key={pillar.title}
 					className="nabla-platform-pillar"
-					style={{ ["--pillar-accent" as any]: pillar.color }}
+					style={{ "--pillar-accent": pillar.color } as CSSProperties}
 				>
 					<h3>
 						<i className={pillar.icon} aria-hidden="true"></i> {pillar.title}
 					</h3>
 					<ul className="nabla-tool-tags">
-						{pillar.tools.map((tool, i) =>
+						{pillar.tools.map((tool) =>
 							tool.link ? (
-								<li key={tool.label + i} className="nabla-tool-tag-li-link">
+								<li key={tool.label} className="nabla-tool-tag-li-link">
 									<a
 										href={tool.link}
 										target="_blank"
@@ -80,7 +80,7 @@ const PlatformsMatrixSection = ({ pillars }: PlatformsMatrixSectionProps) => (
 									</a>
 								</li>
 							) : (
-								<li key={tool.label + i}>{tool.label}</li>
+								<li key={tool.label}>{tool.label}</li>
 							),
 						)}
 					</ul>

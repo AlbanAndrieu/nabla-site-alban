@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 type ContactCard = {
 	icon: string;
@@ -46,11 +46,13 @@ export default function ContactSection({ contacts, logoSrc }: Props) {
 
 				{logoSrc && (
 					<div className="contact-logo-wrap">
-						<img
+						<Image
 							src={logoSrc}
 							alt="Nabla Logo"
 							className="contact-logo"
 							width={120}
+							height={120}
+							style={{ height: "auto" }}
 						/>
 					</div>
 				)}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type React from "react";
 
 type Tool = {
@@ -44,7 +45,7 @@ export default function CollaborateToolsSection({
 									}}
 								>
 									{tool.imageSrc ? (
-										<img
+										<Image
 											src={tool.imageSrc}
 											alt={tool.imageAlt || tool.label + " logo"}
 											width={32}
@@ -55,6 +56,7 @@ export default function CollaborateToolsSection({
 												marginLeft: "auto",
 												marginRight: "auto",
 												objectFit: "contain",
+												height: "auto",
 											}}
 										/>
 									) : (
