@@ -106,7 +106,7 @@ This is an HTML project for Nabla company that promotes DevSecOps expertise. All
 - **Semantic HTML**: Use semantic elements for better content understanding
 - **Canonical URLs**: Specify canonical URL to avoid duplicate content
   ```html
-  <link rel="canonical" href="https://dr-alban.com/page.html" />
+  <link rel="canonical" href="https://albandrieu.com/page.html" />
   ```
 - **Structured Data**: Use JSON-LD for structured data when appropriate
   ```html
@@ -123,7 +123,7 @@ This is an HTML project for Nabla company that promotes DevSecOps expertise. All
 - **Internal Linking**: Use descriptive anchor text for internal links
 - **Meta Author**: Include author information
   ```html
-  <meta name="author" content="alban.andrieu@dr-alban.com" />
+  <meta name="author" content="alban.andrieu@albandrieu.com" />
   ```
 
 ### 7. Crawler Friendly
@@ -147,20 +147,14 @@ This is an HTML project for Nabla company that promotes DevSecOps expertise. All
 - **Avoid JavaScript-Only Content**: Ensure critical content is in HTML, not rendered only by JavaScript
 
 ### 8. Sitemap Maintenance
-**REQUIRED**: Keep `public/sitemap-albandrieu-com.xml` up to date.
+**REQUIRED**: Keep the generated `/sitemap.xml` aligned with the SEO page catalog.
 
-- **Update Sitemap**: When adding/removing/moving pages, update `public/sitemap-albandrieu-com.xml`
-- **Sitemap Format**: Follow XML sitemap protocol (http://www.sitemaps.org/schemas/sitemap/0.9)
-  - Note: The xmlns namespace URL uses `http://` as per official specification, even for HTTPS sites
-- **Include All Pages**: List all public HTML pages
-- **Change Frequency**: Set appropriate `<changefreq>` (always, hourly, daily, weekly, monthly, yearly, never)
-- **Priority**: Use `<priority>` (0.0-1.0) to indicate relative importance (optional)
-- **Last Modified**: Include `<lastmod>` with ISO 8601 date format when possible
-- **Submit to Search Engines**: After updates, ping search engines
-  ```bash
-  curl "https://www.google.com/ping?sitemap=https://dr-alban.com/sitemap-albandrieu-com.xml"
-  ```
-- **Sitemap in robots.txt**: Ensure sitemap URL is in robots.txt (already configured)
+- **Source of truth**: Update `lib/sitePageCatalog.ts` when adding, removing, categorizing or reprioritizing a page.
+- **Generator**: `app/sitemap.ts` maps `SEO_PAGE_SLUGS` to canonical English and French URLs.
+- **Tests**: Keep `unit-tests/sitePageCatalog.test.ts` and `tests/seo-indexing.spec.ts` aligned with intentional policy changes.
+- **Do not create a static sitemap** in `public/`; it would compete with the App Router metadata route.
+- **Search engines**: Submit `https://albandrieu.com/sitemap.xml` through their webmaster consoles.
+- **Robots**: Keep the `Sitemap: https://albandrieu.com/sitemap.xml` directive in `public/robots.txt`.
 
 ### 9. Open Graph Protocol
 **REQUIRED**: Add Open Graph meta tags to all pages for social media sharing.
@@ -169,8 +163,8 @@ This is an HTML project for Nabla company that promotes DevSecOps expertise. All
   ```html
   <meta property="og:title" content="Page Title" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dr-alban.com/page.html" />
-  <meta property="og:image" content="https://dr-alban.com/assets/nabla/nabla-4.png" />
+  <meta property="og:url" content="https://albandrieu.com/page.html" />
+  <meta property="og:image" content="https://albandrieu.com/assets/nabla/nabla-4.png" />
   <meta property="og:description" content="Page description for social sharing" />
   <meta property="og:site_name" content="Nabla - Alban Andrieu" />
   ```
@@ -185,7 +179,7 @@ This is an HTML project for Nabla company that promotes DevSecOps expertise. All
   <meta name="twitter:site" content="@username" />
   <meta name="twitter:title" content="Page Title" />
   <meta name="twitter:description" content="Description" />
-  <meta name="twitter:image" content="https://dr-alban.com/image.png" />
+  <meta name="twitter:image" content="https://albandrieu.com/image.png" />
   ```
 - **Type-Specific Properties**: Use appropriate `og:type` (website, article, profile, etc.)
 - **Locale**: Specify content locale
@@ -300,4 +294,4 @@ When creating or modifying HTML pages, ensure:
 - [ ] Performance optimized (lazy loading, minification, CDN usage)
 
 ## Contact
-For questions or clarifications, contact: alban.andrieu@dr-alban.com
+For questions or clarifications, contact: alban.andrieu@albandrieu.com

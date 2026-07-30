@@ -83,7 +83,7 @@ python -m http.server 8001        # Python 3
 - Maintain `public/print.css` (media query, optimization, proper page breaks).
 
 ### SEO/Crawler
-- Keep `public/robots.txt` and `public/sitemap-albandrieu-com.xml` up to date.
+- Keep `public/robots.txt`, `lib/sitePageCatalog.ts` and the generated `app/sitemap.ts` route aligned.
 - Include meta tags and canonical URLs.
 
 ### Commit/Branching

@@ -1,13 +1,28 @@
+import type { Metadata } from "next";
 import Image from "next/image";
-import Script from "next/script";
-import React from "react";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
-export default function TestPage() {
+export const metadata: Metadata = { robots: NON_INDEXABLE_ROBOTS };
+
+export default async function TestPage({
+	params,
+}: PageProps<"/[locale]/test">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
+
+	setRequestLocale(locale);
+	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				Skip to main content
+				{site("skipToMainContent")}
 			</a>
 			<main id="main-content" role="main" className="mb-5">
 				<section className="services-section" aria-labelledby="people-heading">
@@ -105,8 +120,7 @@ export default function TestPage() {
 								<p>View my work</p>
 							</div>
 						</a>
-					</div>
-					<div style={{ marginTop: "3rem" }}>
+
 						<Image
 							src="/assets/nabla/nabla-4.svg"
 							alt="Nabla Logo"
@@ -117,15 +131,13 @@ export default function TestPage() {
 					</div>
 				</div>
 			</section>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-scroll-reveal=".service-card,.skill-category,.tool-item"
-				data-reveal-effect="animation"
-				data-reveal-animation="fadeInUp 0.6s ease forwards"
-				data-axeptio=""
-				data-print-pdf=""
-				data-coffee-fab=""
+			<SiteWidgetsScript
+				axeptio
+				coffeeFab
+				printPdf
+				scrollReveal=".service-card,.skill-category,.tool-item"
+				revealEffect="animation"
+				revealAnimation="fadeInUp 0.6s ease forwards"
 			/>
 		</div>
 	);

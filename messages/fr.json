@@ -16,14 +16,222 @@
 			"en": "Anglais",
 			"fr": "Français"
 		},
-		"switchLanguage": "Changer de langue"
+		"switchLanguage": "Changer de langue",
+		"rssFeedAria": "Flux RSS de ce site",
+		"copyright": "© {year} Alban Andrieu. Professionnel DevSecOps indépendant."
 	},
 	"checkout": {
 		"sessionCreateError": "Impossible de créer la session de paiement.",
-		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
+		"meta": {
+			"checkoutTitle": "Paiement | Alban Andrieu",
+			"paymentTitle": "Options de paiement — Alban Andrieu",
+			"cancelTitle": "Paiement annulé | Alban Andrieu",
+			"successTitle": "État du paiement | Alban Andrieu"
+		},
+		"page": {
+			"title": "Paiement",
+			"subtitle": "Paiement unique via Stripe. Paiement sécurisé.",
+			"qrAlt": "Code QR pour ouvrir ce paiement Stripe sur votre téléphone",
+			"qrCaption": "Ou scannez ce QR code pour payer sur votre téléphone",
+			"submit": "Passer à la caisse"
+		},
+		"options": {
+			"title": "Options de paiement",
+			"intro": "Payez par carte avec la page de paiement hébergée par Stripe, ou par virement SEPA avec le RIB ci-dessous.",
+			"cardTitle": "Payer par carte (Stripe)",
+			"cardDescription": "Paiement unique sécurisé sur le site de Stripe.",
+			"continue": "Continuer vers Stripe",
+			"issueBeforeLink": "En cas de problème, utilisez le ",
+			"directLink": "lien Stripe direct",
+			"issueAfterLink": ", le virement SEPA ou contactez-moi.",
+			"bankTitle": "Payer par virement bancaire (SEPA)",
+			"bankDescription": "Indiquez la facture ou la référence dans le libellé du virement.",
+			"downloadBankDetails": "Télécharger le RIB (PDF)",
+			"afterPayment": "Après le paiement, envoyez si nécessaire la référence à "
+		},
+		"cancel": {
+			"title": "Paiement annulé",
+			"message": "Aucun paiement n’a été effectué. Vous pouvez réessayer à tout moment.",
+			"beforeDirectLink": "Vous pouvez aussi utiliser le ",
+			"directLink": "lien Stripe direct",
+			"beforeSepa": " ou payer par ",
+			"sepa": "virement SEPA",
+			"paymentOptions": "Retour aux options de paiement",
+			"backSite": "Retour au site"
+		},
+		"success": {
+			"confirmedTitle": "Merci pour votre paiement",
+			"pendingTitle": "Paiement en cours de vérification",
+			"confirmedMessage": "Le paiement a bien été confirmé par Stripe.",
+			"pendingMessage": "Nous ne pouvons pas encore confirmer ce paiement. Vérifiez le lien reçu de Stripe ou contactez-nous.",
+			"questions": "Pour toute question : ",
+			"paymentOptions": "Options de paiement",
+			"backSite": "Retour au site"
+		}
 	},
 	"checkoutTjm": {
 		"qrCaption": "Scannez ce QR code pour ouvrir la page de paiement Stripe sécurisée."
+	},
+	"pricing": {
+		"title": "Tarifs et modes d’engagement",
+		"intro": "J’accompagne les startups et scale-ups sous forme de mandat récurrent, d’audit ciblé ou de livraison par jalons. Les tarifs sont confirmés après un bref cadrage et s’entendent hors TVA lorsqu’elle s’applique.",
+		"howTitle": "Fonctionnement des tarifs",
+		"how": [
+			"À la journée — les missions fractionnées et de conseil sont chiffrées en jours-personnes ou en forfait mensuel.",
+			"Sprint forfaitaire — un audit ou un livrable bien délimité peut être proposé au forfait après la découverte.",
+			"Frais — les dépenses cloud, déplacements et outils tiers sont validés au préalable et facturés au coût réel."
+		],
+		"tiersAriaLabel": "Modes d’engagement",
+		"addonsTitle": "Services optionnels",
+		"addons": [
+			"Intervention critique le soir ou le week-end sur accord préalable.",
+			"Astreinte chiffrée séparément des journées de conseil.",
+			"Formations et ateliers d’une demi-journée ou d’une journée."
+		],
+		"nextTitle": "Prochaine étape",
+		"next": "Réservez une consultation gratuite de 30 minutes pour valider l’adéquation et recevoir une estimation écrite.",
+		"book": "Réserver un appel",
+		"services": "Retour aux services"
+	},
+	"ciso": {
+		"title": "Tableau de bord RSSI",
+		"subtitle": "Veille sur les menaces, indicateurs de sécurité et suivi de conformité",
+		"curatedBy": "Une sélection maintenue par",
+		"compliance": "Conformité et suivi des risques",
+		"complianceIntro": "Une vue synthétique de la posture actuelle des contrôles et certifications.",
+		"audit": "Des revues régulières maintiennent les preuves, les risques et les plans de remédiation à jour.",
+		"checklist": "Ouvrir la checklist de sécurité",
+		"inProgress": "En cours",
+		"metrics": "Indicateurs clés de sécurité",
+		"metricItems": [
+			["fa-stopwatch", "Temps de réponse aux incidents", "15 min"],
+			["fa-screwdriver-wrench", "Efficacité des correctifs", "92%"],
+			["fa-gauge-high", "Niveau de risque", "Moyen"]
+		],
+		"threats": "Veille sur les menaces",
+		"threatsIntro": "Actualités récentes issues d’une sélection limitée de sources de cybersécurité reconnues."
+	},
+	"expertisePage": {
+		"metadataTitle": "Services et expertise technique — Alban Andrieu",
+		"metadataDescription": "Services DevSecOps, cybersécurité, cloud, plateforme et IA proposés par Alban Andrieu.",
+		"hero": {
+			"label": "Présentation de l’architecture et des services DevSecOps",
+			"imageAlt": "Schéma d’architecture DevSecOps d’Alban Andrieu couvrant cloud, sécurité, conteneurs et ingénierie IA",
+			"tagline": "Votre partenaire de confiance pour l’IA et le cloud"
+		},
+		"services": {
+			"title": "Services proposés",
+			"subtitle": "Accompagnement DevSecOps et cloud concret pour les équipes de direction — avec des réalisations récentes sur AWS, Azure et OVH.",
+			"items": [
+				{"title":"Intégration de la sécurité","lead":"Intégrer la sécurité au développement, sans mauvaise surprise avant la mise en production.","bullets":["Analyses de sécurité automatisées dans la CI/CD (SAST, DAST et dépendances).","Gestion des vulnérabilités du cloud et des applications.","Préparation aux audits ISO 27001 et SOC 2."]},
+				{"title":"Intégration de l’IA","lead":"Transformer les LLM en assistants prêts pour la production, de façon sûre et maîtrisée.","bullets":["Conception de processus assistés par IA pour le support, les outils internes et les opérations.","Intégration d’OpenAI, Azure OpenAI et de modèles personnalisés ou hébergés.","Maîtrise des coûts et observabilité avec traçage et garde-fous."]},
+				{"title":"Architecture cloud","lead":"Des fondations évolutives, économiques et sécurisées sur AWS, Azure ou OVHcloud.","bullets":["Conception multi-comptes, réseau et durcissement.","Optimisation des coûts, supervision et lisibilité opérationnelle.","Haute disponibilité, sauvegarde et reprise après sinistre."]},
+				{"title":"Transformation DevOps","lead":"Des livraisons plus rapides et reproductibles sans épuiser l’équipe.","bullets":["Pipelines SDLC de bout en bout et automatisation des versions.","Processus et outils adaptés au profil de risque.","Accompagnement pratique pour rendre les équipes autonomes."]},
+				{"title":"Infrastructure as Code","lead":"Une source de vérité unique, vérifiable et reproductible pour l’infrastructure.","bullets":["Terraform, Ansible et GitOps pour des environnements cohérents.","Modèles pour la préproduction, la production et le multirégion."]},
+				{"title":"Orchestration de conteneurs","lead":"Exécuter les charges de manière portable, du poste local aux clusters de production.","bullets":["Kubernetes, Nomad et Docker ; ingress, secrets et fondations de plateforme.","Intégration de Cloudflare et Vault lorsqu’elle réduit les risques."]},
+				{"title":"Supervision et observabilité","lead":"Détecter les incidents avant qu’ils n’affectent les clients.","bullets":["Métriques, journaux et traces avec Prometheus, Grafana, Loki et OpenTelemetry.","Tableaux de bord et alertes adaptés aux SLO et à l’astreinte."]}
+			]
+		},
+		"aiml": {
+			"title": "Infrastructure IA et MLOps",
+			"subtitle": "Un accompagnement pour mettre l’IA en production, au-delà des démonstrations, tout en maîtrisant sécurité et coûts.",
+			"bullets": ["Concevoir une infrastructure IA sécurisée pour les LLM, le RAG et les charges GPU.","Intégrer OpenAI et Azure OpenAI avec des garde-fous de coûts, de sécurité et d’accès.","Fournir journaux, traces et analyse des prompts pour les charges IA.","Concevoir selon ISO 42001, la résidence des données et les exigences de contrôle d’accès."]
+		},
+		"skills": {
+			"title": "Expertise technique",
+			"subtitle": "Une sélection ciblée pour le cloud, le DevSecOps, la sécurité et l’IA — détails complets dans le CV et sur demande.",
+			"categoryTitles": ["Sécurité et conformité","Supervision et journalisation","IA et traitement des données","Plateformes cloud","Conteneurs et orchestration","Infrastructure as Code","DevOps et SDLC","Stockage de données","Programmation"],
+			"cvLink": "Voir tous les formats de CV"
+		},
+		"technologies": {
+			"title": "Technologies et outils",
+			"subtitle": "Une sélection de technologies que j’utilise en production.",
+			"officialWebsite": "site officiel (s’ouvre dans un nouvel onglet)",
+			"groupTitles": ["Langages et scripts","Web et frontend","Cloud, systèmes d’exploitation et infrastructure","Sécurité","Bases de données, données et messagerie","DevOps, observabilité et outillage","IA, apprentissage automatique et GPU"]
+		}
+	},
+	"linkPage": {
+		"metadataTitle": "Profils publics et registres — Alban Andrieu",
+		"metadataDescription": "Profils publics vérifiés, plateformes de code source et registres logiciels utilisés par Alban Andrieu pour ses activités DevSecOps.",
+		"breadcrumbLabel": "Fil d’Ariane",
+		"backHome": "Retour à l’accueil",
+		"nablaOverview": "Présentation de Nabla",
+		"title": "Profils et registres utilisés",
+		"introBeforeLink": "Profils publics et registres référencés depuis la présentation DevSecOps de",
+		"introAfterLink": ".",
+		"profilesHeading": "Liens vers les registres et profils",
+		"freelanceHeading": "Références freelance"
+	},
+	"truenasPage": {
+		"metadataTitle": "Homelab et matériel TrueNAS Scale — Alban Andrieu",
+		"metadataDescription": "Homelab TrueNAS Scale construit par Alban Andrieu : stockage ZFS, matériel Mini-ITX, applications auto-hébergées, outils de sécurité et expérimentations IA.",
+		"heroLabel": "Présentation de TrueNAS",
+		"heroTitle": "Homelab et matériel TrueNAS Scale",
+		"heroLead": "Plateforme matérielle, stockage ZFS, applications auto-hébergées, outils de sécurité et services liés à l’IA.",
+		"heroCredit": "Guide et documentation par Alban Andrieu.",
+		"heroTopics": "Matériel, applications, ZFS, automatisation et IA — open source et mise en pratique.",
+		"apps": {
+			"title": "Services TrueNAS",
+			"lead": "Applications auto-hébergées sur TrueNAS Scale.",
+			"iconsBefore": "Les icônes des services proviennent de",
+			"iconsAfter": "Pour découvrir d’autres applications open source auto-hébergées, consultez"
+		},
+		"homelab": {
+			"title": "Homelab pour les projets de sécurité, d’IA et freelance",
+			"intro": "Ce homelab a été construit pour héberger les futurs projets et services Nabla.",
+			"purpose": "Il permet de tester des intégrations de services de sécurité et d’IA, ainsi que de reproduire des attaques ciblant mes domaines.",
+			"projectDescription": "Projet et services Nabla",
+			"openProject": "Ouvrir le projet Nabla"
+		},
+		"services": {
+			"tunnel": "Service web (tunnel)",
+			"internal": "Interne"
+		},
+		"tools": {
+			"title": "Outils et connexion",
+			"webUi": "Interface web TrueNAS",
+			"signIn": "Connexion principale",
+			"logoAlt": "Logo TrueNAS"
+		},
+		"hardware": {
+			"title": "Matériel",
+			"incident": "Après sept années de service fiable, l’ancien système FreeNAS est tombé en panne : sa carte mère, son processeur et plusieurs disques durs étaient défectueux. Une mise à niveau s’imposait.",
+			"tagline": "Un système physique Mini-ITX exécutant TrueNAS Scale : stockage ZFS fiable et hôte homelab pour les applications, la domotique, les outils de sécurité et les charges de calcul intensives, notamment les expérimentations IA.",
+			"purposeLabel": "Usages de la plateforme",
+			"pillars": [
+				{"title": "ZFS et jeux de données", "subtitle": "Pools, instantanés et réplication"},
+				{"title": "Hôte homelab", "subtitle": "Applications, machines virtuelles et services internes"},
+				{"title": "Pile de sécurité", "subtitle": "Outils de sécurité et supervision"},
+				{"title": "IA et calcul", "subtitle": "Capacité AM5 pour les modèles et traitements"}
+			]
+		},
+		"bom": {
+			"title": "Nomenclature du matériel",
+			"reusedTitle": "Composants réutilisés",
+			"reusedItems": [
+				"Boîtier : ancien châssis iXsystems d’environ 170 × 170 mm, au format Mini-ITX.",
+				"Alimentation : ancienne unité de 200 W, incompatible avec le connecteur processeur 8 broches de la carte mère MSI.",
+				"SSD mSATA Kingston SKC600MS — 256 Go TLC 3D NAND. 83 €.",
+				"Stockage : 4 × Western Digital Red WD30EFRX — 3 To chacun, SATA 6 Gbit/s."
+			],
+			"newTitle": "Nouveaux achats",
+			"purchaseDetails": [
+				"Carte mère Mini-ITX AM5, DDR5, PCIe 4.0, M.2 et Wi-Fi 6E. 174,67 €.",
+				"Boîtier USB 3.0 sans outil pour SSD mSATA 50 × 30 mm, jusqu’à 2 To. 17,99 €.",
+				"Ventirad compact pour processeur AMD AM5. 49,90 €.",
+				"Processeur 3,8 GHz avec 32 Mo de cache L3. 212,75 €.",
+				"Mémoire CL46 (CT64G56C46U5 ; compatible également avec 5200/4800 MHz). 679,00 €.",
+				"Alimentation ATX 500 W ; l’unité plus compacte commandée n’a jamais été livrée. 50,00 €."
+			],
+			"totalLabel": "Prix total",
+			"totalNote": "Somme de la carte mère, du boîtier, du processeur, de la mémoire, du ventirad et de l’alimentation.",
+			"futureTitle": "Évolutions possibles",
+			"futureItems": [
+				"64 Go supplémentaires de mémoire DDR5 UDIMM au format bureau 288 broches. La mémoire SO-DIMM pour portable et la mémoire serveur RDIMM enregistrée ne sont pas compatibles avec cette carte mère.",
+				"Un SSD NVMe M.2 supplémentaire pour un pool rapide ou du stockage de type cache, choisi selon les spécifications de la carte mère et la charge prévue."
+			]
+		}
 	},
 	"jm": {
 		"4years": {
@@ -45,6 +253,7 @@
 			"numbers": "Bilan chiffré des performances"
 		},
 		"pageTitle": "Jusmundi — 4 ans d'impact & KPIs clés | Alban Andrieu",
+		"metadataDescription": "Réalisations DevSecOps, infrastructure, sécurité et fiabilité menées par Alban Andrieu chez Jus Mundi.",
 		"heroTitle": "Jusmundi — 4 ans de rétrospective",
 		"heroSubtitle": "KPIs et réalisations majeures (2022–2025) · Bilan de mon travail DevSecOps et contributions impactantes de mes collègues",
 		"kpisHeading": "Indicateurs de performance clés",
@@ -55,6 +264,15 @@
 		"kpiMttrP1": "~30 min",
 		"kpiAlertNoiseReduction": "60%",
 		"kpiAnnualSavings": "€50K+",
+		"kpiLabels": {
+			"tasksCompleted": "Tâches réalisées",
+			"platformUptime": "Disponibilité de la plateforme (SLA)",
+			"securityBreaches": "Failles de sécurité",
+			"mttrP1": "MTTR (P1)",
+			"alertNoiseReduction": "Réduction du bruit des alertes",
+			"annualSavings": "Économies annuelles estimées"
+		},
+		"topAchievement": "Réalisation majeure n°{rank}",
 		"securityBandHeading": "Sécurité prioritaire — anti-scraping, Keycloak pour identité et autorisation, absence de friction pour les clients légitimes",
 		"securityBandLead": "Priorité donnée à la sécurité : protection contre le scraping abusif et mise en place d'une identité robuste avec Keycloak, sans ralentir ni bloquer les clients légitimes, partenaires ou crawlers approuvés.",
 		"securityBand": [
@@ -271,6 +489,10 @@
 		}
 	},
 	"home": {
+		"meta": {
+			"title": "Alban Andrieu — Ingénieur cybersécurité et DevSecOps",
+			"description": "Ingénieur cybersécurité et DevSecOps spécialisé dans la sécurisation et l’automatisation des plateformes cloud et IA."
+		},
 		"hero": {
 			"title": "Ingénieur cybersécurité & DevSecOps — 20+ ans d’expérience",
 			"subtitle": "J’aide les équipes à sécuriser le cloud, automatiser les contrôles et fiabiliser leurs plateformes, du code à la production.",
@@ -512,6 +734,7 @@
 		"role": "Architecte Cloud DevSecOps | Consultant indépendant",
 		"intro": "Disponible pour des problématiques d’intégration IA, de MLOps, de plateformes cloud et de sécurité.",
 		"hero": {
+			"profileAlt": "Portrait d’Alban Andrieu, ingénieur DevSecOps et architecte cloud",
 			"current": "Je conçois actuellement des solutions cloud sécurisées chez",
 			"experience": "Avec plus de 20 ans d’expérience dans des environnements d’entreprise, j’accompagne leur transformation par l’automatisation DevOps, la sécurité cloud et l’infrastructure as code.",
 			"contactCta": "Me contacter",
@@ -716,52 +939,182 @@
 		"title": "Tableau de veille Cyber menaces",
 		"hero": "💀🛡️",
 		"subtitle": "Collecte automatisée pour suivi et analyse en temps réel",
+		"heroImageLabel": "Emoji tête de mort et bouclier",
+		"description": "Une sélection automatisée multi-sources pour la veille et la cyberdéfense.",
 		"threatFeedTitle": "Veille sur les menaces",
 		"threatFeedIntro": "Actus et alertes extraites de sources cyber reconnues."
 	},
 	"email": {
 		"title": "Mise à jour de l’adresse email",
-		"reason": "L’adresse <strong>alban.andrieu@free.fr</strong> est désactivée. Google modifie la gestion des comptes tiers dans Gmail (Gmailify et POP « vérifier d’autres adresses ») : <a href=\"https://support.google.com/mail/answer/16604719\" rel=\"noopener noreferrer\" target=\"_blank\">Plus d’informations sur les changements Gmailify & POP</a> (Aide Google). Ce changement explique la fermeture de cette boîte mail.",
+		"metadataTitle": "Adresses email de contact — Alban Andrieu",
+		"metadataDescription": "Adresses email actuelles d’Alban Andrieu pour les contacts professionnels, la sécurité, la facturation et les autres demandes.",
 		"useTheseAddresses": "Merci d’utiliser ces adresses",
 		"cards": [
 			{
 				"title": "Job / travail (indépendant)",
-				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+				"email": "job@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Job / travail",
-				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+				"email": "job@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Sécurité site",
-				"desc": "<a href=\"mailto:security@albandrieu.com\">security@albandrieu.com</a>"
+				"email": "security@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Facturation",
-				"desc": "Pour toute question de facturation (règlement, TVA, etc.) : <a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a> — n’envoyez pas de facture à job ou contact."
+				"email": "invoice@albanandrieu.com",
+				"descriptionBefore": "Pour toute question de facturation (règlement, TVA, etc.) : ",
+				"descriptionAfter": " — n’envoyez pas de facture à job ou contact."
 			},
 			{
 				"title": "Autres sujets",
-				"desc": "<a href=\"mailto:contact@albandrieu.com\">contact@albandrieu.com</a>"
+				"email": "contact@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Bababou",
-				"desc": "<a href=\"mailto:alban.andrieu@bababou.com\">alban.andrieu@bababou.com</a>"
+				"email": "alban.andrieu@bababou.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			}
 		],
 		"automatedHeading": "Expéditeurs automatiques",
 		"automatedDesc": "Si vous recevez un mail depuis l’un de ces expéditeurs, cela signifie que votre message n’a pas été ouvert manuellement (sinon il est géré par une règle ou un tri automatique) :",
 		"automatedList": [
-			"<a href=\"mailto:no-reply@albanandrieu.com\">no-reply@albanandrieu.com</a>",
-			"<a href=\"mailto:no-reply@albandrieu.com\">no-reply@albandrieu.com</a>",
-			"<a href=\"mailto:no-reply@bababou.com\">no-reply@bababou.com</a>",
-			"<a href=\"mailto:openclaw@albandrieu.com\">openclaw@albandrieu.com</a>",
-			"<a href=\"mailto:assistant@albandrieu.com\">assistant@albandrieu.com</a>",
-			"<a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a>"
+			"no-reply@albanandrieu.com",
+			"no-reply@albandrieu.com",
+			"no-reply@bababou.com",
+			"openclaw@albandrieu.com",
+			"assistant@albandrieu.com",
+			"invoice@albanandrieu.com"
 		],
 		"reasonLine1": "L’adresse",
 		"reasonLine2": "est désactivée. Google modifie la gestion des comptes tiers dans Gmail (Gmailify et POP « vérifier d’autres adresses ») :",
 		"reasonLine3": "Plus d’informations sur les changements Gmailify & POP",
 		"reasonLine4": " (Aide Google). Ce changement explique la fermeture de cette boîte mail."
+	},
+	"nabla": {
+		"metadata": {
+			"title": "Nabla — Homelab DevSecOps et plateforme cloud",
+			"description": "Découvrez le homelab Nabla, ses automatisations, ses outils DevSecOps et ses expérimentations cloud, sécurité et IA."
+		},
+		"collaborate": {
+			"heading": "Outils de collaboration",
+			"subtitle": "Centralisez vos flux DevSecOps avec ces outils essentiels de communication et de développement."
+		},
+		"platforms": {
+			"heading": "Plateformes et outils DevSecOps",
+			"intro1": "Une sélection pour une livraison moderne : collaborer, construire, publier, sécuriser et observer. La pile doit correspondre aux risques, à la conformité et aux compétences de l’équipe.",
+			"intro2": "Ce homelab héberge les projets et services Nabla. Il sert principalement à tester les intégrations sécurité et IA ainsi qu’à simuler des attaques.",
+			"logoCtaLabel": "Ouvrir le projet Nabla"
+		},
+		"opensource": {
+			"ansible": {
+				"title": "Rôles et playbooks Ansible",
+				"description": "Une collection d’automatisations Ansible comprenant des rôles pour Jenkins, Docker, Eclipse et la configuration complète d’environnements de développement.",
+				"linkLabel": "Voir sur GitHub"
+			},
+			"nabla": {
+				"title": "Plateforme DevSecOps Nabla",
+				"description": "Une plateforme DevSecOps réunissant cycle de développement, analyses de sécurité, automatisation de l’infrastructure et supervision.",
+				"linkLabel": "En savoir plus"
+			},
+			"docker": {
+				"title": "Images Docker",
+				"description": "Des images Docker optimisées et renforcées pour les environnements de développement et de production, disponibles sur Docker Hub.",
+				"linkLabel": "Voir sur Docker Hub"
+			}
+		},
+		"services": {
+			"search": {
+				"title": "Recherche personnalisée optimisée",
+				"description": "Recherche personnalisée utilisée par les outils IA développés en interne."
+			},
+			"iac": {
+				"title": "Infrastructure as Code",
+				"description": "Mise en œuvre de solutions IaC avec Terraform, Ansible et d’autres outils pour gérer l’infrastructure efficacement et de façon cohérente.",
+				"wipLabel": "En construction",
+				"wipDescription": "Cette fonctionnalité est encore en cours de préparation et n’est pas prête pour le trafic de production."
+			},
+			"fastapi": {
+				"title": "Exemple FastAPI Cloud",
+				"description": "Un exemple utilisé pour tester la CI, les accès sécurisés externes et le déploiement avec un MCP personnel.",
+				"openSample": "Ouvrir l’exemple",
+				"adminUI": "Interface d’administration",
+				"viewSource": "Voir le code sur GitLab"
+			}
+		},
+		"contact": {
+			"email": {
+				"label": "Email",
+				"value": "job@albandrieu.com",
+				"href": "mailto:job@albandrieu.com"
+			},
+			"linkedin": {
+				"label": "LinkedIn",
+				"value": "Me contacter",
+				"href": "https://www.linkedin.com/in/nabla"
+			},
+			"calendly": {
+				"label": "Calendly",
+				"value": "Planifier un appel",
+				"href": "https://calendly.com/alban-andrieu"
+			},
+			"github": {
+				"label": "GitHub",
+				"value": "Voir mes projets",
+				"href": "https://github.com/AlbanAndrieu"
+			}
+		}
+	},
+	"startup": {
+		"meta": {
+			"title": "Démarrer votre projet — Alban Andrieu",
+			"description": "Présentez votre projet cloud, cybersécurité, conformité ou livraison à Alban Andrieu."
+		},
+		"navigation": {
+			"backHome": "Retour à l’accueil",
+			"contact": "Contact"
+		},
+		"hero": {
+			"title": "Démarrer votre projet",
+			"beforeEmail": "Présentez brièvement votre besoin — plateforme cloud, sécurité, conformité ou livraison. Je réponds généralement sous un jour ouvré à ",
+			"afterEmail": " Vous pouvez aussi ",
+			"call": "réserver un échange de 30 minutes"
+		},
+		"form": {
+			"heading": "Présentation du projet",
+			"subject": "[albanandrieu.com] Demande de projet / startup",
+			"name": "Votre nom",
+			"namePlaceholder": "Jane Doe",
+			"email": "Email professionnel",
+			"emailPlaceholder": "vous@entreprise.com",
+			"company": "Entreprise ou produit",
+			"companyPlaceholder": "ex. Acme AI",
+			"need": "Sur quel sujet avez-vous besoin d’aide ?",
+			"needPlaceholder": "Stack (AWS, Azure, OVH…), besoins IA, calendrier et objectifs de conformité sécurité (ISO 27001, SOC 2…).",
+			"privacyBeforeLegal": "En envoyant ce formulaire, vous acceptez que votre message soit utilisé uniquement pour répondre à votre demande, conformément aux ",
+			"legal": "mentions légales",
+			"privacyConnector": "et à la ",
+			"privacy": "politique de confidentialité",
+			"submit": "Envoyer à"
+		},
+		"thanks": {
+			"title": "Merci — message reçu",
+			"beforeEmail": "Votre demande a été envoyée à ",
+			"afterEmail": " Je réponds généralement sous un jour ouvré. Si votre demande est urgente, vous pouvez aussi ",
+			"call": "planifier un échange",
+			"backHome": "Retour à l’accueil",
+			"another": "Envoyer un autre message"
+		}
 	}
 }

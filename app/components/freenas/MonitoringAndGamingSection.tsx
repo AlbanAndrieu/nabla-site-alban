@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 export default function MonitoringAndGamingSection() {
 	return (
@@ -6,10 +6,11 @@ export default function MonitoringAndGamingSection() {
 			<section className="row monitoring-section main-cards-section justify-content-center">
 				<div className="col-md-4 p-3">
 					<div className="card box-shadow">
-						<img
+						<Image
 							className="img-fluid d-block mx-auto py-2"
-							src="assets/logo-monitoring-simple.png"
-							width="150"
+							src="/assets/logo-monitoring-simple.png"
+							width={150}
+							height={100}
 							alt="Monitoring Tools"
 						/>
 						<div className="card-body">
@@ -36,10 +37,11 @@ export default function MonitoringAndGamingSection() {
 			<section className="row gaming-section main-cards-section justify-content-center">
 				<div className="col-md-4 p-3">
 					<div className="card box-shadow">
-						<img
+						<Image
 							className="img-fluid d-block mx-auto py-2"
-							src="assets/logo-gaming-simple.png"
-							width="140"
+							src="/assets/logo-gaming-simple.png"
+							width={140}
+							height={140}
 							alt="Gaming Platform"
 						/>
 						<div className="card-body">
@@ -54,10 +56,11 @@ export default function MonitoringAndGamingSection() {
 									target="_blank"
 									rel="noopener"
 								>
-									<img
+									<Image
 										className="img-fluid d-block mx-auto my-1"
-										src="assets/logo-lutris-simple.png"
-										width="100"
+										src="/assets/logo-lutris-simple.png"
+										width={100}
+										height={100}
 										alt="Lutris"
 									/>
 									Lutris
@@ -68,10 +71,11 @@ export default function MonitoringAndGamingSection() {
 									target="_blank"
 									rel="noopener"
 								>
-									<img
+									<Image
 										className="img-fluid d-block mx-auto my-1"
-										src="assets/logo-steam-simple.png"
-										width="100"
+										src="/assets/logo-steam-simple.png"
+										width={100}
+										height={100}
 										alt="Steam"
 									/>
 									Steam

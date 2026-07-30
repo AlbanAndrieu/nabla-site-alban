@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
+
+export const metadata: Metadata = {
+	robots: NON_INDEXABLE_ROBOTS,
+};
 
 export default async function CheckoutTjmPage({
 	params,
@@ -13,7 +20,7 @@ export default async function CheckoutTjmPage({
 	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
 			</a>

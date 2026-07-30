@@ -330,7 +330,7 @@ body.site-content-page.page-contact .contact-info-item a:hover {
 }
 
 /* ----- Security (security.html) ----- */
-body.site-content-page.page-security {
+.site-content-page.page-security {
 	--security-primary: #dc3545;
 	--security-secondary: #6c757d;
 	--security-success: #28a745;
@@ -339,7 +339,7 @@ body.site-content-page.page-security {
 	--security-danger: #dc3545;
 }
 
-body.site-content-page.page-security .hero-section {
+.site-content-page.page-security .hero-section {
 	text-align: center;
 	padding: 4rem 2rem;
 	background: linear-gradient(
@@ -350,22 +350,22 @@ body.site-content-page.page-security .hero-section {
 	color: white;
 }
 
-body.site-content-page.page-security .hero-section h1 {
+.site-content-page.page-security .hero-section h1 {
 	font-size: 3rem;
 	font-weight: bold;
 	margin-bottom: 1rem;
 }
 
-body.site-content-page.page-security .hero-section p {
+.site-content-page.page-security .hero-section p {
 	font-size: 1.25rem;
 	margin-bottom: 2rem;
 }
 
-body.site-content-page.page-security .security-resources {
+.site-content-page.page-security .security-resources {
 	padding: 3rem 0;
 }
 
-body.site-content-page.page-security .resource-card {
+.site-content-page.page-security .resource-card {
 	background: white;
 	border: 1px solid #ddd;
 	border-radius: 8px;
@@ -377,38 +377,38 @@ body.site-content-page.page-security .resource-card {
 		box-shadow 0.3s ease;
 }
 
-body.site-content-page.page-security .resource-card:hover {
+.site-content-page.page-security .resource-card:hover {
 	transform: translateY(-5px);
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-body.site-content-page.page-security .resource-card h3 {
+.site-content-page.page-security .resource-card h3 {
 	color: var(--security-danger);
 	margin-bottom: 1rem;
 	font-size: 1.5rem;
 }
 
-body.site-content-page.page-security .resource-card .icon {
+.site-content-page.page-security .resource-card .icon {
 	font-size: 2rem;
 	color: var(--security-info);
 	margin-bottom: 1rem;
 }
 
-body.site-content-page.page-security .resource-list {
+.site-content-page.page-security .resource-list {
 	list-style: none;
 	padding-left: 0;
 }
 
-body.site-content-page.page-security .resource-list li {
+.site-content-page.page-security .resource-list li {
 	padding: 0.5rem 0;
 	border-bottom: 1px solid #eee;
 }
 
-body.site-content-page.page-security .resource-list li:last-child {
+.site-content-page.page-security .resource-list li:last-child {
 	border-bottom: none;
 }
 
-body.site-content-page.page-security .resource-list a {
+.site-content-page.page-security .resource-list a {
 	color: var(--security-info);
 	text-decoration: none;
 	display: flex;
@@ -416,22 +416,22 @@ body.site-content-page.page-security .resource-list a {
 	gap: 0.5rem;
 }
 
-body.site-content-page.page-security .resource-list a:hover {
+.site-content-page.page-security .resource-list a:hover {
 	color: var(--security-danger);
 	text-decoration: underline;
 }
 
-body.site-content-page.page-security .resource-list i {
+.site-content-page.page-security .resource-list i {
 	font-size: 1.2rem;
 }
 
-body.site-content-page.page-security .resource-list-link--commercial {
+.site-content-page.page-security .resource-list-link--commercial {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1rem;
 }
 
-body.site-content-page.page-security .resource-list-link__lead {
+.site-content-page.page-security .resource-list-link__lead {
 	display: flex;
 	align-items: flex-start;
 	gap: 0.5rem;
@@ -439,7 +439,7 @@ body.site-content-page.page-security .resource-list-link__lead {
 	flex: 1 1 auto;
 }
 
-body.site-content-page.page-security .resource-vendor-crest {
+.site-content-page.page-security .resource-vendor-crest {
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
@@ -463,24 +463,21 @@ body.site-content-page.page-security .resource-vendor-crest {
 		box-shadow 0.2s ease;
 }
 
-body.site-content-page.page-security
-	.resource-list
-	a:hover
-	.resource-vendor-crest {
+.site-content-page.page-security .resource-list a:hover .resource-vendor-crest {
 	transform: rotate(0deg) scale(1.04);
 	box-shadow:
 		0 8px 24px rgba(15, 23, 42, 0.11),
 		inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
-body.site-content-page.page-security .resource-vendor-crest img {
+.site-content-page.page-security .resource-vendor-crest img {
 	display: block;
 	width: 38px;
 	height: 38px;
 	object-fit: contain;
 }
 
-body.site-content-page.page-security .resource-vendor-crest__tag {
+.site-content-page.page-security .resource-vendor-crest__tag {
 	font-size: 0.58rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
@@ -491,18 +488,18 @@ body.site-content-page.page-security .resource-vendor-crest__tag {
 }
 
 @media (max-width: 520px) {
-	body.site-content-page.page-security .resource-list-link--commercial {
+	.site-content-page.page-security .resource-list-link--commercial {
 		flex-wrap: wrap;
 	}
 
-	body.site-content-page.page-security .resource-vendor-crest {
+	.site-content-page.page-security .resource-vendor-crest {
 		margin-left: auto;
 		flex-direction: row;
 		transform: rotate(-1deg);
 	}
 }
 
-body.site-content-page.page-security .category-badge {
+.site-content-page.page-security .category-badge {
 	display: inline-block;
 	padding: 0.25rem 0.75rem;
 	background: var(--security-info);
@@ -861,31 +858,36 @@ body.site-content-page.page-ciso .feed-item p {
 }
 
 /* ----- Login (login.html) ----- */
-body.site-content-page.page-login .form-signin {
+.site-content-page.page-login .form-signin {
 	width: 100%;
 	max-width: 330px;
 	padding: 15px;
 	margin: auto;
 }
 
-body.site-content-page.page-login .form-signin .checkbox {
+.site-content-page.page-login .form-signin .checkbox {
 	font-weight: 400;
 }
 
-body.site-content-page.page-login .form-signin .form-floating:focus-within {
+.site-content-page.page-login .form-signin .form-floating:focus-within {
 	z-index: 2;
 }
 
-body.site-content-page.page-login .form-signin input[type="text"] {
+.site-content-page.page-login .form-signin input[type="text"] {
 	margin-bottom: -1px;
 	border-bottom-right-radius: 0;
 	border-bottom-left-radius: 0;
 }
 
-body.site-content-page.page-login .form-signin input[type="password"] {
+.site-content-page.page-login .form-signin input[type="password"] {
 	margin-bottom: 10px;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+}
+
+.site-content-page.page-login .form-floating > label {
+	color: #212529;
+	opacity: 1;
 }
 
 /* ----- CTID threat intel (ctid.html) ----- */

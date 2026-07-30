@@ -1,44 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import ThreatFeed from "@/components/ciso/ThreatFeed";
+import TopAnchor from "@/components/TopAnchor";
 import { type AppLocale, routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 type Props = { params: Promise<{ locale: string }> };
-
-const copy = {
-	en: {
-		title: "CISO Dashboard",
-		subtitle:
-			"Threat intelligence, security metrics, and compliance monitoring",
-		compliance: "Compliance & risk monitoring",
-		complianceIntro:
-			"A concise view of the current control and certification posture.",
-		audit:
-			"Regular reviews keep evidence, risks, and remediation plans current.",
-		checklist: "Open the security checklist",
-		metrics: "Key security metrics",
-		threats: "Threat intelligence",
-		threatsIntro:
-			"Recent headlines from a small, curated set of established security sources.",
-	},
-	fr: {
-		title: "Tableau de bord RSSI",
-		subtitle:
-			"Veille sur les menaces, indicateurs de sécurité et suivi de conformité",
-		compliance: "Conformité et suivi des risques",
-		complianceIntro:
-			"Une vue synthétique de la posture actuelle des contrôles et certifications.",
-		audit:
-			"Des revues régulières maintiennent les preuves, les risques et les plans de remédiation à jour.",
-		checklist: "Ouvrir la checklist de sécurité",
-		metrics: "Indicateurs clés de sécurité",
-		threats: "Veille sur les menaces",
-		threatsIntro:
-			"Actualités récentes issues d’une sélection limitée de sources de cybersécurité reconnues.",
-	},
-} as const;
 
 const compliance = [
 	["fa-user-shield", "GDPR / RGPD", "95%"],
@@ -48,24 +17,22 @@ const compliance = [
 	["fa-credit-card", "PCI DSS", "10%"],
 ] as const;
 
-const metrics = {
-	en: [
-		["fa-stopwatch", "Incident response time", "15 min"],
-		["fa-screwdriver-wrench", "Patching effectiveness", "92%"],
-		["fa-gauge-high", "Risk rating", "Medium"],
-	],
-	fr: [
-		["fa-stopwatch", "Temps de réponse aux incidents", "15 min"],
-		["fa-screwdriver-wrench", "Efficacité des correctifs", "92%"],
-		["fa-gauge-high", "Niveau de risque", "Moyen"],
-	],
-} as const;
+type MetricItem = readonly [icon: string, label: string, value: string];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-	const locale = (await params).locale === "fr" ? "fr" : "en";
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "ciso" });
 	return {
-		title: `${copy[locale].title} — Alban Andrieu`,
-		description: copy[locale].subtitle,
+		title: `${t("title")} — Alban Andrieu`,
+		description: t("subtitle"),
+		alternates: {
+			canonical: canonicalPagePath("ciso", locale),
+			languages: {
+				en: canonicalPagePath("ciso", "en"),
+				fr: canonicalPagePath("ciso", "fr"),
+			},
+		},
 	};
 }
 
@@ -74,14 +41,17 @@ export default async function CisoPage({ params }: Props) {
 	if (!hasLocale(routing.locales, requestedLocale)) notFound();
 	const locale = requestedLocale as AppLocale;
 	setRequestLocale(locale);
-	const t = copy[locale];
+	const [site, t] = await Promise.all([
+		getTranslations("site"),
+		getTranslations("ciso"),
+	]);
+	const metrics = t.raw("metricItems") as MetricItem[];
 
 	return (
 		<>
+			<TopAnchor />
 			<a className="skip-to-main" href="#main-content">
-				{locale === "fr"
-					? "Aller au contenu principal"
-					: "Skip to main content"}
+				{site("skipToMainContent")}
 			</a>
 			<main id="main-content" className="site-content-page page-ciso page-dark">
 				<section
@@ -91,11 +61,11 @@ export default async function CisoPage({ params }: Props) {
 					<div className="hero-content">
 						<h1 id="ciso-title" className="hero-title">
 							<i className="fa-solid fa-shield-halved" aria-hidden="true" />{" "}
-							{t.title}
+							{t("title")}
 						</h1>
-						<p className="hero-subtitle">{t.subtitle}</p>
+						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">
-							{locale === "fr" ? "Une sélection maintenue par " : "Curated by "}
+							{t("curatedBy")} {" "}
 							<a href={`/${locale}/contact`}>Alban Andrieu</a>
 						</p>
 					</div>
@@ -108,9 +78,9 @@ export default async function CisoPage({ params }: Props) {
 					>
 						<h2 id="compliance-heading">
 							<i className="fa-solid fa-certificate" aria-hidden="true" />{" "}
-							{t.compliance}
+							{t("compliance")}
 						</h2>
-						<p>{t.complianceIntro}</p>
+						<p>{t("complianceIntro")}</p>
 						<dl className="ciso-compliance-grid">
 							{compliance.map(([icon, label, value]) => (
 								<div key={label}>
@@ -119,21 +89,19 @@ export default async function CisoPage({ params }: Props) {
 										<span>{label}</span>
 									</dt>
 									<dd>
-										{value === "In progress" && locale === "fr"
-											? "En cours"
-											: value}
+									{value === "In progress" ? t("inProgress") : value}
 									</dd>
 								</div>
 							))}
 						</dl>
-						<p>{t.audit}</p>
+						<p>{t("audit")}</p>
 						<a
 							className="resource-link"
 							href="https://checklist.albandrieu.com/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{t.checklist}{" "}
+							{t("checklist")} {" "}
 							<i
 								className="fa-solid fa-arrow-up-right-from-square"
 								aria-hidden="true"
@@ -147,10 +115,10 @@ export default async function CisoPage({ params }: Props) {
 					>
 						<h2 id="metrics-heading">
 							<i className="fa-solid fa-chart-line" aria-hidden="true" />{" "}
-							{t.metrics}
+							{t("metrics")}
 						</h2>
 						<div className="ciso-metrics">
-							{metrics[locale].map(([icon, label, value]) => (
+							{metrics.map(([icon, label, value]) => (
 								<article className="ciso-metric" key={label}>
 									<i
 										className={`fa-solid ${icon} ciso-metric-icon`}
@@ -168,9 +136,9 @@ export default async function CisoPage({ params }: Props) {
 						aria-labelledby="threats-heading"
 					>
 						<h2 id="threats-heading">
-							<i className="fa-solid fa-globe" aria-hidden="true" /> {t.threats}
+							<i className="fa-solid fa-globe" aria-hidden="true" /> {t("threats")}
 						</h2>
-						<p>{t.threatsIntro}</p>
+						<p>{t("threatsIntro")}</p>
 						<ThreatFeed locale={locale} />
 					</section>
 				</div>

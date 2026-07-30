@@ -16,9 +16,9 @@ This runbook documents the shared frontend runtime scripts that were consolidate
 - `public/nabla-service-status.js`
 - `app/api/homelab-tunnel-check/route.ts` (server-side tunnel HTTP/TLS probe for homelab cards)
 - `public/site-content-page.css` (homelab card + ping indicator styles)
-- `lib/marketingPages.ts`
+- `lib/sitePageCatalog.ts`
 - `app/[locale]/page.tsx`
-- `app/[locale]/[slug]/page.tsx`
+- `app/[locale]/workstation/page.tsx`
 - `lib/htmlFromPublic.ts`
 - `public/*.html` pages that load these scripts (for integration examples)
 
@@ -39,7 +39,7 @@ Use `data-analytics-mode` on the script tag:
 
 - `vercel` (default): Vercel analytics + Vercel speed insights.
 - `full`: GTM + GA4 + VWO + PostHog + Heap + Datadog RUM + Vercel.
-- `marketing`: same as `full` without Datadog RUM.
+- `showcase`: same as `full` without Datadog RUM.
 - `home`: Mixpanel + everything in `full`.
 
 Optional analytics attributes:
@@ -50,11 +50,17 @@ Optional analytics attributes:
 
 Programmatic fallback is also supported through `window.NABLA_ANALYTICS_PRESET`.
 
+The Next.js application shell uses the lightweight `vercel` mode by default.
+Set `NEXT_PUBLIC_ANALYTICS_MODE` explicitly to `full`, `showcase`, or `home`
+only when the additional vendors are required and their performance/privacy
+cost has been accepted. Per-page duplicate loaders must not be added below the
+localized layout.
+
 ### Verified page examples
 
 - `home`: `public/index.html`
 - `full`: `public/link.html`, `public/nabla.html`, `public/cv/index.html`
-- `marketing`: `public/truenas.html`, `public/freenas.html`
+- `showcase`: `public/truenas.html`, `public/freenas.html`, `public/workstation.html`
 - `vercel`: `public/ai.html`, `public/contact.html`, `public/security.html`, `public/pricing.html`
 
 ## Shared UI Attributes (`site-widgets.js`)
@@ -167,22 +173,33 @@ Important limitations:
 - False negatives happen when a service is up but does not expose a favicon or blocks hotlinking.
 - LAN-only addresses can fail for remote users even if service is healthy internally.
 
-## Next.js Marketing Slug Bridge
+## Next.js HTML Content Migration
 
-`lib/marketingPages.ts` is the source-of-truth map for root marketing pages exposed as extensionless routes in Next.js.
+Each migrated URL has a dedicated App Router page. A few dedicated routes still
+load a fragment from `public/` through `lib/htmlFromPublic.ts` (`ai`, `security`,
+`workstation` and some CV pages). The three content routes render through
+`app/components/PublicHtmlFragment.tsx` so extraction and trusted HTML injection
+remain centralized. `lib/sitePageCatalog.ts` separately owns
+functional categories and the strict sitemap allowlist.
 
 Workflow:
 
-1. Add or update entry in `MARKETING_PAGES` (slug, `public/*.html` file, extract mode, body class).
-2. `app/[locale]/[slug]/page.tsx` generates static params from this map and loads the fragment via `loadPublicHtmlFragment()`.
-3. `lib/htmlFromPublic.ts` rewrites internal `.html` links to extensionless paths for runtime navigation.
+1. Create a dedicated `app/[locale]/<slug>/page.tsx` route.
+2. During migration only, load its `public/*.html` fragment with `loadPublicHtmlFragment()`.
+3. Replace the fragment progressively with typed React components and next-intl messages.
+4. `lib/htmlFromPublic.ts` rewrites legacy internal links during the transition.
 
 ### Practical constraints
 
 - Keep slugs stable when possible to avoid breaking existing URLs.
-- Ajouter l’entrée à `lib/marketingPages.ts` (`MARKETING_PAGES`) et conserver
-  `lib/marketingPages.config.mjs` en phase avec les URLs historiques réécrites
-  par `next.config.mjs`.
+- Conserver `lib/htmlRoutes.config.mjs` en phase avec les URLs historiques
+  réécrites par `next.config.mjs`.
+- N’ajouter une page à `SEO_PAGE_SLUGS` que si elle doit réellement apparaître
+  dans `sitemap.xml`.
+- Toute page absente de cette liste doit aussi déclarer
+  `robots: NON_INDEXABLE_ROBOTS` dans ses métadonnées Next.js. Le test
+  `tests/seo-indexing.spec.ts` vérifie cette règle sur les routes publiques,
+  techniques, CV et Jus Mundi.
 - Use relative script paths in `public/*.html`; rewrite tooling is for links, not script `src`.
 
 ## Recommended Integration Pattern

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import PaymentShell from "@/components/payments/PaymentShell";
 import { routing } from "@/i18n/routing";
 import { paymentLocale } from "@/lib/paymentPages";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 import { getStripeClient } from "@/lib/stripe";
 
 type Props = {
@@ -12,10 +13,11 @@ type Props = {
 	searchParams: Promise<{ session_id?: string | string[] }>;
 };
 
-export const metadata: Metadata = {
-	title: "Payment status | Alban Andrieu",
-	robots: { index: false, follow: false },
-};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const locale = paymentLocale((await params).locale);
+	const t = await getTranslations({ locale, namespace: "checkout" });
+	return { title: t("meta.successTitle"), robots: NON_INDEXABLE_ROBOTS };
+}
 
 async function paymentIsConfirmed(
 	sessionId: string | undefined,
@@ -38,12 +40,12 @@ export default async function SuccessPage({ params, searchParams }: Props) {
 	if (!hasLocale(routing.locales, rawLocale)) notFound();
 	const locale = paymentLocale(rawLocale);
 	setRequestLocale(locale);
+	const t = await getTranslations("checkout");
 	const rawSessionId = (await searchParams).session_id;
 	const sessionId = Array.isArray(rawSessionId)
 		? rawSessionId[0]
 		: rawSessionId;
 	const confirmed = await paymentIsConfirmed(sessionId);
-	const fr = locale === "fr";
 
 	return (
 		<PaymentShell locale={locale}>
@@ -59,24 +61,16 @@ export default async function SuccessPage({ params, searchParams }: Props) {
 					</div>
 					<h1 className="checkout-title">
 						{confirmed
-							? fr
-								? "Merci pour votre paiement"
-								: "Thank you for your payment"
-							: fr
-								? "Paiement en cours de vérification"
-								: "Payment verification pending"}
+							? t("success.confirmedTitle")
+							: t("success.pendingTitle")}
 					</h1>
 					<p className="checkout-message">
 						{confirmed
-							? fr
-								? "Le paiement a bien été confirmé par Stripe."
-								: "Stripe has confirmed your payment."
-							: fr
-								? "Nous ne pouvons pas encore confirmer ce paiement. Vérifiez le lien reçu de Stripe ou contactez-nous."
-								: "We cannot confirm this payment yet. Check the link received from Stripe or contact us."}
+							? t("success.confirmedMessage")
+							: t("success.pendingMessage")}
 					</p>
 					<p className="checkout-message">
-						{fr ? "Pour toute question : " : "Questions? Contact "}
+						{t("success.questions")}
 						<a href="mailto:invoice@albandrieu.com">invoice@albandrieu.com</a>.
 					</p>
 					<p className="checkout-actions">
@@ -84,10 +78,10 @@ export default async function SuccessPage({ params, searchParams }: Props) {
 							href={`/${locale}/payment`}
 							className="checkout-button checkout-button-secondary"
 						>
-							{fr ? "Options de paiement" : "Payment options"}
+							{t("success.paymentOptions")}
 						</a>
 						<a href={`/${locale}`} className="checkout-button">
-							{fr ? "Retour au site" : "Back to site"}
+							{t("success.backSite")}
 						</a>
 					</p>
 				</section>

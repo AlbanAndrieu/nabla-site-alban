@@ -1,20 +1,54 @@
-import Script from "next/script";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
+
+type EmailCard = {
+	title: string;
+	email: string;
+	descriptionBefore: string;
+	descriptionAfter: string;
+};
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/email">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "email" });
+
+	return {
+		title: t("metadataTitle"),
+		description: t("metadataDescription"),
+		alternates: {
+			canonical: canonicalPagePath("email", locale),
+			languages: {
+				en: canonicalPagePath("email", "en"),
+				fr: canonicalPagePath("email", "fr"),
+			},
+		},
+	};
+}
 
 export default async function EmailPage({
 	params,
-}: {
-	params: { locale: string };
-}) {
+}: PageProps<"/[locale]/email">) {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
-	const t = await getTranslations("email");
-	const tSite = await getTranslations("site");
-	const cards = t.raw("cards") as { title: string; desc: string }[];
+	const [t, tSite] = await Promise.all([
+		getTranslations("email"),
+		getTranslations("site"),
+	]);
+	const cards = t.raw("cards") as EmailCard[];
 	const automatedList: string[] = t.raw("automatedList") as string[];
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{tSite("skipToMainContent")}
 			</a>
@@ -44,10 +78,11 @@ export default async function EmailPage({
 								<div className="card h-100 bg-body-secondary border-secondary">
 									<div className="card-body">
 										<h3 className="h6 card-title">{card.title}</h3>
-										<p
-											className="card-text mb-0"
-											dangerouslySetInnerHTML={{ __html: card.desc }}
-										/>
+										<p className="card-text mb-0">
+											{card.descriptionBefore}
+											<a href={`mailto:${card.email}`}>{card.email}</a>
+											{card.descriptionAfter}
+										</p>
 									</div>
 								</div>
 							</div>
@@ -62,20 +97,17 @@ export default async function EmailPage({
 						<div className="card-body">
 							<p className="mb-2">{t("automatedDesc")}</p>
 							<ul className="mb-0">
-								{automatedList.map((item) => (
-									<li key={item} dangerouslySetInnerHTML={{ __html: item }} />
+								{automatedList.map((email) => (
+									<li key={email}>
+										<a href={`mailto:${email}`}>{email}</a>
+									</li>
 								))}
 							</ul>
 						</div>
 					</div>
 				</section>
 			</main>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab />
 		</div>
 	);
 }

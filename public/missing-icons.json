@@ -1,6 +1,6 @@
 {
 	"speedtest.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/speedtest.png",
-	"rxresume.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/rxresume.png",
+	"rxresume.png": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/reactive-resume-light.png",
 	"searxng.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/searxng.png",
 	"freshrss.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/freshrss.png",
 	"nginx.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/nginx.png",
@@ -54,5 +54,7 @@
 	"litellm.jpg": "https://cdn.prod.website-files.com/66f2feef6cd182361acd52e8/67fe1c2809428a7beab6cd9b_litellm.jpg",
 	"icon.svg": "https://raw.githubusercontent.com/langfuse/langfuse/main/web/public/icon.svg",
 	"openai.svg": "https://cdn.jsdelivr.net/npm/simple-icons@13.16.0/icons/openai.svg",
-	"figma-icon.svg": "https://www.vectorlogo.zone/logos/figma/figma-icon.svg"
+	"figma-icon.svg": "https://www.vectorlogo.zone/logos/figma/figma-icon.svg",
+	"asana.png": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/asana.png",
+	"notion.png": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/notion.png"
 }

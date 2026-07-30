@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-One-off / repeatable generator: copy English marketing HTML from public/ to
+One-off / repeatable generator: copy English content HTML from public/ to
 public/locales/fr/, translating visible text (googletrans) and root-prefixing
 relative /assets paths so pages work under /fr/*.
 """
@@ -19,7 +19,7 @@ REPO = Path(__file__).resolve().parents[1]
 PUBLIC = REPO / "public"
 OUT = PUBLIC / "locales" / "fr"
 
-# Keep in sync with lib/marketingPages.ts + app routes using loadPublicHtmlFragment.
+# Keep in sync with dedicated app routes using loadPublicHtmlFragment.
 FILES = sorted(
     {
         "index.html",

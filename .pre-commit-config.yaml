@@ -128,6 +128,7 @@ repos:
         exclude: >
           (?x)^(
             .gitlab-ci.yml|
+            .github/workflows/ci.yml|
           )$
     -   id: sort-simple-yaml
         name: "🔀 sort/📜 yaml - Sort yaml"
@@ -327,7 +328,7 @@ repos:
 
     ### Javascript & Web Tools ###
 -   repo: https://github.com/biomejs/pre-commit
-    rev: "v2.5.5"
+    rev: "v2.5.6"
     hooks:
     -   id: biome-check
         name: "🟨 javascript · Lint, format, and safe fixes with Biome"
@@ -430,7 +431,7 @@ repos:
 
     # ----------------------------- 🔒 Deployment Tools ---------------------------- #
 -   repo: https://github.com/hadolint/hadolint
-    rev: v2.14.0
+    rev: v2.15.0
     hooks:
     -   id: hadolint-docker
         name: "🐳 hadolint · Validate Dockerfile"

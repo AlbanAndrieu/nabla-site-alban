@@ -6,6 +6,7 @@ const pagesToTest = [
 	"/ctid",
 	"/freenas",
 	"/truenas",
+	"/workstation",
 	"/test",
 	"/ciso",
 	"/nabla",
@@ -42,7 +43,7 @@ test.describe("Site SSR/CSR migration - major console JS errors", () => {
 					if (msg.type() === "error" || msg.type() === "warning")
 						errors.push(msg.text());
 				});
-				await p.goto(path, { waitUntil: "networkidle" });
+				await p.goto(path, { waitUntil: "domcontentloaded" });
 				await p.waitForTimeout(300); // laisse finir l'hydratation
 				const matching = errors.filter((err) =>
 					errorPatterns.some((pattern) => pattern.test(err)),

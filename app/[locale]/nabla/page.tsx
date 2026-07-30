@@ -1,193 +1,260 @@
-import Image from "next/image";
-import Script from "next/script";
-import React from "react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import Hero from "../../components/Hero";
+import AnsibleHeroCard from "../../components/nabla/AnsibleHeroCard";
+import CollaborateToolsSection from "../../components/nabla/CollaborateToolsSection";
+import ContactSection from "../../components/nabla/ContactSection";
+import DockerHeroCard from "../../components/nabla/DockerHeroCard";
+import GoogleCSEClientOnly from "../../components/nabla/GoogleCSEClientOnly";
+import NablaDevSecOpsHeroCard from "../../components/nabla/NablaDevSecOpsHeroCard";
+import NablaPlatformsSection from "../../components/nabla/NablaPlatformsSection";
+import ServiceCardsSection from "../../components/nabla/ServiceCardsSection";
+import HardwareSection from "../../components/truenas/HardwareSection";
+import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
 
-export default function NablaPage() {
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/nabla">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "nabla.metadata" });
+
+	return {
+		title: t("title"),
+		description: t("description"),
+		alternates: {
+			canonical: canonicalPagePath("nabla", locale),
+			languages: {
+				en: canonicalPagePath("nabla", "en"),
+				fr: canonicalPagePath("nabla", "fr"),
+			},
+		},
+	};
+}
+
+// Type for NablaPlatformsSection
+type Pillar = {
+	title: string;
+	icon: string;
+	color: string;
+	tools: { label: string; link?: string }[];
+};
+
+export default async function NablaPage({
+	params,
+}: PageProps<"/[locale]/nabla">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
+
+	setRequestLocale(locale);
+	const site = await getTranslations("site");
+	const nabla = await getTranslations("nabla");
+
+	const nablaPillars: Pillar[] = [];
+
 	return (
-		<div className="site-content-page page-dark page-nabla-best-practices">
-			<div id="top" />
+		<div className="site-content-page page-dark">
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				Skip to main content
+				{site("skipToMainContent")}
 			</a>
-			<nav className="page-nav container py-3" aria-label="Breadcrumb">
-				<a href="/" className="text-decoration-none">
-					<i className="fas fa-home" aria-hidden="true"></i> Back to home
-				</a>
-				<span className="text-muted mx-2" aria-hidden="true">
-					·
-				</span>
-				<a href="/truenas" className="text-decoration-none">
-					TrueNAS
-				</a>
-				<span className="text-muted mx-2" aria-hidden="true">
-					·
-				</span>
-				<span className="text-muted">Nabla project</span>
-			</nav>
-			{/* Hero Section */}
-			<section className="hero-section" id="home">
-				<div className="hero-content">
-					<img
-						src="https://avatars1.githubusercontent.com/u/7859836"
-						alt="Alban Andrieu"
-						className="profile-image"
-						width={120}
-						height={120}
-					/>
-					<h1 className="hero-title">Alban Andrieu</h1>
-					<p className="hero-subtitle">
-						DevSecOps Cloud Architect | Independent Consultant
-					</p>
-					<p className="hero-description">
-						Currently architecting securing cloud solutions at{" "}
-						<a
-							href="https://www.jusmundi.com"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<img
-								src="/assets/nabla/jusmundi-favicon.ico"
-								alt=""
-								width="16"
-								height="16"
-								className="jusmundi-link-icon"
-								decoding="async"
-								aria-hidden="true"
-							/>
-							Jus Mundi
-						</a>
-						.<br />
-						With 20+ years of experience in enterprise environments, I
-						specialize in transforming businesses through DevOps automation,
-						cloud security, and infrastructure as code.
-						<br />
-						<br />
-						Open to challenges around AI Integration, MLOps, and Security.
-					</p>
-					<div className="cta-buttons">
-						<a href="#contact" className="btn btn-primary">
-							<i className="fas fa-envelope"></i> Get in Touch
-						</a>
-						<a
-							href="https://www.linkedin.com/in/nabla"
-							target="_blank"
-							className="btn btn-secondary"
-							rel="noopener"
-						>
-							<i className="fab fa-linkedin"></i> View LinkedIn
-						</a>
-					</div>
-				</div>
-			</section>
-			{/* Main Content */}
 			<main id="main-content" role="main" className="mb-5">
-				{/* Toolchain matrix, hardware, open source, services, contact sections */}
-				{/* Migrate static section markup here as needed (omitted for brevity, see source) */}
+				{/* Hero Section */}
+				<Hero />
+
+				<CollaborateToolsSection
+					heading={nabla("collaborate.heading")}
+					subtitle={nabla("collaborate.subtitle")}
+					tools={[
+						{
+							label: "Git",
+							icon: "fab fa-git-alt",
+							badge: "core",
+							color: "#f34f29",
+						},
+						{
+							label: "GitHub",
+							icon: "fab fa-github",
+							color: "#333",
+							link: "https://github.com/AlbanAndrieu",
+							badge: "open source",
+						},
+						{
+							label: "GitLab",
+							icon: "fab fa-gitlab",
+							color: "#fc6d26",
+							link: "https://gitlab.com/AlbanAndrieu",
+						},
+						{
+							label: "Jira",
+							icon: "fab fa-jira",
+							color: "#0052cc",
+							link: "https://www.atlassian.com/software/jira",
+						},
+						{
+							label: "Asana",
+							imageSrc: "/assets/selfh-icons/asana.png",
+							imageAlt: "Asana",
+							color: "#fc636b",
+							link: "https://asana.com",
+						},
+						{
+							label: "Slack",
+							icon: "fab fa-slack",
+							color: "#611f69",
+							link: "https://slack.com",
+						},
+						{
+							label: "Notion",
+							imageSrc: "/assets/selfh-icons/notion.png",
+							imageAlt: "Notion",
+							color: "#000",
+							link: "https://app.notion.com/p/albandrieu/Getting-Started-d588a6b720254a7baebd45357e8315a3",
+							badge: "knowledge base",
+						},
+						{
+							label: "Reactive Resume",
+							imageSrc: "/assets/selfh-icons/rxresume.png",
+							imageAlt: "RxResume",
+							color: "#6c63ff",
+							link: "https://reactive-resume.albandrieu.com",
+							badge: "cv",
+						},
+					]}
+				/>
+
+				<section className="content-section">
+					{/* Platforms & Tools Matrix */}
+					<NablaPlatformsSection
+						heading={nabla("platforms.heading")}
+						intro1={nabla("platforms.intro1")}
+						intro2={nabla("platforms.intro2")}
+						logoSrc="/assets/nabla/nabla-4.svg"
+						logoAlt="Nabla site logo"
+						logoCtaLabel={nabla("platforms.logoCtaLabel")}
+						logoCtaHref="/nabla"
+						pillars={nablaPillars}
+					/>
+
+					{/* Open Source Contributions */}
+					<AnsibleHeroCard
+						title={nabla("opensource.ansible.title")}
+						description={nabla("opensource.ansible.description")}
+						linkLabel={nabla("opensource.ansible.linkLabel")}
+						linkUrl="https://github.com/AlbanAndrieu"
+						imageSrc="/assets/selfh-icons/ansible-icon.svg"
+						imageAlt="Ansible logo"
+					/>
+					<NablaDevSecOpsHeroCard
+						title={nabla("opensource.nabla.title")}
+						description={nabla("opensource.nabla.description")}
+						linkLabel={nabla("opensource.nabla.linkLabel")}
+						linkUrl="#home"
+					/>
+					<DockerHeroCard
+						title={nabla("opensource.docker.title")}
+						description={nabla("opensource.docker.description")}
+						linkLabel={nabla("opensource.docker.linkLabel")}
+						linkUrl="https://hub.docker.com/u/nabla"
+					/>
+
+					{/* Services Grid */}
+					<ServiceCardsSection
+						services={[
+							{
+								icon: "fas fa-infinity",
+								title: nabla("services.search.title"),
+								description: nabla("services.search.description"),
+								customContent: <GoogleCSEClientOnly />,
+							},
+							{
+								icon: "fas fa-robot",
+								title: nabla("services.iac.title"),
+								description: nabla("services.iac.description"),
+								customContent: (
+									<div
+										className="nabla-wip-callout"
+										role="status"
+										aria-live="polite"
+									>
+										<span
+											className="nabla-wip-callout__icon"
+											aria-hidden="true"
+										>
+											<i className="fas fa-screwdriver-wrench"></i>
+										</span>
+										<div>
+											<strong>{nabla("services.iac.wipLabel")}</strong>{" "}
+											{nabla("services.iac.wipDescription")}
+										</div>
+									</div>
+								),
+							},
+							{
+								icon: "fas fa-cloud",
+								title: nabla("services.fastapi.title"),
+								description: nabla("services.fastapi.description"),
+								links: [
+									{
+										label: nabla("services.fastapi.openSample"),
+										url: "https://fastapi-sample.fastapicloud.dev/api",
+										icon: "fas fa-external-link-alt",
+									},
+									{
+										label: nabla("services.fastapi.adminUI"),
+										url: "https://dashboard.fastapicloud.com/albanandrieu-22237405/apps",
+										icon: "fas fa-external-link-alt",
+									},
+									{
+										label: nabla("services.fastapi.viewSource"),
+										url: "https://gitlab.com/AlbanAndrieu/fastapi-sample",
+										icon: "fab fa-gitlab",
+									},
+								],
+							},
+						]}
+					/>
+				</section>
+
+				{/* Contact Section */}
+				<ContactSection
+					contacts={[
+						{
+							icon: "fas fa-envelope",
+							label: nabla("contact.email.label"),
+							value: nabla("contact.email.value"),
+							href: nabla("contact.email.href"),
+						},
+						{
+							icon: "fab fa-linkedin",
+							label: nabla("contact.linkedin.label"),
+							value: nabla("contact.linkedin.value"),
+							href: nabla("contact.linkedin.href"),
+							ariaLabel: "LinkedIn",
+						},
+						{
+							icon: "fa fa-calendar-plus",
+							label: nabla("contact.calendly.label"),
+							value: nabla("contact.calendly.value"),
+							href: nabla("contact.calendly.href"),
+							ariaLabel: "Calendly",
+						},
+						{
+							icon: "fab fa-github",
+							label: nabla("contact.github.label"),
+							value: nabla("contact.github.value"),
+							href: nabla("contact.github.href"),
+							ariaLabel: "GitHub",
+						},
+					]}
+					logoSrc="/assets/nabla/nabla-4.svg"
+				/>
 			</main>
-			{/* Footer */}
-			<footer className="footer" role="contentinfo">
-				<div className="social-links">
-					<a
-						href="https://www.linkedin.com/in/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="LinkedIn"
-					>
-						<i className="fab fa-linkedin-in"></i>
-					</a>
-					<a
-						href="https://calendly.com/alban-andrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Calendly"
-					>
-						<i className="fa fa-calendar-plus"></i>
-					</a>
-					<a
-						href="https://github.com/AlbanAndrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="GitHub"
-					>
-						<i className="fab fa-github"></i>
-					</a>
-					<a
-						href="https://hub.docker.com/u/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Docker Hub"
-					>
-						<i className="fab fa-docker"></i>
-					</a>
-					<a
-						href="https://stackexchange.com/users/4652074/albanandrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Stack Exchange"
-					>
-						<i className="fab fa-stack-exchange"></i>
-					</a>
-				</div>
-				<div className="footer-links">
-					<a href="/policy/legal.html">Legal notices</a>
-					<a
-						href="javascript:openAxeptioCookies()"
-						rel="noopener noreferrer"
-						className="text-muted"
-					>
-						Cookies
-					</a>
-				</div>
-				<p className="text-md-center mt-3">
-					<a href="/" className="btn btn-sm btn-outline-secondary">
-						Back to Home
-					</a>
-					<a
-						href="#top"
-						className="btn btn-sm btn-outline-secondary"
-						aria-label="Back to top of page"
-					>
-						Back to top
-					</a>
-				</p>
-				<p className="footer-copyright"></p>
-			</footer>
-			{/* 3rd-party scripts needed for widgets/etc */}
-			<Script
-				src="https://uptime.betterstack.com/widgets/announcement.js"
-				data-id="150620"
-				async
-				strategy="afterInteractive"
-			/>
-			<Script
-				src="/nabla-service-status.js"
-				strategy="afterInteractive"
-				defer
-			/>
-			<Script
-				src="/homelab-services-render.js"
-				strategy="afterInteractive"
-				defer
-			/>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-scroll-reveal=".contact-card,.social-card"
-				data-reveal-effect="opacity"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
-			{/* For google custom search */}
-			<Script
-				async
-				src="https://cse.google.com/cse.js?cx=8090719dd778f44d0"
-				strategy="afterInteractive"
-			/>
 		</div>
 	);
 }
