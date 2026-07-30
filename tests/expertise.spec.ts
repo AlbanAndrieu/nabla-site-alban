@@ -14,4 +14,25 @@ test.describe("Expertise page", () => {
 		await expect(page.locator("#services")).toBeVisible();
 		await expect(page.locator("#skills")).toBeVisible();
 	});
+
+	test("renders the French catalog and a single primary heading", async ({
+		page,
+	}) => {
+		await page.goto("/fr/expertise.html");
+
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			"Votre partenaire de confiance pour l’IA et le cloud",
+		);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+		await expect(
+			page.getByRole("heading", { name: "Services proposés" }),
+		).toBeVisible();
+		await expect(
+			page.getByRole("heading", { name: "Expertise technique", exact: true }),
+		).toBeVisible();
+		await expect(page.getByRole("link", { name: "Voir tous les formats de CV" })).toHaveAttribute(
+			"href",
+			"/fr/cv",
+		);
+	});
 });

@@ -99,4 +99,21 @@ test.describe("Homepage Tests", () => {
 			"Alban Andrieu. Independent DevSecOps Professional.",
 		);
 	});
+
+	test("footer and homepage metadata use the French catalog", async ({ page }) => {
+		await page.goto("/fr");
+		const year = String(new Date().getFullYear());
+
+		await expect(page).toHaveTitle(
+			"Alban Andrieu — Ingénieur cybersécurité et DevSecOps",
+		);
+		await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+			"content",
+			/plateformes cloud et IA/,
+		);
+		await expect(page.locator("footer .footer-copyright")).toHaveText(
+			`© ${year} Alban Andrieu. Professionnel DevSecOps indépendant.`,
+		);
+		await expect(page.getByRole("link", { name: "Flux RSS de ce site" })).toBeVisible();
+	});
 });

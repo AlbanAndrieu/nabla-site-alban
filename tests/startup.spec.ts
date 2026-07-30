@@ -31,5 +31,18 @@ test.describe("Startup inquiry page", () => {
 		await expect(page.locator('input[name="_next"]')).toHaveValue(
 			"https://albanandrieu.com/fr/startup-thanks.html",
 		);
+		await expect(page.getByRole("contentinfo")).toHaveCount(1);
+	});
+
+	test("thank-you page reuses the global footer", async ({ page }) => {
+		await page.goto("/fr/startup-thanks.html");
+
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			"Merci — message reçu",
+		);
+		await expect(page.getByRole("contentinfo")).toHaveCount(1);
+		await expect(
+			page.getByRole("link", { name: "Mentions légales" }),
+		).toHaveCount(1);
 	});
 });

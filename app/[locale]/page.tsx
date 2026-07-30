@@ -1,8 +1,9 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Hero from "@/app/components/Hero";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 
@@ -17,6 +18,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
 	return (
 		<>
+			<link rel="stylesheet" href="/timeline.css" precedence="page" />
+			<link rel="stylesheet" href="/education.css" precedence="page" />
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
@@ -78,7 +81,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									<img
+									<Image
 										alt=""
 										aria-hidden="true"
 										className="jusmundi-link-icon"
@@ -278,7 +281,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 						/>
 					</div>
 					<div className="contact-logo-wrap">
-						<img
+						<Image
 							alt={t("contact.logo.alt")}
 							className="contact-logo"
 							height={120}
@@ -288,11 +291,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 					</div>
 				</section>
 			</main>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-			/>
+			<SiteWidgetsScript printPdf />
 		</>
 	);
 }

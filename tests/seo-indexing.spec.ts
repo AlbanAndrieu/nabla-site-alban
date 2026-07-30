@@ -33,11 +33,19 @@ const nonIndexablePages = [
 ];
 
 const indexablePages = [
+	"/",
+	"/expertise.html",
+	"/contact.html",
+	"/security.html",
+	"/ai.html",
+	"/ciso.html",
+	"/truenas.html",
+	"/link.html",
+	"/email.html",
+	"/nabla.html",
 	"/cv",
 	"/cv/index.html",
-	"/nabla.html",
 	"/jm",
-	"/truenas.html",
 ];
 
 test.describe("SEO indexing policy", () => {

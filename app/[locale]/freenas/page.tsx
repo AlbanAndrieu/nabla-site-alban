@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -31,12 +31,7 @@ export default async function FreenasPage({
 				<JenkinsAndPluginsSection />
 				<MonitoringAndGamingSection />
 			</main>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab />
 		</div>
 	);
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -195,79 +195,7 @@ export default async function StartupPage({
 					</div>
 				</div>
 			</main>
-			<footer className="footer">
-				<div className="social-links">
-					<a
-						href="https://www.linkedin.com/in/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="LinkedIn"
-					>
-						<i className="fab fa-linkedin-in"></i>
-					</a>
-					<a
-						href="https://calendly.com/alban-andrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Calendly"
-					>
-						<i className="fa fa-calendar-plus"></i>
-					</a>
-					<a
-						href="https://github.com/AlbanAndrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="GitHub"
-					>
-						<i className="fab fa-github"></i>
-					</a>
-					<a
-						href="https://hub.docker.com/u/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Docker Hub"
-					>
-						<i className="fab fa-docker"></i>
-					</a>
-					<a
-						href="https://stackexchange.com/users/4652074/albanandrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Stack Exchange"
-					>
-						<i className="fab fa-stack-exchange"></i>
-					</a>
-				</div>
-				<div className="footer-links">
-					<a href="/policy/legal.html">
-						{t("footer.legal")}
-					</a>
-				</div>
-				<p className="text-md-center mt-3">
-					<a href={homePath} className="btn btn-sm btn-outline-secondary">
-						{t("footer.backHome")}
-					</a>
-					<a
-						href="#top"
-						className="btn btn-sm btn-outline-secondary"
-						aria-label={t("footer.backTopAria")}
-					>
-						{t("footer.backTop")}
-					</a>
-				</p>
-				<p className="footer-copyright"></p>
-			</footer>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab />
 		</div>
 	);
 }

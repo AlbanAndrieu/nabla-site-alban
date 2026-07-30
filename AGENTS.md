@@ -1,3 +1,9 @@
+## Project 404 invariant
+
+- `app/global-not-found.tsx` is the single application-wide unmatched-route handler. This project has a top-level dynamic locale layout and enables `experimental.globalNotFound`, so a duplicate root `app/not-found.tsx` must not be added unless distinct segment-level `notFound()` behavior is explicitly required.
+- The global handler must render the body of the trusted, versioned `public/404.html` asset. Preserve that file's classes, inline styles, IDs, ARIA attributes, and links because its visual rendering depends on them. Remove embedded scripts and load the shared analytics/widget scripts exactly once from the React document.
+- After routing or 404 changes, verify that `/toto` and `/fr/toto` return HTTP 404, display the custom animated page, include `noindex`, and produce no hydration errors. Keep `tests/not-found.spec.ts` as the regression check.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

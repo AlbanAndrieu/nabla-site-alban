@@ -1,6 +1,13 @@
 import Image from "next/image";
 
-export default function ToolsSection() {
+type Props = {
+	title: string;
+	webUi: string;
+	signIn: string;
+	logoAlt: string;
+};
+
+export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 	return (
 		<section
 			className="py-4 page-truenas-tools border-top border-secondary"
@@ -12,7 +19,7 @@ export default function ToolsSection() {
 						className="fas fa-screwdriver-wrench text-primary me-2"
 						aria-hidden="true"
 					></i>
-					Tools & sign-in
+					{title}
 				</h2>
 				<div className="row align-items-center g-4">
 					<div className="col-md-6">
@@ -27,15 +34,15 @@ export default function ToolsSection() {
 								width="72"
 								height="72"
 								className="rounded flex-shrink-0"
-								alt=""
+								alt={logoAlt}
 								style={{ height: "auto" }}
 							/>
 							<span>
 								<span className="d-block fw-semibold text-body">
-									TrueNAS web UI
+									{webUi}
 								</span>
 								<span className="d-block small text-muted">
-									Primary sign-in (same host as above)
+									{signIn}
 								</span>
 							</span>
 						</a>

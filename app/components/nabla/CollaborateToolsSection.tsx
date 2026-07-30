@@ -51,12 +51,12 @@ export default function CollaborateToolsSection({
 											width={32}
 											height={32}
 											style={{
-												maxHeight: 36,
 												display: "block",
 												marginLeft: "auto",
 												marginRight: "auto",
 												objectFit: "contain",
-												height: "auto",
+												width: 32,
+												height: 32,
 											}}
 										/>
 									) : (

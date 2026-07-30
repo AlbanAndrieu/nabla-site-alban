@@ -4,6 +4,7 @@ import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
@@ -54,7 +55,7 @@ export default async function WorkstationPage({ params }: Props) {
 				<HardwareSection />
 				<BillOfMaterialsSection />
 			</div>
-			<Script src="/site-widgets.js" strategy="afterInteractive" />
+			<SiteWidgetsScript />
 		</div>
 	);
 }

@@ -71,5 +71,6 @@
 	"[css]": { "editor.defaultFormatter": "Biome.biome-vscode" },
 	"[html]": { "editor.defaultFormatter": "Biome.biome-vscode" },
 	"eslint.format.enable": false,
-	"prettier.enable": false
+	"prettier.enable": false,
+	"cSpell.words": ["albandrieu"]
 }

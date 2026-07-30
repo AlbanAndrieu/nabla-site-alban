@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -131,15 +131,13 @@ export default async function TestPage({
 					</div>
 				</div>
 			</section>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-scroll-reveal=".service-card,.skill-category,.tool-item"
-				data-reveal-effect="animation"
-				data-reveal-animation="fadeInUp 0.6s ease forwards"
-				data-axeptio=""
-				data-print-pdf=""
-				data-coffee-fab=""
+			<SiteWidgetsScript
+				axeptio
+				coffeeFab
+				printPdf
+				scrollReveal=".service-card,.skill-category,.tool-item"
+				revealEffect="animation"
+				revealAnimation="fadeInUp 0.6s ease forwards"
 			/>
 		</div>
 	);

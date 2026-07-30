@@ -22,15 +22,11 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/nabla">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const isFrench = locale === "fr";
+	const t = await getTranslations({ locale, namespace: "nabla.metadata" });
 
 	return {
-		title: isFrench
-			? "Nabla — Homelab DevSecOps et plateforme cloud"
-			: "Nabla — DevSecOps homelab and cloud platform",
-		description: isFrench
-			? "Découvrez le homelab Nabla, ses automatisations, ses outils DevSecOps et ses expérimentations cloud, sécurité et IA."
-			: "Explore the Nabla homelab, its automation, DevSecOps tooling, and cloud, security, and AI experiments.",
+		title: t("title"),
+		description: t("description"),
 		alternates: {
 			canonical: canonicalPagePath("nabla", locale),
 			languages: {

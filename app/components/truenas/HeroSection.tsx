@@ -1,21 +1,26 @@
-import React from "react";
+type Props = {
+	ariaLabel: string;
+	title: string;
+	lead: string;
+	credit: string;
+	topics: string;
+};
 
-export default function HeroSection() {
+export default function HeroSection({
+	ariaLabel,
+	title,
+	lead,
+	credit,
+	topics,
+}: Props) {
 	return (
-		<section className="truenas-hero" aria-label="TrueNAS branding/intro">
+		<section className="truenas-hero" aria-label={ariaLabel}>
 			<div className="container py-4 mb-2">
-				<h1 className="display-4 mb-2 text-center">
-					TrueNAS Scale Homelab & Hardware
-				</h1>
-				<p className="lead mb-1 text-center">
-					TrueNAS Scale homelab: hardware platform, self-hosted apps (Portainer,
-					Grafana, n8n, Home Assistant), security tooling, and AI-related
-					services.
-				</p>
+				<h1 className="display-4 mb-2 text-center">{title}</h1>
+				<p className="lead mb-1 text-center">{lead}</p>
 				<p className="lead text-center small text-muted">
-					Guide & documentation Alban Andrieu. <br />
-					Hardware, apps, ZFS, automation & AI, open-source ethos, full-stack
-					hands-on
+					{credit} <br />
+					{topics}
 				</p>
 			</div>
 		</section>

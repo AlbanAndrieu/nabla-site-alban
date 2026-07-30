@@ -5,7 +5,7 @@ import {
 	type TechnologyGroup,
 } from "../../../lib/technologyCatalog";
 
-function LogoRow({ title, technologies }: TechnologyGroup) {
+function LogoRow({ title, technologies, officialWebsite }: TechnologyGroup & { officialWebsite: string }) {
 	return (
 		<div style={{ marginBottom: 28 }}>
 			<h3 style={{ fontWeight: 700, margin: "0 0 8px" }}>{title}</h3>
@@ -25,7 +25,7 @@ function LogoRow({ title, technologies }: TechnologyGroup) {
 							href={href}
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label={`${name} — official website (opens in a new tab)`}
+							aria-label={`${name} — ${officialWebsite}`}
 							title={name}
 						>
 							{icon ? (
@@ -58,7 +58,9 @@ function LogoRow({ title, technologies }: TechnologyGroup) {
 	);
 }
 
-export default function TechnologiesSection() {
+type Props = { title: string; subtitle: string; groupTitles: string[]; officialWebsite: string };
+
+export default function TechnologiesSection({ title, subtitle, groupTitles, officialWebsite }: Props) {
 	return (
 		<section
 			className="services-section section-tight-top"
@@ -66,15 +68,15 @@ export default function TechnologiesSection() {
 			aria-labelledby="ai-stack-heading"
 		>
 			<h2 className="section-title" id="ai-stack-heading">
-				Technologies & Stack
+				{title}
 			</h2>
 			<p className="section-subtitle">
-				Here is a selection of technologies I use in production.
+				{subtitle}
 			</p>
 			<div className="services-grid ai-mlops-grid">
 				<div className="service-card ai-mlops-wide-card">
-					{TECHNOLOGY_GROUPS.map((group) => (
-						<LogoRow key={group.title} {...group} />
+					{TECHNOLOGY_GROUPS.map((group, index) => (
+						<LogoRow key={group.title} {...group} title={groupTitles[index]} officialWebsite={officialWebsite} />
 					))}
 				</div>
 			</div>

@@ -16,6 +16,13 @@ test.describe("localized not-found page", () => {
 			page.getByRole("heading", { level: 1, name: "404" }),
 		).toBeVisible();
 		await expect(page.getByText("We're fairly sure that page")).toBeVisible();
+		await expect(page.locator(".cloak__wrapper")).toBeVisible();
+		expect(await page.locator("style").allTextContents()).toEqual(
+			expect.arrayContaining([expect.stringContaining("--swing-x")]),
+		);
+		await expect(page.getByRole("link", { name: "Back to home" })).toHaveClass(
+			/text-decoration-none/,
+		);
 		await expect(page.locator('script[src="/site-analytics.js"]')).toHaveCount(
 			1,
 		);

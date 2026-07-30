@@ -3,17 +3,28 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("CISO Dashboard", () => {
-	test("should render /en/ciso and contain heading", async ({ page }) => {
-		await page.goto("/en/ciso");
-		await expect(page).toHaveURL(/\/ciso\.html$/);
-		await expect(page.locator("h1")).toHaveText(/CISO Dashboard/i);
-		await expect(page).toHaveTitle(/CISO Dashboard/i);
-	});
+	const cases = [
+		{
+			pathname: "/ciso.html",
+			heading: "CISO Dashboard",
+			status: "In progress",
+		},
+		{
+			pathname: "/fr/ciso.html",
+			heading: "Tableau de bord RSSI",
+			status: "En cours",
+		},
+	] as const;
 
-	test("should render /fr/ciso and contain heading", async ({ page }) => {
-		await page.goto("/fr/ciso");
-		await expect(page).toHaveURL(/fr\/ciso/);
-		await expect(page.locator("h1")).toHaveText(/Tableau de bord RSSI/i);
-		await expect(page).toHaveTitle(/Tableau de bord RSSI/i);
-	});
+	for (const { pathname, heading, status } of cases) {
+		test(`${pathname} uses its next-intl catalog`, async ({ page }) => {
+			await page.goto(pathname);
+			await expect(page).toHaveURL(new RegExp(`${pathname.replace(".", "\\.")}$`));
+			await expect(page.getByRole("heading", { level: 1 })).toContainText(
+				heading,
+			);
+			await expect(page).toHaveTitle(new RegExp(heading, "i"));
+			await expect(page.getByText(status, { exact: true })).toBeVisible();
+		});
+	}
 });

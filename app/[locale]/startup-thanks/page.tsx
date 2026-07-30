@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -73,19 +73,7 @@ export default async function StartupThanksPage({
 					{t("thanks.another")}
 				</a>
 			</main>
-			<footer className="footer" role="contentinfo">
-				<div className="footer-links">
-					<a href="/policy/legal.html">
-						{t("thanks.legal")}
-					</a>
-				</div>
-				<p className="footer-copyright"></p>
-			</footer>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-			/>
+			<SiteWidgetsScript printPdf />
 		</div>
 	);
 }

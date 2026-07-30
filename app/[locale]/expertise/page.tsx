@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
-import ServicesSection from "../../components/expertise/ServicesSection";
+import ServicesSection, {
+	type ExpertiseService,
+} from "../../components/expertise/ServicesSection";
 import SkillsSection from "../../components/expertise/SkillsSection";
 import TechnologiesSection from "../../components/expertise/TechnologiesSection";
 
@@ -16,17 +18,13 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/expertise">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const isFrench = locale === "fr";
+	const t = await getTranslations({ locale, namespace: "expertisePage" });
 
 	return {
-		title: isFrench
-			? "Services et expertise technique — Alban Andrieu"
-			: "Services & technical expertise — Alban Andrieu",
-		description: isFrench
-			? "Services DevSecOps, cybersécurité, cloud, plateforme et IA proposés par Alban Andrieu."
-			: "DevSecOps, cybersecurity, cloud, platform and AI services offered by Alban Andrieu.",
+		title: t("metadataTitle"),
+		description: t("metadataDescription"),
 		alternates: {
-			canonical: isFrench ? "/fr/expertise.html" : "/expertise.html",
+			canonical: locale === "fr" ? "/fr/expertise.html" : "/expertise.html",
 			languages: { en: "/expertise.html", fr: "/fr/expertise.html" },
 		},
 	};
@@ -39,7 +37,14 @@ export default async function ExpertisePage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
+	const [site, t] = await Promise.all([
+		getTranslations("site"),
+		getTranslations("expertisePage"),
+	]);
+	const services = t.raw("services.items") as ExpertiseService[];
+	const aiBullets = t.raw("aiml.bullets") as string[];
+	const skillCategoryTitles = t.raw("skills.categoryTitles") as string[];
+	const technologyGroupTitles = t.raw("technologies.groupTitles") as string[];
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
@@ -47,18 +52,36 @@ export default async function ExpertisePage({
 				{site("skipToMainContent")}
 			</a>
 			<main id="main-content">
-				<HeroSection />
-				<ServicesSection />
-				<AIMLOpsSection />
-				<SkillsSection />
-				<TechnologiesSection />
+				<HeroSection
+					label={t("hero.label")}
+					imageAlt={t("hero.imageAlt")}
+					tagline={t("hero.tagline")}
+				/>
+				<ServicesSection
+					title={t("services.title")}
+					subtitle={t("services.subtitle")}
+					services={services}
+				/>
+				<AIMLOpsSection
+					title={t("aiml.title")}
+					subtitle={t("aiml.subtitle")}
+					bullets={aiBullets}
+				/>
+				<SkillsSection
+					title={t("skills.title")}
+					subtitle={t("skills.subtitle")}
+					categoryTitles={skillCategoryTitles}
+					cvLink={t("skills.cvLink")}
+					cvHref={locale === "fr" ? "/fr/cv" : "/cv"}
+				/>
+				<TechnologiesSection
+					title={t("technologies.title")}
+					subtitle={t("technologies.subtitle")}
+					groupTitles={technologyGroupTitles}
+					officialWebsite={t("technologies.officialWebsite")}
+				/>
 			</main>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab />
 		</div>
 	);
 }

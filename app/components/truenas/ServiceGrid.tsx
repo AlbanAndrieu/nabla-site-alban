@@ -24,7 +24,12 @@ function lockerIcon(color: string) {
 	);
 }
 
-export default function ServiceGrid() {
+type Props = {
+	tunnelLabel: string;
+	internalLabel: string;
+};
+
+export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
 	const services = (homelabData.services as HomelabService[]) || [];
 	return (
 		<div className="row service-grid">
@@ -81,7 +86,7 @@ export default function ServiceGrid() {
 											rel="noopener noreferrer"
 										>
 											{locker}
-											Service Web (tunnel)
+											{tunnelLabel}
 										</a>
 									)}
 									{hasInternal && (
@@ -98,7 +103,7 @@ export default function ServiceGrid() {
 													aria-hidden="true"
 												/>
 											)}
-											Internal ({svc.internalHost}:{svc.internalPort})
+											{internalLabel} ({svc.internalHost}:{svc.internalPort})
 										</a>
 									)}
 								</div>

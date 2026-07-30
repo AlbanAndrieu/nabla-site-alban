@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 type Link = { href: string; label: string; flag?: string; download?: boolean };
@@ -153,13 +156,13 @@ export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/cv">): Promise<Metadata> {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "cvPage" });
-	const normalizedLocale = locale === "fr" ? "fr" : "en";
 	return {
 		title: t("meta.title"),
 		description: t("meta.description"),
 		alternates: {
-			canonical: canonicalPagePath("cv", normalizedLocale),
+			canonical: canonicalPagePath("cv", locale),
 			languages: {
 				en: canonicalPagePath("cv", "en"),
 				fr: canonicalPagePath("cv", "fr"),
@@ -170,19 +173,23 @@ export async function generateMetadata({
 
 export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
-	const t = await getTranslations("cvPage");
-	const contact = await getTranslations("contactPage");
+	const [t, contact] = await Promise.all([
+		getTranslations("cvPage"),
+		getTranslations("contactPage"),
+	]);
 	return (
 		<main id="main-content" className="site-content-page page-cv page-dark">
 			<ContactHero
 				contactCta={contact("hero.contactCta")}
-				contactHref={`/${locale}/contact`}
+				contactHref={canonicalPagePath("contact", locale)}
 				current={contact("hero.current")}
 				cvCta={contact("hero.cvCta")}
 				cvHref="#cv-formats"
 				experience={contact("hero.experience")}
 				intro={contact("intro")}
+				profileAlt={contact("hero.profileAlt")}
 				role={contact("role")}
 			/>
 
@@ -193,7 +200,7 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 				<h2 className="section-title">{t("contact.title")}</h2>
 				<a
 					className="cv-page-qr cv-contact-qr"
-					href={`/${locale}/contact`}
+					href={canonicalPagePath("contact", locale)}
 					aria-label={t("contact.cta")}
 				>
 					<Image
@@ -244,9 +251,10 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 							>
 								<Image
 									src="/assets/nabla/signature/qr_linkedin_nabla.png"
-									width={140}
-									height={140}
+									width={445}
+									height={440}
 									alt={t("professional.linkedinAlt")}
+									style={{ width: 140, height: "auto" }}
 								/>
 								<strong>LinkedIn</strong>
 							</a>
@@ -258,9 +266,10 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 							>
 								<Image
 									src="/assets/nabla/signature/qr-code-malt-nabla.jpg"
-									width={140}
-									height={140}
+									width={996}
+									height={1507}
 									alt={t("professional.maltAlt")}
+									style={{ width: 140, height: "auto" }}
 								/>
 								<strong>Malt</strong>
 							</a>

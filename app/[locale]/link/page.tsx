@@ -1,10 +1,32 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/link">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "linkPage" });
+
+	return {
+		title: t("metadataTitle"),
+		description: t("metadataDescription"),
+		alternates: {
+			canonical: canonicalPagePath("link", locale),
+			languages: {
+				en: canonicalPagePath("link", "en"),
+				fr: canonicalPagePath("link", "fr"),
+			},
+		},
+	};
+}
 
 export default async function LinkPage({
 	params,
@@ -13,36 +35,41 @@ export default async function LinkPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
+	const [site, t] = await Promise.all([
+		getTranslations("site"),
+		getTranslations("linkPage"),
+	]);
+	const homeHref = locale === "fr" ? "/fr" : "/";
+	const nablaHref = canonicalPagePath("nabla", locale);
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
 			</a>
-			<nav className="page-nav container py-3" aria-label="Breadcrumb">
-				<a href="/" className="text-decoration-none">
-					<i className="fas fa-home" aria-hidden="true"></i> Back to home
+			<nav className="page-nav container py-3" aria-label={t("breadcrumbLabel")}>
+				<a href={homeHref} className="text-decoration-none">
+					<i className="fas fa-home" aria-hidden="true"></i> {t("backHome")}
 				</a>
 				<span className="text-muted mx-2" aria-hidden="true">
 					·
 				</span>
-				<a href="/nabla" className="text-decoration-none">
-					Nabla overview
+				<a href={nablaHref} className="text-decoration-none">
+					{t("nablaOverview")}
 				</a>
 			</nav>
 			<main id="main-content" className="container py-4 pb-5">
 				<header className="mb-4 text-center">
-					<h1 className="h2 mb-2">Profiles & registries in use</h1>
+					<h1 className="h2 mb-2">{t("title")}</h1>
 					<p className="section-subtitle mb-0">
-						Public profiles and registries referenced from the{" "}
-						<a href="/nabla">Nabla</a> DevSecOps overview.
+						{t("introBeforeLink")} <a href={nablaHref}>Nabla</a>{" "}
+						{t("introAfterLink")}
 					</p>
 				</header>
 
 				<section className="py-2" aria-labelledby="profiles-grid-heading">
 					<h2 id="profiles-grid-heading" className="visually-hidden">
-						Registry and profile links
+						{t("profilesHeading")}
 					</h2>
 					<div className="tools-grid">
 						<div className="tool-item">
@@ -54,8 +81,8 @@ export default async function LinkPage({
 								<Image
 									src="/assets/logo-github-simple.png"
 									alt="GitHub"
-									width={100}
-									height={100}
+									width={220}
+									height={220}
 								/>
 								<h4>GitHub</h4>
 							</a>
@@ -69,8 +96,8 @@ export default async function LinkPage({
 								<Image
 									src="/assets/logo-sonar.png"
 									alt="SonarCloud"
-									width={100}
-									height={100}
+									width={470}
+									height={187}
 								/>
 								<h4>SonarCloud</h4>
 							</a>
@@ -84,8 +111,8 @@ export default async function LinkPage({
 								<Image
 									src="/assets/logo-docker-hub-simple.png"
 									alt="Docker Hub"
-									width={100}
-									height={100}
+									width={1000}
+									height={1000}
 								/>
 								<h4>Docker Hub</h4>
 							</a>
@@ -99,8 +126,8 @@ export default async function LinkPage({
 								<Image
 									src="/assets/logo-nexus.png"
 									alt="Sonatype Nexus Repository"
-									width={100}
-									height={100}
+									width={357}
+									height={144}
 								/>
 								<h4>Nexus</h4>
 							</a>
@@ -110,7 +137,7 @@ export default async function LinkPage({
 
 				<section className="py-4 mt-2" aria-labelledby="freelance-refs-heading">
 					<h2 id="freelance-refs-heading" className="h4 text-center mb-4">
-						Freelance references
+						{t("freelanceHeading")}
 					</h2>
 					<div className="tools-grid">
 						<div className="tool-item">
@@ -134,8 +161,8 @@ export default async function LinkPage({
 								<Image
 									src="/assets/fontawesome-free-7.1.0-web/svgs/brands/linkedin-in.svg"
 									alt="LinkedIn"
-									width={100}
-									height={100}
+									width={448}
+									height={512}
 								/>
 								<h4>LinkedIn</h4>
 							</a>
@@ -143,85 +170,7 @@ export default async function LinkPage({
 					</div>
 				</section>
 			</main>
-			<footer className="footer">
-				<div className="social-links">
-					<a
-						href="https://www.linkedin.com/in/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="LinkedIn"
-					>
-						<i className="fab fa-linkedin-in"></i>
-					</a>
-					<a
-						href="https://calendly.com/alban-andrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Calendly"
-					>
-						<i className="fa fa-calendar-plus"></i>
-					</a>
-					<a
-						href="https://github.com/AlbanAndrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="GitHub"
-					>
-						<i className="fab fa-github"></i>
-					</a>
-					<a
-						href="https://hub.docker.com/u/nabla"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Docker Hub"
-					>
-						<i className="fab fa-docker"></i>
-					</a>
-					<a
-						href="https://stackexchange.com/users/4652074/albanandrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="social-link"
-						aria-label="Stack Exchange"
-					>
-						<i className="fab fa-stack-exchange"></i>
-					</a>
-				</div>
-				<div className="footer-links">
-					<a href="/policy/legal.html">Legal notices</a>
-					<a
-						href="javascript:openAxeptioCookies()"
-						rel="noopener noreferrer"
-						className="text-muted"
-					>
-						Cookies
-					</a>
-				</div>
-				<p className="text-md-center mt-3">
-					<a href="/" className="btn btn-sm btn-outline-secondary">
-						Back to Home
-					</a>
-					<a
-						href="#top"
-						className="btn btn-sm btn-outline-secondary"
-						aria-label="Back to top of page"
-					>
-						Back to top
-					</a>
-				</p>
-				<p className="footer-copyright"></p>
-			</footer>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-				data-axeptio=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab axeptio />
 		</div>
 	);
 }

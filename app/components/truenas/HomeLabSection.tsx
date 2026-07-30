@@ -1,6 +1,22 @@
 import Image from "next/image";
 
-export default function HomeLabSection() {
+type Props = {
+	title: string;
+	intro: string;
+	purpose: string;
+	projectDescription: string;
+	openProject: string;
+	nablaHref: string;
+};
+
+export default function HomeLabSection({
+	title,
+	intro,
+	purpose,
+	projectDescription,
+	openProject,
+	nablaHref,
+}: Props) {
 	return (
 		<section
 			className="py-4 page-truenas-secondary"
@@ -12,15 +28,10 @@ export default function HomeLabSection() {
 						className="fas fa-layer-group text-primary me-2"
 						aria-hidden="true"
 					></i>
-					Home lab for Security, AI and Freelance projects
+					{title}
 				</h2>
-				<p className="text-secondary mb-4">
-					This home lab was built to host upcoming Nabla projects and services.
-				</p>
-				<p>
-					Its purpose is to test Security and AI service integrations and to
-					reproduce attacks targeting my domains.
-				</p>
+				<p className="text-secondary mb-4">{intro}</p>
+				<p>{purpose}</p>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
@@ -35,13 +46,13 @@ export default function HomeLabSection() {
 							<div className="card-body text-center border-top border-secondary">
 								<h3 className="h5 card-title mb-1">Nabla</h3>
 								<p className="card-text text-muted small mb-0">
-									Nabla & project
+									{projectDescription}
 								</p>
 								<a
-									href="/nabla.html"
+									href={nablaHref}
 									className="btn btn-sm btn-outline-primary mt-3"
 								>
-									Open nabla project
+									{openProject}
 								</a>
 							</div>
 						</div>

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Script from "next/script";
 import { useState } from "react";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 
 export default function LoginPage() {
@@ -111,13 +112,11 @@ export default function LoginPage() {
 				strategy="afterInteractive"
 			/>
 			{/* Site widgets */}
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-scroll-reveal=".service-card,.skill-category,.tool-item"
-				data-reveal-effect="animation"
-				data-reveal-animation="fadeInUp 0.6s ease forwards"
-				data-coffee-fab=""
+			<SiteWidgetsScript
+				coffeeFab
+				scrollReveal=".service-card,.skill-category,.tool-item"
+				revealEffect="animation"
+				revealAnimation="fadeInUp 0.6s ease forwards"
 			/>
 		</div>
 	);

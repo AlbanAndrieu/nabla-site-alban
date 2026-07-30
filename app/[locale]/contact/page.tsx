@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 const socials = [
 	[
@@ -52,14 +56,26 @@ export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/contact">): Promise<Metadata> {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "contactPage" });
-	return { title: t("meta.title"), description: t("meta.description") };
+	return {
+		title: t("meta.title"),
+		description: t("meta.description"),
+		alternates: {
+			canonical: canonicalPagePath("contact", locale),
+			languages: {
+				en: canonicalPagePath("contact", "en"),
+				fr: canonicalPagePath("contact", "fr"),
+			},
+		},
+	};
 }
 
 export default async function ContactPage({
 	params,
 }: PageProps<"/[locale]/contact">) {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
 	const t = await getTranslations("contactPage");
 	return (
@@ -73,16 +89,20 @@ export default async function ContactPage({
 				contactHref="#contact-details"
 				current={t("hero.current")}
 				cvCta={t("hero.cvCta")}
-				cvHref={`/${locale}/cv`}
+				cvHref={canonicalPagePath("cv", locale)}
 				experience={t("hero.experience")}
 				intro={t("intro")}
+				profileAlt={t("hero.profileAlt")}
 				role={t("role")}
 			/>
 			<section className="contact-section container" id="contact-details">
 				<h2 className="section-title">{t("information.title")}</h2>
 				<p className="section-subtitle">{t("information.subtitle")}</p>
 				<div className="contact-methods">
-					<a className="contact-method" href={`/${locale}/contact`}>
+					<a
+						className="contact-method"
+						href={canonicalPagePath("contact", locale)}
+					>
 						<Image
 							src="/assets/nabla/signature/qr_albanandrieu_contact_logo.png"
 							width={120}
@@ -156,10 +176,11 @@ export default async function ContactPage({
 					rel="noopener noreferrer"
 				>
 					<Image
-						src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
-						width={120}
-						height={120}
-						alt={t("linkedinQrAlt")}
+							src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
+							width={954}
+							height={996}
+							alt={t("linkedinQrAlt")}
+							style={{ width: 120, height: "auto" }}
 					/>
 					<strong>LinkedIn</strong>
 				</a>

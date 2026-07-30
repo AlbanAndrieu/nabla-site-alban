@@ -57,41 +57,44 @@ export default async function ReviewPage({ params }: Props) {
 	const t = await getTranslations("jm.4years");
 
 	return (
-		<main className="container py-4 pb-5">
-			<section
-				className="hero-section jusmundi-hero-compact"
-				aria-labelledby="hero-heading"
-			>
-				<div className="hero-content">
-					<h1 className="hero-title" id="hero-heading">
-						{t("headline")}
-					</h1>
-					<p className="hero-subtitle">{t("lead")}</p>
-				</div>
-			</section>
-			{config.detailed ? (
-				<>
-					<section
-						className="proof-section jusmundi-landing-content"
-						aria-labelledby="exec-heading"
-					>
-						<h2 className="section-title" id="exec-heading">
-							{t("executive_title")}
-						</h2>
-						<div className="service-card jusmundi-service-card-wide">
-							<p>{t("executive_copy")}</p>
-						</div>
-					</section>
-					<section
-						className="proof-section jusmundi-landing-content"
-						aria-labelledby="achievements-heading"
-					>
-						<h2 className="section-title" id="achievements-heading">
-							{t("key_achievements")}
-						</h2>
-					</section>
-				</>
-			) : null}
-		</main>
+		<>
+			<link rel="stylesheet" href="/jm/jusmundi.css" precedence="page" />
+			<main className="container py-4 pb-5">
+				<section
+					className="hero-section jusmundi-hero-compact"
+					aria-labelledby="hero-heading"
+				>
+					<div className="hero-content">
+						<h1 className="hero-title" id="hero-heading">
+							{t("headline")}
+						</h1>
+						<p className="hero-subtitle">{t("lead")}</p>
+					</div>
+				</section>
+				{config.detailed ? (
+					<>
+						<section
+							className="proof-section jusmundi-landing-content"
+							aria-labelledby="exec-heading"
+						>
+							<h2 className="section-title" id="exec-heading">
+								{t("executive_title")}
+							</h2>
+							<div className="service-card jusmundi-service-card-wide">
+								<p>{t("executive_copy")}</p>
+							</div>
+						</section>
+						<section
+							className="proof-section jusmundi-landing-content"
+							aria-labelledby="achievements-heading"
+						>
+							<h2 className="section-title" id="achievements-heading">
+								{t("key_achievements")}
+							</h2>
+						</section>
+					</>
+				) : null}
+			</main>
+		</>
 	);
 }

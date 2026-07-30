@@ -12,15 +12,11 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/jm">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const isFrench = locale === "fr";
+	const t = await getTranslations({ locale, namespace: "jm" });
 
 	return {
-		title: isFrench
-			? "Expérience Jus Mundi — Alban Andrieu"
-			: "Jus Mundi experience — Alban Andrieu",
-		description: isFrench
-			? "Réalisations DevSecOps, infrastructure, sécurité et fiabilité menées par Alban Andrieu chez Jus Mundi."
-			: "DevSecOps, infrastructure, security, and reliability achievements delivered by Alban Andrieu at Jus Mundi.",
+		title: t("pageTitle"),
+		description: t("metadataDescription"),
 		alternates: {
 			canonical: canonicalPagePath("jm", locale),
 			languages: {
@@ -39,12 +35,22 @@ export default async function JusmundiPage({
 }) {
 	const { locale } = await params;
 	setRequestLocale(locale);
-	const jm = await getTranslations("jm");
-	const site = await getTranslations("site");
+	const [jm, site] = await Promise.all([
+		getTranslations("jm"),
+		getTranslations("site"),
+	]);
+	const kpis = [
+		["kpiTasksCompleted", "kpiLabels.tasksCompleted"],
+		["kpiPlatformUptime", "kpiLabels.platformUptime"],
+		["kpiSecurityBreaches", "kpiLabels.securityBreaches"],
+		["kpiMttrP1", "kpiLabels.mttrP1"],
+		["kpiAlertNoiseReduction", "kpiLabels.alertNoiseReduction"],
+		["kpiAnnualSavings", "kpiLabels.annualSavings"],
+	] as const;
 
 	return (
 		<>
-			<link rel="stylesheet" href="/jm/jusmundi.css" />
+			<link rel="stylesheet" href="/jm/jusmundi.css" precedence="page" />
 			<div className="jusmundi-page jusmundi-landing-page page-dark">
 				<span id="top" />
 				<a href="#main-content" className="skip-link">
@@ -71,30 +77,12 @@ export default async function JusmundiPage({
 						</h2>
 						<p className="section-subtitle">{jm("kpisSubtitle")}</p>
 						<div className="kpi-grid">
-							<div className="kpi-card">
-								<span className="value">{jm("kpiTasksCompleted")}</span>
-								<span className="label">Tasks completed</span>
-							</div>
-							<div className="kpi-card">
-								<span className="value">{jm("kpiPlatformUptime")}</span>
-								<span className="label">Platform uptime (SLA)</span>
-							</div>
-							<div className="kpi-card">
-								<span className="value">{jm("kpiSecurityBreaches")}</span>
-								<span className="label">Security breaches</span>
-							</div>
-							<div className="kpi-card">
-								<span className="value">{jm("kpiMttrP1")}</span>
-								<span className="label">MTTR (P1)</span>
-							</div>
-							<div className="kpi-card">
-								<span className="value">{jm("kpiAlertNoiseReduction")}</span>
-								<span className="label">Alert noise reduction</span>
-							</div>
-							<div className="kpi-card">
-								<span className="value">{jm("kpiAnnualSavings")}</span>
-								<span className="label">Est. annual savings</span>
-							</div>
+							{kpis.map(([valueKey, labelKey]) => (
+								<div className="kpi-card" key={valueKey}>
+									<span className="value">{jm(valueKey)}</span>
+									<span className="label">{jm(labelKey)}</span>
+								</div>
+							))}
 						</div>
 					</section>
 
@@ -110,7 +98,7 @@ export default async function JusmundiPage({
 							<div className="engagement-block infra-migration-band-body">
 								<p className="infra-top-achievement-pill">
 									<i className="fas fa-trophy" aria-hidden="true" />
-									<span>Top #1 achievement</span>
+									<span>{jm("topAchievement", { rank: 1 })}</span>
 								</p>
 								<h3 id="security-focus-highlight-heading">
 									{jm("securityBandHeading")}
@@ -137,7 +125,7 @@ export default async function JusmundiPage({
 							<div className="engagement-block infra-migration-band-body">
 								<p className="infra-top-achievement-pill">
 									<i className="fas fa-trophy" aria-hidden="true" />
-									<span>Top #2 achievement</span>
+									<span>{jm("topAchievement", { rank: 2 })}</span>
 								</p>
 								<h3 id="infra-k8s-us-heading">{jm("infraBandHeading")}</h3>
 								<p className="infra-migration-lead">{jm("infraBandLead")}</p>
@@ -162,7 +150,7 @@ export default async function JusmundiPage({
 							<div className="engagement-block infra-migration-band-body">
 								<p className="infra-top-achievement-pill">
 									<i className="fas fa-trophy" aria-hidden="true" />
-									<span>Top #3 achievement</span>
+									<span>{jm("topAchievement", { rank: 3 })}</span>
 								</p>
 								<h3 id="ai-company-transition-heading">
 									{jm("aiBandHeading")}
