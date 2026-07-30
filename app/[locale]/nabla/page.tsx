@@ -1,6 +1,8 @@
-import { getTranslations } from "next-intl/server";
-import React from "react";
-import TopAnchor from "../../../components/TopAnchor";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
 import Hero from "../../components/Hero";
 import AnsibleHeroCard from "../../components/nabla/AnsibleHeroCard";
 import CollaborateToolsSection from "../../components/nabla/CollaborateToolsSection";
@@ -21,7 +23,13 @@ type Pillar = {
 	tools: { label: string; link?: string }[];
 };
 
-export default async function NablaPage() {
+export default async function NablaPage({
+	params,
+}: PageProps<"/[locale]/nabla">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
+
+	setRequestLocale(locale);
 	const site = await getTranslations("site");
 	const nabla = await getTranslations("nabla");
 

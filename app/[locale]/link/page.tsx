@@ -1,9 +1,18 @@
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import Script from "next/script";
-import { getTranslations } from "next-intl/server";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
 
-export default async function LinkPage() {
+export default async function LinkPage({
+	params,
+}: PageProps<"/[locale]/link">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
+
+	setRequestLocale(locale);
 	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">

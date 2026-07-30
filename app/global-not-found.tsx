@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import sanitizeHtml from "sanitize-html";
 import { loadPublicHtmlFragment } from "@/lib/htmlFromPublic";
 
 export const metadata: Metadata = {
@@ -13,10 +14,10 @@ export const metadata: Metadata = {
 
 export default async function GlobalNotFound() {
 	const staticBody = await loadPublicHtmlFragment("404.html", "body", "en");
-	const staticMarkup = staticBody.replace(
-		/<script\b[^>]*>[\s\S]*?<\/script>/gi,
-		"",
-	);
+	const staticMarkup = sanitizeHtml(staticBody, {
+		allowedTags: sanitizeHtml.defaults.allowedTags,
+		allowedAttributes: false,
+	});
 
 	return (
 		<html

@@ -763,5 +763,75 @@
 		"reasonLine2": "est désactivée. Google modifie la gestion des comptes tiers dans Gmail (Gmailify et POP « vérifier d’autres adresses ») :",
 		"reasonLine3": "Plus d’informations sur les changements Gmailify & POP",
 		"reasonLine4": " (Aide Google). Ce changement explique la fermeture de cette boîte mail."
+	},
+	"nabla": {
+		"collaborate": {
+			"heading": "Outils de collaboration",
+			"subtitle": "Centralisez vos flux DevSecOps avec ces outils essentiels de communication et de développement."
+		},
+		"platforms": {
+			"heading": "Plateformes et outils DevSecOps",
+			"intro1": "Une sélection pour une livraison moderne : collaborer, construire, publier, sécuriser et observer. La pile doit correspondre aux risques, à la conformité et aux compétences de l’équipe.",
+			"intro2": "Ce homelab héberge les projets et services Nabla. Il sert principalement à tester les intégrations sécurité et IA ainsi qu’à simuler des attaques.",
+			"logoCtaLabel": "Ouvrir le projet Nabla"
+		},
+		"opensource": {
+			"ansible": {
+				"title": "Rôles et playbooks Ansible",
+				"description": "Une collection d’automatisations Ansible comprenant des rôles pour Jenkins, Docker, Eclipse et la configuration complète d’environnements de développement.",
+				"linkLabel": "Voir sur GitHub"
+			},
+			"nabla": {
+				"title": "Plateforme DevSecOps Nabla",
+				"description": "Une plateforme DevSecOps réunissant cycle de développement, analyses de sécurité, automatisation de l’infrastructure et supervision.",
+				"linkLabel": "En savoir plus"
+			},
+			"docker": {
+				"title": "Images Docker",
+				"description": "Des images Docker optimisées et renforcées pour les environnements de développement et de production, disponibles sur Docker Hub.",
+				"linkLabel": "Voir sur Docker Hub"
+			}
+		},
+		"services": {
+			"search": {
+				"title": "Recherche personnalisée optimisée",
+				"description": "Recherche personnalisée utilisée par les outils IA développés en interne."
+			},
+			"iac": {
+				"title": "Infrastructure as Code",
+				"description": "Mise en œuvre de solutions IaC avec Terraform, Ansible et d’autres outils pour gérer l’infrastructure efficacement et de façon cohérente.",
+				"wipLabel": "En construction",
+				"wipDescription": "Cette fonctionnalité est encore en cours de préparation et n’est pas prête pour le trafic de production."
+			},
+			"fastapi": {
+				"title": "Exemple FastAPI Cloud",
+				"description": "Un exemple utilisé pour tester la CI, les accès sécurisés externes et le déploiement avec un MCP personnel.",
+				"openSample": "Ouvrir l’exemple",
+				"adminUI": "Interface d’administration",
+				"viewSource": "Voir le code sur GitLab"
+			}
+		},
+		"contact": {
+			"email": {
+				"label": "Email",
+				"value": "job@albandrieu.com",
+				"href": "mailto:job@albandrieu.com"
+			},
+			"linkedin": {
+				"label": "LinkedIn",
+				"value": "Me contacter",
+				"href": "https://www.linkedin.com/in/nabla"
+			},
+			"calendly": {
+				"label": "Calendly",
+				"value": "Planifier un appel",
+				"href": "https://calendly.com/alban-andrieu"
+			},
+			"github": {
+				"label": "GitHub",
+				"value": "Voir mes projets",
+				"href": "https://github.com/AlbanAndrieu"
+			}
+		}
 	}
 }

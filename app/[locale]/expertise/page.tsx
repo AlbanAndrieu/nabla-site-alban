@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Script from "next/script";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
 import ServicesSection from "../../components/expertise/ServicesSection";
@@ -10,6 +15,7 @@ export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/expertise">): Promise<Metadata> {
 	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
 	const isFrench = locale === "fr";
 
 	return {
@@ -26,10 +32,13 @@ export async function generateMetadata({
 	};
 }
 
-import { getTranslations } from "next-intl/server";
-import TopAnchor from "@/components/TopAnchor";
+export default async function ExpertisePage({
+	params,
+}: PageProps<"/[locale]/expertise">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
 
-export default async function ExpertisePage() {
+	setRequestLocale(locale);
 	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">

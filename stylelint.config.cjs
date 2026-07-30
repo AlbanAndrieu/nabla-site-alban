@@ -6,7 +6,7 @@ module.exports = {
 		"declaration-block-no-duplicate-properties": true,
 		"font-family-no-duplicate-names": true,
 		"function-calc-no-unspaced-operator": true,
-		"keyframe-block-no-duplicate-selectors": true,
+
 		"no-duplicate-at-import-rules": true,
 		"no-duplicate-selectors": true,
 		"no-empty-source": true,
@@ -18,6 +18,7 @@ module.exports = {
 		"unit-no-unknown": true,
 	},
 	ignoreFiles: [
+		"**/*.scss",
 		"node_modules/**/*",
 		"public/assets/**/*.css",
 		"public/arf.css",
