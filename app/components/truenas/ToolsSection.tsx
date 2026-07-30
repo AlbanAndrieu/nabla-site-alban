@@ -1,70 +1,66 @@
 import Image from "next/image";
 
 type Props = {
-	title: string;
-	webUi: string;
-	signIn: string;
-	logoAlt: string;
+  title: string;
+  webUi: string;
+  signIn: string;
+  logoAlt: string;
 };
 
 export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
-	return (
-		<section
-			className="py-4 page-truenas-tools border-top border-secondary"
-			aria-labelledby="truenas-tools-heading"
-		>
-			<div className="container">
-				<h2 id="truenas-tools-heading" className="h4 mb-4">
-					<i
-						className="fas fa-screwdriver-wrench text-primary me-2"
-						aria-hidden="true"
-					></i>
-					{title}
-				</h2>
-				<div className="row align-items-center g-4">
-					<div className="col-md-6">
-						<a
-							className="stack-tool-link d-flex align-items-center gap-3 text-decoration-none p-3 rounded border border-secondary"
-							href="https://truenas.albandrieu.com"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Image
-								src="/assets/logo-freenas-community-simple.jpeg"
-								width="72"
-								height="72"
-								className="rounded flex-shrink-0"
-								alt={logoAlt}
-								style={{ height: "auto" }}
-							/>
-							<span>
-								<span className="d-block fw-semibold text-body">
-									{webUi}
-								</span>
-								<span className="d-block small text-muted">
-									{signIn}
-								</span>
-							</span>
-						</a>
-					</div>
-				</div>
-				<div className="stack-exchange-badge">
-					<a
-						href="https://stackexchange.com/users/4652074/albanandrieu"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<img
-							src="https://stackexchange.com/users/flair/4652074.png"
-							width="208"
-							height="58"
-							alt="Stack Exchange profile for AlbanAndrieu"
-							loading="lazy"
-							decoding="async"
-						/>
-					</a>
-				</div>
-			</div>
-		</section>
-	);
+  return (
+    <section
+      className="py-4 page-truenas-tools border-top border-secondary"
+      aria-labelledby="truenas-tools-heading"
+    >
+      <div className="container">
+        <h2 id="truenas-tools-heading" className="h4 mb-4">
+          <i
+            className="fas fa-screwdriver-wrench text-primary me-2"
+            aria-hidden="true"
+          ></i>
+          {title}
+        </h2>
+        <div className="row align-items-center g-4">
+          <div className="col-md-6">
+            <a
+              className="stack-tool-link d-flex align-items-center gap-3 text-decoration-none p-3 rounded border border-secondary"
+              href="https://truenas.albandrieu.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src="/assets/logo-freenas-community-simple.jpeg"
+                width="72"
+                height="72"
+                className="rounded flex-shrink-0"
+                alt={logoAlt}
+                style={{ height: "auto" }}
+              />
+              <span>
+                <span className="d-block fw-semibold text-body">{webUi}</span>
+                <span className="d-block small text-muted">{signIn}</span>
+              </span>
+            </a>
+          </div>
+        </div>
+        <div className="stack-exchange-badge">
+          <a
+            href="https://stackexchange.com/users/4652074/albanandrieu"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://stackexchange.com/users/flair/4652074.png"
+              width="208"
+              height="58"
+              alt="Stack Exchange profile for AlbanAndrieu"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
 }

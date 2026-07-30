@@ -209,7 +209,7 @@ repos:
     -   id: pyupgrade
         name: "🐍 python · Py Upgrade"
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.1
     hooks:
     -   id: ruff-format
         name: "🐍 python · Format with Ruff"

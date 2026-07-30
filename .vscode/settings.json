@@ -1,76 +1,76 @@
 {
-	"files.associations": {
-		"wrangler.json": "jsonc"
-	},
-	"latex-workshop.latex.tools": [
-		{
-			"name": "latexmk-xelatex",
-			"command": "latexmk",
-			"args": [
-				"-synctex=1",
-				"-interaction=nonstopmode",
-				"-file-line-error",
-				"-xelatex",
-				"-outdir=%OUTDIR%",
-				"%DOC%"
-			],
-			"env": {}
-		},
-		{
-			"name": "xelatex",
-			"command": "xelatex",
-			"args": [
-				"-shell-escape",
-				"-synctex=1",
-				"-interaction=nonstopmode",
-				"-file-line-error",
-				"%DOC%"
-			],
-			"env": {}
-		},
-		{
-			"name": "pdflatex",
-			"command": "pdflatex",
-			"args": [
-				"-shell-escape",
-				"-synctex=1",
-				"-interaction=nonstopmode",
-				"-file-line-error",
-				"%DOC%"
-			],
-			"env": {}
-		}
-	],
-	"latex-workshop.latex.recipes": [
-		{
-			"name": "latexmk (xelatex)",
-			"tools": ["latexmk-xelatex"]
-		},
-		{
-			"name": "xelatex",
-			"tools": ["xelatex"]
-		},
-		{
-			"name": "pdflatex",
-			"tools": ["pdflatex"]
-		}
-	],
-	"latex-workshop.latex.recipe.default": "latexmk (xelatex)",
-	"github.copilot.advanced": {
-		"debug.overrideProxyUrl": "http://172.17.0.57:4000",
-		"debug.testOverrideProxyUrl": "http://172.17.0.57:4000"
-	},
-	"aws.telemetry": false,
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "Biome.biome-vscode",
-	"[javascript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[typescript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[typescriptreact]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[json]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[markdown]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[css]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"[html]": { "editor.defaultFormatter": "Biome.biome-vscode" },
-	"eslint.format.enable": false,
-	"prettier.enable": false,
-	"cSpell.words": ["albandrieu"]
+  "files.associations": {
+    "wrangler.json": "jsonc"
+  },
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-xelatex",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-xelatex",
+        "-outdir=%OUTDIR%",
+        "%DOC%"
+      ],
+      "env": {}
+    },
+    {
+      "name": "xelatex",
+      "command": "xelatex",
+      "args": [
+        "-shell-escape",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ],
+      "env": {}
+    },
+    {
+      "name": "pdflatex",
+      "command": "pdflatex",
+      "args": [
+        "-shell-escape",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (xelatex)",
+      "tools": ["latexmk-xelatex"]
+    },
+    {
+      "name": "xelatex",
+      "tools": ["xelatex"]
+    },
+    {
+      "name": "pdflatex",
+      "tools": ["pdflatex"]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "latexmk (xelatex)",
+  "github.copilot.advanced": {
+    "debug.overrideProxyUrl": "http://172.17.0.57:4000",
+    "debug.testOverrideProxyUrl": "http://172.17.0.57:4000"
+  },
+  "aws.telemetry": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "Biome.biome-vscode",
+  "[javascript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[typescript]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[json]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[markdown]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[css]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "[html]": { "editor.defaultFormatter": "Biome.biome-vscode" },
+  "eslint.format.enable": false,
+  "prettier.enable": false,
+  "cSpell.words": ["albandrieu"]
 }

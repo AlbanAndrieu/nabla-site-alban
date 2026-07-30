@@ -5,12 +5,12 @@ import type { ReactNode } from "react";
  * (root layout did not include these, so the card looked unstyled).
  */
 export default function CheckoutLayout({ children }: { children: ReactNode }) {
-	return (
-		<>
-			<link rel="stylesheet" href="/arf.css" />
-			<link rel="stylesheet" href="/site-content-page.css" />
-			<link rel="stylesheet" href="/checkout.css" />
-			{children}
-		</>
-	);
+  return (
+    <>
+      <link rel="stylesheet" href="/arf.css" />
+      <link rel="stylesheet" href="/site-content-page.css" />
+      <link rel="stylesheet" href="/checkout.css" />
+      {children}
+    </>
+  );
 }

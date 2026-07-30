@@ -1,650 +1,650 @@
 {
-	"picture": {
-		"hidden": false,
-		"url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782314404554.jpeg",
-		"size": 100,
-		"rotation": 0,
-		"aspectRatio": 1,
-		"borderRadius": 0,
-		"borderColor": "rgba(0, 0, 0, 0.5)",
-		"borderWidth": 0,
-		"shadowColor": "rgba(0, 0, 0, 0.5)",
-		"shadowWidth": 0
-	},
-	"basics": {
-		"name": "Alban Andrieu",
-		"headline": "Architecte Cloud Securité et AI",
-		"email": "job@albanandrieu.com",
-		"phone": "+33 6 95 43 53 53",
-		"location": "Paris Area",
-		"website": {
-			"url": "https://albanandrieu.com",
-			"label": "davidkowalski.games"
-		},
-		"customFields": [
-			{
-				"id": "019bef5a-93e4-7746-ad39-3a132360f823",
-				"icon": "linkedin-logo",
-				"text": "nabla",
-				"link": "https://github.com/AlbanAndrieuhttps://linkedin.com/in/nabla/"
-			},
-			{
-				"id": "019bef5a-0477-77e0-968b-5d0e2ecb34e3",
-				"icon": "github-logo",
-				"text": "AlbanAndrieu",
-				"link": "https://github.com/AlbanAndrieu"
-			}
-		]
-	},
-	"summary": {
-		"title": "",
-		"icon": "",
-		"columns": 1,
-		"hidden": false,
-		"content": "<p><strong>Architecte Cloud expérimenté </strong>avec plus de 20 ans d'expertise en ingénierie logicielle, infrastructure cloud et automatisation SDLC. Spécialisé dans les initiatives de transformation digitale, les technologies de conteneurisation et les pratiques de <u>déploiement sécurisé</u>. Solide expérience dans le pilotage de projets d'intégration complexes, la mise en œuvre de flux GitOps et la coordination d'équipes pluridisciplinaires. Expert en conception et maintenance de pipelines SDLC robustes avec Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform et Ansible sur des stacks variés (C/C++, Java, JavaScript, PHP, Go, Python). Forte expérience dans les services financiers avec une connaissance approfondie des systèmes back-office et des exigences réglementaires.</p>"
-	},
-	"sections": {
-		"profiles": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-43c470b77f4a",
-					"hidden": false,
-					"icon": "linkedin-logo",
-					"iconColor": "",
-					"network": "LinkedIn",
-					"username": "nabla",
-					"website": {
-						"url": "https://linkedin.com/in/nabla/",
-						"label": "linkedin.com/in/davidkowalski",
-						"inlineLink": false
-					}
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-3d42ddc9b4d8",
-					"hidden": false,
-					"icon": "github-logo",
-					"iconColor": "",
-					"network": "GitHub",
-					"username": "AlbanAndrieu",
-					"website": {
-						"url": "https://github.com/AlbanAndrieu",
-						"label": "github.com/dkowalski-dev",
-						"inlineLink": false
-					}
-				},
-				{
-					"id": "019efa50-d14d-72f2-b69d-6068119bf13d",
-					"hidden": false,
-					"icon": "globe",
-					"iconColor": "",
-					"network": "Website",
-					"username": "albanandrieu.com",
-					"website": {
-						"url": "https://albanandrieu.com",
-						"label": "",
-						"inlineLink": false
-					}
-				}
-			]
-		},
-		"experience": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-44d8cec98ca4",
-					"hidden": false,
-					"company": "Jus Mundi",
-					"position": "Architecte Cloud (DevSecOps)",
-					"location": "Paris, France",
-					"period": "2022 - Present",
-					"website": {
-						"url": "https://www.jusmundi.com",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li><p>Focus : Accompagnement de la transition IA et hébergement du site</p></li><li><p>Projet : Agent IA pour le droit international et l'arbitrage (jusmundi.com)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité complètes pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Protection métier : Renforcement de la sécurité applicative grâce à des mécanismes anti-scraping et à la gestion centralisée des identités et des accès avec Keycloak, tout en préservant la fluidité du parcours utilisateur, première legal tech à obtenir les certifications ISO 42001, 27001, SOC II</p></li><li><p>Conteneurisation : Pilotage de la conteneurisation avec Docker, création d'images optimisées et bonnes pratiques sécurité et performance</p></li><li><p>Orchestration : Conception et déploiement de clusters Nomad et Kubernetes pour les charges de production (réseau, stockage, monitoring)</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation des processus : Définition et documentation des processus de livraison, indicateurs qualité et KPIs</p></li><li><p>Coordination inter-équipes : Collaboration avec le développement et les Data Scientists pour l'automatisation build, test, package et livraison</p></li><li><p>Métriques et reporting : Mise en place de monitoring et reporting (taux de succès des builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architectures microservices en Python, GO, Nuxt et PHP</p></li><li><p>Produit : Jus Mundi propose l'IA et la recherche optimisée pour le contenu juridique international</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Continuité d'activité : Garantir la disponibilité du site et la livraison rapide des évolutions et correctifs</p></li><li><p>Sécurité : Promouvoir un haut niveau de sécurité et de protection</p></li><li><p>Support IA : Accompagner la livraison des outils IA auprès des ingénieurs et data scientists</p></li></ul></li></ul><p></p>",
-					"roles": []
-				},
-				{
-					"id": "019efa62-8896-71ae-9859-58d3e282e47e",
-					"hidden": false,
-					"company": "Finastra (ex-Misys puis Thomson Reuters)",
-					"position": "Architecte d'intégration Cloud",
-					"location": "Paris, France",
-					"period": "2017-2022",
-					"website": {
-						"url": "https://finastra.com/solutions/treasury-capital-markets",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li><p>Focus: Digital Transformation and Cloud Migration</p></li><li><p>Leading DevSecOps initiatives for legal tech platform</p></li><li><p>Project: Treasury and Capital Markets Solutions (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://finastra.com/solutions/treasury-capital-markets\">finastra.com/solutions/treasury-capital-markets</a>)</p></li><li><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Solaris and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul></li><li><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Infrastructure Unification: Consolidated disparate SDLC systems under a unified Jenkins-based platform</p></li><li><p>Cross-Team Coordination: Collaborated with development, QA, and operations teams to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul></li><li><p>Key Responsibilities:</p><ul><li><p>Pipeline Management: Design, implement, and maintain comprehensive DevSecOps pipelines integrating security scanning, automated testing, and continuous deployment</p></li><li><p>Cloud Systems Integration: Architect and maintain cloud-based infrastructure ensuring high availability, scalability, and security</p></li><li><p>Security Automation: Implement automated security and compliance checks within cloud environments, including vulnerability scanning, secrets management, and access control automation</p></li><li><p>Infrastructure as Code: Lead infrastructure automation initiatives using Ansible, Terraform, and other IaC tools for consistent and reproducible deployments</p></li><li><p>SDLC Optimization: Continuously improve build, test, and deployment workflows to enhance efficiency, reliability, and security</p></li><li><p>Team Collaboration: Work closely with development, operations, and security teams to implement DevSecOps best practices and foster a culture of shared responsibility</p></li></ul></li><li><p>Technologies &amp; Tools:</p><ul><li><p>Security Tools: SAST/DAST scanning, Klocwork, Fuzzing, Secret Detection, vulnerability management</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>",
-					"roles": [
-						{
-							"id": "019efa6f-e7de-76d8-b325-2fbef32c9080",
-							"position": "Architecte d'intégration cloud",
-							"period": "2017-2022",
-							"description": "<ul><li><p>Focus : Transformation digitale et migration cloud</p></li><li><p>Pilotage des initiatives DevSecOps pour plateforme legal tech</p></li><li><p>Projet : Solutions Trésorerie et Marchés de capitaux (finastra.com/solutions/treasury-capital-markets)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Conteneurisation : Pilotage avec Docker, Zone Solaris, images optimisées et bonnes pratiques</p></li><li><p>Orchestration Solaris et Kubernetes : Conception et déploiement de clusters</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation : Processus de livraison et KPIs</p></li><li><p>Unification : Consolidation des systèmes SDLC sur une plateforme Jenkins unifiée</p></li><li><p>Coordination : Collaboration avec dev, qa, sécurité et opérations pour l'automatisation complète</p></li><li><p>Métriques : Monitoring et reporting (builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Pipelines : Conception, mise en œuvre et maintenance de pipelines DevSecOps (sécurité, tests, déploiement)</p></li><li><p>Intégration cloud : Architecture et maintenance d'infrastructure cloud (haute disponibilité, scalabilité, sécurité)</p></li><li><p>Automatisation sécurité : Contrôles de sécurité et conformité automatisés (vulnérabilités, secrets, accès)</p></li><li><p>Infrastructure as Code : Ansible, Terraform et autres outils IaC pour des déploiements reproductibles</p></li><li><p>Optimisation SDLC : Amélioration continue des flux build, test et déploiement</p></li><li><p>Collaboration : Travail avec dev, ops et sécurité pour les bonnes pratiques DevSecOps</p></li></ul></li><li><p>Technologies et outils :</p><ul><li><p>Sécurité : SAST/DAST, Klocwork, Fuzzing, Secret Detection, gestion des vulnérabilités</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>"
-						},
-						{
-							"id": "019efa70-fa97-7276-a6bf-7d0adca0cb22",
-							"position": "Ingénieur d'intégration cloud",
-							"period": "2012-2017",
-							"description": "<ul><li><p>Focus : Introduction de l'intégration continue et de l'automatisation</p></li><li><p>Réalisations clés :</p></li><li><p>Mise en œuvre SDLC : Adoption de l'intégration continue avec Jenkins et Ansible, réduction de 60 % des problèmes d'intégration</p></li><li><p>Pratiques GitOps : Infrastructure as code avec Ansible sur Unix, Windows, Solaris, AIX et macOS</p></li><li><p>Support multi-langages : Systèmes de build pour :</p><ul><li><p>C/C++ Applications natives</p></li><li><p>Objective-C Applications macOS et iOS</p></li><li><p>Java Applications avec Maven et Gradle</p></li><li><p>JavaScript Frontend npm et Angular</p></li><li><p>Python Scripts et outils d'automatisation</p></li><li><p>Shell/Perl Scripts d'administration</p></li></ul></li><li><p>Automatisation : Frameworks de tests et scripts de déploiement, réduction du temps de déploiement manuel</p></li><li><p>Contrôle de version : Migration des équipes vers Git, formation et stratégies de branches</p></li></ul><p></p>"
-						},
-						{
-							"id": "019efa72-f41a-7545-a7e4-529aa7e43c6c",
-							"position": "Ingénieur logiciel senior",
-							"period": "2007-2012",
-							"description": "<ul><li><p>Focus : Développement des modules stock et comptabilité</p></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architecture web 3 tiers (services métier C++, Java J2EE via CORBA)</p></li><li><p>Produit : Suite Kondor+ Back-Office (K+TP) - plateforme trésorerie et trading</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Gestion des stocks matériels avec suivi d'inventaire en temps réel</p></li><li><p>Génération automatique des écritures comptables bilan et hors bilan, conformité réglementaire</p></li><li><p>Optimisationdes requêtes et logique applicative pour le traitement à fort volume</p></li></ul></li></ul><p></p>"
-						}
-					]
-				},
-				{
-					"id": "019efa73-dd7b-709f-bdd6-e37d1ecf439c",
-					"hidden": false,
-					"company": "Société Générale Corporate & Investment Banking (via ESN)",
-					"position": "Software Engineer",
-					"location": "Paris, France",
-					"period": "2005-2010",
-					"website": {
-						"url": "https://wholesale.banking.societegenerale.com/en/",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li><p>Focus : Systèmes d'information Back-Office</p></li><li><p>Maintenance et évolution des systèmes :</p><ul><li><p>Système EOLE : Maintenance et évolution du système back-office pour les opérations d'achat/vente de titres</p></li><li><p>Système GATE : Développement pour la gestion des trades et des opérations de règlement</p></li></ul></li><li><p>Activités techniques :</p><ul><li><p>Développement : Nouvelles fonctionnalités et correctifs en C, PL/SQL et Java</p></li><li><p>Migration base de données : Migration Oracle 8i vers 10g, sans perte de données et temps d'arrêt minimal</p></li><li><p>Migration OS : Migration True 64 Unix vers Sun Solaris (recompilation et tests)</p></li><li><p>Support : Support technique niveau 2 et gestion des incidents de production</p></li><li><p>Analyse des besoins : Collaboration avec les analystes métier pour recueillir et documenter les besoins fonctionnels</p></li></ul></li></ul><p></p>",
-					"roles": []
-				}
-			]
-		},
-		"education": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-48455f6cef9e",
-					"hidden": false,
-					"school": "EFREI - École d'Ingénieurs Généralistes",
-					"degree": "Engineering Degree in Computer Science (Diplôme d'Ingénieur)",
-					"area": "Computer Science",
-					"grade": "",
-					"location": "Paris, France",
-					"period": "1999-2004",
-					"website": {
-						"url": "https://www.efrei.fr/",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li><p>Key Courses: Software Engineering, Database Systems, Network Architecture, Algorithms &amp; Data Structures, Object-Oriented Programming</p></li></ul><p></p>"
-				}
-			]
-		},
-		"projects": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-4d2603fe2801",
-					"hidden": true,
-					"name": "Echoes of the Void (Indie Game)",
-					"period": "2023 - Present",
-					"website": {
-						"url": "https://itch.io/echoes-of-the-void",
-						"label": "View on itch.io",
-						"inlineLink": false
-					},
-					"description": "<p>Solo developer for a narrative-driven 2D platformer built in Unity. Features custom dialogue system, branching story paths, and atmospheric pixel art. Currently in development with demo released on itch.io garnering 5K+ downloads and positive community feedback. Planned Steam release Q2 2025.</p>"
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-524195dd7eff",
-					"hidden": true,
-					"name": "Open Source: Unity Dialogue Framework",
-					"period": "2021 - 2023",
-					"website": {
-						"url": "https://github.com/dkowalski-dev/unity-dialogue",
-						"label": "View on GitHub",
-						"inlineLink": false
-					},
-					"description": "<p>Created and maintain an open-source dialogue system for Unity with visual node-based editor, localization support, and voice acting integration. Project has 800+ GitHub stars and is actively used by indie developers worldwide. Includes comprehensive documentation and example projects.</p>"
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-549106273c73",
-					"hidden": true,
-					"name": "Game Jam Participation",
-					"period": "2019 - Present",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Regular participant in Ludum Dare and Global Game Jam events. Created 12+ game prototypes exploring experimental mechanics and art styles. Won 'Best Gameplay' award at Ludum Dare 48 with puzzle game 'Deeper and Deeper' that ranked in top 5% overall.</p>"
-				}
-			]
-		},
-		"skills": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-5a52dcf50ed4",
-					"hidden": false,
-					"icon": "lock-key",
-					"iconColor": "",
-					"name": "Cybersécurity",
-					"proficiency": "Advanced",
-					"level": 4,
-					"keywords": ["WAF", "SAST", "DAST", "PfSense"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-6574ab6814bd",
-					"hidden": false,
-					"icon": "brain",
-					"iconColor": "",
-					"name": "AI",
-					"proficiency": "Advanced",
-					"level": 4,
-					"keywords": ["GPU", "Fast API MCP", "LiteLLM"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-5e8bb7cacbc8",
-					"hidden": false,
-					"icon": "anchor-simple",
-					"iconColor": "",
-					"name": "Orchestration",
-					"proficiency": "Expert",
-					"level": 4,
-					"keywords": ["Nomad", "Kubernetes", "Ansible", "Terraform"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-622f9d41da55",
-					"hidden": false,
-					"icon": "cpu",
-					"iconColor": "",
-					"name": "Programming Languages",
-					"proficiency": "Advanced",
-					"level": 5,
-					"keywords": ["Java", "C++", "Python", "Shell"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-6a8e22bec684",
-					"hidden": false,
-					"icon": "shooting-star",
-					"iconColor": "",
-					"name": "Release",
-					"proficiency": "Expert",
-					"level": 4,
-					"keywords": ["GitLab", "Jenkins", "Docker"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-6d8bf7be7514",
-					"hidden": true,
-					"icon": "chart-line-up",
-					"iconColor": "",
-					"name": "Performance Optimization",
-					"proficiency": "Advanced",
-					"level": 4,
-					"keywords": ["Profiling", "Memory Management", "Frame Rate"]
-				}
-			]
-		},
-		"languages": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-73807ccc48b5",
-					"hidden": false,
-					"language": "French",
-					"fluency": "Native",
-					"level": 5
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-768670459358",
-					"hidden": false,
-					"language": "English",
-					"fluency": "Conversational",
-					"level": 3
-				}
-			]
-		},
-		"interests": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-7c64c1a607d3",
-					"hidden": true,
-					"icon": "robot",
-					"iconColor": "",
-					"name": "AI & LLM & Security",
-					"keywords": ["LLMOps", "Machine Learning", "Guard prompt"]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-80bccce3c0ef",
-					"hidden": false,
-					"icon": "person-simple-run",
-					"iconColor": "",
-					"name": "Running",
-					"keywords": [
-						"Active runner participating in half-marathons demonstrating discipline and endurance"
-					]
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-84bb7e9af005",
-					"hidden": false,
-					"icon": "lock",
-					"iconColor": "",
-					"name": "Cybersecurity",
-					"keywords": [
-						"Continuous learning in cybersecurity following latest trends in application security infrastructure hardening, and threat intelligence"
-					]
-				},
-				{
-					"id": "019efaa1-0bc0-737e-9027-167a9fc5944e",
-					"hidden": true,
-					"icon": "person-simple-ski",
-					"iconColor": "",
-					"name": "Ski alpin",
-					"keywords": []
-				}
-			]
-		},
-		"awards": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-8a8bb9fbe182",
-					"hidden": true,
-					"title": "Best Gameplay - Ludum Dare 48",
-					"awarder": "Ludum Dare",
-					"date": "April 2021",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Awarded for puzzle game 'Deeper and Deeper' which ranked in the top 5% overall among 3,000+ submissions</p>"
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-8dd81379c7c9",
-					"hidden": true,
-					"title": "Employee Excellence Award",
-					"awarder": "Pixel Forge Interactive",
-					"date": "December 2021",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Recognized for exceptional contributions to 'Starbound Odyssey' development and dedication to code quality</p>"
-				}
-			]
-		},
-		"certifications": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-91fe8a4dfea6",
-					"hidden": true,
-					"title": "Unity Certified Expert: Programmer",
-					"issuer": "Unity Technologies",
-					"date": "March 2022",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": ""
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-961afccc2508",
-					"hidden": true,
-					"title": "Unreal Engine 5 C++ Developer",
-					"issuer": "Epic Games (Udemy)",
-					"date": "June 2023",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": ""
-				}
-			]
-		},
-		"publications": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-9816f0081895",
-					"hidden": true,
-					"title": "Optimizing Unity Games for Mobile: A Practical Guide",
-					"publisher": "Game Developer Magazine",
-					"date": "September 2021",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Technical article covering mobile optimization techniques including draw call batching, LOD systems, and memory management</p>"
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-9cf55c272c05",
-					"hidden": true,
-					"title": "Building Modular Dialogue Systems",
-					"publisher": "Seattle Indie Game Developers Meetup",
-					"date": "May 2022",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Presented talk on designing flexible dialogue systems for narrative games, attended by 60+ local developers</p>"
-				}
-			]
-		},
-		"volunteer": {
-			"title": "",
-			"icon": "",
-			"columns": 2,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-a02580473e05",
-					"hidden": true,
-					"organization": "Seattle Indies",
-					"location": "Seattle, WA",
-					"period": "2020 - Present",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Active member of local indie game development community. Organize monthly game showcases and provide mentorship to aspiring game developers through code reviews and technical guidance.</p>"
-				},
-				{
-					"id": "019bef5a-93e4-7746-ad39-a731c5b1b286",
-					"hidden": true,
-					"organization": "Code.org Game Development Workshops",
-					"location": "Seattle, WA",
-					"period": "2021 - Present",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<p>Volunteer instructor teaching basic game programming concepts to middle school students. Led 8+ workshops introducing Unity fundamentals and game design principles.</p>"
-				}
-			]
-		},
-		"references": {
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"items": [
-				{
-					"id": "019bef5a-93e4-7746-ad39-a945c0f42dd5",
-					"hidden": false,
-					"name": "Available upon request",
-					"position": "",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"phone": "",
-					"description": ""
-				}
-			]
-		}
-	},
-	"customSections": [
-		{
-			"title": "",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"id": "019becaf-0b87-769d-98a6-46ccf558c0e8",
-			"type": "experience",
-			"items": [
-				{
-					"id": "019bef5a-d1fa-7289-a87c-2677688d9e75",
-					"hidden": true,
-					"company": "Pixel Forge Interactive",
-					"position": "Game Developer",
-					"location": "Bellevue, WA",
-					"period": "June 2020 - February 2022",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li>Core developer on 'Starbound Odyssey,' a sci-fi roguelike that achieved 500K+ sales on Steam with 'Very Positive' user reviews</li><li>Implemented procedural generation systems for level layouts, enemy encounters, and loot drops using Unity and C#</li><li>Designed and programmed player progression systems including skill trees, equipment upgrades, and meta-progression mechanics</li><li>Created robust save/load system supporting cloud saves and cross-platform play between PC and Nintendo Switch</li><li>Integrated third-party SDKs for analytics (GameAnalytics), achievements (Steamworks), and multiplayer networking (Photon)</li><li>Fixed critical bugs and balanced gameplay based on community feedback and telemetry data, releasing 12 post-launch content updates</li><li>Worked closely with artists to implement VFX, animations, and shaders that enhanced visual polish while maintaining performance targets</li></ul>",
-					"roles": []
-				},
-				{
-					"id": "019bef5a-db0e-73c6-9b6e-4471703864f1",
-					"hidden": true,
-					"company": "Mobile Games Studio",
-					"position": "Junior Game Developer",
-					"location": "Remote",
-					"period": "September 2018 - May 2020",
-					"website": {
-						"url": "",
-						"label": "",
-						"inlineLink": false
-					},
-					"description": "<ul><li><p>Contributed to development of three mobile puzzle games built in Unity, collectively downloaded 2M+ times on iOS and Android</p></li><li><p>Implemented UI systems, touch controls, and gesture recognition optimized for mobile devices and various screen sizes</p></li><li><p>Developed monetization features including rewarded video ads, in-app purchases, and daily reward systems that increased retention by 25%</p></li><li><p>Optimized memory usage and load times for mobile platforms, reducing app size by 35% through asset compression and code optimization</p></li><li><p>Collaborated with game designers to balance puzzle difficulty curves and progression pacing using A/B testing data</p></li></ul><p></p>",
-					"roles": []
-				}
-			]
-		},
-		{
-			"title": "Cover Letter",
-			"icon": "",
-			"columns": 1,
-			"hidden": false,
-			"id": "019bef5b-0b3d-7e2a-8a7c-12d9e23a4f6b",
-			"type": "cover-letter",
-			"items": [
-				{
-					"id": "019bef5b-0f8d-77d1-9b2a-4a1b65e1b8aa",
-					"hidden": false,
-					"recipient": "<p>Hiring Manager<br>XXX<br>Paris, France<br><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"mailto:hiring@xxx.com\">hiring@xxx.com</a></p>",
-					"content": "<p>Dear Hiring Manager,</p><p>I am excited to apply for the CyberSecurity Engineer / DevSecOps position at XXX.</p><p>Throughout more than twenty years in software engineering, cloud infrastructure, cybersecurity, and DevSecOps, I have consistently helped organizations improve their security posture while accelerating software delivery. Rather than viewing security as a gatekeeping function, I focus on building scalable security platforms, automated controls, and engineering practices that enable teams to deliver secure products efficiently.</p><p>What particularly attracts me to Wakam is the opportunity to contribute to a technology-driven company that is transforming a highly regulated industry. The challenge of strengthening security while maintaining agility, innovation, and operational excellence aligns perfectly with my professional experience and ambitions.</p><p>My background combines enterprise-scale environments such as Thomson Reuters with fast-growing technology companies such as Jus Mundi, where I worked at the intersection of cloud engineering, cybersecurity, compliance, and artificial intelligence. These experiences have given me a broad perspective on how to build security capabilities that support business objectives rather than constrain them.</p><p>Over the last 10 years, I have led and implemented numerous initiatives to evolve as CyberSecurity expert, including:</p><p>• Designing and deploying SAST, DAST, and SCA programs integrated directly into CI/CD pipelines.</p><p>• Establishing automated security controls and security gates while maintaining rapid developer feedback loops.</p><p>• Building secure cloud-native platforms using Infrastructure as Code, immutable infrastructure principles, and automated deployment pipelines.</p><p>• Embedding security requirements into development workflows through automation, education, and engineering enablement.</p><p>• Driving vulnerability management programs focused on risk prioritization and measurable remediation outcomes.</p><p>• Supporting compliance initiatives within highly regulated environments, including ISO 27001, SOC 2, and AI governance frameworks such as ISO 42001.</p><p>• Securing public-facing applications through Web Application Firewalls (WAF), reverse proxies, traffic filtering, and attack surface reduction strategies.</p><p>• Designing and strengthening network security architectures, including segmentation, access control, VPNs, secure communications, and infrastructure hardening.</p><p>At Thomson Reuters and later at Jus Mundi, I directly implemented and operationalized SAST, DAST, and SCA capabilities, integrating security testing into engineering workflows and helping teams identify and remediate vulnerabilities early in the software development lifecycle.</p><p>At Jus Mundi, I worked extensively on AI-powered legal technology platforms processing large volumes of sensitive legal information. In this environment, security, privacy, compliance, and operational reliability were critical. I collaborated closely with engineering teams, data scientists, legal experts, and executive stakeholders to ensure security was integrated throughout the entire product lifecycle.</p><p>My infrastructure experience includes large-scale Linux environments, cloud platforms, Infrastructure as Code, HashiCorp Nomad and Vault, Docker containers, CI/CD automation, monitoring platforms, and production operations. Having worked across development, operations, networking, and security disciplines, I am comfortable addressing security challenges from both application and infrastructure perspectives.</p><p>One of my strengths is the ability to bridge the gap between security teams and engineering teams. Security programs succeed when developers understand and adopt them naturally. </p><p>What excites me most about this opportunity is not simply operating security tools, but helping Wakam move to the next level of DevSecOps maturity. I am particularly excited by the opportunity to further contribute to the design and deployment of mature SIEM and SOAR capabilities, while supporting the evolution of cloud-native platforms based on Kubernetes and leading cloud providers such as Azure and AWS. I believe my background in DevSecOps, platform engineering, network security, and application security would enable me to quickly deliver value while continuing to broaden my experience in these strategic areas.</p><p>For this reason, I see my contribution to Wakam extending beyond the traditional responsibilities of a CyberSecurity Engineer. I believe I can help lead XXX's DevSecOps maturity journey by establishing scalable security foundations, enabling engineering teams, strengthening operational resilience, and aligning security initiatives with business objectives.</p><p>Wakam's culture of ownership, continuous improvement, curiosity, and innovation strongly resonates with me. I would welcome the opportunity to contribute my experience and leadership to help build the next generation of secure digital insurance platforms.</p><p>Thank you for your consideration. I look forward to discussing how my background in DevSecOps, security engineering, cloud infrastructure, AI platforms and security transformation can support Wakam's continued growth.</p><p></p><p>Sincerely,<br>Alban Andrieu</p>"
-				}
-			]
-		}
-	],
-	"metadata": {
-		"template": "azurill",
-		"layout": {
-			"sidebarWidth": 30,
-			"pages": [
-				{
-					"fullWidth": false,
-					"main": ["summary", "education", "experience"],
-					"sidebar": ["profiles", "skills"]
-				},
-				{
-					"fullWidth": false,
-					"main": ["019becaf-0b87-769d-98a6-46ccf558c0e8", "awards"],
-					"sidebar": ["certifications", "languages", "interests", "references"]
-				},
-				{
-					"fullWidth": true,
-					"main": ["projects", "publications", "volunteer"],
-					"sidebar": []
-				},
-				{
-					"fullWidth": true,
-					"main": ["019bef5b-0b3d-7e2a-8a7c-12d9e23a4f6b"],
-					"sidebar": []
-				}
-			]
-		},
-		"page": {
-			"gapX": 12,
-			"gapY": 8,
-			"marginX": 16,
-			"marginY": 16,
-			"format": "a4",
-			"locale": "en-US",
-			"hideLinkUnderline": false,
-			"hideIcons": false,
-			"hideSectionIcons": true
-		},
-		"design": {
-			"level": {
-				"icon": "star",
-				"type": "icon"
-			},
-			"colors": {
-				"primary": "rgba(0, 132, 209, 1)",
-				"text": "rgba(0, 0, 0, 1)",
-				"background": "rgba(255, 255, 255, 1)"
-			}
-		},
-		"typography": {
-			"body": {
-				"fontFamily": "IBM Plex Serif",
-				"fontWeights": ["400", "600"],
-				"fontSize": 10,
-				"lineHeight": 1.5
-			},
-			"heading": {
-				"fontFamily": "Fira Sans Condensed",
-				"fontWeights": ["500"],
-				"fontSize": 12,
-				"lineHeight": 1.5
-			}
-		},
-		"notes": "",
-		"styleRules": []
-	}
+  "picture": {
+    "hidden": false,
+    "url": "https://reactive.albandrieu.com/api/uploads/019e46d4-215f-70be-a30f-2328492babbd/pictures/1782314404554.jpeg",
+    "size": 100,
+    "rotation": 0,
+    "aspectRatio": 1,
+    "borderRadius": 0,
+    "borderColor": "rgba(0, 0, 0, 0.5)",
+    "borderWidth": 0,
+    "shadowColor": "rgba(0, 0, 0, 0.5)",
+    "shadowWidth": 0
+  },
+  "basics": {
+    "name": "Alban Andrieu",
+    "headline": "Architecte Cloud Securité et AI",
+    "email": "job@albandrieu.com",
+    "phone": "+33 6 95 43 53 53",
+    "location": "Paris Area",
+    "website": {
+      "url": "https://albanandrieu.com",
+      "label": "davidkowalski.games"
+    },
+    "customFields": [
+      {
+        "id": "019bef5a-93e4-7746-ad39-3a132360f823",
+        "icon": "linkedin-logo",
+        "text": "nabla",
+        "link": "https://github.com/AlbanAndrieuhttps://linkedin.com/in/nabla/"
+      },
+      {
+        "id": "019bef5a-0477-77e0-968b-5d0e2ecb34e3",
+        "icon": "github-logo",
+        "text": "AlbanAndrieu",
+        "link": "https://github.com/AlbanAndrieu"
+      }
+    ]
+  },
+  "summary": {
+    "title": "",
+    "icon": "",
+    "columns": 1,
+    "hidden": false,
+    "content": "<p><strong>Architecte Cloud expérimenté </strong>avec plus de 20 ans d'expertise en ingénierie logicielle, infrastructure cloud et automatisation SDLC. Spécialisé dans les initiatives de transformation digitale, les technologies de conteneurisation et les pratiques de <u>déploiement sécurisé</u>. Solide expérience dans le pilotage de projets d'intégration complexes, la mise en œuvre de flux GitOps et la coordination d'équipes pluridisciplinaires. Expert en conception et maintenance de pipelines SDLC robustes avec Jenkins, GitLab, Docker, Nomad, Kubernetes, Terraform et Ansible sur des stacks variés (C/C++, Java, JavaScript, PHP, Go, Python). Forte expérience dans les services financiers avec une connaissance approfondie des systèmes back-office et des exigences réglementaires.</p>"
+  },
+  "sections": {
+    "profiles": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-43c470b77f4a",
+          "hidden": false,
+          "icon": "linkedin-logo",
+          "iconColor": "",
+          "network": "LinkedIn",
+          "username": "nabla",
+          "website": {
+            "url": "https://linkedin.com/in/nabla/",
+            "label": "linkedin.com/in/davidkowalski",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-3d42ddc9b4d8",
+          "hidden": false,
+          "icon": "github-logo",
+          "iconColor": "",
+          "network": "GitHub",
+          "username": "AlbanAndrieu",
+          "website": {
+            "url": "https://github.com/AlbanAndrieu",
+            "label": "github.com/dkowalski-dev",
+            "inlineLink": false
+          }
+        },
+        {
+          "id": "019efa50-d14d-72f2-b69d-6068119bf13d",
+          "hidden": false,
+          "icon": "globe",
+          "iconColor": "",
+          "network": "Website",
+          "username": "albanandrieu.com",
+          "website": {
+            "url": "https://albanandrieu.com",
+            "label": "",
+            "inlineLink": false
+          }
+        }
+      ]
+    },
+    "experience": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-44d8cec98ca4",
+          "hidden": false,
+          "company": "Jus Mundi",
+          "position": "Architecte Cloud (DevSecOps)",
+          "location": "Paris, France",
+          "period": "2022 - Present",
+          "website": {
+            "url": "https://www.jusmundi.com",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li><p>Focus : Accompagnement de la transition IA et hébergement du site</p></li><li><p>Projet : Agent IA pour le droit international et l'arbitrage (jusmundi.com)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité complètes pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Protection métier : Renforcement de la sécurité applicative grâce à des mécanismes anti-scraping et à la gestion centralisée des identités et des accès avec Keycloak, tout en préservant la fluidité du parcours utilisateur, première legal tech à obtenir les certifications ISO 42001, 27001, SOC II</p></li><li><p>Conteneurisation : Pilotage de la conteneurisation avec Docker, création d'images optimisées et bonnes pratiques sécurité et performance</p></li><li><p>Orchestration : Conception et déploiement de clusters Nomad et Kubernetes pour les charges de production (réseau, stockage, monitoring)</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation des processus : Définition et documentation des processus de livraison, indicateurs qualité et KPIs</p></li><li><p>Coordination inter-équipes : Collaboration avec le développement et les Data Scientists pour l'automatisation build, test, package et livraison</p></li><li><p>Métriques et reporting : Mise en place de monitoring et reporting (taux de succès des builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architectures microservices en Python, GO, Nuxt et PHP</p></li><li><p>Produit : Jus Mundi propose l'IA et la recherche optimisée pour le contenu juridique international</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Continuité d'activité : Garantir la disponibilité du site et la livraison rapide des évolutions et correctifs</p></li><li><p>Sécurité : Promouvoir un haut niveau de sécurité et de protection</p></li><li><p>Support IA : Accompagner la livraison des outils IA auprès des ingénieurs et data scientists</p></li></ul></li></ul><p></p>",
+          "roles": []
+        },
+        {
+          "id": "019efa62-8896-71ae-9859-58d3e282e47e",
+          "hidden": false,
+          "company": "Finastra (ex-Misys puis Thomson Reuters)",
+          "position": "Architecte d'intégration Cloud",
+          "location": "Paris, France",
+          "period": "2017-2022",
+          "website": {
+            "url": "https://finastra.com/solutions/treasury-capital-markets",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li><p>Focus: Digital Transformation and Cloud Migration</p></li><li><p>Leading DevSecOps initiatives for legal tech platform</p></li><li><p>Project: Treasury and Capital Markets Solutions (<a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://finastra.com/solutions/treasury-capital-markets\">finastra.com/solutions/treasury-capital-markets</a>)</p></li><li><p>Digital Transformation Initiatives:</p><ul><li><p>Infrastructure Security: Implemented comprehensive security measures for deployment infrastructure, including vulnerability scanning, secrets management, and access controls</p></li><li><p>Containerization: Led containerization efforts using Docker, creating optimized images and implementing best practices for security and performance</p></li><li><p>Orchestration: Designed and deployed Solaris and Kubernetes clusters for production workloads, including configuration of networking, storage, and monitoring</p></li></ul></li><li><p>SDLC Integration Project:</p><ul><li><p>Process Standardization: Defined and documented delivery processes across multiple teams, establishing quality metrics and KPIs</p></li><li><p>Infrastructure Unification: Consolidated disparate SDLC systems under a unified Jenkins-based platform</p></li><li><p>Cross-Team Coordination: Collaborated with development, QA, and operations teams to implement end-to-end automation for build, test, package, and delivery workflows</p></li><li><p>Metrics &amp; Reporting: Implemented comprehensive monitoring and reporting systems for build success rates, deployment frequency, and lead time</p></li></ul></li><li><p>Key Responsibilities:</p><ul><li><p>Pipeline Management: Design, implement, and maintain comprehensive DevSecOps pipelines integrating security scanning, automated testing, and continuous deployment</p></li><li><p>Cloud Systems Integration: Architect and maintain cloud-based infrastructure ensuring high availability, scalability, and security</p></li><li><p>Security Automation: Implement automated security and compliance checks within cloud environments, including vulnerability scanning, secrets management, and access control automation</p></li><li><p>Infrastructure as Code: Lead infrastructure automation initiatives using Ansible, Terraform, and other IaC tools for consistent and reproducible deployments</p></li><li><p>SDLC Optimization: Continuously improve build, test, and deployment workflows to enhance efficiency, reliability, and security</p></li><li><p>Team Collaboration: Work closely with development, operations, and security teams to implement DevSecOps best practices and foster a culture of shared responsibility</p></li></ul></li><li><p>Technologies &amp; Tools:</p><ul><li><p>Security Tools: SAST/DAST scanning, Klocwork, Fuzzing, Secret Detection, vulnerability management</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>",
+          "roles": [
+            {
+              "id": "019efa6f-e7de-76d8-b325-2fbef32c9080",
+              "position": "Architecte d'intégration cloud",
+              "period": "2017-2022",
+              "description": "<ul><li><p>Focus : Transformation digitale et migration cloud</p></li><li><p>Pilotage des initiatives DevSecOps pour plateforme legal tech</p></li><li><p>Projet : Solutions Trésorerie et Marchés de capitaux (finastra.com/solutions/treasury-capital-markets)</p></li><li><p>Initiatives de transformation digitale :</p><ul><li><p>Sécurité de l'infrastructure : Mise en place de mesures de sécurité pour l'infrastructure de déploiement (analyse de vulnérabilités, gestion des secrets, contrôles d'accès)</p></li><li><p>Conteneurisation : Pilotage avec Docker, Zone Solaris, images optimisées et bonnes pratiques</p></li><li><p>Orchestration Solaris et Kubernetes : Conception et déploiement de clusters</p></li></ul></li><li><p>Projet d'intégration SDLC :</p><ul><li><p>Standardisation : Processus de livraison et KPIs</p></li><li><p>Unification : Consolidation des systèmes SDLC sur une plateforme Jenkins unifiée</p></li><li><p>Coordination : Collaboration avec dev, qa, sécurité et opérations pour l'automatisation complète</p></li><li><p>Métriques : Monitoring et reporting (builds, fréquence de déploiement, lead time)</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Pipelines : Conception, mise en œuvre et maintenance de pipelines DevSecOps (sécurité, tests, déploiement)</p></li><li><p>Intégration cloud : Architecture et maintenance d'infrastructure cloud (haute disponibilité, scalabilité, sécurité)</p></li><li><p>Automatisation sécurité : Contrôles de sécurité et conformité automatisés (vulnérabilités, secrets, accès)</p></li><li><p>Infrastructure as Code : Ansible, Terraform et autres outils IaC pour des déploiements reproductibles</p></li><li><p>Optimisation SDLC : Amélioration continue des flux build, test et déploiement</p></li><li><p>Collaboration : Travail avec dev, ops et sécurité pour les bonnes pratiques DevSecOps</p></li></ul></li><li><p>Technologies et outils :</p><ul><li><p>Sécurité : SAST/DAST, Klocwork, Fuzzing, Secret Detection, gestion des vulnérabilités</p></li><li><p>Automatisation : Ansible, Terraform, Jenkins, Trivy, SonarQube</p></li><li><p>Cloud : On premise, Azure, Docker, Rancher, Kubernetes, Solaris</p></li></ul></li></ul><p></p>"
+            },
+            {
+              "id": "019efa70-fa97-7276-a6bf-7d0adca0cb22",
+              "position": "Ingénieur d'intégration cloud",
+              "period": "2012-2017",
+              "description": "<ul><li><p>Focus : Introduction de l'intégration continue et de l'automatisation</p></li><li><p>Réalisations clés :</p></li><li><p>Mise en œuvre SDLC : Adoption de l'intégration continue avec Jenkins et Ansible, réduction de 60 % des problèmes d'intégration</p></li><li><p>Pratiques GitOps : Infrastructure as code avec Ansible sur Unix, Windows, Solaris, AIX et macOS</p></li><li><p>Support multi-langages : Systèmes de build pour :</p><ul><li><p>C/C++ Applications natives</p></li><li><p>Objective-C Applications macOS et iOS</p></li><li><p>Java Applications avec Maven et Gradle</p></li><li><p>JavaScript Frontend npm et Angular</p></li><li><p>Python Scripts et outils d'automatisation</p></li><li><p>Shell/Perl Scripts d'administration</p></li></ul></li><li><p>Automatisation : Frameworks de tests et scripts de déploiement, réduction du temps de déploiement manuel</p></li><li><p>Contrôle de version : Migration des équipes vers Git, formation et stratégies de branches</p></li></ul><p></p>"
+            },
+            {
+              "id": "019efa72-f41a-7545-a7e4-529aa7e43c6c",
+              "position": "Ingénieur logiciel senior",
+              "period": "2007-2012",
+              "description": "<ul><li><p>Focus : Développement des modules stock et comptabilité</p></li><li><p>Environnement technique :</p><ul><li><p>Architecture : Architecture web 3 tiers (services métier C++, Java J2EE via CORBA)</p></li><li><p>Produit : Suite Kondor+ Back-Office (K+TP) - plateforme trésorerie et trading</p></li></ul></li><li><p>Responsabilités clés :</p><ul><li><p>Gestion des stocks matériels avec suivi d'inventaire en temps réel</p></li><li><p>Génération automatique des écritures comptables bilan et hors bilan, conformité réglementaire</p></li><li><p>Optimisationdes requêtes et logique applicative pour le traitement à fort volume</p></li></ul></li></ul><p></p>"
+            }
+          ]
+        },
+        {
+          "id": "019efa73-dd7b-709f-bdd6-e37d1ecf439c",
+          "hidden": false,
+          "company": "Société Générale Corporate & Investment Banking (via ESN)",
+          "position": "Software Engineer",
+          "location": "Paris, France",
+          "period": "2005-2010",
+          "website": {
+            "url": "https://wholesale.banking.societegenerale.com/en/",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li><p>Focus : Systèmes d'information Back-Office</p></li><li><p>Maintenance et évolution des systèmes :</p><ul><li><p>Système EOLE : Maintenance et évolution du système back-office pour les opérations d'achat/vente de titres</p></li><li><p>Système GATE : Développement pour la gestion des trades et des opérations de règlement</p></li></ul></li><li><p>Activités techniques :</p><ul><li><p>Développement : Nouvelles fonctionnalités et correctifs en C, PL/SQL et Java</p></li><li><p>Migration base de données : Migration Oracle 8i vers 10g, sans perte de données et temps d'arrêt minimal</p></li><li><p>Migration OS : Migration True 64 Unix vers Sun Solaris (recompilation et tests)</p></li><li><p>Support : Support technique niveau 2 et gestion des incidents de production</p></li><li><p>Analyse des besoins : Collaboration avec les analystes métier pour recueillir et documenter les besoins fonctionnels</p></li></ul></li></ul><p></p>",
+          "roles": []
+        }
+      ]
+    },
+    "education": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-48455f6cef9e",
+          "hidden": false,
+          "school": "EFREI - École d'Ingénieurs Généralistes",
+          "degree": "Engineering Degree in Computer Science (Diplôme d'Ingénieur)",
+          "area": "Computer Science",
+          "grade": "",
+          "location": "Paris, France",
+          "period": "1999-2004",
+          "website": {
+            "url": "https://www.efrei.fr/",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li><p>Key Courses: Software Engineering, Database Systems, Network Architecture, Algorithms &amp; Data Structures, Object-Oriented Programming</p></li></ul><p></p>"
+        }
+      ]
+    },
+    "projects": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-4d2603fe2801",
+          "hidden": true,
+          "name": "Echoes of the Void (Indie Game)",
+          "period": "2023 - Present",
+          "website": {
+            "url": "https://itch.io/echoes-of-the-void",
+            "label": "View on itch.io",
+            "inlineLink": false
+          },
+          "description": "<p>Solo developer for a narrative-driven 2D platformer built in Unity. Features custom dialogue system, branching story paths, and atmospheric pixel art. Currently in development with demo released on itch.io garnering 5K+ downloads and positive community feedback. Planned Steam release Q2 2025.</p>"
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-524195dd7eff",
+          "hidden": true,
+          "name": "Open Source: Unity Dialogue Framework",
+          "period": "2021 - 2023",
+          "website": {
+            "url": "https://github.com/dkowalski-dev/unity-dialogue",
+            "label": "View on GitHub",
+            "inlineLink": false
+          },
+          "description": "<p>Created and maintain an open-source dialogue system for Unity with visual node-based editor, localization support, and voice acting integration. Project has 800+ GitHub stars and is actively used by indie developers worldwide. Includes comprehensive documentation and example projects.</p>"
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-549106273c73",
+          "hidden": true,
+          "name": "Game Jam Participation",
+          "period": "2019 - Present",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Regular participant in Ludum Dare and Global Game Jam events. Created 12+ game prototypes exploring experimental mechanics and art styles. Won 'Best Gameplay' award at Ludum Dare 48 with puzzle game 'Deeper and Deeper' that ranked in top 5% overall.</p>"
+        }
+      ]
+    },
+    "skills": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-5a52dcf50ed4",
+          "hidden": false,
+          "icon": "lock-key",
+          "iconColor": "",
+          "name": "Cybersécurity",
+          "proficiency": "Advanced",
+          "level": 4,
+          "keywords": ["WAF", "SAST", "DAST", "PfSense"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-6574ab6814bd",
+          "hidden": false,
+          "icon": "brain",
+          "iconColor": "",
+          "name": "AI",
+          "proficiency": "Advanced",
+          "level": 4,
+          "keywords": ["GPU", "Fast API MCP", "LiteLLM"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-5e8bb7cacbc8",
+          "hidden": false,
+          "icon": "anchor-simple",
+          "iconColor": "",
+          "name": "Orchestration",
+          "proficiency": "Expert",
+          "level": 4,
+          "keywords": ["Nomad", "Kubernetes", "Ansible", "Terraform"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-622f9d41da55",
+          "hidden": false,
+          "icon": "cpu",
+          "iconColor": "",
+          "name": "Programming Languages",
+          "proficiency": "Advanced",
+          "level": 5,
+          "keywords": ["Java", "C++", "Python", "Shell"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-6a8e22bec684",
+          "hidden": false,
+          "icon": "shooting-star",
+          "iconColor": "",
+          "name": "Release",
+          "proficiency": "Expert",
+          "level": 4,
+          "keywords": ["GitLab", "Jenkins", "Docker"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-6d8bf7be7514",
+          "hidden": true,
+          "icon": "chart-line-up",
+          "iconColor": "",
+          "name": "Performance Optimization",
+          "proficiency": "Advanced",
+          "level": 4,
+          "keywords": ["Profiling", "Memory Management", "Frame Rate"]
+        }
+      ]
+    },
+    "languages": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-73807ccc48b5",
+          "hidden": false,
+          "language": "French",
+          "fluency": "Native",
+          "level": 5
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-768670459358",
+          "hidden": false,
+          "language": "English",
+          "fluency": "Conversational",
+          "level": 3
+        }
+      ]
+    },
+    "interests": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-7c64c1a607d3",
+          "hidden": true,
+          "icon": "robot",
+          "iconColor": "",
+          "name": "AI & LLM & Security",
+          "keywords": ["LLMOps", "Machine Learning", "Guard prompt"]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-80bccce3c0ef",
+          "hidden": false,
+          "icon": "person-simple-run",
+          "iconColor": "",
+          "name": "Running",
+          "keywords": [
+            "Active runner participating in half-marathons demonstrating discipline and endurance"
+          ]
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-84bb7e9af005",
+          "hidden": false,
+          "icon": "lock",
+          "iconColor": "",
+          "name": "Cybersecurity",
+          "keywords": [
+            "Continuous learning in cybersecurity following latest trends in application security infrastructure hardening, and threat intelligence"
+          ]
+        },
+        {
+          "id": "019efaa1-0bc0-737e-9027-167a9fc5944e",
+          "hidden": true,
+          "icon": "person-simple-ski",
+          "iconColor": "",
+          "name": "Ski alpin",
+          "keywords": []
+        }
+      ]
+    },
+    "awards": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-8a8bb9fbe182",
+          "hidden": true,
+          "title": "Best Gameplay - Ludum Dare 48",
+          "awarder": "Ludum Dare",
+          "date": "April 2021",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Awarded for puzzle game 'Deeper and Deeper' which ranked in the top 5% overall among 3,000+ submissions</p>"
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-8dd81379c7c9",
+          "hidden": true,
+          "title": "Employee Excellence Award",
+          "awarder": "Pixel Forge Interactive",
+          "date": "December 2021",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Recognized for exceptional contributions to 'Starbound Odyssey' development and dedication to code quality</p>"
+        }
+      ]
+    },
+    "certifications": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-91fe8a4dfea6",
+          "hidden": true,
+          "title": "Unity Certified Expert: Programmer",
+          "issuer": "Unity Technologies",
+          "date": "March 2022",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": ""
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-961afccc2508",
+          "hidden": true,
+          "title": "Unreal Engine 5 C++ Developer",
+          "issuer": "Epic Games (Udemy)",
+          "date": "June 2023",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": ""
+        }
+      ]
+    },
+    "publications": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-9816f0081895",
+          "hidden": true,
+          "title": "Optimizing Unity Games for Mobile: A Practical Guide",
+          "publisher": "Game Developer Magazine",
+          "date": "September 2021",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Technical article covering mobile optimization techniques including draw call batching, LOD systems, and memory management</p>"
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-9cf55c272c05",
+          "hidden": true,
+          "title": "Building Modular Dialogue Systems",
+          "publisher": "Seattle Indie Game Developers Meetup",
+          "date": "May 2022",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Presented talk on designing flexible dialogue systems for narrative games, attended by 60+ local developers</p>"
+        }
+      ]
+    },
+    "volunteer": {
+      "title": "",
+      "icon": "",
+      "columns": 2,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-a02580473e05",
+          "hidden": true,
+          "organization": "Seattle Indies",
+          "location": "Seattle, WA",
+          "period": "2020 - Present",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Active member of local indie game development community. Organize monthly game showcases and provide mentorship to aspiring game developers through code reviews and technical guidance.</p>"
+        },
+        {
+          "id": "019bef5a-93e4-7746-ad39-a731c5b1b286",
+          "hidden": true,
+          "organization": "Code.org Game Development Workshops",
+          "location": "Seattle, WA",
+          "period": "2021 - Present",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<p>Volunteer instructor teaching basic game programming concepts to middle school students. Led 8+ workshops introducing Unity fundamentals and game design principles.</p>"
+        }
+      ]
+    },
+    "references": {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "items": [
+        {
+          "id": "019bef5a-93e4-7746-ad39-a945c0f42dd5",
+          "hidden": false,
+          "name": "Available upon request",
+          "position": "",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "phone": "",
+          "description": ""
+        }
+      ]
+    }
+  },
+  "customSections": [
+    {
+      "title": "",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "id": "019becaf-0b87-769d-98a6-46ccf558c0e8",
+      "type": "experience",
+      "items": [
+        {
+          "id": "019bef5a-d1fa-7289-a87c-2677688d9e75",
+          "hidden": true,
+          "company": "Pixel Forge Interactive",
+          "position": "Game Developer",
+          "location": "Bellevue, WA",
+          "period": "June 2020 - February 2022",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li>Core developer on 'Starbound Odyssey,' a sci-fi roguelike that achieved 500K+ sales on Steam with 'Very Positive' user reviews</li><li>Implemented procedural generation systems for level layouts, enemy encounters, and loot drops using Unity and C#</li><li>Designed and programmed player progression systems including skill trees, equipment upgrades, and meta-progression mechanics</li><li>Created robust save/load system supporting cloud saves and cross-platform play between PC and Nintendo Switch</li><li>Integrated third-party SDKs for analytics (GameAnalytics), achievements (Steamworks), and multiplayer networking (Photon)</li><li>Fixed critical bugs and balanced gameplay based on community feedback and telemetry data, releasing 12 post-launch content updates</li><li>Worked closely with artists to implement VFX, animations, and shaders that enhanced visual polish while maintaining performance targets</li></ul>",
+          "roles": []
+        },
+        {
+          "id": "019bef5a-db0e-73c6-9b6e-4471703864f1",
+          "hidden": true,
+          "company": "Mobile Games Studio",
+          "position": "Junior Game Developer",
+          "location": "Remote",
+          "period": "September 2018 - May 2020",
+          "website": {
+            "url": "",
+            "label": "",
+            "inlineLink": false
+          },
+          "description": "<ul><li><p>Contributed to development of three mobile puzzle games built in Unity, collectively downloaded 2M+ times on iOS and Android</p></li><li><p>Implemented UI systems, touch controls, and gesture recognition optimized for mobile devices and various screen sizes</p></li><li><p>Developed monetization features including rewarded video ads, in-app purchases, and daily reward systems that increased retention by 25%</p></li><li><p>Optimized memory usage and load times for mobile platforms, reducing app size by 35% through asset compression and code optimization</p></li><li><p>Collaborated with game designers to balance puzzle difficulty curves and progression pacing using A/B testing data</p></li></ul><p></p>",
+          "roles": []
+        }
+      ]
+    },
+    {
+      "title": "Cover Letter",
+      "icon": "",
+      "columns": 1,
+      "hidden": false,
+      "id": "019bef5b-0b3d-7e2a-8a7c-12d9e23a4f6b",
+      "type": "cover-letter",
+      "items": [
+        {
+          "id": "019bef5b-0f8d-77d1-9b2a-4a1b65e1b8aa",
+          "hidden": false,
+          "recipient": "<p>Hiring Manager<br>XXX<br>Paris, France<br><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"mailto:hiring@xxx.com\">hiring@xxx.com</a></p>",
+          "content": "<p>Dear Hiring Manager,</p><p>I am excited to apply for the CyberSecurity Engineer / DevSecOps position at XXX.</p><p>Throughout more than twenty years in software engineering, cloud infrastructure, cybersecurity, and DevSecOps, I have consistently helped organizations improve their security posture while accelerating software delivery. Rather than viewing security as a gatekeeping function, I focus on building scalable security platforms, automated controls, and engineering practices that enable teams to deliver secure products efficiently.</p><p>What particularly attracts me to Wakam is the opportunity to contribute to a technology-driven company that is transforming a highly regulated industry. The challenge of strengthening security while maintaining agility, innovation, and operational excellence aligns perfectly with my professional experience and ambitions.</p><p>My background combines enterprise-scale environments such as Thomson Reuters with fast-growing technology companies such as Jus Mundi, where I worked at the intersection of cloud engineering, cybersecurity, compliance, and artificial intelligence. These experiences have given me a broad perspective on how to build security capabilities that support business objectives rather than constrain them.</p><p>Over the last 10 years, I have led and implemented numerous initiatives to evolve as CyberSecurity expert, including:</p><p>• Designing and deploying SAST, DAST, and SCA programs integrated directly into CI/CD pipelines.</p><p>• Establishing automated security controls and security gates while maintaining rapid developer feedback loops.</p><p>• Building secure cloud-native platforms using Infrastructure as Code, immutable infrastructure principles, and automated deployment pipelines.</p><p>• Embedding security requirements into development workflows through automation, education, and engineering enablement.</p><p>• Driving vulnerability management programs focused on risk prioritization and measurable remediation outcomes.</p><p>• Supporting compliance initiatives within highly regulated environments, including ISO 27001, SOC 2, and AI governance frameworks such as ISO 42001.</p><p>• Securing public-facing applications through Web Application Firewalls (WAF), reverse proxies, traffic filtering, and attack surface reduction strategies.</p><p>• Designing and strengthening network security architectures, including segmentation, access control, VPNs, secure communications, and infrastructure hardening.</p><p>At Thomson Reuters and later at Jus Mundi, I directly implemented and operationalized SAST, DAST, and SCA capabilities, integrating security testing into engineering workflows and helping teams identify and remediate vulnerabilities early in the software development lifecycle.</p><p>At Jus Mundi, I worked extensively on AI-powered legal technology platforms processing large volumes of sensitive legal information. In this environment, security, privacy, compliance, and operational reliability were critical. I collaborated closely with engineering teams, data scientists, legal experts, and executive stakeholders to ensure security was integrated throughout the entire product lifecycle.</p><p>My infrastructure experience includes large-scale Linux environments, cloud platforms, Infrastructure as Code, HashiCorp Nomad and Vault, Docker containers, CI/CD automation, monitoring platforms, and production operations. Having worked across development, operations, networking, and security disciplines, I am comfortable addressing security challenges from both application and infrastructure perspectives.</p><p>One of my strengths is the ability to bridge the gap between security teams and engineering teams. Security programs succeed when developers understand and adopt them naturally. </p><p>What excites me most about this opportunity is not simply operating security tools, but helping Wakam move to the next level of DevSecOps maturity. I am particularly excited by the opportunity to further contribute to the design and deployment of mature SIEM and SOAR capabilities, while supporting the evolution of cloud-native platforms based on Kubernetes and leading cloud providers such as Azure and AWS. I believe my background in DevSecOps, platform engineering, network security, and application security would enable me to quickly deliver value while continuing to broaden my experience in these strategic areas.</p><p>For this reason, I see my contribution to Wakam extending beyond the traditional responsibilities of a CyberSecurity Engineer. I believe I can help lead XXX's DevSecOps maturity journey by establishing scalable security foundations, enabling engineering teams, strengthening operational resilience, and aligning security initiatives with business objectives.</p><p>Wakam's culture of ownership, continuous improvement, curiosity, and innovation strongly resonates with me. I would welcome the opportunity to contribute my experience and leadership to help build the next generation of secure digital insurance platforms.</p><p>Thank you for your consideration. I look forward to discussing how my background in DevSecOps, security engineering, cloud infrastructure, AI platforms and security transformation can support Wakam's continued growth.</p><p></p><p>Sincerely,<br>Alban Andrieu</p>"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "template": "azurill",
+    "layout": {
+      "sidebarWidth": 30,
+      "pages": [
+        {
+          "fullWidth": false,
+          "main": ["summary", "education", "experience"],
+          "sidebar": ["profiles", "skills"]
+        },
+        {
+          "fullWidth": false,
+          "main": ["019becaf-0b87-769d-98a6-46ccf558c0e8", "awards"],
+          "sidebar": ["certifications", "languages", "interests", "references"]
+        },
+        {
+          "fullWidth": true,
+          "main": ["projects", "publications", "volunteer"],
+          "sidebar": []
+        },
+        {
+          "fullWidth": true,
+          "main": ["019bef5b-0b3d-7e2a-8a7c-12d9e23a4f6b"],
+          "sidebar": []
+        }
+      ]
+    },
+    "page": {
+      "gapX": 12,
+      "gapY": 8,
+      "marginX": 16,
+      "marginY": 16,
+      "format": "a4",
+      "locale": "en-US",
+      "hideLinkUnderline": false,
+      "hideIcons": false,
+      "hideSectionIcons": true
+    },
+    "design": {
+      "level": {
+        "icon": "star",
+        "type": "icon"
+      },
+      "colors": {
+        "primary": "rgba(0, 132, 209, 1)",
+        "text": "rgba(0, 0, 0, 1)",
+        "background": "rgba(255, 255, 255, 1)"
+      }
+    },
+    "typography": {
+      "body": {
+        "fontFamily": "IBM Plex Serif",
+        "fontWeights": ["400", "600"],
+        "fontSize": 10,
+        "lineHeight": 1.5
+      },
+      "heading": {
+        "fontFamily": "Fira Sans Condensed",
+        "fontWeights": ["500"],
+        "fontSize": 12,
+        "lineHeight": 1.5
+      }
+    },
+    "notes": "",
+    "styleRules": []
+  }
 }

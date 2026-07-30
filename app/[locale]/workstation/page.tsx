@@ -14,41 +14,41 @@ import HardwareSection from "../../components/workstation/HardwareSection";
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-	const { locale } = await params;
-	if (!hasLocale(routing.locales, locale)) return {};
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
 
-	const metadata = await metadataFromPublicHtml(
-		"workstation.html",
-		"/workstation.html",
-		locale,
-	);
-	return { ...metadata, robots: NON_INDEXABLE_ROBOTS };
+  const metadata = await metadataFromPublicHtml(
+    "workstation.html",
+    "/workstation.html",
+    locale,
+  );
+  return { ...metadata, robots: NON_INDEXABLE_ROBOTS };
 }
 
 export default async function WorkstationPage({ params }: Props) {
-	const { locale } = await params;
-	if (!hasLocale(routing.locales, locale)) notFound();
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
 
-	setRequestLocale(locale);
-	const site = await getTranslations("site");
+  setRequestLocale(locale);
+  const site = await getTranslations("site");
 
-	return (
-		<div className="site-content-page page-dark page-truenas page-workstation">
-			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
-			<PublicHtmlFragment
-				file="workstation.html"
-				mode="headerMain"
-				locale={locale}
-			/>
+  return (
+    <div className="site-content-page page-dark page-truenas page-workstation">
+      <TopAnchor />
+      <a href="#main-content" className="skip-to-main">
+        {site("skipToMainContent")}
+      </a>
+      <PublicHtmlFragment
+        file="workstation.html"
+        mode="headerMain"
+        locale={locale}
+      />
 
-			<div className="hardware-section-bg">
-				<HardwareSection />
-				<BillOfMaterialsSection />
-			</div>
-			<SiteWidgetsScript />
-		</div>
-	);
+      <div className="hardware-section-bg">
+        <HardwareSection />
+        <BillOfMaterialsSection />
+      </div>
+      <SiteWidgetsScript />
+    </div>
+  );
 }

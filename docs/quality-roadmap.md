@@ -61,8 +61,12 @@ verts sur la branche de travail.
   français.
 - [x] Corriger les contrastes détectés sur TrueNAS et confirmer le score
   Lighthouse accessibilité de 100.
-- [ ] Étendre la vérification du focus visible et de la navigation clavier à
-  toutes les pages prioritaires.
+- [x] Centraliser canonical et `hreflang` (`en`, `fr`, `x-default`) pour toutes
+  les pages indexables et normaliser le domaine public sur `albandrieu.com`.
+- [x] Ajouter une matrice bilingue vérifiant structure, images, lien
+  d'évitement et focus visible sur toutes les pages indexables.
+- [ ] Confirmer la matrice accessibilité complète en CI après les corrections
+  Contact, CV et Security.
 - [x] Ajouter les données structurées JSON-LD `Person` sur l'accueil et
   `ProfessionalService` sur la page expertise.
 - [ ] Ajouter des données structurées aux contenus éditoriaux qui disposent

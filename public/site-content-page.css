@@ -5,65 +5,65 @@
  */
 
 body.site-content-page {
-	font-family:
-		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-		Arial, sans-serif;
-	color: var(--text-dark);
-	line-height: 1.6;
-	overflow-x: hidden;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
 /* Jusmundi / CV chrome pages bring their own surface (cv-theme, jusmundi.css). */
 
 body.site-content-page:not(.jusmundi-page):not(.page-dark) {
-	background-color: var(--bg-white);
+  background-color: var(--bg-white);
 }
 
 body.site-content-page #main-content.container {
-	padding-left: 1rem;
-	padding-right: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 /* Policy / long-form prose */
 body.site-content-page.policy-legal #main-content h1 {
-	font-size: 2rem;
-	font-weight: 700;
-	margin-bottom: 0.5rem;
-	color: var(--text-dark);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
 }
 
 body.site-content-page.policy-legal #main-content h2 {
-	font-size: 1.3rem;
-	font-weight: 600;
-	margin-top: 2rem;
-	margin-bottom: 0.65rem;
-	color: var(--text-dark);
-	padding-bottom: 0.35rem;
-	border-bottom: 1px solid var(--border-color);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.65rem;
+  color: var(--text-dark);
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 body.site-content-page.policy-legal #main-content p,
 body.site-content-page.policy-legal #main-content li {
-	color: var(--text-dark);
+  color: var(--text-dark);
 }
 
 body.site-content-page.policy-legal #main-content a {
-	color: var(--primary-color);
-	font-weight: 500;
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
 body.site-content-page.policy-legal #main-content a:hover {
-	color: var(--secondary-color);
+  color: var(--secondary-color);
 }
 
 body.site-content-page.policy-legal #main-content ul {
-	padding-left: 1.25rem;
+  padding-left: 1.25rem;
 }
 
 @media (prefers-color-scheme: dark) {
-	body.site-content-page.policy-legal #main-content a:hover {
-		filter: brightness(1.15);
-	}
+  body.site-content-page.policy-legal #main-content a:hover {
+    filter: brightness(1.15);
+  }
 }
 
 /* All unused and incomplete CSS blocks removed below this line.

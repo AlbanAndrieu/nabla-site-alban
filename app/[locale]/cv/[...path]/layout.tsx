@@ -6,32 +6,32 @@ import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
 
 type Props = {
-	children: ReactNode;
-	params: Promise<{ locale: string; path: string[] }>;
+  children: ReactNode;
+  params: Promise<{ locale: string; path: string[] }>;
 };
 
 export function generateStaticParams() {
-	return routing.locales.map((locale) => ({ locale }));
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 export default async function CVLayout({ children, params }: Props) {
-	const { locale, path } = await params;
-	setRequestLocale(locale);
+  const { locale, path } = await params;
+  setRequestLocale(locale);
 
-	// Determine if this is a sub-page (e.g., cv-small-fr.html)
-	const isSubPage = path && path.length === 1 && path[0].startsWith("cv-");
+  // Determine if this is a sub-page (e.g., cv-small-fr.html)
+  const isSubPage = path && path.length === 1 && path[0].startsWith("cv-");
 
-	// Set body classes based on page type
-	const bodyClassName = isSubPage
-		? "page-cv"
-		: "site-content-page page-cv page-dark page-nabla-best-practices";
+  // Set body classes based on page type
+  const bodyClassName = isSubPage
+    ? "page-cv"
+    : "site-content-page page-cv page-dark page-nabla-best-practices";
 
-	return (
-		<div className={bodyClassName} suppressHydrationWarning>
-			{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
-			{isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}
-			{children}
-			<SiteWidgetsScript printPdf noCoffeeFab noGoogleTranslate />
-		</div>
-	);
+  return (
+    <div className={bodyClassName} suppressHydrationWarning>
+      {/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
+      {isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}
+      {children}
+      <SiteWidgetsScript printPdf noCoffeeFab noGoogleTranslate />
+    </div>
+  );
 }

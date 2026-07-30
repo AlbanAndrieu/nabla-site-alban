@@ -13,25 +13,25 @@ import MonitoringAndGamingSection from "../../components/freenas/MonitoringAndGa
 export const metadata: Metadata = { robots: NON_INDEXABLE_ROBOTS };
 
 export default async function FreenasPage({
-	params,
+  params,
 }: PageProps<"/[locale]/freenas">) {
-	const { locale } = await params;
-	if (!hasLocale(routing.locales, locale)) notFound();
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
 
-	setRequestLocale(locale);
-	const tSite = await getTranslations("site");
-	return (
-		<div className="site-content-page page-dark">
-			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{tSite("skipToMainContent")}
-			</a>
-			<main id="main-content" className="container py-4 pb-5">
-				<HeroSection />
-				<JenkinsAndPluginsSection />
-				<MonitoringAndGamingSection />
-			</main>
-			<SiteWidgetsScript printPdf coffeeFab />
-		</div>
-	);
+  setRequestLocale(locale);
+  const tSite = await getTranslations("site");
+  return (
+    <div className="site-content-page page-dark">
+      <TopAnchor />
+      <a href="#main-content" className="skip-to-main">
+        {tSite("skipToMainContent")}
+      </a>
+      <main id="main-content" className="container py-4 pb-5">
+        <HeroSection />
+        <JenkinsAndPluginsSection />
+        <MonitoringAndGamingSection />
+      </main>
+      <SiteWidgetsScript printPdf coffeeFab />
+    </div>
+  );
 }

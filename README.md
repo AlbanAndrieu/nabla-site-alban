@@ -1,6 +1,6 @@
 <!-- markdown-link-check-disable-next-line -->
 
-# [![Nabla](https://albandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) Nabla — Alban Andrieu
+# [![Nabla](https://albanandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) Nabla — Alban Andrieu
 
 [![CI](https://github.com/AlbanAndrieu/nabla-site-alban/actions/workflows/ci.yml/badge.svg)](https://github.com/AlbanAndrieu/nabla-site-alban/actions/workflows/ci.yml)
 [![Coverage Status](https://codecov.io/gh/AlbanAndrieu/nabla-site-alban/branch/main/graph/badge.svg)](https://codecov.io/gh/AlbanAndrieu/nabla-site-alban)

@@ -12,13 +12,13 @@ const services = JSON.parse(fs.readFileSync(homelabJson, "utf8")).services;
 const missing = {};
 
 for (const svc of services) {
-	const icon = path.basename(svc.iconSrc);
-	if (!existing.has(icon)) {
-		const slug = icon.replace(".png", "");
-		missing[icon] = cdnBase + slug + ".png";
-	}
+  const icon = path.basename(svc.iconSrc);
+  if (!existing.has(icon)) {
+    const slug = icon.replace(".png", "");
+    missing[icon] = cdnBase + slug + ".png";
+  }
 }
 fs.writeFileSync(outputFile, JSON.stringify(missing, null, 2), "utf8");
 console.log(
-	`[OK] Missing icons JSON ready : ${outputFile} (${Object.keys(missing).length} files)`,
+  `[OK] Missing icons JSON ready : ${outputFile} (${Object.keys(missing).length} files)`,
 );

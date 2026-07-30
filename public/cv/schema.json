@@ -1,185 +1,185 @@
 {
-	"basics": {
-		"name": "Alban Andrieu",
-		"label": "DevSecOps Engineer",
-		"image": "https://albanandrieu.com/assets/nabla/nabla-4.svg",
-		"email": "job@albandrieu.com",
-		"phone": "",
-		"url": "https://albanandrieu.com",
-		"summary": "Experienced DevSecOps professional specializing in SDLC, Cloud Infrastructure, and Software Development. Proven track record in implementing automation, security best practices, and modern development workflows across diverse enterprise environments.",
-		"location": {
-			"address": "",
-			"postalCode": "",
-			"city": "",
-			"countryCode": "FR",
-			"region": ""
-		},
-		"profiles": [
-			{
-				"network": "LinkedIn",
-				"username": "nabla",
-				"url": "https://www.linkedin.com/in/nabla/"
-			},
-			{
-				"network": "GitHub",
-				"username": "AlbanAndrieu",
-				"url": "https://github.com/AlbanAndrieu"
-			},
-			{
-				"network": "Twitter",
-				"username": "AlbanAndrieu",
-				"url": "https://twitter.com/AlbanAndrieu"
-			}
-		]
-	},
-	"work": [
-		{
-			"name": "Various Organizations",
-			"position": "DevSecOps Engineer",
-			"url": "",
-			"startDate": "",
-			"endDate": "",
-			"summary": "Leading DevSecOps initiatives, implementing SDLC pipelines, cloud infrastructure management, and security automation across enterprise environments.",
-			"highlights": [
-				"Designed and implemented enterprise-scale SDLC pipelines",
-				"Automated infrastructure provisioning and configuration management",
-				"Implemented security scanning and compliance automation",
-				"Led cloud migration and modernization projects",
-				"Mentored teams on DevOps and security best practices"
-			]
-		}
-	],
-	"volunteer": [],
-	"education": [],
-	"awards": [],
-	"certificates": [],
-	"publications": [],
-	"skills": [
-		{
-			"name": "DevSecOps",
-			"level": "Expert",
-			"keywords": [
-				"SDLC",
-				"DevOps",
-				"DevSecOps",
-				"Jenkins CI",
-				"GitLab CI",
-				"GitHub Actions",
-				"Security Scanning",
-				"Compliance Automation",
-				"Java",
-				"C++",
-				"C",
-				"Perl",
-				"PL/SQL",
-				"Shell",
-				"Bash",
-				"Git",
-				"Software Architecture",
-				"System Administration",
-				"System Monitoring",
-				"System Logging",
-				"System Security",
-				"System Configuration",
-				"System Deployment",
-				"System Maintenance",
-				"System Optimization"
-			]
-		},
-		{
-			"name": "Cloud Infrastructure",
-			"level": "Expert",
-			"keywords": [
-				"AWS",
-				"EKS",
-				"Azure",
-				"AKS",
-				"GCP",
-				"Kubernetes",
-				"Rancher",
-				"OVH",
-				"Scaleway",
-				"Cloudflare",
-				"Cloudflare CDN",
-				"TrueNAS",
-				"Docker",
-				"Terraform",
-				"Infrastructure as Code"
-			]
-		},
-		{
-			"name": "Software Engineering",
-			"level": "Expert",
-			"keywords": [
-				"Python",
-				"Java",
-				"JavaScript",
-				"Bash",
-				"Git",
-				"Software Architecture"
-			]
-		},
-		{
-			"name": "Automation",
-			"level": "Expert",
-			"keywords": [
-				"Ansible",
-				"Terraform",
-				"Configuration Management",
-				"Scripting"
-			]
-		},
-		{
-			"name": "Security",
-			"level": "Advanced",
-			"keywords": [
-				"Security Scanning",
-				"Vulnerability Management",
-				"Compliance",
-				"SAST",
-				"DAST",
-				"Container Security"
-			]
-		}
-	],
-	"languages": [
-		{
-			"language": "English",
-			"fluency": "Professional"
-		},
-		{
-			"language": "French",
-			"fluency": "Native"
-		}
-	],
-	"interests": [],
-	"references": [],
-	"projects": [],
-	"meta": {
-		"canonical": "https://albanandrieu.com/cv/schema.json",
-		"version": "v1.0.0",
-		"lastModified": "2026-01-24",
-		"schema": "JSONResume",
-		"note": "This schema is compatible with resume tools like @xitanggg/open-resume and @amruthpillai/reactive-resume. The 'resumes' section is a custom extension for machine-extraction tools."
-	},
-	"resumes": {
-		"latex": {
-			"name": "LaTeX Resume PDF",
-			"url": "https://albanandrieu.com/cv/cv-aandrieu-2026-en.pdf",
-			"format": "application/pdf",
-			"description": "Traditional formatted resume"
-		},
-		"linkedin": {
-			"name": "LinkedIn Resume PDF",
-			"url": "https://albanandrieu.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
-			"format": "application/pdf",
-			"description": "LinkedIn profile exported as PDF"
-		},
-		"web": {
-			"name": "Online CV Landing Page",
-			"url": "https://albanandrieu.com/cv/index.html",
-			"format": "text/html",
-			"description": "Interactive web-based CV"
-		}
-	}
+  "basics": {
+    "name": "Alban Andrieu",
+    "label": "DevSecOps Engineer",
+    "image": "https://albanandrieu.com/assets/nabla/nabla-4.svg",
+    "email": "job@albandrieu.com",
+    "phone": "",
+    "url": "https://albanandrieu.com",
+    "summary": "Experienced DevSecOps professional specializing in SDLC, Cloud Infrastructure, and Software Development. Proven track record in implementing automation, security best practices, and modern development workflows across diverse enterprise environments.",
+    "location": {
+      "address": "",
+      "postalCode": "",
+      "city": "",
+      "countryCode": "FR",
+      "region": ""
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "nabla",
+        "url": "https://www.linkedin.com/in/nabla/"
+      },
+      {
+        "network": "GitHub",
+        "username": "AlbanAndrieu",
+        "url": "https://github.com/AlbanAndrieu"
+      },
+      {
+        "network": "Twitter",
+        "username": "AlbanAndrieu",
+        "url": "https://twitter.com/AlbanAndrieu"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Various Organizations",
+      "position": "DevSecOps Engineer",
+      "url": "",
+      "startDate": "",
+      "endDate": "",
+      "summary": "Leading DevSecOps initiatives, implementing SDLC pipelines, cloud infrastructure management, and security automation across enterprise environments.",
+      "highlights": [
+        "Designed and implemented enterprise-scale SDLC pipelines",
+        "Automated infrastructure provisioning and configuration management",
+        "Implemented security scanning and compliance automation",
+        "Led cloud migration and modernization projects",
+        "Mentored teams on DevOps and security best practices"
+      ]
+    }
+  ],
+  "volunteer": [],
+  "education": [],
+  "awards": [],
+  "certificates": [],
+  "publications": [],
+  "skills": [
+    {
+      "name": "DevSecOps",
+      "level": "Expert",
+      "keywords": [
+        "SDLC",
+        "DevOps",
+        "DevSecOps",
+        "Jenkins CI",
+        "GitLab CI",
+        "GitHub Actions",
+        "Security Scanning",
+        "Compliance Automation",
+        "Java",
+        "C++",
+        "C",
+        "Perl",
+        "PL/SQL",
+        "Shell",
+        "Bash",
+        "Git",
+        "Software Architecture",
+        "System Administration",
+        "System Monitoring",
+        "System Logging",
+        "System Security",
+        "System Configuration",
+        "System Deployment",
+        "System Maintenance",
+        "System Optimization"
+      ]
+    },
+    {
+      "name": "Cloud Infrastructure",
+      "level": "Expert",
+      "keywords": [
+        "AWS",
+        "EKS",
+        "Azure",
+        "AKS",
+        "GCP",
+        "Kubernetes",
+        "Rancher",
+        "OVH",
+        "Scaleway",
+        "Cloudflare",
+        "Cloudflare CDN",
+        "TrueNAS",
+        "Docker",
+        "Terraform",
+        "Infrastructure as Code"
+      ]
+    },
+    {
+      "name": "Software Engineering",
+      "level": "Expert",
+      "keywords": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "Bash",
+        "Git",
+        "Software Architecture"
+      ]
+    },
+    {
+      "name": "Automation",
+      "level": "Expert",
+      "keywords": [
+        "Ansible",
+        "Terraform",
+        "Configuration Management",
+        "Scripting"
+      ]
+    },
+    {
+      "name": "Security",
+      "level": "Advanced",
+      "keywords": [
+        "Security Scanning",
+        "Vulnerability Management",
+        "Compliance",
+        "SAST",
+        "DAST",
+        "Container Security"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Professional"
+    },
+    {
+      "language": "French",
+      "fluency": "Native"
+    }
+  ],
+  "interests": [],
+  "references": [],
+  "projects": [],
+  "meta": {
+    "canonical": "https://albanandrieu.com/cv/schema.json",
+    "version": "v1.0.0",
+    "lastModified": "2026-01-24",
+    "schema": "JSONResume",
+    "note": "This schema is compatible with resume tools like @xitanggg/open-resume and @amruthpillai/reactive-resume. The 'resumes' section is a custom extension for machine-extraction tools."
+  },
+  "resumes": {
+    "latex": {
+      "name": "LaTeX Resume PDF",
+      "url": "https://albanandrieu.com/cv/cv-aandrieu-2026-en.pdf",
+      "format": "application/pdf",
+      "description": "Traditional formatted resume"
+    },
+    "linkedin": {
+      "name": "LinkedIn Resume PDF",
+      "url": "https://albanandrieu.com/cv/linkedin/cv-aandrieu-linkedin-2026-01-01.pdf",
+      "format": "application/pdf",
+      "description": "LinkedIn profile exported as PDF"
+    },
+    "web": {
+      "name": "Online CV Landing Page",
+      "url": "https://albanandrieu.com/cv/index.html",
+      "format": "text/html",
+      "description": "Interactive web-based CV"
+    }
+  }
 }

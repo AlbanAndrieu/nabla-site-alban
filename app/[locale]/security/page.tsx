@@ -7,41 +7,47 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
+import { pageAlternates } from "@/lib/sitePageCatalog";
 
 export async function generateMetadata({
-	params,
+  params,
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
-	const { locale } = await params;
-	if (!hasLocale(routing.locales, locale)) return {};
-	return metadataFromPublicHtml("security.html", "/security.html", locale);
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const metadata = await metadataFromPublicHtml(
+    "security.html",
+    "/security.html",
+    locale,
+  );
+  return { ...metadata, alternates: pageAlternates("security", locale) };
 }
 
 export default async function SecurityPage({
-	params,
+  params,
 }: PageProps<"/[locale]/security">) {
-	const { locale } = await params;
-	if (!hasLocale(routing.locales, locale)) notFound();
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
 
-	setRequestLocale(locale);
-	const site = await getTranslations("site");
+  setRequestLocale(locale);
+  const site = await getTranslations("site");
 
-	return (
-		<>
-			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
-			<PublicHtmlFragment
-				file="security.html"
-				mode="headerMain"
-				locale={locale}
-				className="site-content-page page-security page-dark"
-			/>
-			<Script
-				src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"
-				strategy="afterInteractive"
-			/>
-			<Script src="/arf.js" strategy="afterInteractive" />
-		</>
-	);
+  return (
+    <>
+      <TopAnchor />
+      <a href="#main-content" className="skip-to-main">
+        {site("skipToMainContent")}
+      </a>
+      <PublicHtmlFragment
+        file="security.html"
+        mode="headerMain"
+        locale={locale}
+        className="site-content-page page-security page-dark"
+      />
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"
+        strategy="afterInteractive"
+      />
+      <Script src="/arf.js" strategy="afterInteractive" />
+    </>
+  );
 }

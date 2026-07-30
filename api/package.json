@@ -1,18 +1,18 @@
 {
-	"name": "api",
-	"private": true,
-	"version": "0.0.1",
-	"description": "Vercel serverless API",
-	"dependencies": {
-		"got": "11.8.5",
-		"node-fetch": "2.6.7",
-		"parse-github-url": "1.0.2",
-		"stripe": "^22.0.0",
-		"tar-fs": "^2.1.4"
-	},
-	"devDependencies": {
-		"@types/node": "20.11.0",
-		"@types/node-fetch": "2.5.4",
-		"@types/tar-fs": "1.16.1"
-	}
+  "name": "api",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Vercel serverless API",
+  "dependencies": {
+    "got": "11.8.5",
+    "node-fetch": "2.6.7",
+    "parse-github-url": "1.0.2",
+    "stripe": "^22.0.0",
+    "tar-fs": "^2.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "@types/node-fetch": "2.5.4",
+    "@types/tar-fs": "1.16.1"
+  }
 }

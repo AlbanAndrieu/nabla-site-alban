@@ -12,8 +12,8 @@ const cli = path.join(root, "node_modules", "opencommit", "out", "cli.cjs");
 const env = { ...process.env, PWD: root };
 const args = process.argv.slice(2);
 const r = spawnSync(process.execPath, [cli, ...args], {
-	stdio: "inherit",
-	env,
-	cwd: root,
+  stdio: "inherit",
+  env,
+  cwd: root,
 });
 process.exit(r.status === null ? 1 : r.status);

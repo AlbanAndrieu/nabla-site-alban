@@ -4,7 +4,7 @@
  */
 window.NABLA_ANALYTICS_MODE = "vercel";
 (() => {
-	var s = document.createElement("script");
-	s.src = "/site-analytics.js";
-	(document.head || document.documentElement).appendChild(s);
+  var s = document.createElement("script");
+  s.src = "/site-analytics.js";
+  (document.head || document.documentElement).appendChild(s);
 })();
