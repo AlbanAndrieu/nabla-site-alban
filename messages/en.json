@@ -20,7 +20,53 @@
 	},
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
-		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
+		"meta": {
+			"checkoutTitle": "Checkout | Alban Andrieu",
+			"paymentTitle": "Payment options — Alban Andrieu",
+			"cancelTitle": "Checkout canceled | Alban Andrieu",
+			"successTitle": "Payment status | Alban Andrieu"
+		},
+		"page": {
+			"title": "Payment",
+			"subtitle": "One-time payment via Stripe. Secure checkout.",
+			"qrAlt": "QR code to open this Stripe payment on your phone",
+			"qrCaption": "Or scan this QR code to pay on your phone",
+			"submit": "Proceed to checkout"
+		},
+		"options": {
+			"title": "Payment options",
+			"intro": "Pay by card with Stripe-hosted Checkout, or by SEPA bank transfer using the bank details below.",
+			"cardTitle": "Pay by card (Stripe)",
+			"cardDescription": "Secure one-time payment on Stripe’s hosted checkout.",
+			"continue": "Continue to Stripe Checkout",
+			"issueBeforeLink": "If checkout does not start, use the ",
+			"directLink": "direct Stripe link",
+			"issueAfterLink": ", a SEPA transfer, or contact me.",
+			"bankTitle": "Pay by bank transfer (SEPA)",
+			"bankDescription": "Include the invoice or reference in the transfer label.",
+			"downloadBankDetails": "Download bank details (PDF)",
+			"afterPayment": "After paying, send the transfer reference if needed to "
+		},
+		"cancel": {
+			"title": "Checkout canceled",
+			"message": "No payment was made. You can try again at any time.",
+			"beforeDirectLink": "You can also use the ",
+			"directLink": "direct Stripe link",
+			"beforeSepa": " or pay by ",
+			"sepa": "SEPA transfer",
+			"paymentOptions": "Back to payment options",
+			"backSite": "Back to site"
+		},
+		"success": {
+			"confirmedTitle": "Thank you for your payment",
+			"pendingTitle": "Payment verification pending",
+			"confirmedMessage": "Stripe has confirmed your payment.",
+			"pendingMessage": "We cannot confirm this payment yet. Check the link received from Stripe or contact us.",
+			"questions": "Questions? Contact ",
+			"paymentOptions": "Payment options",
+			"backSite": "Back to site"
+		}
 	},
 	"checkoutTjm": {
 		"qrCaption": "Scan this QR code to open the secure Stripe payment page."

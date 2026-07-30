@@ -20,7 +20,53 @@
 	},
 	"checkout": {
 		"sessionCreateError": "Impossible de créer la session de paiement.",
-		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+		"missingPublishableKey": "Le paiement est indisponible: définissez NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
+		"meta": {
+			"checkoutTitle": "Paiement | Alban Andrieu",
+			"paymentTitle": "Options de paiement — Alban Andrieu",
+			"cancelTitle": "Paiement annulé | Alban Andrieu",
+			"successTitle": "État du paiement | Alban Andrieu"
+		},
+		"page": {
+			"title": "Paiement",
+			"subtitle": "Paiement unique via Stripe. Paiement sécurisé.",
+			"qrAlt": "Code QR pour ouvrir ce paiement Stripe sur votre téléphone",
+			"qrCaption": "Ou scannez ce QR code pour payer sur votre téléphone",
+			"submit": "Passer à la caisse"
+		},
+		"options": {
+			"title": "Options de paiement",
+			"intro": "Payez par carte avec la page de paiement hébergée par Stripe, ou par virement SEPA avec le RIB ci-dessous.",
+			"cardTitle": "Payer par carte (Stripe)",
+			"cardDescription": "Paiement unique sécurisé sur le site de Stripe.",
+			"continue": "Continuer vers Stripe",
+			"issueBeforeLink": "En cas de problème, utilisez le ",
+			"directLink": "lien Stripe direct",
+			"issueAfterLink": ", le virement SEPA ou contactez-moi.",
+			"bankTitle": "Payer par virement bancaire (SEPA)",
+			"bankDescription": "Indiquez la facture ou la référence dans le libellé du virement.",
+			"downloadBankDetails": "Télécharger le RIB (PDF)",
+			"afterPayment": "Après le paiement, envoyez si nécessaire la référence à "
+		},
+		"cancel": {
+			"title": "Paiement annulé",
+			"message": "Aucun paiement n’a été effectué. Vous pouvez réessayer à tout moment.",
+			"beforeDirectLink": "Vous pouvez aussi utiliser le ",
+			"directLink": "lien Stripe direct",
+			"beforeSepa": " ou payer par ",
+			"sepa": "virement SEPA",
+			"paymentOptions": "Retour aux options de paiement",
+			"backSite": "Retour au site"
+		},
+		"success": {
+			"confirmedTitle": "Merci pour votre paiement",
+			"pendingTitle": "Paiement en cours de vérification",
+			"confirmedMessage": "Le paiement a bien été confirmé par Stripe.",
+			"pendingMessage": "Nous ne pouvons pas encore confirmer ce paiement. Vérifiez le lien reçu de Stripe ou contactez-nous.",
+			"questions": "Pour toute question : ",
+			"paymentOptions": "Options de paiement",
+			"backSite": "Retour au site"
+		}
 	},
 	"checkoutTjm": {
 		"qrCaption": "Scannez ce QR code pour ouvrir la page de paiement Stripe sécurisée."
