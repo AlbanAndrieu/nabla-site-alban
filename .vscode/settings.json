@@ -57,8 +57,8 @@
 	],
 	"latex-workshop.latex.recipe.default": "latexmk (xelatex)",
 	"github.copilot.advanced": {
-		"debug.overrideProxyUrl": "http://localhost:4100",
-		"debug.testOverrideProxyUrl": "http://localhost:4100"
+		"debug.overrideProxyUrl": "http://172.17.0.57:4000",
+		"debug.testOverrideProxyUrl": "http://172.17.0.57:4000"
 	},
 	"aws.telemetry": false,
 	"editor.formatOnSave": true,

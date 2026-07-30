@@ -3,13 +3,10 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import AppsSection from "@/app/components/truenas/AppsSection";
+import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import {
-	loadPublicHtmlFragment,
-	metadataFromPublicHtml,
-} from "@/lib/htmlFromPublic";
+import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
 import HardwareSection from "../../components/workstation/HardwareSection";
@@ -34,38 +31,30 @@ export default async function WorkstationPage({ params }: Props) {
 
 	setRequestLocale(locale);
 	const site = await getTranslations("site");
-	const html = await loadPublicHtmlFragment(
-		"workstation.html",
-		"mainOuter",
-		locale,
-	);
 
 	return (
-		<>
-			<div className="site-content-page page-dark">
-				<Script
-					id="site-analytics-workstation"
-					src="/site-analytics.js"
-					strategy="afterInteractive"
-					data-analytics-mode="showcase"
-				/>
-				<TopAnchor />
-				<a href="#main-content" className="skip-to-main">
-					{site("skipToMainContent")}
-				</a>
-				<div
-					className="site-content-page page-dark page-truenas page-workstation"
-					dangerouslySetInnerHTML={{ __html: html }}
-				/>
+		<div className="site-content-page page-dark page-truenas page-workstation">
+			<Script
+				id="site-analytics-workstation"
+				src="/site-analytics.js"
+				strategy="afterInteractive"
+				data-analytics-mode="showcase"
+			/>
+			<TopAnchor />
+			<a href="#main-content" className="skip-to-main">
+				{site("skipToMainContent")}
+			</a>
+			<PublicHtmlFragment
+				file="workstation.html"
+				mode="headerMain"
+				locale={locale}
+			/>
 
-				<main id="main-content">
-					<div className="hardware-section-bg">
-						<HardwareSection />
-						<BillOfMaterialsSection />
-					</div>
-				</main>
-				<Script src="/site-widgets.js" strategy="afterInteractive" />
+			<div className="hardware-section-bg">
+				<HardwareSection />
+				<BillOfMaterialsSection />
 			</div>
-		</>
+			<Script src="/site-widgets.js" strategy="afterInteractive" />
+		</div>
 	);
 }

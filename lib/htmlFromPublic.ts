@@ -346,10 +346,11 @@ export function extractHtmlFragment(
 			return html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] ?? "";
 		case "headerMain": {
 			// Allow comments and other nodes between </header> and <main>.
-			const fragment = html.match(
-				/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
-			)?.[0];
-			return fragment ? `<div class="site-content-page">${fragment}</div>` : "";
+			return (
+				html.match(
+					/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
+				)?.[0] ?? ""
+			);
 		}
 		case "navHeaderMain":
 			return (

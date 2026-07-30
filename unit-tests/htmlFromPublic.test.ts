@@ -28,6 +28,10 @@ test("extractHtmlFragment keeps the requested structural boundary", () => {
 		extractHtmlFragment(html, "mainOuter"),
 		'<main id="main">Content</main>',
 	);
+	assert.equal(
+		extractHtmlFragment(html, "headerMain"),
+		'<header>Hero</header><main id="main">Content</main>',
+	);
 	assert.match(extractHtmlFragment(html, "navHeaderMain"), /^<nav/);
 	assert.doesNotMatch(extractHtmlFragment(html, "body"), /Footer/);
 });

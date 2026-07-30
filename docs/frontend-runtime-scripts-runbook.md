@@ -171,7 +171,9 @@ Important limitations:
 
 Each migrated URL has a dedicated App Router page. A few dedicated routes still
 load a fragment from `public/` through `lib/htmlFromPublic.ts` (`ai`, `security`,
-`workstation` and some CV pages). `lib/sitePageCatalog.ts` separately owns
+`workstation` and some CV pages). The three content routes render through
+`app/components/PublicHtmlFragment.tsx` so extraction and trusted HTML injection
+remain centralized. `lib/sitePageCatalog.ts` separately owns
 functional categories and the strict sitemap allowlist.
 
 Workflow:

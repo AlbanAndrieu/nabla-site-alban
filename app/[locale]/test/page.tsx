@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
-import React from "react";
 import TopAnchor from "@/components/TopAnchor";
 
 export default async function TestPage() {
