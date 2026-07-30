@@ -17,17 +17,17 @@ jobs:
         run: npm run check
       - name: Run pre-commit hooks
         run: |
-          pip install pre-commit  # Needed for pre-commit cli
+          pip install pre-commit
           pre-commit run --all-files --show-diff-on-failure || true
       - name: Run Playwright tests
         run: npm test
       - name: Optional: Upload coverage to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        if: ${{ secrets.CODECOV_TOKEN }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Optional: Snyk Vulnerability Scan
-        if: ${{ secrets.SNYK_TOKEN != '' }}
+        if: ${{ secrets.SNYK_TOKEN }}
         uses: snyk/actions/node@v3
         with:
           command: test

@@ -12,7 +12,6 @@ jobs:
     name: Run Playwright Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    # publish-unit-test-result-action POSTs check-runs; default token is often read-only.
     permissions:
       contents: read
       checks: write
@@ -36,6 +35,9 @@ jobs:
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Purge Node.js and Next.js cache
+        run: rm -rf node_modules package-lock.json .next || true
 
       - name: Build Next.js app
         run: npm run build

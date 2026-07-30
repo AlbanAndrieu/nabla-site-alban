@@ -16,4 +16,20 @@ test.describe("Startup inquiry page", () => {
 		await expect(page.getByLabel(/Work email/i)).toBeVisible();
 		await expect(page.getByLabel(/What do you need help with/i)).toBeVisible();
 	});
+
+	test("uses the French next-intl catalog and localized return URL", async ({
+		page,
+	}) => {
+		await page.goto("/fr/startup.html");
+
+		await expect(page).toHaveTitle(/Démarrer votre projet/i);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			"Démarrer votre projet",
+		);
+		await expect(page.getByLabel(/Votre nom/i)).toBeVisible();
+		await expect(page.getByLabel(/Email professionnel/i)).toBeVisible();
+		await expect(page.locator('input[name="_next"]')).toHaveValue(
+			"https://albanandrieu.com/fr/startup-thanks.html",
+		);
+	});
 });
