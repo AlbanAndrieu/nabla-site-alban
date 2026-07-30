@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
@@ -35,12 +34,6 @@ export default async function WorkstationPage({ params }: Props) {
 
 	return (
 		<div className="site-content-page page-dark page-truenas page-workstation">
-			<Script
-				id="site-analytics-workstation"
-				src="/site-analytics.js"
-				strategy="afterInteractive"
-				data-analytics-mode="showcase"
-			/>
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}

@@ -50,6 +50,12 @@ Optional analytics attributes:
 
 Programmatic fallback is also supported through `window.NABLA_ANALYTICS_PRESET`.
 
+The Next.js application shell uses the lightweight `vercel` mode by default.
+Set `NEXT_PUBLIC_ANALYTICS_MODE` explicitly to `full`, `showcase`, or `home`
+only when the additional vendors are required and their performance/privacy
+cost has been accepted. Per-page duplicate loaders must not be added below the
+localized layout.
+
 ### Verified page examples
 
 - `home`: `public/index.html`

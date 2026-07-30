@@ -19,23 +19,33 @@ verts sur la branche de travail.
 - [ ] Réduire les derniers fragments HTML historiques lorsque leur migration
   apporte une amélioration mesurable.
 
-## Priorité 3 — Performance et qualité front-end (en cours)
+## Priorité 3 — Performance et qualité front-end (presque terminée)
 
 - [x] Centraliser le chargement de `site-widgets.js` dans
   `components/SiteWidgetsScript.tsx`.
 - [x] Préserver les configurations par page et leur exécution lors des
   navigations Next.js.
 - [x] Remplacer les images locales React pertinentes par `next/image`.
+- [x] Éviter le pipeline `next/image` pour les 70 petites icônes TrueNAS et
+  conserver leur chargement natif différé.
 - [x] Supprimer les attentes Playwright fixes, les tests dupliqués et les
   annotations `flaky` non prises en charge.
 - [x] Découper et typer les principaux composants expertise et homelab.
-- [ ] Mesurer Lighthouse et les Web Vitals sur accueil, expertise, contact, CV
-  et homelab, sur mobile et desktop.
-- [ ] Réduire les feuilles CSS globales et les dépendances CDN chargées par le
+- [x] Établir une baseline locale des Web Vitals sur accueil, expertise,
+  contact, JM et TrueNAS.
+- [x] Mesurer Lighthouse mobile sur un build de production pour l'accueil et
+  TrueNAS, avec les scores et leur variabilité documentés.
+- [x] Réduire les feuilles CSS globales et les dépendances CDN chargées par le
   layout localisé.
-- [ ] Auditer le poids des scripts et ressources statiques historiques.
-- [ ] Supprimer le chemin obsolète `loadCvHtmlFragment` après vérification de
-  ses derniers consommateurs.
+- [x] Auditer le poids des scripts analytiques et passer les intégrations
+  marketing lourdes en opt-in.
+- [ ] Compléter Lighthouse desktop et étendre le relevé aux autres pages
+  prioritaires sur un déploiement de préproduction stable.
+- [ ] Auditer les autres ressources statiques historiques.
+- [x] Vérifier les consommateurs de `loadCvHtmlFragment` et documenter son rôle
+  transitoire pour les variantes HTML détaillées du CV.
+- [ ] Migrer les variantes `cv-{small,medium,large,full}-*.html` avant de
+  supprimer `loadCvHtmlFragment`.
 
 ## Priorité 4 — SEO et accessibilité (bien avancée)
 
@@ -49,9 +59,14 @@ verts sur la branche de travail.
   principaux.
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et en
   français.
-- [ ] Vérifier contraste, focus visible et navigation clavier.
-- [ ] Ajouter les données structurées JSON-LD utiles (`Person`,
-  `ProfessionalService` et contenus éditoriaux).
+- [x] Corriger les contrastes détectés sur TrueNAS et confirmer le score
+  Lighthouse accessibilité de 100.
+- [ ] Étendre la vérification du focus visible et de la navigation clavier à
+  toutes les pages prioritaires.
+- [x] Ajouter les données structurées JSON-LD `Person` sur l'accueil et
+  `ProfessionalService` sur la page expertise.
+- [ ] Ajouter des données structurées aux contenus éditoriaux qui disposent
+  d'une date et d'un auteur fiables.
 - [ ] Contrôler en production les canonical, `hreflang`, robots, sitemap et
   aperçus Open Graph.
 - [ ] Décider explicitement si CTID, FreeNAS et Workstation doivent rejoindre

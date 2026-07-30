@@ -1322,6 +1322,19 @@ html[data-theme="light"] .social-link:hover {
 	padding: 1rem 0;
 }
 
+.hardware-section-bg .hardware-bom-heading--sub {
+	color: #aeb8c4 !important;
+}
+
+.hardware-section-bg .hardware-bom-li a {
+	color: #075caf;
+}
+
+.hardware-section-bg .hardware-bom-li a:hover,
+.hardware-section-bg .hardware-bom-li a:focus-visible {
+	color: #034a8c;
+}
+
 /* Jus Mundi external links: favicon-sized mark beside the label */
 
 .jusmundi-link-icon {

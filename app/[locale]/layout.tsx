@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import {
+	getMessages,
+	getTranslations,
+	setRequestLocale,
+} from "next-intl/server";
 import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
 import { routing } from "@/i18n/routing";
@@ -90,6 +94,12 @@ export default async function LocaleLayout({
 	const copyright = siteTranslations("copyright", {
 		year: String(new Date().getUTCFullYear()),
 	});
+	const configuredAnalyticsMode = process.env.NEXT_PUBLIC_ANALYTICS_MODE;
+	const analyticsMode = ["full", "home", "showcase", "vercel"].includes(
+		configuredAnalyticsMode ?? "",
+	)
+		? configuredAnalyticsMode
+		: "vercel";
 
 	return (
 		<html lang={locale} data-nabla-app="next-intl" suppressHydrationWarning>
@@ -134,7 +144,7 @@ export default async function LocaleLayout({
 				</NextIntlClientProvider>
 				<Script
 					src="/site-analytics.js"
-					data-analytics-mode="home"
+					data-analytics-mode={analyticsMode}
 					data-ahrefs-key={process.env.AHREFS_ANALYTICS_KEY}
 					strategy="afterInteractive"
 				/>

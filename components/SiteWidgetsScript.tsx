@@ -59,6 +59,7 @@ export default function SiteWidgetsScript({
 			strategy="afterInteractive"
 			data-axeptio={axeptio ? "" : undefined}
 			data-coffee-fab={coffeeFab ? "" : undefined}
+			data-no-font-awesome=""
 			data-no-coffee-fab={noCoffeeFab ? "" : undefined}
 			data-no-google-translate={noGoogleTranslate ? "" : undefined}
 			data-print-pdf={printPdf ? "" : undefined}

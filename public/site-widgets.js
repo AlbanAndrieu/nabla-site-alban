@@ -281,6 +281,8 @@
 			var p = u.pathname;
 			var i = p.lastIndexOf("/");
 			u.pathname = p.slice(0, i + 1);
+			u.search = "";
+			u.hash = "";
 			return u.href;
 		} catch (_e) {
 			return "";

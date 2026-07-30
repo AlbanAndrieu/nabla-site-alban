@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import JsonLd from "@/components/JsonLd";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
@@ -45,8 +46,27 @@ export default async function ExpertisePage({
 	const aiBullets = t.raw("aiml.bullets") as string[];
 	const skillCategoryTitles = t.raw("skills.categoryTitles") as string[];
 	const technologyGroupTitles = t.raw("technologies.groupTitles") as string[];
+	const canonicalUrl = `https://albandrieu.com${
+		locale === "fr" ? "/fr/expertise.html" : "/expertise.html"
+	}`;
+	const professionalServiceJsonLd = {
+		"@context": "https://schema.org",
+		"@type": "ProfessionalService",
+		name: "Alban Andrieu — DevSecOps & Cloud Architecture",
+		url: canonicalUrl,
+		description: t("metadataDescription"),
+		email: "job@albandrieu.com",
+		areaServed: ["France", "Europe", "Remote"],
+		serviceType: services.map((service) => service.title),
+		provider: {
+			"@type": "Person",
+			name: "Alban Andrieu",
+			url: "https://albandrieu.com/",
+		},
+	};
 	return (
 		<div className="site-content-page page-dark">
+			<JsonLd data={professionalServiceJsonLd} />
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}

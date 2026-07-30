@@ -85,7 +85,11 @@ export async function resolveCvPublicFilePath(
 	return null;
 }
 
-/* TODO remove loadCvHtmlFragment */
+/**
+ * Transitional renderer for the detailed static CV variants linked from the
+ * React CV landing page. Keep this loader until those documents are migrated;
+ * the explicit allowlist prevents arbitrary filesystem reads.
+ */
 export async function loadCvHtmlFragment(
 	urlPath: string[],
 	locale?: string,

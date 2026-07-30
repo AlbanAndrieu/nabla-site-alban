@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 type HomelabService = {
 	name: string;
 	description: string;
@@ -57,12 +55,14 @@ export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
 						key={`${svc.name}:${svc.tunnelUrl ?? svc.internalHost ?? "local"}`}
 					>
 						<div className="card box-shadow h-100 service-card-ux">
-							<Image
+							<img
 								className="img-fluid d-block mx-auto p-4"
 								src={iconPath}
 								width={80}
 								height={80}
 								alt={svc.name}
+								loading="lazy"
+								decoding="async"
 								style={{ minHeight: 60, minWidth: 60, height: "auto" }}
 							/>
 							<div className="card-body text-center border-top border-secondary">

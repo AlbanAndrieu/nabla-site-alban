@@ -86,4 +86,23 @@ test.describe("SEO indexing policy", () => {
 			);
 		}
 	});
+
+	test("priority pages expose their structured data", async ({ request }) => {
+		const cases = [
+			["/", "Person"],
+			["/expertise.html", "ProfessionalService"],
+		] as const;
+
+		for (const [pathname, expectedType] of cases) {
+			const response = await request.get(pathname);
+			expect(response.ok(), `${pathname} should load`).toBeTruthy();
+			const html = await response.text();
+			const jsonLd = html.match(
+				/<script type="application\/ld\+json">([^<]+)<\/script>/,
+			)?.[1];
+
+			expect(jsonLd, `${pathname} should expose JSON-LD`).toBeTruthy();
+			expect(JSON.parse(jsonLd ?? "{}")["@type"]).toBe(expectedType);
+		}
+	});
 });
