@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import Script from "next/script";
-import { getTranslations } from "next-intl/server";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
-export default async function TestPage() {
+export const metadata: Metadata = { robots: NON_INDEXABLE_ROBOTS };
+
+export default async function TestPage({
+	params,
+}: PageProps<"/[locale]/test">) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) notFound();
+
+	setRequestLocale(locale);
 	const site = await getTranslations("site");
 	return (
 		<div className="site-content-page page-dark">

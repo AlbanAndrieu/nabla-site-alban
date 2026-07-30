@@ -190,6 +190,10 @@ Workflow:
   réécrites par `next.config.mjs`.
 - N’ajouter une page à `SEO_PAGE_SLUGS` que si elle doit réellement apparaître
   dans `sitemap.xml`.
+- Toute page absente de cette liste doit aussi déclarer
+  `robots: NON_INDEXABLE_ROBOTS` dans ses métadonnées Next.js. Le test
+  `tests/seo-indexing.spec.ts` vérifie cette règle sur les routes publiques,
+  techniques, CV et Jus Mundi.
 - Use relative script paths in `public/*.html`; rewrite tooling is for links, not script `src`.
 
 ## Recommended Integration Pattern

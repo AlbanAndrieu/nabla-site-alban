@@ -58,10 +58,19 @@ export const SITE_PAGES = {
 	},
 	ctid: { category: "editorialShowcase" },
 	freenas: { category: "editorialShowcase" },
-	nabla: { category: "editorialShowcase" },
+	nabla: {
+		category: "editorialShowcase",
+		seo: { priority: 0.7, changeFrequency: "monthly" },
+	},
 	workstation: { category: "editorialShowcase" },
-	cv: { category: "portfolioEvidence" },
-	jm: { category: "portfolioEvidence" },
+	cv: {
+		category: "portfolioEvidence",
+		seo: { priority: 0.7, changeFrequency: "monthly" },
+	},
+	jm: {
+		category: "portfolioEvidence",
+		seo: { priority: 0.65, changeFrequency: "monthly" },
+	},
 	startup: { category: "technicalFlow" },
 	"startup-thanks": { category: "technicalFlow" },
 	pricing: { category: "technicalFlow" },
@@ -122,5 +131,8 @@ export function seoSettings(slug: SeoPageSlug): SeoSettings {
 
 export function canonicalPagePath(slug: SeoPageSlug, locale: "en" | "fr") {
 	if (slug === "index") return locale === "fr" ? "/fr" : "/";
+	if (slug === "cv" || slug === "jm") {
+		return `${locale === "fr" ? "/fr" : ""}/${slug}`;
+	}
 	return `${locale === "fr" ? "/fr" : ""}/${slug}.html`;
 }

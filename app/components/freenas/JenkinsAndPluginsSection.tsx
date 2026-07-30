@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 export default function JenkinsAndPluginsSection() {
 	return (
@@ -6,11 +6,11 @@ export default function JenkinsAndPluginsSection() {
 			<section className="row main-cards-section justify-content-center">
 				<div className="col-md-4 p-3">
 					<div className="card box-shadow">
-						<img
+						<Image
 							className="card-img-top"
-							src="assets/jenkins-basic.png"
-							width="100"
-							height="100"
+							src="/assets/jenkins-basic.png"
+							width={100}
+							height={100}
 							alt="Jenkins SDLC Platform"
 							style={{ objectFit: "contain", margin: "0 auto" }}
 						/>
@@ -56,11 +56,11 @@ export default function JenkinsAndPluginsSection() {
 			<section className="row gaming-section main-cards-section justify-content-center">
 				<div className="col-md-4 p-3">
 					<div className="card box-shadow">
-						<img
+						<Image
 							className="card-img-top"
-							src="assets/logo-freenas.jpg"
-							width="50"
-							height="50"
+							src="/assets/logo-freenas.jpg"
+							width={50}
+							height={50}
 							alt="FreeNAS Storage Platform"
 							style={{ objectFit: "contain", margin: "0 auto" }}
 						/>

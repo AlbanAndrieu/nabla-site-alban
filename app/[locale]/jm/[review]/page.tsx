@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 const reviews = {
 	"4-years-review-aandrieu": {
@@ -37,7 +38,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { review } = await params;
 	const config = reviews[review as Review];
-	return config ? { title: config.title, description: config.description } : {};
+	return config
+		? {
+				title: config.title,
+				description: config.description,
+				robots: NON_INDEXABLE_ROBOTS,
+			}
+		: {};
 }
 
 export default async function ReviewPage({ params }: Props) {

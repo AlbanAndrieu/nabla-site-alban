@@ -23,16 +23,14 @@ function scalarPaths(value: unknown, prefix = ""): string[] {
 	);
 }
 
-test("the French Nabla catalog matches the English message structure", async () => {
+test("French and English message catalogs have the same structure", async () => {
 	const [english, french] = await Promise.all([
 		loadMessages("en"),
 		loadMessages("fr"),
 	]);
 
-	assert.ok(english.nabla, "English Nabla messages are missing");
-	assert.ok(french.nabla, "French Nabla messages are missing");
 	assert.deepEqual(
-		scalarPaths(french.nabla).sort(),
-		scalarPaths(english.nabla).sort(),
+		scalarPaths(french).sort(),
+		scalarPaths(english).sort(),
 	);
 });

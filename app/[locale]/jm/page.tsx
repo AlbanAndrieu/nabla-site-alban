@@ -1,7 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 export const dynamic = "force-static";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/jm">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const isFrench = locale === "fr";
+
+	return {
+		title: isFrench
+			? "Expérience Jus Mundi — Alban Andrieu"
+			: "Jus Mundi experience — Alban Andrieu",
+		description: isFrench
+			? "Réalisations DevSecOps, infrastructure, sécurité et fiabilité menées par Alban Andrieu chez Jus Mundi."
+			: "DevSecOps, infrastructure, security, and reliability achievements delivered by Alban Andrieu at Jus Mundi.",
+		alternates: {
+			canonical: canonicalPagePath("jm", locale),
+			languages: {
+				en: canonicalPagePath("jm", "en"),
+				fr: canonicalPagePath("jm", "fr"),
+			},
+		},
+	};
+}
 
 // Correction Next.js 15: params is Promise
 export default async function JusmundiPage({
@@ -17,7 +45,7 @@ export default async function JusmundiPage({
 	return (
 		<>
 			<link rel="stylesheet" href="/jm/jusmundi.css" />
-			<main className="jusmundi-page jusmundi-landing-page page-dark">
+			<div className="jusmundi-page jusmundi-landing-page page-dark">
 				<span id="top" />
 				<a href="#main-content" className="skip-link">
 					{site("skipToMainContent")}
@@ -339,7 +367,7 @@ export default async function JusmundiPage({
 						</div>
 					</section>
 				</main>
-			</main>
+			</div>
 		</>
 	);
 }

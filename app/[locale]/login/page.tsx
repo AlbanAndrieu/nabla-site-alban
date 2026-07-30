@@ -26,7 +26,7 @@ export default function LoginPage() {
 			<a href="#main-content" className="skip-to-main">
 				Skip to main content
 			</a>
-			<div className="">
+			<div>
 				<div className="container">
 					<div className="row">
 						<a href="https://hostedscan.com">
@@ -38,52 +38,62 @@ export default function LoginPage() {
 							/>
 						</a>
 					</div>
-					<div className="row">
-						<main id="main-content" className="form-signin">
-							<form method="POST" action="/handler" autoComplete="off">
-								<h2 className="h3 mb-3 fw-normal">Turnstile – Login</h2>
-								<div className="form-floating">
-									<input type="text" id="user" className="form-control" />
-									<label htmlFor="user">User name</label>
-								</div>
-								<div className="form-floating">
-									<input
-										type="password"
-										id="pass"
-										className="form-control"
-										autoComplete="off"
-										readOnly
-										value="CorrectHorseBatteryStaple"
-									/>
-									<label htmlFor="pass">Password (dummy)</label>
-								</div>
-								<div className="checkbox mb-3">
-									{/* The following line configures the Turnstile widget. */}
-									<div
-										className="cf-turnstile"
-										data-sitekey="0x4AAAAAAABU6iWSRkSavdni"
-										data-callback="javascriptCallback"
-										data-theme="light"
-									></div>
-									{/* end. */}
-								</div>
-								<button className="w-100 btn btn-lg btn-primary" type="submit">
-									Sign in
+					<main id="main-content">
+						<div className="row">
+							<section className="form-signin" aria-labelledby="login-heading">
+								<form method="POST" action="/handler" autoComplete="off">
+									<h1 id="login-heading" className="h3 mb-3 fw-normal">
+										Turnstile – Login
+									</h1>
+									<div className="form-floating">
+										<input type="text" id="user" className="form-control" />
+										<label htmlFor="user">User name</label>
+									</div>
+									<div className="form-floating">
+										<input
+											type="password"
+											id="pass"
+											className="form-control"
+											autoComplete="off"
+											readOnly
+											value="CorrectHorseBatteryStaple"
+										/>
+										<label htmlFor="pass">Password (dummy)</label>
+									</div>
+									<div className="checkbox mb-3">
+										{/* The following line configures the Turnstile widget. */}
+										<div
+											className="cf-turnstile"
+											data-sitekey="0x4AAAAAAABU6iWSRkSavdni"
+											data-callback="javascriptCallback"
+											data-theme="light"
+										></div>
+										{/* end. */}
+									</div>
+									<button
+										className="w-100 btn btn-lg btn-primary"
+										type="submit"
+									>
+										Sign in
+									</button>
+								</form>
+							</section>
+						</div>
+						<div className="row">
+							<section
+								className="pre-clearance-demo"
+								aria-labelledby="pre-clearance-heading"
+							>
+								<h2 id="pre-clearance-heading">Pre-clearance Demo</h2>
+								<button id="fetchBtn" type="button" onClick={handleFetch}>
+									Fetch Data
 								</button>
-							</form>
-						</main>
-					</div>
-					<div className="row">
-						<main className="pre-clearance-demo">
-							<h2>Pre-clearance Demo</h2>
-							<button id="fetchBtn" onClick={handleFetch}>
-								Fetch Data
-							</button>
-							<div id="response" className="mt-2">
-								{fetchResult}
-							</div>
-						</main>
-					</div>
+								<div id="response" className="mt-2" aria-live="polite">
+									{fetchResult}
+								</div>
+							</section>
+						</div>
+					</main>
 				</div>
 			</div>
 			{/* Uptime Status/Announcement widget script */}

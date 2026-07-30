@@ -833,5 +833,53 @@
 				"href": "https://github.com/AlbanAndrieu"
 			}
 		}
+	},
+	"startup": {
+		"meta": {
+			"title": "Démarrer votre projet — Alban Andrieu",
+			"description": "Présentez votre projet cloud, cybersécurité, conformité ou livraison à Alban Andrieu."
+		},
+		"navigation": {
+			"backHome": "Retour à l’accueil",
+			"contact": "Contact"
+		},
+		"hero": {
+			"title": "Démarrer votre projet",
+			"beforeEmail": "Présentez brièvement votre besoin — plateforme cloud, sécurité, conformité ou livraison. Je réponds généralement sous un jour ouvré à ",
+			"afterEmail": " Vous pouvez aussi ",
+			"call": "réserver un échange de 30 minutes"
+		},
+		"form": {
+			"heading": "Présentation du projet",
+			"subject": "[albanandrieu.com] Demande de projet / startup",
+			"name": "Votre nom",
+			"namePlaceholder": "Jane Doe",
+			"email": "Email professionnel",
+			"emailPlaceholder": "vous@entreprise.com",
+			"company": "Entreprise ou produit",
+			"companyPlaceholder": "ex. Acme AI",
+			"need": "Sur quel sujet avez-vous besoin d’aide ?",
+			"needPlaceholder": "Stack (AWS, Azure, OVH…), besoins IA, calendrier et objectifs de conformité sécurité (ISO 27001, SOC 2…).",
+			"privacyBeforeLegal": "En envoyant ce formulaire, vous acceptez que votre message soit utilisé uniquement pour répondre à votre demande, conformément aux ",
+			"legal": "mentions légales",
+			"privacyConnector": "et à la ",
+			"privacy": "politique de confidentialité",
+			"submit": "Envoyer à"
+		},
+		"footer": {
+			"legal": "Mentions légales",
+			"backHome": "Retour à l’accueil",
+			"backTop": "Retour en haut",
+			"backTopAria": "Revenir en haut de la page"
+		},
+		"thanks": {
+			"title": "Merci — message reçu",
+			"beforeEmail": "Votre demande a été envoyée à ",
+			"afterEmail": " Je réponds généralement sous un jour ouvré. Si votre demande est urgente, vous pouvez aussi ",
+			"call": "planifier un échange",
+			"backHome": "Retour à l’accueil",
+			"another": "Envoyer un autre message",
+			"legal": "Mentions légales"
+		}
 	}
 }

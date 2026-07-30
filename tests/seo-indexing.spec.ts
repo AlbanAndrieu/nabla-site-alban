@@ -10,6 +10,34 @@ const expectedSitemapUrls = [
 	"https://albanandrieu.com/truenas.html",
 	"https://albanandrieu.com/link.html",
 	"https://albanandrieu.com/email.html",
+	"https://albanandrieu.com/nabla.html",
+	"https://albanandrieu.com/cv",
+	"https://albanandrieu.com/jm",
+];
+
+const nonIndexablePages = [
+	"/ctid.html",
+	"/freenas.html",
+	"/workstation.html",
+	"/jm/4-years-review-aandrieu",
+	"/startup.html",
+	"/startup-thanks.html",
+	"/pricing.html",
+	"/payment.html",
+	"/success.html",
+	"/cancel.html",
+	"/checkout",
+	"/checkout-tjm",
+	"/login.html",
+	"/test.html",
+];
+
+const indexablePages = [
+	"/cv",
+	"/cv/index.html",
+	"/nabla.html",
+	"/jm",
+	"/truenas.html",
 ];
 
 test.describe("SEO indexing policy", () => {
@@ -29,30 +57,25 @@ test.describe("SEO indexing policy", () => {
 		expect(xml).not.toContain("/startup");
 		expect(xml).not.toContain("/pricing");
 		expect(xml).not.toContain("/payment");
-		expect(xml).not.toContain("/cv");
-		expect(xml).not.toContain("/jm");
 	});
 
-	test("technical pages are noindex", async ({ page }) => {
-		await page.goto("/startup.html");
-		await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-			"content",
-			"noindex, nofollow",
-		);
+	test("every page outside the SEO allowlist is noindex", async ({ request }) => {
+		for (const pathname of nonIndexablePages) {
+			const response = await request.get(pathname);
+			expect(response.ok(), `${pathname} should load`).toBeTruthy();
+			expect(await response.text(), `${pathname} should be noindex`).toContain(
+				'<meta name="robots" content="noindex, nofollow"/>',
+			);
+		}
 	});
 
-	test("non-indexed showcase pages stay outside search results", async ({
-		page,
-	}) => {
-		await page.goto("/workstation.html");
-		await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-			"content",
-			"noindex, nofollow",
-		);
-	});
-
-	test("SEO showcase pages remain indexable", async ({ page }) => {
-		await page.goto("/truenas.html");
-		await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+	test("explicit SEO pages remain indexable", async ({ request }) => {
+		for (const pathname of indexablePages) {
+			const response = await request.get(pathname);
+			expect(response.ok(), `${pathname} should load`).toBeTruthy();
+			expect(await response.text(), `${pathname} should be indexable`).not.toContain(
+				'<meta name="robots" content="noindex, nofollow"/>',
+			);
+		}
 	});
 });

@@ -858,31 +858,36 @@ body.site-content-page.page-ciso .feed-item p {
 }
 
 /* ----- Login (login.html) ----- */
-body.site-content-page.page-login .form-signin {
+.site-content-page.page-login .form-signin {
 	width: 100%;
 	max-width: 330px;
 	padding: 15px;
 	margin: auto;
 }
 
-body.site-content-page.page-login .form-signin .checkbox {
+.site-content-page.page-login .form-signin .checkbox {
 	font-weight: 400;
 }
 
-body.site-content-page.page-login .form-signin .form-floating:focus-within {
+.site-content-page.page-login .form-signin .form-floating:focus-within {
 	z-index: 2;
 }
 
-body.site-content-page.page-login .form-signin input[type="text"] {
+.site-content-page.page-login .form-signin input[type="text"] {
 	margin-bottom: -1px;
 	border-bottom-right-radius: 0;
 	border-bottom-left-radius: 0;
 }
 
-body.site-content-page.page-login .form-signin input[type="password"] {
+.site-content-page.page-login .form-signin input[type="password"] {
 	margin-bottom: 10px;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+}
+
+.site-content-page.page-login .form-floating > label {
+	color: #212529;
+	opacity: 1;
 }
 
 /* ----- CTID threat intel (ctid.html) ----- */

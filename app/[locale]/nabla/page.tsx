@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import Hero from "../../components/Hero";
 import AnsibleHeroCard from "../../components/nabla/AnsibleHeroCard";
 import CollaborateToolsSection from "../../components/nabla/CollaborateToolsSection";
@@ -14,6 +16,30 @@ import NablaPlatformsSection from "../../components/nabla/NablaPlatformsSection"
 import ServiceCardsSection from "../../components/nabla/ServiceCardsSection";
 import HardwareSection from "../../components/truenas/HardwareSection";
 import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/nabla">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const isFrench = locale === "fr";
+
+	return {
+		title: isFrench
+			? "Nabla — Homelab DevSecOps et plateforme cloud"
+			: "Nabla — DevSecOps homelab and cloud platform",
+		description: isFrench
+			? "Découvrez le homelab Nabla, ses automatisations, ses outils DevSecOps et ses expérimentations cloud, sécurité et IA."
+			: "Explore the Nabla homelab, its automation, DevSecOps tooling, and cloud, security, and AI experiments.",
+		alternates: {
+			canonical: canonicalPagePath("nabla", locale),
+			languages: {
+				en: canonicalPagePath("nabla", "en"),
+				fr: canonicalPagePath("nabla", "fr"),
+			},
+		},
+	};
+}
 
 // Type for NablaPlatformsSection
 type Pillar = {

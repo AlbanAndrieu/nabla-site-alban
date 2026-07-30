@@ -16,38 +16,7 @@
 			"en": "English",
 			"fr": "French"
 		},
-		"switchLanguage": "Switch language",
-		"services": {
-			"search": {
-				"title": "Optimized custom search",
-				"description": "Custom search used by home made IA."
-			},
-			"iac": {
-				"title": "Infrastructure as Code",
-				"description": "Implementing IaC solutions using Terraform, Ansible, and other tools to manage infrastructure efficiently and consistently.",
-				"wipLabel": "Under construction",
-				"wipDescription": "This blurb is still in a feature branch: the full story is not merged yet and not quite ready for production traffic. Watch this space after the next rollout."
-			},
-			"fastapi": {
-				"title": "FastAPI Cloud sample",
-				"description": "A custom sample used to test CI, security access from outside my network and deployment with a personal MCP aimed to access my personal information.",
-				"openSample": "Open sample",
-				"adminUI": "Admin UI",
-				"viewSource": "View source on GitLab"
-			}
-		},
-		"opensource": {
-			"nabla": {
-				"title": "Nabla DevSecOps Platform",
-				"description": "Comprehensive DevSecOps platform combining SDLC, security scanning, infrastructure automation, and monitoring tools in a unified solution.",
-				"linkLabel": "Learn More"
-			},
-			"docker": {
-				"title": "Docker Images",
-				"description": "Optimized and security-hardened Docker images for development and production environments, available on Docker Hub.",
-				"linkLabel": "View on Docker Hub"
-			}
-		}
+		"switchLanguage": "Switch language"
 	},
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
@@ -863,6 +832,54 @@
 				"value": "View my work",
 				"href": "https://github.com/AlbanAndrieu"
 			}
+		}
+	},
+	"startup": {
+		"meta": {
+			"title": "Start your project — Alban Andrieu",
+			"description": "Share your cloud, cybersecurity, compliance or delivery project with Alban Andrieu."
+		},
+		"navigation": {
+			"backHome": "Back to home",
+			"contact": "Contact"
+		},
+		"hero": {
+			"title": "Start your project",
+			"beforeEmail": "Share a short brief — cloud platform, security, compliance, or delivery. I typically answer within one business day at ",
+			"afterEmail": " You can also ",
+			"call": "book a 30-minute call"
+		},
+		"form": {
+			"heading": "Project brief",
+			"subject": "[albanandrieu.com] Startup / project inquiry",
+			"name": "Your name",
+			"namePlaceholder": "Jane Doe",
+			"email": "Work email",
+			"emailPlaceholder": "you@company.com",
+			"company": "Company or product",
+			"companyPlaceholder": "e.g. Acme AI",
+			"need": "What do you need help with?",
+			"needPlaceholder": "Stack (AWS, Azure, OVH…), AI needs, timeline, and any security compliance goals (ISO 27001, SOC 2…).",
+			"privacyBeforeLegal": "By sending this form you agree that your message is used only to respond to your request, as described in the ",
+			"legal": "legal notices",
+			"privacyConnector": "and ",
+			"privacy": "privacy policy",
+			"submit": "Send to"
+		},
+		"footer": {
+			"legal": "Legal notices",
+			"backHome": "Back to home",
+			"backTop": "Back to top",
+			"backTopAria": "Back to top of page"
+		},
+		"thanks": {
+			"title": "Thank you — message received",
+			"beforeEmail": "Your brief was sent to ",
+			"afterEmail": " I usually reply within one business day. If it is urgent, you can also ",
+			"call": "schedule a call",
+			"backHome": "Back to home",
+			"another": "Send another message",
+			"legal": "Legal notices"
 		}
 	}
 }

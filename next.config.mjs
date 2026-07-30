@@ -32,6 +32,13 @@ const homeHtmlBeforeFiles = [
 	{ source: "/fr/index.html", destination: "/fr" },
 ];
 
+/** Keep legacy CV entry points on the maintained App Router page. */
+const cvIndexBeforeFiles = [
+	{ source: "/cv/index.html", destination: "/en/cv" },
+	{ source: "/en/cv/index.html", destination: "/en/cv" },
+	{ source: "/fr/cv/index.html", destination: "/fr/cv" },
+];
+
 /** Extensionless content URLs → canonical `*.html` (browser URL matches static hosting). */
 const canonicalHtmlRedirects = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/${slug}`, destination: `/${slug}.html`, permanent: true },
@@ -73,7 +80,11 @@ const nextConfig = {
 	},
 	async rewrites() {
 		return {
-			beforeFiles: [...homeHtmlBeforeFiles, ...htmlPageBeforeFiles],
+			beforeFiles: [
+				...homeHtmlBeforeFiles,
+				...cvIndexBeforeFiles,
+				...htmlPageBeforeFiles,
+			],
 			afterFiles: [...localizedPolicyRewrites, ...policyRewrites],
 		};
 	},

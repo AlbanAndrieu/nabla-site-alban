@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 type Link = { href: string; label: string; flag?: string; download?: boolean };
 
@@ -153,7 +154,18 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/cv">): Promise<Metadata> {
 	const { locale } = await params;
 	const t = await getTranslations({ locale, namespace: "cvPage" });
-	return { title: t("meta.title"), description: t("meta.description") };
+	const normalizedLocale = locale === "fr" ? "fr" : "en";
+	return {
+		title: t("meta.title"),
+		description: t("meta.description"),
+		alternates: {
+			canonical: canonicalPagePath("cv", normalizedLocale),
+			languages: {
+				en: canonicalPagePath("cv", "en"),
+				fr: canonicalPagePath("cv", "fr"),
+			},
+		},
+	};
 }
 
 export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {

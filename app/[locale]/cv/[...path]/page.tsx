@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { loadCvHtmlFragment, metadataFromCvHtml } from "@/lib/cvFromPublic";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
 type Props = {
 	params: Promise<{ locale: string; path: string[] }>;
@@ -17,7 +18,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		? locale
 		: routing.defaultLocale;
 	const canonicalPath = `/${normalizedLocale}/cv/${path.join("/")}`;
-	return metadataFromCvHtml(path, canonicalPath, normalizedLocale);
+	const metadata = await metadataFromCvHtml(
+		path,
+		canonicalPath,
+		normalizedLocale,
+	);
+	return { ...metadata, robots: NON_INDEXABLE_ROBOTS };
 }
 
 export default async function CvPathPage({ params }: Props) {

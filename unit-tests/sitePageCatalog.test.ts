@@ -19,6 +19,9 @@ const expectedSeoSlugs = [
 	"truenas",
 	"link",
 	"email",
+	"nabla",
+	"cv",
+	"jm",
 ];
 
 test("SEO allowlist contains only the intentionally indexed pages", () => {
@@ -26,13 +29,10 @@ test("SEO allowlist contains only the intentionally indexed pages", () => {
 	assert.equal(sitemap().length, expectedSeoSlugs.length);
 });
 
-test("technical and portfolio pages stay outside the sitemap", () => {
+test("technical pages stay outside the sitemap", () => {
 	const urls = sitemap().map(({ url }) => url);
 
-	for (const slug of [
-		...PAGE_CATEGORIES.technicalFlow,
-		...PAGE_CATEGORIES.portfolioEvidence,
-	]) {
+	for (const slug of PAGE_CATEGORIES.technicalFlow) {
 		assert.equal(
 			urls.some((url) => url.includes(`/${slug}`)),
 			false,
@@ -52,4 +52,8 @@ test("sitemap uses localized canonical URLs", () => {
 	assert.equal(canonicalPagePath("index", "fr"), "/fr");
 	assert.equal(canonicalPagePath("expertise", "en"), "/expertise.html");
 	assert.equal(canonicalPagePath("expertise", "fr"), "/fr/expertise.html");
+	assert.equal(canonicalPagePath("cv", "en"), "/cv");
+	assert.equal(canonicalPagePath("cv", "fr"), "/fr/cv");
+	assert.equal(canonicalPagePath("jm", "en"), "/jm");
+	assert.equal(canonicalPagePath("jm", "fr"), "/fr/jm");
 });

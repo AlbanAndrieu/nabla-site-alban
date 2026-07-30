@@ -1,0 +1,35 @@
+name: CI (Quality, Build, Test, Coverage, Snyk)
+
+on: [push, pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run code quality check
+        run: npm run check
+      - name: Run pre-commit hooks
+        run: |
+          pip install pre-commit  # Needed for pre-commit cli
+          pre-commit run --all-files --show-diff-on-failure || true
+      - name: Run Playwright tests
+        run: npm test
+      - name: Optional: Upload coverage to Codecov
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Optional: Snyk Vulnerability Scan
+        if: ${{ secrets.SNYK_TOKEN != '' }}
+        uses: snyk/actions/node@v3
+        with:
+          command: test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
