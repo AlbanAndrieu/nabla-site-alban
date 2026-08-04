@@ -18,6 +18,8 @@ export default function Footer({
 	copyright,
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
+	const actionStyle = { minWidth: "220px", maxWidth: "100%" };
+
 	return (
 		<footer className="footer text-center" role="contentinfo">
 			<div className="social-links">
@@ -78,12 +80,13 @@ export default function Footer({
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
 			<nav
-				className="d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 mt-4"
+				className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2 mt-4 w-100"
 				aria-label="Footer navigation"
 			>
 				<a
 					href={homeHref}
 					className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2 px-4"
+					style={actionStyle}
 				>
 					<i className="fas fa-home" aria-hidden="true"></i>
 					<span>{backHome}</span>
@@ -91,6 +94,7 @@ export default function Footer({
 				<a
 					href="#top"
 					className="btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4"
+					style={actionStyle}
 					aria-label={backToTopAria}
 				>
 					<i className="fas fa-arrow-up" aria-hidden="true"></i>
