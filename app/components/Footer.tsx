@@ -19,7 +19,7 @@ export default function Footer({
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
 	return (
-		<footer className="footer" role="contentinfo">
+		<footer className="footer text-center" role="contentinfo">
 			<div className="social-links">
 				<a
 					href="https://www.linkedin.com/in/nabla"
@@ -74,7 +74,7 @@ export default function Footer({
 					<i className="fa fa-rss" aria-hidden="true"></i>
 				</a>
 			</div>
-			<div className="footer-links">
+			<div className="footer-links text-center">
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
 			<nav
@@ -97,7 +97,7 @@ export default function Footer({
 					<span>{backToTop}</span>
 				</a>
 			</nav>
-			<p className="footer-copyright">{copyright}</p>
+			<p className="footer-copyright text-center">{copyright}</p>
 		</footer>
 	);
 }
