@@ -4,6 +4,8 @@ type FooterProps = {
 	backToTopAria: string;
 	legalNotices: string;
 	locale: string;
+	rssFeedAria: string;
+	copyright: string;
 };
 
 export default function Footer({
@@ -12,6 +14,8 @@ export default function Footer({
 	backToTopAria,
 	legalNotices,
 	locale,
+	rssFeedAria,
+	copyright,
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
 	return (
@@ -65,7 +69,7 @@ export default function Footer({
 				<a
 					href="/feed.xml"
 					className="social-link"
-					aria-label="RSS feed for this site"
+					aria-label={rssFeedAria}
 				>
 					<i className="fa fa-rss" aria-hidden="true"></i>
 				</a>
@@ -85,10 +89,7 @@ export default function Footer({
 					{backToTop}
 				</a>
 			</p>
-			<p className="footer-copyright">
-				© {new Date().getFullYear()} Alban Andrieu. Independent DevSecOps
-				Professional.
-			</p>
+			<p className="footer-copyright">{copyright}</p>
 		</footer>
 	);
 }

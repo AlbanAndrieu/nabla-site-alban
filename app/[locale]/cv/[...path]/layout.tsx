@@ -1,6 +1,6 @@
-import Script from "next/script";
 import { setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import { routing } from "@/i18n/routing";
 
 import "@/app/globals.css";
@@ -31,13 +31,7 @@ export default async function CVLayout({ children, params }: Props) {
 			{/* Inject cv-theme.css only for sub pages like cv-small-fr.html */}
 			{isSubPage && <link rel="stylesheet" href="/cv/cv-theme.css" />}
 			{children}
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf
-				data-no-coffee-fab
-				data-no-google-translate
-			/>
+			<SiteWidgetsScript printPdf noCoffeeFab noGoogleTranslate />
 		</div>
 	);
 }

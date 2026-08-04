@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
+import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import {
-	loadPublicHtmlFragment,
-	metadataFromPublicHtml,
-} from "@/lib/htmlFromPublic";
+import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -21,15 +20,21 @@ export default async function AiBestPracticesPage({ params }: Props) {
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const html = await loadPublicHtmlFragment("ai.html", "navHeaderMain", locale);
+	const site = await getTranslations("site");
 
 	return (
 		<>
 			<link rel="stylesheet" href="/nabla.css" />
-			<div
+			<TopAnchor />
+			<a href="#main-content" className="skip-to-main">
+				{site("skipToMainContent")}
+			</a>
+			<PublicHtmlFragment
+				file="ai.html"
+				mode="navHeaderMain"
+				locale={locale}
 				className="site-content-page page-ai page-dark page-nabla-best-practices"
 				suppressHydrationWarning
-				dangerouslySetInnerHTML={{ __html: html }}
 			/>
 		</>
 	);

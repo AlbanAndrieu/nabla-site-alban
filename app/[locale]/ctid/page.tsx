@@ -1,7 +1,11 @@
-import Script from "next/script";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-
 import ThreatFeed from "@/components/ciso/ThreatFeed";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import TopAnchor from "@/components/TopAnchor";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
+
+export const metadata: Metadata = { robots: NON_INDEXABLE_ROBOTS };
 
 export default async function CTIDPage({
 	params,
@@ -14,7 +18,7 @@ export default async function CTIDPage({
 	// On retire tout le <nav> local
 	return (
 		<div className="site-content-page page-ciso page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<main id="main-content">
 				<section
 					className="hero-section ciso-hero"
@@ -27,17 +31,13 @@ export default async function CTIDPage({
 						</h1>
 						<div
 							role="img"
-							aria-label="Skull and shield emoji"
+							aria-label={t("heroImageLabel")}
 							style={{ fontSize: "2rem" }}
 						>
 							{t("hero")}
 						</div>
 						<p className="hero-subtitle">{t("subtitle")}</p>
-						<p className="hero-description">
-							{locale === "fr"
-								? "Une sélection automatisée multi-sources pour la veille et la cyberdéfense."
-								: "A curated selection of security news and threat intelligence sources."}
-						</p>
+						<p className="hero-description">{t("description")}</p>
 					</div>
 				</section>
 				<section
@@ -60,7 +60,7 @@ export default async function CTIDPage({
 					/>
 				</section>
 			</main>
-			<Script src="/site-widgets.js" strategy="afterInteractive" />
+			<SiteWidgetsScript />
 		</div>
 	);
 }

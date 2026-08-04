@@ -56,6 +56,12 @@ If unsure: always review via diff or use a linter.
 - After migration, always remove nav/footer UI and back/nav CTAs from pages — dupes in both page and layout create SSR/CSR bugs and UX confusion.
 - Apply this pattern to all migrated pages (EN/FR).
 
+---
+### ⚠️ Correction clé : import des composants partagés
+
+Quand vous migrez un fichier volumineux (nabla, truenas, workstation, expertise, etc), n’importe quelle importation de composant partagé doit utiliser un chemin relatif correct depuis la page — rarement `"app/components/..."`, mais souvent du type `import SiteFooter from "../../../components/SiteFooter";` ou avec alias projet (ex `@/components/SiteFooter`).
+Vérifiez que chaque import pointe bien vers le bon `components/` racine : cela évitera les erreurs `"Module not found : Can't resolve 'app/components/Footer'"` observées dans tous les retours d’expérience.
+
 **Best practice for large HTML pages (block-by-block subcomponent migration):**
 - Any migration of a large static HTML (like expertise, truenas, freenas, workstation, ...) **must** be split into multiple React subcomponents — one per logical section (Hero, Services, AI/ML, Skills, Technologies, Timeline, etc.).
 - For each section, create a separate React file (e.g. `app/components/{slug}/{Section}.tsx`), and extract all visible text labels to `messages/en.json` and `fr.json`.
@@ -64,6 +70,13 @@ If unsure: always review via diff or use a linter.
 - Use this approach **systematically** for every page too large to migrate as a single export/file.
 
 ---
+
+## Pour quels fichiers volumineux ? (déjà migrés)
+
+- app/[locale]/truenas/page.tsx
+- app/[locale]/workstation/page.tsx
+- app/[locale]/nabla/page.tsx
+- app/[locale]/expertise/page.tsx
 
 **Choose the model**
 

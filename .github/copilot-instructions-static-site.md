@@ -26,7 +26,7 @@ public/
 ├── landing-sections.css                  # Modern styling
 ├── print.css                         # Print-specific styles
 ├── robots.txt                        # Search engine crawler rules
-├── sitemap-albandrieu-com.xml        # Site sitemap for SEO
+├── ../app/sitemap.ts                 # Current Next.js sitemap generator
 ├── security.txt                      # Security contact information
 ├── favicon.ico                       # Site favicon
 ├── CNAME                             # Custom domain configuration
@@ -360,7 +360,7 @@ Allow: /
 User-agent: GPTBot
 Disallow: /
 
-Sitemap: https://bababou.albandrieu.com/sitemap-albandrieu-com.xml
+Sitemap: https://albandrieu.com/sitemap.xml
 ```
 
 **When to update:**
@@ -370,13 +370,13 @@ Sitemap: https://bababou.albandrieu.com/sitemap-albandrieu-com.xml
 
 ### Sitemap
 
-Located at `public/sitemap-albandrieu-com.xml`:
+The current application generates `/sitemap.xml` from `app/sitemap.ts` and `lib/sitePageCatalog.ts`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://bababou.albandrieu.com/index.html</loc>
+    <loc>https://albandrieu.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <lastmod>2024-01-15</lastmod>

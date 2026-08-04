@@ -135,7 +135,7 @@ Production deployments update your main site:
 vercel --prod
 
 # Your site will be available at configured domains:
-# https://dr-alban.com
+# https://albandrieu.com
 ```
 
 **Characteristics**:
@@ -463,10 +463,11 @@ vercel logs [deployment-url]
    - Share preview URLs for review
    - Document production deployment schedule
 
-## Additional Resources
+## Additional resources
 
 - **Vercel Documentation**: https://vercel.com/docs
 - **Vercel CLI Reference**: https://vercel.com/docs/cli
+- **Next.js Documentation**: https://nextjs.org/docs
 - **GitHub Actions Documentation**: https://docs.github.com/en/actions
 - **Project-specific docs**:
   - [GITHUB_ACTIONS_SETUP.md](../docs/GITHUB_ACTIONS_SETUP.md)
@@ -476,7 +477,7 @@ vercel logs [deployment-url]
 
 For issues specific to this project:
 - **GitHub Issues**: Open an issue in this repository
-- **Email**: alban.andrieu@dr-alban.com
+- **Email**: alban.andrieu@albandrieu.com
 
 For Vercel platform issues:
 - **Vercel Support**: https://vercel.com/support

@@ -1,5 +1,8 @@
 name: Build CV PDFs
-on: [push, pull_request]
+on:
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
 
 jobs:
   build-cv-pdfs:
@@ -23,33 +26,45 @@ jobs:
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-fr.log
 
       - name: Build PDF (German)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-de.tex -output-directory=./public/cv
       - name: Scan log (German)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-de.log
 
       - name: Build PDF (Norwegian)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-no.tex -output-directory=./public/cv
       - name: Scan log (Norwegian)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-no.log
 
       - name: Build 20 secs PDF (English)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-en.tex -aux-directory=./public/cv -output-directory=./public/cv
       - name: Scan 20 secs PDF log (English)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-en.log
 
       - name: Build 20 secs PDF (French)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-fr.tex -aux-directory=./public/cv -output-directory=./public/cv
       - name: Scan 20 secs PDF log (French)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-fr.log
 
       - name: Build 20 secs PDF (German)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-de.tex -aux-directory=./public/cv -output-directory=./public/cv
       - name: Scan 20 secs PDF log (German)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-de.log
 
       - name: Build 20 secs PDF (Norwegian)
+        if: github.ref == 'refs/heads/master'
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-no.tex -aux-directory=./public/cv -output-directory=./public/cv
       - name: Scan 20 secs PDF log (Norwegian)
+        if: github.ref == 'refs/heads/master'
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-no.log
 
       - name: Report if rebuilt PDFs differ from git (informational)
@@ -99,30 +114,48 @@ jobs:
           fi
           exit 0
 
-      - name: Upload PDF artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: cv-pdfs
-          path: |
-            ./public/cv/cv-aandrieu-2026-en.pdf
-            ./public/cv/cv-aandrieu-2026-fr.pdf
-            ./public/cv/cv-aandrieu-2026-de.pdf
-            ./public/cv/cv-aandrieu-2026-no.pdf
-            ./public/cv/cv-aandrieu-2026-ts-en.pdf
-            ./public/cv/cv-aandrieu-2026-ts-fr.pdf
-            ./public/cv/cv-aandrieu-2026-ts-de.pdf
-            ./public/cv/cv-aandrieu-2026-ts-no.pdf
+       - name: Upload CV PDFs EN/FR
+         uses: actions/upload-artifact@v6
+         if: github.ref != 'refs/heads/master'
+         with:
+           name: cv-pdfs
+           path: |
+             ./public/cv/cv-aandrieu-2026-en.pdf
+             ./public/cv/cv-aandrieu-2026-fr.pdf
+       - name: Upload All CV PDFs
+         uses: actions/upload-artifact@v6
+         if: github.ref == 'refs/heads/master'
+         with:
+           name: cv-pdfs
+           path: |
+             ./public/cv/cv-aandrieu-2026-en.pdf
+             ./public/cv/cv-aandrieu-2026-fr.pdf
+             ./public/cv/cv-aandrieu-2026-de.pdf
+             ./public/cv/cv-aandrieu-2026-no.pdf
+             ./public/cv/cv-aandrieu-2026-ts-en.pdf
+             ./public/cv/cv-aandrieu-2026-ts-fr.pdf
+             ./public/cv/cv-aandrieu-2026-ts-de.pdf
+             ./public/cv/cv-aandrieu-2026-ts-no.pdf
 
-      - name: Upload log artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: cv-logs
-          path: |
-            ./public/cv/cv-aandrieu-2026-en.log
-            ./public/cv/cv-aandrieu-2026-fr.log
-            ./public/cv/cv-aandrieu-2026-de.log
-            ./public/cv/cv-aandrieu-2026-no.log
-            ./public/cv/cv-aandrieu-2026-ts-en.log
-            ./public/cv/cv-aandrieu-2026-ts-fr.log
-            ./public/cv/cv-aandrieu-2026-ts-de.log
-            ./public/cv/cv-aandrieu-2026-ts-no.log
+       - name: Upload log artifacts EN/FR
+         uses: actions/upload-artifact@v6
+         if: github.ref != 'refs/heads/master'
+         with:
+           name: cv-logs
+           path: |
+             ./public/cv/cv-aandrieu-2026-en.log
+             ./public/cv/cv-aandrieu-2026-fr.log
+       - name: Upload All log artifacts
+         uses: actions/upload-artifact@v6
+         if: github.ref == 'refs/heads/master'
+         with:
+           name: cv-logs
+           path: |
+             ./public/cv/cv-aandrieu-2026-en.log
+             ./public/cv/cv-aandrieu-2026-fr.log
+             ./public/cv/cv-aandrieu-2026-de.log
+             ./public/cv/cv-aandrieu-2026-no.log
+             ./public/cv/cv-aandrieu-2026-ts-en.log
+             ./public/cv/cv-aandrieu-2026-ts-fr.log
+             ./public/cv/cv-aandrieu-2026-ts-de.log
+             ./public/cv/cv-aandrieu-2026-ts-no.log

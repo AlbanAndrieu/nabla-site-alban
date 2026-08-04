@@ -14,6 +14,7 @@ const DEFAULT_LOCALE: SiteLocale = "en";
 const SUPPORTED_LOCALES: readonly SiteLocale[] = ["en", "fr"];
 
 const PUBLIC_HTML_FILES = [
+	"404.html",
 	"ai.html",
 	"cancel.html",
 	"checkout.html",
@@ -164,6 +165,33 @@ function decodeBasicEntities(text: string): string {
 		.replace(/&gt;/g, ">");
 }
 
+function htmlAttribute(tag: string, name: string): string | undefined {
+	const match = tag.match(
+		new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, "i"),
+	);
+	return match?.[1] ?? match?.[2];
+}
+
+export function extractDocumentMetadata(html: string): {
+	title?: string;
+	description?: string;
+} {
+	const rawTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim();
+	const descriptionTag = (html.match(/<meta\b[^>]*>/gi) ?? []).find(
+		(tag) => htmlAttribute(tag, "name")?.toLowerCase() === "description",
+	);
+	const rawDescription = descriptionTag
+		? htmlAttribute(descriptionTag, "content")?.trim()
+		: undefined;
+
+	return {
+		title: rawTitle ? decodeBasicEntities(rawTitle) : undefined,
+		description: rawDescription
+			? decodeBasicEntities(rawDescription)
+			: undefined,
+	};
+}
+
 function normalizeLocale(locale?: string): SiteLocale {
 	if (locale && SUPPORTED_LOCALES.includes(locale as SiteLocale)) {
 		return locale as SiteLocale;
@@ -287,42 +315,11 @@ export async function loadPublicHtmlFragment(
 ): Promise<string> {
 	const full = await resolvePublicFilePath(file, locale);
 	const html = await readFile(full, "utf8");
-	let fragment = "";
+	let fragment = extractHtmlFragment(html, mode);
 
-	try {
-		if (mode === "body") {
-			const m = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-			fragment = (m?.[1] ?? "").replace(
-				/<footer\b[^>]*>[\s\S]*?<\/footer>/gi,
-				"",
-			);
-		} else if (mode === "main") {
-			const m = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-			fragment = m?.[1] ?? "";
-		} else if (mode === "headerMain") {
-			// Allow comments/other nodes between <\/header> and <main>.
-			const m = html.match(
-				/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
-			);
-			fragment = m?.[0] ? `<div class="site-content-page">${m[0]}</div>` : "";
-		} else if (mode === "navHeaderMain") {
-			const m = html.match(/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i);
-			fragment = m?.[0] ?? "";
-		} else {
-			const m = html.match(/<main[^>]*>[\s\S]*?<\/main>/i);
-			fragment = m?.[0] ?? "";
-		}
-	} catch (err) {
-		console.error(
-			`Error extracting HTML for file: ${file}, mode: ${mode}, locale: ${locale}`,
-			err,
-		);
-		throw err;
-	}
-
-	if (!fragment) {
-		console.warn(
-			`[loadPublicHtmlFragment] EMPTY FRAGMENT for file: ${file} (mode: ${mode}, locale: ${locale})`,
+	if (!fragment.trim()) {
+		throw new Error(
+			`Empty HTML fragment: file=${file}, mode=${mode}, locale=${normalizeLocale(locale)}`,
 		);
 	}
 
@@ -332,11 +329,36 @@ export async function loadPublicHtmlFragment(
 		"",
 	);
 
-	console.log(
-		`[loadPublicHtmlFragment] file: ${file} mode: ${mode} locale: ${locale} => extracted length: ${fragment.length}`,
-	);
-
 	return rewriteLegacyHtmlHrefs(fragment, locale);
+}
+
+export function extractHtmlFragment(
+	html: string,
+	mode: HtmlExtractMode,
+): string {
+	switch (mode) {
+		case "body":
+			return (html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] ?? "").replace(
+				/<footer\b[^>]*>[\s\S]*?<\/footer>/gi,
+				"",
+			);
+		case "main":
+			return html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] ?? "";
+		case "headerMain": {
+			// Allow comments and other nodes between </header> and <main>.
+			return (
+				html.match(
+					/<header[^>]*>[\s\S]*?<\/header>[\s\S]*?<main[^>]*>[\s\S]*?<\/main>/i,
+				)?.[0] ?? ""
+			);
+		}
+		case "navHeaderMain":
+			return (
+				html.match(/<nav[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/main>/i)?.[0] ?? ""
+			);
+		case "mainOuter":
+			return html.match(/<main[^>]*>[\s\S]*?<\/main>/i)?.[0] ?? "";
+	}
 }
 
 export async function metadataFromPublicHtml(
@@ -346,16 +368,7 @@ export async function metadataFromPublicHtml(
 ): Promise<Metadata> {
 	const full = await resolvePublicFilePath(file, locale);
 	const html = await readFile(full, "utf8");
-	const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
-	const descMatch = html.match(
-		/<meta\s+name="description"\s+content="([^"]*)"/i,
-	);
-	const title = titleMatch?.[1]
-		? decodeBasicEntities(titleMatch[1].trim())
-		: undefined;
-	const description = descMatch?.[1]
-		? decodeBasicEntities(descMatch[1].trim())
-		: undefined;
+	const { title, description } = extractDocumentMetadata(html);
 
 	const normalizedPath = canonicalPath.startsWith("/")
 		? canonicalPath

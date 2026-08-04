@@ -1,31 +1,62 @@
-import Script from "next/script";
-import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import TopAnchor from "@/components/TopAnchor";
+import { routing } from "@/i18n/routing";
+import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/startup">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "startup" });
+
+	return {
+		title: t("meta.title"),
+		description: t("meta.description"),
+		alternates: {
+			canonical: locale === "fr" ? "/fr/startup.html" : "/startup.html",
+			languages: { en: "/startup.html", fr: "/fr/startup.html" },
+		},
+		robots: NON_INDEXABLE_ROBOTS,
+	};
+}
 
 export default async function StartupPage({
 	params,
-}: {
-	params: Promise<{ locale: string }>;
-}) {
+}: PageProps<"/[locale]/startup">) {
 	const { locale } = await params;
-	const t = await getTranslations({ locale, namespace: "startupPage" });
-	const localePrefix = locale === "fr" ? "/fr" : "";
+	if (!hasLocale(routing.locales, locale)) notFound();
 
+	setRequestLocale(locale);
+	const site = await getTranslations("site");
+	const t = await getTranslations("startup");
+	const localePrefix = locale === "fr" ? "/fr" : "";
+	const homePath = localePrefix || "/";
+	const contactPath = `${localePrefix}/contact.html`;
+	const thanksUrl = `https://albanandrieu.com${localePrefix}/startup-thanks.html`;
 	return (
 		<div className="site-content-page page-dark">
-			<div id="top" />
+			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
-				{t("skipToMain")}
+				{site("skipToMainContent")}
 			</a>
 			<nav className="page-nav container py-3" aria-label="Breadcrumb">
-				<a href={`${localePrefix}/`} className="text-decoration-none">
+				<a href={homePath} className="text-decoration-none">
 					<i className="fas fa-home" aria-hidden="true"></i>{" "}
-					{t("backHome")}
+					{t("navigation.backHome")}
 				</a>
 				<span className="text-muted mx-2" aria-hidden="true">
 					·
 				</span>
-				<a href={`${localePrefix}/contact`} className="text-decoration-none">
-					{t("contact")}
+				<span className="text-muted mx-2" aria-hidden="true">
+					·
+				</span>
+				<a href={contactPath} className="text-decoration-none">
+					{t("navigation.contact")}
 				</a>
 			</nav>
 			<main
@@ -34,17 +65,17 @@ export default async function StartupPage({
 				className="container py-4 pb-5 col-lg-8"
 			>
 				<header className="mb-4">
-					<h1 className="h2 mb-2">{t("title")}</h1>
+					<h1 className="h2 mb-2">{t("hero.title")}</h1>
 					<p className="lead text-secondary mb-0">
-						{t("intro")}{" "}
-						<a href="mailto:job@albandrieu.com">job@albandrieu.com</a>.{" "}
-						{t("or")}{" "}
+						{t("hero.beforeEmail")}
+						<a href="mailto:job@albandrieu.com">job@albandrieu.com</a>.
+						{t("hero.afterEmail")}
 						<a
 							href="https://calendly.com/alban-andrieu"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{t("bookCall")}
+							{t("hero.call")}
 						</a>
 						.
 					</p>
@@ -58,17 +89,17 @@ export default async function StartupPage({
 							aria-labelledby="startup-form-heading"
 						>
 							<h2 id="startup-form-heading" className="h5 mb-3">
-								{t("formTitle")}
+								{t("form.heading")}
 							</h2>
 							<input
 								type="hidden"
 								name="_subject"
-								value="[albanandrieu.com] Startup / project inquiry"
+								value={t("form.subject")}
 							/>
 							<input
 								type="hidden"
 								name="_next"
-								value={`https://albanandrieu.com${localePrefix}/startup-thanks.html`}
+								value={thanksUrl}
 							/>
 							<input type="hidden" name="_captcha" value="true" />
 							<input type="hidden" name="_template" value="table" />
@@ -90,7 +121,8 @@ export default async function StartupPage({
 							/>
 							<div className="mb-3">
 								<label htmlFor="startup-name" className="form-label">
-									{t("name")} <span className="text-danger">*</span>
+									{t("form.name")} {" "}
+									<span className="text-danger">*</span>
 								</label>
 								<input
 									type="text"
@@ -99,12 +131,13 @@ export default async function StartupPage({
 									name="name"
 									required
 									autoComplete="name"
-									placeholder={t("namePlaceholder")}
+									placeholder={t("form.namePlaceholder")}
 								/>
 							</div>
 							<div className="mb-3">
 								<label htmlFor="startup-email" className="form-label">
-									{t("email")} <span className="text-danger">*</span>
+									{t("form.email")} {" "}
+									<span className="text-danger">*</span>
 								</label>
 								<input
 									type="email"
@@ -113,12 +146,12 @@ export default async function StartupPage({
 									name="email"
 									required
 									autoComplete="email"
-									placeholder={t("emailPlaceholder")}
+									placeholder={t("form.emailPlaceholder")}
 								/>
 							</div>
 							<div className="mb-3">
 								<label htmlFor="startup-company" className="form-label">
-									{t("company")}
+									{t("form.company")}
 								</label>
 								<input
 									type="text"
@@ -126,12 +159,12 @@ export default async function StartupPage({
 									id="startup-company"
 									name="company"
 									autoComplete="organization"
-									placeholder={t("companyPlaceholder")}
+									placeholder={t("form.companyPlaceholder")}
 								/>
 							</div>
 							<div className="mb-3">
 								<label htmlFor="startup-context" className="form-label">
-									{t("need")}{" "}
+									{t("form.need")} {" "}
 									<span className="text-danger">*</span>
 								</label>
 								<textarea
@@ -140,28 +173,29 @@ export default async function StartupPage({
 									name="message"
 									rows={6}
 									required
-									placeholder={t("needPlaceholder")}
+									placeholder={t("form.needPlaceholder")}
 								></textarea>
 							</div>
 							<p className="small text-secondary mb-3">
-								{t("privacyPrefix")}{" "}
-								<a href="/policy/legal.html">{t("legal")}</a> {t("and")}{" "}
-								<a href="/policy/privacy_policy.html">{t("privacy")}</a>.
+								{t("form.privacyBeforeLegal")}
+								<a href="/policy/legal.html">
+									{t("form.legal")}
+								</a>{" "}
+								{t("form.privacyConnector")}
+								<a href="/policy/privacy_policy.html">
+									{t("form.privacy")}
+								</a>
+								.
 							</p>
 							<button type="submit" className="btn btn-primary">
 								<i className="fas fa-paper-plane" aria-hidden="true"></i>{" "}
-								{t("submit")}
+								{t("form.submit")} job@albandrieu.com
 							</button>
 						</form>
 					</div>
 				</div>
 			</main>
-			<Script
-				src="/site-widgets.js"
-				strategy="afterInteractive"
-				data-print-pdf=""
-				data-coffee-fab=""
-			/>
+			<SiteWidgetsScript printPdf coffeeFab />
 		</div>
 	);
 }

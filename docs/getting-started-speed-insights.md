@@ -13,7 +13,7 @@ double instrumentation.
 ## Modes analytics
 
 `data-analytics-mode="vercel"` charge Vercel Analytics et Speed Insights. Les
-modes `full`, `marketing` et `home` ajoutent d’autres fournisseurs mais
+modes `full`, `showcase` et `home` ajoutent d’autres fournisseurs mais
 conservent aussi les outils Vercel.
 
 Voir [frontend-runtime-scripts-runbook.md](frontend-runtime-scripts-runbook.md)

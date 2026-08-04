@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import {
+	getMessages,
+	getTranslations,
+	setRequestLocale,
+} from "next-intl/server";
 import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
 import { routing } from "@/i18n/routing";
@@ -18,14 +22,10 @@ export async function generateMetadata({
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 
-	const isFrench = locale === "fr";
-	const canonical = isFrench ? "/fr" : "/";
-	const title = isFrench
-		? "Alban Andrieu — Ingénieur cybersécurité et DevSecOps"
-		: "Alban Andrieu — Cybersecurity & DevSecOps Engineer";
-	const description = isFrench
-		? "Ingénieur cybersécurité et DevSecOps spécialisé dans la sécurisation et l’automatisation des plateformes cloud et IA."
-		: "Cybersecurity and DevSecOps engineer securing cloud and AI platforms through automation, reliable infrastructure, and pragmatic compliance.";
+	const t = await getTranslations({ locale, namespace: "home.meta" });
+	const canonical = locale === "fr" ? "/fr" : "/";
+	const title = t("title");
+	const description = t("description");
 
 	return {
 		metadataBase: new URL("https://albanandrieu.com"),
@@ -80,13 +80,26 @@ export default async function LocaleLayout({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const messages = await getMessages();
+	const [messages, siteTranslations] = await Promise.all([
+		getMessages(),
+		getTranslations("site"),
+	]);
 	const site = messages.site as {
 		backHome: string;
 		backToTop: string;
 		backToTopAria: string;
 		legalNotices: string;
+		rssFeedAria: string;
 	};
+	const copyright = siteTranslations("copyright", {
+		year: String(new Date().getUTCFullYear()),
+	});
+	const configuredAnalyticsMode = process.env.NEXT_PUBLIC_ANALYTICS_MODE;
+	const analyticsMode = ["full", "home", "showcase", "vercel"].includes(
+		configuredAnalyticsMode ?? "",
+	)
+		? configuredAnalyticsMode
+		: "vercel";
 
 	return (
 		<html lang={locale} data-nabla-app="next-intl" suppressHydrationWarning>
@@ -96,15 +109,12 @@ export default async function LocaleLayout({
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />
 				<link rel="stylesheet" href="/style.css" />
-				<link rel="stylesheet" href="/timeline.css" />
-				<link rel="stylesheet" href="/education.css" />
 				<link rel="stylesheet" href="/print.css" />
 				<link rel="stylesheet" href="/site-content-page.css" />
 				<link rel="stylesheet" href="/page-layouts.css" />
 				<link rel="stylesheet" href="/assets/fontawesome/css/fontawesome.css" />
 				<link rel="stylesheet" href="/assets/fontawesome/css/brands.css" />
 				<link rel="stylesheet" href="/assets/fontawesome/css/solid.css" />
-				<link rel="stylesheet" href="/jm/jusmundi.css" />
 				<link
 					rel="stylesheet"
 					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/css/bootstrap.min.css"
@@ -128,11 +138,13 @@ export default async function LocaleLayout({
 						backToTopAria={site.backToTopAria}
 						legalNotices={site.legalNotices}
 						locale={locale}
+						rssFeedAria={site.rssFeedAria}
+						copyright={copyright}
 					/>
 				</NextIntlClientProvider>
 				<Script
 					src="/site-analytics.js"
-					data-analytics-mode="home"
+					data-analytics-mode={analyticsMode}
 					data-ahrefs-key={process.env.AHREFS_ANALYTICS_KEY}
 					strategy="afterInteractive"
 				/>

@@ -1,9 +1,13 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Hero from "@/app/components/Hero";
+import JsonLd from "@/components/JsonLd";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
+import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
 	const { locale } = await params;
@@ -16,6 +20,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
 	return (
 		<>
+			<JsonLd data={locale === "fr" ? HOME_JSON_LD_FR : HOME_JSON_LD} />
+			<link rel="stylesheet" href="/timeline.css" precedence="page" />
+			<link rel="stylesheet" href="/education.css" precedence="page" />
 			<TopAnchor />
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
@@ -77,7 +84,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									<img
+									<Image
 										alt=""
 										aria-hidden="true"
 										className="jusmundi-link-icon"
@@ -277,7 +284,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 						/>
 					</div>
 					<div className="contact-logo-wrap">
-						<img
+						<Image
 							alt={t("contact.logo.alt")}
 							className="contact-logo"
 							height={120}
@@ -287,6 +294,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 					</div>
 				</section>
 			</main>
+			<SiteWidgetsScript printPdf />
 		</>
 	);
 }

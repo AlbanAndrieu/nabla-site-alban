@@ -518,8 +518,8 @@ When exploring the codebase:
      - Submit sitemap via Google Search Console (recommended over deprecated ping service)
 
 2. **Sitemap Requirements**
-   - Reference current sitemap at `public/sitemap-albandrieu-com.xml`
-   - **CRITICAL: Update sitemap when adding/removing pages**
+   - The App Router generates `/sitemap.xml` from `app/sitemap.ts`
+   - **CRITICAL: Update `lib/sitePageCatalog.ts` when indexing policy changes**
    - Submit sitemap to Google Search Console after updates
    - Use Google Search Console for sitemap verification and monitoring
 
@@ -548,7 +548,7 @@ When exploring the codebase:
 
 ### Sitemap Maintenance Guidelines
 
-**Keep `public/sitemap-albandrieu-com.xml` up to date:**
+**Keep `lib/sitePageCatalog.ts` and the generated `/sitemap.xml` aligned:**
 
 1. **Sitemap Structure**
    ```xml
@@ -594,7 +594,7 @@ When exploring the codebase:
 
 5. **Sitemap Validation**
    - Validate XML structure before committing
-   - Test sitemap URL is accessible: `https://albanandrieu.com/sitemap-albandrieu-com.xml`
+   - Test sitemap URL is accessible: `https://albanandrieu.com/sitemap.xml`
    - Submit to Google Search Console after updates
    - Verify all URLs in sitemap return HTTP 200 status
    - Keep sitemap size under 50MB and 50,000 URLs

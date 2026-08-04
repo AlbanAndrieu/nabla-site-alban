@@ -16,14 +16,222 @@
 			"en": "English",
 			"fr": "French"
 		},
-		"switchLanguage": "Switch language"
+		"switchLanguage": "Switch language",
+		"rssFeedAria": "RSS feed for this site",
+		"copyright": "© {year} Alban Andrieu. Independent DevSecOps Professional."
 	},
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
-		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY."
+		"missingPublishableKey": "Checkout is unavailable: set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
+		"meta": {
+			"checkoutTitle": "Checkout | Alban Andrieu",
+			"paymentTitle": "Payment options — Alban Andrieu",
+			"cancelTitle": "Checkout canceled | Alban Andrieu",
+			"successTitle": "Payment status | Alban Andrieu"
+		},
+		"page": {
+			"title": "Payment",
+			"subtitle": "One-time payment via Stripe. Secure checkout.",
+			"qrAlt": "QR code to open this Stripe payment on your phone",
+			"qrCaption": "Or scan this QR code to pay on your phone",
+			"submit": "Proceed to checkout"
+		},
+		"options": {
+			"title": "Payment options",
+			"intro": "Pay by card with Stripe-hosted Checkout, or by SEPA bank transfer using the bank details below.",
+			"cardTitle": "Pay by card (Stripe)",
+			"cardDescription": "Secure one-time payment on Stripe’s hosted checkout.",
+			"continue": "Continue to Stripe Checkout",
+			"issueBeforeLink": "If checkout does not start, use the ",
+			"directLink": "direct Stripe link",
+			"issueAfterLink": ", a SEPA transfer, or contact me.",
+			"bankTitle": "Pay by bank transfer (SEPA)",
+			"bankDescription": "Include the invoice or reference in the transfer label.",
+			"downloadBankDetails": "Download bank details (PDF)",
+			"afterPayment": "After paying, send the transfer reference if needed to "
+		},
+		"cancel": {
+			"title": "Checkout canceled",
+			"message": "No payment was made. You can try again at any time.",
+			"beforeDirectLink": "You can also use the ",
+			"directLink": "direct Stripe link",
+			"beforeSepa": " or pay by ",
+			"sepa": "SEPA transfer",
+			"paymentOptions": "Back to payment options",
+			"backSite": "Back to site"
+		},
+		"success": {
+			"confirmedTitle": "Thank you for your payment",
+			"pendingTitle": "Payment verification pending",
+			"confirmedMessage": "Stripe has confirmed your payment.",
+			"pendingMessage": "We cannot confirm this payment yet. Check the link received from Stripe or contact us.",
+			"questions": "Questions? Contact ",
+			"paymentOptions": "Payment options",
+			"backSite": "Back to site"
+		}
 	},
 	"checkoutTjm": {
 		"qrCaption": "Scan this QR code to open the secure Stripe payment page."
+	},
+	"pricing": {
+		"title": "Consulting pricing & engagement options",
+		"intro": "I work with startups and scale-ups through retainers, focused audits, or milestone-based delivery. Prices are confirmed after a short scoping call and exclude VAT where applicable.",
+		"howTitle": "How pricing works",
+		"how": [
+			"Day-based — fractional and advisory work is quoted in person-days or as a monthly retainer.",
+			"Fixed sprint — bounded audits and deliverables can use a fixed fee after discovery.",
+			"Expenses — cloud spend, travel, and third-party tools require prior agreement and are billed at cost."
+		],
+		"tiersAriaLabel": "Engagement tiers",
+		"addonsTitle": "Optional services",
+		"addons": [
+			"Evening or weekend critical work by prior agreement.",
+			"On-call coverage priced separately from advisory days.",
+			"Half-day or full-day training and workshops."
+		],
+		"nextTitle": "Next step",
+		"next": "Book a free 30-minute consultation to check fit and receive a written estimate.",
+		"book": "Book an intro call",
+		"services": "Back to services"
+	},
+	"ciso": {
+		"title": "CISO Dashboard",
+		"subtitle": "Threat intelligence, security metrics, and compliance monitoring",
+		"curatedBy": "Curated by",
+		"compliance": "Compliance & risk monitoring",
+		"complianceIntro": "A concise view of the current control and certification posture.",
+		"audit": "Regular reviews keep evidence, risks, and remediation plans current.",
+		"checklist": "Open the security checklist",
+		"inProgress": "In progress",
+		"metrics": "Key security metrics",
+		"metricItems": [
+			["fa-stopwatch", "Incident response time", "15 min"],
+			["fa-screwdriver-wrench", "Patching effectiveness", "92%"],
+			["fa-gauge-high", "Risk rating", "Medium"]
+		],
+		"threats": "Threat intelligence",
+		"threatsIntro": "Recent headlines from a small, curated set of established security sources."
+	},
+	"expertisePage": {
+		"metadataTitle": "Services & technical expertise — Alban Andrieu",
+		"metadataDescription": "DevSecOps, cybersecurity, cloud, platform and AI services offered by Alban Andrieu.",
+		"hero": {
+			"label": "DevSecOps architecture and services overview",
+			"imageAlt": "Alban Andrieu DevSecOps architecture diagram covering cloud, security, containers and AI engineering",
+			"tagline": "Your trusted partner for AI and cloud"
+		},
+		"services": {
+			"title": "Services I offer",
+			"subtitle": "Practical DevSecOps and cloud work for leadership teams — recent outcomes on AWS, Azure and OVH.",
+			"items": [
+				{"title":"Security integration","lead":"Make security part of development — not a late surprise before release.","bullets":["Automated security scans in CI/CD (SAST/DAST and dependency checks).","Vulnerability management for cloud and applications.","Support for ISO 27001 / SOC 2 readiness and audits."]},
+				{"title":"AI integration","lead":"Turn LLMs into production-grade assistants — safely and cost-aware.","bullets":["Design AI-assisted workflows for support, internal tools and operations.","Integrate OpenAI, Azure OpenAI and custom or hosted models.","Control cost and observability with tracing and guardrails."]},
+				{"title":"Cloud architecture","lead":"Scalable, cost-efficient and secure foundations on AWS, Azure or OVHcloud.","bullets":["Multi-account design, networking and hardening.","Cost optimization, monitoring and operational clarity.","High availability, backup and disaster-recovery patterns."]},
+				{"title":"DevOps transformation","lead":"Faster, repeatable delivery without burning out the team.","bullets":["End-to-end SDLC pipelines and release automation.","Processes and tools aligned with your risk profile.","Hands-on enablement so your engineers own the stack."]},
+				{"title":"Infrastructure as Code","lead":"One source of truth for infrastructure — reviewable and reproducible.","bullets":["Terraform, Ansible and GitOps for consistent environments.","Patterns for staging, production and multi-region setups."]},
+				{"title":"Container orchestration","lead":"Run workloads portably from laptops to production clusters.","bullets":["Kubernetes, Nomad and Docker; ingress, secrets and platform foundations.","Cloudflare and Vault integration where it reduces risk."]},
+				{"title":"Monitoring and observability","lead":"Know when something breaks before your customers do.","bullets":["Metrics, logs and traces with Prometheus, Grafana, Loki and OpenTelemetry.","Dashboards and alerts tuned to SLOs and on-call reality."]}
+			]
+		},
+		"aiml": {
+			"title": "AI and MLOps infrastructure",
+			"subtitle": "Support for leaders who need AI in production — not only demos — with security and cost under control.",
+			"bullets": ["Design secure AI infrastructure for LLMs, RAG and GPU workloads.","Integrate OpenAI and Azure OpenAI with cost, safety and access guardrails.","Provide logs, traces and prompt analytics for AI workloads.","Design for ISO 42001, data residency and access-control requirements."]
+		},
+		"skills": {
+			"title": "Technical expertise",
+			"subtitle": "A focused stack for cloud, DevSecOps, security and AI — full details in the CV and on request.",
+			"categoryTitles": ["Security and compliance","Monitoring and logging","AI and data processing","Cloud platforms","Containers and orchestration","Infrastructure as Code","DevOps and SDLC","Data stores","Programming"],
+			"cvLink": "View all CV formats"
+		},
+		"technologies": {
+			"title": "Technologies and stack",
+			"subtitle": "A selection of technologies I use in production.",
+			"officialWebsite": "official website (opens in a new tab)",
+			"groupTitles": ["Languages and scripting","Web and frontend","Cloud, operating systems and infrastructure","Security","Databases, data and messaging","DevOps, observability and tooling","AI, machine learning and GPU"]
+		}
+	},
+	"linkPage": {
+		"metadataTitle": "Public profiles and registries — Alban Andrieu",
+		"metadataDescription": "Verified public profiles, source-code platforms and software registries used by Alban Andrieu for DevSecOps work.",
+		"breadcrumbLabel": "Breadcrumb",
+		"backHome": "Back to home",
+		"nablaOverview": "Nabla overview",
+		"title": "Profiles & registries in use",
+		"introBeforeLink": "Public profiles and registries referenced from the",
+		"introAfterLink": "DevSecOps overview.",
+		"profilesHeading": "Registry and profile links",
+		"freelanceHeading": "Freelance references"
+	},
+	"truenasPage": {
+		"metadataTitle": "TrueNAS Scale homelab and hardware — Alban Andrieu",
+		"metadataDescription": "TrueNAS Scale homelab built by Alban Andrieu: ZFS storage, Mini-ITX hardware, self-hosted applications, security tooling and AI experiments.",
+		"heroLabel": "TrueNAS introduction",
+		"heroTitle": "TrueNAS Scale homelab & hardware",
+		"heroLead": "Hardware platform, ZFS storage, self-hosted apps, security tooling and AI-related services.",
+		"heroCredit": "Guide and documentation by Alban Andrieu.",
+		"heroTopics": "Hardware, apps, ZFS, automation and AI — open-source and hands-on.",
+		"apps": {
+			"title": "TrueNAS services",
+			"lead": "Self-hosted applications on TrueNAS Scale.",
+			"iconsBefore": "Service icons are vendored from",
+			"iconsAfter": "For more open-source self-hosted ideas, see"
+		},
+		"homelab": {
+			"title": "Homelab for security, AI and freelance projects",
+			"intro": "This homelab was built to host upcoming Nabla projects and services.",
+			"purpose": "Its purpose is to test security and AI service integrations and reproduce attacks targeting my domains.",
+			"projectDescription": "Nabla project and services",
+			"openProject": "Open the Nabla project"
+		},
+		"services": {
+			"tunnel": "Web service (tunnel)",
+			"internal": "Internal"
+		},
+		"tools": {
+			"title": "Tools and sign-in",
+			"webUi": "TrueNAS web interface",
+			"signIn": "Primary sign-in",
+			"logoAlt": "TrueNAS logo"
+		},
+		"hardware": {
+			"title": "Hardware",
+			"incident": "After seven years of reliable service, the previous FreeNAS system failed: its motherboard, CPU and several hard drives were faulty. It was time for an upgrade.",
+			"tagline": "One physical Mini-ITX system running TrueNAS Scale: dependable ZFS storage and a homelab host for applications, home automation, security tooling and compute-intensive workloads, including AI experiments.",
+			"purposeLabel": "Platform purposes",
+			"pillars": [
+				{"title": "ZFS and datasets", "subtitle": "Pools, snapshots and replication"},
+				{"title": "Homelab host", "subtitle": "Applications, VMs and internal services"},
+				{"title": "Security stack", "subtitle": "Security tooling and monitoring"},
+				{"title": "AI and compute", "subtitle": "AM5 capacity for models and jobs"}
+			]
+		},
+		"bom": {
+			"title": "Bill of materials",
+			"reusedTitle": "Reused components",
+			"reusedItems": [
+				"Case: previous iXsystems chassis, approximately 170 × 170 mm, Mini-ITX format.",
+				"Power supply: previous 200 W unit, incompatible with the MSI motherboard’s 8-pin CPU connector.",
+				"Kingston SKC600MS mSATA SSD — 256 GB TLC 3D NAND. €83.",
+				"Storage: 4 × Western Digital Red WD30EFRX — 3 TB each, SATA 6 Gb/s."
+			],
+			"newTitle": "New purchases",
+			"purchaseDetails": [
+				"Mini-ITX AM5 motherboard, DDR5, PCIe 4.0, M.2 and Wi-Fi 6E. €174.67.",
+				"Tool-free USB 3.0 enclosure for 50 × 30 mm mSATA SSDs, up to 2 TB. €17.99.",
+				"Low-profile CPU cooler for AMD AM5. €49.90.",
+				"3.8 GHz processor with 32 MB L3 cache. €212.75.",
+				"CL46 memory (CT64G56C46U5; also supports 5200/4800 MHz). €679.00.",
+				"ATX 500 W power supply; the smaller ordered unit was never delivered. €50.00."
+			],
+			"totalLabel": "Total price",
+			"totalNote": "Sum of motherboard, enclosure, CPU, RAM, CPU cooler and power supply.",
+			"futureTitle": "Possible future upgrades",
+			"futureItems": [
+				"Another 64 GB of DDR5 UDIMM memory in 288-pin desktop format. SO-DIMM laptop memory and registered RDIMM server memory are not compatible with this motherboard.",
+				"An additional M.2 NVMe SSD for a fast pool or cache-style storage, selected according to the motherboard specifications and intended workload."
+			]
+		}
 	},
 	"jm": {
 		"4years": {
@@ -45,6 +253,7 @@
 			"numbers": "Performance summary by numbers"
 		},
 		"pageTitle": "Jusmundi — 4 Years Key Achievements & KPIs | Alban Andrieu",
+		"metadataDescription": "DevSecOps, infrastructure, security, and reliability achievements delivered by Alban Andrieu at Jus Mundi.",
 		"heroTitle": "Jusmundi — 4 Years in Review",
 		"heroSubtitle": "Key KPIs & Achievements (2022–2025) · Highlighting my work as DevSecOps and colleagues' work & impactful contributions",
 		"kpisHeading": "Key performance indicators",
@@ -55,6 +264,15 @@
 		"kpiMttrP1": "~30 min",
 		"kpiAlertNoiseReduction": "60%",
 		"kpiAnnualSavings": "€50K+",
+		"kpiLabels": {
+			"tasksCompleted": "Tasks completed",
+			"platformUptime": "Platform uptime (SLA)",
+			"securityBreaches": "Security breaches",
+			"mttrP1": "MTTR (P1)",
+			"alertNoiseReduction": "Alert noise reduction",
+			"annualSavings": "Est. annual savings"
+		},
+		"topAchievement": "Top #{rank} achievement",
 		"securityBandHeading": "Security-first — anti-scraping, Keycloak identity and authorization, no friction for legitimate customers",
 		"securityBandLead": "Primary focus on security: protecting the business from abusive scraping and delivering robust identity and authorization with Keycloak—without slowing down or blocking legitimate customers, partners, or approved crawlers.",
 		"securityBand": [
@@ -271,6 +489,10 @@
 		}
 	},
 	"home": {
+		"meta": {
+			"title": "Alban Andrieu — Cybersecurity & DevSecOps Engineer",
+			"description": "Cybersecurity and DevSecOps engineer securing cloud and AI platforms through automation, reliable infrastructure, and pragmatic compliance."
+		},
 		"hero": {
 			"title": "Cybersecurity & DevSecOps Engineer — 20+ years of experience",
 			"subtitle": "I help teams secure cloud environments, automate controls, and make platforms reliable from code to production.",
@@ -512,6 +734,7 @@
 		"role": "DevSecOps Cloud Architect | Independent Consultant",
 		"intro": "Open to challenges around AI integration, MLOps, cloud platforms and security.",
 		"hero": {
+			"profileAlt": "Portrait of Alban Andrieu, DevSecOps engineer and cloud architect",
 			"current": "Currently architecting secure cloud solutions at",
 			"experience": "With more than 20 years of experience in enterprise environments, I transform businesses through DevOps automation, cloud security and infrastructure as code.",
 			"contactCta": "Get in touch",
@@ -716,6 +939,8 @@
 		"title": "Cybersecurity Threat Intelligence Dashboard",
 		"hero": "💀🛡️",
 		"subtitle": "Aggregated sources for real-time monitoring and analysis",
+		"heroImageLabel": "Skull and shield emoji",
+		"description": "A curated selection of security news and threat intelligence sources.",
 		"threatFeedTitle": "Threat intelligence",
 		"threatFeedIntro": "Recent headlines from recognized cybersecurity sources."
 	},
@@ -744,47 +969,175 @@
 	},
 	"email": {
 		"title": "Email address update",
-		"reason": "The address <strong>alban.andrieu@free.fr</strong> is discontinued. Google is changing how Gmail works with third-party accounts (Gmailify and POP “check mail from other accounts”); see <a href=\"https://support.google.com/mail/answer/16604719\" rel=\"noopener noreferrer\" target=\"_blank\">Learn about upcoming changes to Gmailify & POP in Gmail</a> (Google Help). That policy shift is why this mailbox will no longer be used.",
+		"metadataTitle": "Contact email addresses — Alban Andrieu",
+		"metadataDescription": "Current professional, security, billing and general contact email addresses for Alban Andrieu.",
 		"useTheseAddresses": "Please use these addresses",
 		"cards": [
 			{
 				"title": "Job / work (independent)",
-				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+				"email": "job@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Job / work",
-				"desc": "<a href=\"mailto:job@albandrieu.com\">job@albandrieu.com</a>"
+				"email": "job@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Website security",
-				"desc": "<a href=\"mailto:security@albandrieu.com\">security@albandrieu.com</a>"
+				"email": "security@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Invoices",
-				"desc": "For all invoice-related matters (billing, payment questions, VAT or purchase orders), use <a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a> — do not send invoices to the job or general contact addresses above."
+				"email": "invoice@albanandrieu.com",
+				"descriptionBefore": "For all invoice-related matters (billing, payment questions, VAT or purchase orders), use ",
+				"descriptionAfter": " — do not send invoices to the job or general contact addresses above."
 			},
 			{
 				"title": "Other topics",
-				"desc": "<a href=\"mailto:contact@albandrieu.com\">contact@albandrieu.com</a>"
+				"email": "contact@albandrieu.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			},
 			{
 				"title": "Bababou",
-				"desc": "<a href=\"mailto:alban.andrieu@bababou.com\">alban.andrieu@bababou.com</a>"
+				"email": "alban.andrieu@bababou.com",
+				"descriptionBefore": "",
+				"descriptionAfter": ""
 			}
 		],
 		"automatedHeading": "Automated or triaged replies",
 		"automatedDesc": "If you receive mail from any of the following, it usually means your message did not meet the requirements to be read by a human (me), or it was handled by automated triage:",
 		"automatedList": [
-			"<a href=\"mailto:no-reply@albanandrieu.com\">no-reply@albanandrieu.com</a>",
-			"<a href=\"mailto:no-reply@albandrieu.com\">no-reply@albandrieu.com</a>",
-			"<a href=\"mailto:no-reply@bababou.com\">no-reply@bababou.com</a>",
-			"<a href=\"mailto:openclaw@albandrieu.com\">openclaw@albandrieu.com</a>",
-			"<a href=\"mailto:assistant@albandrieu.com\">assistant@albandrieu.com</a>",
-			"<a href=\"mailto:invoice@albanandrieu.com\">invoice@albanandrieu.com</a>"
+			"no-reply@albanandrieu.com",
+			"no-reply@albandrieu.com",
+			"no-reply@bababou.com",
+			"openclaw@albandrieu.com",
+			"assistant@albandrieu.com",
+			"invoice@albanandrieu.com"
 		],
 		"reasonLine1": "The address",
 		"reasonLine2": "is discontinued. Google is changing how Gmail works with third-party accounts (Gmailify and POP “check mail from other accounts”); see",
 		"reasonLine3": "Learn about upcoming changes to Gmailify & POP in Gmail",
 		"reasonLine4": " (Google Help). That policy shift is why this mailbox will no longer be used."
+	},
+	"nabla": {
+		"metadata": {
+			"title": "Nabla — DevSecOps homelab and cloud platform",
+			"description": "Explore the Nabla homelab, its automation, DevSecOps tooling, and cloud, security, and AI experiments."
+		},
+		"collaborate": {
+			"heading": "Collaboration Tools",
+			"subtitle": "Centralize your DevSecOps workflows with these core tools for communication and development."
+		},
+		"platforms": {
+			"heading": "Popular DevSecOps Platforms & Tools",
+			"intro1": "A curated stack for modern delivery—collaborate, build, ship, secure, observe. Your stack should match risk, compliance, and your team's skillset.",
+			"intro2": "This home lab was built to host Nabla company projects/services. Main goals are to test security/AI integrations and simulate attacks.",
+			"logoCtaLabel": "Open nabla project"
+		},
+		"opensource": {
+			"ansible": {
+				"title": "Ansible Roles & Playbooks",
+				"description": "Extensive collection of Ansible automation including roles for Jenkins, Docker, Eclipse, and complete development environment setup. Used by teams worldwide.",
+				"linkLabel": "View on GitHub"
+			},
+			"nabla": {
+				"title": "Nabla DevSecOps Platform",
+				"description": "Comprehensive DevSecOps platform combining SDLC, security scanning, infrastructure automation, and monitoring tools in a unified solution.",
+				"linkLabel": "Learn More"
+			},
+			"docker": {
+				"title": "Docker Images",
+				"description": "Optimized and security-hardened Docker images for development and production environments, available on Docker Hub.",
+				"linkLabel": "View on Docker Hub"
+			}
+		},
+		"services": {
+			"search": {
+				"title": "Optimized custom search",
+				"description": "Custom search used by home made IA."
+			},
+			"iac": {
+				"title": "Infrastructure as Code",
+				"description": "Implementing IaC solutions using Terraform, Ansible, and other tools to manage infrastructure efficiently and consistently.",
+				"wipLabel": "Under construction",
+				"wipDescription": "This blurb is still in a feature branch: the full story is not merged yet and not quite ready for production traffic. Watch this space after the next rollout."
+			},
+			"fastapi": {
+				"title": "FastAPI Cloud sample",
+				"description": "A custom sample used to test CI, security access from outside my network and deployment with a personal MCP aimed to access my personal information.",
+				"openSample": "Open sample",
+				"adminUI": "Admin UI",
+				"viewSource": "View source on GitLab"
+			}
+		},
+		"contact": {
+			"email": {
+				"label": "Email",
+				"value": "job@albandrieu.com",
+				"href": "mailto:job@albandrieu.com"
+			},
+			"linkedin": {
+				"label": "LinkedIn",
+				"value": "Connect with me",
+				"href": "https://www.linkedin.com/in/nabla"
+			},
+			"calendly": {
+				"label": "Calendly",
+				"value": "Have a call",
+				"href": "https://calendly.com/alban-andrieu"
+			},
+			"github": {
+				"label": "GitHub",
+				"value": "View my work",
+				"href": "https://github.com/AlbanAndrieu"
+			}
+		}
+	},
+	"startup": {
+		"meta": {
+			"title": "Start your project — Alban Andrieu",
+			"description": "Share your cloud, cybersecurity, compliance or delivery project with Alban Andrieu."
+		},
+		"navigation": {
+			"backHome": "Back to home",
+			"contact": "Contact"
+		},
+		"hero": {
+			"title": "Start your project",
+			"beforeEmail": "Share a short brief — cloud platform, security, compliance, or delivery. I typically answer within one business day at ",
+			"afterEmail": " You can also ",
+			"call": "book a 30-minute call"
+		},
+		"form": {
+			"heading": "Project brief",
+			"subject": "[albanandrieu.com] Startup / project inquiry",
+			"name": "Your name",
+			"namePlaceholder": "Jane Doe",
+			"email": "Work email",
+			"emailPlaceholder": "you@company.com",
+			"company": "Company or product",
+			"companyPlaceholder": "e.g. Acme AI",
+			"need": "What do you need help with?",
+			"needPlaceholder": "Stack (AWS, Azure, OVH…), AI needs, timeline, and any security compliance goals (ISO 27001, SOC 2…).",
+			"privacyBeforeLegal": "By sending this form you agree that your message is used only to respond to your request, as described in the ",
+			"legal": "legal notices",
+			"privacyConnector": "and ",
+			"privacy": "privacy policy",
+			"submit": "Send to"
+		},
+		"thanks": {
+			"title": "Thank you — message received",
+			"beforeEmail": "Your brief was sent to ",
+			"afterEmail": " I usually reply within one business day. If it is urgent, you can also ",
+			"call": "schedule a call",
+			"backHome": "Back to home",
+			"another": "Send another message"
+		}
 	}
 }

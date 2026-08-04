@@ -2,7 +2,10 @@ import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Metadata } from "next";
 
-import { rewriteLegacyHtmlHrefs } from "@/lib/htmlFromPublic";
+import {
+	extractDocumentMetadata,
+	rewriteLegacyHtmlHrefs,
+} from "@/lib/htmlFromPublic";
 
 export type CvLocale = "en" | "fr";
 
@@ -82,7 +85,11 @@ export async function resolveCvPublicFilePath(
 	return null;
 }
 
-/* TODO remove loadCvHtmlFragment */
+/**
+ * Transitional renderer for the detailed static CV variants linked from the
+ * React CV landing page. Keep this loader until those documents are migrated;
+ * the explicit allowlist prevents arbitrary filesystem reads.
+ */
 export async function loadCvHtmlFragment(
 	urlPath: string[],
 	locale?: string,
@@ -114,12 +121,7 @@ export async function metadataFromCvHtml(
 	const fullPath = await resolveCvPublicFilePath(urlPath, locale);
 	if (!fullPath) return {};
 	const raw = await readFile(fullPath, "utf8");
-	const titleMatch = raw.match(/<title>([^<]*)<\/title>/i);
-	const descMatch = raw.match(
-		/<meta\s+name="description"\s+content="([^"]*)"/i,
-	);
-	const title = titleMatch?.[1]?.trim();
-	const description = descMatch?.[1]?.trim();
+	const { title, description } = extractDocumentMetadata(raw);
 
 	const normalizedPath = canonicalPath.startsWith("/")
 		? canonicalPath

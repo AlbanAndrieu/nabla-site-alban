@@ -5,6 +5,8 @@ Ce répertoire contient les runbooks maintenus avec l’application Next.js.
 ## Index
 
 - [Architecture et exploitation](architecture.md)
+- [Feuille de route qualité](quality-roadmap.md)
+- [Baseline de performance frontend](performance-baseline.md)
 - [Upgrade Next.js 16.3](nextjs-16-3-upgrade.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)
 - [Scripts frontend historiques](frontend-runtime-scripts-runbook.md)

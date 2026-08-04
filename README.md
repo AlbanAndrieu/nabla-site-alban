@@ -2,6 +2,11 @@
 
 # [![Nabla](https://albandrieu.com/assets/nabla/nabla-4.png)](https://github.com/AlbanAndrieu/nabla-site-alban) Nabla — Alban Andrieu
 
+[![CI](https://github.com/AlbanAndrieu/nabla-site-alban/actions/workflows/ci.yml/badge.svg)](https://github.com/AlbanAndrieu/nabla-site-alban/actions/workflows/ci.yml)
+[![Coverage Status](https://codecov.io/gh/AlbanAndrieu/nabla-site-alban/branch/main/graph/badge.svg)](https://codecov.io/gh/AlbanAndrieu/nabla-site-alban)
+[![Vercel](https://vercel.com/api/v1/badges/)](https://vercel.com/albandrieu-nabla-site-alban)
+[![Known Vulnerabilities](https://snyk.io/test/github/AlbanAndrieu/nabla-site-alban/badge.svg)](https://snyk.io/test/github/AlbanAndrieu/nabla-site-alban)
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S61UUL97)
 
 [CHANGELOG](./CHANGELOG.html).

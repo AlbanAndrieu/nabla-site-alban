@@ -49,7 +49,9 @@ test.describe("Accessibility Tests", () => {
 
 		for (let attempt = 0; attempt < 5; attempt++) {
 			await page.keyboard.press("Tab");
-			if (await skipLink.evaluate((element) => document.activeElement === element))
+			if (
+				await skipLink.evaluate((element) => document.activeElement === element)
+			)
 				break;
 		}
 		await expect(skipLink).toBeFocused();

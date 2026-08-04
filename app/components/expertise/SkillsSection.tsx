@@ -1,120 +1,44 @@
-export default function SkillsSection() {
+const SKILL_CATEGORIES = [
+	{ icon: "fas fa-shield", tags: ["Zero trust, WAF, hardening", "SAST, DAST, OWASP", "Vault, SIEM", "ISO 27001 / 42001, SOC 2"] },
+	{ icon: "fas fa-chart-area", tags: ["Prometheus", "Grafana", "Loki", "OpenTelemetry"] },
+	{ icon: "fas fa-brain", tags: ["Azure OpenAI / GPU", "LangFuse, DVC", "FastAPI, MCP", "Temporal"] },
+	{ icon: "fas fa-cloud", tags: ["AWS", "Azure", "OVHcloud", "Cloudflare"] },
+	{ icon: "fas fa-cube", tags: ["Kubernetes", "Docker, Helm", "Nomad, Rancher"] },
+	{ icon: "fas fa-file-code", tags: ["Terraform", "Ansible", "Argo CD"] },
+	{ icon: "fas fa-code", tags: ["GitHub Actions", "GitLab CI", "Jenkins"] },
+	{ icon: "fas fa-database", tags: ["PostgreSQL", "Elasticsearch", "VictoriaMetrics"] },
+	{ icon: "fas fa-laptop-code", tags: ["Python", "Bash", "Java, C++"] },
+] as const;
+
+type Props = {
+	title: string;
+	subtitle: string;
+	categoryTitles: string[];
+	cvLink: string;
+	cvHref: string;
+};
+
+export default function SkillsSection({ title, subtitle, categoryTitles, cvLink, cvHref }: Props) {
 	return (
-		<section
-			className="skills-section"
-			id="skills"
-			aria-labelledby="skills-heading"
-		>
-			<h2 className="section-title" id="skills-heading">
-				Technical expertise
-			</h2>
-			<p className="section-subtitle">
-				High-signal stack for cloud, DevSecOps, security and AI — full detail in
-				the CV and on request.
-			</p>
+		<section className="skills-section" id="skills" aria-labelledby="skills-heading">
+			<h2 className="section-title" id="skills-heading">{title}</h2>
+			<p className="section-subtitle">{subtitle}</p>
 			<div className="skills-container">
 				<div className="skills-grid">
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-shield"></i> Security & compliance
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Zero trust, WAF, hardening</span>
-							<span className="skill-tag">SAST, DAST, OWASP</span>
-							<span className="skill-tag">Vault, SIEM-class tooling</span>
-							<span className="skill-tag">ISO 27001 / 42001, SOC 2</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-chart-area"></i> Monitoring & logging
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Prometheus</span>
-							<span className="skill-tag">Grafana</span>
-							<span className="skill-tag">Loki</span>
-							<span className="skill-tag">OpenTelemetry</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-brain"></i> AI & data processing
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Azure OpenAI / GPUs</span>
-							<span className="skill-tag">LangFuse, DVC</span>
-							<span className="skill-tag">FastAPI, MCP</span>
-							<span className="skill-tag">Temporal</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-cloud"></i> Cloud platforms
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">AWS</span>
-							<span className="skill-tag">Azure</span>
-							<span className="skill-tag">OVHcloud</span>
-							<span className="skill-tag">Cloudflare</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-cube"></i> Containers & orchestration
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Kubernetes</span>
-							<span className="skill-tag">Docker, Helm</span>
-							<span className="skill-tag">Nomad, Rancher</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-file-code"></i> Infrastructure as Code
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Terraform</span>
-							<span className="skill-tag">Ansible</span>
-							<span className="skill-tag">Argo CD</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-code"></i> DevOps & SDLC
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">GitHub Actions</span>
-							<span className="skill-tag">GitLab CI</span>
-							<span className="skill-tag">Jenkins</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-database"></i> Data stores
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">PostgreSQL</span>
-							<span className="skill-tag">Elasticsearch</span>
-							<span className="skill-tag">VictoriaMetrics</span>
-						</div>
-					</div>
-					<div className="skill-category">
-						<h4>
-							<i className="fas fa-laptop-code"></i> Programming
-						</h4>
-						<div className="skill-tags">
-							<span className="skill-tag">Python</span>
-							<span className="skill-tag">Bash</span>
-							<span className="skill-tag">Java, C++</span>
-						</div>
-					</div>
+					{SKILL_CATEGORIES.map((category, index) => (
+						<section className="skill-category" key={category.icon}>
+							<h3 className="h4">
+								<i className={category.icon} aria-hidden="true"></i>{" "}
+								{categoryTitles[index]}
+							</h3>
+							<div className="skill-tags">
+								{category.tags.map((tag) => <span className="skill-tag" key={tag}>{tag}</span>)}
+							</div>
+						</section>
+					))}
 				</div>
 			</div>
-			<p className="skills-more">
-				<a href="/cv/index.html" target="_blank" rel="noopener noreferrer">
-					View full CVs & formats
-				</a>
-			</p>
+			<p className="skills-more"><a href={cvHref}>{cvLink}</a></p>
 		</section>
 	);
 }

@@ -1,10 +1,44 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	extractDocumentMetadata,
+	extractHtmlFragment,
 	loadPublicHtmlFragment,
 	metadataFromPublicHtml,
 	rewriteLegacyHtmlHrefs,
 } from "../lib/htmlFromPublic";
+
+test("extractDocumentMetadata supports attribute order and quote styles", () => {
+	const metadata = extractDocumentMetadata(
+		"<title>Cloud &amp; Security</title><meta content='DevSecOps &amp; cloud' name='description'>",
+	);
+
+	assert.deepEqual(metadata, {
+		title: "Cloud & Security",
+		description: "DevSecOps & cloud",
+	});
+});
+
+test("extractHtmlFragment keeps the requested structural boundary", () => {
+	const html =
+		'<body><nav class="page-nav">Nav</nav><header>Hero</header><main id="main">Content</main><footer>Footer</footer></body>';
+
+	assert.equal(extractHtmlFragment(html, "main"), "Content");
+	assert.equal(
+		extractHtmlFragment(html, "mainOuter"),
+		'<main id="main">Content</main>',
+	);
+	assert.equal(
+		extractHtmlFragment(html, "headerMain"),
+		'<header>Hero</header><main id="main">Content</main>',
+	);
+	assert.match(extractHtmlFragment(html, "navHeaderMain"), /^<nav/);
+	assert.doesNotMatch(extractHtmlFragment(html, "body"), /Footer/);
+});
+
+test("extractHtmlFragment returns empty content when the boundary is missing", () => {
+	assert.equal(extractHtmlFragment("<section>Content</section>", "main"), "");
+});
 
 test("rewriteLegacyHtmlHrefs rewrites html links and keeps query/hash", () => {
 	const fragment =
@@ -82,6 +116,14 @@ test("loadPublicHtmlFragment returns inner main content for localized page", asy
 
 	assert.match(fragment, /Architecte Cloud et DevSecOps/);
 	assert.doesNotMatch(fragment, /<main/i);
+});
+
+test("loadPublicHtmlFragment can reuse the static 404 body", async () => {
+	const fragment = await loadPublicHtmlFragment("404.html", "body", "en");
+
+	assert.match(fragment, /<h1>404<\/h1>/);
+	assert.match(fragment, /We're fairly sure that page/);
+	assert.doesNotMatch(fragment, /<body/i);
 });
 
 test("loadPublicHtmlFragment removes legacy page navigation", async () => {
