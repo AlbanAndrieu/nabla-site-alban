@@ -77,18 +77,26 @@ export default function Footer({
 			<div className="footer-links">
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
-			<p className="text-md-center mt-3">
-				<a href={homeHref} className="btn btn-sm btn-outline-secondary">
-					{backHome}
+			<nav
+				className="d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 mt-4"
+				aria-label="Footer navigation"
+			>
+				<a
+					href={homeHref}
+					className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2 px-4"
+				>
+					<i className="fas fa-home" aria-hidden="true"></i>
+					<span>{backHome}</span>
 				</a>
 				<a
 					href="#top"
-					className="btn btn-sm btn-outline-secondary ms-2"
+					className="btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4"
 					aria-label={backToTopAria}
 				>
-					{backToTop}
+					<i className="fas fa-arrow-up" aria-hidden="true"></i>
+					<span>{backToTop}</span>
 				</a>
-			</p>
+			</nav>
 			<p className="footer-copyright">{copyright}</p>
 		</footer>
 	);
