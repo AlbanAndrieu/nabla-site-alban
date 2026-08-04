@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -27,7 +28,6 @@ export default async function StartupThanksPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
 	const t = await getTranslations("startup");
 	const localePrefix = locale === "fr" ? "/fr" : "";
 	const homePath = localePrefix || "/";
@@ -35,9 +35,7 @@ export default async function StartupThanksPage({
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<nav className="page-nav container py-3" aria-label="Breadcrumb">
 				<a href={homePath} className="text-decoration-none">
 					<i className="fas fa-home" aria-hidden="true"></i>{" "}
