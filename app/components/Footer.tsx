@@ -1,3 +1,5 @@
+import BackToTopButton from "@/components/BackToTopButton";
+
 type FooterProps = {
 	backHome: string;
 	backToTop: string;
@@ -19,6 +21,8 @@ export default function Footer({
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
 	const actionStyle = { minWidth: "220px", maxWidth: "100%" };
+	const actionClassName =
+		"btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4";
 
 	return (
 		<footer className="footer text-center" role="contentinfo">
@@ -91,15 +95,13 @@ export default function Footer({
 					<i className="fas fa-home" aria-hidden="true"></i>
 					<span>{backHome}</span>
 				</a>
-				<a
-					href="#top"
-					className="btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4"
-					style={actionStyle}
-					aria-label={backToTopAria}
-				>
-					<i className="fas fa-arrow-up" aria-hidden="true"></i>
-					<span>{backToTop}</span>
-				</a>
+				<div style={actionStyle}>
+					<BackToTopButton
+						label={backToTop}
+						ariaLabel={backToTopAria}
+						className={`${actionClassName} w-100`}
+					/>
+				</div>
 			</nav>
 			<p className="footer-copyright text-center">{copyright}</p>
 		</footer>
