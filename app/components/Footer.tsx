@@ -1,3 +1,5 @@
+import BackToTopButton from "@/components/BackToTopButton";
+
 type FooterProps = {
 	backHome: string;
 	backToTop: string;
@@ -18,8 +20,12 @@ export default function Footer({
 	copyright,
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
+	const actionStyle = { minWidth: "220px", maxWidth: "100%" };
+	const actionClassName =
+		"btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4";
+
 	return (
-		<footer className="footer" role="contentinfo">
+		<footer className="footer text-center" role="contentinfo">
 			<div className="social-links">
 				<a
 					href="https://www.linkedin.com/in/nabla"
@@ -74,22 +80,30 @@ export default function Footer({
 					<i className="fa fa-rss" aria-hidden="true"></i>
 				</a>
 			</div>
-			<div className="footer-links">
+			<div className="footer-links text-center">
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
-			<p className="text-md-center mt-3">
-				<a href={homeHref} className="btn btn-sm btn-outline-secondary">
-					{backHome}
-				</a>
+			<nav
+				className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2 mt-4 w-100"
+				aria-label="Footer navigation"
+			>
 				<a
-					href="#top"
-					className="btn btn-sm btn-outline-secondary ms-2"
-					aria-label={backToTopAria}
+					href={homeHref}
+					className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2 px-4"
+					style={actionStyle}
 				>
-					{backToTop}
+					<i className="fas fa-home" aria-hidden="true"></i>
+					<span>{backHome}</span>
 				</a>
-			</p>
-			<p className="footer-copyright">{copyright}</p>
+				<div style={actionStyle}>
+					<BackToTopButton
+						label={backToTop}
+						ariaLabel={backToTopAria}
+						className={`${actionClassName} w-100`}
+					/>
+				</div>
+			</nav>
+			<p className="footer-copyright text-center">{copyright}</p>
 		</footer>
 	);
 }
