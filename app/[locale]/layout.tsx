@@ -82,7 +82,7 @@ export default async function LocaleLayout({
 	setRequestLocale(locale);
 	const [messages, siteTranslations] = await Promise.all([
 		getMessages(),
-		getTranslations("site"),
+		getTranslations({ locale, namespace: "site" }),
 	]);
 	const site = messages.site as {
 		backHome: string;
