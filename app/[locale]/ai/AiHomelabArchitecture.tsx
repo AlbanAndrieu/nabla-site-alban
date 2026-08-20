@@ -15,9 +15,16 @@ declare global {
 
 const diagram = `flowchart LR
   U[User / Browser] --> OW[Open WebUI]
+  U --> OC[OpenClaw]
+  U --> CODE[OpenCode]
   OW --> LLM[LiteLLM gateway]
-  LLM --> OL[Ollama - local models]
-  LLM --> OAI[OpenAI - remote models]
+  OC --> LLM
+  CODE --> LLM
+  LLM --> OL[Ollama - Qwen 2.5 local]
+  LLM --> OAI[OpenAI API - complex reasoning]
+  OC --> MAIL[Email analysis]
+  OC --> CAL[Calendar management]
+  CODE --> REPO[Autonomous coding / repositories]
   OW --> OT[Open Terminal]
   OW --> SX[SearXNG]
   OW --> MCP[FastAPI MCP]
@@ -28,6 +35,8 @@ const diagram = `flowchart LR
 
   subgraph Homelab[Self-hosted AI homelab]
     OW
+    OC
+    CODE
     LLM
     OL
     OT
@@ -77,16 +86,16 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 			</h2>
 			<p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
 				{french
-					? "Open WebUI est mon interface IA centrale. LiteLLM fournit une passerelle unique vers Ollama pour les modèles locaux et OpenAI pour les modèles distants. Open WebUI utilise aussi Open Terminal pour l’exécution contrôlée de commandes, SearXNG pour la recherche Web et mon service FastAPI MCP pour les outils et intégrations Model Context Protocol."
-					: "Open WebUI is my central AI interface. LiteLLM provides one gateway to Ollama for local models and OpenAI for remote models. Open WebUI also uses Open Terminal for controlled command execution, SearXNG for web search, and my FastAPI MCP service for Model Context Protocol tools and integrations."}
+					? "Open WebUI reste mon interface IA centrale. OpenClaw automatise l’analyse des e-mails et la gestion du calendrier, tandis qu’OpenCode exécute des tâches de développement de manière autonome. Ces clients passent par LiteLLM, qui route les requêtes courantes vers Ollama avec Qwen 2.5 en local et les tâches nécessitant un raisonnement plus complexe vers l’API OpenAI. Open WebUI utilise également Open Terminal, SearXNG et mon service FastAPI MCP."
+					: "Open WebUI remains my central AI interface. OpenClaw automates email analysis and calendar management, while OpenCode handles autonomous coding tasks. These clients use LiteLLM, which routes routine requests to local Qwen 2.5 through Ollama and tasks requiring more complex reasoning to the OpenAI API. Open WebUI also uses Open Terminal, SearXNG, and my FastAPI MCP service."}
 			</p>
 			<div className="resource-card overflow-auto" aria-label={french ? "Diagramme de l’architecture IA" : "AI architecture diagram"}>
 				<pre className="mermaid ai-homelab-mermaid">{diagram}</pre>
 			</div>
 			<p style={{ marginTop: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
 				{french
-					? "Cette séparation conserve Open WebUI comme point d’entrée, LiteLLM comme couche de routage des modèles, et isole la recherche, l’exécution système et les outils MCP pour faciliter maintenance, observabilité et contrôle de sécurité."
-					: "This separation keeps Open WebUI as the entry point, LiteLLM as the model-routing layer, and isolates search, system execution, and MCP tooling for easier maintenance, observability, and security control."}
+					? "LiteLLM constitue ainsi le plan de contrôle commun des modèles : priorité à l’inférence locale pour la confidentialité et le coût, avec bascule vers OpenAI lorsque la complexité du raisonnement le justifie. Les interfaces, agents, outils MCP, recherche Web et capacités d’exécution restent découplés pour faciliter maintenance, observabilité et sécurité."
+					: "LiteLLM therefore acts as the shared model control plane: local inference is preferred for privacy and cost, with OpenAI used when reasoning complexity warrants it. Interfaces, agents, MCP tools, web search, and execution capabilities remain decoupled for easier maintenance, observability, and security."}
 			</p>
 			<Script
 				src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
