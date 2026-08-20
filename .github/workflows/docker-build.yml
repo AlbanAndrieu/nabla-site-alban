@@ -13,7 +13,6 @@ on:
       - "Dockerfile"
       - "docker/**"
       - ".dockerignore"
-      - ".github/workflows/docker-build.yml"
   schedule:
     - cron: "0 6 * * 3"
   pull_request:
@@ -22,7 +21,6 @@ on:
       - "Dockerfile"
       - "docker/**"
       - ".dockerignore"
-      - ".github/workflows/docker-build.yml"
   workflow_dispatch:
 
 concurrency:
@@ -30,7 +28,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  OWNER: ${{ github.repository_owner }}
+  IMAGE_NAME: nabla-site-alban
+  DOCKERHUB_IMAGE: nabla/nabla-site-alban
+  GHCR_IMAGE: ghcr.io/albanandrieu/nabla-site-alban
 
 jobs:
   build-template:
@@ -65,8 +65,8 @@ jobs:
         with:
           context: .
           tags: |
-            ${{ env.OWNER }}/pgclient:latest
-            ghcr.io/${{ env.OWNER }}/pgclient:latest
+            ${{ env.DOCKERHUB_IMAGE }}:latest
+            ${{ env.GHCR_IMAGE }}:latest
           build-args: |
             PG_MAJOR=18
             GIT_SHA=${{ github.sha }}
@@ -82,7 +82,7 @@ jobs:
         if: github.event_name != 'schedule'
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: ${{ env.OWNER }}/pgclient:latest
+          image-ref: ${{ env.DOCKERHUB_IMAGE }}:latest
           format: "template"
           template: "@/contrib/sarif.tpl"
           output: "trivy-results.sarif"
