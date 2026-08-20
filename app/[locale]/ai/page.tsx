@@ -6,12 +6,8 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
-import AiGlobalTools from "./AiGlobalTools";
-import AiHomelabArchitecture from "./AiHomelabArchitecture";
-import AiObservability from "./AiObservability";
+import AiNativeSections from "./AiNativeSections";
 import AiPageGuide from "./AiPageGuide";
-import AiUsageAnalytics from "./AiUsageAnalytics";
-import AiWorkflowAutomation from "./AiWorkflowAutomation";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -40,12 +36,8 @@ export default async function AiBestPracticesPage({ params }: Props) {
 				suppressHydrationWarning
 				omitElementIds={["workflow-automation-ai-tools"]}
 			/>
+			<AiNativeSections locale={locale} />
 			<AiPageGuide locale={locale} />
-			<AiWorkflowAutomation locale={locale} />
-			<AiGlobalTools locale={locale} />
-			<AiObservability locale={locale} />
-			<AiUsageAnalytics locale={locale} />
-			<AiHomelabArchitecture locale={locale} />
 		</>
 	);
 }
