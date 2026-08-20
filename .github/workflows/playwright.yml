@@ -3,6 +3,13 @@ name: Playwright Tests
 on:
   pull_request:
     branches: [main, master, develop]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "public/cv/**/*.tex"
+      - "public/cv/**/*.pdf"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
   workflow_dispatch:
 
 permissions:
@@ -11,6 +18,7 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
 jobs:
   test:
     name: Run Playwright Tests
@@ -30,9 +38,7 @@ jobs:
         with:
           node-version: "24"
           cache: "npm"
-          cache-dependency-path: |
-            package-lock.json
-            app/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
@@ -40,8 +46,8 @@ jobs:
       - name: Install Playwright Chromium Browser
         run: npx playwright install --with-deps chromium
 
-       - name: Build Next.js app
-         run: npm run build
+      - name: Build Next.js app
+        run: npm run build
 
       - name: Run Playwright tests
         id: playwright
@@ -59,7 +65,7 @@ jobs:
 
       - name: Upload Playwright failure report
         uses: actions/upload-artifact@v6
-        if: ${{ !cancelled() }}
+        if: failure() && !cancelled()
         with:
           name: playwright-report
           path: |
@@ -68,27 +74,9 @@ jobs:
           retention-days: 3
           if-no-files-found: ignore
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v6
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-test-results
-          path: test-results/
-          retention-days: 30
-          if-no-files-found: ignore
-
-      - name: Upload Test Traces
-        uses: actions/upload-artifact@v6
-        if: failure()
-        with:
-          name: playwright-traces
-          path: test-results/
-          retention-days: 30
-
       - name: Failure summary
         if: failure() && !cancelled()
         run: |
-          echo "## Playwright tests failed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Download the **playwright-report** artifact for the HTML report (traces, screenshots)." >> $GITHUB_STEP_SUMMARY
-          echo "Download the **test-results** artifact for JUnit XML and failure artifacts." >> $GITHUB_STEP_SUMMARY
+          echo "## Playwright tests failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the **playwright-report** artifact for the HTML report, traces and screenshots." >> "$GITHUB_STEP_SUMMARY"
