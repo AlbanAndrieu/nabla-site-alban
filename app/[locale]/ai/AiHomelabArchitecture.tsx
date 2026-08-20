@@ -13,46 +13,98 @@ declare global {
 	}
 }
 
-const diagram = `flowchart LR
-  U[User / Browser] --> OW[Open WebUI]
-  U --> OC[OpenClaw]
-  U --> CODE[OpenCode]
-  OW --> LLM[LiteLLM gateway]
+const diagram = `flowchart TB
+  U([User])
+
+  subgraph Clients[AI interfaces & autonomous agents]
+    direction LR
+    OW[Open WebUI<br/>Chat & orchestration]
+    OC[OpenClaw<br/>Personal automation]
+    CODE[OpenCode<br/>Autonomous coding]
+  end
+
+  subgraph Control[Model control plane]
+    LLM{{LiteLLM<br/>routing · budgets · observability}}
+  end
+
+  subgraph Models[Inference]
+    direction LR
+    OL[Ollama<br/>Qwen 2.5<br/>LOCAL]
+    OAI[OpenAI API<br/>Advanced reasoning<br/>REMOTE]
+  end
+
+  subgraph Capabilities[Tools & capabilities]
+    direction LR
+    MAIL[Email]
+    CAL[Calendar]
+    OT[Open Terminal]
+    SX[SearXNG]
+    MCP[FastAPI MCP]
+    REPO[Git repositories]
+  end
+
+  subgraph Resources[Controlled resources]
+    direction LR
+    HOST[Homelab execution]
+    WEB[Web sources]
+    TOOLS[MCP tools & APIs]
+  end
+
+  U --> OW
+  U --> OC
+  U --> CODE
+
+  OW --> LLM
   OC --> LLM
   CODE --> LLM
-  LLM --> OL[Ollama - Qwen 2.5 local]
-  LLM --> OAI[OpenAI API - complex reasoning]
-  OC --> MAIL[Email analysis]
-  OC --> CAL[Calendar management]
-  CODE --> REPO[Autonomous coding / repositories]
-  OW --> OT[Open Terminal]
-  OW --> SX[SearXNG]
-  OW --> MCP[FastAPI MCP]
-  MCP --> TOOLS[MCP tools & APIs]
-  OT --> HOST[Homelab execution environment]
-  SX --> WEB[Web sources]
-  MCP --> SEC[Controlled service integrations]
 
-  subgraph Homelab[Self-hosted AI homelab]
-    OW
-    OC
-    CODE
-    LLM
-    OL
-    OT
-    SX
-    MCP
-    HOST
-    TOOLS
-    SEC
-  end`;
+  LLM -->|privacy · low cost| OL
+  LLM -->|complex reasoning| OAI
+
+  OC --> MAIL
+  OC --> CAL
+  CODE --> REPO
+  OW --> OT
+  OW --> SX
+  OW --> MCP
+
+  OT --> HOST
+  SX --> WEB
+  MCP --> TOOLS
+
+  classDef client fill:#eef6ff,stroke:#2563eb,stroke-width:2px,color:#172033;
+  classDef gateway fill:#fff7df,stroke:#d97706,stroke-width:3px,color:#172033;
+  classDef local fill:#eaf8ef,stroke:#16803a,stroke-width:2px,color:#172033;
+  classDef remote fill:#f5edff,stroke:#7c3aed,stroke-width:2px,color:#172033;
+  classDef capability fill:#f7f7f8,stroke:#64748b,stroke-width:1.5px,color:#172033;
+
+  class OW,OC,CODE client;
+  class LLM gateway;
+  class OL local;
+  class OAI remote;
+  class MAIL,CAL,OT,SX,MCP,REPO,HOST,WEB,TOOLS capability;`;
 
 function renderMermaid() {
 	if (!window.mermaid) return;
 	window.mermaid.initialize({
 		startOnLoad: false,
 		securityLevel: "strict",
-		theme: document.documentElement.dataset.theme === "dark" ? "dark" : "default",
+		theme: "base",
+		flowchart: {
+			curve: "basis",
+			htmlLabels: true,
+			nodeSpacing: 36,
+			rankSpacing: 52,
+			useMaxWidth: true,
+		},
+		themeVariables: {
+			fontFamily: "inherit",
+			fontSize: "15px",
+			lineColor: document.documentElement.dataset.theme === "dark" ? "#94a3b8" : "#64748b",
+			clusterBkg: document.documentElement.dataset.theme === "dark" ? "#151b26" : "#ffffff",
+			clusterBorder: document.documentElement.dataset.theme === "dark" ? "#475569" : "#cbd5e1",
+			primaryTextColor: document.documentElement.dataset.theme === "dark" ? "#f8fafc" : "#172033",
+		},
 	});
 	void window.mermaid.run({ querySelector: ".ai-homelab-mermaid" });
 }
@@ -82,20 +134,36 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 	return createPortal(
 		<section className="category-section" aria-labelledby="ai-homelab-heading">
 			<h2 id="ai-homelab-heading" className="category-title">
-				<i className="fas fa-network-wired" aria-hidden="true" /> {french ? "Architecture de mon homelab IA" : "My AI homelab architecture"}
+				<i className="fas fa-network-wired" aria-hidden="true" /> {french ? "Ma plateforme IA" : "My AI platform"}
 			</h2>
 			<p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
 				{french
-					? "Open WebUI reste mon interface IA centrale. OpenClaw automatise l’analyse des e-mails et la gestion du calendrier, tandis qu’OpenCode exécute des tâches de développement de manière autonome. Ces clients passent par LiteLLM, qui route les requêtes courantes vers Ollama avec Qwen 2.5 en local et les tâches nécessitant un raisonnement plus complexe vers l’API OpenAI. Open WebUI utilise également Open Terminal, SearXNG et mon service FastAPI MCP."
-					: "Open WebUI remains my central AI interface. OpenClaw automates email analysis and calendar management, while OpenCode handles autonomous coding tasks. These clients use LiteLLM, which routes routine requests to local Qwen 2.5 through Ollama and tasks requiring more complex reasoning to the OpenAI API. Open WebUI also uses Open Terminal, SearXNG, and my FastAPI MCP service."}
+					? "Une architecture local-first organisée par responsabilités : interfaces et agents en entrée, LiteLLM comme plan de contrôle commun, modèles locaux ou distants selon le besoin, puis outils et données découplés. OpenClaw automatise l’analyse des e-mails et du calendrier, OpenCode prend en charge le développement autonome et Open WebUI reste l’interface interactive principale."
+					: "A local-first architecture organized by responsibility: interfaces and agents at the edge, LiteLLM as the shared control plane, local or remote models selected by need, and decoupled tools and data. OpenClaw automates email and calendar analysis, OpenCode handles autonomous development, and Open WebUI remains the primary interactive interface."}
 			</p>
-			<div className="resource-card overflow-auto" aria-label={french ? "Diagramme de l’architecture IA" : "AI architecture diagram"}>
+
+			<div className="resource-grid" style={{ marginBottom: "1.5rem" }}>
+				<article className="resource-card">
+					<h3><i className="fas fa-user-shield resource-card-icon" aria-hidden="true" /> {french ? "Confidentialité" : "Privacy"}</h3>
+					<p>{french ? "Les tâches courantes privilégient Ollama et Qwen 2.5 dans le homelab afin de conserver les données localement." : "Routine workloads prefer Ollama and Qwen 2.5 inside the homelab to keep data local."}</p>
+				</article>
+				<article className="resource-card">
+					<h3><i className="fas fa-coins resource-card-icon" aria-hidden="true" /> {french ? "Coût" : "Cost"}</h3>
+					<p>{french ? "LiteLLM centralise le routage, les budgets et l’observabilité afin de réserver les API distantes aux tâches qui le justifient." : "LiteLLM centralizes routing, budgets, and observability so remote APIs are reserved for workloads that justify them."}</p>
+				</article>
+				<article className="resource-card">
+					<h3><i className="fas fa-brain resource-card-icon" aria-hidden="true" /> {french ? "Raisonnement" : "Reasoning"}</h3>
+					<p>{french ? "Les demandes complexes peuvent être routées vers l’API OpenAI, sans coupler les agents à un fournisseur unique." : "Complex requests can be routed to the OpenAI API without coupling agents to a single provider."}</p>
+				</article>
+			</div>
+
+			<div className="resource-card overflow-auto ai-architecture-diagram" aria-label={french ? "Diagramme de la plateforme IA" : "AI platform architecture diagram"}>
 				<pre className="mermaid ai-homelab-mermaid">{diagram}</pre>
 			</div>
 			<p style={{ marginTop: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
 				{french
-					? "LiteLLM constitue ainsi le plan de contrôle commun des modèles : priorité à l’inférence locale pour la confidentialité et le coût, avec bascule vers OpenAI lorsque la complexité du raisonnement le justifie. Les interfaces, agents, outils MCP, recherche Web et capacités d’exécution restent découplés pour faciliter maintenance, observabilité et sécurité."
-					: "LiteLLM therefore acts as the shared model control plane: local inference is preferred for privacy and cost, with OpenAI used when reasoning complexity warrants it. Interfaces, agents, MCP tools, web search, and execution capabilities remain decoupled for easier maintenance, observability, and security."}
+					? "Le flux se lit de haut en bas : utilisateurs et agents → LiteLLM → inférence locale ou distante → capacités contrôlées. Cette séparation rend l’architecture plus lisible, remplaçable et observable, tout en limitant l’exposition des données et la dépendance à un fournisseur."
+					: "Read the flow from top to bottom: users and agents → LiteLLM → local or remote inference → controlled capabilities. This separation makes the architecture easier to understand, replace, and observe while limiting data exposure and provider lock-in."}
 			</p>
 			<Script
 				src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
