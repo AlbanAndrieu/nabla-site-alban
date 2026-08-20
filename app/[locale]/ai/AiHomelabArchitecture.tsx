@@ -16,93 +16,97 @@ declare global {
 const diagram = `flowchart TB
   U([User])
 
-  subgraph Clients[AI interfaces & autonomous agents]
+  subgraph Interfaces[1 · AI interfaces & autonomous agents]
     direction LR
-    OW[Open WebUI<br/>Chat & orchestration]
-    OC[OpenClaw<br/>Personal automation]
-    CODE[OpenCode<br/>Autonomous coding]
+    OW[Open WebUI<br/>deployed]
+    OC[OpenClaw<br/>agent automation]
+    CODE[OpenCode / Codex / Cursor<br/>coding agents]
   end
 
-  subgraph Control[Model control plane]
-    LLM{{LiteLLM<br/>routing · budgets · observability<br/>LLM Guard · PII}}
+  subgraph Control[2 · AI gateway & model control plane]
+    direction LR
+    LLM{{LiteLLM<br/>routing · fallbacks · budgets<br/>privacy · telemetry}}
+    REDIS[(Redis<br/>LLM cache)]
   end
 
-  subgraph Models[Inference]
+  subgraph Models[Inference providers]
     direction LR
-    OL[Ollama<br/>Qwen 2.5<br/>LOCAL]
-    OAI[OpenAI API<br/>Advanced reasoning<br/>REMOTE]
+    OL[Ollama<br/>Qwen 3 · Llama 3 · Gemma 3<br/>LOCAL]
+    OAI[OpenAI API<br/>REMOTE]
   end
 
-  subgraph Capabilities[Shared tools & capabilities]
+  subgraph Knowledge[3 · Tools, MCP & knowledge]
     direction LR
-    MAIL[Email]
-    CAL[Calendar]
+    MCP[FastAPI MCP]
     OT[Open Terminal]
     RAG[OpenRAG]
     SX[SearXNG]
-    MCP[FastAPI MCP]
-    REPO[Git repositories]
+    PAPER[Paperless<br/>OCR · archive]
   end
 
-  subgraph Observability[LLM observability]
-    LF[Langfuse<br/>traces · prompts · costs · latency]
-  end
-
-  subgraph Documents[Document pipeline]
+  subgraph Workflows[4 · Workflow & orchestration]
     direction LR
-    PDF[PDF documents]
-    PAPER[Paperless tools<br/>OCR · classify · archive]
+    N8N[n8n]
+    TEMP[Temporal]
+    LANGFLOW[Langflow]
   end
 
-  subgraph Resources[Controlled resources]
+  subgraph Observe[5 · Observability, evaluation & FinOps]
     direction LR
-    HOST[Homelab execution]
-    KB[Indexed knowledge]
+    LF[Langfuse<br/>traces · prompts · cost]
+    OPIK[Opik<br/>evaluation]
+    PROM[Prometheus<br/>metrics]
+  end
+
+  subgraph Resources[Homelab resources]
+    direction LR
+    HOST[Controlled execution]
+    KB[(Indexed knowledge)]
     WEB[Web sources]
-    TOOLS[MCP tools & APIs]
   end
 
   U --> OW
   U --> OC
   U --> CODE
-
   OW --> LLM
   OC --> LLM
   CODE --> LLM
 
-  LLM -->|privacy · low cost| OL
-  LLM -->|PII filtered · complex reasoning| OAI
-  LLM -.->|traces & usage| LF
+  LLM <--> REDIS
+  LLM -->|local-first| OL
+  LLM -->|complex / remote| OAI
 
-  OC --> MAIL
-  OC --> CAL
-  CODE --> REPO
-  OW --> OT
+  OW --> MCP
   OW --> RAG
   OW --> SX
-  OW --> MCP
-
-  MCP -.->|tool traces| LF
-  PDF --> PAPER
-  PAPER -->|processed PDFs| RAG
+  OW --> OT
+  PAPER --> RAG
   RAG --> KB
-  OT --> HOST
   SX --> WEB
-  MCP --> TOOLS
+  OT --> HOST
 
-  classDef client fill:#eef6ff,stroke:#2563eb,stroke-width:2px,color:#172033;
-  classDef gateway fill:#fff7df,stroke:#d97706,stroke-width:3px,color:#172033;
+  N8N --> MCP
+  TEMP --> MCP
+  LANGFLOW --> LLM
+
+  LLM -.-> LF
+  LLM -.-> PROM
+  MCP -.-> LF
+  LF -.-> OPIK
+
+  classDef interface fill:#eef6ff,stroke:#2563eb,stroke-width:2px,color:#172033;
+  classDef control fill:#fff7df,stroke:#d97706,stroke-width:3px,color:#172033;
   classDef local fill:#eaf8ef,stroke:#16803a,stroke-width:2px,color:#172033;
   classDef remote fill:#f5edff,stroke:#7c3aed,stroke-width:2px,color:#172033;
   classDef capability fill:#f7f7f8,stroke:#64748b,stroke-width:1.5px,color:#172033;
-  classDef observability fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#172033;
+  classDef observe fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#172033;
 
-  class OW,OC,CODE client;
-  class LLM gateway;
+  class OW,OC,CODE interface;
+  class LLM,REDIS control;
   class OL local;
   class OAI remote;
-  class LF observability;
-  class MAIL,CAL,OT,RAG,SX,MCP,REPO,PDF,PAPER,HOST,KB,WEB,TOOLS capability;`;
+  class LF,OPIK,PROM observe;
+  class MCP,OT,RAG,SX,PAPER,N8N,TEMP,LANGFLOW,HOST,KB,WEB capability;`;
 
 function renderMermaid() {
 	if (!window.mermaid) return;
@@ -123,6 +127,8 @@ function renderMermaid() {
 	void window.mermaid.run({ querySelector: ".ai-homelab-mermaid" });
 }
 
+const layerStyle = { marginBottom: "1.5rem" };
+
 export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 	const french = locale === "fr";
 	const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null);
@@ -132,7 +138,7 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 		if (!documentPipeline?.parentElement) return;
 		const host = document.createElement("div");
 		host.className = "ai-homelab-architecture-host";
-		documentPipeline.insertAdjacentElement("afterend", host);
+		documentPipeline.insertAdjacentElement("beforebegin", host);
 		setMountPoint(host);
 		window.addEventListener("themechange", renderMermaid);
 		return () => { window.removeEventListener("themechange", renderMermaid); host.remove(); };
@@ -142,20 +148,27 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 
 	return createPortal(
 		<section className="category-section" aria-labelledby="ai-homelab-heading">
-			<h2 id="ai-homelab-heading" className="category-title"><i className="fas fa-network-wired" aria-hidden="true" /> {french ? "Ma plateforme IA" : "My AI platform"}</h2>
+			<h2 id="ai-homelab-heading" className="category-title"><i className="fas fa-network-wired" aria-hidden="true" /> {french ? "Architecture de ma plateforme IA" : "My AI platform architecture"}</h2>
 			<p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
-				{french ? "Une architecture local-first organisée par responsabilités : interfaces et agents en entrée, LiteLLM comme plan de contrôle commun, modèles locaux ou distants selon le besoin, capacités partagées, observabilité Langfuse et pipeline documentaire Paperless vers OpenRAG." : "A local-first architecture organized by responsibility: interfaces and agents at the edge, LiteLLM as the shared control plane, local or remote models selected by need, shared capabilities, Langfuse observability, and a Paperless-to-OpenRAG document pipeline."}
+				{french ? "Une plateforme local-first structurée en couches plutôt qu’en catalogue de produits. LiteLLM constitue le plan de contrôle central entre interfaces, modèles, outils, workflows et observabilité." : "A local-first platform structured as layers rather than a product catalogue. LiteLLM is the central control plane connecting interfaces, models, tools, workflows, and observability."}
 			</p>
-			<div className="resource-grid" style={{ marginBottom: "1.5rem" }}>
-				<article className="resource-card">
-					<h3><i className="fas fa-user-shield resource-card-icon" aria-hidden="true" /> {french ? "Confidentialité" : "Privacy"}</h3>
-					<p>{french ? "Les tâches courantes privilégient Ollama et Qwen 2.5 dans le homelab. LiteLLM utilise également la fonction LLM Guard pour détecter et protéger les PII avant le routage vers les modèles, notamment lorsque l’inférence distante est nécessaire." : "Routine workloads prefer Ollama and Qwen 2.5 inside the homelab. LiteLLM also uses the LLM Guard capability to detect and protect PII before model routing, especially when remote inference is required."}</p>
-				</article>
-				<article className="resource-card"><h3><i className="fas fa-coins resource-card-icon" aria-hidden="true" /> {french ? "Coût" : "Cost"}</h3><p>{french ? "LiteLLM centralise le routage, les budgets et l’observabilité afin de réserver les API distantes aux tâches qui le justifient." : "LiteLLM centralizes routing, budgets, and observability so remote APIs are reserved for workloads that justify them."}</p></article>
-				<article className="resource-card"><h3><i className="fas fa-brain resource-card-icon" aria-hidden="true" /> {french ? "Raisonnement" : "Reasoning"}</h3><p>{french ? "Les demandes complexes peuvent être routées vers l’API OpenAI, sans coupler les agents à un fournisseur unique." : "Complex requests can be routed to the OpenAI API without coupling agents to a single provider."}</p></article>
+
+			<div className="resource-grid" style={layerStyle}>
+				<article className="resource-card"><h3>1 · {french ? "Interfaces & agents" : "Interfaces & agents"}</h3><p>{french ? "Open WebUI fournit l’interface conversationnelle ; OpenClaw et les agents de code complètent la couche autonome sans imposer un fournisseur de modèle." : "Open WebUI provides the conversational interface; OpenClaw and coding agents add autonomous capabilities without binding the platform to one model provider."}</p></article>
+				<article className="resource-card"><h3>2 · {french ? "Gateway & modèles" : "Gateway & models"}</h3><p>{french ? "LiteLLM centralise routage, fallbacks, budgets, cache Redis et télémétrie. Ollama exécute actuellement Qwen 3, Llama 3 et Gemma 3 localement ; les API distantes restent disponibles pour les besoins plus complexes." : "LiteLLM centralizes routing, fallbacks, budgets, Redis caching, and telemetry. Ollama currently runs Qwen 3, Llama 3, and Gemma 3 locally; remote APIs remain available for more demanding workloads."}</p></article>
+				<article className="resource-card"><h3>3 · {french ? "Outils, MCP & connaissance" : "Tools, MCP & knowledge"}</h3><p>{french ? "FastAPI MCP expose les outils ; Open Terminal contrôle l’exécution ; OpenRAG et Paperless construisent la connaissance documentaire ; SearXNG apporte la recherche Web." : "FastAPI MCP exposes tools; Open Terminal controls execution; OpenRAG and Paperless build document knowledge; SearXNG provides web search."}</p></article>
+				<article className="resource-card"><h3>4 · {french ? "Workflow & orchestration" : "Workflow & orchestration"}</h3><p>{french ? "n8n compose rapidement les intégrations, Temporal sécurise les traitements stateful et durables, et Langflow complète l’expérimentation de flux IA." : "n8n rapidly composes integrations, Temporal handles durable stateful processing, and Langflow complements AI-flow experimentation."}</p></article>
+				<article className="resource-card"><h3>5 · {french ? "Observabilité, évaluation & FinOps" : "Observability, evaluation & FinOps"}</h3><p>{french ? "Langfuse centralise traces, prompts, latence et coûts ; Opik couvre l’évaluation ; Prometheus reçoit les métriques opérationnelles de LiteLLM et de la plateforme." : "Langfuse centralizes traces, prompts, latency, and cost; Opik covers evaluation; Prometheus receives operational metrics from LiteLLM and the platform."}</p></article>
 			</div>
-			<div className="resource-card overflow-auto ai-architecture-diagram" aria-label={french ? "Diagramme de la plateforme IA" : "AI platform architecture diagram"}><pre className="mermaid ai-homelab-mermaid">{diagram}</pre></div>
-			<p style={{ marginTop: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>{french ? "Les PDF transitent par les outils Paperless pour l’OCR, la classification et l’archivage, puis alimentent OpenRAG et la connaissance indexée. LiteLLM conserve le contrôle du routage modèle et applique la protection des PII avant l’inférence distante. Langfuse reçoit les traces de LiteLLM et du serveur MCP afin de centraliser l’observabilité des appels IA et des outils." : "PDFs pass through Paperless tooling for OCR, classification, and archiving, then feed OpenRAG and indexed knowledge. LiteLLM retains model-routing control and applies PII protection before remote inference. Langfuse receives traces from LiteLLM and the MCP server to centralize observability across AI and tool calls."}</p>
+
+			<div className="resource-card overflow-auto ai-architecture-diagram" aria-label={french ? "Diagramme en couches de la plateforme IA" : "Layered AI platform architecture diagram"}><pre className="mermaid ai-homelab-mermaid">{diagram}</pre></div>
+
+			<div className="resource-grid" style={{ marginTop: "1.5rem" }}>
+				<article className="resource-card"><h3><i className="fas fa-user-shield resource-card-icon" aria-hidden="true" /> {french ? "Local-first & confidentialité" : "Local-first & privacy"}</h3><p>{french ? "Les charges courantes privilégient Ollama dans le homelab. Le passage par LiteLLM permet de garder une politique commune de routage et de protection avant tout recours à une inférence distante." : "Routine workloads prefer Ollama inside the homelab. Routing through LiteLLM keeps one shared routing and protection policy before any remote inference."}</p></article>
+				<article className="resource-card"><h3><i className="fas fa-coins resource-card-icon" aria-hidden="true" /> {french ? "Coût & résilience" : "Cost & resilience"}</h3><p>{french ? "Le cache Redis, les fallbacks et le routage centralisé réduisent les appels distants inutiles et évitent de coupler les clients à un modèle unique." : "Redis caching, fallbacks, and centralized routing reduce unnecessary remote calls and avoid coupling clients to a single model."}</p></article>
+				<article className="resource-card"><h3><i className="fas fa-chart-line resource-card-icon" aria-hidden="true" /> {french ? "Mesurable" : "Measurable"}</h3><p>{french ? "Langfuse, Opik et Prometheus séparent l’observabilité LLM, l’évaluation de qualité et les métriques opérationnelles tout en conservant une vue cohérente de la plateforme." : "Langfuse, Opik, and Prometheus separate LLM observability, quality evaluation, and operational metrics while preserving a coherent platform view."}</p></article>
+			</div>
+
 			<Script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" strategy="afterInteractive" onLoad={renderMermaid} />
 		</section>,
 		mountPoint,
