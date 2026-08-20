@@ -1,161 +1,75 @@
 name: Build CV PDFs
+
 on:
   pull_request:
     branches: [main, master, develop]
+    paths:
+      - "public/cv/**/*.tex"
+      - "public/cv/**/*.sty"
+      - "public/cv/**/*.cls"
+      - ".github/workflows/build-pdf.yml"
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-cv-pdfs:
-    name: Build CV PDFs (EN / FR / DE / NO)
+    name: Build CV PDFs (EN / FR)
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - name: Install TeX Live
-        run: sudo apt update && sudo apt install texlive-full fonts-font-awesome
-
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install required TeX packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            latexmk \
+            texlive-luatex \
+            texlive-latex-extra \
+            texlive-fonts-extra \
+            texlive-fonts-recommended \
+            texlive-extra-utils
+
       - name: Build PDF (English)
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-en.tex -output-directory=./public/cv
+
       - name: Scan log (English)
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-en.log
 
       - name: Build PDF (French)
         run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-fr.tex -output-directory=./public/cv
+
       - name: Scan log (French)
         run: texloganalyser -w ./public/cv/cv-aandrieu-2026-fr.log
 
-      - name: Build PDF (German)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-de.tex -output-directory=./public/cv
-      - name: Scan log (German)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-de.log
-
-      - name: Build PDF (Norwegian)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-no.tex -output-directory=./public/cv
-      - name: Scan log (Norwegian)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-no.log
-
-      - name: Build 20 secs PDF (English)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-en.tex -aux-directory=./public/cv -output-directory=./public/cv
-      - name: Scan 20 secs PDF log (English)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-en.log
-
-      - name: Build 20 secs PDF (French)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-fr.tex -aux-directory=./public/cv -output-directory=./public/cv
-      - name: Scan 20 secs PDF log (French)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-fr.log
-
-      - name: Build 20 secs PDF (German)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-de.tex -aux-directory=./public/cv -output-directory=./public/cv
-      - name: Scan 20 secs PDF log (German)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-de.log
-
-      - name: Build 20 secs PDF (Norwegian)
-        if: github.ref == 'refs/heads/master'
-        run: latexmk -pdflua ./public/cv/cv-aandrieu-2026-ts-no.tex -aux-directory=./public/cv -output-directory=./public/cv
-      - name: Scan 20 secs PDF log (Norwegian)
-        if: github.ref == 'refs/heads/master'
-        run: texloganalyser -w ./public/cv/cv-aandrieu-2026-ts-no.log
-
-      - name: Report if rebuilt PDFs differ from git (informational)
+      - name: Report rebuilt PDF drift
         if: success()
         run: |
-          set +e
-          PDF_FILES=(
+          git status --short -- \
+            ./public/cv/cv-aandrieu-2026-en.pdf \
+            ./public/cv/cv-aandrieu-2026-fr.pdf >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload CV PDFs
+        uses: actions/upload-artifact@v6
+        with:
+          name: cv-pdfs
+          path: |
             ./public/cv/cv-aandrieu-2026-en.pdf
             ./public/cv/cv-aandrieu-2026-fr.pdf
-            ./public/cv/cv-aandrieu-2026-de.pdf
-            ./public/cv/cv-aandrieu-2026-no.pdf
-            ./public/cv/cv-aandrieu-2026-ts-en.pdf
-            ./public/cv/cv-aandrieu-2026-ts-fr.pdf
-            ./public/cv/cv-aandrieu-2026-ts-de.pdf
-            ./public/cv/cv-aandrieu-2026-ts-no.pdf
-          )
+          retention-days: 7
 
-          drift=""
-          for f in "${PDF_FILES[@]}"; do
-            line="$(git status --porcelain -- "$f" 2>/dev/null || true)"
-            if [[ -n "$line" ]]; then
-              drift+="${line}"$'\n'
-            fi
-          done
-
-          {
-            echo "## CV PDFs vs git"
-            echo ""
-            if [[ -z "$drift" ]]; then
-              echo "Rebuilt PDFs match the current git tree for these paths (nothing to commit for CI-built CV PDFs)."
-            else
-              echo "**Rebuilt PDFs are not the same as what git has for these files.**"
-              echo ""
-              echo "Commit and push the updated \`public/cv/cv-aandrieu-2026*.pdf\` files so production (for example Vercel) serves the same binaries this workflow produced."
-              echo ""
-              echo '```text'
-              printf '%s' "$drift"
-              echo '```'
-              echo ""
-              echo "### \`git diff --stat\` (tracked files only; binary changes may be coarse)"
-              git diff --stat -- "${PDF_FILES[@]}" 2>/dev/null || true
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          if [[ -n "$drift" ]]; then
-            echo "::notice title=CV PDFs out of sync::Rebuilt PDFs differ from git — commit and push public/cv/*.pdf. Details are in the job summary for this run."
-          fi
-          exit 0
-
-       - name: Upload CV PDFs EN/FR
-         uses: actions/upload-artifact@v6
-         if: github.ref != 'refs/heads/master'
-         with:
-           name: cv-pdfs
-           path: |
-             ./public/cv/cv-aandrieu-2026-en.pdf
-             ./public/cv/cv-aandrieu-2026-fr.pdf
-       - name: Upload All CV PDFs
-         uses: actions/upload-artifact@v6
-         if: github.ref == 'refs/heads/master'
-         with:
-           name: cv-pdfs
-           path: |
-             ./public/cv/cv-aandrieu-2026-en.pdf
-             ./public/cv/cv-aandrieu-2026-fr.pdf
-             ./public/cv/cv-aandrieu-2026-de.pdf
-             ./public/cv/cv-aandrieu-2026-no.pdf
-             ./public/cv/cv-aandrieu-2026-ts-en.pdf
-             ./public/cv/cv-aandrieu-2026-ts-fr.pdf
-             ./public/cv/cv-aandrieu-2026-ts-de.pdf
-             ./public/cv/cv-aandrieu-2026-ts-no.pdf
-
-       - name: Upload log artifacts EN/FR
-         uses: actions/upload-artifact@v6
-         if: github.ref != 'refs/heads/master'
-         with:
-           name: cv-logs
-           path: |
-             ./public/cv/cv-aandrieu-2026-en.log
-             ./public/cv/cv-aandrieu-2026-fr.log
-       - name: Upload All log artifacts
-         uses: actions/upload-artifact@v6
-         if: github.ref == 'refs/heads/master'
-         with:
-           name: cv-logs
-           path: |
-             ./public/cv/cv-aandrieu-2026-en.log
-             ./public/cv/cv-aandrieu-2026-fr.log
-             ./public/cv/cv-aandrieu-2026-de.log
-             ./public/cv/cv-aandrieu-2026-no.log
-             ./public/cv/cv-aandrieu-2026-ts-en.log
-             ./public/cv/cv-aandrieu-2026-ts-fr.log
-             ./public/cv/cv-aandrieu-2026-ts-de.log
-             ./public/cv/cv-aandrieu-2026-ts-no.log
+      - name: Upload logs on failure
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: cv-logs
+          path: ./public/cv/*.log
+          retention-days: 7
+          if-no-files-found: ignore

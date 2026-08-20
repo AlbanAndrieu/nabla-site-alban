@@ -14,11 +14,22 @@ type SiteWidgetsScriptProps = {
 	scrollReveal?: string;
 };
 
+function restoreLocalizedFooterCopyright() {
+	if (document.documentElement.dataset.nablaApp !== "next-intl") return;
+
+	document
+		.querySelectorAll<HTMLElement>(".footer-copyright[data-localized-copyright]")
+		.forEach((element) => {
+			const localizedCopyright = element.dataset.localizedCopyright;
+			if (localizedCopyright) element.textContent = localizedCopyright;
+		});
+}
+
 /**
  * Loads the legacy widget runtime from a client boundary.
  *
- * Next.js 16.3 preview can leave an afterInteractive Script rendered directly
- * by a Server Component at the preload stage without injecting its script tag.
+ * The legacy runtime still normalizes copyright text for static HTML pages.
+ * Next-intl pages restore their server-rendered localized copyright after it loads.
  */
 export default function SiteWidgetsScript({
 	axeptio = false,
@@ -57,6 +68,7 @@ export default function SiteWidgetsScript({
 		<Script
 			src={`/site-widgets.js?config=${configuration || "default"}`}
 			strategy="afterInteractive"
+			onLoad={restoreLocalizedFooterCopyright}
 			data-axeptio={axeptio ? "" : undefined}
 			data-coffee-fab={coffeeFab ? "" : undefined}
 			data-no-font-awesome=""
