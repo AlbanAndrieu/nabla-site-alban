@@ -36,6 +36,9 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 						? "Un flux pratique du PDF vers la connaissance : normaliser les PDF localement, les archiver et les OCRiser dans Paperless, les enrichir avec Paperless-AI, puis exploiter le corpus dans AnythingLLM avec Paperless-ngx intégré pour des vérifications rapides."
 						: "A practical PDF-to-knowledge flow: normalize PDFs locally, archive and OCR them in Paperless, enrich them with Paperless-AI, then work with the corpus in AnythingLLM with Paperless-ngx integrated for quick checks.";
 			}
+
+			// Keep the concrete document workflow as the final content section, immediately before the page footer.
+			content.append(documentPipeline);
 		}
 
 		const host = document.createElement("div");
