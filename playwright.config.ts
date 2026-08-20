@@ -2,18 +2,16 @@ import { defineConfig, devices } from "@playwright/test";
 
 const requestedPort = Number(process.env.PLAYWRIGHT_PORT || 3000);
 const testPort =
-	Number.isInteger(requestedPort) &&
-	requestedPort >= 1 &&
-	requestedPort <= 65535
+	Number.isInteger(requestedPort) && requestedPort >= 1 && requestedPort <= 65535
 		? requestedPort
 		: 3000;
 const localTestUrl = `http://127.0.0.1:${testPort}`;
+const externalBaseUrl = process.env.BASE_URL?.trim();
 
 export default defineConfig({
 	testDir: "./tests",
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
-	/* One CI retry is enough to identify flakes while avoiding duplicate deterministic failures. */
 	retries: process.env.CI ? 1 : 0,
 	workers: process.env.CI ? 1 : undefined,
 	reporter: [
@@ -27,7 +25,7 @@ export default defineConfig({
 			: []),
 	],
 	use: {
-		baseURL: process.env.BASE_URL || localTestUrl,
+		baseURL: externalBaseUrl || localTestUrl,
 		navigationTimeout: 30_000,
 		trace: "on-first-retry",
 		screenshot: "only-on-failure",
@@ -58,10 +56,12 @@ export default defineConfig({
 			use: { ...devices["iPhone 12"] },
 		},
 	],
-	webServer: {
-		command: `${process.env.CI ? "npm run start:test" : "npm run dev:test"} -- --port ${testPort}`,
-		url: `${localTestUrl}/fr`,
-		reuseExistingServer: !process.env.CI,
-		timeout: 120 * 1000,
-	},
+	webServer: externalBaseUrl
+		? undefined
+		: {
+				command: `${process.env.CI ? "npm run start:test" : "npm run dev:test"} -- --port ${testPort}`,
+				url: `${localTestUrl}/fr`,
+				reuseExistingServer: !process.env.CI,
+				timeout: 120 * 1000,
+			},
 });
