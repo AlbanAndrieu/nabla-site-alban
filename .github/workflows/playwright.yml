@@ -2,14 +2,20 @@ name: Playwright Tests
 
 on:
   pull_request:
-    branches: [main, master, develop]
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - "public/cv/**/*.tex"
-      - "public/cv/**/*.pdf"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/PULL_REQUEST_TEMPLATE.md"
+    branches: [master]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "messages/**"
+      - "public/**/*.css"
+      - "public/**/*.js"
+      - "tests/**"
+      - "playwright.config.*"
+      - "next.config.*"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/playwright.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,7 +28,7 @@ concurrency:
 jobs:
   test:
     name: Run Playwright Tests
-    timeout-minutes: 60
+    timeout-minutes: 45
     runs-on: ubuntu-latest
 
     steps:
