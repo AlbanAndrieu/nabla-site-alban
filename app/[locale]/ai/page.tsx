@@ -6,6 +6,9 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
+import AiHomelabArchitecture from "./AiHomelabArchitecture";
+import AiPageGuide from "./AiPageGuide";
+import AiUsageAnalytics from "./AiUsageAnalytics";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -36,6 +39,9 @@ export default async function AiBestPracticesPage({ params }: Props) {
 				className="site-content-page page-ai page-dark page-nabla-best-practices"
 				suppressHydrationWarning
 			/>
+			<AiPageGuide locale={locale} />
+			<AiUsageAnalytics locale={locale} />
+			<AiHomelabArchitecture locale={locale} />
 		</>
 	);
 }
