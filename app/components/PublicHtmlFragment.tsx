@@ -1,6 +1,7 @@
 import {
 	type HtmlExtractMode,
 	loadPublicHtmlFragment,
+	removeLegacyElementsById,
 	type SiteLocale,
 } from "@/lib/htmlFromPublic";
 
@@ -10,6 +11,7 @@ type Props = Readonly<{
 	locale: SiteLocale;
 	className?: string;
 	suppressHydrationWarning?: boolean;
+	omitElementIds?: readonly string[];
 }>;
 
 /** Transitional boundary for trusted HTML files while sections move to React. */
@@ -19,8 +21,10 @@ export default async function PublicHtmlFragment({
 	locale,
 	className,
 	suppressHydrationWarning = false,
+	omitElementIds = [],
 }: Props) {
-	const html = await loadPublicHtmlFragment(file, mode, locale);
+	let html = await loadPublicHtmlFragment(file, mode, locale);
+	if (omitElementIds.length > 0) html = removeLegacyElementsById(html, omitElementIds);
 
 	return (
 		<div
