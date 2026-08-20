@@ -44,6 +44,10 @@ const diagram = `flowchart TB
     REPO[Git repositories]
   end
 
+  subgraph Observability[LLM observability]
+    LF[Langfuse<br/>traces · prompts · costs · latency]
+  end
+
   subgraph Documents[Document pipeline]
     direction LR
     PDF[PDF documents]
@@ -68,6 +72,7 @@ const diagram = `flowchart TB
 
   LLM -->|privacy · low cost| OL
   LLM -->|PII filtered · complex reasoning| OAI
+  LLM -.->|traces & usage| LF
 
   OC --> MAIL
   OC --> CAL
@@ -77,6 +82,7 @@ const diagram = `flowchart TB
   OW --> SX
   OW --> MCP
 
+  MCP -.->|tool traces| LF
   PDF --> PAPER
   PAPER -->|processed PDFs| RAG
   RAG --> KB
@@ -89,11 +95,13 @@ const diagram = `flowchart TB
   classDef local fill:#eaf8ef,stroke:#16803a,stroke-width:2px,color:#172033;
   classDef remote fill:#f5edff,stroke:#7c3aed,stroke-width:2px,color:#172033;
   classDef capability fill:#f7f7f8,stroke:#64748b,stroke-width:1.5px,color:#172033;
+  classDef observability fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#172033;
 
   class OW,OC,CODE client;
   class LLM gateway;
   class OL local;
   class OAI remote;
+  class LF observability;
   class MAIL,CAL,OT,RAG,SX,MCP,REPO,PDF,PAPER,HOST,KB,WEB,TOOLS capability;`;
 
 function renderMermaid() {
@@ -136,7 +144,7 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 		<section className="category-section" aria-labelledby="ai-homelab-heading">
 			<h2 id="ai-homelab-heading" className="category-title"><i className="fas fa-network-wired" aria-hidden="true" /> {french ? "Ma plateforme IA" : "My AI platform"}</h2>
 			<p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
-				{french ? "Une architecture local-first organisée par responsabilités : interfaces et agents en entrée, LiteLLM comme plan de contrôle commun, modèles locaux ou distants selon le besoin, capacités partagées et pipeline documentaire Paperless vers OpenRAG." : "A local-first architecture organized by responsibility: interfaces and agents at the edge, LiteLLM as the shared control plane, local or remote models selected by need, shared capabilities, and a Paperless-to-OpenRAG document pipeline."}
+				{french ? "Une architecture local-first organisée par responsabilités : interfaces et agents en entrée, LiteLLM comme plan de contrôle commun, modèles locaux ou distants selon le besoin, capacités partagées, observabilité Langfuse et pipeline documentaire Paperless vers OpenRAG." : "A local-first architecture organized by responsibility: interfaces and agents at the edge, LiteLLM as the shared control plane, local or remote models selected by need, shared capabilities, Langfuse observability, and a Paperless-to-OpenRAG document pipeline."}
 			</p>
 			<div className="resource-grid" style={{ marginBottom: "1.5rem" }}>
 				<article className="resource-card">
@@ -147,7 +155,7 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 				<article className="resource-card"><h3><i className="fas fa-brain resource-card-icon" aria-hidden="true" /> {french ? "Raisonnement" : "Reasoning"}</h3><p>{french ? "Les demandes complexes peuvent être routées vers l’API OpenAI, sans coupler les agents à un fournisseur unique." : "Complex requests can be routed to the OpenAI API without coupling agents to a single provider."}</p></article>
 			</div>
 			<div className="resource-card overflow-auto ai-architecture-diagram" aria-label={french ? "Diagramme de la plateforme IA" : "AI platform architecture diagram"}><pre className="mermaid ai-homelab-mermaid">{diagram}</pre></div>
-			<p style={{ marginTop: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>{french ? "Les PDF transitent par les outils Paperless pour l’OCR, la classification et l’archivage, puis alimentent OpenRAG et la connaissance indexée. LiteLLM conserve le contrôle du routage modèle et applique la protection des PII avant l’inférence distante." : "PDFs pass through Paperless tooling for OCR, classification, and archiving, then feed OpenRAG and indexed knowledge. LiteLLM retains model-routing control and applies PII protection before remote inference."}</p>
+			<p style={{ marginTop: "1.5rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>{french ? "Les PDF transitent par les outils Paperless pour l’OCR, la classification et l’archivage, puis alimentent OpenRAG et la connaissance indexée. LiteLLM conserve le contrôle du routage modèle et applique la protection des PII avant l’inférence distante. Langfuse reçoit les traces de LiteLLM et du serveur MCP afin de centraliser l’observabilité des appels IA et des outils." : "PDFs pass through Paperless tooling for OCR, classification, and archiving, then feed OpenRAG and indexed knowledge. LiteLLM retains model-routing control and applies PII protection before remote inference. Langfuse receives traces from LiteLLM and the MCP server to centralize observability across AI and tool calls."}</p>
 			<Script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" strategy="afterInteractive" onLoad={renderMermaid} />
 		</section>,
 		mountPoint,
