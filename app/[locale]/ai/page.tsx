@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import AiGlobalTools from "./AiGlobalTools";
 import AiHomelabArchitecture from "./AiHomelabArchitecture";
+import AiObservability from "./AiObservability";
 import AiPageGuide from "./AiPageGuide";
 import AiUsageAnalytics from "./AiUsageAnalytics";
 import AiWorkflowAutomation from "./AiWorkflowAutomation";
@@ -44,6 +45,7 @@ export default async function AiBestPracticesPage({ params }: Props) {
 			<AiPageGuide locale={locale} />
 			<AiWorkflowAutomation locale={locale} />
 			<AiGlobalTools locale={locale} />
+			<AiObservability locale={locale} />
 			<AiUsageAnalytics locale={locale} />
 			<AiHomelabArchitecture locale={locale} />
 		</>
