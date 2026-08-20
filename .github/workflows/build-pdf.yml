@@ -33,8 +33,8 @@ jobs:
             latexmk \
             texlive-luatex \
             texlive-latex-extra \
+            texlive-fonts-extra \
             texlive-fonts-recommended \
-            fonts-font-awesome \
             texlive-extra-utils
 
       - name: Build PDF (English)
