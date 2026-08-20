@@ -2,11 +2,17 @@ name: CI (Quality and Security)
 
 on:
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/PULL_REQUEST_TEMPLATE.md"
+    paths:
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "messages/**"
+      - "public/**/*.css"
+      - "scripts/**"
+      - "unit-tests/**"
+      - "*.{js,cjs,mjs,ts,json}"
+      - "package-lock.json"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 permissions:
