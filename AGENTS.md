@@ -18,4 +18,4 @@ Next.js 16 / React 19 / TypeScript / next-intl. Node/npm constraints and command
 `app/global-not-found.tsx` is the application-wide unmatched-route handler. Do not add root `app/not-found.tsx` unless segment-level `notFound()` behavior is explicitly required. Preserve trusted `public/404.html` rendering semantics and keep `tests/not-found.spec.ts` as regression coverage.
 
 ## Next.js
-This project may use APIs newer than model training data. For Next.js-specific work, read only the relevant local guide under `node_modules/next/dist/docs/` before editing. Do not inject or maintain a full Next.js documentation index in this file; locate the specific guide on demand.
+`next.config.mjs` intentionally sets `agentRules: false` so `next dev` does not regenerate large agent context blocks. For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/` before editing. Do not add a full documentation index here.
