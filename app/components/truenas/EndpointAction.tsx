@@ -7,6 +7,7 @@ type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
 type Props = {
 	url?: string;
 	secure?: boolean;
+	enabled: boolean;
 	external: boolean;
 	label: string;
 };
@@ -38,10 +39,13 @@ function classifyPublicEndpoint(payload: {
 	return status === 0 ? "unknown" : "fail";
 }
 
-async function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
-	return await new Promise((resolve) => {
+function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
+	return new Promise((resolve) => {
 		const image = new Image();
+		let settled = false;
 		const done = (result: boolean) => {
+			if (settled) return;
+			settled = true;
 			image.onload = null;
 			image.onerror = null;
 			resolve(result);
@@ -79,16 +83,29 @@ async function probePrivateEndpoint(
 	return false;
 }
 
-export default function EndpointAction({ url, secure, external, label }: Props) {
-	const [health, setHealth] = useState<HealthState>(url ? "pending" : "unknown");
+export default function EndpointAction({
+	url,
+	secure,
+	enabled,
+	external,
+	label,
+}: Props) {
+	const configured = enabled && Boolean(url);
+	const [health, setHealth] = useState<HealthState>(
+		configured ? "pending" : "unknown",
+	);
 	const [detail, setDetail] = useState(
-		url ? "Checking endpoint…" : "No endpoint configured",
+		configured ? "Checking endpoint…" : "Endpoint not configured for use",
 	);
 
 	useEffect(() => {
-		if (!url) {
+		if (!url || !enabled) {
 			setHealth("unknown");
-			setDetail("No endpoint configured");
+			setDetail(
+				url
+					? "Endpoint URL retained for inventory but not configured for use"
+					: "No endpoint URL configured",
+			);
 			return;
 		}
 
@@ -101,7 +118,7 @@ export default function EndpointAction({ url, secure, external, label }: Props) 
 			return;
 		}
 
-		if (!['http:', 'https:'].includes(parsed.protocol)) {
+		if (!["http:", "https:"].includes(parsed.protocol)) {
 			setHealth("unknown");
 			setDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
 			return;
@@ -110,7 +127,11 @@ export default function EndpointAction({ url, secure, external, label }: Props) 
 		const controller = new AbortController();
 		const timeout = window.setTimeout(() => controller.abort(), 6500);
 		setHealth("pending");
-		setDetail(external ? "Checking public endpoint…" : "Checking private endpoint from this browser…");
+		setDetail(
+			external
+				? "Checking public endpoint…"
+				: "Checking private endpoint from this browser…",
+		);
 
 		void (async () => {
 			try {
@@ -137,6 +158,7 @@ export default function EndpointAction({ url, secure, external, label }: Props) 
 				}
 
 				const reachable = await probePrivateEndpoint(url, controller.signal);
+				if (controller.signal.aborted) return;
 				setHealth(reachable ? "ok" : "fail");
 				setDetail(
 					reachable
@@ -157,16 +179,22 @@ export default function EndpointAction({ url, secure, external, label }: Props) 
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [external, url]);
+	}, [enabled, external, url]);
 
-	if (!url) {
+	if (!url || !enabled) {
 		return (
 			<span
 				className="btn btn-outline-secondary btn-sm d-block disabled"
 				aria-disabled="true"
 				title={detail}
+				data-endpoint-url={url}
 			>
-				<i className="fas fa-link" aria-hidden="true" /> {label}
+				<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
+				<i
+					className="fas fa-lock"
+					style={{ color: LOCK_COLOR.unknown, marginLeft: 5 }}
+					aria-hidden="true"
+				/>
 			</span>
 		);
 	}
