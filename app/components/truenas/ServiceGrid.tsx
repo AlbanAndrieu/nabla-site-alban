@@ -7,6 +7,7 @@ type HomelabService = {
 	iconSrc: string;
 	tunnelUrl?: string;
 	tunnelSecure?: boolean;
+	endpointEnabled?: boolean;
 	internalHost?: string;
 	internalPort?: number;
 	internalSecure?: boolean;
@@ -66,6 +67,7 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 									<EndpointAction
 										url={svc.tunnelUrl}
 										secure={svc.tunnelSecure}
+										enabled={svc.endpointEnabled !== false}
 										external={isExternal}
 										label={endpointLabel}
 									/>
