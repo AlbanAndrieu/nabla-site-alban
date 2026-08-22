@@ -25,22 +25,19 @@ function lockerIcon(color: string) {
 }
 
 type Props = {
-	tunnelLabel: string;
+	endpointLabel: string;
 	internalLabel: string;
 };
 
-export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
+export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 	const services = (homelabData.services as HomelabService[]) || [];
 	return (
 		<div className="row service-grid">
 			{services.map((svc) => {
-				const hasTunnelUrl =
+				const hasEndpoint =
 					typeof svc.tunnelUrl === "string" && svc.tunnelUrl.length > 0;
-				const isExternal =
-					(svc.external ?? svc.reacheableFromOutside) === true;
-				const tunnelEnabled = isExternal && hasTunnelUrl;
-				const tunnelIsHttps =
-					tunnelEnabled && svc.tunnelUrl!.startsWith("https");
+				const endpointIsHttps =
+					hasEndpoint && svc.tunnelUrl!.startsWith("https");
 				const hasInternal =
 					typeof svc.internalHost === "string" && svc.internalPort;
 				const iconPath = svc.iconSrc
@@ -48,8 +45,8 @@ export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
 						? "/" + svc.iconSrc.replace(".png", ".svg")
 						: "/" + svc.iconSrc
 					: "/assets/selfh-icons/generic-app.svg";
-				const locker = tunnelEnabled
-					? lockerIcon(tunnelIsHttps ? "limegreen" : "red")
+				const locker = hasEndpoint
+					? lockerIcon(endpointIsHttps ? "limegreen" : "red")
 					: lockerIcon("gray");
 				return (
 					<div
@@ -80,24 +77,25 @@ export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
 										gap: 8,
 									}}
 								>
-									{tunnelEnabled ? (
+									{hasEndpoint ? (
 										<a
 											href={svc.tunnelUrl}
 											className="btn btn-outline-primary btn-sm d-block"
 											target="_blank"
 											rel="noopener noreferrer"
+											title={(svc.external ?? svc.reacheableFromOutside) === true ? "Public endpoint" : "Internal/private endpoint"}
 										>
 											{locker}
-											{tunnelLabel}
+											{endpointLabel}
 										</a>
 									) : (
 										<span
 											className="btn btn-outline-secondary btn-sm d-block disabled"
 											aria-disabled="true"
-											title="No external tunnel configured"
+											title="No endpoint configured"
 										>
 											{locker}
-											{tunnelLabel}
+											{endpointLabel}
 										</span>
 									)}
 									{hasInternal && (
