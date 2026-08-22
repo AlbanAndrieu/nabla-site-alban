@@ -75,7 +75,6 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 								>
 									<EndpointAction
 										url={svc.tunnelUrl}
-										secure={svc.tunnelSecure}
 										enabled={endpointEnabled}
 										external={isExternal}
 										label={endpointLabel}
