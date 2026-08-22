@@ -39,6 +39,11 @@ const cvIndexBeforeFiles = [
 	{ source: "/fr/cv/index.html", destination: "/fr/cv" },
 ];
 
+/** Route the legacy catalog URL through the FastAPI-first proxy before `public/` wins. */
+const homelabCatalogBeforeFiles = [
+	{ source: "/homelab-services.json", destination: "/api/homelab-services" },
+];
+
 /** Extensionless content URLs → canonical `*.html` (browser URL matches static hosting). */
 const canonicalHtmlRedirects = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/${slug}`, destination: `/${slug}.html`, permanent: true },
@@ -83,6 +88,7 @@ const nextConfig = {
 	async rewrites() {
 		return {
 			beforeFiles: [
+				...homelabCatalogBeforeFiles,
 				...homeHtmlBeforeFiles,
 				...cvIndexBeforeFiles,
 				...htmlPageBeforeFiles,
