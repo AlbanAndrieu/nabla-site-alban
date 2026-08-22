@@ -118,23 +118,96 @@
 		}
 	}
 
-	function applyFastApiHealth(anchor, entry) {
-		const state = entry && ["ok", "warn", "fail"].includes(entry.state)
-			? entry.state
-			: "fail";
+	function setSnapshotTlsLock(anchor, trusted) {
+		const lock = anchor.querySelector(".homelab-tls-lock");
+		if (!lock) return;
+		lock.classList.remove(
+			"homelab-tls-lock--pending",
+			"homelab-tls-lock--ok",
+			"homelab-tls-lock--fail",
+		);
+		if (trusted === true) {
+			lock.classList.add("homelab-tls-lock--ok");
+			lock.title = "HTTPS certificate trusted by the FastAPI probe";
+		} else if (trusted === false) {
+			lock.classList.add("homelab-tls-lock--fail");
+			lock.title = "HTTPS certificate validation failed";
+		} else {
+			lock.style.color = "gray";
+			lock.title = "HTTPS certificate status unknown";
+		}
+	}
+
+	function tunnelColor(status) {
+		const normalized = String(status || "").trim().toLowerCase();
+		if (["healthy", "active", "up", "ok"].includes(normalized)) return "limegreen";
+		if (["degraded", "warning", "warn"].includes(normalized)) return "gold";
+		if (["down", "inactive", "failed", "fail"].includes(normalized)) return "red";
+		return "gray";
+	}
+
+	function setSnapshotTunnelStatus(anchor, entry) {
+		const tunnel = anchor.querySelector(".homelab-cloudflare-tunnel");
+		if (!tunnel) return;
+		const status = entry && typeof entry.tunnel_status === "string"
+			? entry.tunnel_status
+			: "unknown";
+		const name = entry && typeof entry.tunnel_name === "string" ? entry.tunnel_name : "";
+		tunnel.style.color = tunnelColor(status);
+		tunnel.title = `Cloudflare tunnel: ${status}${name ? ` (${name})` : ""}`;
+	}
+
+	function setEndpointState(anchor, state) {
 		for (const current of ["pending", "ok", "warn", "fail", "unknown"]) {
 			anchor.classList.remove(`homelab-tunnel-tab--${current}`);
 		}
 		anchor.classList.add(`homelab-tunnel-tab--${state}`);
+	}
+
+	function applyFastApiHealth(anchor, entry, truenasDown) {
+		const entryState = entry && ["ok", "warn", "fail"].includes(entry.state)
+			? entry.state
+			: "fail";
+		const state = truenasDown ? "fail" : entryState;
+		setEndpointState(anchor, state);
 		const status = typeof entry.http_status === "number" ? entry.http_status : 0;
 		const latency =
 			typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 		const tls = entry.tls_trusted === false ? ", TLS error" : "";
+		const tunnel = entry.tunnel_status ? `, tunnel ${entry.tunnel_status}` : "";
 		const error = typeof entry.error === "string" && entry.error ? ` — ${entry.error}` : "";
-		anchor.title = `FastAPI health snapshot: HTTP ${status || "network error"}${tls}${latency}${error}`;
+		const dependency = truenasDown ? " — TrueNAS dependency down" : "";
+		anchor.title = `FastAPI health snapshot: HTTP ${status || "network error"}${tls}${tunnel}${latency}${error}${dependency}`;
 		anchor.setAttribute("data-homelab-health-source", "fastapi");
+		setSnapshotTlsLock(anchor, entry.tls_trusted);
+		setSnapshotTunnelStatus(anchor, entry);
 		// Prevent the legacy endpoint-level checker from overwriting a valid snapshot.
 		anchor.removeAttribute("data-homelab-external");
+	}
+
+	function applyTrueNasDependencyFailure(anchor) {
+		setEndpointState(anchor, "fail");
+		anchor.title = "TrueNAS dependency is down; external service marked unavailable";
+		anchor.setAttribute("data-homelab-health-source", "fastapi-truenas");
+		anchor.removeAttribute("data-homelab-external");
+	}
+
+	function showTrueNasAlert(payload) {
+		const health = payload && payload.truenas;
+		if (!health || !["warn", "fail"].includes(health.state)) return;
+		const root = document.querySelector('[data-homelab-variant="truenas"]');
+		if (!root || document.getElementById("homelab-truenas-alert")) return;
+		const alert = document.createElement("div");
+		alert.id = "homelab-truenas-alert";
+		alert.className = `alert ${health.state === "fail" ? "alert-danger" : "alert-warning"}`;
+		alert.setAttribute("role", "alert");
+		const publicState = health.public && health.public.state ? health.public.state : "unknown";
+		const internal = health.internal;
+		const internalText = internal
+			? `${internal.host}:${internal.port} ${internal.state}`
+			: "unavailable from this runtime";
+		alert.innerHTML = `<strong><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> TrueNAS ${health.state === "fail" ? "appears to be down" : "connectivity is degraded"}</strong> — public probe ${esc(publicState)}; internal probe ${esc(internalText)}.`;
+		root.parentNode.insertBefore(alert, root);
 	}
 
 	async function hydrateExternalHealthSnapshot() {
@@ -157,6 +230,8 @@
 			return;
 		}
 
+		showTrueNasAlert(payload);
+		const truenasDown = payload.truenas && payload.truenas.state === "fail";
 		const byUrl = Object.create(null);
 		for (const entry of payload.services) {
 			if (!entry || typeof entry.url !== "string") {
@@ -174,7 +249,9 @@
 		for (const anchor of anchors) {
 			const key = normalizeHealthUrl(anchor.getAttribute("href"));
 			if (key && byUrl[key]) {
-				applyFastApiHealth(anchor, byUrl[key]);
+				applyFastApiHealth(anchor, byUrl[key], truenasDown);
+			} else if (truenasDown) {
+				applyTrueNasDependencyFailure(anchor);
 			}
 		}
 	}
@@ -205,7 +282,7 @@
 
 	/**
 	 * Padlock next to Internal / External only when the rendered URL is HTTPS; color
-	 * is set client-side from the favicon probe (same limits as nabla-service-status.js).
+	 * is set client-side from the favicon probe until FastAPI provides TLS status.
 	 */
 	function homelabTlsLockMarkup(href) {
 		const h = String(href || "");
@@ -218,7 +295,12 @@
 		} catch {
 			return "";
 		}
-		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
+		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
+	}
+
+	function cloudflareTunnelMarkup(isExternal) {
+		if (!isExternal) return "";
+		return '<span class="homelab-cloudflare-tunnel" style="color: gray; margin-left: 0.35rem" title="Cloudflare tunnel status not observed yet" aria-hidden="true"><i class="fas fa-cloud" aria-hidden="true"></i></span>';
 	}
 
 	function disabledEndpointLockMarkup(href) {
@@ -267,6 +349,7 @@
 		const endpointLock = endpointActive
 			? homelabTlsLockMarkup(endpointHref)
 			: disabledEndpointLockMarkup(endpointHref);
+		const tunnelIcon = cloudflareTunnelMarkup(isExternal);
 
 		const externalAttr = isExternal ? "true" : "false";
 		const endpointProbe =
@@ -277,10 +360,10 @@
 			: "";
 		const endpointControl = endpointActive
 			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-external="${externalAttr}"${externalLinkAttrs} title="${endpointTitle}">
-					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}${tunnelIcon}
 				</a>`
 			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" data-endpoint-url="${esc(rawEndpointUrl)}" title="${endpointTitle}">
-					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}${tunnelIcon}
 				</span>`;
 
 		const group = `<div class="truenas-app-actions d-grid gap-2 mt-2">
