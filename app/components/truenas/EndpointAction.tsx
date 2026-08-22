@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { HomelabHealthEntry } from "../../../lib/homelabHealth";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
 
@@ -9,6 +10,7 @@ type Props = {
 	enabled: boolean;
 	external: boolean;
 	label: string;
+	initialHealth?: HomelabHealthEntry;
 };
 
 const HEALTH_CLASS: Record<HealthState, string> = {
@@ -41,6 +43,15 @@ function isHttpsUrl(url?: string): boolean {
 	} catch {
 		return false;
 	}
+}
+
+function fastApiHealthDetail(entry: HomelabHealthEntry): string {
+	const status = entry.http_status || "network error";
+	const latency =
+		typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
+	const tls = entry.tls_trusted === false ? ", TLS error" : "";
+	const error = entry.error ? ` — ${entry.error}` : "";
+	return `FastAPI health snapshot: HTTP ${status}${tls}${latency}${error}`;
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -113,14 +124,20 @@ export default function EndpointAction({
 	enabled,
 	external,
 	label,
+	initialHealth,
 }: Props) {
 	const configured = enabled && Boolean(url);
 	const https = isHttpsUrl(url);
+	const snapshotHealth = external ? initialHealth : undefined;
 	const [health, setHealth] = useState<HealthState>(
-		configured ? "pending" : "unknown",
+		snapshotHealth?.state ?? (configured ? "pending" : "unknown"),
 	);
 	const [detail, setDetail] = useState(
-		configured ? "Checking endpoint…" : "Endpoint not configured for use",
+		snapshotHealth
+			? fastApiHealthDetail(snapshotHealth)
+			: configured
+				? "Checking endpoint…"
+				: "Endpoint not configured for use",
 	);
 
 	useEffect(() => {
@@ -146,6 +163,12 @@ export default function EndpointAction({
 		if (!["http:", "https:"].includes(parsed.protocol)) {
 			setHealth("unknown");
 			setDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
+			return;
+		}
+
+		if (external && initialHealth) {
+			setHealth(initialHealth.state);
+			setDetail(fastApiHealthDetail(initialHealth));
 			return;
 		}
 
@@ -208,7 +231,7 @@ export default function EndpointAction({
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [enabled, external, url]);
+	}, [enabled, external, initialHealth, url]);
 
 	if (!url || !enabled) {
 		return (
