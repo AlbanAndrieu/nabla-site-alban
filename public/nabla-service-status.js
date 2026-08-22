@@ -323,7 +323,7 @@
 	 */
 	function initHomelabTunnelTabIndicators() {
 		var sel =
-			".truenas-page-apps .homelab-service-btn-tunnel[data-homelab-reachable-outside], .nabla-homelab-services .homelab-service-btn-tunnel[data-homelab-reachable-outside]";
+			".truenas-page-apps .homelab-service-btn-tunnel[data-homelab-external], .nabla-homelab-services .homelab-service-btn-tunnel[data-homelab-external]";
 		var anchors = document.querySelectorAll(sel);
 		var byUrl = Object.create(null);
 		for (var i = 0; i < anchors.length; i++) {
@@ -336,11 +336,10 @@
 				continue;
 			}
 			if (!byUrl[href]) {
-				byUrl[href] = { anchors: [], reachable: "false" };
+				byUrl[href] = { anchors: [], external: false };
 			}
 			byUrl[href].anchors.push(a);
-			byUrl[href].reachable =
-				a.getAttribute("data-homelab-reachable-outside") || "false";
+			byUrl[href].external = a.getAttribute("data-homelab-external") === "true";
 		}
 		var urls = Object.keys(byUrl);
 		if (!urls.length) {
@@ -353,7 +352,7 @@
 				return Promise.resolve();
 			}
 			var job = byUrl[u];
-			if (job.reachable !== "true") {
+			if (!job.external) {
 				var localOrigin;
 				try {
 					localOrigin = new URL(u, window.location.href).origin;
