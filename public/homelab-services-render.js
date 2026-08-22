@@ -76,6 +76,17 @@
 		return `Endpoint (${exposure})`;
 	}
 
+	function isInternalEndpointUrl(endpointUrl) {
+		if (!endpointUrl || typeof endpointUrl !== "string") {
+			return false;
+		}
+		try {
+			return new URL(endpointUrl).hostname.endsWith(".int.albandrieu.com");
+		} catch {
+			return false;
+		}
+	}
+
 	const externalLinkAttrs = ' target="_blank" rel="noopener noreferrer"';
 
 	function safeHref(url) {
@@ -135,6 +146,10 @@
 		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
 	}
 
+	function disabledEndpointLockMarkup() {
+		return '<span class="homelab-tls-lock text-secondary" title="Endpoint not configured for use" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
+	}
+
 	function renderServiceCard(s, variant) {
 		const name = esc(s.name);
 		const icons = titleIconMarkup(s);
@@ -144,15 +159,21 @@
 			typeof s.tunnelUrl === "string" && s.tunnelUrl.length > 0
 				? s.tunnelUrl
 				: "";
-		const hasEndpoint = rawEndpointUrl.length > 0;
-		const endpointHref = hasEndpoint ? safeHref(rawEndpointUrl) : "";
+		const hasEndpointUrl = rawEndpointUrl.length > 0;
+		const endpointEnabled =
+			s.endpointEnabled ??
+			(isExternal || isInternalEndpointUrl(rawEndpointUrl));
+		const endpointActive = hasEndpointUrl && endpointEnabled;
+		const endpointHref = hasEndpointUrl ? safeHref(rawEndpointUrl) : "";
 		const intTitle = esc(
 			s.internalTitle || defaultInternalTitle(variant, s.internalSecure),
 		);
 		const endpointTitle = esc(
-			hasEndpoint
-				? s.tunnelTitle || defaultEndpointTitle(rawEndpointUrl, isExternal)
-				: "No endpoint configured",
+			!hasEndpointUrl
+				? "No endpoint URL configured"
+				: endpointActive
+					? s.tunnelTitle || defaultEndpointTitle(rawEndpointUrl, isExternal)
+					: "Endpoint URL retained for inventory but not configured for use",
 		);
 		const aria = esc(`Open ${String(s.name).toLowerCase()}`);
 		const desc = s.description ? esc(s.description) : "";
@@ -165,22 +186,22 @@
 			: "";
 
 		const intLock = homelabTlsLockMarkup(s.internalSecure === true, intHref);
-		const endpointLock = hasEndpoint
+		const endpointLock = endpointActive
 			? homelabTlsLockMarkup(s.tunnelSecure === true, endpointHref)
-			: '<span class="homelab-tls-lock text-secondary" title="No endpoint configured" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
+			: disabledEndpointLockMarkup();
 
 		const reachableOutside = isExternal ? "true" : "false";
 		const endpointProbe =
-			hasEndpoint &&
+			endpointActive &&
 			(endpointHref.startsWith("https:") || endpointHref.startsWith("http:"));
 		const endpointStateClass = endpointProbe
 			? " homelab-tunnel-tab--pending"
 			: "";
-		const endpointControl = hasEndpoint
+		const endpointControl = endpointActive
 			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${endpointTitle}">
 					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
 				</a>`
-			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" title="${endpointTitle}">
+			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" data-endpoint-url="${esc(rawEndpointUrl)}" title="${endpointTitle}">
 					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
 				</span>`;
 
