@@ -28,15 +28,11 @@ const LOCK_COLOR: Record<HealthState, string> = {
 	unknown: "gray",
 };
 
-function classifyPublicEndpoint(payload: {
-	status?: number;
-	tlsError?: boolean;
-}): HealthState {
-	if (payload.tlsError === true) return "fail";
-	const status = typeof payload.status === "number" ? payload.status : 0;
+function classifyHttpStatus(status: number, tlsError = false): HealthState {
+	if (tlsError) return "fail";
 	if (status >= 200 && status <= 399) return "ok";
-	if ([401, 403, 404, 429].includes(status)) return "warn";
-	return status === 0 ? "unknown" : "fail";
+	if ([401, 403, 407, 429].includes(status)) return "warn";
+	return "fail";
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -60,27 +56,49 @@ function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
 async function probePrivateEndpoint(
 	url: string,
 	signal: AbortSignal,
-): Promise<boolean> {
+): Promise<{ state: HealthState; detail: string }> {
 	try {
-		await fetch(url, {
-			method: "GET",
-			mode: "no-cors",
+		let response = await fetch(url, {
+			method: "HEAD",
+			mode: "cors",
 			cache: "no-store",
 			signal,
 		});
-		return true;
+		if (response.status === 405 || response.status === 501) {
+			response = await fetch(url, {
+				method: "GET",
+				mode: "cors",
+				cache: "no-store",
+				signal,
+			});
+		}
+		return {
+			state: classifyHttpStatus(response.status),
+			detail: `Private endpoint probe: HTTP ${response.status}`,
+		};
 	} catch {
-		if (signal.aborted) return false;
+		if (signal.aborted) {
+			return { state: "fail", detail: "Private endpoint probe timed out" };
+		}
 	}
 
 	const origin = new URL(url).origin.replace(/\/$/, "");
 	for (const path of ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]) {
 		if (await probeImage(`${origin}${path}?_np=${Date.now()}`, signal)) {
-			return true;
+			return {
+				state: "ok",
+				detail: "Private endpoint responded from this browser (favicon probe)",
+			};
 		}
-		if (signal.aborted) return false;
+		if (signal.aborted) {
+			return { state: "fail", detail: "Private endpoint probe timed out" };
+		}
 	}
-	return false;
+	return {
+		state: "fail",
+		detail:
+			"Private endpoint did not return a readable HTTP response or common favicon",
+	};
 }
 
 export default function EndpointAction({
@@ -125,7 +143,7 @@ export default function EndpointAction({
 		}
 
 		const controller = new AbortController();
-		const timeout = window.setTimeout(() => controller.abort(), 6500);
+		const timeout = window.setTimeout(() => controller.abort(), 10_000);
 		setHealth("pending");
 		setDetail(
 			external
@@ -149,25 +167,23 @@ export default function EndpointAction({
 						status?: number;
 						tlsError?: boolean;
 					};
-					const next = classifyPublicEndpoint(payload);
+					const status =
+						typeof payload.status === "number" ? payload.status : 0;
+					const next = classifyHttpStatus(status, payload.tlsError === true);
 					setHealth(next);
 					setDetail(
-						`Public endpoint probe: HTTP ${payload.status ?? "?"}${payload.tlsError ? ", TLS error" : ""}`,
+						`Public endpoint probe: HTTP ${status || "network error"}${payload.tlsError ? ", TLS error" : ""}`,
 					);
 					return;
 				}
 
-				const reachable = await probePrivateEndpoint(url, controller.signal);
+				const result = await probePrivateEndpoint(url, controller.signal);
 				if (controller.signal.aborted) return;
-				setHealth(reachable ? "ok" : "fail");
-				setDetail(
-					reachable
-						? "Private endpoint reachable from this browser; HTTPS/TLS accepted when applicable"
-						: "Private endpoint unreachable from this browser, blocked, or TLS was rejected",
-				);
+				setHealth(result.state);
+				setDetail(result.detail);
 			} catch {
 				if (!controller.signal.aborted) {
-					setHealth("unknown");
+					setHealth("fail");
 					setDetail("Endpoint health check failed");
 				}
 			} finally {
