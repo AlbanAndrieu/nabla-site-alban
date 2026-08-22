@@ -11,7 +11,7 @@
 			"tunnelUrl": "https://truenas.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/truenas-scale.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "pfSense",
@@ -25,7 +25,7 @@
 			"tunnelSecure": true,
 			"internalTitle": "pfSense web UI on LAN gateway (172.17.0.1:10443); certificate may be self-signed",
 			"iconSrc": "assets/selfh-icons/pfsense.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Home",
@@ -37,7 +37,7 @@
 			"tunnelUrl": "https://home.albandrieu.com:10443",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/pfsense.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "AdGuard Home",
@@ -49,7 +49,7 @@
 			"tunnelUrl": "https://adguardhome.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/adguard-home.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Heimdall",
@@ -61,7 +61,7 @@
 			"tunnelUrl": "https://heimdall.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/heimdall.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Domain Watchdog",
@@ -73,7 +73,7 @@
 			"tunnelUrl": "https://domain-watchdog.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/domain-watchdog.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Prometheus",
@@ -85,7 +85,7 @@
 			"tunnelUrl": "https://prometheus.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/prometheus.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Prometheus - albandrieu",
@@ -97,7 +97,7 @@
 			"tunnelUrl": "https://prometheus - albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/prometheus.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Open SpeedTest",
@@ -109,7 +109,7 @@
 			"tunnelUrl": "https://open-speed-test.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/openspeedtest.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Speedtest Tracker",
@@ -121,7 +121,7 @@
 			"tunnelUrl": "https://speedtest.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/speedtest.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "PortTracker",
@@ -133,7 +133,7 @@
 			"tunnelUrl": "https://portracker.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/portracker.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "PortTracker - albandrieu",
@@ -145,7 +145,7 @@
 			"tunnelUrl": "https://portracker-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/portracker.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Portainer",
@@ -157,7 +157,7 @@
 			"tunnelUrl": "https://portainer.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/portainer.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Scrutiny",
@@ -169,7 +169,7 @@
 			"tunnelUrl": "https://scrutiny.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/scrutiny.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Scrutiny Collector - albandrieu",
@@ -181,7 +181,7 @@
 			"tunnelUrl": "https://scrutiny-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/scrutiny.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "IT Tools",
@@ -193,7 +193,7 @@
 			"tunnelUrl": "https://ittools.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/it-tools.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Uptime Kuma",
@@ -205,7 +205,7 @@
 			"tunnelUrl": "https://uptime-kuma.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/uptime-kuma.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Vaultwarden",
@@ -217,7 +217,7 @@
 			"tunnelUrl": "https://vaultwarden.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/vaultwarden.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "2FAuth",
@@ -229,7 +229,7 @@
 			"tunnelUrl": "https://2fauth.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/2fauth.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "LocalAI",
@@ -241,7 +241,7 @@
 			"tunnelUrl": "https://localai.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/localai.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Ollama",
@@ -253,7 +253,7 @@
 			"tunnelUrl": "https://ollama.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/ollama.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "n8n",
@@ -265,7 +265,7 @@
 			"tunnelUrl": "https://n8n.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/n8n.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Grafana",
@@ -277,7 +277,7 @@
 			"tunnelUrl": "https://grafana.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/grafana.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Keycloak",
@@ -289,7 +289,7 @@
 			"tunnelUrl": "https://keycloak.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/keycloak.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "ClamAV",
@@ -301,7 +301,7 @@
 			"tunnelUrl": "https://clamav.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/clamav.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Homarr",
@@ -313,7 +313,7 @@
 			"tunnelUrl": "https://homarr.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/homarr.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Gatus",
@@ -325,7 +325,7 @@
 			"tunnelUrl": "https://gatus.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/gatus.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "DDNS Updater",
@@ -337,7 +337,7 @@
 			"tunnelUrl": "https://ddns-updater.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/ddns-updater.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Paperless AI",
@@ -349,7 +349,7 @@
 			"tunnelUrl": "https://paperless-ai.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/paperless-ai.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Paperless-ngx",
@@ -361,7 +361,7 @@
 			"tunnelUrl": "https://paperless-ngx.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/paperless-ngx.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Transmission",
@@ -373,7 +373,7 @@
 			"tunnelUrl": "https://transmission.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/transmission.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Sonarr",
@@ -385,7 +385,7 @@
 			"tunnelUrl": "https://sonarr.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/sonarr.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Radarr",
@@ -397,7 +397,7 @@
 			"tunnelUrl": "https://radarr.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/radarr.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Lidarr",
@@ -409,7 +409,7 @@
 			"tunnelUrl": "https://lidarr.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/lidarr.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Prowlarr",
@@ -421,7 +421,7 @@
 			"tunnelUrl": "https://prowlarr.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/prowlarr.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Netbootxyz",
@@ -433,7 +433,7 @@
 			"tunnelUrl": "https://netbootxyz.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/netboot-xyz.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Affine",
@@ -445,7 +445,7 @@
 			"tunnelUrl": "https://affine.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/affine.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "ConvertX",
@@ -457,7 +457,7 @@
 			"tunnelUrl": "https://convertx.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/convertx.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Bichon",
@@ -469,7 +469,7 @@
 			"tunnelUrl": "https://bichon.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/bichon.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "OpenArchiver",
@@ -481,7 +481,7 @@
 			"tunnelUrl": "https://openarchiver.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/open-archiver.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "pgAdmin",
@@ -493,7 +493,7 @@
 			"tunnelUrl": "https://pgadmin.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/pgadmin.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "PostgreSQL",
@@ -508,7 +508,7 @@
 			"tunnelTitle": "Postgres via Cloudflare Tunnel (TCP)",
 			"portHtml": "Port 5432 · <code class=\"user-select-all\">172.17.0.24:5432</code> · <code class=\"user-select-all\">postgres.albandrieu.com:5432</code>",
 			"iconSrc": "assets/selfh-icons/postgresql.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "KaraKeep",
@@ -520,7 +520,7 @@
 			"tunnelUrl": "https://karakeep.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/karakeep.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "SABnzbd",
@@ -529,10 +529,8 @@
 			"internalHost": "172.17.0.24",
 			"internalPort": 30055,
 			"internalSecure": false,
-			"tunnelUrl": "https://sabnzbd.albandrieu.com",
-			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/sabnzbd.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Stirling PDF",
@@ -544,7 +542,7 @@
 			"tunnelUrl": "https://stirling.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/stirling-pdf.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Stirling PDF - albandrieu",
@@ -556,7 +554,7 @@
 			"tunnelUrl": "https://stirling-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/stirling-pdf.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "AnythingLLM",
@@ -568,7 +566,7 @@
 			"tunnelUrl": "https://anythingllm.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/anythingllm.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "AnythingLLM - albandrieu",
@@ -580,7 +578,7 @@
 			"tunnelUrl": "https://anythingllm-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/anythingllm.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Reactive Resume",
@@ -592,7 +590,7 @@
 			"tunnelUrl": "https://reactive.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/rxresume.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Reactive Resume - albandrieu",
@@ -604,7 +602,7 @@
 			"tunnelUrl": "https://reactive-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/rxresume.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Plumber",
@@ -616,7 +614,7 @@
 			"tunnelUrl": "https://plumber-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/plumber.svg",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Plumber API",
@@ -628,7 +626,7 @@
 			"tunnelUrl": "https://plumber-api-albandrieu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/plumber.svg",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Graylog",
@@ -640,7 +638,7 @@
 			"tunnelUrl": "https://graylog.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/graylog.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "LocalAI (GPU)",
@@ -652,7 +650,7 @@
 			"tunnelUrl": "https://localai-gpu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/localai.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "NetAlertX",
@@ -664,7 +662,7 @@
 			"tunnelUrl": "https://netalertx.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/netalertx.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "ntopng",
@@ -676,7 +674,7 @@
 			"tunnelUrl": "https://ntopng.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/ntopng.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Ollama (GPU)",
@@ -688,7 +686,7 @@
 			"tunnelUrl": "https://ollama-gpu.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/ollama.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Open WebUI",
@@ -700,7 +698,7 @@
 			"tunnelUrl": "https://open-webui.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/open-webui.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "OpenClaw",
@@ -712,7 +710,7 @@
 			"tunnelUrl": "https://openclaw.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/openclaw.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Nexus",
@@ -724,7 +722,7 @@
 			"tunnelUrl": "https://nexus.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/sonatype-nexus-repository.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "LiteLLM",
@@ -736,7 +734,7 @@
 			"tunnelUrl": "https://litellm.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/litellm.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "LiteLLM - albandrieu",
@@ -745,10 +743,8 @@
 			"internalHost": "172.17.0.57",
 			"internalPort": 4000,
 			"internalSecure": true,
-			"tunnelUrl": "https://litellm-albandrieu.albandrieu.com",
-			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/litellm.png",
-			"reacheableFromOutside": true
+			"external": false
 		},
 		{
 			"name": "SearXNG",
@@ -760,7 +756,7 @@
 			"tunnelUrl": "https://searxng.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/searxng.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "FreshRSS",
@@ -772,7 +768,7 @@
 			"tunnelUrl": "https://freshrss.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/freshrss.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Hello",
@@ -784,7 +780,7 @@
 			"tunnelUrl": "https://hello.int.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/nginx.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Clickhouse",
@@ -796,7 +792,7 @@
 			"tunnelUrl": "https://clickhouse.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/clickhouse.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Minio",
@@ -808,7 +804,7 @@
 			"tunnelUrl": "https://minio.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/minio.png",
-			"reacheableFromOutside": false
+			"external": false
 		},
 		{
 			"name": "Langfuse",
@@ -820,7 +816,7 @@
 			"tunnelUrl": "https://langfuse.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/langfuse.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Language Tool",
@@ -832,7 +828,7 @@
 			"tunnelUrl": "https://languagetool.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/languagetool.png",
-			"reacheableFromOutside": true
+			"external": true
 		},
 		{
 			"name": "Garage",
@@ -844,7 +840,7 @@
 			"tunnelUrl": "https://garage.int.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"reacheableFromOutside": false
+			"external": false
 		}
 	]
 }
