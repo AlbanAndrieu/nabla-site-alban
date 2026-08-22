@@ -61,7 +61,7 @@
 
 	function defaultEndpointTitle(endpointUrl, isExternal) {
 		if (!endpointUrl || typeof endpointUrl !== "string") {
-			return "Endpoint";
+			return "External";
 		}
 		const exposure = isExternal ? "public" : "internal/private";
 		if (endpointUrl.indexOf("postgres:") === 0) {
@@ -122,7 +122,7 @@
 	}
 
 	/**
-	 * Padlock next to Internal / Endpoint when JSON marks HTTPS; color set client-side
+	 * Padlock next to Internal / External when JSON marks HTTPS; color set client-side
 	 * from favicon probe (same limits as nabla-service-status.js).
 	 */
 	function homelabTlsLockMarkup(secureFlag, href) {
@@ -147,7 +147,7 @@
 	}
 
 	function disabledEndpointLockMarkup() {
-		return '<span class="homelab-tls-lock text-secondary" title="Endpoint not configured for use" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
+		return '<span class="homelab-tls-lock text-secondary" title="External access not configured for use" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
 	}
 
 	function renderServiceCard(s, variant) {
@@ -170,10 +170,10 @@
 		);
 		const endpointTitle = esc(
 			!hasEndpointUrl
-				? "No endpoint URL configured"
+				? "No external URL configured"
 				: endpointActive
 					? s.tunnelTitle || defaultEndpointTitle(rawEndpointUrl, isExternal)
-					: "Endpoint URL retained for inventory but not configured for use",
+					: "External URL retained for inventory but not configured for use",
 		);
 		const aria = esc(`Open ${String(s.name).toLowerCase()}`);
 		const desc = s.description ? esc(s.description) : "";
@@ -199,10 +199,10 @@
 			: "";
 		const endpointControl = endpointActive
 			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-external="${externalAttr}"${externalLinkAttrs} title="${endpointTitle}">
-					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}
 				</a>`
 			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" data-endpoint-url="${esc(rawEndpointUrl)}" title="${endpointTitle}">
-					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">External</span>${endpointLock}
 				</span>`;
 
 		const group = `<div class="truenas-app-actions d-grid gap-2 mt-2">
