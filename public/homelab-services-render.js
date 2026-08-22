@@ -59,17 +59,21 @@
 		return "Homelab origin (Docker bridge or gateway)";
 	}
 
-	function defaultTunnelTitle(tunnelUrl) {
-		if (!tunnelUrl || typeof tunnelUrl !== "string") {
-			return "Tunnel";
+	function defaultEndpointTitle(endpointUrl, isExternal) {
+		if (!endpointUrl || typeof endpointUrl !== "string") {
+			return "Endpoint";
 		}
-		if (tunnelUrl.indexOf("postgres:") === 0) {
-			return "Postgres via Cloudflare Tunnel (TCP)";
+		const exposure = isExternal ? "public" : "internal/private";
+		if (endpointUrl.indexOf("postgres:") === 0) {
+			return `Postgres endpoint (${exposure})`;
 		}
-		if (tunnelUrl.indexOf("https://") === 0) {
-			return "HTTPS via Cloudflare Tunnel";
+		if (endpointUrl.indexOf("https://") === 0) {
+			return `HTTPS endpoint (${exposure})`;
 		}
-		return "Tunnel endpoint";
+		if (endpointUrl.indexOf("http://") === 0) {
+			return `HTTP endpoint (${exposure})`;
+		}
+		return `Endpoint (${exposure})`;
 	}
 
 	const externalLinkAttrs = ' target="_blank" rel="noopener noreferrer"';
@@ -92,8 +96,8 @@
 		if (!host || port === undefined || port === null || port === "") {
 			return "#";
 		}
-		const tunnel = typeof s.tunnelUrl === "string" ? s.tunnelUrl : "";
-		if (tunnel.indexOf("postgres:") === 0) {
+		const endpoint = typeof s.tunnelUrl === "string" ? s.tunnelUrl : "";
+		if (endpoint.indexOf("postgres:") === 0) {
 			return `postgres://${host}:${port}/`;
 		}
 		const scheme = s.internalSecure ? "https" : "http";
@@ -107,7 +111,7 @@
 	}
 
 	/**
-	 * Padlock next to Internal / Tunnel when JSON marks HTTPS; color set client-side
+	 * Padlock next to Internal / Endpoint when JSON marks HTTPS; color set client-side
 	 * from favicon probe (same limits as nabla-service-status.js).
 	 */
 	function homelabTlsLockMarkup(secureFlag, href) {
@@ -131,28 +135,24 @@
 		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
 	}
 
-	function disabledTunnelLockMarkup() {
-		return '<span class="homelab-tls-lock text-secondary" title="No external tunnel configured" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
-	}
-
 	function renderServiceCard(s, variant) {
 		const name = esc(s.name);
 		const icons = titleIconMarkup(s);
 		const intHref = safeHref(buildInternalUrl(s));
 		const isExternal = (s.external ?? s.reacheableFromOutside) === true;
-		const rawTunnelUrl =
+		const rawEndpointUrl =
 			typeof s.tunnelUrl === "string" && s.tunnelUrl.length > 0
 				? s.tunnelUrl
 				: "";
-		const tunnelEnabled = isExternal && rawTunnelUrl.length > 0;
-		const tunHref = tunnelEnabled ? safeHref(rawTunnelUrl) : "";
+		const hasEndpoint = rawEndpointUrl.length > 0;
+		const endpointHref = hasEndpoint ? safeHref(rawEndpointUrl) : "";
 		const intTitle = esc(
 			s.internalTitle || defaultInternalTitle(variant, s.internalSecure),
 		);
-		const tunTitle = esc(
-			tunnelEnabled
-				? s.tunnelTitle || defaultTunnelTitle(rawTunnelUrl)
-				: "No external tunnel configured",
+		const endpointTitle = esc(
+			hasEndpoint
+				? s.tunnelTitle || defaultEndpointTitle(rawEndpointUrl, isExternal)
+				: "No endpoint configured",
 		);
 		const aria = esc(`Open ${String(s.name).toLowerCase()}`);
 		const desc = s.description ? esc(s.description) : "";
@@ -165,22 +165,23 @@
 			: "";
 
 		const intLock = homelabTlsLockMarkup(s.internalSecure === true, intHref);
-		const tunLock = tunnelEnabled
-			? homelabTlsLockMarkup(s.tunnelSecure === true, tunHref)
-			: disabledTunnelLockMarkup();
+		const endpointLock = hasEndpoint
+			? homelabTlsLockMarkup(s.tunnelSecure === true, endpointHref)
+			: '<span class="homelab-tls-lock text-secondary" title="No endpoint configured" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
 
 		const reachableOutside = isExternal ? "true" : "false";
-		const tunProbe =
-			tunnelEnabled &&
-			typeof tunHref === "string" &&
-			(tunHref.startsWith("https:") || tunHref.startsWith("http:"));
-		const tunTabStateClass = tunProbe ? " homelab-tunnel-tab--pending" : "";
-		const tunnelControl = tunnelEnabled
-			? `<a href="${tunHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${tunTabStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${tunTitle}">
-					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
+		const endpointProbe =
+			hasEndpoint &&
+			(endpointHref.startsWith("https:") || endpointHref.startsWith("http:"));
+		const endpointStateClass = endpointProbe
+			? " homelab-tunnel-tab--pending"
+			: "";
+		const endpointControl = hasEndpoint
+			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${endpointTitle}">
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
 				</a>`
-			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" title="${tunTitle}">
-					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
+			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" title="${endpointTitle}">
+					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
 				</span>`;
 
 		const group = `<div class="truenas-app-actions d-grid gap-2 mt-2">
@@ -188,7 +189,7 @@
 				<a href="${intHref}" class="btn btn-outline-secondary homelab-service-btn-internal"${externalLinkAttrs} title="${intTitle}">
 					<i class="fas fa-house-laptop" aria-hidden="true"></i><span class="ms-1">Internal</span>${intLock}
 				</a>
-				${tunnelControl}
+				${endpointControl}
 			</div>
 		</div>`;
 
