@@ -14,7 +14,7 @@ This runbook documents the shared frontend runtime scripts that were consolidate
 - `public/homelab-services-render.js`
 - `public/homelab-services.json`
 - `public/nabla-service-status.js`
-- `app/api/homelab-tunnel-check/route.ts` (server-side tunnel HTTP/TLS probe for homelab cards)
+- `app/api/homelab-tunnel-check/route.ts` (server-side HTTP/TLS probe for public homelab endpoints)
 - `public/site-content-page.css` (homelab card + ping indicator styles)
 - `lib/sitePageCatalog.ts`
 - `app/[locale]/page.tsx`
@@ -90,16 +90,17 @@ Default behavior to remember:
 
 ## Homelab Service Cards Runtime
 
-`public/truenas.html` and `public/nabla.html` now render service cards from JSON at runtime instead of hardcoding each card in HTML.
+`public/truenas.html` and `public/nabla.html` render service cards from JSON at runtime instead of hardcoding each card in HTML.
 
 ### Runtime flow
 
 1. Page defines one or more roots using `data-homelab-services-root`.
 2. `public/homelab-services-render.js` fetches JSON (`homelab-services.json` by default, or `data-homelab-json` override).
-3. Script renders a responsive card grid with Internal and Tunnel actions for each service (optional `fa-lock` spans when `internalSecure` / `tunnelSecure` are true and the URL is `https:`).
-4. After render, the script calls `window.initHomelabServiceCardPings()`, `window.initHomelabTlsLockIndicators()`, and `window.initHomelabTunnelTabIndicators()` when available.
-5. `public/nabla-service-status.js` runs favicon probes: reachability dots on each button origin, and padlock color (green/red) for each HTTPS lock span (`data-homelab-tls-origin`), with the same false-negative caveats as favicon probing.
-6. Tunnel buttons (`data-homelab-reachable-outside`) call `GET /api/homelab-tunnel-check?url=…` (same-origin). The API performs a server-side `HEAD` (fallback `GET` with `Range`) against allowlisted tunnel hosts and returns HTTP status; the client tints the Tunnel button green / yellow / red from status + `reacheableFromOutside`. Static-only hosts without Next return “unknown” (gray) when the API is missing.
+3. Script renders a responsive card grid with Internal and Endpoint actions for each service. `tunnelUrl` is retained as the historical JSON field name for endpoint/inventory URLs.
+4. `endpointEnabled` determines whether the Endpoint action is active when explicitly supplied. Without it, public (`external: true`) and `*.int.albandrieu.com` endpoints are active; other private URLs are retained as inventory metadata but shown disabled/grey.
+5. After render, the script calls `window.initHomelabServiceCardPings()`, `window.initHomelabTlsLockIndicators()`, and `window.initHomelabTunnelTabIndicators()` when available.
+6. `public/nabla-service-status.js` runs favicon probes for reachability and HTTPS padlock state. Active Endpoint elements expose `data-homelab-external` so health-check location is chosen from `external` only.
+7. Public endpoints (`external: true`) call `GET /api/homelab-tunnel-check?url=…` from the site server. Private endpoints (`external: false`) are probed from the browser so LAN and `.int` services can be green when locally reachable.
 
 ### Root attributes (public interface)
 
@@ -136,13 +137,22 @@ Per-service fields used by renderer:
 - `description` (optional): short summary text.
 - `internalHost` + `internalPort` (required for usable internal button): compose internal URL.
 - `internalSecure` (optional boolean): `https` when true, `http` when false. When exactly `true` and the built internal URL is `https:`, a padlock icon is rendered on the Internal button and later colored by a client-side probe.
-- `tunnelSecure` (optional boolean): metadata paired with `tunnelUrl`; when exactly `true` and the tunnel URL is `https:`, a padlock is shown on the Tunnel button and probed the same way.
+- `tunnelUrl` (optional): endpoint/inventory URL. The field name is historical and is kept even when the endpoint is disabled. Values can be `https://...`, `http://...`, or protocol-specific values such as `postgres://...`.
+- `tunnelSecure` (optional boolean): HTTPS metadata paired with `tunnelUrl`.
+- `endpointEnabled` (optional boolean): explicitly controls whether `tunnelUrl` is an active Endpoint. When omitted, the renderer enables `external: true` endpoints and private URLs under `*.int.albandrieu.com`; other `external: false` URLs stay disabled while their `tunnelUrl` remains available as inventory metadata.
+- `external` (boolean): **sole source of truth for exposure**. `true` means the active endpoint is intended to be publicly reachable; `false` means private/internal. This flag does not itself determine health.
 - `internalPath` (optional): appended path; if present and missing leading slash, renderer adds it.
-- `tunnelUrl` (required for tunnel button): external URL, can be `https://...` or `postgres://...`.
-- `reacheableFromOutside` (boolean): public-exposure intent for the tunnel URL. When `true`, a green Tunnel tab requires HTTP **2xx** or **304** from `/api/homelab-tunnel-check` and a successful TLS handshake on the server. When `false`, **yellow** means “blocked or unavailable as expected” (**401**, **403**, **404**, **429**, **502**, **503**, or network failure / status **0**); **red** means an unexpected success (**2xx**/**304**) or another HTTP code. Host allowlist defaults to `*.albandrieu.com`; override with `HOMELAB_TUNNEL_CHECK_HOSTS` (comma-separated hostnames, no scheme).
-- Internal and tunnel links always open in a new tab (`target="_blank"` with `rel="noopener noreferrer"`).
+- Internal and endpoint links always open in a new tab (`target="_blank"` with `rel="noopener noreferrer"`).
 - `internalTitle` and `tunnelTitle` (optional): override button tooltip text.
 - `portHtml` (optional): custom HTML rendered in card footer (used for protocol-specific hints like Postgres).
+
+### Endpoint health semantics
+
+- Active + `external: true`: server-side HTTP/TLS probe. HTTP `2xx`/`3xx` is green; common auth/restriction responses such as `401`, `403`, `404`, and `429` are warning/yellow; TLS/network or other failures are red/unknown as applicable.
+- Active + `external: false`: browser-side probe so LAN and `.int` DNS can be evaluated from the user's network rather than from Vercel.
+- Disabled endpoint: grey, while `tunnelUrl` may still be retained for inventory.
+- HTTPS health and public exposure are independent concepts.
+- Host allowlist for the server-side public probe defaults to `*.albandrieu.com`; override with `HOMELAB_TUNNEL_CHECK_HOSTS` (comma-separated hostnames, no scheme).
 
 ### URL-building constraints
 
@@ -280,6 +290,13 @@ Homelab service has broken Internal URL:
 - Ensure `internalHost` and `internalPort` are present.
 - Ensure `internalPath` is a valid path fragment.
 - For Postgres services, keep `tunnelUrl` scheme as `postgres://` to get protocol-specific handling.
+
+Endpoint state is unexpected:
+
+- Check `endpointEnabled` first when present.
+- Check `external`: it controls public/private exposure only, not health.
+- For a private active endpoint, confirm the browser can resolve/reach the LAN or `.int` hostname.
+- For a public endpoint, inspect `/api/homelab-tunnel-check?url=…` and the server-side allowlist.
 
 Status dots missing or stuck pending:
 
