@@ -61,7 +61,7 @@ function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
 	});
 }
 
-async function probePrivateEndpoint(
+async function probeBrowserEndpoint(
 	url: string,
 	signal: AbortSignal,
 ): Promise<{ state: HealthState; detail: string }> {
@@ -82,11 +82,11 @@ async function probePrivateEndpoint(
 		}
 		return {
 			state: classifyHttpStatus(response.status),
-			detail: `Private endpoint probe: HTTP ${response.status}`,
+			detail: `Browser endpoint probe: HTTP ${response.status}`,
 		};
 	} catch {
 		if (signal.aborted) {
-			return { state: "fail", detail: "Private endpoint probe timed out" };
+			return { state: "fail", detail: "Browser endpoint probe timed out" };
 		}
 	}
 
@@ -95,17 +95,16 @@ async function probePrivateEndpoint(
 		if (await probeImage(`${origin}${path}?_np=${Date.now()}`, signal)) {
 			return {
 				state: "ok",
-				detail: "Private endpoint responded from this browser (favicon probe)",
+				detail: "Endpoint responded from this browser (favicon probe)",
 			};
 		}
 		if (signal.aborted) {
-			return { state: "fail", detail: "Private endpoint probe timed out" };
+			return { state: "fail", detail: "Browser endpoint probe timed out" };
 		}
 	}
 	return {
 		state: "fail",
-		detail:
-			"Private endpoint did not return a readable HTTP response or common favicon",
+		detail: "Endpoint did not return a readable HTTP response or common favicon",
 	};
 }
 
@@ -167,8 +166,12 @@ export default function EndpointAction({
 						{ cache: "no-store", signal: controller.signal },
 					);
 					if (!response.ok) {
-						setHealth("unknown");
-						setDetail(`Endpoint check API returned HTTP ${response.status}`);
+						const fallback = await probeBrowserEndpoint(url, controller.signal);
+						if (controller.signal.aborted) return;
+						setHealth(fallback.state);
+						setDetail(
+							`Endpoint check API returned HTTP ${response.status}; ${fallback.detail}`,
+						);
 						return;
 					}
 					const payload = (await response.json()) as {
@@ -185,14 +188,16 @@ export default function EndpointAction({
 					return;
 				}
 
-				const result = await probePrivateEndpoint(url, controller.signal);
+				const result = await probeBrowserEndpoint(url, controller.signal);
 				if (controller.signal.aborted) return;
 				setHealth(result.state);
 				setDetail(result.detail);
 			} catch {
 				if (!controller.signal.aborted) {
-					setHealth("fail");
-					setDetail("Endpoint health check failed");
+					const fallback = await probeBrowserEndpoint(url, controller.signal);
+					if (controller.signal.aborted) return;
+					setHealth(fallback.state);
+					setDetail(`Endpoint health check failed; ${fallback.detail}`);
 				}
 			} finally {
 				window.clearTimeout(timeout);
