@@ -9,12 +9,34 @@ export type HomelabHealthEntry = {
 	tls_trusted?: boolean | null;
 	latency_ms?: number;
 	error?: string;
+	tunnel_status?: string | null;
+	tunnel_name?: string | null;
+};
+
+export type HomelabInternalHealthEntry = {
+	name: string;
+	host: string;
+	port: number;
+	reachable: boolean;
+	state: HomelabHealthState;
+	latency_ms?: number;
+	error?: string;
+};
+
+export type TrueNasHealth = {
+	state: HomelabHealthState;
+	public?: HomelabHealthEntry | null;
+	internal?: HomelabInternalHealthEntry | null;
+	internal_probe_enabled?: boolean;
 };
 
 export type HomelabHealthSnapshot = {
 	schema_version: number;
 	checked_at: string;
 	services: HomelabHealthEntry[];
+	truenas?: TrueNasHealth | null;
+	internal_probes_enabled?: boolean;
+	internal_services?: HomelabInternalHealthEntry[];
 };
 
 export type HomelabHealthSource = "fastapi" | "unavailable";
@@ -44,6 +66,75 @@ export function normalizeHomelabHealthUrl(url?: string): string | null {
 	}
 }
 
+function validOptionalBoolean(value: unknown): boolean {
+	return value === undefined || value === null || typeof value === "boolean";
+}
+
+function validOptionalNumber(value: unknown): boolean {
+	return (
+		value === undefined ||
+		(typeof value === "number" && Number.isFinite(value) && value >= 0)
+	);
+}
+
+function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
+	if (!isRecord(entry)) return false;
+	return (
+		typeof entry.name === "string" &&
+		entry.name.trim().length > 0 &&
+		typeof entry.url === "string" &&
+		normalizeHomelabHealthUrl(entry.url) !== null &&
+		typeof entry.reachable === "boolean" &&
+		typeof entry.http_status === "number" &&
+		Number.isFinite(entry.http_status) &&
+		isHealthState(entry.state) &&
+		validOptionalBoolean(entry.tls_trusted) &&
+		validOptionalNumber(entry.latency_ms) &&
+		(entry.error === undefined || typeof entry.error === "string") &&
+		(entry.tunnel_status === undefined ||
+			entry.tunnel_status === null ||
+			typeof entry.tunnel_status === "string") &&
+		(entry.tunnel_name === undefined ||
+			entry.tunnel_name === null ||
+			typeof entry.tunnel_name === "string")
+	);
+}
+
+function validInternalHealthEntry(
+	entry: unknown,
+): entry is HomelabInternalHealthEntry {
+	if (!isRecord(entry)) return false;
+	return (
+		typeof entry.name === "string" &&
+		entry.name.trim().length > 0 &&
+		typeof entry.host === "string" &&
+		entry.host.trim().length > 0 &&
+		typeof entry.port === "number" &&
+		Number.isInteger(entry.port) &&
+		entry.port >= 1 &&
+		entry.port <= 65535 &&
+		typeof entry.reachable === "boolean" &&
+		isHealthState(entry.state) &&
+		validOptionalNumber(entry.latency_ms) &&
+		(entry.error === undefined || typeof entry.error === "string")
+	);
+}
+
+function validTrueNasHealth(value: unknown): value is TrueNasHealth {
+	if (!isRecord(value) || !isHealthState(value.state)) return false;
+	if (value.public !== undefined && value.public !== null && !validHealthEntry(value.public)) {
+		return false;
+	}
+	if (
+		value.internal !== undefined &&
+		value.internal !== null &&
+		!validInternalHealthEntry(value.internal)
+	) {
+		return false;
+	}
+	return validOptionalBoolean(value.internal_probe_enabled);
+}
+
 export function parseHomelabHealthSnapshot(
 	value: unknown,
 ): HomelabHealthSnapshot | null {
@@ -54,44 +145,26 @@ export function parseHomelabHealthSnapshot(
 		typeof value.schema_version !== "number" ||
 		!Number.isFinite(value.schema_version) ||
 		typeof value.checked_at !== "string" ||
-		value.checked_at.trim().length === 0 ||
-		value.services.length === 0
+		value.checked_at.trim().length === 0
 	) {
 		return null;
 	}
 
-	for (const entry of value.services) {
-		if (
-			!isRecord(entry) ||
-			typeof entry.name !== "string" ||
-			entry.name.trim().length === 0 ||
-			typeof entry.url !== "string" ||
-			normalizeHomelabHealthUrl(entry.url) === null ||
-			typeof entry.reachable !== "boolean" ||
-			typeof entry.http_status !== "number" ||
-			!Number.isFinite(entry.http_status) ||
-			!isHealthState(entry.state)
-		) {
-			return null;
-		}
-		if (
-			entry.tls_trusted !== undefined &&
-			entry.tls_trusted !== null &&
-			typeof entry.tls_trusted !== "boolean"
-		) {
-			return null;
-		}
-		if (
-			entry.latency_ms !== undefined &&
-			(typeof entry.latency_ms !== "number" ||
-				!Number.isFinite(entry.latency_ms) ||
-				entry.latency_ms < 0)
-		) {
-			return null;
-		}
-		if (entry.error !== undefined && typeof entry.error !== "string") {
-			return null;
-		}
+	if (!value.services.every(validHealthEntry)) return null;
+	if (
+		value.truenas !== undefined &&
+		value.truenas !== null &&
+		!validTrueNasHealth(value.truenas)
+	) {
+		return null;
+	}
+	if (!validOptionalBoolean(value.internal_probes_enabled)) return null;
+	if (
+		value.internal_services !== undefined &&
+		(!Array.isArray(value.internal_services) ||
+			!value.internal_services.every(validInternalHealthEntry))
+	) {
+		return null;
 	}
 
 	return value as HomelabHealthSnapshot;
@@ -116,7 +189,7 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-health/1.0",
+				"User-Agent": "nabla-site-homelab-health/2.0",
 			},
 			signal: controller.signal,
 			cache: "no-store",
