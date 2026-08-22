@@ -1,3 +1,6 @@
+import homelabData from "../../../public/homelab-services.json";
+import EndpointAction from "./EndpointAction";
+
 type HomelabService = {
 	name: string;
 	description: string;
@@ -12,18 +15,6 @@ type HomelabService = {
 	reacheableFromOutside?: boolean;
 };
 
-import homelabData from "../../../public/homelab-services.json";
-
-function lockerIcon(color: string) {
-	return (
-		<i
-			className="fas fa-lock"
-			style={{ color, marginRight: 5 }}
-			aria-hidden="true"
-		/>
-	);
-}
-
 type Props = {
 	endpointLabel: string;
 	internalLabel: string;
@@ -34,10 +25,6 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 	return (
 		<div className="row service-grid">
 			{services.map((svc) => {
-				const hasEndpoint =
-					typeof svc.tunnelUrl === "string" && svc.tunnelUrl.length > 0;
-				const endpointIsHttps =
-					hasEndpoint && svc.tunnelUrl!.startsWith("https");
 				const hasInternal =
 					typeof svc.internalHost === "string" && svc.internalPort;
 				const iconPath = svc.iconSrc
@@ -45,9 +32,6 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 						? "/" + svc.iconSrc.replace(".png", ".svg")
 						: "/" + svc.iconSrc
 					: "/assets/selfh-icons/generic-app.svg";
-				const locker = hasEndpoint
-					? lockerIcon(endpointIsHttps ? "limegreen" : "red")
-					: lockerIcon("gray");
 				const isExternal =
 					(svc.external ?? svc.reacheableFromOutside) === true;
 				return (
@@ -79,27 +63,12 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 										gap: 8,
 									}}
 								>
-									{hasEndpoint ? (
-										<a
-											href={svc.tunnelUrl}
-											className="btn btn-outline-primary btn-sm d-block"
-											target="_blank"
-											rel="noopener noreferrer"
-											title={isExternal ? "Public endpoint" : "Internal/private endpoint"}
-										>
-											{locker}
-											{endpointLabel}
-										</a>
-									) : (
-										<span
-											className="btn btn-outline-secondary btn-sm d-block disabled"
-											aria-disabled="true"
-											title="No endpoint configured"
-										>
-											{locker}
-											{endpointLabel}
-										</span>
-									)}
+									<EndpointAction
+										url={svc.tunnelUrl}
+										secure={svc.tunnelSecure}
+										external={isExternal}
+										label={endpointLabel}
+									/>
 									{hasInternal && (
 										<a
 											href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
