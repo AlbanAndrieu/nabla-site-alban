@@ -5,7 +5,7 @@ type Props = {
 	lead: string;
 	iconsBefore: string;
 	iconsAfter: string;
-	tunnelLabel: string;
+	endpointLabel: string;
 	internalLabel: string;
 };
 
@@ -14,7 +14,7 @@ export default function AppsSection({
 	lead,
 	iconsBefore,
 	iconsAfter,
-	tunnelLabel,
+	endpointLabel,
 	internalLabel,
 }: Props) {
 	return (
@@ -53,7 +53,7 @@ export default function AppsSection({
 					</div>
 				</div>
 				<ServiceGrid
-					tunnelLabel={tunnelLabel}
+					endpointLabel={endpointLabel}
 					internalLabel={internalLabel}
 				/>
 			</div>

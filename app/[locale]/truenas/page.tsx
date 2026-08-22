@@ -71,7 +71,7 @@ export default async function TruenasPage({ params }: Props) {
 						lead={t("apps.lead")}
 						iconsBefore={t("apps.iconsBefore")}
 						iconsAfter={t("apps.iconsAfter")}
-						tunnelLabel={t("services.tunnel")}
+						endpointLabel="External"
 						internalLabel={t("services.internal")}
 					/>
 					<HomeLabSection

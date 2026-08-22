@@ -1,54 +1,47 @@
-type HomelabService = {
-	name: string;
-	description: string;
-	iconSrc: string;
-	tunnelUrl?: string;
-	tunnelSecure?: boolean;
-	internalHost?: string;
-	internalPort?: number;
-	internalSecure?: boolean;
-	reacheableFromOutside?: boolean;
-};
-
-import homelabData from "../../../public/homelab-services.json";
-
-function lockerIcon(color: string) {
-	return (
-		<i
-			className="fas fa-lock"
-			style={{ color, marginRight: 5 }}
-			aria-hidden="true"
-		/>
-	);
-}
+import {
+	loadHomelabServicesCatalog,
+	type HomelabService,
+} from "../../../lib/homelabServices";
+import EndpointAction from "./EndpointAction";
 
 type Props = {
-	tunnelLabel: string;
+	endpointLabel: string;
 	internalLabel: string;
 };
 
-export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
-	const services = (homelabData.services as HomelabService[]) || [];
+function isInternalEndpointUrl(url?: string): boolean {
+	if (!url) return false;
+	try {
+		return new URL(url).hostname.endsWith(".int.albandrieu.com");
+	} catch {
+		return false;
+	}
+}
+
+function serviceIconPath(iconSrc?: string): string {
+	if (!iconSrc) return "/assets/selfh-icons/generic-app.svg";
+	if (/^https?:\/\//i.test(iconSrc)) return iconSrc;
+	return `/${iconSrc}`;
+}
+
+export default async function ServiceGrid({
+	endpointLabel,
+	internalLabel,
+}: Props) {
+	const { catalog } = await loadHomelabServicesCatalog();
+	const services: HomelabService[] = catalog.services;
+
 	return (
 		<div className="row service-grid">
 			{services.map((svc) => {
-				const hasTunnel =
-					typeof svc.tunnelUrl === "string" && svc.tunnelUrl.length > 0;
-				const tunnelIsHttps = hasTunnel && svc.tunnelUrl!.startsWith("https");
 				const hasInternal =
-					typeof svc.internalHost === "string" && svc.internalPort;
-				const iconPath = svc.iconSrc
-					? svc.iconSrc.match(/svg$/)
-						? "/" + svc.iconSrc.replace(".png", ".svg")
-						: "/" + svc.iconSrc
-					: "/assets/selfh-icons/generic-app.svg";
-				let locker = null;
-				if (hasTunnel) {
-					if (!tunnelIsHttps) locker = lockerIcon("red");
-					else if (svc.reacheableFromOutside === false)
-						locker = lockerIcon("gold");
-					else locker = lockerIcon("limegreen");
-				}
+					typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+				const iconPath = serviceIconPath(svc.iconSrc);
+				const isExternal = svc.external === true;
+				const endpointEnabled =
+					svc.endpointEnabled ??
+					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
+
 				return (
 					<div
 						className="col-md-4 p-3"
@@ -78,17 +71,12 @@ export default function ServiceGrid({ tunnelLabel, internalLabel }: Props) {
 										gap: 8,
 									}}
 								>
-									{hasTunnel && (
-										<a
-											href={svc.tunnelUrl}
-											className="btn btn-outline-primary btn-sm d-block"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{locker}
-											{tunnelLabel}
-										</a>
-									)}
+									<EndpointAction
+										url={svc.tunnelUrl}
+										enabled={endpointEnabled}
+										external={isExternal}
+										label={endpointLabel}
+									/>
 									{hasInternal && (
 										<a
 											href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
