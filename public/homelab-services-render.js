@@ -105,6 +105,80 @@
 		return u;
 	}
 
+	function normalizeHealthUrl(url) {
+		try {
+			const parsed = new URL(String(url || ""), window.location.href);
+			if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+				return "";
+			}
+			parsed.hash = "";
+			return parsed.href;
+		} catch {
+			return "";
+		}
+	}
+
+	function applyFastApiHealth(anchor, entry) {
+		const state = entry && ["ok", "warn", "fail"].includes(entry.state)
+			? entry.state
+			: "fail";
+		for (const current of ["pending", "ok", "warn", "fail", "unknown"]) {
+			anchor.classList.remove(`homelab-tunnel-tab--${current}`);
+		}
+		anchor.classList.add(`homelab-tunnel-tab--${state}`);
+		const status = typeof entry.http_status === "number" ? entry.http_status : 0;
+		const latency =
+			typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
+		const tls = entry.tls_trusted === false ? ", TLS error" : "";
+		const error = typeof entry.error === "string" && entry.error ? ` — ${entry.error}` : "";
+		anchor.title = `FastAPI health snapshot: HTTP ${status || "network error"}${tls}${latency}${error}`;
+		anchor.setAttribute("data-homelab-health-source", "fastapi");
+		// Prevent the legacy endpoint-level checker from overwriting a valid snapshot.
+		anchor.removeAttribute("data-homelab-external");
+	}
+
+	async function hydrateExternalHealthSnapshot() {
+		let response;
+		try {
+			response = await fetch("/api/homelab-health", { cache: "no-store" });
+		} catch {
+			return;
+		}
+		if (!response.ok) {
+			return;
+		}
+		let payload;
+		try {
+			payload = await response.json();
+		} catch {
+			return;
+		}
+		if (!payload || !Array.isArray(payload.services)) {
+			return;
+		}
+
+		const byUrl = Object.create(null);
+		for (const entry of payload.services) {
+			if (!entry || typeof entry.url !== "string") {
+				continue;
+			}
+			const key = normalizeHealthUrl(entry.url);
+			if (key) {
+				byUrl[key] = entry;
+			}
+		}
+
+		const anchors = document.querySelectorAll(
+			'.homelab-service-btn-tunnel[data-homelab-external="true"][href]',
+		);
+		for (const anchor of anchors) {
+			const key = normalizeHealthUrl(anchor.getAttribute("href"));
+			if (key && byUrl[key]) {
+				applyFastApiHealth(anchor, byUrl[key]);
+			}
+		}
+	}
+
 	/**
 	 * Builds internal URL from internalHost, internalPort, internalSecure.
 	 * Optional internalPath (e.g. "/#" for pfSense). Postgres when tunnelUrl uses postgres: scheme.
@@ -278,6 +352,7 @@
 		if (typeof window.initHomelabTlsLockIndicators === "function") {
 			window.initHomelabTlsLockIndicators();
 		}
+		await hydrateExternalHealthSnapshot();
 		if (typeof window.initHomelabTunnelTabIndicators === "function") {
 			window.initHomelabTunnelTabIndicators();
 		}
