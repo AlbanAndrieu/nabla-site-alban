@@ -48,6 +48,8 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 				const locker = hasEndpoint
 					? lockerIcon(endpointIsHttps ? "limegreen" : "red")
 					: lockerIcon("gray");
+				const isExternal =
+					(svc.external ?? svc.reacheableFromOutside) === true;
 				return (
 					<div
 						className="col-md-4 p-3"
@@ -83,7 +85,7 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 											className="btn btn-outline-primary btn-sm d-block"
 											target="_blank"
 											rel="noopener noreferrer"
-											title={(svc.external ?? svc.reacheableFromOutside) === true ? "Public endpoint" : "Internal/private endpoint"}
+											title={isExternal ? "Public endpoint" : "Internal/private endpoint"}
 										>
 											{locker}
 											{endpointLabel}
