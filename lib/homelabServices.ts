@@ -58,10 +58,15 @@ export function parseHomelabServicesCatalog(
 	return value as HomelabServicesCatalog;
 }
 
-const LOCAL_FALLBACK = parseHomelabServicesCatalog(localCatalog);
-if (!LOCAL_FALLBACK) {
-	throw new Error("Invalid local homelab-services.json fallback");
+function requireLocalFallback(): HomelabServicesCatalog {
+	const catalog = parseHomelabServicesCatalog(localCatalog);
+	if (!catalog) {
+		throw new Error("Invalid local homelab-services.json fallback");
+	}
+	return catalog;
 }
+
+const LOCAL_FALLBACK = requireLocalFallback();
 
 function primaryApiUrl(): string {
 	return (
