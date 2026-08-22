@@ -37,80 +37,106 @@ export default async function ServiceGrid({
 		loadHomelabHealthSnapshot(),
 	]);
 	const services: HomelabService[] = catalog.services;
+	const truenasDown = snapshot?.truenas?.state === "fail";
+	const truenasWarning = snapshot?.truenas?.state === "warn";
+	const truenasPublic = snapshot?.truenas?.public;
+	const truenasInternal = snapshot?.truenas?.internal;
 
 	return (
-		<div className="row service-grid">
-			{services.map((svc) => {
-				const hasInternal =
-					typeof svc.internalHost === "string" && Boolean(svc.internalPort);
-				const iconPath = serviceIconPath(svc.iconSrc);
-				const isExternal = svc.external === true;
-				const endpointEnabled =
-					svc.endpointEnabled ??
-					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
-				const initialHealth = isExternal
-					? homelabHealthForUrl(snapshot, svc.tunnelUrl)
-					: undefined;
+		<>
+			{(truenasDown || truenasWarning) && (
+				<div
+					className={`alert ${truenasDown ? "alert-danger" : "alert-warning"}`}
+					role="alert"
+				>
+					<strong>
+						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
+						TrueNAS {truenasDown ? "appears to be down" : "connectivity is degraded"}
+					</strong>
+					{" — "}
+					public probe {truenasPublic?.state ?? "unknown"}
+					{truenasInternal
+						? `; internal ${truenasInternal.host}:${truenasInternal.port} ${truenasInternal.state}`
+						: "; internal probe unavailable from this runtime"}
+					. External services depending on this host are shown as unavailable when
+					TrueNAS is down.
+				</div>
+			)}
+			<div className="row service-grid">
+				{services.map((svc) => {
+					const hasInternal =
+						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+					const iconPath = serviceIconPath(svc.iconSrc);
+					const isExternal = svc.external === true;
+					const endpointEnabled =
+						svc.endpointEnabled ??
+						(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
+					const initialHealth = isExternal
+						? homelabHealthForUrl(snapshot, svc.tunnelUrl)
+						: undefined;
 
-				return (
-					<div
-						className="col-md-4 p-3"
-						key={`${svc.name}:${svc.tunnelUrl ?? svc.internalHost ?? "local"}`}
-					>
-						<div className="card box-shadow h-100 service-card-ux">
-							<img
-								className="img-fluid d-block mx-auto p-4"
-								src={iconPath}
-								width={80}
-								height={80}
-								alt={svc.name}
-								loading="lazy"
-								decoding="async"
-								style={{ minHeight: 60, minWidth: 60, height: "auto" }}
-							/>
-							<div className="card-body text-center border-top border-secondary">
-								<h3 className="h5 card-title mb-1">{svc.name}</h3>
-								<p className="card-text text-muted small mb-0">
-									{svc.description}
-								</p>
-								<div
-									style={{
-										marginTop: 18,
-										display: "flex",
-										flexDirection: "column",
-										gap: 8,
-									}}
-								>
-									<EndpointAction
-										url={svc.tunnelUrl}
-										enabled={endpointEnabled}
-										external={isExternal}
-										label={endpointLabel}
-										initialHealth={initialHealth}
-									/>
-									{hasInternal && (
-										<a
-											href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
-											className="btn btn-outline-secondary btn-sm d-block"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{svc.internalSecure && (
-												<i
-													className="fas fa-lock"
-													style={{ color: "limegreen", marginRight: 5 }}
-													aria-hidden="true"
-												/>
-											)}
-											{internalLabel} ({svc.internalHost}:{svc.internalPort})
-										</a>
-									)}
+					return (
+						<div
+							className="col-md-4 p-3"
+							key={`${svc.name}:${svc.tunnelUrl ?? svc.internalHost ?? "local"}`}
+						>
+							<div className="card box-shadow h-100 service-card-ux">
+								<img
+									className="img-fluid d-block mx-auto p-4"
+									src={iconPath}
+									width={80}
+									height={80}
+									alt={svc.name}
+									loading="lazy"
+									decoding="async"
+									style={{ minHeight: 60, minWidth: 60, height: "auto" }}
+								/>
+								<div className="card-body text-center border-top border-secondary">
+									<h3 className="h5 card-title mb-1">{svc.name}</h3>
+									<p className="card-text text-muted small mb-0">
+										{svc.description}
+									</p>
+									<div
+										style={{
+											marginTop: 18,
+											display: "flex",
+											flexDirection: "column",
+											gap: 8,
+										}}
+									>
+										<EndpointAction
+											url={svc.tunnelUrl}
+											enabled={endpointEnabled}
+											external={isExternal}
+											label={endpointLabel}
+											initialHealth={initialHealth}
+											truenasDown={truenasDown}
+										/>
+										{hasInternal && (
+											<a
+												href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
+												className="btn btn-outline-secondary btn-sm d-block"
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{svc.internalSecure && (
+													<i
+														className="fas fa-lock"
+														style={{ color: "gray", marginRight: 5 }}
+														title="Internal TLS certificate is not verified by the server-side TCP probe"
+														aria-label="Internal HTTPS certificate status unknown"
+													/>
+												)}
+												{internalLabel} ({svc.internalHost}:{svc.internalPort})
+											</a>
+										)}
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				);
-			})}
-		</div>
+					);
+				})}
+			</div>
+		</>
 	);
 }
