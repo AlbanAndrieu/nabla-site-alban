@@ -1,4 +1,8 @@
 import {
+	homelabHealthForUrl,
+	loadHomelabHealthSnapshot,
+} from "../../../lib/homelabHealth";
+import {
 	loadHomelabServicesCatalog,
 	type HomelabService,
 } from "../../../lib/homelabServices";
@@ -28,7 +32,10 @@ export default async function ServiceGrid({
 	endpointLabel,
 	internalLabel,
 }: Props) {
-	const { catalog } = await loadHomelabServicesCatalog();
+	const [{ catalog }, { snapshot }] = await Promise.all([
+		loadHomelabServicesCatalog(),
+		loadHomelabHealthSnapshot(),
+	]);
 	const services: HomelabService[] = catalog.services;
 
 	return (
@@ -41,6 +48,9 @@ export default async function ServiceGrid({
 				const endpointEnabled =
 					svc.endpointEnabled ??
 					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
+				const initialHealth = isExternal
+					? homelabHealthForUrl(snapshot, svc.tunnelUrl)
+					: undefined;
 
 				return (
 					<div
@@ -76,6 +86,7 @@ export default async function ServiceGrid({
 										enabled={endpointEnabled}
 										external={isExternal}
 										label={endpointLabel}
+										initialHealth={initialHealth}
 									/>
 									{hasInternal && (
 										<a
