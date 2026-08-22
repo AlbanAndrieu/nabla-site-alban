@@ -1,18 +1,8 @@
-import homelabData from "../../../public/homelab-services.json";
+import {
+	loadHomelabServicesCatalog,
+	type HomelabService,
+} from "../../../lib/homelabServices";
 import EndpointAction from "./EndpointAction";
-
-type HomelabService = {
-	name: string;
-	description: string;
-	iconSrc: string;
-	tunnelUrl?: string;
-	tunnelSecure?: boolean;
-	endpointEnabled?: boolean;
-	internalHost?: string;
-	internalPort?: number;
-	internalSecure?: boolean;
-	external?: boolean;
-};
 
 type Props = {
 	endpointLabel: string;
@@ -28,22 +18,30 @@ function isInternalEndpointUrl(url?: string): boolean {
 	}
 }
 
-export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
-	const services = (homelabData.services as HomelabService[]) || [];
+function serviceIconPath(iconSrc?: string): string {
+	if (!iconSrc) return "/assets/selfh-icons/generic-app.svg";
+	if (/^https?:\/\//i.test(iconSrc)) return iconSrc;
+	return `/${iconSrc}`;
+}
+
+export default async function ServiceGrid({
+	endpointLabel,
+	internalLabel,
+}: Props) {
+	const { catalog } = await loadHomelabServicesCatalog();
+	const services: HomelabService[] = catalog.services;
+
 	return (
 		<div className="row service-grid">
 			{services.map((svc) => {
 				const hasInternal =
-					typeof svc.internalHost === "string" && svc.internalPort;
-				const iconPath = svc.iconSrc
-					? svc.iconSrc.match(/svg$/)
-						? "/" + svc.iconSrc.replace(".png", ".svg")
-						: "/" + svc.iconSrc
-					: "/assets/selfh-icons/generic-app.svg";
+					typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+				const iconPath = serviceIconPath(svc.iconSrc);
 				const isExternal = svc.external === true;
 				const endpointEnabled =
 					svc.endpointEnabled ??
 					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
+
 				return (
 					<div
 						className="col-md-4 p-3"
