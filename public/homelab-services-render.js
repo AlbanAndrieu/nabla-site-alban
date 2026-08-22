@@ -131,15 +131,29 @@
 		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
 	}
 
+	function disabledTunnelLockMarkup() {
+		return '<span class="homelab-tls-lock text-secondary" title="No external tunnel configured" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
+	}
+
 	function renderServiceCard(s, variant) {
 		const name = esc(s.name);
 		const icons = titleIconMarkup(s);
 		const intHref = safeHref(buildInternalUrl(s));
-		const tunHref = safeHref(s.tunnelUrl);
+		const isExternal = (s.external ?? s.reacheableFromOutside) === true;
+		const rawTunnelUrl =
+			typeof s.tunnelUrl === "string" && s.tunnelUrl.length > 0
+				? s.tunnelUrl
+				: "";
+		const tunnelEnabled = isExternal && rawTunnelUrl.length > 0;
+		const tunHref = tunnelEnabled ? safeHref(rawTunnelUrl) : "";
 		const intTitle = esc(
 			s.internalTitle || defaultInternalTitle(variant, s.internalSecure),
 		);
-		const tunTitle = esc(s.tunnelTitle || defaultTunnelTitle(s.tunnelUrl));
+		const tunTitle = esc(
+			tunnelEnabled
+				? s.tunnelTitle || defaultTunnelTitle(rawTunnelUrl)
+				: "No external tunnel configured",
+		);
 		const aria = esc(`Open ${String(s.name).toLowerCase()}`);
 		const desc = s.description ? esc(s.description) : "";
 		const portSmall = s.portHtml
@@ -151,23 +165,30 @@
 			: "";
 
 		const intLock = homelabTlsLockMarkup(s.internalSecure === true, intHref);
-		const tunLock = homelabTlsLockMarkup(s.tunnelSecure === true, tunHref);
+		const tunLock = tunnelEnabled
+			? homelabTlsLockMarkup(s.tunnelSecure === true, tunHref)
+			: disabledTunnelLockMarkup();
 
-		const reachableOutside =
-			s.reacheableFromOutside === true ? "true" : "false";
+		const reachableOutside = isExternal ? "true" : "false";
 		const tunProbe =
+			tunnelEnabled &&
 			typeof tunHref === "string" &&
 			(tunHref.startsWith("https:") || tunHref.startsWith("http:"));
 		const tunTabStateClass = tunProbe ? " homelab-tunnel-tab--pending" : "";
+		const tunnelControl = tunnelEnabled
+			? `<a href="${tunHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${tunTabStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${tunTitle}">
+					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
+				</a>`
+			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" title="${tunTitle}">
+					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
+				</span>`;
 
 		const group = `<div class="truenas-app-actions d-grid gap-2 mt-2">
 			<div class="btn-group btn-group-sm w-100" role="group" aria-label="${aria}">
 				<a href="${intHref}" class="btn btn-outline-secondary homelab-service-btn-internal"${externalLinkAttrs} title="${intTitle}">
 					<i class="fas fa-house-laptop" aria-hidden="true"></i><span class="ms-1">Internal</span>${intLock}
 				</a>
-				<a href="${tunHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${tunTabStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${tunTitle}">
-					<i class="fas fa-cloud" aria-hidden="true"></i><span class="ms-1">Tunnel</span>${tunLock}
-				</a>
+				${tunnelControl}
 			</div>
 		</div>`;
 
