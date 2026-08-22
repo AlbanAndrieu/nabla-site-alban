@@ -30,7 +30,7 @@
 	}
 
 	function probeOrigin(origin) {
-		var paths = ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]; // TODO don ot check only image but first "/health", "/metrics", "/ping"
+		var paths = ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"];
 		var i = 0;
 		var base = origin.replace(/\/$/, "");
 		function attempt() {
@@ -200,8 +200,7 @@
 	}
 
 	/**
-	 * Colors homelab HTTPS padlocks (favicon probe). Green ≈ browser accepted TLS and
-	 * returned a favicon path; red includes self-signed, offline, or missing favicon.
+	 * Colors homelab HTTPS padlocks from a browser-side favicon probe.
 	 */
 	function initHomelabTlsLockIndicators() {
 		var locks = document.querySelectorAll(
@@ -264,47 +263,15 @@
 		Promise.all(workers).catch(() => {});
 	}
 
-	/**
-	 * Server-side tunnel HTTP check via `/api/homelab-tunnel-check` (see app/api).
-	 * Green: reacheableFromOutside true and 2xx/304 and TLS OK.
-	 * Yellow: reacheableFromOutside false and blocked/unreachable-style status (401/403/404/429/502/503 or network).
-	 * Red: policy mismatch or other statuses / TLS failure.
-	 */
-	function classifyTunnelTab(reachableAttr, payload) {
-		var R = reachableAttr === "true";
+	function classifyEndpoint(payload) {
 		var status = typeof payload.status === "number" ? payload.status : 0;
 		if (payload.tlsError === true) {
 			return "fail";
 		}
-		if (R) {
-			if (status >= 200 && status <= 299) {
-				return "ok";
-			}
-			if (status === 304) {
-				return "ok";
-			}
-			// if (status === 307) {
-			// 	return "ok";
-			// }
-			return "fail";
+		if (status >= 200 && status <= 399) {
+			return "ok";
 		}
-		if (status >= 200 && status <= 299) {
-			return "fail";
-		}
-		if (status === 304) {
-			return "fail";
-		}
-		if (
-			status === 401 ||
-			status === 403 ||
-			status === 404 ||
-			status === 429 ||
-			status === 502 ||
-			status === 503
-		) {
-			return "warn";
-		}
-		if (status === 0) {
+		if (status === 401 || status === 403 || status === 404 || status === 429) {
 			return "warn";
 		}
 		return "fail";
@@ -349,6 +316,11 @@
 		});
 	}
 
+	/**
+	 * Endpoint health is independent from exposure policy:
+	 * - external=true: probe from the Next.js server to validate public reachability;
+	 * - external=false: probe from this browser, so LAN/.int endpoints can be healthy.
+	 */
 	function initHomelabTunnelTabIndicators() {
 		var sel =
 			".truenas-page-apps .homelab-service-btn-tunnel[data-homelab-reachable-outside], .nabla-homelab-services .homelab-service-btn-tunnel[data-homelab-reachable-outside]";
@@ -381,28 +353,48 @@
 				return Promise.resolve();
 			}
 			var job = byUrl[u];
+			if (job.reachable !== "true") {
+				var localOrigin;
+				try {
+					localOrigin = new URL(u, window.location.href).origin;
+				} catch {
+					localOrigin = "";
+				}
+				if (!localOrigin) {
+					for (var j = 0; j < job.anchors.length; j++) {
+						setTunnelTabVisual(job.anchors[j], "unknown", "Internal endpoint URL is invalid.");
+					}
+					return worker();
+				}
+				return probeOrigin(localOrigin).then((ok) => {
+					var localState = ok ? "ok" : "fail";
+					var localTitle = ok
+						? "Internal endpoint responded from this browser (favicon probe)."
+						: "Internal endpoint did not respond from this browser, or exposes no common favicon.";
+					for (var j = 0; j < job.anchors.length; j++) {
+						setTunnelTabVisual(job.anchors[j], localState, localTitle);
+					}
+					return worker();
+				});
+			}
 			return fetchTunnelCheck(u).then((data) => {
 				var state;
 				var title;
 				if (data.apiMissing) {
 					state = "unknown";
 					title =
-						"Tunnel HTTP check unavailable (no /api on this host). Open the link manually.";
+						"Public endpoint check unavailable (no /api on this host). Open the link manually.";
 				} else if (data.parseError) {
 					state = "unknown";
-					title = "Tunnel check returned an unreadable response.";
+					title = "Endpoint check returned an unreadable response.";
 				} else if (data.httpError && !data.status) {
 					state = "unknown";
-					title = "Tunnel check API returned HTTP " + data.httpError + ".";
+					title = "Endpoint check API returned HTTP " + data.httpError + ".";
 				} else {
-					state = classifyTunnelTab(job.reachable, data);
+					state = classifyEndpoint(data);
 					var st = data.status != null ? data.status : "?";
-					var pol =
-						job.reachable === "true"
-							? "reacheableFromOutside=true (expect public 2xx/304)"
-							: "reacheableFromOutside=false (expect 401/403/404/429/502/503 or unreachable)";
 					title =
-						"Tunnel probe: HTTP " + st + ". " + pol + ". Class: " + state + ".";
+						"Public endpoint probe: HTTP " + st + ". Class: " + state + ".";
 				}
 				for (var j = 0; j < job.anchors.length; j++) {
 					setTunnelTabVisual(job.anchors[j], state, title);
