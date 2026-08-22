@@ -6,7 +6,6 @@ type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
 
 type Props = {
 	url?: string;
-	secure?: boolean;
 	enabled: boolean;
 	external: boolean;
 	label: string;
@@ -33,6 +32,15 @@ function classifyHttpStatus(status: number, tlsError = false): HealthState {
 	if (status >= 200 && status <= 399) return "ok";
 	if ([401, 403, 407, 429].includes(status)) return "warn";
 	return "fail";
+}
+
+function isHttpsUrl(url?: string): boolean {
+	if (!url) return false;
+	try {
+		return new URL(url).protocol === "https:";
+	} catch {
+		return false;
+	}
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -103,12 +111,12 @@ async function probePrivateEndpoint(
 
 export default function EndpointAction({
 	url,
-	secure,
 	enabled,
 	external,
 	label,
 }: Props) {
 	const configured = enabled && Boolean(url);
+	const https = isHttpsUrl(url);
 	const [health, setHealth] = useState<HealthState>(
 		configured ? "pending" : "unknown",
 	);
@@ -206,11 +214,13 @@ export default function EndpointAction({
 				data-endpoint-url={url}
 			>
 				<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
-				<i
-					className="fas fa-lock"
-					style={{ color: LOCK_COLOR.unknown, marginLeft: 5 }}
-					aria-hidden="true"
-				/>
+				{https && (
+					<i
+						className="fas fa-lock"
+						style={{ color: LOCK_COLOR.unknown, marginLeft: 5 }}
+						aria-label="HTTPS endpoint"
+					/>
+				)}
 			</span>
 		);
 	}
@@ -224,7 +234,7 @@ export default function EndpointAction({
 			title={`${external ? "Public" : "Internal/private"} endpoint — ${detail}`}
 		>
 			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
-			{secure === true && url.startsWith("https://") && (
+			{https && (
 				<i
 					className="fas fa-lock"
 					style={{ color: LOCK_COLOR[health], marginLeft: 5 }}
