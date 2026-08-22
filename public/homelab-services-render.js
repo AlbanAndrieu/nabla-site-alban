@@ -87,6 +87,14 @@
 		}
 	}
 
+	function isHttpsHref(href) {
+		try {
+			return new URL(String(href || ""), window.location.href).protocol === "https:";
+		} catch {
+			return false;
+		}
+	}
+
 	const externalLinkAttrs = ' target="_blank" rel="noopener noreferrer"';
 
 	function safeHref(url) {
@@ -122,31 +130,27 @@
 	}
 
 	/**
-	 * Padlock next to Internal / External when JSON marks HTTPS; color set client-side
-	 * from favicon probe (same limits as nabla-service-status.js).
+	 * Padlock next to Internal / External only when the rendered URL is HTTPS; color
+	 * is set client-side from the favicon probe (same limits as nabla-service-status.js).
 	 */
-	function homelabTlsLockMarkup(secureFlag, href) {
-		if (secureFlag !== true) {
-			return "";
-		}
+	function homelabTlsLockMarkup(href) {
 		const h = String(href || "");
-		if (!h || h === "#") {
+		if (!h || h === "#" || !isHttpsHref(h)) {
 			return "";
 		}
 		let origin = "";
 		try {
-			const u = new URL(h, window.location.href);
-			if (u.protocol !== "https:") {
-				return "";
-			}
-			origin = u.origin;
+			origin = new URL(h, window.location.href).origin;
 		} catch {
 			return "";
 		}
 		return `<span class="homelab-tls-lock homelab-tls-lock--pending" data-homelab-tls-origin="${esc(origin)}" title="Checking HTTPS (favicon probe)…" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>`;
 	}
 
-	function disabledEndpointLockMarkup() {
+	function disabledEndpointLockMarkup(href) {
+		if (!isHttpsHref(href)) {
+			return "";
+		}
 		return '<span class="homelab-tls-lock text-secondary" title="External access not configured for use" aria-hidden="true"><i class="fas fa-lock" aria-hidden="true"></i></span>';
 	}
 
@@ -185,10 +189,10 @@
 			? `<p class="card-text text-muted small mb-2 flex-grow-0">${desc}</p>`
 			: "";
 
-		const intLock = homelabTlsLockMarkup(s.internalSecure === true, intHref);
+		const intLock = homelabTlsLockMarkup(intHref);
 		const endpointLock = endpointActive
-			? homelabTlsLockMarkup(s.tunnelSecure === true, endpointHref)
-			: disabledEndpointLockMarkup();
+			? homelabTlsLockMarkup(endpointHref)
+			: disabledEndpointLockMarkup(endpointHref);
 
 		const externalAttr = isExternal ? "true" : "false";
 		const endpointProbe =
