@@ -808,7 +808,7 @@
 			"tunnelUrl": "https://minio.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/minio.png",
-			"external": false
+			"external": true
 		},
 		{
 			"name": "Langfuse",
