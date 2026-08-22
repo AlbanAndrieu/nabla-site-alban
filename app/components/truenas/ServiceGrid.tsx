@@ -21,6 +21,15 @@ type Props = {
 	internalLabel: string;
 };
 
+function isInternalEndpointUrl(url?: string): boolean {
+	if (!url) return false;
+	try {
+		return new URL(url).hostname.endsWith(".int.albandrieu.com");
+	} catch {
+		return false;
+	}
+}
+
 export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 	const services = (homelabData.services as HomelabService[]) || [];
 	return (
@@ -35,6 +44,9 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 					: "/assets/selfh-icons/generic-app.svg";
 				const isExternal =
 					(svc.external ?? svc.reacheableFromOutside) === true;
+				const endpointEnabled =
+					svc.endpointEnabled ??
+					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
 				return (
 					<div
 						className="col-md-4 p-3"
@@ -67,7 +79,7 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 									<EndpointAction
 										url={svc.tunnelUrl}
 										secure={svc.tunnelSecure}
-										enabled={svc.endpointEnabled !== false}
+										enabled={endpointEnabled}
 										external={isExternal}
 										label={endpointLabel}
 									/>
