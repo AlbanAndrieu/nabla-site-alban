@@ -154,7 +154,7 @@
 		const name = esc(s.name);
 		const icons = titleIconMarkup(s);
 		const intHref = safeHref(buildInternalUrl(s));
-		const isExternal = (s.external ?? s.reacheableFromOutside) === true;
+		const isExternal = s.external === true;
 		const rawEndpointUrl =
 			typeof s.tunnelUrl === "string" && s.tunnelUrl.length > 0
 				? s.tunnelUrl
@@ -190,7 +190,7 @@
 			? homelabTlsLockMarkup(s.tunnelSecure === true, endpointHref)
 			: disabledEndpointLockMarkup();
 
-		const reachableOutside = isExternal ? "true" : "false";
+		const externalAttr = isExternal ? "true" : "false";
 		const endpointProbe =
 			endpointActive &&
 			(endpointHref.startsWith("https:") || endpointHref.startsWith("http:"));
@@ -198,7 +198,7 @@
 			? " homelab-tunnel-tab--pending"
 			: "";
 		const endpointControl = endpointActive
-			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-reachable-outside="${reachableOutside}"${externalLinkAttrs} title="${endpointTitle}">
+			? `<a href="${endpointHref}" class="btn btn-outline-primary homelab-service-btn-tunnel${endpointStateClass}" data-homelab-external="${externalAttr}"${externalLinkAttrs} title="${endpointTitle}">
 					<i class="fas fa-link" aria-hidden="true"></i><span class="ms-1">Endpoint</span>${endpointLock}
 				</a>`
 			: `<span class="btn btn-outline-secondary homelab-service-btn-tunnel disabled" aria-disabled="true" data-endpoint-url="${esc(rawEndpointUrl)}" title="${endpointTitle}">
