@@ -12,8 +12,6 @@ type HomelabService = {
 	internalPort?: number;
 	internalSecure?: boolean;
 	external?: boolean;
-	/** @deprecated Use external. */
-	reacheableFromOutside?: boolean;
 };
 
 type Props = {
@@ -42,8 +40,7 @@ export default function ServiceGrid({ endpointLabel, internalLabel }: Props) {
 						? "/" + svc.iconSrc.replace(".png", ".svg")
 						: "/" + svc.iconSrc
 					: "/assets/selfh-icons/generic-app.svg";
-				const isExternal =
-					(svc.external ?? svc.reacheableFromOutside) === true;
+				const isExternal = svc.external === true;
 				const endpointEnabled =
 					svc.endpointEnabled ??
 					(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
