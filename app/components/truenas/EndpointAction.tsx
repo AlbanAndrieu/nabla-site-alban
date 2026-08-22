@@ -11,6 +11,7 @@ type Props = {
 	external: boolean;
 	label: string;
 	initialHealth?: HomelabHealthEntry;
+	truenasDown?: boolean;
 };
 
 const HEALTH_CLASS: Record<HealthState, string> = {
@@ -19,14 +20,6 @@ const HEALTH_CLASS: Record<HealthState, string> = {
 	warn: "btn-outline-warning",
 	fail: "btn-outline-danger",
 	unknown: "btn-outline-secondary",
-};
-
-const LOCK_COLOR: Record<HealthState, string> = {
-	pending: "gray",
-	ok: "limegreen",
-	warn: "gold",
-	fail: "red",
-	unknown: "gray",
 };
 
 function classifyHttpStatus(status: number, tlsError = false): HealthState {
@@ -45,13 +38,36 @@ function isHttpsUrl(url?: string): boolean {
 	}
 }
 
+function tlsColor(trusted: boolean | null | undefined): string {
+	if (trusted === true) return "limegreen";
+	if (trusted === false) return "red";
+	return "gray";
+}
+
+function tunnelColor(status: string | null | undefined): string {
+	const normalized = status?.trim().toLowerCase();
+	if (["healthy", "active", "up", "ok"].includes(normalized ?? "")) {
+		return "limegreen";
+	}
+	if (["degraded", "warning", "warn"].includes(normalized ?? "")) {
+		return "gold";
+	}
+	if (["down", "inactive", "failed", "fail"].includes(normalized ?? "")) {
+		return "red";
+	}
+	return "gray";
+}
+
 function fastApiHealthDetail(entry: HomelabHealthEntry): string {
 	const status = entry.http_status || "network error";
 	const latency =
 		typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 	const tls = entry.tls_trusted === false ? ", TLS error" : "";
+	const tunnel = entry.tunnel_status
+		? `, tunnel ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
+		: "";
 	const error = entry.error ? ` — ${entry.error}` : "";
-	return `FastAPI health snapshot: HTTP ${status}${tls}${latency}${error}`;
+	return `FastAPI health snapshot: HTTP ${status}${tls}${tunnel}${latency}${error}`;
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -125,24 +141,32 @@ export default function EndpointAction({
 	external,
 	label,
 	initialHealth,
+	truenasDown = false,
 }: Props) {
 	const configured = enabled && Boolean(url);
 	const https = isHttpsUrl(url);
 	const snapshotHealth = external ? initialHealth : undefined;
-	const [health, setHealth] = useState<HealthState>(
-		snapshotHealth?.state ?? (configured ? "pending" : "unknown"),
+	const initialState = truenasDown && external
+		? "fail"
+		: (snapshotHealth?.state ?? (configured ? "pending" : "unknown"));
+	const [health, setHealth] = useState<HealthState>(initialState);
+	const [tlsTrusted, setTlsTrusted] = useState<boolean | null | undefined>(
+		snapshotHealth?.tls_trusted,
 	);
 	const [detail, setDetail] = useState(
-		snapshotHealth
-			? fastApiHealthDetail(snapshotHealth)
-			: configured
-				? "Checking endpoint…"
-				: "Endpoint not configured for use",
+		truenasDown && external
+			? "TrueNAS dependency is down; external service marked unavailable"
+			: snapshotHealth
+				? fastApiHealthDetail(snapshotHealth)
+				: configured
+					? "Checking endpoint…"
+					: "Endpoint not configured for use",
 	);
 
 	useEffect(() => {
 		if (!url || !enabled) {
 			setHealth("unknown");
+			setTlsTrusted(undefined);
 			setDetail(
 				url
 					? "Endpoint URL retained for inventory but not configured for use"
@@ -151,23 +175,33 @@ export default function EndpointAction({
 			return;
 		}
 
+		if (truenasDown && external) {
+			setHealth("fail");
+			setTlsTrusted(initialHealth?.tls_trusted);
+			setDetail("TrueNAS dependency is down; external service marked unavailable");
+			return;
+		}
+
 		let parsed: URL;
 		try {
 			parsed = new URL(url);
 		} catch {
 			setHealth("fail");
+			setTlsTrusted(undefined);
 			setDetail("Invalid endpoint URL");
 			return;
 		}
 
 		if (!["http:", "https:"].includes(parsed.protocol)) {
 			setHealth("unknown");
+			setTlsTrusted(undefined);
 			setDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
 			return;
 		}
 
 		if (external && initialHealth) {
 			setHealth(initialHealth.state);
+			setTlsTrusted(initialHealth.tls_trusted);
 			setDetail(fastApiHealthDetail(initialHealth));
 			return;
 		}
@@ -175,6 +209,7 @@ export default function EndpointAction({
 		const controller = new AbortController();
 		const timeout = window.setTimeout(() => controller.abort(), 10_000);
 		setHealth("pending");
+		setTlsTrusted(undefined);
 		setDetail(
 			external
 				? "Checking public endpoint…"
@@ -205,6 +240,7 @@ export default function EndpointAction({
 						typeof payload.status === "number" ? payload.status : 0;
 					const next = classifyHttpStatus(status, payload.tlsError === true);
 					setHealth(next);
+					setTlsTrusted(payload.tlsError === true ? false : status > 0 ? true : undefined);
 					setDetail(
 						`Public endpoint probe: HTTP ${status || "network error"}${payload.tlsError ? ", TLS error" : ""}`,
 					);
@@ -231,7 +267,12 @@ export default function EndpointAction({
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [enabled, external, initialHealth, url]);
+	}, [enabled, external, initialHealth, truenasDown, url]);
+
+	const tunnelStatus = external ? initialHealth?.tunnel_status : undefined;
+	const tunnelTitle = tunnelStatus
+		? `Cloudflare tunnel: ${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`
+		: "Cloudflare tunnel status not observed yet";
 
 	if (!url || !enabled) {
 		return (
@@ -245,8 +286,8 @@ export default function EndpointAction({
 				{https && (
 					<i
 						className="fas fa-lock"
-						style={{ color: LOCK_COLOR.unknown, marginLeft: 5 }}
-						aria-label="HTTPS endpoint"
+						style={{ color: "gray", marginLeft: 5 }}
+						aria-label="HTTPS certificate status unknown"
 					/>
 				)}
 			</span>
@@ -265,8 +306,22 @@ export default function EndpointAction({
 			{https && (
 				<i
 					className="fas fa-lock"
-					style={{ color: LOCK_COLOR[health], marginLeft: 5 }}
-					aria-label={`HTTPS endpoint health: ${health}`}
+					style={{ color: tlsColor(tlsTrusted), marginLeft: 5 }}
+					aria-label={
+						tlsTrusted === false
+							? "HTTPS certificate invalid"
+							: tlsTrusted === true
+								? "HTTPS certificate trusted"
+								: "HTTPS certificate status unknown"
+					}
+				/>
+			)}
+			{external && (
+				<i
+					className="fas fa-cloud"
+					style={{ color: tunnelColor(tunnelStatus), marginLeft: 6 }}
+					title={tunnelTitle}
+					aria-label={tunnelTitle}
 				/>
 			)}
 		</a>
