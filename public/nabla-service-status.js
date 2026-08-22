@@ -271,7 +271,7 @@
 		if (status >= 200 && status <= 399) {
 			return "ok";
 		}
-		if (status === 401 || status === 403 || status === 404 || status === 429) {
+		if (status === 401 || status === 403 || status === 407 || status === 429) {
 			return "warn";
 		}
 		return "fail";
@@ -316,10 +316,27 @@
 		});
 	}
 
+	function fetchBrowserEndpointStatus(url) {
+		function request(method) {
+			return fetch(url, {
+				method: method,
+				mode: "cors",
+				cache: "no-store",
+			}).then((res) => {
+				if ((res.status === 405 || res.status === 501) && method === "HEAD") {
+					return request("GET");
+				}
+				return { status: res.status, tlsError: false };
+			});
+		}
+		return request("HEAD").catch(() => null);
+	}
+
 	/**
 	 * Endpoint health is independent from exposure policy:
 	 * - external=true: probe from the Next.js server to validate public reachability;
-	 * - external=false: probe from this browser, so LAN/.int endpoints can be healthy.
+	 * - external=false: read the HTTP status from this browser when CORS allows it,
+	 *   otherwise fall back to a favicon probe for LAN/.int services.
 	 */
 	function initHomelabTunnelTabIndicators() {
 		var sel =
@@ -353,27 +370,47 @@
 			}
 			var job = byUrl[u];
 			if (!job.external) {
-				var localOrigin;
-				try {
-					localOrigin = new URL(u, window.location.href).origin;
-				} catch {
-					localOrigin = "";
-				}
-				if (!localOrigin) {
-					for (var j = 0; j < job.anchors.length; j++) {
-						setTunnelTabVisual(job.anchors[j], "unknown", "Internal endpoint URL is invalid.");
+				return fetchBrowserEndpointStatus(u).then((browserData) => {
+					if (browserData) {
+						var browserState = classifyEndpoint(browserData);
+						var browserTitle =
+							"Internal endpoint probe: HTTP " +
+							browserData.status +
+							". Class: " +
+							browserState +
+							".";
+						for (var j = 0; j < job.anchors.length; j++) {
+							setTunnelTabVisual(job.anchors[j], browserState, browserTitle);
+						}
+						return worker();
 					}
-					return worker();
-				}
-				return probeOrigin(localOrigin).then((ok) => {
-					var localState = ok ? "ok" : "fail";
-					var localTitle = ok
-						? "Internal endpoint responded from this browser (favicon probe)."
-						: "Internal endpoint did not respond from this browser, or exposes no common favicon.";
-					for (var j = 0; j < job.anchors.length; j++) {
-						setTunnelTabVisual(job.anchors[j], localState, localTitle);
+
+					var localOrigin;
+					try {
+						localOrigin = new URL(u, window.location.href).origin;
+					} catch {
+						localOrigin = "";
 					}
-					return worker();
+					if (!localOrigin) {
+						for (var j = 0; j < job.anchors.length; j++) {
+							setTunnelTabVisual(
+								job.anchors[j],
+								"unknown",
+								"Internal endpoint URL is invalid.",
+							);
+						}
+						return worker();
+					}
+					return probeOrigin(localOrigin).then((ok) => {
+						var localState = ok ? "ok" : "fail";
+						var localTitle = ok
+							? "Internal endpoint responded from this browser (favicon probe)."
+							: "Internal endpoint did not return a readable response or common favicon.";
+						for (var j = 0; j < job.anchors.length; j++) {
+							setTunnelTabVisual(job.anchors[j], localState, localTitle);
+						}
+						return worker();
+					});
 				});
 			}
 			return fetchTunnelCheck(u).then((data) => {
