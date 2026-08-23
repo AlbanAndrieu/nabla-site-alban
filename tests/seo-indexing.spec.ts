@@ -91,6 +91,32 @@ test.describe("SEO indexing policy", () => {
 		}
 	});
 
+	test("migrated pages expose self-canonical and reciprocal extensionless hreflang", async ({
+		page,
+	}) => {
+		for (const slug of migratedSeoSlugs) {
+			const englishUrl = `https://albanandrieu.com/${slug}`;
+			const frenchUrl = `https://albanandrieu.com/fr/${slug}`;
+
+			for (const [pathname, canonical] of [
+				[`/${slug}`, englishUrl],
+				[`/fr/${slug}`, frenchUrl],
+			] as const) {
+				await page.goto(pathname);
+				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+					"href",
+					canonical,
+				);
+				await expect(
+					page.locator('link[rel="alternate"][hreflang="en"]'),
+				).toHaveAttribute("href", englishUrl);
+				await expect(
+					page.locator('link[rel="alternate"][hreflang="fr"]'),
+				).toHaveAttribute("href", frenchUrl);
+			}
+		}
+	});
+
 	test("migrated html SEO URLs permanently redirect to clean routes", async ({
 		request,
 	}) => {
