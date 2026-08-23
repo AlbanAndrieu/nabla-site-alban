@@ -129,12 +129,9 @@ test.describe("SEO indexing policy", () => {
 		expect(typeof baseURL).toBe("string");
 
 		const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
-		const trustedOidcToken = process.env.VERCEL_TRUSTED_OIDC_TOKEN?.trim();
 		const extraHTTPHeaders: Record<string, string> | undefined = bypassSecret
 			? { "x-vercel-protection-bypass": bypassSecret }
-			: trustedOidcToken
-				? { "x-vercel-trusted-oidc-idp-token": trustedOidcToken }
-				: undefined;
+			: undefined;
 
 		const redirectRequest = await playwrightRequest.newContext({
 			baseURL: String(baseURL),
