@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
   statuses: write
 
 concurrency:
@@ -61,28 +62,45 @@ jobs:
       - name: Install Chromium system dependencies
         run: npx playwright install-deps chromium
 
+      - name: Request GitHub OIDC token for Vercel
+        id: vercel-oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
+
       - name: Verify protected Preview access
         env:
           BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.vercel-oidc.outputs.token }}
         run: |
-          if [[ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]]; then
-            echo "::error::GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET is required for protected Vercel Preview tests."
-            echo "Generate/enable Protection Bypass for Automation in Vercel, then store the same value as the GitHub Actions secret VERCEL_AUTOMATION_BYPASS_SECRET."
+          response_headers="$(mktemp)"
+          curl_headers=()
+
+          if [[ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]]; then
+            echo "Using Vercel Protection Bypass for Automation."
+            curl_headers+=(--header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
+            curl_headers+=(--header 'x-vercel-set-bypass-cookie: true')
+          elif [[ -n "$VERCEL_TRUSTED_OIDC_TOKEN" ]]; then
+            echo "Using GitHub Actions OIDC as a Vercel trusted source."
+            curl_headers+=(--header "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          else
+            echo "::error::No Vercel Preview automation credential is available."
             exit 1
           fi
 
-          response_headers="$(mktemp)"
           status="$(curl --silent --show-error \
             --output /dev/null \
             --dump-header "$response_headers" \
             --write-out '%{http_code}' \
-            --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-            --header 'x-vercel-set-bypass-cookie: true' \
+            "${curl_headers[@]}" \
             "$BASE_URL/")"
 
           if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$response_headers" || [[ "$status" == "401" || "$status" == "403" ]]; then
-            echo "::error::Vercel Preview protection bypass was rejected (HTTP $status). Verify the Vercel/GitHub automation bypass secret pair."
+            echo "::error::Vercel Preview authentication was rejected (HTTP $status)."
             exit 1
           fi
 
@@ -96,6 +114,7 @@ jobs:
           BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
           VERCEL_PREVIEW_PROTECTED: true
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.vercel-oidc.outputs.token }}
 
       - name: Upload Playwright failure report
         uses: actions/upload-artifact@v6
