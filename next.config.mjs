@@ -45,12 +45,6 @@ const canonicalHtmlRedirects = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/fr/${slug}`, destination: `/fr/${slug}.html`, permanent: true },
 ]);
 
-/** Retire generated locale files without breaking historical direct bookmarks. */
-const retiredLocalizedHtmlRedirects = [
-	{ source: "/locales/fr/nabla.html", destination: "/fr/nabla", permanent: true },
-	{ source: "/locales/fr/truenas.html", destination: "/fr/truenas", permanent: true },
-];
-
 const policyRewrites = [
 	"legal",
 	"impressum",
@@ -82,7 +76,7 @@ const nextConfig = {
 		root: __dirname,
 	},
 	async redirects() {
-		return [...canonicalHtmlRedirects, ...retiredLocalizedHtmlRedirects];
+		return canonicalHtmlRedirects;
 	},
 	async rewrites() {
 		return {
