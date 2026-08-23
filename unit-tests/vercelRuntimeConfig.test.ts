@@ -48,7 +48,23 @@ test("Nabla and TrueNAS legacy html URLs stay routed to App Router", async () =>
 		new URL("lib/htmlRoutes.config.mjs", ROOT),
 		"utf8",
 	);
+	const config = await readFile(new URL("next.config.mjs", ROOT), "utf8");
 
 	assert.match(routes, /["']nabla["']/);
 	assert.match(routes, /["']truenas["']/);
+	assert.match(config, /\/locales\/fr\/nabla\.html/);
+	assert.match(config, /\/locales\/fr\/truenas\.html/);
+	assert.match(config, /destination: ["']\/fr\/nabla["']/);
+	assert.match(config, /destination: ["']\/fr\/truenas["']/);
+});
+
+test("legacy homelab renderer is retired", async () => {
+	for (const path of [
+		"public/homelab-services-render.js",
+		"components/HomelabServicesScripts.tsx",
+		"public/locales/fr/nabla.html",
+		"public/locales/fr/truenas.html",
+	]) {
+		await assert.rejects(readFile(new URL(path, ROOT), "utf8"));
+	}
 });
