@@ -96,6 +96,8 @@ test("legacy homelab and Vercel runtimes are retired", async () => {
 	for (const path of [
 		"public/homelab-services-render.js",
 		"components/HomelabServicesScripts.tsx",
+		"public/nabla-service-status.js",
+		"public/assets/jpg_to_transparent_png.py",
 		"public/locales/fr/nabla.html",
 		"public/locales/fr/truenas.html",
 		"app/api/homelab-tunnel-check/route.ts",
