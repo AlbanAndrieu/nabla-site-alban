@@ -47,11 +47,11 @@ test("every catalog page belongs to exactly one derived category", () => {
 	assert.equal(new Set(categorizedSlugs).size, categorizedSlugs.length);
 });
 
-test("sitemap uses localized canonical URLs", () => {
+test("sitemap uses localized extensionless canonical URLs", () => {
 	assert.equal(canonicalPagePath("index", "en"), "/");
 	assert.equal(canonicalPagePath("index", "fr"), "/fr");
-	assert.equal(canonicalPagePath("expertise", "en"), "/expertise.html");
-	assert.equal(canonicalPagePath("expertise", "fr"), "/fr/expertise.html");
+	assert.equal(canonicalPagePath("expertise", "en"), "/expertise");
+	assert.equal(canonicalPagePath("expertise", "fr"), "/fr/expertise");
 	assert.equal(canonicalPagePath("cv", "en"), "/cv");
 	assert.equal(canonicalPagePath("cv", "fr"), "/fr/cv");
 	assert.equal(canonicalPagePath("jm", "en"), "/jm");
