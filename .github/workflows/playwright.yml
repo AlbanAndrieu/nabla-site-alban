@@ -152,13 +152,12 @@ jobs:
             bypass_configured=true
             if verify_access \
               "Protection Bypass for Automation" \
-              --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-              --header 'x-vercel-set-bypass-cookie: true'; then
+              --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET"; then
               echo "VERCEL_AUTH_MODE=bypass" >> "$GITHUB_ENV"
               exit 0
             fi
             bypass_rejected=true
-            echo "::warning::VERCEL_AUTOMATION_BYPASS_SECRET is configured but was rejected; trying GitHub Actions OIDC fallback."
+            echo "::warning::VERCEL_AUTOMATION_BYPASS_SECRET is configured but was rejected without a bypass cookie; trying GitHub Actions OIDC fallback."
           fi
 
           if [[ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]] && verify_access \
