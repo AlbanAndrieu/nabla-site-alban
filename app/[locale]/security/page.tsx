@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	return metadataFromPublicHtml("security.html", "/security.html", locale);
+	return metadataFromPublicHtml("security.html", "/security", locale);
 }
 
 export default async function SecurityPage({
