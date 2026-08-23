@@ -13,17 +13,20 @@ permissions:
   contents: read
 
 concurrency:
-  group: playwright-${{ github.event.deployment.id || github.ref }}
+  # Vercel can publish several previews while a PR is updated. Keep only the
+  # latest Playwright run for the deployed branch instead of one per deployment.
+  group: playwright-${{ github.event.deployment.ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
-    name: Run Playwright Tests
+    name: Run Playwright Tests on Preview
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.deployment_status.state == 'success' &&
-       github.event.deployment_status.environment == 'Preview' &&
-       github.event.deployment_status.environment_url != '')
+       github.event.deployment_status.environment_url != '' &&
+       github.event.deployment_status.environment != 'Production' &&
+       github.event.deployment.ref != 'master')
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
