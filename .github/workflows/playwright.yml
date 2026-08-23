@@ -1,12 +1,21 @@
 name: Playwright Tests
 
 on:
+  repository_dispatch:
+    types:
+      - vercel.deployment.success
+  # Transitional fallback while the Vercel repository_dispatch integration rolls out.
+  # Vercel recommends repository_dispatch for deployment-driven GitHub Actions.
   deployment_status:
   workflow_dispatch:
     inputs:
       base_url:
         description: "Existing deployment URL to test"
         required: true
+        type: string
+      git_sha:
+        description: "Optional deployed Git SHA"
+        required: false
         type: string
 
 permissions:
@@ -15,9 +24,14 @@ permissions:
   statuses: write
 
 concurrency:
-  # Vercel can publish several previews while a PR is updated. Keep only the
-  # latest Playwright run for the deployed branch instead of one per deployment.
-  group: playwright-${{ github.event.deployment.ref || github.ref }}
+  # Keep only the latest E2E execution for a deployed branch/ref. repository_dispatch
+  # is branch-aware enough for actions/cache, unlike deployment_status.
+  group: >-
+    playwright-${{
+      github.event.client_payload.git.ref ||
+      github.event.deployment.ref ||
+      github.ref
+    }}
   cancel-in-progress: true
 
 jobs:
@@ -25,18 +39,38 @@ jobs:
     name: Run Playwright Tests on Preview
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.deployment_status.state == 'success' &&
+      (github.event_name == 'repository_dispatch' &&
+       github.event.client_payload.url != '' &&
+       github.event.client_payload.git.sha != '' &&
+       github.event.client_payload.git.ref != 'master' &&
+       github.event.client_payload.environment != 'production') ||
+      (github.event_name == 'deployment_status' &&
+       github.event.deployment_status.state == 'success' &&
        github.event.deployment_status.environment_url != '' &&
        github.event.deployment_status.environment != 'Production' &&
        github.event.deployment.ref != 'master')
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    env:
+      PREVIEW_BASE_URL: >-
+        ${{
+          inputs.base_url ||
+          github.event.client_payload.url ||
+          github.event.deployment_status.environment_url
+        }}
+      DEPLOYED_SHA: >-
+        ${{
+          inputs.git_sha ||
+          github.event.client_payload.git.sha ||
+          github.event.deployment.sha ||
+          github.sha
+        }}
 
     steps:
       - name: Checkout deployed revision
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.deployment.sha || github.sha }}
+          ref: ${{ env.DEPLOYED_SHA }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -50,13 +84,14 @@ jobs:
 
       - name: Cache Playwright Chromium
         id: playwright-cache
+        if: github.event_name != 'deployment_status'
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium Browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        if: github.event_name == 'deployment_status' || steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
       - name: Install Chromium system dependencies
@@ -73,45 +108,68 @@ jobs:
 
       - name: Verify protected Preview access
         env:
-          BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
+          BASE_URL: ${{ env.PREVIEW_BASE_URL }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.vercel-oidc.outputs.token }}
         run: |
-          response_headers="$(mktemp)"
-          curl_headers=()
+          set -euo pipefail
 
-          if [[ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]]; then
-            echo "Using Vercel Protection Bypass for Automation."
-            curl_headers+=(--header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
-            curl_headers+=(--header 'x-vercel-set-bypass-cookie: true')
-          elif [[ -n "$VERCEL_TRUSTED_OIDC_TOKEN" ]]; then
-            echo "Using GitHub Actions OIDC as a Vercel trusted source."
-            curl_headers+=(--header "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
-          else
-            echo "::error::No Vercel Preview automation credential is available."
+          verify_access() {
+            local auth_name="$1"
+            shift
+            local response_headers
+            local status
+
+            response_headers="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --output /dev/null \
+              --dump-header "$response_headers" \
+              --write-out '%{http_code}' \
+              "$@" \
+              "$BASE_URL/")"
+
+            if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$response_headers" || \
+              [[ "$status" == "401" || "$status" == "403" ]]; then
+              echo "$auth_name rejected by Vercel (HTTP $status)."
+              rm -f "$response_headers"
+              return 1
+            fi
+
+            echo "Vercel Preview access accepted with $auth_name (HTTP $status)."
+            rm -f "$response_headers"
+            return 0
+          }
+
+          if [[ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            if verify_access \
+              "Protection Bypass for Automation" \
+              --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+              --header 'x-vercel-set-bypass-cookie: true'; then
+              echo "VERCEL_AUTH_MODE=bypass" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is configured but Vercel rejected it. Regenerate the project Automation Bypass secret and update the GitHub Actions secret."
             exit 1
           fi
 
-          status="$(curl --silent --show-error \
-            --output /dev/null \
-            --dump-header "$response_headers" \
-            --write-out '%{http_code}' \
-            "${curl_headers[@]}" \
-            "$BASE_URL/")"
-
-          if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$response_headers" || [[ "$status" == "401" || "$status" == "403" ]]; then
-            echo "::error::Vercel Preview authentication was rejected (HTTP $status)."
-            exit 1
+          if [[ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]] && verify_access \
+            "GitHub Actions OIDC trusted source" \
+            --header "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN"; then
+            echo "VERCEL_AUTH_MODE=oidc" >> "$GITHUB_ENV"
+            exit 0
           fi
 
-          echo "Vercel Preview access accepted (HTTP $status)."
+          echo "::error::The Vercel Preview is protected and no working automation bypass is configured."
+          echo "::error::Recommended: enable Protection Bypass for Automation in Vercel and add the same value as GitHub Actions secret VERCEL_AUTOMATION_BYPASS_SECRET."
+          echo "::error::Alternative: configure GitHub Actions as a Vercel Trusted Source so the OIDC token is accepted."
+          exit 1
 
       - name: Run Playwright against deployed preview
         id: playwright
         run: npm test -- --project=chromium
         env:
           CI: true
-          BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
+          BASE_URL: ${{ env.PREVIEW_BASE_URL }}
           VERCEL_PREVIEW_PROTECTED: true
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.vercel-oidc.outputs.token }}
@@ -133,15 +191,15 @@ jobs:
           echo "## Playwright tests failed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Target: $BASE_URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the **playwright-report** artifact for traces and screenshots." >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the **playwright-report** artifact for traces and screenshots when tests reached Playwright." >> "$GITHUB_STEP_SUMMARY"
         env:
-          BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
+          BASE_URL: ${{ env.PREVIEW_BASE_URL }}
 
       - name: Publish Playwright Preview E2E status
-        if: always() && github.event_name == 'deployment_status'
+        if: always() && github.event_name != 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEPLOYED_SHA: ${{ github.event.deployment.sha }}
+          STATUS_SHA: ${{ env.DEPLOYED_SHA }}
           JOB_STATUS: ${{ job.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -163,5 +221,5 @@ jobs:
             --header "Authorization: Bearer $GH_TOKEN" \
             --header 'Accept: application/vnd.github+json' \
             --header 'X-GitHub-Api-Version: 2022-11-28' \
-            "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$DEPLOYED_SHA" \
+            "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$STATUS_SHA" \
             --data "$payload"
