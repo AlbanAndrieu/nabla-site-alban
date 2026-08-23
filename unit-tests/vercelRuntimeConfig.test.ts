@@ -9,16 +9,19 @@ import {
 
 const ROOT = new URL("../", import.meta.url);
 
-test("Vercel ignores only the legacy root api directory", async () => {
+test("Vercel keeps App Router APIs and excludes repository-only content", async () => {
 	const ignore = await readFile(new URL(".vercelignore", ROOT), "utf8");
 	const rules = ignore
 		.split(/\r?\n/)
 		.map((line) => line.trim())
 		.filter((line) => line && !line.startsWith("#"));
 
-	assert.ok(rules.includes("/api/"));
+	assert.ok(!rules.includes("/api/"));
 	assert.ok(!rules.includes("api"));
-	assert.ok(!rules.some((rule) => rule.startsWith("!app/api")));
+	assert.ok(!rules.some((rule) => rule.includes("app/api")));
+	for (const rule of ["/.github/", "/docs/", "/tests/", "/unit-tests/"]) {
+		assert.ok(rules.includes(rule));
+	}
 });
 
 test("Nabla and TrueNAS pages stay statically renderable with shared homelab UI", async () => {
@@ -46,6 +49,7 @@ test("dynamic homelab data is isolated behind same-origin APIs", async () => {
 	assert.match(source, /^"use client";/);
 	assert.match(source, /fetch\("\/api\/homelab-services"/);
 	assert.match(source, /fetch\("\/api\/homelab-health"/);
+	assert.doesNotMatch(source, /homelab-tunnel-check/);
 });
 
 test("all SEO canonical and hreflang paths are extensionless", () => {
@@ -88,12 +92,15 @@ test("SEO html URLs permanently redirect to extensionless canonical routes", asy
 	assert.match(config, /permanent: true/);
 });
 
-test("legacy homelab renderer is retired", async () => {
+test("legacy homelab and Vercel runtimes are retired", async () => {
 	for (const path of [
 		"public/homelab-services-render.js",
 		"components/HomelabServicesScripts.tsx",
 		"public/locales/fr/nabla.html",
 		"public/locales/fr/truenas.html",
+		"app/api/homelab-tunnel-check/route.ts",
+		"server.cjs",
+		"api/create-checkout-session.js",
 	]) {
 		await assert.rejects(readFile(new URL(path, ROOT), "utf8"));
 	}
