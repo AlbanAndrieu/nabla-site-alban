@@ -16,15 +16,20 @@ test("Vercel ignores only the legacy root api directory", async () => {
 	assert.ok(!rules.some((rule) => rule.startsWith("!app/api")));
 });
 
-test("TrueNAS page stays statically renderable", async () => {
-	const source = await readFile(
-		new URL("app/[locale]/truenas/page.tsx", ROOT),
-		"utf8",
-	);
+test("Nabla and TrueNAS pages stay statically renderable with shared homelab UI", async () => {
+	for (const page of ["nabla", "truenas"]) {
+		const source = await readFile(
+			new URL(`app/[locale]/${page}/page.tsx`, ROOT),
+			"utf8",
+		);
 
-	assert.doesNotMatch(source, /force-dynamic/);
-	assert.doesNotMatch(source, /loadHomelabServicesCatalog|loadHomelabHealthSnapshot/);
-	assert.match(source, /HomelabServicesSection/);
+		assert.doesNotMatch(source, /force-dynamic/);
+		assert.doesNotMatch(
+			source,
+			/loadHomelabServicesCatalog|loadHomelabHealthSnapshot/,
+		);
+		assert.match(source, /HomelabServicesSection/);
+	}
 });
 
 test("dynamic homelab data is isolated behind same-origin APIs", async () => {
@@ -43,12 +48,7 @@ test("Nabla and TrueNAS legacy html URLs stay routed to App Router", async () =>
 		new URL("lib/htmlRoutes.config.mjs", ROOT),
 		"utf8",
 	);
-	const nabla = await readFile(
-		new URL("app/components/nabla/ServiceCardsSection.tsx", ROOT),
-		"utf8",
-	);
 
 	assert.match(routes, /["']nabla["']/);
 	assert.match(routes, /["']truenas["']/);
-	assert.match(nabla, /HomelabServicesSection/);
 });
