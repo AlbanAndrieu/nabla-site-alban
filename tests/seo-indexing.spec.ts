@@ -2,18 +2,30 @@ import { expect, test } from "@playwright/test";
 
 const expectedSitemapUrls = [
 	"https://albanandrieu.com/",
-	"https://albanandrieu.com/expertise.html",
-	"https://albanandrieu.com/contact.html",
-	"https://albanandrieu.com/security.html",
-	"https://albanandrieu.com/ai.html",
-	"https://albanandrieu.com/ciso.html",
-	"https://albanandrieu.com/truenas.html",
-	"https://albanandrieu.com/link.html",
-	"https://albanandrieu.com/email.html",
-	"https://albanandrieu.com/nabla.html",
+	"https://albanandrieu.com/expertise",
+	"https://albanandrieu.com/contact",
+	"https://albanandrieu.com/security",
+	"https://albanandrieu.com/ai",
+	"https://albanandrieu.com/ciso",
+	"https://albanandrieu.com/truenas",
+	"https://albanandrieu.com/link",
+	"https://albanandrieu.com/email",
+	"https://albanandrieu.com/nabla",
 	"https://albanandrieu.com/cv",
 	"https://albanandrieu.com/jm",
 ];
+
+const migratedSeoSlugs = [
+	"expertise",
+	"contact",
+	"security",
+	"ai",
+	"ciso",
+	"truenas",
+	"link",
+	"email",
+	"nabla",
+] as const;
 
 const nonIndexablePages = [
 	"/ctid.html",
@@ -34,22 +46,13 @@ const nonIndexablePages = [
 
 const indexablePages = [
 	"/",
-	"/expertise.html",
-	"/contact.html",
-	"/security.html",
-	"/ai.html",
-	"/ciso.html",
-	"/truenas.html",
-	"/link.html",
-	"/email.html",
-	"/nabla.html",
+	...migratedSeoSlugs.map((slug) => `/${slug}`),
 	"/cv",
-	"/cv/index.html",
 	"/jm",
 ];
 
 test.describe("SEO indexing policy", () => {
-	test("sitemap exposes only the explicit SEO allowlist", async ({
+	test("sitemap exposes only extensionless canonical SEO URLs", async ({
 		request,
 	}) => {
 		const response = await request.get("/sitemap.xml");
@@ -62,6 +65,7 @@ test.describe("SEO indexing policy", () => {
 		);
 
 		expect(urls).toEqual(expectedSitemapUrls);
+		expect(xml).not.toContain(".html");
 		expect(xml).not.toContain("/startup");
 		expect(xml).not.toContain("/pricing");
 		expect(xml).not.toContain("/payment");
@@ -77,7 +81,7 @@ test.describe("SEO indexing policy", () => {
 		}
 	});
 
-	test("explicit SEO pages remain indexable", async ({ request }) => {
+	test("explicit SEO pages remain indexable on clean URLs", async ({ request }) => {
 		for (const pathname of indexablePages) {
 			const response = await request.get(pathname);
 			expect(response.ok(), `${pathname} should load`).toBeTruthy();
@@ -87,10 +91,28 @@ test.describe("SEO indexing policy", () => {
 		}
 	});
 
+	test("migrated html SEO URLs permanently redirect to clean routes", async ({
+		request,
+	}) => {
+		for (const slug of migratedSeoSlugs) {
+			for (const [oldPath, destination] of [
+				[`/${slug}.html`, `/${slug}`],
+				[`/en/${slug}.html`, `/${slug}`],
+				[`/fr/${slug}.html`, `/fr/${slug}`],
+			] as const) {
+				const response = await request.get(oldPath, { maxRedirects: 0 });
+				expect([301, 308], `${oldPath} should permanently redirect`).toContain(
+					response.status(),
+				);
+				expect(response.headers().location).toBe(destination);
+			}
+		}
+	});
+
 	test("priority pages expose their structured data", async ({ request }) => {
 		const cases = [
 			["/", "Person"],
-			["/expertise.html", "ProfessionalService"],
+			["/expertise", "ProfessionalService"],
 		] as const;
 
 		for (const [pathname, expectedType] of cases) {
