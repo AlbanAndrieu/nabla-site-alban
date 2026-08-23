@@ -1,32 +1,18 @@
-# Ignore everything (folders and files) on root only
-# /*
+# Local/build artifacts
 .vc-config.json
 node_modules
 .next
-.gitignore
-ts
-#*
 .env
 .DS_Store
-tsconfig.js
-server.cjs
-/vendor
 /.idea
-# vercel do not like .python-version
+/vendor
 .python-version
-# Ignore only the legacy root Vercel Functions tree. Next.js App Router routes
-# under app/api/** are part of the application and must be deployed normally.
-/api/
-!lib
-!app
-!components
-!messages
-!i18n
-!public
-!vercel.json
-!tsconfig.tsbuildinfo
-!package.json
-!package-lock.json
-!*.html
-!README.md
+
+# Repository-only content that is not required by the Next.js production build.
+/.github/
+/docs/
+/tests/
+/unit-tests/
+/playwright-report/
+/test-results/
 packages/*/test/**
