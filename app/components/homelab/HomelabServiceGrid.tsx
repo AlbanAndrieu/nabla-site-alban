@@ -1,14 +1,10 @@
-import {
-	homelabHealthForUrl,
-	loadHomelabHealthSnapshot,
-} from "../../../lib/homelabHealth";
-import {
-	loadHomelabServicesCatalog,
-	type HomelabService,
-} from "../../../lib/homelabServices";
+import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type { HomelabService, HomelabServicesCatalog } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 
 type Props = {
+	catalog: HomelabServicesCatalog;
+	snapshot: HomelabHealthSnapshot | null;
 	endpointLabel: string;
 	internalLabel: string;
 };
@@ -28,15 +24,42 @@ function serviceIconPath(iconSrc?: string): string {
 	return `/${iconSrc}`;
 }
 
-export default async function ServiceGrid({
+function healthByUrl(snapshot: HomelabHealthSnapshot | null) {
+	const map = new Map<string, HomelabHealthEntry>();
+	for (const entry of snapshot?.services ?? []) {
+		try {
+			const url = new URL(entry.url);
+			url.hash = "";
+			map.set(url.href, entry);
+		} catch {
+			// FastAPI payload is validated by the same-origin proxy; ignore malformed extras defensively.
+		}
+	}
+	return map;
+}
+
+function lookupHealth(
+	map: Map<string, HomelabHealthEntry>,
+	url?: string,
+): HomelabHealthEntry | undefined {
+	if (!url) return undefined;
+	try {
+		const normalized = new URL(url);
+		normalized.hash = "";
+		return map.get(normalized.href);
+	} catch {
+		return undefined;
+	}
+}
+
+export default function HomelabServiceGrid({
+	catalog,
+	snapshot,
 	endpointLabel,
 	internalLabel,
 }: Props) {
-	const [{ catalog }, { snapshot }] = await Promise.all([
-		loadHomelabServicesCatalog(),
-		loadHomelabHealthSnapshot(),
-	]);
 	const services: HomelabService[] = catalog.services;
+	const externalHealth = healthByUrl(snapshot);
 	const truenasDown = snapshot?.truenas?.state === "fail";
 	const truenasWarning = snapshot?.truenas?.state === "warn";
 	const truenasPublic = snapshot?.truenas?.public;
@@ -66,13 +89,12 @@ export default async function ServiceGrid({
 				{services.map((svc) => {
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
-					const iconPath = serviceIconPath(svc.iconSrc);
 					const isExternal = svc.external === true;
 					const endpointEnabled =
 						svc.endpointEnabled ??
 						(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
 					const initialHealth = isExternal
-						? homelabHealthForUrl(snapshot, svc.tunnelUrl)
+						? lookupHealth(externalHealth, svc.tunnelUrl)
 						: undefined;
 
 					return (
@@ -83,7 +105,7 @@ export default async function ServiceGrid({
 							<div className="card box-shadow h-100 service-card-ux">
 								<img
 									className="img-fluid d-block mx-auto p-4"
-									src={iconPath}
+									src={serviceIconPath(svc.iconSrc)}
 									width={80}
 									height={80}
 									alt={svc.name}
@@ -93,9 +115,7 @@ export default async function ServiceGrid({
 								/>
 								<div className="card-body text-center border-top border-secondary">
 									<h3 className="h5 card-title mb-1">{svc.name}</h3>
-									<p className="card-text text-muted small mb-0">
-										{svc.description}
-									</p>
+									<p className="card-text text-muted small mb-0">{svc.description}</p>
 									<div
 										style={{
 											marginTop: 18,

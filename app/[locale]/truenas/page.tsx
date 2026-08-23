@@ -8,7 +8,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
-import AppsSection from "../../components/truenas/AppsSection";
+import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import BillOfMaterialsSection, {
 	type BillOfMaterialsCopy,
 } from "../../components/truenas/BillOfMaterialsSection";
@@ -52,49 +52,48 @@ export default async function TruenasPage({ params }: Props) {
 	const billOfMaterialsCopy = t.raw("bom") as BillOfMaterialsCopy;
 
 	return (
-		<>
-			<div className="site-content-page page-dark">
-				<TopAnchor />
-				<a href="#main-content" className="skip-to-main">
-					{site("skipToMainContent")}
-				</a>
-				<main id="main-content">
-					<HeroSection
-						ariaLabel={t("heroLabel")}
-						title={t("heroTitle")}
-						lead={t("heroLead")}
-						credit={t("heroCredit")}
-						topics={t("heroTopics")}
-					/>
-					<AppsSection
-						title={t("apps.title")}
-						lead={t("apps.lead")}
-						iconsBefore={t("apps.iconsBefore")}
-						iconsAfter={t("apps.iconsAfter")}
-						endpointLabel="External"
-						internalLabel={t("services.internal")}
-					/>
-					<HomeLabSection
-						title={t("homelab.title")}
-						intro={t("homelab.intro")}
-						purpose={t("homelab.purpose")}
-						projectDescription={t("homelab.projectDescription")}
-						openProject={t("homelab.openProject")}
-						nablaHref={canonicalPagePath("nabla", locale)}
-					/>
-					<div className="hardware-section-bg">
-						<HardwareSection copy={hardwareCopy} />
-						<BillOfMaterialsSection copy={billOfMaterialsCopy} />
-					</div>
-					<ToolsSection
-						title={t("tools.title")}
-						webUi={t("tools.webUi")}
-						signIn={t("tools.signIn")}
-						logoAlt={t("tools.logoAlt")}
-					/>
-				</main>
-				<SiteWidgetsScript />
-			</div>
-		</>
+		<div className="site-content-page page-dark">
+			<TopAnchor />
+			<a href="#main-content" className="skip-to-main">
+				{site("skipToMainContent")}
+			</a>
+			<main id="main-content">
+				<HeroSection
+					ariaLabel={t("heroLabel")}
+					title={t("heroTitle")}
+					lead={t("heroLead")}
+					credit={t("heroCredit")}
+					topics={t("heroTopics")}
+				/>
+				<HomelabServicesSection
+					title={t("apps.title")}
+					lead={t("apps.lead")}
+					iconsBefore={t("apps.iconsBefore")}
+					iconsAfter={t("apps.iconsAfter")}
+					endpointLabel="External"
+					internalLabel={t("services.internal")}
+					headingId="truenas-heading"
+				/>
+				<HomeLabSection
+					title={t("homelab.title")}
+					intro={t("homelab.intro")}
+					purpose={t("homelab.purpose")}
+					projectDescription={t("homelab.projectDescription")}
+					openProject={t("homelab.openProject")}
+					nablaHref={canonicalPagePath("nabla", locale)}
+				/>
+				<div className="hardware-section-bg">
+					<HardwareSection copy={hardwareCopy} />
+					<BillOfMaterialsSection copy={billOfMaterialsCopy} />
+				</div>
+				<ToolsSection
+					title={t("tools.title")}
+					webUi={t("tools.webUi")}
+					signIn={t("tools.signIn")}
+					logoAlt={t("tools.logoAlt")}
+				/>
+			</main>
+			<SiteWidgetsScript />
+		</div>
 	);
 }

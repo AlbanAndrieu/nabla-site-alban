@@ -1,4 +1,4 @@
-import ServiceGrid from "./ServiceGrid";
+import HomelabServicesBlock from "./HomelabServicesBlock";
 
 type Props = {
 	title: string;
@@ -7,55 +7,44 @@ type Props = {
 	iconsAfter: string;
 	endpointLabel: string;
 	internalLabel: string;
+	headingId?: string;
 };
 
-export default function AppsSection({
+export default function HomelabServicesSection({
 	title,
 	lead,
 	iconsBefore,
 	iconsAfter,
 	endpointLabel,
 	internalLabel,
+	headingId = "homelab-services-heading",
 }: Props) {
 	return (
 		<section
-			className="stack-page-hero py-5 page-truenas-apps"
-			aria-labelledby="truenas-heading"
+			className="stack-page-hero py-5 homelab-services-section page-truenas-apps"
+			aria-labelledby={headingId}
 		>
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12 text-center">
-						<h2 id="truenas-heading" className="display-4 mb-3">
+						<h2 id={headingId} className="display-4 mb-3">
 							{title}
 						</h2>
-						<p className="lead mb-2 stack-page-hero__lead">
-							{lead}
-						</p>
+						<p className="lead mb-2 stack-page-hero__lead">{lead}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-0">
 							{iconsBefore}{" "}
-							<a
-								href="https://selfh.st/icons/"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
+							<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">
 								selfh.st/icons
 							</a>
 							. {iconsAfter}{" "}
-							<a
-								href="https://selfh.st/apps/"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
+							<a href="https://selfh.st/apps/" target="_blank" rel="noopener noreferrer">
 								selfh.st/apps
 							</a>
 							.
 						</p>
 					</div>
 				</div>
-				<ServiceGrid
-					endpointLabel={endpointLabel}
-					internalLabel={internalLabel}
-				/>
+				<HomelabServicesBlock endpointLabel={endpointLabel} internalLabel={internalLabel} />
 			</div>
 		</section>
 	);

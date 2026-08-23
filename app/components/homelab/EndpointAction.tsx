@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { HomelabHealthEntry } from "../../../lib/homelabHealth";
+import type { HomelabHealthEntry } from "@/lib/homelabHealth";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
 
@@ -22,8 +22,7 @@ const HEALTH_CLASS: Record<HealthState, string> = {
 	unknown: "btn-outline-secondary",
 };
 
-function classifyHttpStatus(status: number, tlsError = false): HealthState {
-	if (tlsError) return "fail";
+function classifyHttpStatus(status: number): HealthState {
 	if (status >= 200 && status <= 399) return "ok";
 	if ([401, 403, 407, 429].includes(status)) return "warn";
 	return "fail";
@@ -46,22 +45,15 @@ function tlsColor(trusted: boolean | null | undefined): string {
 
 function tunnelColor(status: string | null | undefined): string {
 	const normalized = status?.trim().toLowerCase();
-	if (["healthy", "active", "up", "ok"].includes(normalized ?? "")) {
-		return "limegreen";
-	}
-	if (["degraded", "warning", "warn"].includes(normalized ?? "")) {
-		return "gold";
-	}
-	if (["down", "inactive", "failed", "fail"].includes(normalized ?? "")) {
-		return "red";
-	}
+	if (["healthy", "active", "up", "ok"].includes(normalized ?? "")) return "limegreen";
+	if (["degraded", "warning", "warn"].includes(normalized ?? "")) return "gold";
+	if (["down", "inactive", "failed", "fail"].includes(normalized ?? "")) return "red";
 	return "gray";
 }
 
 function fastApiHealthDetail(entry: HomelabHealthEntry): string {
 	const status = entry.http_status || "network error";
-	const latency =
-		typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
+	const latency = typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 	const tls = entry.tls_trusted === false ? ", TLS error" : "";
 	const tunnel = entry.tunnel_status
 		? `, tunnel ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
@@ -88,7 +80,7 @@ function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
 	});
 }
 
-async function probeBrowserEndpoint(
+async function probePrivateEndpoint(
 	url: string,
 	signal: AbortSignal,
 ): Promise<{ state: HealthState; detail: string }> {
@@ -112,22 +104,15 @@ async function probeBrowserEndpoint(
 			detail: `Browser endpoint probe: HTTP ${response.status}`,
 		};
 	} catch {
-		if (signal.aborted) {
-			return { state: "fail", detail: "Browser endpoint probe timed out" };
-		}
+		if (signal.aborted) return { state: "fail", detail: "Browser endpoint probe timed out" };
 	}
 
 	const origin = new URL(url).origin.replace(/\/$/, "");
 	for (const path of ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]) {
 		if (await probeImage(`${origin}${path}?_np=${Date.now()}`, signal)) {
-			return {
-				state: "ok",
-				detail: "Endpoint responded from this browser (favicon probe)",
-			};
+			return { state: "ok", detail: "Endpoint responded from this browser (favicon probe)" };
 		}
-		if (signal.aborted) {
-			return { state: "fail", detail: "Browser endpoint probe timed out" };
-		}
+		if (signal.aborted) return { state: "fail", detail: "Browser endpoint probe timed out" };
 	}
 	return {
 		state: "fail",
@@ -145,130 +130,64 @@ export default function EndpointAction({
 }: Props) {
 	const configured = enabled && Boolean(url);
 	const https = isHttpsUrl(url);
-	const snapshotHealth = external ? initialHealth : undefined;
-	const initialState = truenasDown && external
-		? "fail"
-		: (snapshotHealth?.state ?? (configured ? "pending" : "unknown"));
-	const [health, setHealth] = useState<HealthState>(initialState);
-	const [tlsTrusted, setTlsTrusted] = useState<boolean | null | undefined>(
-		snapshotHealth?.tls_trusted,
+	const [privateHealth, setPrivateHealth] = useState<HealthState>(
+		configured && !external ? "pending" : "unknown",
 	);
-	const [detail, setDetail] = useState(
-		truenasDown && external
-			? "TrueNAS dependency is down; external service marked unavailable"
-			: snapshotHealth
-				? fastApiHealthDetail(snapshotHealth)
-				: configured
-					? "Checking endpoint…"
-					: "Endpoint not configured for use",
+	const [privateDetail, setPrivateDetail] = useState(
+		configured ? "Checking private endpoint from this browser…" : "Endpoint not configured for use",
 	);
 
 	useEffect(() => {
-		if (!url || !enabled) {
-			setHealth("unknown");
-			setTlsTrusted(undefined);
-			setDetail(
-				url
-					? "Endpoint URL retained for inventory but not configured for use"
-					: "No endpoint URL configured",
-			);
-			return;
-		}
-
-		if (truenasDown && external) {
-			setHealth("fail");
-			setTlsTrusted(initialHealth?.tls_trusted);
-			setDetail("TrueNAS dependency is down; external service marked unavailable");
-			return;
-		}
+		if (external || !url || !enabled) return;
 
 		let parsed: URL;
 		try {
 			parsed = new URL(url);
 		} catch {
-			setHealth("fail");
-			setTlsTrusted(undefined);
-			setDetail("Invalid endpoint URL");
+			setPrivateHealth("fail");
+			setPrivateDetail("Invalid endpoint URL");
 			return;
 		}
-
 		if (!["http:", "https:"].includes(parsed.protocol)) {
-			setHealth("unknown");
-			setTlsTrusted(undefined);
-			setDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
-			return;
-		}
-
-		if (external && initialHealth) {
-			setHealth(initialHealth.state);
-			setTlsTrusted(initialHealth.tls_trusted);
-			setDetail(fastApiHealthDetail(initialHealth));
+			setPrivateHealth("unknown");
+			setPrivateDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
 			return;
 		}
 
 		const controller = new AbortController();
 		const timeout = window.setTimeout(() => controller.abort(), 10_000);
-		setHealth("pending");
-		setTlsTrusted(undefined);
-		setDetail(
-			external
-				? "Checking public endpoint…"
-				: "Checking private endpoint from this browser…",
-		);
-
-		void (async () => {
-			try {
-				if (external) {
-					const response = await fetch(
-						`/api/homelab-tunnel-check?url=${encodeURIComponent(url)}`,
-						{ cache: "no-store", signal: controller.signal },
-					);
-					if (!response.ok) {
-						const fallback = await probeBrowserEndpoint(url, controller.signal);
-						if (controller.signal.aborted) return;
-						setHealth(fallback.state);
-						setDetail(
-							`Endpoint check API returned HTTP ${response.status}; ${fallback.detail}`,
-						);
-						return;
-					}
-					const payload = (await response.json()) as {
-						status?: number;
-						tlsError?: boolean;
-					};
-					const status =
-						typeof payload.status === "number" ? payload.status : 0;
-					const next = classifyHttpStatus(status, payload.tlsError === true);
-					setHealth(next);
-					setTlsTrusted(payload.tlsError === true ? false : status > 0 ? true : undefined);
-					setDetail(
-						`Public endpoint probe: HTTP ${status || "network error"}${payload.tlsError ? ", TLS error" : ""}`,
-					);
-					return;
-				}
-
-				const result = await probeBrowserEndpoint(url, controller.signal);
-				if (controller.signal.aborted) return;
-				setHealth(result.state);
-				setDetail(result.detail);
-			} catch {
-				if (!controller.signal.aborted) {
-					const fallback = await probeBrowserEndpoint(url, controller.signal);
-					if (controller.signal.aborted) return;
-					setHealth(fallback.state);
-					setDetail(`Endpoint health check failed; ${fallback.detail}`);
-				}
-			} finally {
-				window.clearTimeout(timeout);
+		setPrivateHealth("pending");
+		setPrivateDetail("Checking private endpoint from this browser…");
+		void probePrivateEndpoint(url, controller.signal).then((result) => {
+			if (!controller.signal.aborted) {
+				setPrivateHealth(result.state);
+				setPrivateDetail(result.detail);
 			}
-		})();
+		});
 
 		return () => {
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [enabled, external, initialHealth, truenasDown, url]);
+	}, [enabled, external, url]);
 
+	const health: HealthState = external
+		? truenasDown
+			? "fail"
+			: (initialHealth?.state ?? "unknown")
+		: privateHealth;
+	const tlsTrusted = external ? initialHealth?.tls_trusted : undefined;
+	const detail = !configured
+		? url
+			? "Endpoint URL retained for inventory but not configured for use"
+			: "No endpoint URL configured"
+		: external
+			? truenasDown
+				? "TrueNAS dependency is down; external service marked unavailable"
+				: initialHealth
+					? fastApiHealthDetail(initialHealth)
+					: "Public health snapshot unavailable"
+			: privateDetail;
 	const tunnelStatus = external ? initialHealth?.tunnel_status : undefined;
 	const tunnelTitle = tunnelStatus
 		? `Cloudflare tunnel: ${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`

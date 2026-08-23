@@ -30,18 +30,17 @@ const ServiceCardsSection = ({ services }: Props) => (
 					<h3>{service.title}</h3>
 					<p>{service.description}</p>
 					{service.customContent}
-					{service.links &&
-						service.links.map((l, j) => (
-							<a
-								key={l.label + j}
-								href={l.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="opensource-link d-block"
-							>
-								{l.label} {l.icon && <i className={l.icon}></i>}
-							</a>
-						))}
+					{service.links?.map((link) => (
+						<a
+							key={link.label}
+							href={link.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="opensource-link d-block"
+						>
+							{link.label} {link.icon && <i className={link.icon}></i>}
+						</a>
+					))}
 				</div>
 			))}
 		</div>

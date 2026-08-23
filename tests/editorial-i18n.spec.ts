@@ -3,23 +3,23 @@ import { expect, test } from "@playwright/test";
 test.describe("editorial page localization", () => {
 	const metadataCases = [
 		{
-			pathname: "/fr/expertise.html",
+			pathname: "/fr/expertise",
 			title: "Services et expertise technique — Alban Andrieu",
 		},
 		{
-			pathname: "/fr/nabla.html",
+			pathname: "/fr/nabla",
 			title: "Nabla — Homelab DevSecOps et plateforme cloud",
 		},
 		{
-			pathname: "/fr/link.html",
+			pathname: "/fr/link",
 			title: "Profils publics et registres — Alban Andrieu",
 		},
 		{
-			pathname: "/fr/email.html",
+			pathname: "/fr/email",
 			title: "Adresses email de contact — Alban Andrieu",
 		},
 		{
-			pathname: "/fr/truenas.html",
+			pathname: "/fr/truenas",
 			title: "Homelab et matériel TrueNAS Scale — Alban Andrieu",
 		},
 	] as const;
@@ -34,7 +34,7 @@ test.describe("editorial page localization", () => {
 	test("the French links page keeps navigation in the active locale", async ({
 		page,
 	}) => {
-		await page.goto("/fr/link.html");
+		await page.goto("/fr/link");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
 			"Profils et registres utilisés",
 		);
@@ -42,12 +42,12 @@ test.describe("editorial page localization", () => {
 			page.getByRole("navigation", { name: "Fil d’Ariane" }).getByRole("link", {
 				name: "Présentation de Nabla",
 			}),
-		).toHaveAttribute("href", "/fr/nabla.html");
+		).toHaveAttribute("href", "/fr/nabla");
 		await expect(page.getByRole("contentinfo")).toHaveCount(1);
 	});
 
 	test("TrueNAS exposes a localized primary heading", async ({ page }) => {
-		await page.goto("/fr/truenas.html");
+		await page.goto("/fr/truenas");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
 			"Homelab et matériel TrueNAS Scale",
 		);
@@ -61,7 +61,7 @@ test.describe("editorial page localization", () => {
 		).toBeVisible();
 		await expect(page.getByRole("link", { name: "Ouvrir le projet Nabla" })).toHaveAttribute(
 			"href",
-			"/fr/nabla.html",
+			"/fr/nabla",
 		);
 		await expect(
 			page.getByRole("heading", { name: "Outils et connexion" }),
@@ -79,7 +79,7 @@ test.describe("editorial page localization", () => {
 	});
 
 	test("the email page renders structured mail links", async ({ page }) => {
-		await page.goto("/fr/email.html");
+		await page.goto("/fr/email");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
 			"Mise à jour de l’adresse email",
 		);
@@ -100,10 +100,10 @@ test.describe("editorial page localization", () => {
 		).toBeVisible();
 		await expect(page.getByRole("link", { name: /Me contacter/ })).toHaveAttribute(
 			"href",
-			"/fr/contact.html",
+			"/fr/contact",
 		);
 
-		await page.goto("/fr/contact.html");
+		await page.goto("/fr/contact");
 		await expect(page.getByRole("link", { name: /Voir mon CV/ })).toHaveAttribute(
 			"href",
 			"/fr/cv",

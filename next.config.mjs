@@ -3,7 +3,10 @@ import { fileURLToPath } from "node:url";
 
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { HTML_ROUTE_SLUGS } from "./lib/htmlRoutes.config.mjs";
+import {
+	HTML_ROUTE_SLUGS,
+	SEO_HTML_MIGRATION_SLUGS,
+} from "./lib/htmlRoutes.config.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,34 +15,31 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const localePrefixes = ["en", "fr"];
 
-/** Serve legacy root HTML under `*.html` URLs through App Router before `public/*.html` wins. */
+/** Non-SEO legacy HTML routes that still render through App Router. */
 const htmlPageBeforeFiles = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/${slug}.html`, destination: `/en/${slug}` },
 	{ source: `/en/${slug}.html`, destination: `/en/${slug}` },
 	{ source: `/fr/${slug}.html`, destination: `/fr/${slug}` },
-]).concat([
-	{ source: `/ai.html`, destination: `/en/ai` },
-	{ source: `/fr/ai.html`, destination: `/fr/ai` },
-	{ source: `/cancel.html`, destination: `/en/cancel` },
-	{ source: `/fr/cancel.html`, destination: `/fr/cancel` },
-	{ source: `/ciso.html`, destination: `/en/ciso` },
-	{ source: `/fr/ciso.html`, destination: `/fr/ciso` },
 ]);
 
-/** Home legacy URLs → localized home routes. */
-const homeHtmlBeforeFiles = [
-	{ source: "/index.html", destination: "/en" },
-	{ source: "/fr/index.html", destination: "/fr" },
+/** Old SEO `*.html` URLs permanently move to their clean canonical routes. */
+const seoHtmlRedirects = SEO_HTML_MIGRATION_SLUGS.flatMap((slug) => [
+	{ source: `/${slug}.html`, destination: `/${slug}`, permanent: true },
+	{ source: `/en/${slug}.html`, destination: `/${slug}`, permanent: true },
+	{ source: `/fr/${slug}.html`, destination: `/fr/${slug}`, permanent: true },
+]);
+
+/** Historical SEO entry points that already had extensionless canonicals. */
+const seoIndexRedirects = [
+	{ source: "/index.html", destination: "/", permanent: true },
+	{ source: "/en/index.html", destination: "/", permanent: true },
+	{ source: "/fr/index.html", destination: "/fr", permanent: true },
+	{ source: "/cv/index.html", destination: "/cv", permanent: true },
+	{ source: "/en/cv/index.html", destination: "/cv", permanent: true },
+	{ source: "/fr/cv/index.html", destination: "/fr/cv", permanent: true },
 ];
 
-/** Keep legacy CV entry points on the maintained App Router page. */
-const cvIndexBeforeFiles = [
-	{ source: "/cv/index.html", destination: "/en/cv" },
-	{ source: "/en/cv/index.html", destination: "/en/cv" },
-	{ source: "/fr/cv/index.html", destination: "/fr/cv" },
-];
-
-/** Extensionless content URLs → canonical `*.html` (browser URL matches static hosting). */
+/** Non-SEO extensionless URLs keep their legacy HTML canonical form for now. */
 const canonicalHtmlRedirects = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/${slug}`, destination: `/${slug}.html`, permanent: true },
 	{ source: `/fr/${slug}`, destination: `/fr/${slug}.html`, permanent: true },
@@ -67,8 +67,6 @@ const localizedPolicyRewrites = localePrefixes.flatMap((locale) =>
 const nextConfig = {
 	reactStrictMode: true,
 	experimental: {
-		/** Keep concise repository agent instructions instead of regenerating large context files. */
-		agentRules: false,
 		/** Required because the root layout lives below the dynamic `[locale]` segment. */
 		globalNotFound: true,
 	},
@@ -78,15 +76,15 @@ const nextConfig = {
 		root: __dirname,
 	},
 	async redirects() {
-		return canonicalHtmlRedirects;
+		return [
+			...seoHtmlRedirects,
+			...seoIndexRedirects,
+			...canonicalHtmlRedirects,
+		];
 	},
 	async rewrites() {
 		return {
-			beforeFiles: [
-				...homeHtmlBeforeFiles,
-				...cvIndexBeforeFiles,
-				...htmlPageBeforeFiles,
-			],
+			beforeFiles: [...htmlPageBeforeFiles],
 			afterFiles: [...localizedPolicyRewrites, ...policyRewrites],
 		};
 	},

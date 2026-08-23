@@ -14,17 +14,9 @@ server.cjs
 /.idea
 # vercel do not like .python-version
 .python-version
-#!api
-api
-# Keep the homelab App Router APIs deployed while the legacy root /api tree stays ignored.
-!app/api/
-app/api/*
-!app/api/homelab-health/
-!app/api/homelab-health/**
-!app/api/homelab-services/
-!app/api/homelab-services/**
-!app/api/homelab-tunnel-check/
-!app/api/homelab-tunnel-check/**
+# Ignore only the legacy root Vercel Functions tree. Next.js App Router routes
+# under app/api/** are part of the application and must be deployed normally.
+/api/
 !lib
 !app
 !components
