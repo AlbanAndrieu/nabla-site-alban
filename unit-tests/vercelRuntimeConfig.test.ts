@@ -16,11 +16,23 @@ test("Vercel ignores only the legacy root api directory", async () => {
 	assert.ok(!rules.some((rule) => rule.startsWith("!app/api")));
 });
 
-test("TrueNAS page is explicitly rendered at runtime", async () => {
+test("TrueNAS page stays statically renderable", async () => {
 	const source = await readFile(
 		new URL("app/[locale]/truenas/page.tsx", ROOT),
 		"utf8",
 	);
 
-	assert.match(source, /export const dynamic = ["']force-dynamic["'];/);
+	assert.doesNotMatch(source, /force-dynamic/);
+	assert.doesNotMatch(source, /loadHomelabServicesCatalog|loadHomelabHealthSnapshot/);
+});
+
+test("dynamic homelab data is isolated behind same-origin APIs", async () => {
+	const source = await readFile(
+		new URL("app/components/homelab/HomelabServicesBlock.tsx", ROOT),
+		"utf8",
+	);
+
+	assert.match(source, /^"use client";/);
+	assert.match(source, /fetch\("\/api\/homelab-services"/);
+	assert.match(source, /fetch\("\/api\/homelab-health"/);
 });
