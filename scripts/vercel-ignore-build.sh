@@ -7,6 +7,8 @@ set -euo pipefail
 #
 # Skip only when every changed file is maintenance/documentation that cannot
 # affect the deployed application. Keep the allow-list deliberately narrow.
+# The Playwright workflow is deploy-relevant because its deployment_status
+# trigger must be validated against a real Vercel Preview URL.
 
 if ! git rev-parse HEAD^ >/dev/null 2>&1; then
   echo "No parent commit available; build deployment."
@@ -25,6 +27,10 @@ printf '%s\n' "$changed_files"
 
 while IFS= read -r file; do
   case "$file" in
+    .github/workflows/playwright.yml)
+      echo "Playwright workflow changed; build preview for end-to-end validation."
+      exit 1
+      ;;
     docs/*|*.md|.github/ISSUE_TEMPLATE/*|.github/PULL_REQUEST_TEMPLATE.md)
       ;;
     .github/workflows/*)
