@@ -1,4 +1,4 @@
-import ServiceGrid from "./ServiceGrid";
+import HomelabServicesBlock from "../homelab/HomelabServicesBlock";
 
 type Props = {
 	title: string;
@@ -28,9 +28,7 @@ export default function AppsSection({
 						<h2 id="truenas-heading" className="display-4 mb-3">
 							{title}
 						</h2>
-						<p className="lead mb-2 stack-page-hero__lead">
-							{lead}
-						</p>
+						<p className="lead mb-2 stack-page-hero__lead">{lead}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-0">
 							{iconsBefore}{" "}
 							<a
@@ -52,7 +50,7 @@ export default function AppsSection({
 						</p>
 					</div>
 				</div>
-				<ServiceGrid
+				<HomelabServicesBlock
 					endpointLabel={endpointLabel}
 					internalLabel={internalLabel}
 				/>
