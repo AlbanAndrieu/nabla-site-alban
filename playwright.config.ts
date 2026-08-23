@@ -24,16 +24,17 @@ if (
 	);
 }
 
-const vercelProtectionHeaders = vercelBypassSecret
-	? {
-			"x-vercel-protection-bypass": vercelBypassSecret,
-			"x-vercel-set-bypass-cookie": "true",
-		}
-	: vercelTrustedOidcToken
+const vercelProtectionHeaders: Record<string, string> | undefined =
+	vercelBypassSecret
 		? {
-				"x-vercel-trusted-oidc-idp-token": vercelTrustedOidcToken,
+				"x-vercel-protection-bypass": vercelBypassSecret,
+				"x-vercel-set-bypass-cookie": "true",
 			}
-		: undefined;
+		: vercelTrustedOidcToken
+			? {
+					"x-vercel-trusted-oidc-idp-token": vercelTrustedOidcToken,
+				}
+			: undefined;
 
 export default defineConfig({
 	testDir: "./tests",
