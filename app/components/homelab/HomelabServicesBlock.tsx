@@ -16,6 +16,28 @@ type State = {
 	error: boolean;
 };
 
+async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog> {
+	const response = await fetch("/api/homelab-services", {
+		cache: "no-store",
+		signal,
+	});
+	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
+	return (await response.json()) as HomelabServicesCatalog;
+}
+
+async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot | null> {
+	try {
+		const response = await fetch("/api/homelab-health", {
+			cache: "no-store",
+			signal,
+		});
+		return response.ok ? ((await response.json()) as HomelabHealthSnapshot) : null;
+	} catch (error) {
+		if (signal.aborted) throw error;
+		return null;
+	}
+}
+
 export default function HomelabServicesBlock({ endpointLabel, internalLabel }: Props) {
 	const [state, setState] = useState<State>({
 		catalog: null,
@@ -27,19 +49,8 @@ export default function HomelabServicesBlock({ endpointLabel, internalLabel }: P
 		const controller = new AbortController();
 
 		void Promise.all([
-			fetch("/api/homelab-services", {
-				cache: "no-store",
-				signal: controller.signal,
-			}).then(async (response) => {
-				if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-				return (await response.json()) as HomelabServicesCatalog;
-			}),
-			fetch("/api/homelab-health", {
-				cache: "no-store",
-				signal: controller.signal,
-			}).then(async (response) =>
-				response.ok ? ((await response.json()) as HomelabHealthSnapshot) : null,
-			),
+			fetchCatalog(controller.signal),
+			fetchHealth(controller.signal),
 		])
 			.then(([catalog, snapshot]) => {
 				if (!controller.signal.aborted) {
