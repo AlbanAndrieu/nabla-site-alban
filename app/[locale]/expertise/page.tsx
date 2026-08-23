@@ -6,6 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
 import ServicesSection, {
@@ -25,8 +26,11 @@ export async function generateMetadata({
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
 		alternates: {
-			canonical: locale === "fr" ? "/fr/expertise.html" : "/expertise.html",
-			languages: { en: "/expertise.html", fr: "/fr/expertise.html" },
+			canonical: canonicalPagePath("expertise", locale),
+			languages: {
+				en: canonicalPagePath("expertise", "en"),
+				fr: canonicalPagePath("expertise", "fr"),
+			},
 		},
 	};
 }
@@ -46,9 +50,10 @@ export default async function ExpertisePage({
 	const aiBullets = t.raw("aiml.bullets") as string[];
 	const skillCategoryTitles = t.raw("skills.categoryTitles") as string[];
 	const technologyGroupTitles = t.raw("technologies.groupTitles") as string[];
-	const canonicalUrl = `https://albandrieu.com${
-		locale === "fr" ? "/fr/expertise.html" : "/expertise.html"
-	}`;
+	const canonicalUrl = `https://albanandrieu.com${canonicalPagePath(
+		"expertise",
+		locale,
+	)}`;
 	const professionalServiceJsonLd = {
 		"@context": "https://schema.org",
 		"@type": "ProfessionalService",
@@ -61,7 +66,7 @@ export default async function ExpertisePage({
 		provider: {
 			"@type": "Person",
 			name: "Alban Andrieu",
-			url: "https://albandrieu.com/",
+			url: "https://albanandrieu.com/",
 		},
 	};
 	return (
