@@ -6,6 +6,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import Hero from "../../components/Hero";
+import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import AnsibleHeroCard from "../../components/nabla/AnsibleHeroCard";
 import CollaborateToolsSection from "../../components/nabla/CollaborateToolsSection";
 import ContactSection from "../../components/nabla/ContactSection";
@@ -14,8 +15,6 @@ import GoogleCSEClientOnly from "../../components/nabla/GoogleCSEClientOnly";
 import NablaDevSecOpsHeroCard from "../../components/nabla/NablaDevSecOpsHeroCard";
 import NablaPlatformsSection from "../../components/nabla/NablaPlatformsSection";
 import ServiceCardsSection from "../../components/nabla/ServiceCardsSection";
-import HardwareSection from "../../components/truenas/HardwareSection";
-import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
 
 export async function generateMetadata({
 	params,
@@ -37,7 +36,6 @@ export async function generateMetadata({
 	};
 }
 
-// Type for NablaPlatformsSection
 type Pillar = {
 	title: string;
 	icon: string;
@@ -52,8 +50,11 @@ export default async function NablaPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
-	const nabla = await getTranslations("nabla");
+	const [site, nabla, truenas] = await Promise.all([
+		getTranslations("site"),
+		getTranslations("nabla"),
+		getTranslations("truenasPage"),
+	]);
 
 	const nablaPillars: Pillar[] = [];
 
@@ -64,7 +65,6 @@ export default async function NablaPage({
 				{site("skipToMainContent")}
 			</a>
 			<main id="main-content" role="main" className="mb-5">
-				{/* Hero Section */}
 				<Hero />
 
 				<CollaborateToolsSection
@@ -129,7 +129,6 @@ export default async function NablaPage({
 				/>
 
 				<section className="content-section">
-					{/* Platforms & Tools Matrix */}
 					<NablaPlatformsSection
 						heading={nabla("platforms.heading")}
 						intro1={nabla("platforms.intro1")}
@@ -141,7 +140,6 @@ export default async function NablaPage({
 						pillars={nablaPillars}
 					/>
 
-					{/* Open Source Contributions */}
 					<AnsibleHeroCard
 						title={nabla("opensource.ansible.title")}
 						description={nabla("opensource.ansible.description")}
@@ -163,7 +161,6 @@ export default async function NablaPage({
 						linkUrl="https://hub.docker.com/u/nabla"
 					/>
 
-					{/* Services Grid */}
 					<ServiceCardsSection
 						services={[
 							{
@@ -221,7 +218,16 @@ export default async function NablaPage({
 					/>
 				</section>
 
-				{/* Contact Section */}
+				<HomelabServicesSection
+					title={truenas("apps.title")}
+					lead={truenas("apps.lead")}
+					iconsBefore={truenas("apps.iconsBefore")}
+					iconsAfter={truenas("apps.iconsAfter")}
+					endpointLabel="External"
+					internalLabel={truenas("services.internal")}
+					headingId="nabla-homelab-services-heading"
+				/>
+
 				<ContactSection
 					contacts={[
 						{
