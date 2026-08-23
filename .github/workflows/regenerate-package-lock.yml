@@ -1,0 +1,38 @@
+name: Regenerate package lock
+
+on:
+  push:
+    branches:
+      - fix/playwright-preview-deployment
+    paths:
+      - package.json
+      - .github/workflows/regenerate-package-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/playwright-preview-deployment
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Regenerate lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit lockfile
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo 'package-lock.json already synchronized.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          git commit -m 'chore: sync package lock'
+          git push origin HEAD:fix/playwright-preview-deployment
