@@ -21,10 +21,6 @@ import ToolsSection from "../../components/truenas/ToolsSection";
 
 type Props = { params: Promise<{ locale: string }> };
 
-// Service catalog and health are runtime data. Declare this explicitly instead of
-// letting Next.js attempt static generation and bail out on no-store fetches.
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
