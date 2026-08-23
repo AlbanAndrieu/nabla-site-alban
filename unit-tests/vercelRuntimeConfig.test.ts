@@ -2,6 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+import {
+	canonicalPagePath,
+	SEO_PAGE_SLUGS,
+} from "../lib/sitePageCatalog";
+
 const ROOT = new URL("../", import.meta.url);
 
 test("Vercel ignores only the legacy root api directory", async () => {
@@ -43,17 +48,44 @@ test("dynamic homelab data is isolated behind same-origin APIs", async () => {
 	assert.match(source, /fetch\("\/api\/homelab-health"/);
 });
 
-test("Nabla and TrueNAS do not keep legacy html routing", async () => {
+test("all SEO canonical and hreflang paths are extensionless", () => {
+	for (const slug of SEO_PAGE_SLUGS) {
+		for (const locale of ["en", "fr"] as const) {
+			const path = canonicalPagePath(slug, locale);
+			assert.doesNotMatch(path, /\.html(?:$|[?#])/);
+			if (locale === "en") {
+				assert.ok(path === "/" || !path.startsWith("/en/"));
+			} else {
+				assert.ok(path === "/fr" || path.startsWith("/fr/"));
+			}
+		}
+	}
+});
+
+test("SEO html URLs permanently redirect to extensionless canonical routes", async () => {
 	const routes = await readFile(
 		new URL("lib/htmlRoutes.config.mjs", ROOT),
 		"utf8",
 	);
 	const config = await readFile(new URL("next.config.mjs", ROOT), "utf8");
 
-	assert.doesNotMatch(routes, /["']nabla["']/);
-	assert.doesNotMatch(routes, /["']truenas["']/);
-	assert.doesNotMatch(config, /\/locales\/fr\/nabla\.html/);
-	assert.doesNotMatch(config, /\/locales\/fr\/truenas\.html/);
+	for (const slug of [
+		"expertise",
+		"contact",
+		"security",
+		"ai",
+		"ciso",
+		"truenas",
+		"link",
+		"email",
+		"nabla",
+	]) {
+		assert.match(routes, new RegExp(`["']${slug}["']`));
+	}
+	assert.match(config, /seoHtmlRedirects/);
+	assert.match(config, /source: `\/\$\{slug\}\.html`/);
+	assert.match(config, /destination: `\/\$\{slug\}`/);
+	assert.match(config, /permanent: true/);
 });
 
 test("legacy homelab renderer is retired", async () => {
