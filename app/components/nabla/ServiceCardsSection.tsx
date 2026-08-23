@@ -1,4 +1,5 @@
 import type React from "react";
+import HomelabServicesSection from "../homelab/HomelabServicesSection";
 
 type ServiceCardLink = { label: string; url: string; icon?: string };
 type ServiceCard = {
@@ -14,38 +15,49 @@ type Props = {
 };
 
 const ServiceCardsSection = ({ services }: Props) => (
-	<section className="category-section" id="services">
-		<h2 className="section-title">
-			<i className="fas fa-robot"></i> Tools & Automation
-		</h2>
-		<p className="section-subtitle">
-			Comprehensive DevSecOps solutions tailored to your security checks needs
-		</p>
-		<div className="services-grid">
-			{services.map((service, i) => (
-				<div className="service-card" key={service.title + i}>
-					<div className="service-icon">
-						<i className={service.icon}></i>
-					</div>
-					<h3>{service.title}</h3>
-					<p>{service.description}</p>
-					{service.customContent}
-					{service.links &&
-						service.links.map((l, j) => (
+	<>
+		<section className="category-section" id="services">
+			<h2 className="section-title">
+				<i className="fas fa-robot"></i> Tools & Automation
+			</h2>
+			<p className="section-subtitle">
+				Comprehensive DevSecOps solutions tailored to your security checks needs
+			</p>
+			<div className="services-grid">
+				{services.map((service, i) => (
+					<div className="service-card" key={service.title + i}>
+						<div className="service-icon">
+							<i className={service.icon}></i>
+						</div>
+						<h3>{service.title}</h3>
+						<p>{service.description}</p>
+						{service.customContent}
+						{service.links?.map((link) => (
 							<a
-								key={l.label + j}
-								href={l.url}
+								key={link.label}
+								href={link.url}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="opensource-link d-block"
 							>
-								{l.label} {l.icon && <i className={l.icon}></i>}
+								{link.label} {link.icon && <i className={link.icon}></i>}
 							</a>
 						))}
-				</div>
-			))}
-		</div>
-	</section>
+					</div>
+				))}
+			</div>
+		</section>
+
+		<HomelabServicesSection
+			title="Homelab services"
+			lead="Live self-hosted services used by Nabla projects and experiments."
+			iconsBefore="Service icons are vendored from"
+			iconsAfter="For more open-source self-hosted ideas, see"
+			endpointLabel="External"
+			internalLabel="Internal"
+			headingId="nabla-homelab-services-heading"
+		/>
+	</>
 );
 
 export default ServiceCardsSection;
