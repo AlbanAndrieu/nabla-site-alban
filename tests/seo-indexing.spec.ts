@@ -102,6 +102,13 @@ test.describe("SEO indexing policy", () => {
 				[`/${slug}`, englishUrl],
 				[`/fr/${slug}`, frenchUrl],
 			] as const) {
+				// next-intl persists the last explicit locale in NEXT_LOCALE. Clear it
+				// before checking the unprefixed English canonical so a previous /fr/*
+				// navigation cannot redirect the next assertion to the French route.
+				if (pathname === `/${slug}`) {
+					await page.context().clearCookies({ name: "NEXT_LOCALE" });
+				}
+
 				await page.goto(pathname);
 				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 					"href",
