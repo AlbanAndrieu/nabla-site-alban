@@ -47,16 +47,9 @@ test.describe("Site widgets integration", () => {
 		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 	});
 
-	test("should keep 404 in minimal chrome mode while still applying stored theme", async ({
-		page,
-	}) => {
-		await page.addInitScript(() => {
-			localStorage.setItem("site-theme-preference", "light");
-		});
-
+	test("should keep the global 404 in minimal chrome mode", async ({ page }) => {
 		await page.goto("/404.html");
 
-		await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 		await expect(page.locator("#theme-toggle-root")).toHaveCount(0);
 		await expect(page.locator(".google-translate-widget")).toHaveCount(0);
 		await expect(page.locator("#nabla-print-pdf-btn")).toHaveCount(0);

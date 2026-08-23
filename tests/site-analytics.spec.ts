@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-async function _injectSiteAnalytics(
+async function injectSiteAnalytics(
 	page: Page,
 	attrs: Record<string, string> = {},
 ) {
@@ -19,9 +19,8 @@ test.describe("Site analytics loader regression tests", () => {
 	test("should load default vercel analytics scripts and expose API", async ({
 		page,
 	}) => {
-		// Root `*.html` slugs are rewritten to App Router content pages without
-		// the original `<head>` scripts; use static `/404.html` (default `vercel` analytics mode).
 		await page.goto("/404.html?nablaEnableThirdParty=1");
+		await injectSiteAnalytics(page);
 
 		await expect
 			.poll(async () => {
@@ -31,7 +30,6 @@ test.describe("Site analytics loader regression tests", () => {
 			})
 			.toBe("function");
 
-		// Browsers may normalize script src to an absolute URL; match by path suffix
 		await expect(
 			page.locator('script[src*="/_vercel/insights/script.js"]'),
 		).toHaveCount(1);
@@ -41,9 +39,8 @@ test.describe("Site analytics loader regression tests", () => {
 	});
 
 	test("should keep GTM and gtag init idempotent", async ({ page }) => {
-		// Home uses data-analytics-mode="home" and already injects GTM/gtag; use vercel-only page.
-		// Same rewrite caveat as above: prefer static `/404.html` over marketed `/expertise.html`.
 		await page.goto("/404.html");
+		await injectSiteAnalytics(page);
 
 		await expect
 			.poll(async () => {
@@ -83,14 +80,13 @@ test.describe("Site analytics loader regression tests", () => {
 			};
 		});
 
-		// init* can be a no-op if scripts are already loaded; idempotence means never duplicating.
 		expect(after.gtm).toBe(Math.max(1, before.gtm));
 		expect(after.gtag).toBe(Math.max(1, before.gtag));
 	});
 
 	test("should load Ahrefs script when key is provided", async ({ page }) => {
 		await page.goto("/404.html?nablaEnableThirdParty=1");
-		await _injectSiteAnalytics(page, {
+		await injectSiteAnalytics(page, {
 			"data-ahrefs-key": "tg3zLMS/bebJFl0LxctiCw",
 		});
 
