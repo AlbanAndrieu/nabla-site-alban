@@ -15,15 +15,14 @@ new global scripts.
 - `public/site-google-translate.js`: compatibility bootstrap for legacy pages.
 - `public/theme-toggle.js`: early theme preference application.
 - `public/analytics-stubs.js`: deprecated compatibility shim.
-- `public/nabla-service-status.js`: best-effort favicon reachability hints for
-  legacy Nabla tool/open-source links only.
 
-The following former homelab runtimes are retired and must not be reintroduced:
+The following former runtimes are retired and must not be reintroduced:
 
 - `public/homelab-services-render.js`
 - `components/HomelabServicesScripts.tsx`
+- `public/nabla-service-status.js`
 - `app/api/homelab-tunnel-check/route.ts`
-- homelab globals/callbacks previously exposed by `nabla-service-status.js`
+- homelab globals/callbacks previously exposed by legacy scripts
 
 ## Analytics modes
 
@@ -100,24 +99,6 @@ Relevant fields include:
 
 Exposure and health are independent concepts. A service can be public but down,
 or private but healthy from the user's LAN.
-
-## `nabla-service-status.js`
-
-This script has been reduced to its remaining legacy responsibility. It probes
-only generic Nabla tool/open-source HTTP(S) links with favicon image requests.
-It does **not** manage homelab cards, TLS locks, Cloudflare tunnel state or
-FastAPI health.
-
-Probe behavior:
-
-- tries `/favicon.ico`, `/favicon.png`, then `/apple-touch-icon.png`;
-- five origins are processed concurrently;
-- timeout is 6500 ms per image probe;
-- results are best-effort and may produce false negatives when a host has no
-  favicon or blocks hotlinking.
-
-Do not extend this script for new React features. Its target state is deletion
-after the remaining legacy Nabla HTML consumers are migrated.
 
 ## Next.js HTML content migration
 
