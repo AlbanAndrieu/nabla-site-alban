@@ -7,13 +7,24 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	return metadataFromPublicHtml("security.html", "/security", locale);
+	const metadata = await metadataFromPublicHtml("security.html", "/security", locale);
+	return {
+		...metadata,
+		alternates: {
+			canonical: canonicalPagePath("security", locale),
+			languages: {
+				en: canonicalPagePath("security", "en"),
+				fr: canonicalPagePath("security", "fr"),
+			},
+		},
+	};
 }
 
 export default async function SecurityPage({
