@@ -14,7 +14,7 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	return metadataFromPublicHtml("ai.html", "/ai.html", locale);
+	return metadataFromPublicHtml("ai.html", "/ai", locale);
 }
 
 export default async function AiBestPracticesPage({ params }: Props) {
