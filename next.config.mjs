@@ -73,8 +73,6 @@ const localizedPolicyRewrites = localePrefixes.flatMap((locale) =>
 const nextConfig = {
 	reactStrictMode: true,
 	experimental: {
-		/** Keep concise repository agent instructions instead of regenerating large context files. */
-		agentRules: false,
 		/** Required because the root layout lives below the dynamic `[locale]` segment. */
 		globalNotFound: true,
 	},
