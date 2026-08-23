@@ -88,7 +88,13 @@
 
 	function registerAnchor(anchor, seen) {
 		var href = anchor.getAttribute("href");
-		if (!href || href.charAt(0) === "#" || href.indexOf("javascript:") === 0) return;
+		var normalizedHref = href ? href.trim().toLowerCase() : "";
+		if (
+			!href ||
+			href.charAt(0) === "#" ||
+			/^(javascript|data|vbscript):/.test(normalizedHref)
+		)
+			return;
 		if (/^mailto:/i.test(href)) return;
 
 		if (/^postgres:/i.test(href)) {
