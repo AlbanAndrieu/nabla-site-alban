@@ -129,10 +129,13 @@ export function seoSettings(slug: SeoPageSlug): SeoSettings {
 	return settings;
 }
 
+/**
+ * Canonical public URL policy:
+ * - English is the default locale and stays at the root (`/nabla`).
+ * - French is namespaced under `/fr` (`/fr/nabla`).
+ * - SEO URLs never expose implementation extensions such as `.html`.
+ */
 export function canonicalPagePath(slug: SeoPageSlug, locale: "en" | "fr") {
 	if (slug === "index") return locale === "fr" ? "/fr" : "/";
-	if (slug === "cv" || slug === "jm") {
-		return `${locale === "fr" ? "/fr" : ""}/${slug}`;
-	}
-	return `${locale === "fr" ? "/fr" : ""}/${slug}.html`;
+	return `${locale === "fr" ? "/fr" : ""}/${slug}`;
 }
