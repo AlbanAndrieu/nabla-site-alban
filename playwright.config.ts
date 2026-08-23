@@ -9,18 +9,12 @@ const localTestUrl = `http://127.0.0.1:${testPort}`;
 const externalBaseUrl = process.env.BASE_URL?.trim();
 const vercelBypassSecret =
 	process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
-const vercelTrustedOidcToken = process.env.VERCEL_TRUSTED_OIDC_TOKEN?.trim();
 const protectedVercelPreview =
 	process.env.VERCEL_PREVIEW_PROTECTED === "true";
 
-if (
-	externalBaseUrl &&
-	protectedVercelPreview &&
-	!vercelBypassSecret &&
-	!vercelTrustedOidcToken
-) {
+if (externalBaseUrl && protectedVercelPreview && !vercelBypassSecret) {
 	throw new Error(
-		"Protected Vercel Preview E2E requires either VERCEL_AUTOMATION_BYPASS_SECRET or VERCEL_TRUSTED_OIDC_TOKEN",
+		"Protected Vercel Preview E2E requires VERCEL_AUTOMATION_BYPASS_SECRET",
 	);
 }
 
@@ -30,11 +24,7 @@ const vercelProtectionHeaders: Record<string, string> | undefined =
 				"x-vercel-protection-bypass": vercelBypassSecret,
 				"x-vercel-set-bypass-cookie": "true",
 			}
-		: vercelTrustedOidcToken
-			? {
-					"x-vercel-trusted-oidc-idp-token": vercelTrustedOidcToken,
-				}
-			: undefined;
+		: undefined;
 
 export default defineConfig({
 	testDir: "./tests",
