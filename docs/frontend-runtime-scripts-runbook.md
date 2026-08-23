@@ -2,311 +2,165 @@
 
 ## Scope
 
-This runbook documents the shared frontend runtime scripts that were consolidated for this repository. It focuses on how pages should wire analytics, UI widgets, and translation without reintroducing duplicated inline snippets.
+This runbook documents the shared browser scripts that remain necessary while
+legacy `public/*.html` content is progressively migrated to Next.js App Router.
+New React pages should prefer typed components and `next-intl` instead of adding
+new global scripts.
 
-## Codepaths Covered
+## Active shared scripts
 
-- `public/site-analytics.js`
-- `public/site-widgets.js`
-- `public/site-google-translate.js`
-- `public/analytics-stubs.js` (legacy compatibility shim)
-- `public/theme-toggle.js`
+- `public/site-analytics.js`: analytics and telemetry loaders by mode.
+- `public/site-widgets.js`: theme/translate bootstrap, scroll helpers, print,
+  back-to-top, coffee FAB, consent and optional Intercom behavior.
+- `public/site-google-translate.js`: compatibility bootstrap for legacy pages.
+- `public/theme-toggle.js`: early theme preference application.
+- `public/analytics-stubs.js`: deprecated compatibility shim.
+- `public/nabla-service-status.js`: best-effort favicon reachability hints for
+  legacy Nabla tool/open-source links only.
+
+The following former homelab runtimes are retired and must not be reintroduced:
+
 - `public/homelab-services-render.js`
-- `public/homelab-services.json`
-- `public/nabla-service-status.js`
-- `app/api/homelab-tunnel-check/route.ts` (server-side HTTP/TLS probe for public homelab endpoints)
-- `public/site-content-page.css` (homelab card + ping indicator styles)
-- `lib/sitePageCatalog.ts`
-- `app/[locale]/page.tsx`
-- `app/[locale]/workstation/page.tsx`
-- `lib/htmlFromPublic.ts`
-- `public/*.html` pages that load these scripts (for integration examples)
+- `components/HomelabServicesScripts.tsx`
+- `app/api/homelab-tunnel-check/route.ts`
+- homelab globals/callbacks previously exposed by `nabla-service-status.js`
 
-## Runtime Architecture
+## Analytics modes
 
-The current frontend runtime is split into focused scripts:
+Use `data-analytics-mode` on `site-analytics.js`:
 
-- `site-analytics.js`: analytics and telemetry loaders by mode.
-- `site-widgets.js`: shared UI behavior (theme, translate bootstrap, scroll helpers, print button, back-to-top, coffee FAB, consent, optional Intercom).
-- `theme-toggle.js`: early theme preference application and segmented theme control injection.
-- `site-google-translate.js`: standalone translate bootstrap kept for compatibility with older pages.
-
-`site-widgets.js` and `site-google-translate.js` both protect against double initialization through `window.__NABLA_GOOGLE_TRANSLATE_STARTED`.
-
-## Analytics Modes (`site-analytics.js`)
-
-Use `data-analytics-mode` on the script tag:
-
-- `vercel` (default): Vercel analytics + Vercel speed insights.
+- `vercel` (default): Vercel Analytics + Speed Insights.
 - `full`: GTM + GA4 + VWO + PostHog + Heap + Datadog RUM + Vercel.
-- `showcase`: same as `full` without Datadog RUM.
+- `showcase`: `full` without Datadog RUM.
 - `home`: Mixpanel + everything in `full`.
 
-Optional analytics attributes:
+The Next.js application shell uses `vercel` by default. Set
+`NEXT_PUBLIC_ANALYTICS_MODE` explicitly only when the extra vendor cost and
+privacy/performance impact are intentional.
 
-- `data-ahrefs-key`: adds Ahrefs Web Analytics.
-- `data-gtm-id`: override GTM container.
-- `data-ga-measurement-id`: override GA4 measurement id.
+## Shared UI attributes
 
-Programmatic fallback is also supported through `window.NABLA_ANALYTICS_PRESET`.
+`site-widgets.js` supports the legacy attributes below:
 
-The Next.js application shell uses the lightweight `vercel` mode by default.
-Set `NEXT_PUBLIC_ANALYTICS_MODE` explicitly to `full`, `showcase`, or `home`
-only when the additional vendors are required and their performance/privacy
-cost has been accepted. Per-page duplicate loaders must not be added below the
-localized layout.
+- `data-print-pdf`
+- `data-no-print-pdf`
+- `data-coffee-fab`
+- `data-no-coffee-fab`
+- `data-axeptio`
+- `data-no-google-translate`
+- `data-no-scroll-reveal`
+- `data-minimal-chrome`
+- `data-no-back-to-top`
+- `data-intercom-app-id`
 
-### Verified page examples
+`site-widgets.js` and `site-google-translate.js` guard against duplicate Google
+Translate initialization through `window.__NABLA_GOOGLE_TRANSLATE_STARTED`.
 
-- `home`: `public/index.html`
-- `full`: `public/link.html`, `public/nabla.html`, `public/cv/index.html`
-- `showcase`: `public/truenas.html`, `public/freenas.html`, `public/workstation.html`
-- `vercel`: `public/ai.html`, `public/contact.html`, `public/security.html`, `public/pricing.html`
+## Homelab runtime
 
-## Shared UI Attributes (`site-widgets.js`)
+Homelab cards are no longer rendered by imperative scripts. Both Nabla and
+TrueNAS compose the same React implementation:
 
-Frequently used attributes:
-
-- `data-print-pdf`: inject print button.
-- `data-no-print-pdf`: disable print button.
-- `data-coffee-fab`: inject support floating action button.
-- `data-no-coffee-fab`: disable support button.
-- `data-axeptio`: load Axeptio consent SDK.
-- `data-no-google-translate`: skip translate bootstrap.
-- `data-no-scroll-reveal`: disable reveal animations.
-- `data-minimal-chrome`: minimal UI mode (no theme toggle button, no translate, no print, no back-to-top, no Axeptio).
-
-Default behavior to remember:
-
-- Back-to-top is injected unless disabled (`data-no-back-to-top`).
-- Intercom is only loaded when `data-intercom-app-id` is set.
-- Theme preference is stored under `site-theme-preference` and reflected via `data-theme` on `<html>`.
-
-### Verified page examples
-
-- Standard page with print/coffee/consent: `public/index.html`, `public/contact.html`
-- Checkout pages suppressing print/coffee: `public/checkout.html`, `public/cancel.html`
-- Minimal chrome mode: `public/404.html`
-
-## Homelab Service Cards Runtime
-
-`public/truenas.html` and `public/nabla.html` render service cards from JSON at runtime instead of hardcoding each card in HTML.
-
-### Runtime flow
-
-1. Page defines one or more roots using `data-homelab-services-root`.
-2. `public/homelab-services-render.js` fetches JSON (`homelab-services.json` by default, or `data-homelab-json` override).
-3. Script renders a responsive card grid with Internal and Endpoint actions for each service. `tunnelUrl` is retained as the historical JSON field name for endpoint/inventory URLs.
-4. `endpointEnabled` determines whether the Endpoint action is active when explicitly supplied. Without it, public (`external: true`) and `*.int.albandrieu.com` endpoints are active; other private URLs are retained as inventory metadata but shown disabled/grey.
-5. After render, the script calls `window.initHomelabServiceCardPings()`, `window.initHomelabTlsLockIndicators()`, and `window.initHomelabTunnelTabIndicators()` when available.
-6. `public/nabla-service-status.js` runs favicon probes for reachability and HTTPS padlock state. Active Endpoint elements expose `data-homelab-external` so health-check location is chosen from `external` only.
-7. Public endpoints (`external: true`) call `GET /api/homelab-tunnel-check?url=…` from the site server. Private endpoints (`external: false`) are probed from the browser so LAN and `.int` services can be green when locally reachable.
-
-### Root attributes (public interface)
-
-- `data-homelab-services-root`: required mount point.
-- `data-homelab-variant`: optional, `truenas` or `nabla` (`truenas` default). Controls default internal link tooltip text.
-- `data-homelab-json`: optional JSON path, default `homelab-services.json`.
-
-Example:
-
-```html
-<div
-	data-homelab-services-root
-	data-homelab-variant="truenas"
-	data-homelab-json="homelab-services.json"
-></div>
+```text
+app/components/homelab/HomelabServicesSection.tsx
+  -> HomelabServicesBlock.tsx
+      -> GET /api/homelab-services
+      -> GET /api/homelab-health
+      -> HomelabServiceGrid.tsx
+          -> EndpointAction.tsx
 ```
 
-### `homelab-services.json` contract
+Behavior:
 
-Top-level payload:
+- the catalogue is fetched from the same-origin Next API, which is FastAPI-first
+  with a repository JSON fallback;
+- public endpoint health is authoritative from the FastAPI health snapshot;
+- a missing/failed health snapshot degrades health to unknown without hiding a
+  valid catalogue;
+- private/internal HTTP(S) endpoints may use browser-side reachability probes so
+  LAN and `.int` DNS can be evaluated from the user's network;
+- there is no generic Vercel tunnel-check API anymore.
 
-```json
-{
-	"version": 1,
-	"services": []
-}
-```
+`public/homelab-services.json` remains a catalogue fallback during the FastAPI
+migration. It is data, not a frontend renderer.
 
-Per-service fields used by renderer:
+### Catalogue fields
 
-- `name` (required): card title.
-- `iconSrc` (optional): path to a **local** image under `assets/` (e.g. `assets/selfh-icons/grafana.png`). Validated: must start with `assets/`, ASCII letters/digits/`._-/`, no `..` or `//`. When set, the card title shows this image instead of Font Awesome. Prefer icons discovered on [selfh.st/icons](https://selfh.st/icons/) and vendored into `public/assets/selfh-icons/` (see `.cursor/rules/506_homelab-selfh-icons.mdc`).
-- `icons` (optional): list of Font Awesome classes; validated against `^[\\w.\\- ]+$`. Invalid class falls back to `fas fa-circle`. Used when `iconSrc` is absent or invalid.
-- `description` (optional): short summary text.
-- `internalHost` + `internalPort` (required for usable internal button): compose internal URL.
-- `internalSecure` (optional boolean): `https` when true, `http` when false. When exactly `true` and the built internal URL is `https:`, a padlock icon is rendered on the Internal button and later colored by a client-side probe.
-- `tunnelUrl` (optional): endpoint/inventory URL. The field name is historical and is kept even when the endpoint is disabled. Values can be `https://...`, `http://...`, or protocol-specific values such as `postgres://...`.
-- `tunnelSecure` (optional boolean): HTTPS metadata paired with `tunnelUrl`.
-- `endpointEnabled` (optional boolean): explicitly controls whether `tunnelUrl` is an active Endpoint. When omitted, the renderer enables `external: true` endpoints and private URLs under `*.int.albandrieu.com`; other `external: false` URLs stay disabled while their `tunnelUrl` remains available as inventory metadata.
-- `external` (boolean): **sole source of truth for exposure**. `true` means the active endpoint is intended to be publicly reachable; `false` means private/internal. This flag does not itself determine health.
-- `internalPath` (optional): appended path; if present and missing leading slash, renderer adds it.
-- Internal and endpoint links always open in a new tab (`target="_blank"` with `rel="noopener noreferrer"`).
-- `internalTitle` and `tunnelTitle` (optional): override button tooltip text.
-- `portHtml` (optional): custom HTML rendered in card footer (used for protocol-specific hints like Postgres).
+Relevant fields include:
 
-### Endpoint health semantics
+- `name`
+- `iconSrc` / `icons`
+- `description`
+- `internalHost`, `internalPort`, `internalSecure`, `internalPath`
+- historical `tunnelUrl` / `tunnelSecure`
+- `endpointEnabled`
+- `external`: sole exposure flag (`true` public, `false` private/internal)
+- `internalTitle` / `tunnelTitle`
+- `portHtml`
 
-- Active + `external: true`: server-side HTTP/TLS probe. HTTP `2xx`/`3xx` is green; common auth/restriction responses such as `401`, `403`, `404`, and `429` are warning/yellow; TLS/network or other failures are red/unknown as applicable.
-- Active + `external: false`: browser-side probe so LAN and `.int` DNS can be evaluated from the user's network rather than from Vercel.
-- Disabled endpoint: grey, while `tunnelUrl` may still be retained for inventory.
-- HTTPS health and public exposure are independent concepts.
-- Host allowlist for the server-side public probe defaults to `*.albandrieu.com`; override with `HOMELAB_TUNNEL_CHECK_HOSTS` (comma-separated hostnames, no scheme).
+Exposure and health are independent concepts. A service can be public but down,
+or private but healthy from the user's LAN.
 
-### URL-building constraints
+## `nabla-service-status.js`
 
-- Internal URL falls back to `#` when host/port is missing.
-- If `tunnelUrl` starts with `postgres:`, internal URL is generated as `postgres://<host>:<port>/`.
-- Internal scheme is selected from `internalSecure`.
-- `safeHref()` blocks unsafe values containing `"` or `<` (returns `#`).
+This script has been reduced to its remaining legacy responsibility. It probes
+only generic Nabla tool/open-source HTTP(S) links with favicon image requests.
+It does **not** manage homelab cards, TLS locks, Cloudflare tunnel state or
+FastAPI health.
 
-### Reachability probe behavior (`nabla-service-status.js`)
+Probe behavior:
 
-- Scope:
-  - `.nabla-platforms-section a.nabla-tool-tag-link`
-  - `#services a.opensource-link`
-  - `.opensource-section a.opensource-link`
-  - Homelab card action links in `.truenas-page-apps` and `.nabla-homelab-services`
-- Probe method: tries `origin + /favicon.ico`, then `/favicon.png`, then `/apple-touch-icon.png`.
-- Concurrency: 5 origins in parallel.
-- Timeout: 6500 ms per image probe.
-- States:
-  - `pending`: gray pulse while probing.
-  - `ok`: green dot when favicon load succeeds.
-  - `fail`: red dot on timeout/error.
-  - `unknown`: non-HTTP targets such as `postgres://`.
+- tries `/favicon.ico`, `/favicon.png`, then `/apple-touch-icon.png`;
+- five origins are processed concurrently;
+- timeout is 6500 ms per image probe;
+- results are best-effort and may produce false negatives when a host has no
+  favicon or blocks hotlinking.
 
-Important limitations:
+Do not extend this script for new React features. Its target state is deletion
+after the remaining legacy Nabla HTML consumers are migrated.
 
-- Probes are best-effort hints only.
-- False negatives happen when a service is up but does not expose a favicon or blocks hotlinking.
-- LAN-only addresses can fail for remote users even if service is healthy internally.
+## Next.js HTML content migration
 
-## Next.js HTML Content Migration
+Some dedicated App Router routes still load trusted fragments from `public/`
+through `lib/htmlFromPublic.ts` (notably `ai`, `security`, `workstation` and some
+CV content). `app/components/PublicHtmlFragment.tsx` centralizes that temporary
+HTML boundary.
 
-Each migrated URL has a dedicated App Router page. A few dedicated routes still
-load a fragment from `public/` through `lib/htmlFromPublic.ts` (`ai`, `security`,
-`workstation` and some CV pages). The three content routes render through
-`app/components/PublicHtmlFragment.tsx` so extraction and trusted HTML injection
-remain centralized. `lib/sitePageCatalog.ts` separately owns
-functional categories and the strict sitemap allowlist.
+For each migrated page:
 
-Workflow:
+1. keep/create `app/[locale]/<slug>/page.tsx`;
+2. use a public HTML fragment only as a temporary bridge;
+3. replace the fragment with typed React components and localized messages;
+4. keep internal URLs, canonical metadata, hreflang and sitemap policy aligned;
+5. remove the obsolete public HTML/script dependency when no consumer remains.
 
-1. Create a dedicated `app/[locale]/<slug>/page.tsx` route.
-2. During migration only, load its `public/*.html` fragment with `loadPublicHtmlFragment()`.
-3. Replace the fragment progressively with typed React components and next-intl messages.
-4. `lib/htmlFromPublic.ts` rewrites legacy internal links during the transition.
-
-### Practical constraints
-
-- Keep slugs stable when possible to avoid breaking existing URLs.
-- Conserver `lib/htmlRoutes.config.mjs` en phase avec les URLs historiques
-  réécrites par `next.config.mjs`.
-- N’ajouter une page à `SEO_PAGE_SLUGS` que si elle doit réellement apparaître
-  dans `sitemap.xml`.
-- Toute page absente de cette liste doit aussi déclarer
-  `robots: NON_INDEXABLE_ROBOTS` dans ses métadonnées Next.js. Le test
-  `tests/seo-indexing.spec.ts` vérifie cette règle sur les routes publiques,
-  techniques, CV et Jus Mundi.
-- Use relative script paths in `public/*.html`; rewrite tooling is for links, not script `src`.
-
-## Recommended Integration Pattern
-
-Paths below are for `public/*.html` at **site root**. For `public/cv/index.html` use `../theme-toggle.js`, `../site-widgets.js`, etc.; for `public/cv/jusmundi/*.html` use `../../…`. Same rule as shared CSS. Never use `/site-widgets.js`-style root paths for these files.
-
-For content pages in `public/` (root-level HTML):
-
-```html
-<script src="theme-toggle.js"></script>
-<script src="site-google-translate.js" defer></script>
-<script src="site-analytics.js" data-analytics-mode="vercel"></script>
-```
-
-End of `<body>` (before `</body>`):
-
-```html
-<script
-  src="site-widgets.js"
-  defer
-  data-print-pdf
-  data-coffee-fab
-  data-axeptio
-></script>
-```
-
-For minimal utility pages:
-
-```html
-<script src="theme-toggle.js"></script>
-<script src="site-google-translate.js" defer></script>
-<script src="site-analytics.js" data-analytics-mode="vercel"></script>
-<!-- … -->
-<script src="site-widgets.js" defer data-no-print-pdf data-no-coffee-fab></script>
-```
-
-For root `public/404.html` (minimal chrome):
-
-```html
-<script src="site-widgets.js" defer data-minimal-chrome></script>
-```
+SEO-indexable canonical URLs are extensionless. Historical `.html` URLs may
+remain only as permanent migration redirects, not as canonical internal links.
 
 ## Troubleshooting
 
-Theme toggle not visible:
+### Theme/translate/widgets missing
 
-- Confirm `theme-toggle.js` is present.
-- Confirm page is not using `data-minimal-chrome`.
+- confirm the relevant legacy script is loaded only once;
+- check `data-minimal-chrome` and the corresponding `data-no-*` attributes;
+- on a new App Router page, prefer the shared React/layout implementation over
+  adding another script tag.
 
-Translate widget missing:
+### Homelab cards missing
 
-- Check for `data-no-google-translate` or `data-minimal-chrome`.
-- If both `site-widgets.js` and `site-google-translate.js` are loaded, only one init runs by design.
+- inspect `GET /api/homelab-services`;
+- verify the catalogue contains a `services` array;
+- a health API failure alone should no longer remove the catalogue from the UI.
 
-Print button missing:
+### Homelab health unexpected
 
-- Confirm `data-print-pdf` is present and `data-no-print-pdf` is not set.
+- inspect `GET /api/homelab-health` and the FastAPI snapshot;
+- verify `external` and `endpointEnabled` separately;
+- for private endpoints, verify the browser can resolve/reach the LAN hostname.
 
-Back-to-top missing:
+Do not look for `/api/homelab-tunnel-check`: that endpoint has been retired.
 
-- Confirm `data-no-back-to-top` is not set.
-- Confirm the page does not use `data-minimal-chrome`.
+## Migration rule
 
-Analytics mode mismatch:
-
-- Verify the exact `data-analytics-mode` value on the page script tag.
-- Use page examples above to keep mode selection consistent.
-
-Homelab cards not showing:
-
-- Confirm page contains `data-homelab-services-root`.
-- Confirm `homelab-services.json` path resolves (or set `data-homelab-json` explicitly).
-- Check browser console for `[homelab-services] Failed to load ...`.
-- Validate JSON root includes `services` array.
-
-Homelab service has broken Internal URL:
-
-- Ensure `internalHost` and `internalPort` are present.
-- Ensure `internalPath` is a valid path fragment.
-- For Postgres services, keep `tunnelUrl` scheme as `postgres://` to get protocol-specific handling.
-
-Endpoint state is unexpected:
-
-- Check `endpointEnabled` first when present.
-- Check `external`: it controls public/private exposure only, not health.
-- For a private active endpoint, confirm the browser can resolve/reach the LAN or `.int` hostname.
-- For a public endpoint, inspect `/api/homelab-tunnel-check?url=…` and the server-side allowlist.
-
-Status dots missing or stuck pending:
-
-- Confirm `nabla-service-status.js` is loaded on the page.
-- Confirm `homelab-services-render.js` runs after DOM is ready and calls ping init.
-- If all dots are `fail`, verify browser network access to target origins and favicon availability.
-
-## Migration and Compatibility Notes
-
-- `public/analytics-stubs.js` is deprecated and only exists so legacy pages keep loading `site-analytics.js` in `vercel` mode.
-- If you touch an old page, replace `analytics-stubs.js` with direct `site-analytics.js` usage.
-- Prefer script attributes over inline third-party snippets to keep runtime behavior centralized.
-- `public/truenas-health.js` has been removed; use `public/nabla-service-status.js` as the shared reachability indicator script.
+Every edit to a legacy browser runtime should reduce its scope. New behavior
+belongs in App Router components, route handlers or shared typed libraries.
