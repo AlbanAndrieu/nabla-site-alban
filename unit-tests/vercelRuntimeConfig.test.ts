@@ -24,6 +24,7 @@ test("TrueNAS page stays statically renderable", async () => {
 
 	assert.doesNotMatch(source, /force-dynamic/);
 	assert.doesNotMatch(source, /loadHomelabServicesCatalog|loadHomelabHealthSnapshot/);
+	assert.match(source, /HomelabServicesSection/);
 });
 
 test("dynamic homelab data is isolated behind same-origin APIs", async () => {
@@ -35,4 +36,19 @@ test("dynamic homelab data is isolated behind same-origin APIs", async () => {
 	assert.match(source, /^"use client";/);
 	assert.match(source, /fetch\("\/api\/homelab-services"/);
 	assert.match(source, /fetch\("\/api\/homelab-health"/);
+});
+
+test("Nabla and TrueNAS legacy html URLs stay routed to App Router", async () => {
+	const routes = await readFile(
+		new URL("lib/htmlRoutes.config.mjs", ROOT),
+		"utf8",
+	);
+	const nabla = await readFile(
+		new URL("app/components/nabla/ServiceCardsSection.tsx", ROOT),
+		"utf8",
+	);
+
+	assert.match(routes, /["']nabla["']/);
+	assert.match(routes, /["']truenas["']/);
+	assert.match(nabla, /HomelabServicesSection/);
 });
