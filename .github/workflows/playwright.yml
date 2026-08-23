@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   # Vercel can publish several previews while a PR is updated. Keep only the
@@ -87,3 +88,32 @@ jobs:
           echo "Download the **playwright-report** artifact for traces and screenshots." >> "$GITHUB_STEP_SUMMARY"
         env:
           BASE_URL: ${{ inputs.base_url || github.event.deployment_status.environment_url }}
+
+      - name: Publish Playwright Preview E2E status
+        if: always() && github.event_name == 'deployment_status'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOYED_SHA: ${{ github.event.deployment.sha }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$JOB_STATUS" in
+            success) STATE=success; DESCRIPTION='Playwright preview tests passed' ;;
+            cancelled) STATE=error; DESCRIPTION='Playwright preview tests cancelled' ;;
+            *) STATE=failure; DESCRIPTION='Playwright preview tests failed' ;;
+          esac
+
+          payload="$(jq -n \
+            --arg state "$STATE" \
+            --arg target_url "$RUN_URL" \
+            --arg description "$DESCRIPTION" \
+            --arg context 'Playwright Preview E2E' \
+            '{state: $state, target_url: $target_url, description: $description, context: $context}')"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$DEPLOYED_SHA" \
+            --data "$payload"
