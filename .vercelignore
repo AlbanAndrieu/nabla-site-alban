@@ -16,6 +16,15 @@ server.cjs
 .python-version
 #!api
 api
+# Keep the homelab App Router APIs deployed while the legacy root /api tree stays ignored.
+!app/api/
+app/api/*
+!app/api/homelab-health/
+!app/api/homelab-health/**
+!app/api/homelab-services/
+!app/api/homelab-services/**
+!app/api/homelab-tunnel-check/
+!app/api/homelab-tunnel-check/**
 !lib
 !app
 !components
