@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, request as playwrightRequest, test } from "@playwright/test";
 
 const expectedSitemapUrls = [
 	"https://albanandrieu.com/",
@@ -124,21 +124,39 @@ test.describe("SEO indexing policy", () => {
 		}
 	});
 
-	test("migrated html SEO URLs permanently redirect to clean routes", async ({
-		request,
-	}) => {
-		for (const slug of migratedSeoSlugs) {
-			for (const [oldPath, destination] of [
-				[`/${slug}.html`, `/${slug}`],
-				[`/en/${slug}.html`, `/${slug}`],
-				[`/fr/${slug}.html`, `/fr/${slug}`],
-			] as const) {
-				const response = await request.get(oldPath, { maxRedirects: 0 });
-				expect([301, 308], `${oldPath} should permanently redirect`).toContain(
-					response.status(),
-				);
-				expect(response.headers().location).toBe(destination);
+	test("migrated html SEO URLs permanently redirect to clean routes", async ({}, testInfo) => {
+		const baseURL = testInfo.project.use.baseURL;
+		expect(typeof baseURL).toBe("string");
+
+		const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+		const trustedOidcToken = process.env.VERCEL_TRUSTED_OIDC_TOKEN?.trim();
+		const extraHTTPHeaders: Record<string, string> | undefined = bypassSecret
+			? { "x-vercel-protection-bypass": bypassSecret }
+			: trustedOidcToken
+				? { "x-vercel-trusted-oidc-idp-token": trustedOidcToken }
+				: undefined;
+
+		const redirectRequest = await playwrightRequest.newContext({
+			baseURL: String(baseURL),
+			...(extraHTTPHeaders ? { extraHTTPHeaders } : {}),
+		});
+
+		try {
+			for (const slug of migratedSeoSlugs) {
+				for (const [oldPath, destination] of [
+					[`/${slug}.html`, `/${slug}`],
+					[`/en/${slug}.html`, `/${slug}`],
+					[`/fr/${slug}.html`, `/fr/${slug}`],
+				] as const) {
+					const response = await redirectRequest.get(oldPath, { maxRedirects: 0 });
+					expect([301, 308], `${oldPath} should permanently redirect`).toContain(
+						response.status(),
+					);
+					expect(response.headers().location).toBe(destination);
+				}
 			}
+		} finally {
+			await redirectRequest.dispose();
 		}
 	});
 
