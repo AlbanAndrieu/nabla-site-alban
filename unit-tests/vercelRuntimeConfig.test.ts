@@ -9,6 +9,12 @@ import {
 
 const ROOT = new URL("../", import.meta.url);
 
+async function assertFilesAbsent(paths: string[]) {
+	for (const path of paths) {
+		await assert.rejects(readFile(new URL(path, ROOT), "utf8"));
+	}
+}
+
 test("Vercel keeps App Router APIs and excludes repository-only content", async () => {
 	const ignore = await readFile(new URL(".vercelignore", ROOT), "utf8");
 	const rules = ignore
@@ -92,18 +98,19 @@ test("SEO html URLs permanently redirect to extensionless canonical routes", asy
 	assert.match(config, /permanent: true/);
 });
 
-test("legacy homelab and Vercel runtimes are retired", async () => {
-	for (const path of [
+test("legacy homelab and Vercel runtimes stay retired", async () => {
+	await assertFilesAbsent([
 		"public/homelab-services-render.js",
 		"components/HomelabServicesScripts.tsx",
 		"public/nabla-service-status.js",
-		"public/assets/jpg_to_transparent_png.py",
 		"public/locales/fr/nabla.html",
 		"public/locales/fr/truenas.html",
 		"app/api/homelab-tunnel-check/route.ts",
 		"server.cjs",
 		"api/create-checkout-session.js",
-	]) {
-		await assert.rejects(readFile(new URL(path, ROOT), "utf8"));
-	}
+	]);
+});
+
+test("repository-only image tooling stays out of public assets", async () => {
+	await assertFilesAbsent(["public/assets/jpg_to_transparent_png.py"]);
 });
