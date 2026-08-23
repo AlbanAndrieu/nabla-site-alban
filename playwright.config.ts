@@ -28,6 +28,7 @@ const vercelProtectionHeaders: Record<string, string> | undefined =
 	vercelBypassSecret
 		? {
 				"x-vercel-protection-bypass": vercelBypassSecret,
+				"x-vercel-set-bypass-cookie": "true",
 			}
 		: vercelTrustedOidcToken
 			? {
