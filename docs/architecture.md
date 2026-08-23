@@ -59,8 +59,10 @@ Les pages `/nabla`, `/fr/nabla`, `/truenas` et `/fr/truenas` restent SSG/CDN ;
 seul le bloc homelab charge les données dynamiques après hydratation. Une panne
 du snapshot santé ne masque pas un catalogue valide.
 
-`public/nabla-service-status.js` ne gère plus le homelab. Il reste uniquement
-comme sonde favicon best-effort pour certains liens legacy Nabla.
+Les anciens renderers/probes globaux (`homelab-services-render.js`,
+`nabla-service-status.js` et `/api/homelab-tunnel-check`) sont retirés. La santé
+publique vient du snapshot FastAPI et les sondes privées restent encapsulées
+dans les composants React.
 
 ## Observabilité
 
@@ -100,6 +102,3 @@ au commit déployé.
   `lib/htmlFromPublic.ts`; leur structure est contrôlée en navigateur.
 - Plusieurs grandes feuilles CSS et assets historiques sont encore sous
   `public/` et doivent être audités avant suppression.
-- `public/nabla-service-status.js` reste un runtime legacy générique et pourra
-  être remplacé par un composant React lorsque les derniers consommateurs HTML
-  auront migré.
