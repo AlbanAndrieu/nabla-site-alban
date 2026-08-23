@@ -1,6 +1,6 @@
 import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabService, HomelabServicesCatalog } from "@/lib/homelabServices";
-import EndpointAction from "../truenas/EndpointAction";
+import EndpointAction from "./EndpointAction";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
