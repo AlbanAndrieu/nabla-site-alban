@@ -9,14 +9,31 @@ const localTestUrl = `http://127.0.0.1:${testPort}`;
 const externalBaseUrl = process.env.BASE_URL?.trim();
 const vercelBypassSecret =
 	process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+const vercelTrustedOidcToken = process.env.VERCEL_TRUSTED_OIDC_TOKEN?.trim();
 const protectedVercelPreview =
 	process.env.VERCEL_PREVIEW_PROTECTED === "true";
 
-if (externalBaseUrl && protectedVercelPreview && !vercelBypassSecret) {
+if (
+	externalBaseUrl &&
+	protectedVercelPreview &&
+	!vercelBypassSecret &&
+	!vercelTrustedOidcToken
+) {
 	throw new Error(
-		"VERCEL_AUTOMATION_BYPASS_SECRET is required for protected Vercel Preview E2E tests",
+		"Protected Vercel Preview E2E requires either VERCEL_AUTOMATION_BYPASS_SECRET or VERCEL_TRUSTED_OIDC_TOKEN",
 	);
 }
+
+const vercelProtectionHeaders = vercelBypassSecret
+	? {
+			"x-vercel-protection-bypass": vercelBypassSecret,
+			"x-vercel-set-bypass-cookie": "true",
+		}
+	: vercelTrustedOidcToken
+		? {
+				"x-vercel-trusted-oidc-idp-token": vercelTrustedOidcToken,
+			}
+		: undefined;
 
 export default defineConfig({
 	testDir: "./tests",
@@ -40,13 +57,8 @@ export default defineConfig({
 		trace: "on-first-retry",
 		screenshot: "only-on-failure",
 		actionTimeout: 10000,
-		...(vercelBypassSecret
-			? {
-					extraHTTPHeaders: {
-						"x-vercel-protection-bypass": vercelBypassSecret,
-						"x-vercel-set-bypass-cookie": "true",
-					},
-			}
+		...(vercelProtectionHeaders
+			? { extraHTTPHeaders: vercelProtectionHeaders }
 			: {}),
 	},
 	expect: { timeout: 5000 },
