@@ -19,16 +19,20 @@ export default function HomeLabSection({
 }: Props) {
 	return (
 		<section
+			id="homelab"
 			className="py-4 page-truenas-secondary"
 			aria-labelledby="nabla-on-stack-heading"
 		>
 			<div className="container">
 				<h2 id="nabla-on-stack-heading" className="h4 mb-3">
-					<i
-						className="fas fa-layer-group text-primary me-2"
-						aria-hidden="true"
-					></i>
-					{title}
+					<a className="text-reset text-decoration-none" href="#homelab">
+						<i
+							className="fas fa-layer-group text-primary me-2"
+							aria-hidden="true"
+						></i>
+						{title}
+						<span className="ms-2 small text-secondary" aria-hidden="true">#</span>
+					</a>
 				</h2>
 				<p className="text-secondary mb-4">{intro}</p>
 				<p>{purpose}</p>
@@ -51,6 +55,8 @@ export default function HomeLabSection({
 								<a
 									href={nablaHref}
 									className="btn btn-sm btn-outline-primary mt-3"
+									target="_blank"
+									rel="noopener noreferrer"
 								>
 									{openProject}
 								</a>
