@@ -1,0 +1,69 @@
+{
+  "truenasUpgrades": {
+    "fastPool": {
+      "badge": "Planifié",
+      "title": "Pool SSD rapide pour les services",
+      "purchase": "2 × WD Red SN700 1 To NVMe SSD",
+      "unitPrice": "l’unité",
+      "totalPrice": "au total",
+      "architectureLabel": "Architecture de stockage cible",
+      "system": "SYSTEM",
+      "systemDevice": "Kingston SKC600MS 256 Go via USB",
+      "systemRole": "Système TrueNAS",
+      "fast": "FAST",
+      "fastDevice": "2 × WD Red SN700 1 To",
+      "fastRole": "Miroir → fastpool",
+      "fastUsage": "Apps, datasets applicatifs et VM",
+      "data": "DATA",
+      "dataDevice": "4 × WD Red 3 To",
+      "dataRole": "RAIDZ → cpool",
+      "dataUsage": "Documents, médias et sauvegardes",
+      "note": "Les datasets applicatifs existants seront migrés sélectivement vers le pool SSD. Par exemple, /mnt/cpool/openwebui pourra devenir /mnt/fastpool/appdata/openwebui, tandis que les données volumineuses resteront sur cpool."
+    },
+    "gpu": {
+      "title": "GPU pour l’inférence IA locale",
+      "lead": "La carte mère fournit un slot PCIe x16. Le choix final dépend surtout de l’espace réel dans le châssis, de l’alimentation et de la VRAM nécessaire aux modèles.",
+      "vram": "VRAM",
+      "power": "Puissance",
+      "formFactor": "Format",
+      "price": "Prix observé",
+      "fromPrice": "À partir de",
+      "priceSnapshot": "Relevé de prix : 24 août 2026 ; les prix de vente peuvent évoluer rapidement.",
+      "recommended": "Choix privilégié",
+      "source": "Source du prix",
+      "ramTitle": "Mémoire système",
+      "ram": "Le passage de 64 à 128 Go de DDR5 est supporté. Le Ryzen 7 7700 supporte officiellement 128 Go de DDR5 UDIMM en double canal et DDR5-5200 avec deux DIMM ; la carte MSI accepte des profils mémoire plus rapides, mais 5200 MT/s est la spécification CPU conservatrice. L’objectif est d’ajouter un second module UDIMM de 64 Go compatible, idéalement identique au module existant.",
+      "fit": [
+        "Meilleur choix pour le châssis compact actuel et l’alimentation 500 W. Ses 70 W, son format low-profile double-slot et ses 24 Go de VRAM ECC en font l’évolution privilégiée pour l’inférence.",
+        "Double la VRAM à 48 Go et élargit fortement les modèles exécutables entièrement sur GPU, mais ses 300 W et son format pleine hauteur de 267 mm imposeront probablement un boîtier plus grand et une alimentation plus puissante.",
+        "Avec 96 Go de VRAM ECC, c’est la cible maximale de cette feuille de route pour l’inférence locale. Prévoir un nouveau boîtier, une alimentation renforcée et une ventilation adaptée pour la carte Max-Q de 300 W."
+      ]
+    },
+    "models": {
+      "title": "Capacité des modèles locaux avec RTX PRO 4000 SFF",
+      "lead": "Capacité indicative avec un GPU de 24 Go. Les vitesses mesurées proviennent de benchmarks publics réalisés sur ce GPU exact lorsque disponibles ; les autres valeurs sont des estimations d’ingénierie prudentes et dépendent de la quantification, du contexte et du moteur d’inférence.",
+      "gpuTierTitle": "Modèles tenant dans 24 Go de VRAM",
+      "ramTierTitle": "Modèles hybrides plus grands avec 128 Go de RAM système",
+      "model": "Modèle",
+      "memory": "Mémoire modèle approx.",
+      "use": "Usage privilégié",
+      "speed": "Vitesse de génération",
+      "parallel": "Prompts parallèles pratiques",
+      "measured": "mesuré sur RTX PRO 4000 Blackwell SFF",
+      "estimated": "estimé",
+      "concurrencyNote": "Les chiffres de parallélisme supposent un serveur partagé de type llama.cpp/vLLM avec batching continu et des contextes courts à moyens. Ils ne signifient pas qu’une copie distincte du modèle est chargée pour chaque utilisateur.",
+      "ramNote": "La RAM système ne devient pas de la VRAM. Les modèles plus grands utilisent un offload CPU/RAM et sont donc nettement plus lents que ceux qui tiennent entièrement sur le GPU.",
+      "gpuUses": [
+        "Raisonnement général, agents, outils et code",
+        "Code agentique, travail sur dépôt et raisonnement multimodal général",
+        "Code spécialisé et développement à l’échelle d’un dépôt",
+        "Traduction multilingue à fort volume (400+ langues)"
+      ],
+      "ramUses": [
+        "Raisonnement général de meilleure qualité, agents et code",
+        "Grand modèle généraliste multilingue ; offload dense CPU/GPU",
+        "Raisonnement agentique, RAG et expérimentation long contexte ; runtimes quantifiés communautaires"
+      ]
+    }
+  }
+}
