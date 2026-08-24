@@ -51,8 +51,9 @@
       "parallel": "Prompts parallèles pratiques",
       "measured": "mesuré sur RTX PRO 4000 Blackwell SFF",
       "estimated": "estimé",
+      "benchmarkSource": "Source du benchmark sur ce GPU exact",
       "concurrencyNote": "Les chiffres de parallélisme supposent un serveur partagé de type llama.cpp/vLLM avec batching continu et des contextes courts à moyens. Ils ne signifient pas qu’une copie distincte du modèle est chargée pour chaque utilisateur.",
-      "ramNote": "La RAM système ne devient pas de la VRAM. Les modèles plus grands utilisent un offload CPU/RAM et sont donc nettement plus lents que ceux qui tiennent entièrement sur le GPU.",
+      "ramNote": "La RAM système ne devient pas de la VRAM. Les modèles plus grands utilisent un offload CPU/RAM et sont donc nettement plus lents que ceux qui tiennent entièrement sur le GPU. Sur TrueNAS, ces mêmes 128 Go sont aussi partagés avec l’ARC ZFS et les autres applications : les très gros modèles nécessitent donc un budget mémoire explicite et des limites ARC/conteneurs raisonnables.",
       "gpuUses": [
         "Raisonnement général, agents, outils et code",
         "Code agentique, travail sur dépôt et raisonnement multimodal général",
