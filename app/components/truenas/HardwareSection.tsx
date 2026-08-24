@@ -1,12 +1,5 @@
+import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
-
-export type HardwareCopy = {
-	title: string;
-	incident: string;
-	tagline: string;
-	purposeLabel: string;
-	pillars: Array<{ title: string; subtitle: string }>;
-};
 
 const PILLAR_ICONS = [
 	"fa-database",
@@ -15,7 +8,12 @@ const PILLAR_ICONS = [
 	"fa-microchip",
 ] as const;
 
-export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
+type Pillar = { title: string; subtitle: string };
+
+export default async function HardwareSection() {
+	const t = await getTranslations("truenas.page.hardware");
+	const pillars = t.raw("pillars") as Pillar[];
+
 	return (
 		<section
 			className="category-section nabla-platforms-section hardware-section"
@@ -31,7 +29,7 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 							>
 								<i className="fas fa-server"></i>
 							</span>
-							<span className="hardware-heading-with-icon__text">{copy.title}</span>
+							<span className="hardware-heading-with-icon__text">{t("title")}</span>
 						</AnchoredHeading>
 						<div className="hardware-platform-band mt-4">
 							<div className="row justify-content-center">
@@ -45,7 +43,7 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 												>
 													<i className="fas fa-screwdriver-wrench"></i>
 												</span>
-												<span className="hardware-bom-intro__text">{copy.incident}</span>
+												<span className="hardware-bom-intro__text">{t("incident")}</span>
 											</p>
 										</div>
 									</div>
@@ -59,10 +57,10 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 										id="hardware-tagline"
 										className="hardware-platform-band__tagline text-center"
 									>
-										{copy.tagline}
+										{t("tagline")}
 									</p>
-									<ul className="hardware-pill-grid" aria-label={copy.purposeLabel}>
-										{copy.pillars.map((pillar, index) => (
+									<ul className="hardware-pill-grid" aria-label={t("purposeLabel")}>
+										{pillars.map((pillar, index) => (
 											<li className="hardware-pill" key={pillar.title}>
 												<span className="hardware-pill__icon" aria-hidden="true">
 													<i className={`fas ${PILLAR_ICONS[index]}`} />
