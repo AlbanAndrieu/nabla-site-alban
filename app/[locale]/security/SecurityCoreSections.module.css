@@ -1,0 +1,18 @@
+.heroLink {
+	color: #fff;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.18em;
+}
+
+.heroLink:hover,
+.heroLink:focus-visible {
+	color: #fff;
+	text-decoration-thickness: 0.14em;
+}
+
+.heroLink:focus-visible {
+	outline: 3px solid rgba(255, 255, 255, 0.9);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
