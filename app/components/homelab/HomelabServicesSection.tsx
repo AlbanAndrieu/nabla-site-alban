@@ -1,25 +1,16 @@
+import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import HomelabServicesBlock from "./HomelabServicesBlock";
 
 type Props = {
-	title: string;
-	lead: string;
-	iconsBefore: string;
-	iconsAfter: string;
-	endpointLabel: string;
-	internalLabel: string;
 	headingId?: string;
 };
 
-export default function HomelabServicesSection({
-	title,
-	lead,
-	iconsBefore,
-	iconsAfter,
-	endpointLabel,
-	internalLabel,
+export default async function HomelabServicesSection({
 	headingId = "homelab-services",
 }: Props) {
+	const t = await getTranslations("homelab.section");
+
 	return (
 		<section
 			className="stack-page-hero py-5 homelab-services-section page-truenas-apps"
@@ -29,15 +20,15 @@ export default function HomelabServicesSection({
 				<div className="row mb-4">
 					<div className="col-12 text-center">
 						<AnchoredHeading id={headingId} className="display-4 mb-3">
-							{title}
+							{t("title")}
 						</AnchoredHeading>
-						<p className="lead mb-2 stack-page-hero__lead">{lead}</p>
+						<p className="lead mb-2 stack-page-hero__lead">{t("lead")}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-0">
-							{iconsBefore}{" "}
+							{t("iconsBefore")}{" "}
 							<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">
 								selfh.st/icons
 							</a>
-							. {iconsAfter}{" "}
+							. {t("iconsAfter")}{" "}
 							<a href="https://selfh.st/apps/" target="_blank" rel="noopener noreferrer">
 								selfh.st/apps
 							</a>
@@ -45,7 +36,7 @@ export default function HomelabServicesSection({
 						</p>
 					</div>
 				</div>
-				<HomelabServicesBlock endpointLabel={endpointLabel} internalLabel={internalLabel} />
+				<HomelabServicesBlock />
 			</div>
 		</section>
 	);
