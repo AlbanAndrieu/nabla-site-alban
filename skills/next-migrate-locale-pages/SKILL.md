@@ -9,98 +9,104 @@ Migrate pages into `app/[locale]/<route>/page.tsx` without losing information or
 
 ---
 
-## IMPORTANT: i18n message file update best-practices
+## i18n catalog ownership
 
-**Never overwrite the global translation file!**
+Use Next-Intl as the only source of human-facing localized copy. **Never create component-local locale dictionaries** such as `COPY = { en: ..., fr: ... }`.
 
-When adding translations for a specific page:
-- Always parse the existing `messages/en.json` and `messages/fr.json` in full, and MERGE or APPEND only the key(s) for the new/migrated page.
-- Never overwrite or truncate any unrelated translation keys/sections. These JSON files are _global registries_ for all locale strings (used by all pages and components).
-- Use a workflow that always reads and merges the full file before writing.
-- **The only supported tool in this repository for patch operations on the global catalogs is:**
-  ```
-  node scripts/merge-i18n-message.js messages/en.json patch.json
-  ```
-  `patch.json` should contain only the new/modified keys (e.g. `{ "404": { ... } }`).
-  This deep-merges and preserves the rest.
-  All automation or manual edits to the global catalogs MUST use this script.
-- All automations/scripts must do read-modify-write (never replace).
+The repository supports two catalog classes:
 
-### Feature-scoped catalogs
+1. `messages/{locale}.json` — legacy/global namespaces and genuinely site-wide copy.
+2. `messages/<feature>/{locale}.json` — actively maintained feature domains such as `truenas` or shared UI domains such as `homelab`.
 
-Large actively maintained features may use a small feature-scoped catalog such as `messages/truenas/en.json` and `messages/truenas/fr.json` when that keeps the global registries manageable. In that case:
-- merge the feature catalog into the Next-Intl message object in `i18n/request.ts`;
-- keep the same namespace/key structure in every supported locale;
-- add or extend a unit test that verifies locale structure parity;
-- keep canonical product/model names as data and translate only surrounding human-facing copy;
-- do not duplicate an existing global namespace in a feature catalog.
+### Rules for feature catalogs
 
-**Never create component-local translation dictionaries such as `COPY = { en: ..., fr: ... }`.** Visible UI copy must come from Next-Intl message catalogs and be passed to pure presentation components or read through the appropriate Next-Intl API.
+- A feature catalog owns one distinct top-level namespace, e.g. `messages/truenas/fr.json` owns `truenas`.
+- Shared cross-page UI gets its own domain instead of being borrowed from an unrelated page. Example: TrueNAS and Nabla both consume `homelab`, rather than Nabla importing TrueNAS page copy.
+- Load feature catalogs centrally through `i18n/messages.ts`; `i18n/request.ts` should delegate to that loader rather than accumulating feature-specific imports.
+- The loader must reject duplicate top-level namespaces.
+- During incremental extraction, explicitly retire the old namespace from the legacy/global catalog at runtime. Remove the physical legacy block in a later safe JSON migration rather than allowing two runtime sources of truth.
+- Keep the same key structure in every supported locale and cover each feature catalog with locale-parity tests.
+- Keep canonical technical/product/model data in typed TypeScript data modules; translate only surrounding human-facing copy.
+- Server components should normally read their own namespace with `getTranslations()` instead of receiving large translation objects through several component layers.
+- Client components should use `useTranslations()` for their own localized state, status, tooltips and accessibility labels.
 
-**Rule:**
-> Any script/manual edit must only update the **subtree** for the page/component and NEVER destroy or replace other unrelated parts of the file.
+### Editing catalogs safely
 
-If unsure: always review via diff or use a linter.
+**Never overwrite or truncate an unrelated translation subtree.**
+
+For the large legacy/global catalogs, prefer the repository merge helper:
+
+```text
+node scripts/merge-i18n-message.js messages/en.json patch.json
+```
+
+Feature catalogs are intentionally small enough to review as complete files, but edits must still preserve unrelated keys and locale parity.
 
 ---
 
 ## Migration traps: rewrites, redirects & legacy HTML
 
-**Always check for rewrites or redirects that might shadow your React app with static HTML or legacy content!**
+**Always check for rewrites or redirects that might shadow your React app with static HTML or legacy content.**
 
-- Examine `vercel.json`, `next.config.mjs`, etc for:
-  - `{ "source": "/jm", "destination": "/jm/index.html" }`
-  - `/{slug}.html -> /[locale]/{slug}` or inverse
-  - Home/policy/landing rewrites
-- A fallback or rewrite can shadow even a migrated app route!
+Examine `vercel.json`, `next.config.mjs`, etc. for rules such as:
 
-**Rule:**
-- If a React page exists in `app/[locale]/...`, never update the static HTML.
-- Only migrate a rewrite/Fallback after true parity.
-- When ready, REMOVE obsolete rewrites.
----
+- `{ "source": "/jm", "destination": "/jm/index.html" }`
+- `/{slug}.html -> /[locale]/{slug}` or the inverse
+- home/policy/landing fallbacks
 
-## Migration process (core)
-
-**Global pattern for Next.js migration:**
-- NEVER import or code JSX of nav/footer/cta into page-specific files (`page.tsx`): ALL such UI must come from the layout global (`layout.tsx` or shared global component).
-- After migration, always remove nav/footer UI and back/nav CTAs from pages — dupes in both page and layout create SSR/CSR bugs and UX confusion.
-- Apply this pattern to all migrated pages (EN/FR).
-
----
-### ⚠️ Correction clé : import des composants partagés
-
-Quand vous migrez un fichier volumineux (nabla, truenas, workstation, expertise, etc), n’importe quelle importation de composant partagé doit utiliser un chemin relatif correct depuis la page — rarement `"app/components/..."`, mais souvent du type `import SiteFooter from "../../../components/SiteFooter";` ou avec alias projet (ex `@/components/SiteFooter`).
-Vérifiez que chaque import pointe bien vers le bon `components/` racine : cela évitera les erreurs `"Module not found : Can't resolve 'app/components/Footer'"` observées dans tous les retours d’expérience.
-
-**Best practice for large HTML pages (block-by-block subcomponent migration):**
-- Any migration of a large static HTML (like expertise, truenas, freenas, workstation, ...) **must** be split into multiple React subcomponents — one per logical section (Hero, Services, AI/ML, Skills, Technologies, Timeline, etc.).
-- For each section, create a separate React file (e.g. `app/components/{slug}/{Section}.tsx`), and extract all visible text labels to Next-Intl message catalogs.
-- The final page (`page.tsx`) assembles these components, eliminating risk of missing context, truncated exports, or token overflow.
-- This segmentation ensures: no section loss, maintainable UX, and industrialized i18n.
-- Use this approach **systematically** for every page too large to migrate as a single export/file.
+If a React page exists in `app/[locale]/...`, do not keep updating the static HTML as a parallel source of truth. Remove obsolete rewrites only after parity is verified.
 
 ---
 
-## Pour quels fichiers volumineux ? (déjà migrés)
+## Migration process
 
-- app/[locale]/truenas/page.tsx
-- app/[locale]/workstation/page.tsx
-- app/[locale]/nabla/page.tsx
-- app/[locale]/expertise/page.tsx
+### Shared layout UI
 
-**Choose the model**
+Do not duplicate global navigation, footer or back-navigation UI in page-specific files. Shared page chrome belongs in the locale layout or shared components.
 
-- Prefer native React + message catalogs for actively maintained/shared pages.
-- Use server-side extraction only for legacy static pages.
+Reuse existing primitives such as:
+
+- `TopAnchor`
+- `SkipToMainContent`
+- `AnchoredHeading`
+
+Do not reimplement their markup page by page.
+
+### Large-page component boundaries
+
+Large pages such as `truenas`, `nabla`, `workstation` and `expertise` should be split by logical responsibility: Hero, Services, Hardware, AI/ML, Skills, Technologies, Timeline, etc.
+
+For each section:
+
+- keep rendering logic in a dedicated component;
+- put localized human-facing copy in its owning Next-Intl namespace;
+- keep stable technical inventories/configuration in typed data modules;
+- avoid giant `copy` props when the server component can read its namespace itself;
+- use stable authored IDs with `AnchoredHeading` for shareable sections rather than generating IDs from translated text.
+
+### Shared component imports
+
+The `@/*` alias maps to the repository root. Therefore:
+
+```ts
+import AnchoredHeading from "@/components/AnchoredHeading";
+```
+
+means `components/AnchoredHeading.tsx`, **not** `app/components/AnchoredHeading.tsx`.
+
+Feature-specific components can remain under `app/components/<feature>/`.
 
 ---
 
-## KEY RULE FOR TRANSLATION FILES (messages/en.json, fr.json, …)
+## Validation before merge
 
-Whenever you add a new page or translation key:
-- Merge/append only the relevant section;
-- Never remove, replace, or truncate others;
-- Always validate via diff or linter before PR/merge.
+For every migration/refactor:
 
----
+- run ESLint and CSS linting;
+- generate Next.js route types;
+- run `tsc --noEmit`;
+- run unit tests, including locale-structure parity tests;
+- verify canonical/hreflang behavior and legacy redirects when routes changed;
+- review the diff for accidental translation loss or duplicate namespaces.
+
+A successful compile alone is not proof of migration parity.
