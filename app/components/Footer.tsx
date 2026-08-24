@@ -1,4 +1,6 @@
 import BackToTopButton from "@/components/BackToTopButton";
+import ActionLink, { actionClassName } from "@/components/ui/ActionLink";
+import styles from "./Footer.module.css";
 
 type FooterProps = {
 	backHome: string;
@@ -20,9 +22,6 @@ export default function Footer({
 	copyright,
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
-	const actionStyle = { minWidth: "220px", maxWidth: "100%" };
-	const actionClassName =
-		"btn btn-secondary d-inline-flex align-items-center justify-content-center gap-2 px-4";
 
 	return (
 		<footer className="footer text-center" role="contentinfo">
@@ -37,14 +36,16 @@ export default function Footer({
 			<div className="footer-links text-center">
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
-			<nav className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2 mt-4 w-100" aria-label="Footer navigation">
-				<a href={homeHref} className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2 px-4" style={actionStyle}>
+			<nav className={styles.actions} aria-label="Footer navigation">
+				<ActionLink href={homeHref}>
 					<i className="fas fa-home" aria-hidden="true"></i>
 					<span>{backHome}</span>
-				</a>
-				<div style={actionStyle}>
-					<BackToTopButton label={backToTop} ariaLabel={backToTopAria} className={`${actionClassName} w-100`} />
-				</div>
+				</ActionLink>
+				<BackToTopButton
+					label={backToTop}
+					ariaLabel={backToTopAria}
+					className={actionClassName("secondary")}
+				/>
 			</nav>
 			<p className="footer-copyright text-center" data-localized-copyright={copyright}>
 				{copyright}
