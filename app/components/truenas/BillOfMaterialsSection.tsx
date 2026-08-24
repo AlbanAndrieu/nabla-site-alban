@@ -1,4 +1,5 @@
 import FastPoolPlan from "./FastPoolPlan";
+import GpuUpgradePlan from "./GpuUpgradePlan";
 
 export type BillOfMaterialsCopy = {
 	title: string;
@@ -21,7 +22,7 @@ const PURCHASES = [
 		href: "https://www.amazon.fr/dp/B0BHCRX6K7",
 	},
 	{
-		icon: "fa-usb",
+		icon: "fa-hard-drive",
 		name: "ORICO mSATA SSD enclosure (USB 3.0, 5 Gbps)",
 		href: "https://www.amazon.fr/dp/B0CKP48DMB",
 	},
@@ -59,13 +60,15 @@ export default function BillOfMaterialsSection({
 	locale: string;
 }) {
 	return (
-		<section className="py-5 hardware-bom-section" aria-labelledby="bom-heading">
+		<section id="hardware-bom" className="py-5 hardware-bom-section" aria-labelledby="bom-heading">
 			<div className="container">
 				<h3 id="bom-heading" className="h5 mt-4 hardware-bom-heading">
-					<span className="hardware-bom-heading__icon" aria-hidden="true">
-						<i className="fas fa-clipboard-list"></i>
-					</span>
-					{copy.title}
+					<a className="text-reset text-decoration-none" href="#hardware-bom">
+						<span className="hardware-bom-heading__icon" aria-hidden="true">
+							<i className="fas fa-clipboard-list"></i>
+						</span>
+						{copy.title}<span className="ms-2 text-secondary" aria-hidden="true">#</span>
+					</a>
 				</h3>
 				<h4 className="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
@@ -93,11 +96,7 @@ export default function BillOfMaterialsSection({
 							<ItemIcon name={purchase.icon} />
 							<span className="hardware-bom-li__body">
 								{"href" in purchase ? (
-									<a
-										href={purchase.href}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
+									<a href={purchase.href} target="_blank" rel="noopener noreferrer">
 										{purchase.name}
 									</a>
 								) : (
@@ -113,17 +112,19 @@ export default function BillOfMaterialsSection({
 					<span className="hardware-bom-total__amount">1 184,31 €</span>
 					<span className="hardware-bom-total__note">{copy.totalNote}</span>
 				</p>
-				<div className="hardware-bom-upgrade-note mt-3">
+				<div id="hardware-upgrades" className="hardware-bom-upgrade-note mt-3">
 					<p className="hardware-bom-upgrade-note__title mb-2">
-						{copy.futureTitle}
+						<a className="text-reset text-decoration-none" href="#hardware-upgrades">
+							{copy.futureTitle}<span className="ms-2 text-secondary" aria-hidden="true">#</span>
+						</a>
 					</p>
 					<ul className="hardware-bom-upgrade-note__list mb-0">
-						{/* The old generic single-NVMe placeholder is superseded by the explicit mirrored fastpool plan below. */}
 						{copy.futureItems.slice(0, 1).map((item) => (
 							<li key={item}>{item}</li>
 						))}
 					</ul>
 					<FastPoolPlan locale={locale} />
+					<GpuUpgradePlan locale={locale} />
 				</div>
 			</div>
 		</section>
