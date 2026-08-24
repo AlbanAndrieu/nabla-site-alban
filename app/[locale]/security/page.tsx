@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
@@ -8,6 +7,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import SecurityArfTree from "./SecurityArfTree";
 
 export async function generateMetadata({
 	params,
@@ -48,11 +48,7 @@ export default async function SecurityPage({
 				locale={locale}
 				className="site-content-page page-security page-dark"
 			/>
-			<Script
-				src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"
-				strategy="afterInteractive"
-			/>
-			<Script src="/arf.js" strategy="afterInteractive" />
+			<SecurityArfTree />
 		</>
 	);
 }
