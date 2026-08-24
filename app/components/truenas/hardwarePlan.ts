@@ -1,3 +1,5 @@
+export const CURRENT_BUILD_TOTAL_EUR = 1184.31;
+
 export const FAST_POOL_PRODUCT = {
 	href: "https://www.amazon.fr/dp/B09H1CKTFP",
 	unitPriceEur: 299.99,
