@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
 	locale: string;
@@ -11,14 +12,10 @@ export default async function HomeOutcomesSection({ locale }: Props) {
 	const prefix = locale === "fr" ? "/fr" : "";
 
 	return (
-		<section
-			className="proof-section"
-			id="outcomes"
-			aria-labelledby="outcomes-heading"
-		>
-			<h2 className="section-title" id="outcomes-heading">
+		<section className="proof-section" aria-labelledby="outcomes">
+			<AnchoredHeading className="section-title" id="outcomes">
 				{t("outcomes.title")}
-			</h2>
+			</AnchoredHeading>
 			<p className="section-subtitle">{t("outcomes.engagements")}</p>
 			<div className="proof-grid">
 				{OUTCOME_DOMAINS.map((domain) => (
