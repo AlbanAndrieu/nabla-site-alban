@@ -1,0 +1,49 @@
+{
+  "homelab": {
+    "section": {
+      "title": "TrueNAS services",
+      "lead": "Self-hosted applications on TrueNAS Scale.",
+      "iconsBefore": "Service icons are vendored from",
+      "iconsAfter": "For more open-source self-hosted ideas, see"
+    },
+    "loading": "Loading homelab services…",
+    "unavailable": "Homelab services are temporarily unavailable.",
+    "endpoint": {
+      "external": "Web service (tunnel)",
+      "internal": "Internal",
+      "networkError": "network error",
+      "tlsError": "TLS error",
+      "tunnel": "tunnel",
+      "fastApiSnapshot": "FastAPI health snapshot: HTTP {status}",
+      "browserProbeHttp": "Browser endpoint probe: HTTP {status}",
+      "browserProbeTimedOut": "Browser endpoint probe timed out",
+      "browserProbeFavicon": "Endpoint responded from this browser (favicon probe)",
+      "browserProbeUnreadable": "Endpoint did not return a readable HTTP response or common favicon",
+      "checkingPrivate": "Checking private endpoint from this browser…",
+      "notConfigured": "Endpoint not configured for use",
+      "invalidUrl": "Invalid endpoint URL",
+      "protocolNotProbed": "{protocol} endpoint is not HTTP-probed",
+      "inventoryOnly": "Endpoint URL retained for inventory but not configured for use",
+      "noUrl": "No endpoint URL configured",
+      "dependencyDown": "TrueNAS dependency is down; external service marked unavailable",
+      "publicSnapshotUnavailable": "Public health snapshot unavailable",
+      "publicKind": "Public",
+      "privateKind": "Internal/private",
+      "httpsUnknown": "HTTPS certificate status unknown",
+      "httpsInvalid": "HTTPS certificate invalid",
+      "httpsTrusted": "HTTPS certificate trusted",
+      "tunnelUnknown": "Cloudflare tunnel status not observed yet",
+      "tunnelState": "Cloudflare tunnel: {status}"
+    },
+    "truenas": {
+      "down": "TrueNAS appears to be down",
+      "degraded": "TrueNAS connectivity is degraded",
+      "publicProbe": "public probe {state}",
+      "internalProbe": "internal {host}:{port} {state}",
+      "internalUnavailable": "internal probe unavailable from this runtime",
+      "dependencyNote": "External services depending on this host are shown as unavailable when TrueNAS is down.",
+      "internalTlsTitle": "Internal TLS certificate is not verified by the server-side TCP probe",
+      "internalTlsAria": "Internal HTTPS certificate status unknown"
+    }
+  }
+}
