@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import HomelabServiceGrid from "./HomelabServiceGrid";
-
-type Props = {
-	endpointLabel: string;
-	internalLabel: string;
-};
 
 type State = {
 	catalog: HomelabServicesCatalog | null;
@@ -38,7 +34,8 @@ async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot |
 	}
 }
 
-export default function HomelabServicesBlock({ endpointLabel, internalLabel }: Props) {
+export default function HomelabServicesBlock() {
+	const t = useTranslations("homelab");
 	const [state, setState] = useState<State>({
 		catalog: null,
 		snapshot: null,
@@ -69,19 +66,10 @@ export default function HomelabServicesBlock({ endpointLabel, internalLabel }: P
 	if (!state.catalog) {
 		return (
 			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
-				{state.error
-					? "Homelab services are temporarily unavailable."
-					: "Loading homelab services…"}
+				{state.error ? t("unavailable") : t("loading")}
 			</div>
 		);
 	}
 
-	return (
-		<HomelabServiceGrid
-			catalog={state.catalog}
-			snapshot={state.snapshot}
-			endpointLabel={endpointLabel}
-			internalLabel={internalLabel}
-		/>
-	);
+	return <HomelabServiceGrid catalog={state.catalog} snapshot={state.snapshot} />;
 }
