@@ -1,75 +1,139 @@
 {
-  "truenasUpgrades": {
-    "fastPool": {
-      "badge": "Planifié",
-      "title": "Pool SSD rapide pour les services",
-      "purchase": "2 × WD Red SN700 1 To NVMe SSD",
-      "unitPrice": "l’unité",
-      "totalPrice": "au total",
-      "architectureLabel": "Architecture de stockage cible",
-      "system": "SYSTEM",
-      "systemDevice": "Kingston SKC600MS 256 Go via USB",
-      "systemRole": "Système TrueNAS",
-      "fast": "FAST",
-      "fastDevice": "2 × WD Red SN700 1 To",
-      "fastRole": "Miroir → fastpool",
-      "fastUsage": "Apps, datasets applicatifs et VM",
-      "data": "DATA",
-      "dataDevice": "4 × WD Red 3 To",
-      "dataRole": "RAIDZ → cpool",
-      "dataUsage": "Documents, médias et sauvegardes",
-      "note": "Les datasets applicatifs existants seront migrés sélectivement vers le pool SSD. Par exemple, /mnt/cpool/openwebui pourra devenir /mnt/fastpool/appdata/openwebui, tandis que les données volumineuses resteront sur cpool."
+  "truenas": {
+    "page": {
+      "meta": {
+        "title": "Homelab et matériel TrueNAS Scale — Alban Andrieu",
+        "description": "Homelab TrueNAS Scale construit par Alban Andrieu : stockage ZFS, matériel Mini-ITX, applications auto-hébergées, outils de sécurité et expérimentations IA."
+      },
+      "hero": {
+        "ariaLabel": "Présentation de TrueNAS",
+        "title": "Homelab et matériel TrueNAS Scale",
+        "lead": "Plateforme matérielle, stockage ZFS, applications auto-hébergées, outils de sécurité et services liés à l’IA.",
+        "credit": "Guide et documentation par Alban Andrieu.",
+        "topics": "Matériel, applications, ZFS, automatisation et IA — open source et mise en pratique."
+      },
+      "homelab": {
+        "title": "Homelab pour les projets de sécurité, d’IA et freelance",
+        "intro": "Ce homelab a été construit pour héberger les futurs projets et services Nabla.",
+        "purpose": "Il permet de tester des intégrations de services de sécurité et d’IA, ainsi que de reproduire des attaques ciblant mes domaines.",
+        "projectDescription": "Projet et services Nabla",
+        "openProject": "Ouvrir le projet Nabla",
+        "logoAlt": "Logo Nabla"
+      },
+      "tools": {
+        "title": "Outils et connexion",
+        "webUi": "Interface web TrueNAS",
+        "signIn": "Connexion principale",
+        "logoAlt": "Logo TrueNAS",
+        "stackExchangeAlt": "Profil Stack Exchange d’Alban Andrieu"
+      },
+      "hardware": {
+        "title": "Matériel",
+        "incident": "Après sept années de service fiable, l’ancien système FreeNAS est tombé en panne : sa carte mère, son processeur et plusieurs disques durs étaient défectueux. Une mise à niveau s’imposait.",
+        "tagline": "Un système physique Mini-ITX exécutant TrueNAS Scale : stockage ZFS fiable et hôte homelab pour les applications, la domotique, les outils de sécurité et les charges de calcul intensives, notamment les expérimentations IA.",
+        "purposeLabel": "Usages de la plateforme",
+        "pillars": [
+          {"title": "ZFS et jeux de données", "subtitle": "Pools, instantanés et réplication"},
+          {"title": "Hôte homelab", "subtitle": "Applications, machines virtuelles et services internes"},
+          {"title": "Pile de sécurité", "subtitle": "Outils de sécurité et supervision"},
+          {"title": "IA et calcul", "subtitle": "Capacité AM5 pour les modèles et traitements"}
+        ]
+      },
+      "bom": {
+        "title": "Nomenclature du matériel",
+        "reusedTitle": "Composants réutilisés",
+        "reusedItems": [
+          "Boîtier : ancien châssis iXsystems d’environ 170 × 170 mm, au format Mini-ITX.",
+          "Alimentation : ancienne unité de 200 W, incompatible avec le connecteur processeur 8 broches de la carte mère MSI.",
+          "SSD mSATA Kingston SKC600MS — 256 Go TLC 3D NAND. 83 €.",
+          "Stockage : 4 × Western Digital Red WD30EFRX — 3 To chacun, SATA 6 Gbit/s."
+        ],
+        "newTitle": "Nouveaux achats",
+        "purchaseDetails": [
+          "Carte mère Mini-ITX AM5, DDR5, PCIe 4.0, M.2 et Wi-Fi 6E. 174,67 €.",
+          "Boîtier USB 3.0 sans outil pour SSD mSATA 50 × 30 mm, jusqu’à 2 To. 17,99 €.",
+          "Ventirad compact pour processeur AMD AM5. 49,90 €.",
+          "Processeur 3,8 GHz avec 32 Mo de cache L3. 212,75 €.",
+          "Mémoire CL46 (CT64G56C46U5 ; compatible également avec 5200/4800 MHz). 679,00 €.",
+          "Alimentation ATX 500 W ; l’unité plus compacte commandée n’a jamais été livrée. 50,00 €."
+        ],
+        "totalLabel": "Prix total",
+        "totalNote": "Somme de la carte mère, du boîtier, du processeur, de la mémoire, du ventirad et de l’alimentation.",
+        "futureTitle": "Évolutions possibles"
+      }
     },
-    "gpu": {
-      "title": "GPU pour l’inférence IA locale",
-      "lead": "La carte mère fournit un slot PCIe x16. Le choix final dépend surtout de l’espace réel dans le châssis, de l’alimentation et de la VRAM nécessaire aux modèles.",
-      "vram": "VRAM",
-      "power": "Puissance",
-      "formFactor": "Format",
-      "formFactors": [
-        "168 mm, double-slot, low-profile",
-        "267 mm, double-slot, pleine hauteur",
-        "267 mm, double-slot, pleine hauteur"
-      ],
-      "price": "Prix observé",
-      "fromPrice": "À partir de",
-      "priceSnapshot": "Relevé de prix : 24 août 2026 ; les prix de vente peuvent évoluer rapidement.",
-      "recommended": "Choix privilégié",
-      "source": "Source du prix",
-      "ramTitle": "Mémoire système",
-      "ram": "Le passage de 64 à 128 Go de DDR5 est supporté. Le Ryzen 7 7700 supporte officiellement 128 Go de DDR5 UDIMM en double canal et DDR5-5200 avec deux DIMM ; la carte MSI accepte des profils mémoire plus rapides, mais 5200 MT/s est la spécification CPU conservatrice. L’objectif est d’ajouter un second module UDIMM de 64 Go compatible, idéalement identique au module existant.",
-      "fit": [
-        "Meilleur choix pour le châssis compact actuel et l’alimentation 500 W. Ses 70 W, son format low-profile double-slot et ses 24 Go de VRAM ECC en font l’évolution privilégiée pour l’inférence.",
-        "Double la VRAM à 48 Go et élargit fortement les modèles exécutables entièrement sur GPU, mais ses 300 W et son format pleine hauteur de 267 mm imposeront probablement un boîtier plus grand et une alimentation plus puissante.",
-        "Avec 96 Go de VRAM ECC, c’est la cible maximale de cette feuille de route pour l’inférence locale. Prévoir un nouveau boîtier, une alimentation renforcée et une ventilation adaptée pour la carte Max-Q de 300 W."
-      ]
-    },
-    "models": {
-      "title": "Capacité des modèles locaux avec RTX PRO 4000 SFF",
-      "lead": "Capacité indicative avec un GPU de 24 Go. Les vitesses mesurées proviennent de benchmarks publics réalisés sur ce GPU exact lorsque disponibles ; les autres valeurs sont des estimations d’ingénierie prudentes et dépendent de la quantification, du contexte et du moteur d’inférence.",
-      "gpuTierTitle": "Modèles tenant dans 24 Go de VRAM",
-      "ramTierTitle": "Modèles hybrides plus grands avec 128 Go de RAM système",
-      "model": "Modèle",
-      "memory": "Mémoire modèle approx.",
-      "use": "Usage privilégié",
-      "speed": "Vitesse de génération",
-      "parallel": "Prompts parallèles pratiques",
-      "measured": "mesuré sur RTX PRO 4000 Blackwell SFF",
-      "estimated": "estimé",
-      "benchmarkSource": "Source du benchmark sur ce GPU exact",
-      "concurrencyNote": "Les chiffres de parallélisme supposent un serveur partagé de type llama.cpp/vLLM avec batching continu et des contextes courts à moyens. Ils ne signifient pas qu’une copie distincte du modèle est chargée pour chaque utilisateur.",
-      "ramNote": "La RAM système ne devient pas de la VRAM. Les modèles plus grands utilisent un offload CPU/RAM et sont donc nettement plus lents que ceux qui tiennent entièrement sur le GPU. Sur TrueNAS, ces mêmes 128 Go sont aussi partagés avec l’ARC ZFS et les autres applications : les très gros modèles nécessitent donc un budget mémoire explicite et des limites ARC/conteneurs raisonnables.",
-      "gpuUses": [
-        "Raisonnement général, agents, outils et code",
-        "Code agentique, travail sur dépôt et raisonnement multimodal général",
-        "Code spécialisé et développement à l’échelle d’un dépôt",
-        "Traduction multilingue à fort volume (400+ langues)"
-      ],
-      "ramUses": [
-        "Raisonnement général de meilleure qualité, agents et code",
-        "Grand modèle généraliste multilingue ; offload dense CPU/GPU",
-        "Raisonnement agentique, RAG et expérimentation long contexte ; runtimes quantifiés communautaires"
-      ]
+    "upgrades": {
+      "fastPool": {
+        "badge": "Planifié",
+        "title": "Pool SSD rapide pour les services",
+        "purchase": "2 × WD Red SN700 1 To NVMe SSD",
+        "unitPrice": "l’unité",
+        "totalPrice": "au total",
+        "architectureLabel": "Architecture de stockage cible",
+        "system": "SYSTEM",
+        "systemDevice": "Kingston SKC600MS 256 Go via USB",
+        "systemRole": "Système TrueNAS",
+        "fast": "FAST",
+        "fastDevice": "2 × WD Red SN700 1 To",
+        "fastRole": "Miroir → fastpool",
+        "fastUsage": "Apps, datasets applicatifs et VM",
+        "data": "DATA",
+        "dataDevice": "4 × WD Red 3 To",
+        "dataRole": "RAIDZ → cpool",
+        "dataUsage": "Documents, médias et sauvegardes",
+        "note": "Les datasets applicatifs existants seront migrés sélectivement vers le pool SSD. Par exemple, /mnt/cpool/openwebui pourra devenir /mnt/fastpool/appdata/openwebui, tandis que les données volumineuses resteront sur cpool."
+      },
+      "gpu": {
+        "title": "GPU pour l’inférence IA locale",
+        "lead": "La carte mère fournit un slot PCIe x16. Le choix final dépend surtout de l’espace réel dans le châssis, de l’alimentation et de la VRAM nécessaire aux modèles.",
+        "vram": "VRAM",
+        "power": "Puissance",
+        "formFactor": "Format",
+        "formFactors": [
+          "168 mm, double-slot, low-profile",
+          "267 mm, double-slot, pleine hauteur",
+          "267 mm, double-slot, pleine hauteur"
+        ],
+        "price": "Prix observé",
+        "fromPrice": "À partir de",
+        "priceSnapshot": "Relevé de prix : 24 août 2026 ; les prix de vente peuvent évoluer rapidement.",
+        "recommended": "Choix privilégié",
+        "source": "Source du prix",
+        "ramTitle": "Mémoire système",
+        "ram": "Le passage de 64 à 128 Go de DDR5 est supporté. Le Ryzen 7 7700 supporte officiellement 128 Go de DDR5 UDIMM en double canal et DDR5-5200 avec deux DIMM ; la carte MSI accepte des profils mémoire plus rapides, mais 5200 MT/s est la spécification CPU conservatrice. L’objectif est d’ajouter un second module UDIMM de 64 Go compatible, idéalement identique au module existant.",
+        "fit": [
+          "Meilleur choix pour le châssis compact actuel et l’alimentation 500 W. Ses 70 W, son format low-profile double-slot et ses 24 Go de VRAM ECC en font l’évolution privilégiée pour l’inférence.",
+          "Double la VRAM à 48 Go et élargit fortement les modèles exécutables entièrement sur GPU, mais ses 300 W et son format pleine hauteur de 267 mm imposeront probablement un boîtier plus grand et une alimentation plus puissante.",
+          "Avec 96 Go de VRAM ECC, c’est la cible maximale de cette feuille de route pour l’inférence locale. Prévoir un nouveau boîtier, une alimentation renforcée et une ventilation adaptée pour la carte Max-Q de 300 W."
+        ]
+      },
+      "models": {
+        "title": "Capacité des modèles locaux avec RTX PRO 4000 SFF",
+        "lead": "Capacité indicative avec un GPU de 24 Go. Les vitesses mesurées proviennent de benchmarks publics réalisés sur ce GPU exact lorsque disponibles ; les autres valeurs sont des estimations d’ingénierie prudentes et dépendent de la quantification, du contexte et du moteur d’inférence.",
+        "gpuTierTitle": "Modèles tenant dans 24 Go de VRAM",
+        "ramTierTitle": "Modèles hybrides plus grands avec 128 Go de RAM système",
+        "model": "Modèle",
+        "memory": "Mémoire modèle approx.",
+        "use": "Usage privilégié",
+        "speed": "Vitesse de génération",
+        "parallel": "Prompts parallèles pratiques",
+        "measured": "mesuré sur RTX PRO 4000 Blackwell SFF",
+        "estimated": "estimé",
+        "benchmarkSource": "Source du benchmark sur ce GPU exact",
+        "concurrencyNote": "Les chiffres de parallélisme supposent un serveur partagé de type llama.cpp/vLLM avec batching continu et des contextes courts à moyens. Ils ne signifient pas qu’une copie distincte du modèle est chargée pour chaque utilisateur.",
+        "ramNote": "La RAM système ne devient pas de la VRAM. Les modèles plus grands utilisent un offload CPU/RAM et sont donc nettement plus lents que ceux qui tiennent entièrement sur le GPU. Sur TrueNAS, ces mêmes 128 Go sont aussi partagés avec l’ARC ZFS et les autres applications : les très gros modèles nécessitent donc un budget mémoire explicite et des limites ARC/conteneurs raisonnables.",
+        "gpuUses": [
+          "Raisonnement général, agents, outils et code",
+          "Code agentique, travail sur dépôt et raisonnement multimodal général",
+          "Code spécialisé et développement à l’échelle d’un dépôt",
+          "Traduction multilingue à fort volume (400+ langues)"
+        ],
+        "ramUses": [
+          "Raisonnement général de meilleure qualité, agents et code",
+          "Grand modèle généraliste multilingue ; offload dense CPU/GPU",
+          "Raisonnement agentique, RAG et expérimentation long contexte ; runtimes quantifiés communautaires"
+        ]
+      }
     }
   }
 }
