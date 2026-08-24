@@ -118,11 +118,6 @@ export default function BillOfMaterialsSection({
 							{copy.futureTitle}<span className="ms-2 text-secondary" aria-hidden="true">#</span>
 						</a>
 					</p>
-					<ul className="hardware-bom-upgrade-note__list mb-0">
-						{copy.futureItems.slice(0, 1).map((item) => (
-							<li key={item}>{item}</li>
-						))}
-					</ul>
 					<FastPoolPlan locale={locale} />
 					<GpuUpgradePlan locale={locale} />
 				</div>
