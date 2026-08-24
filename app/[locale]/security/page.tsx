@@ -48,7 +48,7 @@ export default async function SecurityPage({
 				locale={locale}
 				className="site-content-page page-security page-dark"
 			/>
-			<SecurityArfTree />
+			<SecurityArfTree locale={locale} />
 		</>
 	);
 }
