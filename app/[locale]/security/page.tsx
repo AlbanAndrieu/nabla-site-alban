@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import SecurityArfTree from "./SecurityArfTree";
+import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
+
+const NATIVE_SECTION_IDS = [
+	"owasp-resources",
+	"personal-security-checklist",
+	"network-security-scanning",
+] as const;
 
 export async function generateMetadata({
 	params,
@@ -34,21 +42,23 @@ export default async function SecurityPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
+	const contactHref = canonicalPagePath("contact", locale);
 
 	return (
-		<>
+		<div className="site-content-page page-security page-dark">
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
-			<PublicHtmlFragment
-				file="security.html"
-				mode="headerMain"
-				locale={locale}
-				className="site-content-page page-security page-dark"
-			/>
+			<SkipToMainContent />
+			<SecurityHero locale={locale} contactHref={contactHref} />
+			<main id="main-content" className="security-resources">
+				<SecurityCoreSections locale={locale} />
+				<PublicHtmlFragment
+					file="security.html"
+					mode="main"
+					locale={locale}
+					omitElementIds={NATIVE_SECTION_IDS}
+				/>
+			</main>
 			<SecurityArfTree locale={locale} />
-		</>
+		</div>
 	);
 }
