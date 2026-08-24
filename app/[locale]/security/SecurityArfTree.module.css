@@ -1,0 +1,55 @@
+.tree {
+	max-width: 100%;
+	padding: 1rem;
+	border: 1px solid rgb(255 255 255 / 14%);
+	border-radius: 0.75rem;
+	background: rgb(255 255 255 / 4%);
+}
+
+.status {
+	margin: 0;
+	color: var(--text-secondary, #adb5bd);
+}
+
+.list,
+.children {
+	margin: 0;
+	padding-left: 1.25rem;
+	list-style: none;
+}
+
+.item {
+	position: relative;
+	padding: 0.3rem 0 0.3rem 0.75rem;
+	border-left: 1px solid rgb(255 255 255 / 18%);
+}
+
+.folder > summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.folder > summary:focus-visible,
+.link:focus-visible {
+	outline: 3px solid #9ec5fe;
+	outline-offset: 3px;
+	border-radius: 0.25rem;
+}
+
+.children {
+	margin-top: 0.35rem;
+}
+
+.link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding-block: 0.2rem;
+}
+
+.description {
+	display: block;
+	margin-top: 0.2rem;
+	color: var(--text-secondary, #adb5bd);
+	font-size: 0.875rem;
+}
