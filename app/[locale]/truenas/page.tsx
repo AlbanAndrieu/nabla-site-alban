@@ -12,6 +12,7 @@ import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import BillOfMaterialsSection, {
 	type BillOfMaterialsCopy,
+	type TrueNasUpgradeCopy,
 } from "../../components/truenas/BillOfMaterialsSection";
 import HardwareSection, {
 	type HardwareCopy,
@@ -46,8 +47,14 @@ export default async function TruenasPage({ params }: Props) {
 
 	setRequestLocale(locale);
 	const t = await getTranslations("truenasPage");
+	const upgradesT = await getTranslations("truenasUpgrades");
 	const hardwareCopy = t.raw("hardware") as HardwareCopy;
 	const billOfMaterialsCopy = t.raw("bom") as BillOfMaterialsCopy;
+	const upgradesCopy: TrueNasUpgradeCopy = {
+		fastPool: upgradesT.raw("fastPool") as TrueNasUpgradeCopy["fastPool"],
+		gpu: upgradesT.raw("gpu") as TrueNasUpgradeCopy["gpu"],
+		models: upgradesT.raw("models") as TrueNasUpgradeCopy["models"],
+	};
 
 	return (
 		<div className="site-content-page page-dark">
@@ -66,7 +73,7 @@ export default async function TruenasPage({ params }: Props) {
 					lead={t("apps.lead")}
 					iconsBefore={t("apps.iconsBefore")}
 					iconsAfter={t("apps.iconsAfter")}
-					endpointLabel="External"
+					endpointLabel={t("services.tunnel")}
 					internalLabel={t("services.internal")}
 					headingId="truenas-heading"
 				/>
@@ -80,7 +87,11 @@ export default async function TruenasPage({ params }: Props) {
 				/>
 				<div className="hardware-section-bg">
 					<HardwareSection copy={hardwareCopy} />
-					<BillOfMaterialsSection copy={billOfMaterialsCopy} locale={locale} />
+					<BillOfMaterialsSection
+						copy={billOfMaterialsCopy}
+						upgrades={upgradesCopy}
+						locale={locale}
+					/>
 				</div>
 				<ToolsSection
 					title={t("tools.title")}
