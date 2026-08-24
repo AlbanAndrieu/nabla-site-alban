@@ -85,6 +85,13 @@ export async function resolveCvPublicFilePath(
 	return null;
 }
 
+export function removeLegacyCvBackLink(html: string): string {
+	return html.replace(
+		/<a\b(?=[^>]*\bclass=["'][^"']*\bback-link\b[^"']*["'])[^>]*>[\s\S]*?<\/a>/gi,
+		"",
+	);
+}
+
 /**
  * Transitional renderer for the detailed static CV variants linked from the
  * React CV landing page. Keep this loader until those documents are migrated;
@@ -102,9 +109,11 @@ export async function loadCvHtmlFragment(
 
 	// CV pages are full HTML docs; embed their <body> content if present.
 	const bodyMatch = raw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-	const body = (bodyMatch?.[1] ?? raw).replace(
-		/<nav\b[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/nav>/gi,
-		"",
+	const body = removeLegacyCvBackLink(
+		(bodyMatch?.[1] ?? raw).replace(
+			/<nav\b[^>]*\bpage-nav\b[^>]*>[\s\S]*?<\/nav>/gi,
+			"",
+		),
 	);
 
 	return {
@@ -126,7 +135,7 @@ export async function metadataFromCvHtml(
 	const normalizedPath = canonicalPath.startsWith("/")
 		? canonicalPath
 		: `/${canonicalPath}`;
-	const canonical = `https://albandrieu.com${normalizedPath}`;
+	const canonical = `https://albanandrieu.com${normalizedPath}`;
 
 	return {
 		title,
