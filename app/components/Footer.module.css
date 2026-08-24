@@ -1,0 +1,15 @@
+.actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--ui-space-xs);
+	width: 100%;
+	margin-top: var(--ui-space-lg);
+}
+
+@media (min-width: 576px) {
+	.actions {
+		flex-direction: row;
+	}
+}
