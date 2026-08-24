@@ -1,3 +1,5 @@
+import styles from "./SecurityCoreSections.module.css";
+
 type SecurityLocale = "en" | "fr";
 
 type ResourceLink = {
@@ -183,10 +185,16 @@ export function SecurityHero({
 				</h1>
 				<p>{hero.lead}</p>
 				<p>
-					{hero.curatedBy} <a href={contactHref}>Alban Andrieu</a>
+					{hero.curatedBy}{" "}
+					<a className={styles.heroLink} href={contactHref}>
+						Alban Andrieu
+					</a>
 				</p>
 				<p>
-					<a href="#security-standards-compliance">{hero.standards}</a> — {hero.standardsLead}
+					<a className={styles.heroLink} href="#security-standards-compliance">
+						{hero.standards}
+					</a>{" "}
+					— {hero.standardsLead}
 				</p>
 			</div>
 		</header>
