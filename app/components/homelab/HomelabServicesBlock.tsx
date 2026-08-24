@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type {
-	HomelabHealthEntry,
-	HomelabHealthSnapshot,
-} from "@/lib/homelabHealth";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 
@@ -28,52 +25,13 @@ async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog
 	return (await response.json()) as HomelabServicesCatalog;
 }
 
-async function fetchDirectTrueNasHealth(
-	signal: AbortSignal,
-): Promise<HomelabHealthEntry | null> {
+async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot | null> {
 	try {
-		const response = await fetch("/api/truenas-health", {
+		const response = await fetch("/api/homelab-health", {
 			cache: "no-store",
 			signal,
 		});
-		return response.ok ? ((await response.json()) as HomelabHealthEntry) : null;
-	} catch (error) {
-		if (signal.aborted) throw error;
-		return null;
-	}
-}
-
-async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot | null> {
-	try {
-		const [healthResponse, directTrueNas] = await Promise.all([
-			fetch("/api/homelab-health", {
-				cache: "no-store",
-				signal,
-			}),
-			fetchDirectTrueNasHealth(signal),
-		]);
-		const snapshot = healthResponse.ok
-			? ((await healthResponse.json()) as HomelabHealthSnapshot)
-			: null;
-
-		if (!directTrueNas?.reachable) return snapshot;
-		if (!snapshot) {
-			return {
-				schema_version: 2,
-				checked_at: new Date().toISOString(),
-				services: [],
-				truenas: { state: "ok", public: directTrueNas },
-			};
-		}
-
-		return {
-			...snapshot,
-			truenas: {
-				...(snapshot.truenas ?? {}),
-				state: "ok",
-				public: directTrueNas,
-			},
-		};
+		return response.ok ? ((await response.json()) as HomelabHealthSnapshot) : null;
 	} catch (error) {
 		if (signal.aborted) throw error;
 		return null;
@@ -111,7 +69,9 @@ export default function HomelabServicesBlock({ endpointLabel, internalLabel }: P
 	if (!state.catalog) {
 		return (
 			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
-				{state.error ? "Homelab services are temporarily unavailable." : "Loading homelab services…"}
+				{state.error
+					? "Homelab services are temporarily unavailable."
+					: "Loading homelab services…"}
 			</div>
 		);
 	}
