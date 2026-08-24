@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
 	locale: string;
@@ -9,8 +10,10 @@ export default async function HomeEducationSection({ locale }: Props) {
 	const prefix = locale === "fr" ? "/fr" : "";
 
 	return (
-		<section className="education-section" id="education">
-			<h2 className="section-title">{t("education.title")}</h2>
+		<section className="education-section" aria-labelledby="education">
+			<AnchoredHeading className="section-title" id="education">
+				{t("education.title")}
+			</AnchoredHeading>
 			<div className="education-grid">
 				<EducationCard
 					icon="fa-globe"
