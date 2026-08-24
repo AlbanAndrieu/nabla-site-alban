@@ -26,6 +26,11 @@
       "vram": "VRAM",
       "power": "Puissance",
       "formFactor": "Format",
+      "formFactors": [
+        "168 mm, double-slot, low-profile",
+        "267 mm, double-slot, pleine hauteur",
+        "267 mm, double-slot, pleine hauteur"
+      ],
       "price": "Prix observé",
       "fromPrice": "À partir de",
       "priceSnapshot": "Relevé de prix : 24 août 2026 ; les prix de vente peuvent évoluer rapidement.",
