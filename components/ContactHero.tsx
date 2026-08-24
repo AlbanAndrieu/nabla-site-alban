@@ -15,7 +15,6 @@ type ContactHeroProps = {
 export default function ContactHero({
 	contactCta,
 	contactHref,
-	current,
 	cvCta,
 	cvHref,
 	experience,
@@ -37,26 +36,7 @@ export default function ContactHero({
 				/>
 				<h1 className="hero-title">Alban Andrieu</h1>
 				<p className="hero-subtitle">{role}</p>
-				<p className="hero-description">
-					{current}{" "}
-					<a
-						className="contact-hero-link"
-						href="https://www.jusmundi.com"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Image
-							src="/assets/nabla/jusmundi-favicon.ico"
-							width={16}
-							height={16}
-							alt=""
-							aria-hidden="true"
-						/>
-						Jus Mundi
-					</a>
-					. <br />
-					{experience}
-				</p>
+				<p className="hero-description">{experience}</p>
 				<p className="hero-description">{intro}</p>
 				<div className="cta-buttons">
 					<a className="btn btn-light btn-lg" href={contactHref}>
