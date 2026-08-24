@@ -1,5 +1,9 @@
-import FastPoolPlan from "./FastPoolPlan";
-import GpuUpgradePlan from "./GpuUpgradePlan";
+import AnchoredHeading from "@/components/AnchoredHeading";
+import FastPoolPlan, { type FastPoolPlanCopy } from "./FastPoolPlan";
+import GpuUpgradePlan, { type GpuUpgradePlanCopy } from "./GpuUpgradePlan";
+import InferenceModelSummary, {
+	type InferenceModelSummaryCopy,
+} from "./InferenceModelSummary";
 
 export type BillOfMaterialsCopy = {
 	title: string;
@@ -11,6 +15,12 @@ export type BillOfMaterialsCopy = {
 	totalNote: string;
 	futureTitle: string;
 	futureItems: string[];
+};
+
+export type TrueNasUpgradeCopy = {
+	fastPool: FastPoolPlanCopy;
+	gpu: GpuUpgradePlanCopy;
+	models: InferenceModelSummaryCopy;
 };
 
 const REUSED_ICONS = ["fa-cube", "fa-plug", "fa-hard-drive", "fa-hdd"];
@@ -54,22 +64,22 @@ function ItemIcon({ name }: { name: string }) {
 
 export default function BillOfMaterialsSection({
 	copy,
+	upgrades,
 	locale,
 }: {
 	copy: BillOfMaterialsCopy;
+	upgrades: TrueNasUpgradeCopy;
 	locale: string;
 }) {
 	return (
-		<section id="hardware-bom" className="py-5 hardware-bom-section" aria-labelledby="bom-heading">
+		<section className="py-5 hardware-bom-section" aria-labelledby="hardware-bom">
 			<div className="container">
-				<h3 id="bom-heading" className="h5 mt-4 hardware-bom-heading">
-					<a className="text-reset text-decoration-none" href="#hardware-bom">
-						<span className="hardware-bom-heading__icon" aria-hidden="true">
-							<i className="fas fa-clipboard-list"></i>
-						</span>
-						{copy.title}<span className="ms-2 text-secondary" aria-hidden="true">#</span>
-					</a>
-				</h3>
+				<AnchoredHeading as="h3" id="hardware-bom" className="h5 mt-4 hardware-bom-heading">
+					<span className="hardware-bom-heading__icon" aria-hidden="true">
+						<i className="fas fa-clipboard-list"></i>
+					</span>
+					{copy.title}
+				</AnchoredHeading>
 				<h4 className="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-recycle"></i>
@@ -112,14 +122,17 @@ export default function BillOfMaterialsSection({
 					<span className="hardware-bom-total__amount">1 184,31 €</span>
 					<span className="hardware-bom-total__note">{copy.totalNote}</span>
 				</p>
-				<div id="hardware-upgrades" className="hardware-bom-upgrade-note mt-3">
-					<p className="hardware-bom-upgrade-note__title mb-2">
-						<a className="text-reset text-decoration-none" href="#hardware-upgrades">
-							{copy.futureTitle}<span className="ms-2 text-secondary" aria-hidden="true">#</span>
-						</a>
-					</p>
-					<FastPoolPlan locale={locale} />
-					<GpuUpgradePlan locale={locale} />
+				<div className="hardware-bom-upgrade-note mt-3">
+					<AnchoredHeading
+						as="h4"
+						id="hardware-upgrades"
+						className="h6 hardware-bom-upgrade-note__title mb-2"
+					>
+						{copy.futureTitle}
+					</AnchoredHeading>
+					<FastPoolPlan copy={upgrades.fastPool} locale={locale} />
+					<GpuUpgradePlan copy={upgrades.gpu} locale={locale} />
+					<InferenceModelSummary copy={upgrades.models} />
 				</div>
 			</div>
 		</section>
