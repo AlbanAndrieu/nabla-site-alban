@@ -1,3 +1,4 @@
+import AnchoredHeading from "@/components/AnchoredHeading";
 import HomelabServicesBlock from "./HomelabServicesBlock";
 
 type Props = {
@@ -17,7 +18,7 @@ export default function HomelabServicesSection({
 	iconsAfter,
 	endpointLabel,
 	internalLabel,
-	headingId = "homelab-services-heading",
+	headingId = "homelab-services",
 }: Props) {
 	return (
 		<section
@@ -27,9 +28,9 @@ export default function HomelabServicesSection({
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12 text-center">
-						<h2 id={headingId} className="display-4 mb-3">
+						<AnchoredHeading id={headingId} className="display-4 mb-3">
 							{title}
-						</h2>
+						</AnchoredHeading>
 						<p className="lead mb-2 stack-page-hero__lead">{lead}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-0">
 							{iconsBefore}{" "}
