@@ -1,12 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { formatEuro } from "./formatters";
 import { GPU_OPTIONS } from "./hardwarePlan";
-
-function formatPrice(locale: string, amount: number): string {
-	return new Intl.NumberFormat(locale === "fr" ? "fr-FR" : "en-GB", {
-		style: "currency",
-		currency: "EUR",
-	}).format(amount);
-}
 
 export default async function GpuUpgradePlan() {
 	const [locale, t] = await Promise.all([
@@ -53,7 +47,7 @@ export default async function GpuUpgradePlan() {
 									<div className="d-flex justify-content-between gap-3">
 										<dt>{gpu.priceMode === "from" ? t("fromPrice") : t("price")}</dt>
 										<dd className="mb-1 text-end fw-semibold">
-											{formatPrice(locale, gpu.priceEur)}
+											{formatEuro(locale, gpu.priceEur)}
 										</dd>
 									</div>
 								</dl>
