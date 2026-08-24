@@ -79,6 +79,90 @@ export default async function ArchitecturePage({
 					topology={topology}
 					topologySource={topologySource}
 				/>
+
+				<section
+					id="declared-observed-architecture"
+					className="content-section"
+					aria-labelledby="declared-observed-title"
+				>
+					<div className="container py-5">
+						<div className="text-center mx-auto mb-4" style={{ maxWidth: "860px" }}>
+							<h2 id="declared-observed-title">
+								{french
+									? "Configuration déclarée, runtime observé et santé"
+									: "Declared configuration, observed runtime, and health"}
+							</h2>
+							<p>
+								{french
+									? "L’architecture sépare volontairement ce qui devrait exister, ce qui tourne réellement et ce qui est effectivement utilisable. Cette séparation permet de détecter les dérives sans faire de l’interface Web ou de l’API TrueNAS une source de vérité de configuration."
+									: "The architecture deliberately separates what should exist, what is actually running, and what is operationally usable. This makes configuration drift visible without turning the website or the TrueNAS API into the configuration source of truth."}
+							</p>
+						</div>
+
+						<div className="row g-3">
+							<div className="col-12 col-md-6 col-xl-3">
+								<div className="card h-100 bg-dark border-secondary p-3">
+									<h3 className="h5">1. nabla-compose</h3>
+									<p className="mb-0">
+										{french
+											? "Source déclarative : services x-nabla, identité stable, binding runtime et relations de topologie. services.json et service-topology.json sont générés depuis le code."
+											: "Declarative source: x-nabla services, stable identity, runtime binding, and topology relationships. services.json and service-topology.json are generated from code."}
+									</p>
+								</div>
+							</div>
+							<div className="col-12 col-md-6 col-xl-3">
+								<div className="card h-100 bg-dark border-secondary p-3">
+									<h3 className="h5">2. TrueNAS API</h3>
+									<p className="mb-0">
+										{french
+											? "Source runtime observée : le client officiel truenas_api_client interroge app.query pour les Apps, containers, états et versions. Il ne décide jamais qu’un service doit exister ou être public."
+											: "Observed runtime source: the official truenas_api_client queries app.query for Apps, containers, states, and versions. It never decides that a service should exist or be public."}
+									</p>
+								</div>
+							</div>
+							<div className="col-12 col-md-6 col-xl-3">
+								<div className="card h-100 bg-dark border-secondary p-3">
+									<h3 className="h5">3. fastapi-sample</h3>
+									<p className="mb-0">
+										{french
+											? "Couche de réconciliation : joint les bindings déclarés aux workloads TrueNAS, classe les écarts (in_sync, declared_only, observed_only, conflict) et garde les contrôles de santé séparés."
+											: "Reconciliation layer: joins declared bindings to TrueNAS workloads, classifies drift (in_sync, declared_only, observed_only, conflict), and keeps health checks separate."}
+									</p>
+								</div>
+							</div>
+							<div className="col-12 col-md-6 col-xl-3">
+								<div className="card h-100 bg-dark border-secondary p-3">
+									<h3 className="h5">4. albanandrieu.com</h3>
+									<p className="mb-0">
+										{french
+											? "Couche de présentation : visualise la topologie, le statut runtime et la santé sans devenir une source de données backend."
+											: "Presentation layer: visualizes topology, runtime status, and health without becoming a backend data source."}
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div className="text-center mt-4">
+							<p className="mb-3">
+								<strong>Declared ≠ Observed ≠ Healthy</strong>
+							</p>
+							<div className="d-flex flex-wrap gap-2 justify-content-center">
+								<ActionLink
+									href="https://github.com/AlbanAndrieu/nabla-compose"
+									variant="secondary"
+								>
+									nabla-compose
+								</ActionLink>
+								<ActionLink
+									href="https://github.com/AlbanAndrieu/fastapi-sample"
+									variant="secondary"
+								>
+									fastapi-sample
+								</ActionLink>
+							</div>
+						</div>
+					</div>
+				</section>
 			</main>
 		</div>
 	);
