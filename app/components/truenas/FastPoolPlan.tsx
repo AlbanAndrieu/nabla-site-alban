@@ -1,12 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { formatEuro } from "./formatters";
 import { FAST_POOL_PRODUCT } from "./hardwarePlan";
-
-function formatPrice(locale: string, amount: number): string {
-	return new Intl.NumberFormat(locale === "fr" ? "fr-FR" : "en-GB", {
-		style: "currency",
-		currency: "EUR",
-	}).format(amount);
-}
 
 export default async function FastPoolPlan() {
 	const [locale, t] = await Promise.all([
@@ -26,8 +20,8 @@ export default async function FastPoolPlan() {
 					<a href={FAST_POOL_PRODUCT.href} target="_blank" rel="noopener noreferrer">
 						{t("purchase")}
 					</a>{" "}
-					— {formatPrice(locale, FAST_POOL_PRODUCT.unitPriceEur)} {t("unitPrice")},{" "}
-					{formatPrice(locale, totalPrice)} {t("totalPrice")}.
+					— {formatEuro(locale, FAST_POOL_PRODUCT.unitPriceEur)} {t("unitPrice")},{" "}
+					{formatEuro(locale, totalPrice)} {t("totalPrice")}.
 				</p>
 
 				<div className="row g-3" role="list" aria-label={t("architectureLabel")}>
