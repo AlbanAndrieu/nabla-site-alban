@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
@@ -32,13 +33,12 @@ export default async function AiBestPracticesPage({ params }: Props) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
-	const site = await getTranslations("site");
 
 	return (
 		<>
 			<link rel="stylesheet" href="/nabla.css" />
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">{site("skipToMainContent")}</a>
+			<SkipToMainContent />
 			<PublicHtmlFragment
 				file="ai.html"
 				mode="navHeaderMain"
