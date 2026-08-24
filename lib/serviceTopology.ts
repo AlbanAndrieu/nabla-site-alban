@@ -104,8 +104,11 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 	return value as ServiceTopology;
 }
 
-const LOCAL_FALLBACK = parseServiceTopology(localTopology);
-if (!LOCAL_FALLBACK) throw new Error("Invalid local service-topology.json fallback");
+const parsedLocalFallback = parseServiceTopology(localTopology);
+if (!parsedLocalFallback) {
+	throw new Error("Invalid local service-topology.json fallback");
+}
+const LOCAL_FALLBACK: ServiceTopology = parsedLocalFallback;
 
 export async function loadServiceTopology(): Promise<{
 	topology: ServiceTopology;
