@@ -1,3 +1,5 @@
+import FastPoolPlan from "./FastPoolPlan";
+
 export type BillOfMaterialsCopy = {
 	title: string;
 	reusedTitle: string;
@@ -51,8 +53,10 @@ function ItemIcon({ name }: { name: string }) {
 
 export default function BillOfMaterialsSection({
 	copy,
+	locale,
 }: {
 	copy: BillOfMaterialsCopy;
+	locale: string;
 }) {
 	return (
 		<section className="py-5 hardware-bom-section" aria-labelledby="bom-heading">
@@ -114,10 +118,12 @@ export default function BillOfMaterialsSection({
 						{copy.futureTitle}
 					</p>
 					<ul className="hardware-bom-upgrade-note__list mb-0">
-						{copy.futureItems.map((item) => (
+						{/* The old generic single-NVMe placeholder is superseded by the explicit mirrored fastpool plan below. */}
+						{copy.futureItems.slice(0, 1).map((item) => (
 							<li key={item}>{item}</li>
 						))}
 					</ul>
+					<FastPoolPlan locale={locale} />
 				</div>
 			</div>
 		</section>

@@ -80,7 +80,7 @@ export default async function TruenasPage({ params }: Props) {
 				/>
 				<div className="hardware-section-bg">
 					<HardwareSection copy={hardwareCopy} />
-					<BillOfMaterialsSection copy={billOfMaterialsCopy} />
+					<BillOfMaterialsSection copy={billOfMaterialsCopy} locale={locale} />
 				</div>
 				<ToolsSection
 					title={t("tools.title")}
