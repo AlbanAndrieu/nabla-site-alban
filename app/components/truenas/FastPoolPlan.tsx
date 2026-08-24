@@ -2,50 +2,26 @@ const PRODUCT_URL = "https://www.amazon.fr/dp/B09H1CKTFP";
 const UNIT_PRICE_EUR = 299.99;
 const QUANTITY = 2;
 
-const COPY = {
-	fr: {
-		badge: "Planifié",
-		title: "Pool SSD rapide pour les services",
-		purchase: "2 × WD Red SN700 1 To NVMe SSD",
-		unitPrice: "l’unité",
-		totalPrice: "au total",
-		architectureLabel: "Architecture de stockage cible",
-		system: "SYSTEM",
-		systemDevice: "Kingston SKC600MS 256 Go via USB",
-		systemRole: "TrueNAS OS",
-		fast: "FAST",
-		fastDevice: "2 × WD Red SN700 1 To",
-		fastRole: "Mirror → fastpool",
-		fastUsage: "Apps, datasets applicatifs et VM",
-		data: "DATA",
-		dataDevice: "4 × WD Red 3 To",
-		dataRole: "RAIDZ → cpool",
-		dataUsage: "Documents, médias et sauvegardes",
-		note:
-			"Les datasets applicatifs existants seront migrés sélectivement vers le pool SSD. Par exemple, /mnt/cpool/openwebui pourra devenir /mnt/fastpool/appdata/openwebui, tandis que les données volumineuses resteront sur cpool.",
-	},
-	en: {
-		badge: "Planned",
-		title: "Fast SSD pool for services",
-		purchase: "2 × WD Red SN700 1 TB NVMe SSD",
-		unitPrice: "each",
-		totalPrice: "total",
-		architectureLabel: "Target storage architecture",
-		system: "SYSTEM",
-		systemDevice: "Kingston SKC600MS 256 GB via USB",
-		systemRole: "TrueNAS OS",
-		fast: "FAST",
-		fastDevice: "2 × WD Red SN700 1 TB",
-		fastRole: "Mirror → fastpool",
-		fastUsage: "Apps, application datasets and VMs",
-		data: "DATA",
-		dataDevice: "4 × WD Red 3 TB",
-		dataRole: "RAIDZ → cpool",
-		dataUsage: "Documents, media and backups",
-		note:
-			"Existing application datasets will be migrated selectively to the SSD pool. For example, /mnt/cpool/openwebui can become /mnt/fastpool/appdata/openwebui, while bulk data remains on cpool.",
-	},
-} as const;
+export type FastPoolPlanCopy = {
+	badge: string;
+	title: string;
+	purchase: string;
+	unitPrice: string;
+	totalPrice: string;
+	architectureLabel: string;
+	system: string;
+	systemDevice: string;
+	systemRole: string;
+	fast: string;
+	fastDevice: string;
+	fastRole: string;
+	fastUsage: string;
+	data: string;
+	dataDevice: string;
+	dataRole: string;
+	dataUsage: string;
+	note: string;
+};
 
 function formatPrice(locale: string, amount: number): string {
 	return new Intl.NumberFormat(locale === "fr" ? "fr-FR" : "en-GB", {
@@ -54,8 +30,13 @@ function formatPrice(locale: string, amount: number): string {
 	}).format(amount);
 }
 
-export default function FastPoolPlan({ locale }: { locale: string }) {
-	const copy = locale === "fr" ? COPY.fr : COPY.en;
+export default function FastPoolPlan({
+	copy,
+	locale,
+}: {
+	copy: FastPoolPlanCopy;
+	locale: string;
+}) {
 	const totalPrice = UNIT_PRICE_EUR * QUANTITY;
 
 	return (
@@ -69,8 +50,8 @@ export default function FastPoolPlan({ locale }: { locale: string }) {
 					<a href={PRODUCT_URL} target="_blank" rel="noopener noreferrer">
 						{copy.purchase}
 					</a>{" "}
-					— {formatPrice(locale, UNIT_PRICE_EUR)} {copy.unitPrice}, {formatPrice(locale, totalPrice)}{" "}
-					{copy.totalPrice}.
+					— {formatPrice(locale, UNIT_PRICE_EUR)} {copy.unitPrice},{" "}
+					{formatPrice(locale, totalPrice)} {copy.totalPrice}.
 				</p>
 
 				<div className="row g-3" role="list" aria-label={copy.architectureLabel}>
