@@ -32,7 +32,17 @@ const FORBIDDEN_TRANSLATED_PRODUCT_NAMES = [
 	"<b>Tour de guet</b>",
 ] as const;
 
-test("French localized pages render canonical product names outside CV pages", async () => {
+function assertNoTranslatedProductNames(content: string, source: string) {
+	for (const translated of FORBIDDEN_TRANSLATED_PRODUCT_NAMES) {
+		assert.doesNotMatch(
+			content,
+			new RegExp(translated.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"),
+			`${source} still renders machine-translated product name: ${translated}`,
+		);
+	}
+}
+
+test("French localized HTML renders canonical product names outside CV pages", async () => {
 	const localizedDirectory = path.join(process.cwd(), "public/locales/fr");
 	const files = (await readdir(localizedDirectory)).filter((file) => file.endsWith(".html"));
 
@@ -41,14 +51,13 @@ test("French localized pages render canonical product names outside CV pages", a
 	for (const file of files) {
 		const source = await readFile(path.join(localizedDirectory, file), "utf8");
 		const rendered = preserveCanonicalProductNames(source, file, "fr");
-		for (const translated of FORBIDDEN_TRANSLATED_PRODUCT_NAMES) {
-			assert.doesNotMatch(
-				rendered,
-				new RegExp(translated.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"),
-				`${file} still renders machine-translated product name: ${translated}`,
-			);
-		}
+		assertNoTranslatedProductNames(rendered, file);
 	}
+});
+
+test("native French message catalogue does not translate canonical product names", async () => {
+	const messages = await readFile(path.join(process.cwd(), "messages/fr.json"), "utf8");
+	assertNoTranslatedProductNames(messages, "messages/fr.json");
 });
 
 test("product-name normalization is French-only and explicitly excludes CV content", () => {
