@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import AiGlobalTools from "./AiGlobalTools";
 import AiHomelabArchitecture from "./AiHomelabArchitecture";
 import AiObservability from "./AiObservability";
+import AiSecurePlatformOverview from "./AiSecurePlatformOverview";
 import AiUsageAnalytics from "./AiUsageAnalytics";
 import AiWorkflowAutomation from "./AiWorkflowAutomation";
 
@@ -53,6 +54,7 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 
 	return createPortal(
 		<>
+			<AiSecurePlatformOverview locale={locale} />
 			<AiWorkflowAutomation locale={locale} />
 			<AiGlobalTools locale={locale} />
 			<AiObservability locale={locale} />
