@@ -170,33 +170,37 @@ function ResourceSection({ section }: Readonly<{ section: ResourceSectionCopy }>
 	);
 }
 
-export default function SecurityCoreSections({
+export function SecurityHero({
 	locale,
 	contactHref,
 }: Readonly<{ locale: SecurityLocale; contactHref: string }>) {
-	const copy = COPY[locale];
-
+	const hero = COPY[locale].hero;
 	return (
-		<>
-			<header className="hero-section" id="hero">
-				<div className="container">
-					<h1>
-						<i className="fa-solid fa-shield-halved" aria-hidden="true" /> {copy.hero.title}
-					</h1>
-					<p>{copy.hero.lead}</p>
-					<p>
-						{copy.hero.curatedBy} <a href={contactHref}>Alban Andrieu</a>
-					</p>
-					<p>
-						<a href="#security-standards-compliance">{copy.hero.standards}</a> — {copy.hero.standardsLead}
-					</p>
-				</div>
-			</header>
+		<header className="hero-section" id="hero">
 			<div className="container">
-				{copy.sections.map((section) => (
-					<ResourceSection section={section} key={section.id} />
-				))}
+				<h1>
+					<i className="fa-solid fa-shield-halved" aria-hidden="true" /> {hero.title}
+				</h1>
+				<p>{hero.lead}</p>
+				<p>
+					{hero.curatedBy} <a href={contactHref}>Alban Andrieu</a>
+				</p>
+				<p>
+					<a href="#security-standards-compliance">{hero.standards}</a> — {hero.standardsLead}
+				</p>
 			</div>
-		</>
+		</header>
+	);
+}
+
+export default function SecurityCoreSections({
+	locale,
+}: Readonly<{ locale: SecurityLocale }>) {
+	return (
+		<div className="container">
+			{COPY[locale].sections.map((section) => (
+				<ResourceSection section={section} key={section.id} />
+			))}
+		</div>
 	);
 }
