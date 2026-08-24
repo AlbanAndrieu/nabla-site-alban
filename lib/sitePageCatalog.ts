@@ -40,6 +40,10 @@ export const SITE_PAGES = {
 		category: "editorialShowcase",
 		seo: { priority: 0.8, changeFrequency: "monthly" },
 	},
+	architecture: {
+		category: "editorialShowcase",
+		seo: { priority: 0.78, changeFrequency: "monthly" },
+	},
 	ciso: {
 		category: "editorialShowcase",
 		seo: { priority: 0.8, changeFrequency: "weekly" },
