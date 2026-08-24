@@ -19,13 +19,9 @@ export default function HomeLabSection({
 	nablaHref,
 }: Props) {
 	return (
-		<section
-			id="homelab"
-			className="py-4 page-truenas-secondary"
-			aria-labelledby="nabla-on-stack-heading"
-		>
+		<section className="py-4 page-truenas-secondary" aria-labelledby="homelab">
 			<div className="container">
-				<AnchoredHeading as="h2" id="nabla-on-stack-heading" className="h4 mb-3">
+				<AnchoredHeading as="h2" id="homelab" className="h4 mb-3">
 					<i
 						className="fas fa-layer-group text-primary me-2"
 						aria-hidden="true"
