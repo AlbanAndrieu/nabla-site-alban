@@ -10,13 +10,8 @@ import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
-import BillOfMaterialsSection, {
-	type BillOfMaterialsCopy,
-	type TrueNasUpgradeCopy,
-} from "../../components/truenas/BillOfMaterialsSection";
-import HardwareSection, {
-	type HardwareCopy,
-} from "../../components/truenas/HardwareSection";
+import BillOfMaterialsSection from "../../components/truenas/BillOfMaterialsSection";
+import HardwareSection from "../../components/truenas/HardwareSection";
 import HeroSection from "../../components/truenas/HeroSection";
 import HomeLabSection from "../../components/truenas/HomeLabSection";
 import ToolsSection from "../../components/truenas/ToolsSection";
@@ -26,11 +21,11 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const t = await getTranslations({ locale, namespace: "truenasPage" });
+	const t = await getTranslations({ locale, namespace: "truenas.page.meta" });
 
 	return {
-		title: t("metadataTitle"),
-		description: t("metadataDescription"),
+		title: t("title"),
+		description: t("description"),
 		alternates: {
 			canonical: canonicalPagePath("truenas", locale),
 			languages: {
@@ -44,61 +39,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function TruenasPage({ params }: Props) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
-
 	setRequestLocale(locale);
-	const t = await getTranslations("truenasPage");
-	const upgradesT = await getTranslations("truenasUpgrades");
-	const hardwareCopy = t.raw("hardware") as HardwareCopy;
-	const billOfMaterialsCopy = t.raw("bom") as BillOfMaterialsCopy;
-	const upgradesCopy: TrueNasUpgradeCopy = {
-		fastPool: upgradesT.raw("fastPool") as TrueNasUpgradeCopy["fastPool"],
-		gpu: upgradesT.raw("gpu") as TrueNasUpgradeCopy["gpu"],
-		models: upgradesT.raw("models") as TrueNasUpgradeCopy["models"],
-	};
 
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
 			<SkipToMainContent />
 			<main id="main-content">
-				<HeroSection
-					ariaLabel={t("heroLabel")}
-					title={t("heroTitle")}
-					lead={t("heroLead")}
-					credit={t("heroCredit")}
-					topics={t("heroTopics")}
-				/>
-				<HomelabServicesSection
-					title={t("apps.title")}
-					lead={t("apps.lead")}
-					iconsBefore={t("apps.iconsBefore")}
-					iconsAfter={t("apps.iconsAfter")}
-					endpointLabel={t("services.tunnel")}
-					internalLabel={t("services.internal")}
-					headingId="truenas-services"
-				/>
-				<HomeLabSection
-					title={t("homelab.title")}
-					intro={t("homelab.intro")}
-					purpose={t("homelab.purpose")}
-					projectDescription={t("homelab.projectDescription")}
-					openProject={t("homelab.openProject")}
-					nablaHref={canonicalPagePath("nabla", locale)}
-				/>
+				<HeroSection />
+				<HomelabServicesSection headingId="truenas-services" />
+				<HomeLabSection nablaHref={canonicalPagePath("nabla", locale)} />
 				<div className="hardware-section-bg">
-					<HardwareSection copy={hardwareCopy} />
-					<BillOfMaterialsSection
-						copy={billOfMaterialsCopy}
-						upgrades={upgradesCopy}
-						locale={locale}
-					/>
+					<HardwareSection />
+					<BillOfMaterialsSection />
 				</div>
-				<ToolsSection
-					title={t("tools.title")}
-					webUi={t("tools.webUi")}
-					signIn={t("tools.signIn")}
-					logoAlt={t("tools.logoAlt")}
-				/>
+				<ToolsSection />
 			</main>
 			<SiteWidgetsScript />
 		</div>
