@@ -3,7 +3,6 @@ const GPU_OPTIONS = [
 		name: "PNY NVIDIA RTX PRO 4000 Blackwell SFF Edition",
 		vram: "24 GB GDDR7 ECC",
 		power: "70 W",
-		formFactor: "168 mm, dual-slot, low-profile",
 		priceEur: 2483,
 		priceMode: "observed",
 		productHref: "https://www.amazon.fr/dp/B0GLJFC411",
@@ -14,7 +13,6 @@ const GPU_OPTIONS = [
 		name: "NVIDIA RTX PRO 5000 Blackwell",
 		vram: "48 GB GDDR7 ECC",
 		power: "300 W",
-		formFactor: "267 mm, dual-slot, full-height",
 		priceEur: 7172.61,
 		priceMode: "from",
 		productHref: "https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/",
@@ -25,7 +23,6 @@ const GPU_OPTIONS = [
 		name: "NVIDIA RTX PRO 6000 Blackwell Max-Q",
 		vram: "96 GB GDDR7 ECC",
 		power: "300 W",
-		formFactor: "267 mm, dual-slot, full-height",
 		priceEur: 18888.97,
 		priceMode: "from",
 		productHref: "https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/",
@@ -40,6 +37,7 @@ export type GpuUpgradePlanCopy = {
 	vram: string;
 	power: string;
 	formFactor: string;
+	formFactors: string[];
 	price: string;
 	fromPrice: string;
 	priceSnapshot: string;
@@ -92,7 +90,7 @@ export default function GpuUpgradePlan({
 									</div>
 									<div className="d-flex justify-content-between gap-3">
 										<dt>{copy.formFactor}</dt>
-										<dd className="mb-1 text-end">{gpu.formFactor}</dd>
+										<dd className="mb-1 text-end">{copy.formFactors[index]}</dd>
 									</div>
 									<div className="d-flex justify-content-between gap-3">
 										<dt>{gpu.priceMode === "from" ? copy.fromPrice : copy.price}</dt>
