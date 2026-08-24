@@ -15,6 +15,7 @@ const expectedSeoSlugs = [
 	"contact",
 	"security",
 	"ai",
+	"architecture",
 	"ciso",
 	"truenas",
 	"link",
