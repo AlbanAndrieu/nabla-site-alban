@@ -51,8 +51,9 @@
       "parallel": "Practical parallel prompts",
       "measured": "measured on RTX PRO 4000 Blackwell SFF",
       "estimated": "estimated",
+      "benchmarkSource": "Exact-GPU benchmark source",
       "concurrencyNote": "Parallel figures assume one shared llama.cpp/vLLM-style server with continuous batching and short-to-moderate contexts. They do not mean loading a separate copy of the model for every user.",
-      "ramNote": "System RAM does not become VRAM. Larger models use CPU/RAM offload and are therefore substantially slower than models that stay entirely on the GPU.",
+      "ramNote": "System RAM does not become VRAM. Larger models use CPU/RAM offload and are therefore substantially slower than models that stay entirely on the GPU. On TrueNAS, the same 128 GB is also shared with ZFS ARC and other applications, so very large models need an explicit memory budget and sensible ARC/container limits.",
       "gpuUses": [
         "General reasoning, agents, tool use and coding",
         "Agentic coding, repository work, general multimodal reasoning",
