@@ -18,17 +18,13 @@ const PILLAR_ICONS = [
 export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 	return (
 		<section
-			id="hardware"
 			className="category-section nabla-platforms-section hardware-section"
-			aria-labelledby="hardware-heading"
+			aria-labelledby="hardware"
 		>
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12">
-						<AnchoredHeading
-							id="hardware-heading"
-							className="hardware-heading-with-icon display-4"
-						>
+						<AnchoredHeading id="hardware" className="hardware-heading-with-icon display-4">
 							<span
 								className="hardware-heading-with-icon__glyph"
 								aria-hidden="true"
