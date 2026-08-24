@@ -1,14 +1,10 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 
-type Props = {
-	title: string;
-	webUi: string;
-	signIn: string;
-	logoAlt: string;
-};
+export default async function ToolsSection() {
+	const t = await getTranslations("truenas.page.tools");
 
-export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 	return (
 		<section
 			className="py-4 page-truenas-tools border-top border-secondary"
@@ -20,7 +16,7 @@ export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 						className="fas fa-screwdriver-wrench text-primary me-2"
 						aria-hidden="true"
 					></i>
-					{title}
+					{t("title")}
 				</AnchoredHeading>
 				<div className="row align-items-center g-4">
 					<div className="col-md-6">
@@ -35,12 +31,12 @@ export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 								width="72"
 								height="72"
 								className="rounded flex-shrink-0"
-								alt={logoAlt}
+								alt={t("logoAlt")}
 								style={{ height: "auto" }}
 							/>
 							<span>
-								<span className="d-block fw-semibold text-body">{webUi}</span>
-								<span className="d-block small text-muted">{signIn}</span>
+								<span className="d-block fw-semibold text-body">{t("webUi")}</span>
+								<span className="d-block small text-muted">{t("signIn")}</span>
 							</span>
 						</a>
 					</div>
@@ -55,7 +51,7 @@ export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 							src="https://stackexchange.com/users/flair/4652074.png"
 							width="208"
 							height="58"
-							alt="Stack Exchange profile for AlbanAndrieu"
+							alt={t("stackExchangeAlt")}
 							loading="lazy"
 							decoding="async"
 						/>
