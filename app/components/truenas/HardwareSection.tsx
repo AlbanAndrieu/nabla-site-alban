@@ -8,7 +8,7 @@ export type HardwareCopy = {
 
 const PILLAR_ICONS = [
 	"fa-database",
-	"fa-house-laptop",
+	"fa-house",
 	"fa-shield-halved",
 	"fa-microchip",
 ] as const;
@@ -16,6 +16,7 @@ const PILLAR_ICONS = [
 export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 	return (
 		<section
+			id="hardware"
 			className="category-section nabla-platforms-section hardware-section"
 			aria-labelledby="hardware-heading"
 		>
