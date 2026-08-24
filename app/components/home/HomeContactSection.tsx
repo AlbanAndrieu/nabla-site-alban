@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
 	locale: string;
@@ -9,14 +10,10 @@ export default async function HomeContactSection({ locale }: Props) {
 	const t = await getTranslations({ locale, namespace: "home" });
 
 	return (
-		<section
-			className="contact-section"
-			id="contact"
-			aria-labelledby="contact-heading"
-		>
-			<h2 className="section-title" id="contact-heading">
+		<section className="contact-section" aria-labelledby="contact">
+			<AnchoredHeading className="section-title" id="contact">
 				{t("contact.title")}
-			</h2>
+			</AnchoredHeading>
 			<p className="section-subtitle">{t("contact.subtitle")}</p>
 			<div className="cta-buttons contact-hero-ctas">
 				<a
