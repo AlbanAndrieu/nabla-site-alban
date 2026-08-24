@@ -1,0 +1,17 @@
+:root {
+	--ui-control-min-height: 2.75rem;
+	--ui-action-min-width: 13.75rem;
+	--ui-radius-control: 0.5rem;
+	--ui-space-xs: 0.5rem;
+	--ui-space-sm: 0.75rem;
+	--ui-space-md: 1rem;
+	--ui-space-lg: 1.5rem;
+	--ui-font-weight-action: 600;
+	--ui-primary-bg: #0d6efd;
+	--ui-primary-bg-hover: #0b5ed7;
+	--ui-primary-text: #fff;
+	--ui-secondary-bg: #6c757d;
+	--ui-secondary-bg-hover: #5c636a;
+	--ui-secondary-text: #fff;
+	--ui-focus-ring: #9ec5fe;
+}
