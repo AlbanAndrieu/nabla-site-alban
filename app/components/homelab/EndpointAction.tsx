@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
@@ -13,6 +14,16 @@ type Props = {
 	initialHealth?: HomelabHealthEntry;
 	truenasDown?: boolean;
 };
+
+type ProbeDetail =
+	| { kind: "checking" }
+	| { kind: "notConfigured" }
+	| { kind: "invalidUrl" }
+	| { kind: "protocol"; protocol: string }
+	| { kind: "http"; status: number }
+	| { kind: "timeout" }
+	| { kind: "favicon" }
+	| { kind: "unreadable" };
 
 const HEALTH_CLASS: Record<HealthState, string> = {
 	pending: "btn-outline-primary",
@@ -51,17 +62,6 @@ function tunnelColor(status: string | null | undefined): string {
 	return "gray";
 }
 
-function fastApiHealthDetail(entry: HomelabHealthEntry): string {
-	const status = entry.http_status || "network error";
-	const latency = typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
-	const tls = entry.tls_trusted === false ? ", TLS error" : "";
-	const tunnel = entry.tunnel_status
-		? `, tunnel ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
-		: "";
-	const error = entry.error ? ` — ${entry.error}` : "";
-	return `FastAPI health snapshot: HTTP ${status}${tls}${tunnel}${latency}${error}`;
-}
-
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
 	return new Promise((resolve) => {
 		const image = new Image();
@@ -83,7 +83,7 @@ function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
 async function probePrivateEndpoint(
 	url: string,
 	signal: AbortSignal,
-): Promise<{ state: HealthState; detail: string }> {
+): Promise<{ state: HealthState; detail: ProbeDetail }> {
 	try {
 		let response = await fetch(url, {
 			method: "HEAD",
@@ -101,23 +101,20 @@ async function probePrivateEndpoint(
 		}
 		return {
 			state: classifyHttpStatus(response.status),
-			detail: `Browser endpoint probe: HTTP ${response.status}`,
+			detail: { kind: "http", status: response.status },
 		};
 	} catch {
-		if (signal.aborted) return { state: "fail", detail: "Browser endpoint probe timed out" };
+		if (signal.aborted) return { state: "fail", detail: { kind: "timeout" } };
 	}
 
 	const origin = new URL(url).origin.replace(/\/$/, "");
 	for (const path of ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]) {
 		if (await probeImage(`${origin}${path}?_np=${Date.now()}`, signal)) {
-			return { state: "ok", detail: "Endpoint responded from this browser (favicon probe)" };
+			return { state: "ok", detail: { kind: "favicon" } };
 		}
-		if (signal.aborted) return { state: "fail", detail: "Browser endpoint probe timed out" };
+		if (signal.aborted) return { state: "fail", detail: { kind: "timeout" } };
 	}
-	return {
-		state: "fail",
-		detail: "Endpoint did not return a readable HTTP response or common favicon",
-	};
+	return { state: "fail", detail: { kind: "unreadable" } };
 }
 
 export default function EndpointAction({
@@ -128,13 +125,14 @@ export default function EndpointAction({
 	initialHealth,
 	truenasDown = false,
 }: Props) {
+	const t = useTranslations("homelab.endpoint");
 	const configured = enabled && Boolean(url);
 	const https = isHttpsUrl(url);
 	const [privateHealth, setPrivateHealth] = useState<HealthState>(
 		configured && !external ? "pending" : "unknown",
 	);
-	const [privateDetail, setPrivateDetail] = useState(
-		configured ? "Checking private endpoint from this browser…" : "Endpoint not configured for use",
+	const [privateDetail, setPrivateDetail] = useState<ProbeDetail>(
+		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
 
 	useEffect(() => {
@@ -145,19 +143,19 @@ export default function EndpointAction({
 			parsed = new URL(url);
 		} catch {
 			setPrivateHealth("fail");
-			setPrivateDetail("Invalid endpoint URL");
+			setPrivateDetail({ kind: "invalidUrl" });
 			return;
 		}
 		if (!["http:", "https:"].includes(parsed.protocol)) {
 			setPrivateHealth("unknown");
-			setPrivateDetail(`${parsed.protocol} endpoint is not HTTP-probed`);
+			setPrivateDetail({ kind: "protocol", protocol: parsed.protocol });
 			return;
 		}
 
 		const controller = new AbortController();
 		const timeout = window.setTimeout(() => controller.abort(), 10_000);
 		setPrivateHealth("pending");
-		setPrivateDetail("Checking private endpoint from this browser…");
+		setPrivateDetail({ kind: "checking" });
 		void probePrivateEndpoint(url, controller.signal).then((result) => {
 			if (!controller.signal.aborted) {
 				setPrivateHealth(result.state);
@@ -171,6 +169,38 @@ export default function EndpointAction({
 		};
 	}, [enabled, external, url]);
 
+	const translateProbeDetail = (detail: ProbeDetail): string => {
+		switch (detail.kind) {
+			case "checking":
+				return t("checkingPrivate");
+			case "notConfigured":
+				return t("notConfigured");
+			case "invalidUrl":
+				return t("invalidUrl");
+			case "protocol":
+				return t("protocolNotProbed", { protocol: detail.protocol });
+			case "http":
+				return t("browserProbeHttp", { status: detail.status });
+			case "timeout":
+				return t("browserProbeTimedOut");
+			case "favicon":
+				return t("browserProbeFavicon");
+			case "unreadable":
+				return t("browserProbeUnreadable");
+		}
+	};
+
+	const fastApiHealthDetail = (entry: HomelabHealthEntry): string => {
+		const status = entry.http_status || t("networkError");
+		const latency = typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
+		const tls = entry.tls_trusted === false ? `, ${t("tlsError")}` : "";
+		const tunnel = entry.tunnel_status
+			? `, ${t("tunnel")} ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
+			: "";
+		const error = entry.error ? ` — ${entry.error}` : "";
+		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${latency}${error}`;
+	};
+
 	const health: HealthState = external
 		? truenasDown
 			? "fail"
@@ -179,19 +209,21 @@ export default function EndpointAction({
 	const tlsTrusted = external ? initialHealth?.tls_trusted : undefined;
 	const detail = !configured
 		? url
-			? "Endpoint URL retained for inventory but not configured for use"
-			: "No endpoint URL configured"
+			? t("inventoryOnly")
+			: t("noUrl")
 		: external
 			? truenasDown
-				? "TrueNAS dependency is down; external service marked unavailable"
+				? t("dependencyDown")
 				: initialHealth
 					? fastApiHealthDetail(initialHealth)
-					: "Public health snapshot unavailable"
-			: privateDetail;
+					: t("publicSnapshotUnavailable")
+			: translateProbeDetail(privateDetail);
 	const tunnelStatus = external ? initialHealth?.tunnel_status : undefined;
 	const tunnelTitle = tunnelStatus
-		? `Cloudflare tunnel: ${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`
-		: "Cloudflare tunnel status not observed yet";
+		? t("tunnelState", {
+				status: `${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`,
+			})
+		: t("tunnelUnknown");
 
 	if (!url || !enabled) {
 		return (
@@ -206,7 +238,7 @@ export default function EndpointAction({
 					<i
 						className="fas fa-lock"
 						style={{ color: "gray", marginLeft: 5 }}
-						aria-label="HTTPS certificate status unknown"
+						aria-label={t("httpsUnknown")}
 					/>
 				)}
 			</span>
@@ -219,7 +251,7 @@ export default function EndpointAction({
 			className={`btn ${HEALTH_CLASS[health]} btn-sm d-block`}
 			target="_blank"
 			rel="noopener noreferrer"
-			title={`${external ? "Public" : "Internal/private"} endpoint — ${detail}`}
+			title={`${external ? t("publicKind") : t("privateKind")} — ${detail}`}
 		>
 			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
 			{https && (
@@ -228,10 +260,10 @@ export default function EndpointAction({
 					style={{ color: tlsColor(tlsTrusted), marginLeft: 5 }}
 					aria-label={
 						tlsTrusted === false
-							? "HTTPS certificate invalid"
+							? t("httpsInvalid")
 							: tlsTrusted === true
-								? "HTTPS certificate trusted"
-								: "HTTPS certificate status unknown"
+								? t("httpsTrusted")
+								: t("httpsUnknown")
 					}
 				/>
 			)}
