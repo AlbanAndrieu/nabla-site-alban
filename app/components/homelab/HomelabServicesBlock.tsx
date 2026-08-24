@@ -69,7 +69,7 @@ async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot |
 		return {
 			...snapshot,
 			truenas: {
-				...snapshot.truenas,
+				...(snapshot.truenas ?? {}),
 				state: "ok",
 				public: directTrueNas,
 			},
