@@ -34,21 +34,26 @@ const RAM_MODELS = [
 		name: "gpt-oss-120b MXFP4",
 		memory: "63.4 GB",
 		speed: "~20–30 tok/s",
+		speedKind: "estimated",
 		parallel: "1–2",
 	},
 	{
 		name: "Llama 3.3 70B Instruct Q4_K_M",
 		memory: "~42 GB",
 		speed: "~2–4 tok/s",
+		speedKind: "estimated",
 		parallel: "1",
 	},
 	{
 		name: "NVIDIA Nemotron 3 Super 120B-A12B (quantized)",
 		memory: "~65 GB",
 		speed: "~8–16 tok/s",
+		speedKind: "estimated",
 		parallel: "1",
 	},
 ] as const;
+
+const EXACT_GPU_BENCHMARK_URL = "https://github.com/mmontes11/llm-bench";
 
 export type InferenceModelSummaryCopy = {
 	title: string;
@@ -62,6 +67,7 @@ export type InferenceModelSummaryCopy = {
 	parallel: string;
 	measured: string;
 	estimated: string;
+	benchmarkSource: string;
 	concurrencyNote: string;
 	ramNote: string;
 	gpuUses: string[];
@@ -72,18 +78,16 @@ function ModelTable({
 	rows,
 	uses,
 	copy,
-	showMeasuredStatus,
 }: {
 	rows: ReadonlyArray<{
 		name: string;
 		memory: string;
 		speed: string;
 		parallel: string;
-		speedKind?: "measured" | "estimated";
+		speedKind: "measured" | "estimated";
 	}>;
 	uses: string[];
 	copy: InferenceModelSummaryCopy;
-	showMeasuredStatus: boolean;
 }) {
 	return (
 		<div className="table-responsive">
@@ -105,11 +109,9 @@ function ModelTable({
 							<td>{uses[index]}</td>
 							<td>
 								{row.speed}
-								{showMeasuredStatus && row.speedKind && (
-									<small className="d-block text-muted">
-										{row.speedKind === "measured" ? copy.measured : copy.estimated}
-									</small>
-								)}
+								<small className="d-block text-muted">
+									{row.speedKind === "measured" ? copy.measured : copy.estimated}
+								</small>
 							</td>
 							<td>{row.parallel}</td>
 						</tr>
@@ -135,12 +137,17 @@ export default function InferenceModelSummary({
 				<p className="small text-muted">{copy.lead}</p>
 
 				<h6 className="small fw-bold mt-3">{copy.gpuTierTitle}</h6>
-				<ModelTable rows={GPU_MODELS} uses={copy.gpuUses} copy={copy} showMeasuredStatus />
+				<ModelTable rows={GPU_MODELS} uses={copy.gpuUses} copy={copy} />
 
 				<h6 className="small fw-bold mt-4">{copy.ramTierTitle}</h6>
-				<ModelTable rows={RAM_MODELS} uses={copy.ramUses} copy={copy} showMeasuredStatus={false} />
+				<ModelTable rows={RAM_MODELS} uses={copy.ramUses} copy={copy} />
 
-				<p className="small text-muted mt-3 mb-1">{copy.concurrencyNote}</p>
+				<p className="small mt-3 mb-1">
+					<a href={EXACT_GPU_BENCHMARK_URL} target="_blank" rel="noopener noreferrer">
+						{copy.benchmarkSource}
+					</a>
+				</p>
+				<p className="small text-muted mb-1">{copy.concurrencyNote}</p>
 				<p className="small text-muted mb-0">{copy.ramNote}</p>
 			</div>
 		</div>
