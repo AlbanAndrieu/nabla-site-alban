@@ -1,88 +1,113 @@
 const GPU_OPTIONS = [
 	{
-		name: "NVIDIA RTX PRO 4000 Blackwell SFF",
+		name: "PNY NVIDIA RTX PRO 4000 Blackwell SFF Edition",
 		vram: "24 GB GDDR7 ECC",
 		power: "70 W",
 		formFactor: "168 mm, dual-slot, low-profile",
-		fit: "Best fit for the existing compact chassis and 500 W PSU; preferred first inference upgrade.",
-		href: "https://www.nvidia.com/products/workstations/professional-desktop-gpus/rtx-pro-4000-sff/",
+		priceEur: 2483,
+		priceMode: "observed",
+		productHref: "https://www.amazon.fr/dp/B0GLJFC411",
+		priceHref: "https://www.idealo.fr/prix/207997856/pny-nvidia-rtx-pro-4000-blackwell-sff.html",
+		recommended: true,
 	},
 	{
 		name: "NVIDIA RTX PRO 5000 Blackwell",
 		vram: "48 GB GDDR7 ECC",
 		power: "300 W",
 		formFactor: "267 mm, dual-slot, full-height",
-		fit: "Much larger LLM capacity, but likely requires a larger chassis and a stronger PSU.",
-		href: "https://www.nvidia.com/products/workstations/professional-desktop-gpus/rtx-pro-5000/",
+		priceEur: 7172.61,
+		priceMode: "from",
+		productHref: "https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/",
+		priceHref: "https://www.idealo.fr/prix/211801592/nvidia-rtx-pro-5000-blackwell-48-go.html",
+		recommended: false,
 	},
 	{
 		name: "NVIDIA RTX PRO 6000 Blackwell Max-Q",
 		vram: "96 GB GDDR7 ECC",
 		power: "300 W",
 		formFactor: "267 mm, dual-slot, full-height",
-		fit: "Maximum local-inference target; chassis, airflow and PSU replacement should be assumed.",
-		href: "https://www.nvidia.com/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/",
+		priceEur: 18888.97,
+		priceMode: "from",
+		productHref: "https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/",
+		priceHref: "https://www.idealo.fr/prix/206565584/nvidia-rtx-pro-6000-blackwell-max-q.html",
+		recommended: false,
 	},
 ] as const;
 
-const COPY = {
-	fr: {
-		title: "GPU pour l’inférence IA locale",
-		lead: "La carte mère fournit un unique slot PCIe 4.0 x16. Le choix final dépend surtout de l’espace réel dans le châssis, de l’alimentation et de la VRAM nécessaire aux modèles.",
-		vram: "VRAM",
-		power: "Puissance",
-		formFactor: "Format",
-		ramTitle: "Mémoire système",
-		ram: "Passer de 64 à 128 Go de DDR5 est possible : la MSI MPG B650I Edge WiFi possède 2 slots DDR5 et supporte officiellement 128 Go au maximum. L’objectif est d’ajouter un second module UDIMM 64 Go compatible, idéalement identique au module existant.",
-		fit: [
-			"Meilleur candidat pour le châssis compact actuel et l’alimentation 500 W ; premier choix recommandé pour l’inférence.",
-			"Permet des LLM nettement plus volumineux, mais impose probablement un boîtier plus grand et une alimentation plus puissante.",
-			"Cible maximale pour l’inférence locale ; prévoir un changement de boîtier, d’alimentation et une ventilation adaptée.",
-		],
-	},
-	en: {
-		title: "GPU options for local AI inference",
-		lead: "The motherboard provides one PCIe 4.0 x16 slot. The final choice is primarily constrained by chassis clearance, PSU capacity and the VRAM required by the models.",
-		vram: "VRAM",
-		power: "Power",
-		formFactor: "Form factor",
-		ramTitle: "System memory",
-		ram: "Upgrading from 64 to 128 GB DDR5 is supported: the MSI MPG B650I Edge WiFi has 2 DDR5 slots and officially supports up to 128 GB. The target is a second compatible 64 GB UDIMM, ideally matching the existing module.",
-		fit: GPU_OPTIONS.map((option) => option.fit),
-	},
-} as const;
+export type GpuUpgradePlanCopy = {
+	title: string;
+	lead: string;
+	vram: string;
+	power: string;
+	formFactor: string;
+	price: string;
+	fromPrice: string;
+	priceSnapshot: string;
+	recommended: string;
+	source: string;
+	ramTitle: string;
+	ram: string;
+	fit: string[];
+};
 
-export default function GpuUpgradePlan({ locale }: { locale: string }) {
-	const copy = locale === "fr" ? COPY.fr : COPY.en;
+function formatPrice(locale: string, amount: number): string {
+	return new Intl.NumberFormat(locale === "fr" ? "fr-FR" : "en-GB", {
+		style: "currency",
+		currency: "EUR",
+	}).format(amount);
+}
 
+export default function GpuUpgradePlan({
+	copy,
+	locale,
+}: {
+	copy: GpuUpgradePlanCopy;
+	locale: string;
+}) {
 	return (
 		<div className="mt-4">
 			<h5 className="h6 mb-2">
 				<i className="fas fa-microchip me-2" aria-hidden="true" />
 				{copy.title}
 			</h5>
-			<p className="small text-muted">{copy.lead}</p>
+			<p className="small text-muted mb-2">{copy.lead}</p>
+			<p className="small text-muted">{copy.priceSnapshot}</p>
 			<div className="row g-3">
 				{GPU_OPTIONS.map((gpu, index) => (
 					<div className="col-lg-4" key={gpu.name}>
-						<div className="card h-100 border-secondary">
-							<div className="card-body">
-								<h6 className="card-title">{gpu.name}</h6>
+						<div className={`card h-100 ${gpu.recommended ? "border-primary" : "border-secondary"}`}>
+							<div className="card-body d-flex flex-column">
+								<div className="d-flex align-items-start justify-content-between gap-2">
+									<h6 className="card-title">{gpu.name}</h6>
+									{gpu.recommended && <span className="badge text-bg-primary">{copy.recommended}</span>}
+								</div>
 								<dl className="small mb-3">
 									<div className="d-flex justify-content-between gap-3">
-										<dt>{copy.vram}</dt><dd className="mb-1 text-end">{gpu.vram}</dd>
+										<dt>{copy.vram}</dt>
+										<dd className="mb-1 text-end">{gpu.vram}</dd>
 									</div>
 									<div className="d-flex justify-content-between gap-3">
-										<dt>{copy.power}</dt><dd className="mb-1 text-end">{gpu.power}</dd>
+										<dt>{copy.power}</dt>
+										<dd className="mb-1 text-end">{gpu.power}</dd>
 									</div>
 									<div className="d-flex justify-content-between gap-3">
-										<dt>{copy.formFactor}</dt><dd className="mb-1 text-end">{gpu.formFactor}</dd>
+										<dt>{copy.formFactor}</dt>
+										<dd className="mb-1 text-end">{gpu.formFactor}</dd>
+									</div>
+									<div className="d-flex justify-content-between gap-3">
+										<dt>{gpu.priceMode === "from" ? copy.fromPrice : copy.price}</dt>
+										<dd className="mb-1 text-end fw-semibold">{formatPrice(locale, gpu.priceEur)}</dd>
 									</div>
 								</dl>
 								<p className="small text-muted">{copy.fit[index]}</p>
-								<a href={gpu.href} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
-									NVIDIA
-								</a>
+								<div className="mt-auto d-flex flex-wrap gap-2">
+									<a href={gpu.productHref} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+										{gpu.recommended ? "Amazon" : "NVIDIA"}
+									</a>
+									<a href={gpu.priceHref} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-secondary">
+										{copy.source}
+									</a>
+								</div>
 							</div>
 						</div>
 					</div>
