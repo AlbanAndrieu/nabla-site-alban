@@ -12,6 +12,8 @@ type ArfNode = {
 	children?: ArfNode[];
 };
 
+type Props = Readonly<{ locale: string }>;
+
 function ArfTreeNode({ node, depth }: Readonly<{ node: ArfNode; depth: number }>) {
 	const hasChildren = Boolean(node.children?.length);
 	const label = node.name?.trim() || "Resource group";
@@ -50,7 +52,8 @@ function ArfTreeNode({ node, depth }: Readonly<{ node: ArfNode; depth: number }>
 	);
 }
 
-export default function SecurityArfTree() {
+export default function SecurityArfTree({ locale }: Props) {
+	const isFrench = locale === "fr";
 	const [target, setTarget] = useState<HTMLElement | null>(null);
 	const [data, setData] = useState<ArfNode | null>(null);
 	const [error, setError] = useState(false);
@@ -78,7 +81,9 @@ export default function SecurityArfTree() {
 	if (error) {
 		return createPortal(
 			<p className={styles.status} role="status">
-				The security resources tree is temporarily unavailable.
+				{isFrench
+					? "L’arbre des ressources de sécurité est temporairement indisponible."
+					: "The security resources tree is temporarily unavailable."}
 			</p>,
 			target,
 		);
@@ -87,7 +92,7 @@ export default function SecurityArfTree() {
 	if (!data) {
 		return createPortal(
 			<p className={styles.status} role="status">
-				Loading security resources…
+				{isFrench ? "Chargement des ressources de sécurité…" : "Loading security resources…"}
 			</p>,
 			target,
 		);
@@ -95,7 +100,14 @@ export default function SecurityArfTree() {
 
 	const rootNodes = data.children?.length ? data.children : [data];
 	return createPortal(
-		<div className={styles.tree} aria-label="Expandable OSINT and security resources tree">
+		<div
+			className={styles.tree}
+			aria-label={
+				isFrench
+					? "Arbre dépliable des ressources OSINT et sécurité"
+					: "Expandable OSINT and security resources tree"
+			}
+		>
 			<ul className={styles.list}>
 				{rootNodes.map((node, index) => (
 					<ArfTreeNode node={node} depth={0} key={`${node.name ?? "root"}-${index}`} />
