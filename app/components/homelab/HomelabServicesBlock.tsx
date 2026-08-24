@@ -69,7 +69,9 @@ export default function HomelabServicesBlock({ endpointLabel, internalLabel }: P
 	if (!state.catalog) {
 		return (
 			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
-				{state.error ? "Homelab services are temporarily unavailable." : "Loading homelab services…"}
+				{state.error
+					? "Homelab services are temporarily unavailable."
+					: "Loading homelab services…"}
 			</div>
 		);
 	}

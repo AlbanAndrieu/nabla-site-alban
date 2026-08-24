@@ -7,9 +7,15 @@ export default getRequestConfig(async ({ requestLocale }) => {
 	const locale = hasLocale(routing.locales, requested)
 		? requested
 		: routing.defaultLocale;
+	const appLocale = locale as AppLocale;
+	const baseMessages = (await import(`../messages/${appLocale}.json`)).default;
+	const truenasMessages = (await import(`../messages/truenas/${appLocale}.json`)).default;
 
 	return {
 		locale,
-		messages: (await import(`../messages/${locale as AppLocale}.json`)).default,
+		messages: {
+			...baseMessages,
+			...truenasMessages,
+		},
 	};
 });

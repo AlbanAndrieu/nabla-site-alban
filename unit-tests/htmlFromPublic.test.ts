@@ -79,8 +79,8 @@ test("metadataFromPublicHtml decodes entities and builds canonical url", async (
 		metadata.title,
 		"Alban Andrieu — Freelance DevSecOps & Cloud Architect (AWS, Azure, OVH)",
 	);
-	assert.equal(metadata.alternates?.canonical, "https://albandrieu.com/");
-	assert.equal(metadata.openGraph?.url, "https://albandrieu.com/");
+	assert.equal(metadata.alternates?.canonical, "https://albanandrieu.com/");
+	assert.equal(metadata.openGraph?.url, "https://albanandrieu.com/");
 });
 
 test("metadataFromPublicHtml uses locale-specific source when available", async () => {
@@ -90,8 +90,8 @@ test("metadataFromPublicHtml uses locale-specific source when available", async 
 		metadata.title,
 		"Alban Andrieu — Freelance DevSecOps & Cloud Architect (AWS, Azure, OVH)",
 	);
-	assert.equal(metadata.alternates?.canonical, "https://albandrieu.com/fr");
-	assert.equal(metadata.openGraph?.url, "https://albandrieu.com/fr");
+	assert.equal(metadata.alternates?.canonical, "https://albanandrieu.com/fr");
+	assert.equal(metadata.openGraph?.url, "https://albanandrieu.com/fr");
 });
 
 test("metadataFromPublicHtml falls back to english source and normalizes locale", async () => {
@@ -107,7 +107,7 @@ test("metadataFromPublicHtml falls back to english source and normalizes locale"
 	);
 	assert.equal(
 		metadata.alternates?.canonical,
-		"https://albandrieu.com/contact",
+		"https://albanandrieu.com/contact",
 	);
 });
 

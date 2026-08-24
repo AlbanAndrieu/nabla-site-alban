@@ -1,0 +1,75 @@
+{
+  "truenasUpgrades": {
+    "fastPool": {
+      "badge": "Planned",
+      "title": "Fast SSD pool for services",
+      "purchase": "2 × WD Red SN700 1 TB NVMe SSD",
+      "unitPrice": "each",
+      "totalPrice": "total",
+      "architectureLabel": "Target storage architecture",
+      "system": "SYSTEM",
+      "systemDevice": "Kingston SKC600MS 256 GB via USB",
+      "systemRole": "TrueNAS OS",
+      "fast": "FAST",
+      "fastDevice": "2 × WD Red SN700 1 TB",
+      "fastRole": "Mirror → fastpool",
+      "fastUsage": "Apps, application datasets and VMs",
+      "data": "DATA",
+      "dataDevice": "4 × WD Red 3 TB",
+      "dataRole": "RAIDZ → cpool",
+      "dataUsage": "Documents, media and backups",
+      "note": "Existing application datasets will be migrated selectively to the SSD pool. For example, /mnt/cpool/openwebui can become /mnt/fastpool/appdata/openwebui, while bulk data remains on cpool."
+    },
+    "gpu": {
+      "title": "GPU options for local AI inference",
+      "lead": "The motherboard provides one PCIe x16 slot. The final choice is primarily constrained by chassis clearance, PSU capacity and the VRAM required by the models.",
+      "vram": "VRAM",
+      "power": "Power",
+      "formFactor": "Form factor",
+      "formFactors": [
+        "168 mm, dual-slot, low-profile",
+        "267 mm, dual-slot, full-height",
+        "267 mm, dual-slot, full-height"
+      ],
+      "price": "Observed price",
+      "fromPrice": "From",
+      "priceSnapshot": "Price snapshot: 24 August 2026; retail prices can change quickly.",
+      "recommended": "Preferred option",
+      "source": "Price source",
+      "ramTitle": "System memory",
+      "ram": "Upgrading from 64 to 128 GB DDR5 is supported. The Ryzen 7 7700 officially supports 128 GB of dual-channel DDR5 UDIMM and DDR5-5200 with two DIMMs; the MSI board can run faster memory profiles, but 5200 MT/s is the conservative CPU specification. The target is a second compatible 64 GB UDIMM, ideally matching the existing module.",
+      "fit": [
+        "Best fit for the existing compact chassis and 500 W PSU. Its 70 W board power, low-profile dual-slot format and 24 GB ECC VRAM make it the preferred inference upgrade.",
+        "Doubles VRAM to 48 GB and greatly expands fully-GPU model capacity, but its 300 W power draw and full-height 267 mm format likely require a larger chassis and stronger PSU.",
+        "96 GB ECC VRAM is the maximum local-inference target in this roadmap. Assume a new chassis, stronger PSU and carefully designed airflow for the 300 W Max-Q card."
+      ]
+    },
+    "models": {
+      "title": "Local model capacity with RTX PRO 4000 SFF",
+      "lead": "Indicative capacity for a 24 GB GPU. Measured speeds use public benchmarks on this exact GPU where available; other figures are conservative engineering estimates and depend on quantization, context length and inference engine.",
+      "gpuTierTitle": "Models that fit in 24 GB VRAM",
+      "ramTierTitle": "Larger hybrid models with 128 GB system RAM",
+      "model": "Model",
+      "memory": "Approx. model memory",
+      "use": "Best use",
+      "speed": "Generation speed",
+      "parallel": "Practical parallel prompts",
+      "measured": "measured on RTX PRO 4000 Blackwell SFF",
+      "estimated": "estimated",
+      "benchmarkSource": "Exact-GPU benchmark source",
+      "concurrencyNote": "Parallel figures assume one shared llama.cpp/vLLM-style server with continuous batching and short-to-moderate contexts. They do not mean loading a separate copy of the model for every user.",
+      "ramNote": "System RAM does not become VRAM. Larger models use CPU/RAM offload and are therefore substantially slower than models that stay entirely on the GPU. On TrueNAS, the same 128 GB is also shared with ZFS ARC and other applications, so very large models need an explicit memory budget and sensible ARC/container limits.",
+      "gpuUses": [
+        "General reasoning, agents, tool use and coding",
+        "Agentic coding, repository work, general multimodal reasoning",
+        "Dedicated coding and repository-scale development",
+        "High-volume multilingual translation (400+ languages)"
+      ],
+      "ramUses": [
+        "Higher-quality general reasoning, agents and coding",
+        "Large multilingual general-purpose model; dense CPU/GPU offload",
+        "Agentic reasoning, RAG and long-context experimentation; quantized community runtimes"
+      ]
+    }
+  }
+}

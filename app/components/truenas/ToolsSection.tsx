@@ -1,4 +1,5 @@
 import Image from "next/image";
+import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
 	title: string;
@@ -11,16 +12,16 @@ export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 	return (
 		<section
 			className="py-4 page-truenas-tools border-top border-secondary"
-			aria-labelledby="truenas-tools-heading"
+			aria-labelledby="truenas-tools"
 		>
 			<div className="container">
-				<h2 id="truenas-tools-heading" className="h4 mb-4">
+				<AnchoredHeading id="truenas-tools" className="h4 mb-4">
 					<i
 						className="fas fa-screwdriver-wrench text-primary me-2"
 						aria-hidden="true"
 					></i>
 					{title}
-				</h2>
+				</AnchoredHeading>
 				<div className="row align-items-center g-4">
 					<div className="col-md-6">
 						<a
@@ -38,12 +39,8 @@ export default function ToolsSection({ title, webUi, signIn, logoAlt }: Props) {
 								style={{ height: "auto" }}
 							/>
 							<span>
-								<span className="d-block fw-semibold text-body">
-									{webUi}
-								</span>
-								<span className="d-block small text-muted">
-									{signIn}
-								</span>
+								<span className="d-block fw-semibold text-body">{webUi}</span>
+								<span className="d-block small text-muted">{signIn}</span>
 							</span>
 						</a>
 					</div>

@@ -60,10 +60,15 @@ export default function HomelabServiceGrid({
 }: Props) {
 	const services: HomelabService[] = catalog.services;
 	const externalHealth = healthByUrl(snapshot);
-	const truenasDown = snapshot?.truenas?.state === "fail";
-	const truenasWarning = snapshot?.truenas?.state === "warn";
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
+	// A cloud runtime cannot normally reach the private 172.17.x.x address. If the
+	// public TrueNAS endpoint is reachable, an internal-probe failure must not mark
+	// the host itself as down.
+	const truenasPublicUp =
+		truenasPublic?.reachable === true && truenasPublic.state !== "fail";
+	const truenasDown = !truenasPublicUp && snapshot?.truenas?.state === "fail";
+	const truenasWarning = !truenasPublicUp && snapshot?.truenas?.state === "warn";
 
 	return (
 		<>
@@ -116,14 +121,7 @@ export default function HomelabServiceGrid({
 								<div className="card-body text-center border-top border-secondary">
 									<h3 className="h5 card-title mb-1">{svc.name}</h3>
 									<p className="card-text text-muted small mb-0">{svc.description}</p>
-									<div
-										style={{
-											marginTop: 18,
-											display: "flex",
-											flexDirection: "column",
-											gap: 8,
-										}}
-									>
+									<div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
 										<EndpointAction
 											url={svc.tunnelUrl}
 											enabled={endpointEnabled}

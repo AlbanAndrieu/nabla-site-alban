@@ -1,3 +1,5 @@
+import AnchoredHeading from "@/components/AnchoredHeading";
+
 export type HardwareCopy = {
 	title: string;
 	incident: string;
@@ -16,27 +18,21 @@ const PILLAR_ICONS = [
 export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 	return (
 		<section
-			id="hardware"
 			className="category-section nabla-platforms-section hardware-section"
-			aria-labelledby="hardware-heading"
+			aria-labelledby="hardware"
 		>
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12">
-						<h2
-							id="hardware-heading"
-							className="hardware-heading-with-icon display-4"
-						>
+						<AnchoredHeading id="hardware" className="hardware-heading-with-icon display-4">
 							<span
 								className="hardware-heading-with-icon__glyph"
 								aria-hidden="true"
 							>
 								<i className="fas fa-server"></i>
 							</span>
-							<span className="hardware-heading-with-icon__text">
-								{copy.title}
-							</span>
-						</h2>
+							<span className="hardware-heading-with-icon__text">{copy.title}</span>
+						</AnchoredHeading>
 						<div className="hardware-platform-band mt-4">
 							<div className="row justify-content-center">
 								<div className="col-lg-8">
@@ -49,9 +45,7 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 												>
 													<i className="fas fa-screwdriver-wrench"></i>
 												</span>
-												<span className="hardware-bom-intro__text">
-													{copy.incident}
-												</span>
+												<span className="hardware-bom-intro__text">{copy.incident}</span>
 											</p>
 										</div>
 									</div>
@@ -67,25 +61,15 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 									>
 										{copy.tagline}
 									</p>
-									<ul
-										className="hardware-pill-grid"
-										aria-label={copy.purposeLabel}
-									>
+									<ul className="hardware-pill-grid" aria-label={copy.purposeLabel}>
 										{copy.pillars.map((pillar, index) => (
 											<li className="hardware-pill" key={pillar.title}>
-												<span
-													className="hardware-pill__icon"
-													aria-hidden="true"
-												>
+												<span className="hardware-pill__icon" aria-hidden="true">
 													<i className={`fas ${PILLAR_ICONS[index]}`} />
 												</span>
 												<span className="hardware-pill__text">
-													<span className="hardware-pill__title">
-														{pillar.title}
-													</span>
-													<span className="hardware-pill__sub">
-														{pillar.subtitle}
-													</span>
+													<span className="hardware-pill__title">{pillar.title}</span>
+													<span className="hardware-pill__sub">{pillar.subtitle}</span>
 												</span>
 											</li>
 										))}

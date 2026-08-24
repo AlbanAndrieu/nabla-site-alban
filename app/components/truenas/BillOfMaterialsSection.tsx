@@ -1,4 +1,9 @@
-import FastPoolPlan from "./FastPoolPlan";
+import AnchoredHeading from "@/components/AnchoredHeading";
+import FastPoolPlan, { type FastPoolPlanCopy } from "./FastPoolPlan";
+import GpuUpgradePlan, { type GpuUpgradePlanCopy } from "./GpuUpgradePlan";
+import InferenceModelSummary, {
+	type InferenceModelSummaryCopy,
+} from "./InferenceModelSummary";
 
 export type BillOfMaterialsCopy = {
 	title: string;
@@ -12,6 +17,12 @@ export type BillOfMaterialsCopy = {
 	futureItems: string[];
 };
 
+export type TrueNasUpgradeCopy = {
+	fastPool: FastPoolPlanCopy;
+	gpu: GpuUpgradePlanCopy;
+	models: InferenceModelSummaryCopy;
+};
+
 const REUSED_ICONS = ["fa-cube", "fa-plug", "fa-hard-drive", "fa-hdd"];
 
 const PURCHASES = [
@@ -21,7 +32,7 @@ const PURCHASES = [
 		href: "https://www.amazon.fr/dp/B0BHCRX6K7",
 	},
 	{
-		icon: "fa-usb",
+		icon: "fa-hard-drive",
 		name: "ORICO mSATA SSD enclosure (USB 3.0, 5 Gbps)",
 		href: "https://www.amazon.fr/dp/B0CKP48DMB",
 	},
@@ -53,20 +64,22 @@ function ItemIcon({ name }: { name: string }) {
 
 export default function BillOfMaterialsSection({
 	copy,
+	upgrades,
 	locale,
 }: {
 	copy: BillOfMaterialsCopy;
+	upgrades: TrueNasUpgradeCopy;
 	locale: string;
 }) {
 	return (
-		<section className="py-5 hardware-bom-section" aria-labelledby="bom-heading">
+		<section className="py-5 hardware-bom-section" aria-labelledby="hardware-bom">
 			<div className="container">
-				<h3 id="bom-heading" className="h5 mt-4 hardware-bom-heading">
+				<AnchoredHeading as="h3" id="hardware-bom" className="h5 mt-4 hardware-bom-heading">
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-clipboard-list"></i>
 					</span>
 					{copy.title}
-				</h3>
+				</AnchoredHeading>
 				<h4 className="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-recycle"></i>
@@ -93,11 +106,7 @@ export default function BillOfMaterialsSection({
 							<ItemIcon name={purchase.icon} />
 							<span className="hardware-bom-li__body">
 								{"href" in purchase ? (
-									<a
-										href={purchase.href}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
+									<a href={purchase.href} target="_blank" rel="noopener noreferrer">
 										{purchase.name}
 									</a>
 								) : (
@@ -114,16 +123,16 @@ export default function BillOfMaterialsSection({
 					<span className="hardware-bom-total__note">{copy.totalNote}</span>
 				</p>
 				<div className="hardware-bom-upgrade-note mt-3">
-					<p className="hardware-bom-upgrade-note__title mb-2">
+					<AnchoredHeading
+						as="h4"
+						id="hardware-upgrades"
+						className="h6 hardware-bom-upgrade-note__title mb-2"
+					>
 						{copy.futureTitle}
-					</p>
-					<ul className="hardware-bom-upgrade-note__list mb-0">
-						{/* The old generic single-NVMe placeholder is superseded by the explicit mirrored fastpool plan below. */}
-						{copy.futureItems.slice(0, 1).map((item) => (
-							<li key={item}>{item}</li>
-						))}
-					</ul>
-					<FastPoolPlan locale={locale} />
+					</AnchoredHeading>
+					<FastPoolPlan copy={upgrades.fastPool} locale={locale} />
+					<GpuUpgradePlan copy={upgrades.gpu} locale={locale} />
+					<InferenceModelSummary copy={upgrades.models} />
 				</div>
 			</div>
 		</section>
