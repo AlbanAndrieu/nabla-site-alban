@@ -27,15 +27,18 @@ export default function HardwareSection({ copy }: { copy: HardwareCopy }) {
 							id="hardware-heading"
 							className="hardware-heading-with-icon display-4"
 						>
-							<span
-								className="hardware-heading-with-icon__glyph"
-								aria-hidden="true"
-							>
-								<i className="fas fa-server"></i>
-							</span>
-							<span className="hardware-heading-with-icon__text">
-								{copy.title}
-							</span>
+							<a className="text-reset text-decoration-none" href="#hardware">
+								<span
+									className="hardware-heading-with-icon__glyph"
+									aria-hidden="true"
+								>
+									<i className="fas fa-server"></i>
+								</span>
+								<span className="hardware-heading-with-icon__text">
+									{copy.title}
+									<span className="ms-2 small text-secondary" aria-hidden="true">#</span>
+								</span>
+							</a>
 						</h2>
 						<div className="hardware-platform-band mt-4">
 							<div className="row justify-content-center">
