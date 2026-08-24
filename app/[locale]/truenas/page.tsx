@@ -75,7 +75,7 @@ export default async function TruenasPage({ params }: Props) {
 					iconsAfter={t("apps.iconsAfter")}
 					endpointLabel={t("services.tunnel")}
 					internalLabel={t("services.internal")}
-					headingId="truenas-heading"
+					headingId="truenas-services"
 				/>
 				<HomeLabSection
 					title={t("homelab.title")}
