@@ -14,8 +14,13 @@ import {
 	type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import {
+	parseHomelabStatusSnapshot,
+	type HomelabStatusService,
+	type HomelabStatusSnapshot,
+} from "@/lib/homelabStatus";
 import type { ServiceTopology, ServiceTopologySource } from "@/lib/serviceTopology";
 import {
 	AI_ENTITIES,
@@ -36,6 +41,8 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	url?: string;
 	detail?: string;
 	openLabel: string;
+	reconciliation?: string;
+	runtimeState?: string;
 };
 
 type Props = {
@@ -49,13 +56,22 @@ type Props = {
 function ArchitectureNode({ data, selected }: NodeProps) {
 	const item = data as ArchitectureNodeData;
 	return (
-		<div className={`${styles.node} ${selected ? styles.nodeSelected : ""}`}>
+		<div
+			className={`${styles.node} ${selected ? styles.nodeSelected : ""}`}
+			data-reconciliation={item.reconciliation}
+		>
 			<Handle type="target" position={Position.Left} className={styles.handle} />
 			<div className={styles.nodeMeta}>
 				<span>{item.category}</span>
 				<span>{item.kind}</span>
 			</div>
 			<strong className={styles.nodeTitle}>{item.name}</strong>
+			{item.reconciliation ? (
+				<span className={styles.runtimeBadge}>
+					{item.reconciliation.replaceAll("_", " ")}
+					{item.runtimeState ? ` · ${item.runtimeState}` : ""}
+				</span>
+			) : null}
 			{item.detail ? <small className={styles.nodeDetail}>{item.detail}</small> : null}
 			{item.url ? (
 				<a
@@ -110,21 +126,27 @@ function makeNodes(
 	entities: ArchitectureEntity[],
 	mode: GraphMode,
 	openLabel: string,
+	statusById: Map<string, HomelabStatusService>,
 ): Node<ArchitectureNodeData>[] {
 	const positions = mode === "ai" ? layerPositions(entities) : gridPositions(entities);
-	return entities.map((entity) => ({
-		id: entity.id,
-		type: "architecture",
-		position: positions.get(entity.id) ?? { x: 0, y: 0 },
-		data: {
-			name: entity.name,
-			kind: entity.kind,
-			category: entity.category,
-			url: entity.url,
-			detail: entity.detail,
-			openLabel,
-		},
-	}));
+	return entities.map((entity) => {
+		const runtimeStatus = mode === "services" ? statusById.get(entity.id) : undefined;
+		return {
+			id: entity.id,
+			type: "architecture",
+			position: positions.get(entity.id) ?? { x: 0, y: 0 },
+			data: {
+				name: entity.name,
+				kind: entity.kind,
+				category: entity.category,
+				url: entity.url,
+				detail: entity.detail,
+				openLabel,
+				reconciliation: runtimeStatus?.reconciliation,
+				runtimeState: runtimeStatus?.observed?.appState,
+			},
+		};
+	});
 }
 
 function makeEdges(relations: ArchitectureRelation[], visible: Set<string>): Edge[] {
@@ -166,6 +188,18 @@ function filterGraph(
 	};
 }
 
+function observedOnlyEntities(snapshot: HomelabStatusSnapshot | null): ArchitectureEntity[] {
+	return (snapshot?.observedOnly ?? []).map((service) => ({
+		id: service.id,
+		name: service.name,
+		kind: "TrueNAS app",
+		category: "runtime drift",
+		detail: service.observed?.appState
+			? `Observed by TrueNAS · ${service.observed.appState}`
+			: "Observed by TrueNAS but not declared in nabla-compose",
+	}));
+}
+
 export default function ArchitectureExplorer({
 	locale,
 	catalog,
@@ -176,18 +210,57 @@ export default function ArchitectureExplorer({
 	const french = locale === "fr";
 	const [mode, setMode] = useState<GraphMode>("ai");
 	const [query, setQuery] = useState("");
+	const [runtimeStatus, setRuntimeStatus] = useState<HomelabStatusSnapshot | null>(null);
+	const [runtimeSource, setRuntimeSource] = useState<"loading" | "fastapi" | "unavailable">("loading");
 
-	const servicesEntities = useMemo(
-		() => buildNablaEntities(catalog.services, topology),
-		[catalog.services, topology],
+	useEffect(() => {
+		let active = true;
+		const load = async () => {
+			try {
+				const response = await fetch("/api/homelab-status", { cache: "no-store" });
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
+				const snapshot = parseHomelabStatusSnapshot(await response.json());
+				if (!snapshot) throw new Error("Invalid homelab status payload");
+				if (active) {
+					setRuntimeStatus(snapshot);
+					setRuntimeSource("fastapi");
+				}
+			} catch {
+				if (active) setRuntimeSource("unavailable");
+			}
+		};
+		void load();
+		const timer = window.setInterval(load, 30_000);
+		return () => {
+			active = false;
+			window.clearInterval(timer);
+		};
+	}, []);
+
+	const statusById = useMemo(
+		() =>
+			new Map(
+				[...(runtimeStatus?.services ?? []), ...(runtimeStatus?.observedOnly ?? [])].map(
+					(service) => [service.id, service],
+				),
+			),
+		[runtimeStatus],
 	);
+	const servicesEntities = useMemo(() => {
+		const declared = buildNablaEntities(catalog.services, topology);
+		const existingIds = new Set(declared.map((entity) => entity.id));
+		return [
+			...declared,
+			...observedOnlyEntities(runtimeStatus).filter((entity) => !existingIds.has(entity.id)),
+		];
+	}, [catalog.services, topology, runtimeStatus]);
 	const servicesRelations = useMemo(() => buildNablaRelations(topology), [topology]);
 	const entities = mode === "ai" ? AI_ENTITIES : servicesEntities;
 	const relations = mode === "ai" ? AI_RELATIONS : servicesRelations;
 	const filtered = useMemo(() => filterGraph(entities, relations, query), [entities, relations, query]);
 	const nodes = useMemo(
-		() => makeNodes(filtered.entities, mode, french ? "Ouvrir" : "Open"),
-		[filtered.entities, french, mode],
+		() => makeNodes(filtered.entities, mode, french ? "Ouvrir" : "Open", statusById),
+		[filtered.entities, french, mode, statusById],
 	);
 	const edges = useMemo(
 		() => makeEdges(relations, filtered.visible),
@@ -221,7 +294,8 @@ export default function ArchitectureExplorer({
 				{french ? "relations" : "relations"}
 				{mode === "services" ? (
 					<span>
-						{" "}· catalog: {catalogSource} · topology: {topologySource}
+						{" "}· catalog: {catalogSource} · topology: {topologySource} · runtime: {runtimeSource}
+						{runtimeStatus ? ` (${runtimeStatus.runtime.reachable ? "reachable" : "unreachable"})` : ""}
 					</span>
 				) : null}
 			</div>
@@ -246,8 +320,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les flèches animées représentent les relations requises ; les relations optionnelles restent statiques. Le bouton Ouvrir utilise l’URL publique quand elle existe, sinon l’endpoint interne connu."
-					: "Animated arrows represent required relations; optional relations remain static. Open uses the public URL when available, otherwise the known internal endpoint."}
+					? "Les flèches animées représentent les relations requises ; les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift."
+					: "Animated arrows represent required relations; runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift."}
 			</p>
 		</section>
 	);
