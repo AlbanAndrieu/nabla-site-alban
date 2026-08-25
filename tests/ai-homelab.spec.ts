@@ -10,12 +10,13 @@ test.describe("AI homelab architecture", () => {
 		await expect(
 			page.getByText("LiteLLM is the central control plane", { exact: false }),
 		).toBeVisible();
-		await expect(page.locator(".ai-homelab-mermaid svg")).toBeVisible({
-			timeout: 15_000,
-		});
-		await expect(page.locator(".ai-homelab-mermaid")).toContainText(
-			/Open WebUI|SearXNG|FastAPI MCP/,
-		);
+
+		const flow = page.getByRole("list", { name: "Layered AI platform flow" });
+		await expect(flow).toBeVisible();
+		await expect(flow).toContainText("Open WebUI");
+		await expect(flow).toContainText("LiteLLM");
+		await expect(flow).toContainText("FastAPI MCP");
+		await expect(flow).toContainText("SearXNG");
 	});
 
 	test("provides the architecture description in French", async ({ page }) => {
@@ -28,6 +29,9 @@ test.describe("AI homelab architecture", () => {
 			page.getByText("LiteLLM constitue le plan de contrôle central", {
 				exact: false,
 			}),
+		).toBeVisible();
+		await expect(
+			page.getByRole("list", { name: "Flux en couches de la plateforme IA" }),
 		).toBeVisible();
 	});
 });
