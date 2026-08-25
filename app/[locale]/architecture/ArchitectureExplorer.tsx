@@ -200,6 +200,14 @@ function observedOnlyEntities(snapshot: HomelabStatusSnapshot | null): Architect
 	}));
 }
 
+function runtimeAvailability(snapshot: HomelabStatusSnapshot | null, french: boolean): string | null {
+	if (!snapshot) return null;
+	if (!snapshot.runtime.configured) return french ? "non configuré" : "not configured";
+	if (snapshot.runtime.stale) return french ? "snapshot périmé" : "stale snapshot";
+	if (snapshot.runtime.reachable) return french ? "joignable" : "reachable";
+	return french ? "injoignable" : "unreachable";
+}
+
 export default function ArchitectureExplorer({
 	locale,
 	catalog,
@@ -266,6 +274,7 @@ export default function ArchitectureExplorer({
 		() => makeEdges(relations, filtered.visible),
 		[relations, filtered.visible],
 	);
+	const availability = runtimeAvailability(runtimeStatus, french);
 
 	return (
 		<section
@@ -298,7 +307,7 @@ export default function ArchitectureExplorer({
 				{mode === "services" ? (
 					<span>
 						{" "}· catalog: {catalogSource} · topology: {topologySource} · runtime: {runtimeSource}
-						{runtimeStatus ? ` (${runtimeStatus.runtime.reachable ? "reachable" : "unreachable"})` : ""}
+						{availability ? ` (${availability})` : ""}
 					</span>
 				) : null}
 			</div>
