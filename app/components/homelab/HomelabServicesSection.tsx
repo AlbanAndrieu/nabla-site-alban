@@ -23,9 +23,9 @@ export default async function HomelabServicesSection({
 						<AnchoredHeading id={headingId} className="display-4 mb-3">
 							{t("title")}
 						</AnchoredHeading>
-						<p className="lead mb-2 stack-page-hero__lead">{lead}</p>
+						<p className="lead mb-2 stack-page-hero__lead">{t("lead")}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-3">
-							{iconsBefore}{" "}
+							{t("iconsBefore")}{" "}
 							<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">
 								selfh.st/icons
 							</a>
