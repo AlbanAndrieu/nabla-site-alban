@@ -1,3 +1,4 @@
+import AnchoredHeading from "@/components/AnchoredHeading";
 import type { ResourceSection } from "@/lib/resourcePages";
 
 type Translator = (key: string) => string;
@@ -16,7 +17,9 @@ export default function ResourceDirectory({
 					<div className="service-icon" aria-hidden="true">
 						<i className={`fas ${section.icon}`} />
 					</div>
-					<h2>{t(`sections.${section.key}.title`)}</h2>
+					<AnchoredHeading id={section.key}>
+						{t(`sections.${section.key}.title`)}
+					</AnchoredHeading>
 					<p className="service-lead">
 						{t(`sections.${section.key}.description`)}
 					</p>

@@ -1,23 +1,10 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 
-type Props = {
-	title: string;
-	intro: string;
-	purpose: string;
-	projectDescription: string;
-	openProject: string;
-	nablaHref: string;
-};
+export default async function HomeLabSection({ nablaHref }: { nablaHref: string }) {
+	const t = await getTranslations("truenas.page.homelab");
 
-export default function HomeLabSection({
-	title,
-	intro,
-	purpose,
-	projectDescription,
-	openProject,
-	nablaHref,
-}: Props) {
 	return (
 		<section className="py-4 page-truenas-secondary" aria-labelledby="homelab">
 			<div className="container">
@@ -26,10 +13,10 @@ export default function HomeLabSection({
 						className="fas fa-layer-group text-primary me-2"
 						aria-hidden="true"
 					></i>
-					{title}
+					{t("title")}
 				</AnchoredHeading>
-				<p className="text-secondary mb-4">{intro}</p>
-				<p>{purpose}</p>
+				<p className="text-secondary mb-4">{t("intro")}</p>
+				<p>{t("purpose")}</p>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
@@ -38,19 +25,21 @@ export default function HomeLabSection({
 								src="/assets/nabla/nabla-4.svg"
 								width={140}
 								height={140}
-								alt="Nabla logo"
+								alt={t("logoAlt")}
 								style={{ height: "auto" }}
 							/>
 							<div className="card-body text-center border-top border-secondary">
 								<h3 className="h5 card-title mb-1">Nabla</h3>
-								<p className="card-text text-muted small mb-0">{projectDescription}</p>
+								<p className="card-text text-muted small mb-0">
+									{t("projectDescription")}
+								</p>
 								<a
 									href={nablaHref}
 									className="btn btn-sm btn-outline-primary mt-3"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{openProject}
+									{t("openProject")}
 								</a>
 							</div>
 						</div>

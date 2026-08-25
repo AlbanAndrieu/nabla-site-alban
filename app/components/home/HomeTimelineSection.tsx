@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
 	locale: string;
@@ -10,9 +11,11 @@ export default async function HomeTimelineSection({ locale }: Props) {
 	const prefix = locale === "fr" ? "/fr" : "";
 
 	return (
-		<section className="timeline-section" id="timeline">
+		<section className="timeline-section" aria-labelledby="timeline">
 			<br />
-			<h2 className="section-title">{t("timeline.title")}</h2>
+			<AnchoredHeading className="section-title" id="timeline">
+				{t("timeline.title")}
+			</AnchoredHeading>
 			<p className="section-subtitle">{t("timeline.subtitle")}</p>
 			<div className="timeline">
 				<TimelineItem

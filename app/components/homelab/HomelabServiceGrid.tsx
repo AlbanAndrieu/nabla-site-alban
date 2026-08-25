@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabService, HomelabServicesCatalog } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
@@ -5,8 +8,6 @@ import EndpointAction from "./EndpointAction";
 type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
-	endpointLabel: string;
-	internalLabel: string;
 };
 
 function isInternalEndpointUrl(url?: string): boolean {
@@ -52,12 +53,8 @@ function lookupHealth(
 	}
 }
 
-export default function HomelabServiceGrid({
-	catalog,
-	snapshot,
-	endpointLabel,
-	internalLabel,
-}: Props) {
+export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
+	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
 	const externalHealth = healthByUrl(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
@@ -79,15 +76,18 @@ export default function HomelabServiceGrid({
 				>
 					<strong>
 						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
-						TrueNAS {truenasDown ? "appears to be down" : "connectivity is degraded"}
+						{truenasDown ? t("truenas.down") : t("truenas.degraded")}
 					</strong>
 					{" — "}
-					public probe {truenasPublic?.state ?? "unknown"}
+					{t("truenas.publicProbe", { state: truenasPublic?.state ?? "unknown" })}
 					{truenasInternal
-						? `; internal ${truenasInternal.host}:${truenasInternal.port} ${truenasInternal.state}`
-						: "; internal probe unavailable from this runtime"}
-					. External services depending on this host are shown as unavailable when
-					TrueNAS is down.
+						? `; ${t("truenas.internalProbe", {
+								host: truenasInternal.host,
+								port: truenasInternal.port,
+								state: truenasInternal.state,
+							})}`
+						: `; ${t("truenas.internalUnavailable")}`}
+					. {t("truenas.dependencyNote")}
 				</div>
 			)}
 			<div className="row service-grid">
@@ -126,7 +126,7 @@ export default function HomelabServiceGrid({
 											url={svc.tunnelUrl}
 											enabled={endpointEnabled}
 											external={isExternal}
-											label={endpointLabel}
+											label={t("endpoint.external")}
 											initialHealth={initialHealth}
 											truenasDown={truenasDown}
 										/>
@@ -141,11 +141,11 @@ export default function HomelabServiceGrid({
 													<i
 														className="fas fa-lock"
 														style={{ color: "gray", marginRight: 5 }}
-														title="Internal TLS certificate is not verified by the server-side TCP probe"
-														aria-label="Internal HTTPS certificate status unknown"
+														title={t("truenas.internalTlsTitle")}
+														aria-label={t("truenas.internalTlsAria")}
 													/>
 												)}
-												{internalLabel} ({svc.internalHost}:{svc.internalPort})
+												{t("endpoint.internal")} ({svc.internalHost}:{svc.internalPort})
 											</a>
 										)}
 									</div>

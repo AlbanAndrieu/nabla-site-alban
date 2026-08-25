@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -50,20 +51,13 @@ export default async function NablaPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const [site, nabla, truenas] = await Promise.all([
-		getTranslations("site"),
-		getTranslations("nabla"),
-		getTranslations("truenasPage"),
-	]);
-
+	const nabla = await getTranslations("nabla");
 	const nablaPillars: Pillar[] = [];
 
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<main id="main-content" role="main" className="mb-5">
 				<Hero />
 
@@ -218,15 +212,7 @@ export default async function NablaPage({
 					/>
 				</section>
 
-				<HomelabServicesSection
-					title={truenas("apps.title")}
-					lead={truenas("apps.lead")}
-					iconsBefore={truenas("apps.iconsBefore")}
-					iconsAfter={truenas("apps.iconsAfter")}
-					endpointLabel="External"
-					internalLabel={truenas("services.internal")}
-					headingId="nabla-homelab-services-heading"
-				/>
+				<HomelabServicesSection headingId="nabla-homelab-services" />
 
 				<ContactSection
 					contacts={[

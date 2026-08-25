@@ -1,58 +1,14 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
-import FastPoolPlan, { type FastPoolPlanCopy } from "./FastPoolPlan";
-import GpuUpgradePlan, { type GpuUpgradePlanCopy } from "./GpuUpgradePlan";
-import InferenceModelSummary, {
-	type InferenceModelSummaryCopy,
-} from "./InferenceModelSummary";
-
-export type BillOfMaterialsCopy = {
-	title: string;
-	reusedTitle: string;
-	reusedItems: string[];
-	newTitle: string;
-	purchaseDetails: string[];
-	totalLabel: string;
-	totalNote: string;
-	futureTitle: string;
-	futureItems: string[];
-};
-
-export type TrueNasUpgradeCopy = {
-	fastPool: FastPoolPlanCopy;
-	gpu: GpuUpgradePlanCopy;
-	models: InferenceModelSummaryCopy;
-};
-
-const REUSED_ICONS = ["fa-cube", "fa-plug", "fa-hard-drive", "fa-hdd"];
-
-const PURCHASES = [
-	{
-		icon: "fa-server",
-		name: "MSI MPG B650I Edge WiFi",
-		href: "https://www.amazon.fr/dp/B0BHCRX6K7",
-	},
-	{
-		icon: "fa-hard-drive",
-		name: "ORICO mSATA SSD enclosure (USB 3.0, 5 Gbps)",
-		href: "https://www.amazon.fr/dp/B0CKP48DMB",
-	},
-	{
-		icon: "fa-fan",
-		name: "Noctua NH-L9a-AM5",
-		href: "https://www.amazon.fr/dp/B0BNL8ZM1T",
-	},
-	{
-		icon: "fa-microchip",
-		name: "AMD Ryzen 7 7700",
-		href: "https://www.amazon.fr/dp/B0C3T39N6P",
-	},
-	{
-		icon: "fa-memory",
-		name: "Crucial DDR5 64 GB 5600 MHz",
-		href: "https://www.amazon.fr/dp/B0DSQP6YR9",
-	},
-	{ icon: "fa-plug", name: "ATX 500 W PSU" },
-] as const;
+import FastPoolPlan from "./FastPoolPlan";
+import { formatEuro } from "./formatters";
+import GpuUpgradePlan from "./GpuUpgradePlan";
+import {
+	CURRENT_BUILD_TOTAL_EUR,
+	HARDWARE_PURCHASES,
+	REUSED_COMPONENT_ICONS,
+} from "./hardwarePlan";
+import InferenceModelSummary from "./InferenceModelSummary";
 
 function ItemIcon({ name }: { name: string }) {
 	return (
@@ -62,15 +18,14 @@ function ItemIcon({ name }: { name: string }) {
 	);
 }
 
-export default function BillOfMaterialsSection({
-	copy,
-	upgrades,
-	locale,
-}: {
-	copy: BillOfMaterialsCopy;
-	upgrades: TrueNasUpgradeCopy;
-	locale: string;
-}) {
+export default async function BillOfMaterialsSection() {
+	const [locale, t] = await Promise.all([
+		getLocale(),
+		getTranslations("truenas.page.bom"),
+	]);
+	const reusedItems = t.raw("reusedItems") as string[];
+	const purchaseDetails = t.raw("purchaseDetails") as string[];
+
 	return (
 		<section className="py-5 hardware-bom-section" aria-labelledby="hardware-bom">
 			<div className="container">
@@ -78,18 +33,18 @@ export default function BillOfMaterialsSection({
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-clipboard-list"></i>
 					</span>
-					{copy.title}
+					{t("title")}
 				</AnchoredHeading>
 				<h4 className="h6 text-muted mt-3 mb-2 hardware-bom-heading hardware-bom-heading--sub">
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-recycle"></i>
 					</span>
-					<span>{copy.reusedTitle}</span>
+					<span>{t("reusedTitle")}</span>
 				</h4>
 				<ul className="list-group list-group-flush hardware-bom-list mb-3">
-					{copy.reusedItems.map((item, index) => (
+					{reusedItems.map((item, index) => (
 						<li className="list-group-item hardware-bom-li" key={item}>
-							<ItemIcon name={REUSED_ICONS[index]} />
+							<ItemIcon name={REUSED_COMPONENT_ICONS[index]} />
 							<span className="hardware-bom-li__body">{item}</span>
 						</li>
 					))}
@@ -98,10 +53,10 @@ export default function BillOfMaterialsSection({
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-basket-shopping"></i>
 					</span>
-					<span>{copy.newTitle}</span>
+					<span>{t("newTitle")}</span>
 				</h4>
 				<ul className="list-group list-group-flush hardware-bom-list">
-					{PURCHASES.map((purchase, index) => (
+					{HARDWARE_PURCHASES.map((purchase, index) => (
 						<li className="list-group-item hardware-bom-li" key={purchase.name}>
 							<ItemIcon name={purchase.icon} />
 							<span className="hardware-bom-li__body">
@@ -112,15 +67,17 @@ export default function BillOfMaterialsSection({
 								) : (
 									purchase.name
 								)}{" "}
-								— {copy.purchaseDetails[index]}
+								— {purchaseDetails[index]}
 							</span>
 						</li>
 					))}
 				</ul>
 				<p className="hardware-bom-total mt-3 mb-0" role="status">
-					<span className="hardware-bom-total__label">{copy.totalLabel}</span>
-					<span className="hardware-bom-total__amount">1 184,31 €</span>
-					<span className="hardware-bom-total__note">{copy.totalNote}</span>
+					<span className="hardware-bom-total__label">{t("totalLabel")}</span>
+					<span className="hardware-bom-total__amount">
+						{formatEuro(locale, CURRENT_BUILD_TOTAL_EUR)}
+					</span>
+					<span className="hardware-bom-total__note">{t("totalNote")}</span>
 				</p>
 				<div className="hardware-bom-upgrade-note mt-3">
 					<AnchoredHeading
@@ -128,11 +85,11 @@ export default function BillOfMaterialsSection({
 						id="hardware-upgrades"
 						className="h6 hardware-bom-upgrade-note__title mb-2"
 					>
-						{copy.futureTitle}
+						{t("futureTitle")}
 					</AnchoredHeading>
-					<FastPoolPlan copy={upgrades.fastPool} locale={locale} />
-					<GpuUpgradePlan copy={upgrades.gpu} locale={locale} />
-					<InferenceModelSummary copy={upgrades.models} />
+					<FastPoolPlan />
+					<GpuUpgradePlan />
+					<InferenceModelSummary />
 				</div>
 			</div>
 		</section>
