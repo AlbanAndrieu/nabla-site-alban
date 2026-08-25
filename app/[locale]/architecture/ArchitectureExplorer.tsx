@@ -33,6 +33,7 @@ import {
 import styles from "./ArchitectureExplorer.module.css";
 
 type GraphMode = "ai" | "services";
+type RuntimeStatusWithFreshness = HomelabStatusSnapshot["runtime"] & { stale?: boolean };
 
 type ArchitectureNodeData = Record<string, unknown> & {
 	name: string;
@@ -266,6 +267,8 @@ export default function ArchitectureExplorer({
 		() => makeEdges(relations, filtered.visible),
 		[relations, filtered.visible],
 	);
+	const runtime = runtimeStatus?.runtime as RuntimeStatusWithFreshness | undefined;
+	const freshnessLabel = runtime?.stale ? (french ? "périmé" : "stale") : null;
 
 	return (
 		<section
@@ -298,7 +301,7 @@ export default function ArchitectureExplorer({
 				{mode === "services" ? (
 					<span>
 						{" "}· catalog: {catalogSource} · topology: {topologySource} · runtime: {runtimeSource}
-						{runtimeStatus ? ` (${runtimeStatus.runtime.reachable ? "reachable" : "unreachable"})` : ""}
+						{runtime ? ` (${runtime.reachable ? "reachable" : "unreachable"}${freshnessLabel ? `, ${freshnessLabel}` : ""})` : ""}
 					</span>
 				) : null}
 			</div>
@@ -323,8 +326,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les flèches animées représentent les relations requises ; les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift."
-					: "Animated arrows represent required relations; runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift."}
+					? "Les flèches animées représentent les relations requises ; les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift. Un runtime périmé indique que FastAPI sert le dernier snapshot TrueNAS valide après un échec de rafraîchissement."
+					: "Animated arrows represent required relations; runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift. A stale runtime means FastAPI is serving the last valid TrueNAS snapshot after a refresh failure."}
 			</p>
 		</section>
 	);
