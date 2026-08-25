@@ -93,6 +93,24 @@
 	color: var(--text-primary, inherit);
 }
 
+.node[data-reconciliation="in_sync"] {
+	border-color: #2f9e44;
+}
+
+.node[data-reconciliation="declared_only"],
+.node[data-reconciliation="binding_conflict"] {
+	border-color: #f08c00;
+}
+
+.node[data-reconciliation="observed_only"] {
+	border-color: #e8590c;
+	border-style: dashed;
+}
+
+.node[data-reconciliation="runtime_unknown"] {
+	border-color: #868e96;
+}
+
 .nodeSelected {
 	outline: 3px solid var(--ui-focus-color);
 	outline-offset: 2px;
@@ -107,10 +125,19 @@
 	letter-spacing: 0.04em;
 }
 
-.nodeMeta span {
+.nodeMeta span,
+.runtimeBadge {
 	padding: 0.12rem 0.35rem;
 	border-radius: 999px;
 	background: rgb(127 127 127 / 14%);
+}
+
+.runtimeBadge {
+	justify-self: start;
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
 }
 
 .nodeTitle {
