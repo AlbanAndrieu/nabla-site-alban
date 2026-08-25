@@ -268,7 +268,10 @@ export default function ArchitectureExplorer({
 	);
 
 	return (
-		<section className={styles.explorer} aria-labelledby="architecture-explorer-heading">
+		<section
+			className={styles.explorer}
+			aria-label={french ? "Explorateur d’architecture" : "Architecture explorer"}
+		>
 			<div className={styles.toolbar}>
 				<div className={styles.tabs} role="group" aria-label={french ? "Vue du diagramme" : "Diagram view"}>
 					<button type="button" aria-pressed={mode === "ai"} onClick={() => setMode("ai")}>
@@ -300,7 +303,7 @@ export default function ArchitectureExplorer({
 				) : null}
 			</div>
 
-			<div className={styles.flowShell} id="architecture-explorer-heading">
+			<div className={styles.flowShell}>
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
