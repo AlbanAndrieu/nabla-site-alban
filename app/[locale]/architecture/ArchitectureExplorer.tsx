@@ -40,6 +40,7 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	category: string;
 	url?: string;
 	detail?: string;
+	icon?: string;
 	openLabel: string;
 	reconciliation?: string;
 	runtimeState?: string;
@@ -65,7 +66,14 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 				<span>{item.category}</span>
 				<span>{item.kind}</span>
 			</div>
-			<strong className={styles.nodeTitle}>{item.name}</strong>
+			<div className={styles.nodeHeading}>
+				{item.icon ? (
+					<span className={styles.nodeIcon} aria-hidden="true">
+						{item.icon}
+					</span>
+				) : null}
+				<strong className={styles.nodeTitle}>{item.name}</strong>
+			</div>
 			{item.reconciliation ? (
 				<span className={styles.runtimeBadge}>
 					{item.reconciliation.replaceAll("_", " ")}
@@ -141,6 +149,7 @@ function makeNodes(
 				category: entity.category,
 				url: entity.url,
 				detail: entity.detail,
+				icon: entity.icon,
 				openLabel,
 				reconciliation: runtimeStatus?.reconciliation,
 				runtimeState: runtimeStatus?.observed?.appState,
@@ -332,8 +341,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les flèches animées représentent les relations requises ; les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift."
-					: "Animated arrows represent required relations; runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift."}
+					? "Les flèches animées représentent les relations requises ; les icônes viennent du catalogue déclaré et les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift."
+					: "Animated arrows represent required relations; icons come from the declared catalog and runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift."}
 			</p>
 		</section>
 	);

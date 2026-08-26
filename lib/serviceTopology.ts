@@ -8,6 +8,7 @@ export type ServiceTopologyNode = {
 	sourcePath?: string;
 	url?: string;
 	description?: string;
+	icon?: string;
 };
 
 export type ServiceRelationType =
@@ -75,7 +76,8 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.id === "string" &&
 				typeof node.name === "string" &&
 				typeof node.kind === "string" &&
-				typeof node.category === "string",
+				typeof node.category === "string" &&
+				(node.icon === undefined || typeof node.icon === "string"),
 		)
 	) {
 		return null;

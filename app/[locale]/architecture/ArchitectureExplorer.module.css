@@ -140,6 +140,19 @@
 	letter-spacing: 0.03em;
 }
 
+.nodeHeading {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	min-width: 0;
+}
+
+.nodeIcon {
+	flex: 0 0 auto;
+	font-size: 1.45rem;
+	line-height: 1;
+}
+
 .nodeTitle {
 	font-size: 0.95rem;
 	line-height: 1.25;
