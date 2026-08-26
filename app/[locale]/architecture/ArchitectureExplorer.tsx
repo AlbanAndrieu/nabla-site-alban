@@ -15,6 +15,20 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
+import {
+	HOMELAB_HEALTH_DEFAULT_API_URL,
+	parseHomelabHealthSnapshot,
+	type HomelabHealthEntry,
+	type HomelabHealthSnapshot,
+	type HomelabHealthState,
+} from "@/lib/homelabHealth";
+import {
+	cloudflareIndicatorColor,
+	hasCloudflareEvidence,
+	homelabHealthColor,
+	isHttpsEndpoint,
+	tlsIndicatorColor,
+} from "@/lib/homelabHealthPresentation";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
 	parseHomelabStatusSnapshot,
@@ -33,7 +47,6 @@ import {
 import styles from "./ArchitectureExplorer.module.css";
 
 type GraphMode = "ai" | "services";
-type RuntimeStatusWithFreshness = HomelabStatusSnapshot["runtime"] & { stale?: boolean };
 
 type ArchitectureNodeData = Record<string, unknown> & {
 	name: string;
@@ -46,6 +59,12 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	openLabel: string;
 	reconciliation?: string;
 	runtimeState?: string;
+	healthState?: HomelabHealthState;
+	tlsTrusted?: boolean | null;
+	cloudflareObserved?: boolean;
+	cloudflareStatus?: string | null;
+	cloudflareColor?: string;
+	applicationError?: string | null;
 };
 
 type Props = {
@@ -59,15 +78,20 @@ type Props = {
 function ArchitectureNode({ data, selected }: NodeProps) {
 	const item = data as ArchitectureNodeData;
 	const fallback = item.name.trim().slice(0, 2).toUpperCase();
+	const healthColor = item.healthState ? homelabHealthColor(item.healthState) : undefined;
+	const https = isHttpsEndpoint(item.url);
+	const healthLabel = item.healthState ? `Health: ${item.healthState}` : "Health unavailable";
 	return (
 		<div
 			className={`${styles.node} ${selected ? styles.nodeSelected : ""}`}
 			data-reconciliation={item.reconciliation}
+			data-health-state={item.healthState}
+			style={healthColor ? { borderColor: healthColor, boxShadow: `0 0 0 1px ${healthColor}55` } : undefined}
 		>
 			<Handle type="target" position={Position.Left} className={styles.handle} />
 			<div className={styles.nodeMeta}>
 				<span>{item.category}</span>
-				<span>{item.kind}</span>
+				<span style={healthColor ? { color: healthColor } : undefined}>{item.healthState ?? item.kind}</span>
 			</div>
 			<div className={styles.nodeHeading}>
 				<span className={styles.nodeIconFrame} aria-hidden="true">
@@ -79,7 +103,33 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 						<span className={styles.nodeIconFallback}>{fallback}</span>
 					)}
 				</span>
-				<strong className={styles.nodeTitle}>{item.name}</strong>
+				<strong className={styles.nodeTitle} style={healthColor ? { color: healthColor } : undefined}>
+					{item.name}
+				</strong>
+				{https ? (
+					<i
+						className="fas fa-lock"
+						style={{ color: tlsIndicatorColor(item.tlsTrusted), marginLeft: 6 }}
+						title={item.tlsTrusted === true ? "TLS trusted" : item.tlsTrusted === false ? "TLS invalid" : "TLS not verified"}
+						aria-label={item.tlsTrusted === true ? "TLS trusted" : item.tlsTrusted === false ? "TLS invalid" : "TLS not verified"}
+					/>
+				) : null}
+				{item.cloudflareObserved ? (
+					<i
+						className="fas fa-cloud"
+						style={{ color: item.cloudflareColor, marginLeft: 6 }}
+						title={`Cloudflare${item.cloudflareStatus ? `: ${item.cloudflareStatus}` : " observed"}`}
+						aria-label={`Cloudflare${item.cloudflareStatus ? `: ${item.cloudflareStatus}` : " observed"}`}
+					/>
+				) : null}
+				{item.applicationError ? (
+					<i
+						className="fas fa-skull-crossbones"
+						style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
+						title={item.applicationError}
+						aria-label={item.applicationError}
+					/>
+				) : null}
 			</div>
 			{item.reconciliation ? (
 				<span className={styles.runtimeBadge}>
@@ -95,6 +145,8 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 					target="_blank"
 					rel="noopener noreferrer"
 					onClick={(event) => event.stopPropagation()}
+					style={healthColor ? { color: healthColor, borderColor: healthColor } : undefined}
+					title={healthLabel}
 				>
 					{item.openLabel} ↗
 				</a>
@@ -137,15 +189,25 @@ function gridPositions(entities: ArchitectureEntity[]): Map<string, { x: number;
 	return positions;
 }
 
+function healthMap(snapshot: HomelabHealthSnapshot | null): Map<string, HomelabHealthEntry> {
+	return new Map(
+		(snapshot?.services ?? [])
+			.filter((entry): entry is HomelabHealthEntry & { id: string } => Boolean(entry.id))
+			.map((entry) => [entry.id, entry]),
+	);
+}
+
 function makeNodes(
 	entities: ArchitectureEntity[],
 	mode: GraphMode,
 	openLabel: string,
 	statusById: Map<string, HomelabStatusService>,
+	healthById: Map<string, HomelabHealthEntry>,
 ): Node<ArchitectureNodeData>[] {
 	const positions = mode === "ai" ? layerPositions(entities) : gridPositions(entities);
 	return entities.map((entity) => {
 		const runtimeStatus = mode === "services" ? statusById.get(entity.id) : undefined;
+		const health = mode === "services" ? healthById.get(entity.id) : undefined;
 		return {
 			id: entity.id,
 			type: "architecture",
@@ -154,13 +216,19 @@ function makeNodes(
 				name: entity.name,
 				kind: entity.kind,
 				category: entity.category,
-				url: entity.url,
+				url: health?.url ?? entity.url,
 				detail: entity.detail,
 				icon: entity.icon,
 				iconSrc: entity.iconSrc,
 				openLabel,
 				reconciliation: runtimeStatus?.reconciliation,
 				runtimeState: runtimeStatus?.observed?.appState,
+				healthState: health?.application_error ? "fail" : health?.state,
+				tlsTrusted: health?.tls_trusted,
+				cloudflareObserved: hasCloudflareEvidence(health),
+				cloudflareStatus: health?.tunnel_status,
+				cloudflareColor: cloudflareIndicatorColor(health),
+				applicationError: health?.application_error,
 			},
 		};
 	});
@@ -195,22 +263,16 @@ function filterGraph(
 ): { entities: ArchitectureEntity[]; visible: Set<string> } {
 	const needle = query.trim().toLowerCase();
 	if (!needle) return { entities, visible: new Set(entities.map((entity) => entity.id)) };
-
 	const matches = new Set(
 		entities
-			.filter((entity) =>
-				`${entity.name} ${entity.kind} ${entity.category}`.toLowerCase().includes(needle),
-			)
+			.filter((entity) => `${entity.name} ${entity.kind} ${entity.category}`.toLowerCase().includes(needle))
 			.map((entity) => entity.id),
 	);
 	for (const relation of relations) {
 		if (matches.has(relation.source)) matches.add(relation.target);
 		if (matches.has(relation.target)) matches.add(relation.source);
 	}
-	return {
-		entities: entities.filter((entity) => matches.has(entity.id)),
-		visible: matches,
-	};
+	return { entities: entities.filter((entity) => matches.has(entity.id)), visible: matches };
 }
 
 function observedOnlyEntities(snapshot: HomelabStatusSnapshot | null): ArchitectureEntity[] {
@@ -245,11 +307,13 @@ export default function ArchitectureExplorer({
 	const [mode, setMode] = useState<GraphMode>("ai");
 	const [query, setQuery] = useState("");
 	const [runtimeStatus, setRuntimeStatus] = useState<HomelabStatusSnapshot | null>(null);
+	const [healthStatus, setHealthStatus] = useState<HomelabHealthSnapshot | null>(null);
 	const [runtimeSource, setRuntimeSource] = useState<"loading" | "fastapi" | "unavailable">("loading");
+	const [healthSource, setHealthSource] = useState<"loading" | "fastapi" | "unavailable">("loading");
 
 	useEffect(() => {
 		let active = true;
-		const load = async () => {
+		const loadRuntime = async () => {
 			try {
 				const response = await fetch("/api/homelab-status", { cache: "no-store" });
 				if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -263,7 +327,25 @@ export default function ArchitectureExplorer({
 				if (active) setRuntimeSource("unavailable");
 			}
 		};
-		void load();
+		const loadHealth = async () => {
+			try {
+				const response = await fetch(HOMELAB_HEALTH_DEFAULT_API_URL, {
+					cache: "no-store",
+					headers: { Accept: "application/json" },
+				});
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
+				const snapshot = parseHomelabHealthSnapshot(await response.json());
+				if (!snapshot) throw new Error("Invalid homelab health payload");
+				if (active) {
+					setHealthStatus(snapshot);
+					setHealthSource("fastapi");
+				}
+			} catch {
+				if (active) setHealthSource("unavailable");
+			}
+		};
+		const load = () => void Promise.all([loadRuntime(), loadHealth()]);
+		load();
 		const timer = window.setInterval(load, 30_000);
 		return () => {
 			active = false;
@@ -272,14 +354,14 @@ export default function ArchitectureExplorer({
 	}, []);
 
 	const statusById = useMemo(
-		() =>
-			new Map(
-				[...(runtimeStatus?.services ?? []), ...(runtimeStatus?.observedOnly ?? [])].map(
-					(service) => [service.id, service],
-				),
+		() => new Map(
+			[...(runtimeStatus?.services ?? []), ...(runtimeStatus?.observedOnly ?? [])].map(
+				(service) => [service.id, service],
 			),
+		),
 		[runtimeStatus],
 	);
+	const healthById = useMemo(() => healthMap(healthStatus), [healthStatus]);
 	const servicesEntities = useMemo(() => {
 		const declared = buildNablaEntities(catalog.services, topology);
 		const existingIds = new Set(declared.map((entity) => entity.id));
@@ -293,28 +375,18 @@ export default function ArchitectureExplorer({
 	const relations = mode === "ai" ? AI_RELATIONS : servicesRelations;
 	const filtered = useMemo(() => filterGraph(entities, relations, query), [entities, relations, query]);
 	const nodes = useMemo(
-		() => makeNodes(filtered.entities, mode, french ? "Ouvrir" : "Open", statusById),
-		[filtered.entities, french, mode, statusById],
+		() => makeNodes(filtered.entities, mode, french ? "Ouvrir" : "Open", statusById, healthById),
+		[filtered.entities, french, mode, statusById, healthById],
 	);
-	const edges = useMemo(
-		() => makeEdges(relations, filtered.visible),
-		[relations, filtered.visible],
-	);
+	const edges = useMemo(() => makeEdges(relations, filtered.visible), [relations, filtered.visible]);
 	const availability = runtimeAvailability(runtimeStatus, french);
 
 	return (
-		<section
-			className={styles.explorer}
-			aria-label={french ? "Explorateur d’architecture" : "Architecture explorer"}
-		>
+		<section className={styles.explorer} aria-label={french ? "Explorateur d’architecture" : "Architecture explorer"}>
 			<div className={styles.toolbar}>
 				<div className={styles.tabs} role="group" aria-label={french ? "Vue du diagramme" : "Diagram view"}>
-					<button type="button" aria-pressed={mode === "ai"} onClick={() => setMode("ai")}>
-						AI Platform
-					</button>
-					<button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}>
-						Nabla / TrueNAS
-					</button>
+					<button type="button" aria-pressed={mode === "ai"} onClick={() => setMode("ai")}>AI Platform</button>
+					<button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}>Nabla / TrueNAS</button>
 				</div>
 				<label className={styles.search}>
 					<span>{french ? "Filtrer" : "Filter"}</span>
@@ -328,12 +400,11 @@ export default function ArchitectureExplorer({
 			</div>
 
 			<div className={styles.status} role="status">
-				<strong>{filtered.entities.length}</strong> {french ? "nœuds" : "nodes"} · <strong>{edges.length}</strong>{" "}
-				{french ? "relations" : "relations"}
+				<strong>{filtered.entities.length}</strong> {french ? "nœuds" : "nodes"} · <strong>{edges.length}</strong> relations
 				{mode === "services" ? (
 					<span>
 						{" "}· catalog: {catalogSource} · topology: {topologySource} · runtime: {runtimeSource}
-						{availability ? ` (${availability})` : ""}
+						{availability ? ` (${availability})` : ""} · health: {healthSource}
 					</span>
 				) : null}
 			</div>
@@ -357,7 +428,10 @@ export default function ArchitectureExplorer({
 						zoomable
 						bgColor="#0f172a"
 						maskColor="rgb(2 6 23 / 74%)"
-						nodeColor="#38bdf8"
+						nodeColor={(node) => {
+							const data = node.data as ArchitectureNodeData;
+							return data.healthState ? homelabHealthColor(data.healthState) : "#38bdf8";
+						}}
 						nodeStrokeColor="#e0f2fe"
 						nodeStrokeWidth={2}
 						className={styles.miniMap}
@@ -368,8 +442,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les flèches cyan animées représentent les relations requises ; les icônes utilisent d’abord les logos du catalogue, puis l’icône déclarée et enfin un fallback lisible. Les badges runtime montrent la réconciliation TrueNAS."
-					: "Animated cyan arrows represent required relations; icons use catalog logos first, then declared icons and finally a readable fallback. Runtime badges show TrueNAS reconciliation."}
+					? "Les couleurs de service suivent la santé FastAPI : vert fonctionnel, orange dégradé, rouge en échec et gris inconnu. Le cadenas représente la confiance TLS, le nuage une preuve Cloudflare observée et le crâne une erreur applicative. Les badges runtime restent dédiés à la réconciliation TrueNAS."
+					: "Service colors follow FastAPI health: green healthy, orange degraded, red failed, and gray unknown. The lock represents TLS trust, the cloud observed Cloudflare evidence, and the skull an application error. Runtime badges remain dedicated to TrueNAS reconciliation."}
 			</p>
 		</section>
 	);
