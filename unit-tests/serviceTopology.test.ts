@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { parseServiceTopology } from "../lib/serviceTopology";
+import {
+	getStaticServiceTopology,
+	parseServiceTopology,
+} from "../lib/serviceTopology";
 
 test("local topology fallback is a valid connected graph", async () => {
 	const raw = JSON.parse(await readFile("public/service-topology.json", "utf8")) as unknown;
@@ -13,6 +16,25 @@ test("local topology fallback is a valid connected graph", async () => {
 	assert.ok(topology.relations.length >= 10);
 	assert.ok(topology.relations.some((relation) => relation.source === "openwebui" && relation.target === "litellm"));
 	assert.ok(topology.relations.some((relation) => relation.source === "litellm" && relation.target === "ollama"));
+});
+
+test("static architecture topology never probes FastAPI during prerender", () => {
+	const originalFetch = globalThis.fetch;
+	let fetchCalled = false;
+	globalThis.fetch = (async () => {
+		fetchCalled = true;
+		throw new Error("static topology must not fetch");
+	}) as typeof fetch;
+
+	try {
+		const result = getStaticServiceTopology();
+		assert.equal(fetchCalled, false);
+		assert.equal(result.source, "local-fallback");
+		assert.ok(result.topology.nodes.length >= 10);
+		assert.ok(result.topology.relations.length >= 10);
+	} finally {
+		globalThis.fetch = originalFetch;
+	}
 });
 
 test("topology parser rejects edges with unknown nodes", () => {
@@ -26,7 +48,7 @@ test("topology parser rejects edges with unknown nodes", () => {
 	assert.equal(topology, null);
 });
 
-test("architecture route uses a high-contrast React Flow with shared service health indicators", async () => {
+test("architecture route uses a static declared shell with live shared service health indicators", async () => {
 	const [page, explorer, data, css, packageJson] = await Promise.all([
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
 		readFile("app/[locale]/architecture/ArchitectureExplorer.tsx", "utf8"),
@@ -37,6 +59,10 @@ test("architecture route uses a high-contrast React Flow with shared service hea
 
 	assert.match(page, /buildPageMetadata\(/);
 	assert.match(page, /slug: "architecture"/);
+	assert.match(page, /getStaticHomelabServicesCatalog\(\)/);
+	assert.match(page, /getStaticServiceTopology\(\)/);
+	assert.doesNotMatch(page, /loadHomelabServicesCatalog\(\)/);
+	assert.doesNotMatch(page, /loadServiceTopology\(\)/);
 	assert.match(explorer, /from "@xyflow\/react"/);
 	assert.match(explorer, /colorMode="dark"/);
 	assert.match(explorer, /<MiniMap[\s\S]*nodeColor=\{\(node\) =>/);

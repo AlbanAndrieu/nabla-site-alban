@@ -6,8 +6,8 @@ import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
-import { loadHomelabServicesCatalog } from "@/lib/homelabServices";
-import { loadServiceTopology } from "@/lib/serviceTopology";
+import { getStaticHomelabServicesCatalog } from "@/lib/homelabServices";
+import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureExplorer from "./ArchitectureExplorer";
 
@@ -34,8 +34,8 @@ export default async function ArchitecturePage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
 	const french = locale === "fr";
-	const [{ catalog, source: catalogSource }, { topology, source: topologySource }] =
-		await Promise.all([loadHomelabServicesCatalog(), loadServiceTopology()]);
+	const { catalog, source: catalogSource } = getStaticHomelabServicesCatalog();
+	const { topology, source: topologySource } = getStaticServiceTopology();
 	const prefix = french ? "/fr" : "";
 
 	return (

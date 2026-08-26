@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { GET } from "../app/api/homelab-services/route";
 import {
+	getStaticHomelabServicesCatalog,
 	HOMELAB_SERVICES_DEFAULT_API_URL,
 	homelabServiceEndpointUrl,
 	loadHomelabServicesCatalog,
@@ -57,6 +58,22 @@ test("homelab service endpoint uses explicit URL before the stable-id DNS fallba
 		homelabServiceEndpointUrl({ name: "Prometheus - albandrieu" }),
 		"https://prometheus-albandrieu.albandrieu.com",
 	);
+});
+
+test("static homelab catalog never probes FastAPI during prerender", () => {
+	setApiUrl("https://catalog.example.test/homelab");
+	let fetchCalled = false;
+	globalThis.fetch = (async () => {
+		fetchCalled = true;
+		throw new Error("static catalog must not fetch");
+	}) as typeof fetch;
+
+	const result = getStaticHomelabServicesCatalog();
+
+	assert.equal(fetchCalled, false);
+	assert.equal(result.source, "local-fallback");
+	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
+	assert.ok(result.catalog.services.some((service) => service.name === "TrueNAS"));
 });
 
 test("homelab catalog prefers FastAPI when a valid payload is available", async () => {
