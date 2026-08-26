@@ -6,6 +6,8 @@ import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 
+const HEALTH_REFRESH_MS = 30_000;
+
 type State = {
 	catalog: HomelabServicesCatalog | null;
 	snapshot: HomelabHealthSnapshot | null;
@@ -43,24 +45,53 @@ export default function HomelabServicesBlock() {
 	});
 
 	useEffect(() => {
-		const controller = new AbortController();
+		const initialController = new AbortController();
+		let refreshController: AbortController | null = null;
+
+		const refreshHealth = async () => {
+			if (document.hidden) return;
+			refreshController?.abort();
+			refreshController = new AbortController();
+			const snapshot = await fetchHealth(refreshController.signal);
+			if (!refreshController.signal.aborted) {
+				setState((current) => ({
+					...current,
+					// Keep the last known good snapshot during transient backend failures.
+					snapshot: snapshot ?? current.snapshot,
+					error: current.catalog === null && snapshot === null,
+				}));
+			}
+		};
 
 		void Promise.all([
-			fetchCatalog(controller.signal),
-			fetchHealth(controller.signal),
+			fetchCatalog(initialController.signal),
+			fetchHealth(initialController.signal),
 		])
 			.then(([catalog, snapshot]) => {
-				if (!controller.signal.aborted) {
+				if (!initialController.signal.aborted) {
 					setState({ catalog, snapshot, error: false });
 				}
 			})
 			.catch(() => {
-				if (!controller.signal.aborted) {
+				if (!initialController.signal.aborted) {
 					setState((current) => ({ ...current, error: true }));
 				}
 			});
 
-		return () => controller.abort();
+		const interval = window.setInterval(() => {
+			void refreshHealth();
+		}, HEALTH_REFRESH_MS);
+		const onVisibilityChange = () => {
+			if (!document.hidden) void refreshHealth();
+		};
+		document.addEventListener("visibilitychange", onVisibilityChange);
+
+		return () => {
+			initialController.abort();
+			refreshController?.abort();
+			window.clearInterval(interval);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
+		};
 	}, []);
 
 	if (!state.catalog) {

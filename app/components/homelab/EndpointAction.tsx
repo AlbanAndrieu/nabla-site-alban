@@ -136,7 +136,9 @@ export default function EndpointAction({
 	);
 
 	useEffect(() => {
-		if (external || !url || !enabled) return;
+		// FastAPI reconciliation is authoritative when available because a browser
+		// cross-origin request can be blocked by CORS even when normal navigation works.
+		if (external || initialHealth || !url || !enabled) return;
 
 		let parsed: URL;
 		try {
@@ -167,7 +169,7 @@ export default function EndpointAction({
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [enabled, external, url]);
+	}, [enabled, external, initialHealth, url]);
 
 	const translateProbeDetail = (detail: ProbeDetail): string => {
 		switch (detail.kind) {
@@ -191,34 +193,36 @@ export default function EndpointAction({
 	};
 
 	const fastApiHealthDetail = (entry: HomelabHealthEntry): string => {
-		const status = entry.http_status || t("networkError");
+		const status = entry.http_status > 0 ? String(entry.http_status) : "not probed";
 		const latency = typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 		const tls = entry.tls_trusted === false ? `, ${t("tlsError")}` : "";
 		const tunnel = entry.tunnel_status
 			? `, ${t("tunnel")} ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
 			: "";
+		const runtime = entry.runtime_state
+			? `, TrueNAS ${entry.runtime_state}${entry.runtime_app ? ` (${entry.runtime_app})` : ""}`
+			: "";
+		const internal = entry.internal_state ? `, internal ${entry.internal_state}` : "";
 		const error = entry.error ? ` — ${entry.error}` : "";
-		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${latency}${error}`;
+		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${runtime}${internal}${latency}${error}`;
 	};
 
-	const health: HealthState = external
-		? truenasDown
-			? "fail"
-			: (initialHealth?.state ?? "unknown")
-		: privateHealth;
-	const tlsTrusted = external ? initialHealth?.tls_trusted : undefined;
+	const health: HealthState = truenasDown
+		? "fail"
+		: (initialHealth?.state ?? (external ? "unknown" : privateHealth));
+	const tlsTrusted = initialHealth?.tls_trusted;
 	const detail = !configured
 		? url
 			? t("inventoryOnly")
 			: t("noUrl")
-		: external
-			? truenasDown
-				? t("dependencyDown")
-				: initialHealth
-					? fastApiHealthDetail(initialHealth)
-					: t("publicSnapshotUnavailable")
-			: translateProbeDetail(privateDetail);
-	const tunnelStatus = external ? initialHealth?.tunnel_status : undefined;
+		: truenasDown
+			? t("dependencyDown")
+			: initialHealth
+				? fastApiHealthDetail(initialHealth)
+				: external
+					? t("publicSnapshotUnavailable")
+					: translateProbeDetail(privateDetail);
+	const tunnelStatus = initialHealth?.tunnel_status;
 	const tunnelTitle = tunnelStatus
 		? t("tunnelState", {
 				status: `${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`,

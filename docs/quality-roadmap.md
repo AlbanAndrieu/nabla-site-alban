@@ -21,20 +21,6 @@ branche finale et le déploiement Vercel sont validés.
 - [ ] Le connecteur de logs runtime Vercel doit être revalidé lorsqu'il est
   disponible ; il était indisponible lors du contrôle du 26 août.
 
-## P0 — Stabilisation post-merge
-
-- [x] Ajouter `npm run build` à la CI avant merge.
-- [x] Rejouer le workflow Quality/Security sur `master` après merge.
-- [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.
-- [ ] Conserver une seule implémentation de la politique metadata sociale ; les
-  anciens imports doivent rester compatibles pendant la migration.
-- [ ] Aligner l'origine canonical/sitemap/Open Graph sur le host de production
-  final et éviter les canonical qui nécessitent une redirection.
-- [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
-  afin qu'une PR rouge ne puisse plus casser `master`.
-- [ ] Ajouter un smoke test post-déploiement sur accueil EN/FR, `/truenas`,
-  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
-
 ## P0 — Cohérence produit et contenu
 
 - [ ] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
@@ -81,6 +67,23 @@ branche finale et le déploiement Vercel sont validés.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après
   chaque migration visible.
 
+## P0 — Empêcher une nouvelle régression de merge
+
+Ce P0 reste volontairement le dernier des P0 et le dernier lot de l'ordre de
+livraison, comme demandé. Les garde-fous déjà introduits restent actifs pendant
+les autres chantiers.
+
+- [x] Ajouter `npm run build` à la CI avant merge.
+- [x] Rejouer le workflow Quality/Security sur `master` après merge.
+- [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.
+- [x] Consolider la politique metadata sociale et conserver une façade de
+  compatibilité pour les anciens imports.
+- [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
+- [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
+  afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
+- [ ] Ajouter un smoke test post-déploiement sur accueil EN/FR, `/truenas`,
+  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
+
 ## P1 — Architecture et homelab runtime
 
 - [x] Consommer la topologie déclarée issue de `nabla-compose`.
@@ -91,13 +94,17 @@ branche finale et le déploiement Vercel sont validés.
   `runtime_unknown`, `not_observed` et les workloads `observed_only`.
 - [x] Signaler les snapshots runtime périmés (`stale`) séparément d'un runtime
   fraîchement observable.
+- [ ] Réconcilier la santé de chaque service depuis les preuves HTTP directes,
+  le runtime TrueNAS et les ingress Cloudflare plutôt que depuis un probe unique.
+- [ ] Rafraîchir automatiquement le snapshot de santé dans l'UI en conservant le
+  dernier état valide pendant une panne transitoire du backend.
+- [ ] Afficher explicitement la preuve ayant conduit à vert/orange/rouge et l'âge
+  du snapshot afin qu'un ancien état vert ne soit jamais interprété comme live.
 - [ ] Revalider le graphe de production après chaque évolution importante du
   catalogue `nabla-compose` / du contrat `fastapi-sample`.
 - [ ] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
   multi-services (par exemple Elasticsearch/Kibana) et les services auxiliaires
   qui ne doivent pas devenir des nœuds fonctionnels par erreur.
-- [ ] Exposer dans l'UI l'âge de l'observation runtime lorsque le backend fournit
-  un timestamp exploitable.
 
 ## P1 — Accessibilité
 
@@ -171,7 +178,8 @@ Autres contrôles :
 - [x] Ajouter Open Graph/Twitter, locales `en_US`/`fr_FR`, images 1200×630 et
   métadonnées sociales page-aware.
 - [x] Ajouter une image sociale générée localement sans dépendance distante.
-- [ ] Terminer la consolidation `socialMetadata` / compatibilité `siteMetadata`.
+- [x] Consolider `socialMetadata` et conserver `siteMetadata` comme façade de
+  compatibilité.
 - [ ] Contrôler après déploiement canonical, `hreflang`, robots, sitemap et
   aperçus Open Graph sur le host final `www`.
 - [ ] Vérifier puis rediriger/retirer proprement les anciennes URL `.html` encore
@@ -225,14 +233,16 @@ Autres contrôles :
 
 ## Ordre de livraison réévalué
 
-1. Stabilisation post-merge : metadata unique, canonical `www`, ruleset requis et
-   smoke tests production.
+1. Santé homelab : réconciliation HTTP + TrueNAS + Cloudflare, auto-refresh et
+   âge/preuve du snapshot.
 2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
 3. Design system partagé : tokens globaux puis primitives Footer/RouteHeader.
 4. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
 5. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
 6. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
 7. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
+8. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
+   puis conserver ces garde-fous pour tous les travaux ultérieurs.
 
 ## Contrôles de sortie
 
