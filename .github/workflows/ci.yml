@@ -13,6 +13,20 @@ on:
       - "*.{js,cjs,mjs,ts,json}"
       - "package-lock.json"
       - ".github/workflows/ci.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "messages/**"
+      - "public/**/*.css"
+      - "scripts/**"
+      - "unit-tests/**"
+      - "*.{js,cjs,mjs,ts,json}"
+      - "package-lock.json"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -56,6 +70,9 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
+
+      - name: Build Next.js application
+        run: npm run build
 
       - name: Run Snyk vulnerability scan
         if: env.SNYK_TOKEN != ''
