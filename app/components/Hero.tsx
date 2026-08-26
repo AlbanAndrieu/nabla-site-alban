@@ -88,7 +88,7 @@ export default function Hero() {
 				</div>
 				<div className="cta-buttons">
 					<a
-						href={`${localePrefix}/expertise.html`}
+						href={`${localePrefix}/expertise`}
 						className="btn btn-secondary"
 					>
 						<i className="fas fa-layer-group" aria-hidden="true"></i>{" "}
