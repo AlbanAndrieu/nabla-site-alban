@@ -6,7 +6,7 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { buildLegacyPageMetadata } from "@/lib/legacyPageMetadata";
+import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityArfTree from "./SecurityArfTree";
