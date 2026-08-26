@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import ThreatFeed from "@/components/ciso/ThreatFeed";
 import TopAnchor from "@/components/TopAnchor";
 import { type AppLocale, routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildPageMetadata } from "@/lib/siteMetadata";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -23,17 +23,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "ciso" });
-	return {
+	return buildPageMetadata({
+		slug: "ciso",
+		locale,
 		title: `${t("title")} — Alban Andrieu`,
 		description: t("subtitle"),
-		alternates: {
-			canonical: canonicalPagePath("ciso", locale),
-			languages: {
-				en: canonicalPagePath("ciso", "en"),
-				fr: canonicalPagePath("ciso", "fr"),
-			},
-		},
-	};
+	});
 }
 
 export default async function CisoPage({ params }: Props) {
