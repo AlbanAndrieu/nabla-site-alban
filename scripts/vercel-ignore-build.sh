@@ -5,23 +5,31 @@ set -euo pipefail
 #   0 => skip the deployment
 #   1 => continue building
 #
-# Skip only when every changed file is maintenance, documentation, or unit-test
-# code that cannot affect the deployed application. Browser/E2E workflow changes
-# remain deploy-relevant because they need a real Preview URL.
+# Skip only when every change since the last successful Vercel deployment is
+# maintenance, documentation, or unit-test code that cannot affect the deployed
+# application. Browser/E2E workflow changes remain deploy-relevant because they
+# need a real Preview URL.
 
-if ! git rev-parse HEAD^ >/dev/null 2>&1; then
-  echo "No parent commit available; build deployment."
-  exit 1
+base_sha="${VERCEL_GIT_PREVIOUS_SHA:-}"
+
+if [[ -z "$base_sha" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
+  if git rev-parse HEAD^ >/dev/null 2>&1; then
+    base_sha="$(git rev-parse HEAD^)"
+    echo "VERCEL_GIT_PREVIOUS_SHA unavailable; falling back to parent commit $base_sha."
+  else
+    echo "No comparison base available; build deployment."
+    exit 1
+  fi
 fi
 
-changed_files="$(git diff --name-only HEAD^ HEAD)"
+changed_files="$(git diff --name-only "$base_sha" HEAD)"
 
 if [[ -z "$changed_files" ]]; then
-  echo "No changed files detected; skip deployment."
+  echo "No changed files detected since $base_sha; skip deployment."
   exit 0
 fi
 
-echo "Changed files:"
+echo "Changed files since $base_sha:"
 printf '%s\n' "$changed_files"
 
 while IFS= read -r file; do
