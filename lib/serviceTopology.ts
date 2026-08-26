@@ -112,6 +112,13 @@ if (!parsedLocalFallback) {
 }
 const LOCAL_FALLBACK: ServiceTopology = parsedLocalFallback;
 
+export function getStaticServiceTopology(): {
+	topology: ServiceTopology;
+	source: "local-fallback";
+} {
+	return { topology: LOCAL_FALLBACK, source: "local-fallback" };
+}
+
 export async function loadServiceTopology(): Promise<{
 	topology: ServiceTopology;
 	source: ServiceTopologySource;
