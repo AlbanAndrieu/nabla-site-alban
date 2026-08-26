@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
+import {
+	cloudflareIndicatorColor,
+	hasCloudflareEvidence,
+	homelabHealthColor,
+	isHttpsEndpoint,
+	tlsIndicatorColor,
+} from "@/lib/homelabHealthPresentation";
 import styles from "./EndpointAction.module.css";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
@@ -47,21 +54,6 @@ function snapshotHealth(entry: HomelabHealthEntry): HealthState {
 	return entry.state;
 }
 
-function isHttpsUrl(url?: string): boolean {
-	if (!url) return false;
-	try {
-		return new URL(url).protocol === "https:";
-	} catch {
-		return false;
-	}
-}
-
-function tlsColor(trusted: boolean | null | undefined): string {
-	if (trusted === true) return "limegreen";
-	if (trusted === false) return "red";
-	return "gray";
-}
-
 function tunnelIndicatorState(
 	tunnelSecure: boolean,
 	entry?: HomelabHealthEntry,
@@ -71,13 +63,6 @@ function tunnelIndicatorState(
 	if (!normalized) return "missing";
 	if (["healthy", "active", "up", "ok"].includes(normalized)) return "healthy";
 	return "degraded";
-}
-
-function tunnelColor(state: TunnelIndicatorState): string {
-	if (state === "healthy") return "limegreen";
-	if (state === "missing") return "red";
-	if (state === "degraded") return "orange";
-	return "gray";
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -146,7 +131,7 @@ export default function EndpointAction({
 }: Props) {
 	const t = useTranslations("homelab.endpoint");
 	const configured = enabled && Boolean(url);
-	const https = isHttpsUrl(url);
+	const https = isHttpsEndpoint(url);
 	const [privateHealth, setPrivateHealth] = useState<HealthState>(
 		configured && !external ? "pending" : "unknown",
 	);
@@ -207,22 +192,14 @@ export default function EndpointAction({
 
 	const translateProbeDetail = (detail: ProbeDetail): string => {
 		switch (detail.kind) {
-			case "checking":
-				return t("checkingPrivate");
-			case "notConfigured":
-				return t("notConfigured");
-			case "invalidUrl":
-				return t("invalidUrl");
-			case "protocol":
-				return t("protocolNotProbed", { protocol: detail.protocol });
-			case "http":
-				return t("browserProbeHttp", { status: detail.status });
-			case "timeout":
-				return t("browserProbeTimedOut");
-			case "favicon":
-				return t("browserProbeFavicon");
-			case "unreadable":
-				return t("browserProbeUnreadable");
+			case "checking": return t("checkingPrivate");
+			case "notConfigured": return t("notConfigured");
+			case "invalidUrl": return t("invalidUrl");
+			case "protocol": return t("protocolNotProbed", { protocol: detail.protocol });
+			case "http": return t("browserProbeHttp", { status: detail.status });
+			case "timeout": return t("browserProbeTimedOut");
+			case "favicon": return t("browserProbeFavicon");
+			case "unreadable": return t("browserProbeUnreadable");
 		}
 	};
 
@@ -245,11 +222,8 @@ export default function EndpointAction({
 	};
 
 	const reconciledSnapshotHealth = initialHealth?.state;
-	const effectiveSnapshotHealth = initialHealth
-		? snapshotHealth(initialHealth)
-		: reconciledSnapshotHealth;
-	const privateProbeIsAuthoritative =
-		privateDetail.kind === "http" || privateDetail.kind === "favicon";
+	const effectiveSnapshotHealth = initialHealth ? snapshotHealth(initialHealth) : reconciledSnapshotHealth;
+	const privateProbeIsAuthoritative = privateDetail.kind === "http" || privateDetail.kind === "favicon";
 	const health: HealthState = truenasDown
 		? "fail"
 		: supplementWithPrivateProbe && privateHealth === "pending"
@@ -261,36 +235,29 @@ export default function EndpointAction({
 	const browserDetail = translateProbeDetail(privateDetail);
 	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
 	const detail = !configured
-		? url
-			? t("inventoryOnly")
-			: t("noUrl")
+		? url ? t("inventoryOnly") : t("noUrl")
 		: truenasDown
 			? t("dependencyDown")
 			: supplementWithPrivateProbe
 				? `${browserDetail}${apiDetail ? `; ${apiDetail}` : ""}`
-				: initialHealth
-					? apiDetail
-					: external
-						? t("publicSnapshotUnavailable")
-						: browserDetail;
+				: initialHealth ? apiDetail : external ? t("publicSnapshotUnavailable") : browserDetail;
 	const tunnelState = tunnelIndicatorState(tunnelSecure, initialHealth);
-	const tunnelTitle =
-		tunnelState === "healthy"
-			? t("tunnelConfigured", {
-					status: initialHealth?.tunnel_status ?? "healthy",
-					name: initialHealth?.tunnel_name ?? "Cloudflare",
-				})
-			: tunnelState === "missing"
-				? t("tunnelMissing")
-				: tunnelState === "degraded"
-					? t("tunnelDegraded", {
-							status: initialHealth?.tunnel_status ?? "unknown",
-						})
-					: t("tunnelUnknown");
+	const tunnelTitle = tunnelState === "healthy"
+		? t("tunnelConfigured", {
+			status: initialHealth?.tunnel_status ?? "healthy",
+			name: initialHealth?.tunnel_name ?? "Cloudflare",
+		})
+		: tunnelState === "missing"
+			? t("tunnelMissing")
+			: tunnelState === "degraded"
+				? t("tunnelDegraded", { status: initialHealth?.tunnel_status ?? "unknown" })
+				: t("tunnelUnknown");
 	const applicationError = initialHealth?.application_error;
 	const applicationErrorTitle = applicationError
 		? t("applicationError", { error: applicationError })
 		: "";
+	const healthColor = homelabHealthColor(health);
+	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
 
 	if (!url || !enabled) {
 		return (
@@ -299,12 +266,13 @@ export default function EndpointAction({
 				aria-disabled="true"
 				title={detail}
 				data-endpoint-url={url}
+				style={{ color: homelabHealthColor("unknown") }}
 			>
 				<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
 				{https && (
 					<i
 						className="fas fa-lock"
-						style={{ color: "gray", marginLeft: 5 }}
+						style={{ color: tlsIndicatorColor(undefined), marginLeft: 5 }}
 						aria-label={t("httpsUnknown")}
 					/>
 				)}
@@ -319,30 +287,25 @@ export default function EndpointAction({
 			target="_blank"
 			rel="noopener noreferrer"
 			title={`${external ? t("publicKind") : t("privateKind")} — ${detail}`}
+			style={{ color: healthColor, borderColor: healthColor }}
+			data-health-state={health}
 		>
 			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
 			{health === "pending" && (
-				<span className={styles.pending} aria-live="polite">
-					{t("pending")}
-				</span>
+				<span className={styles.pending} aria-live="polite">{t("pending")}</span>
 			)}
 			{https && (
 				<i
 					className="fas fa-lock"
-					style={{ color: tlsColor(tlsTrusted), marginLeft: 5 }}
-					aria-label={
-						tlsTrusted === false
-							? t("httpsInvalid")
-							: tlsTrusted === true
-								? t("httpsTrusted")
-								: t("httpsUnknown")
-					}
+					style={{ color: tlsIndicatorColor(tlsTrusted), marginLeft: 5 }}
+					title={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
+					aria-label={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
 				/>
 			)}
-			{tunnelSecure && (
+			{showCloudflare && (
 				<i
 					className="fas fa-cloud"
-					style={{ color: tunnelColor(tunnelState), marginLeft: 6 }}
+					style={{ color: cloudflareIndicatorColor(initialHealth), marginLeft: 6 }}
 					title={tunnelTitle}
 					aria-label={tunnelTitle}
 				/>
@@ -351,7 +314,7 @@ export default function EndpointAction({
 				<>
 					<i
 						className="fas fa-skull-crossbones"
-						style={{ color: "red", marginLeft: 6 }}
+						style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
 						title={applicationErrorTitle}
 						aria-label={applicationErrorTitle}
 					/>{" "}
