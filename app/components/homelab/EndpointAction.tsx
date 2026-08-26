@@ -236,7 +236,10 @@ export default function EndpointAction({
 		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${runtime}${internal}${latency}${applicationError}${error}`;
 	};
 
-	const effectiveSnapshotHealth = initialHealth ? snapshotHealth(initialHealth) : undefined;
+	const reconciledSnapshotHealth = initialHealth?.state;
+	const effectiveSnapshotHealth = initialHealth
+		? snapshotHealth(initialHealth)
+		: reconciledSnapshotHealth;
 	const health: HealthState = truenasDown
 		? "fail"
 		: (effectiveSnapshotHealth ?? (external ? "unknown" : privateHealth));
