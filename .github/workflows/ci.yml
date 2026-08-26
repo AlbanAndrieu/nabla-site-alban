@@ -39,7 +39,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -71,7 +71,7 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
-      - name: Build Next.js application
+      - name: Build Next.js production bundle
         run: npm run build
 
       - name: Run Snyk vulnerability scan
