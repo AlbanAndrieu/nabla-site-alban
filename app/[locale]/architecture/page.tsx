@@ -7,7 +7,6 @@ import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { loadHomelabServicesCatalog } from "@/lib/homelabServices";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { loadServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureExplorer from "./ArchitectureExplorer";
