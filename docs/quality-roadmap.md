@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 24 août 2026.
+Dernière vérification : 26 août 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles locaux pertinents, la CI
@@ -47,6 +47,22 @@ et le rendu Vercel sont validés.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après
   chaque migration visible.
 
+## P0 — Empêcher une nouvelle régression de merge
+
+Ce P0 est volontairement placé en dernier dans l'ordre de livraison demandé : il
+formalise les garde-fous à conserver après les lots fonctionnels et de refactoring.
+
+- [ ] Protéger `master` avec des status checks requis afin qu'une PR dont le
+  dernier `typecheck`/test est rouge ou obsolète ne puisse plus être mergée.
+- [ ] Exiger au minimum lint JS/TS, lint CSS, `next typegen`, TypeScript et tests
+  unitaires sur le dernier SHA de la PR.
+- [ ] Exiger un Preview Vercel réussi pour les changements Next.js qui affectent
+  build, routes, metadata ou rendu avant merge lorsque le quota Vercel le permet.
+- [ ] Empêcher qu'un ancien run vert masque un nouveau run rouge après le dernier
+  push/rebase de la branche.
+- [ ] Garder les hotfix de production minimaux et séparer les refactors de leur
+  correction, comme pour la régression metadata post-merge du 26 août 2026.
+
 ## P1 — Accessibilité
 
 ### Shared SkipToMainContent
@@ -54,8 +70,8 @@ et le rendu Vercel sont validés.
 - [x] `startup`
 - [x] `startup-thanks`
 - [ ] `app/[locale]/page.tsx`
-- [ ] `app/[locale]/ai/page.tsx`
-- [ ] `app/[locale]/security/page.tsx`
+- [x] `app/[locale]/ai/page.tsx`
+- [x] `app/[locale]/security/page.tsx`
 - [ ] `app/[locale]/freenas/page.tsx`
 - [ ] `app/[locale]/truenas/page.tsx`
 - [ ] `app/[locale]/workstation/page.tsx`
@@ -77,6 +93,24 @@ Autres contrôles :
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
 - [ ] Étendre la vérification du focus visible et de la navigation clavier.
 - [ ] Vérifier `prefers-reduced-motion` pour les interactions animées.
+
+## P1 — Santé homelab et topologie observée
+
+- [x] Séparer le modèle déclaré (`nabla-compose`) du runtime observé TrueNAS et
+  afficher explicitement les états stale/drift dans l'architecture.
+- [x] Propager les icônes du catalogue dans React Flow et renforcer le contraste
+  du graphe en thème sombre.
+- [x] Préparer l'observation read-only des Cloudflare Tunnels dans
+  `fastapi-sample`.
+- [ ] Finaliser la réconciliation multi-source HTTP + TrueNAS + Cloudflare dans
+  `/api/homelab/health` et afficher la preuve ayant conduit à vert/orange/rouge.
+- [ ] Rafraîchir automatiquement les états de santé dans l'UI sans perdre le
+  dernier snapshot valide lors d'une panne transitoire.
+- [ ] Déclarer les runtimes encore suffisamment prouvés dans `nabla-compose`
+  pour réduire le fallback statique, sans inventer de binding pour un service
+  logique seulement.
+- [ ] Ajouter une indication d'âge du snapshot et un état stale visible sur la
+  page TrueNAS afin qu'un ancien état vert ne soit jamais interprété comme live.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
@@ -106,8 +140,12 @@ Autres contrôles :
 - [x] Générer sitemap, canonical et variantes linguistiques depuis les mêmes
   conventions.
 - [x] Migrer les principales URL SEO vers des routes sans extension.
+- [x] Ajouter des cartes Open Graph/Twitter localisées et spécifiques aux pages
+  principales.
+- [ ] Consolider les deux helpers metadata hérités des PR SEO successives afin
+  qu'il ne reste qu'une seule politique OpenGraph/Twitter/canonical.
 - [ ] Contrôler en production canonical, `hreflang`, robots, sitemap et aperçus
-  Open Graph.
+  Open Graph après stabilisation du déploiement.
 - [ ] Décider explicitement si CTID, FreeNAS et Workstation doivent être
   indexables.
 - [ ] Décider si l'application éditoriale reste volontairement EN/FR ou si DE/NO
@@ -119,7 +157,7 @@ Autres contrôles :
 - [x] Réduire fortement le JavaScript tiers chargé par défaut via le mode
   analytique léger.
 - [ ] Compléter Lighthouse desktop sur un déploiement stable.
-- [ ] Définir des budgets de non-régression pour LCP, CLS, INP, JS, CSS et
+- [ ] Définir des budgets de non-réression pour LCP, CLS, INP, JS, CSS et
   JavaScript tiers.
 - [ ] Exécuter l'audit des dépendances, licences et paquets inutilisés.
 - [ ] Évaluer Knip pour détecter fichiers, exports et dépendances morts.
@@ -153,12 +191,16 @@ Autres contrôles :
 
 ## Ordre de livraison recommandé
 
-1. Cohérence du contenu et nettoyage de la roadmap.
-2. Design tokens + primitives UI + footer/header.
-3. Migration native de `/security` et retrait D3 v3/`arf.js`.
-4. Migration finale du legacy AI et recentrage Secure AI.
-5. Accessibilité partagée + axe + clavier/focus.
-6. Workstation/CV legacy, code mort, CSS et budgets performance.
+1. Santé homelab : réconciliation HTTP + TrueNAS + Cloudflare, live refresh et
+   âge du snapshot.
+2. Cohérence du contenu et nettoyage de la roadmap.
+3. Design tokens + primitives UI + footer/header.
+4. Migration native de `/security` et retrait D3 v3/`arf.js`.
+5. Migration finale du legacy AI et recentrage Secure AI.
+6. Accessibilité partagée + axe + clavier/focus.
+7. Workstation/CV legacy, code mort, CSS et budgets performance.
+8. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
+   puis conserver ces garde-fous pour tous les lots suivants.
 
 ## Contrôles de sortie
 
