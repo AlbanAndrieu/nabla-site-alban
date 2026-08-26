@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
+import styles from "./EndpointAction.module.css";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
 type TunnelIndicatorState = "healthy" | "missing" | "degraded" | "unknown";
@@ -310,7 +311,7 @@ export default function EndpointAction({
 		>
 			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
 			{health === "pending" && (
-				<span className="endpoint-pending-status" aria-live="polite">
+				<span className={styles.pending} aria-live="polite">
 					{t("pending")}
 				</span>
 			)}
