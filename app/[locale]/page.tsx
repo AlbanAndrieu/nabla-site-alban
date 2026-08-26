@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Hero from "@/app/components/Hero";
 import HomeContactSection from "@/app/components/home/HomeContactSection";
 import HomeEducationSection from "@/app/components/home/HomeEducationSection";
@@ -12,6 +13,21 @@ import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
+import { buildPageMetadata } from "@/lib/siteMetadata";
+
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]">): Promise<Metadata> {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) return {};
+	const t = await getTranslations({ locale, namespace: "home.meta" });
+	return buildPageMetadata({
+		slug: "index",
+		locale,
+		title: t("title"),
+		description: t("description"),
+	});
+}
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
 	const { locale } = await params;
