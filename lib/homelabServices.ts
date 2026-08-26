@@ -105,6 +105,18 @@ function primaryApiUrl(): string {
 	);
 }
 
+export function getStaticHomelabServicesCatalog(): {
+	catalog: HomelabServicesCatalog;
+	source: "local-fallback";
+	primaryUrl: string;
+} {
+	return {
+		catalog: LOCAL_FALLBACK,
+		source: "local-fallback",
+		primaryUrl: primaryApiUrl(),
+	};
+}
+
 export async function loadHomelabServicesCatalog(): Promise<{
 	catalog: HomelabServicesCatalog;
 	source: HomelabServicesSource;
