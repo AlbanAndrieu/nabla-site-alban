@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildPageMetadata } from "@/lib/siteMetadata";
 
 type EmailCard = {
 	title: string;
@@ -21,17 +21,12 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "email" });
 
-	return {
+	return buildPageMetadata({
+		slug: "email",
+		locale,
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
-		alternates: {
-			canonical: canonicalPagePath("email", locale),
-			languages: {
-				en: canonicalPagePath("email", "en"),
-				fr: canonicalPagePath("email", "fr"),
-			},
-		},
-	};
+	});
 }
 
 export default async function EmailPage({
