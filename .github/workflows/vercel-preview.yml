@@ -1,50 +1,58 @@
-name: Vercel Preview Checkpoint
+name: Vercel Preview (On Demand)
 
 on:
-  workflow_run:
-    workflows:
-      - "CI (Quality and Security)"
-    types:
-      - completed
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number to deploy after CI is validated"
+        required: true
+        type: number
   pull_request:
     types:
       - closed
 
 permissions:
-  actions: read
   contents: write
   pull-requests: read
 
 concurrency:
   group: >-
     vercel-preview-${{
-      github.event.workflow_run.pull_requests[0].number ||
+      inputs.pr_number ||
       github.event.pull_request.number ||
-      github.event.workflow_run.head_branch ||
       github.ref
     }}
   cancel-in-progress: true
 
 jobs:
   checkpoint:
-    name: Publish latest validated PR SHA
-    if: >-
-      github.event_name == 'workflow_run' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.pull_requests[0].number != null &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+    name: Publish requested PR Preview checkpoint
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Publish deploy-relevant checkpoint only
         uses: actions/github-script@v8
         env:
-          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
-          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+          PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
             const prNumber = Number(process.env.PR_NUMBER);
-            const sha = process.env.VALIDATED_SHA;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            if (pr.state !== 'open') {
+              core.setFailed(`PR #${prNumber} is not open.`);
+              return;
+            }
+            if (pr.head.repo.full_name !== context.repo.owner + '/' + context.repo.repo) {
+              core.setFailed('Preview checkpoints are limited to branches from this repository.');
+              return;
+            }
+
+            const sha = pr.head.sha;
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -56,11 +64,9 @@ jobs:
               filename.startsWith('docs/') ||
               filename.endsWith('.md') ||
               filename.startsWith('unit-tests/') ||
-              filename.startsWith('.github/ISSUE_TEMPLATE/') ||
-              filename === '.github/PULL_REQUEST_TEMPLATE.md' ||
-              (filename.startsWith('.github/workflows/') &&
-                filename !== '.github/workflows/playwright.yml' &&
-                filename !== '.github/workflows/vercel-preview.yml');
+              filename.startsWith('.github/') ||
+              filename.startsWith('.vscode/') ||
+              filename.startsWith('.idea/');
 
             const deployRelevant = files
               .map((file) => file.filename)
