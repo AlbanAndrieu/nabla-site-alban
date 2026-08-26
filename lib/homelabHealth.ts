@@ -1,4 +1,5 @@
-export type HomelabHealthState = "ok" | "warn" | "fail" | "unknown";
+export type VerifiedHomelabHealthState = "ok" | "warn" | "fail";
+export type HomelabHealthState = VerifiedHomelabHealthState | "unknown";
 
 export type HomelabHealthEntry = {
 	id?: string;
@@ -26,13 +27,13 @@ export type HomelabInternalHealthEntry = {
 	host: string;
 	port: number;
 	reachable: boolean;
-	state: HomelabHealthState;
+	state: VerifiedHomelabHealthState;
 	latency_ms?: number;
 	error?: string;
 };
 
 export type TrueNasHealth = {
-	state: HomelabHealthState;
+	state: VerifiedHomelabHealthState;
 	public?: HomelabHealthEntry | null;
 	internal?: HomelabInternalHealthEntry | null;
 	internal_probe_enabled?: boolean;
@@ -64,6 +65,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isHealthState(value: unknown): value is HomelabHealthState {
 	return value === "ok" || value === "warn" || value === "fail" || value === "unknown";
+}
+
+function isVerifiedHealthState(value: unknown): value is VerifiedHomelabHealthState {
+	return value === "ok" || value === "warn" || value === "fail";
 }
 
 export function normalizeHomelabHealthUrl(url?: string): string | null {
@@ -138,14 +143,14 @@ function validInternalHealthEntry(
 		entry.port >= 1 &&
 		entry.port <= 65535 &&
 		typeof entry.reachable === "boolean" &&
-		isHealthState(entry.state) &&
+		isVerifiedHealthState(entry.state) &&
 		validOptionalNumber(entry.latency_ms) &&
 		(entry.error === undefined || typeof entry.error === "string")
 	);
 }
 
 function validTrueNasHealth(value: unknown): value is TrueNasHealth {
-	if (!isRecord(value) || !isHealthState(value.state)) return false;
+	if (!isRecord(value) || !isVerifiedHealthState(value.state)) return false;
 	if (value.public !== undefined && value.public !== null && !validHealthEntry(value.public)) {
 		return false;
 	}
