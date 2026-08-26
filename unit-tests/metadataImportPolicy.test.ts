@@ -14,20 +14,37 @@ function sourceFiles(dir: string): string[] {
 	});
 }
 
-test("app routes consume page metadata through the compatibility facade", () => {
-	const offenders = sourceFiles(APP_DIR)
-		.filter((path) => {
-			const source = readFileSync(path, "utf8");
-			return /import\s*\{[^}]*\bbuildPageMetadata\b[^}]*\}\s*from\s*["']@\/lib\/socialMetadata["']/.test(
-				source,
-			);
-		})
-		.map((path) => relative(ROOT, path));
+function duplicateNamedImports(source: string): string[] {
+	const imports = source.matchAll(
+		/import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+["'][^"']+["']/g,
+	);
+	const seen = new Set<string>();
+	const duplicates = new Set<string>();
+
+	for (const match of imports) {
+		for (const rawSpecifier of match[1].split(",")) {
+			const specifier = rawSpecifier.trim().replace(/^type\s+/, "");
+			if (!specifier) continue;
+			const alias = specifier.split(/\s+as\s+/);
+			const localName = (alias[1] ?? alias[0]).trim();
+			if (seen.has(localName)) duplicates.add(localName);
+			seen.add(localName);
+		}
+	}
+	return [...duplicates].sort();
+}
+
+test("App Router sources do not bind the same named import more than once", () => {
+	const offenders = sourceFiles(APP_DIR).flatMap((path) =>
+		duplicateNamedImports(readFileSync(path, "utf8")).map(
+			(name) => `${relative(ROOT, path)}: ${name}`,
+		),
+	);
 
 	assert.deepEqual(
 		offenders,
 		[],
-		"App routes must import buildPageMetadata from @/lib/siteMetadata so parallel SEO changes cannot introduce duplicate bindings.",
+		"A duplicate local import binding can pass independent PR checks but break the merged Turbopack build.",
 	);
 });
 
