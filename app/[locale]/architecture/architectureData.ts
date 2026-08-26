@@ -8,6 +8,7 @@ export type ArchitectureEntity = {
 	category: string;
 	url?: string;
 	detail?: string;
+	icon?: string;
 	layer?: number;
 };
 
@@ -144,6 +145,7 @@ export function buildNablaEntities(
 			category: node.category,
 			url: current?.url ?? node.url,
 			detail: node.description ?? current?.detail,
+			icon: node.icon ?? current?.icon,
 		});
 	}
 	for (const entity of NABLA_EXTERNAL_ENTITIES) entities.set(entity.id, entity);

@@ -30,6 +30,7 @@ export type HomelabRuntimeSummary = {
 	observed_at: string;
 	configured: boolean;
 	reachable: boolean;
+	stale?: boolean;
 	error?: string;
 };
 
@@ -87,7 +88,9 @@ export function parseHomelabStatusSnapshot(value: unknown): HomelabStatusSnapsho
 		value.runtime.provider !== "truenas" ||
 		typeof value.runtime.observed_at !== "string" ||
 		typeof value.runtime.configured !== "boolean" ||
-		typeof value.runtime.reachable !== "boolean"
+		typeof value.runtime.reachable !== "boolean" ||
+		(value.runtime.stale !== undefined && typeof value.runtime.stale !== "boolean") ||
+		(value.runtime.error !== undefined && typeof value.runtime.error !== "string")
 	) {
 		return null;
 	}

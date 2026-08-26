@@ -6,6 +6,7 @@ const expectedSitemapUrls = [
 	"https://albanandrieu.com/contact",
 	"https://albanandrieu.com/security",
 	"https://albanandrieu.com/ai",
+	"https://albanandrieu.com/architecture",
 	"https://albanandrieu.com/ciso",
 	"https://albanandrieu.com/truenas",
 	"https://albanandrieu.com/link",
@@ -47,6 +48,7 @@ const nonIndexablePages = [
 const indexablePages = [
 	"/",
 	...migratedSeoSlugs.map((slug) => `/${slug}`),
+	"/architecture",
 	"/cv",
 	"/jm",
 ];

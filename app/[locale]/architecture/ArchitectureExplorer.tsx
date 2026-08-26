@@ -41,6 +41,7 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	category: string;
 	url?: string;
 	detail?: string;
+	icon?: string;
 	openLabel: string;
 	reconciliation?: string;
 	runtimeState?: string;
@@ -66,7 +67,14 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 				<span>{item.category}</span>
 				<span>{item.kind}</span>
 			</div>
-			<strong className={styles.nodeTitle}>{item.name}</strong>
+			<div className={styles.nodeHeading}>
+				{item.icon ? (
+					<span className={styles.nodeIcon} aria-hidden="true">
+						{item.icon}
+					</span>
+				) : null}
+				<strong className={styles.nodeTitle}>{item.name}</strong>
+			</div>
 			{item.reconciliation ? (
 				<span className={styles.runtimeBadge}>
 					{item.reconciliation.replaceAll("_", " ")}
@@ -142,6 +150,7 @@ function makeNodes(
 				category: entity.category,
 				url: entity.url,
 				detail: entity.detail,
+				icon: entity.icon,
 				openLabel,
 				reconciliation: runtimeStatus?.reconciliation,
 				runtimeState: runtimeStatus?.observed?.appState,
@@ -199,6 +208,14 @@ function observedOnlyEntities(snapshot: HomelabStatusSnapshot | null): Architect
 			? `Observed by TrueNAS · ${service.observed.appState}`
 			: "Observed by TrueNAS but not declared in nabla-compose",
 	}));
+}
+
+function runtimeAvailability(snapshot: HomelabStatusSnapshot | null, french: boolean): string | null {
+	if (!snapshot) return null;
+	if (!snapshot.runtime.configured) return french ? "non configuré" : "not configured";
+	if (snapshot.runtime.stale) return french ? "snapshot périmé" : "stale snapshot";
+	if (snapshot.runtime.reachable) return french ? "joignable" : "reachable";
+	return french ? "injoignable" : "unreachable";
 }
 
 export default function ArchitectureExplorer({
@@ -267,8 +284,7 @@ export default function ArchitectureExplorer({
 		() => makeEdges(relations, filtered.visible),
 		[relations, filtered.visible],
 	);
-	const runtime = runtimeStatus?.runtime as RuntimeStatusWithFreshness | undefined;
-	const freshnessLabel = runtime?.stale ? (french ? "périmé" : "stale") : null;
+	const availability = runtimeAvailability(runtimeStatus, french);
 
 	return (
 		<section
@@ -301,7 +317,7 @@ export default function ArchitectureExplorer({
 				{mode === "services" ? (
 					<span>
 						{" "}· catalog: {catalogSource} · topology: {topologySource} · runtime: {runtimeSource}
-						{runtime ? ` (${runtime.reachable ? "reachable" : "unreachable"}${freshnessLabel ? `, ${freshnessLabel}` : ""})` : ""}
+						{availability ? ` (${availability})` : ""}
 					</span>
 				) : null}
 			</div>
@@ -326,8 +342,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les flèches animées représentent les relations requises ; les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift. Un runtime périmé indique que FastAPI sert le dernier snapshot TrueNAS valide après un échec de rafraîchissement."
-					: "Animated arrows represent required relations; runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift. A stale runtime means FastAPI is serving the last valid TrueNAS snapshot after a refresh failure."}
+					? "Les flèches animées représentent les relations requises ; les icônes viennent du catalogue déclaré et les badges runtime montrent la réconciliation TrueNAS. Les Apps observées mais absentes du code apparaissent comme runtime drift."
+					: "Animated arrows represent required relations; icons come from the declared catalog and runtime badges show TrueNAS reconciliation. Apps observed but absent from code appear as runtime drift."}
 			</p>
 		</section>
 	);
