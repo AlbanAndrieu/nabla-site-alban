@@ -7,7 +7,7 @@ import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { enrichPageMetadata } from "@/lib/socialMetadata";
 import AiNativeSections from "./AiNativeSections";
 import AiPageGuide from "./AiPageGuide";
 
@@ -17,16 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const metadata = await metadataFromPublicHtml("ai.html", "/ai", locale);
-	return {
-		...metadata,
-		alternates: {
-			canonical: canonicalPagePath("ai", locale),
-			languages: {
-				en: canonicalPagePath("ai", "en"),
-				fr: canonicalPagePath("ai", "fr"),
-			},
-		},
-	};
+	return enrichPageMetadata(metadata, { slug: "ai", locale });
 }
 
 export default async function AiBestPracticesPage({ params }: Props) {
