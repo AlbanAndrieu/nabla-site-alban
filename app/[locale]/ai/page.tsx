@@ -6,8 +6,7 @@ import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildLegacyPageMetadata } from "@/lib/legacyPageMetadata";
 import AiNativeSections from "./AiNativeSections";
 import AiPageGuide from "./AiPageGuide";
 
@@ -16,17 +15,16 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const metadata = await metadataFromPublicHtml("ai.html", "/ai", locale);
-	return {
-		...metadata,
-		alternates: {
-			canonical: canonicalPagePath("ai", locale),
-			languages: {
-				en: canonicalPagePath("ai", "en"),
-				fr: canonicalPagePath("ai", "fr"),
-			},
-		},
-	};
+	return buildLegacyPageMetadata({
+		file: "ai.html",
+		slug: "ai",
+		locale,
+		fallbackTitle: locale === "fr" ? "IA et MLOps" : "AI and MLOps",
+		fallbackDescription:
+			locale === "fr"
+				? "Architecture, sécurité et exploitation de plateformes IA."
+				: "Architecture, security, and operations for AI platforms.",
+	});
 }
 
 export default async function AiBestPracticesPage({ params }: Props) {
