@@ -1,0 +1,132 @@
+name: Vercel Preview Checkpoint
+
+on:
+  workflow_run:
+    workflows:
+      - "CI (Quality and Security)"
+    types:
+      - completed
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: >-
+    vercel-preview-${{
+      github.event.workflow_run.pull_requests[0].number ||
+      github.event.pull_request.number ||
+      github.event.workflow_run.head_branch ||
+      github.ref
+    }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint:
+    name: Publish latest validated PR SHA
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.pull_requests[0].number != null &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish deploy-relevant checkpoint only
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const sha = process.env.VALIDATED_SHA;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100,
+            });
+
+            const safeOnly = (filename) =>
+              filename.startsWith('docs/') ||
+              filename.endsWith('.md') ||
+              filename.startsWith('unit-tests/') ||
+              filename.startsWith('.github/ISSUE_TEMPLATE/') ||
+              filename === '.github/PULL_REQUEST_TEMPLATE.md' ||
+              (filename.startsWith('.github/workflows/') &&
+                filename !== '.github/workflows/playwright.yml' &&
+                filename !== '.github/workflows/vercel-preview.yml');
+
+            const deployRelevant = files
+              .map((file) => file.filename)
+              .filter((filename) => !safeOnly(filename));
+
+            if (deployRelevant.length === 0) {
+              core.info(`PR #${prNumber} only changes tests/docs/maintenance; no Vercel Preview needed.`);
+              return;
+            }
+
+            core.info(`Deploy-relevant files: ${deployRelevant.join(', ')}`);
+            const branch = `vercel-preview-pr-${prNumber}`;
+            const ref = `heads/${branch}`;
+
+            try {
+              const current = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+              });
+              if (current.data.object.sha === sha) {
+                core.info(`${branch} already points to ${sha}; no new Vercel build needed.`);
+                return;
+              }
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+                sha,
+                force: true,
+              });
+              core.info(`Moved ${branch} to ${sha}`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/${ref}`,
+                sha,
+              });
+              core.info(`Created ${branch} at ${sha}`);
+            }
+
+  cleanup:
+    name: Remove closed PR Preview checkpoint
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete dedicated Preview branch
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const ref = `heads/vercel-preview-pr-${process.env.PR_NUMBER}`;
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+              });
+              core.info(`Deleted ${ref}`);
+            } catch (error) {
+              if (error.status !== 422 && error.status !== 404) throw error;
+              core.info(`${ref} does not exist; nothing to clean up.`);
+            }

@@ -4,6 +4,13 @@
   "regions": ["fra1"],
   "framework": "nextjs",
   "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
+  "git": {
+    "deploymentEnabled": {
+      "*": false,
+      "master": true,
+      "vercel-preview-*": true
+    }
+  },
   "github": {
     "silent": true,
     "autoJobCancelation": true
