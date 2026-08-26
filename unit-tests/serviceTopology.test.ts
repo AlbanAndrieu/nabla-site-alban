@@ -26,7 +26,7 @@ test("topology parser rejects edges with unknown nodes", () => {
 	assert.equal(topology, null);
 });
 
-test("architecture route uses a high-contrast React Flow with visible service icons", async () => {
+test("architecture route uses a high-contrast React Flow with shared service health indicators", async () => {
 	const [page, explorer, data, css, packageJson] = await Promise.all([
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
 		readFile("app/[locale]/architecture/ArchitectureExplorer.tsx", "utf8"),
@@ -39,10 +39,17 @@ test("architecture route uses a high-contrast React Flow with visible service ic
 	assert.match(page, /slug: "architecture"/);
 	assert.match(explorer, /from "@xyflow\/react"/);
 	assert.match(explorer, /colorMode="dark"/);
-	assert.match(explorer, /<MiniMap[\s\S]*nodeColor="#38bdf8"/);
-	assert.match(explorer, /<Controls className={styles\.flowControls} \/>/);
+	assert.match(explorer, /<MiniMap[\s\S]*nodeColor=\{\(node\) =>/);
+	assert.match(explorer, /homelabHealthColor\(data\.healthState\)/);
+	assert.match(explorer, /: "#38bdf8"/);
+	assert.match(explorer, /<Controls className=\{styles\.flowControls\} \/>/);
 	assert.match(explorer, /iconSrc: entity\.iconSrc/);
 	assert.match(explorer, /nodeIconFallback/);
+	assert.match(explorer, /className="fas fa-lock"/);
+	assert.match(explorer, /className="fas fa-cloud"/);
+	assert.match(explorer, /className="fas fa-skull-crossbones"/);
+	assert.match(explorer, /health\?\.url \?\? entity\.url/);
+	assert.match(explorer, /parseHomelabHealthSnapshot/);
 	assert.match(data, /iconSrc: serviceIconSrc\(service\)/);
 	assert.match(css, /background: #020617/);
 	assert.match(css, /\.nodeIconFrame/);
