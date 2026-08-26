@@ -14,8 +14,21 @@ type SocialMetadataOptions = {
 	type?: "website" | "profile";
 };
 
+type ExistingMetadataOptions = Pick<
+	SocialMetadataOptions,
+	"slug" | "locale" | "type"
+>;
+
 function socialLocale(locale: "en" | "fr") {
 	return locale === "fr" ? "fr_FR" : "en_US";
+}
+
+function metadataTitle(metadata: Metadata) {
+	return typeof metadata.title === "string" ? metadata.title : "Alban Andrieu";
+}
+
+function metadataDescription(metadata: Metadata) {
+	return typeof metadata.description === "string" ? metadata.description : undefined;
 }
 
 export function socialCardPath({
@@ -77,5 +90,21 @@ export function buildPageMetadata({
 			description,
 			images: [{ url: socialImage, alt: title }],
 		},
+	};
+}
+
+export function enrichPageMetadata(
+	metadata: Metadata,
+	{ slug, locale, type }: ExistingMetadataOptions,
+): Metadata {
+	return {
+		...metadata,
+		...buildPageMetadata({
+			title: metadataTitle(metadata),
+			description: metadataDescription(metadata),
+			slug,
+			locale,
+			type,
+		}),
 	};
 }
