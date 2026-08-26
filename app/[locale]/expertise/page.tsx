@@ -7,7 +7,7 @@ import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
-import { buildPageMetadata } from "@/lib/siteMetadata";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
 import ServicesSection, {
@@ -24,10 +24,10 @@ export async function generateMetadata({
 	const t = await getTranslations({ locale, namespace: "expertisePage" });
 
 	return buildPageMetadata({
-		slug: "expertise",
-		locale,
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
+		slug: "expertise",
+		locale,
 	});
 }
 

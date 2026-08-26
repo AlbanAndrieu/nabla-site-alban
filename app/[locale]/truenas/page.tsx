@@ -8,7 +8,7 @@ import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
-import { buildPageMetadata } from "@/lib/siteMetadata";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 
 import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import BillOfMaterialsSection from "../../components/truenas/BillOfMaterialsSection";
@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const t = await getTranslations({ locale, namespace: "truenas.page.meta" });
 
 	return buildPageMetadata({
-		slug: "truenas",
-		locale,
 		title: t("title"),
 		description: t("description"),
+		slug: "truenas",
+		locale,
 	});
 }
 

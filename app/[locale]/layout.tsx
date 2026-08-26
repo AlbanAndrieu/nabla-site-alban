@@ -12,6 +12,7 @@ import {
 import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
 import { routing } from "@/i18n/routing";
+import { buildPageMetadata, SITE_ORIGIN } from "@/lib/socialMetadata";
 
 export function generateStaticParams() {
 	return routing.locales.map((locale) => ({ locale }));
@@ -24,14 +25,20 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 
 	const t = await getTranslations({ locale, namespace: "home.meta" });
-	const canonical = locale === "fr" ? "/fr" : "/";
 	const title = t("title");
 	const description = t("description");
+	const socialMetadata = buildPageMetadata({
+		title,
+		description,
+		slug: "index",
+		locale,
+		type: "profile",
+	});
 
 	return {
-		metadataBase: new URL("https://albanandrieu.com"),
+		...socialMetadata,
+		metadataBase: new URL(SITE_ORIGIN),
 		title: { absolute: title },
-		description,
 		keywords: [
 			"DevSecOps engineer",
 			"cloud architect",
@@ -46,10 +53,6 @@ export async function generateMetadata({
 		authors: [{ name: "Alban Andrieu", url: "/" }],
 		creator: "Alban Andrieu",
 		referrer: "origin-when-cross-origin",
-		alternates: {
-			canonical,
-			languages: { en: "/", fr: "/fr", "x-default": "/" },
-		},
 	};
 }
 

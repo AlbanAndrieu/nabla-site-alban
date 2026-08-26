@@ -8,6 +8,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { buildPageMetadata } from "@/lib/siteMetadata";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 
 export async function generateMetadata({
 	params,
@@ -17,10 +18,10 @@ export async function generateMetadata({
 	const t = await getTranslations({ locale, namespace: "linkPage" });
 
 	return buildPageMetadata({
-		slug: "link",
-		locale,
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
+		slug: "link",
+		locale,
 	});
 }
 

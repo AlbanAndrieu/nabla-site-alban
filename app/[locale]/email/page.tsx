@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { buildPageMetadata } from "@/lib/siteMetadata";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 
 type EmailCard = {
 	title: string;
@@ -22,10 +22,10 @@ export async function generateMetadata({
 	const t = await getTranslations({ locale, namespace: "email" });
 
 	return buildPageMetadata({
-		slug: "email",
-		locale,
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
+		slug: "email",
+		locale,
 	});
 }
 

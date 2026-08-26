@@ -8,6 +8,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { buildLegacyPageMetadata } from "@/lib/legacyPageMetadata";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityArfTree from "./SecurityArfTree";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
 
@@ -22,16 +23,8 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	return buildLegacyPageMetadata({
-		file: "security.html",
-		slug: "security",
-		locale,
-		fallbackTitle: locale === "fr" ? "Sécurité DevSecOps" : "DevSecOps security",
-		fallbackDescription:
-			locale === "fr"
-				? "Sécurité applicative, cloud, réseau et pratiques DevSecOps."
-				: "Application, cloud, network security, and DevSecOps practices.",
-	});
+	const metadata = await metadataFromPublicHtml("security.html", "/security", locale);
+	return enrichPageMetadata(metadata, { slug: "security", locale });
 }
 
 export default async function SecurityPage({

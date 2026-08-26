@@ -8,7 +8,7 @@ import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { loadHomelabServicesCatalog } from "@/lib/homelabServices";
 import { loadServiceTopology } from "@/lib/serviceTopology";
-import { buildPageMetadata } from "@/lib/siteMetadata";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureExplorer from "./ArchitectureExplorer";
 
 export async function generateMetadata({
@@ -18,12 +18,12 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
 	return buildPageMetadata({
-		slug: "architecture",
-		locale,
 		title: french ? "Architecture des services Nabla" : "Nabla service architecture",
 		description: french
 			? "Diagrammes interactifs de la plateforme IA et de la topologie des services Nabla et TrueNAS."
 			: "Interactive diagrams of the AI platform and the Nabla and TrueNAS service topology.",
+		slug: "architecture",
+		locale,
 	});
 }
 
