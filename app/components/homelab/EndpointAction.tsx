@@ -44,13 +44,6 @@ function classifyHttpStatus(status: number): HealthState {
 
 function snapshotHealth(entry: HomelabHealthEntry): HealthState {
 	if (entry.application_error) return "fail";
-	if (
-		entry.reachable &&
-		((entry.http_status >= 200 && entry.http_status <= 399) ||
-			[401, 403].includes(entry.http_status))
-	) {
-		return "ok";
-	}
 	return entry.state;
 }
 
@@ -160,9 +153,17 @@ export default function EndpointAction({
 	const [privateDetail, setPrivateDetail] = useState<ProbeDetail>(
 		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
+	const hasAuthoritativeEndpointEvidence = Boolean(
+		initialHealth?.application_error ||
+			initialHealth?.direct_state != null ||
+			initialHealth?.internal_state != null ||
+			initialHealth?.state === "fail",
+	);
+	const supplementWithPrivateProbe =
+		configured && !external && !hasAuthoritativeEndpointEvidence;
 
 	useEffect(() => {
-		if (external || initialHealth || !url || !enabled) return;
+		if (!supplementWithPrivateProbe || !url) return;
 
 		let parsed: URL;
 		try {
@@ -202,7 +203,7 @@ export default function EndpointAction({
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
-	}, [enabled, external, initialHealth, url]);
+	}, [supplementWithPrivateProbe, url]);
 
 	const translateProbeDetail = (detail: ProbeDetail): string => {
 		switch (detail.kind) {
@@ -247,21 +248,31 @@ export default function EndpointAction({
 	const effectiveSnapshotHealth = initialHealth
 		? snapshotHealth(initialHealth)
 		: reconciledSnapshotHealth;
+	const privateProbeIsAuthoritative =
+		privateDetail.kind === "http" || privateDetail.kind === "favicon";
 	const health: HealthState = truenasDown
 		? "fail"
-		: (effectiveSnapshotHealth ?? (external ? "unknown" : privateHealth));
+		: supplementWithPrivateProbe && privateHealth === "pending"
+			? "pending"
+			: supplementWithPrivateProbe && privateProbeIsAuthoritative
+				? privateHealth
+				: (effectiveSnapshotHealth ?? (external ? "unknown" : privateHealth === "fail" ? "unknown" : privateHealth));
 	const tlsTrusted = initialHealth?.tls_trusted;
+	const browserDetail = translateProbeDetail(privateDetail);
+	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
 	const detail = !configured
 		? url
 			? t("inventoryOnly")
 			: t("noUrl")
 		: truenasDown
 			? t("dependencyDown")
-			: initialHealth
-				? fastApiHealthDetail(initialHealth)
-				: external
-					? t("publicSnapshotUnavailable")
-					: translateProbeDetail(privateDetail);
+			: supplementWithPrivateProbe
+				? `${browserDetail}${apiDetail ? `; ${apiDetail}` : ""}`
+				: initialHealth
+					? apiDetail
+					: external
+						? t("publicSnapshotUnavailable")
+						: browserDetail;
 	const tunnelState = tunnelIndicatorState(tunnelSecure, initialHealth);
 	const tunnelTitle =
 		tunnelState === "healthy"
