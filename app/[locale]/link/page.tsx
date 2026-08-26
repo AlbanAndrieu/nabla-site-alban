@@ -7,7 +7,7 @@ import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
-import { buildPageMetadata } from "@/lib/socialMetadata";
+import { buildPageMetadata } from "@/lib/siteMetadata";
 
 export async function generateMetadata({
 	params,
