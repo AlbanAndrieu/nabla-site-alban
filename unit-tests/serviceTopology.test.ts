@@ -34,7 +34,8 @@ test("architecture route uses React Flow and preserves canonical product names",
 		readFile("package.json", "utf8"),
 	]);
 
-	assert.match(page, /canonicalPagePath\("architecture"/);
+	assert.match(page, /buildPageMetadata\(/);
+	assert.match(page, /slug: "architecture"/);
 	assert.match(explorer, /from "@xyflow\/react"/);
 	assert.match(explorer, /<MiniMap pannable zoomable \/>/);
 	assert.match(explorer, /<Controls \/>/);

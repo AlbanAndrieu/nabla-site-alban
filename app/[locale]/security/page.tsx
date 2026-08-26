@@ -8,6 +8,7 @@ import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityArfTree from "./SecurityArfTree";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
 
@@ -23,16 +24,7 @@ export async function generateMetadata({
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const metadata = await metadataFromPublicHtml("security.html", "/security", locale);
-	return {
-		...metadata,
-		alternates: {
-			canonical: canonicalPagePath("security", locale),
-			languages: {
-				en: canonicalPagePath("security", "en"),
-				fr: canonicalPagePath("security", "fr"),
-			},
-		},
-	};
+	return enrichPageMetadata(metadata, { slug: "security", locale });
 }
 
 export default async function SecurityPage({

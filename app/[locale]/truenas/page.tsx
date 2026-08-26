@@ -8,6 +8,7 @@ import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 
 import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import BillOfMaterialsSection from "../../components/truenas/BillOfMaterialsSection";
@@ -23,17 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "truenas.page.meta" });
 
-	return {
+	return buildPageMetadata({
 		title: t("title"),
 		description: t("description"),
-		alternates: {
-			canonical: canonicalPagePath("truenas", locale),
-			languages: {
-				en: canonicalPagePath("truenas", "en"),
-				fr: canonicalPagePath("truenas", "fr"),
-			},
-		},
-	};
+		slug: "truenas",
+		locale,
+	});
 }
 
 export default async function TruenasPage({ params }: Props) {
