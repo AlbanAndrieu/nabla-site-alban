@@ -9,6 +9,7 @@ export type ArchitectureEntity = {
 	url?: string;
 	detail?: string;
 	icon?: string;
+	iconSrc?: string;
 	layer?: number;
 };
 
@@ -20,26 +21,26 @@ export type ArchitectureRelation = {
 };
 
 export const AI_ENTITIES: ArchitectureEntity[] = [
-	{ id: "openwebui", name: "Open WebUI", kind: "interface", category: "interfaces", layer: 0 },
-	{ id: "openclaw", name: "OpenClaw", kind: "agent", category: "interfaces", layer: 0 },
-	{ id: "opencode", name: "OpenCode", kind: "coding-agent", category: "interfaces", layer: 0 },
-	{ id: "codex", name: "Codex", kind: "coding-agent", category: "interfaces", layer: 0 },
-	{ id: "cursor", name: "Cursor", kind: "coding-agent", category: "interfaces", layer: 0 },
-	{ id: "litellm", name: "LiteLLM", kind: "model-gateway", category: "control-plane", layer: 1 },
-	{ id: "redis", name: "Redis", kind: "cache", category: "control-plane", layer: 1 },
-	{ id: "ollama", name: "Ollama", kind: "local-inference", category: "inference", layer: 2 },
-	{ id: "openai", name: "OpenAI API", kind: "remote-inference", category: "inference", layer: 2, url: "https://platform.openai.com" },
-	{ id: "fastapi-mcp", name: "FastAPI MCP", kind: "mcp-server", category: "tools", layer: 3, url: "https://fastapi-sample.fastapicloud.dev/api" },
-	{ id: "open-terminal", name: "Open Terminal", kind: "agent-tool", category: "tools", layer: 3 },
-	{ id: "openrag", name: "OpenRAG", kind: "rag", category: "tools", layer: 3, url: "https://github.com/langflow-ai/openrag" },
-	{ id: "searxng", name: "SearXNG", kind: "search", category: "tools", layer: 3 },
-	{ id: "paperless", name: "Paperless-ngx", kind: "knowledge", category: "tools", layer: 3, url: "https://docs.paperless-ngx.com/" },
-	{ id: "n8n", name: "n8n", kind: "workflow", category: "orchestration", layer: 4 },
-	{ id: "temporal", name: "Temporal", kind: "workflow", category: "orchestration", layer: 4, url: "https://temporal.io/" },
-	{ id: "langflow", name: "Langflow", kind: "workflow", category: "orchestration", layer: 4 },
-	{ id: "langfuse", name: "Langfuse", kind: "llm-observability", category: "observability", layer: 5 },
-	{ id: "opik", name: "Opik", kind: "evaluation", category: "observability", layer: 5, url: "https://www.comet.com/docs/opik/" },
-	{ id: "prometheus", name: "Prometheus", kind: "metrics", category: "observability", layer: 5 },
+	{ id: "openwebui", name: "Open WebUI", kind: "interface", category: "interfaces", layer: 0, icon: "💬" },
+	{ id: "openclaw", name: "OpenClaw", kind: "agent", category: "interfaces", layer: 0, icon: "🦞" },
+	{ id: "opencode", name: "OpenCode", kind: "coding-agent", category: "interfaces", layer: 0, icon: "⌨️" },
+	{ id: "codex", name: "Codex", kind: "coding-agent", category: "interfaces", layer: 0, icon: "🧩" },
+	{ id: "cursor", name: "Cursor", kind: "coding-agent", category: "interfaces", layer: 0, icon: "🖱️" },
+	{ id: "litellm", name: "LiteLLM", kind: "model-gateway", category: "control-plane", layer: 1, icon: "🧠" },
+	{ id: "redis", name: "Redis", kind: "cache", category: "control-plane", layer: 1, icon: "🔴" },
+	{ id: "ollama", name: "Ollama", kind: "local-inference", category: "inference", layer: 2, icon: "🦙" },
+	{ id: "openai", name: "OpenAI API", kind: "remote-inference", category: "inference", layer: 2, url: "https://platform.openai.com", icon: "✨" },
+	{ id: "fastapi-mcp", name: "FastAPI MCP", kind: "mcp-server", category: "tools", layer: 3, url: "https://fastapi-sample.fastapicloud.dev/api", icon: "⚡" },
+	{ id: "open-terminal", name: "Open Terminal", kind: "agent-tool", category: "tools", layer: 3, icon: "⌨️" },
+	{ id: "openrag", name: "OpenRAG", kind: "rag", category: "tools", layer: 3, url: "https://github.com/langflow-ai/openrag", icon: "📚" },
+	{ id: "searxng", name: "SearXNG", kind: "search", category: "tools", layer: 3, icon: "🌐" },
+	{ id: "paperless", name: "Paperless-ngx", kind: "knowledge", category: "tools", layer: 3, url: "https://docs.paperless-ngx.com/", icon: "📄" },
+	{ id: "n8n", name: "n8n", kind: "workflow", category: "orchestration", layer: 4, icon: "⚙️" },
+	{ id: "temporal", name: "Temporal", kind: "workflow", category: "orchestration", layer: 4, url: "https://temporal.io/", icon: "⏱️" },
+	{ id: "langflow", name: "Langflow", kind: "workflow", category: "orchestration", layer: 4, icon: "🔗" },
+	{ id: "langfuse", name: "Langfuse", kind: "llm-observability", category: "observability", layer: 5, icon: "📈" },
+	{ id: "opik", name: "Opik", kind: "evaluation", category: "observability", layer: 5, url: "https://www.comet.com/docs/opik/", icon: "🧪" },
+	{ id: "prometheus", name: "Prometheus", kind: "metrics", category: "observability", layer: 5, icon: "📊" },
 ];
 
 export const AI_RELATIONS: ArchitectureRelation[] = [
@@ -66,16 +67,16 @@ export const AI_RELATIONS: ArchitectureRelation[] = [
 ];
 
 export const NABLA_EXTERNAL_ENTITIES: ArchitectureEntity[] = [
-	{ id: "github", name: "GitHub", kind: "scm", category: "collaboration", url: "https://github.com/AlbanAndrieu" },
-	{ id: "gitlab", name: "GitLab", kind: "scm", category: "collaboration", url: "https://gitlab.com/AlbanAndrieu" },
-	{ id: "jira", name: "Jira", kind: "project-management", category: "collaboration", url: "https://www.atlassian.com/software/jira" },
-	{ id: "asana", name: "Asana", kind: "project-management", category: "collaboration", url: "https://asana.com" },
-	{ id: "slack", name: "Slack", kind: "collaboration", category: "collaboration", url: "https://slack.com" },
-	{ id: "notion", name: "Notion", kind: "knowledge", category: "collaboration", url: "https://app.notion.com/p/albandrieu/Getting-Started-d588a6b720254a7baebd45357e8315a3" },
-	{ id: "reactive-resume", name: "Reactive Resume", kind: "application", category: "portfolio", url: "https://reactive-resume.albandrieu.com" },
-	{ id: "fastapi-cloud", name: "FastAPI Cloud", kind: "application-platform", category: "platform", url: "https://fastapi-sample.fastapicloud.dev/api" },
-	{ id: "docker-hub", name: "Docker Hub / Nabla", kind: "registry", category: "platform", url: "https://hub.docker.com/u/nabla" },
-	{ id: "ansible", name: "Ansible", kind: "configuration", category: "platform", url: "https://github.com/AlbanAndrieu" },
+	{ id: "github", name: "GitHub", kind: "scm", category: "collaboration", url: "https://github.com/AlbanAndrieu", icon: "🐙" },
+	{ id: "gitlab", name: "GitLab", kind: "scm", category: "collaboration", url: "https://gitlab.com/AlbanAndrieu", icon: "🦊" },
+	{ id: "jira", name: "Jira", kind: "project-management", category: "collaboration", url: "https://www.atlassian.com/software/jira", icon: "📋" },
+	{ id: "asana", name: "Asana", kind: "project-management", category: "collaboration", url: "https://asana.com", icon: "✅" },
+	{ id: "slack", name: "Slack", kind: "collaboration", category: "collaboration", url: "https://slack.com", icon: "💬" },
+	{ id: "notion", name: "Notion", kind: "knowledge", category: "collaboration", url: "https://app.notion.com/p/albandrieu/Getting-Started-d588a6b720254a7baebd45357e8315a3", icon: "📝" },
+	{ id: "reactive-resume", name: "Reactive Resume", kind: "application", category: "portfolio", url: "https://reactive-resume.albandrieu.com", icon: "📄" },
+	{ id: "fastapi-cloud", name: "FastAPI Cloud", kind: "application-platform", category: "platform", url: "https://fastapi-sample.fastapicloud.dev/api", icon: "⚡" },
+	{ id: "docker-hub", name: "Docker Hub / Nabla", kind: "registry", category: "platform", url: "https://hub.docker.com/u/nabla", icon: "🐳" },
+	{ id: "ansible", name: "Ansible", kind: "configuration", category: "platform", url: "https://github.com/AlbanAndrieu", icon: "🅰️" },
 ];
 
 const TOPOLOGY_ID_BY_NAME: Record<string, string> = {
@@ -119,6 +120,11 @@ function serviceUrl(service: HomelabService): string | undefined {
 	return `${service.internalSecure ? "https" : "http"}://${service.internalHost}:${service.internalPort}`;
 }
 
+function serviceIconSrc(service: HomelabService): string | undefined {
+	if (!service.iconSrc) return undefined;
+	return service.iconSrc.startsWith("/") ? service.iconSrc : `/${service.iconSrc}`;
+}
+
 export function buildNablaEntities(
 	services: HomelabService[],
 	topology: ServiceTopology,
@@ -134,6 +140,8 @@ export function buildNablaEntities(
 			category: "homelab",
 			url: serviceUrl(service),
 			detail: service.external ? "public endpoint" : "private/internal endpoint",
+			icon: service.icon,
+			iconSrc: serviceIconSrc(service),
 		});
 	}
 	for (const node of topology.nodes) {
@@ -146,6 +154,7 @@ export function buildNablaEntities(
 			url: current?.url ?? node.url,
 			detail: node.description ?? current?.detail,
 			icon: node.icon ?? current?.icon,
+			iconSrc: current?.iconSrc,
 		});
 	}
 	for (const entity of NABLA_EXTERNAL_ENTITIES) entities.set(entity.id, entity);

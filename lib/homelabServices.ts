@@ -3,6 +3,7 @@ import localCatalog from "../public/homelab-services.json";
 export type HomelabService = {
 	name: string;
 	description?: string;
+	icon?: string;
 	iconSrc?: string;
 	tunnelUrl?: string;
 	endpointEnabled?: boolean;
