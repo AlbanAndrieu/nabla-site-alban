@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { SOCIAL_CARD_HEIGHT, SOCIAL_CARD_WIDTH } from "@/lib/socialMetadata";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const MAX_TITLE_LENGTH = 110;
 const MAX_DESCRIPTION_LENGTH = 220;
@@ -56,11 +56,17 @@ export function GET(request: Request) {
 							borderRadius: "22px",
 							background: "#42c9b7",
 							color: "#07111f",
-							fontSize: "54px",
-							fontWeight: 800,
 						}}
 					>
-						∇
+						<svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+							<path
+								d="M7 9h40L27 47 7 9Z"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="6"
+								strokeLinejoin="round"
+							/>
+						</svg>
 					</div>
 					<div style={{ display: "flex", flexDirection: "column" }}>
 						<span style={{ fontSize: "30px", fontWeight: 700 }}>Alban Andrieu</span>
