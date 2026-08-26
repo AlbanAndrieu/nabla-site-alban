@@ -39,7 +39,11 @@
       "tunnelMissing": "Cloudflare tunnel expected by tunnelSecure=true but not observed",
       "tunnelDegraded": "Cloudflare tunnel observed but potentially misconfigured: {status}",
       "applicationErrorShort": "Application error",
-      "applicationError": "Application error detected: {error}"
+      "applicationError": "Application error detected: {error}",
+      "evidence": "Evidence: {evidence}",
+      "evidenceUnavailable": "Evidence unavailable",
+      "snapshotAge": "snapshot {seconds}s old",
+      "snapshotAgeUnknown": "snapshot age unknown"
     },
     "truenas": {
       "down": "TrueNAS appears to be down",
