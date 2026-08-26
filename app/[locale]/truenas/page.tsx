@@ -38,7 +38,7 @@ export default async function TruenasPage({ params }: Props) {
 	setRequestLocale(locale);
 
 	return (
-		<div className="site-content-page page-dark">
+		<div className="site-content-page page-dark page-truenas">
 			<TopAnchor />
 			<SkipToMainContent />
 			<main id="main-content">

@@ -255,3 +255,58 @@
 		height: 360px;
 	}
 }
+
+/* TrueNAS page: keep Bootstrap utility text readable on the dark site surface. */
+.page-truenas {
+	--truenas-text-primary: #f8fafc;
+	--truenas-text-secondary: #d7e0ec;
+	--truenas-text-muted: #b9c6d8;
+	--truenas-link: #7dd3fc;
+	--truenas-link-hover: #bae6fd;
+	--truenas-card-bg: #111827;
+	--truenas-card-border: #475569;
+	color: var(--truenas-text-primary);
+}
+
+.page-truenas :is(.text-secondary, .text-muted) {
+	color: var(--truenas-text-secondary) !important;
+}
+
+.page-truenas .small.text-muted,
+.page-truenas :is(.hardware-pill__sub, .hardware-bom-total__note) {
+	color: var(--truenas-text-muted) !important;
+}
+
+.page-truenas :is(p, li, dd, dt, .card-text, .list-group-item) {
+	color: var(--truenas-text-primary);
+}
+
+.page-truenas :is(.card, .list-group-item) {
+	border-color: var(--truenas-card-border);
+	background-color: var(--truenas-card-bg);
+}
+
+.page-truenas :is(.card-title, h1, h2, h3, h4, h5, h6, .hardware-pill__title) {
+	color: #fff;
+}
+
+.page-truenas a:not(.btn) {
+	color: var(--truenas-link);
+	text-decoration-color: rgb(125 211 252 / 70%);
+}
+
+.page-truenas a:not(.btn):hover,
+.page-truenas a:not(.btn):focus-visible {
+	color: var(--truenas-link-hover);
+	text-decoration-color: currentColor;
+}
+
+.page-truenas .border-secondary {
+	border-color: var(--truenas-card-border) !important;
+}
+
+.page-truenas .hardware-bom-li__icon,
+.page-truenas .hardware-bom-heading__icon,
+.page-truenas .hardware-pill__icon {
+	color: #67e8f9;
+}
