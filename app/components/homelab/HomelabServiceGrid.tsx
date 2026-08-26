@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import {
 	homelabServiceEndpointUrl,
 	type HomelabService,
@@ -59,6 +60,12 @@ function lookupHealth(
 	}
 }
 
+function reconciledHealth(entry?: HomelabHealthEntry): HomelabHealthEntry | undefined {
+	if (!entry) return undefined;
+	const reconciliation = reconcileHomelabHealth(entry);
+	return { ...entry, state: reconciliation.state };
+}
+
 export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
@@ -105,7 +112,9 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					// Exposure policy and navigation are independent. Only an explicit
 					// endpointEnabled=false disables the link.
 					const endpointEnabled = svc.endpointEnabled !== false;
-					const initialHealth = lookupHealth(serviceHealth, svc, endpointUrl);
+					const initialHealth = reconciledHealth(
+						lookupHealth(serviceHealth, svc, endpointUrl),
+					);
 
 					return (
 						<div
