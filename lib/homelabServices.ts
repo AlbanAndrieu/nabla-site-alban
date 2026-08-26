@@ -6,6 +6,7 @@ export type HomelabService = {
 	icon?: string;
 	iconSrc?: string;
 	tunnelUrl?: string;
+	tunnelSecure?: boolean;
 	endpointEnabled?: boolean;
 	internalHost?: string;
 	internalPort?: number;
