@@ -7,6 +7,7 @@ import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 import AIMLOpsSection from "../../components/expertise/AIMLOpsSection";
 import HeroSection from "../../components/expertise/HeroSection";
 import ServicesSection, {
@@ -22,17 +23,12 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "expertisePage" });
 
-	return {
+	return buildPageMetadata({
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
-		alternates: {
-			canonical: canonicalPagePath("expertise", locale),
-			languages: {
-				en: canonicalPagePath("expertise", "en"),
-				fr: canonicalPagePath("expertise", "fr"),
-			},
-		},
-	};
+		slug: "expertise",
+		locale,
+	});
 }
 
 export default async function ExpertisePage({
