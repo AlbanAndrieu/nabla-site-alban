@@ -16,7 +16,6 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
 import {
-	HOMELAB_HEALTH_DEFAULT_API_URL,
 	parseHomelabHealthSnapshot,
 	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
@@ -329,7 +328,7 @@ export default function ArchitectureExplorer({
 		};
 		const loadHealth = async () => {
 			try {
-				const response = await fetch(HOMELAB_HEALTH_DEFAULT_API_URL, {
+				const response = await fetch("/api/homelab-health", {
 					cache: "no-store",
 					headers: { Accept: "application/json" },
 				});
