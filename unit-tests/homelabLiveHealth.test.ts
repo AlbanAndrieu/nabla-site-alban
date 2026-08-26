@@ -6,17 +6,25 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("homelab service grid uses backend health for private and public endpoints", async () => {
+test("homelab service grid keeps private endpoints clickable and matches health by id", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
-	assert.match(page, /const initialHealth = lookupHealth\(serviceHealth, svc\.tunnelUrl\)/);
-	assert.doesNotMatch(page, /const initialHealth = isExternal/);
+	assert.match(page, /const endpointUrl = homelabServiceEndpointUrl\(svc\)/);
+	assert.match(page, /const endpointEnabled = svc\.endpointEnabled !== false/);
+	assert.match(page, /lookupHealth\(serviceHealth, svc, endpointUrl\)/);
+	assert.match(page, /if \(service\.id\)/);
+	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
 });
 
-test("endpoint action prefers reconciled backend evidence before browser probing", async () => {
+test("endpoint action follows FastAPI state and supplements unverified private endpoints", async () => {
 	const page = await source("app/components/homelab/EndpointAction.tsx");
-	assert.match(page, /if \(external \|\| initialHealth \|\| !url \|\| !enabled\) return/);
-	assert.match(page, /initialHealth\?\.state/);
+	assert.match(page, /return entry\.state/);
+	assert.match(page, /\[401, 403, 407, 429\]\.includes\(status\)/);
+	assert.match(page, /supplementWithPrivateProbe/);
+	assert.match(page, /initialHealth\?\.direct_state != null/);
+	assert.match(page, /initialHealth\?\.internal_state != null/);
+	assert.match(page, /initialHealth\?\.state === "fail"/);
+	assert.match(page, /privateProbeIsAuthoritative/);
 	assert.match(page, /runtime_state/);
 	assert.match(page, /tunnel_status/);
 });
