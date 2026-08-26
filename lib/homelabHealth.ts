@@ -1,6 +1,7 @@
 export type HomelabHealthState = "ok" | "warn" | "fail";
 
 export type HomelabHealthEntry = {
+	id?: string;
 	name: string;
 	url: string;
 	reachable: boolean;
@@ -11,6 +12,11 @@ export type HomelabHealthEntry = {
 	error?: string;
 	tunnel_status?: string | null;
 	tunnel_name?: string | null;
+	direct_state?: HomelabHealthState | null;
+	internal_state?: HomelabHealthState | null;
+	runtime_state?: string | null;
+	runtime_app?: string | null;
+	runtime_reachable?: boolean | null;
 };
 
 export type HomelabInternalHealthEntry = {
@@ -37,6 +43,10 @@ export type HomelabHealthSnapshot = {
 	truenas?: TrueNasHealth | null;
 	internal_probes_enabled?: boolean;
 	internal_services?: HomelabInternalHealthEntry[];
+	truenas_runtime_reachable?: boolean;
+	truenas_runtime_stale?: boolean;
+	cloudflare_configured?: boolean;
+	cloudflare_tunnels_observed?: number;
 };
 
 export type HomelabHealthSource = "fastapi" | "unavailable";
@@ -77,9 +87,18 @@ function validOptionalNumber(value: unknown): boolean {
 	);
 }
 
+function validOptionalString(value: unknown): boolean {
+	return value === undefined || value === null || typeof value === "string";
+}
+
+function validOptionalHealthState(value: unknown): boolean {
+	return value === undefined || value === null || isHealthState(value);
+}
+
 function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 	if (!isRecord(entry)) return false;
 	return (
+		(entry.id === undefined || typeof entry.id === "string") &&
 		typeof entry.name === "string" &&
 		entry.name.trim().length > 0 &&
 		typeof entry.url === "string" &&
@@ -91,12 +110,13 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalBoolean(entry.tls_trusted) &&
 		validOptionalNumber(entry.latency_ms) &&
 		(entry.error === undefined || typeof entry.error === "string") &&
-		(entry.tunnel_status === undefined ||
-			entry.tunnel_status === null ||
-			typeof entry.tunnel_status === "string") &&
-		(entry.tunnel_name === undefined ||
-			entry.tunnel_name === null ||
-			typeof entry.tunnel_name === "string")
+		validOptionalString(entry.tunnel_status) &&
+		validOptionalString(entry.tunnel_name) &&
+		validOptionalHealthState(entry.direct_state) &&
+		validOptionalHealthState(entry.internal_state) &&
+		validOptionalString(entry.runtime_state) &&
+		validOptionalString(entry.runtime_app) &&
+		validOptionalBoolean(entry.runtime_reachable)
 	);
 }
 
@@ -166,6 +186,10 @@ export function parseHomelabHealthSnapshot(
 	) {
 		return null;
 	}
+	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
+	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
+	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
+	if (!validOptionalNumber(value.cloudflare_tunnels_observed)) return null;
 
 	return value as HomelabHealthSnapshot;
 }
@@ -189,7 +213,7 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-health/2.0",
+				"User-Agent": "nabla-site-homelab-health/3.0",
 			},
 			signal: controller.signal,
 			cache: "no-store",
