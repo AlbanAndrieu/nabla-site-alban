@@ -1,9 +1,10 @@
-export type HomelabHealthState = "ok" | "warn" | "fail";
+export type HomelabHealthState = "ok" | "warn" | "fail" | "unknown";
 
 export type HomelabHealthEntry = {
 	id?: string;
 	name: string;
 	url: string;
+	url_derived?: boolean;
 	reachable: boolean;
 	http_status: number;
 	state: HomelabHealthState;
@@ -62,7 +63,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isHealthState(value: unknown): value is HomelabHealthState {
-	return value === "ok" || value === "warn" || value === "fail";
+	return value === "ok" || value === "warn" || value === "fail" || value === "unknown";
 }
 
 export function normalizeHomelabHealthUrl(url?: string): string | null {
@@ -104,6 +105,7 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		entry.name.trim().length > 0 &&
 		typeof entry.url === "string" &&
 		normalizeHomelabHealthUrl(entry.url) !== null &&
+		validOptionalBoolean(entry.url_derived) &&
 		typeof entry.reachable === "boolean" &&
 		typeof entry.http_status === "number" &&
 		Number.isFinite(entry.http_status) &&
@@ -215,7 +217,7 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-health/3.0",
+				"User-Agent": "nabla-site-homelab-health/4.0",
 			},
 			signal: controller.signal,
 			cache: "no-store",
