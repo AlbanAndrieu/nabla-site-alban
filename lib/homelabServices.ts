@@ -1,6 +1,10 @@
 import localCatalog from "../public/homelab-services.json";
 
+const HOMELAB_DOMAIN = "albandrieu.com";
+const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export type HomelabService = {
+	id?: string;
 	name: string;
 	description?: string;
 	icon?: string;
@@ -32,6 +36,29 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function slugifyServiceName(name: string): string {
+	return (
+		name
+			.normalize("NFKD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, "-")
+			.replace(/^-+|-+$/g, "") || "service"
+	);
+}
+
+export function homelabServiceEndpointUrl(service: HomelabService): string {
+	const explicit = service.tunnelUrl?.trim();
+	if (explicit) return explicit;
+
+	const explicitId = service.id?.trim();
+	const serviceId =
+		explicitId && SERVICE_ID_RE.test(explicitId)
+			? explicitId
+			: slugifyServiceName(service.name);
+	return `https://${serviceId}.${HOMELAB_DOMAIN}`;
+}
+
 export function parseHomelabServicesCatalog(
 	value: unknown,
 ): HomelabServicesCatalog | null {
@@ -52,7 +79,8 @@ export function parseHomelabServicesCatalog(
 			(service) =>
 				isRecord(service) &&
 				typeof service.name === "string" &&
-				service.name.trim().length > 0,
+				service.name.trim().length > 0 &&
+				(service.id === undefined || typeof service.id === "string"),
 		)
 	) {
 		return null;
