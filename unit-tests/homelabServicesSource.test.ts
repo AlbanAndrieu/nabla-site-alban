@@ -3,6 +3,7 @@ import test from "node:test";
 import { GET } from "../app/api/homelab-services/route";
 import {
 	HOMELAB_SERVICES_DEFAULT_API_URL,
+	homelabServiceEndpointUrl,
 	loadHomelabServicesCatalog,
 	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
@@ -37,6 +38,25 @@ test("homelab catalog parser accepts the expected contract and rejects unusable 
 	assert.equal(parseHomelabServicesCatalog({ services: [] }), null);
 	assert.equal(parseHomelabServicesCatalog({ services: [{}] }), null);
 	assert.equal(parseHomelabServicesCatalog({ version: "1", services: [{ name: "x" }] }), null);
+});
+
+test("homelab service endpoint uses explicit URL before the stable-id DNS fallback", () => {
+	assert.equal(
+		homelabServiceEndpointUrl({
+			id: "prometheus",
+			name: "Prometheus",
+			tunnelUrl: "https://metrics.albandrieu.com",
+		}),
+		"https://metrics.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl({ id: "prometheus", name: "Prometheus" }),
+		"https://prometheus.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl({ name: "Prometheus - albandrieu" }),
+		"https://prometheus-albandrieu.albandrieu.com",
+	);
 });
 
 test("homelab catalog prefers FastAPI when a valid payload is available", async () => {
