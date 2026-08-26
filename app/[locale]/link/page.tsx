@@ -7,6 +7,7 @@ import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import { buildPageMetadata } from "@/lib/socialMetadata";
 
 export async function generateMetadata({
 	params,
@@ -15,17 +16,12 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const t = await getTranslations({ locale, namespace: "linkPage" });
 
-	return {
+	return buildPageMetadata({
 		title: t("metadataTitle"),
 		description: t("metadataDescription"),
-		alternates: {
-			canonical: canonicalPagePath("link", locale),
-			languages: {
-				en: canonicalPagePath("link", "en"),
-				fr: canonicalPagePath("link", "fr"),
-			},
-		},
-	};
+		slug: "link",
+		locale,
+	});
 }
 
 export default async function LinkPage({
