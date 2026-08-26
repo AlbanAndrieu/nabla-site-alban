@@ -1,21 +1,51 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 24 août 2026.
+Dernière vérification : 26 août 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
-n'est considéré comme terminé que lorsque les contrôles locaux pertinents, la CI
-et le rendu Vercel sont validés.
+n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
+branche finale et le déploiement Vercel sont validés.
+
+## État validé au 26 août 2026
+
+- [x] `master` compile avec le build Next.js de production dans la CI.
+- [x] La CI Quality/Security s'exécute sur les PR et sur les pushes pertinents de
+  `master`.
+- [x] Le dernier `master` validé est déployé avec un statut Vercel réussi.
+- [x] Les pages d'accueil EN/FR et `/fr/truenas` répondent en production.
+- [x] Les graphes Architecture affichent les icônes du catalogue, le contraste
+  dark-mode renforcé et les états runtime TrueNAS réconciliés.
+- [x] Les métadonnées sociales EN/FR couvrent les principales pages SEO et les
+  cartes Open Graph/Twitter sont générées localement.
+- [x] Le catalogue homelab distingue déclaration, observation runtime et santé.
+- [ ] Le connecteur de logs runtime Vercel doit être revalidé lorsqu'il est
+  disponible ; il était indisponible lors du contrôle du 26 août.
+
+## P0 — Stabilisation post-merge
+
+- [x] Ajouter `npm run build` à la CI avant merge.
+- [x] Rejouer le workflow Quality/Security sur `master` après merge.
+- [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.
+- [ ] Conserver une seule implémentation de la politique metadata sociale ; les
+  anciens imports doivent rester compatibles pendant la migration.
+- [ ] Aligner l'origine canonical/sitemap/Open Graph sur le host de production
+  final et éviter les canonical qui nécessitent une redirection.
+- [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
+  afin qu'une PR rouge ne puisse plus casser `master`.
+- [ ] Ajouter un smoke test post-déploiement sur accueil EN/FR, `/truenas`,
+  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
 
 ## P0 — Cohérence produit et contenu
 
 - [ ] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
   et leurs traductions : statut indépendant, périodes d'expérience et temps
   verbaux doivent raconter la même chronologie.
+- [ ] Supprimer les anciennes traductions/props Jus Mundi devenues mortes ; ne pas
+  réintroduire de dictionnaire local dans les composants.
 - [ ] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
   obsolètes héritées de la période Jus Mundi.
-- [ ] Maintenir les pages `nabla-site-alban` utilisées aussi dans
-  `nabla-site-bababou` à parité lorsqu'elles doivent volontairement être
-  identiques, en particulier `/contact`.
+- [ ] Maintenir les pages utilisées aussi dans `nabla-site-bababou` à parité
+  uniquement lorsqu'elles doivent volontairement être identiques.
 
 ## P0 — Achever la migration Next.js native
 
@@ -24,50 +54,79 @@ et le rendu Vercel sont validés.
 - [x] Consolider les pages Nabla/TrueNAS et retirer leurs runtimes historiques.
 - [ ] Migrer `/security` de `PublicHtmlFragment` vers des composants React natifs.
 - [ ] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
-  implémentation moderne intégrée au bundle lorsque la migration Security est
-  terminée.
-- [ ] Finir la migration du contenu historique encore nécessaire sur `/ai`.
+  implémentation moderne intégrée au bundle après la migration Security.
+- [ ] Finir la migration du contenu historique encore nécessaire sur `/ai` et
+  recentrer la page sur l'architecture Secure AI actuelle.
 - [ ] Migrer les derniers fragments nécessaires de `/workstation`.
 - [ ] Migrer les variantes `cv-{small,medium,large,full}-*.html` avant de
   supprimer `loadCvHtmlFragment`.
-- [ ] Réduire puis supprimer `PublicHtmlFragment` dès qu'il n'a plus de
+- [ ] Réduire puis supprimer `PublicHtmlFragment` lorsqu'il n'a plus de
   consommateur justifié.
 
 ## P0 — Design system et cohérence UI/UX
 
-- [ ] Introduire des tokens partagés pour couleurs, surfaces, espacements,
-  rayons, états success/warning/danger et typographie.
-- [ ] Introduire des primitives `Button`, `Card`, `Container`, `Section`,
-  `Badge`, `ExternalLink` et `PageHeader` sous `components/ui/`.
+- [x] Introduire des design tokens partagés de base pour les pages Next.js.
+- [x] Renforcer les tokens/contrastes spécifiques aux graphes Architecture et à
+  la page TrueNAS dark-mode.
+- [ ] Normaliser les tokens globaux pour couleurs, surfaces, espacements, rayons,
+  typographie et états success/warning/danger.
+- [ ] Introduire les primitives `Button`, `Card`, `Container`, `Section`, `Badge`,
+  `ExternalLink` et `PageHeader` sous `components/ui/`.
 - [ ] Migrer le footer et `RouteHeader` vers ces primitives avant les composants
   spécifiques aux pages.
-- [ ] Réduire progressivement le mélange Tailwind + Bootstrap + CSS historique.
+- [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
+  feuilles globales chargées dans le layout.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
   couvrent.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après
   chaque migration visible.
 
+## P1 — Architecture et homelab runtime
+
+- [x] Consommer la topologie déclarée issue de `nabla-compose`.
+- [x] Afficher les icônes déclarées par le catalogue avec fallback lisible.
+- [x] Consommer `/api/homelab/status` via un proxy Next sans exposer les secrets
+  TrueNAS au navigateur.
+- [x] Distinguer `in_sync`, `declared_only`, `binding_conflict`,
+  `runtime_unknown`, `not_observed` et les workloads `observed_only`.
+- [x] Signaler les snapshots runtime périmés (`stale`) séparément d'un runtime
+  fraîchement observable.
+- [ ] Revalider le graphe de production après chaque évolution importante du
+  catalogue `nabla-compose` / du contrat `fastapi-sample`.
+- [ ] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
+  multi-services (par exemple Elasticsearch/Kibana) et les services auxiliaires
+  qui ne doivent pas devenir des nœuds fonctionnels par erreur.
+- [ ] Exposer dans l'UI l'âge de l'observation runtime lorsque le backend fournit
+  un timestamp exploitable.
+
 ## P1 — Accessibilité
 
-### Shared SkipToMainContent
+### Shared `SkipToMainContent`
 
-- [x] `startup`
-- [x] `startup-thanks`
-- [ ] `app/[locale]/page.tsx`
-- [ ] `app/[locale]/ai/page.tsx`
-- [ ] `app/[locale]/security/page.tsx`
-- [ ] `app/[locale]/freenas/page.tsx`
-- [ ] `app/[locale]/truenas/page.tsx`
-- [ ] `app/[locale]/workstation/page.tsx`
-- [ ] `app/[locale]/email/page.tsx`
-- [ ] `app/[locale]/expertise/page.tsx`
-- [ ] `app/[locale]/ciso/page.tsx`
-- [ ] `app/[locale]/pricing/page.tsx`
-- [ ] `app/[locale]/link/page.tsx`
-- [ ] `app/[locale]/nabla/page.tsx`
-- [ ] `app/[locale]/checkout-tjm/page.tsx`
-- [ ] `app/[locale]/cv/[...path]/page.tsx`
-- [ ] `components/payments/PaymentShell.tsx`
+Déjà migrés :
+
+- [x] accueil
+- [x] AI
+- [x] FreeNAS
+- [x] TrueNAS
+- [x] Workstation
+- [x] Email
+- [x] Expertise
+- [x] CISO
+- [x] Pricing
+- [x] Nabla
+- [x] Architecture
+- [x] Jus Mundi
+- [x] Checkout TJM
+- [x] CV catch-all
+- [x] Startup / Startup Thanks
+
+Restant :
+
+- [ ] Security lors de sa migration native.
+- [ ] Link si le markup manuel subsiste après vérification.
+- [ ] `components/payments/PaymentShell.tsx` si le shell expose encore son propre
+  markup de skip-link.
 
 Critères d'acceptation : un composant partagé, aucun markup de skip-link dupliqué,
 chaque page expose `<main id="main-content">`, et des tests de non-régression.
@@ -76,17 +135,20 @@ Autres contrôles :
 
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
 - [ ] Étendre la vérification du focus visible et de la navigation clavier.
-- [ ] Vérifier `prefers-reduced-motion` pour les interactions animées.
+- [ ] Vérifier `prefers-reduced-motion` pour React Flow et les interactions
+  animées.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
 - [ ] Organiser la page autour d'une architecture Secure AI : identité/RBAC,
   LiteLLM gateway, inference locale/distante, PII/secrets, MCP, RAG,
   observabilité, FinOps et gouvernance.
+- [ ] Réutiliser les données/topologies déjà présentes plutôt que créer un second
+  catalogue statique spécifique à la page AI.
 - [ ] Conserver les catalogues d'outils comme contenu secondaire et non comme
   structure principale.
-- [ ] Relier explicitement les choix de plateforme à ISO 27001, ISO 42001 et
-  aux contraintes GDPR lorsque pertinent.
+- [ ] Relier explicitement les choix de plateforme à ISO 27001, ISO 42001 et aux
+  contraintes GDPR lorsque pertinent.
 
 ## P1 — Sécurité applicative
 
@@ -96,8 +158,8 @@ Autres contrôles :
 - [ ] Vérifier la validation `Origin` des POST initiés par navigateur.
 - [ ] Ajouter les webhooks Stripe signés lorsqu'un paiement déclenche un état
   métier côté serveur.
-- [ ] Durcir progressivement la CSP au fur et à mesure de la suppression des
-  scripts/styles CDN historiques.
+- [ ] Durcir progressivement la CSP pendant la suppression de Bootstrap/CDN et
+  des scripts/styles historiques.
 
 ## P1 — SEO et i18n
 
@@ -106,8 +168,14 @@ Autres contrôles :
 - [x] Générer sitemap, canonical et variantes linguistiques depuis les mêmes
   conventions.
 - [x] Migrer les principales URL SEO vers des routes sans extension.
-- [ ] Contrôler en production canonical, `hreflang`, robots, sitemap et aperçus
-  Open Graph.
+- [x] Ajouter Open Graph/Twitter, locales `en_US`/`fr_FR`, images 1200×630 et
+  métadonnées sociales page-aware.
+- [x] Ajouter une image sociale générée localement sans dépendance distante.
+- [ ] Terminer la consolidation `socialMetadata` / compatibilité `siteMetadata`.
+- [ ] Contrôler après déploiement canonical, `hreflang`, robots, sitemap et
+  aperçus Open Graph sur le host final `www`.
+- [ ] Vérifier puis rediriger/retirer proprement les anciennes URL `.html` encore
+  indexées par les moteurs (`security.html`, `contact.html`, etc.).
 - [ ] Décider explicitement si CTID, FreeNAS et Workstation doivent être
   indexables.
 - [ ] Décider si l'application éditoriale reste volontairement EN/FR ou si DE/NO
@@ -121,10 +189,12 @@ Autres contrôles :
 - [ ] Compléter Lighthouse desktop sur un déploiement stable.
 - [ ] Définir des budgets de non-régression pour LCP, CLS, INP, JS, CSS et
   JavaScript tiers.
+- [ ] Remplacer progressivement Bootstrap CDN et Bootstrap Icons par les
+  primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
 - [ ] Exécuter l'audit des dépendances, licences et paquets inutilisés.
 - [ ] Évaluer Knip pour détecter fichiers, exports et dépendances morts.
-- [ ] Supprimer les composants historiques sans consommateur confirmé, par
-  exemple les doublons de footer après vérification.
+- [ ] Supprimer les props, composants et feuilles historiques sans consommateur
+  confirmé.
 
 ## P2 — CI/CD et Vercel
 
@@ -133,13 +203,15 @@ Autres contrôles :
 - [x] Utiliser `repository_dispatch: vercel.deployment.success` pour le hand-off
   Preview → Playwright.
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
-- [ ] Réduire encore les déploiements Preview inutiles : le projet a déjà atteint
-  la limite Vercel de plus de 100 déploiements par jour pendant les travaux de
-  migration.
+- [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
+- [x] Exécuter Quality/Security sur `master` après merge.
+- [ ] Configurer un ruleset GitHub avec Quality/Security comme check requis.
+- [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
+  changements docs-only et les commits intermédiaires d'une même PR.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
-  profils mobiles lorsque cela apporte une couverture complémentaire réelle.
-- [ ] Confirmer tous les workflows GitHub Actions sur le dernier push avant une
-  release importante.
+  profils mobiles seulement lorsque cela apporte une couverture complémentaire.
+- [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un
+  connecteur/endpoint de logs est disponible dans l'environnement d'audit.
 
 ## P2 — Documentation et maintenance
 
@@ -151,14 +223,16 @@ Autres contrôles :
 - [ ] Garder les PR de refactoring petites et thématiques afin d'éviter les
   branches de migration à plusieurs dizaines de commits.
 
-## Ordre de livraison recommandé
+## Ordre de livraison réévalué
 
-1. Cohérence du contenu et nettoyage de la roadmap.
-2. Design tokens + primitives UI + footer/header.
-3. Migration native de `/security` et retrait D3 v3/`arf.js`.
-4. Migration finale du legacy AI et recentrage Secure AI.
-5. Accessibilité partagée + axe + clavier/focus.
-6. Workstation/CV legacy, code mort, CSS et budgets performance.
+1. Stabilisation post-merge : metadata unique, canonical `www`, ruleset requis et
+   smoke tests production.
+2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
+3. Design system partagé : tokens globaux puis primitives Footer/RouteHeader.
+4. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
+5. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
+6. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
+7. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
 
 ## Contrôles de sortie
 
@@ -174,4 +248,5 @@ npm run build
 Pour une modification Next.js visible, compléter ces commandes avec une
 vérification dans un navigateur réel et le diagnostic `/_next/mcp` du serveur de
 développement. Sur une PR Vercel, le Playwright Preview E2E reste l'autorité pour
-le rendu déployé.
+le rendu déployé. Sur `master`, le build Quality/Security et le statut Vercel
+doivent tous les deux être verts.
