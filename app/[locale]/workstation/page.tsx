@@ -11,6 +11,7 @@ import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
 import HardwareSection from "../../components/workstation/HardwareSection";
+import WorkstationHero from "./WorkstationHero";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -36,16 +37,14 @@ export default async function WorkstationPage({ params }: Props) {
 		<div className="site-content-page page-dark page-truenas page-workstation">
 			<TopAnchor />
 			<SkipToMainContent />
-			<PublicHtmlFragment
-				file="workstation.html"
-				mode="headerMain"
-				locale={locale}
-			/>
-
-			<div className="hardware-section-bg">
-				<HardwareSection />
-				<BillOfMaterialsSection />
-			</div>
+			<WorkstationHero locale={locale} />
+			<main id="main-content" className="mb-5">
+				<PublicHtmlFragment file="workstation.html" mode="main" locale={locale} />
+				<div className="hardware-section-bg">
+					<HardwareSection />
+					<BillOfMaterialsSection />
+				</div>
+			</main>
 			<SiteWidgetsScript />
 		</div>
 	);
