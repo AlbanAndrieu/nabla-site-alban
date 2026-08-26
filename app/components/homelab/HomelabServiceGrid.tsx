@@ -2,7 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
-import type { HomelabService, HomelabServicesCatalog } from "@/lib/homelabServices";
+import {
+	homelabServiceEndpointUrl,
+	type HomelabService,
+	type HomelabServicesCatalog,
+} from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 
 type Props = {
@@ -10,14 +14,10 @@ type Props = {
 	snapshot: HomelabHealthSnapshot | null;
 };
 
-function isInternalEndpointUrl(url?: string): boolean {
-	if (!url) return false;
-	try {
-		return new URL(url).hostname.endsWith(".int.albandrieu.com");
-	} catch {
-		return false;
-	}
-}
+type HealthIndex = {
+	byId: Map<string, HomelabHealthEntry>;
+	byUrl: Map<string, HomelabHealthEntry>;
+};
 
 function serviceIconPath(iconSrc?: string): string {
 	if (!iconSrc) return "/assets/selfh-icons/generic-app.svg";
@@ -25,29 +25,35 @@ function serviceIconPath(iconSrc?: string): string {
 	return `/${iconSrc}`;
 }
 
-function healthByUrl(snapshot: HomelabHealthSnapshot | null) {
-	const map = new Map<string, HomelabHealthEntry>();
+function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
+	const byId = new Map<string, HomelabHealthEntry>();
+	const byUrl = new Map<string, HomelabHealthEntry>();
 	for (const entry of snapshot?.services ?? []) {
+		if (entry.id) byId.set(entry.id, entry);
 		try {
 			const url = new URL(entry.url);
 			url.hash = "";
-			map.set(url.href, entry);
+			byUrl.set(url.href, entry);
 		} catch {
-			// FastAPI payload is validated by the same-origin proxy; ignore malformed extras defensively.
+			// The same-origin proxy validates FastAPI payloads; ignore malformed extras defensively.
 		}
 	}
-	return map;
+	return { byId, byUrl };
 }
 
 function lookupHealth(
-	map: Map<string, HomelabHealthEntry>,
-	url?: string,
+	index: HealthIndex,
+	service: HomelabService,
+	url: string,
 ): HomelabHealthEntry | undefined {
-	if (!url) return undefined;
+	if (service.id) {
+		const byId = index.byId.get(service.id);
+		if (byId) return byId;
+	}
 	try {
 		const normalized = new URL(url);
 		normalized.hash = "";
-		return map.get(normalized.href);
+		return index.byUrl.get(normalized.href);
 	} catch {
 		return undefined;
 	}
@@ -56,7 +62,7 @@ function lookupHealth(
 export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
-	const serviceHealth = healthByUrl(snapshot);
+	const serviceHealth = healthIndex(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
 	// A cloud runtime cannot normally reach the private 172.17.x.x address. If the
@@ -95,15 +101,16 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 					const isExternal = svc.external === true;
-					const endpointEnabled =
-						svc.endpointEnabled ??
-						(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
-					const initialHealth = lookupHealth(serviceHealth, svc.tunnelUrl);
+					const endpointUrl = homelabServiceEndpointUrl(svc);
+					// Exposure policy and navigation are independent. Only an explicit
+					// endpointEnabled=false disables the link.
+					const endpointEnabled = svc.endpointEnabled !== false;
+					const initialHealth = lookupHealth(serviceHealth, svc, endpointUrl);
 
 					return (
 						<div
 							className="col-md-4 p-3"
-							key={`${svc.name}:${svc.tunnelUrl ?? svc.internalHost ?? "local"}`}
+							key={`${svc.id ?? svc.name}:${endpointUrl}`}
 						>
 							<div className="card box-shadow h-100 service-card-ux">
 								<img
@@ -121,7 +128,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 									<p className="card-text text-muted small mb-0">{svc.description}</p>
 									<div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
 										<EndpointAction
-											url={svc.tunnelUrl}
+											url={endpointUrl}
 											enabled={endpointEnabled}
 											external={isExternal}
 											tunnelSecure={svc.tunnelSecure === true}
