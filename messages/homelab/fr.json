@@ -9,7 +9,7 @@
     "loading": "Chargement des services du homelab…",
     "unavailable": "Les services du homelab sont temporairement indisponibles.",
     "endpoint": {
-      "external": "Service web (tunnel)",
+      "external": "Service web",
       "internal": "Interne",
       "networkError": "erreur réseau",
       "tlsError": "erreur TLS",
@@ -33,7 +33,9 @@
       "httpsInvalid": "Certificat HTTPS invalide",
       "httpsTrusted": "Certificat HTTPS approuvé",
       "tunnelUnknown": "État du tunnel Cloudflare pas encore observé",
-      "tunnelState": "Tunnel Cloudflare : {status}"
+      "tunnelState": "Tunnel Cloudflare : {status}",
+      "applicationErrorShort": "Erreur applicative",
+      "applicationError": "Erreur applicative détectée : {error}"
     },
     "truenas": {
       "down": "TrueNAS semble indisponible",
