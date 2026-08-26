@@ -26,18 +26,25 @@ test("topology parser rejects edges with unknown nodes", () => {
 	assert.equal(topology, null);
 });
 
-test("architecture route uses React Flow and preserves canonical product names", async () => {
-	const [page, explorer, data, packageJson] = await Promise.all([
+test("architecture route uses a high-contrast React Flow with visible service icons", async () => {
+	const [page, explorer, data, css, packageJson] = await Promise.all([
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
 		readFile("app/[locale]/architecture/ArchitectureExplorer.tsx", "utf8"),
 		readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
+		readFile("app/[locale]/architecture/ArchitectureExplorer.module.css", "utf8"),
 		readFile("package.json", "utf8"),
 	]);
 
 	assert.match(page, /canonicalPagePath\("architecture"/);
 	assert.match(explorer, /from "@xyflow\/react"/);
-	assert.match(explorer, /<MiniMap pannable zoomable \/>/);
-	assert.match(explorer, /<Controls \/>/);
+	assert.match(explorer, /colorMode="dark"/);
+	assert.match(explorer, /<MiniMap[\s\S]*nodeColor="#38bdf8"/);
+	assert.match(explorer, /<Controls className={styles\.flowControls} \/>/);
+	assert.match(explorer, /iconSrc: entity\.iconSrc/);
+	assert.match(explorer, /nodeIconFallback/);
+	assert.match(data, /iconSrc: serviceIconSrc\(service\)/);
+	assert.match(css, /background: #020617/);
+	assert.match(css, /\.nodeIconFrame/);
 	assert.match(packageJson, /"@xyflow\/react": "12\.11\.3"/);
 	for (const product of ["Open WebUI", "LiteLLM", "Ollama", "Paperless-ngx", "OpenRAG", "Langfuse"]) {
 		assert.match(data, new RegExp(product.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
