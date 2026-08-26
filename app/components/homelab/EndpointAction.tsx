@@ -22,6 +22,7 @@ type Props = {
 	tunnelSecure: boolean;
 	label: string;
 	initialHealth?: HomelabHealthEntry;
+	snapshotCheckedAt?: string;
 	truenasDown?: boolean;
 };
 
@@ -63,6 +64,13 @@ function tunnelIndicatorState(
 	if (!normalized) return "missing";
 	if (["healthy", "active", "up", "ok"].includes(normalized)) return "healthy";
 	return "degraded";
+}
+
+function snapshotAgeSeconds(checkedAt?: string): number | null {
+	if (!checkedAt) return null;
+	const timestamp = Date.parse(checkedAt);
+	if (!Number.isFinite(timestamp)) return null;
+	return Math.max(0, Math.round((Date.now() - timestamp) / 1000));
 }
 
 function probeImage(url: string, signal: AbortSignal): Promise<boolean> {
@@ -127,6 +135,7 @@ export default function EndpointAction({
 	tunnelSecure,
 	label,
 	initialHealth,
+	snapshotCheckedAt,
 	truenasDown = false,
 }: Props) {
 	const t = useTranslations("homelab.endpoint");
@@ -258,6 +267,24 @@ export default function EndpointAction({
 		: "";
 	const healthColor = homelabHealthColor(health);
 	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
+	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
+	const evidence = [
+		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
+			? `HTTP ${initialHealth.http_status}`
+			: null,
+		initialHealth?.direct_state ? `direct ${initialHealth.direct_state}` : null,
+		initialHealth?.runtime_state ? `TrueNAS ${initialHealth.runtime_state}` : null,
+		initialHealth?.internal_state ? `internal ${initialHealth.internal_state}` : null,
+		showCloudflare && initialHealth?.tunnel_status
+			? `Cloudflare ${initialHealth.tunnel_status}`
+			: null,
+	].filter((item): item is string => Boolean(item));
+	const evidenceLabel = evidence.length > 0
+		? t("evidence", { evidence: evidence.join(" · ") })
+		: t("evidenceUnavailable");
+	const ageLabel = ageSeconds === null
+		? t("snapshotAgeUnknown")
+		: t("snapshotAge", { seconds: ageSeconds });
 
 	if (!url || !enabled) {
 		return (
@@ -281,46 +308,55 @@ export default function EndpointAction({
 	}
 
 	return (
-		<a
-			href={url}
-			className={`btn ${HEALTH_CLASS[health]} btn-sm d-block`}
-			target="_blank"
-			rel="noopener noreferrer"
-			title={`${external ? t("publicKind") : t("privateKind")} — ${detail}`}
-			style={{ color: healthColor, borderColor: healthColor }}
-			data-health-state={health}
-		>
-			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
-			{health === "pending" && (
-				<span className={styles.pending} aria-live="polite">{t("pending")}</span>
-			)}
-			{https && (
-				<i
-					className="fas fa-lock"
-					style={{ color: tlsIndicatorColor(tlsTrusted), marginLeft: 5 }}
-					title={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
-					aria-label={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
-				/>
-			)}
-			{showCloudflare && (
-				<i
-					className="fas fa-cloud"
-					style={{ color: cloudflareIndicatorColor(initialHealth), marginLeft: 6 }}
-					title={tunnelTitle}
-					aria-label={tunnelTitle}
-				/>
-			)}
-			{applicationError && (
-				<>
+		<>
+			<a
+				href={url}
+				className={`btn ${HEALTH_CLASS[health]} btn-sm d-block`}
+				target="_blank"
+				rel="noopener noreferrer"
+				title={`${external ? t("publicKind") : t("privateKind")} — ${detail}`}
+				style={{ color: healthColor, borderColor: healthColor }}
+				data-health-state={health}
+			>
+				<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
+				{health === "pending" && (
+					<span className={styles.pending} aria-live="polite">{t("pending")}</span>
+				)}
+				{https && (
 					<i
-						className="fas fa-skull-crossbones"
-						style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
-						title={applicationErrorTitle}
-						aria-label={applicationErrorTitle}
-					/>{" "}
-					<span>{t("applicationErrorShort")}</span>
-				</>
+						className="fas fa-lock"
+						style={{ color: tlsIndicatorColor(tlsTrusted), marginLeft: 5 }}
+						title={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
+						aria-label={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
+					/>
+				)}
+				{showCloudflare && (
+					<i
+						className="fas fa-cloud"
+						style={{ color: cloudflareIndicatorColor(initialHealth), marginLeft: 6 }}
+						title={tunnelTitle}
+						aria-label={tunnelTitle}
+					/>
+				)}
+				{applicationError && (
+					<>
+						<i
+							className="fas fa-skull-crossbones"
+							style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
+							title={applicationErrorTitle}
+							aria-label={applicationErrorTitle}
+						/>{" "}
+						<span>{t("applicationErrorShort")}</span>
+					</>
+				)}
+			</a>
+			{initialHealth && (
+				<small className="text-muted d-block" data-health-evidence>
+					<i className="fas fa-wave-square" aria-hidden="true" /> {evidenceLabel}
+					{" · "}
+					<i className="fas fa-clock" aria-hidden="true" /> {ageLabel}
+				</small>
 			)}
-		</a>
+		</>
 	);
 }

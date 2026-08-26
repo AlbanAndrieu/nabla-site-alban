@@ -39,7 +39,11 @@
       "tunnelMissing": "Tunnel Cloudflare attendu par tunnelSecure=true mais non observé",
       "tunnelDegraded": "Tunnel Cloudflare observé mais potentiellement mal configuré : {status}",
       "applicationErrorShort": "Erreur applicative",
-      "applicationError": "Erreur applicative détectée : {error}"
+      "applicationError": "Erreur applicative détectée : {error}",
+      "evidence": "Preuves : {evidence}",
+      "evidenceUnavailable": "Preuves indisponibles",
+      "snapshotAge": "snapshot âgé de {seconds}s",
+      "snapshotAgeUnknown": "âge du snapshot inconnu"
     },
     "truenas": {
       "down": "TrueNAS semble indisponible",
