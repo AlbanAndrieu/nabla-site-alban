@@ -5,10 +5,9 @@ set -euo pipefail
 #   0 => skip the deployment
 #   1 => continue building
 #
-# Skip only when every changed file is maintenance/documentation that cannot
-# affect the deployed application. Keep the allow-list deliberately narrow.
-# The Playwright workflow is deploy-relevant because its deployment_status
-# trigger must be validated against a real Vercel Preview URL.
+# Skip only when every changed file is maintenance, documentation, or unit-test
+# code that cannot affect the deployed application. Browser/E2E workflow changes
+# remain deploy-relevant because they need a real Preview URL.
 
 if ! git rev-parse HEAD^ >/dev/null 2>&1; then
   echo "No parent commit available; build deployment."
@@ -31,7 +30,7 @@ while IFS= read -r file; do
       echo "Playwright workflow changed; build preview for end-to-end validation."
       exit 1
       ;;
-    docs/*|*.md|.github/ISSUE_TEMPLATE/*|.github/PULL_REQUEST_TEMPLATE.md)
+    docs/*|*.md|unit-tests/*|.github/ISSUE_TEMPLATE/*|.github/PULL_REQUEST_TEMPLATE.md)
       ;;
     .github/workflows/*)
       ;;
@@ -42,5 +41,5 @@ while IFS= read -r file; do
   esac
 done <<< "$changed_files"
 
-echo "Only documentation/GitHub maintenance changed; skip Vercel deployment."
+echo "Only documentation, unit tests, or GitHub maintenance changed; skip Vercel deployment."
 exit 0
