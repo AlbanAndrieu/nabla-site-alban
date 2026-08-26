@@ -27,15 +27,29 @@ test("endpoint action follows FastAPI state and supplements unverified private e
 	assert.match(page, /privateProbeIsAuthoritative/);
 	assert.match(page, /runtime_state/);
 	assert.match(page, /tunnel_status/);
+	assert.match(page, /style=\{\{ color: healthColor, borderColor: healthColor \}\}/);
+	assert.match(page, /data-health-state=\{health\}/);
 });
 
-test("Cloudflare indicator follows tunnelSecure intent and observed health", async () => {
+test("Cloudflare indicator requires tunnel intent and observed API evidence", async () => {
 	const page = await source("app/components/homelab/EndpointAction.tsx");
-	assert.match(page, /tunnelSecure && \(/);
-	assert.match(page, /state === "healthy"\) return "limegreen"/);
-	assert.match(page, /state === "missing"\) return "red"/);
-	assert.match(page, /state === "degraded"\) return "orange"/);
-	assert.match(page, /if \(!normalized\) return "missing"/);
+	const presentation = await source("lib/homelabHealthPresentation.ts");
+	assert.match(page, /showCloudflare = tunnelSecure && hasCloudflareEvidence\(initialHealth\)/);
+	assert.match(page, /\{showCloudflare && \(/);
+	assert.match(page, /cloudflareIndicatorColor\(initialHealth\)/);
+	assert.match(presentation, /entry\?\.tunnel_status\?\.trim\(\) \|\| entry\?\.tunnel_name\?\.trim\(\)/);
+	assert.match(presentation, /\["healthy", "active", "up", "ok"\]\.includes\(status\)/);
+	assert.match(presentation, /status === "degraded" \? HEALTH_COLORS\.warn : HEALTH_COLORS\.fail/);
+});
+
+test("TLS indicator is shown for HTTPS and follows API trust evidence", async () => {
+	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const presentation = await source("lib/homelabHealthPresentation.ts");
+	assert.match(page, /const https = isHttpsEndpoint\(url\)/);
+	assert.match(page, /className="fas fa-lock"/);
+	assert.match(page, /tlsIndicatorColor\(tlsTrusted\)/);
+	assert.match(presentation, /trusted === true\) return HEALTH_COLORS\.ok/);
+	assert.match(presentation, /trusted === false\) return HEALTH_COLORS\.fail/);
 });
 
 test("pending endpoint state is explicit and motion-safe", async () => {
