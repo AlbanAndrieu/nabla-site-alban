@@ -269,8 +269,10 @@ export default function EndpointAction({
 	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
-		initialHealth?.http_status > 0 ? `HTTP ${initialHealth.http_status}` : null,
-		initialHealth?.direct_state ? `HTTP ${initialHealth.direct_state}` : null,
+		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
+			? `HTTP ${initialHealth.http_status}`
+			: null,
+		initialHealth?.direct_state ? `direct ${initialHealth.direct_state}` : null,
 		initialHealth?.runtime_state ? `TrueNAS ${initialHealth.runtime_state}` : null,
 		initialHealth?.internal_state ? `internal ${initialHealth.internal_state}` : null,
 		showCloudflare && initialHealth?.tunnel_status
