@@ -56,7 +56,7 @@ function lookupHealth(
 export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
-	const externalHealth = healthByUrl(snapshot);
+	const serviceHealth = healthByUrl(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
 	// A cloud runtime cannot normally reach the private 172.17.x.x address. If the
@@ -98,9 +98,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					const endpointEnabled =
 						svc.endpointEnabled ??
 						(isExternal || isInternalEndpointUrl(svc.tunnelUrl));
-					const initialHealth = isExternal
-						? lookupHealth(externalHealth, svc.tunnelUrl)
-						: undefined;
+					const initialHealth = lookupHealth(serviceHealth, svc.tunnelUrl);
 
 					return (
 						<div
