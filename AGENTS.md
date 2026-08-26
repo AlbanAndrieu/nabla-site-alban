@@ -56,9 +56,23 @@ Never bypass repository hooks with `git push --no-verify`. Never weaken or disab
 
 Next.js 16 / React 19 / TypeScript / next-intl. Node/npm constraints and commands are authoritative in `package.json`.
 
-## 404 invariant
+## Legacy static 404 rendering exception
 
-`app/global-not-found.tsx` is the application-wide unmatched-route handler. Do not add root `app/not-found.tsx` unless segment-level `notFound()` behavior is explicitly required. Preserve trusted `public/404.html` rendering semantics and keep `tests/not-found.spec.ts` as regression coverage.
+`public/404.html`, the public `/404` presentation, and `app/global-not-found.tsx` are an **intentional rendering exception to the Next.js migration**.
+
+The current static 404 presentation is preferred over a fully native React/Next rewrite and must be preserved unless the user explicitly approves that architectural migration in the current task.
+
+Agents must therefore:
+
+- keep `public/404.html` as the rendering source of truth for the custom 404 presentation;
+- keep `app/global-not-found.tsx` loading the trusted static body via `loadPublicHtmlFragment("404.html", ...)`, or an equivalent static-fragment integration that preserves the same rendered result;
+- preserve the established visual effect, layout, copy, animations, home CTA, analytics integration, widget integration, 404 HTTP status and `noindex` behavior;
+- **not replace the 404 with fully native Next/React markup or migrate its styling wholesale into a CSS module merely for architectural consistency**;
+- not remove `public/404.html` as dead or legacy code while this exception is active;
+- keep `app/global-not-found.tsx` as the application-wide unmatched-route handler and do not add root `app/not-found.tsx` unless segment-level `notFound()` behavior is explicitly required;
+- treat `tests/not-found.spec.ts`, including its static cloak/style assertions, as an intentional regression contract rather than obsolete implementation detail.
+
+Safety, compatibility, accessibility or browser fixes may be made around the static integration when they preserve the established rendered behavior. Any architectural change that stops loading `public/404.html` requires explicit user approval first.
 
 ## Next.js
 
