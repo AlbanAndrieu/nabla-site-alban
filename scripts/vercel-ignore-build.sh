@@ -5,10 +5,9 @@ set -euo pipefail
 #   0 => skip the deployment
 #   1 => continue building
 #
-# Skip only when every change since the last successful Vercel deployment is
-# maintenance, documentation, or unit-test code that cannot affect the deployed
-# application. Browser/E2E workflow changes remain deploy-relevant because they
-# need a real Preview URL.
+# Compare with the last successful Vercel deployment and skip changes that cannot
+# affect the deployed application. Keep application/runtime configuration,
+# dependencies, assets, messages and build scripts deploy-relevant.
 
 base_sha="${VERCEL_GIT_PREVIOUS_SHA:-}"
 
@@ -34,13 +33,7 @@ printf '%s\n' "$changed_files"
 
 while IFS= read -r file; do
   case "$file" in
-    .github/workflows/playwright.yml)
-      echo "Playwright workflow changed; build preview for end-to-end validation."
-      exit 1
-      ;;
-    docs/*|*.md|unit-tests/*|.github/ISSUE_TEMPLATE/*|.github/PULL_REQUEST_TEMPLATE.md)
-      ;;
-    .github/workflows/*)
+    docs/*|*.md|unit-tests/*|.github/*|.github/**/*|.vscode/*|.idea/*)
       ;;
     *)
       echo "Deploy-relevant change detected: $file"
@@ -49,5 +42,5 @@ while IFS= read -r file; do
   esac
 done <<< "$changed_files"
 
-echo "Only documentation, unit tests, or GitHub maintenance changed; skip Vercel deployment."
+echo "Only documentation, tests, editor metadata, or GitHub maintenance changed; skip Vercel deployment."
 exit 0

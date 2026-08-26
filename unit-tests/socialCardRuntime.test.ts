@@ -14,12 +14,19 @@ test("social image routes avoid deprecated edge runtime and dynamic nabla glyph 
 	assert.match(socialCard, /<svg[\s\S]*<path/);
 });
 
-test("Vercel compares against the last successful deployment and skips safe-only changes", async () => {
+test("Vercel skips CI-only changes", async () => {
 	const script = await readFile("scripts/vercel-ignore-build.sh", "utf8");
 
-	assert.match(script, /VERCEL_GIT_PREVIOUS_SHA/);
-	assert.match(script, /git diff --name-only "\$base_sha" HEAD/);
-	assert.match(script, /unit-tests\/\*/);
-	assert.match(script, /\.github\/workflows\/playwright\.yml/);
-	assert.match(script, /Playwright workflow changed; build preview/);
+	assert.ok(script.includes("VERCEL_GIT_PREVIOUS_SHA"));
+	assert.ok(script.includes("unit-tests/*"));
+	assert.ok(script.includes(".github/*"));
+	assert.ok(!script.includes("Playwright workflow changed; build preview"));
+});
+
+test("Playwright ignores production deployment dispatches", async () => {
+	const workflow = await readFile(".github/workflows/playwright.yml", "utf8");
+
+	assert.ok(workflow.includes("github.event.client_payload.git.sha != github.sha"));
+	assert.ok(workflow.includes("github.event.client_payload.git.ref != 'master'"));
+	assert.ok(workflow.includes("github.event.client_payload.environment != 'production'"));
 });

@@ -35,6 +35,7 @@ jobs:
       (github.event_name == 'repository_dispatch' &&
        github.event.client_payload.url != '' &&
        github.event.client_payload.git.sha != '' &&
+       github.event.client_payload.git.sha != github.sha &&
        github.event.client_payload.git.ref != 'master' &&
        github.event.client_payload.environment != 'production')
     timeout-minutes: 30
