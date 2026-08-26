@@ -21,7 +21,7 @@
 		"lint:css": "stylelint public/*.css",
 		"typecheck": "tsc --noEmit",
 		"quality:fix": "biome check --write .",
-		"quality:gate": "bash scripts/agent-pre-push.sh",
+		"quality:gate": "bash scripts/quality-gate.sh",
 		"check": "npm run lint && npm run lint:css && npm run typecheck && npm run test:unit && npm run build",
 		"audit": "npm audit --audit-level=moderate",
 		"dev": "next dev",

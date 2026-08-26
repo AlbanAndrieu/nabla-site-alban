@@ -5,7 +5,6 @@ node = "25.4.0"
 python = "{{ get_env(name='PYTHON_VERSION', default='3.14') }}"
 pre-commit = "latest"
 
-
 [settings]
 lockfile = true
 
@@ -13,3 +12,14 @@ lockfile = true
 _.file = [".env.secrets", ".env.local"]
 
 ENV = "dev"
+
+[tasks.hooks]
+description = "Install canonical pre-commit, commit-msg and pre-push Git hooks"
+run = '''
+pre-commit install --install-hooks --hook-type pre-commit --hook-type commit-msg
+pre-commit install --config .pre-commit-pre-push.yaml --install-hooks --hook-type pre-push
+'''
+
+[tasks.quality]
+description = "Run the canonical publication quality gate"
+run = "bash scripts/quality-gate.sh"
