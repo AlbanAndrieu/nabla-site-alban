@@ -14,6 +14,7 @@ test("homelab service grid keeps private endpoints clickable and matches health 
 	assert.match(page, /if \(service\.id\)/);
 	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
+	assert.match(page, /snapshotCheckedAt=\{snapshot\?\.checked_at\}/);
 });
 
 test("endpoint action follows FastAPI state and supplements unverified private endpoints", async () => {
@@ -29,6 +30,16 @@ test("endpoint action follows FastAPI state and supplements unverified private e
 	assert.match(page, /tunnel_status/);
 	assert.match(page, /style=\{\{ color: healthColor, borderColor: healthColor \}\}/);
 	assert.match(page, /data-health-state=\{health\}/);
+});
+
+test("health evidence shows HTTP, TrueNAS, Cloudflare and snapshot age", async () => {
+	const page = await source("app/components/homelab/EndpointAction.tsx");
+	assert.match(page, /snapshotAgeSeconds/);
+	assert.match(page, /HTTP \$\{initialHealth\.http_status\}/);
+	assert.match(page, /TrueNAS \$\{initialHealth\.runtime_state\}/);
+	assert.match(page, /Cloudflare \$\{initialHealth\.tunnel_status\}/);
+	assert.match(page, /data-health-evidence/);
+	assert.match(page, /t\("snapshotAge", \{ seconds: ageSeconds \}\)/);
 });
 
 test("Cloudflare indicator requires tunnel intent and observed API evidence", async () => {
