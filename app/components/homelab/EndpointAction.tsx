@@ -39,6 +39,23 @@ function classifyHttpStatus(status: number): HealthState {
 	return "fail";
 }
 
+function snapshotHealth(entry: HomelabHealthEntry): HealthState {
+	// A functional error returned inside HTTP 2xx must win over transport health.
+	if (entry.application_error) return "fail";
+
+	// For the UI, a measured HTTP response proves the web service is alive even if
+	// secondary TrueNAS/Cloudflare evidence is stale. Authentication gates are also
+	// operational endpoints, so 401/403 are shown green rather than degraded.
+	if (
+		entry.reachable &&
+		((entry.http_status >= 200 && entry.http_status <= 399) ||
+			[401, 403].includes(entry.http_status))
+	) {
+		return "ok";
+	}
+	return entry.state;
+}
+
 function isHttpsUrl(url?: string): boolean {
 	if (!url) return false;
 	try {
@@ -154,18 +171,27 @@ export default function EndpointAction({
 			return;
 		}
 
+		let disposed = false;
 		const controller = new AbortController();
-		const timeout = window.setTimeout(() => controller.abort(), 10_000);
+		const timeout = window.setTimeout(() => {
+			controller.abort();
+			if (!disposed) {
+				setPrivateHealth("fail");
+				setPrivateDetail({ kind: "timeout" });
+			}
+		}, 10_000);
 		setPrivateHealth("pending");
 		setPrivateDetail({ kind: "checking" });
 		void probePrivateEndpoint(url, controller.signal).then((result) => {
-			if (!controller.signal.aborted) {
+			if (!disposed) {
+				window.clearTimeout(timeout);
 				setPrivateHealth(result.state);
 				setPrivateDetail(result.detail);
 			}
 		});
 
 		return () => {
+			disposed = true;
 			window.clearTimeout(timeout);
 			controller.abort();
 		};
@@ -203,13 +229,20 @@ export default function EndpointAction({
 			? `, TrueNAS ${entry.runtime_state}${entry.runtime_app ? ` (${entry.runtime_app})` : ""}`
 			: "";
 		const internal = entry.internal_state ? `, internal ${entry.internal_state}` : "";
+		const applicationError = entry.application_error
+			? ` — ${t("applicationError", { error: entry.application_error })}`
+			: "";
 		const error = entry.error ? ` — ${entry.error}` : "";
-		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${runtime}${internal}${latency}${error}`;
+		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${runtime}${internal}${latency}${applicationError}${error}`;
 	};
 
+	const reconciledSnapshotHealth = initialHealth?.state;
+	const effectiveSnapshotHealth = initialHealth
+		? snapshotHealth(initialHealth)
+		: reconciledSnapshotHealth;
 	const health: HealthState = truenasDown
 		? "fail"
-		: (initialHealth?.state ?? (external ? "unknown" : privateHealth));
+		: (effectiveSnapshotHealth ?? (external ? "unknown" : privateHealth));
 	const tlsTrusted = initialHealth?.tls_trusted;
 	const detail = !configured
 		? url
@@ -227,7 +260,11 @@ export default function EndpointAction({
 		? t("tunnelState", {
 				status: `${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`,
 			})
-		: t("tunnelUnknown");
+		: "";
+	const applicationError = initialHealth?.application_error;
+	const applicationErrorTitle = applicationError
+		? t("applicationError", { error: applicationError })
+		: "";
 
 	if (!url || !enabled) {
 		return (
@@ -271,13 +308,24 @@ export default function EndpointAction({
 					}
 				/>
 			)}
-			{external && (
+			{external && tunnelStatus && (
 				<i
 					className="fas fa-cloud"
 					style={{ color: tunnelColor(tunnelStatus), marginLeft: 6 }}
 					title={tunnelTitle}
 					aria-label={tunnelTitle}
 				/>
+			)}
+			{applicationError && (
+				<>
+					<i
+						className="fas fa-skull-crossbones"
+						style={{ color: "red", marginLeft: 6 }}
+						title={applicationErrorTitle}
+						aria-label={applicationErrorTitle}
+					/>{" "}
+					<span>{t("applicationErrorShort")}</span>
+				</>
 			)}
 		</a>
 	);

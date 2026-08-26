@@ -10,6 +10,7 @@ export type HomelabHealthEntry = {
 	tls_trusted?: boolean | null;
 	latency_ms?: number;
 	error?: string;
+	application_error?: string | null;
 	tunnel_status?: string | null;
 	tunnel_name?: string | null;
 	direct_state?: HomelabHealthState | null;
@@ -110,6 +111,7 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalBoolean(entry.tls_trusted) &&
 		validOptionalNumber(entry.latency_ms) &&
 		(entry.error === undefined || typeof entry.error === "string") &&
+		validOptionalString(entry.application_error) &&
 		validOptionalString(entry.tunnel_status) &&
 		validOptionalString(entry.tunnel_name) &&
 		validOptionalHealthState(entry.direct_state) &&

@@ -9,7 +9,7 @@
     "loading": "Loading homelab services…",
     "unavailable": "Homelab services are temporarily unavailable.",
     "endpoint": {
-      "external": "Web service (tunnel)",
+      "external": "Web service",
       "internal": "Internal",
       "networkError": "network error",
       "tlsError": "TLS error",
@@ -33,7 +33,9 @@
       "httpsInvalid": "HTTPS certificate invalid",
       "httpsTrusted": "HTTPS certificate trusted",
       "tunnelUnknown": "Cloudflare tunnel status not observed yet",
-      "tunnelState": "Cloudflare tunnel: {status}"
+      "tunnelState": "Cloudflare tunnel: {status}",
+      "applicationErrorShort": "Application error",
+      "applicationError": "Application error detected: {error}"
     },
     "truenas": {
       "down": "TrueNAS appears to be down",
