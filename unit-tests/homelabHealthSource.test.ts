@@ -58,7 +58,7 @@ test.afterEach(() => {
 	globalThis.fetch = ORIGINAL_FETCH;
 });
 
-test("homelab health parser accepts the FastAPI v2 contract", () => {
+test("homelab health parser accepts legacy and complete service-health contracts", () => {
 	assert.deepEqual(parseHomelabHealthSnapshot(VALID_SNAPSHOT), VALID_SNAPSHOT);
 	assert.deepEqual(
 		parseHomelabHealthSnapshot({ ...VALID_SNAPSHOT, services: [] }),
@@ -71,12 +71,25 @@ test("homelab health parser accepts the FastAPI v2 contract", () => {
 		}),
 		null,
 	);
-	assert.equal(
-		parseHomelabHealthSnapshot({
-			...VALID_SNAPSHOT,
-			services: [{ ...VALID_SNAPSHOT.services[0], state: "unknown" }],
-		}),
-		null,
+	const unknownServiceSnapshot = {
+		...VALID_SNAPSHOT,
+		schema_version: 4,
+		services: [
+			{
+				...VALID_SNAPSHOT.services[0],
+				id: "prometheus",
+				name: "Prometheus",
+				url: "https://prometheus.albandrieu.com/",
+				url_derived: true,
+				reachable: false,
+				http_status: 0,
+				state: "unknown",
+			},
+		],
+	};
+	assert.deepEqual(
+		parseHomelabHealthSnapshot(unknownServiceSnapshot),
+		unknownServiceSnapshot,
 	);
 	assert.equal(
 		parseHomelabHealthSnapshot({
