@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
+import styles from "./EndpointAction.module.css";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
+type TunnelIndicatorState = "healthy" | "missing" | "degraded" | "unknown";
 
 type Props = {
 	url?: string;
 	enabled: boolean;
 	external: boolean;
+	tunnelSecure: boolean;
 	label: string;
 	initialHealth?: HomelabHealthEntry;
 	truenasDown?: boolean;
@@ -40,12 +43,7 @@ function classifyHttpStatus(status: number): HealthState {
 }
 
 function snapshotHealth(entry: HomelabHealthEntry): HealthState {
-	// A functional error returned inside HTTP 2xx must win over transport health.
 	if (entry.application_error) return "fail";
-
-	// For the UI, a measured HTTP response proves the web service is alive even if
-	// secondary TrueNAS/Cloudflare evidence is stale. Authentication gates are also
-	// operational endpoints, so 401/403 are shown green rather than degraded.
 	if (
 		entry.reachable &&
 		((entry.http_status >= 200 && entry.http_status <= 399) ||
@@ -71,11 +69,21 @@ function tlsColor(trusted: boolean | null | undefined): string {
 	return "gray";
 }
 
-function tunnelColor(status: string | null | undefined): string {
-	const normalized = status?.trim().toLowerCase();
-	if (["healthy", "active", "up", "ok"].includes(normalized ?? "")) return "limegreen";
-	if (["degraded", "warning", "warn"].includes(normalized ?? "")) return "gold";
-	if (["down", "inactive", "failed", "fail"].includes(normalized ?? "")) return "red";
+function tunnelIndicatorState(
+	tunnelSecure: boolean,
+	entry?: HomelabHealthEntry,
+): TunnelIndicatorState {
+	if (!tunnelSecure || !entry) return "unknown";
+	const normalized = entry.tunnel_status?.trim().toLowerCase();
+	if (!normalized) return "missing";
+	if (["healthy", "active", "up", "ok"].includes(normalized)) return "healthy";
+	return "degraded";
+}
+
+function tunnelColor(state: TunnelIndicatorState): string {
+	if (state === "healthy") return "limegreen";
+	if (state === "missing") return "red";
+	if (state === "degraded") return "orange";
 	return "gray";
 }
 
@@ -138,6 +146,7 @@ export default function EndpointAction({
 	url,
 	enabled,
 	external,
+	tunnelSecure,
 	label,
 	initialHealth,
 	truenasDown = false,
@@ -153,8 +162,6 @@ export default function EndpointAction({
 	);
 
 	useEffect(() => {
-		// FastAPI reconciliation is authoritative when available because a browser
-		// cross-origin request can be blocked by CORS even when normal navigation works.
 		if (external || initialHealth || !url || !enabled) return;
 
 		let parsed: URL;
@@ -255,12 +262,20 @@ export default function EndpointAction({
 				: external
 					? t("publicSnapshotUnavailable")
 					: translateProbeDetail(privateDetail);
-	const tunnelStatus = initialHealth?.tunnel_status;
-	const tunnelTitle = tunnelStatus
-		? t("tunnelState", {
-				status: `${tunnelStatus}${initialHealth?.tunnel_name ? ` (${initialHealth.tunnel_name})` : ""}`,
-			})
-		: "";
+	const tunnelState = tunnelIndicatorState(tunnelSecure, initialHealth);
+	const tunnelTitle =
+		tunnelState === "healthy"
+			? t("tunnelConfigured", {
+					status: initialHealth?.tunnel_status ?? "healthy",
+					name: initialHealth?.tunnel_name ?? "Cloudflare",
+				})
+			: tunnelState === "missing"
+				? t("tunnelMissing")
+				: tunnelState === "degraded"
+					? t("tunnelDegraded", {
+							status: initialHealth?.tunnel_status ?? "unknown",
+						})
+					: t("tunnelUnknown");
 	const applicationError = initialHealth?.application_error;
 	const applicationErrorTitle = applicationError
 		? t("applicationError", { error: applicationError })
@@ -295,6 +310,11 @@ export default function EndpointAction({
 			title={`${external ? t("publicKind") : t("privateKind")} — ${detail}`}
 		>
 			<i className="fas fa-link" aria-hidden="true" /> {label}{" "}
+			{health === "pending" && (
+				<span className={styles.pending} aria-live="polite">
+					{t("pending")}
+				</span>
+			)}
 			{https && (
 				<i
 					className="fas fa-lock"
@@ -308,10 +328,10 @@ export default function EndpointAction({
 					}
 				/>
 			)}
-			{external && tunnelStatus && (
+			{tunnelSecure && (
 				<i
 					className="fas fa-cloud"
-					style={{ color: tunnelColor(tunnelStatus), marginLeft: 6 }}
+					style={{ color: tunnelColor(tunnelState), marginLeft: 6 }}
 					title={tunnelTitle}
 					aria-label={tunnelTitle}
 				/>

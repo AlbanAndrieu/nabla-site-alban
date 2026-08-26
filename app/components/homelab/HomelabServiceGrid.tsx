@@ -124,6 +124,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 											url={svc.tunnelUrl}
 											enabled={endpointEnabled}
 											external={isExternal}
+											tunnelSecure={svc.tunnelSecure === true}
 											label={t("endpoint.external")}
 											initialHealth={initialHealth}
 											truenasDown={truenasDown}

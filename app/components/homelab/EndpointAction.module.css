@@ -1,0 +1,22 @@
+.pending {
+	display: inline-block;
+	margin-left: 0.35rem;
+	font-weight: 700;
+	animation: endpoint-pending-blink 1s ease-in-out infinite;
+}
+
+@keyframes endpoint-pending-blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.25;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pending {
+		animation: none;
+	}
+}
