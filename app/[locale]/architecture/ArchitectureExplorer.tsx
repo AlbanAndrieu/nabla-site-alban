@@ -33,6 +33,7 @@ import {
 import styles from "./ArchitectureExplorer.module.css";
 
 type GraphMode = "ai" | "services";
+type RuntimeStatusWithFreshness = HomelabStatusSnapshot["runtime"] & { stale?: boolean };
 
 type ArchitectureNodeData = Record<string, unknown> & {
 	name: string;
