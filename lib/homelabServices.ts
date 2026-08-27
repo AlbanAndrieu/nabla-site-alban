@@ -57,16 +57,24 @@ export function homelabServiceId(service: HomelabService): string {
 		: slugifyServiceName(service.name);
 }
 
+const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>([
+	["truenas", "https://truenas.albandrieu.com:7000/"],
+	["pfsense", "https://home.albandrieu.com:10443/"],
+]);
+
 /**
  * Return the URL the user should open.
  *
- * endpointUrl is deliberately distinct from tunnelUrl: pfSense/TrueNAS can be
- * reached on explicit published ports even when Cloudflare/tunnel metadata uses
- * a host-only identity for health evidence.
+ * endpointUrl is deliberately distinct from tunnelUrl: pfSense/TrueNAS are
+ * published on explicit ports even while FastAPI/Cloudflare evidence keeps a
+ * host-only tunnel identity.
  */
 export function homelabServiceEndpointUrl(service: HomelabService): string {
 	const navigation = service.endpointUrl?.trim();
 	if (navigation) return navigation;
+
+	const override = NAVIGATION_ENDPOINT_OVERRIDES.get(homelabServiceId(service));
+	if (override) return override;
 
 	const explicit = service.tunnelUrl?.trim();
 	if (explicit) return explicit;
@@ -128,9 +136,12 @@ function applyLocalPresentationOverrides(
 	return {
 		...catalog,
 		services: catalog.services.map((service) => {
-			const local = LOCAL_PRESENTATION_BY_ID.get(homelabServiceId(service));
-			if (!local?.endpointUrl) return service;
-			return { ...service, endpointUrl: local.endpointUrl };
+			const serviceId = homelabServiceId(service);
+			const local = LOCAL_PRESENTATION_BY_ID.get(serviceId);
+			const endpointUrl =
+				NAVIGATION_ENDPOINT_OVERRIDES.get(serviceId) ?? local?.endpointUrl;
+			if (!endpointUrl) return service;
+			return { ...service, endpointUrl };
 		}),
 	};
 }
@@ -148,7 +159,7 @@ export function getStaticHomelabServicesCatalog(): {
 	primaryUrl: string;
 } {
 	return {
-		catalog: LOCAL_FALLBACK,
+		catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 		source: "local-fallback",
 		primaryUrl: primaryApiUrl(),
 	};
@@ -190,7 +201,7 @@ export async function loadHomelabServicesCatalog(): Promise<{
 			`[homelab-services] FastAPI catalog unavailable (${primaryUrl}): ${reason}; using local fallback`,
 		);
 		return {
-			catalog: LOCAL_FALLBACK,
+			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 			source: "local-fallback",
 			primaryUrl,
 		};
