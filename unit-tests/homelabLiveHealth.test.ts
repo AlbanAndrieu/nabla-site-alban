@@ -13,7 +13,10 @@ test("homelab service grid keeps endpoints clickable and matches FastAPI health 
 	assert.match(page, /const stableId = homelabServiceId\(service\)/);
 	assert.match(page, /index\.byId\.get\(stableId\)/);
 	assert.match(page, /index\.byName\.get\(normalizedName\(service\.name\)\)/);
-	assert.match(page, /lookupHealth\(serviceHealth, svc, endpointUrl\)/);
+	assert.match(
+		page,
+		/serviceHealthEvidence\(serviceHealth, svc, endpointUrl, snapshot\)/,
+	);
 	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
 	assert.match(page, /snapshotCheckedAt=\{snapshot\?\.checked_at\}/);
@@ -21,6 +24,20 @@ test("homelab service grid keeps endpoints clickable and matches FastAPI health 
 	assert.match(page, /external: service\.external === true/);
 	assert.match(page, /tunnelExpected: service\.tunnelSecure === true/);
 	assert.match(page, /state: reconciliation\.state/);
+});
+
+test("TrueNAS card uses the dedicated FastAPI public probe on port 7000", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(page, /function serviceHealthEvidence/);
+	assert.match(page, /homelabServiceId\(service\) !== "truenas"/);
+	assert.match(page, /snapshot\?\.truenas\?\.public/);
+	assert.match(page, /const publicHealth = snapshot\.truenas\.public/);
+	assert.match(page, /state: snapshot\.truenas\.state/);
+	assert.match(page, /direct_state: publicHealth\.state/);
+	assert.match(
+		page,
+		/generic\?\.internal_state \?\? snapshot\.truenas\.internal\?\.state \?\? null/,
+	);
 });
 
 test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
@@ -35,6 +52,7 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	assert.match(page, /internalPresentationState\(initialHealth\)/);
 	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\)/);
+	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
 	assert.match(page, /style=\{\{ color: internalColor, borderColor: internalColor \}\}/);
 	assert.match(page, /data-health-state=\{internalState\}/);
 });
