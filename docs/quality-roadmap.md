@@ -105,6 +105,26 @@ les autres chantiers.
   fraîchement observable.
 - [ ] Réconcilier la santé de chaque service depuis les preuves HTTP directes,
   le runtime TrueNAS et les ingress Cloudflare plutôt que depuis un probe unique.
+- [ ] Propager les dépendances `strength=required` fournies par `fastapi-sample`
+  dans l'état final : distinguer `local_state`, `dependency_state` et
+  `effective_state`, puis afficher `required_dependencies`, `blocked_by` et les
+  preuves ayant provoqué la dégradation.
+- [ ] Utiliser `effective_state` comme couleur principale des cartes/nœuds tout en
+  conservant un indicateur local/runtime afin qu'un service `RUNNING` mais bloqué
+  par PostgreSQL, ClickHouse, Redis, MinIO ou une autre dépendance requise soit
+  explicitement affiché comme dégradé.
+- [ ] Unifier la politique de santé de **tous** les diagrammes React Flow et de la
+  grille des services avec un resolver partagé ; les dépendances requises portent
+  l'état de leur cible, les relations optionnelles restent secondaires.
+- [ ] Distinguer visuellement les arêtes de dépendance des chemins d'exposition :
+  `HAProxy direct`, `Cloudflare Tunnel`, `LAN/VPN only` et routage interne ; garder
+  visibles les ports structurants `7000`, `10443` et `9922`.
+- [ ] Ne jamais utiliser l'état Cloudflare comme preuve du chemin TrueNAS direct
+  `Internet -> pfSense:7000 -> HAProxy -> TrueNAS`.
+- [ ] Centraliser les types/tokens/helpers d'état et les composants de preuve afin
+  que `/truenas#homelab`, `/architecture` et les futurs graphes ne développent pas
+  des conventions de couleurs divergentes. Voir `docs/homelab-dependency-health-ui.md`
+  et l'issue #89.
 - [ ] Rafraîchir automatiquement le snapshot de santé dans l'UI en conservant le
   dernier état valide pendant une panne transitoire du backend.
 - [ ] Afficher explicitement la preuve ayant conduit à vert/orange/rouge et l'âge
@@ -114,6 +134,9 @@ les autres chantiers.
 - [ ] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
   multi-services (par exemple Elasticsearch/Kibana) et les services auxiliaires
   qui ne doivent pas devenir des nœuds fonctionnels par erreur.
+- [ ] Ajouter une couverture visuelle/Playwright light/dark/mobile des états
+  `healthy`, `degraded`, `failed`, `stale` et `unknown` après migration des
+  diagrammes vers le resolver partagé.
 
 ## P1 — Résilience DNS et politique de résolution
 
@@ -264,8 +287,10 @@ Autres contrôles :
 
 ## Ordre de livraison réévalué
 
-1. Santé homelab : réconciliation HTTP + TrueNAS + Cloudflare, auto-refresh et
-   âge/preuve du snapshot.
+1. Santé homelab : propagation des dépendances `required` dans FastAPI,
+   réconciliation HTTP + TrueNAS + Cloudflare, puis adoption de l'état effectif
+   partagé par les cartes et tous les diagrammes React Flow avec âge/preuve du
+   snapshot.
 2. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
    de panne sans dépendance unique à TrueNAS Apps.
 3. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
