@@ -64,10 +64,14 @@ function lookupHealth(
 }
 
 function reconciledHealth(
-	entry?: HomelabHealthEntry,
+	entry: HomelabHealthEntry | undefined,
+	service: HomelabService,
 ): HomelabHealthEntry | undefined {
 	if (!entry) return undefined;
-	const reconciliation = reconcileHomelabHealth(entry);
+	const reconciliation = reconcileHomelabHealth(entry, {
+		external: service.external === true,
+		tunnelExpected: service.tunnelSecure === true,
+	});
 	return { ...entry, state: reconciliation.state };
 }
 
@@ -77,9 +81,6 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 	const serviceHealth = healthIndex(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
-	// A cloud runtime cannot normally reach the private 172.17.x.x address. If the
-	// public TrueNAS endpoint is reachable, an internal-probe failure must not mark
-	// the host itself as down.
 	const truenasPublicUp =
 		truenasPublic?.reachable === true && truenasPublic.state !== "fail";
 	const truenasDown = !truenasPublicUp && snapshot?.truenas?.state === "fail";
@@ -117,11 +118,10 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 					const isExternal = svc.external === true;
 					const endpointUrl = homelabServiceEndpointUrl(svc);
-					// Exposure policy and navigation are independent. Only an explicit
-					// endpointEnabled=false disables the link.
 					const endpointEnabled = svc.endpointEnabled !== false;
 					const initialHealth = reconciledHealth(
 						lookupHealth(serviceHealth, svc, endpointUrl),
+						svc,
 					);
 
 					return (
