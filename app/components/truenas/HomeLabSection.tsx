@@ -21,6 +21,14 @@ export default async function HomeLabSection({
 				</AnchoredHeading>
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<p>{t("purpose")}</p>
+				<div className="alert alert-secondary" role="note">
+					<strong>FastAPI Cloud → Internet → pfSense:7000 → HAProxy → TrueNAS</strong>
+					<p className="small mb-0 mt-2">
+						The public TrueNAS endpoint is exposed through pfSense and HAProxy so
+						FastAPI Cloud can perform controlled health and API probes without
+						exposing the TrueNAS host directly.
+					</p>
+				</div>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
