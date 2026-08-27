@@ -1,7 +1,7 @@
 .shell {
 	position: relative;
-	height: clamp(34rem, 68vh, 52rem);
-	min-height: 34rem;
+	height: clamp(46rem, 84vh, 64rem);
+	min-height: 46rem;
 	margin-bottom: 1rem;
 	overflow: hidden;
 	border: 1px solid #475569;
@@ -24,10 +24,10 @@
 
 .node {
 	display: grid;
-	gap: 0.55rem;
-	width: 15rem;
+	gap: 0.5rem;
+	width: 14.5rem;
 	min-height: 7.4rem;
-	padding: 0.85rem;
+	padding: 0.8rem;
 	border: 1.5px solid #64748b;
 	border-radius: 0.8rem;
 	background: linear-gradient(145deg, #172033, #0f172a 68%);
@@ -45,12 +45,16 @@
 
 .node code {
 	justify-self: start;
+	max-width: 100%;
 	padding: 0.18rem 0.42rem;
+	overflow: hidden;
 	border: 1px solid #334155;
 	border-radius: 999px;
 	background: #020617;
 	color: #dbeafe;
-	font-size: 0.72rem;
+	font-size: 0.7rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .nodeHeader {
@@ -79,6 +83,18 @@
 	font-weight: 650;
 }
 
+.badge {
+	justify-self: start;
+	padding: 0.18rem 0.42rem;
+	border: 1px solid #475569;
+	border-radius: 999px;
+	background: rgb(15 23 42 / 80%);
+	color: #f8fafc;
+	font-size: 0.62rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+}
+
 .wan {
 	border-color: #38bdf8;
 }
@@ -96,6 +112,22 @@
 
 .wifi {
 	border-color: #f59e0b;
+}
+
+.cloudflare {
+	border-color: #fb923c;
+}
+
+.proxy {
+	border-color: #c084fc;
+}
+
+.container {
+	border-color: #22d3ee;
+}
+
+.app {
+	border-color: #a78bfa;
 }
 
 .selected {
@@ -137,14 +169,16 @@
 	bottom: 0.75rem;
 	z-index: 5;
 	display: flex;
+	max-width: calc(100% - 1.5rem);
 	flex-wrap: wrap;
+	justify-content: flex-end;
 	gap: 0.65rem;
-	padding: 0.4rem 0.6rem;
+	padding: 0.45rem 0.65rem;
 	border: 1px solid #475569;
-	border-radius: 999px;
+	border-radius: 0.8rem;
 	background: rgb(15 23 42 / 92%);
 	color: #e2e8f0;
-	font-size: 0.7rem;
+	font-size: 0.68rem;
 	font-weight: 700;
 	backdrop-filter: blur(8px);
 }
@@ -173,10 +207,22 @@
 	background: #f59e0b;
 }
 
+.haproxyDot {
+	background: #c084fc;
+}
+
+.tunnelDot {
+	background: #fb923c;
+}
+
+.dnsDot {
+	background: #a3e635;
+}
+
 @media (max-width: 700px) {
 	.shell {
-		height: 38rem;
-		min-height: 38rem;
+		height: 44rem;
+		min-height: 44rem;
 	}
 
 	.node {
@@ -184,9 +230,8 @@
 	}
 
 	.legend {
-		left: 50%;
-		right: auto;
-		transform: translateX(-50%);
-		white-space: nowrap;
+		left: 0.75rem;
+		right: 0.75rem;
+		justify-content: center;
 	}
 }
