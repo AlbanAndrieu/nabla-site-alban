@@ -55,6 +55,19 @@ function snapshotHealth(entry: HomelabHealthEntry): HealthState {
 	return entry.state;
 }
 
+function hasAuthoritativeEvidence(entry?: HomelabHealthEntry): boolean {
+	if (!entry) return false;
+	return Boolean(
+		entry.application_error ||
+			entry.direct_state != null ||
+			entry.internal_state != null ||
+			entry.runtime_state != null ||
+			entry.tunnel_status?.trim() ||
+			entry.http_status > 0 ||
+			entry.state !== "unknown",
+	);
+}
+
 function tunnelIndicatorState(
 	tunnelSecure: boolean,
 	entry?: HomelabHealthEntry,
@@ -119,11 +132,7 @@ async function probePrivateEndpoint(
 	}
 
 	const origin = new URL(url).origin.replace(/\/$/, "");
-	for (const path of [
-		"/favicon.ico",
-		"/favicon.png",
-		"/apple-touch-icon.png",
-	]) {
+	for (const path of ["/favicon.ico", "/favicon.png", "/apple-touch-icon.png"]) {
 		if (await probeImage(`${origin}${path}?_np=${Date.now()}`, signal)) {
 			return { state: "ok", detail: { kind: "favicon" } };
 		}
@@ -145,20 +154,15 @@ export default function EndpointAction({
 	const t = useTranslations("homelab.endpoint");
 	const configured = enabled && Boolean(url);
 	const https = isHttpsEndpoint(url);
+	const authoritativeSnapshot = hasAuthoritativeEvidence(initialHealth);
+	const supplementWithPrivateProbe =
+		configured && !external && !authoritativeSnapshot;
 	const [privateHealth, setPrivateHealth] = useState<HealthState>(
-		configured && !external ? "pending" : "unknown",
+		supplementWithPrivateProbe ? "pending" : "unknown",
 	);
 	const [privateDetail, setPrivateDetail] = useState<ProbeDetail>(
 		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
-	const hasAuthoritativeEndpointEvidence = Boolean(
-		initialHealth?.application_error ||
-			initialHealth?.direct_state != null ||
-			initialHealth?.internal_state != null ||
-			initialHealth?.state === "fail",
-	);
-	const supplementWithPrivateProbe =
-		configured && !external && !hasAuthoritativeEndpointEvidence;
 
 	useEffect(() => {
 		if (!supplementWithPrivateProbe || !url) return;
@@ -225,8 +229,7 @@ export default function EndpointAction({
 	};
 
 	const fastApiHealthDetail = (entry: HomelabHealthEntry): string => {
-		const status =
-			entry.http_status > 0 ? String(entry.http_status) : "not probed";
+		const status = entry.http_status > 0 ? String(entry.http_status) : "not probed";
 		const latency =
 			typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 		const tls = entry.tls_trusted === false ? `, ${t("tlsError")}` : "";
@@ -246,24 +249,23 @@ export default function EndpointAction({
 		return `${t("fastApiSnapshot", { status })}${tls}${tunnel}${runtime}${internal}${latency}${applicationError}${error}`;
 	};
 
-	const reconciledSnapshotHealth = initialHealth?.state;
-	const effectiveSnapshotHealth = initialHealth
-		? snapshotHealth(initialHealth)
-		: reconciledSnapshotHealth;
+	const snapshotState = initialHealth ? snapshotHealth(initialHealth) : undefined;
 	const privateProbeIsAuthoritative =
 		privateDetail.kind === "http" || privateDetail.kind === "favicon";
 	const health: HealthState = truenasDown
 		? "fail"
-		: supplementWithPrivateProbe && privateHealth === "pending"
-			? "pending"
-			: supplementWithPrivateProbe && privateProbeIsAuthoritative
-				? privateHealth
-				: (effectiveSnapshotHealth ??
-					(external
-						? "unknown"
-						: privateHealth === "fail"
+		: authoritativeSnapshot && snapshotState
+			? snapshotState
+			: supplementWithPrivateProbe && privateHealth === "pending"
+				? "pending"
+				: supplementWithPrivateProbe && privateProbeIsAuthoritative
+					? privateHealth
+					: (snapshotState ??
+						(external
 							? "unknown"
-							: privateHealth));
+							: privateHealth === "fail"
+								? "unknown"
+								: privateHealth));
 	const tlsTrusted = initialHealth?.tls_trusted;
 	const browserDetail = translateProbeDetail(privateDetail);
 	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
@@ -273,13 +275,15 @@ export default function EndpointAction({
 			: t("noUrl")
 		: truenasDown
 			? t("dependencyDown")
-			: supplementWithPrivateProbe
-				? `${browserDetail}${apiDetail ? `; ${apiDetail}` : ""}`
-				: initialHealth
-					? apiDetail
-					: external
-						? t("publicSnapshotUnavailable")
-						: browserDetail;
+			: authoritativeSnapshot && initialHealth
+				? apiDetail
+				: supplementWithPrivateProbe
+					? `${browserDetail}${apiDetail ? `; ${apiDetail}` : ""}`
+					: initialHealth
+						? apiDetail
+						: external
+							? t("publicSnapshotUnavailable")
+							: browserDetail;
 	const tunnelState = tunnelIndicatorState(tunnelSecure, initialHealth);
 	const tunnelTitle =
 		tunnelState === "healthy"
@@ -302,17 +306,12 @@ export default function EndpointAction({
 	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
-		typeof initialHealth?.http_status === "number" &&
-		initialHealth.http_status > 0
+		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
 			? `HTTP ${initialHealth.http_status}`
 			: null,
 		initialHealth?.direct_state ? `direct ${initialHealth.direct_state}` : null,
-		initialHealth?.runtime_state
-			? `TrueNAS ${initialHealth.runtime_state}`
-			: null,
-		initialHealth?.internal_state
-			? `internal ${initialHealth.internal_state}`
-			: null,
+		initialHealth?.runtime_state ? `TrueNAS ${initialHealth.runtime_state}` : null,
+		initialHealth?.internal_state ? `internal ${initialHealth.internal_state}` : null,
 		showCloudflare && initialHealth?.tunnel_status
 			? `Cloudflare ${initialHealth.tunnel_status}`
 			: null,
