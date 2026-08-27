@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 26 août 2026.
+Dernière vérification : 27 août 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -54,6 +54,15 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Introduire des design tokens partagés de base pour les pages Next.js.
 - [x] Renforcer les tokens/contrastes spécifiques aux graphes Architecture et à
   la page TrueNAS dark-mode.
+- [ ] Auditer l'ensemble des pages en thème clair et sombre et supprimer les
+  combinaisons incohérentes issues du mélange Bootstrap/CSS historique (par
+  exemple texte clair forcé sur surface Bootstrap claire).
+- [ ] Définir des tokens sémantiques explicites `surface`, `surface-muted`,
+  `text-primary`, `text-secondary`, `border`, `link`, `success`, `warning` et
+  `danger` pour les deux thèmes, avec un contraste WCAG AA au minimum.
+- [ ] Ajouter une vérification visuelle automatisée light/dark sur les pages
+  prioritaires (`/`, `/truenas`, `/architecture`, `/ai`, `/contact`, `/cv`) afin
+  d'empêcher les régressions de contraste lors des migrations Bootstrap/CSS.
 - [ ] Normaliser les tokens globaux pour couleurs, surfaces, espacements, rayons,
   typographie et états success/warning/danger.
 - [ ] Introduire les primitives `Button`, `Card`, `Container`, `Section`, `Badge`,
@@ -236,7 +245,8 @@ Autres contrôles :
 1. Santé homelab : réconciliation HTTP + TrueNAS + Cloudflare, auto-refresh et
    âge/preuve du snapshot.
 2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
-3. Design system partagé : tokens globaux puis primitives Footer/RouteHeader.
+3. Design system partagé : audit light/dark et tokens globaux, puis primitives
+   Footer/RouteHeader.
 4. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
 5. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
 6. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
