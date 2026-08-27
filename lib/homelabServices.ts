@@ -1,3 +1,4 @@
+import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
@@ -57,10 +58,9 @@ export function homelabServiceId(service: HomelabService): string {
 		: slugifyServiceName(service.name);
 }
 
-const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>([
-	["truenas", "https://truenas.albandrieu.com:7000/"],
-	["pfsense", "https://home.albandrieu.com:10443/"],
-]);
+const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(
+	Object.entries(navigationOverrides),
+);
 
 /**
  * Return the URL the user should open.
