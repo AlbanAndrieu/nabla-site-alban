@@ -111,8 +111,14 @@ function serviceHealthEvidence(
 function reconciledHealth(
 	entry: HomelabHealthEntry | undefined,
 	service: HomelabService,
+	schemaVersion?: number,
 ): HomelabHealthEntry | undefined {
 	if (!entry) return undefined;
+	// Schema v4 is already reconciled server-side from HTTP, TrueNAS runtime,
+	// internal probes and Cloudflare evidence. Do not turn FastAPI `warn` into a
+	// misleading green state by applying a second, different browser policy.
+	if ((schemaVersion ?? 0) >= 4) return entry;
+
 	const reconciliation = reconcileHomelabHealth(entry, {
 		external: service.external === true,
 		tunnelExpected: service.tunnelSecure === true,
@@ -190,6 +196,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					const initialHealth = reconciledHealth(
 						serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
 						svc,
+						snapshot?.schema_version,
 					);
 					const dependsOnTrueNas =
 						svc.internalHost === "172.17.0.24" ||
