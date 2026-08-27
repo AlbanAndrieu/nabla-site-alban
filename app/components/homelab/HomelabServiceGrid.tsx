@@ -19,6 +19,8 @@ import EndpointAction from "./EndpointAction";
 type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
+	healthUnavailable?: boolean;
+	healthHttpStatus?: number | null;
 };
 
 type HealthIndex = {
@@ -27,11 +29,21 @@ type HealthIndex = {
 	byName: Map<string, HomelabHealthEntry>;
 };
 
+type RuntimePresentationState = HomelabHealthState | "missing";
+
 const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
 	ok: "btn-outline-success",
 	warn: "btn-outline-warning",
 	fail: "btn-outline-danger",
 	unknown: "btn-outline-secondary",
+};
+
+const RUNTIME_ICON_CLASS: Record<RuntimePresentationState, string> = {
+	ok: "fas fa-circle-check",
+	warn: "fas fa-triangle-exclamation",
+	fail: "fas fa-circle-xmark",
+	unknown: "fas fa-circle-question",
+	missing: "fas fa-skull-crossbones",
 };
 
 function serviceIconPath(iconSrc?: string): string {
@@ -101,7 +113,10 @@ function serviceHealthEvidence(
 		id: generic?.id ?? publicHealth.id ?? "truenas",
 		name: generic?.name ?? publicHealth.name,
 		url: publicHealth.url,
-		state: snapshot.truenas.state,
+		// The clickable TrueNAS line represents the public :7000 HTTP endpoint.
+		// Keep API/runtime degradation as a separate warning instead of turning a
+		// reachable UI gray/orange because app.query is rebooting or unavailable.
+		state: publicHealth.state,
 		direct_state: publicHealth.state,
 		internal_state:
 			generic?.internal_state ?? snapshot.truenas.internal?.state ?? null,
@@ -149,17 +164,64 @@ function internalPresentationState(
 	);
 }
 
-export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
+function runtimePresentationState(
+	entry: HomelabHealthEntry | undefined,
+	dependsOnTrueNas: boolean,
+	serviceId: string,
+	runtimeUnavailable: boolean,
+	runtimeStale: boolean,
+): RuntimePresentationState | null {
+	if (!dependsOnTrueNas || serviceId === "truenas") return null;
+	if (runtimeUnavailable || runtimeStale) return "missing";
+	return runtimeHealthState(entry?.runtime_state) ?? "missing";
+}
+
+export default function HomelabServiceGrid({
+	catalog,
+	snapshot,
+	healthUnavailable = false,
+	healthHttpStatus = null,
+}: Props) {
 	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
 	const serviceHealth = healthIndex(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
+	const truenasApi = snapshot?.truenas?.api;
 	const truenasPublicUp =
 		truenasPublic?.reachable === true && truenasPublic.state !== "fail";
 	const truenasDown = !truenasPublicUp && snapshot?.truenas?.state === "fail";
 	const truenasWarning =
 		!truenasPublicUp && snapshot?.truenas?.state === "warn";
+	const truenasRuntimeUnavailable =
+		healthUnavailable ||
+		truenasApi?.reachable === false ||
+		snapshot?.truenas_runtime_reachable === false;
+	const truenasRuntimeStale = snapshot?.truenas_runtime_stale === true;
+	const runtimeWarningDetails: string[] = [];
+	if (healthUnavailable) {
+		runtimeWarningDetails.push(
+			t("truenas.liveSnapshotUnavailable", {
+				status:
+					healthHttpStatus === null
+						? t("truenas.networkError")
+						: `HTTP ${healthHttpStatus}`,
+			}),
+		);
+	}
+	if (truenasApi?.reachable === false) {
+		runtimeWarningDetails.push(
+			t("truenas.apiUnavailable", {
+				error: truenasApi.error?.trim() || t("truenas.noErrorDetail"),
+			}),
+		);
+	}
+	if (snapshot?.truenas_runtime_reachable === false) {
+		runtimeWarningDetails.push(t("truenas.runtimeUnavailable"));
+	}
+	if (truenasRuntimeStale) {
+		runtimeWarningDetails.push(t("truenas.runtimeStale"));
+	}
 
 	return (
 		<>
@@ -186,8 +248,21 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					. {t("truenas.dependencyNote")}
 				</div>
 			)}
+
+			{(truenasRuntimeUnavailable || truenasRuntimeStale) && (
+				<div className="alert alert-warning" role="alert" data-truenas-runtime-warning>
+					<strong>
+						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
+						{t("truenas.runtimeDataUnavailable")}
+					</strong>
+					{" — "}
+					{runtimeWarningDetails.join(" ")} {t("truenas.runtimeDependencyNote")}
+				</div>
+			)}
+
 			<div className="row service-grid">
 				{services.map((svc) => {
+					const serviceId = homelabServiceId(svc);
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 					const isExternal = svc.external === true;
@@ -203,11 +278,40 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 						initialHealth?.runtime_app != null;
 					const internalState = internalPresentationState(initialHealth);
 					const internalColor = homelabHealthColor(internalState);
+					const runtimeState = runtimePresentationState(
+						initialHealth,
+						dependsOnTrueNas,
+						serviceId,
+						truenasRuntimeUnavailable,
+						truenasRuntimeStale,
+					);
+					const runtimeColor =
+						runtimeState === "missing"
+							? homelabHealthColor("unknown")
+							: runtimeState
+								? homelabHealthColor(runtimeState)
+								: undefined;
+					const runtimeTitle =
+						runtimeState === "ok"
+							? t("runtime.running", {
+									state: initialHealth?.runtime_state ?? "RUNNING",
+								})
+							: runtimeState === "fail"
+								? t("runtime.failed", {
+										state: initialHealth?.runtime_state ?? "FAILED",
+									})
+								: runtimeState === "warn"
+									? t("runtime.degraded", {
+											state: initialHealth?.runtime_state ?? "UNKNOWN",
+										})
+									: runtimeState === "missing"
+										? t("runtime.missing")
+										: undefined;
 
 					return (
 						<div
 							className="col-md-4 p-3"
-							key={`${homelabServiceId(svc)}:${endpointUrl}`}
+							key={`${serviceId}:${endpointUrl}`}
 						>
 							<div className="card box-shadow h-100 service-card-ux">
 								<img
@@ -221,7 +325,18 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 									style={{ minHeight: 60, minWidth: 60, height: "auto" }}
 								/>
 								<div className="card-body text-center border-top border-secondary">
-									<h3 className="h5 card-title mb-1">{svc.name}</h3>
+									<h3 className="h5 card-title mb-1">
+										{svc.name}
+										{runtimeState && runtimeTitle && (
+											<i
+												className={RUNTIME_ICON_CLASS[runtimeState]}
+												style={{ color: runtimeColor, marginLeft: 8 }}
+												title={runtimeTitle}
+												aria-label={runtimeTitle}
+												data-truenas-runtime-state={runtimeState}
+											/>
+										)}
+									</h3>
 									<p className="card-text text-muted small mb-0">
 										{svc.description}
 									</p>
@@ -271,6 +386,47 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 						</div>
 					);
 				})}
+			</div>
+
+			<div
+				className="d-flex flex-wrap justify-content-center gap-3 small text-muted mt-3"
+				role="note"
+				aria-label={t("runtime.legendTitle")}
+				data-truenas-runtime-legend
+			>
+				<strong>{t("runtime.legendTitle")}:</strong>
+				<span>
+					<i
+						className={RUNTIME_ICON_CLASS.ok}
+						style={{ color: homelabHealthColor("ok") }}
+						aria-hidden="true"
+					/>{" "}
+					{t("runtime.legendRunning")}
+				</span>
+				<span>
+					<i
+						className={RUNTIME_ICON_CLASS.warn}
+						style={{ color: homelabHealthColor("warn") }}
+						aria-hidden="true"
+					/>{" "}
+					{t("runtime.legendDegraded")}
+				</span>
+				<span>
+					<i
+						className={RUNTIME_ICON_CLASS.fail}
+						style={{ color: homelabHealthColor("fail") }}
+						aria-hidden="true"
+					/>{" "}
+					{t("runtime.legendFailed")}
+				</span>
+				<span>
+					<i
+						className={RUNTIME_ICON_CLASS.missing}
+						style={{ color: homelabHealthColor("unknown") }}
+						aria-hidden="true"
+					/>{" "}
+					{t("runtime.legendMissing")}
+				</span>
 			</div>
 		</>
 	);

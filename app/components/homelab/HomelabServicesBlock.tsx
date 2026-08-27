@@ -8,10 +8,17 @@ import HomelabServiceGrid from "./HomelabServiceGrid";
 
 const HEALTH_REFRESH_MS = 30_000;
 
+type HealthFetchResult = {
+	snapshot: HomelabHealthSnapshot | null;
+	status: number | null;
+};
+
 type State = {
 	catalog: HomelabServicesCatalog | null;
 	snapshot: HomelabHealthSnapshot | null;
 	error: boolean;
+	healthUnavailable: boolean;
+	healthStatus: number | null;
 };
 
 async function fetchCatalog(
@@ -25,20 +32,22 @@ async function fetchCatalog(
 	return (await response.json()) as HomelabServicesCatalog;
 }
 
-async function fetchHealth(
-	signal: AbortSignal,
-): Promise<HomelabHealthSnapshot | null> {
+async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	try {
 		const response = await fetch("/api/homelab-health", {
 			cache: "no-store",
 			signal,
 		});
-		return response.ok
-			? ((await response.json()) as HomelabHealthSnapshot)
-			: null;
+		if (!response.ok) {
+			return { snapshot: null, status: response.status };
+		}
+		return {
+			snapshot: (await response.json()) as HomelabHealthSnapshot,
+			status: response.status,
+		};
 	} catch (error) {
 		if (signal.aborted) throw error;
-		return null;
+		return { snapshot: null, status: null };
 	}
 }
 
@@ -48,6 +57,8 @@ export default function HomelabServicesBlock() {
 		catalog: null,
 		snapshot: null,
 		error: false,
+		healthUnavailable: false,
+		healthStatus: null,
 	});
 
 	useEffect(() => {
@@ -58,13 +69,16 @@ export default function HomelabServicesBlock() {
 			if (document.hidden) return;
 			refreshController?.abort();
 			refreshController = new AbortController();
-			const snapshot = await fetchHealth(refreshController.signal);
+			const health = await fetchHealth(refreshController.signal);
 			if (!refreshController.signal.aborted) {
 				setState((current) => ({
 					...current,
-					// Keep the last known good snapshot during transient backend failures.
-					snapshot: snapshot ?? current.snapshot,
-					error: current.catalog === null && snapshot === null,
+					// Keep the last known snapshot for context, but explicitly mark it stale
+					// when the live FastAPI refresh fails so the UI never hides a 503/reboot.
+					snapshot: health.snapshot ?? current.snapshot,
+					healthUnavailable: health.snapshot === null,
+					healthStatus: health.status,
+					error: current.catalog === null && health.snapshot === null,
 				}));
 			}
 		};
@@ -73,14 +87,24 @@ export default function HomelabServicesBlock() {
 			fetchCatalog(initialController.signal),
 			fetchHealth(initialController.signal),
 		])
-			.then(([catalog, snapshot]) => {
+			.then(([catalog, health]) => {
 				if (!initialController.signal.aborted) {
-					setState({ catalog, snapshot, error: false });
+					setState({
+						catalog,
+						snapshot: health.snapshot,
+						error: false,
+						healthUnavailable: health.snapshot === null,
+						healthStatus: health.status,
+					});
 				}
 			})
 			.catch(() => {
 				if (!initialController.signal.aborted) {
-					setState((current) => ({ ...current, error: true }));
+					setState((current) => ({
+						...current,
+						error: true,
+						healthUnavailable: true,
+					}));
 				}
 			});
 
@@ -109,6 +133,11 @@ export default function HomelabServicesBlock() {
 	}
 
 	return (
-		<HomelabServiceGrid catalog={state.catalog} snapshot={state.snapshot} />
+		<HomelabServiceGrid
+			catalog={state.catalog}
+			snapshot={state.snapshot}
+			healthUnavailable={state.healthUnavailable}
+			healthHttpStatus={state.healthStatus}
+		/>
 	);
 }

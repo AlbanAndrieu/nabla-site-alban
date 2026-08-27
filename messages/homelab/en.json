@@ -45,6 +45,17 @@
 			"snapshotAge": "snapshot {seconds}s old",
 			"snapshotAgeUnknown": "snapshot age unknown"
 		},
+		"runtime": {
+			"running": "TrueNAS reports application state {state}",
+			"failed": "TrueNAS reports application failure state {state}",
+			"degraded": "TrueNAS reports transitional/degraded application state {state}",
+			"missing": "No current TrueNAS application status is available",
+			"legendTitle": "TrueNAS application status",
+			"legendRunning": "running / healthy",
+			"legendDegraded": "transitional / degraded",
+			"legendFailed": "stopped / failed",
+			"legendMissing": "no current runtime status"
+		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",
@@ -52,6 +63,14 @@
 			"internalProbe": "internal {host}:{port} {state}",
 			"internalUnavailable": "internal probe unavailable from this runtime",
 			"dependencyNote": "External services depending on this host are shown as unavailable when TrueNAS is down.",
+			"runtimeDataUnavailable": "TrueNAS application status cannot be refreshed",
+			"liveSnapshotUnavailable": "Live FastAPI health refresh failed ({status}); the UI is showing the last known snapshot where available.",
+			"apiUnavailable": "TrueNAS API probe is unavailable: {error}.",
+			"runtimeUnavailable": "The TrueNAS app.query runtime is unreachable.",
+			"runtimeStale": "The TrueNAS runtime snapshot is stale.",
+			"runtimeDependencyNote": "Application runtime icons use a skull until a current TrueNAS status is available.",
+			"networkError": "network error",
+			"noErrorDetail": "no error detail",
 			"internalTlsTitle": "Internal TLS certificate is not verified by the server-side TCP probe",
 			"internalTlsAria": "Internal HTTPS certificate status unknown"
 		}

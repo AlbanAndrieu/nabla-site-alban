@@ -32,11 +32,18 @@ export type HomelabInternalHealthEntry = {
 	error?: string;
 };
 
+export type TrueNasApiHealth = {
+	reachable: boolean;
+	error?: string;
+};
+
 export type TrueNasHealth = {
 	state: VerifiedHomelabHealthState;
 	public?: HomelabHealthEntry | null;
 	internal?: HomelabInternalHealthEntry | null;
+	api?: TrueNasApiHealth | null;
 	internal_probe_enabled?: boolean;
+	verify_ssl?: boolean;
 };
 
 export type HomelabHealthSnapshot = {
@@ -160,6 +167,11 @@ function validInternalHealthEntry(
 	);
 }
 
+function validTrueNasApiHealth(value: unknown): value is TrueNasApiHealth {
+	if (!isRecord(value) || typeof value.reachable !== "boolean") return false;
+	return value.error === undefined || typeof value.error === "string";
+}
+
 function validTrueNasHealth(value: unknown): value is TrueNasHealth {
 	if (!isRecord(value) || !isVerifiedHealthState(value.state)) return false;
 	if (
@@ -176,7 +188,17 @@ function validTrueNasHealth(value: unknown): value is TrueNasHealth {
 	) {
 		return false;
 	}
-	return validOptionalBoolean(value.internal_probe_enabled);
+	if (
+		value.api !== undefined &&
+		value.api !== null &&
+		!validTrueNasApiHealth(value.api)
+	) {
+		return false;
+	}
+	return (
+		validOptionalBoolean(value.internal_probe_enabled) &&
+		validOptionalBoolean(value.verify_ssl)
+	);
 }
 
 export function parseHomelabHealthSnapshot(
