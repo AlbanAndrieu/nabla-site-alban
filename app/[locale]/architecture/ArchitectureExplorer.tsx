@@ -28,6 +28,11 @@ import {
 	isHttpsEndpoint,
 	tlsIndicatorColor,
 } from "@/lib/homelabHealthPresentation";
+import {
+	blockedDependencyLabels,
+	requiredDependencyTargetState,
+	resolveEffectiveServiceState,
+} from "@/lib/homelabHealthResolver";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
 	type HomelabStatusService,
@@ -62,6 +67,8 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	reconciliation?: string;
 	runtimeState?: string;
 	healthState?: HomelabHealthState;
+	localHealthState?: HomelabHealthState;
+	blockedBy?: string[];
 	tlsTrusted?: boolean | null;
 	cloudflareObserved?: boolean;
 	cloudflareStatus?: string | null;
@@ -85,8 +92,15 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 		: undefined;
 	const https = isHttpsEndpoint(item.url);
 	const healthLabel = item.healthState
-		? `Health: ${item.healthState}`
+		? `Health: ${item.healthState}${item.localHealthState && item.localHealthState !== item.healthState ? ` (local ${item.localHealthState})` : ""}`
 		: "Health unavailable";
+	const dependencyDegraded =
+		(item.blockedBy?.length ?? 0) > 0 ||
+		Boolean(
+			item.localHealthState &&
+				item.healthState &&
+				item.localHealthState !== item.healthState,
+		);
 	return (
 		<div
 			className={`${styles.node} ${selected ? styles.nodeSelected : ""}`}
@@ -174,6 +188,16 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 				<span className={styles.runtimeBadge}>
 					{item.reconciliation.replaceAll("_", " ")}
 					{item.runtimeState ? ` · ${item.runtimeState}` : ""}
+				</span>
+			) : null}
+			{dependencyDegraded ? (
+				<span
+					className={styles.runtimeBadge}
+					data-dependency-health
+					title={healthLabel}
+				>
+					⚠ dependency
+					{item.blockedBy?.length ? ` · ${item.blockedBy.join(", ")}` : ""}
 				</span>
 			) : null}
 			{item.detail ? (
@@ -271,6 +295,8 @@ function makeNodes(
 		const runtimeStatus =
 			mode === "services" ? statusById.get(entity.id) : undefined;
 		const health = mode === "services" ? healthById.get(entity.id) : undefined;
+		const resolvedHealth = resolveEffectiveServiceState(health);
+		const blockers = blockedDependencyLabels(health);
 		return {
 			id: entity.id,
 			type: "architecture",
@@ -286,7 +312,13 @@ function makeNodes(
 				openLabel,
 				reconciliation: runtimeStatus?.reconciliation,
 				runtimeState: runtimeStatus?.observed?.appState,
-				healthState: health?.application_error ? "fail" : health?.state,
+				healthState: health?.application_error
+					? "fail"
+					: health
+						? resolvedHealth.effectiveState
+						: undefined,
+				localHealthState: health ? resolvedHealth.localState : undefined,
+				blockedBy: blockers,
 				tlsTrusted: health?.tls_trusted,
 				cloudflareObserved: hasCloudflareEvidence(health),
 				cloudflareStatus: health?.tunnel_status,
@@ -297,9 +329,26 @@ function makeNodes(
 	});
 }
 
+function requiredEdgeHealthState(
+	relation: ArchitectureRelation,
+	healthById: Map<string, HomelabHealthEntry>,
+): HomelabHealthState | null {
+	if (relation.optional) return null;
+	const sourceHealth = healthById.get(relation.source);
+	const evidenceState = requiredDependencyTargetState(
+		sourceHealth,
+		relation.target,
+		relation.type,
+	);
+	if (evidenceState) return evidenceState;
+	const targetHealth = healthById.get(relation.target);
+	return targetHealth ? resolveEffectiveServiceState(targetHealth).effectiveState : null;
+}
+
 function makeEdges(
 	relations: ArchitectureRelation[],
 	visible: Set<string>,
+	healthById: Map<string, HomelabHealthEntry>,
 ): Edge[] {
 	return relations
 		.filter(
@@ -307,7 +356,14 @@ function makeEdges(
 				visible.has(relation.source) && visible.has(relation.target),
 		)
 		.map((relation, index) => {
-			const stroke = relation.optional ? "#94a3b8" : "#38bdf8";
+			const targetState = requiredEdgeHealthState(relation, healthById);
+			const stroke = relation.optional
+				? "#94a3b8"
+				: targetState === "fail"
+					? homelabHealthColor("fail")
+					: targetState === "warn" || targetState === "unknown"
+						? homelabHealthColor("warn")
+						: "#38bdf8";
 			return {
 				id: `${relation.source}-${relation.type}-${relation.target}-${index}`,
 				source: relation.source,
@@ -490,8 +546,8 @@ export default function ArchitectureExplorer({
 		[filtered.entities, french, mode, statusById, healthById],
 	);
 	const edges = useMemo(
-		() => makeEdges(relations, filtered.visible),
-		[relations, filtered.visible],
+		() => makeEdges(relations, filtered.visible, healthById),
+		[relations, filtered.visible, healthById],
 	);
 	const availability = runtimeAvailability(runtimeStatus, french);
 
@@ -586,8 +642,8 @@ export default function ArchitectureExplorer({
 			</div>
 			<p className={styles.legend}>
 				{french
-					? "Les couleurs de service suivent la santé FastAPI : vert fonctionnel, orange dégradé, rouge en échec et gris inconnu. Le cadenas représente la confiance TLS, le nuage une preuve Cloudflare observée et le crâne une erreur applicative. Les badges runtime restent dédiés à la réconciliation TrueNAS."
-					: "Service colors follow FastAPI health: green healthy, orange degraded, red failed, and gray unknown. The lock represents TLS trust, the cloud observed Cloudflare evidence, and the skull an application error. Runtime badges remain dedicated to TrueNAS reconciliation."}
+					? "Les couleurs des services suivent l’état effectif FastAPI : vert fonctionnel, orange dégradé, rouge en échec et gris inconnu. Un badge dependency nomme les dépendances requises qui dégradent un nœud ; les arêtes requises deviennent orange/rouges selon leur cible, tandis que les relations optionnelles restent neutres. Le cadenas représente la confiance TLS, le nuage une preuve Cloudflare observée et le crâne une erreur applicative. Les badges runtime restent dédiés à l’état local TrueNAS."
+					: "Service colors follow FastAPI effective health: green healthy, orange degraded, red failed, and gray unknown. A dependency badge names required blockers; required edges become orange/red with their target while optional relations stay neutral. The lock represents TLS trust, the cloud observed Cloudflare evidence, and the skull an application error. Runtime badges remain dedicated to local TrueNAS state."}
 			</p>
 		</section>
 	);

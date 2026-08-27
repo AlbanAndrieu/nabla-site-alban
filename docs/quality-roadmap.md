@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 27 août 2026.
+Dernière vérification : 28 août 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -82,6 +82,11 @@ Ce P0 reste volontairement le dernier des P0 et le dernier lot de l'ordre de
 livraison, comme demandé. Les garde-fous déjà introduits restent actifs pendant
 les autres chantiers.
 
+- [x] Interdire explicitement aux agents toute écriture, création/suppression de
+  fichier, push ou mise à jour de ref directement sur `master` ; chaque mutation
+  distante doit cibler une branche non-default explicite puis passer par une PR,
+  y compris pour les changements triviaux ou docs-only (`AGENTS.md` et
+  `CONTRIBUTING.md`).
 - [x] Ajouter `npm run build` à la CI avant merge.
 - [x] Rejouer le workflow Quality/Security sur `master` après merge.
 - [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.

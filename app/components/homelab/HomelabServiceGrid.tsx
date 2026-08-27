@@ -9,6 +9,10 @@ import type {
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import {
+	blockedDependencyLabels,
+	resolveEffectiveServiceState,
+} from "@/lib/homelabHealthResolver";
+import {
 	type HomelabService,
 	type HomelabServicesCatalog,
 	homelabServiceEndpointUrl,
@@ -113,10 +117,16 @@ function serviceHealthEvidence(
 		id: generic?.id ?? publicHealth.id ?? "truenas",
 		name: generic?.name ?? publicHealth.name,
 		url: publicHealth.url,
-		// The clickable TrueNAS line represents the public :7000 HTTP endpoint.
-		// Keep API/runtime degradation as a separate warning instead of turning a
-		// reachable UI gray/orange because app.query is rebooting or unavailable.
+		// The clickable TrueNAS line represents only the direct public :7000
+		// endpoint. Dependency/runtime health is deliberately kept out of this
+		// navigation signal and remains visible through dedicated warnings.
 		state: publicHealth.state,
+		local_state: publicHealth.state,
+		dependency_state: null,
+		effective_state: publicHealth.state,
+		required_dependencies: [],
+		blocked_by: [],
+		dependency_evidence: [],
 		direct_state: publicHealth.state,
 		internal_state:
 			generic?.internal_state ?? snapshot.truenas.internal?.state ?? null,
@@ -129,9 +139,9 @@ function reconciledHealth(
 	schemaVersion?: number,
 ): HomelabHealthEntry | undefined {
 	if (!entry) return undefined;
-	// Schema v4 is already reconciled server-side from HTTP, TrueNAS runtime,
-	// internal probes and Cloudflare evidence. Do not turn FastAPI `warn` into a
-	// misleading green state by applying a second, different browser policy.
+	// Schema v4+ is already reconciled server-side from HTTP, TrueNAS runtime,
+	// internal probes, Cloudflare and (from v5) required dependencies. Do not
+	// apply a second browser policy that could contradict the authoritative state.
 	if ((schemaVersion ?? 0) >= 4) return entry;
 
 	const reconciliation = reconcileHomelabHealth(entry, {
@@ -159,6 +169,7 @@ function internalPresentationState(
 	return (
 		entry?.internal_state ??
 		runtimeHealthState(entry?.runtime_state) ??
+		entry?.local_state ??
 		entry?.state ??
 		"unknown"
 	);
@@ -273,6 +284,11 @@ export default function HomelabServiceGrid({
 						svc,
 						snapshot?.schema_version,
 					);
+					const resolvedHealth = resolveEffectiveServiceState(initialHealth);
+					const blockerLabels = blockedDependencyLabels(initialHealth);
+					const dependencyDegraded =
+						blockerLabels.length > 0 ||
+						resolvedHealth.localState !== resolvedHealth.effectiveState;
 					const dependsOnTrueNas =
 						svc.internalHost === "172.17.0.24" ||
 						initialHealth?.runtime_app != null;
@@ -340,6 +356,26 @@ export default function HomelabServiceGrid({
 									<p className="card-text text-muted small mb-0">
 										{svc.description}
 									</p>
+									{dependencyDegraded && (
+										<div
+											className="alert alert-warning py-2 px-2 small text-start mt-3 mb-0"
+											role="status"
+											data-dependency-health
+										>
+											<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
+											{blockerLabels.length > 0
+												? t("dependency.blockedBy", {
+														services: blockerLabels.join(" · "),
+													})
+												: t("dependency.degraded")}
+											<span className="d-block text-muted mt-1">
+												{t("dependency.stateSummary", {
+													local: resolvedHealth.localState,
+													effective: resolvedHealth.effectiveState,
+												})}
+											</span>
+										</div>
+									)}
 									<div
 										style={{
 											marginTop: 18,
@@ -427,6 +463,15 @@ export default function HomelabServiceGrid({
 					/>{" "}
 					{t("runtime.legendMissing")}
 				</span>
+			</div>
+			<div
+				className="small text-muted text-center mt-2"
+				role="note"
+				aria-label={t("dependency.legendTitle")}
+				data-dependency-health-legend
+			>
+				<strong>{t("dependency.legendTitle")}:</strong>{" "}
+				{t("dependency.legend")}
 			</div>
 		</>
 	);

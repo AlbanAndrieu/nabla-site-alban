@@ -56,6 +56,13 @@
 			"legendFailed": "stopped / failed",
 			"legendMissing": "no current runtime status"
 		},
+		"dependency": {
+			"blockedBy": "Blocked by required dependencies: {services}",
+			"degraded": "Required dependency health degrades this service.",
+			"stateSummary": "Local {local} · effective {effective}",
+			"legendTitle": "Dependency health",
+			"legend": "The primary service/link color follows effective health; the runtime icon remains the local TrueNAS application state."
+		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",

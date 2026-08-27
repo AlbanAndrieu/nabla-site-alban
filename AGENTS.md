@@ -19,6 +19,24 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 3. Validate narrowly first, then broaden checks.
 4. For CI failures, inspect the failing job/step and affected files before unrelated code.
 
+## Protected default-branch policy
+
+Agents must **never** commit, push, create, update, delete, or otherwise mutate files directly on `master`, and must never move, force-update, or write the `master` ref directly.
+
+This prohibition applies equally to Git CLI pushes, GitHub Contents/API writes, ref updates, merge commits authored by an agent, generated-file updates, documentation-only changes, trivial fixes, and emergency fixes. There is no “small change” exception.
+
+Before every remote mutation, an agent must verify that the destination is a non-default working branch. If a repository API or tool defaults to the repository default branch when a `branch`/`ref` argument is omitted, omitting that argument for a write is prohibited.
+
+All agent-authored repository changes must follow this path:
+
+1. create or reuse a dedicated non-default branch;
+2. apply all remote mutations only to that branch;
+3. validate the branch and inspect CI/deployment results;
+4. open or update a pull request targeting `master`;
+5. leave the merge to the user/maintainer unless the user explicitly asks the agent to merge that pull request.
+
+Never force-update `master`. If an accidental direct mutation occurs, stop further writes, report it explicitly, and repair it through the safest reviewed path rather than hiding or rewriting history without user approval.
+
 ## Validation
 
 For a focused change, run the closest relevant formatter/linter or test first.
@@ -39,12 +57,13 @@ Agents must never publish changes immediately after editing files.
 
 Before every `git push`, GitHub API file update, or other remote repository mutation:
 
-1. Run `bash scripts/quality-gate.sh` from a local checkout whenever shell access is available.
-2. Fix every formatter, linter, YAML, workflow, configuration, generated-file, or security-check failure caused by the change.
-3. If the gate modifies files, review and commit those changes.
-4. Run `bash scripts/quality-gate.sh` again until it exits successfully with a clean working tree.
-5. Verify `git status --short` is empty.
-6. Only then publish the changes.
+1. Confirm the target is a dedicated non-default branch and is **not** `master`.
+2. Run `bash scripts/quality-gate.sh` from a local checkout whenever shell access is available.
+3. Fix every formatter, linter, YAML, workflow, configuration, generated-file, or security-check failure caused by the change.
+4. If the gate modifies files, review and commit those changes.
+5. Run `bash scripts/quality-gate.sh` again until it exits successfully with a clean working tree.
+6. Verify `git status --short` is empty.
+7. Only then publish the changes to the non-default branch and use a pull request for integration.
 
 When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the canonical `pre-push` hook invokes the same `scripts/quality-gate.sh` automatically before push.
 
