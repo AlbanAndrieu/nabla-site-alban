@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
+import styles from "./HomeLabSection.module.css";
 
 export default async function HomeLabSection({
 	nablaHref,
@@ -21,9 +22,9 @@ export default async function HomeLabSection({
 				</AnchoredHeading>
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<p>{t("purpose")}</p>
-				<aside className="truenas-network-card mb-4" aria-label="Homelab network topology">
-					<div className="truenas-network-card__header">
-						<span className="truenas-network-card__eyebrow">FastAPI Cloud access path</span>
+				<aside className={styles.networkCard} aria-label="Homelab network topology">
+					<div className={styles.header}>
+						<span className={styles.eyebrow}>FastAPI Cloud access path</span>
 						<strong>FastAPI Cloud → Internet → pfSense:7000 → HAProxy → TrueNAS</strong>
 					</div>
 					<p className="small mb-3">
@@ -31,7 +32,7 @@ export default async function HomeLabSection({
 						FastAPI Cloud can perform controlled health and API probes without
 						exposing the TrueNAS host directly.
 					</p>
-					<pre className="truenas-network-card__diagram small mb-3">
+					<pre className={`${styles.diagram} small mb-3`}>
 						{`Internet
    │
 pfSense  WAN 82.66.4.247 / LAN 172.17.0.1
@@ -42,7 +43,7 @@ LAN switch
    └── R7000 AP       172.17.0.12
           └── S24 Ultra 172.17.0.11`}
 					</pre>
-					<ul className="small mb-0 truenas-network-card__facts">
+					<ul className={`${styles.facts} small mb-0`}>
 						<li>R7000: access-point mode; pfSense remains gateway and DHCP authority.</li>
 						<li>AP DNS: 172.17.0.1 primary, 172.17.0.24 secondary.</li>
 						<li>Observed S24 Ultra / Free Mobile public source: 37.166.227.161.</li>
