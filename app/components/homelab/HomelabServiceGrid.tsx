@@ -9,10 +9,10 @@ import type {
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import {
-		 type HomelabService,
-		 type HomelabServicesCatalog,
-		homelabServiceEndpointUrl,
-		homelabServiceId,
+	type HomelabService,
+	type HomelabServicesCatalog,
+	homelabServiceEndpointUrl,
+	homelabServiceId,
 } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 
@@ -27,6 +27,13 @@ type HealthIndex = {
 	byName: Map<string, HomelabHealthEntry>;
 };
 
+const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
+	ok: "btn-outline-success",
+	warn: "btn-outline-warning",
+	fail: "btn-outline-danger",
+	unknown: "btn-outline-secondary",
+};
+
 function serviceIconPath(iconSrc?: string): string {
 	if (!iconSrc) return "/assets/selfh-icons/generic-app.svg";
 	if (/^https?:\/\//i.test(iconSrc)) return iconSrc;
@@ -34,7 +41,7 @@ function serviceIconPath(iconSrc?: string): string {
 }
 
 function normalizedName(value: string): string {
-	return value.trim().toLocaleLowerCase();
+	return value.trim().toLowerCase();
 }
 
 function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
@@ -207,7 +214,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 										{hasInternal && (
 											<a
 												href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
-												className="btn btn-outline-secondary btn-sm d-block"
+												className={`btn ${INTERNAL_HEALTH_CLASS[internalState]} btn-sm d-block`}
 												target="_blank"
 												rel="noopener noreferrer"
 												style={{ color: internalColor, borderColor: internalColor }}
