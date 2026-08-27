@@ -21,14 +21,17 @@ export default async function HomeLabSection({
 				</AnchoredHeading>
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<p>{t("purpose")}</p>
-				<div className="alert alert-secondary" role="note">
-					<strong>FastAPI Cloud → Internet → pfSense:7000 → HAProxy → TrueNAS</strong>
-					<p className="small mb-2 mt-2">
+				<aside className="truenas-network-card mb-4" aria-label="Homelab network topology">
+					<div className="truenas-network-card__header">
+						<span className="truenas-network-card__eyebrow">FastAPI Cloud access path</span>
+						<strong>FastAPI Cloud → Internet → pfSense:7000 → HAProxy → TrueNAS</strong>
+					</div>
+					<p className="small mb-3">
 						The public TrueNAS endpoint is exposed through pfSense and HAProxy so
 						FastAPI Cloud can perform controlled health and API probes without
 						exposing the TrueNAS host directly.
 					</p>
-					<pre className="small mb-2 text-wrap">
+					<pre className="truenas-network-card__diagram small mb-3">
 						{`Internet
    │
 pfSense  WAN 82.66.4.247 / LAN 172.17.0.1
@@ -39,14 +42,14 @@ LAN switch
    └── R7000 AP       172.17.0.12
           └── S24 Ultra 172.17.0.11`}
 					</pre>
-					<ul className="small mb-0">
+					<ul className="small mb-0 truenas-network-card__facts">
 						<li>R7000: access-point mode; pfSense remains gateway and DHCP authority.</li>
 						<li>AP DNS: 172.17.0.1 primary, 172.17.0.24 secondary.</li>
 						<li>Observed S24 Ultra / Free Mobile public source: 37.166.227.161.</li>
 						<li>Observed FastAPI Cloud probe source: 34.200.20.162.</li>
 						<li>TrueNAS SSH TCP/9922 is LAN-only and expected unreachable from the Internet.</li>
 					</ul>
-				</div>
+				</aside>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
