@@ -115,6 +115,25 @@ les autres chantiers.
   multi-services (par exemple Elasticsearch/Kibana) et les services auxiliaires
   qui ne doivent pas devenir des nœuds fonctionnels par erreur.
 
+## P1 — Résilience DNS et politique de résolution
+
+- [ ] Revoir la politique DNS du LAN en gardant pfSense/Unbound disponible
+  indépendamment de TrueNAS Apps, afin qu'un arrêt Docker/TrueNAS ne provoque plus
+  une panne DNS globale malgré un routage Internet fonctionnel.
+- [ ] Définir explicitement le rôle de Pi-hole et d'AdGuard Home : filtrage en
+  amont/aval d'Unbound, résolution client-facing ou service secondaire, sans
+  laisser l'ordre DNS annoncé par DHCP créer un contournement aléatoire du
+  filtrage selon les clients.
+- [ ] Si Pi-hole/AdGuard restent directement annoncés aux clients, fournir deux
+  résolveurs sur des domaines de panne distincts ; deux conteneurs sur le même
+  TrueNAS ne constituent pas une vraie redondance.
+- [ ] Documenter DHCP DNS, zones locales, DNSSEC, conditional forwarding,
+  comportement de failover et responsabilité des enregistrements internes.
+- [ ] Ajouter des tests de panne : TrueNAS arrêté, Docker arrêté, Pi-hole arrêté,
+  AdGuard Home arrêté, Unbound redémarré et WAN indisponible.
+- [ ] Faire remonter dans la santé homelab la disponibilité DNS et la conformité
+  de la politique, pas seulement l'ouverture des ports DNS.
+
 ## P1 — Accessibilité
 
 ### Shared `SkipToMainContent`
@@ -244,14 +263,16 @@ Autres contrôles :
 
 1. Santé homelab : réconciliation HTTP + TrueNAS + Cloudflare, auto-refresh et
    âge/preuve du snapshot.
-2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
-3. Design system partagé : audit light/dark et tokens globaux, puis primitives
+2. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
+   de panne sans dépendance unique à TrueNAS Apps.
+3. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
+4. Design system partagé : audit light/dark et tokens globaux, puis primitives
    Footer/RouteHeader.
-4. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
-5. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
-6. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
-7. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
-8. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
+5. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
+6. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
+7. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
+8. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
+9. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
    puis conserver ces garde-fous pour tous les travaux ultérieurs.
 
 ## Contrôles de sortie
