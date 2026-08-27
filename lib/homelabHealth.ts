@@ -57,7 +57,10 @@ export type HomelabHealthSource = "fastapi" | "unavailable";
 export const HOMELAB_HEALTH_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
 
-const PRIMARY_TIMEOUT_MS = 2500;
+// FastAPI may spend up to five seconds on a cold TrueNAS/internal probe before
+// returning the cached multi-source snapshot. Keep the proxy timeout above that
+// ceiling so the richer runtime evidence is not discarded at 2.5 seconds.
+const PRIMARY_TIMEOUT_MS = 8_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
