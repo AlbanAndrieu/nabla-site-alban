@@ -21,6 +21,8 @@ Please be respectful and constructive in all interactions.
 
 ## Development Workflow
 
+> **Never push or write directly to `master`.** All changes, including documentation-only and trivial fixes, must be made on a non-default branch and integrated through a pull request. Automated agents must also specify an explicit non-default branch for every remote write and must never force-update `master`.
+
 1. **Create a feature branch**:
    ```bash
    git checkout -b feature/your-feature-name
@@ -44,12 +46,12 @@ Please be respectful and constructive in all interactions.
    git commit -m "docs: update README"
    ```
 
-5. **Push to your fork**:
+5. **Push the non-default branch**:
    ```bash
    git push origin feature/your-feature-name
    ```
 
-6. **Open a Pull Request** on GitHub
+6. **Open a Pull Request** on GitHub targeting `master`
 
 ## Commit Message Guidelines
 
