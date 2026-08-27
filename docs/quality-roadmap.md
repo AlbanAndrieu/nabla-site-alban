@@ -54,6 +54,11 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Introduire des design tokens partagés de base pour les pages Next.js.
 - [x] Renforcer les tokens/contrastes spécifiques aux graphes Architecture et à
   la page TrueNAS dark-mode.
+- [ ] Auditer l'ensemble du site en thèmes clair et sombre avec des tests de
+  contraste explicites (texte/surface, cartes, alerts, code/pre, boutons, liens,
+  états de santé) afin d'éviter les régressions de type texte blanc sur fond blanc.
+- [ ] Ajouter des contrôles automatisés de contraste sur les pages prioritaires
+  et intégrer les écarts critiques au quality gate UI/accessibilité.
 - [ ] Normaliser les tokens globaux pour couleurs, surfaces, espacements, rayons,
   typographie et états success/warning/danger.
 - [ ] Introduire les primitives `Button`, `Card`, `Container`, `Section`, `Badge`,

@@ -38,7 +38,7 @@ LAN switch
                 └── S24 Ultra 172.17.0.11
 ```
 
-The Netgear R7000 is configured in **Access Point mode**, not router mode. pfSense remains the LAN gateway, DHCP authority and primary DNS resolver.
+The Netgear R7000 is configured in **Access Point mode**, not router mode. pfSense remains the LAN gateway and DHCP authority.
 
 ### Relevant addressing
 
@@ -53,16 +53,43 @@ The Netgear R7000 is configured in **Access Point mode**, not router mode. pfSen
 | S24 Ultra via Free Mobile | `37.166.227.161` | Observed public source during external validation |
 | FastAPI Cloud probe source | `34.200.20.162` | Observed source correlated with `/healthz` refresh traffic |
 
-### DNS
+## DNS design
 
-The AP uses:
+LAN clients should receive **pfSense `172.17.0.1` as their resilient DNS entry point**. Pi-hole on TrueNAS can still provide filtering, but TrueNAS should not be the only DNS server handed directly to clients while it also hosts Docker Apps.
+
+The failure mode observed during the TrueNAS Apps outage was:
 
 ```text
-Primary DNS:   172.17.0.1   # pfSense
-Secondary DNS: 172.17.0.24  # TrueNAS, fallback only
+S24 Ultra → Wi-Fi association succeeds
+         → DHCP succeeds
+         → gateway 172.17.0.1 is reachable
+         → DNS points to 172.17.0.24 (Pi-hole)
+         → TrueNAS / Docker Apps is down
+         → DNS lookups fail
+         → Android reports "Connected without Internet"
 ```
 
-LAN clients should preferably receive DNS through pfSense so a TrueNAS outage does not make Wi-Fi clients appear to have lost Internet connectivity solely because name resolution is unavailable.
+The preferred design is:
+
+```text
+LAN client
+   │
+   └── DNS 172.17.0.1 (pfSense)
+            │
+            ├── pfSense resolver / fallback path
+            └── optional forwarding/filtering through Pi-hole on TrueNAS
+```
+
+This keeps Pi-hole useful for DNS filtering while avoiding a circular dependency where a TrueNAS/Docker failure also removes basic name resolution from the LAN.
+
+The R7000 management interface currently uses:
+
+```text
+Primary DNS:   172.17.0.1
+Secondary DNS: 172.17.0.24
+```
+
+Those values apply to the AP itself; Wi-Fi clients receive their DNS configuration from the pfSense DHCP service.
 
 TrueNAS currently uses:
 
@@ -77,8 +104,10 @@ Default route: 172.17.0.1
 
 A refresh of the FastAPI health board has produced TCP traffic from the FastAPI Cloud source address to the public pfSense address on TCP/7000. The TCP handshake and subsequent application traffic confirm that the FastAPI Cloud request reaches the HAProxy listener.
 
-LAN validation also confirms that:
+LAN validation confirms that:
 
+- the TrueNAS default route is `172.17.0.1` on `enp10s0`;
+- `enp10s0` negotiates 1000 Mbit/s, full duplex, with link detected;
 - `/` returns an HTTP redirect to `/ui/`;
 - `/ui/` returns HTTP 200;
 - direct access to `https://172.17.0.24:7000/ui/` negotiates TLS 1.3 and serves the TrueNAS UI;
@@ -89,18 +118,47 @@ These checks demonstrate transport and HTTPS reachability. They do not, on their
 
 ## Docker / Apps network constraint
 
-The TrueNAS host LAN is `172.17.0.0/24`. The Apps Address Pool must **not** overlap that network.
-
-A configuration such as:
+The TrueNAS host LAN is `172.17.0.0/24`. The previous Apps Address Pool was:
 
 ```text
 Base: 172.17.0.0/12
 Size: 24
 ```
 
-is invalid for this topology because `/12` is canonicalized to `172.16.0.0/12`, which includes the physical LAN `172.17.0.0/24`. Docker can then allocate container bridges from address space that overlaps the host LAN, causing routing ambiguity and preventing the Apps service from starting correctly.
+That value is effectively in the `172.16.0.0/12` supernet and overlaps the physical LAN `172.17.0.0/24`. Existing Docker bridges were consequently allocated as `172.16.x.0/24` networks. After the outage, the Apps service could not start reliably while this overlapping address space remained the default pool.
 
-Before changing the Apps Address Pool, choose a private range that is unused by all pfSense LANs/VLANs, VPNs, Docker networks and planned Talos/Kubernetes networks.
+The corrected Apps Address Pool is:
+
+```text
+Base: 10.200.0.0/16
+Size: 24
+```
+
+pfSense routing currently has no `10.200.0.0/16` route, so this range is not in conflict with the known routed networks. The Apps service recovered to:
+
+```text
+{"description": "Application(s) are currently running", "status": "RUNNING"}
+```
+
+Old `172.16.x.0/24` Docker bridge routes can remain visible as `linkdown` for already-created Apps. Do not delete them blindly during service recovery. Recreate or clean them only after identifying which installed Apps still reference those networks.
+
+## Cloudflare Tunnel recovery
+
+After Docker Apps recovered, the `cloudflared` App required a restart. The `nabla-truescale` tunnel then returned to:
+
+```text
+Healthy — 1 connector
+```
+
+This confirms the expected dependency chain:
+
+```text
+TrueNAS networking
+   → Docker Apps service
+      → cloudflared App
+         → Cloudflare Tunnel
+            → externally published homelab services
+```
 
 ## Planned network hardening
 
@@ -113,6 +171,8 @@ The following changes are intentionally deferred until FastAPI Cloud → TrueNAS
 - [ ] Re-enable IDS/IPS and filtering controls only after the explicit WAN policy has been validated.
 - [ ] Keep the public health check lightweight and distinct from authenticated API/WebSocket validation.
 - [ ] Keep TrueNAS SSH on TCP/9922 reachable from trusted LAN administration hosts only; it must remain unreachable from the public Internet.
+- [ ] Audit the remaining `172.16.x.0/24` Docker networks after all Apps are healthy and migrate/recreate stale networks where required.
+- [ ] Keep Pi-hole as a filtering resolver without making TrueNAS/Docker the single DNS dependency for the complete LAN.
 
 ## HAProxy observability target
 
