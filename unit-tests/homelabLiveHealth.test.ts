@@ -15,7 +15,9 @@ test("homelab service grid keeps private endpoints clickable and matches health 
 	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
 	assert.match(page, /snapshotCheckedAt=\{snapshot\?\.checked_at\}/);
-	assert.match(page, /reconcileHomelabHealth\(entry\)/);
+	assert.match(page, /reconcileHomelabHealth\(entry, \{/);
+	assert.match(page, /external: service\.external === true/);
+	assert.match(page, /tunnelExpected: service\.tunnelSecure === true/);
 	assert.match(page, /state: reconciliation\.state/);
 });
 

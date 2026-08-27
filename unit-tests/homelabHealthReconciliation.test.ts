@@ -24,16 +24,39 @@ test("application errors are authoritative failures", () => {
 	assert.equal(result.reason, "application_error");
 });
 
-test("direct HTTP failure is not masked by a healthy TrueNAS runtime", () => {
+test("direct HTTP failure is authoritative for external services", () => {
 	const result = reconcileHomelabHealth(
 		entry({
 			direct_state: "fail",
 			runtime_state: "RUNNING",
 			runtime_reachable: true,
 		}),
+		{ external: true },
 	);
 	assert.equal(result.state, "fail");
 	assert.equal(result.reason, "http_failure");
+});
+
+test("private HTTP failure does not override a healthy TrueNAS runtime", () => {
+	const result = reconcileHomelabHealth(
+		entry({
+			direct_state: "fail",
+			runtime_state: "RUNNING",
+			runtime_reachable: true,
+		}),
+		{ external: false },
+	);
+	assert.equal(result.state, "ok");
+	assert.equal(result.reason, "healthy_evidence");
+});
+
+test("private HTTP failure without private/runtime proof is degraded, not red", () => {
+	const result = reconcileHomelabHealth(
+		entry({ direct_state: "fail", http_status: 503, state: "fail" }),
+		{ external: false },
+	);
+	assert.equal(result.state, "warn");
+	assert.equal(result.reason, "degraded_evidence");
 });
 
 test("healthy HTTP with a failed runtime is degraded instead of green", () => {
@@ -48,21 +71,41 @@ test("healthy HTTP with a failed runtime is degraded instead of green", () => {
 	assert.equal(result.reason, "degraded_evidence");
 });
 
-test("healthy HTTP with failed Cloudflare telemetry is degraded instead of red", () => {
+test("healthy HTTP with failed expected Cloudflare telemetry is degraded", () => {
 	const result = reconcileHomelabHealth(
 		entry({
 			direct_state: "ok",
 			tunnel_status: "down",
 			tunnel_name: "service-tunnel",
 		}),
+		{ external: true, tunnelExpected: true },
 	);
 	assert.equal(result.state, "warn");
 	assert.equal(result.reason, "degraded_evidence");
 });
 
-test("Cloudflare failure is authoritative when HTTP is not independently healthy", () => {
+test("Cloudflare telemetry is ignored when no tunnel is configured", () => {
+	const result = reconcileHomelabHealth(
+		entry({
+			http_status: 0,
+			state: "unknown",
+			runtime_state: "RUNNING",
+			tunnel_status: "failed",
+		}),
+		{ external: false, tunnelExpected: false },
+	);
+	assert.equal(result.state, "ok");
+	assert.equal(result.reason, "healthy_evidence");
+	assert.equal(
+		result.evidence.some((item) => item.kind === "cloudflare"),
+		false,
+	);
+});
+
+test("Cloudflare failure is authoritative when expected and HTTP is not healthy", () => {
 	const result = reconcileHomelabHealth(
 		entry({ http_status: 0, state: "unknown", tunnel_status: "failed" }),
+		{ external: true, tunnelExpected: true },
 	);
 	assert.equal(result.state, "fail");
 	assert.equal(result.reason, "cloudflare_failure");
@@ -88,6 +131,7 @@ test("multiple healthy proofs reconcile to ok", () => {
 			runtime_state: "RUNNING",
 			tunnel_status: "healthy",
 		}),
+		{ external: true, tunnelExpected: true },
 	);
 	assert.equal(result.state, "ok");
 	assert.equal(result.reason, "healthy_evidence");

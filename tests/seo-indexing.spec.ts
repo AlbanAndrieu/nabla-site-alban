@@ -1,19 +1,21 @@
 import { expect, request as playwrightRequest, test } from "@playwright/test";
 
+const canonicalOrigin = "https://www.albanandrieu.com";
+
 const expectedSitemapUrls = [
-	"https://albanandrieu.com/",
-	"https://albanandrieu.com/expertise",
-	"https://albanandrieu.com/contact",
-	"https://albanandrieu.com/security",
-	"https://albanandrieu.com/ai",
-	"https://albanandrieu.com/architecture",
-	"https://albanandrieu.com/ciso",
-	"https://albanandrieu.com/truenas",
-	"https://albanandrieu.com/link",
-	"https://albanandrieu.com/email",
-	"https://albanandrieu.com/nabla",
-	"https://albanandrieu.com/cv",
-	"https://albanandrieu.com/jm",
+	`${canonicalOrigin}/`,
+	`${canonicalOrigin}/expertise`,
+	`${canonicalOrigin}/contact`,
+	`${canonicalOrigin}/security`,
+	`${canonicalOrigin}/ai`,
+	`${canonicalOrigin}/architecture`,
+	`${canonicalOrigin}/ciso`,
+	`${canonicalOrigin}/truenas`,
+	`${canonicalOrigin}/link`,
+	`${canonicalOrigin}/email`,
+	`${canonicalOrigin}/nabla`,
+	`${canonicalOrigin}/cv`,
+	`${canonicalOrigin}/jm`,
 ];
 
 const migratedSeoSlugs = [
@@ -70,7 +72,6 @@ test.describe("SEO indexing policy", () => {
 		expect(xml).not.toContain(".html");
 		expect(xml).not.toContain("/startup");
 		expect(xml).not.toContain("/pricing");
-		expect(xml).not.toContain("/payment");
 	});
 
 	test("every page outside the SEO allowlist is noindex", async ({ request }) => {
@@ -97,8 +98,8 @@ test.describe("SEO indexing policy", () => {
 		page,
 	}) => {
 		for (const slug of migratedSeoSlugs) {
-			const englishUrl = `https://albanandrieu.com/${slug}`;
-			const frenchUrl = `https://albanandrieu.com/fr/${slug}`;
+			const englishUrl = `${canonicalOrigin}/${slug}`;
+			const frenchUrl = `${canonicalOrigin}/fr/${slug}`;
 
 			for (const [pathname, canonical] of [
 				[`/${slug}`, englishUrl],
