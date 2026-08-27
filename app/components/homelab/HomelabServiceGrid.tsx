@@ -83,6 +83,31 @@ function lookupHealth(
 	return index.byName.get(normalizedName(service.name));
 }
 
+function serviceHealthEvidence(
+	index: HealthIndex,
+	service: HomelabService,
+	url: string,
+	snapshot: HomelabHealthSnapshot | null,
+): HomelabHealthEntry | undefined {
+	const generic = lookupHealth(index, service, url);
+	if (homelabServiceId(service) !== "truenas" || !snapshot?.truenas?.public) {
+		return generic;
+	}
+
+	const publicHealth = snapshot.truenas.public;
+	return {
+		...generic,
+		...publicHealth,
+		id: generic?.id ?? publicHealth.id ?? "truenas",
+		name: generic?.name ?? publicHealth.name,
+		url: publicHealth.url,
+		state: snapshot.truenas.state,
+		direct_state: publicHealth.state,
+		internal_state:
+			generic?.internal_state ?? snapshot.truenas.internal?.state ?? null,
+	};
+}
+
 function reconciledHealth(
 	entry: HomelabHealthEntry | undefined,
 	service: HomelabService,
@@ -163,7 +188,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 					const endpointUrl = homelabServiceEndpointUrl(svc);
 					const endpointEnabled = svc.endpointEnabled !== false;
 					const initialHealth = reconciledHealth(
-						lookupHealth(serviceHealth, svc, endpointUrl),
+						serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
 						svc,
 					);
 					const dependsOnTrueNas =
