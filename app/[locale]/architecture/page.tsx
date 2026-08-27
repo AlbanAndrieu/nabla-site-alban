@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
+import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
 import { routing } from "@/i18n/routing";
 import { getStaticHomelabServicesCatalog } from "@/lib/homelabServices";
 import { getStaticServiceTopology } from "@/lib/serviceTopology";
@@ -84,6 +85,31 @@ export default async function ArchitecturePage({
 					topology={topology}
 					topologySource={topologySource}
 				/>
+
+				<section
+					id="homelab-network-architecture"
+					className="content-section"
+					aria-labelledby="homelab-network-architecture-title"
+				>
+					<div className="container py-5">
+						<div
+							className="text-center mx-auto mb-4"
+							style={{ maxWidth: "900px" }}
+						>
+							<h2 id="homelab-network-architecture-title">
+								{french
+									? "Réseau homelab et chemins d’ingress"
+									: "Homelab network and ingress paths"}
+							</h2>
+							<p>
+								{french
+									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Il distingue le chemin HAProxy direct, le DNS Cloudflare sans Tunnel pour Garage et le Cloudflare Tunnel terminé par le conteneur Docker cloudflared pour OpenWebUI."
+									: "This React Flow diagram is the exact same component used on the TrueNAS page. It separates direct HAProxy publication, Cloudflare DNS without Tunnel for Garage, and Cloudflare Tunnel terminated by the cloudflared Docker container for OpenWebUI."}
+							</p>
+						</div>
+						<HomeLabNetworkFlow />
+					</div>
+				</section>
 
 				<section
 					id="declared-observed-architecture"
