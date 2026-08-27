@@ -48,7 +48,10 @@ test("loadCvHtmlFragment extracts the body and removes legacy navigation and bac
 test("detailed CV route uses the shared design-system action for the whole button", async () => {
 	const source = await readFile("app/[locale]/cv/[...path]/page.tsx", "utf8");
 
-	assert.match(source, /import ActionLink from "@\/components\/ui\/ActionLink"/);
+	assert.match(
+		source,
+		/import ActionLink from "@\/components\/ui\/ActionLink"/,
+	);
 	assert.match(source, /<ActionLink href=\{cvIndexHref\} variant="primary">/);
 	assert.doesNotMatch(source, /className="back-link"/);
 	assert.match(source, /de: "Zurück zum Lebenslauf-Index"/);

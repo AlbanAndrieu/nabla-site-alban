@@ -7,7 +7,10 @@ type Locale = "en" | "fr";
 
 const FEATURE_CATALOGS = ["truenas", "homelab"] as const;
 
-async function loadMessages(locale: Locale, feature?: string): Promise<Messages> {
+async function loadMessages(
+	locale: Locale,
+	feature?: string,
+): Promise<Messages> {
 	const path = feature
 		? `../messages/${feature}/${locale}.json`
 		: `../messages/${locale}.json`;
@@ -31,10 +34,7 @@ async function assertLocaleParity(feature?: string) {
 		loadMessages("fr", feature),
 	]);
 
-	assert.deepEqual(
-		scalarPaths(french).sort(),
-		scalarPaths(english).sort(),
-	);
+	assert.deepEqual(scalarPaths(french).sort(), scalarPaths(english).sort());
 }
 
 test("French and English global message catalogs have the same structure", async () => {

@@ -27,9 +27,16 @@ export default async function BillOfMaterialsSection() {
 	const purchaseDetails = t.raw("purchaseDetails") as string[];
 
 	return (
-		<section className="py-5 hardware-bom-section" aria-labelledby="hardware-bom">
+		<section
+			className="py-5 hardware-bom-section"
+			aria-labelledby="hardware-bom"
+		>
 			<div className="container">
-				<AnchoredHeading as="h3" id="hardware-bom" className="h5 mt-4 hardware-bom-heading">
+				<AnchoredHeading
+					as="h3"
+					id="hardware-bom"
+					className="h5 mt-4 hardware-bom-heading"
+				>
 					<span className="hardware-bom-heading__icon" aria-hidden="true">
 						<i className="fas fa-clipboard-list"></i>
 					</span>
@@ -61,7 +68,11 @@ export default async function BillOfMaterialsSection() {
 							<ItemIcon name={purchase.icon} />
 							<span className="hardware-bom-li__body">
 								{"href" in purchase ? (
-									<a href={purchase.href} target="_blank" rel="noopener noreferrer">
+									<a
+										href={purchase.href}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
 										{purchase.name}
 									</a>
 								) : (

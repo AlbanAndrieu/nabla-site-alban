@@ -20,7 +20,10 @@ test("buildPageMetadata creates complete English social metadata", () => {
 	const image = images[0] as { url?: string; width?: number; height?: number };
 
 	assert.equal(metadata.alternates?.canonical, "/architecture");
-	assert.equal(metadata.openGraph?.url, "https://www.albanandrieu.com/architecture");
+	assert.equal(
+		metadata.openGraph?.url,
+		"https://www.albanandrieu.com/architecture",
+	);
 	assert.equal(metadata.openGraph?.locale, "en_US");
 	assert.equal(image.width, SOCIAL_CARD_WIDTH);
 	assert.equal(image.height, SOCIAL_CARD_HEIGHT);

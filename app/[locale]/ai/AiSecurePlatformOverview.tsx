@@ -18,8 +18,7 @@ type Copy = {
 const COPY: Record<Locale, Copy> = {
 	en: {
 		title: "Secure AI platform engineering",
-		lead:
-			"The goal is not to accumulate AI tools. It is to operate models, agents, MCP tools and knowledge pipelines behind explicit security, reliability, cost and governance boundaries.",
+		lead: "The goal is not to accumulate AI tools. It is to operate models, agents, MCP tools and knowledge pipelines behind explicit security, reliability, cost and governance boundaries.",
 		principles: "Architecture principles",
 		pillars: [
 			{
@@ -70,8 +69,7 @@ const COPY: Record<Locale, Copy> = {
 	},
 	fr: {
 		title: "Ingénierie d’une plateforme IA sécurisée",
-		lead:
-			"L’objectif n’est pas d’accumuler des outils IA, mais d’exploiter modèles, agents, outils MCP et pipelines de connaissance derrière des frontières explicites de sécurité, de fiabilité, de coût et de gouvernance.",
+		lead: "L’objectif n’est pas d’accumuler des outils IA, mais d’exploiter modèles, agents, outils MCP et pipelines de connaissance derrière des frontières explicites de sécurité, de fiabilité, de coût et de gouvernance.",
 		principles: "Principes d’architecture",
 		pillars: [
 			{
@@ -122,11 +120,16 @@ const COPY: Record<Locale, Copy> = {
 	},
 };
 
-export default function AiSecurePlatformOverview({ locale }: Readonly<{ locale: string }>) {
+export default function AiSecurePlatformOverview({
+	locale,
+}: Readonly<{ locale: string }>) {
 	const copy = COPY[locale === "fr" ? "fr" : "en"];
 
 	return (
-		<section className="category-section" aria-labelledby="secure-ai-platform-heading">
+		<section
+			className="category-section"
+			aria-labelledby="secure-ai-platform-heading"
+		>
 			<h2 id="secure-ai-platform-heading" className="category-title">
 				<i className="fas fa-shield-halved" aria-hidden="true" /> {copy.title}
 			</h2>
@@ -136,7 +139,11 @@ export default function AiSecurePlatformOverview({ locale }: Readonly<{ locale: 
 				{copy.pillars.map((pillar) => (
 					<article className="resource-card" key={pillar.title}>
 						<h3>
-							<i className={`${pillar.icon} resource-card-icon`} aria-hidden="true" /> {pillar.title}
+							<i
+								className={`${pillar.icon} resource-card-icon`}
+								aria-hidden="true"
+							/>{" "}
+							{pillar.title}
 						</h3>
 						<p>{pillar.description}</p>
 					</article>

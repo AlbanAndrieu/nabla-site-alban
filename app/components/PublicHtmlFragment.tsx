@@ -24,7 +24,8 @@ export default async function PublicHtmlFragment({
 	omitElementIds = [],
 }: Props) {
 	let html = await loadPublicHtmlFragment(file, mode, locale);
-	if (omitElementIds.length > 0) html = removeLegacyElementsById(html, omitElementIds);
+	if (omitElementIds.length > 0)
+		html = removeLegacyElementsById(html, omitElementIds);
 
 	return (
 		<div

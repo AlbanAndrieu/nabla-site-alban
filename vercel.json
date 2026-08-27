@@ -1,21 +1,21 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "regions": ["fra1"],
-  "framework": "nextjs",
-  "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
-  "git": {
-    "deploymentEnabled": {
-      "*": false,
-      "master": true,
-      "vercel-preview-*": true
-    }
-  },
-  "github": {
-    "silent": true,
-    "autoJobCancelation": true
-  },
-  "env": {
-    "STRIPE_PRICE_ID": "price_1TIuNgQR8aaUqJtoydBY5Fmw"
-  }
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"version": 2,
+	"regions": ["fra1"],
+	"framework": "nextjs",
+	"ignoreCommand": "bash scripts/vercel-ignore-build.sh",
+	"git": {
+		"deploymentEnabled": {
+			"*": false,
+			"master": true,
+			"vercel-preview-*": true
+		}
+	},
+	"github": {
+		"silent": true,
+		"autoJobCancelation": true
+	},
+	"env": {
+		"STRIPE_PRICE_ID": "price_1TIuNgQR8aaUqJtoydBY5Fmw"
+	}
 }

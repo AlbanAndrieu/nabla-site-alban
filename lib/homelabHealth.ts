@@ -64,10 +64,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isHealthState(value: unknown): value is HomelabHealthState {
-	return value === "ok" || value === "warn" || value === "fail" || value === "unknown";
+	return (
+		value === "ok" ||
+		value === "warn" ||
+		value === "fail" ||
+		value === "unknown"
+	);
 }
 
-function isVerifiedHealthState(value: unknown): value is VerifiedHomelabHealthState {
+function isVerifiedHealthState(
+	value: unknown,
+): value is VerifiedHomelabHealthState {
 	return value === "ok" || value === "warn" || value === "fail";
 }
 
@@ -75,7 +82,8 @@ export function normalizeHomelabHealthUrl(url?: string): string | null {
 	if (!url) return null;
 	try {
 		const parsed = new URL(url);
-		if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+		if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
+			return null;
 		parsed.hash = "";
 		return parsed.href;
 	} catch {
@@ -151,7 +159,11 @@ function validInternalHealthEntry(
 
 function validTrueNasHealth(value: unknown): value is TrueNasHealth {
 	if (!isRecord(value) || !isVerifiedHealthState(value.state)) return false;
-	if (value.public !== undefined && value.public !== null && !validHealthEntry(value.public)) {
+	if (
+		value.public !== undefined &&
+		value.public !== null &&
+		!validHealthEntry(value.public)
+	) {
 		return false;
 	}
 	if (

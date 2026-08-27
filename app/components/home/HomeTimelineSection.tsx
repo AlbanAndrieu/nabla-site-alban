@@ -160,7 +160,13 @@ function TimelineItem({
 				</div>
 				<div
 					className="timeline-content"
-					style={{ display: "none", height: 0, minHeight: 0, padding: 0, margin: 0 }}
+					style={{
+						display: "none",
+						height: 0,
+						minHeight: 0,
+						padding: 0,
+						margin: 0,
+					}}
 				/>
 			</div>
 		);

@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const architecturePath = new URL("../app/[locale]/ai/AiHomelabArchitecture.tsx", import.meta.url);
+const architecturePath = new URL(
+	"../app/[locale]/ai/AiHomelabArchitecture.tsx",
+	import.meta.url,
+);
 
 test("AI architecture diagram is rendered locally without Mermaid CDN", async () => {
 	const source = await readFile(architecturePath, "utf8");

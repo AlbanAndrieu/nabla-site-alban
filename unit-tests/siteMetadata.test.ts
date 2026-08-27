@@ -25,7 +25,10 @@ test("buildPageMetadata keeps canonical, Open Graph and Twitter metadata aligned
 		"x-default": "/architecture",
 	});
 	assert.equal(metadata.openGraph?.title, "Nabla service architecture");
-	assert.equal(metadata.openGraph?.description, "Interactive service topology.");
+	assert.equal(
+		metadata.openGraph?.description,
+		"Interactive service topology.",
+	);
 	assert.equal(metadata.openGraph?.url, expectedCanonical);
 	assert.equal(metadata.openGraph?.locale, "en_US");
 	assert.deepEqual(metadata.openGraph?.alternateLocale, ["fr_FR"]);
@@ -60,7 +63,9 @@ test("buildPageMetadata localizes French social metadata and defaults hreflang t
 	assert.deepEqual(metadata.openGraph?.alternateLocale, ["en_US"]);
 	assert.equal(metadata.alternates?.languages?.["x-default"], "/expertise");
 	assert.match(
-		String((metadata.twitter?.images?.[0] as { url?: string } | undefined)?.url),
+		String(
+			(metadata.twitter?.images?.[0] as { url?: string } | undefined)?.url,
+		),
 		/title=Expertise\+DevSecOps&locale=fr&description=Architecture\+cloud\+et\+s%C3%A9curit%C3%A9\.$/,
 	);
 });

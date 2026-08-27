@@ -22,14 +22,19 @@ export default async function HardwareSection() {
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12">
-						<AnchoredHeading id="hardware" className="hardware-heading-with-icon display-4">
+						<AnchoredHeading
+							id="hardware"
+							className="hardware-heading-with-icon display-4"
+						>
 							<span
 								className="hardware-heading-with-icon__glyph"
 								aria-hidden="true"
 							>
 								<i className="fas fa-server"></i>
 							</span>
-							<span className="hardware-heading-with-icon__text">{t("title")}</span>
+							<span className="hardware-heading-with-icon__text">
+								{t("title")}
+							</span>
 						</AnchoredHeading>
 						<div className="hardware-platform-band mt-4">
 							<div className="row justify-content-center">
@@ -43,7 +48,9 @@ export default async function HardwareSection() {
 												>
 													<i className="fas fa-screwdriver-wrench"></i>
 												</span>
-												<span className="hardware-bom-intro__text">{t("incident")}</span>
+												<span className="hardware-bom-intro__text">
+													{t("incident")}
+												</span>
 											</p>
 										</div>
 									</div>
@@ -59,15 +66,25 @@ export default async function HardwareSection() {
 									>
 										{t("tagline")}
 									</p>
-									<ul className="hardware-pill-grid" aria-label={t("purposeLabel")}>
+									<ul
+										className="hardware-pill-grid"
+										aria-label={t("purposeLabel")}
+									>
 										{pillars.map((pillar, index) => (
 											<li className="hardware-pill" key={pillar.title}>
-												<span className="hardware-pill__icon" aria-hidden="true">
+												<span
+													className="hardware-pill__icon"
+													aria-hidden="true"
+												>
 													<i className={`fas ${PILLAR_ICONS[index]}`} />
 												</span>
 												<span className="hardware-pill__text">
-													<span className="hardware-pill__title">{pillar.title}</span>
-													<span className="hardware-pill__sub">{pillar.subtitle}</span>
+													<span className="hardware-pill__title">
+														{pillar.title}
+													</span>
+													<span className="hardware-pill__sub">
+														{pillar.subtitle}
+													</span>
 												</span>
 											</li>
 										))}

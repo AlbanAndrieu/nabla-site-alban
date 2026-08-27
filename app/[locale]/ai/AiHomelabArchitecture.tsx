@@ -16,7 +16,11 @@ const LAYERS: ArchitectureLayer[] = [
 	},
 	{
 		title: "AI gateway & policy",
-		items: ["LiteLLM", "Redis cache", "routing · budgets · fallbacks · telemetry"],
+		items: [
+			"LiteLLM",
+			"Redis cache",
+			"routing · budgets · fallbacks · telemetry",
+		],
 	},
 	{
 		title: "Inference providers",
@@ -94,7 +98,9 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 		<section className="category-section" aria-labelledby="ai-homelab-heading">
 			<h2 id="ai-homelab-heading" className="category-title">
 				<i className="fas fa-network-wired" aria-hidden="true" />{" "}
-				{french ? "Architecture de ma plateforme IA" : "My AI platform architecture"}
+				{french
+					? "Architecture de ma plateforme IA"
+					: "My AI platform architecture"}
 			</h2>
 			<p className={styles.intro}>
 				{french
@@ -107,8 +113,13 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 			<div className="resource-grid">
 				<article className="resource-card">
 					<h3>
-						<i className="fas fa-user-shield resource-card-icon" aria-hidden="true" />{" "}
-						{french ? "Local-first et confidentialité" : "Local-first & privacy"}
+						<i
+							className="fas fa-user-shield resource-card-icon"
+							aria-hidden="true"
+						/>{" "}
+						{french
+							? "Local-first et confidentialité"
+							: "Local-first & privacy"}
 					</h3>
 					<p>
 						{french
@@ -129,7 +140,10 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 				</article>
 				<article className="resource-card">
 					<h3>
-						<i className="fas fa-chart-line resource-card-icon" aria-hidden="true" />{" "}
+						<i
+							className="fas fa-chart-line resource-card-icon"
+							aria-hidden="true"
+						/>{" "}
 						{french ? "Mesurable" : "Measurable"}
 					</h3>
 					<p>

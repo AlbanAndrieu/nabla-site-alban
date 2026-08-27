@@ -53,7 +53,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isReconciliationState(value: unknown): value is HomelabReconciliationState {
+function isReconciliationState(
+	value: unknown,
+): value is HomelabReconciliationState {
 	return (
 		value === "in_sync" ||
 		value === "declared_only" ||
@@ -77,9 +79,12 @@ function validStatusService(value: unknown): value is HomelabStatusService {
 	);
 }
 
-export function parseHomelabStatusSnapshot(value: unknown): HomelabStatusSnapshot | null {
+export function parseHomelabStatusSnapshot(
+	value: unknown,
+): HomelabStatusSnapshot | null {
 	if (!isRecord(value) || !isRecord(value.runtime)) return null;
-	if (!Array.isArray(value.services) || !Array.isArray(value.observedOnly)) return null;
+	if (!Array.isArray(value.services) || !Array.isArray(value.observedOnly))
+		return null;
 	if (
 		typeof value.schemaVersion !== "number" ||
 		typeof value.checkedAt !== "string" ||
@@ -89,19 +94,26 @@ export function parseHomelabStatusSnapshot(value: unknown): HomelabStatusSnapsho
 		typeof value.runtime.observed_at !== "string" ||
 		typeof value.runtime.configured !== "boolean" ||
 		typeof value.runtime.reachable !== "boolean" ||
-		(value.runtime.stale !== undefined && typeof value.runtime.stale !== "boolean") ||
-		(value.runtime.error !== undefined && typeof value.runtime.error !== "string")
+		(value.runtime.stale !== undefined &&
+			typeof value.runtime.stale !== "boolean") ||
+		(value.runtime.error !== undefined &&
+			typeof value.runtime.error !== "string")
 	) {
 		return null;
 	}
-	if (!value.services.every(validStatusService) || !value.observedOnly.every(validStatusService)) {
+	if (
+		!value.services.every(validStatusService) ||
+		!value.observedOnly.every(validStatusService)
+	) {
 		return null;
 	}
 	return value as HomelabStatusSnapshot;
 }
 
 function primaryApiUrl(): string {
-	return process.env.HOMELAB_STATUS_API_URL?.trim() || HOMELAB_STATUS_DEFAULT_API_URL;
+	return (
+		process.env.HOMELAB_STATUS_API_URL?.trim() || HOMELAB_STATUS_DEFAULT_API_URL
+	);
 }
 
 export async function loadHomelabStatusSnapshot(): Promise<{
@@ -127,7 +139,9 @@ export async function loadHomelabStatusSnapshot(): Promise<{
 		return { snapshot, source: "fastapi", primaryUrl };
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(`[homelab-status] FastAPI status unavailable (${primaryUrl}): ${reason}`);
+		console.warn(
+			`[homelab-status] FastAPI status unavailable (${primaryUrl}): ${reason}`,
+		);
 		return { snapshot: null, source: "unavailable", primaryUrl };
 	} finally {
 		clearTimeout(timeout);

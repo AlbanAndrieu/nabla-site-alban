@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import HomelabServiceGrid from "./HomelabServiceGrid";
@@ -14,7 +14,9 @@ type State = {
 	error: boolean;
 };
 
-async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog> {
+async function fetchCatalog(
+	signal: AbortSignal,
+): Promise<HomelabServicesCatalog> {
 	const response = await fetch("/api/homelab-services", {
 		cache: "no-store",
 		signal,
@@ -23,13 +25,17 @@ async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog
 	return (await response.json()) as HomelabServicesCatalog;
 }
 
-async function fetchHealth(signal: AbortSignal): Promise<HomelabHealthSnapshot | null> {
+async function fetchHealth(
+	signal: AbortSignal,
+): Promise<HomelabHealthSnapshot | null> {
 	try {
 		const response = await fetch("/api/homelab-health", {
 			cache: "no-store",
 			signal,
 		});
-		return response.ok ? ((await response.json()) as HomelabHealthSnapshot) : null;
+		return response.ok
+			? ((await response.json()) as HomelabHealthSnapshot)
+			: null;
 	} catch (error) {
 		if (signal.aborted) throw error;
 		return null;
@@ -102,5 +108,7 @@ export default function HomelabServicesBlock() {
 		);
 	}
 
-	return <HomelabServiceGrid catalog={state.catalog} snapshot={state.snapshot} />;
+	return (
+		<HomelabServiceGrid catalog={state.catalog} snapshot={state.snapshot} />
+	);
 }

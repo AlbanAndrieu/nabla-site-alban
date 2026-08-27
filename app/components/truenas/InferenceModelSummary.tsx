@@ -2,8 +2,8 @@ import { getTranslations } from "next-intl/server";
 import {
 	EXACT_GPU_BENCHMARK_URL,
 	GPU_MODELS,
-	RAM_MODELS,
 	type InferenceModelRow,
+	RAM_MODELS,
 } from "./hardwarePlan";
 
 type TableLabels = {
@@ -46,7 +46,9 @@ function ModelTable({
 							<td>
 								{row.speed}
 								<small className="d-block text-muted">
-									{row.speedKind === "measured" ? labels.measured : labels.estimated}
+									{row.speedKind === "measured"
+										? labels.measured
+										: labels.estimated}
 								</small>
 							</td>
 							<td>{row.parallel}</td>
@@ -88,7 +90,11 @@ export default async function InferenceModelSummary() {
 				<ModelTable rows={RAM_MODELS} uses={ramUses} labels={labels} />
 
 				<p className="small mt-3 mb-1">
-					<a href={EXACT_GPU_BENCHMARK_URL} target="_blank" rel="noopener noreferrer">
+					<a
+						href={EXACT_GPU_BENCHMARK_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						{t("benchmarkSource")}
 					</a>
 				</p>

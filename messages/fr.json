@@ -124,31 +124,107 @@
 			"title": "Services proposés",
 			"subtitle": "Accompagnement DevSecOps et cloud concret pour les équipes de direction — avec des réalisations récentes sur AWS, Azure et OVH.",
 			"items": [
-				{"title":"Intégration de la sécurité","lead":"Intégrer la sécurité au développement, sans mauvaise surprise avant la mise en production.","bullets":["Analyses de sécurité automatisées dans la CI/CD (SAST, DAST et dépendances).","Gestion des vulnérabilités du cloud et des applications.","Préparation aux audits ISO 27001 et SOC 2."]},
-				{"title":"Intégration de l’IA","lead":"Transformer les LLM en assistants prêts pour la production, de façon sûre et maîtrisée.","bullets":["Conception de processus assistés par IA pour le support, les outils internes et les opérations.","Intégration d’OpenAI, Azure OpenAI et de modèles personnalisés ou hébergés.","Maîtrise des coûts et observabilité avec traçage et garde-fous."]},
-				{"title":"Architecture cloud","lead":"Des fondations évolutives, économiques et sécurisées sur AWS, Azure ou OVHcloud.","bullets":["Conception multi-comptes, réseau et durcissement.","Optimisation des coûts, supervision et lisibilité opérationnelle.","Haute disponibilité, sauvegarde et reprise après sinistre."]},
-				{"title":"Transformation DevOps","lead":"Des livraisons plus rapides et reproductibles sans épuiser l’équipe.","bullets":["Pipelines SDLC de bout en bout et automatisation des versions.","Processus et outils adaptés au profil de risque.","Accompagnement pratique pour rendre les équipes autonomes."]},
-				{"title":"Infrastructure as Code","lead":"Une source de vérité unique, vérifiable et reproductible pour l’infrastructure.","bullets":["Terraform, Ansible et GitOps pour des environnements cohérents.","Modèles pour la préproduction, la production et le multirégion."]},
-				{"title":"Orchestration de conteneurs","lead":"Exécuter les charges de manière portable, du poste local aux clusters de production.","bullets":["Kubernetes, Nomad et Docker ; ingress, secrets et fondations de plateforme.","Intégration de Cloudflare et Vault lorsqu’elle réduit les risques."]},
-				{"title":"Supervision et observabilité","lead":"Détecter les incidents avant qu’ils n’affectent les clients.","bullets":["Métriques, journaux et traces avec Prometheus, Grafana, Loki et OpenTelemetry.","Tableaux de bord et alertes adaptés aux SLO et à l’astreinte."]}
+				{
+					"title": "Intégration de la sécurité",
+					"lead": "Intégrer la sécurité au développement, sans mauvaise surprise avant la mise en production.",
+					"bullets": [
+						"Analyses de sécurité automatisées dans la CI/CD (SAST, DAST et dépendances).",
+						"Gestion des vulnérabilités du cloud et des applications.",
+						"Préparation aux audits ISO 27001 et SOC 2."
+					]
+				},
+				{
+					"title": "Intégration de l’IA",
+					"lead": "Transformer les LLM en assistants prêts pour la production, de façon sûre et maîtrisée.",
+					"bullets": [
+						"Conception de processus assistés par IA pour le support, les outils internes et les opérations.",
+						"Intégration d’OpenAI, Azure OpenAI et de modèles personnalisés ou hébergés.",
+						"Maîtrise des coûts et observabilité avec traçage et garde-fous."
+					]
+				},
+				{
+					"title": "Architecture cloud",
+					"lead": "Des fondations évolutives, économiques et sécurisées sur AWS, Azure ou OVHcloud.",
+					"bullets": [
+						"Conception multi-comptes, réseau et durcissement.",
+						"Optimisation des coûts, supervision et lisibilité opérationnelle.",
+						"Haute disponibilité, sauvegarde et reprise après sinistre."
+					]
+				},
+				{
+					"title": "Transformation DevOps",
+					"lead": "Des livraisons plus rapides et reproductibles sans épuiser l’équipe.",
+					"bullets": [
+						"Pipelines SDLC de bout en bout et automatisation des versions.",
+						"Processus et outils adaptés au profil de risque.",
+						"Accompagnement pratique pour rendre les équipes autonomes."
+					]
+				},
+				{
+					"title": "Infrastructure as Code",
+					"lead": "Une source de vérité unique, vérifiable et reproductible pour l’infrastructure.",
+					"bullets": [
+						"Terraform, Ansible et GitOps pour des environnements cohérents.",
+						"Modèles pour la préproduction, la production et le multirégion."
+					]
+				},
+				{
+					"title": "Orchestration de conteneurs",
+					"lead": "Exécuter les charges de manière portable, du poste local aux clusters de production.",
+					"bullets": [
+						"Kubernetes, Nomad et Docker ; ingress, secrets et fondations de plateforme.",
+						"Intégration de Cloudflare et Vault lorsqu’elle réduit les risques."
+					]
+				},
+				{
+					"title": "Supervision et observabilité",
+					"lead": "Détecter les incidents avant qu’ils n’affectent les clients.",
+					"bullets": [
+						"Métriques, journaux et traces avec Prometheus, Grafana, Loki et OpenTelemetry.",
+						"Tableaux de bord et alertes adaptés aux SLO et à l’astreinte."
+					]
+				}
 			]
 		},
 		"aiml": {
 			"title": "Infrastructure IA et MLOps",
 			"subtitle": "Un accompagnement pour mettre l’IA en production, au-delà des démonstrations, tout en maîtrisant sécurité et coûts.",
-			"bullets": ["Concevoir une infrastructure IA sécurisée pour les LLM, le RAG et les charges GPU.","Intégrer OpenAI et Azure OpenAI avec des garde-fous de coûts, de sécurité et d’accès.","Fournir journaux, traces et analyse des prompts pour les charges IA.","Concevoir selon ISO 42001, la résidence des données et les exigences de contrôle d’accès."]
+			"bullets": [
+				"Concevoir une infrastructure IA sécurisée pour les LLM, le RAG et les charges GPU.",
+				"Intégrer OpenAI et Azure OpenAI avec des garde-fous de coûts, de sécurité et d’accès.",
+				"Fournir journaux, traces et analyse des prompts pour les charges IA.",
+				"Concevoir selon ISO 42001, la résidence des données et les exigences de contrôle d’accès."
+			]
 		},
 		"skills": {
 			"title": "Expertise technique",
 			"subtitle": "Une sélection ciblée pour le cloud, le DevSecOps, la sécurité et l’IA — détails complets dans le CV et sur demande.",
-			"categoryTitles": ["Sécurité et conformité","Supervision et journalisation","IA et traitement des données","Plateformes cloud","Conteneurs et orchestration","Infrastructure as Code","DevOps et SDLC","Stockage de données","Programmation"],
+			"categoryTitles": [
+				"Sécurité et conformité",
+				"Supervision et journalisation",
+				"IA et traitement des données",
+				"Plateformes cloud",
+				"Conteneurs et orchestration",
+				"Infrastructure as Code",
+				"DevOps et SDLC",
+				"Stockage de données",
+				"Programmation"
+			],
 			"cvLink": "Voir tous les formats de CV"
 		},
 		"technologies": {
 			"title": "Technologies et outils",
 			"subtitle": "Une sélection de technologies que j’utilise en production.",
 			"officialWebsite": "site officiel (s’ouvre dans un nouvel onglet)",
-			"groupTitles": ["Langages et scripts","Web et frontend","Cloud, systèmes d’exploitation et infrastructure","Sécurité","Bases de données, données et messagerie","DevOps, observabilité et outillage","IA, apprentissage automatique et GPU"]
+			"groupTitles": [
+				"Langages et scripts",
+				"Web et frontend",
+				"Cloud, systèmes d’exploitation et infrastructure",
+				"Sécurité",
+				"Bases de données, données et messagerie",
+				"DevOps, observabilité et outillage",
+				"IA, apprentissage automatique et GPU"
+			]
 		}
 	},
 	"linkPage": {
@@ -200,10 +276,22 @@
 			"tagline": "Un système physique Mini-ITX exécutant TrueNAS Scale : stockage ZFS fiable et hôte homelab pour les applications, la domotique, les outils de sécurité et les charges de calcul intensives, notamment les expérimentations IA.",
 			"purposeLabel": "Usages de la plateforme",
 			"pillars": [
-				{"title": "ZFS et jeux de données", "subtitle": "Pools, instantanés et réplication"},
-				{"title": "Hôte homelab", "subtitle": "Applications, machines virtuelles et services internes"},
-				{"title": "Pile de sécurité", "subtitle": "Outils de sécurité et supervision"},
-				{"title": "IA et calcul", "subtitle": "Capacité AM5 pour les modèles et traitements"}
+				{
+					"title": "ZFS et jeux de données",
+					"subtitle": "Pools, instantanés et réplication"
+				},
+				{
+					"title": "Hôte homelab",
+					"subtitle": "Applications, machines virtuelles et services internes"
+				},
+				{
+					"title": "Pile de sécurité",
+					"subtitle": "Outils de sécurité et supervision"
+				},
+				{
+					"title": "IA et calcul",
+					"subtitle": "Capacité AM5 pour les modèles et traitements"
+				}
 			]
 		},
 		"bom": {

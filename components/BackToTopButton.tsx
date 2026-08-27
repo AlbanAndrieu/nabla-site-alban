@@ -13,7 +13,11 @@ export default function BackToTopButton({
 }: BackToTopButtonProps) {
 	const handleClick = () => {
 		window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-		window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#top`);
+		window.history.replaceState(
+			null,
+			"",
+			`${window.location.pathname}${window.location.search}#top`,
+		);
 	};
 
 	return (

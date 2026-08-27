@@ -1,43 +1,257 @@
 {
-  "version": 1,
-  "name": "Nabla homelab declared topology",
-  "nodes": [
-    {"id":"openwebui","name":"Open WebUI","kind":"application","category":"ai","sourcePath":"apps/openwebui/compose.yml"},
-    {"id":"openwebui-pipelines","name":"Open WebUI Pipelines","kind":"service","category":"ai","sourcePath":"apps/openwebui/compose.yml"},
-    {"id":"litellm","name":"LiteLLM","kind":"gateway","category":"ai","sourcePath":"apps/litellm/compose.yml"},
-    {"id":"ollama","name":"Ollama","kind":"model-runtime","category":"ai","sourcePath":"apps/ollama/compose.yml"},
-    {"id":"langfuse","name":"Langfuse","kind":"observability","category":"ai","sourcePath":"apps/langfuse/compose.yml"},
-    {"id":"openrag-backend","name":"OpenRAG Backend","kind":"service","category":"ai","sourcePath":"apps/openrag/compose.yml"},
-    {"id":"openrag-frontend","name":"OpenRAG Frontend","kind":"application","category":"ai","sourcePath":"apps/openrag/compose.yml"},
-    {"id":"langflow","name":"Langflow","kind":"workflow","category":"ai","sourcePath":"apps/langflow/compose.yml"},
-    {"id":"n8n","name":"n8n","kind":"workflow","category":"automation","sourcePath":"apps/n8n/compose.yml"},
-    {"id":"elasticsearch","name":"Elasticsearch","kind":"search","category":"data","sourcePath":"apps/elasticsearch/compose.yml"},
-    {"id":"postgresql","name":"PostgreSQL","kind":"database","category":"data"},
-    {"id":"redis","name":"Redis","kind":"cache","category":"data","sourcePath":"apps/redis/compose.yml"},
-    {"id":"clickhouse","name":"ClickHouse","kind":"database","category":"data","sourcePath":"apps/clickhouse/compose.yml"},
-    {"id":"minio","name":"MinIO","kind":"object-storage","category":"data","sourcePath":"apps/minio/compose.yml"},
-    {"id":"prometheus","name":"Prometheus","kind":"observability","category":"observability"},
-    {"id":"traefik","name":"Traefik","kind":"edge","category":"network"}
-  ],
-  "relations": [
-    {"source":"openwebui","target":"litellm","type":"consumesApi","strength":"required","description":"Open WebUI sends chat and RAG OpenAI-compatible requests through LiteLLM.","evidence":["apps/openwebui/compose.yml:OPENAI_API_BASE_URL"]},
-    {"source":"litellm","target":"ollama","type":"routesTo","strength":"required","description":"LiteLLM routes local model and embedding requests to Ollama runtimes.","evidence":["apps/litellm/config.yaml:model_list"]},
-    {"source":"litellm","target":"langfuse","type":"observedBy","strength":"optional","description":"LiteLLM exports LLM telemetry to Langfuse.","evidence":["apps/litellm/config.yaml:langfuse_otel"]},
-    {"source":"litellm","target":"redis","type":"dependsOn","strength":"optional","description":"LiteLLM can use Redis for its response cache.","evidence":["apps/litellm/config.yaml:cache_params.redis_url"]},
-    {"source":"litellm","target":"prometheus","type":"observedBy","strength":"optional","description":"LiteLLM exposes Prometheus metrics.","evidence":["apps/litellm/config.yaml:callbacks.prometheus"]},
-    {"source":"openrag-frontend","target":"openrag-backend","type":"consumesApi","strength":"required","evidence":["apps/openrag/compose.yml:OPENRAG_BACKEND_HOST"]},
-    {"source":"openrag-backend","target":"langflow","type":"dependsOn","strength":"required","evidence":["apps/openrag/compose.yml:LANGFLOW_URL"]},
-    {"source":"openrag-backend","target":"elasticsearch","type":"dependsOn","strength":"required","evidence":["apps/openrag/compose.yml:ES_HOST"]},
-    {"source":"langflow","target":"elasticsearch","type":"dependsOn","strength":"required","evidence":["apps/langflow/compose.yml:ES_HOST"]},
-    {"source":"langfuse","target":"postgresql","type":"dependsOn","strength":"required","evidence":["apps/langfuse/compose.yml:DATABASE_URL"]},
-    {"source":"langfuse","target":"clickhouse","type":"dependsOn","strength":"required","evidence":["apps/langfuse/compose.yml:CLICKHOUSE_URL"]},
-    {"source":"langfuse","target":"minio","type":"storesIn","strength":"required","evidence":["apps/langfuse/compose.yml:LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT"]},
-    {"source":"langfuse","target":"redis","type":"dependsOn","strength":"required","evidence":["apps/langfuse/compose.yml:REDIS_HOST"]},
-    {"source":"n8n","target":"postgresql","type":"dependsOn","strength":"required","evidence":["apps/n8n/compose.yml:DB_POSTGRESDB_USER"]},
-    {"source":"n8n","target":"redis","type":"dependsOn","strength":"optional","evidence":["apps/n8n/compose.yml:N8N_REDIS_PASSWORD"]},
-    {"source":"n8n","target":"traefik","type":"exposedBy","strength":"optional","evidence":["apps/n8n/compose.yml:traefik.http.routers.n8n"]},
-    {"source":"n8n","target":"prometheus","type":"observedBy","strength":"optional","evidence":["apps/n8n/compose.yml:prometheus.scrape"]},
-    {"source":"ollama","target":"traefik","type":"exposedBy","strength":"optional","evidence":["apps/ollama/compose.yml:traefik.http.routers.ollama"]},
-    {"source":"ollama","target":"prometheus","type":"observedBy","strength":"optional","evidence":["apps/ollama/compose.yml:prometheus.scrape"]}
-  ]
+	"version": 1,
+	"name": "Nabla homelab declared topology",
+	"nodes": [
+		{
+			"id": "openwebui",
+			"name": "Open WebUI",
+			"kind": "application",
+			"category": "ai",
+			"sourcePath": "apps/openwebui/compose.yml"
+		},
+		{
+			"id": "openwebui-pipelines",
+			"name": "Open WebUI Pipelines",
+			"kind": "service",
+			"category": "ai",
+			"sourcePath": "apps/openwebui/compose.yml"
+		},
+		{
+			"id": "litellm",
+			"name": "LiteLLM",
+			"kind": "gateway",
+			"category": "ai",
+			"sourcePath": "apps/litellm/compose.yml"
+		},
+		{
+			"id": "ollama",
+			"name": "Ollama",
+			"kind": "model-runtime",
+			"category": "ai",
+			"sourcePath": "apps/ollama/compose.yml"
+		},
+		{
+			"id": "langfuse",
+			"name": "Langfuse",
+			"kind": "observability",
+			"category": "ai",
+			"sourcePath": "apps/langfuse/compose.yml"
+		},
+		{
+			"id": "openrag-backend",
+			"name": "OpenRAG Backend",
+			"kind": "service",
+			"category": "ai",
+			"sourcePath": "apps/openrag/compose.yml"
+		},
+		{
+			"id": "openrag-frontend",
+			"name": "OpenRAG Frontend",
+			"kind": "application",
+			"category": "ai",
+			"sourcePath": "apps/openrag/compose.yml"
+		},
+		{
+			"id": "langflow",
+			"name": "Langflow",
+			"kind": "workflow",
+			"category": "ai",
+			"sourcePath": "apps/langflow/compose.yml"
+		},
+		{
+			"id": "n8n",
+			"name": "n8n",
+			"kind": "workflow",
+			"category": "automation",
+			"sourcePath": "apps/n8n/compose.yml"
+		},
+		{
+			"id": "elasticsearch",
+			"name": "Elasticsearch",
+			"kind": "search",
+			"category": "data",
+			"sourcePath": "apps/elasticsearch/compose.yml"
+		},
+		{
+			"id": "postgresql",
+			"name": "PostgreSQL",
+			"kind": "database",
+			"category": "data"
+		},
+		{
+			"id": "redis",
+			"name": "Redis",
+			"kind": "cache",
+			"category": "data",
+			"sourcePath": "apps/redis/compose.yml"
+		},
+		{
+			"id": "clickhouse",
+			"name": "ClickHouse",
+			"kind": "database",
+			"category": "data",
+			"sourcePath": "apps/clickhouse/compose.yml"
+		},
+		{
+			"id": "minio",
+			"name": "MinIO",
+			"kind": "object-storage",
+			"category": "data",
+			"sourcePath": "apps/minio/compose.yml"
+		},
+		{
+			"id": "prometheus",
+			"name": "Prometheus",
+			"kind": "observability",
+			"category": "observability"
+		},
+		{
+			"id": "traefik",
+			"name": "Traefik",
+			"kind": "edge",
+			"category": "network"
+		}
+	],
+	"relations": [
+		{
+			"source": "openwebui",
+			"target": "litellm",
+			"type": "consumesApi",
+			"strength": "required",
+			"description": "Open WebUI sends chat and RAG OpenAI-compatible requests through LiteLLM.",
+			"evidence": ["apps/openwebui/compose.yml:OPENAI_API_BASE_URL"]
+		},
+		{
+			"source": "litellm",
+			"target": "ollama",
+			"type": "routesTo",
+			"strength": "required",
+			"description": "LiteLLM routes local model and embedding requests to Ollama runtimes.",
+			"evidence": ["apps/litellm/config.yaml:model_list"]
+		},
+		{
+			"source": "litellm",
+			"target": "langfuse",
+			"type": "observedBy",
+			"strength": "optional",
+			"description": "LiteLLM exports LLM telemetry to Langfuse.",
+			"evidence": ["apps/litellm/config.yaml:langfuse_otel"]
+		},
+		{
+			"source": "litellm",
+			"target": "redis",
+			"type": "dependsOn",
+			"strength": "optional",
+			"description": "LiteLLM can use Redis for its response cache.",
+			"evidence": ["apps/litellm/config.yaml:cache_params.redis_url"]
+		},
+		{
+			"source": "litellm",
+			"target": "prometheus",
+			"type": "observedBy",
+			"strength": "optional",
+			"description": "LiteLLM exposes Prometheus metrics.",
+			"evidence": ["apps/litellm/config.yaml:callbacks.prometheus"]
+		},
+		{
+			"source": "openrag-frontend",
+			"target": "openrag-backend",
+			"type": "consumesApi",
+			"strength": "required",
+			"evidence": ["apps/openrag/compose.yml:OPENRAG_BACKEND_HOST"]
+		},
+		{
+			"source": "openrag-backend",
+			"target": "langflow",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/openrag/compose.yml:LANGFLOW_URL"]
+		},
+		{
+			"source": "openrag-backend",
+			"target": "elasticsearch",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/openrag/compose.yml:ES_HOST"]
+		},
+		{
+			"source": "langflow",
+			"target": "elasticsearch",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/langflow/compose.yml:ES_HOST"]
+		},
+		{
+			"source": "langfuse",
+			"target": "postgresql",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/langfuse/compose.yml:DATABASE_URL"]
+		},
+		{
+			"source": "langfuse",
+			"target": "clickhouse",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/langfuse/compose.yml:CLICKHOUSE_URL"]
+		},
+		{
+			"source": "langfuse",
+			"target": "minio",
+			"type": "storesIn",
+			"strength": "required",
+			"evidence": [
+				"apps/langfuse/compose.yml:LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT"
+			]
+		},
+		{
+			"source": "langfuse",
+			"target": "redis",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/langfuse/compose.yml:REDIS_HOST"]
+		},
+		{
+			"source": "n8n",
+			"target": "postgresql",
+			"type": "dependsOn",
+			"strength": "required",
+			"evidence": ["apps/n8n/compose.yml:DB_POSTGRESDB_USER"]
+		},
+		{
+			"source": "n8n",
+			"target": "redis",
+			"type": "dependsOn",
+			"strength": "optional",
+			"evidence": ["apps/n8n/compose.yml:N8N_REDIS_PASSWORD"]
+		},
+		{
+			"source": "n8n",
+			"target": "traefik",
+			"type": "exposedBy",
+			"strength": "optional",
+			"evidence": ["apps/n8n/compose.yml:traefik.http.routers.n8n"]
+		},
+		{
+			"source": "n8n",
+			"target": "prometheus",
+			"type": "observedBy",
+			"strength": "optional",
+			"evidence": ["apps/n8n/compose.yml:prometheus.scrape"]
+		},
+		{
+			"source": "ollama",
+			"target": "traefik",
+			"type": "exposedBy",
+			"strength": "optional",
+			"evidence": ["apps/ollama/compose.yml:traefik.http.routers.ollama"]
+		},
+		{
+			"source": "ollama",
+			"target": "prometheus",
+			"type": "observedBy",
+			"strength": "optional",
+			"evidence": ["apps/ollama/compose.yml:prometheus.scrape"]
+		}
+	]
 }

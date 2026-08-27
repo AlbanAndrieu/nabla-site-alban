@@ -8,7 +8,9 @@ function metadataTitle(metadata: Metadata, fallback: string) {
 }
 
 function metadataDescription(metadata: Metadata, fallback: string) {
-	return typeof metadata.description === "string" ? metadata.description : fallback;
+	return typeof metadata.description === "string"
+		? metadata.description
+		: fallback;
 }
 
 export async function buildLegacyPageMetadata({

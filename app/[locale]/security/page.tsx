@@ -23,7 +23,11 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const metadata = await metadataFromPublicHtml("security.html", "/security", locale);
+	const metadata = await metadataFromPublicHtml(
+		"security.html",
+		"/security",
+		locale,
+	);
 	return enrichPageMetadata(metadata, { slug: "security", locale });
 }
 

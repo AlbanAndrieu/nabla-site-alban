@@ -87,10 +87,7 @@ export default function Hero() {
 					</ul>
 				</div>
 				<div className="cta-buttons">
-					<a
-						href={`${localePrefix}/expertise`}
-						className="btn btn-secondary"
-					>
+					<a href={`${localePrefix}/expertise`} className="btn btn-secondary">
 						<i className="fas fa-layer-group" aria-hidden="true"></i>{" "}
 						{t("home.hero.services")}
 					</a>

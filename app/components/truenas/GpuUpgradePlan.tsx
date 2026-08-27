@@ -28,7 +28,9 @@ export default async function GpuUpgradePlan() {
 								<div className="d-flex align-items-start justify-content-between gap-2">
 									<h6 className="card-title">{gpu.name}</h6>
 									{gpu.recommended && (
-										<span className="badge text-bg-primary">{t("recommended")}</span>
+										<span className="badge text-bg-primary">
+											{t("recommended")}
+										</span>
 									)}
 								</div>
 								<dl className="small mb-3">
@@ -45,7 +47,9 @@ export default async function GpuUpgradePlan() {
 										<dd className="mb-1 text-end">{formFactors[index]}</dd>
 									</div>
 									<div className="d-flex justify-content-between gap-3">
-										<dt>{gpu.priceMode === "from" ? t("fromPrice") : t("price")}</dt>
+										<dt>
+											{gpu.priceMode === "from" ? t("fromPrice") : t("price")}
+										</dt>
 										<dd className="mb-1 text-end fw-semibold">
 											{formatEuro(locale, gpu.priceEur)}
 										</dd>

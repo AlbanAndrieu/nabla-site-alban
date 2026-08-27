@@ -1,12 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+} from "@/lib/homelabHealth";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import {
-	homelabServiceEndpointUrl,
 	type HomelabService,
 	type HomelabServicesCatalog,
+	homelabServiceEndpointUrl,
 } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 
@@ -60,7 +63,9 @@ function lookupHealth(
 	}
 }
 
-function reconciledHealth(entry?: HomelabHealthEntry): HomelabHealthEntry | undefined {
+function reconciledHealth(
+	entry?: HomelabHealthEntry,
+): HomelabHealthEntry | undefined {
 	if (!entry) return undefined;
 	const reconciliation = reconcileHomelabHealth(entry);
 	return { ...entry, state: reconciliation.state };
@@ -78,7 +83,8 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 	const truenasPublicUp =
 		truenasPublic?.reachable === true && truenasPublic.state !== "fail";
 	const truenasDown = !truenasPublicUp && snapshot?.truenas?.state === "fail";
-	const truenasWarning = !truenasPublicUp && snapshot?.truenas?.state === "warn";
+	const truenasWarning =
+		!truenasPublicUp && snapshot?.truenas?.state === "warn";
 
 	return (
 		<>
@@ -92,7 +98,9 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 						{truenasDown ? t("truenas.down") : t("truenas.degraded")}
 					</strong>
 					{" — "}
-					{t("truenas.publicProbe", { state: truenasPublic?.state ?? "unknown" })}
+					{t("truenas.publicProbe", {
+						state: truenasPublic?.state ?? "unknown",
+					})}
 					{truenasInternal
 						? `; ${t("truenas.internalProbe", {
 								host: truenasInternal.host,
@@ -134,8 +142,17 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 								/>
 								<div className="card-body text-center border-top border-secondary">
 									<h3 className="h5 card-title mb-1">{svc.name}</h3>
-									<p className="card-text text-muted small mb-0">{svc.description}</p>
-									<div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+									<p className="card-text text-muted small mb-0">
+										{svc.description}
+									</p>
+									<div
+										style={{
+											marginTop: 18,
+											display: "flex",
+											flexDirection: "column",
+											gap: 8,
+										}}
+									>
 										<EndpointAction
 											url={endpointUrl}
 											enabled={endpointEnabled}
@@ -161,7 +178,8 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 														aria-label={t("truenas.internalTlsAria")}
 													/>
 												)}
-												{t("endpoint.internal")} ({svc.internalHost}:{svc.internalPort})
+												{t("endpoint.internal")} ({svc.internalHost}:
+												{svc.internalPort})
 											</a>
 										)}
 									</div>

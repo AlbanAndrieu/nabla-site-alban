@@ -18,7 +18,9 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
 	return buildPageMetadata({
-		title: french ? "Architecture des services Nabla" : "Nabla service architecture",
+		title: french
+			? "Architecture des services Nabla"
+			: "Nabla service architecture",
 		description: french
 			? "Diagrammes interactifs de la plateforme IA et de la topologie des services Nabla et TrueNAS."
 			: "Interactive diagrams of the AI platform and the Nabla and TrueNAS service topology.",
@@ -47,7 +49,9 @@ export default async function ArchitecturePage({
 					<div className="hero-content">
 						<h1 id="architecture-title" className="hero-title">
 							<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
-							{french ? "Architecture interactive Nabla" : "Interactive Nabla architecture"}
+							{french
+								? "Architecture interactive Nabla"
+								: "Interactive Nabla architecture"}
 						</h1>
 						<p className="hero-subtitle">
 							{french
@@ -60,9 +64,15 @@ export default async function ArchitecturePage({
 								: "AI Platform expands the previous architecture diagram into individual tools. Nabla / TrueNAS merges the service inventory with relationships declared in nabla-compose; it does not use depends_on as a substitute for functional architecture."}
 						</p>
 						<div className="d-flex flex-wrap gap-2 justify-content-center">
-							<ActionLink href={`${prefix}/ai`} variant="secondary">AI</ActionLink>
-							<ActionLink href={`${prefix}/truenas`} variant="secondary">TrueNAS</ActionLink>
-							<ActionLink href={`${prefix}/nabla`} variant="secondary">Nabla</ActionLink>
+							<ActionLink href={`${prefix}/ai`} variant="secondary">
+								AI
+							</ActionLink>
+							<ActionLink href={`${prefix}/truenas`} variant="secondary">
+								TrueNAS
+							</ActionLink>
+							<ActionLink href={`${prefix}/nabla`} variant="secondary">
+								Nabla
+							</ActionLink>
 						</div>
 					</div>
 				</section>
@@ -81,7 +91,10 @@ export default async function ArchitecturePage({
 					aria-labelledby="declared-observed-title"
 				>
 					<div className="container py-5">
-						<div className="text-center mx-auto mb-4" style={{ maxWidth: "860px" }}>
+						<div
+							className="text-center mx-auto mb-4"
+							style={{ maxWidth: "860px" }}
+						>
 							<h2 id="declared-observed-title">
 								{french
 									? "Configuration déclarée, runtime observé et santé"

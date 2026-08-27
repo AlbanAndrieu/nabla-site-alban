@@ -36,7 +36,8 @@ export function hasCloudflareEvidence(entry?: HomelabHealthEntry): boolean {
 export function cloudflareIndicatorColor(entry?: HomelabHealthEntry): string {
 	const status = entry?.tunnel_status?.trim().toLowerCase();
 	if (!status) return HEALTH_COLORS.unknown;
-	if (["healthy", "active", "up", "ok"].includes(status)) return HEALTH_COLORS.ok;
+	if (["healthy", "active", "up", "ok"].includes(status))
+		return HEALTH_COLORS.ok;
 	if (["down", "inactive", "failed", "error", "degraded"].includes(status)) {
 		return status === "degraded" ? HEALTH_COLORS.warn : HEALTH_COLORS.fail;
 	}

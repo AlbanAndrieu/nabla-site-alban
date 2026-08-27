@@ -4,10 +4,7 @@ type Props = { label: string; imageAlt: string; tagline: string };
 
 export default function HeroSection({ label, imageAlt, tagline }: Props) {
 	return (
-		<section
-			className="hero-content"
-			aria-label={label}
-		>
+		<section className="hero-content" aria-label={label}>
 			<div className="hero-content">
 				<div className="hero-image-wrapper">
 					<Image

@@ -53,10 +53,7 @@ export default async function PricingPage({ params }: Props) {
 						))}
 					</ul>
 				</section>
-				<section
-					className="py-3"
-					aria-label={t("tiersAriaLabel")}
-				>
+				<section className="py-3" aria-label={t("tiersAriaLabel")}>
 					<div className="pricing-tier-grid">
 						{PRICING_TIERS[locale].map((tier) => (
 							<article

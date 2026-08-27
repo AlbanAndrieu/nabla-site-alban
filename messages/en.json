@@ -124,31 +124,107 @@
 			"title": "Services I offer",
 			"subtitle": "Practical DevSecOps and cloud work for leadership teams — recent outcomes on AWS, Azure and OVH.",
 			"items": [
-				{"title":"Security integration","lead":"Make security part of development — not a late surprise before release.","bullets":["Automated security scans in CI/CD (SAST/DAST and dependency checks).","Vulnerability management for cloud and applications.","Support for ISO 27001 / SOC 2 readiness and audits."]},
-				{"title":"AI integration","lead":"Turn LLMs into production-grade assistants — safely and cost-aware.","bullets":["Design AI-assisted workflows for support, internal tools and operations.","Integrate OpenAI, Azure OpenAI and custom or hosted models.","Control cost and observability with tracing and guardrails."]},
-				{"title":"Cloud architecture","lead":"Scalable, cost-efficient and secure foundations on AWS, Azure or OVHcloud.","bullets":["Multi-account design, networking and hardening.","Cost optimization, monitoring and operational clarity.","High availability, backup and disaster-recovery patterns."]},
-				{"title":"DevOps transformation","lead":"Faster, repeatable delivery without burning out the team.","bullets":["End-to-end SDLC pipelines and release automation.","Processes and tools aligned with your risk profile.","Hands-on enablement so your engineers own the stack."]},
-				{"title":"Infrastructure as Code","lead":"One source of truth for infrastructure — reviewable and reproducible.","bullets":["Terraform, Ansible and GitOps for consistent environments.","Patterns for staging, production and multi-region setups."]},
-				{"title":"Container orchestration","lead":"Run workloads portably from laptops to production clusters.","bullets":["Kubernetes, Nomad and Docker; ingress, secrets and platform foundations.","Cloudflare and Vault integration where it reduces risk."]},
-				{"title":"Monitoring and observability","lead":"Know when something breaks before your customers do.","bullets":["Metrics, logs and traces with Prometheus, Grafana, Loki and OpenTelemetry.","Dashboards and alerts tuned to SLOs and on-call reality."]}
+				{
+					"title": "Security integration",
+					"lead": "Make security part of development — not a late surprise before release.",
+					"bullets": [
+						"Automated security scans in CI/CD (SAST/DAST and dependency checks).",
+						"Vulnerability management for cloud and applications.",
+						"Support for ISO 27001 / SOC 2 readiness and audits."
+					]
+				},
+				{
+					"title": "AI integration",
+					"lead": "Turn LLMs into production-grade assistants — safely and cost-aware.",
+					"bullets": [
+						"Design AI-assisted workflows for support, internal tools and operations.",
+						"Integrate OpenAI, Azure OpenAI and custom or hosted models.",
+						"Control cost and observability with tracing and guardrails."
+					]
+				},
+				{
+					"title": "Cloud architecture",
+					"lead": "Scalable, cost-efficient and secure foundations on AWS, Azure or OVHcloud.",
+					"bullets": [
+						"Multi-account design, networking and hardening.",
+						"Cost optimization, monitoring and operational clarity.",
+						"High availability, backup and disaster-recovery patterns."
+					]
+				},
+				{
+					"title": "DevOps transformation",
+					"lead": "Faster, repeatable delivery without burning out the team.",
+					"bullets": [
+						"End-to-end SDLC pipelines and release automation.",
+						"Processes and tools aligned with your risk profile.",
+						"Hands-on enablement so your engineers own the stack."
+					]
+				},
+				{
+					"title": "Infrastructure as Code",
+					"lead": "One source of truth for infrastructure — reviewable and reproducible.",
+					"bullets": [
+						"Terraform, Ansible and GitOps for consistent environments.",
+						"Patterns for staging, production and multi-region setups."
+					]
+				},
+				{
+					"title": "Container orchestration",
+					"lead": "Run workloads portably from laptops to production clusters.",
+					"bullets": [
+						"Kubernetes, Nomad and Docker; ingress, secrets and platform foundations.",
+						"Cloudflare and Vault integration where it reduces risk."
+					]
+				},
+				{
+					"title": "Monitoring and observability",
+					"lead": "Know when something breaks before your customers do.",
+					"bullets": [
+						"Metrics, logs and traces with Prometheus, Grafana, Loki and OpenTelemetry.",
+						"Dashboards and alerts tuned to SLOs and on-call reality."
+					]
+				}
 			]
 		},
 		"aiml": {
 			"title": "AI and MLOps infrastructure",
 			"subtitle": "Support for leaders who need AI in production — not only demos — with security and cost under control.",
-			"bullets": ["Design secure AI infrastructure for LLMs, RAG and GPU workloads.","Integrate OpenAI and Azure OpenAI with cost, safety and access guardrails.","Provide logs, traces and prompt analytics for AI workloads.","Design for ISO 42001, data residency and access-control requirements."]
+			"bullets": [
+				"Design secure AI infrastructure for LLMs, RAG and GPU workloads.",
+				"Integrate OpenAI and Azure OpenAI with cost, safety and access guardrails.",
+				"Provide logs, traces and prompt analytics for AI workloads.",
+				"Design for ISO 42001, data residency and access-control requirements."
+			]
 		},
 		"skills": {
 			"title": "Technical expertise",
 			"subtitle": "A focused stack for cloud, DevSecOps, security and AI — full details in the CV and on request.",
-			"categoryTitles": ["Security and compliance","Monitoring and logging","AI and data processing","Cloud platforms","Containers and orchestration","Infrastructure as Code","DevOps and SDLC","Data stores","Programming"],
+			"categoryTitles": [
+				"Security and compliance",
+				"Monitoring and logging",
+				"AI and data processing",
+				"Cloud platforms",
+				"Containers and orchestration",
+				"Infrastructure as Code",
+				"DevOps and SDLC",
+				"Data stores",
+				"Programming"
+			],
 			"cvLink": "View all CV formats"
 		},
 		"technologies": {
 			"title": "Technologies and stack",
 			"subtitle": "A selection of technologies I use in production.",
 			"officialWebsite": "official website (opens in a new tab)",
-			"groupTitles": ["Languages and scripting","Web and frontend","Cloud, operating systems and infrastructure","Security","Databases, data and messaging","DevOps, observability and tooling","AI, machine learning and GPU"]
+			"groupTitles": [
+				"Languages and scripting",
+				"Web and frontend",
+				"Cloud, operating systems and infrastructure",
+				"Security",
+				"Databases, data and messaging",
+				"DevOps, observability and tooling",
+				"AI, machine learning and GPU"
+			]
 		}
 	},
 	"linkPage": {
@@ -200,10 +276,22 @@
 			"tagline": "One physical Mini-ITX system running TrueNAS Scale: dependable ZFS storage and a homelab host for applications, home automation, security tooling and compute-intensive workloads, including AI experiments.",
 			"purposeLabel": "Platform purposes",
 			"pillars": [
-				{"title": "ZFS and datasets", "subtitle": "Pools, snapshots and replication"},
-				{"title": "Homelab host", "subtitle": "Applications, VMs and internal services"},
-				{"title": "Security stack", "subtitle": "Security tooling and monitoring"},
-				{"title": "AI and compute", "subtitle": "AM5 capacity for models and jobs"}
+				{
+					"title": "ZFS and datasets",
+					"subtitle": "Pools, snapshots and replication"
+				},
+				{
+					"title": "Homelab host",
+					"subtitle": "Applications, VMs and internal services"
+				},
+				{
+					"title": "Security stack",
+					"subtitle": "Security tooling and monitoring"
+				},
+				{
+					"title": "AI and compute",
+					"subtitle": "AM5 capacity for models and jobs"
+				}
 			]
 		},
 		"bom": {

@@ -10,7 +10,10 @@ const sectionSource = await readFile(
 
 test("security owns its semantic main and shared skip link", () => {
 	assert.match(pageSource, /<SkipToMainContent\s*\/>/);
-	assert.match(pageSource, /<main id="main-content" className="security-resources">/);
+	assert.match(
+		pageSource,
+		/<main id="main-content" className="security-resources">/,
+	);
 	assert.doesNotMatch(pageSource, /className="skip-to-main"/);
 });
 

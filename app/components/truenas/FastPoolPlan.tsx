@@ -7,7 +7,8 @@ export default async function FastPoolPlan() {
 		getLocale(),
 		getTranslations("truenas.upgrades.fastPool"),
 	]);
-	const totalPrice = FAST_POOL_PRODUCT.unitPriceEur * FAST_POOL_PRODUCT.quantity;
+	const totalPrice =
+		FAST_POOL_PRODUCT.unitPriceEur * FAST_POOL_PRODUCT.quantity;
 
 	return (
 		<div className="card box-shadow mt-3">
@@ -17,18 +18,28 @@ export default async function FastPoolPlan() {
 					<span className="badge text-bg-warning">{t("badge")}</span>
 				</div>
 				<p className="mb-3">
-					<a href={FAST_POOL_PRODUCT.href} target="_blank" rel="noopener noreferrer">
+					<a
+						href={FAST_POOL_PRODUCT.href}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						{t("purchase")}
 					</a>{" "}
-					— {formatEuro(locale, FAST_POOL_PRODUCT.unitPriceEur)} {t("unitPrice")},{" "}
-					{formatEuro(locale, totalPrice)} {t("totalPrice")}.
+					— {formatEuro(locale, FAST_POOL_PRODUCT.unitPriceEur)}{" "}
+					{t("unitPrice")}, {formatEuro(locale, totalPrice)} {t("totalPrice")}.
 				</p>
 
-				<div className="row g-3" role="list" aria-label={t("architectureLabel")}>
+				<div
+					className="row g-3"
+					role="list"
+					aria-label={t("architectureLabel")}
+				>
 					<div className="col-md-4" role="listitem">
 						<div className="card h-100 border-secondary">
 							<div className="card-body text-center">
-								<div className="fw-bold small text-uppercase mb-2">{t("system")}</div>
+								<div className="fw-bold small text-uppercase mb-2">
+									{t("system")}
+								</div>
 								<div className="mb-1">{t("systemDevice")}</div>
 								<code>boot-pool</code>
 								<div className="small text-muted mt-2">{t("systemRole")}</div>
@@ -38,7 +49,9 @@ export default async function FastPoolPlan() {
 					<div className="col-md-4" role="listitem">
 						<div className="card h-100 border-primary">
 							<div className="card-body text-center">
-								<div className="fw-bold small text-uppercase mb-2">{t("fast")}</div>
+								<div className="fw-bold small text-uppercase mb-2">
+									{t("fast")}
+								</div>
 								<div className="mb-1">{t("fastDevice")}</div>
 								<code>{t("fastRole")}</code>
 								<div className="small text-muted mt-2">{t("fastUsage")}</div>
@@ -48,7 +61,9 @@ export default async function FastPoolPlan() {
 					<div className="col-md-4" role="listitem">
 						<div className="card h-100 border-secondary">
 							<div className="card-body text-center">
-								<div className="fw-bold small text-uppercase mb-2">{t("data")}</div>
+								<div className="fw-bold small text-uppercase mb-2">
+									{t("data")}
+								</div>
 								<div className="mb-1">{t("dataDevice")}</div>
 								<code>{t("dataRole")}</code>
 								<div className="small text-muted mt-2">{t("dataUsage")}</div>

@@ -183,7 +183,7 @@ repos:
         name: "🔒 security · Detect private keys"
 
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v4.6.1
+    rev: v4.6.2
     hooks:
     -   id: validate_manifest
         name: "🤖 manifest · Validate manifest scripts"
@@ -209,7 +209,7 @@ repos:
     -   id: pyupgrade
         name: "🐍 python · Py Upgrade"
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.4
     hooks:
     -   id: ruff-format
         name: "🐍 python · Format with Ruff"
@@ -229,7 +229,7 @@ repos:
     #       name: "🐍 python · Check types"
 
 -   repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.25
+    rev: '0.26'
     hooks:
     -   id: validate-pyproject
         name: "🐍 python · Validate pyproject.toml"
@@ -241,8 +241,9 @@ repos:
     hooks:
       # Choose one of:
       # - id: shfmt         # native (requires Go to build)
-    -   id: shfmt-docker # Docker image (requires Docker to run)
-        name: "🐚 🐳 shell · Format shell scripts"
+      -   id: shfmt-docker # Docker image (requires Docker to run)
+          name: "🐚 🐳 shell · Format shell scripts"
+          args: ["-i", "4", "-ci"]
 -   repo: https://github.com/detailyang/pre-commit-shell
     rev: v1.0.6
     hooks:
@@ -328,7 +329,7 @@ repos:
 
     ### Javascript & Web Tools ###
 -   repo: https://github.com/biomejs/pre-commit
-    rev: "v2.5.6"
+    rev: "v2.5.10"
     hooks:
     -   id: biome-check
         name: "🟨 javascript · Lint, format, and safe fixes with Biome"
@@ -421,7 +422,7 @@ repos:
 
     ### Data & Config Validation ###
 -   repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.4
+    rev: 0.38.0
     hooks:
     -   id: check-github-workflows
         name: "🧩 github-actions · Validate gh workflow files"
@@ -431,7 +432,7 @@ repos:
 
     # ----------------------------- 🔒 Deployment Tools ---------------------------- #
 -   repo: https://github.com/hadolint/hadolint
-    rev: v2.15.0
+    rev: v2.15.1
     hooks:
     -   id: hadolint-docker
         name: "🐳 hadolint · Validate Dockerfile"

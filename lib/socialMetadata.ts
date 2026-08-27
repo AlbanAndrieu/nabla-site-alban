@@ -31,7 +31,9 @@ function metadataTitle(metadata: Metadata) {
 }
 
 function metadataDescription(metadata: Metadata) {
-	return typeof metadata.description === "string" ? metadata.description : undefined;
+	return typeof metadata.description === "string"
+		? metadata.description
+		: undefined;
 }
 
 export function socialCardPath({

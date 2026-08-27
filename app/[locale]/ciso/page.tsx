@@ -61,8 +61,7 @@ export default async function CisoPage({ params }: Props) {
 						</h1>
 						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">
-							{t("curatedBy")} {" "}
-							<a href={`/${locale}/contact`}>Alban Andrieu</a>
+							{t("curatedBy")} <a href={`/${locale}/contact`}>Alban Andrieu</a>
 						</p>
 					</div>
 				</section>
@@ -84,9 +83,7 @@ export default async function CisoPage({ params }: Props) {
 										<i className={`fa-solid ${icon}`} aria-hidden="true" />
 										<span>{label}</span>
 									</dt>
-									<dd>
-									{value === "In progress" ? t("inProgress") : value}
-									</dd>
+									<dd>{value === "In progress" ? t("inProgress") : value}</dd>
 								</div>
 							))}
 						</dl>
@@ -97,7 +94,7 @@ export default async function CisoPage({ params }: Props) {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{t("checklist")} {" "}
+							{t("checklist")}{" "}
 							<i
 								className="fa-solid fa-arrow-up-right-from-square"
 								aria-hidden="true"
@@ -132,7 +129,8 @@ export default async function CisoPage({ params }: Props) {
 						aria-labelledby="threats-heading"
 					>
 						<h2 id="threats-heading">
-							<i className="fa-solid fa-globe" aria-hidden="true" /> {t("threats")}
+							<i className="fa-solid fa-globe" aria-hidden="true" />{" "}
+							{t("threats")}
 						</h2>
 						<p>{t("threatsIntro")}</p>
 						<ThreatFeed locale={locale} />

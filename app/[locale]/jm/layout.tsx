@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 

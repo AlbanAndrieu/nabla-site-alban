@@ -17,7 +17,9 @@ const HOMELAB_LOADERS = {
 
 const LEGACY_FEATURE_NAMESPACES = new Set(["truenasPage"]);
 
-function withoutMigratedLegacyNamespaces<T extends Record<string, unknown>>(catalog: T) {
+function withoutMigratedLegacyNamespaces<T extends Record<string, unknown>>(
+	catalog: T,
+) {
 	const filtered = { ...catalog } as Record<string, unknown>;
 	for (const namespace of LEGACY_FEATURE_NAMESPACES) {
 		delete filtered[namespace];
@@ -25,7 +27,9 @@ function withoutMigratedLegacyNamespaces<T extends Record<string, unknown>>(cata
 	return filtered;
 }
 
-function assertUniqueTopLevelNamespaces(catalogs: ReadonlyArray<Record<string, unknown>>) {
+function assertUniqueTopLevelNamespaces(
+	catalogs: ReadonlyArray<Record<string, unknown>>,
+) {
 	const owners = new Map<string, number>();
 	catalogs.forEach((catalog, catalogIndex) => {
 		for (const namespace of Object.keys(catalog)) {

@@ -10,7 +10,9 @@
 	},
 	"author": "Alban Andrieu (aandrieu)",
 	"license": "Apache-2.0",
-	"bugs": { "url": "https://github.com/AlbanAndrieu/nabla-site-alban/issues" },
+	"bugs": {
+		"url": "https://github.com/AlbanAndrieu/nabla-site-alban/issues"
+	},
 	"homepage": "https://github.com/AlbanAndrieu/nabla-site-alban#readme",
 	"engines": {
 		"node": ">=24.11.0 <25",

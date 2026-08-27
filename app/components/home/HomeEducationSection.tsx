@@ -72,7 +72,9 @@ function EducationCard({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className={`education-card${featured ? " education-card--featured" : ""}`}>
+		<div
+			className={`education-card${featured ? " education-card--featured" : ""}`}
+		>
 			<div className="education-icon">
 				<i className={`fas ${icon}`} aria-hidden="true" />
 			</div>

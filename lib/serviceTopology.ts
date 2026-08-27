@@ -63,10 +63,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function parseServiceTopology(value: unknown): ServiceTopology | null {
-	if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.relations)) {
+	if (
+		!isRecord(value) ||
+		!Array.isArray(value.nodes) ||
+		!Array.isArray(value.relations)
+	) {
 		return null;
 	}
-	if (typeof value.version !== "number" || typeof value.name !== "string") return null;
+	if (typeof value.version !== "number" || typeof value.name !== "string")
+		return null;
 
 	const nodes = value.nodes;
 	if (
@@ -93,7 +98,8 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof relation.target === "string" &&
 				typeof relation.type === "string" &&
 				RELATION_TYPES.has(relation.type as ServiceRelationType) &&
-				(relation.strength === "required" || relation.strength === "optional") &&
+				(relation.strength === "required" ||
+					relation.strength === "optional") &&
 				Array.isArray(relation.evidence) &&
 				relation.evidence.every((entry) => typeof entry === "string") &&
 				nodeIds.has(relation.source) &&
@@ -124,7 +130,8 @@ export async function loadServiceTopology(): Promise<{
 	source: ServiceTopologySource;
 }> {
 	const primaryUrl =
-		process.env.HOMELAB_TOPOLOGY_API_URL?.trim() || SERVICE_TOPOLOGY_DEFAULT_API_URL;
+		process.env.HOMELAB_TOPOLOGY_API_URL?.trim() ||
+		SERVICE_TOPOLOGY_DEFAULT_API_URL;
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 
@@ -136,7 +143,8 @@ export async function loadServiceTopology(): Promise<{
 		});
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		const topology = parseServiceTopology(await response.json());
-		if (!topology || topology.nodes.length === 0) throw new Error("Invalid topology payload");
+		if (!topology || topology.nodes.length === 0)
+			throw new Error("Invalid topology payload");
 		return { topology, source: "fastapi" };
 	} catch {
 		return { topology: LOCAL_FALLBACK, source: "local-fallback" };

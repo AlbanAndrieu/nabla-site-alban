@@ -14,7 +14,10 @@ type ArfNode = {
 
 type Props = Readonly<{ locale: string }>;
 
-function ArfTreeNode({ node, depth }: Readonly<{ node: ArfNode; depth: number }>) {
+function ArfTreeNode({
+	node,
+	depth,
+}: Readonly<{ node: ArfNode; depth: number }>) {
 	const hasChildren = Boolean(node.children?.length);
 	const label = node.name?.trim() || "Resource group";
 
@@ -40,14 +43,24 @@ function ArfTreeNode({ node, depth }: Readonly<{ node: ArfNode; depth: number }>
 	return (
 		<li className={styles.item}>
 			{node.url ? (
-				<a className={styles.link} href={node.url} target="_blank" rel="noopener noreferrer">
+				<a
+					className={styles.link}
+					href={node.url}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<span>{label}</span>
-					<i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+					<i
+						className="fa-solid fa-arrow-up-right-from-square"
+						aria-hidden="true"
+					/>
 				</a>
 			) : (
 				<span>{label}</span>
 			)}
-			{node.description ? <span className={styles.description}>{node.description}</span> : null}
+			{node.description ? (
+				<span className={styles.description}>{node.description}</span>
+			) : null}
 		</li>
 	);
 }
@@ -64,12 +77,14 @@ export default function SecurityArfTree({ locale }: Props) {
 
 		void fetch("/arf.json", { signal: controller.signal })
 			.then((response) => {
-				if (!response.ok) throw new Error(`ARF request failed: ${response.status}`);
+				if (!response.ok)
+					throw new Error(`ARF request failed: ${response.status}`);
 				return response.json() as Promise<ArfNode>;
 			})
 			.then(setData)
 			.catch((cause: unknown) => {
-				if (cause instanceof DOMException && cause.name === "AbortError") return;
+				if (cause instanceof DOMException && cause.name === "AbortError")
+					return;
 				setError(true);
 			});
 
@@ -92,7 +107,9 @@ export default function SecurityArfTree({ locale }: Props) {
 	if (!data) {
 		return createPortal(
 			<p className={styles.status} role="status">
-				{isFrench ? "Chargement des ressources de sécurité…" : "Loading security resources…"}
+				{isFrench
+					? "Chargement des ressources de sécurité…"
+					: "Loading security resources…"}
 			</p>,
 			target,
 		);
@@ -110,7 +127,11 @@ export default function SecurityArfTree({ locale }: Props) {
 		>
 			<ul className={styles.list}>
 				{rootNodes.map((node, index) => (
-					<ArfTreeNode node={node} depth={0} key={`${node.name ?? "root"}-${index}`} />
+					<ArfTreeNode
+						node={node}
+						depth={0}
+						key={`${node.name ?? "root"}-${index}`}
+					/>
 				))}
 			</ul>
 		</div>,

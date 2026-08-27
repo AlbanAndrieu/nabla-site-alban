@@ -18,8 +18,14 @@ type Props = { title: string; subtitle: string; services: ExpertiseService[] };
 
 export default function ServicesSection({ title, subtitle, services }: Props) {
 	return (
-		<section className="services-section" id="services" aria-labelledby="services-heading">
-			<h2 className="section-title" id="services-heading">{title}</h2>
+		<section
+			className="services-section"
+			id="services"
+			aria-labelledby="services-heading"
+		>
+			<h2 className="section-title" id="services-heading">
+				{title}
+			</h2>
 			<p className="section-subtitle">{subtitle}</p>
 			<div className="services-grid">
 				{services.map((service, index) => {
@@ -32,7 +38,9 @@ export default function ServicesSection({ title, subtitle, services }: Props) {
 							<h3>{service.title}</h3>
 							<p className="service-lead">{service.lead}</p>
 							<ul className="service-bullets">
-								{service.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+								{service.bullets.map((bullet) => (
+									<li key={bullet}>{bullet}</li>
+								))}
 							</ul>
 						</article>
 					);

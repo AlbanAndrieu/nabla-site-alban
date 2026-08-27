@@ -86,16 +86,8 @@ export default async function StartupPage({
 							<h2 id="startup-form-heading" className="h5 mb-3">
 								{t("form.heading")}
 							</h2>
-							<input
-								type="hidden"
-								name="_subject"
-								value={t("form.subject")}
-							/>
-							<input
-								type="hidden"
-								name="_next"
-								value={thanksUrl}
-							/>
+							<input type="hidden" name="_subject" value={t("form.subject")} />
+							<input type="hidden" name="_next" value={thanksUrl} />
 							<input type="hidden" name="_captcha" value="true" />
 							<input type="hidden" name="_template" value="table" />
 							<input
@@ -116,8 +108,7 @@ export default async function StartupPage({
 							/>
 							<div className="mb-3">
 								<label htmlFor="startup-name" className="form-label">
-									{t("form.name")} {" "}
-									<span className="text-danger">*</span>
+									{t("form.name")} <span className="text-danger">*</span>
 								</label>
 								<input
 									type="text"
@@ -131,8 +122,7 @@ export default async function StartupPage({
 							</div>
 							<div className="mb-3">
 								<label htmlFor="startup-email" className="form-label">
-									{t("form.email")} {" "}
-									<span className="text-danger">*</span>
+									{t("form.email")} <span className="text-danger">*</span>
 								</label>
 								<input
 									type="email"
@@ -159,8 +149,7 @@ export default async function StartupPage({
 							</div>
 							<div className="mb-3">
 								<label htmlFor="startup-context" className="form-label">
-									{t("form.need")} {" "}
-									<span className="text-danger">*</span>
+									{t("form.need")} <span className="text-danger">*</span>
 								</label>
 								<textarea
 									className="form-control"
@@ -173,14 +162,9 @@ export default async function StartupPage({
 							</div>
 							<p className="small text-secondary mb-3">
 								{t("form.privacyBeforeLegal")}
-								<a href="/policy/legal.html">
-									{t("form.legal")}
-								</a>{" "}
+								<a href="/policy/legal.html">{t("form.legal")}</a>{" "}
 								{t("form.privacyConnector")}
-								<a href="/policy/privacy_policy.html">
-									{t("form.privacy")}
-								</a>
-								.
+								<a href="/policy/privacy_policy.html">{t("form.privacy")}</a>.
 							</p>
 							<button type="submit" className="btn btn-primary">
 								<i className="fas fa-paper-plane" aria-hidden="true"></i>{" "}

@@ -35,7 +35,9 @@ export default async function ToolsSection() {
 								style={{ height: "auto" }}
 							/>
 							<span>
-								<span className="d-block fw-semibold text-body">{t("webUi")}</span>
+								<span className="d-block fw-semibold text-body">
+									{t("webUi")}
+								</span>
 								<span className="d-block small text-muted">{t("signIn")}</span>
 							</span>
 						</a>

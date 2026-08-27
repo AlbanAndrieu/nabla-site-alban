@@ -38,7 +38,10 @@ test("homelab catalog parser accepts the expected contract and rejects unusable 
 	);
 	assert.equal(parseHomelabServicesCatalog({ services: [] }), null);
 	assert.equal(parseHomelabServicesCatalog({ services: [{}] }), null);
-	assert.equal(parseHomelabServicesCatalog({ version: "1", services: [{ name: "x" }] }), null);
+	assert.equal(
+		parseHomelabServicesCatalog({ version: "1", services: [{ name: "x" }] }),
+		null,
+	);
 });
 
 test("homelab service endpoint uses explicit URL before the stable-id DNS fallback", () => {
@@ -73,7 +76,9 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
-	assert.ok(result.catalog.services.some((service) => service.name === "TrueNAS"));
+	assert.ok(
+		result.catalog.services.some((service) => service.name === "TrueNAS"),
+	);
 });
 
 test("homelab catalog prefers FastAPI when a valid payload is available", async () => {
@@ -104,13 +109,17 @@ test("homelab catalog falls back to the repository JSON when FastAPI is unavaila
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
 	assert.ok(result.catalog.services.length > 1);
-	assert.ok(result.catalog.services.some((service) => service.name === "TrueNAS"));
+	assert.ok(
+		result.catalog.services.some((service) => service.name === "TrueNAS"),
+	);
 });
 
 test("homelab proxy exposes which source served the catalog", async () => {
 	setApiUrl("https://catalog.example.test/homelab");
 	globalThis.fetch = (async () =>
-		Response.json({ services: [{ name: "Remote through proxy" }] })) as typeof fetch;
+		Response.json({
+			services: [{ name: "Remote through proxy" }],
+		})) as typeof fetch;
 
 	const response = await GET();
 	const body = await response.json();

@@ -6,8 +6,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { buildPageMetadata } from "@/lib/siteMetadata";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
 export async function generateMetadata({
 	params,
@@ -43,7 +43,10 @@ export default async function LinkPage({
 			<a href="#main-content" className="skip-to-main">
 				{site("skipToMainContent")}
 			</a>
-			<nav className="page-nav container py-3" aria-label={t("breadcrumbLabel")}>
+			<nav
+				className="page-nav container py-3"
+				aria-label={t("breadcrumbLabel")}
+			>
 				<a href={homeHref} className="text-decoration-none">
 					<i className="fas fa-home" aria-hidden="true"></i> {t("backHome")}
 				</a>

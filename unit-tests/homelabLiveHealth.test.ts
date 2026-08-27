@@ -30,7 +30,10 @@ test("endpoint action follows FastAPI state and supplements unverified private e
 	assert.match(page, /privateProbeIsAuthoritative/);
 	assert.match(page, /runtime_state/);
 	assert.match(page, /tunnel_status/);
-	assert.match(page, /style=\{\{ color: healthColor, borderColor: healthColor \}\}/);
+	assert.match(
+		page,
+		/style=\{\{ color: healthColor, borderColor: healthColor \}\}/,
+	);
 	assert.match(page, /data-health-state=\{health\}/);
 });
 
@@ -47,12 +50,24 @@ test("health evidence shows HTTP, TrueNAS, Cloudflare and snapshot age", async (
 test("Cloudflare indicator requires tunnel intent and observed API evidence", async () => {
 	const page = await source("app/components/homelab/EndpointAction.tsx");
 	const presentation = await source("lib/homelabHealthPresentation.ts");
-	assert.match(page, /showCloudflare = tunnelSecure && hasCloudflareEvidence\(initialHealth\)/);
+	assert.match(
+		page,
+		/showCloudflare = tunnelSecure && hasCloudflareEvidence\(initialHealth\)/,
+	);
 	assert.match(page, /\{showCloudflare && \(/);
 	assert.match(page, /cloudflareIndicatorColor\(initialHealth\)/);
-	assert.match(presentation, /entry\?\.tunnel_status\?\.trim\(\) \|\| entry\?\.tunnel_name\?\.trim\(\)/);
-	assert.match(presentation, /\["healthy", "active", "up", "ok"\]\.includes\(status\)/);
-	assert.match(presentation, /status === "degraded" \? HEALTH_COLORS\.warn : HEALTH_COLORS\.fail/);
+	assert.match(
+		presentation,
+		/entry\?\.tunnel_status\?\.trim\(\) \|\| entry\?\.tunnel_name\?\.trim\(\)/,
+	);
+	assert.match(
+		presentation,
+		/\["healthy", "active", "up", "ok"\]\.includes\(status\)/,
+	);
+	assert.match(
+		presentation,
+		/status === "degraded" \? HEALTH_COLORS\.warn : HEALTH_COLORS\.fail/,
+	);
 });
 
 test("TLS indicator is shown for HTTPS and follows API trust evidence", async () => {

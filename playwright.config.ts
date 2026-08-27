@@ -2,15 +2,15 @@ import { defineConfig, devices } from "@playwright/test";
 
 const requestedPort = Number(process.env.PLAYWRIGHT_PORT || 3000);
 const testPort =
-	Number.isInteger(requestedPort) && requestedPort >= 1 && requestedPort <= 65535
+	Number.isInteger(requestedPort) &&
+	requestedPort >= 1 &&
+	requestedPort <= 65535
 		? requestedPort
 		: 3000;
 const localTestUrl = `http://127.0.0.1:${testPort}`;
 const externalBaseUrl = process.env.BASE_URL?.trim();
-const vercelBypassSecret =
-	process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
-const protectedVercelPreview =
-	process.env.VERCEL_PREVIEW_PROTECTED === "true";
+const vercelBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+const protectedVercelPreview = process.env.VERCEL_PREVIEW_PROTECTED === "true";
 
 if (externalBaseUrl && protectedVercelPreview && !vercelBypassSecret) {
 	throw new Error(

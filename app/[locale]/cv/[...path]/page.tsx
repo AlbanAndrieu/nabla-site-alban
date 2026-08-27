@@ -23,10 +23,15 @@ const BACK_TO_INDEX_LABEL: Record<CvDocumentLocale, string> = {
 	no: "Tilbake til CV-oversikten",
 };
 
-function cvDocumentLocale(path: string[], fallback: "en" | "fr"): CvDocumentLocale {
+function cvDocumentLocale(
+	path: string[],
+	fallback: "en" | "fr",
+): CvDocumentLocale {
 	const filename = path.at(-1) ?? "";
 	const match = filename.match(/-(de|en|fr|no)\.html$/i);
-	return (match?.[1]?.toLowerCase() as CvDocumentLocale | undefined) ?? fallback;
+	return (
+		(match?.[1]?.toLowerCase() as CvDocumentLocale | undefined) ?? fallback
+	);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -64,7 +69,10 @@ export default async function CvPathPage({ params }: Props) {
 				</a>
 				{/* eslint-disable-next-line react/no-danger */}
 				<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
-				<nav className={styles.backAction} aria-label={BACK_TO_INDEX_LABEL[documentLocale]}>
+				<nav
+					className={styles.backAction}
+					aria-label={BACK_TO_INDEX_LABEL[documentLocale]}
+				>
 					<ActionLink href={cvIndexHref} variant="primary">
 						<span aria-hidden="true">←</span>
 						{BACK_TO_INDEX_LABEL[documentLocale]}

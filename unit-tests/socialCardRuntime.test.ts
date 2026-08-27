@@ -26,7 +26,15 @@ test("Vercel skips CI-only changes", async () => {
 test("Playwright ignores production deployment dispatches", async () => {
 	const workflow = await readFile(".github/workflows/playwright.yml", "utf8");
 
-	assert.ok(workflow.includes("github.event.client_payload.git.sha != github.sha"));
-	assert.ok(workflow.includes("github.event.client_payload.git.ref != 'master'"));
-	assert.ok(workflow.includes("github.event.client_payload.environment != 'production'"));
+	assert.ok(
+		workflow.includes("github.event.client_payload.git.sha != github.sha"),
+	);
+	assert.ok(
+		workflow.includes("github.event.client_payload.git.ref != 'master'"),
+	);
+	assert.ok(
+		workflow.includes(
+			"github.event.client_payload.environment != 'production'",
+		),
+	);
 });

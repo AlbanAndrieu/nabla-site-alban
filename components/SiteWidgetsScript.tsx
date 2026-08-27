@@ -18,7 +18,9 @@ function restoreLocalizedFooterCopyright() {
 	if (document.documentElement.dataset.nablaApp !== "next-intl") return;
 
 	document
-		.querySelectorAll<HTMLElement>(".footer-copyright[data-localized-copyright]")
+		.querySelectorAll<HTMLElement>(
+			".footer-copyright[data-localized-copyright]",
+		)
 		.forEach((element) => {
 			const localizedCopyright = element.dataset.localizedCopyright;
 			if (localizedCopyright) element.textContent = localizedCopyright;

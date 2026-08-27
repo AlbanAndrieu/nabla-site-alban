@@ -44,9 +44,14 @@ function assertNoTranslatedProductNames(content: string, source: string) {
 
 test("French localized HTML renders canonical product names outside CV pages", async () => {
 	const localizedDirectory = path.join(process.cwd(), "public/locales/fr");
-	const files = (await readdir(localizedDirectory)).filter((file) => file.endsWith(".html"));
+	const files = (await readdir(localizedDirectory)).filter((file) =>
+		file.endsWith(".html"),
+	);
 
-	assert.ok(files.length > 10, "expected the French localized page corpus to be audited");
+	assert.ok(
+		files.length > 10,
+		"expected the French localized page corpus to be audited",
+	);
 
 	for (const file of files) {
 		const source = await readFile(path.join(localizedDirectory, file), "utf8");
@@ -56,7 +61,10 @@ test("French localized HTML renders canonical product names outside CV pages", a
 });
 
 test("native French message catalogue does not translate canonical product names", async () => {
-	const messages = await readFile(path.join(process.cwd(), "messages/fr.json"), "utf8");
+	const messages = await readFile(
+		path.join(process.cwd(), "messages/fr.json"),
+		"utf8",
+	);
 	assertNoTranslatedProductNames(messages, "messages/fr.json");
 });
 

@@ -112,7 +112,8 @@ test("homelab health URL lookup normalizes root trailing slashes", () => {
 		"ok",
 	);
 	assert.equal(
-		homelabHealthForUrl(snapshot, "https://langfuse.albandrieu.com")?.tunnel_status,
+		homelabHealthForUrl(snapshot, "https://langfuse.albandrieu.com")
+			?.tunnel_status,
 		"healthy",
 	);
 });
@@ -147,7 +148,8 @@ test("homelab health returns unavailable so endpoint-level fallback can run", as
 
 test("homelab health proxy exposes the FastAPI snapshot and cache policy", async () => {
 	setApiUrl("https://health.example.test/homelab");
-	globalThis.fetch = (async () => Response.json(VALID_SNAPSHOT)) as typeof fetch;
+	globalThis.fetch = (async () =>
+		Response.json(VALID_SNAPSHOT)) as typeof fetch;
 
 	const response = await GET();
 	const body = await response.json();

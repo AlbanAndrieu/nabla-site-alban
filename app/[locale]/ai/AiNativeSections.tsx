@@ -19,15 +19,28 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 		const content = document.querySelector("#main-content .content-section");
 		if (!(content instanceof HTMLElement)) return;
 
-		for (const item of content.querySelectorAll("#popular-ai-platforms-tools .nabla-tool-tags li")) {
-			if (MIGRATED_PLATFORM_TAGS.has(item.textContent?.trim().toLowerCase() ?? "")) item.remove();
+		for (const item of content.querySelectorAll(
+			"#popular-ai-platforms-tools .nabla-tool-tags li",
+		)) {
+			if (
+				MIGRATED_PLATFORM_TAGS.has(item.textContent?.trim().toLowerCase() ?? "")
+			)
+				item.remove();
 		}
 
 		const documentPipeline = document.getElementById("document-pipeline");
 		if (documentPipeline) {
-			for (const item of documentPipeline.querySelectorAll(".ai-doc-pipeline > li")) {
-				const toolName = item.querySelector("strong")?.textContent?.trim() ?? "";
-				if (DUPLICATE_DOCUMENT_PIPELINE_TOOLS.some((tool) => toolName.startsWith(tool))) item.remove();
+			for (const item of documentPipeline.querySelectorAll(
+				".ai-doc-pipeline > li",
+			)) {
+				const toolName =
+					item.querySelector("strong")?.textContent?.trim() ?? "";
+				if (
+					DUPLICATE_DOCUMENT_PIPELINE_TOOLS.some((tool) =>
+						toolName.startsWith(tool),
+					)
+				)
+					item.remove();
 			}
 
 			const introduction = documentPipeline.querySelector(":scope > p");
@@ -44,7 +57,8 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 
 		const host = document.createElement("div");
 		host.className = "ai-native-sections";
-		if (documentPipeline?.parentElement === content) documentPipeline.insertAdjacentElement("beforebegin", host);
+		if (documentPipeline?.parentElement === content)
+			documentPipeline.insertAdjacentElement("beforebegin", host);
 		else content.append(host);
 		setMountPoint(host);
 		return () => host.remove();

@@ -176,11 +176,11 @@ export default async function ContactPage({
 					rel="noopener noreferrer"
 				>
 					<Image
-							src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
-							width={954}
-							height={996}
-							alt={t("linkedinQrAlt")}
-							style={{ width: 120, height: "auto" }}
+						src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
+						width={954}
+						height={996}
+						alt={t("linkedinQrAlt")}
+						style={{ width: 120, height: "auto" }}
 					/>
 					<strong>LinkedIn</strong>
 				</a>

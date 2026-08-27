@@ -26,11 +26,19 @@ export default async function HomelabServicesSection({
 						<p className="lead mb-2 stack-page-hero__lead">{t("lead")}</p>
 						<p className="small text-secondary homelab-services-foss-note mb-3">
 							{t("iconsBefore")}{" "}
-							<a href="https://selfh.st/icons/" target="_blank" rel="noopener noreferrer">
+							<a
+								href="https://selfh.st/icons/"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								selfh.st/icons
 							</a>
 							. {t("iconsAfter")}{" "}
-							<a href="https://selfh.st/apps/" target="_blank" rel="noopener noreferrer">
+							<a
+								href="https://selfh.st/apps/"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								selfh.st/apps
 							</a>
 							.

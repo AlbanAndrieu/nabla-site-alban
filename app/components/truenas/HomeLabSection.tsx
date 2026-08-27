@@ -2,7 +2,11 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 
-export default async function HomeLabSection({ nablaHref }: { nablaHref: string }) {
+export default async function HomeLabSection({
+	nablaHref,
+}: {
+	nablaHref: string;
+}) {
 	const t = await getTranslations("truenas.page.homelab");
 
 	return (

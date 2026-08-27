@@ -53,8 +53,7 @@ export default async function StartupThanksPage({
 				<h1 className="h2 mb-3">{t("thanks.title")}</h1>
 				<p className="lead text-secondary mb-4">
 					{t("thanks.beforeEmail")}
-					<strong>job@albandrieu.com</strong>.
-					{t("thanks.afterEmail")}
+					<strong>job@albandrieu.com</strong>.{t("thanks.afterEmail")}
 					<a
 						href="https://calendly.com/alban-andrieu"
 						target="_blank"

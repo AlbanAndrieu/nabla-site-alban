@@ -8,14 +8,26 @@ import {
 } from "../lib/serviceTopology";
 
 test("local topology fallback is a valid connected graph", async () => {
-	const raw = JSON.parse(await readFile("public/service-topology.json", "utf8")) as unknown;
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
 	const topology = parseServiceTopology(raw);
 
 	assert.ok(topology);
 	assert.ok(topology.nodes.length >= 10);
 	assert.ok(topology.relations.length >= 10);
-	assert.ok(topology.relations.some((relation) => relation.source === "openwebui" && relation.target === "litellm"));
-	assert.ok(topology.relations.some((relation) => relation.source === "litellm" && relation.target === "ollama"));
+	assert.ok(
+		topology.relations.some(
+			(relation) =>
+				relation.source === "openwebui" && relation.target === "litellm",
+		),
+	);
+	assert.ok(
+		topology.relations.some(
+			(relation) =>
+				relation.source === "litellm" && relation.target === "ollama",
+		),
+	);
 });
 
 test("static architecture topology never probes FastAPI during prerender", () => {
@@ -42,7 +54,15 @@ test("topology parser rejects edges with unknown nodes", () => {
 		version: 1,
 		name: "invalid",
 		nodes: [{ id: "a", name: "A", kind: "service", category: "test" }],
-		relations: [{ source: "a", target: "missing", type: "dependsOn", strength: "required", evidence: ["test"] }],
+		relations: [
+			{
+				source: "a",
+				target: "missing",
+				type: "dependsOn",
+				strength: "required",
+				evidence: ["test"],
+			},
+		],
 	});
 
 	assert.equal(topology, null);
@@ -53,7 +73,10 @@ test("architecture route uses a static declared shell with live shared service h
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
 		readFile("app/[locale]/architecture/ArchitectureExplorer.tsx", "utf8"),
 		readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
-		readFile("app/[locale]/architecture/ArchitectureExplorer.module.css", "utf8"),
+		readFile(
+			"app/[locale]/architecture/ArchitectureExplorer.module.css",
+			"utf8",
+		),
 		readFile("package.json", "utf8"),
 	]);
 
@@ -80,7 +103,17 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(css, /background: #020617/);
 	assert.match(css, /\.nodeIconFrame/);
 	assert.match(packageJson, /"@xyflow\/react": "12\.11\.3"/);
-	for (const product of ["Open WebUI", "LiteLLM", "Ollama", "Paperless-ngx", "OpenRAG", "Langfuse"]) {
-		assert.match(data, new RegExp(product.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+	for (const product of [
+		"Open WebUI",
+		"LiteLLM",
+		"Ollama",
+		"Paperless-ngx",
+		"OpenRAG",
+		"Langfuse",
+	]) {
+		assert.match(
+			data,
+			new RegExp(product.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+		);
 	}
 });
