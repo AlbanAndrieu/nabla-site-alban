@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
+import HomeLabNetworkFlow from "./HomeLabNetworkFlow";
 import styles from "./HomeLabSection.module.css";
 
 export default async function HomeLabSection({
@@ -32,17 +33,7 @@ export default async function HomeLabSection({
 						FastAPI Cloud can perform controlled health and API probes without
 						exposing the TrueNAS host directly.
 					</p>
-					<pre className={`${styles.diagram} small mb-3`}>
-						{`Internet
-   │
-pfSense  WAN 82.66.4.247 / LAN 172.17.0.1
-   │
-LAN switch
-   ├── TrueNAS        172.17.0.24
-   ├── Workstation    172.17.0.57
-   └── R7000 AP       172.17.0.12
-          └── S24 Ultra 172.17.0.11`}
-					</pre>
+					<HomeLabNetworkFlow />
 					<ul className={`${styles.facts} small mb-0`}>
 						<li>R7000: access-point mode; pfSense remains gateway and DHCP authority.</li>
 						<li>AP DNS: 172.17.0.1 primary, 172.17.0.24 secondary.</li>
