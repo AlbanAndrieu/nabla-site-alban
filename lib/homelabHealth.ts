@@ -1,6 +1,15 @@
 export type VerifiedHomelabHealthState = "ok" | "warn" | "fail";
 export type HomelabHealthState = VerifiedHomelabHealthState | "unknown";
 
+export type HomelabDependencyEvidence = {
+	target: string;
+	target_name?: string;
+	relation_type: string;
+	target_state: HomelabHealthState;
+	evidence: string[];
+	description?: string;
+};
+
 export type HomelabHealthEntry = {
 	id?: string;
 	name: string;
@@ -9,6 +18,12 @@ export type HomelabHealthEntry = {
 	reachable: boolean;
 	http_status: number;
 	state: HomelabHealthState;
+	local_state?: HomelabHealthState;
+	dependency_state?: HomelabHealthState | null;
+	effective_state?: HomelabHealthState;
+	required_dependencies?: string[];
+	blocked_by?: string[];
+	dependency_evidence?: HomelabDependencyEvidence[];
 	tls_trusted?: boolean | null;
 	latency_ms?: number;
 	error?: string;
@@ -120,6 +135,37 @@ function validOptionalHealthState(value: unknown): boolean {
 	return value === undefined || value === null || isHealthState(value);
 }
 
+function validOptionalStringArray(value: unknown): boolean {
+	return (
+		value === undefined ||
+		(Array.isArray(value) &&
+			value.every(
+				(item) => typeof item === "string" && item.trim().length > 0,
+			))
+	);
+}
+
+function validDependencyEvidence(value: unknown): boolean {
+	if (value === undefined) return true;
+	if (!Array.isArray(value)) return false;
+	return value.every(
+		(item) =>
+			isRecord(item) &&
+			typeof item.target === "string" &&
+			item.target.trim().length > 0 &&
+			(item.target_name === undefined || typeof item.target_name === "string") &&
+			typeof item.relation_type === "string" &&
+			item.relation_type.trim().length > 0 &&
+			isHealthState(item.target_state) &&
+			Array.isArray(item.evidence) &&
+			item.evidence.every(
+				(evidence) =>
+					typeof evidence === "string" && evidence.trim().length > 0,
+			) &&
+			(item.description === undefined || typeof item.description === "string"),
+	);
+}
+
 function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 	if (!isRecord(entry)) return false;
 	return (
@@ -133,6 +179,12 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		typeof entry.http_status === "number" &&
 		Number.isFinite(entry.http_status) &&
 		isHealthState(entry.state) &&
+		validOptionalHealthState(entry.local_state) &&
+		validOptionalHealthState(entry.dependency_state) &&
+		validOptionalHealthState(entry.effective_state) &&
+		validOptionalStringArray(entry.required_dependencies) &&
+		validOptionalStringArray(entry.blocked_by) &&
+		validDependencyEvidence(entry.dependency_evidence) &&
 		validOptionalBoolean(entry.tls_trusted) &&
 		validOptionalNumber(entry.latency_ms) &&
 		(entry.error === undefined || typeof entry.error === "string") &&
@@ -265,7 +317,7 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-health/4.0",
+				"User-Agent": "nabla-site-homelab-health/5.0",
 			},
 			signal: controller.signal,
 			cache: "no-store",
