@@ -216,7 +216,9 @@ export function parseHomelabHealthSnapshot(
 		return null;
 	}
 
-	if (!value.services.every(validHealthEntry)) return null;
+	// Fail soft at row level. A malformed catalog URL or stale optional service
+	// must not discard valid TrueNAS/Garage/runtime evidence for the whole board.
+	const services = value.services.filter(validHealthEntry);
 	if (
 		value.truenas !== undefined &&
 		value.truenas !== null &&
@@ -225,19 +227,23 @@ export function parseHomelabHealthSnapshot(
 		return null;
 	}
 	if (!validOptionalBoolean(value.internal_probes_enabled)) return null;
-	if (
-		value.internal_services !== undefined &&
-		(!Array.isArray(value.internal_services) ||
-			!value.internal_services.every(validInternalHealthEntry))
-	) {
-		return null;
+	let internalServices: HomelabInternalHealthEntry[] | undefined;
+	if (value.internal_services !== undefined) {
+		if (!Array.isArray(value.internal_services)) return null;
+		internalServices = value.internal_services.filter(validInternalHealthEntry);
 	}
 	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
 	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
 	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
 	if (!validOptionalNumber(value.cloudflare_tunnels_observed)) return null;
 
-	return value as HomelabHealthSnapshot;
+	return {
+		...value,
+		services,
+		...(internalServices === undefined
+			? {}
+			: { internal_services: internalServices }),
+	} as HomelabHealthSnapshot;
 }
 
 function primaryApiUrl(): string {

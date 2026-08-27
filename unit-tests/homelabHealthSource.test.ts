@@ -91,13 +91,74 @@ test("homelab health parser accepts legacy and complete service-health contracts
 		parseHomelabHealthSnapshot(unknownServiceSnapshot),
 		unknownServiceSnapshot,
 	);
-	assert.equal(
-		parseHomelabHealthSnapshot({
-			...VALID_SNAPSHOT,
-			services: [{ ...VALID_SNAPSHOT.services[0], http_status: "200" }],
-		}),
-		null,
-	);
+});
+
+test("homelab health parser drops malformed service rows without discarding valid TrueNAS evidence", () => {
+	const snapshot = {
+		...VALID_SNAPSHOT,
+		schema_version: 4,
+		truenas: {
+			...VALID_SNAPSHOT.truenas,
+			state: "warn",
+			public: {
+				...VALID_SNAPSHOT.truenas.public,
+				reachable: true,
+				http_status: 200,
+				state: "ok",
+				tls_trusted: true,
+			},
+			api: {
+				reachable: false,
+				error: "HTTP 503 while TrueNAS is rebooting",
+			},
+		},
+		truenas_runtime_reachable: false,
+		truenas_runtime_stale: false,
+		cloudflare_configured: true,
+		cloudflare_tunnels_observed: 2,
+		services: [
+			{
+				...VALID_SNAPSHOT.services[0],
+				id: "garage",
+				name: "Garage",
+				url: "https://garage.int.albandrieu.com/",
+				reachable: true,
+				http_status: 503,
+				state: "fail",
+				direct_state: "fail",
+				runtime_state: "STOPPED",
+				runtime_app: "garage",
+				runtime_reachable: true,
+			},
+			{
+				id: "prometheus-albandrieu",
+				name: "Prometheus - albandrieu",
+				url: "https://prometheus - albandrieu.albandrieu.com/",
+				reachable: false,
+				http_status: 0,
+				state: "unknown",
+			},
+		],
+	};
+
+	const parsed = parseHomelabHealthSnapshot(snapshot);
+	assert.ok(parsed);
+	assert.equal(parsed.truenas?.public?.state, "ok");
+	assert.equal(parsed.truenas?.api?.reachable, false);
+	assert.equal(parsed.truenas_runtime_reachable, false);
+	assert.equal(parsed.services.length, 1);
+	assert.equal(parsed.services[0].id, "garage");
+	assert.equal(parsed.services[0].http_status, 503);
+	assert.equal(parsed.services[0].runtime_state, "STOPPED");
+});
+
+test("homelab health parser filters malformed row field types rather than failing the whole snapshot", () => {
+	const parsed = parseHomelabHealthSnapshot({
+		...VALID_SNAPSHOT,
+		services: [{ ...VALID_SNAPSHOT.services[0], http_status: "200" }],
+	});
+	assert.ok(parsed);
+	assert.deepEqual(parsed.services, []);
 });
 
 test("homelab health URL lookup normalizes root trailing slashes", () => {
