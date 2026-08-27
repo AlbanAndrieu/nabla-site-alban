@@ -5,6 +5,7 @@ import {
 	getStaticHomelabServicesCatalog,
 	HOMELAB_SERVICES_DEFAULT_API_URL,
 	homelabServiceEndpointUrl,
+	homelabServiceId,
 	loadHomelabServicesCatalog,
 	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
@@ -44,7 +45,16 @@ test("homelab catalog parser accepts the expected contract and rejects unusable 
 	);
 });
 
-test("homelab service endpoint uses explicit URL before the stable-id DNS fallback", () => {
+test("homelab service endpoint separates browser navigation from tunnel identity", () => {
+	assert.equal(
+		homelabServiceEndpointUrl({
+			id: "prometheus",
+			name: "Prometheus",
+			endpointUrl: "https://metrics.example.test:9443/",
+			tunnelUrl: "https://metrics.albandrieu.com",
+		}),
+		"https://metrics.example.test:9443/",
+	);
 	assert.equal(
 		homelabServiceEndpointUrl({
 			id: "prometheus",
@@ -63,6 +73,26 @@ test("homelab service endpoint uses explicit URL before the stable-id DNS fallba
 	);
 });
 
+test("TrueNAS and pfSense navigation keeps their published ports", () => {
+	assert.equal(
+		homelabServiceEndpointUrl({
+			id: "truenas",
+			name: "TrueNAS",
+			tunnelUrl: "https://truenas.albandrieu.com",
+		}),
+		"https://truenas.albandrieu.com:7000/",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl({
+			id: "pfsense",
+			name: "pfSense",
+			tunnelUrl: "https://pfsense.albandrieu.com",
+		}),
+		"https://home.albandrieu.com:10443/",
+	);
+	assert.equal(homelabServiceId({ name: "pfSense" }), "pfsense");
+});
+
 test("static homelab catalog never probes FastAPI during prerender", () => {
 	setApiUrl("https://catalog.example.test/homelab");
 	let fetchCalled = false;
@@ -72,31 +102,60 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	}) as typeof fetch;
 
 	const result = getStaticHomelabServicesCatalog();
+	const truenas = result.catalog.services.find((service) => service.name === "TrueNAS");
+	const pfsense = result.catalog.services.find((service) => service.name === "pfSense");
 
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
-	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
-	assert.ok(
-		result.catalog.services.some((service) => service.name === "TrueNAS"),
+	assert.ok(truenas);
+	assert.ok(pfsense);
+	assert.equal(
+		homelabServiceEndpointUrl(truenas),
+		"https://truenas.albandrieu.com:7000/",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(pfsense),
+		"https://home.albandrieu.com:10443/",
 	);
 });
 
-test("homelab catalog prefers FastAPI when a valid payload is available", async () => {
+test("homelab catalog prefers FastAPI and overlays site-owned navigation details", async () => {
 	setApiUrl(undefined);
 	let requestedUrl = "";
 	globalThis.fetch = (async (input) => {
 		requestedUrl = String(input);
 		return Response.json({
 			version: 1,
-			services: [{ name: "FastAPI service", external: true }],
+			services: [
+				{
+					id: "truenas",
+					name: "TrueNAS",
+					tunnelUrl: "https://truenas.albandrieu.com",
+					external: false,
+				},
+				{
+					id: "pfsense",
+					name: "pfSense",
+					tunnelUrl: "https://pfsense.albandrieu.com",
+					external: false,
+				},
+				{ name: "FastAPI service", external: true },
+			],
 		});
 	}) as typeof fetch;
 
 	const result = await loadHomelabServicesCatalog();
+	const truenas = result.catalog.services.find((service) => service.id === "truenas");
+	const pfsense = result.catalog.services.find((service) => service.id === "pfsense");
 
 	assert.equal(requestedUrl, HOMELAB_SERVICES_DEFAULT_API_URL);
 	assert.equal(result.source, "fastapi");
-	assert.equal(result.catalog.services[0].name, "FastAPI service");
+	assert.equal(truenas?.endpointUrl, "https://truenas.albandrieu.com:7000/");
+	assert.equal(pfsense?.endpointUrl, "https://home.albandrieu.com:10443/");
+	assert.equal(
+		result.catalog.services.find((service) => service.name === "FastAPI service")?.name,
+		"FastAPI service",
+	);
 });
 
 test("homelab catalog falls back to the repository JSON when FastAPI is unavailable", async () => {
@@ -109,8 +168,11 @@ test("homelab catalog falls back to the repository JSON when FastAPI is unavaila
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
 	assert.ok(result.catalog.services.length > 1);
-	assert.ok(
-		result.catalog.services.some((service) => service.name === "TrueNAS"),
+	assert.equal(
+		homelabServiceEndpointUrl(
+			result.catalog.services.find((service) => service.name === "TrueNAS")!,
+		),
+		"https://truenas.albandrieu.com:7000/",
 	);
 });
 

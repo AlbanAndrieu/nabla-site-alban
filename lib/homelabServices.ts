@@ -1,3 +1,4 @@
+import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
@@ -9,6 +10,8 @@ export type HomelabService = {
 	description?: string;
 	icon?: string;
 	iconSrc?: string;
+	/** Browser navigation target. May intentionally differ from tunnelUrl. */
+	endpointUrl?: string;
 	tunnelUrl?: string;
 	tunnelSecure?: boolean;
 	endpointEnabled?: boolean;
@@ -47,16 +50,36 @@ function slugifyServiceName(name: string): string {
 	);
 }
 
+/** Return the same stable identity used by the FastAPI homelab contract. */
+export function homelabServiceId(service: HomelabService): string {
+	const explicitId = service.id?.trim();
+	return explicitId && SERVICE_ID_RE.test(explicitId)
+		? explicitId
+		: slugifyServiceName(service.name);
+}
+
+const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(
+	Object.entries(navigationOverrides),
+);
+
+/**
+ * Return the URL the user should open.
+ *
+ * endpointUrl is deliberately distinct from tunnelUrl: pfSense/TrueNAS are
+ * published on explicit ports even while FastAPI/Cloudflare evidence keeps a
+ * host-only tunnel identity.
+ */
 export function homelabServiceEndpointUrl(service: HomelabService): string {
+	const navigation = service.endpointUrl?.trim();
+	if (navigation) return navigation;
+
+	const override = NAVIGATION_ENDPOINT_OVERRIDES.get(homelabServiceId(service));
+	if (override) return override;
+
 	const explicit = service.tunnelUrl?.trim();
 	if (explicit) return explicit;
 
-	const explicitId = service.id?.trim();
-	const serviceId =
-		explicitId && SERVICE_ID_RE.test(explicitId)
-			? explicitId
-			: slugifyServiceName(service.name);
-	return `https://${serviceId}.${HOMELAB_DOMAIN}`;
+	return `https://${homelabServiceId(service)}.${HOMELAB_DOMAIN}`;
 }
 
 export function parseHomelabServicesCatalog(
@@ -80,7 +103,9 @@ export function parseHomelabServicesCatalog(
 				isRecord(service) &&
 				typeof service.name === "string" &&
 				service.name.trim().length > 0 &&
-				(service.id === undefined || typeof service.id === "string"),
+				(service.id === undefined || typeof service.id === "string") &&
+				(service.endpointUrl === undefined ||
+					typeof service.endpointUrl === "string"),
 		)
 	) {
 		return null;
@@ -97,6 +122,29 @@ function requireLocalFallback(): HomelabServicesCatalog {
 }
 
 const LOCAL_FALLBACK = requireLocalFallback();
+const LOCAL_PRESENTATION_BY_ID = new Map(
+	LOCAL_FALLBACK.services.map((service) => [homelabServiceId(service), service]),
+);
+
+/**
+ * Keep operational inventory/status authoritative in FastAPI while allowing the
+ * site to own browser-navigation details such as explicit published ports.
+ */
+function applyLocalPresentationOverrides(
+	catalog: HomelabServicesCatalog,
+): HomelabServicesCatalog {
+	return {
+		...catalog,
+		services: catalog.services.map((service) => {
+			const serviceId = homelabServiceId(service);
+			const local = LOCAL_PRESENTATION_BY_ID.get(serviceId);
+			const endpointUrl =
+				NAVIGATION_ENDPOINT_OVERRIDES.get(serviceId) ?? local?.endpointUrl;
+			if (!endpointUrl) return service;
+			return { ...service, endpointUrl };
+		}),
+	};
+}
 
 function primaryApiUrl(): string {
 	return (
@@ -111,7 +159,7 @@ export function getStaticHomelabServicesCatalog(): {
 	primaryUrl: string;
 } {
 	return {
-		catalog: LOCAL_FALLBACK,
+		catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 		source: "local-fallback",
 		primaryUrl: primaryApiUrl(),
 	};
@@ -142,14 +190,18 @@ export async function loadHomelabServicesCatalog(): Promise<{
 		if (!catalog) {
 			throw new Error("Invalid homelab catalog payload");
 		}
-		return { catalog, source: "fastapi", primaryUrl };
+		return {
+			catalog: applyLocalPresentationOverrides(catalog),
+			source: "fastapi",
+			primaryUrl,
+		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
 		console.warn(
 			`[homelab-services] FastAPI catalog unavailable (${primaryUrl}): ${reason}; using local fallback`,
 		);
 		return {
-			catalog: LOCAL_FALLBACK,
+			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 			source: "local-fallback",
 			primaryUrl,
 		};

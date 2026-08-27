@@ -1,0 +1,192 @@
+.shell {
+	position: relative;
+	height: clamp(34rem, 68vh, 52rem);
+	min-height: 34rem;
+	margin-bottom: 1rem;
+	overflow: hidden;
+	border: 1px solid #475569;
+	border-radius: 0.75rem;
+	background: #020617;
+	box-shadow:
+		0 1rem 2.4rem rgb(0 0 0 / 22%),
+		inset 0 0 0 1px rgb(148 163 184 / 6%);
+}
+
+.shell :global(.react-flow__renderer) {
+	background: #020617;
+}
+
+.shell :global(.react-flow__edge-text) {
+	paint-order: stroke;
+	stroke: #020617;
+	stroke-width: 2px;
+}
+
+.node {
+	display: grid;
+	gap: 0.55rem;
+	width: 15rem;
+	min-height: 7.4rem;
+	padding: 0.85rem;
+	border: 1.5px solid #64748b;
+	border-radius: 0.8rem;
+	background: linear-gradient(145deg, #172033, #0f172a 68%);
+	box-shadow:
+		0 0.45rem 1.1rem rgb(0 0 0 / 38%),
+		inset 0 1px 0 rgb(255 255 255 / 5%);
+	color: #f8fafc;
+}
+
+.node strong {
+	display: block;
+	font-size: 1rem;
+	line-height: 1.2;
+}
+
+.node code {
+	justify-self: start;
+	padding: 0.18rem 0.42rem;
+	border: 1px solid #334155;
+	border-radius: 999px;
+	background: #020617;
+	color: #dbeafe;
+	font-size: 0.72rem;
+}
+
+.nodeHeader {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.icon {
+	display: grid;
+	flex: 0 0 2.65rem;
+	width: 2.65rem;
+	height: 2.65rem;
+	place-items: center;
+	border: 1px solid #475569;
+	border-radius: 0.7rem;
+	background: #f8fafc;
+	font-size: 1.45rem;
+}
+
+.role {
+	display: block;
+	margin-top: 0.18rem;
+	color: #cbd5e1;
+	font-size: 0.72rem;
+	font-weight: 650;
+}
+
+.wan {
+	border-color: #38bdf8;
+}
+
+.gateway {
+	border-color: #60a5fa;
+	box-shadow:
+		0 0.45rem 1.1rem rgb(0 0 0 / 38%),
+		0 0 0 1px rgb(96 165 250 / 20%);
+}
+
+.lan {
+	border-color: #4ade80;
+}
+
+.wifi {
+	border-color: #f59e0b;
+}
+
+.selected {
+	outline: 3px solid #e0f2fe;
+	outline-offset: 3px;
+}
+
+.handle {
+	width: 0.68rem;
+	height: 0.68rem;
+	border: 2px solid #e0f2fe;
+	background: #38bdf8;
+}
+
+.controls {
+	overflow: hidden;
+	border: 1px solid #475569;
+	border-radius: 0.6rem;
+	box-shadow: 0 0.35rem 0.9rem rgb(0 0 0 / 28%);
+}
+
+.controls :global(button) {
+	border-bottom-color: #334155;
+	background: #0f172a;
+	color: #f8fafc;
+}
+
+.controls :global(button:hover) {
+	background: #1e293b;
+}
+
+.controls :global(button svg) {
+	fill: #f8fafc;
+}
+
+.legend {
+	position: absolute;
+	right: 0.75rem;
+	bottom: 0.75rem;
+	z-index: 5;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid #475569;
+	border-radius: 999px;
+	background: rgb(15 23 42 / 92%);
+	color: #e2e8f0;
+	font-size: 0.7rem;
+	font-weight: 700;
+	backdrop-filter: blur(8px);
+}
+
+.legend span {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+}
+
+.legend i {
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 50%;
+}
+
+.wanDot {
+	background: #38bdf8;
+}
+
+.lanDot {
+	background: #4ade80;
+}
+
+.wifiDot {
+	background: #f59e0b;
+}
+
+@media (max-width: 700px) {
+	.shell {
+		height: 38rem;
+		min-height: 38rem;
+	}
+
+	.node {
+		width: 13rem;
+	}
+
+	.legend {
+		left: 50%;
+		right: auto;
+		transform: translateX(-50%);
+		white-space: nowrap;
+	}
+}

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
+import HomeLabNetworkFlow from "./HomeLabNetworkFlow";
+import styles from "./HomeLabSection.module.css";
 
 export default async function HomeLabSection({
 	nablaHref,
@@ -21,38 +23,49 @@ export default async function HomeLabSection({
 				</AnchoredHeading>
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<p>{t("purpose")}</p>
-				<div className="card border-secondary-subtle bg-body-tertiary text-body mb-4">
-					<div className="card-body">
-						<h3 className="h6 card-title mb-2">
-							FastAPI Cloud → Internet → pfSense:7000 → HAProxy → TrueNAS
-						</h3>
-						<p className="small text-body-secondary mb-3">
-							The public TrueNAS endpoint is exposed through pfSense and HAProxy so
-							FastAPI Cloud can perform controlled health and API probes without
-							exposing the TrueNAS host directly.
-						</p>
-						<pre className="small mb-3 p-3 border rounded bg-body text-body overflow-x-auto">
-							{`Internet
-   │
-pfSense  WAN 82.66.4.247 / LAN 172.17.0.1
-   │
-LAN switch
-   ├── TrueNAS        172.17.0.24
-   ├── Workstation    172.17.0.57
-   └── R7000 AP       172.17.0.12
-          └── S24 Ultra 172.17.0.11`}
-						</pre>
-						<ul className="small text-body-secondary mb-0">
-							<li>R7000: access-point mode; pfSense remains gateway and DHCP authority.</li>
-							<li>LAN clients use pfSense (172.17.0.1) as the resilient DNS entry point.</li>
-							<li>Pi-hole on TrueNAS can remain an upstream/filtering resolver without becoming a single point of failure for Wi-Fi.</li>
-							<li>TrueNAS Apps address pool: 10.200.0.0/16, split into /24 networks.</li>
-							<li>Observed S24 Ultra / Free Mobile public source: 37.166.227.161.</li>
-							<li>Observed FastAPI Cloud probe source: 34.200.20.162.</li>
-							<li>TrueNAS SSH TCP/9922 is LAN-only and expected unreachable from the Internet.</li>
-						</ul>
+				<aside className={styles.networkCard} aria-label="Homelab network topology">
+					<div className={styles.header}>
+						<span className={styles.eyebrow}>FastAPI Cloud access path</span>
+						<strong>
+							Internet → pfSense WAN :7000 → HAProxy → TrueNAS 172.17.0.24:7000
+						</strong>
 					</div>
-				</div>
+					<p className="small mb-3">
+						TrueNAS is intentionally published on TCP/7000 by HAProxy running on
+						pfSense. HAProxy terminates the public Let&apos;s Encrypt TLS connection and
+						re-encrypts the backend connection to the TrueNAS HTTPS service. This
+						TrueNAS path is a direct HAProxy publication, not a Cloudflare Tunnel.
+					</p>
+					<HomeLabNetworkFlow />
+					<ul className={`${styles.facts} small mb-0`}>
+						<li>
+							<strong>TCP/7000 — TrueNAS HTTPS/API:</strong> intentionally reachable from
+							the Internet through pfSense HAProxy; backend 172.17.0.24:7000 uses TLS.
+						</li>
+						<li>
+							<strong>TCP/10443 — pfSense admin UI:</strong> reachable from the trusted
+							LAN/VPN only; a successful FastAPI Cloud or Internet probe is a security
+							configuration failure.
+						</li>
+						<li>
+							<strong>TCP/9922 — TrueNAS SSH:</strong> LAN-only and expected to be blocked
+							from the Internet.
+						</li>
+						<li>
+							<strong>Cloudflare:</strong> the <code>nabla-truescale</code> connector
+							publishes selected services separately; its health does not explain or
+							replace the direct TrueNAS HAProxy path on port 7000.
+						</li>
+						<li>R7000: access-point mode; pfSense remains gateway and DHCP authority.</li>
+						<li>
+							DNS resilience target: keep pfSense/Unbound available independently from
+							TrueNAS Apps; Pi-hole and AdGuard Home should provide filtering without
+							making a TrueNAS/Docker outage a LAN-wide DNS outage.
+						</li>
+						<li>Observed S24 Ultra / Free Mobile public source: 37.166.227.161.</li>
+						<li>Observed FastAPI Cloud probe source: 34.200.20.162.</li>
+					</ul>
+				</aside>
 				<div className="row justify-content-center">
 					<div className="col-md-6 col-lg-4">
 						<div className="card box-shadow h-100 border-secondary">
