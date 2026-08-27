@@ -20,6 +20,12 @@ test("homelab service grid keeps endpoints clickable and matches FastAPI health 
 	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
 	assert.match(page, /snapshotCheckedAt=\{snapshot\?\.checked_at\}/);
+});
+
+test("schema-v4 service state remains authoritative and older snapshots keep local reconciliation fallback", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(page, /if \(\(schemaVersion \?\? 0\) >= 4\) return entry/);
+	assert.match(page, /snapshot\?\.schema_version/);
 	assert.match(page, /reconcileHomelabHealth\(entry, \{/);
 	assert.match(page, /external: service\.external === true/);
 	assert.match(page, /tunnelExpected: service\.tunnelSecure === true/);
@@ -53,7 +59,10 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	assert.match(page, /internalPresentationState\(initialHealth\)/);
 	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\)/);
 	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
-	assert.match(page, /style=\{\{ color: internalColor, borderColor: internalColor \}\}/);
+	assert.match(
+		page,
+		/style=\{\{ color: internalColor, borderColor: internalColor \}\}/,
+	);
 	assert.match(page, /data-health-state=\{internalState\}/);
 });
 
@@ -65,7 +74,10 @@ test("endpoint action treats FastAPI runtime evidence as authoritative", async (
 	assert.match(page, /entry\.runtime_state != null/);
 	assert.match(page, /entry\.tunnel_status\?\.trim\(\)/);
 	assert.match(page, /entry\.state !== "unknown"/);
-	assert.match(page, /const authoritativeSnapshot = hasAuthoritativeEvidence\(initialHealth\)/);
+	assert.match(
+		page,
+		/const authoritativeSnapshot = hasAuthoritativeEvidence\(initialHealth\)/,
+	);
 	assert.match(page, /configured && !external && !authoritativeSnapshot/);
 	assert.match(page, /authoritativeSnapshot && snapshotState/);
 	assert.match(page, /privateProbeIsAuthoritative/);
