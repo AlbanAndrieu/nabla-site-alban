@@ -45,6 +45,17 @@
 			"snapshotAge": "snapshot âgé de {seconds}s",
 			"snapshotAgeUnknown": "âge du snapshot inconnu"
 		},
+		"runtime": {
+			"running": "TrueNAS signale l’état applicatif {state}",
+			"failed": "TrueNAS signale l’état applicatif en échec {state}",
+			"degraded": "TrueNAS signale l’état applicatif transitoire/dégradé {state}",
+			"missing": "Aucun statut applicatif TrueNAS courant n’est disponible",
+			"legendTitle": "Statut applicatif TrueNAS",
+			"legendRunning": "en cours / sain",
+			"legendDegraded": "transitoire / dégradé",
+			"legendFailed": "arrêté / en échec",
+			"legendMissing": "aucun statut runtime courant"
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",
@@ -52,6 +63,14 @@
 			"internalProbe": "interne {host}:{port} {state}",
 			"internalUnavailable": "test interne indisponible depuis cet environnement",
 			"dependencyNote": "Les services externes dépendant de cet hôte sont affichés comme indisponibles lorsque TrueNAS est hors ligne.",
+			"runtimeDataUnavailable": "Le statut des applications TrueNAS ne peut pas être actualisé",
+			"liveSnapshotUnavailable": "L’actualisation de santé FastAPI a échoué ({status}) ; l’interface affiche le dernier snapshot connu lorsqu’il existe.",
+			"apiUnavailable": "Le test de l’API TrueNAS est indisponible : {error}.",
+			"runtimeUnavailable": "Le runtime TrueNAS app.query est injoignable.",
+			"runtimeStale": "Le snapshot runtime TrueNAS est périmé.",
+			"runtimeDependencyNote": "Les icônes runtime des applications utilisent un crâne tant qu’aucun statut TrueNAS courant n’est disponible.",
+			"networkError": "erreur réseau",
+			"noErrorDetail": "aucun détail d’erreur",
 			"internalTlsTitle": "Le certificat TLS interne n’est pas vérifié par le test TCP côté serveur",
 			"internalTlsAria": "État du certificat HTTPS interne inconnu"
 		}

@@ -32,18 +32,49 @@ test("schema-v4 service state remains authoritative and older snapshots keep loc
 	assert.match(page, /state: reconciliation\.state/);
 });
 
-test("TrueNAS card uses the dedicated FastAPI public probe on port 7000", async () => {
+test("TrueNAS card uses only the dedicated public port-7000 probe for link color", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	assert.match(page, /function serviceHealthEvidence/);
 	assert.match(page, /homelabServiceId\(service\) !== "truenas"/);
 	assert.match(page, /snapshot\?\.truenas\?\.public/);
 	assert.match(page, /const publicHealth = snapshot\.truenas\.public/);
-	assert.match(page, /state: snapshot\.truenas\.state/);
+	assert.match(page, /state: publicHealth\.state/);
 	assert.match(page, /direct_state: publicHealth\.state/);
+	assert.doesNotMatch(page, /state: snapshot\.truenas\.state/);
 	assert.match(
 		page,
 		/generic\?\.internal_state \?\? snapshot\.truenas\.internal\?\.state \?\? null/,
 	);
+});
+
+test("TrueNAS runtime/API failures are explicit even when the public UI remains reachable", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const health = await source("lib/homelabHealth.ts");
+	assert.match(page, /healthUnavailable \|\|/);
+	assert.match(page, /truenasApi\?\.reachable === false/);
+	assert.match(page, /snapshot\?\.truenas_runtime_reachable === false/);
+	assert.match(page, /snapshot\?\.truenas_runtime_stale === true/);
+	assert.match(page, /data-truenas-runtime-warning/);
+	assert.match(block, /healthUnavailable: health\.snapshot === null/);
+	assert.match(block, /healthStatus: health\.status/);
+	assert.match(block, /snapshot: health\.snapshot \?\? current\.snapshot/);
+	assert.match(health, /export type TrueNasApiHealth/);
+	assert.match(health, /api\?: TrueNasApiHealth \| null/);
+	assert.match(health, /validTrueNasApiHealth/);
+});
+
+test("TrueNAS application cards show runtime icons and a legend", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(page, /function runtimePresentationState/);
+	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\) \?\? "missing"/);
+	assert.match(page, /"fas fa-circle-check"/);
+	assert.match(page, /"fas fa-triangle-exclamation"/);
+	assert.match(page, /"fas fa-circle-xmark"/);
+	assert.match(page, /"fas fa-skull-crossbones"/);
+	assert.match(page, /data-truenas-runtime-state=\{runtimeState\}/);
+	assert.match(page, /data-truenas-runtime-legend/);
+	assert.match(page, /t\("runtime\.legendMissing"\)/);
 });
 
 test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
@@ -140,10 +171,12 @@ test("pending endpoint state is explicit and motion-safe", async () => {
 	assert.match(css, /prefers-reduced-motion: reduce/);
 });
 
-test("homelab health refreshes every thirty seconds and on tab visibility", async () => {
+test("homelab health refreshes every thirty seconds, preserves context and exposes failed refreshes", async () => {
 	const page = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
-	assert.match(page, /snapshot: snapshot \?\? current\.snapshot/);
+	assert.match(page, /snapshot: health\.snapshot \?\? current\.snapshot/);
+	assert.match(page, /healthUnavailable: health\.snapshot === null/);
+	assert.match(page, /healthHttpStatus=\{state\.healthStatus\}/);
 });
