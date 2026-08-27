@@ -1,0 +1,66 @@
+.networkCard {
+	margin-block: 1.5rem;
+	padding: clamp(1rem, 2vw, 1.5rem);
+	border: 1px solid var(--truenas-card-border, #475569);
+	border-radius: 0.75rem;
+	background: var(--truenas-card-bg, #111827);
+	color: var(--truenas-text-primary, #f8fafc);
+	box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 12%);
+}
+
+.networkCard :is(p, li, strong, pre) {
+	color: inherit;
+}
+
+.header {
+	display: grid;
+	gap: 0.35rem;
+	margin-bottom: 0.85rem;
+}
+
+.eyebrow {
+	color: var(--truenas-text-secondary, #d7e0ec);
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.diagram {
+	margin: 0;
+	padding: 1rem;
+	overflow-x: auto;
+	border: 1px solid color-mix(in srgb, var(--truenas-card-border, #475569) 75%, transparent);
+	border-radius: 0.5rem;
+	background: #0b1220;
+	color: #f8fafc;
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+	line-height: 1.55;
+	white-space: pre;
+}
+
+.facts {
+	padding-left: 1.25rem;
+}
+
+.facts li + li {
+	margin-top: 0.35rem;
+}
+
+@media (prefers-color-scheme: light) {
+	.networkCard {
+		border-color: #94a3b8;
+		background: #f8fafc;
+		color: #0f172a;
+	}
+
+	.eyebrow {
+		color: #475569;
+	}
+
+	.diagram {
+		border-color: #cbd5e1;
+		background: #0f172a;
+		color: #f8fafc;
+	}
+}
