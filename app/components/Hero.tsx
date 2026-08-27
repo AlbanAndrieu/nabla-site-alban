@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
 export default function Hero() {
@@ -57,28 +56,10 @@ export default function Hero() {
 						<i className="fab fa-linkedin"></i> {t("home.hero.cta.linkedin")}
 					</a>
 				</div>
-				<br />
-				<div className="hero-value-list">
-					<p>
-						{t("home.hero.lastexp")}{" "}
-						<a
-							className="jusmundi-link"
-							href="https://www.jusmundi.com"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Image
-								alt=""
-								aria-hidden="true"
-								className="jusmundi-link-icon"
-								height={16}
-								src="/assets/nabla/jusmundi-favicon.ico"
-								width={16}
-							/>
-							{t("home.hero.jusmundi")}
-						</a>{" "}
-						{t("home.hero.purpose")}
-					</p>
+				<div
+					className="hero-value-list"
+					aria-label={t("home.hero.services")}
+				>
 					<ul>
 						<li>{t("home.hero.lastexp1")}</li>
 						<li>{t("home.hero.lastexp2")}</li>
