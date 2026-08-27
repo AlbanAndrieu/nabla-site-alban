@@ -6,12 +6,14 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("homelab service grid keeps private endpoints clickable and matches health by id", async () => {
+test("homelab service grid keeps endpoints clickable and matches FastAPI health by stable identity", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	assert.match(page, /const endpointUrl = homelabServiceEndpointUrl\(svc\)/);
 	assert.match(page, /const endpointEnabled = svc\.endpointEnabled !== false/);
+	assert.match(page, /const stableId = homelabServiceId\(service\)/);
+	assert.match(page, /index\.byId\.get\(stableId\)/);
+	assert.match(page, /index\.byName\.get\(normalizedName\(service\.name\)\)/);
 	assert.match(page, /lookupHealth\(serviceHealth, svc, endpointUrl\)/);
-	assert.match(page, /if \(service\.id\)/);
 	assert.doesNotMatch(page, /isExternal \|\| isInternalEndpointUrl/);
 	assert.match(page, /tunnelSecure=\{svc\.tunnelSecure === true\}/);
 	assert.match(page, /snapshotCheckedAt=\{snapshot\?\.checked_at\}/);
@@ -21,17 +23,34 @@ test("homelab service grid keeps private endpoints clickable and matches health 
 	assert.match(page, /state: reconciliation\.state/);
 });
 
-test("endpoint action follows FastAPI state and supplements unverified private endpoints", async () => {
+test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(page, /const dependsOnTrueNas =/);
+	assert.match(page, /svc\.internalHost === "172\.17\.0\.24"/);
+	assert.match(page, /initialHealth\?\.runtime_app != null/);
+	assert.match(page, /truenasDown=\{truenasDown && dependsOnTrueNas\}/);
+});
+
+test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(page, /internalPresentationState\(initialHealth\)/);
+	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\)/);
+	assert.match(page, /style=\{\{ color: internalColor, borderColor: internalColor \}\}/);
+	assert.match(page, /data-health-state=\{internalState\}/);
+});
+
+test("endpoint action treats FastAPI runtime evidence as authoritative", async () => {
 	const page = await source("app/components/homelab/EndpointAction.tsx");
-	assert.match(page, /return entry\.state/);
-	assert.match(page, /\[401, 403, 407, 429\]\.includes\(status\)/);
-	assert.match(page, /supplementWithPrivateProbe/);
-	assert.match(page, /initialHealth\?\.direct_state != null/);
-	assert.match(page, /initialHealth\?\.internal_state != null/);
-	assert.match(page, /initialHealth\?\.state === "fail"/);
+	assert.match(page, /function hasAuthoritativeEvidence/);
+	assert.match(page, /entry\.direct_state != null/);
+	assert.match(page, /entry\.internal_state != null/);
+	assert.match(page, /entry\.runtime_state != null/);
+	assert.match(page, /entry\.tunnel_status\?\.trim\(\)/);
+	assert.match(page, /entry\.state !== "unknown"/);
+	assert.match(page, /const authoritativeSnapshot = hasAuthoritativeEvidence\(initialHealth\)/);
+	assert.match(page, /configured && !external && !authoritativeSnapshot/);
+	assert.match(page, /authoritativeSnapshot && snapshotState/);
 	assert.match(page, /privateProbeIsAuthoritative/);
-	assert.match(page, /runtime_state/);
-	assert.match(page, /tunnel_status/);
 	assert.match(
 		page,
 		/style=\{\{ color: healthColor, borderColor: healthColor \}\}/,
