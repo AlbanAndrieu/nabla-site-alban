@@ -56,6 +56,13 @@
 			"legendFailed": "arrêté / en échec",
 			"legendMissing": "aucun statut runtime courant"
 		},
+		"dependency": {
+			"blockedBy": "Bloqué par des dépendances requises : {services}",
+			"degraded": "L’état des dépendances requises dégrade ce service.",
+			"stateSummary": "Local {local} · effectif {effective}",
+			"legendTitle": "Santé des dépendances",
+			"legend": "La couleur principale du service/lien suit l’état effectif ; l’icône runtime conserve l’état local de l’application TrueNAS."
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",
