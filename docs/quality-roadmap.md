@@ -117,6 +117,9 @@ les autres chantiers.
 
 ## P1 — Résilience DNS et politique de résolution
 
+- [ ] Sauvegarder/exporter la configuration pfSense avant la réactivation complète
+  de CrowdSec, pfBlockerNG et Snort et avant toute nouvelle modification réseau ;
+  conserver une copie datée hors du firewall permettant un rollback rapide.
 - [ ] Revoir la politique DNS du LAN en gardant pfSense/Unbound disponible
   indépendamment de TrueNAS Apps, afin qu'un arrêt Docker/TrueNAS ne provoque plus
   une panne DNS globale malgré un routage Internet fonctionnel.
