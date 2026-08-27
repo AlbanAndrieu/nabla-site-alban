@@ -6,6 +6,11 @@ export type HomelabHealthEvidence = {
 	label: string;
 };
 
+export type HomelabHealthPolicy = {
+	external?: boolean;
+	tunnelExpected?: boolean;
+};
+
 export type HomelabHealthReconciliation = {
 	state: HomelabHealthState;
 	reason:
@@ -64,8 +69,11 @@ function addEvidence(
 
 export function reconcileHomelabHealth(
 	entry: HomelabHealthEntry,
+	policy: HomelabHealthPolicy = {},
 ): HomelabHealthReconciliation {
 	const evidence: HomelabHealthEvidence[] = [];
+	const external = policy.external ?? true;
+	const tunnelExpected = policy.tunnelExpected ?? true;
 
 	if (entry.application_error) {
 		addEvidence(evidence, "application", "fail", entry.application_error);
@@ -108,7 +116,9 @@ export function reconcileHomelabHealth(
 		);
 	}
 
-	const tunnelState = normalizeTunnelState(entry.tunnel_status);
+	const tunnelState = tunnelExpected
+		? normalizeTunnelState(entry.tunnel_status)
+		: null;
 	if (tunnelState) {
 		addEvidence(
 			evidence,
@@ -124,7 +134,7 @@ export function reconcileHomelabHealth(
 	const internal = byKind.get("internal");
 	const cloudflare = byKind.get("cloudflare");
 
-	if (http === "fail") {
+	if (external && http === "fail") {
 		return { state: "fail", reason: "http_failure", evidence };
 	}
 
@@ -132,8 +142,18 @@ export function reconcileHomelabHealth(
 		return { state: "fail", reason: "runtime_failure", evidence };
 	}
 
-	if (cloudflare === "fail" && http !== "ok") {
+	if (tunnelExpected && cloudflare === "fail" && http !== "ok") {
 		return { state: "fail", reason: "cloudflare_failure", evidence };
+	}
+
+	if (!external && http === "fail") {
+		if (runtime === "ok" && internal !== "fail") {
+			return { state: "ok", reason: "healthy_evidence", evidence };
+		}
+		if (internal === "ok" && runtime !== "fail") {
+			return { state: "ok", reason: "healthy_evidence", evidence };
+		}
+		return { state: "warn", reason: "degraded_evidence", evidence };
 	}
 
 	if ([http, runtime, internal, cloudflare].includes("warn")) {
