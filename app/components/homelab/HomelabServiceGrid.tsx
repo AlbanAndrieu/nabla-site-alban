@@ -4,12 +4,15 @@ import { useTranslations } from "next-intl";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
+	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
+import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import {
-	type HomelabService,
-	type HomelabServicesCatalog,
-	homelabServiceEndpointUrl,
+		 type HomelabService,
+		 type HomelabServicesCatalog,
+		homelabServiceEndpointUrl,
+		homelabServiceId,
 } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 
@@ -21,6 +24,7 @@ type Props = {
 type HealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byUrl: Map<string, HomelabHealthEntry>;
+	byName: Map<string, HomelabHealthEntry>;
 };
 
 function serviceIconPath(iconSrc?: string): string {
@@ -29,11 +33,17 @@ function serviceIconPath(iconSrc?: string): string {
 	return `/${iconSrc}`;
 }
 
+function normalizedName(value: string): string {
+	return value.trim().toLocaleLowerCase();
+}
+
 function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
 	const byId = new Map<string, HomelabHealthEntry>();
 	const byUrl = new Map<string, HomelabHealthEntry>();
+	const byName = new Map<string, HomelabHealthEntry>();
 	for (const entry of snapshot?.services ?? []) {
 		if (entry.id) byId.set(entry.id, entry);
+		byName.set(normalizedName(entry.name), entry);
 		try {
 			const url = new URL(entry.url);
 			url.hash = "";
@@ -42,7 +52,7 @@ function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
 			// The same-origin proxy validates FastAPI payloads; ignore malformed extras defensively.
 		}
 	}
-	return { byId, byUrl };
+	return { byId, byUrl, byName };
 }
 
 function lookupHealth(
@@ -50,17 +60,20 @@ function lookupHealth(
 	service: HomelabService,
 	url: string,
 ): HomelabHealthEntry | undefined {
-	if (service.id) {
-		const byId = index.byId.get(service.id);
-		if (byId) return byId;
-	}
+	const stableId = homelabServiceId(service);
+	const byId = index.byId.get(stableId);
+	if (byId) return byId;
+
 	try {
 		const normalized = new URL(url);
 		normalized.hash = "";
-		return index.byUrl.get(normalized.href);
+		const byUrl = index.byUrl.get(normalized.href);
+		if (byUrl) return byUrl;
 	} catch {
-		return undefined;
+		// Continue with the name fallback below.
 	}
+
+	return index.byName.get(normalizedName(service.name));
 }
 
 function reconciledHealth(
@@ -73,6 +86,29 @@ function reconciledHealth(
 		tunnelExpected: service.tunnelSecure === true,
 	});
 	return { ...entry, state: reconciliation.state };
+}
+
+function runtimeHealthState(state?: string | null): HomelabHealthState | null {
+	const normalized = state?.trim().toUpperCase();
+	if (!normalized) return null;
+	if (["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"].includes(normalized)) {
+		return "ok";
+	}
+	if (["CRASHED", "DOWN", "ERROR", "FAILED", "STOPPED"].includes(normalized)) {
+		return "fail";
+	}
+	return "warn";
+}
+
+function internalPresentationState(
+	entry: HomelabHealthEntry | undefined,
+): HomelabHealthState {
+	return (
+		entry?.internal_state ??
+		runtimeHealthState(entry?.runtime_state) ??
+		entry?.state ??
+		"unknown"
+	);
 }
 
 export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
@@ -123,11 +159,16 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 						lookupHealth(serviceHealth, svc, endpointUrl),
 						svc,
 					);
+					const dependsOnTrueNas =
+						svc.internalHost === "172.17.0.24" ||
+						initialHealth?.runtime_app != null;
+					const internalState = internalPresentationState(initialHealth);
+					const internalColor = homelabHealthColor(internalState);
 
 					return (
 						<div
 							className="col-md-4 p-3"
-							key={`${svc.id ?? svc.name}:${endpointUrl}`}
+							key={`${homelabServiceId(svc)}:${endpointUrl}`}
 						>
 							<div className="card box-shadow h-100 service-card-ux">
 								<img
@@ -161,7 +202,7 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 											label={t("endpoint.external")}
 											initialHealth={initialHealth}
 											snapshotCheckedAt={snapshot?.checked_at}
-											truenasDown={truenasDown}
+											truenasDown={truenasDown && dependsOnTrueNas}
 										/>
 										{hasInternal && (
 											<a
@@ -169,11 +210,14 @@ export default function HomelabServiceGrid({ catalog, snapshot }: Props) {
 												className="btn btn-outline-secondary btn-sm d-block"
 												target="_blank"
 												rel="noopener noreferrer"
+												style={{ color: internalColor, borderColor: internalColor }}
+												data-health-state={internalState}
+												title={`FastAPI/TrueNAS: ${internalState}`}
 											>
 												{svc.internalSecure && (
 													<i
 														className="fas fa-lock"
-														style={{ color: "gray", marginRight: 5 }}
+														style={{ color: internalColor, marginRight: 5 }}
 														title={t("truenas.internalTlsTitle")}
 														aria-label={t("truenas.internalTlsAria")}
 													/>
