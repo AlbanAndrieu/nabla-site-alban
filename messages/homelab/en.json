@@ -85,6 +85,10 @@
 			"requires": "Requires:",
 			"optional": "Optional:",
 			"blastRadius": "Blast radius:",
+			"details": "Inspect dependency impact",
+			"dependencyPath": "Required path:",
+			"directImpact": "Direct dependents:",
+			"transitiveImpact": "Indirect / transitive impact:",
 			"moreImpacted": "+{count} more",
 			"more": "+{count} lower-impact components",
 			"note": "Criticality is derived from blocking required relations (dependsOn, consumesApi, routesTo, storesIn, authenticatesVia and structural partOf). Databases, caches and storage kinds are treated as shared state when they have required dependents. Observability and exposure links do not artificially increase startup criticality."
