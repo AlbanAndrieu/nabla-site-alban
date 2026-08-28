@@ -1,24 +1,132 @@
-name: Release
+name: Semantic Release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - CI (Quality and Security)
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: semantic-release-master
+  cancel-in-progress: false
 
 jobs:
   release:
+    name: Version, changelog and GitHub release
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'master')
     runs-on: ubuntu-latest
+    env:
+      RELEASE_APP_CLIENT_ID: ${{ vars.RELEASE_APP_CLIENT_ID }}
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout validated master revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
+          ref: master
           fetch-depth: 0
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+          persist-credentials: false
+
+      - name: Create dedicated release App token
+        id: release_app_token
+        if: env.RELEASE_APP_CLIENT_ID != '' && env.RELEASE_APP_PRIVATE_KEY != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          node-version: '20.x'
-      - name: Install deps
-        run: npm ci
-      - name: Semantic Release
+          client-id: ${{ env.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ env.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify validated revision is still current master
+        id: freshness
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin master:refs/remotes/origin/master --tags
+          CURRENT_SHA="$(git rev-parse HEAD)"
+          MASTER_SHA="$(git rev-parse origin/master)"
+          VALIDATED_SHA="${{ github.event.workflow_run.head_sha }}"
+          if [[ "${CURRENT_SHA}" != "${MASTER_SHA}" ]]; then
+            echo "Checkout ${CURRENT_SHA} is not current master ${MASTER_SHA}."
+            echo "current=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          if [[ -n "${VALIDATED_SHA}" && "${CURRENT_SHA}" != "${VALIDATED_SHA}" ]]; then
+            echo "Validated revision ${VALIDATED_SHA} is stale; master is ${CURRENT_SHA}."
+            echo "current=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          echo "current=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure release Git credentials
+        if: steps.freshness.outputs.current == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+          GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: gh auth setup-git
+
+      - name: Bootstrap semantic-release baseline
+        id: baseline
+        if: steps.freshness.outputs.current == 'true'
+        env:
+          GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXISTING_TAG="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-version:refname | head -n 1)"
+          if [[ -n "${EXISTING_TAG}" ]]; then
+            echo "Using existing semantic-release baseline ${EXISTING_TAG}."
+            echo "created=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          BASELINE_SHA="$(git rev-parse HEAD^)"
+          git tag -a v0.0.0 "${BASELINE_SHA}" -m "chore(release): semantic-release baseline"
+          git push origin refs/tags/v0.0.0
+          echo "Created technical baseline v0.0.0 on ${BASELINE_SHA}."
+          echo "created=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Verify first-release bootstrap version
+        if: steps.baseline.outputs.created == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "${VERSION}" != "0.0.1" ]]; then
+            echo "First semantic release must bootstrap from package version 0.0.1, found ${VERSION}." >&2
+            exit 1
+          fi
+
+      - name: Run semantic-release
+        if: steps.freshness.outputs.current == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm exec --yes \
+            --package=semantic-release@25.0.8 \
+            --package=@semantic-release/changelog@6.0.3 \
+            --package=@semantic-release/git@10.0.1 \
+            --package=@semantic-release/npm@13.1.3 \
+            -- semantic-release
