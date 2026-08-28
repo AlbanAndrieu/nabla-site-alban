@@ -11,7 +11,7 @@ import {
 	type ServiceTopology,
 	type ServiceTopologySource,
 } from "@/lib/serviceTopology";
-import ArchitectureExplorer from "./ArchitectureExplorer";
+import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
 
 type Props = {
 	locale: string;
@@ -76,7 +76,7 @@ export default function ArchitectureTopologyView({
 	return (
 		<>
 			<ServiceCriticalityOverview topology={topology} />
-			<ArchitectureExplorer
+			<HierarchicalArchitectureExplorer
 				locale={locale}
 				catalog={catalog}
 				catalogSource={catalogSource}
