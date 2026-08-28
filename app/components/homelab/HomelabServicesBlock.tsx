@@ -1,10 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
-import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import {
+	analyzeServiceCriticality,
+	compareServiceCriticality,
+} from "@/lib/serviceCriticality";
+import {
+	homelabServiceId,
+	type HomelabServicesCatalog,
+} from "@/lib/homelabServices";
+import {
+	parseServiceTopology,
+	type ServiceTopology,
+} from "@/lib/serviceTopology";
 import HomelabServiceGrid from "./HomelabServiceGrid";
+import ServiceCriticalityOverview from "./ServiceCriticalityOverview";
 
 const HEALTH_REFRESH_MS = 30_000;
 
@@ -15,6 +27,7 @@ type HealthFetchResult = {
 
 type State = {
 	catalog: HomelabServicesCatalog | null;
+	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	error: boolean;
 	healthUnavailable: boolean;
@@ -30,6 +43,21 @@ async function fetchCatalog(
 	});
 	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
 	return (await response.json()) as HomelabServicesCatalog;
+}
+
+async function fetchTopology(signal: AbortSignal): Promise<ServiceTopology | null> {
+	try {
+		const response = await fetch("/api/homelab-topology", {
+			cache: "no-store",
+			signal,
+			headers: { Accept: "application/json" },
+		});
+		if (!response.ok) return null;
+		return parseServiceTopology(await response.json());
+	} catch (error) {
+		if (signal.aborted) throw error;
+		return null;
+	}
 }
 
 async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
@@ -55,6 +83,7 @@ export default function HomelabServicesBlock() {
 	const t = useTranslations("homelab");
 	const [state, setState] = useState<State>({
 		catalog: null,
+		topology: null,
 		snapshot: null,
 		error: false,
 		healthUnavailable: false,
@@ -85,12 +114,14 @@ export default function HomelabServicesBlock() {
 
 		void Promise.all([
 			fetchCatalog(initialController.signal),
+			fetchTopology(initialController.signal),
 			fetchHealth(initialController.signal),
 		])
-			.then(([catalog, health]) => {
+			.then(([catalog, topology, health]) => {
 				if (!initialController.signal.aborted) {
 					setState({
 						catalog,
+						topology,
 						snapshot: health.snapshot,
 						error: false,
 						healthUnavailable: health.snapshot === null,
@@ -124,7 +155,24 @@ export default function HomelabServicesBlock() {
 		};
 	}, []);
 
-	if (!state.catalog) {
+	const orderedCatalog = useMemo(() => {
+		if (!state.catalog || !state.topology) return state.catalog;
+		const topology = state.topology;
+		const analysis = analyzeServiceCriticality(topology);
+		return {
+			...state.catalog,
+			services: [...state.catalog.services].sort((left, right) =>
+				compareServiceCriticality(
+					homelabServiceId(left),
+					homelabServiceId(right),
+					topology,
+					analysis,
+				),
+			),
+		};
+	}, [state.catalog, state.topology]);
+
+	if (!orderedCatalog) {
 		return (
 			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
 				{state.error ? t("unavailable") : t("loading")}
@@ -133,11 +181,16 @@ export default function HomelabServicesBlock() {
 	}
 
 	return (
-		<HomelabServiceGrid
-			catalog={state.catalog}
-			snapshot={state.snapshot}
-			healthUnavailable={state.healthUnavailable}
-			healthHttpStatus={state.healthStatus}
-		/>
+		<>
+			{state.topology ? (
+				<ServiceCriticalityOverview topology={state.topology} compact />
+			) : null}
+			<HomelabServiceGrid
+				catalog={orderedCatalog}
+				snapshot={state.snapshot}
+				healthUnavailable={state.healthUnavailable}
+				healthHttpStatus={state.healthStatus}
+			/>
+		</>
 	);
 }

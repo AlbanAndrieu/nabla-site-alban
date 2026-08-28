@@ -63,6 +63,21 @@
 			"legendTitle": "Santé des dépendances",
 			"legend": "La couleur principale du service/lien suit l’état effectif ; l’icône runtime conserve l’état local de l’application TrueNAS."
 		},
+		"criticality": {
+			"title": "Hiérarchie des dépendances critiques",
+			"lead": "L’infrastructure fondatrice et les états partagés sont présentés avant les applications, selon les dépendances requises déclarées et leur rayon d’impact transitif.",
+			"tiers": {
+				"foundation": "1 · Fondations d’infrastructure",
+				"shared-data": "2 · Données et état partagés",
+				"shared-platform": "3 · Services de plateforme partagés",
+				"application": "4 · Applications et consommateurs"
+			},
+			"impact": "{count, plural, =0 {feuille} one {# dépendant} other {# dépendants}}",
+			"requires": "Requiert :",
+			"optional": "Optionnel :",
+			"more": "+{count} composants à impact plus faible",
+			"note": "La criticité provient uniquement des relations requises bloquantes (dependsOn, consumesApi, routesTo, storesIn, authenticatesVia et partOf structurel). Les liens d’observabilité et d’exposition n’augmentent pas artificiellement la criticité de démarrage."
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",

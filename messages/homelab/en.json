@@ -63,6 +63,21 @@
 			"legendTitle": "Dependency health",
 			"legend": "The primary service/link color follows effective health; the runtime icon remains the local TrueNAS application state."
 		},
+		"criticality": {
+			"title": "Critical dependency hierarchy",
+			"lead": "Foundational infrastructure and shared state are shown before applications, using declared required dependencies and their transitive blast radius.",
+			"tiers": {
+				"foundation": "1 · Infrastructure foundations",
+				"shared-data": "2 · Shared data and state",
+				"shared-platform": "3 · Shared platform services",
+				"application": "4 · Applications and consumers"
+			},
+			"impact": "{count, plural, =0 {leaf} one {# dependent} other {# dependents}}",
+			"requires": "Requires:",
+			"optional": "Optional:",
+			"more": "+{count} lower-impact components",
+			"note": "Criticality is derived from blocking required relations (dependsOn, consumesApi, routesTo, storesIn, authenticatesVia and structural partOf). Observability and exposure links do not artificially increase startup criticality."
+		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",
