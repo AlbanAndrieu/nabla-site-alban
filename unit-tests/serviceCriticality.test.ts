@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
 	analyzeServiceCriticality,
+	buildServiceImpactFocus,
 	compareServiceCriticality,
 } from "../lib/serviceCriticality";
 import type { ServiceTopology } from "../lib/serviceTopology";
@@ -161,6 +162,22 @@ test("blast radius includes direct and transitive required dependents", () => {
 		"n8n",
 	]);
 	assert.deepEqual(analysis.get("openwebui")?.optionalDependencies, ["searxng"]);
+});
+
+test("impact drill-down separates direct and indirect blast radius and exposes dependency path", () => {
+	const analysis = analyzeServiceCriticality(topology);
+	const openWebUi = buildServiceImpactFocus("openwebui", topology, analysis);
+	const ollama = buildServiceImpactFocus("ollama", topology, analysis);
+	const postgresql = buildServiceImpactFocus("postgresql", topology, analysis);
+
+	assert.deepEqual(openWebUi?.requiredDependencyIds, ["litellm"]);
+	assert.deepEqual(openWebUi?.optionalDependencyIds, ["searxng"]);
+	assert.deepEqual(openWebUi?.dependencyPathIds, ["openwebui", "litellm", "ollama"]);
+	assert.deepEqual(ollama?.directDependentIds, ["litellm"]);
+	assert.deepEqual(ollama?.indirectDependentIds, ["openwebui"]);
+	assert.deepEqual(postgresql?.directDependentIds, ["langfuse", "n8n"]);
+	assert.deepEqual(postgresql?.indirectDependentIds, []);
+	assert.equal(buildServiceImpactFocus("missing", topology, analysis), null);
 });
 
 test("required observability links do not inflate startup criticality", () => {

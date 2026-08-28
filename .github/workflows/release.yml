@@ -78,11 +78,16 @@ jobs:
           fi
           echo "current=true" >> "${GITHUB_OUTPUT}"
 
-      - name: Configure release Git credentials
+      - name: Configure release Git credentials and identity
         if: steps.freshness.outputs.current == 'true'
         env:
           GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
-        run: gh auth setup-git
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Bootstrap semantic-release baseline
         id: baseline

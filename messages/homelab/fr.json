@@ -85,6 +85,10 @@
 			"requires": "Requiert :",
 			"optional": "Optionnel :",
 			"blastRadius": "Rayon d’impact :",
+			"details": "Inspecter l’impact des dépendances",
+			"dependencyPath": "Chemin requis :",
+			"directImpact": "Dépendants directs :",
+			"transitiveImpact": "Impact indirect / transitif :",
 			"moreImpacted": "+{count} autres",
 			"more": "+{count} composants à impact inférieur",
 			"note": "La criticité est dérivée des relations requises bloquantes (dependsOn, consumesApi, routesTo, storesIn, authenticatesVia et partOf structurel). Les bases, caches et stockages sont classés comme état partagé lorsqu’ils ont des dépendants requis. Les liens d’observabilité et d’exposition n’augmentent pas artificiellement la criticité de démarrage."

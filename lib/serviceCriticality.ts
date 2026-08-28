@@ -24,6 +24,16 @@ export type ServiceCriticality = {
 	optionalDependencies: string[];
 };
 
+export type ServiceImpactFocus = {
+	id: string;
+	requiredDependencyIds: string[];
+	optionalDependencyIds: string[];
+	directDependentIds: string[];
+	indirectDependentIds: string[];
+	transitiveDependentIds: string[];
+	dependencyPathIds: string[];
+};
+
 const BLOCKING_RELATION_TYPES = new Set<ServiceRelationType>([
 	"dependsOn",
 	"consumesApi",
@@ -171,6 +181,53 @@ export function analyzeServiceCriticality(
 			];
 		}),
 	);
+}
+
+function longestRequiredDependencyPath(
+	startId: string,
+	analysis: Map<string, ServiceCriticality>,
+	seen = new Set<string>(),
+): string[] {
+	if (seen.has(startId) || !analysis.has(startId)) return [];
+	const nextSeen = new Set(seen).add(startId);
+	const dependencies = (analysis.get(startId)?.requiredDependencies ?? []).filter(
+		(id) => !nextSeen.has(id),
+	);
+	if (dependencies.length === 0) return [startId];
+
+	const candidates = dependencies
+		.map((dependencyId) =>
+			longestRequiredDependencyPath(dependencyId, analysis, nextSeen),
+		)
+		.filter((path) => path.length > 0)
+		.sort(
+			(left, right) =>
+				right.length - left.length || left.join("\0").localeCompare(right.join("\0")),
+		);
+	return [startId, ...(candidates[0] ?? [])];
+}
+
+export function buildServiceImpactFocus(
+	id: string,
+	topology: ServiceTopology,
+	analysis = analyzeServiceCriticality(topology),
+): ServiceImpactFocus | null {
+	if (!topology.nodes.some((node) => node.id === id)) return null;
+	const criticality = analysis.get(id);
+	if (!criticality) return null;
+	const direct = new Set(criticality.directDependentIds);
+
+	return {
+		id,
+		requiredDependencyIds: criticality.requiredDependencies,
+		optionalDependencyIds: criticality.optionalDependencies,
+		directDependentIds: criticality.directDependentIds,
+		indirectDependentIds: criticality.transitiveDependentIds.filter(
+			(dependentId) => !direct.has(dependentId),
+		),
+		transitiveDependentIds: criticality.transitiveDependentIds,
+		dependencyPathIds: longestRequiredDependencyPath(id, analysis),
+	};
 }
 
 export function compareServiceCriticality(

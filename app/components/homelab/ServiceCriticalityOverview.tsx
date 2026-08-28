@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import {
 	analyzeServiceCriticality,
+	buildServiceImpactFocus,
 	compareServiceCriticality,
 	SERVICE_CRITICALITY_TIERS,
 	type ServiceCriticalityTier,
@@ -43,6 +44,8 @@ export default function ServiceCriticalityOverview({
 		() => new Map(topology.nodes.map((node) => [node.id, node])),
 		[topology],
 	);
+	const namesFor = (ids: readonly string[]) =>
+		ids.map((id) => nodesById.get(id)?.name ?? id);
 
 	const tiers = useMemo(
 		() =>
@@ -80,19 +83,27 @@ export default function ServiceCriticalityOverview({
 								<div className="d-flex flex-column gap-2">
 									{nodes.slice(0, MAX_PER_TIER).map((node) => {
 										const criticality = analysis.get(node.id);
-										const required = (criticality?.requiredDependencies ?? [])
-											.map((id) => nodesById.get(id)?.name ?? id)
-											.slice(0, 4);
-										const optional = (criticality?.optionalDependencies ?? [])
-											.map((id) => nodesById.get(id)?.name ?? id)
-											.slice(0, 3);
-										const impacted = (criticality?.transitiveDependentIds ?? [])
-											.map((id) => nodesById.get(id)?.name ?? id)
-											.slice(0, MAX_IMPACT_NAMES);
+										const focus = buildServiceImpactFocus(node.id, topology, analysis);
+										const required = namesFor(
+											criticality?.requiredDependencies ?? [],
+										).slice(0, 4);
+										const optional = namesFor(
+											criticality?.optionalDependencies ?? [],
+										).slice(0, 3);
+										const impacted = namesFor(
+											criticality?.transitiveDependentIds ?? [],
+										).slice(0, MAX_IMPACT_NAMES);
+										const directImpact = namesFor(focus?.directDependentIds ?? []);
+										const indirectImpact = namesFor(focus?.indirectDependentIds ?? []);
+										const dependencyPath = namesFor(focus?.dependencyPathIds ?? []);
 										const hiddenImpact = Math.max(
 											0,
 											(criticality?.transitiveDependents ?? 0) - impacted.length,
 										);
+										const hasDrilldown =
+											dependencyPath.length > 1 ||
+											directImpact.length > 0 ||
+											indirectImpact.length > 0;
 										return (
 											<div
 												className="border rounded p-2"
@@ -135,6 +146,33 @@ export default function ServiceCriticalityOverview({
 															? ` ${t("criticality.moreImpacted", { count: hiddenImpact })}`
 															: ""}
 													</small>
+												) : null}
+												{hasDrilldown ? (
+													<details className="mt-2" data-impact-drilldown={node.id}>
+														<summary className="small fw-semibold">
+															{t("criticality.details")}
+														</summary>
+														<div className="small mt-2 ps-2 border-start">
+															{dependencyPath.length > 1 ? (
+																<div data-dependency-path={focus?.dependencyPathIds.join(",")}>
+																	<strong>{t("criticality.dependencyPath")}</strong>{" "}
+																	{dependencyPath.join(" → ")}
+																</div>
+															) : null}
+															{directImpact.length > 0 ? (
+																<div className="mt-1" data-direct-impact={focus?.directDependentIds.join(",")}>
+																	<strong>{t("criticality.directImpact")}</strong>{" "}
+																	{directImpact.join(", ")}
+																</div>
+															) : null}
+															{indirectImpact.length > 0 ? (
+																<div className="mt-1" data-indirect-impact={focus?.indirectDependentIds.join(",")}>
+																	<strong>{t("criticality.transitiveImpact")}</strong>{" "}
+																	{indirectImpact.join(", ")}
+																</div>
+															) : null}
+														</div>
+													</details>
 												) : null}
 											</div>
 										);

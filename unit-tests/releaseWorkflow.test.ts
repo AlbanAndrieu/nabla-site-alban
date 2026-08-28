@@ -32,6 +32,21 @@ test("semantic-release bootstraps Site Alban at 0.0.1 after green master CI", as
   assert.match(changelog, /^# Changelog/m);
 });
 
+test("release workflow configures a Git identity before creating annotated tags", async () => {
+  const release = await source(".github/workflows/release.yml");
+  const identityPosition = release.indexOf("git config --local user.name");
+  const emailPosition = release.indexOf("git config --local user.email");
+  const tagPosition = release.indexOf("git tag -a v0.0.0");
+
+  assert.ok(identityPosition >= 0, "release workflow must configure git user.name");
+  assert.ok(emailPosition >= 0, "release workflow must configure git user.email");
+  assert.ok(tagPosition >= 0, "release workflow must create the annotated bootstrap tag");
+  assert.ok(identityPosition < tagPosition, "git identity must be configured before tagging");
+  assert.ok(emailPosition < tagPosition, "git email must be configured before tagging");
+  assert.match(release, /github-actions\[bot\]/);
+  assert.match(release, /41898282\+github-actions\[bot\]@users\.noreply\.github\.com/);
+});
+
 test("release configuration keeps feature alias and generated release commit out of CI loops", async () => {
   const config = await source(".releaserc.yaml");
 
