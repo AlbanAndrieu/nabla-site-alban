@@ -19,6 +19,52 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 3. Validate narrowly first, then broaden checks.
 4. For CI failures, inspect the failing job/step and affected files before unrelated code.
 
+## Tool and context efficiency
+
+Optimize the amount of context needed to reach a correct result, **not** the repository's capabilities. `/AGENTS.md` is the canonical repository guidance. Agent-specific instruction files must remain thin adapters to it; do not recursively enumerate every AI-vendor directory or preload every skill.
+
+### Tool classes for this repository
+
+- **First-class:** local Git/search (`git status`, `git diff`, `git ls-files`, `rg`); Node/npm and the commands in `package.json`; `scripts/quality-gate.sh`; GitHub repository/PR, Actions, CodeQL, commit-status, artifact and release diagnostics; Vercel deployment/Preview/build diagnostics and Vercel OpenTelemetry; Playwright; Next.js and the `next-devtools` MCP for Next runtime diagnostics; Semantic Release; conditional Snyk scanning when configured. Docker/Buildx, DockerHub/GHCR and Trivy are first-class for Docker-scoped changes. Use these whenever the task requires them; context efficiency must not restrict their functional use.
+- **On-demand:** matching entries under `skills/` or `.agents/skills` (including agent-browser, Next.js optimization/i18n and Stripe skills); Stripe integrations; the FastAPI Cloud homelab health/data backend; Cloudflare/Wrangler; Datadog/static-analysis configuration; PDF generation; LibreTranslate/OpenCommit; and the legacy MegaLinter workflow. Discover or load them only when the task materially involves them.
+- **Out-of-scope by default:** legacy GitLab CI (`.gitlab-ci.yml`) and unrelated account/service connectors such as Gmail, Calendar, Contacts, Slack, LinkedIn, Supabase or Sentry when the current task has no explicit dependency on them. Do not uninstall or disconnect global integrations merely to save context; leave them installed and simply do not discover/load/invoke them.
+
+The classification is repository-specific and may change when the code or deployment architecture changes. Evidence in current code/workflows takes precedence over assumptions or classifications copied from other repositories.
+
+### Discovery and result reuse
+
+- For MCPs, connectors and plugins, discover only the few functions needed for the current operation instead of loading an entire tool schema. Reuse already-discovered functions for the remainder of the task.
+- Reuse prior tool responses/resources when they still describe the same revision/state. Do not repeat equivalent API calls solely to refresh context.
+- Prefer specialized operations (file/range, PR diff, workflow jobs, job steps, deployment logs) over broad generic REST/API responses.
+- Retrieve only the necessary files, ranges, diffs, status fields or logs. Expand progressively only when the targeted evidence is insufficient.
+- A context-saving rule is never a reason to avoid a tool that is necessary for a correct diagnosis, security review, test investigation or deployment validation.
+
+### Repository context
+
+Prefer `git diff`, `git status`, `git ls-files`, `rg`, changed-file lists and explicit file/range reads over recursive repository scans. Do not load large lockfiles, generated files, reports, artifacts or whole instruction/skill trees when a manifest, diff, summary or targeted fragment answers the question.
+
+`docs/agent-frontend-standards.md` contains detailed frontend/accessibility/i18n/SEO/print conventions and is intentionally **on-demand**. Load it when a task touches those concerns rather than carrying it in every agent session.
+
+### CI, logs, artifacts and observability
+
+Inspect failures progressively:
+
+1. workflow/check/deployment status;
+2. failing job;
+3. failing step;
+4. targeted logs around the error;
+5. full logs, report, artifact, trace, screenshot or video only when the targeted evidence does not explain the failure or when the richer artifact materially improves the diagnosis.
+
+Keep existing test and E2E coverage. For Playwright failures, use the uploaded report, traces, screenshots and other artifacts whenever they are useful; difficult failures justify retrieving the complete artifact set. Apply the same progressive approach to Vercel, FastAPI Cloud, GitHub security results and other observability platforms.
+
+### Polling
+
+Do not loop on workflow status, deployment status, checks, jobs or observability. Read once, continue other useful work, then revalidate when the result can materially change the next action. A requested final CI/deployment verification is still mandatory; avoiding polling must never become skipping the final verification.
+
+### No quality trade-off
+
+Never reduce or bypass security controls, privacy requirements, quality gates, test coverage, hooks, release rules, CI/CD checks or deployment validation to reduce token/context/tool usage. The governing principle is: **reduce the context required to obtain information, not the agent's capabilities or the evidence required for confidence.**
+
 ## Protected default-branch policy
 
 Agents must **never** commit, push, create, update, delete, or otherwise mutate files directly on `master`, and must never move, force-update, or write the `master` ref directly.
@@ -95,7 +141,7 @@ Safety, compatibility, accessibility or browser fixes may be made around the sta
 
 ## Next.js
 
-`next.config.mjs` intentionally sets `experimental.agentRules: false` so `next dev` does not regenerate large agent context blocks. For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/` before editing. Do not add a full documentation index here.
+For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/` before editing. Do not enable, generate or load broad Next.js agent-rule/documentation indexes by default; keep framework guidance targeted to the feature being changed.
 
 ## Completion
 
