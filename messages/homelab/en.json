@@ -63,6 +63,32 @@
 			"legendTitle": "Dependency health",
 			"legend": "The primary service/link color follows effective health; the runtime icon remains the local TrueNAS application state."
 		},
+		"criticality": {
+			"title": "Critical dependency hierarchy",
+			"lead": "Foundational infrastructure and shared state are shown before applications, using declared required dependencies and their transitive blast radius.",
+			"tiers": {
+				"foundation": "1 · Infrastructure foundations",
+				"shared-data": "2 · Shared data and state",
+				"shared-platform": "3 · Shared platform services",
+				"application": "4 · Applications and consumers",
+				"support": "5 · Support and low-impact components"
+			},
+			"tierDescriptions": {
+				"foundation": "Network, storage and container foundations whose failure can remove whole layers of the homelab.",
+				"shared-data": "Databases, caches and storage backends required by one or more higher-level services.",
+				"shared-platform": "Gateways, runtimes and shared capabilities consumed transitively by applications.",
+				"application": "User-facing or workflow services that consume the shared foundations above.",
+				"support": "Optional, observability or inventory components with no declared blocking blast radius."
+			},
+			"impact": "{count, plural, =0 {leaf} one {# dependent} other {# dependents}}",
+			"componentCount": "{count, plural, one {# component} other {# components}}",
+			"requires": "Requires:",
+			"optional": "Optional:",
+			"blastRadius": "Blast radius:",
+			"moreImpacted": "+{count} more",
+			"more": "+{count} lower-impact components",
+			"note": "Criticality is derived from blocking required relations (dependsOn, consumesApi, routesTo, storesIn, authenticatesVia and structural partOf). Databases, caches and storage kinds are treated as shared state when they have required dependents. Observability and exposure links do not artificially increase startup criticality."
+		},
 		"dns": {
 			"title": "DNS resilience",
 			"independent": "pfSense / Unbound keeps a resolution path independent from TrueNAS.",

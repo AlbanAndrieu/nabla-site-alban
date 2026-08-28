@@ -10,7 +10,7 @@ import { routing } from "@/i18n/routing";
 import { getStaticHomelabServicesCatalog } from "@/lib/homelabServices";
 import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
-import ArchitectureExplorer from "./ArchitectureExplorer";
+import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
 export async function generateMetadata({
 	params,
@@ -61,8 +61,8 @@ export default async function ArchitecturePage({
 						</p>
 						<p className="hero-description">
 							{french
-								? "La vue AI Platform reprend le diagramme d’architecture précédent avec les outils individuels. La vue Nabla / TrueNAS fusionne le catalogue de services avec les relations déclarées dans nabla-compose ; elle n’utilise pas depends_on comme substitut à une architecture fonctionnelle."
-								: "AI Platform expands the previous architecture diagram into individual tools. Nabla / TrueNAS merges the service inventory with relationships declared in nabla-compose; it does not use depends_on as a substitute for functional architecture."}
+								? "La lecture commence maintenant par les fondations et composants à plus grand rayon d’impact, avant les applications feuilles. La vue détaillée conserve ensuite l’ensemble des relations déclarées dans nabla-compose."
+								: "The page now starts with foundations and components with the largest blast radius before leaf applications. The detailed view then keeps the complete relationship graph declared in nabla-compose."}
 						</p>
 						<div className="d-flex flex-wrap gap-2 justify-content-center">
 							<ActionLink href={`${prefix}/ai`} variant="secondary">
@@ -78,12 +78,12 @@ export default async function ArchitecturePage({
 					</div>
 				</section>
 
-				<ArchitectureExplorer
+				<ArchitectureTopologyView
 					locale={locale}
-					catalog={catalog}
-					catalogSource={catalogSource}
-					topology={topology}
-					topologySource={topologySource}
+					initialCatalog={catalog}
+					initialCatalogSource={catalogSource}
+					initialTopology={topology}
+					initialTopologySource={topologySource}
 				/>
 
 				<section
