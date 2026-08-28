@@ -2,9 +2,13 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import {
+	parseHomelabHealthSnapshot,
+	type HomelabHealthSnapshot,
+} from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import HomelabServiceGrid from "./HomelabServiceGrid";
+import PfSenseDnsPosture from "./PfSenseDnsPosture";
 
 const HEALTH_REFRESH_MS = 30_000;
 
@@ -42,7 +46,7 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 			return { snapshot: null, status: response.status };
 		}
 		return {
-			snapshot: (await response.json()) as HomelabHealthSnapshot,
+			snapshot: parseHomelabHealthSnapshot(await response.json()),
 			status: response.status,
 		};
 	} catch (error) {
@@ -133,11 +137,17 @@ export default function HomelabServicesBlock() {
 	}
 
 	return (
-		<HomelabServiceGrid
-			catalog={state.catalog}
-			snapshot={state.snapshot}
-			healthUnavailable={state.healthUnavailable}
-			healthHttpStatus={state.healthStatus}
-		/>
+		<>
+			<PfSenseDnsPosture
+				snapshot={state.snapshot}
+				healthUnavailable={state.healthUnavailable}
+			/>
+			<HomelabServiceGrid
+				catalog={state.catalog}
+				snapshot={state.snapshot}
+				healthUnavailable={state.healthUnavailable}
+				healthHttpStatus={state.healthStatus}
+			/>
+		</>
 	);
 }

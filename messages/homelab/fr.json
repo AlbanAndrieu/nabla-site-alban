@@ -63,6 +63,24 @@
 			"legendTitle": "Santé des dépendances",
 			"legend": "La couleur principale du service/lien suit l’état effectif ; l’icône runtime conserve l’état local de l’application TrueNAS."
 		},
+		"dns": {
+			"title": "Résilience DNS",
+			"independent": "pfSense / Unbound conserve un chemin de résolution indépendant de TrueNAS.",
+			"truenasOnly": "Le forwarding DNS pfSense dépend uniquement de DNS hébergés sur TrueNAS ; une panne TrueNAS peut donc devenir une panne DNS de tout le LAN.",
+			"resolverFailed": "Le DNS Resolver pfSense est désactivé ou n’est pas en cours d’exécution.",
+			"unconfigured": "L’observation DNS pfSense n’est pas configurée ; l’indépendance vis-à-vis de TrueNAS n’est pas vérifiée.",
+			"unreachable": "L’observation du plan de contrôle DNS pfSense est indisponible ; la santé des services ne prouve pas à elle seule la résilience DNS.",
+			"incomplete": "Le DNS pfSense est observable mais les preuves de résilience sont incomplètes.",
+			"resolverRunning": "Unbound en cours d’exécution",
+			"resolverStopped": "Unbound arrêté",
+			"resolverUnknown": "État Unbound inconnu",
+			"modeRecursive": "résolution récursive",
+			"modeForwarding": "mode forwarding",
+			"modeUnknown": "mode du resolver inconnu",
+			"upstreamCount": "{count, plural, =0 {aucun upstream configuré} one {# upstream configuré} other {# upstreams configurés}}",
+			"snapshotStale": "La posture affichée provient du dernier snapshot valide car l’actualisation live de la santé a échoué.",
+			"evidenceNote": "Preuve de politique du plan de contrôle uniquement ; ceci n’est pas une requête DNS synthétique effectuée depuis un client du LAN."
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",
