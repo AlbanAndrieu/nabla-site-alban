@@ -18,6 +18,8 @@ export type ServiceCriticality = {
 	directDependents: number;
 	transitiveDependents: number;
 	directDependencies: number;
+	directDependentIds: string[];
+	transitiveDependentIds: string[];
 	requiredDependencies: string[];
 	optionalDependencies: string[];
 };
@@ -40,6 +42,20 @@ const FOUNDATION_KINDS = new Set([
 	"reverse-proxy",
 ]);
 
+const SHARED_DATA_KINDS = new Set([
+	"database",
+	"cache",
+	"key-value-store",
+	"object-storage",
+	"analytics-database",
+	"vector-database",
+	"message-broker",
+	"search",
+	"log-store",
+	"metrics-store",
+	"trace-store",
+]);
+
 const TIER_ORDER: Record<ServiceCriticalityTier, number> = {
 	foundation: 0,
 	"shared-data": 1,
@@ -47,6 +63,14 @@ const TIER_ORDER: Record<ServiceCriticalityTier, number> = {
 	application: 3,
 	support: 4,
 };
+
+export const SERVICE_CRITICALITY_TIERS = [
+	"foundation",
+	"shared-data",
+	"shared-platform",
+	"application",
+	"support",
+] as const satisfies readonly ServiceCriticalityTier[];
 
 function isBlockingRequired(relation: ServiceTopologyRelation): boolean {
 	return (
@@ -57,6 +81,10 @@ function isBlockingRequired(relation: ServiceTopologyRelation): boolean {
 
 function semanticFoundation(node: ServiceTopologyNode): boolean {
 	return FOUNDATION_KINDS.has(node.kind);
+}
+
+function semanticSharedData(node: ServiceTopologyNode): boolean {
+	return node.category === "data" || SHARED_DATA_KINDS.has(node.kind);
 }
 
 function collectReachable(
@@ -82,7 +110,7 @@ function tierFor(
 	transitiveDependents: number,
 ): ServiceCriticalityTier {
 	if (semanticFoundation(node)) return "foundation";
-	if (node.category === "data" && transitiveDependents > 0) return "shared-data";
+	if (semanticSharedData(node) && transitiveDependents > 0) return "shared-data";
 	if (transitiveDependents > 0) return "shared-platform";
 	if (directDependencies > 0) return "application";
 	return "support";
@@ -116,9 +144,11 @@ export function analyzeServiceCriticality(
 
 	return new Map(
 		topology.nodes.map((node) => {
-			const directDependencyIds = [...(requiredDependencies.get(node.id) ?? [])];
-			const directDependentIds = [...(requiredDependents.get(node.id) ?? [])];
-			const transitiveDependents = collectReachable(node.id, requiredDependents);
+			const directDependencyIds = [...(requiredDependencies.get(node.id) ?? [])].sort();
+			const directDependentIds = [...(requiredDependents.get(node.id) ?? [])].sort();
+			const transitiveDependentIds = [
+				...collectReachable(node.id, requiredDependents),
+			].sort();
 			return [
 				node.id,
 				{
@@ -126,12 +156,14 @@ export function analyzeServiceCriticality(
 					tier: tierFor(
 						node,
 						directDependencyIds.length,
-						transitiveDependents.size,
+						transitiveDependentIds.length,
 					),
 					directDependents: directDependentIds.length,
-					transitiveDependents: transitiveDependents.size,
+					transitiveDependents: transitiveDependentIds.length,
 					directDependencies: directDependencyIds.length,
-					requiredDependencies: directDependencyIds.sort(),
+					directDependentIds,
+					transitiveDependentIds,
+					requiredDependencies: directDependencyIds,
 					optionalDependencies: [
 						...(optionalDependencies.get(node.id) ?? []),
 					].sort(),

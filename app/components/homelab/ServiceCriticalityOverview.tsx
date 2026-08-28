@@ -5,30 +5,28 @@ import { useMemo } from "react";
 import {
 	analyzeServiceCriticality,
 	compareServiceCriticality,
+	SERVICE_CRITICALITY_TIERS,
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 
-const DISPLAY_TIERS = [
-	"foundation",
-	"shared-data",
-	"shared-platform",
-	"application",
-] as const satisfies readonly ServiceCriticalityTier[];
-type DisplayTier = (typeof DISPLAY_TIERS)[number];
-const MAX_PER_TIER = 6;
-const TIER_MESSAGE_KEY: Record<
-	DisplayTier,
+type MessageKey =
 	| "criticality.tiers.foundation"
 	| "criticality.tiers.shared-data"
 	| "criticality.tiers.shared-platform"
 	| "criticality.tiers.application"
-> = {
+	| "criticality.tiers.support";
+
+const TIER_MESSAGE_KEY: Record<ServiceCriticalityTier, MessageKey> = {
 	foundation: "criticality.tiers.foundation",
 	"shared-data": "criticality.tiers.shared-data",
 	"shared-platform": "criticality.tiers.shared-platform",
 	application: "criticality.tiers.application",
+	support: "criticality.tiers.support",
 };
+
+const MAX_PER_TIER = 6;
+const MAX_IMPACT_NAMES = 4;
 
 type Props = {
 	topology: ServiceTopology;
@@ -48,7 +46,7 @@ export default function ServiceCriticalityOverview({
 
 	const tiers = useMemo(
 		() =>
-			DISPLAY_TIERS.map((tier) => ({
+			SERVICE_CRITICALITY_TIERS.map((tier) => ({
 				tier,
 				nodes: topology.nodes
 					.filter((node) => analysis.get(node.id)?.tier === tier)
@@ -75,7 +73,7 @@ export default function ServiceCriticalityOverview({
 
 			<div className="row g-3" data-criticality-hierarchy>
 				{tiers.map(({ tier, nodes }) => (
-					<div className="col-12 col-lg-6 col-xxl-3" key={tier}>
+					<div className="col-12 col-lg-6 col-xxl" key={tier}>
 						<div className="card h-100 service-card-ux">
 							<div className="card-body">
 								<h3 className="h5 mb-3">{t(TIER_MESSAGE_KEY[tier])}</h3>
@@ -88,12 +86,20 @@ export default function ServiceCriticalityOverview({
 										const optional = (criticality?.optionalDependencies ?? [])
 											.map((id) => nodesById.get(id)?.name ?? id)
 											.slice(0, 3);
+										const impacted = (criticality?.transitiveDependentIds ?? [])
+											.map((id) => nodesById.get(id)?.name ?? id)
+											.slice(0, MAX_IMPACT_NAMES);
+										const hiddenImpact = Math.max(
+											0,
+											(criticality?.transitiveDependents ?? 0) - impacted.length,
+										);
 										return (
 											<div
 												className="border rounded p-2"
 												key={node.id}
 												data-criticality-node={node.id}
 												data-criticality-tier={tier}
+												data-blast-radius={criticality?.transitiveDependents ?? 0}
 											>
 												<div className="d-flex justify-content-between gap-2 align-items-start">
 													<strong>
@@ -112,13 +118,22 @@ export default function ServiceCriticalityOverview({
 												{required.length > 0 ? (
 													<small className="d-block mt-1">
 														<strong>{t("criticality.requires")}</strong>{" "}
-														{required.join(" → ")}
+														{required.join(" · ")}
 													</small>
 												) : null}
 												{optional.length > 0 ? (
 													<small className="d-block mt-1 text-body-secondary">
 														<strong>{t("criticality.optional")}</strong>{" "}
 														{optional.join(", ")}
+													</small>
+												) : null}
+												{impacted.length > 0 ? (
+													<small className="d-block mt-1 text-body-secondary">
+														<strong>{t("criticality.blastRadius")}</strong>{" "}
+														{impacted.join(", ")}
+														{hiddenImpact > 0
+															? ` ${t("criticality.moreImpacted", { count: hiddenImpact })}`
+															: ""}
 													</small>
 												) : null}
 											</div>
