@@ -412,7 +412,7 @@ export function parseHomelabHealthSnapshot(
 		...(internalServices === undefined
 			? {}
 			: { internal_services: internalServices }),
-		...(pfsense ? { pfsense } : { pfsense: undefined }),
+		...(pfsense ? { pfsense } : {}),
 	} as HomelabHealthSnapshot;
 }
 
