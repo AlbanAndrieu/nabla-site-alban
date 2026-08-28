@@ -1,0 +1,418 @@
+.explorer {
+	width: min(100%, 100rem);
+	margin: 0 auto;
+	padding: var(--ui-space-lg) var(--ui-space-md);
+}
+
+.toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: end;
+	justify-content: space-between;
+	gap: var(--ui-space-md);
+	margin-bottom: var(--ui-space-sm);
+}
+
+.controlCluster {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--ui-space-sm);
+}
+
+.tabs {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: var(--ui-space-xs);
+}
+
+.tabs button {
+	min-height: var(--ui-control-min-height);
+	padding: var(--ui-space-xs) var(--ui-space-md);
+	border: 1px solid #64748b;
+	border-radius: var(--ui-radius-control);
+	background: #0f172a;
+	color: #e2e8f0;
+	font: inherit;
+	font-size: 0.84rem;
+	font-weight: 750;
+	cursor: pointer;
+}
+
+.tabs button[aria-pressed="true"] {
+	border-color: #38bdf8;
+	background: #0c4a6e;
+	color: #f0f9ff;
+	box-shadow: 0 0 0 1px rgb(56 189 248 / 35%);
+}
+
+.tabs button:focus-visible,
+.search input:focus-visible,
+.openLink:focus-visible,
+.toggle input:focus-visible {
+	outline: var(--ui-focus-width) solid #7dd3fc;
+	outline-offset: var(--ui-focus-offset);
+}
+
+.toggle {
+	display: inline-flex;
+	min-height: var(--ui-control-min-height);
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.7rem;
+	border: 1px solid #475569;
+	border-radius: var(--ui-radius-control);
+	background: #0f172a;
+	color: #e2e8f0;
+	font-size: 0.82rem;
+	font-weight: 700;
+}
+
+.toggle input {
+	accent-color: #38bdf8;
+}
+
+.search {
+	display: grid;
+	gap: 0.25rem;
+	color: #e2e8f0;
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.search input {
+	width: min(22rem, 72vw);
+	min-height: var(--ui-control-min-height);
+	padding: 0.5rem 0.75rem;
+	border: 1px solid #64748b;
+	border-radius: var(--ui-radius-control);
+	background: #0f172a;
+	color: #f8fafc;
+}
+
+.search input::placeholder {
+	color: #94a3b8;
+}
+
+.status,
+.legend {
+	color: #cbd5e1;
+	font-size: 0.88rem;
+}
+
+.status {
+	margin-bottom: var(--ui-space-sm);
+}
+
+.flowShell {
+	height: min(82vh, 62rem);
+	min-height: 42rem;
+	overflow: hidden;
+	border: 1px solid #475569;
+	border-radius: var(--ui-radius-card, 1rem);
+	background: #020617;
+	box-shadow:
+		0 1.25rem 3rem rgb(0 0 0 / 30%),
+		inset 0 0 0 1px rgb(148 163 184 / 7%);
+}
+
+.flowShell :global(.react-flow__renderer) {
+	background: #020617;
+}
+
+.flowShell :global(.react-flow__edge-textbg) {
+	fill: #0f172a;
+}
+
+.flowShell :global(.react-flow__edge-text) {
+	paint-order: stroke;
+	stroke: #020617;
+	stroke-width: 2px;
+}
+
+.groupNode {
+	width: 100%;
+	height: 100%;
+	border: 1px solid rgb(100 116 139 / 74%);
+	border-radius: 1rem;
+	background: linear-gradient(180deg, rgb(15 23 42 / 82%), rgb(2 6 23 / 54%));
+	box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+	pointer-events: none;
+}
+
+.groupNode[data-architecture-group="foundation"],
+.groupNode[data-architecture-group="ai-1"] {
+	border-color: rgb(56 189 248 / 72%);
+	background: linear-gradient(180deg, rgb(12 74 110 / 26%), rgb(2 6 23 / 58%));
+}
+
+.groupNode[data-architecture-group="shared-data"],
+.groupNode[data-architecture-group="ai-2"] {
+	border-color: rgb(74 222 128 / 58%);
+}
+
+.groupNode[data-architecture-group="shared-platform"],
+.groupNode[data-architecture-group="ai-3"],
+.groupNode[data-architecture-group="ai-4"] {
+	border-color: rgb(192 132 252 / 58%);
+}
+
+.groupNode[data-architecture-group="application"],
+.groupNode[data-architecture-group="ai-0"] {
+	border-color: rgb(251 191 36 / 58%);
+}
+
+.groupNode[data-architecture-group="external"],
+.groupNode[data-architecture-group="runtime-drift"] {
+	border-style: dashed;
+	opacity: 0.9;
+}
+
+.groupHeading {
+	display: flex;
+	align-items: start;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid rgb(71 85 105 / 70%);
+	background: rgb(15 23 42 / 72%);
+}
+
+.groupHeading strong,
+.groupHeading span {
+	display: block;
+}
+
+.groupHeading strong {
+	color: #f8fafc;
+	font-size: 0.95rem;
+}
+
+.groupHeading span {
+	margin-top: 0.18rem;
+	color: #94a3b8;
+	font-size: 0.7rem;
+}
+
+.groupMeta {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.35rem;
+}
+
+.groupMeta span {
+	margin: 0;
+	padding: 0.15rem 0.4rem;
+	border: 1px solid #475569;
+	border-radius: 999px;
+	background: #020617;
+	color: #cbd5e1;
+	font-size: 0.65rem;
+	font-weight: 700;
+}
+
+.node {
+	position: relative;
+	display: grid;
+	gap: 0.5rem;
+	width: 14rem;
+	min-height: 7rem;
+	padding: 0.78rem;
+	border: 1.5px solid #64748b;
+	border-radius: var(--ui-radius-card, 0.8rem);
+	background: linear-gradient(145deg, #172033, #0f172a 68%);
+	box-shadow:
+		0 0.45rem 1.1rem rgb(0 0 0 / 38%),
+		inset 0 1px 0 rgb(255 255 255 / 5%);
+	color: #f8fafc;
+}
+
+.node[data-criticality-tier="foundation"] {
+	box-shadow:
+		0 0.55rem 1.2rem rgb(0 0 0 / 42%),
+		0 0 0 1px rgb(56 189 248 / 16%);
+}
+
+.node[data-reconciliation="in_sync"] {
+	border-color: #4ade80;
+}
+
+.node[data-reconciliation="declared_only"],
+.node[data-reconciliation="binding_conflict"] {
+	border-color: #fbbf24;
+}
+
+.node[data-reconciliation="observed_only"] {
+	border-color: #fb923c;
+	border-style: dashed;
+}
+
+.nodeSelected {
+	outline: 3px solid #38bdf8;
+	outline-offset: 3px;
+}
+
+.nodeMeta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+	color: #cbd5e1;
+	font-size: 0.66rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.nodeMeta span,
+.runtimeBadge,
+.criticalityBadge {
+	padding: 0.14rem 0.38rem;
+	border: 1px solid #475569;
+	border-radius: 999px;
+	background: #1e293b;
+	color: #e2e8f0;
+}
+
+.runtimeBadge,
+.criticalityBadge {
+	justify-self: start;
+	font-size: 0.65rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.025em;
+}
+
+.criticalityBadge {
+	border-color: #0ea5e9;
+	background: rgb(12 74 110 / 58%);
+	color: #e0f2fe;
+}
+
+.nodeHeading {
+	display: flex;
+	align-items: center;
+	gap: 0.62rem;
+	min-width: 0;
+}
+
+.nodeIconFrame {
+	display: grid;
+	flex: 0 0 2.55rem;
+	width: 2.55rem;
+	height: 2.55rem;
+	place-items: center;
+	overflow: hidden;
+	border: 1px solid #cbd5e1;
+	border-radius: 0.7rem;
+	background: #f8fafc;
+}
+
+.nodeIconImage {
+	display: block;
+	width: 1.9rem;
+	height: 1.9rem;
+	object-fit: contain;
+}
+
+.nodeIcon {
+	font-size: 1.55rem;
+	line-height: 1;
+}
+
+.nodeIconFallback {
+	color: #0f172a;
+	font-size: 0.78rem;
+	font-weight: 900;
+}
+
+.nodeTitle {
+	color: #f8fafc;
+	font-size: 0.95rem;
+	line-height: 1.2;
+}
+
+.nodeDetail {
+	color: #cbd5e1;
+	font-size: 0.72rem;
+	line-height: 1.3;
+}
+
+.openLink {
+	justify-self: start;
+	color: #7dd3fc;
+	font-size: 0.75rem;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+.openLink:hover {
+	text-decoration: underline;
+}
+
+.handle {
+	width: 0.68rem;
+	height: 0.68rem;
+	border: 2px solid #e0f2fe;
+	background: #38bdf8;
+	box-shadow: 0 0 0 2px rgb(56 189 248 / 18%);
+}
+
+.edgeOptional {
+	opacity: 0.62;
+}
+
+.edgeRequired {
+	opacity: 1;
+}
+
+.flowControls,
+.miniMap {
+	overflow: hidden;
+	border: 1px solid #475569;
+	border-radius: 0.65rem;
+	box-shadow: 0 0.4rem 1rem rgb(0 0 0 / 28%);
+}
+
+.flowControls :global(button) {
+	border-bottom-color: #334155;
+	background: #0f172a;
+	color: #f8fafc;
+}
+
+.flowControls :global(button:hover) {
+	background: #1e293b;
+}
+
+.flowControls :global(button svg) {
+	fill: #f8fafc;
+}
+
+.legend {
+	margin: var(--ui-space-sm) 0 0;
+	line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+	.explorer {
+		padding-inline: var(--ui-space-sm);
+	}
+
+	.toolbar,
+	.controlCluster {
+		align-items: stretch;
+	}
+
+	.tabs,
+	.tabs button,
+	.search,
+	.search input,
+	.toggle {
+		width: 100%;
+	}
+
+	.flowShell {
+		height: 78vh;
+		min-height: 34rem;
+	}
+}
