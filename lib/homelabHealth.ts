@@ -406,8 +406,11 @@ export function parseHomelabHealthSnapshot(
 		if (dns) pfsense = { dns };
 	}
 
+	const sanitizedValue = { ...value };
+	delete sanitizedValue.pfsense;
+
 	return {
-		...value,
+		...sanitizedValue,
 		services,
 		...(internalServices === undefined
 			? {}
