@@ -13,7 +13,10 @@ on:
       - "unit-tests/**"
       - "*.{js,cjs,mjs,ts,json}"
       - "package-lock.json"
+      - "CHANGELOG.md"
+      - ".releaserc.yaml"
       - ".github/workflows/ci.yml"
+      - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/vercel-preview.yml"
   push:
@@ -30,7 +33,10 @@ on:
       - "unit-tests/**"
       - "*.{js,cjs,mjs,ts,json}"
       - "package-lock.json"
+      - "CHANGELOG.md"
+      - ".releaserc.yaml"
       - ".github/workflows/ci.yml"
+      - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/vercel-preview.yml"
   workflow_dispatch:
