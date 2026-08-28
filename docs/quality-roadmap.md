@@ -290,6 +290,24 @@ Autres contrôles :
 - [ ] Garder les PR de refactoring petites et thématiques afin d'éviter les
   branches de migration à plusieurs dizaines de commits.
 
+## P3 — Maintenance pfSense / pfBlockerNG
+
+- [x] Documenter l'incident de pression des services de sécurité pfSense, le
+  backpressure CrowdSec, l'OOM PHP pfBlockerNG et les erreurs AutoConfigBackup
+  transitoires dans `docs/pfsense-security-services-incident-2026-08-28.md`.
+- [x] Désactiver temporairement `ASN Reporting` dans pfBlockerNG afin de supprimer
+  l'enrichissement ASN non essentiel au filtrage IP/DNS.
+- [ ] Terminer la suppression propre de l'enrichissement ASN pfBlockerNG :
+  identifier le chemin restant qui déclenche `iptoasn` malgré `ASN Reporting`
+  désactivé, empêcher les téléchargements IPinfo répétés lorsque `asn.mmdb` et le
+  token IPinfo sont absents, puis vérifier que `pfblockerng.php asn`, `iptoasn` et
+  `Downloading [ IPinfo databases ]` ne réapparaissent plus. Ne pas augmenter le
+  `memory_limit` PHP pour masquer la boucle.
+- [ ] Revalider la rotation/rétention des logs pfBlockerNG déjà configurés à
+  environ 10 000 lignes et traiter séparément les fichiers historiques très
+  volumineux (`dns_reply.log`, `unified.log`, `error.log`, `extras.log`) sans
+  augmenter les limites.
+
 ## Ordre de livraison réévalué
 
 1. Santé homelab : propagation des dépendances `required` dans FastAPI,
@@ -307,6 +325,9 @@ Autres contrôles :
 8. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
 9. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
    puis conserver ces garde-fous pour tous les travaux ultérieurs.
+10. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
+    retrait ASN et nettoyer la rétention historique après le durcissement WAN et
+    les travaux réseau prioritaires.
 
 ## Contrôles de sortie
 
