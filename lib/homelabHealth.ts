@@ -61,6 +61,31 @@ export type TrueNasHealth = {
 	verify_ssl?: boolean;
 };
 
+export type PfSenseDnsResolverPosture = {
+	enabled?: boolean | null;
+	running?: boolean | null;
+	forwarding?: boolean | null;
+	forward_tls_upstream?: boolean | null;
+	port?: number | null;
+};
+
+export type PfSenseDnsUpstreamPosture = {
+	count: number;
+	independent_from_truenas?: boolean | null;
+	truenas_only?: boolean | null;
+};
+
+export type PfSenseDnsPosture = {
+	configured: boolean;
+	reachable: boolean | null;
+	policy_state: HomelabHealthState;
+	reason: string;
+	resolver?: PfSenseDnsResolverPosture;
+	upstream?: PfSenseDnsUpstreamPosture;
+	error_stage?: string;
+	error?: string;
+};
+
 export type HomelabHealthSnapshot = {
 	schema_version: number;
 	checked_at: string;
@@ -72,6 +97,9 @@ export type HomelabHealthSnapshot = {
 	truenas_runtime_stale?: boolean;
 	cloudflare_configured?: boolean;
 	cloudflare_tunnels_observed?: number;
+	pfsense?: {
+		dns?: PfSenseDnsPosture;
+	};
 };
 
 export type HomelabHealthSource = "fastapi" | "unavailable";
@@ -253,6 +281,87 @@ function validTrueNasHealth(value: unknown): value is TrueNasHealth {
 	);
 }
 
+function parsePfSenseDnsPosture(value: unknown): PfSenseDnsPosture | null {
+	if (!isRecord(value)) return null;
+	if (
+		typeof value.configured !== "boolean" ||
+		(value.reachable !== null && typeof value.reachable !== "boolean") ||
+		!isHealthState(value.policy_state) ||
+		typeof value.reason !== "string" ||
+		value.reason.trim().length === 0 ||
+		!validOptionalString(value.error_stage) ||
+		!validOptionalString(value.error)
+	) {
+		return null;
+	}
+
+	let resolver: PfSenseDnsResolverPosture | undefined;
+	if (value.resolver !== undefined) {
+		if (!isRecord(value.resolver)) return null;
+		const raw = value.resolver;
+		if (
+			!validOptionalBoolean(raw.enabled) ||
+			!validOptionalBoolean(raw.running) ||
+			!validOptionalBoolean(raw.forwarding) ||
+			!validOptionalBoolean(raw.forward_tls_upstream) ||
+			(raw.port !== undefined &&
+				raw.port !== null &&
+				(typeof raw.port !== "number" ||
+					!Number.isInteger(raw.port) ||
+					raw.port < 1 ||
+					raw.port > 65535))
+		) {
+			return null;
+		}
+		resolver = {
+			enabled: raw.enabled as boolean | null | undefined,
+			running: raw.running as boolean | null | undefined,
+			forwarding: raw.forwarding as boolean | null | undefined,
+			forward_tls_upstream: raw.forward_tls_upstream as
+				| boolean
+				| null
+				| undefined,
+			port: raw.port as number | null | undefined,
+		};
+	}
+
+	let upstream: PfSenseDnsUpstreamPosture | undefined;
+	if (value.upstream !== undefined) {
+		if (!isRecord(value.upstream)) return null;
+		const raw = value.upstream;
+		if (
+			typeof raw.count !== "number" ||
+			!Number.isInteger(raw.count) ||
+			raw.count < 0 ||
+			!validOptionalBoolean(raw.independent_from_truenas) ||
+			!validOptionalBoolean(raw.truenas_only)
+		) {
+			return null;
+		}
+		upstream = {
+			count: raw.count,
+			independent_from_truenas: raw.independent_from_truenas as
+				| boolean
+				| null
+				| undefined,
+			truenas_only: raw.truenas_only as boolean | null | undefined,
+		};
+	}
+
+	return {
+		configured: value.configured,
+		reachable: value.reachable,
+		policy_state: value.policy_state,
+		reason: value.reason,
+		...(resolver ? { resolver } : {}),
+		...(upstream ? { upstream } : {}),
+		...(typeof value.error_stage === "string"
+			? { error_stage: value.error_stage }
+			: {}),
+		...(typeof value.error === "string" ? { error: value.error } : {}),
+	};
+}
+
 export function parseHomelabHealthSnapshot(
 	value: unknown,
 ): HomelabHealthSnapshot | null {
@@ -289,12 +398,24 @@ export function parseHomelabHealthSnapshot(
 	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
 	if (!validOptionalNumber(value.cloudflare_tunnels_observed)) return null;
 
+	// pfSense posture is optional and additive. A malformed observation must not
+	// discard otherwise valid service health; only the known sanitized fields are kept.
+	let pfsense: HomelabHealthSnapshot["pfsense"] | undefined;
+	if (isRecord(value.pfsense)) {
+		const dns = parsePfSenseDnsPosture(value.pfsense.dns);
+		if (dns) pfsense = { dns };
+	}
+
+	const sanitizedValue = { ...value };
+	delete sanitizedValue.pfsense;
+
 	return {
-		...value,
+		...sanitizedValue,
 		services,
 		...(internalServices === undefined
 			? {}
 			: { internal_services: internalServices }),
+		...(pfsense ? { pfsense } : {}),
 	} as HomelabHealthSnapshot;
 }
 

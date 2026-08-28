@@ -63,6 +63,24 @@
 			"legendTitle": "Dependency health",
 			"legend": "The primary service/link color follows effective health; the runtime icon remains the local TrueNAS application state."
 		},
+		"dns": {
+			"title": "DNS resilience",
+			"independent": "pfSense / Unbound keeps a resolution path independent from TrueNAS.",
+			"truenasOnly": "pfSense DNS forwarding depends only on TrueNAS-hosted DNS; a TrueNAS outage can become a LAN-wide DNS outage.",
+			"resolverFailed": "pfSense DNS Resolver is disabled or not running.",
+			"unconfigured": "pfSense DNS observation is not configured; independence from TrueNAS is not verified.",
+			"unreachable": "The pfSense DNS control-plane observation is unavailable; service health alone does not prove DNS resilience.",
+			"incomplete": "pfSense DNS is observable but resilience evidence is incomplete.",
+			"resolverRunning": "Unbound running",
+			"resolverStopped": "Unbound stopped",
+			"resolverUnknown": "Unbound state unknown",
+			"modeRecursive": "recursive resolution",
+			"modeForwarding": "forwarding mode",
+			"modeUnknown": "resolver mode unknown",
+			"upstreamCount": "{count, plural, =0 {no configured upstream} one {# configured upstream} other {# configured upstreams}}",
+			"snapshotStale": "The displayed posture comes from the last valid snapshot because the live health refresh failed.",
+			"evidenceNote": "Control-plane policy evidence only; this is not a synthetic DNS query from a LAN client."
+		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",
