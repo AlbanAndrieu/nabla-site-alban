@@ -1,12 +1,12 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 28 août 2026.
+Dernière vérification : 30 août 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
 branche finale et le déploiement Vercel sont validés.
 
-## État validé au 26 août 2026
+## État validé au 30 août 2026
 
 - [x] `master` compile avec le build Next.js de production dans la CI.
 - [x] La CI Quality/Security s'exécute sur les PR et sur les pushes pertinents de
@@ -18,8 +18,8 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Les métadonnées sociales EN/FR couvrent les principales pages SEO et les
   cartes Open Graph/Twitter sont générées localement.
 - [x] Le catalogue homelab distingue déclaration, observation runtime et santé.
-- [ ] Le connecteur de logs runtime Vercel doit être revalidé lorsqu'il est
-  disponible ; il était indisponible lors du contrôle du 26 août.
+- [x] Le connecteur de logs de build Vercel est de nouveau exploitable pour les
+  validations ciblées ; les logs runtime restent à revalider séparément.
 
 ## P0 — Cohérence produit et contenu
 
@@ -110,28 +110,42 @@ les autres chantiers.
   fraîchement observable.
 - [ ] Réconcilier la santé de chaque service depuis les preuves HTTP directes,
   le runtime TrueNAS et les ingress Cloudflare plutôt que depuis un probe unique.
-- [ ] Propager les dépendances `strength=required` fournies par `fastapi-sample`
+- [x] Propager les dépendances `strength=required` fournies par `fastapi-sample`
   dans l'état final : distinguer `local_state`, `dependency_state` et
   `effective_state`, puis afficher `required_dependencies`, `blocked_by` et les
   preuves ayant provoqué la dégradation.
-- [ ] Utiliser `effective_state` comme couleur principale des cartes/nœuds tout en
+- [x] Utiliser `effective_state` comme couleur principale des cartes/nœuds tout en
   conservant un indicateur local/runtime afin qu'un service `RUNNING` mais bloqué
   par PostgreSQL, ClickHouse, Redis, MinIO ou une autre dépendance requise soit
   explicitement affiché comme dégradé.
-- [ ] Unifier la politique de santé de **tous** les diagrammes React Flow et de la
-  grille des services avec un resolver partagé ; les dépendances requises portent
-  l'état de leur cible, les relations optionnelles restent secondaires.
+- [x] Unifier la politique de santé des diagrammes React Flow et de la grille des
+  services avec un resolver partagé ; les dépendances requises portent l'état de
+  leur cible et les relations optionnelles restent secondaires.
+- [x] Classer les services par criticité (`foundation`, `shared-data`,
+  `shared-platform`, `application`, `support`) et afficher un blast radius
+  transitif sans hardcoder les IDs des services.
+- [x] Fournir un drill-down d'impact distinguant dépendants directs, impact
+  transitif et chemin de dépendances requis dans la vue de criticité partagée.
+- [ ] Compléter les relations d'hébergement/runtime dans la topologie autoritative,
+  notamment `service -> Docker/runtime -> TrueNAS`, uniquement lorsque la
+  configuration réelle les prouve.
+- [ ] Faire refléter ces couches d'hébergement dans le React Flow détaillé avec
+  foundations/data/platform/apps clairement étagés et les nœuds à fort blast
+  radius visuellement dominants.
+- [ ] Ajouter une représentation mobile compacte de cette hiérarchie avec
+  collapse/expand et, lorsque pertinent, filtres critical-only et optional-edge.
 - [ ] Distinguer visuellement les arêtes de dépendance des chemins d'exposition :
   `HAProxy direct`, `Cloudflare Tunnel`, `LAN/VPN only` et routage interne ; garder
   visibles les ports structurants `7000`, `10443` et `9922`.
 - [ ] Ne jamais utiliser l'état Cloudflare comme preuve du chemin TrueNAS direct
   `Internet -> pfSense:7000 -> HAProxy -> TrueNAS`.
-- [ ] Centraliser les types/tokens/helpers d'état et les composants de preuve afin
+- [x] Centraliser les types/tokens/helpers d'état et les composants de preuve afin
   que `/truenas#homelab`, `/architecture` et les futurs graphes ne développent pas
   des conventions de couleurs divergentes. Voir `docs/homelab-dependency-health-ui.md`
   et l'issue #89.
-- [ ] Rafraîchir automatiquement le snapshot de santé dans l'UI en conservant le
-  dernier état valide pendant une panne transitoire du backend.
+- [x] Rafraîchir automatiquement le snapshot de santé dans l'UI toutes les 30 s,
+  suspendre les polls quand l'onglet est masqué et conserver le dernier état
+  valide pendant une panne transitoire du backend.
 - [ ] Afficher explicitement la preuve ayant conduit à vert/orange/rouge et l'âge
   du snapshot afin qu'un ancien état vert ne soit jamais interprété comme live.
 - [ ] Revalider le graphe de production après chaque évolution importante du
@@ -272,6 +286,9 @@ Autres contrôles :
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
+- [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
+  création du tag, du changelog synchronisé et de la GitHub Release sans exiger
+  une mutation manuelle de `master`.
 - [ ] Configurer un ruleset GitHub avec Quality/Security comme check requis.
 - [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
   changements docs-only et les commits intermédiaires d'une même PR.
@@ -310,22 +327,25 @@ Autres contrôles :
 
 ## Ordre de livraison réévalué
 
-1. Santé homelab : propagation des dépendances `required` dans FastAPI,
-   réconciliation HTTP + TrueNAS + Cloudflare, puis adoption de l'état effectif
-   partagé par les cartes et tous les diagrammes React Flow avec âge/preuve du
-   snapshot.
-2. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
-   de panne sans dépendance unique à TrueNAS Apps.
-3. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
-4. Design system partagé : audit light/dark et tokens globaux, puis primitives
+1. Compléter la topologie d'hébergement/runtime à partir des sources autoritatives,
+   puis améliorer le React Flow détaillé avec les mêmes niveaux de criticité et
+   blast radius déjà utilisés dans la vue partagée.
+2. Terminer la preuve de santé : réconciliation HTTP + TrueNAS + ingress, âge du
+   snapshot et raison explicite des états vert/orange/rouge.
+3. Rendre la hiérarchie Architecture/TrueNAS réellement compacte sur mobile avec
+   collapse/expand et filtres ciblés lorsque le graphe dense n'est pas adapté.
+4. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
+5. Design system partagé : audit light/dark et tokens globaux, puis primitives
    Footer/RouteHeader.
-5. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
-6. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
-7. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
-8. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
-9. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
-   puis conserver ces garde-fous pour tous les travaux ultérieurs.
-10. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
+6. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
+7. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
+8. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
+9. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
+10. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
+    de panne ; ce chantier reste volontairement derrière l'architecture/homelab UI.
+11. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
+    puis conserver ces garde-fous pour tous les travaux ultérieurs.
+12. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
     retrait ASN et nettoyer la rétention historique après le durcissement WAN et
     les travaux réseau prioritaires.
 

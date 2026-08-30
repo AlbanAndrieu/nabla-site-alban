@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_APP_CLIENT_ID: ${{ vars.RELEASE_APP_CLIENT_ID }}
-      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
     steps:
       - name: Checkout validated master revision
@@ -39,11 +38,11 @@ jobs:
 
       - name: Create dedicated release App token
         id: release_app_token
-        if: env.RELEASE_APP_CLIENT_ID != '' && env.RELEASE_APP_PRIVATE_KEY != ''
+        if: env.RELEASE_APP_CLIENT_ID != ''
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ env.RELEASE_APP_CLIENT_ID }}
-          private-key: ${{ env.RELEASE_APP_PRIVATE_KEY }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           permission-contents: write
           permission-issues: write
           permission-pull-requests: write
@@ -92,8 +91,6 @@ jobs:
       - name: Bootstrap semantic-release baseline
         id: baseline
         if: steps.freshness.outputs.current == 'true'
-        env:
-          GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
@@ -104,8 +101,18 @@ jobs:
             exit 0
           fi
 
-          BASELINE_SHA="$(git rev-parse HEAD^)"
-          git tag -a v0.0.0 "${BASELINE_SHA}" -m "chore(release): semantic-release baseline"
+          # #98/#99 changed the release workflow. Tagging one of those commits
+          # with the default GitHub App token is rejected as a workflow-file ref
+          # update. Instead, resolve the commit immediately before semantic-release
+          # was introduced, matching the successful nabla-compose 0.0.1 bootstrap.
+          RELEASE_CONFIG_COMMIT="$(git log --reverse --format=%H -- .releaserc.yaml | head -n 1)"
+          if [[ -z "${RELEASE_CONFIG_COMMIT}" ]]; then
+            echo "Cannot locate the first semantic-release configuration commit." >&2
+            exit 1
+          fi
+          BASELINE_SHA="$(git rev-parse "${RELEASE_CONFIG_COMMIT}^")"
+
+          git tag v0.0.0 "${BASELINE_SHA}"
           git push origin refs/tags/v0.0.0
           echo "Created technical baseline v0.0.0 on ${BASELINE_SHA}."
           echo "created=true" >> "${GITHUB_OUTPUT}"
@@ -120,6 +127,10 @@ jobs:
             echo "First semantic release must bootstrap from package version 0.0.1, found ${VERSION}." >&2
             exit 1
           fi
+
+      - name: Normalize npm lock metadata
+        if: steps.freshness.outputs.current == 'true'
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
       - name: Run semantic-release
         if: steps.freshness.outputs.current == 'true'
