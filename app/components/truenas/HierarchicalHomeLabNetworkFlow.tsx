@@ -138,7 +138,7 @@ const NODES: NetworkNodeSpec[] = [
 			name: "HAProxy",
 			role: "pfSense reverse proxy",
 			address: "truenas.albandrieu.com:7000",
-			secondaryAddress: "TrueNAS direct ingress only",
+			secondaryAddress: "Traefik backend 172.17.0.24:443",
 			badge: "DIRECT",
 			icon: "↔️",
 			zone: "proxy",
@@ -271,12 +271,12 @@ const EDGES: NetworkEdgeSpec[] = [
 	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "garage.int + s3.int · DNS only", kind: "dns" },
 	{ id: "cloudflare-dns-tunnel", source: "cloudflare-dns", target: "cloudflare-tunnel", label: "proxied hostname", kind: "tunnel" },
 	{ id: "pfsense-switch", source: "pfsense", target: "switch", label: "LAN", kind: "lan" },
-	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "TrueNAS :7000 publication", kind: "direct" },
-	{ id: "pfsense-traefik", source: "pfsense", target: "traefik", label: "direct HTTPS :443", kind: "direct" },
+	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "direct HTTPS ingress", kind: "direct" },
 	{ id: "switch-truenas", source: "switch", target: "truenas", label: "Ethernet", kind: "lan" },
 	{ id: "switch-workstation", source: "switch", target: "workstation", label: "Ethernet", kind: "lan" },
 	{ id: "switch-r7000", source: "switch", target: "r7000", label: "Ethernet", kind: "lan" },
 	{ id: "haproxy-truenas", source: "haproxy", target: "truenas", label: "TrueNAS :7000", kind: "direct" },
+	{ id: "haproxy-traefik", source: "haproxy", target: "traefik", label: "Traefik backend :443", kind: "direct" },
 	{ id: "truenas-homarr", source: "truenas", target: "homarr", label: "native App", kind: "lan" },
 	{ id: "truenas-traefik", source: "truenas", target: "traefik", label: "Docker host :80/:443", kind: "lan" },
 	{ id: "truenas-garage", source: "truenas", target: "garage", label: "Docker host :3900/:3909", kind: "lan" },
@@ -300,13 +300,13 @@ function domainCopy(
 ): [string, string] {
 	const en: Record<FailureDomain, [string, string]> = {
 		external: ["1 · External / WAN", "Public Internet, DNS and managed Cloudflare edge."],
-		gateway: ["2 · Gateway & ingress", "pfSense is the LAN authority; HAProxy publishes TrueNAS :7000 while direct :443 traffic reaches Traefik on TrueNAS."],
+		gateway: ["2 · Gateway & ingress", "pfSense is the LAN authority; HAProxy handles direct HTTPS ingress and routes TrueNAS :7000 plus the Traefik :443 backend."],
 		lan: ["3 · LAN access", "Ethernet/Wi-Fi fabric and trusted client devices."],
 		truenas: ["4 · TrueNAS failure domain", "Storage host plus native Apps, Traefik/cloudflared Docker ingress and hosted services."],
 	};
 	const fr: Record<FailureDomain, [string, string]> = {
 		external: ["1 · Externe / WAN", "Internet public, DNS et edge Cloudflare managé."],
-		gateway: ["2 · Gateway & ingress", "pfSense reste l’autorité LAN ; HAProxy publie TrueNAS :7000 tandis que le trafic direct :443 atteint Traefik sur TrueNAS."],
+		gateway: ["2 · Gateway & ingress", "pfSense reste l’autorité LAN ; HAProxy porte l’ingress HTTPS direct et route TrueNAS :7000 ainsi que le backend Traefik :443."],
 		lan: ["3 · Accès LAN", "Réseau Ethernet/Wi-Fi et clients de confiance."],
 		truenas: ["4 · Domaine de panne TrueNAS", "Hôte stockage, Apps natives, ingress Docker Traefik/cloudflared et services hébergés."],
 	};
