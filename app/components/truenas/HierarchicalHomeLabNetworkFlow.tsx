@@ -27,7 +27,7 @@ type NetworkZone =
 	| "container"
 	| "app";
 type PathMode = "all" | "direct" | "tunnel" | "lan";
-type LinkKind = "wan" | "lan" | "wifi" | "haproxy" | "tunnel" | "dns";
+type LinkKind = "wan" | "lan" | "wifi" | "direct" | "tunnel" | "dns";
 type FailureDomain = "external" | "gateway" | "lan" | "truenas";
 
 type NetworkNodeData = Record<string, unknown> & {
@@ -77,7 +77,7 @@ const LINK_STYLES: Record<
 	wan: { color: "#38bdf8" },
 	lan: { color: "#4ade80" },
 	wifi: { color: "#f59e0b" },
-	haproxy: { color: "#c084fc" },
+	direct: { color: "#c084fc" },
 	tunnel: { color: "#fb923c", dash: "8 6", animated: true },
 	dns: { color: "#a3e635", dash: "4 6" },
 };
@@ -101,8 +101,8 @@ const NODES: NetworkNodeSpec[] = [
 		data: {
 			name: "Cloudflare DNS",
 			role: "Public DNS / edge",
-			address: "int.albandrieu.com",
-			badge: "DNS",
+			address: "garage.int + s3.int",
+			badge: "DNS ONLY",
 			icon: "☁️",
 			zone: "cloudflare",
 		},
@@ -137,8 +137,8 @@ const NODES: NetworkNodeSpec[] = [
 		data: {
 			name: "HAProxy",
 			role: "pfSense reverse proxy",
-			address: "TrueNAS HTTPS :7000",
-			secondaryAddress: "Garage direct ingress",
+			address: "truenas.albandrieu.com:7000",
+			secondaryAddress: "TrueNAS direct ingress only",
 			badge: "DIRECT",
 			icon: "↔️",
 			zone: "proxy",
@@ -214,14 +214,27 @@ const NODES: NetworkNodeSpec[] = [
 		},
 	},
 	{
+		id: "traefik",
+		domain: "truenas",
+		data: {
+			name: "Traefik",
+			role: "Docker reverse proxy on TrueNAS",
+			address: "172.17.0.24:80 / :443",
+			secondaryAddress: "traefik_network · Let's Encrypt",
+			badge: "DOCKER · DIRECT",
+			icon: "🚦",
+			zone: "container",
+		},
+	},
+	{
 		id: "garage",
 		domain: "truenas",
 		data: {
 			name: "Garage",
-			role: "TrueNAS service · direct HAProxy",
-			address: "garage.int.albandrieu.com",
-			secondaryAddress: "172.17.0.24:3909",
-			badge: "DNS ONLY · NO TUNNEL",
+			role: "Docker S3 storage + WebUI on TrueNAS",
+			address: "s3.int.albandrieu.com → :3900",
+			secondaryAddress: "garage.int.albandrieu.com → :3909",
+			badge: "TRAEFIK · DNS ONLY",
 			icon: "🪣",
 			zone: "app",
 		},
@@ -255,17 +268,19 @@ const NODES: NetworkNodeSpec[] = [
 
 const EDGES: NetworkEdgeSpec[] = [
 	{ id: "internet-pfsense", source: "internet", target: "pfsense", label: "WAN direct", kind: "wan" },
-	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "garage.int · DNS only", kind: "dns" },
+	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "garage.int + s3.int · DNS only", kind: "dns" },
 	{ id: "cloudflare-dns-tunnel", source: "cloudflare-dns", target: "cloudflare-tunnel", label: "proxied hostname", kind: "tunnel" },
 	{ id: "pfsense-switch", source: "pfsense", target: "switch", label: "LAN", kind: "lan" },
-	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "published HTTPS", kind: "haproxy" },
+	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "TrueNAS :7000 publication", kind: "direct" },
+	{ id: "pfsense-traefik", source: "pfsense", target: "traefik", label: "direct HTTPS :443", kind: "direct" },
 	{ id: "switch-truenas", source: "switch", target: "truenas", label: "Ethernet", kind: "lan" },
 	{ id: "switch-workstation", source: "switch", target: "workstation", label: "Ethernet", kind: "lan" },
 	{ id: "switch-r7000", source: "switch", target: "r7000", label: "Ethernet", kind: "lan" },
-	{ id: "haproxy-truenas", source: "haproxy", target: "truenas", label: "TrueNAS :7000", kind: "haproxy" },
+	{ id: "haproxy-truenas", source: "haproxy", target: "truenas", label: "TrueNAS :7000", kind: "direct" },
 	{ id: "truenas-homarr", source: "truenas", target: "homarr", label: "native App", kind: "lan" },
-	{ id: "truenas-garage", source: "truenas", target: "garage", label: "service :3909", kind: "lan" },
-	{ id: "haproxy-garage", source: "haproxy", target: "garage", label: "direct reverse proxy", kind: "haproxy" },
+	{ id: "truenas-traefik", source: "truenas", target: "traefik", label: "Docker host :80/:443", kind: "lan" },
+	{ id: "truenas-garage", source: "truenas", target: "garage", label: "Docker host :3900/:3909", kind: "lan" },
+	{ id: "traefik-garage", source: "traefik", target: "garage", label: "S3 :3900 · WebUI :3909", kind: "direct" },
 	{ id: "truenas-cloudflared", source: "truenas", target: "cloudflared", label: "Docker host", kind: "lan" },
 	{ id: "cloudflare-tunnel-cloudflared", source: "cloudflare-tunnel", target: "cloudflared", label: "encrypted tunnel", kind: "tunnel" },
 	{ id: "cloudflared-openwebui", source: "cloudflared", target: "openwebui", label: "tunnel ingress", kind: "tunnel" },
@@ -274,9 +289,9 @@ const EDGES: NetworkEdgeSpec[] = [
 
 const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
 	all: new Set(NODES.map((node) => node.id)),
-	direct: new Set(["internet", "cloudflare-dns", "pfsense", "haproxy", "truenas", "garage"]),
+	direct: new Set(["internet", "cloudflare-dns", "pfsense", "haproxy", "truenas", "traefik", "garage"]),
 	tunnel: new Set(["cloudflare-dns", "cloudflare-tunnel", "truenas", "cloudflared", "openwebui"]),
-	lan: new Set(["pfsense", "switch", "truenas", "workstation", "r7000", "s24", "homarr"]),
+	lan: new Set(["pfsense", "switch", "truenas", "workstation", "r7000", "s24", "homarr", "traefik", "garage"]),
 };
 
 function domainCopy(
@@ -285,15 +300,15 @@ function domainCopy(
 ): [string, string] {
 	const en: Record<FailureDomain, [string, string]> = {
 		external: ["1 · External / WAN", "Public Internet, DNS and managed Cloudflare edge."],
-		gateway: ["2 · Gateway & ingress", "pfSense is the LAN authority; HAProxy owns direct publication."],
+		gateway: ["2 · Gateway & ingress", "pfSense is the LAN authority; HAProxy publishes TrueNAS :7000 while direct :443 traffic reaches Traefik on TrueNAS."],
 		lan: ["3 · LAN access", "Ethernet/Wi-Fi fabric and trusted client devices."],
-		truenas: ["4 · TrueNAS failure domain", "Storage host plus native Apps, Docker ingress and hosted services."],
+		truenas: ["4 · TrueNAS failure domain", "Storage host plus native Apps, Traefik/cloudflared Docker ingress and hosted services."],
 	};
 	const fr: Record<FailureDomain, [string, string]> = {
 		external: ["1 · Externe / WAN", "Internet public, DNS et edge Cloudflare managé."],
-		gateway: ["2 · Gateway & ingress", "pfSense reste l’autorité LAN ; HAProxy porte la publication directe."],
+		gateway: ["2 · Gateway & ingress", "pfSense reste l’autorité LAN ; HAProxy publie TrueNAS :7000 tandis que le trafic direct :443 atteint Traefik sur TrueNAS."],
 		lan: ["3 · Accès LAN", "Réseau Ethernet/Wi-Fi et clients de confiance."],
-		truenas: ["4 · Domaine de panne TrueNAS", "Hôte stockage, Apps natives, ingress Docker et services hébergés."],
+		truenas: ["4 · Domaine de panne TrueNAS", "Hôte stockage, Apps natives, ingress Docker Traefik/cloudflared et services hébergés."],
 	};
 	return (french ? fr : en)[domain];
 }
@@ -417,8 +432,8 @@ export default function HierarchicalHomeLabNetworkFlow() {
 	const edges = useMemo(() => buildEdges(visibleIds), [visibleIds]);
 
 	const labels: Record<PathMode, string> = french
-		? { all: "Tout", direct: "HAProxy direct", tunnel: "Tunnel", lan: "LAN / Wi-Fi" }
-		: { all: "All paths", direct: "Direct HAProxy", tunnel: "Tunnel", lan: "LAN / Wi-Fi" };
+		? { all: "Tout", direct: "Ingress direct", tunnel: "Tunnel", lan: "LAN / Wi-Fi" }
+		: { all: "All paths", direct: "Direct ingress", tunnel: "Tunnel", lan: "LAN / Wi-Fi" };
 
 	return (
 		<div className={styles.wrapper} data-hierarchical-homelab-network>
@@ -464,9 +479,9 @@ export default function HierarchicalHomeLabNetworkFlow() {
 				</ReactFlow>
 				<div className={styles.legend} aria-label="Network link legend">
 					<span><i className={styles.wanDot} />WAN</span>
-					<span><i className={styles.lanDot} />LAN</span>
+					<span><i className={styles.lanDot} />LAN / hosting</span>
 					<span><i className={styles.wifiDot} />Wi-Fi</span>
-					<span><i className={styles.haproxyDot} />HAProxy direct</span>
+					<span><i className={styles.haproxyDot} />Direct reverse proxy (HAProxy / Traefik)</span>
 					<span><i className={styles.tunnelDot} />Cloudflare Tunnel</span>
 					<span><i className={styles.dnsDot} />Cloudflare DNS only</span>
 				</div>
