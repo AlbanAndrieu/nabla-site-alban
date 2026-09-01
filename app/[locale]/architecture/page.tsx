@@ -104,7 +104,7 @@ export default async function ArchitecturePage({
 							<p>
 								{french
 									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Il distingue le chemin HAProxy direct, le DNS Cloudflare sans Tunnel pour Garage et le Cloudflare Tunnel terminé par le conteneur Docker cloudflared pour OpenWebUI."
-									: "This React Flow diagram is the exact same component used on the TrueNAS page. It separates direct HAProxy publication, Cloudflare DNS without Tunnel for Garage, and Cloudflare Tunnel terminated by the cloudflared Docker container for OpenWebUI."}
+									: "This React Flow diagram is the exact same component used on the TrueNAS page. For Garage, client HTTPS terminates at HAProxy on pfSense, HAProxy re-encrypts the backend connection with TLS to Traefik :443 on TrueNAS, and Traefik then routes to Garage. Cloudflare provides DNS only for Garage, while OpenWebUI uses a Cloudflare Tunnel terminated by the cloudflared Docker container."}
 							</p>
 						</div>
 						<HomeLabNetworkFlow />
