@@ -19,11 +19,10 @@ test("semantic-release bootstraps Site Alban at 0.0.1 after green master CI", as
   assert.match(release, /workflow_run:/);
   assert.match(release, /CI \(Quality and Security\)/);
   assert.match(release, /head_branch == 'master'/);
-  assert.match(release, /git tag -a v0\.0\.0/);
-  assert.match(release, /git rev-parse HEAD\^/);
   assert.match(release, /semantic-release@25\.0\.8/);
   assert.match(release, /@semantic-release\/changelog@6\.0\.3/);
   assert.match(release, /@semantic-release\/git@10\.0\.1/);
+  assert.match(release, /@semantic-release\/npm@13\.1\.3/);
   assert.match(config, /- master/);
   assert.match(config, /tagFormat: "v\$\{version\}"/);
   assert.match(config, /npmPublish: false/);
@@ -32,19 +31,42 @@ test("semantic-release bootstraps Site Alban at 0.0.1 after green master CI", as
   assert.match(changelog, /^# Changelog/m);
 });
 
-test("release workflow configures a Git identity before creating annotated tags", async () => {
+test("release bootstrap anchors v0.0.0 before semantic-release workflow changes", async () => {
   const release = await source(".github/workflows/release.yml");
   const identityPosition = release.indexOf("git config --local user.name");
-  const emailPosition = release.indexOf("git config --local user.email");
-  const tagPosition = release.indexOf("git tag -a v0.0.0");
+  const configCommitPosition = release.indexOf("git log --reverse --format=%H -- .releaserc.yaml");
+  const tagPosition = release.indexOf('git tag v0.0.0 "${BASELINE_SHA}"');
 
   assert.ok(identityPosition >= 0, "release workflow must configure git user.name");
-  assert.ok(emailPosition >= 0, "release workflow must configure git user.email");
-  assert.ok(tagPosition >= 0, "release workflow must create the annotated bootstrap tag");
-  assert.ok(identityPosition < tagPosition, "git identity must be configured before tagging");
-  assert.ok(emailPosition < tagPosition, "git email must be configured before tagging");
-  assert.match(release, /github-actions\[bot\]/);
-  assert.match(release, /41898282\+github-actions\[bot\]@users\.noreply\.github\.com/);
+  assert.ok(configCommitPosition >= 0, "release workflow must locate the first release config commit");
+  assert.ok(tagPosition >= 0, "release workflow must create the technical baseline tag");
+  assert.ok(identityPosition < tagPosition, "git identity must be configured before bootstrap mutations");
+  assert.ok(configCommitPosition < tagPosition, "baseline must be resolved before creating v0.0.0");
+  assert.match(release, /BASELINE_SHA="\$\(git rev-parse "\$\{RELEASE_CONFIG_COMMIT\}\^"\)"/);
+  assert.match(release, /git push origin refs\/tags\/v0\.0\.0/);
+  assert.match(release, /git config --local user.email/);
+  assert.doesNotMatch(release, /git commit --allow-empty/);
+  assert.doesNotMatch(release, /git push origin HEAD:master/);
+});
+
+test("release bootstrap keeps release App permissions minimal and scopes its private key", async () => {
+  const release = await source(".github/workflows/release.yml");
+  const jobEnv = release.slice(release.indexOf("    env:"), release.indexOf("    steps:"));
+
+  assert.match(jobEnv, /RELEASE_APP_CLIENT_ID/);
+  assert.doesNotMatch(jobEnv, /RELEASE_APP_PRIVATE_KEY/);
+  assert.match(release, /private-key: \$\{\{ secrets\.RELEASE_APP_PRIVATE_KEY \}\}/);
+  assert.doesNotMatch(release, /permission-workflows:/);
+});
+
+test("release normalizes package-lock metadata before semantic-release", async () => {
+  const release = await source(".github/workflows/release.yml");
+  const normalizePosition = release.indexOf("Normalize npm lock metadata");
+  const semanticPosition = release.indexOf("Run semantic-release");
+
+  assert.ok(normalizePosition >= 0, "release workflow must normalize npm lock metadata");
+  assert.ok(semanticPosition > normalizePosition, "lock metadata must be normalized before semantic-release");
+  assert.match(release, /npm install --package-lock-only --ignore-scripts --no-audit --no-fund/);
 });
 
 test("release configuration keeps feature alias and generated release commit out of CI loops", async () => {
