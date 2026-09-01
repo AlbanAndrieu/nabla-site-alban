@@ -91,6 +91,8 @@ jobs:
       - name: Bootstrap semantic-release baseline
         id: baseline
         if: steps.freshness.outputs.current == 'true'
+        env:
+          GH_TOKEN: ${{ steps.release_app_token.outputs.token || secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail

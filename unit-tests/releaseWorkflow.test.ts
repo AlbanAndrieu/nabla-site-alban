@@ -49,6 +49,21 @@ test("release bootstrap anchors v0.0.0 before semantic-release workflow changes"
   assert.doesNotMatch(release, /git push origin HEAD:master/);
 });
 
+test("release bootstrap keeps authentication available when git invokes the gh credential helper", async () => {
+  const release = await source(".github/workflows/release.yml");
+  const bootstrapStart = release.indexOf("      - name: Bootstrap semantic-release baseline");
+  const bootstrapEnd = release.indexOf("      - name: Verify first-release bootstrap version");
+  const bootstrapStep = release.slice(bootstrapStart, bootstrapEnd);
+
+  assert.ok(bootstrapStart >= 0, "release workflow must contain the bootstrap step");
+  assert.ok(bootstrapEnd > bootstrapStart, "bootstrap step must precede first-release validation");
+  assert.match(
+    bootstrapStep,
+    /env:\s+GH_TOKEN: \$\{\{ steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN \}\}/,
+  );
+  assert.match(bootstrapStep, /git push origin refs\/tags\/v0\.0\.0/);
+});
+
 test("release bootstrap keeps release App permissions minimal and scopes its private key", async () => {
   const release = await source(".github/workflows/release.yml");
   const jobEnv = release.slice(release.indexOf("    env:"), release.indexOf("    steps:"));
