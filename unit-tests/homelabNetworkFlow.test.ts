@@ -11,6 +11,7 @@ test("shared homelab React Flow documents HAProxy, Traefik, DNS-only and tunnel 
 		"app/components/truenas/HierarchicalHomeLabNetworkFlow.tsx",
 	);
 	assert.match(flow, /name: "HAProxy"/);
+	assert.match(flow, /Traefik backend 172\.17\.0\.24:443/);
 	assert.match(flow, /name: "Traefik"/);
 	assert.match(flow, /Docker reverse proxy on TrueNAS/);
 	assert.match(flow, /172\.17\.0\.24:80 \/ :443/);
@@ -24,12 +25,14 @@ test("shared homelab React Flow documents HAProxy, Traefik, DNS-only and tunnel 
 	assert.match(flow, /TRAEFIK · DNS ONLY/);
 	assert.match(flow, /open-webui\.albandrieu\.com/);
 	assert.match(flow, /CLOUDFLARE TUNNEL/);
-	assert.match(flow, /"pfsense-traefik"/);
+	assert.match(flow, /"pfsense-haproxy"/);
+	assert.match(flow, /"haproxy-traefik"/);
 	assert.match(flow, /"truenas-traefik"/);
 	assert.match(flow, /"traefik-garage"/);
 	assert.match(flow, /S3 :3900 · WebUI :3909/);
 	assert.match(flow, /"cloudflare-tunnel-cloudflared"/);
 	assert.match(flow, /"cloudflared-openwebui"/);
+	assert.doesNotMatch(flow, /"pfsense-traefik"/);
 	assert.doesNotMatch(flow, /"haproxy-garage"/);
 	assert.doesNotMatch(flow, /"cloudflare-tunnel-garage"/);
 });
