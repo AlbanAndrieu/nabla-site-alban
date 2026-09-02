@@ -1,12 +1,12 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 30 août 2026.
+Dernière vérification : 2 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
 branche finale et le déploiement Vercel sont validés.
 
-## État validé au 30 août 2026
+## État validé au 2 septembre 2026
 
 - [x] `master` compile avec le build Next.js de production dans la CI.
 - [x] La CI Quality/Security s'exécute sur les PR et sur les pushes pertinents de
@@ -20,6 +20,11 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Le catalogue homelab distingue déclaration, observation runtime et santé.
 - [x] Le connecteur de logs de build Vercel est de nouveau exploitable pour les
   validations ciblées ; les logs runtime restent à revalider séparément.
+- [x] Les composants partagés `RouteHeader`, `LocaleSwitcher`, Footer et
+  `ContactHero` utilisent désormais les tokens/primitives Next.js sans dépendre
+  de Bootstrap pour leur présentation principale.
+- [x] Les variantes historiques `cv-{small,medium,large,full}-*.html` sont une
+  exception statique intentionnelle et restent des documents HTML autonomes.
 
 ## P0 — Cohérence produit et contenu
 
@@ -44,10 +49,15 @@ branche finale et le déploiement Vercel sont validés.
 - [ ] Finir la migration du contenu historique encore nécessaire sur `/ai` et
   recentrer la page sur l'architecture Secure AI actuelle.
 - [ ] Migrer les derniers fragments nécessaires de `/workstation`.
-- [ ] Migrer les variantes `cv-{small,medium,large,full}-*.html` avant de
-  supprimer `loadCvHtmlFragment`.
+- [x] Conserver `cv-{small,medium,large,full}-{en,fr,de,no}.html` comme documents
+  historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
+  exclus de la migration React/Next.js native ; voir `public/cv/README.md` et le
+  test de contrat `unit-tests/legacyCvStaticPolicy.test.ts`.
+- [ ] Évaluer uniquement si le wrapper localisé `loadCvHtmlFragment` reste utile
+  pour la compatibilité App Router. Sa suppression éventuelle ne doit jamais
+  imposer de migrer les documents HTML historiques eux-mêmes.
 - [ ] Réduire puis supprimer `PublicHtmlFragment` lorsqu'il n'a plus de
-  consommateur justifié.
+  consommateur justifié, hors exceptions statiques explicitement documentées.
 
 ## P0 — Design system et cohérence UI/UX
 
@@ -57,18 +67,23 @@ branche finale et le déploiement Vercel sont validés.
 - [ ] Auditer l'ensemble des pages en thème clair et sombre et supprimer les
   combinaisons incohérentes issues du mélange Bootstrap/CSS historique (par
   exemple texte clair forcé sur surface Bootstrap claire).
-- [ ] Définir des tokens sémantiques explicites `surface`, `surface-muted`,
+- [x] Définir les tokens sémantiques Next.js `surface`, `surface-muted`,
   `text-primary`, `text-secondary`, `border`, `link`, `success`, `warning` et
-  `danger` pour les deux thèmes, avec un contraste WCAG AA au minimum.
+  `danger` en les adossant au contrat `theme.css` existant.
+- [ ] Valider systématiquement le contraste WCAG AA de ces tokens sur les pages
+  prioritaires en thème clair, sombre et préférence système.
 - [ ] Ajouter une vérification visuelle automatisée light/dark sur les pages
   prioritaires (`/`, `/truenas`, `/architecture`, `/ai`, `/contact`, `/cv`) afin
   d'empêcher les régressions de contraste lors des migrations Bootstrap/CSS.
 - [ ] Normaliser les tokens globaux pour couleurs, surfaces, espacements, rayons,
-  typographie et états success/warning/danger.
-- [ ] Introduire les primitives `Button`, `Card`, `Container`, `Section`, `Badge`,
-  `ExternalLink` et `PageHeader` sous `components/ui/`.
-- [ ] Migrer le footer et `RouteHeader` vers ces primitives avant les composants
-  spécifiques aux pages.
+  typographie, ombres et états success/warning/danger.
+- [x] Introduire les primitives `Container` et `ExternalLink` ainsi que la
+  primitive d'action partagée utilisée par le Footer et les CTA migrés.
+- [ ] Introduire les primitives restantes `Button`, `Card`, `Section`, `Badge` et
+  `PageHeader` seulement lorsqu'un consommateur réel permet d'éviter des
+  composants abstraits inutilisés.
+- [x] Migrer le Footer, `RouteHeader`, `LocaleSwitcher` et `ContactHero` vers les
+  tokens/primitives partagés avant les composants spécifiques aux pages.
 - [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
   feuilles globales chargées dans le layout.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
@@ -256,7 +271,8 @@ Autres contrôles :
 - [ ] Contrôler après déploiement canonical, `hreflang`, robots, sitemap et
   aperçus Open Graph sur le host final `www`.
 - [ ] Vérifier puis rediriger/retirer proprement les anciennes URL `.html` encore
-  indexées par les moteurs (`security.html`, `contact.html`, etc.).
+  indexées par les moteurs (`security.html`, `contact.html`, etc.), sans inclure
+  les CV historiques dont les URL `.html` sont intentionnelles.
 - [ ] Décider explicitement si CTID, FreeNAS et Workstation doivent être
   indexables.
 - [ ] Décider si l'application éditoriale reste volontairement EN/FR ou si DE/NO
@@ -335,12 +351,14 @@ Autres contrôles :
 3. Rendre la hiérarchie Architecture/TrueNAS réellement compacte sur mobile avec
    collapse/expand et filtres ciblés lorsque le graphe dense n'est pas adapté.
 4. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
-5. Design system partagé : audit light/dark et tokens globaux, puis primitives
-   Footer/RouteHeader.
+5. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
+   et le retrait de Bootstrap après les migrations déjà faites de RouteHeader,
+   LocaleSwitcher, Footer et ContactHero.
 6. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
 7. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
 8. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
-9. Workstation/CV legacy, code mort, Bootstrap/CDN et budgets performance.
+9. Workstation, code mort, Bootstrap/CDN et budgets performance. Les CV
+   historiques restent volontairement hors de la migration Next.js native.
 10. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
     de panne ; ce chantier reste volontairement derrière l'architecture/homelab UI.
 11. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
