@@ -11,6 +11,7 @@ import { routing } from "@/i18n/routing";
 import { getStaticHomelabServicesCatalog } from "@/lib/homelabServices";
 import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
+import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
@@ -67,6 +68,7 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 				</section>
 
 				<ArchitectureSectionNav locale={locale} />
+				<ArchitectureImpactInspector locale={locale} />
 
 				<ArchitectureTopologyView
 					locale={locale}
