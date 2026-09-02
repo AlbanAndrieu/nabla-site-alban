@@ -92,7 +92,15 @@ export default function PfSenseDnsPosture({
 				? ` ${t("dns.upstreamCount", { count: upstreamCount })}.`
 				: ""}
 			{healthUnavailable ? ` ${t("dns.snapshotStale")}` : ""}
-			<div className="small mt-1">{t("dns.evidenceNote")}</div>
+			<details className="small mt-2" data-pfsense-dns-evidence>
+				<summary className="fw-semibold">{t("dns.details")}</summary>
+				{posture?.reason ? (
+					<div className="mt-1">
+						<strong>{t("dns.reasonLabel")}:</strong> {posture.reason}
+					</div>
+				) : null}
+				<div className="mt-1">{t("dns.evidenceNote")}</div>
+			</details>
 		</div>
 	);
 }

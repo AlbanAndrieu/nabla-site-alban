@@ -61,7 +61,8 @@
 			"degraded": "L’état des dépendances requises dégrade ce service.",
 			"stateSummary": "Local {local} · effectif {effective}",
 			"legendTitle": "Santé des dépendances",
-			"legend": "La couleur principale du service/lien suit l’état effectif ; l’icône runtime conserve l’état local de l’application TrueNAS."
+			"legend": "La couleur principale du service/lien suit l’état effectif ; l’icône runtime conserve l’état local de l’application TrueNAS.",
+			"inspectHierarchy": "Inspecter la hiérarchie des dépendances critiques"
 		},
 		"criticality": {
 			"title": "Hiérarchie des dépendances critiques",
@@ -80,6 +81,12 @@
 				"application": "Services utilisateurs ou workflows qui consomment les fondations partagées ci-dessus.",
 				"support": "Composants optionnels, d’observabilité ou d’inventaire sans rayon d’impact bloquant déclaré."
 			},
+			"filterLabel": "Filtrer les groupes de services",
+			"allTiers": "Tous les groupes de criticité",
+			"expandAll": "Tout déplier",
+			"collapseAll": "Tout replier",
+			"showHierarchy": "Afficher la hiérarchie des dépendances critiques",
+			"hideHierarchy": "Masquer la hiérarchie des dépendances critiques",
 			"impact": "{count, plural, =0 {feuille} one {# dépendant} other {# dépendants}}",
 			"componentCount": "{count, plural, one {# composant} other {# composants}}",
 			"requires": "Requiert :",
@@ -100,7 +107,7 @@
 			"resolverFailed": "Le DNS Resolver pfSense est désactivé ou n’est pas en cours d’exécution.",
 			"unconfigured": "L’observation DNS pfSense n’est pas configurée ; l’indépendance vis-à-vis de TrueNAS n’est pas vérifiée.",
 			"unreachable": "L’observation du plan de contrôle DNS pfSense est indisponible ; la santé des services ne prouve pas à elle seule la résilience DNS.",
-			"incomplete": "Le DNS pfSense est observable mais les preuves de résilience sont incomplètes.",
+			"incomplete": "pfSense / Unbound est observable, mais le snapshot courant ne prouve pas encore que la résolution DNS reste indépendante de TrueNAS pendant une panne TrueNAS ou Apps.",
 			"resolverRunning": "Unbound en cours d’exécution",
 			"resolverStopped": "Unbound arrêté",
 			"resolverUnknown": "État Unbound inconnu",
@@ -109,7 +116,9 @@
 			"modeUnknown": "mode du resolver inconnu",
 			"upstreamCount": "{count, plural, =0 {aucun upstream configuré} one {# upstream configuré} other {# upstreams configurés}}",
 			"snapshotStale": "La posture affichée provient du dernier snapshot valide car l’actualisation live de la santé a échoué.",
-			"evidenceNote": "Preuve de politique du plan de contrôle uniquement ; ceci n’est pas une requête DNS synthétique effectuée depuis un client du LAN."
+			"details": "Pourquoi ce statut DNS ?",
+			"reasonLabel": "Raison observée",
+			"evidenceNote": "Il s’agit d’une preuve de politique du plan de contrôle, pas d’une requête DNS synthétique depuis un client du LAN. Un état résilient pleinement prouvé exige un resolver fonctionnel observé et la preuve que son chemin de résolution/upstream est indépendant de TrueNAS."
 		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
@@ -118,7 +127,9 @@
 			"internalProbe": "interne {host}:{port} {state}",
 			"internalUnavailable": "test interne indisponible depuis cet environnement",
 			"dependencyNote": "Les services externes dépendant de cet hôte sont affichés comme indisponibles lorsque TrueNAS est hors ligne.",
-			"runtimeDataUnavailable": "Le statut des applications TrueNAS ne peut pas être actualisé",
+			"runtimeDataUnavailable": "L’observation du runtime TrueNAS est incomplète",
+			"refreshing": "Actualisation de la santé du homelab",
+			"refreshingNote": "Le dernier snapshot connu reste affiché pendant l’actualisation live de la santé FastAPI.",
 			"liveSnapshotUnavailable": "L’actualisation de santé FastAPI a échoué ({status}) ; l’interface affiche le dernier snapshot connu lorsqu’il existe.",
 			"apiUnavailable": "Le test de l’API TrueNAS est indisponible : {error}.",
 			"runtimeUnavailable": "Le runtime TrueNAS app.query est injoignable.",

@@ -21,10 +21,20 @@ import {
 	type ServiceTopology,
 } from "@/lib/serviceTopology";
 import HomelabServiceGrid from "./HomelabServiceGrid";
+import styles from "./HomelabServicesBlock.module.css";
+import HomelabStatusOverview from "./HomelabStatusOverview";
 import PfSenseDnsPosture from "./PfSenseDnsPosture";
 import ServiceCriticalityOverview from "./ServiceCriticalityOverview";
 
 const HEALTH_REFRESH_MS = 30_000;
+const CRITICALITY_DETAILS_ID = "critical-dependency-hierarchy";
+const ALL_TIERS: readonly ServiceCriticalityTier[] = [
+	"foundation",
+	"shared-data",
+	"shared-platform",
+	"application",
+	"support",
+];
 
 type HealthFetchResult = {
 	snapshot: HomelabHealthSnapshot | null;
@@ -38,12 +48,15 @@ type State = {
 	error: boolean;
 	healthUnavailable: boolean;
 	healthStatus: number | null;
+	healthRefreshing: boolean;
 };
 
 type HierarchyGroup = {
 	tier: ServiceCriticalityTier;
 	catalog: HomelabServicesCatalog;
 };
+
+type TierFilter = "all" | ServiceCriticalityTier;
 
 type TierTitleKey =
 	| "criticality.tiers.foundation"
@@ -129,7 +142,13 @@ export default function HomelabServicesBlock() {
 		error: false,
 		healthUnavailable: false,
 		healthStatus: null,
+		healthRefreshing: true,
 	});
+	const [tierFilter, setTierFilter] = useState<TierFilter>("all");
+	const [expandedTiers, setExpandedTiers] = useState<Set<ServiceCriticalityTier>>(
+		() => new Set(ALL_TIERS),
+	);
+	const [criticalityOpen, setCriticalityOpen] = useState(false);
 
 	useEffect(() => {
 		const initialController = new AbortController();
@@ -139,6 +158,7 @@ export default function HomelabServicesBlock() {
 			if (document.hidden) return;
 			refreshController?.abort();
 			refreshController = new AbortController();
+			setState((current) => ({ ...current, healthRefreshing: true }));
 			const health = await fetchHealth(refreshController.signal);
 			if (!refreshController.signal.aborted) {
 				setState((current) => ({
@@ -148,6 +168,7 @@ export default function HomelabServicesBlock() {
 					snapshot: health.snapshot ?? current.snapshot,
 					healthUnavailable: health.snapshot === null,
 					healthStatus: health.status,
+					healthRefreshing: false,
 					error: current.catalog === null && health.snapshot === null,
 				}));
 			}
@@ -167,6 +188,7 @@ export default function HomelabServicesBlock() {
 						error: false,
 						healthUnavailable: health.snapshot === null,
 						healthStatus: health.status,
+						healthRefreshing: false,
 					});
 				}
 			})
@@ -176,6 +198,7 @@ export default function HomelabServicesBlock() {
 						...current,
 						error: true,
 						healthUnavailable: true,
+						healthRefreshing: false,
 					}));
 				}
 			});
@@ -233,6 +256,32 @@ export default function HomelabServicesBlock() {
 			);
 	}, [state.catalog, state.topology]);
 
+	const visibleHierarchyGroups = useMemo(
+		() =>
+			tierFilter === "all"
+				? hierarchyGroups
+				: hierarchyGroups.filter((group) => group.tier === tierFilter),
+		[hierarchyGroups, tierFilter],
+	);
+
+	const setTierExpanded = (tier: ServiceCriticalityTier, open: boolean) => {
+		setExpandedTiers((current) => {
+			const next = new Set(current);
+			if (open) next.add(tier);
+			else next.delete(tier);
+			return next;
+		});
+	};
+
+	const openCriticality = () => {
+		setCriticalityOpen(true);
+		window.requestAnimationFrame(() => {
+			document
+				.getElementById(CRITICALITY_DETAILS_ID)
+				?.scrollIntoView({ block: "start" });
+		});
+	};
+
 	if (!state.catalog) {
 		return (
 			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
@@ -247,30 +296,80 @@ export default function HomelabServicesBlock() {
 				snapshot={state.snapshot}
 				healthUnavailable={state.healthUnavailable}
 			/>
-			{state.topology ? (
-				<ServiceCriticalityOverview topology={state.topology} compact />
-			) : null}
-			<div data-homelab-service-hierarchy>
-				{hierarchyGroups.map((group, index) => (
-					<section
-						className="mb-4"
+			<HomelabStatusOverview
+				snapshot={state.snapshot}
+				healthUnavailable={state.healthUnavailable}
+				healthHttpStatus={state.healthStatus}
+				healthRefreshing={state.healthRefreshing}
+				onOpenCriticality={openCriticality}
+			/>
+
+			<div className={styles.controls} data-homelab-hierarchy-controls>
+				<label className={styles.filterField}>
+					<span className={styles.filterLabel}>{t("criticality.filterLabel")}</span>
+					<select
+						className={styles.filterSelect}
+						value={tierFilter}
+						onChange={(event) => {
+							const next = event.currentTarget.value as TierFilter;
+							setTierFilter(next);
+							if (next !== "all") setTierExpanded(next, true);
+						}}
+						data-homelab-tier-filter
+					>
+						<option value="all">{t("criticality.allTiers")}</option>
+						{hierarchyGroups.map((group) => (
+							<option value={group.tier} key={group.tier}>
+								{t(TIER_TITLE_KEY[group.tier])}
+							</option>
+						))}
+					</select>
+				</label>
+				<div className={styles.controlButtons}>
+					<button
+						type="button"
+						className={styles.controlButton}
+						onClick={() => setExpandedTiers(new Set(ALL_TIERS))}
+						aria-controls="homelab-service-hierarchy"
+					>
+						{t("criticality.expandAll")}
+					</button>
+					<button
+						type="button"
+						className={styles.controlButton}
+						onClick={() => setExpandedTiers(new Set())}
+						aria-controls="homelab-service-hierarchy"
+					>
+						{t("criticality.collapseAll")}
+					</button>
+				</div>
+			</div>
+
+			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
+				{visibleHierarchyGroups.map((group) => (
+					<details
+						className={styles.groupDetails}
 						key={group.tier}
+						open={expandedTiers.has(group.tier)}
+						onToggle={(event) =>
+							setTierExpanded(group.tier, event.currentTarget.open)
+						}
 						data-service-criticality-group={group.tier}
 					>
-						<div className="d-flex flex-wrap align-items-end justify-content-between gap-2 border-bottom border-secondary pb-2 mb-2">
-							<div>
-								<h3 className="h4 mb-1">{t(TIER_TITLE_KEY[group.tier])}</h3>
-								<p className="small text-body-secondary mb-0">
+						<summary className={styles.groupSummary}>
+							<span className={styles.groupTitle}>
+								<strong>{t(TIER_TITLE_KEY[group.tier])}</strong>
+								<span className={styles.groupDescription}>
 									{t(TIER_DESCRIPTION_KEY[group.tier])}
-								</p>
-							</div>
-							<span className="badge text-bg-secondary">
+								</span>
+							</span>
+							<span className={styles.groupMeta}>
 								{t("criticality.componentCount", {
 									count: group.catalog.services.length,
 								})}
 							</span>
-						</div>
-						<div className={index === 0 ? undefined : "homelab-service-subgrid"}>
+						</summary>
+						<div className={`${styles.groupBody} homelab-service-subgrid`}>
 							<HomelabServiceGrid
 								catalog={group.catalog}
 								snapshot={state.snapshot}
@@ -278,9 +377,32 @@ export default function HomelabServicesBlock() {
 								healthHttpStatus={state.healthStatus}
 							/>
 						</div>
-					</section>
+					</details>
 				))}
 			</div>
+
+			{state.topology ? (
+				<details
+					id={CRITICALITY_DETAILS_ID}
+					className={styles.criticalityDetails}
+					open={criticalityOpen}
+					onToggle={(event) => setCriticalityOpen(event.currentTarget.open)}
+					data-criticality-toggle
+				>
+					<summary className={styles.criticalitySummary}>
+						<span>
+							<i className="fas fa-sitemap" aria-hidden="true" />{" "}
+							{criticalityOpen
+								? t("criticality.hideHierarchy")
+								: t("criticality.showHierarchy")}
+						</span>
+					</summary>
+					<div className={styles.criticalityBody}>
+						<ServiceCriticalityOverview topology={state.topology} compact />
+					</div>
+				</details>
+			) : null}
+
 			<style jsx global>{`
 				.homelab-service-subgrid > .alert,
 				.homelab-service-subgrid > [data-truenas-runtime-legend],
