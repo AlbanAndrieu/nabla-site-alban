@@ -20,14 +20,15 @@ import {
 	parseServiceTopology,
 	type ServiceTopology,
 } from "@/lib/serviceTopology";
+import CriticalDependencyHierarchy, {
+	CRITICAL_DEPENDENCY_HIERARCHY_ID,
+} from "./CriticalDependencyHierarchy";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
 import PfSenseDnsPosture from "./PfSenseDnsPosture";
-import ServiceCriticalityOverview from "./ServiceCriticalityOverview";
 
 const HEALTH_REFRESH_MS = 30_000;
-const CRITICALITY_DETAILS_ID = "critical-dependency-hierarchy";
 const ALL_TIERS: readonly ServiceCriticalityTier[] = [
 	"foundation",
 	"shared-data",
@@ -277,7 +278,7 @@ export default function HomelabServicesBlock() {
 		setCriticalityOpen(true);
 		window.requestAnimationFrame(() => {
 			document
-				.getElementById(CRITICALITY_DETAILS_ID)
+				.getElementById(CRITICAL_DEPENDENCY_HIERARCHY_ID)
 				?.scrollIntoView({ block: "start" });
 		});
 	};
@@ -382,25 +383,11 @@ export default function HomelabServicesBlock() {
 			</div>
 
 			{state.topology ? (
-				<details
-					id={CRITICALITY_DETAILS_ID}
-					className={styles.criticalityDetails}
+				<CriticalDependencyHierarchy
+					topology={state.topology}
 					open={criticalityOpen}
-					onToggle={(event) => setCriticalityOpen(event.currentTarget.open)}
-					data-criticality-toggle
-				>
-					<summary className={styles.criticalitySummary}>
-						<span>
-							<i className="fas fa-sitemap" aria-hidden="true" />{" "}
-							{criticalityOpen
-								? t("criticality.hideHierarchy")
-								: t("criticality.showHierarchy")}
-						</span>
-					</summary>
-					<div className={styles.criticalityBody}>
-						<ServiceCriticalityOverview topology={state.topology} compact />
-					</div>
-				</details>
+					onOpenChange={setCriticalityOpen}
+				/>
 			) : null}
 
 			<style jsx global>{`
