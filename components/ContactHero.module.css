@@ -1,0 +1,112 @@
+.hero {
+	--contact-hero-foreground: #fff;
+	--contact-hero-primary-text: #0d6efd;
+	--contact-hero-primary-hover: #e9ecef;
+	padding: 4rem 2rem;
+	background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+	color: var(--contact-hero-foreground);
+	text-align: center;
+}
+
+.content {
+	max-width: 760px;
+	margin-inline: auto;
+}
+
+.profileImage {
+	display: block;
+	width: 150px;
+	height: 150px;
+	margin: 0 auto var(--ui-space-lg);
+	border: 5px solid var(--contact-hero-foreground);
+	border-radius: 50%;
+	box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+}
+
+.title {
+	color: var(--contact-hero-foreground);
+	font-size: clamp(2.35rem, 6vw, 3rem);
+}
+
+.subtitle {
+	color: var(--contact-hero-foreground);
+	font-size: 1.5rem;
+	opacity: 0.95;
+}
+
+.description {
+	max-width: 700px;
+	margin: 0 auto 1.25rem;
+	color: var(--contact-hero-foreground);
+	font-size: 1.1rem;
+	line-height: 1.65;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--ui-space-md);
+	margin-top: 1.75rem;
+}
+
+.cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--ui-space-xs);
+	min-height: var(--ui-control-min-height);
+	padding: var(--ui-space-sm) var(--ui-space-lg);
+	border: 1px solid transparent;
+	border-radius: var(--ui-radius-control);
+	font-weight: var(--ui-font-weight-action);
+	line-height: 1.2;
+	text-align: center;
+	text-decoration: none;
+	transition:
+		background-color 120ms ease,
+		border-color 120ms ease,
+		color 120ms ease,
+		transform 120ms ease;
+}
+
+.cta:hover {
+	text-decoration: none;
+	transform: translateY(-1px);
+}
+
+.cta:focus-visible {
+	outline: 3px solid var(--contact-hero-foreground);
+	outline-offset: 3px;
+}
+
+.primaryCta {
+	border-color: var(--contact-hero-foreground);
+	background: var(--contact-hero-foreground);
+	color: var(--contact-hero-primary-text);
+}
+
+.primaryCta:hover,
+.primaryCta:focus-visible {
+	border-color: var(--contact-hero-primary-hover);
+	background: var(--contact-hero-primary-hover);
+	color: var(--contact-hero-primary-text);
+}
+
+.secondaryCta {
+	border-color: var(--contact-hero-foreground);
+	background: transparent;
+	color: var(--contact-hero-foreground);
+}
+
+.secondaryCta:hover,
+.secondaryCta:focus-visible {
+	background: var(--contact-hero-foreground);
+	color: var(--contact-hero-primary-text);
+}
+
+@media (max-width: 640px) {
+	.hero {
+		padding: 3rem 1.25rem;
+	}
+}

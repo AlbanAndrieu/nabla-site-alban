@@ -1,4 +1,5 @@
 import Image from "next/image";
+import styles from "./ContactHero.module.css";
 
 type ContactHeroProps = {
 	contactCta: string;
@@ -23,27 +24,35 @@ export default function ContactHero({
 	role,
 }: ContactHeroProps) {
 	return (
-		<header className="contact-hero">
-			<div className="hero-content">
+		<header className={styles.hero}>
+			<div className={styles.content}>
 				<Image
 					src="https://avatars1.githubusercontent.com/u/7859836"
 					width={150}
 					height={150}
 					alt={profileAlt}
-					className="contact-profile-image"
+					className={styles.profileImage}
 					loading="eager"
 					unoptimized
 				/>
-				<h1 className="hero-title">Alban Andrieu</h1>
-				<p className="hero-subtitle">{role}</p>
-				<p className="hero-description">{experience}</p>
-				<p className="hero-description">{intro}</p>
-				<div className="cta-buttons">
-					<a className="btn btn-light btn-lg" href={contactHref}>
-						<i className="fas fa-envelope" aria-hidden="true" /> {contactCta}
+				<h1 className={styles.title}>Alban Andrieu</h1>
+				<p className={styles.subtitle}>{role}</p>
+				<p className={styles.description}>{experience}</p>
+				<p className={styles.description}>{intro}</p>
+				<div className={styles.actions}>
+					<a
+						className={`${styles.cta} ${styles.primaryCta}`}
+						href={contactHref}
+					>
+						<i className="fas fa-envelope" aria-hidden="true" />
+						<span>{contactCta}</span>
 					</a>
-					<a className="btn btn-outline-light btn-lg" href={cvHref}>
-						<i className="fas fa-file-pdf" aria-hidden="true" /> {cvCta}
+					<a
+						className={`${styles.cta} ${styles.secondaryCta}`}
+						href={cvHref}
+					>
+						<i className="fas fa-file-pdf" aria-hidden="true" />
+						<span>{cvCta}</span>
 					</a>
 				</div>
 			</div>
