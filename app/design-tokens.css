@@ -19,6 +19,9 @@
 	--ui-danger-surface: #f8d7da;
 	--ui-danger-border: #f1aeb5;
 	--ui-danger-text: #842029;
+	--ui-chrome-surface: var(--ui-surface-muted);
+	--ui-chrome-text: var(--ui-text-primary);
+	--ui-chrome-muted: var(--ui-text-secondary);
 
 	/* Shared geometry and interaction tokens. */
 	--ui-control-min-height: 2.75rem;
@@ -47,6 +50,9 @@
 		--ui-danger-surface: #4b1f24;
 		--ui-danger-border: #842029;
 		--ui-danger-text: #f5c2c7;
+		--ui-chrome-surface: #020617;
+		--ui-chrome-text: #fff;
+		--ui-chrome-muted: #cbd5e1;
 	}
 }
 
@@ -54,10 +60,16 @@ html[data-theme="light"] {
 	--ui-danger-surface: #f8d7da;
 	--ui-danger-border: #f1aeb5;
 	--ui-danger-text: #842029;
+	--ui-chrome-surface: var(--ui-surface-muted);
+	--ui-chrome-text: var(--ui-text-primary);
+	--ui-chrome-muted: var(--ui-text-secondary);
 }
 
 html[data-theme="dark"] {
 	--ui-danger-surface: #4b1f24;
 	--ui-danger-border: #842029;
 	--ui-danger-text: #f5c2c7;
+	--ui-chrome-surface: #020617;
+	--ui-chrome-text: #fff;
+	--ui-chrome-muted: #cbd5e1;
 }

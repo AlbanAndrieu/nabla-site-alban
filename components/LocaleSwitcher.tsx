@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import styles from "./LocaleSwitcher.module.css";
 
 export default function LocaleSwitcher() {
 	const locale = useLocale();
@@ -17,14 +18,17 @@ export default function LocaleSwitcher() {
 	}
 
 	return (
-		<label htmlFor="locale-switcher" className="locale-switcher">
+		<label
+			htmlFor="locale-switcher"
+			className={`${styles.root} locale-switcher`}
+		>
 			<span>{t("localeSwitcherLabel")}</span>
 			<select
 				id="locale-switcher"
 				name="locale"
 				value={locale}
 				onChange={handleLocaleChange}
-				className="form-select form-select-sm"
+				className={styles.select}
 				aria-label={t("switchLanguage")}
 			>
 				<option value="en">{t("languageName.en")}</option>

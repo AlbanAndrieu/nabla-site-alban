@@ -8,16 +8,6 @@
 	z-index: 9999;
 }
 
-/*d-inline-flex align-items-center gap-2 text-light small*/
-.locale-switcher {
-	display: inline-flex;
-	align-items: center;
-	column-gap: 0.25rem;
-}
-.locale-switcher .form-select {
-	min-width: 7.5rem;
-}
-
 .cv-page-identity {
 	display: flex;
 	align-items: center;
@@ -66,61 +56,6 @@
 	}
 }
 
-/* Contact page: App Router-compatible version of the original blue hero. */
-:is(.page-contact, .page-cv) .contact-hero {
-	padding: 4rem 2rem;
-	text-align: center;
-	color: #fff;
-	background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
-}
-:is(.page-contact, .page-cv) .contact-hero .hero-content {
-	max-width: 760px;
-	margin-inline: auto;
-}
-:is(.page-contact, .page-cv) .contact-profile-image {
-	display: block;
-	width: 150px;
-	height: 150px;
-	margin: 0 auto 1.5rem;
-	border: 5px solid #fff;
-	border-radius: 50%;
-	box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
-}
-:is(.page-contact, .page-cv) .contact-hero .hero-title {
-	color: #fff;
-	font-size: clamp(2.35rem, 6vw, 3rem);
-}
-:is(.page-contact, .page-cv) .contact-hero .hero-subtitle {
-	color: #fff;
-	font-size: 1.5rem;
-	opacity: 0.95;
-}
-:is(.page-contact, .page-cv) .contact-hero .hero-description {
-	max-width: 700px;
-	margin: 0 auto 1.25rem;
-	color: #fff;
-	font-size: 1.1rem;
-	line-height: 1.65;
-}
-:is(.page-contact, .page-cv) .contact-hero-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35rem;
-	color: #fff;
-	font-weight: 700;
-	text-decoration: underline;
-}
-:is(.page-contact, .page-cv) .contact-hero-link:hover {
-	color: #fff;
-	text-decoration-thickness: 2px;
-}
-:is(.page-contact, .page-cv) .contact-hero .cta-buttons {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 1rem;
-	margin-top: 1.75rem;
-}
 .page-contact .location-section,
 .page-contact .contact-open-source {
 	margin: 3rem 0;
@@ -186,9 +121,6 @@
 	margin-top: 2.5rem;
 }
 @media (max-width: 640px) {
-	:is(.page-contact, .page-cv) .contact-hero {
-		padding: 3rem 1.25rem;
-	}
 	.page-contact .map-container iframe {
 		height: 360px;
 	}
