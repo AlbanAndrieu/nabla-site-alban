@@ -10,6 +10,7 @@ import {
 	isHttpsEndpoint,
 	tlsIndicatorColor,
 } from "@/lib/homelabHealthPresentation";
+import ServiceTroubleshootingEvidence from "./ServiceTroubleshootingEvidence";
 import styles from "./EndpointAction.module.css";
 
 type HealthState = "pending" | "ok" | "warn" | "fail" | "unknown";
@@ -155,8 +156,7 @@ export default function EndpointAction({
 	const configured = enabled && Boolean(url);
 	const https = isHttpsEndpoint(url);
 	const authoritativeSnapshot = hasAuthoritativeEvidence(initialHealth);
-	const supplementWithPrivateProbe =
-		configured && !external && !authoritativeSnapshot;
+	const supplementWithPrivateProbe = configured && !external && !authoritativeSnapshot;
 	const [privateHealth, setPrivateHealth] = useState<HealthState>(
 		supplementWithPrivateProbe ? "pending" : "unknown",
 	);
@@ -230,8 +230,7 @@ export default function EndpointAction({
 
 	const fastApiHealthDetail = (entry: HomelabHealthEntry): string => {
 		const status = entry.http_status > 0 ? String(entry.http_status) : "not probed";
-		const latency =
-			typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
+		const latency = typeof entry.latency_ms === "number" ? `, ${entry.latency_ms} ms` : "";
 		const tls = entry.tls_trusted === false ? `, ${t("tlsError")}` : "";
 		const tunnel = entry.tunnel_status
 			? `, ${t("tunnel")} ${entry.tunnel_status}${entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}`
@@ -239,9 +238,7 @@ export default function EndpointAction({
 		const runtime = entry.runtime_state
 			? `, TrueNAS ${entry.runtime_state}${entry.runtime_app ? ` (${entry.runtime_app})` : ""}`
 			: "";
-		const internal = entry.internal_state
-			? `, internal ${entry.internal_state}`
-			: "";
+		const internal = entry.internal_state ? `, internal ${entry.internal_state}` : "";
 		const applicationError = entry.application_error
 			? ` — ${t("applicationError", { error: entry.application_error })}`
 			: "";
@@ -250,8 +247,7 @@ export default function EndpointAction({
 	};
 
 	const snapshotState = initialHealth ? snapshotHealth(initialHealth) : undefined;
-	const privateProbeIsAuthoritative =
-		privateDetail.kind === "http" || privateDetail.kind === "favicon";
+	const privateProbeIsAuthoritative = privateDetail.kind === "http" || privateDetail.kind === "favicon";
 	const health: HealthState = truenasDown
 		? "fail"
 		: authoritativeSnapshot && snapshotState
@@ -260,12 +256,7 @@ export default function EndpointAction({
 				? "pending"
 				: supplementWithPrivateProbe && privateProbeIsAuthoritative
 					? privateHealth
-					: (snapshotState ??
-						(external
-							? "unknown"
-							: privateHealth === "fail"
-								? "unknown"
-								: privateHealth));
+					: (snapshotState ?? (external ? "unknown" : privateHealth === "fail" ? "unknown" : privateHealth));
 	const tlsTrusted = initialHealth?.tls_trusted;
 	const browserDetail = translateProbeDetail(privateDetail);
 	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
@@ -294,9 +285,7 @@ export default function EndpointAction({
 			: tunnelState === "missing"
 				? t("tunnelMissing")
 				: tunnelState === "degraded"
-					? t("tunnelDegraded", {
-							status: initialHealth?.tunnel_status ?? "unknown",
-						})
+					? t("tunnelDegraded", { status: initialHealth?.tunnel_status ?? "unknown" })
 					: t("tunnelUnknown");
 	const applicationError = initialHealth?.application_error;
 	const applicationErrorTitle = applicationError
@@ -312,18 +301,14 @@ export default function EndpointAction({
 		initialHealth?.direct_state ? `direct ${initialHealth.direct_state}` : null,
 		initialHealth?.runtime_state ? `TrueNAS ${initialHealth.runtime_state}` : null,
 		initialHealth?.internal_state ? `internal ${initialHealth.internal_state}` : null,
-		showCloudflare && initialHealth?.tunnel_status
-			? `Cloudflare ${initialHealth.tunnel_status}`
-			: null,
+		showCloudflare && initialHealth?.tunnel_status ? `Cloudflare ${initialHealth.tunnel_status}` : null,
 	].filter((item): item is string => Boolean(item));
-	const evidenceLabel =
-		evidence.length > 0
-			? t("evidence", { evidence: evidence.join(" · ") })
-			: t("evidenceUnavailable");
-	const ageLabel =
-		ageSeconds === null
-			? t("snapshotAgeUnknown")
-			: t("snapshotAge", { seconds: ageSeconds });
+	const evidenceLabel = evidence.length > 0
+		? t("evidence", { evidence: evidence.join(" · ") })
+		: t("evidenceUnavailable");
+	const ageLabel = ageSeconds === null
+		? t("snapshotAgeUnknown")
+		: t("snapshotAge", { seconds: ageSeconds });
 
 	if (!url || !enabled) {
 		return (
@@ -367,29 +352,14 @@ export default function EndpointAction({
 					<i
 						className="fas fa-lock"
 						style={{ color: tlsIndicatorColor(tlsTrusted), marginLeft: 5 }}
-						title={
-							tlsTrusted === false
-								? t("httpsInvalid")
-								: tlsTrusted === true
-									? t("httpsTrusted")
-									: t("httpsUnknown")
-						}
-						aria-label={
-							tlsTrusted === false
-								? t("httpsInvalid")
-								: tlsTrusted === true
-									? t("httpsTrusted")
-									: t("httpsUnknown")
-						}
+						title={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
+						aria-label={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
 					/>
 				)}
 				{showCloudflare && (
 					<i
 						className="fas fa-cloud"
-						style={{
-							color: cloudflareIndicatorColor(initialHealth),
-							marginLeft: 6,
-						}}
+						style={{ color: cloudflareIndicatorColor(initialHealth), marginLeft: 6 }}
 						title={tunnelTitle}
 						aria-label={tunnelTitle}
 					/>
@@ -407,12 +377,15 @@ export default function EndpointAction({
 				)}
 			</a>
 			{initialHealth && (
-				<small className="text-muted d-block" data-health-evidence>
-					<i className="fas fa-wave-square" aria-hidden="true" />{" "}
-					{evidenceLabel}
-					{" · "}
-					<i className="fas fa-clock" aria-hidden="true" /> {ageLabel}
-				</small>
+				<>
+					<small className="text-muted d-block" data-health-evidence>
+						<i className="fas fa-wave-square" aria-hidden="true" />{" "}
+						{evidenceLabel}
+						{" · "}
+						<i className="fas fa-clock" aria-hidden="true" /> {ageLabel}
+					</small>
+					<ServiceTroubleshootingEvidence entry={initialHealth} />
+				</>
 			)}
 		</>
 	);

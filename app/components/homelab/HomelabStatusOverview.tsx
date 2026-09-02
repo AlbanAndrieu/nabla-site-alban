@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
+import HomelabPlatformEvidence from "./HomelabPlatformEvidence";
 import styles from "./HomelabServicesBlock.module.css";
 
 const RUNTIME_ICON_CLASS = {
@@ -179,6 +180,8 @@ export default function HomelabStatusOverview({
 					</a>
 				</div>
 			</div>
+
+			<HomelabPlatformEvidence snapshot={snapshot} />
 		</>
 	);
 }
