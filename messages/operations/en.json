@@ -36,7 +36,15 @@
 			"blindSpot": "Security telemetry blind spot",
 			"blindSpotDetail": "The pfSense security observer shares the same WAN path it is trying to diagnose, so a transport failure cannot prove whether Snort/PF blocked its own telemetry.",
 			"sourceToDestination": "{source} → {destination}:{port}",
-			"details": "Inspect pfSense evidence"
+			"details": "Inspect pfSense evidence",
+			"actions": {
+				"title": "pfSense needs attention",
+				"lead": "pfSense is degraded, stale, or selected as the current troubleshooting focus. Inspect the evidence first, then open the management surfaces if you need to verify the control plane directly.",
+				"admin": "pfSense Admin",
+				"api": "pfSense API health",
+				"apiTitle": "Open the read-only pfSense system version endpoint; authorized API access may be required.",
+				"note": "Admin/API links are diagnostic entry points, not proof that pfSense caused the incident."
+			}
 		},
 		"exposure": {
 			"title": "Trusted-source exposure policy",
