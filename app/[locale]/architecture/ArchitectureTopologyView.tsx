@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import ServiceCriticalityOverview from "@/app/components/homelab/ServiceCriticalityOverview";
+import CriticalDependencyHierarchy from "@/app/components/homelab/CriticalDependencyHierarchy";
 import {
 	parseHomelabHealthSnapshot,
 	type HomelabHealthEntry,
@@ -323,17 +323,9 @@ export default function ArchitectureTopologyView({
 				</p>
 			</section>
 
-			<details id="critical-dependency-hierarchy" className={styles.criticalityDetails}>
-				<summary>
-					<strong>{french ? "Hiérarchie des dépendances critiques" : "Critical dependency hierarchy"}</strong>
-					<span>
-						{french
-							? "Fondations, dépendances requises et rayon d’impact · ouvrir pour inspecter"
-							: "Foundations, required dependencies and blast radius · open to inspect"}
-					</span>
-				</summary>
-				<ServiceCriticalityOverview topology={topology} compact />
-			</details>
+			<div className={styles.criticalitySection}>
+				<CriticalDependencyHierarchy topology={topology} />
+			</div>
 
 			<section
 				id="service-architecture-explorer"
