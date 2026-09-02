@@ -35,6 +35,7 @@
 	--ui-space-md: 1rem;
 	--ui-space-lg: 1.5rem;
 	--ui-space-xl: 2rem;
+	--ui-shadow-sm: 0 4px 12px rgb(0 0 0 / 15%);
 	--ui-font-weight-action: 600;
 	--ui-primary-bg: var(--button-bg, #0d6efd);
 	--ui-primary-bg-hover: var(--button-hover, #0b5ed7);

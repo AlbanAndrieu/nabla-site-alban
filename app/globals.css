@@ -77,15 +77,16 @@
 }
 .page-contact .location-address {
 	margin-bottom: 0.5rem;
-	color: #667085;
+	color: var(--ui-text-secondary);
 	font-size: 1.05rem;
 }
 .page-contact .map-container {
 	max-width: 800px;
 	margin: 1.5rem auto 0;
 	overflow: hidden;
-	border-radius: 12px;
-	box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	box-shadow: var(--ui-shadow-sm);
 }
 .page-contact .map-container iframe {
 	display: block;
@@ -96,14 +97,15 @@
 .page-contact .contact-map-caption {
 	max-width: 44rem;
 	margin: 0.85rem auto 0;
-	color: #667085;
+	color: var(--ui-text-secondary);
 	font-size: 0.9rem;
 	line-height: 1.5;
 }
 .page-contact .contact-open-source {
 	padding: 2.5rem 1.5rem;
-	border-radius: 12px;
-	background: rgb(255 255 255 / 4%);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
 }
 .page-contact .contact-github-badges {
 	display: flex;
