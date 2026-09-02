@@ -15,6 +15,7 @@ const NATIVE_SECTION_IDS = [
 	"owasp-resources",
 	"personal-security-checklist",
 	"network-security-scanning",
+	"system-hardening-cis",
 	"security-visualizations",
 ] as const;
 

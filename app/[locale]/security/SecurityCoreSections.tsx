@@ -9,7 +9,7 @@ type ResourceLink = {
 	icon?: "external" | "github";
 };
 
-type NativeSectionKey = "owasp" | "personal" | "network";
+type NativeSectionKey = "owasp" | "personal" | "network" | "hardening";
 
 type ResourceSectionDefinition = {
 	key: NativeSectionKey;
@@ -73,6 +73,33 @@ const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 				icon: "github",
 			},
 			{ href: "https://www.openvas.org/" },
+		],
+	},
+	{
+		key: "hardening",
+		id: "system-hardening-cis",
+		iconClass: "fa-solid fa-server",
+		links: [
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/cis-benchmarks/",
+			},
+			{ href: "https://www.cisecurity.org/cis-benchmarks/" },
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/",
+			},
+			{ href: "https://dev-sec.io/" },
+			{ href: "https://www.open-scap.org/" },
+			{ href: "https://cisofy.com/lynis/" },
+			{
+				href: "https://github.com/dev-sec/ansible-collection-hardening",
+				icon: "github",
+			},
+			{
+				href: "https://medium.com/@anshumaansingh10jan/comprehensive-vm-hardening-guide-using-openscap-and-ansible-88bd93186ddd",
+			},
+			{
+				href: "https://medium.com/aardvark-infinity/program-title-automated-system-hardening-and-security-audit-script-1e00eb5a577c",
+			},
 		],
 	},
 ];

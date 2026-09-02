@@ -52,6 +52,7 @@ test("security catalogs keep matching native section contracts", async () => {
 			["owasp", 8],
 			["personal", 3],
 			["network", 5],
+			["hardening", 9],
 		] as const) {
 			const section = catalog.securityPage.nativeSections[key];
 			assert.ok(section, `${locale}:${key} section must exist`);

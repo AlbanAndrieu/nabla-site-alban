@@ -50,6 +50,22 @@
 					"Masscan — high-speed TCP port scanner",
 					"Greenbone / OpenVAS — vulnerability assessment"
 				]
+			},
+			"hardening": {
+				"badge": "System Hardening",
+				"title": "System Hardening & CIS Benchmarks",
+				"description": "Best practices and benchmarks for hardening systems and improving security posture.",
+				"links": [
+					"CIS Benchmarks Guide (French) — Security Configuration Benchmarks",
+					"CIS Benchmarks Official Site",
+					"System Hardening Guides (French)",
+					"DevSec Hardening Framework",
+					"OpenSCAP — Security compliance and configuration assessment",
+					"Lynis — Security auditing and hardening tool for Unix-based systems",
+					"Ansible Collection Hardening (dev-sec)",
+					"VM Hardening with OpenSCAP & Ansible (Medium)",
+					"Automated System Hardening & Security Audit Script (Medium)"
+				]
 			}
 		},
 		"sections": {
