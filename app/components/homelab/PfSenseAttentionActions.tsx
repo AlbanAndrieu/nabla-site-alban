@@ -8,9 +8,9 @@ import type {
 } from "@/lib/homelabOperationalEvidence";
 import styles from "./PfSenseAttentionActions.module.css";
 
-const PFSENSE_ADMIN_URL = "https://home.albandrieu.com:10443/";
+const PFSENSE_ADMIN_URL = "https://pfsense.albandrieu.com:10443/";
 const PFSENSE_API_HEALTH_URL =
-	"https://home.albandrieu.com:10443/api/v2/system/version";
+	"https://pfsense.albandrieu.com:10443/api/v2/system/version";
 
 type Props = {
 	component: OperationalComponentEvidence | undefined;
@@ -22,10 +22,10 @@ export function pfsenseNeedsAttention(
 	component: OperationalComponentEvidence | undefined,
 	focus: TroubleshootingFocus,
 ): boolean {
-	return (
-		component?.state !== undefined &&
-		(component.state !== "ok" || component.stale === true)
-	) || focus.startsWith("pfsense_");
+	const componentNeedsAttention =
+		component !== undefined &&
+		(component.state !== "ok" || component.stale === true);
+	return componentNeedsAttention || focus.startsWith("pfsense_");
 }
 
 export default function PfSenseAttentionActions({
@@ -45,7 +45,11 @@ export default function PfSenseAttentionActions({
 			<p className={styles.lead}>{t("pfsense.actions.lead")}</p>
 			<div className={styles.actions}>
 				{hasEvidence ? (
-					<ActionLink href="#pfsense-operational-evidence" size="compact" variant="primary">
+					<ActionLink
+						href="#pfsense-operational-evidence"
+						size="compact"
+						variant="primary"
+					>
 						{t("pfsense.details")}
 					</ActionLink>
 				) : null}
