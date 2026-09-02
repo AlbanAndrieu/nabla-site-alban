@@ -15,7 +15,12 @@ const HOMELAB_LOADERS = {
 	fr: () => import("@/messages/homelab/fr.json"),
 } as const;
 
-const LEGACY_FEATURE_NAMESPACES = new Set(["truenasPage"]);
+const SECURITY_LOADERS = {
+	en: () => import("@/messages/security/en.json"),
+	fr: () => import("@/messages/security/fr.json"),
+} as const;
+
+const LEGACY_FEATURE_NAMESPACES = new Set(["truenasPage", "securityPage"]);
 
 function withoutMigratedLegacyNamespaces<T extends Record<string, unknown>>(
 	catalog: T,
@@ -45,19 +50,25 @@ function assertUniqueTopLevelNamespaces(
 }
 
 export async function loadMessages(locale: AppLocale) {
-	const [{ default: base }, { default: truenas }, { default: homelab }] =
-		await Promise.all([
-			BASE_LOADERS[locale](),
-			TRUENAS_LOADERS[locale](),
-			HOMELAB_LOADERS[locale](),
-		]);
+	const [
+		{ default: base },
+		{ default: truenas },
+		{ default: homelab },
+		{ default: security },
+	] = await Promise.all([
+		BASE_LOADERS[locale](),
+		TRUENAS_LOADERS[locale](),
+		HOMELAB_LOADERS[locale](),
+		SECURITY_LOADERS[locale](),
+	]);
 
 	const legacyBase = withoutMigratedLegacyNamespaces(base);
-	assertUniqueTopLevelNamespaces([legacyBase, truenas, homelab]);
+	assertUniqueTopLevelNamespaces([legacyBase, truenas, homelab, security]);
 
 	return {
 		...legacyBase,
 		...truenas,
 		...homelab,
+		...security,
 	};
 }

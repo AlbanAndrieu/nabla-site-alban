@@ -1,320 +1,244 @@
+import { getTranslations } from "next-intl/server";
+import Container from "@/components/ui/Container";
+import ExternalLink from "@/components/ui/ExternalLink";
+import type { AppLocale } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import styles from "./SecurityCoreSections.module.css";
 
-type SecurityLocale = "en" | "fr";
+type ResourceLinkIcon = "external" | "github" | "brain" | "terminal";
 
-type ResourceLink = {
-	label: string;
-	href: string;
-	icon?: "external" | "github";
+type ResourceLink =
+	| {
+			href: string;
+			icon?: ResourceLinkIcon;
+	  }
+	| {
+			page: "ai";
+			hash: string;
+			icon: ResourceLinkIcon;
+	  };
+
+type NativeSectionKey = "owasp" | "personal" | "network" | "hardening" | "ssh";
+
+type ResourceSectionDefinition = {
+	key: NativeSectionKey;
+	id: string;
+	iconClass: string;
+	links: readonly ResourceLink[];
 };
 
 type ResourceSectionCopy = {
-	id: string;
 	badge: string;
-	iconClass: string;
 	title: string;
 	description: string;
-	links: ResourceLink[];
+	links: string[];
 };
 
-type SecurityCopy = {
-	hero: {
-		title: string;
-		lead: string;
-		curatedBy: string;
-		standards: string;
-		standardsLead: string;
-	};
-	sections: ResourceSectionCopy[];
-};
-
-const COPY: Record<SecurityLocale, SecurityCopy> = {
-	en: {
-		hero: {
-			title: "Security Resources & Tools",
-			lead: "Curated security references for DevSecOps, platform engineering and cloud operations.",
-			curatedBy: "Curated by",
-			standards: "Security Standards & Compliance",
-			standardsLead: "NIST, ISO 27001, GDPR and compliance tooling.",
-		},
-		sections: [
+const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
+	{
+		key: "owasp",
+		id: "owasp-resources",
+		iconClass: "fa-solid fa-shield-halved",
+		links: [
+			{ href: "https://owasp.org/www-project-top-ten/" },
+			{ href: "https://owasp.org/www-project-web-security-testing-guide/" },
 			{
-				id: "owasp-resources",
-				badge: "Application Security",
-				iconClass: "fa-solid fa-shield-halved",
-				title: "OWASP — Open Worldwide Application Security Project",
-				description:
-					"Practical standards, testing guidance and reference material for building and assessing secure web, API and mobile applications.",
-				links: [
-					{
-						label: "OWASP Top 10",
-						href: "https://owasp.org/www-project-top-ten/",
-					},
-					{
-						label: "OWASP Web Security Testing Guide (WSTG)",
-						href: "https://owasp.org/www-project-web-security-testing-guide/",
-					},
-					{
-						label: "OWASP Application Security Verification Standard (ASVS)",
-						href: "https://owasp.org/www-project-application-security-verification-standard/",
-					},
-					{
-						label: "OWASP vulnerability categories",
-						href: "https://owasp.org/www-community/vulnerabilities/",
-					},
-					{
-						label: "OWASP API Security Top 10",
-						href: "https://owasp.org/www-project-api-security/",
-					},
-					{
-						label: "OWASP Mobile Top 10",
-						href: "https://owasp.org/www-project-mobile-top-10/",
-					},
-					{
-						label: "OWASP Cheat Sheet Series",
-						href: "https://cheatsheetseries.owasp.org/",
-					},
-					{
-						label: "Security misconfiguration in Symfony applications",
-						href: "https://pentest-testing-corp.medium.com/fix-security-misconfiguration-in-symfony-apps-be6ace002709",
-					},
-				],
+				href: "https://owasp.org/www-project-application-security-verification-standard/",
 			},
+			{ href: "https://owasp.org/www-community/vulnerabilities/" },
+			{ href: "https://owasp.org/www-project-api-security/" },
+			{ href: "https://owasp.org/www-project-mobile-top-10/" },
+			{ href: "https://cheatsheetseries.owasp.org/" },
 			{
-				id: "personal-security-checklist",
-				badge: "Personal Security",
-				iconClass: "fa-solid fa-user-shield",
-				title: "Personal Security Checklist",
-				description:
-					"Practical references for strengthening personal digital security, privacy, account hygiene and device protection.",
-				links: [
-					{
-						label: "Personal Security Checklist by Lissy93",
-						href: "https://github.com/lissy93/personal-security-checklist",
-						icon: "github",
-					},
-					{
-						label: "Digital Defense — interactive security guide",
-						href: "https://digital-defense.io/",
-					},
-					{ label: "PrivacyTools.io", href: "https://www.privacytools.io/" },
-				],
-			},
-			{
-				id: "network-security-scanning",
-				badge: "Network Security",
-				iconClass: "fa-solid fa-network-wired",
-				title: "Network Security & Scanning Tools",
-				description:
-					"Tools and references for network discovery, packet analysis, vulnerability assessment and infrastructure mapping.",
-				links: [
-					{
-						label: "Scanopy — automatic network diagram generation",
-						href: "https://www.it-connect.fr/tuto-scanopy-outil-creation-automatique-diagramme-reseau/",
-					},
-					{
-						label: "Nmap — network mapper and security auditing",
-						href: "https://nmap.org/",
-					},
-					{
-						label: "Wireshark — network protocol analyzer",
-						href: "https://www.wireshark.org/",
-					},
-					{
-						label: "Masscan — high-speed TCP port scanner",
-						href: "https://github.com/robertdavidgraham/masscan",
-						icon: "github",
-					},
-					{
-						label: "Greenbone / OpenVAS — vulnerability assessment",
-						href: "https://www.openvas.org/",
-					},
-				],
+				href: "https://pentest-testing-corp.medium.com/fix-security-misconfiguration-in-symfony-apps-be6ace002709",
 			},
 		],
 	},
-	fr: {
-		hero: {
-			title: "Ressources et outils de sécurité",
-			lead: "Une sélection de références pour le DevSecOps, l’ingénierie plateforme et les opérations cloud.",
-			curatedBy: "Sélection maintenue par",
-			standards: "Standards de sécurité et conformité",
-			standardsLead: "NIST, ISO 27001, RGPD et outillage de conformité.",
-		},
-		sections: [
+	{
+		key: "personal",
+		id: "personal-security-checklist",
+		iconClass: "fa-solid fa-user-shield",
+		links: [
 			{
-				id: "owasp-resources",
-				badge: "Sécurité applicative",
-				iconClass: "fa-solid fa-shield-halved",
-				title: "OWASP — Open Worldwide Application Security Project",
-				description:
-					"Standards, guides de test et références pratiques pour concevoir et évaluer la sécurité des applications web, API et mobiles.",
-				links: [
-					{
-						label: "OWASP Top 10",
-						href: "https://owasp.org/www-project-top-ten/",
-					},
-					{
-						label: "Guide de test de sécurité web OWASP (WSTG)",
-						href: "https://owasp.org/www-project-web-security-testing-guide/",
-					},
-					{
-						label: "OWASP Application Security Verification Standard (ASVS)",
-						href: "https://owasp.org/www-project-application-security-verification-standard/",
-					},
-					{
-						label: "Catégories de vulnérabilités OWASP",
-						href: "https://owasp.org/www-community/vulnerabilities/",
-					},
-					{
-						label: "OWASP API Security Top 10",
-						href: "https://owasp.org/www-project-api-security/",
-					},
-					{
-						label: "OWASP Mobile Top 10",
-						href: "https://owasp.org/www-project-mobile-top-10/",
-					},
-					{
-						label: "OWASP Cheat Sheet Series",
-						href: "https://cheatsheetseries.owasp.org/",
-					},
-					{
-						label:
-							"Mauvaises configurations de sécurité dans les applications Symfony",
-						href: "https://pentest-testing-corp.medium.com/fix-security-misconfiguration-in-symfony-apps-be6ace002709",
-					},
-				],
+				href: "https://github.com/lissy93/personal-security-checklist",
+				icon: "github",
+			},
+			{ href: "https://digital-defense.io/" },
+			{ href: "https://www.privacytools.io/" },
+		],
+	},
+	{
+		key: "network",
+		id: "network-security-scanning",
+		iconClass: "fa-solid fa-network-wired",
+		links: [
+			{
+				href: "https://www.it-connect.fr/tuto-scanopy-outil-creation-automatique-diagramme-reseau/",
+			},
+			{ href: "https://nmap.org/" },
+			{ href: "https://www.wireshark.org/" },
+			{
+				href: "https://github.com/robertdavidgraham/masscan",
+				icon: "github",
+			},
+			{ href: "https://www.openvas.org/" },
+		],
+	},
+	{
+		key: "hardening",
+		id: "system-hardening-cis",
+		iconClass: "fa-solid fa-server",
+		links: [
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/cis-benchmarks/",
+			},
+			{ href: "https://www.cisecurity.org/cis-benchmarks/" },
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/",
+			},
+			{ href: "https://dev-sec.io/" },
+			{ href: "https://www.open-scap.org/" },
+			{ href: "https://cisofy.com/lynis/" },
+			{
+				href: "https://github.com/dev-sec/ansible-collection-hardening",
+				icon: "github",
 			},
 			{
-				id: "personal-security-checklist",
-				badge: "Sécurité personnelle",
-				iconClass: "fa-solid fa-user-shield",
-				title: "Checklist de sécurité personnelle",
-				description:
-					"Références pratiques pour renforcer la sécurité numérique, la confidentialité, l’hygiène des comptes et la protection des terminaux.",
-				links: [
-					{
-						label: "Personal Security Checklist par Lissy93",
-						href: "https://github.com/lissy93/personal-security-checklist",
-						icon: "github",
-					},
-					{
-						label: "Digital Defense — guide interactif de sécurité",
-						href: "https://digital-defense.io/",
-					},
-					{ label: "PrivacyTools.io", href: "https://www.privacytools.io/" },
-				],
+				href: "https://medium.com/@anshumaansingh10jan/comprehensive-vm-hardening-guide-using-openscap-and-ansible-88bd93186ddd",
 			},
 			{
-				id: "network-security-scanning",
-				badge: "Sécurité réseau",
-				iconClass: "fa-solid fa-network-wired",
-				title: "Outils de sécurité et d’analyse réseau",
-				description:
-					"Outils et références pour la découverte réseau, l’analyse de paquets, l’évaluation des vulnérabilités et la cartographie d’infrastructure.",
-				links: [
-					{
-						label: "Scanopy — génération automatique de diagrammes réseau",
-						href: "https://www.it-connect.fr/tuto-scanopy-outil-creation-automatique-diagramme-reseau/",
-					},
-					{
-						label: "Nmap — cartographie réseau et audit de sécurité",
-						href: "https://nmap.org/",
-					},
-					{
-						label: "Wireshark — analyseur de protocoles réseau",
-						href: "https://www.wireshark.org/",
-					},
-					{
-						label: "Masscan — scanner de ports TCP haute vitesse",
-						href: "https://github.com/robertdavidgraham/masscan",
-						icon: "github",
-					},
-					{
-						label: "Greenbone / OpenVAS — évaluation des vulnérabilités",
-						href: "https://www.openvas.org/",
-					},
-				],
+				href: "https://medium.com/aardvark-infinity/program-title-automated-system-hardening-and-security-audit-script-1e00eb5a577c",
 			},
 		],
 	},
-};
+	{
+		key: "ssh",
+		id: "ssh-security-hardening",
+		iconClass: "fa-solid fa-terminal",
+		links: [
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/ssh/",
+			},
+			{ href: "https://www.ssh.com/academy/ssh/security" },
+			{ href: "https://github.com/mozilla/ssh_scan", icon: "github" },
+			{ href: "https://github.com/jtesta/ssh-audit", icon: "github" },
+			{ href: "https://infosec.mozilla.org/guidelines/openssh" },
+			{ page: "ai", hash: "nvidia-openshell", icon: "brain" },
+			{ page: "ai", hash: "open-terminal", icon: "terminal" },
+		],
+	},
+];
+
+function resourceLinkIconClass(icon: ResourceLinkIcon = "external") {
+	switch (icon) {
+		case "github":
+			return "fa-brands fa-github";
+		case "brain":
+			return "fa-solid fa-brain";
+		case "terminal":
+			return "fa-solid fa-terminal";
+		default:
+			return "fa-solid fa-arrow-up-right-from-square";
+	}
+}
 
 function ResourceSection({
-	section,
-}: Readonly<{ section: ResourceSectionCopy }>) {
-	const headingId = `${section.id}-heading`;
+	definition,
+	copy,
+	locale,
+}: Readonly<{
+	definition: ResourceSectionDefinition;
+	copy: ResourceSectionCopy;
+	locale: AppLocale;
+}>) {
+	const headingId = `${definition.id}-heading`;
 	return (
 		<section
-			id={section.id}
+			id={definition.id}
 			className="resource-card"
 			aria-labelledby={headingId}
 		>
-			<span className="category-badge">{section.badge}</span>
+			<span className="category-badge">{copy.badge}</span>
 			<div className="icon">
-				<i className={section.iconClass} aria-hidden="true" />
+				<i className={definition.iconClass} aria-hidden="true" />
 			</div>
-			<h3 id={headingId}>{section.title}</h3>
-			<p>{section.description}</p>
+			<h3 id={headingId}>{copy.title}</h3>
+			<p>{copy.description}</p>
 			<ul className="resource-list">
-				{section.links.map((link) => (
-					<li key={link.href}>
-						<a href={link.href} target="_blank" rel="noopener noreferrer">
-							<i
-								className={
-									link.icon === "github"
-										? "fa-brands fa-github"
-										: "fa-solid fa-arrow-up-right-from-square"
-								}
-								aria-hidden="true"
-							/>{" "}
-							{link.label}
-						</a>
-					</li>
-				))}
+				{definition.links.map((link, index) => {
+					const label = copy.links[index];
+					const content = (
+						<>
+							<i className={resourceLinkIconClass(link.icon)} aria-hidden="true" />{" "}
+							{label}
+						</>
+					);
+
+					return (
+						<li key={"href" in link ? link.href : `${link.page}#${link.hash}`}>
+							{"href" in link ? (
+								<ExternalLink href={link.href}>{content}</ExternalLink>
+							) : (
+								<a href={`${canonicalPagePath(link.page, locale)}#${link.hash}`}>
+									{content}
+								</a>
+							)}
+						</li>
+					);
+				})}
 			</ul>
 		</section>
 	);
 }
 
-export function SecurityHero({
+export async function SecurityHero({
 	locale,
 	contactHref,
-}: Readonly<{ locale: SecurityLocale; contactHref: string }>) {
-	const hero = COPY[locale].hero;
+}: Readonly<{ locale: AppLocale; contactHref: string }>) {
+	const t = await getTranslations({ locale, namespace: "securityPage" });
 	return (
 		<header className="hero-section" id="hero">
-			<div className="container">
+			<Container>
 				<h1>
 					<i className="fa-solid fa-shield-halved" aria-hidden="true" />{" "}
-					{hero.title}
+					{t("title")}
 				</h1>
-				<p>{hero.lead}</p>
+				<p>{t("hero.lead")}</p>
 				<p>
-					{hero.curatedBy}{" "}
+					{t("hero.curatedBy")} {" "}
 					<a className={styles.heroLink} href={contactHref}>
 						Alban Andrieu
 					</a>
 				</p>
 				<p>
 					<a className={styles.heroLink} href="#security-standards-compliance">
-						{hero.standards}
+						{t("hero.standards")}
 					</a>{" "}
-					— {hero.standardsLead}
+					— {t("hero.standardsLead")}
 				</p>
-			</div>
+			</Container>
 		</header>
 	);
 }
 
-export default function SecurityCoreSections({
+export default async function SecurityCoreSections({
 	locale,
-}: Readonly<{ locale: SecurityLocale }>) {
+}: Readonly<{ locale: AppLocale }>) {
+	const t = await getTranslations({ locale, namespace: "securityPage" });
 	return (
-		<div className="container">
-			{COPY[locale].sections.map((section) => (
-				<ResourceSection section={section} key={section.id} />
+		<Container>
+			{RESOURCE_SECTIONS.map((definition) => (
+				<ResourceSection
+					definition={definition}
+					copy={
+						t.raw(
+							`nativeSections.${definition.key}`,
+						) as ResourceSectionCopy
+					}
+					locale={locale}
+					key={definition.id}
+				/>
 			))}
-		</div>
+		</Container>
 	);
 }
