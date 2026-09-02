@@ -43,8 +43,8 @@ export default async function TruenasPage({ params }: Props) {
 			<SkipToMainContent />
 			<main id="main-content">
 				<HeroSection />
-				<HomelabServicesSection headingId="truenas-services" />
 				<HomeLabSection nablaHref={canonicalPagePath("nabla", locale)} />
+				<HomelabServicesSection headingId="truenas-services" />
 				<div className="hardware-section-bg">
 					<HardwareSection />
 					<BillOfMaterialsSection />
