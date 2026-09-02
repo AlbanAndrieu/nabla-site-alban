@@ -17,6 +17,7 @@
 	transition:
 		background-color 120ms ease,
 		border-color 120ms ease,
+		color 120ms ease,
 		transform 120ms ease;
 }
 
@@ -48,6 +49,18 @@
 .secondary:hover {
 	background: var(--ui-secondary-bg-hover);
 	color: var(--ui-secondary-text);
+}
+
+.outline {
+	border-color: var(--ui-primary-bg);
+	background: transparent;
+	color: var(--ui-link);
+}
+
+.outline:hover {
+	border-color: var(--ui-primary-bg-hover);
+	background: var(--ui-primary-bg);
+	color: var(--ui-primary-text);
 }
 
 @media (max-width: 575.98px) {
