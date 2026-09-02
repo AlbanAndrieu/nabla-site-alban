@@ -8,16 +8,6 @@
 	z-index: 9999;
 }
 
-/*d-inline-flex align-items-center gap-2 text-light small*/
-.locale-switcher {
-	display: inline-flex;
-	align-items: center;
-	column-gap: 0.25rem;
-}
-.locale-switcher .form-select {
-	min-width: 7.5rem;
-}
-
 .cv-page-identity {
 	display: flex;
 	align-items: center;

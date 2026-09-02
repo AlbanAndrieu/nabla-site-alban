@@ -1,6 +1,35 @@
 import BackToTopButton from "@/components/BackToTopButton";
 import ActionLink, { actionClassName } from "@/components/ui/ActionLink";
+import ExternalLink from "@/components/ui/ExternalLink";
 import styles from "./Footer.module.css";
+
+const SOCIAL_LINKS = [
+	{
+		href: "https://www.linkedin.com/in/nabla",
+		label: "LinkedIn",
+		iconClassName: "fab fa-linkedin-in",
+	},
+	{
+		href: "https://calendly.com/alban-andrieu",
+		label: "Calendly",
+		iconClassName: "fa fa-calendar-plus",
+	},
+	{
+		href: "https://github.com/AlbanAndrieu",
+		label: "GitHub",
+		iconClassName: "fab fa-github",
+	},
+	{
+		href: "https://hub.docker.com/u/nabla",
+		label: "Docker Hub",
+		iconClassName: "fab fa-docker",
+	},
+	{
+		href: "https://stackexchange.com/users/4652074/albanandrieu",
+		label: "Stack Exchange",
+		iconClassName: "fab fa-stack-exchange",
+	},
+] as const;
 
 type FooterProps = {
 	backHome: string;
@@ -24,63 +53,32 @@ export default function Footer({
 	const homeHref = locale === "fr" ? "/fr" : "/";
 
 	return (
-		<footer className="footer text-center" role="contentinfo">
-			<div className="social-links">
+		<footer className={`${styles.root} footer`} role="contentinfo">
+			<div className={`${styles.socialLinks} social-links`}>
+				{SOCIAL_LINKS.map((link) => (
+					<ExternalLink
+						key={link.href}
+						href={link.href}
+						className={`${styles.socialLink} social-link`}
+						aria-label={link.label}
+					>
+						<i className={link.iconClassName} aria-hidden="true" />
+					</ExternalLink>
+				))}
 				<a
-					href="https://www.linkedin.com/in/nabla"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="social-link"
-					aria-label="LinkedIn"
+					href="/feed.xml"
+					className={`${styles.socialLink} social-link`}
+					aria-label={rssFeedAria}
 				>
-					<i className="fab fa-linkedin-in"></i>
-				</a>
-				<a
-					href="https://calendly.com/alban-andrieu"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="social-link"
-					aria-label="Calendly"
-				>
-					<i className="fa fa-calendar-plus"></i>
-				</a>
-				<a
-					href="https://github.com/AlbanAndrieu"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="social-link"
-					aria-label="GitHub"
-				>
-					<i className="fab fa-github"></i>
-				</a>
-				<a
-					href="https://hub.docker.com/u/nabla"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="social-link"
-					aria-label="Docker Hub"
-				>
-					<i className="fab fa-docker"></i>
-				</a>
-				<a
-					href="https://stackexchange.com/users/4652074/albanandrieu"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="social-link"
-					aria-label="Stack Exchange"
-				>
-					<i className="fab fa-stack-exchange"></i>
-				</a>
-				<a href="/feed.xml" className="social-link" aria-label={rssFeedAria}>
-					<i className="fa fa-rss" aria-hidden="true"></i>
+					<i className="fa fa-rss" aria-hidden="true" />
 				</a>
 			</div>
-			<div className="footer-links text-center">
+			<div className={`${styles.links} footer-links`}>
 				<a href="/policy/legal.html">{legalNotices}</a>
 			</div>
 			<nav className={styles.actions} aria-label="Footer navigation">
 				<ActionLink href={homeHref}>
-					<i className="fas fa-home" aria-hidden="true"></i>
+					<i className="fas fa-home" aria-hidden="true" />
 					<span>{backHome}</span>
 				</ActionLink>
 				<BackToTopButton
@@ -90,7 +88,7 @@ export default function Footer({
 				/>
 			</nav>
 			<p
-				className="footer-copyright text-center"
+				className={`${styles.copyright} footer-copyright`}
 				data-localized-copyright={copyright}
 			>
 				{copyright}
