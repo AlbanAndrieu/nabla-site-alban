@@ -36,7 +36,15 @@
 			"blindSpot": "Angle mort de la télémétrie sécurité",
 			"blindSpotDetail": "L’observateur sécurité pfSense partage le même chemin WAN qu’il tente de diagnostiquer ; un échec de transport ne peut donc pas prouver que Snort/PF a bloqué sa propre télémétrie.",
 			"sourceToDestination": "{source} → {destination}:{port}",
-			"details": "Inspecter les preuves pfSense"
+			"details": "Inspecter les preuves pfSense",
+			"actions": {
+				"title": "pfSense nécessite votre attention",
+				"lead": "pfSense est dégradé, périmé ou sélectionné comme point de départ du diagnostic. Inspectez d’abord les preuves, puis ouvrez les surfaces d’administration si vous devez vérifier directement le plan de contrôle.",
+				"admin": "Administration pfSense",
+				"api": "Santé de l’API pfSense",
+				"apiTitle": "Ouvre l’endpoint système pfSense en lecture seule ; un accès API autorisé peut être requis.",
+				"note": "Les liens Admin/API sont des points d’entrée de diagnostic, pas une preuve que pfSense est la cause de l’incident."
+			}
 		},
 		"exposure": {
 			"title": "Politique d’exposition par sources approuvées",

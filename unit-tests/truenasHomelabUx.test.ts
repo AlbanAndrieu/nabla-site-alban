@@ -18,25 +18,48 @@ test("TrueNAS shows the visual homelab topology before the service catalog", asy
 
 test("service tiers are filterable and collapsible while criticality details are opt-in", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const hierarchy = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.tsx",
+	);
 
 	assert.match(block, /data-homelab-tier-filter/);
 	assert.match(block, /data-service-criticality-group/);
 	assert.match(block, /setExpandedTiers/);
 	assert.match(block, /useState\(false\)/);
-	assert.match(block, /data-criticality-toggle/);
-	assert.match(block, /critical-dependency-hierarchy/);
+	assert.match(block, /<CriticalDependencyHierarchy/);
+	assert.match(hierarchy, /data-criticality-toggle/);
+	assert.match(hierarchy, /critical-dependency-hierarchy/);
 
 	const hierarchyIndex = block.indexOf("data-homelab-service-hierarchy");
-	const criticalityIndex = block.indexOf("data-criticality-toggle");
+	const criticalityIndex = block.indexOf("<CriticalDependencyHierarchy");
 	assert.ok(hierarchyIndex >= 0);
 	assert.ok(criticalityIndex > hierarchyIndex);
+});
+
+test("critical dependency hierarchy keeps the disclosure arrow next to its label", async () => {
+	const hierarchy = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.tsx",
+	);
+	const css = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.module.css",
+	);
+
+	assert.match(hierarchy, /ServiceCriticalityOverview/);
+	assert.match(hierarchy, /criticality\.showHierarchy/);
+	assert.match(hierarchy, /criticality\.hideHierarchy/);
+	assert.match(css, /justify-content:\s*flex-start/);
+	assert.match(css, /\.summary::after/);
+	assert.doesNotMatch(css, /\.summary[\s\S]*justify-content:\s*space-between/);
 });
 
 test("runtime legend is promoted before service groups and links to criticality details", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const overview = await source("app/components/homelab/HomelabStatusOverview.tsx");
 
-	assert.ok(block.indexOf("<HomelabStatusOverview") < block.indexOf("data-homelab-service-hierarchy"));
+	assert.ok(
+		block.indexOf("<HomelabStatusOverview") <
+			block.indexOf("data-homelab-service-hierarchy"),
+	);
 	assert.match(overview, /data-truenas-runtime-legend/);
 	assert.match(overview, /data-dependency-health-legend/);
 	assert.match(overview, /href="#critical-dependency-hierarchy"/);

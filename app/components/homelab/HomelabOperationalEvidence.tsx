@@ -11,6 +11,7 @@ import type {
 	TroubleshootingFocus,
 } from "@/lib/homelabOperationalEvidence";
 import styles from "./HomelabOperationalEvidence.module.css";
+import PfSenseAttentionActions from "./PfSenseAttentionActions";
 
 const REFRESH_MS = 30_000;
 
@@ -199,6 +200,9 @@ export default function HomelabOperationalEvidence() {
 				: evidence?.board.state === "stale"
 					? t("board.stale")
 					: t("board.fresh");
+	const pfsenseComponent = evidence?.components.find(
+		(component) => component.id === "pfsense",
+	);
 
 	return (
 		<div
@@ -240,6 +244,12 @@ export default function HomelabOperationalEvidence() {
 						<span>{t(FOCUS_KEY[evidence.troubleshootingFocus])}</span>
 					</div>
 
+					<PfSenseAttentionActions
+						component={pfsenseComponent}
+						focus={evidence.troubleshootingFocus}
+						hasEvidence={Boolean(evidence.pfsense)}
+					/>
+
 					<h3 className={styles.subheading}>{t("components.title")}</h3>
 					<div className={styles.componentGrid}>
 						{evidence.components.map((component) => {
@@ -266,7 +276,11 @@ export default function HomelabOperationalEvidence() {
 					</div>
 
 					{evidence.pfsense ? (
-						<details className={styles.details} data-pfsense-security-evidence>
+						<details
+							id="pfsense-operational-evidence"
+							className={styles.details}
+							data-pfsense-security-evidence
+						>
 							<summary>{t("pfsense.details")}</summary>
 							<div className={styles.detailsBody}>
 								<h3>{t("pfsense.title")}</h3>
