@@ -1,17 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ServiceCriticalityOverview from "@/app/components/homelab/ServiceCriticalityOverview";
 import {
+	parseHomelabHealthSnapshot,
+	type HomelabHealthEntry,
+	type HomelabHealthSnapshot,
+	type HomelabHealthState,
+} from "@/lib/homelabHealth";
+import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
+import {
+	homelabServiceId,
 	parseHomelabServicesCatalog,
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
+import {
+	analyzeServiceCriticality,
+	type ServiceCriticalityTier,
+} from "@/lib/serviceCriticality";
 import {
 	parseServiceTopology,
 	type ServiceTopology,
 	type ServiceTopologySource,
 } from "@/lib/serviceTopology";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
+import styles from "./ArchitectureTopologyView.module.css";
 
 type Props = {
 	locale: string;
@@ -21,6 +34,54 @@ type Props = {
 	initialTopologySource: ServiceTopologySource;
 };
 
+type HealthFilter = "all" | HomelabHealthState;
+type TierFilter = "all" | ServiceCriticalityTier;
+
+type HealthIndex = {
+	byId: Map<string, HomelabHealthEntry>;
+	byName: Map<string, HomelabHealthEntry>;
+};
+
+const HEALTH_STATES: readonly HomelabHealthState[] = ["ok", "warn", "fail", "unknown"];
+const TIER_FILTERS: readonly TierFilter[] = [
+	"all",
+	"foundation",
+	"shared-data",
+	"shared-platform",
+	"application",
+	"support",
+];
+
+function normalizedName(value: string): string {
+	return value.trim().toLowerCase();
+}
+
+function indexHealth(snapshot: HomelabHealthSnapshot | null): HealthIndex {
+	const byId = new Map<string, HomelabHealthEntry>();
+	const byName = new Map<string, HomelabHealthEntry>();
+	for (const entry of snapshot?.services ?? []) {
+		if (entry.id) byId.set(entry.id, entry);
+		byName.set(normalizedName(entry.name), entry);
+	}
+	return { byId, byName };
+}
+
+function effectiveState(
+	serviceId: string,
+	serviceName: string,
+	index: HealthIndex,
+): HomelabHealthState {
+	const entry = index.byId.get(serviceId) ?? index.byName.get(normalizedName(serviceName));
+	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
+}
+
+function snapshotAgeSeconds(checkedAt: string | undefined, now: number): number | null {
+	if (!checkedAt) return null;
+	const checkedAtMs = Date.parse(checkedAt);
+	if (!Number.isFinite(checkedAtMs)) return null;
+	return Math.max(0, Math.floor((now - checkedAtMs) / 1000));
+}
+
 export default function ArchitectureTopologyView({
 	locale,
 	initialCatalog,
@@ -28,11 +89,18 @@ export default function ArchitectureTopologyView({
 	initialTopology,
 	initialTopologySource,
 }: Readonly<Props>) {
+	const french = locale === "fr";
 	const [catalog, setCatalog] = useState(initialCatalog);
 	const [catalogSource, setCatalogSource] = useState(initialCatalogSource);
 	const [topology, setTopology] = useState(initialTopology);
 	const [topologySource, setTopologySource] =
 		useState<ServiceTopologySource>(initialTopologySource);
+	const [health, setHealth] = useState<HomelabHealthSnapshot | null>(null);
+	const [healthUnavailable, setHealthUnavailable] = useState(false);
+	const [refreshing, setRefreshing] = useState(true);
+	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
+	const [tierFilter, setTierFilter] = useState<TierFilter>("all");
+	const [now, setNow] = useState(() => Date.now());
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -47,9 +115,7 @@ export default function ArchitectureTopologyView({
 			const parsed = parseHomelabServicesCatalog(await response.json());
 			if (!parsed) throw new Error("invalid catalog");
 			setCatalog(parsed);
-			setCatalogSource(
-				response.headers.get("X-Homelab-Services-Source") ?? "fastapi",
-			);
+			setCatalogSource(response.headers.get("X-Homelab-Services-Source") ?? "fastapi");
 		};
 
 		const loadTopology = async () => {
@@ -73,16 +139,225 @@ export default function ArchitectureTopologyView({
 		return () => controller.abort();
 	}, []);
 
+	useEffect(() => {
+		let active = true;
+		let controller: AbortController | null = null;
+
+		const loadHealth = async () => {
+			if (document.hidden) return;
+			controller?.abort();
+			controller = new AbortController();
+			setRefreshing(true);
+			try {
+				const response = await fetch("/api/homelab-health", {
+					cache: "no-store",
+					signal: controller.signal,
+					headers: { Accept: "application/json" },
+				});
+				if (!response.ok) throw new Error(`health HTTP ${response.status}`);
+				const parsed = parseHomelabHealthSnapshot(await response.json());
+				if (!parsed) throw new Error("invalid health payload");
+				if (active) {
+					setHealth(parsed);
+					setHealthUnavailable(false);
+					setNow(Date.now());
+				}
+			} catch (error) {
+				if (active && !controller.signal.aborted) setHealthUnavailable(true);
+			} finally {
+				if (active && !controller.signal.aborted) setRefreshing(false);
+			}
+		};
+
+		void loadHealth();
+		const refreshTimer = window.setInterval(() => void loadHealth(), 30_000);
+		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
+		const onVisibilityChange = () => {
+			if (!document.hidden) void loadHealth();
+		};
+		document.addEventListener("visibilitychange", onVisibilityChange);
+		return () => {
+			active = false;
+			controller?.abort();
+			window.clearInterval(refreshTimer);
+			window.clearInterval(clockTimer);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
+		};
+	}, []);
+
+	const healthIndex = useMemo(() => indexHealth(health), [health]);
+	const criticality = useMemo(() => analyzeServiceCriticality(topology), [topology]);
+	const counts = useMemo(() => {
+		const result: Record<HomelabHealthState, number> = {
+			ok: 0,
+			warn: 0,
+			fail: 0,
+			unknown: 0,
+		};
+		for (const service of catalog.services) {
+			const state = effectiveState(homelabServiceId(service), service.name, healthIndex);
+			result[state] += 1;
+		}
+		return result;
+	}, [catalog.services, healthIndex]);
+
+	const filteredCatalog = useMemo<HomelabServicesCatalog>(() => {
+		const services = catalog.services.filter((service) => {
+			const id = homelabServiceId(service);
+			const state = effectiveState(id, service.name, healthIndex);
+			const tier = criticality.get(id)?.tier ?? "support";
+			return (
+				(healthFilter === "all" || state === healthFilter) &&
+				(tierFilter === "all" || tier === tierFilter)
+			);
+		});
+		return { ...catalog, services };
+	}, [catalog, criticality, healthFilter, healthIndex, tierFilter]);
+
+	const ageSeconds = snapshotAgeSeconds(health?.checked_at, now);
+	const tierLabel = (tier: TierFilter) => {
+		if (tier === "all") return french ? "Tous les groupes" : "All criticality groups";
+		const labels: Record<ServiceCriticalityTier, [string, string]> = {
+			foundation: ["Infrastructure foundations", "Fondations d’infrastructure"],
+			"shared-data": ["Shared data and state", "Données et état partagés"],
+			"shared-platform": ["Shared platform services", "Services de plateforme partagés"],
+			application: ["Applications and consumers", "Applications et consommateurs"],
+			support: ["Support and low-impact", "Support et faible impact"],
+		};
+		return french ? labels[tier][1] : labels[tier][0];
+	};
+
 	return (
 		<>
-			<ServiceCriticalityOverview topology={topology} />
-			<HierarchicalArchitectureExplorer
-				locale={locale}
-				catalog={catalog}
-				catalogSource={catalogSource}
-				topology={topology}
-				topologySource={topologySource}
-			/>
+			<section
+				id="architecture-health-dashboard"
+				className={styles.dashboard}
+				aria-labelledby="architecture-health-dashboard-title"
+			>
+				<div className={styles.dashboardHeader}>
+					<div>
+						<h2 id="architecture-health-dashboard-title" className={styles.dashboardTitle}>
+							{french ? "État et filtres de l’architecture" : "Architecture health and filters"}
+						</h2>
+						<p className={styles.dashboardLead}>
+							{french
+								? "Les filtres s’appliquent aux services déclarés du graphe ; la topologie complète reste utilisée pour calculer la criticité et le rayon d’impact."
+								: "Filters apply to declared services in the graph; the complete topology remains the basis for criticality and blast-radius calculations."}
+						</p>
+					</div>
+					<div className={styles.refreshStatus} role="status" aria-live="polite">
+						{refreshing
+							? french
+								? "Actualisation…"
+								: "Refreshing…"
+							: healthUnavailable
+								? french
+									? "Actualisation indisponible · dernier snapshot conservé"
+									: "Refresh unavailable · keeping last snapshot"
+								: ageSeconds === null
+									? french
+										? "Snapshot en attente"
+										: "Waiting for snapshot"
+									: french
+										? `Mis à jour il y a ${ageSeconds}s`
+										: `Updated ${ageSeconds}s ago`}
+					</div>
+				</div>
+
+				<div className={styles.healthSummary} aria-label={french ? "Résumé santé" : "Health summary"}>
+					{HEALTH_STATES.map((state) => (
+						<button
+							type="button"
+							key={state}
+							className={styles.healthChip}
+							data-health-filter={state}
+							aria-pressed={healthFilter === state}
+							onClick={() => setHealthFilter((current) => (current === state ? "all" : state))}
+						>
+							<strong>{counts[state]}</strong>{" "}
+							{state === "ok"
+								? french ? "sains" : "healthy"
+								: state === "warn"
+									? french ? "dégradés" : "degraded"
+									: state === "fail"
+										? french ? "en échec" : "failed"
+										: french ? "inconnus" : "unknown"}
+						</button>
+					))}
+				</div>
+
+				<div className={styles.filters}>
+					<label className={styles.filterField}>
+						<span>{french ? "Santé" : "Health"}</span>
+						<select value={healthFilter} onChange={(event) => setHealthFilter(event.target.value as HealthFilter)}>
+							<option value="all">{french ? "Tous les états" : "All health states"}</option>
+							<option value="ok">{french ? "Sain" : "Healthy"}</option>
+							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
+							<option value="fail">{french ? "En échec" : "Failed"}</option>
+							<option value="unknown">{french ? "Inconnu" : "Unknown"}</option>
+						</select>
+					</label>
+					<label className={styles.filterField}>
+						<span>{french ? "Criticité" : "Criticality"}</span>
+						<select value={tierFilter} onChange={(event) => setTierFilter(event.target.value as TierFilter)}>
+							{TIER_FILTERS.map((tier) => (
+								<option value={tier} key={tier}>{tierLabel(tier)}</option>
+							))}
+						</select>
+					</label>
+					<button
+						type="button"
+						className={styles.resetButton}
+						onClick={() => {
+							setHealthFilter("all");
+							setTierFilter("all");
+						}}
+					>
+						{french ? "Réinitialiser" : "Reset filters"}
+					</button>
+				</div>
+				<p className={styles.matchCount}>
+					{french
+						? `${filteredCatalog.services.length} services déclarés affichés sur ${catalog.services.length}`
+						: `${filteredCatalog.services.length} declared services shown of ${catalog.services.length}`}
+				</p>
+			</section>
+
+			<details id="critical-dependency-hierarchy" className={styles.criticalityDetails}>
+				<summary>
+					<strong>{french ? "Hiérarchie des dépendances critiques" : "Critical dependency hierarchy"}</strong>
+					<span>
+						{french
+							? "Fondations, dépendances requises et rayon d’impact · ouvrir pour inspecter"
+							: "Foundations, required dependencies and blast radius · open to inspect"}
+					</span>
+				</summary>
+				<ServiceCriticalityOverview topology={topology} compact />
+			</details>
+
+			<section
+				id="service-architecture-explorer"
+				className={styles.explorerSection}
+				aria-labelledby="service-architecture-explorer-title"
+			>
+				<div className={styles.sectionHeading}>
+					<h2 id="service-architecture-explorer-title">
+						{french ? "Topologie interactive des services" : "Interactive service topology"}
+					</h2>
+					<p>
+						{french
+							? "Utilisez la recherche et les contrôles du graphe pour basculer entre plateforme IA, services, chemin critique, catalogue complet et relations optionnelles."
+							: "Use the graph search and controls to switch between the AI platform, services, critical path, full catalog, and optional relations."}
+					</p>
+				</div>
+				<HierarchicalArchitectureExplorer
+					locale={locale}
+					catalog={filteredCatalog}
+					catalogSource={catalogSource}
+					topology={topology}
+					topologySource={topologySource}
+				/>
+			</section>
 		</>
 	);
 }
