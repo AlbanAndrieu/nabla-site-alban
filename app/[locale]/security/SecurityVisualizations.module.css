@@ -1,0 +1,77 @@
+.section {
+	padding-block: clamp(2.5rem, 6vw, 4rem);
+	border-block: 1px solid var(--ui-border);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-primary);
+}
+
+.heading {
+	margin-bottom: var(--ui-space-lg);
+}
+
+.heading h2 {
+	margin: 0;
+	color: var(--ui-text-primary);
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(14rem, 1fr);
+	gap: var(--ui-space-lg);
+}
+
+.card {
+	min-width: 0;
+	padding: var(--ui-space-lg);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.cardHeader {
+	display: flex;
+	align-items: center;
+	gap: var(--ui-space-md);
+	margin-bottom: var(--ui-space-md);
+}
+
+.cardHeader h3 {
+	margin: 0;
+	color: var(--ui-text-primary);
+}
+
+.logo {
+	width: 4rem;
+	height: 4rem;
+	object-fit: contain;
+}
+
+.externalLink {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--ui-space-xs);
+	min-height: var(--ui-control-min-height);
+	color: var(--ui-link);
+	font-weight: 600;
+}
+
+.externalLink:hover {
+	color: var(--ui-link-hover);
+}
+
+.externalLink:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+	border-radius: var(--ui-radius-sm);
+}
+
+@media (max-width: 760px) {
+	.grid {
+		grid-template-columns: 1fr;
+	}
+
+	.card {
+		padding: var(--ui-space-md);
+	}
+}

@@ -9,13 +9,14 @@ import { routing } from "@/i18n/routing";
 import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
-import SecurityArfTree from "./SecurityArfTree";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
+import SecurityVisualizations from "./SecurityVisualizations";
 
 const NATIVE_SECTION_IDS = [
 	"owasp-resources",
 	"personal-security-checklist",
 	"network-security-scanning",
+	"security-visualizations",
 ] as const;
 
 export async function generateMetadata({
@@ -53,8 +54,8 @@ export default async function SecurityPage({
 					locale={locale}
 					omitElementIds={NATIVE_SECTION_IDS}
 				/>
+				<SecurityVisualizations locale={locale} />
 			</main>
-			<SecurityArfTree locale={locale} />
 		</div>
 	);
 }
