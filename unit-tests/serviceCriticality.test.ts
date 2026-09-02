@@ -222,11 +222,15 @@ test("architecture and TrueNAS share dependency, optional-edge and blast-radius 
 	const explorer = await source(
 		"app/[locale]/architecture/ArchitectureExplorer.tsx",
 	);
+	const hierarchy = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.tsx",
+	);
 	const overview = await source(
 		"app/components/homelab/ServiceCriticalityOverview.tsx",
 	);
 
-	assert.match(architecture, /ServiceCriticalityOverview/);
+	assert.match(architecture, /CriticalDependencyHierarchy/);
+	assert.match(hierarchy, /ServiceCriticalityOverview/);
 	assert.match(architecture, /\/api\/homelab-topology/);
 	assert.match(explorer, /requiredEdgeHealthState/);
 	assert.match(explorer, /relation\.optional/);
