@@ -10,6 +10,9 @@ test("architecture exposes stable anchors for every major section", async () => 
 	const page = await source("app/[locale]/architecture/page.tsx");
 	const nav = await source("app/[locale]/architecture/ArchitectureSectionNav.tsx");
 	const topology = await source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+	const criticality = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.tsx",
+	);
 
 	for (const anchor of [
 		"architecture-overview",
@@ -19,7 +22,10 @@ test("architecture exposes stable anchors for every major section", async () => 
 		"homelab-network-ingress-paths",
 		"declared-observed-health",
 	]) {
-		assert.match(`${page}\n${nav}\n${topology}`, new RegExp(anchor));
+		assert.match(
+			`${page}\n${nav}\n${topology}\n${criticality}`,
+			new RegExp(anchor),
+		);
 	}
 	assert.match(page, /id="homelab-network-architecture"/);
 	assert.match(page, /id="declared-observed-architecture"/);
@@ -37,13 +43,20 @@ test("architecture dashboard filters declared services by health and criticality
 	assert.match(topology, /Reset filters/);
 });
 
-test("critical dependency hierarchy is collapsed by default before the interactive explorer", async () => {
+test("architecture reuses the same collapsed critical hierarchy as TrueNAS", async () => {
 	const topology = await source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
-	const criticalityIndex = topology.indexOf('id="critical-dependency-hierarchy"');
+	const criticality = await source(
+		"app/components/homelab/CriticalDependencyHierarchy.tsx",
+	);
+
+	const criticalityIndex = topology.indexOf("<CriticalDependencyHierarchy");
 	const explorerIndex = topology.indexOf('id="service-architecture-explorer"');
 
 	assert.ok(criticalityIndex >= 0);
 	assert.ok(explorerIndex > criticalityIndex);
-	assert.match(topology, /<details id="critical-dependency-hierarchy"/);
-	assert.doesNotMatch(topology, /<details id="critical-dependency-hierarchy"[^>]* open/);
+	assert.match(topology, /import CriticalDependencyHierarchy/);
+	assert.doesNotMatch(topology, /ServiceCriticalityOverview/);
+	assert.match(criticality, /<details/);
+	assert.match(criticality, /data-criticality-toggle/);
+	assert.doesNotMatch(criticality, /defaultOpen|open=\{true\}/);
 });
