@@ -16,6 +16,7 @@ const NATIVE_SECTION_IDS = [
 	"personal-security-checklist",
 	"network-security-scanning",
 	"system-hardening-cis",
+	"ssh-security-hardening",
 	"security-visualizations",
 ] as const;
 

@@ -25,6 +25,8 @@ test("security uses its dedicated next-intl catalog", async () => {
 	assert.match(sections, /getTranslations/);
 	assert.match(sections, /ExternalLink/);
 	assert.match(sections, /Container/);
+	assert.match(sections, /canonicalPagePath/);
+	assert.doesNotMatch(sections, /\/ai\.html#/);
 	assert.match(loader, /SECURITY_LOADERS/);
 	assert.match(loader, /"securityPage"/);
 });
@@ -53,6 +55,7 @@ test("security catalogs keep matching native section contracts", async () => {
 			["personal", 3],
 			["network", 5],
 			["hardening", 9],
+			["ssh", 7],
 		] as const) {
 			const section = catalog.securityPage.nativeSections[key];
 			assert.ok(section, `${locale}:${key} section must exist`);

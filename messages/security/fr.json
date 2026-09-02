@@ -66,6 +66,20 @@
 					"Durcissement de VM avec OpenSCAP et Ansible (Medium)",
 					"Script automatisé de durcissement système et d’audit de sécurité (Medium)"
 				]
+			},
+			"ssh": {
+				"badge": "Sécurité SSH",
+				"title": "Sécurité et durcissement SSH",
+				"description": "Guides complets pour sécuriser l’accès SSH et renforcer les configurations SSH.",
+				"links": [
+					"Guide de durcissement SSH (français) — tutoriel complet de sécurité SSH",
+					"Guide de sécurité SSH.COM",
+					"Mozilla ssh_scan — scanner de configuration SSH",
+					"ssh-audit — auditeur de configuration serveur et client SSH",
+					"Recommandations de sécurité OpenSSH de Mozilla",
+					"NVIDIA OpenShell — page IA (environnement d’exécution d’agents isolé)",
+					"Open Terminal — page IA (API de terminal auto-hébergée pour agents)"
+				]
 			}
 		},
 		"sections": {

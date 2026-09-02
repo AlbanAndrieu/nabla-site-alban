@@ -66,6 +66,20 @@
 					"VM Hardening with OpenSCAP & Ansible (Medium)",
 					"Automated System Hardening & Security Audit Script (Medium)"
 				]
+			},
+			"ssh": {
+				"badge": "SSH Security",
+				"title": "SSH Security & Hardening",
+				"description": "Comprehensive guides for securing SSH access and hardening SSH configurations.",
+				"links": [
+					"SSH Hardening Guide (French) — Complete SSH Security Tutorial",
+					"SSH.COM Security Guide",
+					"Mozilla ssh_scan — SSH configuration scanner",
+					"ssh-audit — SSH server and client configuration auditor",
+					"Mozilla OpenSSH Security Guidelines",
+					"NVIDIA OpenShell — AI page (sandboxed agent runtime)",
+					"Open Terminal — AI page (self-hosted terminal API for agents)"
+				]
 			}
 		},
 		"sections": {

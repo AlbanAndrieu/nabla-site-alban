@@ -2,14 +2,23 @@ import { getTranslations } from "next-intl/server";
 import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 import type { AppLocale } from "@/i18n/routing";
+import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import styles from "./SecurityCoreSections.module.css";
 
-type ResourceLink = {
-	href: string;
-	icon?: "external" | "github";
-};
+type ResourceLinkIcon = "external" | "github" | "brain" | "terminal";
 
-type NativeSectionKey = "owasp" | "personal" | "network" | "hardening";
+type ResourceLink =
+	| {
+			href: string;
+			icon?: ResourceLinkIcon;
+	  }
+	| {
+			page: "ai";
+			hash: string;
+			icon: ResourceLinkIcon;
+	  };
+
+type NativeSectionKey = "owasp" | "personal" | "network" | "hardening" | "ssh";
 
 type ResourceSectionDefinition = {
 	key: NativeSectionKey;
@@ -102,14 +111,45 @@ const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 			},
 		],
 	},
+	{
+		key: "ssh",
+		id: "ssh-security-hardening",
+		iconClass: "fa-solid fa-terminal",
+		links: [
+			{
+				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/ssh/",
+			},
+			{ href: "https://www.ssh.com/academy/ssh/security" },
+			{ href: "https://github.com/mozilla/ssh_scan", icon: "github" },
+			{ href: "https://github.com/jtesta/ssh-audit", icon: "github" },
+			{ href: "https://infosec.mozilla.org/guidelines/openssh" },
+			{ page: "ai", hash: "nvidia-openshell", icon: "brain" },
+			{ page: "ai", hash: "open-terminal", icon: "terminal" },
+		],
+	},
 ];
+
+function resourceLinkIconClass(icon: ResourceLinkIcon = "external") {
+	switch (icon) {
+		case "github":
+			return "fa-brands fa-github";
+		case "brain":
+			return "fa-solid fa-brain";
+		case "terminal":
+			return "fa-solid fa-terminal";
+		default:
+			return "fa-solid fa-arrow-up-right-from-square";
+	}
+}
 
 function ResourceSection({
 	definition,
 	copy,
+	locale,
 }: Readonly<{
 	definition: ResourceSectionDefinition;
 	copy: ResourceSectionCopy;
+	locale: AppLocale;
 }>) {
 	const headingId = `${definition.id}-heading`;
 	return (
@@ -125,21 +165,27 @@ function ResourceSection({
 			<h3 id={headingId}>{copy.title}</h3>
 			<p>{copy.description}</p>
 			<ul className="resource-list">
-				{definition.links.map((link, index) => (
-					<li key={link.href}>
-						<ExternalLink href={link.href}>
-							<i
-								className={
-									link.icon === "github"
-										? "fa-brands fa-github"
-										: "fa-solid fa-arrow-up-right-from-square"
-								}
-								aria-hidden="true"
-							/>{" "}
-							{copy.links[index]}
-						</ExternalLink>
-					</li>
-				))}
+				{definition.links.map((link, index) => {
+					const label = copy.links[index];
+					const content = (
+						<>
+							<i className={resourceLinkIconClass(link.icon)} aria-hidden="true" />{" "}
+							{label}
+						</>
+					);
+
+					return (
+						<li key={"href" in link ? link.href : `${link.page}#${link.hash}`}>
+							{"href" in link ? (
+								<ExternalLink href={link.href}>{content}</ExternalLink>
+							) : (
+								<a href={`${canonicalPagePath(link.page, locale)}#${link.hash}`}>
+									{content}
+								</a>
+							)}
+						</li>
+					);
+				})}
 			</ul>
 		</section>
 	);
@@ -189,6 +235,7 @@ export default async function SecurityCoreSections({
 							`nativeSections.${definition.key}`,
 						) as ResourceSectionCopy
 					}
+					locale={locale}
 					key={definition.id}
 				/>
 			))}
