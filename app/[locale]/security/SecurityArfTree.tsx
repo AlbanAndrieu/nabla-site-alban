@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import ExternalLink from "@/components/ui/ExternalLink";
 import styles from "./SecurityArfTree.module.css";
 
 type ArfNode = {
@@ -43,18 +43,13 @@ function ArfTreeNode({
 	return (
 		<li className={styles.item}>
 			{node.url ? (
-				<a
-					className={styles.link}
-					href={node.url}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
+				<ExternalLink className={styles.link} href={node.url}>
 					<span>{label}</span>
 					<i
 						className="fa-solid fa-arrow-up-right-from-square"
 						aria-hidden="true"
 					/>
-				</a>
+				</ExternalLink>
 			) : (
 				<span>{label}</span>
 			)}
@@ -67,12 +62,10 @@ function ArfTreeNode({
 
 export default function SecurityArfTree({ locale }: Props) {
 	const isFrench = locale === "fr";
-	const [target, setTarget] = useState<HTMLElement | null>(null);
 	const [data, setData] = useState<ArfNode | null>(null);
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
-		setTarget(document.getElementById("arf-viz-body"));
 		const controller = new AbortController();
 
 		void fetch("/arf.json", { signal: controller.signal })
@@ -91,32 +84,28 @@ export default function SecurityArfTree({ locale }: Props) {
 		return () => controller.abort();
 	}, []);
 
-	if (!target) return null;
-
 	if (error) {
-		return createPortal(
+		return (
 			<p className={styles.status} role="status">
 				{isFrench
 					? "L’arbre des ressources de sécurité est temporairement indisponible."
 					: "The security resources tree is temporarily unavailable."}
-			</p>,
-			target,
+			</p>
 		);
 	}
 
 	if (!data) {
-		return createPortal(
+		return (
 			<p className={styles.status} role="status">
 				{isFrench
 					? "Chargement des ressources de sécurité…"
 					: "Loading security resources…"}
-			</p>,
-			target,
+			</p>
 		);
 	}
 
 	const rootNodes = data.children?.length ? data.children : [data];
-	return createPortal(
+	return (
 		<div
 			className={styles.tree}
 			aria-label={
@@ -134,7 +123,6 @@ export default function SecurityArfTree({ locale }: Props) {
 					/>
 				))}
 			</ul>
-		</div>,
-		target,
+		</div>
 	);
 }
