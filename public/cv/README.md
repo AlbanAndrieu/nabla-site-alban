@@ -8,11 +8,31 @@ HTML and PDF resume pages.
 The CV subsystem publishes:
 
 - the landing page at `/cv/index.html`
-- language-specific HTML CV pages (small, medium, large)
+- language-specific historical HTML CV pages (small, medium, large, full)
 - LaTeX-generated PDF CVs for standard and `-ts` variants
 - machine-readable resume data in `schema.json`
 
 This subsystem is static and is served directly from `public/`.
+
+### 01.01 Intentional static HTML exception
+
+The historical size variants below are intentionally **not** candidates for the
+native Next.js/React migration:
+
+- `cv-small-{en,fr,de,no}.html`
+- `cv-medium-{en,fr,de,no}.html`
+- `cv-large-{en,fr,de,no}.html`
+- `cv-full-{en,fr,de,no}.html`
+
+Keep these documents as simple standalone HTML pages under `public/cv/`, served
+directly through their `/cv/*.html` URLs. Do not convert them to React components,
+CSS Modules, App Router pages, or extensionless canonical routes merely for
+architectural consistency.
+
+An App Router compatibility wrapper may continue to read those files where an
+existing localized route requires it, but the static HTML documents remain the
+source of truth. A future removal or simplification of `loadCvHtmlFragment` must
+not require migrating these historical CV documents away from standalone HTML.
 
 ## 02 Codepaths and File Map
 
