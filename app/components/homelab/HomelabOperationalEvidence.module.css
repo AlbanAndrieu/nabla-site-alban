@@ -1,0 +1,230 @@
+.panel {
+	margin-block: var(--ui-space-xl);
+	padding: clamp(var(--ui-space-md), 3vw, var(--ui-space-xl));
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	box-shadow: var(--ui-shadow-sm);
+	scroll-margin-top: 6rem;
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--ui-space-lg);
+	margin-bottom: var(--ui-space-lg);
+}
+
+.title {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.lead {
+	max-width: 78ch;
+	margin: 0;
+	color: var(--ui-text-secondary);
+}
+
+.boardStatus {
+	flex: 0 0 auto;
+	padding: var(--ui-space-xs) var(--ui-space-sm);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.88rem;
+	font-weight: 600;
+}
+
+.troubleshoot {
+	display: grid;
+	gap: var(--ui-space-xs);
+	margin-bottom: var(--ui-space-lg);
+	padding: var(--ui-space-md);
+	border-left: 4px solid var(--ui-warning-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+.subheading {
+	margin: 0 0 var(--ui-space-sm);
+	font-size: 1.05rem;
+}
+
+.componentGrid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--ui-space-md);
+	margin-bottom: var(--ui-space-lg);
+}
+
+.componentCard {
+	display: grid;
+	align-content: start;
+	gap: var(--ui-space-xs);
+	min-width: 0;
+	padding: var(--ui-space-md);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-muted);
+}
+
+.componentHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--ui-space-sm);
+}
+
+.stateOk {
+	border-color: var(--ui-success-border);
+	color: var(--ui-success-text);
+}
+
+.stateWarn {
+	border-color: var(--ui-warning-border);
+	color: var(--ui-warning-text);
+}
+
+.stateFail {
+	border-color: var(--ui-danger-border);
+	color: var(--ui-danger-text);
+}
+
+.stateUnknown {
+	border-color: var(--ui-border);
+	color: var(--ui-text-secondary);
+}
+
+.detailText,
+.muted {
+	display: block;
+	color: var(--ui-text-secondary);
+	font-size: 0.84rem;
+	line-height: 1.45;
+	overflow-wrap: anywhere;
+}
+
+.badge,
+.badges span {
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+	padding: 0.15rem 0.45rem;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ui-space-2xs);
+	margin-top: var(--ui-space-xs);
+}
+
+.details {
+	margin-top: var(--ui-space-sm);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-muted);
+}
+
+.details > summary {
+	min-height: var(--ui-control-min-height);
+	padding: var(--ui-space-sm) var(--ui-space-md);
+	cursor: pointer;
+	font-weight: 650;
+}
+
+.details > summary:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 2px;
+}
+
+.detailsBody {
+	display: grid;
+	gap: var(--ui-space-sm);
+	padding: 0 var(--ui-space-md) var(--ui-space-md);
+}
+
+.detailsBody h3,
+.detailsBody h4,
+.detailsBody p {
+	margin: 0;
+}
+
+.alertFail,
+.alertWarn {
+	display: grid;
+	gap: var(--ui-space-xs);
+	padding: var(--ui-space-md);
+	border-radius: var(--ui-radius-sm);
+}
+
+.alertFail {
+	border: 1px solid var(--ui-danger-border);
+	background: var(--ui-danger-surface);
+	color: var(--ui-danger-text);
+}
+
+.alertWarn {
+	border: 1px solid var(--ui-warning-border);
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+.evidenceList {
+	display: grid;
+	gap: var(--ui-space-sm);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.evidenceList li {
+	display: grid;
+	gap: var(--ui-space-2xs);
+	padding: var(--ui-space-sm);
+	border-left: 3px solid var(--ui-border);
+	background: var(--ui-surface-card);
+}
+
+.exposureRow {
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: flex-start;
+	gap: var(--ui-space-md);
+}
+
+.exposureRow code,
+.alertFail code {
+	font-size: 0.82rem;
+	overflow-wrap: anywhere;
+}
+
+.emptyState {
+	padding: var(--ui-space-md);
+	border: 1px dashed var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	color: var(--ui-text-secondary);
+	text-align: center;
+}
+
+@media (max-width: 800px) {
+	.header {
+		flex-direction: column;
+	}
+
+	.boardStatus {
+		width: 100%;
+	}
+
+	.componentGrid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import ActionLink from "@/components/ui/ActionLink";
+import HomelabOperationalEvidence from "./HomelabOperationalEvidence";
 import HomelabServicesBlock from "./HomelabServicesBlock";
 
 type Props = {
@@ -53,6 +54,7 @@ export default async function HomelabServicesSection({
 						</div>
 					</div>
 				</div>
+				<HomelabOperationalEvidence />
 				<HomelabServicesBlock />
 			</div>
 		</section>

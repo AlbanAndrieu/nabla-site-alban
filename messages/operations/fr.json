@@ -1,0 +1,82 @@
+{
+	"operations": {
+		"title": "Preuves opérationnelles",
+		"lead": "Preuves en lecture seule provenant de FastAPI, TrueNAS, pfSense et Cloudflare. Utilisez-les pour identifier la couche en défaut avant de modifier la configuration.",
+		"board": {
+			"refreshing": "Actualisation des preuves…",
+			"pending": "La collecte initiale des preuves est encore en cours.",
+			"fresh": "Snapshot courant",
+			"stale": "Dernier snapshot connu",
+			"unavailable": "Les preuves opérationnelles sont temporairement indisponibles.",
+			"age": "âgé de {seconds}s",
+			"probeDuration": "sonde homelab {milliseconds} ms"
+		},
+		"components": {
+			"title": "Plans de contrôle",
+			"truenas": "TrueNAS",
+			"pfsense": "pfSense",
+			"cloudflare": "Cloudflare",
+			"ok": "joignable / sain",
+			"warn": "dégradé / périmé",
+			"fail": "injoignable / en échec",
+			"unknown": "non vérifié actuellement",
+			"api": "API",
+			"latency": "{milliseconds} ms",
+			"lastSuccess": "dernier succès {timestamp}",
+			"refreshError": "erreur d’actualisation : {error}",
+			"failureStage": "étape en échec : {stage}",
+			"tunnels": "{healthy}/{count} tunnels sains",
+			"tunnelStatuses": "États des tunnels : {statuses}"
+		},
+		"pfsense": {
+			"title": "Preuves ingress et sécurité pfSense",
+			"filters": "Couches de filtrage observées",
+			"blocked": "Blocage Snort / PF attribué",
+			"blockedDetail": "L’IP de sortie FastAPI Cloud effectivement observée est présente dans la table pfSense snort2c. Il s’agit d’une preuve directe de blocage, pas d’une déduction.",
+			"blindSpot": "Angle mort de la télémétrie sécurité",
+			"blindSpotDetail": "L’observateur sécurité pfSense partage le même chemin WAN qu’il tente de diagnostiquer ; un échec de transport ne peut donc pas prouver que Snort/PF a bloqué sa propre télémétrie.",
+			"sourceToDestination": "{source} → {destination}:{port}",
+			"details": "Inspecter les preuves pfSense"
+		},
+		"exposure": {
+			"title": "Politique d’exposition par sources approuvées",
+			"lead": "La joignabilité positive depuis FastAPI Cloud est attendue pour les chemins de supervision approuvés. Elle ne prouve pas que les autres origines Internet sont refusées.",
+			"observed": "observé : {state}",
+			"expected": "attendu : {state}",
+			"trusted": "sources approuvées uniquement",
+			"defaultDeny": "refus par défaut",
+			"negativeRequired": "un test négatif indépendant reste requis",
+			"reachable": "joignable",
+			"blocked": "bloqué",
+			"unknown": "inconnu"
+		},
+		"freshness": {
+			"title": "Fraîcheur des preuves et structure des dépendances",
+			"stale": "{count} observations de services sont périmées",
+			"cycles": "{count} cycles de dépendances requises détectés",
+			"none": "Aucune observation de service périmée ni cycle de dépendances requises n’est actuellement signalé.",
+			"age": "âgé de {seconds}s"
+		},
+		"credentials": {
+			"title": "Configuration des observateurs",
+			"lead": "Seuls l’état de configuration nettoyé et les noms de variables d’environnement sont exposés ; les valeurs secrètes ne sont jamais renvoyées.",
+			"configured": "configuré",
+			"missing": "configuration incomplète",
+			"mode": "mode : {mode}",
+			"missingVariables": "manquantes : {variables}",
+			"privilege": "privilège requis : {privilege}",
+			"readOnly": "aucun privilège d’écriture requis"
+		},
+		"troubleshoot": {
+			"title": "Commencer le diagnostic ici",
+			"pfsense_block": "pfSense / Snort d’abord : une attribution exacte au blocage snort2c est disponible. Inspectez l’alerte/règle Snort et la table PF avant de modifier TrueNAS, HAProxy ou l’application.",
+			"pfsense_blind_spot": "Chemin de télémétrie pfSense d’abord : l’observateur sécurité partage le WAN et présente actuellement un angle mort. Rétablissez ou déplacez la télémétrie hors bande avant d’attribuer l’échec à Snort.",
+			"pfsense_control": "Plan de contrôle pfSense d’abord : les preuves de l’API REST sont en échec. Utilisez l’étape d’échec, l’erreur de transport et le dernier snapshot valide avant d’investiguer les services aval.",
+			"cloudflare": "Cloudflare d’abord : les preuves du plan de contrôle ou des tunnels sont dégradées. Vérifiez l’inventaire Tunnel, la politique Access et les preuves edge avant l’application d’origine.",
+			"truenas": "TrueNAS d’abord : les preuves de plateforme sont en échec. Vérifiez HAProxy/TLS public, l’API TrueNAS et le runtime des Apps avant les services feuilles.",
+			"stale_evidence": "Fraîcheur d’abord : une ou plusieurs conclusions reposent sur des preuves périmées. Actualisez les observations avant de traiter une dépendance inconnue comme une panne réelle.",
+			"dependency_cycle": "Modèle de dépendances d’abord : un cycle de dépendances requises est signalé. Résolvez ou justifiez ce cycle car il rend la propagation de cause racine ambiguë.",
+			"dependencies": "Chemin de dépendances du service ensuite : les plans de contrôle ne donnent pas actuellement de cause racine plus forte. Inspectez l’état local du service, sa liste blocked_by et la hiérarchie des dépendances critiques."
+		}
+	}
+}
