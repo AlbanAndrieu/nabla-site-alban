@@ -15,6 +15,11 @@ const HOMELAB_LOADERS = {
 	fr: () => import("@/messages/homelab/fr.json"),
 } as const;
 
+const OPERATIONS_LOADERS = {
+	en: () => import("@/messages/operations/en.json"),
+	fr: () => import("@/messages/operations/fr.json"),
+} as const;
+
 const SECURITY_LOADERS = {
 	en: () => import("@/messages/security/en.json"),
 	fr: () => import("@/messages/security/fr.json"),
@@ -54,21 +59,30 @@ export async function loadMessages(locale: AppLocale) {
 		{ default: base },
 		{ default: truenas },
 		{ default: homelab },
+		{ default: operations },
 		{ default: security },
 	] = await Promise.all([
 		BASE_LOADERS[locale](),
 		TRUENAS_LOADERS[locale](),
 		HOMELAB_LOADERS[locale](),
+		OPERATIONS_LOADERS[locale](),
 		SECURITY_LOADERS[locale](),
 	]);
 
 	const legacyBase = withoutMigratedLegacyNamespaces(base);
-	assertUniqueTopLevelNamespaces([legacyBase, truenas, homelab, security]);
+	assertUniqueTopLevelNamespaces([
+		legacyBase,
+		truenas,
+		homelab,
+		operations,
+		security,
+	]);
 
 	return {
 		...legacyBase,
 		...truenas,
 		...homelab,
+		...operations,
 		...security,
 	};
 }

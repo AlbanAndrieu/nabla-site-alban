@@ -1,0 +1,82 @@
+{
+	"operations": {
+		"title": "Operational evidence",
+		"lead": "Read-only evidence from FastAPI, TrueNAS, pfSense and Cloudflare. Use it to identify which layer is failing before changing configuration.",
+		"board": {
+			"refreshing": "Refreshing evidence…",
+			"pending": "Initial evidence collection is still running.",
+			"fresh": "Fresh snapshot",
+			"stale": "Last known snapshot",
+			"unavailable": "Operational evidence is temporarily unavailable.",
+			"age": "{seconds}s old",
+			"probeDuration": "homelab probe {milliseconds} ms"
+		},
+		"components": {
+			"title": "Control planes",
+			"truenas": "TrueNAS",
+			"pfsense": "pfSense",
+			"cloudflare": "Cloudflare",
+			"ok": "reachable / healthy",
+			"warn": "degraded / stale",
+			"fail": "unreachable / failed",
+			"unknown": "not currently verified",
+			"api": "API",
+			"latency": "{milliseconds} ms",
+			"lastSuccess": "last success {timestamp}",
+			"refreshError": "refresh error: {error}",
+			"failureStage": "failure stage: {stage}",
+			"tunnels": "{healthy}/{count} tunnels healthy",
+			"tunnelStatuses": "Tunnel states: {statuses}"
+		},
+		"pfsense": {
+			"title": "pfSense ingress and security evidence",
+			"filters": "Observed filtering layers",
+			"blocked": "Snort / PF block attributed",
+			"blockedDetail": "The exact observed FastAPI Cloud egress is present in the pfSense snort2c table. This is direct block evidence, not an inference.",
+			"blindSpot": "Security telemetry blind spot",
+			"blindSpotDetail": "The pfSense security observer shares the same WAN path it is trying to diagnose, so a transport failure cannot prove whether Snort/PF blocked its own telemetry.",
+			"sourceToDestination": "{source} → {destination}:{port}",
+			"details": "Inspect pfSense evidence"
+		},
+		"exposure": {
+			"title": "Trusted-source exposure policy",
+			"lead": "Positive reachability from FastAPI Cloud is expected for approved monitoring paths. It does not prove that unrelated Internet origins are denied.",
+			"observed": "observed {state}",
+			"expected": "expected {state}",
+			"trusted": "trusted sources only",
+			"defaultDeny": "default deny",
+			"negativeRequired": "independent negative probe still required",
+			"reachable": "reachable",
+			"blocked": "blocked",
+			"unknown": "unknown"
+		},
+		"freshness": {
+			"title": "Evidence freshness and dependency structure",
+			"stale": "{count} service observations are stale",
+			"cycles": "{count} required dependency cycles detected",
+			"none": "No stale service observations or required dependency cycles are currently reported.",
+			"age": "{seconds}s old"
+		},
+		"credentials": {
+			"title": "Observer configuration",
+			"lead": "Only sanitized configuration state and environment-variable names are exposed; secret values are never returned.",
+			"configured": "configured",
+			"missing": "not fully configured",
+			"mode": "mode: {mode}",
+			"missingVariables": "missing: {variables}",
+			"privilege": "required privilege: {privilege}",
+			"readOnly": "no write privileges required"
+		},
+		"troubleshoot": {
+			"title": "Start troubleshooting here",
+			"pfsense_block": "pfSense / Snort first: an exact snort2c block attribution is available. Inspect the Snort alert/rule and PF table before changing TrueNAS, HAProxy or the application.",
+			"pfsense_blind_spot": "pfSense telemetry path first: the security observer shares the WAN path and currently has a blind spot. Restore or move telemetry out-of-band before attributing the failure to Snort.",
+			"pfsense_control": "pfSense control plane first: the REST API evidence is failing. Use failure stage, transport error and last-good snapshot before investigating downstream services.",
+			"cloudflare": "Cloudflare first: the control-plane/tunnel evidence is unhealthy. Verify Tunnel inventory, Access policy and edge evidence before investigating the origin application.",
+			"truenas": "TrueNAS first: platform evidence is failing. Check public HAProxy/TLS, the TrueNAS API and app runtime before leaf services.",
+			"stale_evidence": "Freshness first: one or more conclusions rely on stale evidence. Refresh observations before treating an unknown dependency as a real outage.",
+			"dependency_cycle": "Dependency model first: a required dependency cycle is reported. Resolve or justify that cycle because it makes root-cause propagation ambiguous.",
+			"dependencies": "Service dependency path next: control planes do not currently expose a stronger root cause. Inspect the affected service local state, blocked_by list and critical dependency hierarchy."
+		}
+	}
+}
