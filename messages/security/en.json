@@ -1,0 +1,86 @@
+{
+	"securityPage": {
+		"meta": {
+			"title": "Security resources and DevSecOps tools | Alban Andrieu",
+			"description": "Security standards, hardening, vulnerability management and cloud security resources."
+		},
+		"title": "Security Resources & Tools",
+		"subtitle": "A practical collection of security resources for DevSecOps professionals",
+		"directoryLabel": "Security resource directory",
+		"hero": {
+			"lead": "Curated security references for DevSecOps, platform engineering and cloud operations.",
+			"curatedBy": "Curated by",
+			"standards": "Security Standards & Compliance",
+			"standardsLead": "NIST, ISO 27001, GDPR and compliance tooling."
+		},
+		"nativeSections": {
+			"owasp": {
+				"badge": "Application Security",
+				"title": "OWASP — Open Worldwide Application Security Project",
+				"description": "Practical standards, testing guidance and reference material for building and assessing secure web, API and mobile applications.",
+				"links": [
+					"OWASP Top 10",
+					"OWASP Web Security Testing Guide (WSTG)",
+					"OWASP Application Security Verification Standard (ASVS)",
+					"OWASP vulnerability categories",
+					"OWASP API Security Top 10",
+					"OWASP Mobile Top 10",
+					"OWASP Cheat Sheet Series",
+					"Security misconfiguration in Symfony applications"
+				]
+			},
+			"personal": {
+				"badge": "Personal Security",
+				"title": "Personal Security Checklist",
+				"description": "Practical references for strengthening personal digital security, privacy, account hygiene and device protection.",
+				"links": [
+					"Personal Security Checklist by Lissy93",
+					"Digital Defense — interactive security guide",
+					"PrivacyTools.io"
+				]
+			},
+			"network": {
+				"badge": "Network Security",
+				"title": "Network Security & Scanning Tools",
+				"description": "Tools and references for network discovery, packet analysis, vulnerability assessment and infrastructure mapping.",
+				"links": [
+					"Scanopy — automatic network diagram generation",
+					"Nmap — network mapper and security auditing",
+					"Wireshark — network protocol analyzer",
+					"Masscan — high-speed TCP port scanner",
+					"Greenbone / OpenVAS — vulnerability assessment"
+				]
+			}
+		},
+		"sections": {
+			"owasp": {
+				"title": "OWASP application security",
+				"description": "Standards, verification guidance and tools for secure web applications."
+			},
+			"hardening": {
+				"title": "System and SSH hardening",
+				"description": "Benchmarks and practical guidance for reducing system attack surfaces."
+			},
+			"compliance": {
+				"title": "Security standards and compliance",
+				"description": "Industry standards and regulatory frameworks for security governance."
+			},
+			"vulnerability": {
+				"title": "Vulnerability management and scanning",
+				"description": "Tools for identifying, assessing and prioritizing vulnerabilities."
+			},
+			"devsecops": {
+				"title": "DevSecOps tools and practices",
+				"description": "Integrate code, dependency, secret and infrastructure scanning into delivery pipelines."
+			},
+			"cloud": {
+				"title": "Cloud security resources",
+				"description": "Guidance and services for securing cloud and Kubernetes environments."
+			}
+		},
+		"posture": {
+			"title": "Build security into delivery",
+			"description": "Combine preventive controls, continuous verification, observable production systems and clear incident response ownership."
+		}
+	}
+}

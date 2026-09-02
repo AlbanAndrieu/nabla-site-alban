@@ -1,0 +1,86 @@
+{
+	"securityPage": {
+		"meta": {
+			"title": "Ressources sécurité et outils DevSecOps | Alban Andrieu",
+			"description": "Normes de sécurité, durcissement, gestion des vulnérabilités et ressources de sécurité cloud."
+		},
+		"title": "Ressources et outils de sécurité",
+		"subtitle": "Une sélection pratique de ressources de sécurité pour les professionnels DevSecOps",
+		"directoryLabel": "Répertoire des ressources de sécurité",
+		"hero": {
+			"lead": "Une sélection de références pour le DevSecOps, l’ingénierie plateforme et les opérations cloud.",
+			"curatedBy": "Sélection maintenue par",
+			"standards": "Standards de sécurité et conformité",
+			"standardsLead": "NIST, ISO 27001, RGPD et outillage de conformité."
+		},
+		"nativeSections": {
+			"owasp": {
+				"badge": "Sécurité applicative",
+				"title": "OWASP — Open Worldwide Application Security Project",
+				"description": "Standards, guides de test et références pratiques pour concevoir et évaluer la sécurité des applications web, API et mobiles.",
+				"links": [
+					"OWASP Top 10",
+					"Guide de test de sécurité web OWASP (WSTG)",
+					"OWASP Application Security Verification Standard (ASVS)",
+					"Catégories de vulnérabilités OWASP",
+					"OWASP API Security Top 10",
+					"OWASP Mobile Top 10",
+					"OWASP Cheat Sheet Series",
+					"Mauvaises configurations de sécurité dans les applications Symfony"
+				]
+			},
+			"personal": {
+				"badge": "Sécurité personnelle",
+				"title": "Checklist de sécurité personnelle",
+				"description": "Références pratiques pour renforcer la sécurité numérique, la confidentialité, l’hygiène des comptes et la protection des terminaux.",
+				"links": [
+					"Personal Security Checklist par Lissy93",
+					"Digital Defense — guide interactif de sécurité",
+					"PrivacyTools.io"
+				]
+			},
+			"network": {
+				"badge": "Sécurité réseau",
+				"title": "Outils de sécurité et d’analyse réseau",
+				"description": "Outils et références pour la découverte réseau, l’analyse de paquets, l’évaluation des vulnérabilités et la cartographie d’infrastructure.",
+				"links": [
+					"Scanopy — génération automatique de diagrammes réseau",
+					"Nmap — cartographie réseau et audit de sécurité",
+					"Wireshark — analyseur de protocoles réseau",
+					"Masscan — scanner de ports TCP haute vitesse",
+					"Greenbone / OpenVAS — évaluation des vulnérabilités"
+				]
+			}
+		},
+		"sections": {
+			"owasp": {
+				"title": "Sécurité applicative OWASP",
+				"description": "Normes, recommandations de vérification et outils pour sécuriser les applications web."
+			},
+			"hardening": {
+				"title": "Durcissement des systèmes et de SSH",
+				"description": "Référentiels et recommandations pratiques pour réduire la surface d’attaque."
+			},
+			"compliance": {
+				"title": "Normes de sécurité et conformité",
+				"description": "Normes industrielles et cadres réglementaires pour la gouvernance de la sécurité."
+			},
+			"vulnerability": {
+				"title": "Gestion et analyse des vulnérabilités",
+				"description": "Outils pour identifier, évaluer et prioriser les vulnérabilités."
+			},
+			"devsecops": {
+				"title": "Outils et pratiques DevSecOps",
+				"description": "Intégrer l’analyse du code, des dépendances, des secrets et de l’infrastructure aux pipelines."
+			},
+			"cloud": {
+				"title": "Ressources de sécurité cloud",
+				"description": "Recommandations et services pour sécuriser les environnements cloud et Kubernetes."
+			}
+		},
+		"posture": {
+			"title": "Intégrer la sécurité à la livraison",
+			"description": "Associer contrôles préventifs, vérification continue, production observable et responsabilités claires pour la réponse aux incidents."
+		}
+	}
+}

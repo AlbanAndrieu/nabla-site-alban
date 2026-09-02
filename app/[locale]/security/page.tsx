@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { metadataFromPublicHtml } from "@/lib/htmlFromPublic";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
@@ -24,11 +23,12 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
-	const metadata = await metadataFromPublicHtml(
-		"security.html",
-		"/security",
-		locale,
-	);
+	const t = await getTranslations({ locale, namespace: "securityPage.meta" });
+	const metadata: Metadata = {
+		title: t("title"),
+		description: t("description"),
+		alternates: { canonical: canonicalPagePath("security", locale) },
+	};
 	return enrichPageMetadata(metadata, { slug: "security", locale });
 }
 
