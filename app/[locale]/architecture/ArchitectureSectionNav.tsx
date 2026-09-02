@@ -7,6 +7,7 @@ export default function ArchitectureSectionNav({ locale }: Readonly<{ locale: st
 		? [
 				["architecture-overview", "Vue d’ensemble"],
 				["operational-evidence", "Preuves opérationnelles"],
+				["service-impact-inspector", "Impact & cause racine"],
 				["architecture-health-dashboard", "Santé & filtres"],
 				["critical-dependency-hierarchy", "Dépendances critiques"],
 				["service-architecture-explorer", "Topologie services"],
@@ -16,6 +17,7 @@ export default function ArchitectureSectionNav({ locale }: Readonly<{ locale: st
 		: [
 				["architecture-overview", "Overview"],
 				["operational-evidence", "Operational evidence"],
+				["service-impact-inspector", "Impact & root cause"],
 				["architecture-health-dashboard", "Health & filters"],
 				["critical-dependency-hierarchy", "Critical dependencies"],
 				["service-architecture-explorer", "Service topology"],
