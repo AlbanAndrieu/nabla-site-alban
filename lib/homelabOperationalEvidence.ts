@@ -339,12 +339,14 @@ function exposurePorts(sickzValue: unknown): ExposurePortEvidence[] {
 	const pfsense = Object.values(sickzValue.checks).find(
 		(value) => isRecord(value) && isRecord(value.pfsense_tcp_port_policy),
 	);
-	if (!isRecord(pfsense) || !isRecord(pfsense.pfsense_tcp_port_policy)) return [];
+	if (!isRecord(pfsense)) return [];
+	const policyByPort = pfsense.pfsense_tcp_port_policy;
+	if (!isRecord(policyByPort)) return [];
 	const observedPorts = isRecord(pfsense.pfsense_tcp_ports)
 		? pfsense.pfsense_tcp_ports
 		: {};
 	return [7000, 10443].flatMap((port) => {
-		const policy = pfsense.pfsense_tcp_port_policy[String(port)];
+		const policy = policyByPort[String(port)];
 		if (!isRecord(policy)) return [];
 		const observed = optionalBoolean(observedPorts[String(port)]);
 		const expected = optionalBoolean(policy.expected_reachable);
