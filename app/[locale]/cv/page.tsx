@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 
@@ -136,17 +137,18 @@ function Links({ links }: { links: Link[] | readonly Link[] }) {
 	return (
 		<div className="cv-page-links">
 			{links.map((link) => (
-				<a
-					className="btn btn-sm btn-outline-primary"
-					href={link.href}
-					target="_blank"
-					rel="noopener noreferrer"
+				<ActionLink
 					download={link.download || undefined}
+					href={link.href}
 					key={link.href}
+					rel="noopener noreferrer"
+					size="compact"
+					target="_blank"
+					variant="outline"
 				>
 					{link.flag && <span aria-hidden="true">{link.flag} </span>}
 					{link.label}
-				</a>
+				</ActionLink>
 			))}
 		</div>
 	);
