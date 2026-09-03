@@ -16,6 +16,7 @@ export type ServiceRelationType =
 	| "consumesApi"
 	| "providesApi"
 	| "partOf"
+	| "hostedBy"
 	| "routesTo"
 	| "observedBy"
 	| "storesIn"
@@ -50,6 +51,7 @@ const RELATION_TYPES = new Set<ServiceRelationType>([
 	"consumesApi",
 	"providesApi",
 	"partOf",
+	"hostedBy",
 	"routesTo",
 	"observedBy",
 	"storesIn",
