@@ -103,8 +103,8 @@ or private but healthy from the user's LAN.
 ## Next.js HTML content migration
 
 Some dedicated App Router routes still load trusted fragments from `public/`
-through `lib/htmlFromPublic.ts` (notably `ai`, `security`, `workstation` and some
-CV content). `app/components/PublicHtmlFragment.tsx` centralizes that temporary
+through `lib/htmlFromPublic.ts` (notably `ai`, `workstation` and some CV
+content). `/security` is fully native and no longer crosses this boundary. `app/components/PublicHtmlFragment.tsx` centralizes that temporary
 HTML boundary.
 
 For each migrated page:
