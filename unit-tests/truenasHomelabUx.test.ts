@@ -23,6 +23,7 @@ test("service tiers are filterable and collapsible while criticality details are
 	);
 
 	assert.match(block, /data-homelab-tier-filter/);
+	assert.match(block, /data-homelab-health-filter/);
 	assert.match(block, /data-service-criticality-group/);
 	assert.match(block, /setExpandedTiers/);
 	assert.match(block, /useState\(false\)/);
@@ -47,8 +48,11 @@ test("critical dependency hierarchy keeps the disclosure arrow next to its label
 	assert.match(hierarchy, /ServiceCriticalityOverview/);
 	assert.match(hierarchy, /criticality\.showHierarchy/);
 	assert.match(hierarchy, /criticality\.hideHierarchy/);
+	assert.match(hierarchy, /styles\.chevron/);
 	assert.match(css, /justify-content:\s*flex-start/);
-	assert.match(css, /\.summary::after/);
+	assert.match(css, /\.chevron/);
+	assert.match(css, /\.details\[open\] \.chevron/);
+	assert.doesNotMatch(css, /\.summary::after/);
 	assert.doesNotMatch(css, /\.summary[\s\S]*justify-content:\s*space-between/);
 });
 
@@ -75,12 +79,13 @@ test("health refresh has a transient status distinct from unavailable runtime ev
 	assert.match(overview, /runtimeObservationIncomplete/);
 });
 
-test("DNS posture exposes expandable evidence and explains independence requirements", async () => {
+test("DNS posture remains sanitized while Operations owns the active presentation", async () => {
 	const posture = await source("app/components/homelab/PfSenseDnsPosture.tsx");
-	const messages = JSON.parse(await source("messages/homelab/en.json"));
+	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const operations = await source("app/components/homelab/HomelabOperationalEvidence.tsx");
 
 	assert.match(posture, /data-pfsense-dns-evidence/);
-	assert.match(posture, /posture\.reason/);
-	assert.match(messages.homelab.dns.incomplete, /independent of TrueNAS/);
-	assert.match(messages.homelab.dns.evidenceNote, /synthetic DNS query/);
+	assert.doesNotMatch(block, /PfSenseDnsPosture/);
+	assert.match(operations, /evidence\.pfsense\.reason/);
+	assert.match(operations, /data-pfsense-security-evidence/);
 });
