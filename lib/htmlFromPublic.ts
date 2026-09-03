@@ -29,7 +29,6 @@ const PUBLIC_HTML_FILES = [
 	"nabla.html",
 	"payment.html",
 	"pricing.html",
-	"security.html",
 	"startup-thanks.html",
 	"startup.html",
 	"success.html",
