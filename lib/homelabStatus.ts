@@ -47,7 +47,10 @@ export type HomelabStatusSnapshot = {
 export const HOMELAB_STATUS_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/status";
 
-const PRIMARY_TIMEOUT_MS = 2500;
+// The status payload can include a cold TrueNAS refresh. Keep the proxy timeout
+// aligned with the richer health/diagnostic loaders so Vercel does not abort a
+// healthy-but-slower FastAPI response at the former 2.5s boundary.
+const PRIMARY_TIMEOUT_MS = 8_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);

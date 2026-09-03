@@ -10,6 +10,17 @@ import styles from "./RouteHeader.module.css";
 export const ROUTE_HEADER_LANGUAGE_SWITCHER_ENABLED =
 	process.env.NEXT_PUBLIC_ENABLE_LOCALE_SWITCHER !== "false";
 
+const ROUTE_HEADER_LABELS = {
+	en: {
+		breadcrumb: "Breadcrumb",
+		home: "Home",
+	},
+	fr: {
+		breadcrumb: "Fil d’Ariane",
+		home: "Accueil",
+	},
+} as const;
+
 function routeParts(pathname: string) {
 	const parts = pathname.split("/").filter(Boolean);
 	if (parts[0] === "en" || parts[0] === "fr") parts.shift();
@@ -39,6 +50,7 @@ export default function RouteHeader() {
 	const parts = routeParts(pathname);
 	const showNavigation = parts.length > 0;
 	const showLanguageSwitcher = ROUTE_HEADER_LANGUAGE_SWITCHER_ENABLED;
+	const labels = ROUTE_HEADER_LABELS[locale === "fr" ? "fr" : "en"];
 
 	if (!showNavigation && !showLanguageSwitcher) return null;
 
@@ -67,14 +79,14 @@ export default function RouteHeader() {
 		<header className={headerClassName}>
 			<Container className={styles.inner}>
 				{showNavigation ? (
-					<nav className={styles.nav} aria-label={t("breadcrumbLabel")}>
+					<nav className={styles.nav} aria-label={labels.breadcrumb}>
 						<Link
 							className={styles.home}
 							href={homeHref}
-							aria-label={locale === "fr" ? "Accueil" : "Home"}
+							aria-label={labels.home}
 						>
 							<i className="fas fa-home" aria-hidden="true" />
-							<span>{locale === "fr" ? "Accueil" : "Home"}</span>
+							<span>{labels.home}</span>
 						</Link>
 						{parentHref && parentSegment ? (
 							<>
