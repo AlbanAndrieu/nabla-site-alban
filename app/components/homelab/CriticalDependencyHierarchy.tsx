@@ -45,6 +45,7 @@ export default function CriticalDependencyHierarchy({
 					{resolvedOpen
 						? t("criticality.hideHierarchy")
 						: t("criticality.showHierarchy")}
+					<span className={styles.chevron} aria-hidden="true">▾</span>
 				</span>
 			</summary>
 			<div className={styles.body}>
