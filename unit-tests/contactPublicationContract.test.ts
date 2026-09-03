@@ -29,9 +29,12 @@ test("policy parity work preserves Site Alban contact publication surfaces", asy
 	assert.match(contact, /mailto:job@albandrieu\.com/);
 });
 
-test("shared footer retains professional social links on native policy pages", async () => {
+test("shared footer retains professional social links and points directly to native legal notices", async () => {
 	const footer = await source("app/components/Footer.tsx");
 	assert.match(footer, /linkedin\.com\/in\/nabla/);
 	assert.match(footer, /github\.com\/AlbanAndrieu/);
 	assert.match(footer, /hub\.docker\.com\/u\/nabla/);
+	assert.match(footer, /"\/fr\/policy\/legal"/);
+	assert.match(footer, /"\/policy\/legal"/);
+	assert.doesNotMatch(footer, /policy\/legal\.html/);
 });
