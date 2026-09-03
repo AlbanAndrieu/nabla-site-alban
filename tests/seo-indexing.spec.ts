@@ -25,6 +25,7 @@ const expectedSitemapUrls = [
 	`${canonicalOrigin}/nabla`,
 	`${canonicalOrigin}/cv`,
 	`${canonicalOrigin}/jm`,
+	`${canonicalOrigin}/policy`,
 	...policySlugs.map((slug) => `${canonicalOrigin}/policy/${slug}`),
 ];
 
@@ -147,7 +148,14 @@ test.describe("SEO indexing policy", () => {
 	test("legacy policy html URLs permanently redirect to native routes", async ({}, testInfo) => {
 		const baseURL = testInfo.project.use.baseURL;
 		expect(typeof baseURL).toBe("string");
-		const redirectRequest = await playwrightRequest.newContext({ baseURL: String(baseURL) });
+		const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+		const extraHTTPHeaders: Record<string, string> | undefined = bypassSecret
+			? { "x-vercel-protection-bypass": bypassSecret }
+			: undefined;
+		const redirectRequest = await playwrightRequest.newContext({
+			baseURL: String(baseURL),
+			...(extraHTTPHeaders ? { extraHTTPHeaders } : {}),
+		});
 		try {
 			for (const slug of policySlugs) {
 				for (const [oldPath, destination] of [[`/policy/${slug}.html`, `/policy/${slug}`], [`/en/policy/${slug}.html`, `/policy/${slug}`], [`/fr/policy/${slug}.html`, `/fr/policy/${slug}`]] as const) {

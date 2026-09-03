@@ -49,6 +49,29 @@ test("static architecture topology never probes FastAPI during prerender", () =>
 	}
 });
 
+test("topology parser accepts hostedBy placement edges", () => {
+	const topology = parseServiceTopology({
+		version: 1,
+		name: "hosting",
+		nodes: [
+			{ id: "service", name: "Service", kind: "application", category: "test" },
+			{ id: "docker", name: "Docker", kind: "container-runtime", category: "infrastructure" },
+		],
+		relations: [
+			{
+				source: "service",
+				target: "docker",
+				type: "hostedBy",
+				strength: "required",
+				evidence: ["x-nabla.runtime.containerService"],
+			},
+		],
+	});
+
+	assert.ok(topology);
+	assert.equal(topology.relations[0]?.type, "hostedBy");
+});
+
 test("topology parser rejects edges with unknown nodes", () => {
 	const topology = parseServiceTopology({
 		version: 1,
