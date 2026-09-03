@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import PublicHtmlFragment from "@/app/components/PublicHtmlFragment";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
@@ -10,15 +9,6 @@ import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
 import SecurityVisualizations from "./SecurityVisualizations";
-
-const NATIVE_SECTION_IDS = [
-	"owasp-resources",
-	"personal-security-checklist",
-	"network-security-scanning",
-	"system-hardening-cis",
-	"ssh-security-hardening",
-	"security-visualizations",
-] as const;
 
 export async function generateMetadata({
 	params,
@@ -50,12 +40,6 @@ export default async function SecurityPage({
 			<SecurityHero locale={locale} contactHref={contactHref} />
 			<main id="main-content" className="security-resources">
 				<SecurityCoreSections locale={locale} />
-				<PublicHtmlFragment
-					file="security.html"
-					mode="main"
-					locale={locale}
-					omitElementIds={NATIVE_SECTION_IDS}
-				/>
 				<SecurityVisualizations locale={locale} />
 			</main>
 		</div>
