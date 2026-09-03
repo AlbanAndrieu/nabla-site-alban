@@ -18,6 +18,7 @@ import type {
 } from "@/lib/homelabOperationalEvidence";
 import styles from "./HomelabOperationalEvidence.module.css";
 import PfSenseAttentionActions from "./PfSenseAttentionActions";
+import PfSenseDnsPosture from "./PfSenseDnsPosture";
 
 const REFRESH_MS = 30_000;
 
@@ -378,6 +379,13 @@ export default function HomelabOperationalEvidence() {
 							);
 						})}
 					</div>
+
+					{evidence.healthSnapshot?.pfsense?.dns ? (
+						<PfSenseDnsPosture
+							snapshot={evidence.healthSnapshot}
+							healthUnavailable={unavailable || evidence.board.state === "stale"}
+						/>
+					) : null}
 
 					<details className={styles.details} data-runtime-transport-evidence>
 						<summary>{t("runtime.title")}</summary>
