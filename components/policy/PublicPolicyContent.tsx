@@ -55,12 +55,15 @@ export default function PublicPolicyContent({
 						{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlinePublicPolicyText text={paragraph} locale={locale} links={copy.links} /></p>)}
 						{items ? (
 							<ul>
-								{items.map((item) => (
-									<li key={`${item.label ?? "item"}-${item.text}`}>
-										{item.label ? <strong>{item.label}: </strong> : null}
-										<InlinePublicPolicyText text={item.text} locale={locale} links={copy.links} />
-									</li>
-								))}
+								{items.map((item) => {
+									const label = "label" in item ? item.label : undefined;
+									return (
+										<li key={`${label ?? "item"}-${item.text}`}>
+											{label ? <strong>{label}: </strong> : null}
+											<InlinePublicPolicyText text={item.text} locale={locale} links={copy.links} />
+										</li>
+									);
+								})}
 							</ul>
 						) : null}
 					</section>
