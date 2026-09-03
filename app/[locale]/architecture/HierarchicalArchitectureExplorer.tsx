@@ -192,7 +192,7 @@ function relationSemantic(type: string): RelationSemantic {
 		return "dependency";
 	}
 	if (["exposedBy"].includes(type)) return "exposure";
-	if (["partOf"].includes(type)) return "placement";
+	if (["partOf", "hostedBy"].includes(type)) return "placement";
 	if (["observedBy", "telemetry", "metrics", "traces", "evaluation"].includes(type)) {
 		return "observation";
 	}
@@ -708,7 +708,7 @@ function requiredEdgeHealthState(
 	relation: ArchitectureRelation,
 	healthById: Map<string, HomelabHealthEntry>,
 ): HomelabHealthState | null {
-	if (relation.optional) return null;
+	if (relation.optional || ["partOf", "hostedBy"].includes(relation.type)) return null;
 	const sourceHealth = healthById.get(relation.source);
 	const evidenceState = requiredDependencyTargetState(
 		sourceHealth,
