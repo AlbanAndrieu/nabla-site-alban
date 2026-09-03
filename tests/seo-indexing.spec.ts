@@ -2,6 +2,15 @@ import { expect, request as playwrightRequest, test } from "@playwright/test";
 
 const canonicalOrigin = "https://www.albanandrieu.com";
 
+const policySlugs = [
+	"accessibility_statement",
+	"cookie_policy",
+	"impressum",
+	"legal",
+	"privacy_policy",
+	"service_terms",
+] as const;
+
 const expectedSitemapUrls = [
 	`${canonicalOrigin}/`,
 	`${canonicalOrigin}/expertise`,
@@ -16,6 +25,7 @@ const expectedSitemapUrls = [
 	`${canonicalOrigin}/nabla`,
 	`${canonicalOrigin}/cv`,
 	`${canonicalOrigin}/jm`,
+	...policySlugs.map((slug) => `${canonicalOrigin}/policy/${slug}`),
 ];
 
 const migratedSeoSlugs = [
@@ -53,21 +63,15 @@ const indexablePages = [
 	"/architecture",
 	"/cv",
 	"/jm",
+	...policySlugs.map((slug) => `/policy/${slug}`),
 ];
 
 test.describe("SEO indexing policy", () => {
-	test("sitemap exposes only extensionless canonical SEO URLs", async ({
-		request,
-	}) => {
+	test("sitemap exposes only extensionless canonical SEO URLs", async ({ request }) => {
 		const response = await request.get("/sitemap.xml");
 		expect(response.ok()).toBeTruthy();
-
 		const xml = await response.text();
-		const urls = Array.from(
-			xml.matchAll(/<loc>([^<]+)<\/loc>/g),
-			([, url]) => url,
-		);
-
+		const urls = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g), ([, url]) => url);
 		expect(urls).toEqual(expectedSitemapUrls);
 		expect(xml).not.toContain(".html");
 		expect(xml).not.toContain("/startup");
@@ -78,9 +82,7 @@ test.describe("SEO indexing policy", () => {
 		for (const pathname of nonIndexablePages) {
 			const response = await request.get(pathname);
 			expect(response.ok(), `${pathname} should load`).toBeTruthy();
-			expect(await response.text(), `${pathname} should be noindex`).toContain(
-				'<meta name="robots" content="noindex, nofollow"/>',
-			);
+			expect(await response.text(), `${pathname} should be noindex`).toContain('<meta name="robots" content="noindex, nofollow"/>');
 		}
 	});
 
@@ -88,41 +90,35 @@ test.describe("SEO indexing policy", () => {
 		for (const pathname of indexablePages) {
 			const response = await request.get(pathname);
 			expect(response.ok(), `${pathname} should load`).toBeTruthy();
-			expect(await response.text(), `${pathname} should be indexable`).not.toContain(
-				'<meta name="robots" content="noindex, nofollow"/>',
-			);
+			expect(await response.text(), `${pathname} should be indexable`).not.toContain('<meta name="robots" content="noindex, nofollow"/>');
 		}
 	});
 
-	test("migrated pages expose self-canonical and reciprocal extensionless hreflang", async ({
-		page,
-	}) => {
+	test("migrated pages expose self-canonical and reciprocal extensionless hreflang", async ({ page }) => {
 		for (const slug of migratedSeoSlugs) {
 			const englishUrl = `${canonicalOrigin}/${slug}`;
 			const frenchUrl = `${canonicalOrigin}/fr/${slug}`;
-
-			for (const [pathname, canonical] of [
-				[`/${slug}`, englishUrl],
-				[`/fr/${slug}`, frenchUrl],
-			] as const) {
-				// next-intl persists the last explicit locale in NEXT_LOCALE. Clear it
-				// before checking the unprefixed English canonical so a previous /fr/*
-				// navigation cannot redirect the next assertion to the French route.
-				if (pathname === `/${slug}`) {
-					await page.context().clearCookies({ name: "NEXT_LOCALE" });
-				}
-
+			for (const [pathname, canonical] of [[`/${slug}`, englishUrl], [`/fr/${slug}`, frenchUrl]] as const) {
+				if (pathname === `/${slug}`) await page.context().clearCookies({ name: "NEXT_LOCALE" });
 				await page.goto(pathname);
-				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-					"href",
-					canonical,
-				);
-				await expect(
-					page.locator('link[rel="alternate"][hreflang="en"]'),
-				).toHaveAttribute("href", englishUrl);
-				await expect(
-					page.locator('link[rel="alternate"][hreflang="fr"]'),
-				).toHaveAttribute("href", frenchUrl);
+				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonical);
+				await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute("href", englishUrl);
+				await expect(page.locator('link[rel="alternate"][hreflang="fr"]')).toHaveAttribute("href", frenchUrl);
+			}
+		}
+	});
+
+	test("policy pages expose localized canonicals and hreflang", async ({ page }) => {
+		for (const slug of policySlugs) {
+			const englishUrl = `${canonicalOrigin}/policy/${slug}`;
+			const frenchUrl = `${canonicalOrigin}/fr/policy/${slug}`;
+			for (const [pathname, canonical] of [[`/policy/${slug}`, englishUrl], [`/fr/policy/${slug}`, frenchUrl]] as const) {
+				if (pathname === `/policy/${slug}`) await page.context().clearCookies({ name: "NEXT_LOCALE" });
+				await page.goto(pathname);
+				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonical);
+				await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute("href", englishUrl);
+				await expect(page.locator('link[rel="alternate"][hreflang="fr"]')).toHaveAttribute("href", frenchUrl);
+				await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute("href", englishUrl);
 			}
 		}
 	});
@@ -130,28 +126,33 @@ test.describe("SEO indexing policy", () => {
 	test("migrated html SEO URLs permanently redirect to clean routes", async ({}, testInfo) => {
 		const baseURL = testInfo.project.use.baseURL;
 		expect(typeof baseURL).toBe("string");
-
 		const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
 		const extraHTTPHeaders: Record<string, string> | undefined = bypassSecret
 			? { "x-vercel-protection-bypass": bypassSecret }
 			: undefined;
-
-		const redirectRequest = await playwrightRequest.newContext({
-			baseURL: String(baseURL),
-			...(extraHTTPHeaders ? { extraHTTPHeaders } : {}),
-		});
-
+		const redirectRequest = await playwrightRequest.newContext({ baseURL: String(baseURL), ...(extraHTTPHeaders ? { extraHTTPHeaders } : {}) });
 		try {
 			for (const slug of migratedSeoSlugs) {
-				for (const [oldPath, destination] of [
-					[`/${slug}.html`, `/${slug}`],
-					[`/en/${slug}.html`, `/${slug}`],
-					[`/fr/${slug}.html`, `/fr/${slug}`],
-				] as const) {
+				for (const [oldPath, destination] of [[`/${slug}.html`, `/${slug}`], [`/en/${slug}.html`, `/${slug}`], [`/fr/${slug}.html`, `/fr/${slug}`]] as const) {
 					const response = await redirectRequest.get(oldPath, { maxRedirects: 0 });
-					expect([301, 308], `${oldPath} should permanently redirect`).toContain(
-						response.status(),
-					);
+					expect([301, 308], `${oldPath} should permanently redirect`).toContain(response.status());
+					expect(response.headers().location).toBe(destination);
+				}
+			}
+		} finally {
+			await redirectRequest.dispose();
+		}
+	});
+
+	test("legacy policy html URLs permanently redirect to native routes", async ({}, testInfo) => {
+		const baseURL = testInfo.project.use.baseURL;
+		expect(typeof baseURL).toBe("string");
+		const redirectRequest = await playwrightRequest.newContext({ baseURL: String(baseURL) });
+		try {
+			for (const slug of policySlugs) {
+				for (const [oldPath, destination] of [[`/policy/${slug}.html`, `/policy/${slug}`], [`/en/policy/${slug}.html`, `/policy/${slug}`], [`/fr/policy/${slug}.html`, `/fr/policy/${slug}`]] as const) {
+					const response = await redirectRequest.get(oldPath, { maxRedirects: 0 });
+					expect([301, 308], `${oldPath} should permanently redirect`).toContain(response.status());
 					expect(response.headers().location).toBe(destination);
 				}
 			}
@@ -161,19 +162,11 @@ test.describe("SEO indexing policy", () => {
 	});
 
 	test("priority pages expose their structured data", async ({ request }) => {
-		const cases = [
-			["/", "Person"],
-			["/expertise", "ProfessionalService"],
-		] as const;
-
-		for (const [pathname, expectedType] of cases) {
+		for (const [pathname, expectedType] of [["/", "Person"], ["/expertise", "ProfessionalService"]] as const) {
 			const response = await request.get(pathname);
 			expect(response.ok(), `${pathname} should load`).toBeTruthy();
 			const html = await response.text();
-			const jsonLd = html.match(
-				/<script type="application\/ld\+json">([^<]+)<\/script>/,
-			)?.[1];
-
+			const jsonLd = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
 			expect(jsonLd, `${pathname} should expose JSON-LD`).toBeTruthy();
 			expect(JSON.parse(jsonLd ?? "{}")["@type"]).toBe(expectedType);
 		}
