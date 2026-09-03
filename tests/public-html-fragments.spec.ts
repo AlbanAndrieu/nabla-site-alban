@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const pages = ["/ai.html", "/security.html", "/workstation.html"];
+const pages = ["/ai.html", "/workstation.html"];
 
 test.describe("transitional public HTML fragments", () => {
 	for (const pathname of pages) {
@@ -25,4 +25,20 @@ test.describe("transitional public HTML fragments", () => {
 			expect(hydrationErrors).toEqual([]);
 		});
 	}
+});
+
+test.describe("native security route", () => {
+	test("legacy URL redirects to the complete React resource directory", async ({
+		page,
+	}) => {
+		const response = await page.goto("/security.html");
+
+		expect(response?.ok()).toBeTruthy();
+		await expect(page).toHaveURL(/\/security$/);
+		await expect(page.locator("main#main-content .resource-card")).toHaveCount(16);
+		await expect(page.locator("#openclaw-security")).toBeVisible();
+		await expect(page.locator("#security-standards-compliance")).toBeVisible();
+		await expect(page.locator("#devsecops-tools")).toBeVisible();
+		await expect(page.locator("#security-visualizations")).toBeVisible();
+	});
 });
