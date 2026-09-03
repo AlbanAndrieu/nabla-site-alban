@@ -44,11 +44,23 @@ test("health board preserves runtime and unified observability consumes all aggr
 			},
 		},
 		homelab: {
+			schema_version: 5,
+			checked_at: "2026-09-03T00:29:58Z",
 			components_status: "degraded",
 			components: {
 				truenas: { reachable: true, state: "ok" },
 				pfsense: { reachable: false, stale: true, refresh_error: "read timeout", error_kind: "read_timeout", failure_stage: "response", exception_type: "ReadTimeout", cache_layer: "redis", cached: true, cache_age_seconds: 12, redis_available: true },
 				cloudflare: { reachable: true, state: "ok" },
+			},
+			pfsense: {
+				dns: {
+					configured: true,
+					reachable: true,
+					policy_state: "ok",
+					reason: "pfSense / Unbound keeps a resolution path independent from TrueNAS",
+					resolver: { enabled: true, running: true, forwarding: false, forward_tls_upstream: false, port: 53 },
+					upstream: { count: 2, independent_from_truenas: true, truenas_only: false },
+				},
 			},
 			cloudflare: {
 				configured: true,
@@ -79,6 +91,9 @@ test("health board preserves runtime and unified observability consumes all aggr
 	const evidence = parseHomelabObservability(board);
 	assert.equal(evidence.runtimeTopology?.observed_instance_count, 1);
 	assert.equal(evidence.sources.runtime, "health-board");
+	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.running, true);
+	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.forwarding, false);
+	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.upstream?.count, 2);
 	assert.equal(evidence.deepDiagnostics.status, "degraded");
 	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "postgres")?.category, "required");
 	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "tavily")?.category, "integration");
