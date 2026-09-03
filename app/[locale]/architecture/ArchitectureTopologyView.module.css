@@ -1,5 +1,4 @@
 .dashboard,
-.criticalitySection,
 .explorerSection {
 	width: min(100% - 2rem, 1200px);
 	margin-inline: auto;
@@ -113,8 +112,13 @@
 	font-size: 0.875rem;
 }
 
+/* Mirror Bootstrap's .container breakpoints used by the TrueNAS services section so
+   the shared CriticalDependencyHierarchy has the same visual width on both pages. */
 .criticalitySection {
+	width: 100%;
+	margin-inline: auto;
 	margin-block: var(--ui-space-xl);
+	padding-inline: 0.75rem;
 }
 
 .criticalitySection > :first-child {
@@ -136,9 +140,28 @@
 	margin-bottom: var(--ui-space-sm);
 }
 
+@media (min-width: 576px) {
+	.criticalitySection { max-width: 540px; }
+}
+
+@media (min-width: 768px) {
+	.criticalitySection { max-width: 720px; }
+}
+
+@media (min-width: 992px) {
+	.criticalitySection { max-width: 960px; }
+}
+
+@media (min-width: 1200px) {
+	.criticalitySection { max-width: 1140px; }
+}
+
+@media (min-width: 1400px) {
+	.criticalitySection { max-width: 1320px; }
+}
+
 @media (max-width: 760px) {
 	.dashboard,
-	.criticalitySection,
 	.explorerSection {
 		width: min(100% - 1rem, 1200px);
 	}
