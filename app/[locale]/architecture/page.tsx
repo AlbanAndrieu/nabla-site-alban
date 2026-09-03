@@ -14,6 +14,7 @@ import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
+import ArchitectureServiceDirectory from "./ArchitectureServiceDirectory";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/architecture">): Promise<Metadata> {
@@ -73,6 +74,7 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					<HomelabOperationalEvidence />
 				</div>
 				<ArchitectureImpactInspector locale={locale} />
+				<ArchitectureServiceDirectory locale={locale} catalog={catalog} topology={topology} />
 
 				<ArchitectureTopologyView
 					locale={locale}
