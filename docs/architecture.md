@@ -18,9 +18,8 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 - Les URLs SEO canoniques sont sans extension ; `next.config.mjs` conserve des
   redirections permanentes depuis les anciennes URLs `.html` pendant la
   migration SEO.
-- Chaque URL publique possède une route App Router dédiée. Les routes `ai`,
-  `security`, `workstation` et certains CV chargent encore temporairement des
-  fragments HTML de `public/`.
+- Chaque URL publique possède une route App Router dédiée. Les routes `ai`, `workstation` et certains CV chargent encore temporairement
+  des fragments HTML de `public/`. `/security` est désormais entièrement natif.
 - Ces fragments passent par `app/components/PublicHtmlFragment.tsx`, frontière
   commune qui centralise l'usage transitoire de `dangerouslySetInnerHTML`.
 - `app/global-not-found.tsx` gère les URL inconnues hors du root layout
