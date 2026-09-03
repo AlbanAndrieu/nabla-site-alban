@@ -26,6 +26,7 @@ import {
 } from "@/lib/serviceTopology";
 import ArchitectureServiceHierarchy from "./ArchitectureServiceHierarchy";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
+import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
 import styles from "./ArchitectureTopologyView.module.css";
 
 type Props = {
@@ -425,6 +426,13 @@ export default function ArchitectureTopologyView({
 				<CriticalDependencyHierarchy topology={topology} />
 			</div>
 
+			<MobileArchitectureHierarchy
+				locale={locale}
+				catalog={filteredCatalog}
+				topology={topology}
+				snapshot={health}
+			/>
+
 			<section
 				id="service-architecture-explorer"
 				className={styles.explorerSection}
@@ -438,8 +446,8 @@ export default function ArchitectureTopologyView({
 					</h2>
 					<p>
 						{french
-							? "Utilisez la recherche et les contrôles du graphe pour basculer entre plateforme IA, services, chemin critique, catalogue complet et relations optionnelles."
-							: "Use the graph search and controls to switch between the AI platform, services, critical path, full catalog, and optional relations."}
+							? "Utilisez la recherche et les contrôles du graphe pour basculer entre plateforme IA, services, chemin critique, catalogue complet et relations optionnelles. Sur mobile, la hiérarchie compacte ci-dessus fournit une lecture plus directe avant le graphe complet."
+							: "Use the graph search and controls to switch between the AI platform, services, critical path, full catalog, and optional relations. On mobile, the compact hierarchy above provides a more direct view before the complete graph."}
 					</p>
 				</div>
 				<HierarchicalArchitectureExplorer
