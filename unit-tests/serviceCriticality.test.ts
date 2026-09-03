@@ -204,7 +204,7 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("TrueNAS grid is grouped by the same criticality tiers", async () => {
+test("TrueNAS grid is grouped by the same criticality tiers and health semantics", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 
 	assert.match(block, /data-homelab-service-hierarchy/);
@@ -212,7 +212,9 @@ test("TrueNAS grid is grouped by the same criticality tiers", async () => {
 	assert.match(block, /criticalityTierOrder/);
 	assert.match(block, /compareServiceCriticality/);
 	assert.match(block, /parseHomelabHealthSnapshot/);
-	assert.match(block, /PfSenseDnsPosture/);
+	assert.match(block, /resolveEffectiveServiceState/);
+	assert.match(block, /data-homelab-health-filter/);
+	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 });
 
 test("architecture and TrueNAS share dependency, optional-edge and blast-radius semantics", async () => {

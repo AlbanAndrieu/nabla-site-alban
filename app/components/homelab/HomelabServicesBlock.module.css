@@ -26,23 +26,79 @@
 	color: var(--ui-link-hover);
 }
 
+.healthDashboard {
+	margin-bottom: var(--ui-space-lg);
+	padding: var(--ui-space-lg);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+	scroll-margin-top: 6rem;
+}
+
+.healthDashboardHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--ui-space-lg);
+}
+
+.healthDashboardTitle {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: 1.35rem;
+}
+
+.healthDashboardHeader p,
+.matchCount {
+	margin: 0;
+	color: var(--ui-text-secondary);
+}
+
+.refreshStatus {
+	flex: 0 0 auto;
+	padding: var(--ui-space-xs) var(--ui-space-sm);
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.healthSummary {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--ui-space-sm);
+	margin-block: var(--ui-space-lg);
+}
+
+.healthChip {
+	min-height: var(--ui-control-min-height);
+	padding: var(--ui-space-sm);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-md);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-primary);
+	cursor: pointer;
+}
+
+.healthChip[aria-pressed="true"] {
+	border-color: var(--ui-link);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-link) 30%, transparent);
+}
+
 .controls {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: end;
 	justify-content: space-between;
 	gap: var(--ui-space-md);
-	margin-bottom: var(--ui-space-lg);
-	padding: var(--ui-space-md);
-	border: 1px solid var(--ui-border);
-	border-radius: var(--ui-radius-card);
-	background: var(--ui-surface-card);
 }
 
 .filterField {
 	display: grid;
 	gap: var(--ui-space-xs);
-	min-width: min(100%, 20rem);
+	min-width: min(100%, 15rem);
 }
 
 .filterLabel {
@@ -62,7 +118,8 @@
 
 .filterSelect:focus-visible,
 .controlButton:focus-visible,
-.groupSummary:focus-visible {
+.groupSummary:focus-visible,
+.healthChip:focus-visible {
 	outline: 3px solid var(--ui-focus-ring);
 	outline-offset: 3px;
 }
@@ -86,6 +143,11 @@
 
 .controlButton:hover {
 	background: var(--ui-secondary-bg-hover);
+}
+
+.matchCount {
+	margin-top: var(--ui-space-md);
+	font-size: 0.875rem;
 }
 
 .groupDetails {
@@ -151,11 +213,20 @@
 	}
 }
 
-@media (max-width: 640px) {
+@media (max-width: 760px) {
+	.healthDashboard {
+		padding: var(--ui-space-md);
+	}
+
+	.healthDashboardHeader,
 	.controls,
 	.legendGroup {
 		align-items: stretch;
 		flex-direction: column;
+	}
+
+	.healthSummary {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	.controlButtons,

@@ -16,6 +16,7 @@ type Props = {
 	component: OperationalComponentEvidence | undefined;
 	focus: TroubleshootingFocus;
 	hasEvidence: boolean;
+	onInspectEvidence?: () => void;
 };
 
 export function pfsenseNeedsAttention(
@@ -32,6 +33,7 @@ export default function PfSenseAttentionActions({
 	component,
 	focus,
 	hasEvidence,
+	onInspectEvidence,
 }: Readonly<Props>) {
 	const t = useTranslations("operations");
 	if (!pfsenseNeedsAttention(component, focus)) return null;
@@ -49,6 +51,11 @@ export default function PfSenseAttentionActions({
 						href="#pfsense-operational-evidence"
 						size="compact"
 						variant="primary"
+						onClick={(event) => {
+							if (!onInspectEvidence) return;
+							event.preventDefault();
+							onInspectEvidence();
+						}}
 					>
 						{t("pfsense.details")}
 					</ActionLink>

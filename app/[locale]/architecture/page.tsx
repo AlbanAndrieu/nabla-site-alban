@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import HomelabOperationalEvidence from "@/app/components/homelab/HomelabOperationalEvidence";
 import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import SkipToMainContent from "@/components/SkipToMainContent";
@@ -13,6 +14,7 @@ import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
+import ArchitectureServiceDirectory from "./ArchitectureServiceDirectory";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/architecture">): Promise<Metadata> {
@@ -68,7 +70,11 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 				</section>
 
 				<ArchitectureSectionNav locale={locale} />
+				<div className="container">
+					<HomelabOperationalEvidence />
+				</div>
 				<ArchitectureImpactInspector locale={locale} />
+				<ArchitectureServiceDirectory locale={locale} catalog={catalog} topology={topology} />
 
 				<ArchitectureTopologyView
 					locale={locale}
@@ -78,11 +84,7 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					initialTopologySource={topologySource}
 				/>
 
-				<section
-					id="homelab-network-architecture"
-					className="content-section"
-					aria-labelledby="homelab-network-ingress-paths"
-				>
+				<section id="homelab-network-architecture" className="content-section" aria-labelledby="homelab-network-ingress-paths">
 					<div className="container py-5">
 						<div className="text-center mx-auto mb-4" style={{ maxWidth: "900px" }}>
 							<AnchoredHeading id="homelab-network-ingress-paths">
@@ -98,17 +100,11 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					</div>
 				</section>
 
-				<section
-					id="declared-observed-architecture"
-					className="content-section"
-					aria-labelledby="declared-observed-health"
-				>
+				<section id="declared-observed-architecture" className="content-section" aria-labelledby="declared-observed-health">
 					<div className="container py-5">
 						<div className="text-center mx-auto mb-4" style={{ maxWidth: "860px" }}>
 							<AnchoredHeading id="declared-observed-health">
-								{french
-									? "Configuration déclarée, runtime observé et santé"
-									: "Declared configuration, observed runtime, and health"}
+								{french ? "Configuration déclarée, runtime observé et santé" : "Declared configuration, observed runtime, and health"}
 							</AnchoredHeading>
 							<p>
 								{french

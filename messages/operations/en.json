@@ -1,7 +1,7 @@
 {
 	"operations": {
-		"title": "Operational evidence",
-		"lead": "Read-only evidence from FastAPI, TrueNAS, pfSense and Cloudflare. Use it to identify which layer is failing before changing configuration.",
+		"title": "Operations and troubleshooting",
+		"lead": "One read-only snapshot of FastAPI runtime, dependency health, TrueNAS, pfSense and Cloudflare evidence. Start here to identify the failing layer before changing configuration.",
 		"board": {
 			"refreshing": "Refreshing evidence…",
 			"pending": "Initial evidence collection is still running.",
@@ -10,6 +10,22 @@
 			"unavailable": "Operational evidence is temporarily unavailable.",
 			"age": "{seconds}s old",
 			"probeDuration": "homelab probe {milliseconds} ms"
+		},
+		"sources": {
+			"title": "Evidence sources",
+			"board": "Health board",
+			"runtime": "Runtime topology",
+			"diagnostics": "Homelab diagnostics",
+			"health-board": "health board",
+			"fallback": "endpoint fallback",
+			"unavailable": "unavailable"
+		},
+		"cache": {
+			"layer": "cache layer: {layer}",
+			"age": "cache age: {seconds}s",
+			"redisAvailable": "Redis cache available",
+			"redisUnavailable": "Redis cache unavailable; local fallback is in use",
+			"refreshing": "peer/origin refresh in progress"
 		},
 		"components": {
 			"title": "Control planes",
@@ -26,7 +42,51 @@
 			"refreshError": "refresh error: {error}",
 			"failureStage": "failure stage: {stage}",
 			"tunnels": "{healthy}/{count} tunnels healthy",
-			"tunnelStatuses": "Tunnel states: {statuses}"
+			"tunnelStatuses": "Tunnel states: {statuses}",
+			"probe": "probe: {probe}",
+			"path": "path: {path}",
+			"exception": "exception: {exception}",
+			"retry": "retry window: {seconds}s"
+		},
+		"runtime": {
+			"title": "Runtime topology and TrueNAS transport",
+			"lead": "Runtime topology comes from the same health-board snapshot when available; the dedicated endpoint is used only as a compatibility fallback.",
+			"provider": "provider: {provider}",
+			"observed": "observed {timestamp}",
+			"instances": "{count} active runtime observations",
+			"aggregation": "aggregation: {aggregation}",
+			"activeEgress": "active egress IPs: {ips}",
+			"recentEgress": "recent egress IPs: {ips}",
+			"windows": "heartbeat {heartbeat}s · active {active}s · recent egress {recent}s",
+			"instance": "{id} · last seen {lastSeen} · egress {egress}",
+			"countSemantics": "Observed runtime count is evidence from application heartbeats, not an authoritative FastAPI Cloud replica count.",
+			"truenas": "TrueNAS API transport",
+			"reachable": "reachable",
+			"unreachable": "unreachable",
+			"lastGood": "last-good evidence retained",
+			"unavailable": "Runtime topology is currently unavailable."
+		},
+		"deep": {
+			"title": "Deep dependency and integration diagnostics",
+			"lead": "FastAPI /healthz checks are preserved as sanitized evidence. Required dependencies determine unhealthy state; optional integrations are reported as degraded without being mistaken for core readiness failures.",
+			"status": "status: {status}",
+			"contract": "contract: {contract}",
+			"version": "version: {version}",
+			"required": "Required runtime dependencies",
+			"control-plane": "Control-plane checks",
+			"integration": "Optional integrations",
+			"homelab": "Homelab service endpoints",
+			"skipped": "skipped",
+			"http": "HTTP {status}",
+			"tlsTrusted": "TLS trusted",
+			"tlsUntrusted": "TLS untrusted",
+			"latency": "{milliseconds} ms",
+			"probe": "probe {probe}",
+			"authentication": "authentication {authentication}",
+			"resource": "resource {resource}",
+			"path": "path {path}",
+			"target": "target {target}",
+			"none": "No deep diagnostic checks are present in this snapshot."
 		},
 		"pfsense": {
 			"title": "pfSense ingress and security evidence",
@@ -37,6 +97,9 @@
 			"blindSpotDetail": "The pfSense security observer shares the same WAN path it is trying to diagnose, so a transport failure cannot prove whether Snort/PF blocked its own telemetry.",
 			"sourceToDestination": "{source} → {destination}:{port}",
 			"details": "Inspect pfSense evidence",
+			"telemetry": "telemetry: {state}",
+			"attribution": "attribution: {state}",
+			"lastSuccess": "telemetry last success: {timestamp}",
 			"actions": {
 				"title": "pfSense needs attention",
 				"lead": "pfSense is degraded, stale, or selected as the current troubleshooting focus. Inspect the evidence first, then open the management surfaces if you need to verify the control plane directly.",
@@ -45,6 +108,22 @@
 				"apiTitle": "Open the read-only pfSense system version endpoint; authorized API access may be required.",
 				"note": "Admin/API links are diagnostic entry points, not proof that pfSense caused the incident."
 			}
+		},
+		"serviceExposure": {
+			"title": "Declared vs observed service exposure",
+			"lead": "Functional health stays separate from exposure policy. Mismatches show where nabla-compose declarations differ from observed Cloudflare Tunnel or Access evidence.",
+			"cloudflare": "Cloudflare observer",
+			"configured": "configured: {state}",
+			"tunnels": "{count} tunnels observed",
+			"accessApps": "{count} Access applications observed",
+			"tunnelObserver": "Tunnel observer: {state}",
+			"accessObserver": "Access observer: {state}",
+			"declared": "declared edge: {edge}",
+			"publicHttps": "public HTTPS: {state}",
+			"tunnel": "Tunnel observed: {state}",
+			"access": "Access observed: {state}",
+			"accessPublic": "public/bypass Access policy: {state}",
+			"none": "No per-service exposure evidence is present in this snapshot."
 		},
 		"exposure": {
 			"title": "Trusted-source exposure policy",

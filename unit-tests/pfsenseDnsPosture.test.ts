@@ -66,14 +66,19 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("DNS posture reuses the existing homelab health refresh instead of adding polling", async () => {
+test("DNS resilience is rendered by unified operational evidence instead of a standalone service-grid panel", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const operations = await source("app/components/homelab/HomelabOperationalEvidence.tsx");
+	const observability = await source("lib/homelabObservability.ts");
 
 	assert.match(block, /parseHomelabHealthSnapshot\(await response\.json\(\)\)/);
-	assert.match(block, /<PfSenseDnsPosture/);
-	assert.match(block, /snapshot=\{state\.snapshot\}/);
-	assert.doesNotMatch(block, /api\/pfsense/);
+	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 	assert.equal(block.match(/setInterval\(/g)?.length, 1);
+	assert.match(observability, /healthSnapshot:\s*HomelabHealthSnapshot/);
+	assert.match(observability, /parseHomelabHealthSnapshot\(board\.homelab\)/);
+	assert.match(operations, /import PfSenseDnsPosture/);
+	assert.match(operations, /snapshot=\{evidence\.healthSnapshot\}/);
+	assert.match(operations, /data-pfsense-security-evidence/);
 });
 
 test("DNS posture exposes explicit resilience states without raw network configuration", async () => {
@@ -86,5 +91,8 @@ test("DNS posture exposes explicit resilience states without raw network configu
 	assert.match(component, /dns\.resolverFailed/);
 	assert.match(component, /dns\.unconfigured/);
 	assert.match(component, /dns\.unreachable/);
+	assert.match(component, /dns\.resolverRunning/);
+	assert.match(component, /dns\.modeRecursive/);
+	assert.match(component, /dns\.upstreamCount/);
 	assert.doesNotMatch(component, /PFSENSE_API_KEY|dnsserver|172\.17\.0\.1/);
 });

@@ -1,11 +1,14 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
 	parseHomelabHealthSnapshot,
+	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
+	type HomelabHealthState,
 } from "@/lib/homelabHealth";
+import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	analyzeServiceCriticality,
 	compareServiceCriticality,
@@ -14,6 +17,7 @@ import {
 } from "@/lib/serviceCriticality";
 import {
 	homelabServiceId,
+	type HomelabService,
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
 import {
@@ -26,9 +30,9 @@ import CriticalDependencyHierarchy, {
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
-import PfSenseDnsPosture from "./PfSenseDnsPosture";
 
 const HEALTH_REFRESH_MS = 30_000;
+const HEALTH_STATES: readonly HomelabHealthState[] = ["ok", "warn", "fail", "unknown"];
 const ALL_TIERS: readonly ServiceCriticalityTier[] = [
 	"foundation",
 	"shared-data",
@@ -57,6 +61,7 @@ type HierarchyGroup = {
 	catalog: HomelabServicesCatalog;
 };
 
+type HealthFilter = "all" | HomelabHealthState;
 type TierFilter = "all" | ServiceCriticalityTier;
 
 type TierTitleKey =
@@ -89,13 +94,8 @@ const TIER_DESCRIPTION_KEY: Record<ServiceCriticalityTier, TierDescriptionKey> =
 	support: "criticality.tierDescriptions.support",
 };
 
-async function fetchCatalog(
-	signal: AbortSignal,
-): Promise<HomelabServicesCatalog> {
-	const response = await fetch("/api/homelab-services", {
-		cache: "no-store",
-		signal,
-	});
+async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog> {
+	const response = await fetch("/api/homelab-services", { cache: "no-store", signal });
 	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
 	return (await response.json()) as HomelabServicesCatalog;
 }
@@ -117,13 +117,8 @@ async function fetchTopology(signal: AbortSignal): Promise<ServiceTopology | nul
 
 async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	try {
-		const response = await fetch("/api/homelab-health", {
-			cache: "no-store",
-			signal,
-		});
-		if (!response.ok) {
-			return { snapshot: null, status: response.status };
-		}
+		const response = await fetch("/api/homelab-health", { cache: "no-store", signal });
+		if (!response.ok) return { snapshot: null, status: response.status };
 		return {
 			snapshot: parseHomelabHealthSnapshot(await response.json()),
 			status: response.status,
@@ -134,8 +129,36 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	}
 }
 
+function normalizedName(value: string): string {
+	return value.trim().toLowerCase();
+}
+
+function healthIndex(snapshot: HomelabHealthSnapshot | null): {
+	byId: Map<string, HomelabHealthEntry>;
+	byName: Map<string, HomelabHealthEntry>;
+} {
+	const byId = new Map<string, HomelabHealthEntry>();
+	const byName = new Map<string, HomelabHealthEntry>();
+	for (const entry of snapshot?.services ?? []) {
+		if (entry.id) byId.set(entry.id, entry);
+		byName.set(normalizedName(entry.name), entry);
+	}
+	return { byId, byName };
+}
+
+function effectiveState(
+	service: HomelabService,
+	index: ReturnType<typeof healthIndex>,
+): HomelabHealthState {
+	const entry =
+		index.byId.get(homelabServiceId(service)) ??
+		index.byName.get(normalizedName(service.name));
+	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
+}
+
 export default function HomelabServicesBlock() {
 	const t = useTranslations("homelab");
+	const french = useLocale() === "fr";
 	const [state, setState] = useState<State>({
 		catalog: null,
 		topology: null,
@@ -145,6 +168,7 @@ export default function HomelabServicesBlock() {
 		healthStatus: null,
 		healthRefreshing: true,
 	});
+	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [tierFilter, setTierFilter] = useState<TierFilter>("all");
 	const [expandedTiers, setExpandedTiers] = useState<Set<ServiceCriticalityTier>>(
 		() => new Set(ALL_TIERS),
@@ -164,8 +188,6 @@ export default function HomelabServicesBlock() {
 			if (!refreshController.signal.aborted) {
 				setState((current) => ({
 					...current,
-					// Keep the last known snapshot for context, but explicitly mark it stale
-					// when the live FastAPI refresh fails so the UI never hides a 503/reboot.
 					snapshot: health.snapshot ?? current.snapshot,
 					healthUnavailable: health.snapshot === null,
 					healthStatus: health.status,
@@ -204,14 +226,11 @@ export default function HomelabServicesBlock() {
 				}
 			});
 
-		const interval = window.setInterval(() => {
-			void refreshHealth();
-		}, HEALTH_REFRESH_MS);
+		const interval = window.setInterval(() => void refreshHealth(), HEALTH_REFRESH_MS);
 		const onVisibilityChange = () => {
 			if (!document.hidden) void refreshHealth();
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);
-
 		return () => {
 			initialController.abort();
 			refreshController?.abort();
@@ -220,22 +239,29 @@ export default function HomelabServicesBlock() {
 		};
 	}, []);
 
+	const indexedHealth = useMemo(() => healthIndex(state.snapshot), [state.snapshot]);
+	const healthCounts = useMemo(() => {
+		const counts: Record<HomelabHealthState, number> = { ok: 0, warn: 0, fail: 0, unknown: 0 };
+		for (const service of state.catalog?.services ?? []) counts[effectiveState(service, indexedHealth)] += 1;
+		return counts;
+	}, [indexedHealth, state.catalog?.services]);
+
 	const hierarchyGroups = useMemo<HierarchyGroup[]>(() => {
 		if (!state.catalog) return [];
-		if (!state.topology) {
-			return [{ tier: "support", catalog: state.catalog }];
-		}
+		const filteredServices = state.catalog.services.filter(
+			(service) => healthFilter === "all" || effectiveState(service, indexedHealth) === healthFilter,
+		);
+		const filteredCatalog = { ...state.catalog, services: filteredServices };
+		if (!state.topology) return [{ tier: "support", catalog: filteredCatalog }];
 
 		const topology = state.topology;
 		const analysis = analyzeServiceCriticality(topology);
-		const grouped = new Map<ServiceCriticalityTier, typeof state.catalog.services>();
-
-		for (const service of state.catalog.services) {
+		const grouped = new Map<ServiceCriticalityTier, typeof filteredServices>();
+		for (const service of filteredServices) {
 			const id = homelabServiceId(service);
 			const tier = analysis.get(id)?.tier ?? "support";
 			grouped.set(tier, [...(grouped.get(tier) ?? []), service]);
 		}
-
 		return [...grouped.entries()]
 			.map(([tier, services]) => ({
 				tier,
@@ -251,18 +277,16 @@ export default function HomelabServicesBlock() {
 					),
 				},
 			}))
-			.sort(
-				(left, right) =>
-					criticalityTierOrder(left.tier) - criticalityTierOrder(right.tier),
-			);
-	}, [state.catalog, state.topology]);
+			.sort((left, right) => criticalityTierOrder(left.tier) - criticalityTierOrder(right.tier));
+	}, [healthFilter, indexedHealth, state.catalog, state.topology]);
 
 	const visibleHierarchyGroups = useMemo(
-		() =>
-			tierFilter === "all"
-				? hierarchyGroups
-				: hierarchyGroups.filter((group) => group.tier === tierFilter),
+		() => tierFilter === "all" ? hierarchyGroups : hierarchyGroups.filter((group) => group.tier === tierFilter),
 		[hierarchyGroups, tierFilter],
+	);
+	const visibleCount = visibleHierarchyGroups.reduce(
+		(total, group) => total + group.catalog.services.length,
+		0,
 	);
 
 	const setTierExpanded = (tier: ServiceCriticalityTier, open: boolean) => {
@@ -277,9 +301,7 @@ export default function HomelabServicesBlock() {
 	const openCriticality = () => {
 		setCriticalityOpen(true);
 		window.requestAnimationFrame(() => {
-			document
-				.getElementById(CRITICAL_DEPENDENCY_HIERARCHY_ID)
-				?.scrollIntoView({ block: "start" });
+			document.getElementById(CRITICAL_DEPENDENCY_HIERARCHY_ID)?.scrollIntoView({ block: "start" });
 		});
 	};
 
@@ -293,10 +315,6 @@ export default function HomelabServicesBlock() {
 
 	return (
 		<>
-			<PfSenseDnsPosture
-				snapshot={state.snapshot}
-				healthUnavailable={state.healthUnavailable}
-			/>
 			<HomelabStatusOverview
 				snapshot={state.snapshot}
 				healthUnavailable={state.healthUnavailable}
@@ -305,46 +323,76 @@ export default function HomelabServicesBlock() {
 				onOpenCriticality={openCriticality}
 			/>
 
-			<div className={styles.controls} data-homelab-hierarchy-controls>
-				<label className={styles.filterField}>
-					<span className={styles.filterLabel}>{t("criticality.filterLabel")}</span>
-					<select
-						className={styles.filterSelect}
-						value={tierFilter}
-						onChange={(event) => {
-							const next = event.currentTarget.value as TierFilter;
-							setTierFilter(next);
-							if (next !== "all") setTierExpanded(next, true);
-						}}
-						data-homelab-tier-filter
-					>
-						<option value="all">{t("criticality.allTiers")}</option>
-						{hierarchyGroups.map((group) => (
-							<option value={group.tier} key={group.tier}>
-								{t(TIER_TITLE_KEY[group.tier])}
-							</option>
-						))}
-					</select>
-				</label>
-				<div className={styles.controlButtons}>
-					<button
-						type="button"
-						className={styles.controlButton}
-						onClick={() => setExpandedTiers(new Set(ALL_TIERS))}
-						aria-controls="homelab-service-hierarchy"
-					>
-						{t("criticality.expandAll")}
-					</button>
-					<button
-						type="button"
-						className={styles.controlButton}
-						onClick={() => setExpandedTiers(new Set())}
-						aria-controls="homelab-service-hierarchy"
-					>
-						{t("criticality.collapseAll")}
-					</button>
+			<section id="truenas-health-dashboard" className={styles.healthDashboard} aria-labelledby="truenas-health-dashboard-title">
+				<div className={styles.healthDashboardHeader}>
+					<div>
+						<h3 id="truenas-health-dashboard-title" className={styles.healthDashboardTitle}>
+							{french ? "Santé et filtres des services" : "Service health and filters"}
+						</h3>
+						<p>{french ? "Les mêmes états et niveaux de criticité sont utilisés ici et dans Architecture." : "The same health states and criticality tiers are used here and on Architecture."}</p>
+					</div>
+					<span className={styles.refreshStatus} role="status" aria-live="polite">
+						{state.healthRefreshing ? (french ? "Actualisation…" : "Refreshing…") : state.healthUnavailable ? (french ? "Dernier snapshot conservé" : "Keeping last snapshot") : (french ? "Snapshot courant" : "Current snapshot")}
+					</span>
 				</div>
-			</div>
+
+				<div className={styles.healthSummary} aria-label={french ? "Résumé santé" : "Health summary"}>
+					{HEALTH_STATES.map((healthState) => (
+						<button
+							type="button"
+							key={healthState}
+							className={styles.healthChip}
+							aria-pressed={healthFilter === healthState}
+							data-homelab-health-filter={healthState}
+							onClick={() => setHealthFilter((current) => current === healthState ? "all" : healthState)}
+						>
+							<strong>{healthCounts[healthState]}</strong>{" "}
+							{healthState === "ok" ? (french ? "sains" : "healthy") : healthState === "warn" ? (french ? "dégradés" : "degraded") : healthState === "fail" ? (french ? "en échec" : "failed") : (french ? "inconnus" : "unknown")}
+						</button>
+					))}
+				</div>
+
+				<div className={styles.controls} data-homelab-hierarchy-controls>
+					<label className={styles.filterField}>
+						<span className={styles.filterLabel}>{french ? "Santé" : "Health"}</span>
+						<select className={styles.filterSelect} value={healthFilter} onChange={(event) => setHealthFilter(event.currentTarget.value as HealthFilter)} data-homelab-health-select>
+							<option value="all">{french ? "Tous les états" : "All health states"}</option>
+							<option value="ok">{french ? "Sain" : "Healthy"}</option>
+							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
+							<option value="fail">{french ? "En échec" : "Failed"}</option>
+							<option value="unknown">{french ? "Inconnu" : "Unknown"}</option>
+						</select>
+					</label>
+					<label className={styles.filterField}>
+						<span className={styles.filterLabel}>{t("criticality.filterLabel")}</span>
+						<select
+							className={styles.filterSelect}
+							value={tierFilter}
+							onChange={(event) => {
+								const next = event.currentTarget.value as TierFilter;
+								setTierFilter(next);
+								if (next !== "all") setTierExpanded(next, true);
+							}}
+							data-homelab-tier-filter
+						>
+							<option value="all">{t("criticality.allTiers")}</option>
+							{ALL_TIERS.map((tier) => <option value={tier} key={tier}>{t(TIER_TITLE_KEY[tier])}</option>)}
+						</select>
+					</label>
+					<div className={styles.controlButtons}>
+						<button type="button" className={styles.controlButton} onClick={() => { setHealthFilter("all"); setTierFilter("all"); }}>
+							{french ? "Réinitialiser" : "Reset filters"}
+						</button>
+						<button type="button" className={styles.controlButton} onClick={() => setExpandedTiers(new Set(ALL_TIERS))} aria-controls="homelab-service-hierarchy">
+							{t("criticality.expandAll")}
+						</button>
+						<button type="button" className={styles.controlButton} onClick={() => setExpandedTiers(new Set())} aria-controls="homelab-service-hierarchy">
+							{t("criticality.collapseAll")}
+						</button>
+					</div>
+				</div>
+				<p className={styles.matchCount}>{french ? `${visibleCount} services affichés sur ${state.catalog.services.length}` : `${visibleCount} services shown of ${state.catalog.services.length}`}</p>
+			</section>
 
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
 				{visibleHierarchyGroups.map((group) => (
@@ -352,23 +400,15 @@ export default function HomelabServicesBlock() {
 						className={styles.groupDetails}
 						key={group.tier}
 						open={expandedTiers.has(group.tier)}
-						onToggle={(event) =>
-							setTierExpanded(group.tier, event.currentTarget.open)
-						}
+						onToggle={(event) => setTierExpanded(group.tier, event.currentTarget.open)}
 						data-service-criticality-group={group.tier}
 					>
 						<summary className={styles.groupSummary}>
 							<span className={styles.groupTitle}>
 								<strong>{t(TIER_TITLE_KEY[group.tier])}</strong>
-								<span className={styles.groupDescription}>
-									{t(TIER_DESCRIPTION_KEY[group.tier])}
-								</span>
+								<span className={styles.groupDescription}>{t(TIER_DESCRIPTION_KEY[group.tier])}</span>
 							</span>
-							<span className={styles.groupMeta}>
-								{t("criticality.componentCount", {
-									count: group.catalog.services.length,
-								})}
-							</span>
+							<span className={styles.groupMeta}>{t("criticality.componentCount", { count: group.catalog.services.length })}</span>
 						</summary>
 						<div className={`${styles.groupBody} homelab-service-subgrid`}>
 							<HomelabServiceGrid
@@ -383,11 +423,7 @@ export default function HomelabServicesBlock() {
 			</div>
 
 			{state.topology ? (
-				<CriticalDependencyHierarchy
-					topology={state.topology}
-					open={criticalityOpen}
-					onOpenChange={setCriticalityOpen}
-				/>
+				<CriticalDependencyHierarchy topology={state.topology} open={criticalityOpen} onOpenChange={setCriticalityOpen} />
 			) : null}
 
 			<style jsx global>{`

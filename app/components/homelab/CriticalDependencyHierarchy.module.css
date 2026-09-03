@@ -13,7 +13,6 @@
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	gap: var(--ui-space-xs);
 	min-height: var(--ui-control-min-height);
 	padding: var(--ui-space-md) var(--ui-space-lg);
 	cursor: pointer;
@@ -23,17 +22,6 @@
 
 .summary::-webkit-details-marker {
 	display: none;
-}
-
-.summary::after {
-	content: "▾";
-	flex: 0 0 auto;
-	font-size: 0.85em;
-	transition: transform 160ms ease;
-}
-
-.details[open] > .summary::after {
-	transform: rotate(180deg);
 }
 
 .details[open] > .summary {
@@ -50,10 +38,29 @@
 	display: inline-flex;
 	align-items: center;
 	gap: var(--ui-space-xs);
+	max-width: 100%;
+}
+
+.chevron {
+	display: inline-block;
+	flex: 0 0 auto;
+	margin-left: 0.1rem;
+	font-size: 0.85em;
+	transition: transform 160ms ease;
+}
+
+.details[open] .chevron {
+	transform: rotate(180deg);
 }
 
 .body {
 	padding: var(--ui-space-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.chevron {
+		transition: none;
+	}
 }
 
 @media (max-width: 760px) {

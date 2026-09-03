@@ -12,6 +12,7 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 		generated_at: "2026-09-02T21:00:00Z",
 		age_seconds: 4,
 		error: null,
+		runtime: null,
 		healthz: {},
 		homelab: {
 			components_status: "degraded",
@@ -52,18 +53,8 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 					policy_state: "ok",
 					reason: "pfSense DNS Resolver is running with a TrueNAS-independent path",
 					security_filters: [
-						{
-							id: "firewall",
-							label: "pfSense/PF firewall",
-							state: "blocked",
-							detail: "PF is enforcing the snort2c block",
-						},
-						{
-							id: "snort",
-							label: "Snort",
-							state: "blocked",
-							detail: "Observed FastAPI egress is present in snort2c",
-						},
+						{ id: "firewall", label: "pfSense/PF firewall", state: "blocked", detail: "PF is enforcing the snort2c block" },
+						{ id: "snort", label: "Snort", state: "blocked", detail: "Observed FastAPI egress is present in snort2c" },
 					],
 					ingress_block: {
 						state: "blocked",
@@ -75,27 +66,13 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 						source: { ip: "203.0.113.10" },
 						destination: { ip: "198.51.100.20", port: 7000 },
 						evidence: "Exact observed egress IP is present in pfSense table snort2c",
-						control_path: {
-							mode: "shared_wan",
-							independent_from_wan_filter: false,
-							blind_spot: false,
-						},
+						control_path: { mode: "shared_wan", independent_from_wan_filter: false, blind_spot: false },
 					},
 				},
 			},
 			services: [
-				{
-					id: "api",
-					name: "API",
-					observation_stale: true,
-					observation_age_seconds: 120,
-					dependency_cycle: ["api", "database"],
-				},
-				{
-					id: "database",
-					name: "Database",
-					dependency_cycle: ["database", "api"],
-				},
+				{ id: "api", name: "API", observation_stale: true, observation_age_seconds: 120, dependency_cycle: ["api", "database"] },
+				{ id: "database", name: "Database", dependency_cycle: ["database", "api"] },
 			],
 		},
 		sickz: {
@@ -103,21 +80,8 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 				pfsense: {
 					pfsense_tcp_ports: { "7000": true, "10443": true },
 					pfsense_tcp_port_policy: {
-						"7000": {
-							service: "TrueNAS via pfSense HAProxy",
-							expected_reachable: true,
-							access_policy: "trusted_sources_only",
-							default_action: "deny",
-							expected_from: ["fastapi_cloud", "approved_admin_sources"],
-							negative_probe_required: true,
-						},
-						"10443": {
-							service: "pfSense Admin/API",
-							expected_reachable: true,
-							access_policy: "trusted_sources_only",
-							default_action: "deny",
-							negative_probe_required: true,
-						},
+						"7000": { service: "TrueNAS via pfSense HAProxy", expected_reachable: true, access_policy: "trusted_sources_only", default_action: "deny", expected_from: ["fastapi_cloud", "approved_admin_sources"], negative_probe_required: true },
+						"10443": { service: "pfSense Admin/API", expected_reachable: true, access_policy: "trusted_sources_only", default_action: "deny", negative_probe_required: true },
 					},
 				},
 			},
@@ -140,10 +104,7 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 });
 
 test("same-origin health proxy prefers the cached FastAPI health board with direct cold-start fallback", async () => {
-	const source = await readFile(
-		new URL("../app/api/homelab-health/route.ts", import.meta.url),
-		"utf8",
-	);
+	const source = await readFile(new URL("../app/api/homelab-health/route.ts", import.meta.url), "utf8");
 	assert.match(source, /loadFastApiHealthBoard/);
 	assert.match(source, /parseHomelabHealthSnapshot\(boardResult\.board\?\.homelab\)/);
 	assert.match(source, /fastapi-health-board/);
@@ -151,23 +112,18 @@ test("same-origin health proxy prefers the cached FastAPI health board with dire
 	assert.match(source, /loadHomelabHealthSnapshot/);
 });
 
-test("TrueNAS and Architecture share the operational-evidence panel", async () => {
-	const section = await readFile(
-		new URL("../app/components/homelab/HomelabServicesSection.tsx", import.meta.url),
-		"utf8",
-	);
-	const architecture = await readFile(
-		new URL("../app/[locale]/architecture/ArchitectureSectionNav.tsx", import.meta.url),
-		"utf8",
-	);
-	const component = await readFile(
-		new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url),
-		"utf8",
-	);
+test("TrueNAS and Architecture render the same unified operational-evidence panel", async () => {
+	const section = await readFile(new URL("../app/components/homelab/HomelabServicesSection.tsx", import.meta.url), "utf8");
+	const architecturePage = await readFile(new URL("../app/[locale]/architecture/page.tsx", import.meta.url), "utf8");
+	const architectureNav = await readFile(new URL("../app/[locale]/architecture/ArchitectureSectionNav.tsx", import.meta.url), "utf8");
+	const component = await readFile(new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url), "utf8");
 	assert.match(section, /HomelabOperationalEvidence/);
-	assert.match(architecture, /operational-evidence/);
-	assert.match(architecture, /HomelabOperationalEvidence/);
+	assert.match(architecturePage, /HomelabOperationalEvidence/);
+	assert.doesNotMatch(architectureNav, /HomelabOperationalEvidence/);
+	assert.match(component, /data-runtime-transport-evidence/);
+	assert.match(component, /data-deep-diagnostics/);
 	assert.match(component, /data-pfsense-security-evidence/);
+	assert.match(component, /data-service-exposure-diagnostics/);
 	assert.match(component, /data-trusted-source-exposure/);
 	assert.match(component, /data-evidence-freshness/);
 	assert.match(component, /data-provider-credential-evidence/);
