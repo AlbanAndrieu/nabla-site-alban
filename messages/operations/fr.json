@@ -1,7 +1,7 @@
 {
 	"operations": {
-		"title": "Preuves opérationnelles",
-		"lead": "Preuves en lecture seule provenant de FastAPI, TrueNAS, pfSense et Cloudflare. Utilisez-les pour identifier la couche en défaut avant de modifier la configuration.",
+		"title": "Opérations et diagnostic",
+		"lead": "Un snapshot unique en lecture seule du runtime FastAPI, de la santé des dépendances et des preuves TrueNAS, pfSense et Cloudflare. Commencez ici pour identifier la couche en défaut avant de modifier la configuration.",
 		"board": {
 			"refreshing": "Actualisation des preuves…",
 			"pending": "La collecte initiale des preuves est encore en cours.",
@@ -10,6 +10,22 @@
 			"unavailable": "Les preuves opérationnelles sont temporairement indisponibles.",
 			"age": "âgé de {seconds}s",
 			"probeDuration": "sonde homelab {milliseconds} ms"
+		},
+		"sources": {
+			"title": "Sources des preuves",
+			"board": "Health board",
+			"runtime": "Topologie runtime",
+			"diagnostics": "Diagnostics homelab",
+			"health-board": "health board",
+			"fallback": "endpoint de secours",
+			"unavailable": "indisponible"
+		},
+		"cache": {
+			"layer": "couche de cache : {layer}",
+			"age": "âge du cache : {seconds}s",
+			"redisAvailable": "cache Redis disponible",
+			"redisUnavailable": "cache Redis indisponible ; fallback local utilisé",
+			"refreshing": "actualisation par un pair/origine en cours"
 		},
 		"components": {
 			"title": "Plans de contrôle",
@@ -26,7 +42,51 @@
 			"refreshError": "erreur d’actualisation : {error}",
 			"failureStage": "étape en échec : {stage}",
 			"tunnels": "{healthy}/{count} tunnels sains",
-			"tunnelStatuses": "États des tunnels : {statuses}"
+			"tunnelStatuses": "États des tunnels : {statuses}",
+			"probe": "sonde : {probe}",
+			"path": "chemin : {path}",
+			"exception": "exception : {exception}",
+			"retry": "fenêtre de nouvel essai : {seconds}s"
+		},
+		"runtime": {
+			"title": "Topologie runtime et transport TrueNAS",
+			"lead": "La topologie runtime provient du même snapshot health-board lorsqu’elle est disponible ; l’endpoint dédié n’est utilisé qu’en fallback de compatibilité.",
+			"provider": "fournisseur : {provider}",
+			"observed": "observé {timestamp}",
+			"instances": "{count} observations de runtimes actifs",
+			"aggregation": "agrégation : {aggregation}",
+			"activeEgress": "IP de sortie actives : {ips}",
+			"recentEgress": "IP de sortie récentes : {ips}",
+			"windows": "heartbeat {heartbeat}s · actif {active}s · egress récent {recent}s",
+			"instance": "{id} · vu pour la dernière fois {lastSeen} · egress {egress}",
+			"countSemantics": "Le nombre de runtimes observés provient des heartbeats applicatifs ; il ne constitue pas le nombre autoritatif de replicas FastAPI Cloud.",
+			"truenas": "Transport de l’API TrueNAS",
+			"reachable": "joignable",
+			"unreachable": "injoignable",
+			"lastGood": "dernière preuve saine conservée",
+			"unavailable": "La topologie runtime est actuellement indisponible."
+		},
+		"deep": {
+			"title": "Diagnostics profonds des dépendances et intégrations",
+			"lead": "Les checks FastAPI /healthz sont conservés comme preuves nettoyées. Les dépendances requises déterminent l’état unhealthy ; les intégrations optionnelles sont signalées comme dégradées sans être confondues avec les prérequis du runtime.",
+			"status": "état : {status}",
+			"contract": "contrat : {contract}",
+			"version": "version : {version}",
+			"required": "Dépendances runtime requises",
+			"control-plane": "Checks des plans de contrôle",
+			"integration": "Intégrations optionnelles",
+			"homelab": "Endpoints des services homelab",
+			"skipped": "ignoré",
+			"http": "HTTP {status}",
+			"tlsTrusted": "TLS de confiance",
+			"tlsUntrusted": "TLS non fiable",
+			"latency": "{milliseconds} ms",
+			"probe": "sonde {probe}",
+			"authentication": "authentification {authentication}",
+			"resource": "ressource {resource}",
+			"path": "chemin {path}",
+			"target": "cible {target}",
+			"none": "Aucun check de diagnostic profond n’est présent dans ce snapshot."
 		},
 		"pfsense": {
 			"title": "Preuves ingress et sécurité pfSense",
@@ -37,6 +97,9 @@
 			"blindSpotDetail": "L’observateur sécurité pfSense partage le même chemin WAN qu’il tente de diagnostiquer ; un échec de transport ne peut donc pas prouver que Snort/PF a bloqué sa propre télémétrie.",
 			"sourceToDestination": "{source} → {destination}:{port}",
 			"details": "Inspecter les preuves pfSense",
+			"telemetry": "télémétrie : {state}",
+			"attribution": "attribution : {state}",
+			"lastSuccess": "dernier succès télémétrie : {timestamp}",
 			"actions": {
 				"title": "pfSense nécessite votre attention",
 				"lead": "pfSense est dégradé, périmé ou sélectionné comme point de départ du diagnostic. Inspectez d’abord les preuves, puis ouvrez les surfaces d’administration si vous devez vérifier directement le plan de contrôle.",
@@ -45,6 +108,22 @@
 				"apiTitle": "Ouvre l’endpoint système pfSense en lecture seule ; un accès API autorisé peut être requis.",
 				"note": "Les liens Admin/API sont des points d’entrée de diagnostic, pas une preuve que pfSense est la cause de l’incident."
 			}
+		},
+		"serviceExposure": {
+			"title": "Exposition des services déclarée vs observée",
+			"lead": "La santé fonctionnelle reste distincte de la politique d’exposition. Les écarts montrent où les déclarations nabla-compose diffèrent des preuves Cloudflare Tunnel ou Access observées.",
+			"cloudflare": "Observateur Cloudflare",
+			"configured": "configuré : {state}",
+			"tunnels": "{count} tunnels observés",
+			"accessApps": "{count} applications Access observées",
+			"tunnelObserver": "Observateur Tunnel : {state}",
+			"accessObserver": "Observateur Access : {state}",
+			"declared": "edge déclaré : {edge}",
+			"publicHttps": "HTTPS public : {state}",
+			"tunnel": "Tunnel observé : {state}",
+			"access": "Access observé : {state}",
+			"accessPublic": "politique Access publique/bypass : {state}",
+			"none": "Aucune preuve d’exposition par service n’est présente dans ce snapshot."
 		},
 		"exposure": {
 			"title": "Politique d’exposition par sources approuvées",

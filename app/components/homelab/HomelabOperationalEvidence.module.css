@@ -42,7 +42,7 @@
 .troubleshoot {
 	display: grid;
 	gap: var(--ui-space-xs);
-	margin-bottom: var(--ui-space-lg);
+	margin-bottom: var(--ui-space-md);
 	padding: var(--ui-space-md);
 	border-left: 4px solid var(--ui-warning-border);
 	border-radius: var(--ui-radius-sm);
@@ -50,16 +50,39 @@
 	color: var(--ui-warning-text);
 }
 
+.sourceRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--ui-space-xs) var(--ui-space-sm);
+	margin-bottom: var(--ui-space-lg);
+	color: var(--ui-text-secondary);
+	font-size: 0.84rem;
+}
+
+.sourceRow span {
+	padding: 0.18rem 0.48rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+}
+
 .subheading {
 	margin: 0 0 var(--ui-space-sm);
 	font-size: 1.05rem;
 }
 
-.componentGrid {
+.componentGrid,
+.splitGrid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: var(--ui-space-md);
 	margin-bottom: var(--ui-space-lg);
+}
+
+.splitGrid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-bottom: 0;
 }
 
 .componentCard {
@@ -73,7 +96,8 @@
 	background: var(--ui-surface-muted);
 }
 
-.componentHeader {
+.componentHeader,
+.evidenceHeading {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -133,6 +157,7 @@
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius-sm);
 	background: var(--ui-surface-muted);
+	scroll-margin-top: 6rem;
 }
 
 .details > summary {
@@ -149,7 +174,7 @@
 
 .detailsBody {
 	display: grid;
-	gap: var(--ui-space-sm);
+	gap: var(--ui-space-md);
 	padding: 0 var(--ui-space-md) var(--ui-space-md);
 }
 
@@ -157,6 +182,15 @@
 .detailsBody h4,
 .detailsBody p {
 	margin: 0;
+}
+
+.diagnosticGroup {
+	display: grid;
+	gap: var(--ui-space-sm);
+}
+
+.diagnosticGroup h3 {
+	font-size: 1rem;
 }
 
 .alertFail,
@@ -193,6 +227,30 @@
 	padding: var(--ui-space-sm);
 	border-left: 3px solid var(--ui-border);
 	background: var(--ui-surface-card);
+	overflow-wrap: anywhere;
+}
+
+.compactList {
+	display: grid;
+	gap: var(--ui-space-2xs);
+	margin: var(--ui-space-xs) 0;
+	padding-left: 1.2rem;
+}
+
+.telemetrySummary,
+.providerSummary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ui-space-xs);
+	padding: var(--ui-space-sm);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-card);
+	font-size: 0.84rem;
+}
+
+.providerSummary strong {
+	flex-basis: 100%;
 }
 
 .exposureRow {
@@ -224,7 +282,8 @@
 		width: 100%;
 	}
 
-	.componentGrid {
+	.componentGrid,
+	.splitGrid {
 		grid-template-columns: 1fr;
 	}
 }

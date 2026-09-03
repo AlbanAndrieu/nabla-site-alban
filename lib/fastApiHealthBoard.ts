@@ -8,6 +8,7 @@ export type FastApiHealthBoardSnapshot = {
 	age_seconds?: number;
 	retry_after_seconds?: number;
 	error?: string | null;
+	runtime: unknown | null;
 	healthz: unknown | null;
 	homelab: unknown | null;
 	sickz: unknown | null;
@@ -66,6 +67,7 @@ export function parseFastApiHealthBoard(
 		...(typeof value.error === "string" || value.error === null
 			? { error: value.error }
 			: {}),
+		runtime: value.runtime ?? null,
 		healthz: value.healthz ?? null,
 		homelab: value.homelab ?? null,
 		sickz: value.sickz ?? null,
