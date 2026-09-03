@@ -13,9 +13,30 @@ import {
 } from "@/lib/sitePageCatalog";
 import { SITE_ORIGIN } from "@/lib/socialMetadata";
 
+function localizedPolicyIndexPath(locale: AppLocale) {
+	return locale === routing.defaultLocale ? "/policy" : `/${locale}/policy`;
+}
+
 function localizedPolicyPath(slug: PolicyPageSlug, locale: AppLocale) {
 	const path = getPolicyPage(slug).canonicalPath;
 	return locale === routing.defaultLocale ? path : `/${locale}${path}`;
+}
+
+function policyIndexSitemapEntry(): MetadataRoute.Sitemap[number] {
+	const defaultPath = localizedPolicyIndexPath(routing.defaultLocale);
+	const languages = Object.fromEntries([
+		...routing.locales.map((locale) => [
+			locale,
+			new URL(localizedPolicyIndexPath(locale), SITE_ORIGIN).href,
+		]),
+		["x-default", new URL(defaultPath, SITE_ORIGIN).href],
+	]);
+	return {
+		url: new URL(defaultPath, SITE_ORIGIN).href,
+		changeFrequency: "yearly" as const,
+		priority: 0.4,
+		alternates: { languages },
+	};
 }
 
 function policySitemapEntries(): MetadataRoute.Sitemap {
@@ -57,5 +78,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		};
 	});
 
-	return [...pageEntries, ...policySitemapEntries()];
+	return [
+		...pageEntries,
+		policyIndexSitemapEntry(),
+		...policySitemapEntries(),
+	];
 }
