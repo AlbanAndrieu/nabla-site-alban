@@ -13,8 +13,6 @@ const __dirname = path.dirname(__filename);
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-const localePrefixes = ["en", "fr"];
-
 /** Non-SEO legacy HTML routes that still render through App Router. */
 const htmlPageBeforeFiles = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/${slug}.html`, destination: `/en/${slug}` },
@@ -45,24 +43,21 @@ const canonicalHtmlRedirects = HTML_ROUTE_SLUGS.flatMap((slug) => [
 	{ source: `/fr/${slug}`, destination: `/fr/${slug}.html`, permanent: true },
 ]);
 
-const policyRewrites = [
+const policyNames = [
 	"legal",
 	"impressum",
 	"privacy_policy",
 	"service_terms",
 	"cookie_policy",
 	"accessibility_statement",
-].map((name) => ({
-	source: `/policy/${name}`,
-	destination: `/policy/${name}.html`,
-}));
+];
 
-const localizedPolicyRewrites = localePrefixes.flatMap((locale) =>
-	policyRewrites.map((rewrite) => ({
-		source: `/${locale}${rewrite.source}`,
-		destination: rewrite.destination,
-	})),
-);
+/** Policy HTML files remain archival sources; public navigation uses native clean routes. */
+const policyHtmlRedirects = policyNames.flatMap((name) => [
+	{ source: `/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
+	{ source: `/en/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
+	{ source: `/fr/policy/${name}.html`, destination: `/fr/policy/${name}`, permanent: true },
+]);
 
 const nextConfig = {
 	reactStrictMode: true,
@@ -80,12 +75,13 @@ const nextConfig = {
 			...seoHtmlRedirects,
 			...seoIndexRedirects,
 			...canonicalHtmlRedirects,
+			...policyHtmlRedirects,
 		];
 	},
 	async rewrites() {
 		return {
 			beforeFiles: [...htmlPageBeforeFiles],
-			afterFiles: [...localizedPolicyRewrites, ...policyRewrites],
+			afterFiles: [],
 		};
 	},
 };

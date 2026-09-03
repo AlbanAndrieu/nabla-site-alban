@@ -1,5 +1,11 @@
 import type { MetadataRoute } from "next";
 
+import { type AppLocale, routing } from "@/i18n/routing";
+import {
+	getPolicyPage,
+	POLICY_PAGE_SLUGS,
+	type PolicyPageSlug,
+} from "@/lib/policyPages";
 import {
 	canonicalPagePath,
 	SEO_PAGE_SLUGS,
@@ -7,8 +13,33 @@ import {
 } from "@/lib/sitePageCatalog";
 import { SITE_ORIGIN } from "@/lib/socialMetadata";
 
+function localizedPolicyPath(slug: PolicyPageSlug, locale: AppLocale) {
+	const path = getPolicyPage(slug).canonicalPath;
+	return locale === routing.defaultLocale ? path : `/${locale}${path}`;
+}
+
+function policySitemapEntries(): MetadataRoute.Sitemap {
+	return POLICY_PAGE_SLUGS.map((slug) => {
+		const defaultPath = localizedPolicyPath(slug, routing.defaultLocale);
+		const languages = Object.fromEntries([
+			...routing.locales.map((locale) => [
+				locale,
+				new URL(localizedPolicyPath(slug, locale), SITE_ORIGIN).href,
+			]),
+			["x-default", new URL(defaultPath, SITE_ORIGIN).href],
+		]);
+
+		return {
+			url: new URL(defaultPath, SITE_ORIGIN).href,
+			changeFrequency: "yearly" as const,
+			priority: 0.3,
+			alternates: { languages },
+		};
+	});
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-	return SEO_PAGE_SLUGS.map((slug) => {
+	const pageEntries = SEO_PAGE_SLUGS.map((slug) => {
 		const englishPath = canonicalPagePath(slug, "en");
 		const frenchPath = canonicalPagePath(slug, "fr");
 		const settings = seoSettings(slug);
@@ -25,4 +56,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			},
 		};
 	});
+
+	return [...pageEntries, ...policySitemapEntries()];
 }
