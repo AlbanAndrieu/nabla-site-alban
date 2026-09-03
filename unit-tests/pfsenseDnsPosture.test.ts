@@ -69,21 +69,30 @@ async function source(path: string) {
 test("DNS resilience is rendered by unified operational evidence instead of a standalone service-grid panel", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const operations = await source("app/components/homelab/HomelabOperationalEvidence.tsx");
-	const parser = await source("lib/homelabOperationalEvidence.ts");
+	const observability = await source("lib/homelabObservability.ts");
 
 	assert.match(block, /parseHomelabHealthSnapshot\(await response\.json\(\)\)/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 	assert.equal(block.match(/setInterval\(/g)?.length, 1);
-	assert.match(parser, /parsePfSensePosture/);
-	assert.match(parser, /dns\.reason/);
-	assert.match(operations, /evidence\.pfsense\.reason/);
+	assert.match(observability, /healthSnapshot:\s*HomelabHealthSnapshot/);
+	assert.match(observability, /parseHomelabHealthSnapshot\(board\.homelab\)/);
+	assert.match(operations, /import PfSenseDnsPosture/);
+	assert.match(operations, /snapshot=\{evidence\.healthSnapshot\}/);
 	assert.match(operations, /data-pfsense-security-evidence/);
 });
 
-test("legacy DNS posture component remains sanitized while the unified panel owns its presentation", async () => {
+test("DNS posture exposes explicit resilience states without raw network configuration", async () => {
 	const component = await source("app/components/homelab/PfSenseDnsPosture.tsx");
 
 	assert.match(component, /data-pfsense-dns-policy/);
 	assert.match(component, /data-pfsense-dns-truenas-only/);
+	assert.match(component, /dns\.independent/);
+	assert.match(component, /dns\.truenasOnly/);
+	assert.match(component, /dns\.resolverFailed/);
+	assert.match(component, /dns\.unconfigured/);
+	assert.match(component, /dns\.unreachable/);
+	assert.match(component, /dns\.resolverRunning/);
+	assert.match(component, /dns\.modeRecursive/);
+	assert.match(component, /dns\.upstreamCount/);
 	assert.doesNotMatch(component, /PFSENSE_API_KEY|dnsserver|172\.17\.0\.1/);
 });
