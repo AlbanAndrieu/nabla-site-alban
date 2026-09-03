@@ -104,6 +104,103 @@
 	margin-bottom: var(--ui-space-sm);
 }
 
+.relationLegend,
+.exposureContract {
+	margin-bottom: var(--ui-space-sm);
+	padding: 0.75rem;
+	border: 1px solid #475569;
+	border-radius: var(--ui-radius-card, 0.85rem);
+	background: #0f172a;
+	color: #e2e8f0;
+}
+
+.relationLegendItems {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	margin: 0.5rem 0;
+}
+
+.relationLegendItems > span {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+.relationSwatch {
+	display: inline-block;
+	width: 2.4rem;
+	height: 0;
+	border-top: 3px solid currentcolor;
+}
+
+.edgeDependency {
+	color: #38bdf8;
+}
+
+.edgeFlow {
+	color: #60a5fa;
+}
+
+.edgeExposure {
+	color: #c084fc;
+	border-top-style: dashed;
+}
+
+.edgePlacement {
+	color: #94a3b8;
+	border-top-style: dotted;
+}
+
+.edgeObservation {
+	color: #4ade80;
+	border-top-style: dashed;
+}
+
+.edgeAutomation {
+	color: #fbbf24;
+	border-top-style: dashed;
+}
+
+.exposureContractHeader {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.65rem;
+}
+
+.exposurePathGrid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.65rem;
+}
+
+.exposurePathGrid > div {
+	display: grid;
+	gap: 0.35rem;
+	padding: 0.65rem;
+	border: 1px solid #334155;
+	border-radius: 0.7rem;
+	background: #020617;
+}
+
+.exposurePathGrid code {
+	overflow-wrap: anywhere;
+	white-space: normal;
+	color: #bae6fd;
+	font-size: 0.72rem;
+}
+
+.exposurePathGrid small,
+.relationLegend small {
+	color: #cbd5e1;
+	font-size: 0.75rem;
+	line-height: 1.4;
+}
+
 .flowShell {
 	height: min(82vh, 62rem);
 	min-height: 42rem;
@@ -393,6 +490,12 @@
 	line-height: 1.45;
 }
 
+@media (max-width: 1100px) {
+	.exposurePathGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 @media (max-width: 700px) {
 	.explorer {
 		padding-inline: var(--ui-space-sm);
@@ -409,6 +512,16 @@
 	.search input,
 	.toggle {
 		width: 100%;
+	}
+
+	.relationLegendItems,
+	.exposureContractHeader {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.exposurePathGrid {
+		grid-template-columns: 1fr;
 	}
 
 	.flowShell {
