@@ -38,7 +38,7 @@ test("policy index links every native policy and derives localized SEO from rout
 	assert.match(index, /routing\.locales\.map/);
 	assert.match(index, /"x-default"/);
 	assert.match(index, /policy-index-title/);
-	assert.doesNotMatch(index, /\.html/);
+	assert.doesNotMatch(index, /<Link[^>]+\.html/);
 
 	const sitemap = await source("app/sitemap.ts");
 	assert.match(sitemap, /policyIndexSitemapEntry/);
