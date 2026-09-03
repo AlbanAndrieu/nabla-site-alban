@@ -11,7 +11,8 @@ test("architecture exposes stable anchors for every declared service", async () 
 		new URL("../app/[locale]/architecture/page.tsx", import.meta.url),
 		"utf8",
 	);
-	assert.match(directory, /id={`service-\${id}`}/);
+	assert.match(directory, /id={`service-\${node\.id}`}/);
+	assert.match(directory, /href={`#service-\${node\.id}`}/);
 	assert.match(directory, /homelabServiceId/);
 	assert.match(page, /ArchitectureServiceDirectory/);
 });
