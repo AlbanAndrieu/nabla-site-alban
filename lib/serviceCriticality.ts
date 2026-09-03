@@ -43,6 +43,11 @@ const BLOCKING_RELATION_TYPES = new Set<ServiceRelationType>([
 	"partOf",
 ]);
 
+const IMPACT_RELATION_TYPES = new Set<ServiceRelationType>([
+	...BLOCKING_RELATION_TYPES,
+	"hostedBy",
+]);
+
 const FOUNDATION_KINDS = new Set([
 	"storage-platform",
 	"container-runtime",
@@ -89,6 +94,13 @@ function isBlockingRequired(relation: ServiceTopologyRelation): boolean {
 	);
 }
 
+function isImpactRequired(relation: ServiceTopologyRelation): boolean {
+	return (
+		relation.strength === "required" &&
+		IMPACT_RELATION_TYPES.has(relation.type)
+	);
+}
+
 function semanticFoundation(node: ServiceTopologyNode): boolean {
 	return FOUNDATION_KINDS.has(node.kind);
 }
@@ -130,7 +142,7 @@ export function analyzeServiceCriticality(
 	topology: ServiceTopology,
 ): Map<string, ServiceCriticality> {
 	const requiredDependencies = new Map<string, Set<string>>();
-	const requiredDependents = new Map<string, Set<string>>();
+	const impactDependents = new Map<string, Set<string>>();
 	const optionalDependencies = new Map<string, Set<string>>();
 
 	for (const relation of topology.relations) {
@@ -138,10 +150,6 @@ export function analyzeServiceCriticality(
 			const dependencies = requiredDependencies.get(relation.source) ?? new Set();
 			dependencies.add(relation.target);
 			requiredDependencies.set(relation.source, dependencies);
-
-			const dependents = requiredDependents.get(relation.target) ?? new Set();
-			dependents.add(relation.source);
-			requiredDependents.set(relation.target, dependents);
 		} else if (
 			relation.strength === "optional" &&
 			BLOCKING_RELATION_TYPES.has(relation.type)
@@ -150,14 +158,20 @@ export function analyzeServiceCriticality(
 			dependencies.add(relation.target);
 			optionalDependencies.set(relation.source, dependencies);
 		}
+
+		if (isImpactRequired(relation)) {
+			const dependents = impactDependents.get(relation.target) ?? new Set();
+			dependents.add(relation.source);
+			impactDependents.set(relation.target, dependents);
+		}
 	}
 
 	return new Map(
 		topology.nodes.map((node) => {
 			const directDependencyIds = [...(requiredDependencies.get(node.id) ?? [])].sort();
-			const directDependentIds = [...(requiredDependents.get(node.id) ?? [])].sort();
+			const directDependentIds = [...(impactDependents.get(node.id) ?? [])].sort();
 			const transitiveDependentIds = [
-				...collectReachable(node.id, requiredDependents),
+				...collectReachable(node.id, impactDependents),
 			].sort();
 			return [
 				node.id,
