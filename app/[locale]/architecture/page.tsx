@@ -14,15 +14,18 @@ import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
-import ArchitectureServiceDirectory from "./ArchitectureServiceDirectory";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/architecture">): Promise<Metadata> {
+export async function generateMetadata({
+	params,
+}: PageProps<"/[locale]/architecture">): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
 	return buildPageMetadata({
-		title: french ? "Architecture des services Nabla" : "Nabla service architecture",
+		title: french
+			? "Architecture des services Nabla"
+			: "Nabla service architecture",
 		description: french
 			? "Diagrammes interactifs de la plateforme IA et de la topologie des services Nabla et TrueNAS."
 			: "Interactive diagrams of the AI platform and the Nabla and TrueNAS service topology.",
@@ -31,7 +34,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/architec
 	});
 }
 
-export default async function ArchitecturePage({ params }: PageProps<"/[locale]/architecture">) {
+export default async function ArchitecturePage({
+	params,
+}: PageProps<"/[locale]/architecture">) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
@@ -45,11 +50,17 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 			<TopAnchor />
 			<SkipToMainContent />
 			<main id="main-content">
-				<section id="architecture-overview" className="hero-section" aria-labelledby="architecture-title">
+				<section
+					id="architecture-overview"
+					className="hero-section"
+					aria-labelledby="architecture-title"
+				>
 					<div className="hero-content">
 						<h1 id="architecture-title" className="hero-title">
 							<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
-							{french ? "Architecture interactive Nabla" : "Interactive Nabla architecture"}
+							{french
+								? "Architecture interactive Nabla"
+								: "Interactive Nabla architecture"}
 						</h1>
 						<p className="hero-subtitle">
 							{french
@@ -62,9 +73,15 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 								: "The page starts with foundations and components with the largest blast radius before leaf applications. The detailed view then keeps the complete relationship graph declared in nabla-compose."}
 						</p>
 						<div className="d-flex flex-wrap gap-2 justify-content-center">
-							<ActionLink href={`${prefix}/ai`} variant="secondary">AI</ActionLink>
-							<ActionLink href={`${prefix}/truenas`} variant="secondary">TrueNAS</ActionLink>
-							<ActionLink href={`${prefix}/nabla`} variant="secondary">Nabla</ActionLink>
+							<ActionLink href={`${prefix}/ai`} variant="secondary">
+								AI
+							</ActionLink>
+							<ActionLink href={`${prefix}/truenas`} variant="secondary">
+								TrueNAS
+							</ActionLink>
+							<ActionLink href={`${prefix}/nabla`} variant="secondary">
+								Nabla
+							</ActionLink>
 						</div>
 					</div>
 				</section>
@@ -74,7 +91,6 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					<HomelabOperationalEvidence />
 				</div>
 				<ArchitectureImpactInspector locale={locale} />
-				<ArchitectureServiceDirectory locale={locale} catalog={catalog} topology={topology} />
 
 				<ArchitectureTopologyView
 					locale={locale}
@@ -84,11 +100,20 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					initialTopologySource={topologySource}
 				/>
 
-				<section id="homelab-network-architecture" className="content-section" aria-labelledby="homelab-network-ingress-paths">
+				<section
+					id="homelab-network-architecture"
+					className="content-section"
+					aria-labelledby="homelab-network-ingress-paths"
+				>
 					<div className="container py-5">
-						<div className="text-center mx-auto mb-4" style={{ maxWidth: "900px" }}>
+						<div
+							className="text-center mx-auto mb-4"
+							style={{ maxWidth: "900px" }}
+						>
 							<AnchoredHeading id="homelab-network-ingress-paths">
-								{french ? "Réseau homelab et chemins d’ingress" : "Homelab network and ingress paths"}
+								{french
+									? "Réseau homelab et chemins d’ingress"
+									: "Homelab network and ingress paths"}
 							</AnchoredHeading>
 							<p>
 								{french
@@ -100,11 +125,20 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 					</div>
 				</section>
 
-				<section id="declared-observed-architecture" className="content-section" aria-labelledby="declared-observed-health">
+				<section
+					id="declared-observed-architecture"
+					className="content-section"
+					aria-labelledby="declared-observed-health"
+				>
 					<div className="container py-5">
-						<div className="text-center mx-auto mb-4" style={{ maxWidth: "860px" }}>
+						<div
+							className="text-center mx-auto mb-4"
+							style={{ maxWidth: "860px" }}
+						>
 							<AnchoredHeading id="declared-observed-health">
-								{french ? "Configuration déclarée, runtime observé et santé" : "Declared configuration, observed runtime, and health"}
+								{french
+									? "Configuration déclarée, runtime observé et santé"
+									: "Declared configuration, observed runtime, and health"}
 							</AnchoredHeading>
 							<p>
 								{french
@@ -115,10 +149,30 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 
 						<div className="row g-3">
 							{[
-								["1. nabla-compose", french ? "Source déclarative : services x-nabla, identité stable, binding runtime et relations de topologie. services.json et service-topology.json sont générés depuis le code." : "Declarative source: x-nabla services, stable identity, runtime binding, and topology relationships. services.json and service-topology.json are generated from code."],
-								["2. TrueNAS API", french ? "Source runtime observée : le client officiel truenas_api_client interroge app.query pour les Apps, containers, états et versions. Il ne décide jamais qu’un service doit exister ou être public." : "Observed runtime source: the official truenas_api_client queries app.query for Apps, containers, states, and versions. It never decides that a service should exist or be public."],
-								["3. fastapi-sample", french ? "Couche de réconciliation : joint les bindings déclarés aux workloads TrueNAS, classe les écarts (in_sync, declared_only, observed_only, conflict) et garde les contrôles de santé séparés." : "Reconciliation layer: joins declared bindings to TrueNAS workloads, classifies drift (in_sync, declared_only, observed_only, conflict), and keeps health checks separate."],
-								["4. albanandrieu.com", french ? "Couche de présentation : visualise la topologie, le statut runtime et la santé sans devenir une source de données backend." : "Presentation layer: visualizes topology, runtime status, and health without becoming a backend data source."],
+								[
+									"1. nabla-compose",
+									french
+										? "Source déclarative : services x-nabla, identité stable, binding runtime et relations de topologie. services.json et service-topology.json sont générés depuis le code."
+										: "Declarative source: x-nabla services, stable identity, runtime binding, and topology relationships. services.json and service-topology.json are generated from code.",
+								],
+								[
+									"2. TrueNAS API",
+									french
+										? "Source runtime observée : le client officiel truenas_api_client interroge app.query pour les Apps, containers, états et versions. Il ne décide jamais qu’un service doit exister ou être public."
+										: "Observed runtime source: the official truenas_api_client queries app.query for Apps, containers, states, and versions. It never decides that a service should exist or be public.",
+								],
+								[
+									"3. fastapi-sample",
+									french
+										? "Couche de réconciliation : joint les bindings déclarés aux workloads TrueNAS, classe les écarts (in_sync, declared_only, observed_only, conflict) et garde les contrôles de santé séparés."
+										: "Reconciliation layer: joins declared bindings to TrueNAS workloads, classifies drift (in_sync, declared_only, observed_only, conflict), and keeps health checks separate.",
+								],
+								[
+									"4. albanandrieu.com",
+									french
+										? "Couche de présentation : visualise la topologie, le statut runtime et la santé sans devenir une source de données backend."
+										: "Presentation layer: visualizes topology, runtime status, and health without becoming a backend data source.",
+								],
 							].map(([title, copy]) => (
 								<div className="col-12 col-md-6 col-xl-3" key={title}>
 									<div className="card h-100 bg-dark border-secondary p-3">
@@ -130,10 +184,22 @@ export default async function ArchitecturePage({ params }: PageProps<"/[locale]/
 						</div>
 
 						<div className="text-center mt-4">
-							<p className="mb-3"><strong>Declared ≠ Observed ≠ Healthy</strong></p>
+							<p className="mb-3">
+								<strong>Declared ≠ Observed ≠ Healthy</strong>
+							</p>
 							<div className="d-flex flex-wrap gap-2 justify-content-center">
-								<ActionLink href="https://github.com/AlbanAndrieu/nabla-compose" variant="secondary">nabla-compose</ActionLink>
-								<ActionLink href="https://github.com/AlbanAndrieu/fastapi-sample" variant="secondary">fastapi-sample</ActionLink>
+								<ActionLink
+									href="https://github.com/AlbanAndrieu/nabla-compose"
+									variant="secondary"
+								>
+									nabla-compose
+								</ActionLink>
+								<ActionLink
+									href="https://github.com/AlbanAndrieu/fastapi-sample"
+									variant="secondary"
+								>
+									fastapi-sample
+								</ActionLink>
 							</div>
 						</div>
 					</div>

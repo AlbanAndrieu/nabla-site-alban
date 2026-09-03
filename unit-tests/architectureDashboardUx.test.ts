@@ -9,7 +9,12 @@ async function source(path: string) {
 test("architecture exposes stable anchors for every major section", async () => {
 	const page = await source("app/[locale]/architecture/page.tsx");
 	const nav = await source("app/[locale]/architecture/ArchitectureSectionNav.tsx");
-	const topology = await source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+	const topology = await source(
+		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
+	);
+	const hierarchy = await source(
+		"app/[locale]/architecture/ArchitectureServiceHierarchy.tsx",
+	);
 	const criticality = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);
@@ -17,22 +22,26 @@ test("architecture exposes stable anchors for every major section", async () => 
 	for (const anchor of [
 		"architecture-overview",
 		"architecture-health-dashboard",
+		"architecture-services",
 		"critical-dependency-hierarchy",
 		"service-architecture-explorer",
 		"homelab-network-ingress-paths",
 		"declared-observed-health",
 	]) {
 		assert.match(
-			`${page}\n${nav}\n${topology}\n${criticality}`,
+			`${page}\n${nav}\n${topology}\n${hierarchy}\n${criticality}`,
 			new RegExp(anchor),
 		);
 	}
 	assert.match(page, /id="homelab-network-architecture"/);
 	assert.match(page, /id="declared-observed-architecture"/);
+	assert.match(hierarchy, /id="service-directory"/);
 });
 
 test("architecture dashboard filters declared services by health and criticality", async () => {
-	const topology = await source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+	const topology = await source(
+		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
+	);
 
 	assert.match(topology, /type HealthFilter = "all" \| HomelabHealthState/);
 	assert.match(topology, /type TierFilter = "all" \| ServiceCriticalityTier/);
@@ -41,21 +50,32 @@ test("architecture dashboard filters declared services by health and criticality
 	assert.match(topology, /filteredCatalog/);
 	assert.match(topology, /data-health-filter/);
 	assert.match(topology, /Reset filters/);
+	assert.match(topology, /HomelabServicesBlock\.module\.css/);
 });
 
-test("architecture reuses the same collapsed critical hierarchy as TrueNAS", async () => {
-	const topology = await source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+test("architecture places TrueNAS-style services between filters and critical hierarchy", async () => {
+	const topology = await source(
+		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
+	);
+	const hierarchy = await source(
+		"app/[locale]/architecture/ArchitectureServiceHierarchy.tsx",
+	);
 	const criticality = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);
 
+	const dashboardIndex = topology.indexOf('id="architecture-health-dashboard"');
+	const servicesIndex = topology.indexOf("<ArchitectureServiceHierarchy");
 	const criticalityIndex = topology.indexOf("<CriticalDependencyHierarchy");
 	const explorerIndex = topology.indexOf('id="service-architecture-explorer"');
 
-	assert.ok(criticalityIndex >= 0);
+	assert.ok(dashboardIndex >= 0);
+	assert.ok(servicesIndex > dashboardIndex);
+	assert.ok(criticalityIndex > servicesIndex);
 	assert.ok(explorerIndex > criticalityIndex);
-	assert.match(topology, /import CriticalDependencyHierarchy/);
-	assert.doesNotMatch(topology, /ServiceCriticalityOverview/);
+	assert.match(hierarchy, /<HomelabServiceGrid/);
+	assert.match(hierarchy, /className={styles\.groupDetails}/);
+	assert.match(hierarchy, /className={styles\.groupSummary}/);
 	assert.match(criticality, /<details/);
 	assert.match(criticality, /data-criticality-toggle/);
 	assert.doesNotMatch(criticality, /defaultOpen|open=\{true\}/);

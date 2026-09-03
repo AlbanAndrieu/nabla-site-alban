@@ -1,115 +1,6 @@
-.dashboard,
 .explorerSection {
 	width: min(100% - 2rem, 1200px);
 	margin-inline: auto;
-}
-
-.dashboard {
-	margin-block: var(--ui-space-xl);
-	padding: var(--ui-space-lg);
-	border: 1px solid var(--ui-border);
-	border-radius: var(--ui-radius-card);
-	background: var(--ui-surface-card);
-	box-shadow: var(--ui-shadow-sm);
-}
-
-.dashboardHeader {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: var(--ui-space-lg);
-}
-
-.dashboardTitle {
-	margin: 0 0 var(--ui-space-xs);
-}
-
-.dashboardLead,
-.matchCount,
-.sectionHeading p {
-	margin: 0;
-	color: var(--ui-text-secondary);
-}
-
-.refreshStatus {
-	flex: 0 0 auto;
-	padding: var(--ui-space-xs) var(--ui-space-sm);
-	border: 1px solid var(--ui-border);
-	border-radius: 999px;
-	background: var(--ui-surface-muted);
-	color: var(--ui-text-secondary);
-	font-size: 0.875rem;
-	font-weight: 600;
-}
-
-.healthSummary {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: var(--ui-space-sm);
-	margin-block: var(--ui-space-lg);
-}
-
-.healthChip {
-	min-height: var(--ui-control-min-height);
-	padding: var(--ui-space-sm);
-	border: 1px solid var(--ui-border);
-	border-radius: var(--ui-radius-md);
-	background: var(--ui-surface-muted);
-	color: var(--ui-text-primary);
-	cursor: pointer;
-}
-
-.healthChip[aria-pressed="true"] {
-	border-color: var(--ui-link);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-link) 30%, transparent);
-}
-
-.healthChip:focus-visible,
-.resetButton:focus-visible,
-.filterField select:focus-visible {
-	outline: 3px solid var(--ui-focus-ring);
-	outline-offset: 3px;
-}
-
-.filters {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: end;
-	gap: var(--ui-space-md);
-}
-
-.filterField {
-	display: grid;
-	gap: var(--ui-space-xs);
-	min-width: min(100%, 15rem);
-	color: var(--ui-text-secondary);
-	font-size: 0.875rem;
-	font-weight: 600;
-}
-
-.filterField select {
-	min-height: var(--ui-control-min-height);
-	padding: 0 var(--ui-space-sm);
-	border: 1px solid var(--ui-border);
-	border-radius: var(--ui-radius-md);
-	background: var(--ui-surface);
-	color: var(--ui-text-primary);
-}
-
-.resetButton {
-	min-height: var(--ui-control-min-height);
-	padding-inline: var(--ui-space-md);
-	border: 1px solid var(--ui-border);
-	border-radius: var(--ui-radius-md);
-	background: var(--ui-surface-muted);
-	color: var(--ui-text-primary);
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.matchCount {
-	margin-top: var(--ui-space-md);
-	font-size: 0.875rem;
 }
 
 /* Mirror Bootstrap's .container breakpoints used by the TrueNAS services section so
@@ -136,51 +27,47 @@
 	text-align: center;
 }
 
+.sectionHeading p {
+	margin: 0;
+	color: var(--ui-text-secondary);
+}
+
 .sectionHeading h2 {
 	margin-bottom: var(--ui-space-sm);
 }
 
 @media (min-width: 576px) {
-	.criticalitySection { max-width: 540px; }
+	.criticalitySection {
+		max-width: 540px;
+	}
 }
 
 @media (min-width: 768px) {
-	.criticalitySection { max-width: 720px; }
+	.criticalitySection {
+		max-width: 720px;
+	}
 }
 
 @media (min-width: 992px) {
-	.criticalitySection { max-width: 960px; }
+	.criticalitySection {
+		max-width: 960px;
+	}
 }
 
 @media (min-width: 1200px) {
-	.criticalitySection { max-width: 1140px; }
+	.criticalitySection {
+		max-width: 1140px;
+	}
 }
 
 @media (min-width: 1400px) {
-	.criticalitySection { max-width: 1320px; }
+	.criticalitySection {
+		max-width: 1320px;
+	}
 }
 
 @media (max-width: 760px) {
-	.dashboard,
 	.explorerSection {
 		width: min(100% - 1rem, 1200px);
-	}
-
-	.dashboard {
-		padding: var(--ui-space-md);
-	}
-
-	.dashboardHeader {
-		flex-direction: column;
-	}
-
-	.healthSummary {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.filters,
-	.filterField,
-	.resetButton {
-		width: 100%;
 	}
 }
