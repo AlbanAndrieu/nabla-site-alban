@@ -4,6 +4,10 @@ import {
 	type HomelabDiagnosticsSnapshot,
 } from "./homelabDiagnostics";
 import {
+	parseHomelabHealthSnapshot,
+	type HomelabHealthSnapshot,
+} from "./homelabHealth";
+import {
 	parseHomelabOperationalEvidence,
 	type HomelabOperationalEvidence,
 	type OperationalComponentEvidence,
@@ -77,6 +81,7 @@ export type CloudflareCacheEvidence = {
 export type HomelabObservabilitySource = "health-board" | "fallback" | "unavailable";
 
 export type HomelabObservabilitySnapshot = HomelabOperationalEvidence & {
+	healthSnapshot: HomelabHealthSnapshot | null;
 	runtimeTopology: RuntimeTopologySnapshot | null;
 	deepDiagnostics: DeepDiagnosticEvidence;
 	diagnostics: HomelabDiagnosticsSnapshot | null;
@@ -271,12 +276,14 @@ export function parseHomelabObservability(
 	board: FastApiHealthBoardSnapshot,
 ): HomelabObservabilitySnapshot {
 	const operational = parseHomelabOperationalEvidence(board);
+	const healthSnapshot = parseHomelabHealthSnapshot(board.homelab);
 	const runtimeTopology = parseRuntimeTopology(board.runtime);
 	const diagnostics = isRecord(board.homelab)
 		? parseHomelabDiagnostics(board.homelab)
 		: null;
 	return {
 		...operational,
+		healthSnapshot,
 		runtimeTopology,
 		deepDiagnostics: parseDeepDiagnostics(board.healthz),
 		diagnostics,
