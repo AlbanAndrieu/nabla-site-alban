@@ -1,12 +1,12 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 2 septembre 2026.
+Dernière vérification : 3 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
 branche finale et le déploiement Vercel sont validés.
 
-## État validé au 2 septembre 2026
+## État validé au 3 septembre 2026
 
 - [x] `master` compile avec le build Next.js de production dans la CI.
 - [x] La CI Quality/Security s'exécute sur les PR et sur les pushes pertinents de
@@ -25,6 +25,10 @@ branche finale et le déploiement Vercel sont validés.
   de Bootstrap pour leur présentation principale.
 - [x] Les variantes historiques `cv-{small,medium,large,full}-*.html` sont une
   exception statique intentionnelle et restent des documents HTML autonomes.
+- [x] Les six pages de policy sont natives, disposent d'un index `/policy`, de
+  canonical/hreflang propres et restent compatibles avec les anciennes URL HTML.
+- [x] Les diagnostics homelab distinguent désormais l'échec courant des preuves
+  `last_good`/stale et conservent l'âge, le cache et la provenance des observations.
 
 ## P0 — Cohérence produit et contenu
 
@@ -44,8 +48,9 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Migrer les URL SEO principales vers des routes canoniques sans `.html`.
 - [x] Consolider les pages Nabla/TrueNAS et retirer leurs runtimes historiques.
 - [ ] Migrer `/security` de `PublicHtmlFragment` vers des composants React natifs.
-- [ ] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
-  implémentation moderne intégrée au bundle après la migration Security.
+- [x] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
+  implémentation React intégrée au bundle ; `arf.json` reste une entrée de données
+  uniquement, couverte par `unit-tests/securityRuntime.test.ts`.
 - [ ] Finir la migration du contenu historique encore nécessaire sur `/ai` et
   recentrer la page sur l'architecture Secure AI actuelle.
 - [ ] Migrer les derniers fragments nécessaires de `/workstation`.
@@ -123,8 +128,9 @@ les autres chantiers.
   `runtime_unknown`, `not_observed` et les workloads `observed_only`.
 - [x] Signaler les snapshots runtime périmés (`stale`) séparément d'un runtime
   fraîchement observable.
-- [ ] Réconcilier la santé de chaque service depuis les preuves HTTP directes,
-  le runtime TrueNAS et les ingress Cloudflare plutôt que depuis un probe unique.
+- [x] Réconcilier la santé de chaque service depuis les preuves HTTP directes,
+  le runtime TrueNAS et les ingress Cloudflare plutôt que depuis un probe unique ;
+  les preuves restent séparées et le resolver partagé décide de l'état local.
 - [x] Propager les dépendances `strength=required` fournies par `fastapi-sample`
   dans l'état final : distinguer `local_state`, `dependency_state` et
   `effective_state`, puis afficher `required_dependencies`, `blocked_by` et les
@@ -149,11 +155,14 @@ les autres chantiers.
   radius visuellement dominants.
 - [ ] Ajouter une représentation mobile compacte de cette hiérarchie avec
   collapse/expand et, lorsque pertinent, filtres critical-only et optional-edge.
-- [ ] Distinguer visuellement les arêtes de dépendance des chemins d'exposition :
-  `HAProxy direct`, `Cloudflare Tunnel`, `LAN/VPN only` et routage interne ; garder
-  visibles les ports structurants `7000`, `10443` et `9922`.
-- [ ] Ne jamais utiliser l'état Cloudflare comme preuve du chemin TrueNAS direct
-  `Internet -> pfSense:7000 -> HAProxy -> TrueNAS`.
+- [x] Distinguer visuellement les arêtes de dépendance des chemins d'exposition :
+  le graphe classe maintenant `dependency`, flux API/données, `exposure`,
+  hébergement, observabilité et automatisation, tandis que le contrat réseau
+  distingue `HAProxy direct`, `Cloudflare Tunnel`, `LAN/VPN only` et routage
+  interne ; les ports structurants `7000`, `10443` et `9922` restent visibles.
+- [x] Ne jamais utiliser l'état Cloudflare comme preuve du chemin TrueNAS direct
+  `Internet -> pfSense:7000 -> HAProxy -> TrueNAS` : la vue et les tests gardent
+  explicitement la preuve Tunnel/Access séparée du chemin direct.
 - [x] Centraliser les types/tokens/helpers d'état et les composants de preuve afin
   que `/truenas#homelab`, `/architecture` et les futurs graphes ne développent pas
   des conventions de couleurs divergentes. Voir `docs/homelab-dependency-health-ui.md`
@@ -161,8 +170,10 @@ les autres chantiers.
 - [x] Rafraîchir automatiquement le snapshot de santé dans l'UI toutes les 30 s,
   suspendre les polls quand l'onglet est masqué et conserver le dernier état
   valide pendant une panne transitoire du backend.
-- [ ] Afficher explicitement la preuve ayant conduit à vert/orange/rouge et l'âge
-  du snapshot afin qu'un ancien état vert ne soit jamais interprété comme live.
+- [x] Afficher explicitement la preuve ayant conduit à vert/orange/rouge et l'âge
+  du snapshot : l'UI distingue état courant, fraîcheur/cache, erreur de refresh et
+  dernière preuve saine `last_good` afin qu'un ancien état vert ne soit pas lu
+  comme une observation live.
 - [ ] Revalider le graphe de production après chaque évolution importante du
   catalogue `nabla-compose` / du contrat `fastapi-sample`.
 - [ ] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
@@ -212,13 +223,13 @@ Déjà migrés :
 - [x] Nabla
 - [x] Architecture
 - [x] Jus Mundi
+- [x] Security
 - [x] Checkout TJM
 - [x] CV catch-all
 - [x] Startup / Startup Thanks
 
 Restant :
 
-- [ ] Security lors de sa migration native.
 - [ ] Link si le markup manuel subsiste après vérification.
 - [ ] `components/payments/PaymentShell.tsx` si le shell expose encore son propre
   markup de skip-link.
@@ -346,15 +357,16 @@ Autres contrôles :
 1. Compléter la topologie d'hébergement/runtime à partir des sources autoritatives,
    puis améliorer le React Flow détaillé avec les mêmes niveaux de criticité et
    blast radius déjà utilisés dans la vue partagée.
-2. Terminer la preuve de santé : réconciliation HTTP + TrueNAS + ingress, âge du
-   snapshot et raison explicite des états vert/orange/rouge.
-3. Rendre la hiérarchie Architecture/TrueNAS réellement compacte sur mobile avec
+2. Rendre la hiérarchie Architecture/TrueNAS réellement compacte sur mobile avec
    collapse/expand et filtres ciblés lorsque le graphe dense n'est pas adapté.
+3. Revalider régulièrement le graphe de production et ajouter les contrats pour
+   workloads multi-services/auxiliaires lorsque la topologie autoritative les expose.
 4. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
 5. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
    et le retrait de Bootstrap après les migrations déjà faites de RouteHeader,
    LocaleSwitcher, Footer et ContactHero.
-6. Migration native de `/security`, retrait D3 v3/`arf.js` et durcissement CSP.
+6. Terminer la migration native de `/security` et le durcissement CSP ; D3 v3 et
+   `arf.js` sont déjà retirés du runtime.
 7. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
 8. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
 9. Workstation, code mort, Bootstrap/CDN et budgets performance. Les CV

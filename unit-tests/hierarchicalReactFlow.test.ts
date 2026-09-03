@@ -50,8 +50,8 @@ test("AI Platform is rendered as functional swimlanes and optional edges remain 
 		assert.match(explorer, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 	}
 	assert.match(explorer, /Optional relations/);
-	assert.match(explorer, /relation\.optional \? "optional" : "required"/);
-	assert.match(explorer, /strokeDasharray: relation\.optional/);
+	assert.match(explorer, /relationStrengthLabel\(Boolean\(relation\.optional\), french\)/);
+	assert.match(explorer, /strokeDasharray/);
 });
 
 test("hierarchical graph keeps dependency-aware health on required edges", async () => {
@@ -65,4 +65,52 @@ test("hierarchical graph keeps dependency-aware health on required edges", async
 	assert.match(explorer, /targetState === "fail"/);
 	assert.match(explorer, /targetState === "warn" \|\| targetState === "unknown"/);
 	assert.match(explorer, /data-dependency-health/);
+});
+
+test("architecture graph distinguishes relation purpose from required or optional strength", async () => {
+	const [explorer, styles] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css"),
+	]);
+	assert.match(explorer, /type RelationSemantic/);
+	assert.match(explorer, /relationSemantic\(relation\.type\)/);
+	assert.match(explorer, /data-architecture-relation-legend/);
+	for (const semantic of [
+		"dependency",
+		"flow",
+		"exposure",
+		"placement",
+		"observation",
+		"automation",
+	]) {
+		assert.match(explorer, new RegExp(`data-relation-kind=\\{semantic\\}|\\[\\"${semantic}\\"`));
+	}
+	for (const className of [
+		"edgeDependency",
+		"edgeFlow",
+		"edgeExposure",
+		"edgePlacement",
+		"edgeObservation",
+		"edgeAutomation",
+	]) {
+		assert.match(styles, new RegExp(`\\.${className}\\b`));
+	}
+	assert.match(explorer, /semanticStyle\.color/);
+	assert.match(explorer, /semanticStyle\.dash/);
+});
+
+test("exposure contract keeps direct, tunnel, LAN VPN and internal paths causally separate", async () => {
+	const explorer = await source(
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+	);
+	assert.match(explorer, /data-exposure-path-contract/);
+	assert.match(explorer, /data-exposure-path="direct"/);
+	assert.match(explorer, /data-exposure-path="cloudflare"/);
+	assert.match(explorer, /data-exposure-path="lan-vpn"/);
+	assert.match(explorer, /data-exposure-path="internal"/);
+	assert.match(explorer, /pfSense:7000 → HAProxy → TrueNAS:7000/);
+	assert.match(explorer, /10443\/tcp/);
+	assert.match(explorer, /9922\/tcp/);
+	assert.match(explorer, /data-cloudflare-direct-isolation/);
+	assert.match(explorer, /Tunnel\/Access evidence never proves/);
 });

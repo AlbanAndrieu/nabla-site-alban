@@ -67,6 +67,13 @@ type ServiceGroupKey =
 	| "external"
 	| "runtime-drift";
 type GroupKey = `ai-${number}` | ServiceGroupKey;
+type RelationSemantic =
+	| "dependency"
+	| "flow"
+	| "exposure"
+	| "placement"
+	| "observation"
+	| "automation";
 
 type ArchitectureNodeData = Record<string, unknown> & {
 	name: string;
@@ -138,6 +145,18 @@ const SERVICE_GROUP_ORDER: readonly ServiceGroupKey[] = [
 	"runtime-drift",
 ];
 
+const RELATION_STYLE: Record<
+	RelationSemantic,
+	{ color: string; dash?: string; animated?: boolean }
+> = {
+	dependency: { color: "#38bdf8", animated: true },
+	flow: { color: "#60a5fa", animated: true },
+	exposure: { color: "#c084fc", dash: "11 5" },
+	placement: { color: "#94a3b8", dash: "2 5" },
+	observation: { color: "#4ade80", dash: "4 6" },
+	automation: { color: "#fbbf24", dash: "10 4 2 4", animated: true },
+};
+
 const AI_GROUP_COPY: Record<
 	number,
 	{ en: [string, string]; fr: [string, string] }
@@ -167,6 +186,53 @@ const AI_GROUP_COPY: Record<
 		fr: ["Observabilité & évaluation", "Tracing, métriques, qualité et boucles d’évaluation."],
 	},
 };
+
+function relationSemantic(type: string): RelationSemantic {
+	if (["dependsOn", "storesIn", "authenticatesVia", "cache"].includes(type)) {
+		return "dependency";
+	}
+	if (["exposedBy"].includes(type)) return "exposure";
+	if (["partOf"].includes(type)) return "placement";
+	if (["observedBy", "telemetry", "metrics", "traces", "evaluation"].includes(type)) {
+		return "observation";
+	}
+	if (["automates", "document workflow"].includes(type)) return "automation";
+	return "flow";
+}
+
+function relationSemanticLabel(semantic: RelationSemantic, french: boolean): string {
+	const labels: Record<RelationSemantic, [string, string]> = {
+		dependency: ["dependency", "dépendance"],
+		flow: ["API/data flow", "flux API/données"],
+		exposure: ["exposure", "exposition"],
+		placement: ["placement", "hébergement"],
+		observation: ["observation", "observabilité"],
+		automation: ["automation", "automatisation"],
+	};
+	return labels[semantic][french ? 1 : 0];
+}
+
+function relationSemanticClass(semantic: RelationSemantic): string {
+	switch (semantic) {
+		case "dependency":
+			return styles.edgeDependency;
+		case "flow":
+			return styles.edgeFlow;
+		case "exposure":
+			return styles.edgeExposure;
+		case "placement":
+			return styles.edgePlacement;
+		case "observation":
+			return styles.edgeObservation;
+		case "automation":
+			return styles.edgeAutomation;
+	}
+}
+
+function relationStrengthLabel(optional: boolean, french: boolean): string {
+	if (french) return optional ? "optionnelle" : "requise";
+	return optional ? "optional" : "required";
+}
 
 function serviceGroupCopy(
 	key: ServiceGroupKey,
@@ -659,6 +725,7 @@ function makeEdges(
 	visible: Set<string>,
 	healthById: Map<string, HomelabHealthEntry>,
 	showOptional: boolean,
+	french: boolean,
 ): Edge[] {
 	return relations
 		.filter(
@@ -669,32 +736,38 @@ function makeEdges(
 		)
 		.map((relation, index) => {
 			const targetState = requiredEdgeHealthState(relation, healthById);
-			const stroke = relation.optional
-				? "#94a3b8"
-				: targetState === "fail"
+			const semantic = relationSemantic(relation.type);
+			const semanticStyle = RELATION_STYLE[semantic];
+			const stroke =
+				targetState === "fail"
 					? homelabHealthColor("fail")
 					: targetState === "warn" || targetState === "unknown"
 						? homelabHealthColor("warn")
-						: "#38bdf8";
+						: semanticStyle.color;
+			const strokeDasharray = relation.optional
+				? semanticStyle.dash ?? "7 6"
+				: semanticStyle.dash;
 			return {
 				id: `${relation.source}-${relation.type}-${relation.target}-${index}`,
 				source: relation.source,
 				target: relation.target,
-				label: `${relation.optional ? "optional" : "required"} · ${relation.type}`,
-				animated: !relation.optional,
+				label: `${relationStrengthLabel(Boolean(relation.optional), french)} · ${relationSemanticLabel(semantic, french)} · ${relation.type}`,
+				animated: Boolean(!relation.optional && semanticStyle.animated),
 				markerEnd: { type: MarkerType.ArrowClosed, color: stroke },
 				style: {
 					stroke,
 					strokeWidth: relation.optional ? 1.5 : 2.4,
-					strokeDasharray: relation.optional ? "7 6" : undefined,
+					strokeDasharray,
 				},
 				labelStyle: { fill: "#f8fafc", fontSize: 10, fontWeight: 700 },
 				labelBgStyle: { fill: "#0f172a", fillOpacity: 0.94 },
 				labelBgPadding: [5, 3],
 				labelBgBorderRadius: 4,
-				className: relation.optional
-					? styles.edgeOptional
-					: styles.edgeRequired,
+				className: `${relation.optional ? styles.edgeOptional : styles.edgeRequired} ${relationSemanticClass(semantic)}`,
+				data: {
+					semantic,
+					strength: relation.optional ? "optional" : "required",
+				},
 			};
 		});
 }
@@ -825,8 +898,8 @@ export default function HierarchicalArchitectureExplorer({
 		[criticality, french, groups, healthById, mode, statusById],
 	);
 	const edges = useMemo(
-		() => makeEdges(relations, filtered.visible, healthById, showOptional),
-		[filtered.visible, healthById, relations, showOptional],
+		() => makeEdges(relations, filtered.visible, healthById, showOptional, french),
+		[filtered.visible, french, healthById, relations, showOptional],
 	);
 	const availability = runtimeAvailability(runtimeStatus, french);
 
@@ -908,6 +981,82 @@ export default function HierarchicalArchitectureExplorer({
 				) : null}
 			</div>
 
+			<div className={styles.relationLegend} data-architecture-relation-legend>
+				<strong>{french ? "Sémantique des arêtes" : "Edge semantics"}</strong>
+				<div className={styles.relationLegendItems}>
+					{(
+						[
+							["dependency", french ? "Dépendance" : "Dependency"],
+							["flow", french ? "Flux API / données" : "API / data flow"],
+							["exposure", french ? "Exposition" : "Exposure"],
+							["placement", french ? "Hébergement" : "Placement"],
+							["observation", french ? "Observabilité" : "Observation"],
+							["automation", french ? "Automatisation" : "Automation"],
+						] as const
+					).map(([semantic, label]) => (
+						<span key={semantic} data-relation-kind={semantic}>
+							<i
+								className={`${styles.relationSwatch} ${relationSemanticClass(semantic)}`}
+								aria-hidden="true"
+							/>
+							{label}
+						</span>
+					))}
+				</div>
+				<small>
+					{french
+						? "La couleur et le motif indiquent la nature de la relation ; required/optional indique séparément son poids fonctionnel. Un état de santé rouge/orange peut temporairement remplacer la couleur d’une relation requise sans changer sa sémantique."
+						: "Color and line pattern identify relation purpose; required/optional separately identifies functional strength. A required edge may temporarily inherit red/orange health without changing its semantic category."}
+				</small>
+			</div>
+
+			{mode === "services" ? (
+				<aside className={styles.exposureContract} data-exposure-path-contract>
+					<div className={styles.exposureContractHeader}>
+						<strong>{french ? "Contrat des chemins d’exposition" : "Exposure path contract"}</strong>
+						<span>{french ? "Réseau ≠ dépendances fonctionnelles" : "Network ≠ functional dependencies"}</span>
+					</div>
+					<div className={styles.exposurePathGrid}>
+						<div data-exposure-path="direct">
+							<strong>HAProxy direct</strong>
+							<code>Internet → pfSense:7000 → HAProxy → TrueNAS:7000</code>
+							<small>
+								{french
+									? "Chemin public direct explicitement distinct du Tunnel Cloudflare."
+									: "Public direct path explicitly separate from Cloudflare Tunnel."}
+							</small>
+						</div>
+						<div data-exposure-path="cloudflare">
+							<strong>Cloudflare Tunnel</strong>
+							<code>Cloudflare edge → cloudflared → service</code>
+							<small data-cloudflare-direct-isolation>
+								{french
+									? "Une preuve Tunnel/Access ne prouve jamais que le chemin direct pfSense:7000 → HAProxy → TrueNAS fonctionne."
+									: "Tunnel/Access evidence never proves that the direct pfSense:7000 → HAProxy → TrueNAS path works."}
+							</small>
+						</div>
+						<div data-exposure-path="lan-vpn">
+							<strong>LAN / VPN only</strong>
+							<code>pfSense admin 10443/tcp · TrueNAS SSH 9922/tcp</code>
+							<small>
+								{french
+									? "Ces ports d’administration ne sont pas des endpoints Internet attendus."
+									: "These administration ports are not expected Internet endpoints."}
+							</small>
+						</div>
+						<div data-exposure-path="internal">
+							<strong>{french ? "Routage interne" : "Internal routing"}</strong>
+							<code>service → API / data / dependency → service</code>
+							<small>
+								{french
+									? "Une relation fonctionnelle interne ne signifie pas qu’un service est publiquement exposé."
+									: "An internal functional relationship does not mean a service is publicly exposed."}
+							</small>
+						</div>
+					</div>
+				</aside>
+			) : null}
+
 			<div className={styles.flowShell}>
 				<ReactFlow
 					key={`${mode}-${scope}`}
@@ -952,11 +1101,11 @@ export default function HierarchicalArchitectureExplorer({
 			<p className={styles.legend}>
 				{mode === "services"
 					? french
-						? "Les swimlanes reprennent exactement les niveaux de criticité de la section Critical dependency hierarchy. Les fondations sont en haut ; les flèches de dépendance requise remontent depuis les consommateurs vers leurs dépendances. Le mode Chemin critique masque les composants support et externes pour réduire le bruit ; la recherche réactive automatiquement l’ensemble du catalogue. Les relations optionnelles restent en pointillés et peuvent être masquées."
-						: "Swimlanes reuse the exact criticality tiers from Critical dependency hierarchy. Foundations sit at the top; required dependency arrows point upward from consumers to their dependencies. Critical path hides support and external components to reduce noise; searching automatically considers the full catalog. Optional relations remain dashed and can be hidden."
+						? "Les swimlanes reprennent exactement les niveaux de criticité de la section Critical dependency hierarchy. Les fondations sont en haut ; les flèches requises remontent depuis les consommateurs vers leurs cibles. La couleur et le motif distinguent désormais dépendance, flux API/données, exposition, hébergement, observabilité et automatisation. Le mode Chemin critique masque les composants support et externes pour réduire le bruit ; la recherche réactive automatiquement l’ensemble du catalogue."
+						: "Swimlanes reuse the exact criticality tiers from Critical dependency hierarchy. Foundations sit at the top; required arrows point upward from consumers to their targets. Color and line pattern now distinguish dependency, API/data flow, exposure, placement, observation, and automation. Critical path hides support and external components to reduce noise; searching automatically considers the full catalog."
 					: french
-						? "AI Platform est regroupé par couches fonctionnelles. Le flux principal descend des interfaces vers le control plane, l’inférence, les outils, l’orchestration et l’observabilité ; les relations optionnelles sont en pointillés."
-						: "AI Platform is grouped by functional layers. The main flow moves from interfaces through control plane, inference, tools, orchestration and observability; optional relations are dashed."}
+						? "AI Platform est regroupé par couches fonctionnelles. Le flux principal descend des interfaces vers le control plane, l’inférence, les outils, l’orchestration et l’observabilité ; la sémantique des arêtes reste distincte de leur caractère requis ou optionnel."
+						: "AI Platform is grouped by functional layers. The main flow moves from interfaces through control plane, inference, tools, orchestration and observability; edge semantics remain distinct from required/optional strength."}
 			</p>
 		</section>
 	);
