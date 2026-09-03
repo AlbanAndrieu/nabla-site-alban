@@ -47,22 +47,25 @@ export default function PublicPolicyContent({
 			<h1>{copy.title}</h1>
 			<p><strong>{copy.lastUpdatedLabel}:</strong> {copy.lastUpdated}</p>
 			{copy.intro.map((paragraph) => <p key={paragraph}><InlinePublicPolicyText text={paragraph} locale={locale} links={copy.links} /></p>)}
-			{copy.sections.map((section) => (
-				<section key={section.heading}>
-					<h2>{section.heading}</h2>
-					{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlinePublicPolicyText text={paragraph} locale={locale} links={copy.links} /></p>)}
-					{section.items ? (
-						<ul>
-							{section.items.map((item) => (
-								<li key={`${item.label ?? "item"}-${item.text}`}>
-									{item.label ? <strong>{item.label}: </strong> : null}
-									<InlinePublicPolicyText text={item.text} locale={locale} links={copy.links} />
-								</li>
-							))}
-						</ul>
-					) : null}
-				</section>
-			))}
+			{copy.sections.map((section) => {
+				const items = "items" in section ? section.items : undefined;
+				return (
+					<section key={section.heading}>
+						<h2>{section.heading}</h2>
+						{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlinePublicPolicyText text={paragraph} locale={locale} links={copy.links} /></p>)}
+						{items ? (
+							<ul>
+								{items.map((item) => (
+									<li key={`${item.label ?? "item"}-${item.text}`}>
+										{item.label ? <strong>{item.label}: </strong> : null}
+										<InlinePublicPolicyText text={item.text} locale={locale} links={copy.links} />
+									</li>
+								))}
+							</ul>
+						) : null}
+					</section>
+				);
+			})}
 			{copy.closing?.map((paragraph) => <p key={paragraph}><InlinePublicPolicyText text={paragraph} locale={locale} links={copy.links} /></p>)}
 		</>
 	);

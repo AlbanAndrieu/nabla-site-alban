@@ -26,13 +26,16 @@ export default function ServiceTermsContent({ locale }: Readonly<{ locale: AppLo
 		<>
 			<h1>{copy.title}</h1>
 			<p><strong>{copy.lastUpdatedLabel}:</strong> {SERVICE_TERMS_LAST_UPDATED}</p>
-			{copy.sections.map((section) => (
-				<section key={section.heading}>
-					<h2>{section.heading}</h2>
-					{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlineContact text={paragraph} /></p>)}
-					{section.bullets ? <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
-				</section>
-			))}
+			{copy.sections.map((section) => {
+				const bullets = "bullets" in section ? section.bullets : undefined;
+				return (
+					<section key={section.heading}>
+						<h2>{section.heading}</h2>
+						{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlineContact text={paragraph} /></p>)}
+						{bullets ? <ul>{bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
+					</section>
+				);
+			})}
 		</>
 	);
 }

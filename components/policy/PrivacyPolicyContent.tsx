@@ -27,13 +27,17 @@ export default function PrivacyPolicyContent({ locale }: Readonly<{ locale: AppL
 		<>
 			<h1>{copy.title}</h1>
 			<p><strong>{copy.lastUpdatedLabel}:</strong> {PRIVACY_POLICY_LAST_UPDATED}</p>
-			{copy.sections.map((section) => (
-				<section key={section.heading}>
-					<h2>{section.heading}</h2>
-					{section.paragraphs?.map((paragraph) => <p key={paragraph}><InlinePrivacyText text={paragraph} /></p>)}
-					{section.bullets ? <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
-				</section>
-			))}
+			{copy.sections.map((section) => {
+				const paragraphs = "paragraphs" in section ? section.paragraphs : undefined;
+				const bullets = "bullets" in section ? section.bullets : undefined;
+				return (
+					<section key={section.heading}>
+						<h2>{section.heading}</h2>
+						{paragraphs?.map((paragraph) => <p key={paragraph}><InlinePrivacyText text={paragraph} /></p>)}
+						{bullets ? <ul>{bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
+					</section>
+				);
+			})}
 		</>
 	);
 }
