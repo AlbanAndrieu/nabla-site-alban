@@ -1,0 +1,79 @@
+.main {
+	max-width: 1080px;
+}
+
+.header {
+	max-width: 760px;
+	margin: 0 auto var(--ui-space-xl);
+	text-align: center;
+}
+
+.title {
+	margin-bottom: var(--ui-space-sm);
+}
+
+.lead {
+	margin: 0;
+	color: var(--ui-text-secondary);
+	font-size: 1.075rem;
+	line-height: 1.65;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--ui-space-lg);
+}
+
+.card {
+	min-width: 0;
+	padding: var(--ui-space-lg);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.cardTitle {
+	margin: 0 0 var(--ui-space-sm);
+	font-size: 1.2rem;
+}
+
+.cardTitle a {
+	color: var(--ui-link);
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.18em;
+}
+
+.cardTitle a:hover {
+	color: var(--ui-link-hover);
+}
+
+.cardTitle a:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 4px;
+	border-radius: var(--ui-radius-control);
+}
+
+.card p {
+	margin: 0 0 var(--ui-space-md);
+	color: var(--ui-text-secondary);
+	line-height: 1.6;
+}
+
+.slug {
+	display: inline-block;
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	color: var(--ui-text-secondary);
+}
+
+@media (max-width: 760px) {
+	.grid {
+		grid-template-columns: 1fr;
+	}
+
+	.card {
+		padding: var(--ui-space-md);
+	}
+}

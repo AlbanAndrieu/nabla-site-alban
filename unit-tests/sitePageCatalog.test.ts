@@ -26,9 +26,12 @@ const expectedSeoSlugs = [
 	"jm",
 ];
 
-test("SEO allowlist contains the intended site pages plus native policies", () => {
+test("SEO allowlist contains the intended site pages plus native policy index and policies", () => {
 	assert.deepEqual([...SEO_PAGE_SLUGS], expectedSeoSlugs);
-	assert.equal(sitemap().length, expectedSeoSlugs.length + POLICY_PAGE_SLUGS.length);
+	assert.equal(
+		sitemap().length,
+		expectedSeoSlugs.length + 1 + POLICY_PAGE_SLUGS.length,
+	);
 });
 
 test("technical pages stay outside the sitemap", () => {
@@ -55,8 +58,14 @@ test("sitemap uses localized extensionless canonical URLs", () => {
 	assert.equal(canonicalPagePath("jm", "fr"), "/fr/jm");
 });
 
-test("policy sitemap entries use clean localized routes and reciprocal alternates", () => {
+test("policy sitemap index and entries use clean localized routes and reciprocal alternates", () => {
 	const entries = new Map(sitemap().map((entry) => [new URL(entry.url).pathname, entry]));
+	const indexEntry = entries.get("/policy");
+	assert.ok(indexEntry, "/policy");
+	assert.equal(indexEntry.alternates?.languages?.en, "https://www.albanandrieu.com/policy");
+	assert.equal(indexEntry.alternates?.languages?.fr, "https://www.albanandrieu.com/fr/policy");
+	assert.equal(indexEntry.alternates?.languages?.["x-default"], "https://www.albanandrieu.com/policy");
+
 	for (const slug of POLICY_PAGE_SLUGS) {
 		const path = `/policy/${slug}`;
 		const entry = entries.get(path);

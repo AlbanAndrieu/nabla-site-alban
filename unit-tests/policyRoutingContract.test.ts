@@ -3,10 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { routing } from "../i18n/routing";
-import {
-	NATIVE_LOCALIZED_POLICY_SLUGS,
-	POLICY_PAGE_SLUGS,
-} from "../lib/policyPages";
+import { POLICY_PAGE_SLUGS } from "../lib/policyPages";
 
 async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -21,7 +18,6 @@ test("all six policy routes are native, typed and statically generated for confi
 		"privacy_policy",
 		"service_terms",
 	].sort());
-	assert.deepEqual([...NATIVE_LOCALIZED_POLICY_SLUGS].sort(), [...POLICY_PAGE_SLUGS].sort());
 	assert.deepEqual([...routing.locales], ["en", "fr"]);
 
 	const page = await source("app/[locale]/policy/[policy]/page.tsx");
@@ -32,6 +28,28 @@ test("all six policy routes are native, typed and statically generated for confi
 	assert.match(page, /"x-default"/);
 	assert.match(page, /SkipToMainContent/);
 	assert.match(page, /TopAnchor/);
+});
+
+test("policy index links every native policy and derives localized SEO from routing", async () => {
+	const index = await source("app/[locale]/policy/page.tsx");
+	assert.match(index, /POLICY_PAGE_SLUGS\.map/);
+	assert.match(index, /localizedPolicyPath/);
+	assert.match(index, /localizedIndexPath/);
+	assert.match(index, /routing\.locales\.map/);
+	assert.match(index, /"x-default"/);
+	assert.match(index, /policy-index-title/);
+	assert.doesNotMatch(index, /<Link[^>]+\.html/);
+
+	const sitemap = await source("app/sitemap.ts");
+	assert.match(sitemap, /policyIndexSitemapEntry/);
+	assert.match(sitemap, /localizedPolicyIndexPath/);
+});
+
+test("policy registry contains only runtime-native metadata after migration", async () => {
+	const registry = await source("lib/policyPages.ts");
+	assert.doesNotMatch(registry, /sourceFile/);
+	assert.doesNotMatch(registry, /NATIVE_LOCALIZED_POLICY_SLUGS/);
+	assert.doesNotMatch(registry, /POLICY_SEGMENT_TO_FILE/);
 });
 
 test("legacy policy html files stay archival while clean routes redirect to Next", async () => {
