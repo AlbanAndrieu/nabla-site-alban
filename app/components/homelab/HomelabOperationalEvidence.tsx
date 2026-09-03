@@ -422,12 +422,27 @@ export default function HomelabOperationalEvidence() {
 									<h3>{t("runtime.truenas")}</h3>
 									{truenasApi ? (
 										<ul className={styles.compactList}>
-											<li className={truenasApi.reachable ? styles.stateOk : styles.stateWarn}>{truenasApi.reachable ? t("runtime.reachable") : t("runtime.unreachable")}{truenasApi.phase || truenasApi.stage ? ` · ${truenasApi.phase ?? "?"}/${truenasApi.stage ?? "?"}` : ""}</li>
+											<li
+												className={truenasApi.reachable ? styles.stateOk : styles.stateWarn}
+												data-current-probe-failure={truenasApi.reachable ? undefined : true}
+											>
+												{truenasApi.reachable ? t("runtime.reachable") : t("runtime.unreachable")}{truenasApi.phase || truenasApi.stage ? ` · ${truenasApi.phase ?? "?"}/${truenasApi.stage ?? "?"}` : ""}
+											</li>
 											{typeof truenasApi.elapsed_ms === "number" ? <li>{t("components.latency", { milliseconds: truenasApi.elapsed_ms })}</li> : null}
-											{truenasApi.cached !== undefined ? <li>{truenasApi.cached ? "cached" : "fresh"}{typeof truenasApi.cache_age_seconds === "number" ? ` · ${Math.round(truenasApi.cache_age_seconds)}s` : ""}{truenasApi.stale ? " · stale" : ""}</li> : null}
+											{truenasApi.cached !== undefined ? <li>{truenasApi.cached ? "cached" : "fresh"}{truenasApi.cache_layer ? ` · ${truenasApi.cache_layer}` : ""}{typeof truenasApi.cache_age_seconds === "number" ? ` · ${Math.round(truenasApi.cache_age_seconds)}s` : ""}{truenasApi.stale ? " · stale" : ""}</li> : null}
+											{truenasApi.redis_available === true ? <li>{t("cache.redisAvailable")}</li> : null}
+											{truenasApi.redis_available === false ? <li>{t("cache.redisUnavailable")}</li> : null}
+											{truenasApi.refresh_in_progress ? <li>{t("cache.refreshing")}</li> : null}
 											{truenasApi.last_success_at ? <li>{t("components.lastSuccess", { timestamp: truenasApi.last_success_at })}</li> : null}
-											{truenasApi.last_good_available ? <li>{t("runtime.lastGood")}</li> : null}
-											{truenasApi.error ? <li className={styles.stateWarn}>{[truenasApi.exception_type, truenasApi.error].filter(Boolean).join(" · ")}</li> : null}
+											{truenasApi.last_good ? (
+												<li data-last-good-evidence>
+													{t("runtime.lastGood")}
+													{truenasApi.last_good.version ? ` · ${truenasApi.last_good.version}` : ""}
+													{typeof truenasApi.last_good.app_count === "number" ? ` · ${truenasApi.last_good.running_app_count ?? 0}/${truenasApi.last_good.app_count} apps running` : ""}
+													{truenasApi.last_good.last_success_at ? ` · ${truenasApi.last_good.last_success_at}` : ""}
+												</li>
+											) : truenasApi.last_good_available ? <li data-last-good-evidence>{t("runtime.lastGood")}</li> : null}
+											{truenasApi.error ? <li className={styles.stateWarn} data-current-probe-failure>{[truenasApi.exception_type, truenasApi.error].filter(Boolean).join(" · ")}</li> : null}
 											{typeof truenasApi.retry_after_seconds === "number" ? <li>{t("components.retry", { seconds: truenasApi.retry_after_seconds })}</li> : null}
 										</ul>
 									) : <p>{t("runtime.unavailable")}</p>}
@@ -478,10 +493,15 @@ export default function HomelabOperationalEvidence() {
 									<div className={styles.telemetrySummary} data-pfsense-ingress-diagnostics>
 										<span>{t("pfsense.telemetry", { state: pfsenseIngress.telemetry_available ? "available" : "unavailable" })}</span>
 										<span>{t("pfsense.attribution", { state: pfsenseIngress.attribution_available ? "available" : "unavailable" })}</span>
-										{pfsenseIngress.failure_stage || pfsenseIngress.error_kind ? <span className={styles.stateWarn}>{[pfsenseIngress.failure_stage, pfsenseIngress.error_kind, pfsenseIngress.exception_type].filter(Boolean).join(" / ")}</span> : null}
+										{pfsenseIngress.failure_stage || pfsenseIngress.error_kind ? <span className={styles.stateWarn} data-current-probe-failure>{[pfsenseIngress.failure_stage, pfsenseIngress.error_kind, pfsenseIngress.exception_type].filter(Boolean).join(" / ")}</span> : null}
 										{pfsenseIngress.last_success_at ? <span>{t("pfsense.lastSuccess", { timestamp: pfsenseIngress.last_success_at })}</span> : null}
-										{pfsenseIngress.cached !== undefined ? <span>{pfsenseIngress.cached ? "cached" : "fresh"}{typeof pfsenseIngress.cache_age_seconds === "number" ? ` · ${Math.round(pfsenseIngress.cache_age_seconds)}s` : ""}{pfsenseIngress.stale ? " · stale" : ""}</span> : null}
-										{pfsenseIngress.refresh_error ? <span className={styles.stateWarn}>{pfsenseIngress.refresh_error}</span> : null}
+										{pfsenseIngress.cached !== undefined ? <span>{pfsenseIngress.cached ? "cached" : "fresh"}{pfsenseIngress.cache_layer ? ` · ${pfsenseIngress.cache_layer}` : ""}{typeof pfsenseIngress.cache_age_seconds === "number" ? ` · ${Math.round(pfsenseIngress.cache_age_seconds)}s` : ""}{pfsenseIngress.stale ? " · stale" : ""}</span> : null}
+										{pfsenseIngress.redis_available === true ? <span>{t("cache.redisAvailable")}</span> : null}
+										{pfsenseIngress.redis_available === false ? <span>{t("cache.redisUnavailable")}</span> : null}
+										{pfsenseIngress.refresh_in_progress ? <span>{t("cache.refreshing")}</span> : null}
+										{pfsenseIngress.stale && pfsenseIngress.evidence ? <span data-last-good-evidence>{pfsenseIngress.evidence}</span> : null}
+										{pfsenseIngress.stale && pfsenseIngress.last_known_match !== undefined ? <span data-pfsense-last-known-match>{`last-known match: ${pfsenseIngress.last_known_match ? "yes" : "no"} · historical only`}</span> : null}
+										{pfsenseIngress.refresh_error ? <span className={styles.stateWarn} data-current-probe-failure>{pfsenseIngress.refresh_error}</span> : null}
 									</div>
 								) : null}
 								<h4>{t("pfsense.filters")}</h4>

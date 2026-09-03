@@ -25,6 +25,14 @@ export type HomelabExposureEvidence = {
 	};
 };
 
+export type TrueNasLastGoodDiagnostics = {
+	version?: string;
+	last_success_at?: string;
+	app_count?: number;
+	running_app_count?: number;
+	non_running_app_count?: number;
+};
+
 export type TrueNasApiDiagnostics = {
 	reachable: boolean;
 	phase?: string;
@@ -33,11 +41,15 @@ export type TrueNasApiDiagnostics = {
 	error?: string;
 	exception_type?: string;
 	cached?: boolean;
+	cache_layer?: string;
 	cache_age_seconds?: number;
 	stale?: boolean;
+	refresh_in_progress?: boolean;
+	redis_available?: boolean;
 	retry_after_seconds?: number;
 	last_success_at?: string;
 	last_good_available?: boolean;
+	last_good?: TrueNasLastGoodDiagnostics;
 };
 
 export type PfSenseIngressDiagnostics = {
@@ -47,7 +59,10 @@ export type PfSenseIngressDiagnostics = {
 	evidence?: string;
 	path?: string;
 	cached?: boolean;
+	cache_layer?: string;
 	stale?: boolean;
+	refresh_in_progress?: boolean;
+	redis_available?: boolean;
 	attempts?: number;
 	elapsed_ms?: number;
 	http_status?: number;
@@ -88,6 +103,7 @@ export const HOMELAB_DIAGNOSTICS_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
 
 const PRIMARY_TIMEOUT_MS = 8_000;
+const RUNNING_APP_STATES = new Set(["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -176,8 +192,26 @@ function parseExposure(value: unknown): HomelabExposureEvidence | undefined {
 	};
 }
 
+function parseTrueNasLastGood(value: unknown): TrueNasLastGoodDiagnostics | undefined {
+	if (!isRecord(value)) return undefined;
+	const apps = Array.isArray(value.apps)
+		? value.apps.filter((app): app is Record<string, unknown> => isRecord(app))
+		: [];
+	const running = apps.filter((app) =>
+		RUNNING_APP_STATES.has(String(app.state ?? "").trim().toUpperCase()),
+	).length;
+	return {
+		version: optionalString(value.version),
+		last_success_at: optionalString(value.last_success_at),
+		app_count: apps.length,
+		running_app_count: running,
+		non_running_app_count: apps.length - running,
+	};
+}
+
 function parseTrueNasApi(value: unknown): TrueNasApiDiagnostics | undefined {
 	if (!isRecord(value) || typeof value.reachable !== "boolean") return undefined;
+	const lastGood = parseTrueNasLastGood(value.last_good);
 	return {
 		reachable: value.reachable,
 		phase: optionalString(value.phase),
@@ -186,11 +220,15 @@ function parseTrueNasApi(value: unknown): TrueNasApiDiagnostics | undefined {
 		error: optionalString(value.error),
 		exception_type: optionalString(value.exception_type),
 		cached: optionalBoolean(value.cached),
+		cache_layer: optionalString(value.cache_layer),
 		cache_age_seconds: optionalNumber(value.cache_age_seconds),
 		stale: optionalBoolean(value.stale),
+		refresh_in_progress: optionalBoolean(value.refresh_in_progress),
+		redis_available: optionalBoolean(value.redis_available),
 		retry_after_seconds: optionalNumber(value.retry_after_seconds),
 		last_success_at: optionalString(value.last_success_at),
-		last_good_available: isRecord(value.last_good),
+		last_good_available: lastGood !== undefined,
+		last_good: lastGood,
 	};
 }
 
@@ -220,7 +258,10 @@ function parsePfSenseIngress(value: unknown): PfSenseIngressDiagnostics | undefi
 		evidence: optionalString(value.evidence),
 		path: optionalString(value.path),
 		cached: optionalBoolean(value.cached),
+		cache_layer: optionalString(value.cache_layer),
 		stale: optionalBoolean(value.stale),
+		refresh_in_progress: optionalBoolean(value.refresh_in_progress),
+		redis_available: optionalBoolean(value.redis_available),
 		attempts: optionalNumber(value.attempts),
 		elapsed_ms: optionalNumber(value.elapsed_ms),
 		http_status: optionalNumber(value.http_status),

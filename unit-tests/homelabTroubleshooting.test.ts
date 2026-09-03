@@ -92,7 +92,7 @@ test("runtime topology parser preserves observed-count semantics and egress sets
 	assert.deepEqual(snapshot.active_egress_ips, ["52.1.1.1", "34.2.2.2"]);
 });
 
-test("diagnostic parser preserves stale Snort and TrueNAS failure classification", () => {
+test("diagnostic parser preserves current failures separately from stale last-good evidence", () => {
 	const diagnostics = parseHomelabDiagnostics({
 		checked_at: "2026-09-03T00:00:00Z",
 		truenas: {
@@ -100,10 +100,23 @@ test("diagnostic parser preserves stale Snort and TrueNAS failure classification
 				reachable: false,
 				phase: "connect",
 				stage: "tls_handshake_timeout",
+				error: "TLS handshake timed out",
+				exception_type: "TimeoutError",
 				cached: true,
+				cache_layer: "redis",
+				cache_age_seconds: 42,
 				stale: true,
+				refresh_in_progress: false,
+				redis_available: true,
 				last_success_at: "2026-09-02T23:59:00Z",
-				last_good: { version: "26.0" },
+				last_good: {
+					version: "26.0",
+					last_success_at: "2026-09-02T23:59:00Z",
+					apps: [
+						{ name: "open-webui", state: "RUNNING" },
+						{ name: "langfuse", state: "STOPPED" },
+					],
+				},
 			},
 		},
 		pfsense: {
@@ -114,10 +127,17 @@ test("diagnostic parser preserves stale Snort and TrueNAS failure classification
 					attribution_available: false,
 					stale: true,
 					cached: true,
+					cache_layer: "redis",
+					refresh_in_progress: false,
+					redis_available: true,
 					attempts: 2,
 					failure_stage: "response",
 					error_kind: "read_timeout",
+					exception_type: "ReadTimeout",
+					refresh_error: "timeout",
 					last_success_at: "2026-09-02T23:58:00Z",
+					last_known_match: true,
+					evidence: "Last-known-good snort2c table retained; current attribution withheld",
 				},
 			},
 		},
@@ -126,10 +146,18 @@ test("diagnostic parser preserves stale Snort and TrueNAS failure classification
 
 	assert.ok(diagnostics);
 	assert.equal(diagnostics.truenas_api?.stage, "tls_handshake_timeout");
+	assert.equal(diagnostics.truenas_api?.error, "TLS handshake timed out");
+	assert.equal(diagnostics.truenas_api?.cache_layer, "redis");
 	assert.equal(diagnostics.truenas_api?.last_good_available, true);
+	assert.equal(diagnostics.truenas_api?.last_good?.version, "26.0");
+	assert.equal(diagnostics.truenas_api?.last_good?.app_count, 2);
+	assert.equal(diagnostics.truenas_api?.last_good?.running_app_count, 1);
+	assert.equal(diagnostics.truenas_api?.last_good?.non_running_app_count, 1);
 	assert.equal(diagnostics.pfsense_ingress?.state, "telemetry_stale");
 	assert.equal(diagnostics.pfsense_ingress?.attribution_available, false);
 	assert.equal(diagnostics.pfsense_ingress?.error_kind, "read_timeout");
+	assert.equal(diagnostics.pfsense_ingress?.cache_layer, "redis");
+	assert.equal(diagnostics.pfsense_ingress?.last_known_match, true);
 });
 
 test("exposure parser separates policy mismatch from functional health", () => {
@@ -194,6 +222,16 @@ test("service troubleshooting exposes stable anchors, causal explanation and bla
 	assert.match(component, /data-service-exposure-evidence/);
 	assert.match(component, /data-incident-dependency-path/);
 	assert.match(component, /data-affected-dependents/);
+});
+
+test("operational evidence distinguishes current probe failure from historical last-good evidence", async () => {
+	const component = await source(
+		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	);
+	assert.match(component, /data-current-probe-failure/);
+	assert.match(component, /data-last-good-evidence/);
+	assert.match(component, /data-pfsense-last-known-match/);
+	assert.match(component, /pfsenseIngress\.evidence/);
 });
 
 test("architecture exposes an anchored impact and root-cause inspector", async () => {
