@@ -33,10 +33,10 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
-          cache: "npm"      - name: Upgrade npm
+          cache: "npm"
+
+      - name: Upgrade npm
         run: npm install --global npm@11.17.0 --no-audit --no-fund
-
-
 
       - name: Install JavaScript dependencies
         run: npm ci --no-audit --no-fund
