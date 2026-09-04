@@ -19,6 +19,7 @@ import type {
 import styles from "./HomelabOperationalEvidence.module.css";
 import PfSenseAttentionActions from "./PfSenseAttentionActions";
 import PfSenseDnsPosture from "./PfSenseDnsPosture";
+import useAnchoredDetails from "./useAnchoredDetails";
 
 const REFRESH_MS = 30_000;
 
@@ -241,7 +242,10 @@ export default function HomelabOperationalEvidence() {
 	const [evidence, setEvidence] = useState<HomelabObservabilitySnapshot | null>(null);
 	const [refreshing, setRefreshing] = useState(true);
 	const [unavailable, setUnavailable] = useState(false);
-	const [pfsenseOpen, setPfSenseOpen] = useState(false);
+	const pfsenseDetails = useAnchoredDetails(
+		"pfsense-operational-evidence",
+		Boolean(evidence?.pfsense),
+	);
 
 	useEffect(() => {
 		let active = true;
@@ -308,15 +312,7 @@ export default function HomelabOperationalEvidence() {
 		[evidence?.diagnostics?.exposure_by_service],
 	);
 
-	const openPfSenseEvidence = () => {
-		setPfSenseOpen(true);
-		window.requestAnimationFrame(() => {
-			document.getElementById("pfsense-operational-evidence")?.scrollIntoView({
-				block: "start",
-				behavior: "smooth",
-			});
-		});
-	};
+	const openPfSenseEvidence = () => pfsenseDetails.reveal("smooth");
 
 	return (
 		<div
@@ -476,7 +472,7 @@ export default function HomelabOperationalEvidence() {
 					</details>
 
 					{evidence.pfsense ? (
-						<details id="pfsense-operational-evidence" className={styles.details} data-pfsense-security-evidence open={pfsenseOpen} onToggle={(event) => setPfSenseOpen(event.currentTarget.open)}>
+						<details id="pfsense-operational-evidence" className={styles.details} data-pfsense-security-evidence open={pfsenseDetails.open} onToggle={(event) => pfsenseDetails.setOpen(event.currentTarget.open)}>
 							<summary>{t("pfsense.details")}</summary>
 							<div className={styles.detailsBody}>
 								<h3>{t("pfsense.title")}</h3>

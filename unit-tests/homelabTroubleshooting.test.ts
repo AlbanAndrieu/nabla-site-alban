@@ -217,7 +217,9 @@ test("service troubleshooting exposes stable anchors, causal explanation and bla
 	const component = await source(
 		"app/components/homelab/ServiceTroubleshootingEvidence.tsx",
 	);
-	assert.match(component, /id=\{`service-\$\{serviceId\}`\}/);
+	assert.match(component, /const detailsId = `service-\$\{serviceId\}`/);
+	assert.match(component, /useAnchoredDetails\(detailsId\)/);
+	assert.match(component, /id=\{detailsId\}/);
 	assert.match(component, /data-status-explanation/);
 	assert.match(component, /data-service-exposure-evidence/);
 	assert.match(component, /data-incident-dependency-path/);
