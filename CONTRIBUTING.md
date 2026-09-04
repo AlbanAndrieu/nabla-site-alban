@@ -90,8 +90,10 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 ```
 nabla-site-alban/
 ├── public/              # Static website files (main site)
-├── my-app/              # Next.js application
-├── api/                 # API functions
+├── app/                 # Next.js App Router and Route Handlers
+├── public/              # Static assets and legacy HTML kept during migration
+├── unit-tests/          # Node.js contract tests
+├── tests/               # Playwright E2E tests
 └── .github/             # GitHub workflows and configurations
 ```
 
@@ -106,11 +108,11 @@ Before submitting a PR:
 
 2. **Test locally**:
    ```bash
-   # Using Cloudflare Wrangler
+   # Next.js production server (requires a build first)
    npm run start
 
-   # Or using Python
-   npm run start-python
+   # Or static legacy assets only
+   npm run start:python
    ```
 
 3. **Check for security vulnerabilities**:

@@ -10,12 +10,12 @@
 
 ## Dependency supply-chain controls
 
-- Node.js is constrained to `>=24.11.0 <25`.
+- Local development and GitHub Actions target Node.js 25; the package engine range is `>=24.11.0 <26` so Vercel can keep selecting a supported Node 24 runtime.
 - npm is constrained to `>=11.17.0 <12`.
 - `.npmrc` enables `strict-allow-scripts=true`.
 - Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
 - Never enable `dangerously-allow-all-scripts`.
-- OpenCommit, the local Vercel CLI, unused browser observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired to reduce the dependency graph and attack surface.
+- The local Vercel CLI, Wrangler deployment config, unused browser observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired. OpenCommit is intentionally retained as opt-in local tooling; its transitive dependency tree is not part of the deployed runtime.
 
 ## Validation
 

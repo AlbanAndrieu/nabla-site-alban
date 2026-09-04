@@ -11,6 +11,6 @@ Follow `/AGENTS.md` as the canonical policy.
 - `master` is the protected default branch. Never write, push, merge-agent changes or move its ref directly.
 - Create/reuse a non-default branch, validate it, then integrate through a pull request targeting `master`.
 - Use Conventional Commits and the rules in `commitlint.config.ts`.
-- OpenCommit and `.opencommit-commitlint` are retired; do not restore them without a new, proven consumer.
+- OpenCommit and `.opencommit-commitlint` are intentionally retained as local/on-demand commit-message tooling; Conventional Commits remain authoritative.
 - Never bypass hooks or quality gates with `--no-verify`.
 - Do not use an obsolete `main/develop` Git Flow model for this repository.

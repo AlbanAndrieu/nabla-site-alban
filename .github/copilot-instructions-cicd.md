@@ -17,13 +17,13 @@ Do not document or restore workflows that are no longer versioned.
 
 ## Runtime and dependency installation
 
-- Node.js major: **24**.
+- Node.js major for GitHub Actions: **25**.
 - npm: **>=11.17.0 <12**.
 - Run Node/npm commands from the repository root.
 - `package.json` and `package-lock.json` are the only application npm manifests.
 - `.npmrc` enables `strict-allow-scripts`; every dependency install script must be explicitly reviewed in `package.json#allowScripts`.
 - Never use `dangerously-allow-all-scripts`.
-- OpenCommit and the local Vercel CLI are retired.
+- The local Vercel CLI is retired. OpenCommit remains local/on-demand and must not be reintroduced as a GitHub workflow without explicit review.
 - Vercel deployments come from Git Integration.
 
 ## Workflow changes

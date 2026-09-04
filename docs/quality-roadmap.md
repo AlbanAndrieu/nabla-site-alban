@@ -300,8 +300,8 @@ Autres contrôles :
 - [ ] Remplacer progressivement Bootstrap CDN et Bootstrap Icons par les
   primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
 - [x] Exécuter un premier audit des dépendances et retirer les racines sans
-  consommateur : CLI Vercel local, OpenCommit, D3 npm, Next DevTools MCP local,
-  SDK navigateur Datadog/Vercel inutilisés. Conserver explicitement Stripe,
+  consommateur : CLI Vercel local, D3 npm, Next DevTools MCP local,
+  SDK navigateur Datadog/Vercel inutilisés. OpenCommit est conservé comme outil local/on-demand par choix explicite. Conserver explicitement Stripe,
   React Flow et le contrat `@vercel/otel` avec ses peers OTel requis
   (`api`, `api-logs`, `instrumentation`, `sdk-logs`) car le build
   Turbopack prouve qu'ils sont consommés à la compilation.
@@ -322,8 +322,9 @@ Autres contrôles :
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
-- [x] Aligner le bootstrap Copilot sur Node 24 et retirer des instructions actives
-  les chemins OpenCommit/Vercel CLI devenus inexistants.
+- [x] Aligner le développement et les workflows GitHub sur Node 25, conserver une plage `>=24.11.0 <26` compatible avec le runtime Vercel Node 24, et garder OpenCommit uniquement comme helper local/on-demand.
+- [x] Retirer `wrangler.jsonc` et les dernières instructions de déploiement Wrangler ; Vercel reste l’unique runtime web publié.
+- [x] Aligner Next.js et `eslint-config-next` sur 16.3.4 ainsi que `@types/node` sur la branche 25.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`.

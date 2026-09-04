@@ -15,7 +15,7 @@
 	},
 	"homepage": "https://github.com/AlbanAndrieu/nabla-site-alban#readme",
 	"engines": {
-		"node": ">=24.11.0 <25",
+		"node": ">=24.11.0 <26",
 		"npm": ">=11.17.0 <12"
 	},
 	"scripts": {
@@ -38,7 +38,9 @@
 		"test:debug": "playwright test --debug",
 		"test:report": "playwright show-report",
 		"test:unit": "node --import tsx --test \"unit-tests/**/*.test.ts\"",
-		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs"
+		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs",
+		"oco": "node scripts/run-opencommit.mjs",
+		"opencommit": "node scripts/run-opencommit.mjs"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",
@@ -49,7 +51,7 @@
 		"@stripe/stripe-js": "^9.1.0",
 		"@vercel/otel": "^2.1.3",
 		"@xyflow/react": "12.11.3",
-		"next": "16.3.1",
+		"next": "16.3.4",
 		"next-intl": "^4.9.2",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
@@ -60,13 +62,14 @@
 		"@eslint/js": "^9.39.1",
 		"@playwright/test": "^1.58.0",
 		"@tailwindcss/postcss": "^4.2.4",
-		"@types/node": "^20.11.17",
+		"@types/node": "^25.9.5",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"eslint": "^10.8.0",
-		"eslint-config-next": "^0.2.4",
+		"eslint-config-next": "16.3.4",
 		"eslint-formatter-gitlab": "^7.2.0",
 		"lodash-es": "^4.18.1",
+		"opencommit": "^3.2.14",
 		"playwright": "^1.58.0",
 		"postcss-selector-parser": "^7.1.4",
 		"stylelint": "^17.14.1",
@@ -79,6 +82,7 @@
 		"@parcel/watcher": false,
 		"@swc/core": false,
 		"esbuild": false,
-		"fsevents": false
+		"fsevents": false,
+		"unrs-resolver": false
 	}
 }

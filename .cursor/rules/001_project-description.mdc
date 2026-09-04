@@ -49,7 +49,7 @@ The repository layout looks like this (main items):
 ├── 📁 vendor/                        <- Optional third-party dir (gitignored if present)
 ├── 👩‍⚖️ LICENSE
 ├── 📰 README.md
-├── 📄 vercel.json, wrangler.jsonc    <- Deployment (Vercel, Cloudflare)
+├── 📄 vercel.json                   <- Deployment (Vercel)
 └── 📄 .gitignore, .pre-commit-config.yaml, commitlint.config.ts, ...
 ```
 

@@ -16,6 +16,9 @@ on:
       - "CHANGELOG.md"
       - ".releaserc.yaml"
       - ".npmrc"
+      - ".nvmrc"
+      - ".envrc"
+      - "mise.toml"
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
@@ -37,6 +40,9 @@ on:
       - "CHANGELOG.md"
       - ".releaserc.yaml"
       - ".npmrc"
+      - ".nvmrc"
+      - ".envrc"
+      - "mise.toml"
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
@@ -64,7 +70,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: "25"
           cache: npm
 
       - name: Install dependencies

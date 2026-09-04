@@ -2,7 +2,7 @@
 
 ## Runtime principal
 
-Le site est une application Next.js 16 App Router avec React 19, TypeScript et
+Le site est une application Next.js 16.3.4 App Router avec React 19, TypeScript et
 `next-intl`. Vercel est l'unique cible de déploiement du runtime web principal.
 Les anciens runtimes Wrangler, Express et Vercel Functions sous `api/` ont été
 retirés : les endpoints applicatifs vivent sous `app/api/**`.
@@ -81,8 +81,12 @@ dans les composants React.
   son ancien wrapper `build.sh` sont retirés.
 - Next DevTools MCP reste disponible à la demande via les configurations MCP qui
   exécutent `npx -y next-devtools-mcp@latest`, sans dépendance npm locale.
-- OpenCommit est retiré du tooling local.
-- Wrangler et Express ne font plus partie du graphe npm du projet.
+- OpenCommit reste disponible comme helper local/on-demand via `npm run oco` / `npm run opencommit`; aucun workflow OpenCommit n’est actif.
+- Wrangler et Express ne font plus partie du graphe npm du projet et `wrangler.jsonc` est retiré.
+
+## Runtime Node.js
+
+Le développement local et GitHub Actions utilisent Node.js 25. `package.json` accepte `>=24.11.0 <26` afin que Vercel puisse continuer à sélectionner son runtime Node 24 supporté pour les Route Handlers.
 
 ## Contrôles
 

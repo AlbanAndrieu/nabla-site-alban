@@ -18,7 +18,6 @@ export default [
 			".pnpm/**",
 			// Static browser assets include vendored and generated JavaScript.
 			"public/**/*.js",
-			"public/.wrangler/**",
 			"api/**",
 			"index/**",
 			"vendor/**",
