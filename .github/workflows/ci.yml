@@ -66,6 +66,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -88,6 +90,9 @@ jobs:
           git add package-lock.json
           git commit -m "chore(deps): normalize Node 25 lockfile"
           git push origin "HEAD:${{ github.head_ref }}"
+
+      - name: Upgrade npm
+        run: npm install --global npm@11.17.0 --no-audit --no-fund
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
