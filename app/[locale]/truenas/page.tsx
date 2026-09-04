@@ -15,6 +15,7 @@ import BillOfMaterialsSection from "../../components/truenas/BillOfMaterialsSect
 import HardwareSection from "../../components/truenas/HardwareSection";
 import HeroSection from "../../components/truenas/HeroSection";
 import HomeLabSection from "../../components/truenas/HomeLabSection";
+import NablaProjectSection from "../../components/truenas/NablaProjectSection";
 import ToolsSection from "../../components/truenas/ToolsSection";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -43,13 +44,14 @@ export default async function TruenasPage({ params }: Props) {
 			<SkipToMainContent />
 			<main id="main-content">
 				<HeroSection />
-				<HomeLabSection nablaHref={canonicalPagePath("nabla", locale)} />
+				<HomeLabSection />
 				<HomelabServicesSection headingId="truenas-services" />
 				<div className="hardware-section-bg">
 					<HardwareSection />
 					<BillOfMaterialsSection />
 				</div>
 				<ToolsSection />
+				<NablaProjectSection nablaHref={canonicalPagePath("nabla", locale)} />
 			</main>
 			<SiteWidgetsScript />
 		</div>

@@ -207,8 +207,78 @@
 	border-top: 1px solid var(--ui-border);
 }
 
+.serviceCard {
+	border-width: 1px;
+	border-color: var(--ui-border);
+	transition:
+		border-color 120ms ease,
+		box-shadow 120ms ease;
+}
+
+.serviceCard[data-effective-health="ok"] {
+	border-color: var(--ui-success-border);
+}
+
+.serviceCard[data-effective-health="warn"] {
+	border-color: var(--ui-warning-border);
+}
+
+.serviceCard[data-effective-health="fail"] {
+	border-color: var(--ui-danger-border);
+}
+
+.serviceTitleRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: var(--ui-space-xs) var(--ui-space-sm);
+	margin-bottom: var(--ui-space-xs);
+}
+
+.serviceHealthBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.25rem 0.55rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.serviceHealthBadge[data-health-state="ok"] {
+	border-color: var(--ui-success-border);
+	background: var(--ui-success-surface);
+	color: var(--ui-success-text);
+}
+
+.serviceHealthBadge[data-health-state="warn"] {
+	border-color: var(--ui-warning-border);
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+.serviceHealthBadge[data-health-state="fail"] {
+	border-color: var(--ui-danger-border);
+	background: var(--ui-danger-surface);
+	color: var(--ui-danger-text);
+}
+
+.serviceFreshness {
+	margin: 0 0 var(--ui-space-xs);
+	color: var(--ui-warning-text);
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.groupSummary::after {
+	.groupSummary::after,
+	.serviceCard {
 		transition: none;
 	}
 }

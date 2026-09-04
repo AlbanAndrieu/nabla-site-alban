@@ -139,6 +139,16 @@
 			"noErrorDetail": "aucun détail d’erreur",
 			"internalTlsTitle": "Le certificat TLS interne n’est pas vérifié par le test TCP côté serveur",
 			"internalTlsAria": "État du certificat HTTPS interne inconnu"
+		},
+		"health": {
+			"effectiveAria": "Santé effective du service : {state}",
+			"states": {
+				"ok": "Sain",
+				"warn": "Dégradé",
+				"fail": "En échec",
+				"unknown": "Inconnu"
+			},
+			"stale": "Preuve obsolète — dernière observation conservée"
 		}
 	}
 }

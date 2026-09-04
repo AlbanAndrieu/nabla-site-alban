@@ -19,6 +19,7 @@ import {
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
+import styles from "./HomelabServicesBlock.module.css";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
@@ -34,6 +35,25 @@ type HealthIndex = {
 };
 
 type RuntimePresentationState = HomelabHealthState | "missing";
+type EffectiveHealthLabelKey =
+	| "health.states.ok"
+	| "health.states.warn"
+	| "health.states.fail"
+	| "health.states.unknown";
+
+const EFFECTIVE_HEALTH_LABEL_KEY: Record<HomelabHealthState, EffectiveHealthLabelKey> = {
+	ok: "health.states.ok",
+	warn: "health.states.warn",
+	fail: "health.states.fail",
+	unknown: "health.states.unknown",
+};
+
+const EFFECTIVE_HEALTH_ICON_CLASS: Record<HomelabHealthState, string> = {
+	ok: "fas fa-circle-check",
+	warn: "fas fa-triangle-exclamation",
+	fail: "fas fa-circle-xmark",
+	unknown: "fas fa-circle-question",
+};
 
 const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
 	ok: "btn-outline-success",
@@ -285,6 +305,9 @@ export default function HomelabServiceGrid({
 						snapshot?.schema_version,
 					);
 					const resolvedHealth = resolveEffectiveServiceState(initialHealth);
+					const effectiveHealthLabel = t(
+						EFFECTIVE_HEALTH_LABEL_KEY[resolvedHealth.effectiveState],
+					);
 					const blockerLabels = blockedDependencyLabels(initialHealth);
 					const dependencyDegraded =
 						blockerLabels.length > 0 ||
@@ -329,7 +352,10 @@ export default function HomelabServiceGrid({
 							className="col-md-4 p-3"
 							key={`${serviceId}:${endpointUrl}`}
 						>
-							<div className="card box-shadow h-100 service-card-ux">
+							<div
+								className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
+								data-effective-health={resolvedHealth.effectiveState}
+							>
 								<img
 									className="img-fluid d-block mx-auto p-4"
 									src={serviceIconPath(svc.iconSrc)}
@@ -341,18 +367,43 @@ export default function HomelabServiceGrid({
 									style={{ minHeight: 60, minWidth: 60, height: "auto" }}
 								/>
 								<div className="card-body text-center border-top border-secondary">
-									<h3 className="h5 card-title mb-1">
-										{svc.name}
-										{runtimeState && runtimeTitle && (
+									<div className={styles.serviceTitleRow}>
+										<h3 className="h5 card-title mb-0">
+											{svc.name}
+											{runtimeState && runtimeTitle && (
+												<i
+													className={RUNTIME_ICON_CLASS[runtimeState]}
+													style={{ color: runtimeColor, marginLeft: 8 }}
+													title={runtimeTitle}
+													aria-label={runtimeTitle}
+													data-truenas-runtime-state={runtimeState}
+												/>
+											)}
+										</h3>
+										<span
+											className={styles.serviceHealthBadge}
+											data-health-state={resolvedHealth.effectiveState}
+											aria-label={t("health.effectiveAria", {
+												state: effectiveHealthLabel,
+											})}
+										>
 											<i
-												className={RUNTIME_ICON_CLASS[runtimeState]}
-												style={{ color: runtimeColor, marginLeft: 8 }}
-												title={runtimeTitle}
-												aria-label={runtimeTitle}
-												data-truenas-runtime-state={runtimeState}
-											/>
-										)}
-									</h3>
+												className={
+													EFFECTIVE_HEALTH_ICON_CLASS[
+														resolvedHealth.effectiveState
+													]
+												}
+												aria-hidden="true"
+											/>{" "}
+											{effectiveHealthLabel}
+										</span>
+									</div>
+									{initialHealth?.observation_stale === true && (
+										<p className={styles.serviceFreshness} data-health-stale>
+											<i className="fas fa-clock-rotate-left" aria-hidden="true" />{" "}
+											{t("health.stale")}
+										</p>
+									)}
 									<p className="card-text text-muted small mb-0">
 										{svc.description}
 									</p>
