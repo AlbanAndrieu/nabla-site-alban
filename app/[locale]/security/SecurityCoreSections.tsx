@@ -4,28 +4,11 @@ import ExternalLink from "@/components/ui/ExternalLink";
 import type { AppLocale } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import styles from "./SecurityCoreSections.module.css";
-
-type ResourceLinkIcon = "external" | "github" | "brain" | "terminal";
-
-type ResourceLink =
-	| {
-			href: string;
-			icon?: ResourceLinkIcon;
-	  }
-	| {
-			page: "ai";
-			hash: string;
-			icon: ResourceLinkIcon;
-	  };
-
-type NativeSectionKey = "owasp" | "personal" | "network" | "hardening" | "ssh";
-
-type ResourceSectionDefinition = {
-	key: NativeSectionKey;
-	id: string;
-	iconClass: string;
-	links: readonly ResourceLink[];
-};
+import {
+	RESOURCE_SECTIONS,
+	type ResourceLinkIcon,
+	type ResourceSectionDefinition,
+} from "./securityResources";
 
 type ResourceSectionCopy = {
 	badge: string;
@@ -33,101 +16,6 @@ type ResourceSectionCopy = {
 	description: string;
 	links: string[];
 };
-
-const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
-	{
-		key: "owasp",
-		id: "owasp-resources",
-		iconClass: "fa-solid fa-shield-halved",
-		links: [
-			{ href: "https://owasp.org/www-project-top-ten/" },
-			{ href: "https://owasp.org/www-project-web-security-testing-guide/" },
-			{
-				href: "https://owasp.org/www-project-application-security-verification-standard/",
-			},
-			{ href: "https://owasp.org/www-community/vulnerabilities/" },
-			{ href: "https://owasp.org/www-project-api-security/" },
-			{ href: "https://owasp.org/www-project-mobile-top-10/" },
-			{ href: "https://cheatsheetseries.owasp.org/" },
-			{
-				href: "https://pentest-testing-corp.medium.com/fix-security-misconfiguration-in-symfony-apps-be6ace002709",
-			},
-		],
-	},
-	{
-		key: "personal",
-		id: "personal-security-checklist",
-		iconClass: "fa-solid fa-user-shield",
-		links: [
-			{
-				href: "https://github.com/lissy93/personal-security-checklist",
-				icon: "github",
-			},
-			{ href: "https://digital-defense.io/" },
-			{ href: "https://www.privacytools.io/" },
-		],
-	},
-	{
-		key: "network",
-		id: "network-security-scanning",
-		iconClass: "fa-solid fa-network-wired",
-		links: [
-			{
-				href: "https://www.it-connect.fr/tuto-scanopy-outil-creation-automatique-diagramme-reseau/",
-			},
-			{ href: "https://nmap.org/" },
-			{ href: "https://www.wireshark.org/" },
-			{
-				href: "https://github.com/robertdavidgraham/masscan",
-				icon: "github",
-			},
-			{ href: "https://www.openvas.org/" },
-		],
-	},
-	{
-		key: "hardening",
-		id: "system-hardening-cis",
-		iconClass: "fa-solid fa-server",
-		links: [
-			{
-				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/cis-benchmarks/",
-			},
-			{ href: "https://www.cisecurity.org/cis-benchmarks/" },
-			{
-				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/",
-			},
-			{ href: "https://dev-sec.io/" },
-			{ href: "https://www.open-scap.org/" },
-			{ href: "https://cisofy.com/lynis/" },
-			{
-				href: "https://github.com/dev-sec/ansible-collection-hardening",
-				icon: "github",
-			},
-			{
-				href: "https://medium.com/@anshumaansingh10jan/comprehensive-vm-hardening-guide-using-openscap-and-ansible-88bd93186ddd",
-			},
-			{
-				href: "https://medium.com/aardvark-infinity/program-title-automated-system-hardening-and-security-audit-script-1e00eb5a577c",
-			},
-		],
-	},
-	{
-		key: "ssh",
-		id: "ssh-security-hardening",
-		iconClass: "fa-solid fa-terminal",
-		links: [
-			{
-				href: "https://blog.stephane-robert.info/docs/securiser/durcissement/ssh/",
-			},
-			{ href: "https://www.ssh.com/academy/ssh/security" },
-			{ href: "https://github.com/mozilla/ssh_scan", icon: "github" },
-			{ href: "https://github.com/jtesta/ssh-audit", icon: "github" },
-			{ href: "https://infosec.mozilla.org/guidelines/openssh" },
-			{ page: "ai", hash: "nvidia-openshell", icon: "brain" },
-			{ page: "ai", hash: "open-terminal", icon: "terminal" },
-		],
-	},
-];
 
 function resourceLinkIconClass(icon: ResourceLinkIcon = "external") {
 	switch (icon) {
@@ -205,7 +93,7 @@ export async function SecurityHero({
 				</h1>
 				<p>{t("hero.lead")}</p>
 				<p>
-					{t("hero.curatedBy")} {" "}
+					{t("hero.curatedBy")}{" "}
 					<a className={styles.heroLink} href={contactHref}>
 						Alban Andrieu
 					</a>

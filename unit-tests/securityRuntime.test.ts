@@ -36,8 +36,8 @@ test("security visualizations own their native markup", async () => {
 	const page = await readFile(securityPagePath, "utf8");
 	const visualizations = await readFile(visualizationsPath, "utf8");
 
-	assert.match(page, /"security-visualizations"/);
 	assert.match(page, /<SecurityVisualizations locale=\{locale\}/);
+	assert.doesNotMatch(page, /id="security-visualizations"/);
 	assert.match(visualizations, /id="security-visualizations"/);
 	assert.match(visualizations, /<SecurityArfTree locale=\{locale\}/);
 	assert.match(visualizations, /Kali Linux/);

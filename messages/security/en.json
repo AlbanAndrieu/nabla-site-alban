@@ -80,6 +80,131 @@
 					"NVIDIA OpenShell — AI page (sandboxed agent runtime)",
 					"Open Terminal — AI page (self-hosted terminal API for agents)"
 				]
+			},
+			"openclaw": {
+				"badge": "Agentic AI",
+				"title": "OpenClaw security hardening",
+				"description": "Hardening guidance for self-hosted agentic AI, from minimum isolation and gateway controls to defense-in-depth with egress filtering and rootless runtimes.",
+				"links": [
+					"OpenClaw security hardening guide — three-tier implementation (Aimaker)",
+					"openclaw-hardened-ansible — automated Tier 1–3 deployment",
+					"OpenClaw hardened deployment — companion notes (Next Kick Labs)"
+				]
+			},
+			"compliance": {
+				"badge": "Standards & Compliance",
+				"title": "Security Standards & Compliance",
+				"description": "Industry standards, compliance frameworks and regulatory guidance for security governance.",
+				"links": [
+					"NIST Cybersecurity Framework",
+					"ISO/IEC 27001 — Information Security Management",
+					"ISO/IEC 42001 — Artificial Intelligence Management System",
+					"PCI DSS — Payment Card Industry Data Security Standard",
+					"GDPR — General Data Protection Regulation",
+					"Drata — continuous compliance automation (SOC 2, ISO 27001 and more)",
+					"Vanta — automated compliance, evidence collection and trust management"
+				]
+			},
+			"vulnerability": {
+				"badge": "Vulnerability Management",
+				"title": "Vulnerability Management & Scanning",
+				"description": "Tools and resources for identifying, assessing and managing vulnerabilities.",
+				"links": [
+					"National Vulnerability Database (NVD)",
+					"CVE — Common Vulnerabilities and Exposures",
+					"OpenCVE (Nabla-org) — Critical and High CVE monitoring",
+					"CISA Known Exploited Vulnerabilities Catalog",
+					"Trivy — comprehensive security scanner",
+					"OWASP ZAP — web application security scanner",
+					"OSTE Meta Scan — multi-scanner vulnerability tool",
+					"TheAuditor — AI-powered SAST security tool"
+				]
+			},
+			"ciScanning": {
+				"badge": "CI Vulnerability Scanning",
+				"title": "CI Vulnerability Scanning",
+				"description": "Multi-scanner analysis and delivery-pipeline assessment tools.",
+				"links": [
+					"Plumber — GitLab CI/CD vulnerability scanning tool",
+					"Infracost — FinOps cost optimization"
+				]
+			},
+			"pentest": {
+				"badge": "Penetration Testing",
+				"title": "Pentest-Tools.com",
+				"description": "Online penetration testing and vulnerability scanning platform.",
+				"links": [
+					"Pentest-Tools.com App — network and web security testing"
+				]
+			},
+			"siem": {
+				"badge": "SIEM / Malware Detection",
+				"title": "SIEM / Malware Detection",
+				"description": "Security monitoring and malware detection resources.",
+				"links": [
+					"Wazuh — ClamAV malware detection logs"
+				]
+			},
+			"devsecops": {
+				"badge": "DevSecOps",
+				"title": "DevSecOps Tools & Practices",
+				"description": "Tools and practices for integrating security into the DevOps delivery pipeline.",
+				"links": [
+					"FluxCD — encrypting secrets with HashiCorp Vault and SOPS",
+					"FastAPI security without slowness",
+					"MegaLinter — multi-language linter",
+					"Trivy — vulnerability and misconfiguration scanner",
+					"Gitleaks — detect secrets in repositories and files",
+					"pre-commit — Git hooks for preventive checks",
+					"Bandit — security linter for Python",
+					"pre-commit-terraform — Terraform and Terragrunt hooks",
+					"Checkov — IaC and container security",
+					"KICS — security and misconfiguration scanning for IaC",
+					"Hadolint — Dockerfile linter",
+					"CNCF TAG Security",
+					"CodeQL — semantic code analysis engine",
+					"Semgrep — static analysis",
+					"TruffleHog — secret discovery",
+					"GitGuardian — secrets scanning and remediation"
+				]
+			},
+			"authentication": {
+				"badge": "Authentication & JWT",
+				"title": "Authentication & JWT",
+				"description": "Boilerplates and guides for secure authentication and JWT.",
+				"links": [
+					"FastAPI + Async SQLAlchemy 2.0 + JWT + PostgreSQL boilerplate"
+				]
+			},
+			"infrastructure": {
+				"badge": "App & Infrastructure Security",
+				"title": "App & Infrastructure Security",
+				"description": "Best practices for securing applications and infrastructure platforms.",
+				"links": [
+					"TrueNAS — securing applications"
+				]
+			},
+			"cloud": {
+				"badge": "Cloud Security",
+				"title": "Cloud Security Resources",
+				"description": "Best practices and tools for securing cloud infrastructure and services.",
+				"links": [
+					"Cloud Security Fundamentals",
+					"Prowler — AWS security assessment tool",
+					"Google Cloud security best practices",
+					"Azure Security documentation"
+				]
+			},
+			"learning": {
+				"badge": "Learning & Training",
+				"title": "Security Learning Resources",
+				"description": "Platforms and resources for learning and improving security skills.",
+				"links": [
+					"TryHackMe — hands-on cyber security training",
+					"Hack The Box — penetration testing labs",
+					"Web Security Academy by PortSwigger",
+					"Offensive Security — professional security training"
+				]
 			}
 		},
 		"sections": {

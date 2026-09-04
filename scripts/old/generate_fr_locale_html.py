@@ -26,7 +26,6 @@ FILES = sorted(
         "checkout.html",
         "contact.html",
         "ai.html",
-        "security.html",
         "expertise.html",
         "workstation.html",
         "startup.html",

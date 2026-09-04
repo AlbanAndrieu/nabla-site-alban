@@ -47,7 +47,7 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Migrer le routage principal vers l'App Router et `next-intl`.
 - [x] Migrer les URL SEO principales vers des routes canoniques sans `.html`.
 - [x] Consolider les pages Nabla/TrueNAS et retirer leurs runtimes historiques.
-- [ ] Migrer `/security` de `PublicHtmlFragment` vers des composants React natifs.
+- [x] Migrer `/security` de `PublicHtmlFragment` vers des composants React natifs.
 - [x] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
   implémentation React intégrée au bundle ; `arf.json` reste une entrée de données
   uniquement, couverte par `unit-tests/securityRuntime.test.ts`.

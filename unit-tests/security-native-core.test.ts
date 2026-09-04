@@ -7,6 +7,10 @@ const sectionSource = await readFile(
 	"app/[locale]/security/SecurityCoreSections.tsx",
 	"utf8",
 );
+const resourceSource = await readFile(
+	"app/[locale]/security/securityResources.ts",
+	"utf8",
+);
 
 test("security owns its semantic main and shared skip link", () => {
 	assert.match(pageSource, /<SkipToMainContent\s*\/>/);
@@ -17,22 +21,37 @@ test("security owns its semantic main and shared skip link", () => {
 	assert.doesNotMatch(pageSource, /className="skip-to-main"/);
 });
 
-test("security renders legacy content as a main-body fragment only", () => {
-	assert.match(pageSource, /mode="main"/);
-	assert.doesNotMatch(pageSource, /mode="headerMain"/);
-	assert.match(pageSource, /omitElementIds=\{NATIVE_SECTION_IDS\}/);
+test("security no longer renders legacy public HTML", () => {
+	assert.doesNotMatch(pageSource, /PublicHtmlFragment/);
+	assert.doesNotMatch(pageSource, /security\.html/);
+	assert.doesNotMatch(pageSource, /NATIVE_SECTION_IDS/);
+	assert.match(pageSource, /<SecurityCoreSections locale=\{locale\} \/>/);
+	assert.match(pageSource, /<SecurityVisualizations locale=\{locale\} \/>/);
 });
 
-test("core security anchors are owned by React", () => {
+test("all security resource anchors are owned by React", () => {
 	for (const id of [
 		"owasp-resources",
 		"personal-security-checklist",
 		"network-security-scanning",
+		"system-hardening-cis",
+		"ssh-security-hardening",
+		"openclaw-security",
+		"security-standards-compliance",
+		"vulnerability-management",
+		"vulnerability-scanning-dast-sast",
+		"pentest-tools",
+		"siem-malware-detection",
+		"devsecops-tools",
+		"authentication-jwt",
+		"app-infrastructure-security",
+		"cloud-security-resources",
+		"security-learning-resources",
 	]) {
-		assert.match(pageSource, new RegExp(`"${id}"`));
-		assert.match(sectionSource, new RegExp(`id: "${id}"`));
+		assert.match(resourceSource, new RegExp(`id: "${id}"`));
 	}
 
+	assert.match(sectionSource, /RESOURCE_SECTIONS\.map/);
 	assert.match(sectionSource, /id="hero"/);
 	assert.match(sectionSource, /security-standards-compliance/);
 });
