@@ -30,6 +30,39 @@ test("local topology fallback is a valid connected graph", async () => {
 	);
 });
 
+test("local fallback preserves the Elasticsearch and Kibana multi-service contract", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const nodeIds = new Set(topology.nodes.map((node) => node.id));
+	assert.ok(nodeIds.has("elasticsearch"));
+	assert.ok(nodeIds.has("kibana"));
+	assert.ok(nodeIds.has("docker"));
+	assert.ok(nodeIds.has("truenas"));
+
+	const hasRelation = (
+		source: string,
+		target: string,
+		type: string,
+		strength = "required",
+	) =>
+		topology.relations.some(
+			(relation) =>
+				relation.source === source &&
+				relation.target === target &&
+				relation.type === type &&
+				relation.strength === strength,
+		);
+
+	assert.ok(hasRelation("kibana", "elasticsearch", "dependsOn"));
+	assert.ok(hasRelation("elasticsearch", "docker", "hostedBy"));
+	assert.ok(hasRelation("kibana", "docker", "hostedBy"));
+	assert.ok(hasRelation("docker", "truenas", "hostedBy"));
+});
+
 test("static architecture topology never probes FastAPI during prerender", () => {
 	const originalFetch = globalThis.fetch;
 	let fetchCalled = false;
