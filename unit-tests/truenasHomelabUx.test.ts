@@ -6,14 +6,29 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("TrueNAS shows the visual homelab topology before the service catalog", async () => {
+test("TrueNAS keeps homelab topology before services and moves Nabla project near the footer", async () => {
 	const page = await source("app/[locale]/truenas/page.tsx");
 	const visualIndex = page.indexOf("<HomeLabSection");
 	const servicesIndex = page.indexOf("<HomelabServicesSection");
+	const toolsIndex = page.indexOf("<ToolsSection");
+	const nablaIndex = page.indexOf("<NablaProjectSection");
 
 	assert.ok(visualIndex >= 0);
 	assert.ok(servicesIndex >= 0);
+	assert.ok(toolsIndex >= 0);
+	assert.ok(nablaIndex >= 0);
 	assert.ok(visualIndex < servicesIndex);
+	assert.ok(nablaIndex > toolsIndex);
+});
+
+test("homelab network policy details are enriched but collapsed by default", async () => {
+	const section = await source("app/components/truenas/HomeLabSection.tsx");
+
+	assert.match(section, /<details className=\{styles\.networkDetails\}>/);
+	assert.doesNotMatch(section, /<details[^>]*\sopen(?:=|\s|>)/);
+	assert.match(section, /network\.tcp10443/);
+	assert.match(section, /network\.tcp9922/);
+	assert.match(section, /network\.sourcesNote/);
 });
 
 test("service tiers are filterable and collapsible while criticality details are opt-in", async () => {
