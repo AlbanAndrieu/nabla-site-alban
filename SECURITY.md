@@ -1,62 +1,27 @@
-# Security Summary
+# Security
 
-## Security Improvements Made
+## Runtime and deployment boundary
 
-### Vulnerabilities Addressed
-- **Initial State**: 25 vulnerabilities (7 moderate, 16 high, 2 critical)
-- **Final State**: 17 vulnerabilities (4 moderate, 13 high, 0 critical)
-- **Improvement**: Eliminated 2 critical and 6 other vulnerabilities
+- Production is a Next.js application deployed by Vercel Git Integration.
+- The local Vercel CLI and its obsolete manual deployment wrapper are intentionally absent.
+- Stripe SDKs remain because Embedded Checkout and server-side Stripe flows actively consume them.
+- `@vercel/otel` and `@opentelemetry/api` remain because application instrumentation actively consumes them.
+- Browser Datadog/Vercel analytics SDK packages are not root dependencies; browser telemetry is loaded through the shared site analytics integration.
 
-### Changes Made
+## Dependency supply-chain controls
 
-1. **Removed webdriver-manager** (v12.1.9)
-   - Had critical vulnerabilities in form-data and request dependencies
-   - Not used anywhere in the codebase
-   - Removed along with 64 transitive dependencies
+- Node.js is constrained to `>=24.11.0 <25`.
+- npm is constrained to `>=11.17.0 <12`.
+- `.npmrc` enables `strict-allow-scripts=true`.
+- Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
+- Never enable `dangerously-allow-all-scripts`.
+- OpenCommit, the local Vercel CLI, unused observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired to reduce the dependency graph and attack surface.
 
-2. **Removed @astrojs/vercel** (v9.0.2)
-   - Not used in the project
-   - Had high severity vulnerabilities in path-to-regexp
+## Validation
 
-3. **Removed crypto package** (v1.0.1)
-   - Not used anywhere in the codebase
-   - Unnecessary dependency
+- `CI (Quality and Security)` runs lint, type generation/type-check, unit tests and the production build.
+- Snyk runs when `SNYK_TOKEN` is configured.
+- `npm audit` remains an advisory signal; upgrades must be reviewed instead of applied with blind `--force`.
+- GitHub/CodeQL and deployment checks should be interpreted from their current runs rather than historical vulnerability counts in documentation.
 
-4. **Total Impact**:
-   - Removed 296 packages
-   - Reduced from 836 to 476 packages
-   - Significantly reduced attack surface
-
-### Remaining Vulnerabilities
-
-The 17 remaining vulnerabilities are primarily in the `vercel` package and its transitive dependencies:
-
-- **path-to-regexp** (CVE: GHSA-9wv6-86v2-598j)
-  - Severity: High
-  - Issue: Backtracking regular expressions (ReDoS)
-  - Status: Requires Vercel to update their dependencies
-  - Mitigation: These are in deployment tooling, not runtime code
-
-These vulnerabilities are in development/deployment tools (Vercel CLI) and don't affect the runtime security of the static website itself.
-
-## CodeQL Analysis
-
-CodeQL security scanning was run with **0 alerts** found:
-- ✅ JavaScript: No security issues detected
-
-## Recommendations
-
-1. **Monitor Vercel Updates**: Keep an eye on Vercel CLI updates that address the path-to-regexp vulnerabilities
-2. **Regular Audits**: Run `npm audit` regularly to catch new vulnerabilities
-3. **Dependency Updates**: Keep dependencies up to date with `npm update`
-4. **Security Headers**: Consider adding security headers via Cloudflare or Vercel configuration
-
-## Conclusion
-
-The project's security posture has been significantly improved by:
-- Eliminating all critical vulnerabilities
-- Removing unused dependencies with known security issues
-- Reducing the dependency tree by ~35%
-- Passing CodeQL security analysis with zero alerts
-
-The remaining vulnerabilities are in deployment tooling and do not affect the production website's security.
+Secrets must never be committed. Use the minimum permissions required by each workflow and keep deployment/release credentials scoped to their task.

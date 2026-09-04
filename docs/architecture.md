@@ -77,7 +77,11 @@ dans les composants React.
 - `scripts/vercel-ignore-build.sh` évite les previews pour les changements de
   documentation/maintenance sans impact runtime ; une modification du workflow
   Playwright reste deploy-relevant afin de disposer d'un preview à tester.
-- `vercel` et `next-devtools-mcp` sont des dépendances de développement.
+- Les déploiements Vercel passent par Git Integration ; le CLI `vercel` local et
+  son ancien wrapper `build.sh` sont retirés.
+- Next DevTools MCP reste disponible à la demande via les configurations MCP qui
+  exécutent `npx -y next-devtools-mcp@latest`, sans dépendance npm locale.
+- OpenCommit est retiré du tooling local.
 - Wrangler et Express ne font plus partie du graphe npm du projet.
 
 ## Contrôles

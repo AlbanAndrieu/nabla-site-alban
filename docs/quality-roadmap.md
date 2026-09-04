@@ -299,7 +299,15 @@ Autres contrôles :
   JavaScript tiers.
 - [ ] Remplacer progressivement Bootstrap CDN et Bootstrap Icons par les
   primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
-- [ ] Exécuter l'audit des dépendances, licences et paquets inutilisés.
+- [x] Exécuter un premier audit des dépendances et retirer les racines sans
+  consommateur : CLI Vercel local, OpenCommit, D3 npm, Next DevTools MCP local,
+  SDK navigateur Datadog/Vercel et modules OTel logs/instrumentation inutilisés.
+  Conserver explicitement Stripe, `@vercel/otel`, `@opentelemetry/api` et
+  React Flow car ils ont des consommateurs applicatifs prouvés.
+- [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
+  maintenir une denylist explicite des scripts d'installation déjà examinés.
+- [ ] Compléter l'audit des licences et des dépendances restantes après plusieurs
+  baselines CI post-nettoyage.
 - [ ] Évaluer Knip pour détecter fichiers, exports et dépendances morts.
 - [ ] Supprimer les props, composants et feuilles historiques sans consommateur
   confirmé.
@@ -313,6 +321,8 @@ Autres contrôles :
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
+- [x] Aligner le bootstrap Copilot sur Node 24 et retirer des instructions actives
+  les chemins OpenCommit/Vercel CLI devenus inexistants.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`.

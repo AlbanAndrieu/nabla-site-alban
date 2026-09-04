@@ -1,81 +1,38 @@
-# GitHub Actions Workflow Setup
+# GitHub Actions workflow setup
 
-This document tracks the workflows currently present in `.github/workflows/` and the secrets they depend on.
+This document records the workflows currently versioned under `.github/workflows/`.
 
-## Current workflow inventory
+## Workflow inventory
 
-The repository currently includes:
+1. `ci.yml` — Quality/Security: lint, CSS lint, Next route types, type-check, unit tests, production build and optional Snyk.
+2. `playwright.yml` — exact Vercel Preview browser tests.
+3. `vercel-preview.yml` — Vercel Preview orchestration/dispatch.
+4. `release.yml` — semantic-release after validated `master`.
+5. `mega-linter.yml` — repository-wide linting.
+6. `docker-build.yml` — Docker build/publish and security validation.
+7. `build-pdf.yml` — CV PDF generation.
+8. `copilot-setup-steps.yml` — coding-agent setup.
 
-1. `playwright.yml` — browser end-to-end tests.
-2. `docker-build.yml` — Docker build/push + Trivy scan.
-3. `mega-linter.yml` — linting and optional auto-fix commit/PR behavior.
-4. `build-pdf.yml` — CV PDF generation via TeX Live.
-5. `opencommit.yml` — automated commit message helper.
-6. `copilot-setup-steps.yml` — setup flow for Copilot coding agent runs.
+OpenCommit is not a current workflow and must not be documented as one.
 
-## Required GitHub secrets
+## Runtime contract
 
-### 1. `DOCKER_USERNAME`
+- Node.js 24.
+- npm `>=11.17.0 <12`.
+- Install from the repository root with `npm ci`.
+- `.npmrc` enables strict install-script policy; reviewed scripts are denied explicitly through `package.json#allowScripts`.
+- Vercel deployment is driven by Git Integration rather than the local Vercel CLI.
 
-Used by `docker-build.yml` for Docker Hub login.
+## Secrets
 
-### 2. `DOCKER_PASSWORD`
+- `DOCKER_USERNAME` / `DOCKER_PASSWORD`: Docker publishing when that workflow is used.
+- `SNYK_TOKEN`: optional Snyk step in Quality/Security.
+- `RELEASE_APP_PRIVATE_KEY` with `RELEASE_APP_CLIENT_ID`: preferred semantic-release GitHub App credentials.
+- `PAT`: optional MegaLinter fallback where configured.
 
-Used by `docker-build.yml` for Docker Hub login.
+Do not add an OpenCommit/OCO secret unless a reviewed workflow is deliberately reintroduced.
 
-### 3. `OCO_API_KEY`
+## Validation
 
-Used by `opencommit.yml` (`di-sukharev/opencommit`) for model access.
-
-### Optional secret: `PAT`
-
-`mega-linter.yml` can use `PAT` for checkout/PR operations and falls back to `GITHUB_TOKEN` when `PAT` is not set.
-
-## Adding or updating secrets
-
-1. Open the repository on GitHub.
-2. Go to `Settings` -> `Secrets and variables` -> `Actions`.
-3. Select `New repository secret`.
-4. Add each secret key/value pair above.
-
-## Behavior notes
-
-- Playwright tests run on push and pull request for `main`, `master`, and `develop`.
-- The Playwright workflow installs dependencies with `npm ci`, builds Next.js,
-  then runs the complete browser suite.
-- Docker CI and MegaLinter skip markdown-only changes because of `paths-ignore`.
-- CV PDF build runs on push and pull request.
-- OpenCommit runs on push for non-protected branches (`branches-ignore` includes `main`, `master`, `dev`, `development`, `release`).
-
-## Security notes
-
-- Do not commit secret values to the repository.
-- Rotate long-lived tokens periodically.
-- Scope tokens to minimum required permissions.
-- Dependabot/npm audit findings must be reviewed before applying breaking
-  `--force` upgrades.
-
-## Local parity check
-
-Before pushing a code or dependency change, run:
-
-```bash
-npm run check
-```
-
-For browser parity with CI, install the three Playwright engines once:
-
-```bash
-npx playwright install chromium firefox webkit
-npm run build
-CI=true npm test
-```
-
-Playwright démarre `npm run dev:test` en local. En CI, le build est réalisé en
-amont puis Playwright démarre `npm run start:test`, afin de tester le même serveur
-de production que celui qui sera déployé. Le serveur et la sonde Playwright
-utilisent tous deux `127.0.0.1:3000` pour éviter une résolution IPv6 différente de
-`localhost` sur certains runners. La sonde attend la route localisée `/fr`, qui
-répond directement en `200` et ne dépend pas de la négociation de langue de `/`.
-Le port `3000` reste la valeur par défaut. S'il est déjà occupé en local, utilisez
-par exemple `PLAYWRIGHT_PORT=3100 npm test` sans modifier la configuration CI.
+For dependency or code changes, use the repository quality gate documented in `AGENTS.md`.
+Browser-affecting changes are additionally validated by Playwright against the exact Vercel Preview.
