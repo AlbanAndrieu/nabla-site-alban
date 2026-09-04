@@ -5,7 +5,7 @@
 - Production is a Next.js application deployed by Vercel Git Integration.
 - The local Vercel CLI and its obsolete manual deployment wrapper are intentionally absent.
 - Stripe SDKs remain because Embedded Checkout and server-side Stripe flows actively consume them.
-- `@vercel/otel` and `@opentelemetry/api` remain because application instrumentation actively consumes them.
+- `@vercel/otel` and its explicit OpenTelemetry peer set (`api`, `api-logs`, `instrumentation`, `sdk-logs`) remain because application instrumentation actively consumes that bundling contract.
 - Browser Datadog/Vercel analytics SDK packages are not root dependencies; browser telemetry is loaded through the shared site analytics integration.
 
 ## Dependency supply-chain controls
@@ -15,7 +15,7 @@
 - `.npmrc` enables `strict-allow-scripts=true`.
 - Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
 - Never enable `dangerously-allow-all-scripts`.
-- OpenCommit, the local Vercel CLI, unused observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired to reduce the dependency graph and attack surface.
+- OpenCommit, the local Vercel CLI, unused browser observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired to reduce the dependency graph and attack surface.
 
 ## Validation
 

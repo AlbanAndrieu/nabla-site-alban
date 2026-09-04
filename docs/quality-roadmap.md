@@ -301,9 +301,10 @@ Autres contrôles :
   primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
 - [x] Exécuter un premier audit des dépendances et retirer les racines sans
   consommateur : CLI Vercel local, OpenCommit, D3 npm, Next DevTools MCP local,
-  SDK navigateur Datadog/Vercel et modules OTel logs/instrumentation inutilisés.
-  Conserver explicitement Stripe, `@vercel/otel`, `@opentelemetry/api` et
-  React Flow car ils ont des consommateurs applicatifs prouvés.
+  SDK navigateur Datadog/Vercel inutilisés. Conserver explicitement Stripe,
+  React Flow et le contrat `@vercel/otel` avec ses peers OTel requis
+  (`api`, `api-logs`, `instrumentation`, `sdk-logs`) car le build
+  Turbopack prouve qu'ils sont consommés à la compilation.
 - [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
   maintenir une denylist explicite des scripts d'installation déjà examinés.
 - [ ] Compléter l'audit des licences et des dépendances restantes après plusieurs

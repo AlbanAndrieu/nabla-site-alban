@@ -7,7 +7,7 @@ const read = (path: string) => readFile(projectUrl(path), "utf8");
 
 test("retired local tooling and unused root dependencies stay absent", async () => {
 	const packageJson = JSON.parse(await read("package.json")) as {scripts?: Record<string,string>; dependencies?: Record<string,string>; devDependencies?: Record<string,string>};
-	for (const name of ["@datadog/browser-rum","@opentelemetry/api-logs","@opentelemetry/instrumentation","@opentelemetry/sdk-logs","@vercel/analytics","@vercel/speed-insights","@vercel/toolbar"]) assert.equal(packageJson.dependencies?.[name], undefined);
+	for (const name of ["@datadog/browser-rum","@vercel/analytics","@vercel/speed-insights","@vercel/toolbar"]) assert.equal(packageJson.dependencies?.[name], undefined);
 	for (const name of ["d3","next-devtools-mcp","opencommit","vercel"]) assert.equal(packageJson.devDependencies?.[name], undefined);
 	for (const script of ["dev:v","oco","opencommit"]) assert.equal(packageJson.scripts?.[script], undefined);
 	await assert.rejects(access(projectUrl("build.sh")));
@@ -20,7 +20,7 @@ test("retired local tooling and unused root dependencies stay absent", async () 
 test("active Alban-specific runtime dependencies remain explicit", async () => {
 	const packageJson = JSON.parse(await read("package.json")) as {dependencies?: Record<string,string>; devDependencies?: Record<string,string>};
 	const [instrumentation, checkout, mcp, setup] = await Promise.all([read("instrumentation.ts"),read("app/components/checkout.tsx"),read(".mcp.json"),read(".github/workflows/copilot-setup-steps.yml")]);
-	for (const name of ["@opentelemetry/api","@vercel/otel","@stripe/react-stripe-js","@stripe/stripe-js","stripe","@xyflow/react"]) assert.ok(packageJson.dependencies?.[name], `${name} must stay installed while consumed`);
+	for (const name of ["@opentelemetry/api","@opentelemetry/api-logs","@opentelemetry/instrumentation","@opentelemetry/sdk-logs","@vercel/otel","@stripe/react-stripe-js","@stripe/stripe-js","stripe","@xyflow/react"]) assert.ok(packageJson.dependencies?.[name], `${name} must stay installed while consumed`);
 	assert.ok(packageJson.devDependencies?.["lodash-es"]);
 	assert.equal(packageJson.dependencies?.["lodash-es"], undefined);
 	assert.match(instrumentation, /from "@vercel\/otel"/);
