@@ -23,6 +23,7 @@ import {
 	fetchServiceTopologyOnce,
 } from "@/lib/homelabTroubleshootingClient";
 import type { ServiceTopology } from "@/lib/serviceTopology";
+import useAnchoredDetails from "./useAnchoredDetails";
 
 function stateClass(state?: string | null): string {
 	if (state === "ok" || state === "match") return "text-success";
@@ -99,6 +100,8 @@ export default function ServiceTroubleshootingEvidence({
 	const dependencyEvidence = entry.dependency_evidence ?? [];
 	const cycle = entry.dependency_cycle ?? [];
 	const serviceId = entry.id ?? entry.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+	const detailsId = `service-${serviceId}`;
+	const anchoredDetails = useAnchoredDetails(detailsId);
 
 	useEffect(() => {
 		let active = true;
@@ -141,9 +144,11 @@ export default function ServiceTroubleshootingEvidence({
 
 	return (
 		<details
-			id={`service-${serviceId}`}
+			id={detailsId}
 			className="text-start mt-2"
 			data-service-troubleshooting-evidence
+			open={anchoredDetails.open}
+			onToggle={(event) => anchoredDetails.setOpen(event.currentTarget.open)}
 		>
 			<summary className="small fw-semibold">
 				<i className="fas fa-stethoscope" aria-hidden="true" />{" "}
@@ -152,7 +157,7 @@ export default function ServiceTroubleshootingEvidence({
 			<div className="small mt-2 p-2 border rounded">
 				<div className="d-flex justify-content-between gap-2 align-items-start flex-wrap mb-2">
 					<strong>{french ? "Pourquoi cet état ?" : "Why this status?"}</strong>
-					<a href={`#service-${serviceId}`} className="small">
+					<a href={`#${detailsId}`} className="small">
 						#{serviceId}
 					</a>
 				</div>
