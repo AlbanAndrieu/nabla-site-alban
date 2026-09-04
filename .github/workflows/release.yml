@@ -103,16 +103,25 @@ jobs:
             exit 0
           fi
 
-          # #98/#99 changed the release workflow. Tagging one of those commits
-          # with the default GitHub App token is rejected as a workflow-file ref
-          # update. Instead, resolve the commit immediately before semantic-release
-          # was introduced, matching the successful nabla-compose 0.0.1 bootstrap.
           RELEASE_CONFIG_COMMIT="$(git log --reverse --format=%H -- .releaserc.yaml | head -n 1)"
           if [[ -z "${RELEASE_CONFIG_COMMIT}" ]]; then
             echo "Cannot locate the first semantic-release configuration commit." >&2
             exit 1
           fi
+
+          # A default GitHub Actions token cannot create a ref whose target commit
+          # modifies a workflow file unless it has the separate workflows permission.
+          # Keep the release token least-privileged: walk backwards from the commit
+          # immediately before semantic-release until the candidate commit itself has
+          # no .github/workflows changes, then use that commit as the technical baseline.
           BASELINE_SHA="$(git rev-parse "${RELEASE_CONFIG_COMMIT}^")"
+          while git diff-tree --no-commit-id --name-only -r "${BASELINE_SHA}" -- .github/workflows | grep -q .; do
+            echo "Skipping workflow-changing baseline candidate ${BASELINE_SHA}."
+            if ! BASELINE_SHA="$(git rev-parse "${BASELINE_SHA}^")"; then
+              echo "Cannot find a workflow-safe semantic-release baseline." >&2
+              exit 1
+            fi
+          done
 
           git tag v0.0.0 "${BASELINE_SHA}"
           git push origin refs/tags/v0.0.0
