@@ -77,6 +77,19 @@ test("TrueNAS application cards show runtime icons and a legend", async () => {
 	assert.match(page, /t\("runtime\.legendMissing"\)/);
 });
 
+test("service cards promote effective health above runtime and troubleshooting details", async () => {
+	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const css = await source("app/components/homelab/HomelabServicesBlock.module.css");
+
+	assert.match(page, /EFFECTIVE_HEALTH_LABEL_KEY/);
+	assert.match(page, /data-effective-health=\{resolvedHealth\.effectiveState\}/);
+	assert.match(page, /className=\{styles\.serviceHealthBadge\}/);
+	assert.match(page, /data-health-state=\{resolvedHealth\.effectiveState\}/);
+	assert.match(page, /data-health-stale/);
+	assert.match(css, /\.serviceHealthBadge\[data-health-state="fail"\]/);
+	assert.match(css, /\.serviceCard\[data-effective-health="warn"\]/);
+});
+
 test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	assert.match(page, /const dependsOnTrueNas =/);
