@@ -139,6 +139,16 @@
 			"noErrorDetail": "no error detail",
 			"internalTlsTitle": "Internal TLS certificate is not verified by the server-side TCP probe",
 			"internalTlsAria": "Internal HTTPS certificate status unknown"
+		},
+		"health": {
+			"effectiveAria": "Effective service health: {state}",
+			"states": {
+				"ok": "Healthy",
+				"warn": "Degraded",
+				"fail": "Failed",
+				"unknown": "Unknown"
+			},
+			"stale": "Stale evidence — last observation retained"
 		}
 	}
 }
