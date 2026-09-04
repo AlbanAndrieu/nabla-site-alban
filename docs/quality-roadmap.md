@@ -318,7 +318,9 @@ Autres contrôles :
   une mutation manuelle de `master`.
 - [ ] Configurer un ruleset GitHub avec Quality/Security comme check requis.
 - [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
-  changements docs-only et les commits intermédiaires d'une même PR.
+  changements docs-only et les commits intermédiaires d'une même PR. Le correctif
+  `deploymentEnabled["**"] = false` est préparé pour empêcher les branches
+  `fix/*`/`feat/*` de contourner involontairement le checkpoint on-demand.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
   profils mobiles seulement lorsque cela apporte une couverture complémentaire.
 - [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un

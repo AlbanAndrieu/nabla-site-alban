@@ -14,6 +14,19 @@ test("social image routes avoid deprecated edge runtime and dynamic nabla glyph 
 	assert.match(socialCard, /<svg[\s\S]*<path/);
 });
 
+test("Vercel auto-deploy rules cover slash-named feature branches", async () => {
+	const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
+		git?: { deploymentEnabled?: Record<string, boolean> };
+	};
+	const rules = config.git?.deploymentEnabled;
+
+	assert.ok(rules);
+	assert.equal(rules["**"], false);
+	assert.equal(rules.master, true);
+	assert.equal(rules["vercel-preview-*"], true);
+	assert.equal(rules["*"], undefined);
+});
+
 test("Vercel skips CI-only changes", async () => {
 	const script = await readFile("scripts/vercel-ignore-build.sh", "utf8");
 
