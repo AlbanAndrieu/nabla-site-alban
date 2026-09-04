@@ -47,8 +47,10 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.3.4");
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
 	for (const workflow of [setup, ci, release, playwright]) {
-		assert.match(workflow, /node-version:\s*"25"/);
+		assert.match(workflow, /node-version-file:\s*"\.nvmrc"/);
+		assert.match(workflow, /npm@11\.17\.0/);
 		assert.doesNotMatch(workflow, /node-version:\s*"24"/);
+		assert.doesNotMatch(workflow, /node-version:\s*"25"/);
 	}
 	assert.match(envrc, /NODE_VERSIONS=.*v25\.4\.0/);
 	assert.equal(nvmrc.trim(), "25.4.0");

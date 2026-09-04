@@ -17,7 +17,7 @@ Do not document or restore workflows that are no longer versioned.
 
 ## Runtime and dependency installation
 
-- Node.js major for GitHub Actions: **25**.
+- GitHub Actions use the repository `.nvmrc` (**Node.js 25.4.0**).
 - npm: **>=11.17.0 <12**.
 - Run Node/npm commands from the repository root.
 - `package.json` and `package-lock.json` are the only application npm manifests.

@@ -50,7 +50,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -66,30 +66,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "25"
+          node-version-file: ".nvmrc"
           cache: npm
-
-      - name: Normalize dependency lock on convergence branch
-        if: github.event_name == 'pull_request' && github.head_ref == 'chore/converge-bababou-tooling'
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-          if git diff --quiet -- package-lock.json; then
-            echo "package-lock.json is already normalized."
-            exit 0
-          fi
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore(deps): normalize Node 25 lockfile"
-          git push origin "HEAD:${{ github.head_ref }}"
 
       - name: Upgrade npm
         run: npm install --global npm@11.17.0 --no-audit --no-fund
