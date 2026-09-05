@@ -40,7 +40,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	const [setup, ci, release, playwright, envrc, nvmrc, mise] = await Promise.all([
+	const [setup, ci, release, playwright, envrc, nvmrc, mise, cicdDocs, architectureDocs] = await Promise.all([
 		read(".github/workflows/copilot-setup-steps.yml"),
 		read(".github/workflows/ci.yml"),
 		read(".github/workflows/release.yml"),
@@ -48,6 +48,8 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		read(".envrc"),
 		read(".nvmrc"),
 		read("mise.toml"),
+		read(".github/copilot-instructions-cicd.md"),
+		read("docs/architecture.md"),
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <26");
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
@@ -62,6 +64,10 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	assert.match(envrc, /NODE_VERSIONS=.*v25\.9\.0/);
 	assert.equal(nvmrc.trim(), "25.9.0");
 	assert.match(mise, /node = "25\.9\.0"/);
+	for (const docs of [cicdDocs, architectureDocs]) {
+		assert.match(docs, /25\.9\.0/);
+		assert.doesNotMatch(docs, /25\.4\.0/);
+	}
 });
 
 test("active Alban-specific runtime dependencies remain explicit", async () => {
