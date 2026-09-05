@@ -43,27 +43,24 @@ test("release bootstrap anchors v0.0.0 before semantic-release workflow changes"
   assert.ok(identityPosition < tagPosition, "git identity must be configured before bootstrap mutations");
   assert.ok(configCommitPosition < tagPosition, "baseline must be resolved before creating v0.0.0");
   assert.match(release, /BASELINE_SHA="\$\(git rev-parse "\$\{RELEASE_CONFIG_COMMIT\}\^"\)"/);
-  assert.match(release, /git push origin refs\/tags\/v0\.0\.0/);
+  assert.match(release, /gh api --method POST/);\n  assert.match(release, /repos\/\$\{GITHUB_REPOSITORY\}\/git\/refs/);
   assert.match(release, /git config --local user.email/);
   assert.doesNotMatch(release, /git commit --allow-empty/);
   assert.doesNotMatch(release, /git push origin HEAD:master/);
 });
 
-test("release bootstrap rejects workflow-changing merge commits as baseline candidates", async () => {
+test("release bootstrap creates only the tag ref through the GitHub API", async () => {
   const release = await source(".github/workflows/release.yml");
   const bootstrapStart = release.indexOf("      - name: Bootstrap semantic-release baseline");
   const bootstrapEnd = release.indexOf("      - name: Verify first-release bootstrap version");
   const bootstrapStep = release.slice(bootstrapStart, bootstrapEnd);
 
-  assert.match(
-    bootstrapStep,
-    /git diff-tree --root -m --no-commit-id --name-only -r "\$\{BASELINE_SHA\}" -- \.github\/workflows/,
-  );
-  assert.doesNotMatch(
-    bootstrapStep,
-    /git diff-tree --no-commit-id --name-only -r "\$\{BASELINE_SHA\}" -- \.github\/workflows/,
-  );
-  assert.match(bootstrapStep, /Skipping workflow-changing baseline candidate/);
+  assert.match(bootstrapStep, /gh api --method POST/);
+  assert.match(bootstrapStep, /repos\/\$\{GITHUB_REPOSITORY\}\/git\/refs/);
+  assert.match(bootstrapStep, /-f ref="refs\/tags\/v0\.0\.0"/);
+  assert.match(bootstrapStep, /-f sha="\$\{BASELINE_SHA\}"/);
+  assert.doesNotMatch(bootstrapStep, /git push origin refs\/tags\/v0\.0\.0/);
+  assert.doesNotMatch(bootstrapStep, /git diff-tree/);
 });
 
 test("release bootstrap keeps authentication available when git invokes the gh credential helper", async () => {
@@ -78,7 +75,7 @@ test("release bootstrap keeps authentication available when git invokes the gh c
     bootstrapStep,
     /env:\s+GH_TOKEN: \$\{\{ steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN \}\}/,
   );
-  assert.match(bootstrapStep, /git push origin refs\/tags\/v0\.0\.0/);
+  assert.match(bootstrapStep, /gh api --method POST/);
 });
 
 test("release bootstrap keeps release App permissions minimal and scopes its private key", async () => {
