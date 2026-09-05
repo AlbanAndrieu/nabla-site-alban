@@ -7,18 +7,19 @@ const workflowPath = new URL(
 	import.meta.url,
 );
 
-test("semantic-release bootstrap avoids workflow-changing tag targets", async () => {
+test("semantic-release bootstrap creates the baseline through the Git References API", async () => {
 	const workflow = await readFile(workflowPath, "utf8");
 
 	assert.match(workflow, /RELEASE_CONFIG_COMMIT=/);
 	assert.match(
 		workflow,
-		/git diff-tree --root -m --no-commit-id --name-only -r/,
+		/BASELINE_SHA="\$\(git rev-parse "\$\{RELEASE_CONFIG_COMMIT\}\^"\)"/,
 	);
-	assert.match(workflow, /-- \.github\/workflows \| grep -q \./);
-	assert.match(workflow, /Skipping workflow-changing baseline candidate/);
-	assert.match(workflow, /git rev-parse "\$\{BASELINE_SHA\}\^"/);
 	assert.match(workflow, /git tag v0\.0\.0 "\$\{BASELINE_SHA\}"/);
+	assert.match(workflow, /gh api --method POST/);
+	assert.match(workflow, /repos\/\$\{GITHUB_REPOSITORY\}\/git\/refs/);
+	assert.doesNotMatch(workflow, /git push origin refs\/tags\/v0\.0\.0/);
+	assert.doesNotMatch(workflow, /git diff-tree/);
 });
 
 test("semantic-release keeps the release token least-privileged", async () => {
