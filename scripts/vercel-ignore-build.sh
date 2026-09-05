@@ -10,6 +10,15 @@ set -euo pipefail
 # dependencies, assets, messages and build scripts deploy-relevant.
 
 base_sha="${VERCEL_GIT_PREVIOUS_SHA:-}"
+git_ref="${VERCEL_GIT_COMMIT_REF:-}"
+
+# `vercel-preview-*` refs are explicit, CI-validated publication checkpoints.
+# Always build them so the Vercel deployment and Playwright checkout refer to
+# the exact validated PR SHA, even when the latest delta is test/docs-only.
+if [[ "${git_ref}" == vercel-preview-* ]]; then
+    echo "Validated checkpoint ${git_ref}; build exact deployment."
+    exit 1
+fi
 
 if [[ -z "${base_sha}" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
     if git rev-parse HEAD^ >/dev/null 2>&1; then

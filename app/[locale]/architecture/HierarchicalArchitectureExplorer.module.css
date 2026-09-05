@@ -201,6 +201,201 @@
 	line-height: 1.4;
 }
 
+
+.mobileHierarchy {
+	display: none;
+}
+
+.mobileHierarchyHint {
+	margin: 0;
+	color: #cbd5e1;
+	font-size: 0.82rem;
+	line-height: 1.45;
+}
+
+.mobileGroup,
+.mobileRelations {
+	border: 1px solid #475569;
+	border-radius: var(--ui-radius-card, 0.8rem);
+	background: #0f172a;
+	color: #e2e8f0;
+}
+
+.mobileGroupSummary,
+.mobileRelations summary {
+	cursor: pointer;
+}
+
+.mobileGroupSummary {
+	padding: 0.75rem;
+}
+
+.mobileGroupSummary > span:first-child {
+	display: grid;
+	gap: 0.2rem;
+}
+
+.mobileGroupSummary strong {
+	color: #f8fafc;
+}
+
+.mobileGroupSummary small,
+.mobileGroupMeta {
+	color: #94a3b8;
+	font-size: 0.72rem;
+	line-height: 1.35;
+}
+
+.mobileGroupMeta {
+	display: block;
+	margin-top: 0.35rem;
+	font-weight: 700;
+}
+
+.mobileItemList,
+.mobileRelations ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mobileItemList {
+	display: grid;
+	gap: 0.65rem;
+	padding: 0 0.65rem 0.65rem;
+}
+
+.mobileItem {
+	display: grid;
+	gap: 0.5rem;
+	padding: 0.7rem;
+	border: 1px solid #334155;
+	border-radius: 0.7rem;
+	background: #020617;
+}
+
+.mobileItem[data-blast-radius-level="dominant"] {
+	border-width: 2px;
+	border-color: #38bdf8;
+	box-shadow: 0 0 0 2px rgb(56 189 248 / 15%);
+}
+
+.mobileItem[data-blast-radius-level="elevated"] {
+	border-color: #4ade80;
+}
+
+.mobileItemHeading {
+	display: flex;
+	align-items: start;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.mobileItemHeading > span:first-child {
+	display: grid;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.mobileItemHeading strong {
+	color: #f8fafc;
+	overflow-wrap: anywhere;
+}
+
+.mobileItemHeading small,
+.mobileItemDetail {
+	color: #cbd5e1;
+	font-size: 0.72rem;
+	line-height: 1.4;
+}
+
+.mobileHealthBadge,
+.mobileBadges span {
+	padding: 0.14rem 0.38rem;
+	border: 1px solid #475569;
+	border-radius: 999px;
+	background: #1e293b;
+	font-size: 0.65rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.025em;
+}
+
+.mobileHealthBadge {
+	flex: 0 0 auto;
+}
+
+.mobileBadges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+}
+
+.mobileBlockedBy,
+.mobileItemDetail {
+	margin: 0;
+}
+
+.mobileBlockedBy {
+	color: #fde68a;
+	font-size: 0.72rem;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.mobileRelations {
+	padding: 0.45rem 0.55rem;
+}
+
+.mobileRelations summary {
+	color: #bae6fd;
+	font-size: 0.72rem;
+	font-weight: 800;
+}
+
+.mobileRelations ul {
+	display: grid;
+	gap: 0.35rem;
+	margin-top: 0.45rem;
+}
+
+.mobileRelations li {
+	display: grid;
+	gap: 0.1rem;
+	padding-top: 0.35rem;
+	border-top: 1px solid #1e293b;
+}
+
+.mobileRelations li span {
+	color: #94a3b8;
+	font-size: 0.65rem;
+}
+
+.mobileRelations li strong {
+	color: #e2e8f0;
+	font-size: 0.72rem;
+}
+
+.mobileOpenLink {
+	justify-self: start;
+	color: #7dd3fc;
+	font-size: 0.75rem;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+.mobileOpenLink:hover {
+	color: #bae6fd;
+	text-decoration: underline;
+}
+
+.mobileGroupSummary:focus-visible,
+.mobileRelations summary:focus-visible,
+.mobileOpenLink:focus-visible {
+	outline: var(--ui-focus-width) solid #7dd3fc;
+	outline-offset: var(--ui-focus-offset);
+}
+
 .flowShell {
 	height: min(82vh, 62rem);
 	min-height: 42rem;
@@ -329,6 +524,24 @@
 	box-shadow:
 		0 0.55rem 1.2rem rgb(0 0 0 / 42%),
 		0 0 0 1px rgb(56 189 248 / 16%);
+}
+
+.node[data-blast-radius-level="dominant"] {
+	z-index: 1;
+	border-width: 2.5px;
+	outline: 2px solid rgb(56 189 248 / 45%);
+	outline-offset: 2px;
+}
+
+.node[data-blast-radius-level="elevated"] {
+	border-width: 2px;
+	outline: 1px solid rgb(74 222 128 / 32%);
+	outline-offset: 1px;
+}
+
+.node[data-blast-radius-level="dominant"] .criticalityBadge {
+	border-color: #38bdf8;
+	background: rgb(12 74 110 / 82%);
 }
 
 .node[data-reconciliation="in_sync"] {
@@ -490,6 +703,12 @@
 	line-height: 1.45;
 }
 
+@media (prefers-reduced-motion: reduce) {
+	.flowShell :global(.react-flow__edge.animated path) {
+		animation: none !important;
+	}
+}
+
 @media (max-width: 1100px) {
 	.exposurePathGrid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -524,8 +743,12 @@
 		grid-template-columns: 1fr;
 	}
 
+	.mobileHierarchy {
+		display: grid;
+		gap: 0.65rem;
+	}
+
 	.flowShell {
-		height: 78vh;
-		min-height: 34rem;
+		display: none;
 	}
 }

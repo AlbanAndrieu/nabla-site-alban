@@ -97,6 +97,7 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	applicationError?: string | null;
 	criticalityTier?: ServiceCriticalityTier;
 	blastRadius?: number;
+	blastRadiusLevel?: "dominant" | "elevated";
 };
 
 type GroupNodeData = Record<string, unknown> & {
@@ -350,6 +351,7 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 			data-reconciliation={item.reconciliation}
 			data-health-state={item.healthState}
 			data-criticality-tier={item.criticalityTier}
+			data-blast-radius-level={item.blastRadiusLevel}
 			style={
 				healthColor
 					? {
@@ -463,6 +465,173 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 				</a>
 			) : null}
 			<Handle type="source" position={sourcePosition} className={styles.handle} />
+		</div>
+	);
+}
+
+
+function MobileArchitectureHierarchy({
+	groups,
+	nodeDataById,
+	relations,
+	french,
+}: Readonly<{
+	groups: GraphGroup[];
+	nodeDataById: Map<string, ArchitectureNodeData>;
+	relations: Edge[];
+	french: boolean;
+}>) {
+	const relationsBySource = new Map<string, Edge[]>();
+	for (const relation of relations) {
+		relationsBySource.set(relation.source, [
+			...(relationsBySource.get(relation.source) ?? []),
+			relation,
+		]);
+	}
+
+	return (
+		<div
+			className={styles.mobileHierarchy}
+			data-mobile-architecture-hierarchy
+			role="region"
+			aria-label={
+				french
+					? "Hiérarchie d’architecture compacte"
+					: "Compact architecture hierarchy"
+			}
+		>
+			<p className={styles.mobileHierarchyHint}>
+				{french
+					? "Vue mobile compacte : ouvrez une couche puis un service pour afficher ses relations visibles."
+					: "Compact mobile view: expand a layer, then a service, to inspect its visible relations."}
+			</p>
+			{groups.map((group) => (
+				<details
+					key={group.id}
+					className={styles.mobileGroup}
+					data-mobile-architecture-group={group.key}
+				>
+					<summary className={styles.mobileGroupSummary}>
+						<span>
+							<strong>{group.label}</strong>
+							<small>{group.description}</small>
+						</span>
+						<span className={styles.mobileGroupMeta}>
+							{group.entities.length} {french ? "nœuds" : "nodes"} · {group.flowHint}
+						</span>
+					</summary>
+					<ul className={styles.mobileItemList}>
+						{group.entities.map((entity) => {
+							const item = nodeDataById.get(entity.id);
+							if (!item) return null;
+							const itemRelations = relationsBySource.get(entity.id) ?? [];
+							const healthColor = item.healthState
+								? homelabHealthColor(item.healthState)
+								: undefined;
+
+							return (
+								<li
+									key={entity.id}
+									className={styles.mobileItem}
+									data-mobile-architecture-item={entity.id}
+									data-health-state={item.healthState}
+									data-criticality-tier={item.criticalityTier}
+									data-blast-radius-level={item.blastRadiusLevel}
+								>
+									<div className={styles.mobileItemHeading}>
+										<span>
+											<strong>{item.name}</strong>
+											<small>
+												{item.category} · {item.kind}
+											</small>
+										</span>
+										{item.healthState ? (
+											<span
+												className={styles.mobileHealthBadge}
+												style={{
+													borderColor: healthColor,
+													color: healthColor,
+												}}
+											>
+												{item.healthState}
+											</span>
+										) : null}
+									</div>
+									<div className={styles.mobileBadges}>
+										{item.criticalityTier ? (
+											<span>
+												{item.criticalityTier.replaceAll("-", " ")}
+												{typeof item.blastRadius === "number"
+													? ` · blast radius ${item.blastRadius}`
+													: ""}
+											</span>
+										) : null}
+										{item.reconciliation ? (
+											<span>
+												{item.reconciliation.replaceAll("_", " ")}
+												{item.runtimeState ? ` · ${item.runtimeState}` : ""}
+											</span>
+										) : null}
+										{item.localHealthState &&
+										item.healthState &&
+										item.localHealthState !== item.healthState ? (
+											<span>
+												local · {item.localHealthState}
+											</span>
+										) : null}
+									</div>
+									{item.blockedBy?.length ? (
+										<p className={styles.mobileBlockedBy}>
+											⚠ {french ? "Bloqué par" : "Blocked by"}:{" "}
+											{item.blockedBy.join(", ")}
+										</p>
+									) : null}
+									{item.detail ? (
+										<p className={styles.mobileItemDetail}>{item.detail}</p>
+									) : null}
+									{itemRelations.length ? (
+										<details className={styles.mobileRelations}>
+											<summary>
+												{itemRelations.length}{" "}
+												{french
+													? itemRelations.length > 1
+														? "relations"
+														: "relation"
+													: itemRelations.length > 1
+														? "relations"
+														: "relation"}
+											</summary>
+											<ul>
+												{itemRelations.map((relation) => {
+													const targetName =
+														nodeDataById.get(relation.target)?.name ??
+														relation.target;
+													return (
+														<li key={relation.id}>
+															<span>{String(relation.label ?? relation.target)}</span>
+															<strong>{targetName}</strong>
+														</li>
+													);
+												})}
+											</ul>
+										</details>
+									) : null}
+									{item.url ? (
+										<a
+											className={styles.mobileOpenLink}
+											href={item.url}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{item.openLabel} ↗
+										</a>
+									) : null}
+								</li>
+							);
+						})}
+					</ul>
+				</details>
+			))}
 		</div>
 	);
 }
@@ -628,6 +797,10 @@ function buildGroupedNodes(
 	criticality: Map<string, ServiceCriticality>,
 ): Node[] {
 	const nodes: Node[] = [];
+	const maxBlastRadius = Math.max(
+		0,
+		...[...criticality.values()].map((entry) => entry.transitiveDependents),
+	);
 	let y = 0;
 
 	for (const group of groups) {
@@ -659,6 +832,16 @@ function buildGroupedNodes(
 			const resolvedHealth = resolveEffectiveServiceState(health);
 			const blockers = blockedDependencyLabels(health);
 			const serviceCriticality = criticality.get(entity.id);
+			const blastRatio =
+				maxBlastRadius > 0 && serviceCriticality
+					? serviceCriticality.transitiveDependents / maxBlastRadius
+					: 0;
+			const blastRadiusLevel =
+				blastRatio >= 0.5
+					? "dominant"
+					: blastRatio >= 0.05
+						? "elevated"
+						: undefined;
 
 			nodes.push({
 				id: entity.id,
@@ -695,6 +878,7 @@ function buildGroupedNodes(
 					applicationError: health?.application_error,
 					criticalityTier: serviceCriticality?.tier,
 					blastRadius: serviceCriticality?.transitiveDependents,
+					blastRadiusLevel,
 				} satisfies ArchitectureNodeData,
 			});
 		});
@@ -828,12 +1012,20 @@ export default function HierarchicalArchitectureExplorer({
 				if (active) setHealthSource("unavailable");
 			}
 		};
-		const load = () => void Promise.all([loadRuntime(), loadHealth()]);
+		const load = () => {
+			if (document.hidden) return;
+			void Promise.all([loadRuntime(), loadHealth()]);
+		};
 		load();
 		const timer = window.setInterval(load, 30_000);
+		const onVisibilityChange = () => {
+			if (!document.hidden) load();
+		};
+		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
 			active = false;
 			window.clearInterval(timer);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, []);
 
@@ -900,6 +1092,15 @@ export default function HierarchicalArchitectureExplorer({
 	const edges = useMemo(
 		() => makeEdges(relations, filtered.visible, healthById, showOptional, french),
 		[filtered.visible, french, healthById, relations, showOptional],
+	);
+	const nodeDataById = useMemo(
+		() =>
+			new Map(
+				nodes
+					.filter((node) => node.type === "architecture")
+					.map((node) => [node.id, node.data as ArchitectureNodeData]),
+			),
+		[nodes],
 	);
 	const availability = runtimeAvailability(runtimeStatus, french);
 
@@ -1056,6 +1257,14 @@ export default function HierarchicalArchitectureExplorer({
 					</div>
 				</aside>
 			) : null}
+
+
+			<MobileArchitectureHierarchy
+				groups={groups}
+				nodeDataById={nodeDataById}
+				relations={edges}
+				french={french}
+			/>
 
 			<div className={styles.flowShell}>
 				<ReactFlow

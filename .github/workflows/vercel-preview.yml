@@ -12,6 +12,7 @@ on:
       - closed
 
 permissions:
+  actions: read
   contents: write
   pull-requests: read
 
@@ -53,6 +54,38 @@ jobs:
             }
 
             const sha = pr.head.sha;
+            const qualityRuns = await github.paginate(
+              github.rest.actions.listWorkflowRunsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: sha,
+                event: 'pull_request',
+                per_page: 100,
+              },
+            );
+            const qualityRun = qualityRuns
+              .filter(
+                (run) =>
+                  run.name === 'CI (Quality and Security)' &&
+                  run.head_sha === sha,
+              )
+              .sort((left, right) => right.run_number - left.run_number)[0];
+
+            if (
+              !qualityRun ||
+              qualityRun.status !== 'completed' ||
+              qualityRun.conclusion !== 'success'
+            ) {
+              core.setFailed(
+                `PR #${prNumber} head ${sha} has no successful completed Quality run.`,
+              );
+              return;
+            }
+            core.info(
+              `Quality run #${qualityRun.run_number} validated exact PR head ${sha}.`,
+            );
+
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -105,9 +138,22 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 ref: `refs/${ref}`,
-                sha,
+                sha: pr.base.sha,
               });
-              core.info(`Created ${branch} at ${sha}`);
+              // A newly created ref alone does not reliably emit the Git push event
+              // consumed by Vercel Git Integration. Move the fresh checkpoint from
+              // the PR base to the already validated head to produce that event
+              // without creating a synthetic commit.
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+                sha,
+                force: true,
+              });
+              core.info(
+                `Created ${branch} from ${pr.base.sha} and moved it to validated head ${sha}`,
+              );
             }
 
   cleanup:
