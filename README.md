@@ -21,8 +21,8 @@ assets historiques progressivement migrés vers les composants de `app/`.
 
 ## Prérequis
 
-- Node.js 24.11 ou supérieur
-- npm 11.6 ou supérieur
+- Node.js 25 pour le développement local et la CI
+- npm 11.17 ou supérieur
 
 ## Démarrage local
 
@@ -85,9 +85,7 @@ pour les scripts côté navigateur.
 
 ## Déploiement
 
-`vercel.json` configure le déploiement Next.js sur Vercel. `wrangler.jsonc`
-conserve une cible Cloudflare dédiée aux assets statiques historiques ; elle ne
-remplace pas le runtime Next.js complet.
+`vercel.json` configure le déploiement Next.js sur Vercel. La configuration Wrangler historique a été retirée : Vercel est l’unique cible de déploiement du site.
 
 Avant un déploiement :
 
@@ -115,8 +113,7 @@ Les workflows GitHub Actions couvrent notamment :
 - la génération des PDF du CV ;
 - les contrôles de configuration pour les assistants de développement.
 
-Les secrets CI actuellement documentés sont `DOCKER_USERNAME`,
-`DOCKER_PASSWORD`, `OCO_API_KEY` et, facultativement, `PAT`.
+Les secrets CI sont documentés dans `docs/GITHUB_ACTIONS_SETUP.md`. OpenCommit reste un outil local/on-demand et n’implique pas de workflow GitHub dédié.
 
 ## Documentation du CV
 

@@ -15,6 +15,10 @@ on:
       - "package-lock.json"
       - "CHANGELOG.md"
       - ".releaserc.yaml"
+      - ".npmrc"
+      - ".nvmrc"
+      - ".envrc"
+      - "mise.toml"
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
@@ -35,6 +39,10 @@ on:
       - "package-lock.json"
       - "CHANGELOG.md"
       - ".releaserc.yaml"
+      - ".npmrc"
+      - ".nvmrc"
+      - ".envrc"
+      - "mise.toml"
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
@@ -62,8 +70,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version-file: ".nvmrc"
           cache: npm
+
+      - name: Upgrade npm
+        run: npm install --global npm@11.17.0 --no-audit --no-fund
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund

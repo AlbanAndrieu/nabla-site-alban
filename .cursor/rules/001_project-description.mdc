@@ -18,7 +18,7 @@ The repository layout looks like this (main items):
 ├── ⚙️ .cursor/rules/                  <- LLM instructions for Cursor IDE (*.mdc)
 ├── 🧑‍💻 .github/
 │   ├── 📄 copilot-instructions.md, github-actions-best-practices.md, vercel-deployment-instructions.md
-│   └── ⚡ workflows/                 <- Playwright, Mega-Linter, Docker build, PDF build, OpenCommit
+│   └── ⚡ workflows/                 <- CI, Playwright, release, Mega-Linter, Docker build, PDF build
 ├── 💻 .vscode/                       <- Settings, MCP config, copilot-instructions
 ├── 📁 api/                           <- Vercel serverless API (Node.js, e.g. Stripe)
 ├── 📚 docs/                          <- Project documentation
@@ -49,7 +49,7 @@ The repository layout looks like this (main items):
 ├── 📁 vendor/                        <- Optional third-party dir (gitignored if present)
 ├── 👩‍⚖️ LICENSE
 ├── 📰 README.md
-├── 📄 vercel.json, wrangler.jsonc    <- Deployment (Vercel, Cloudflare)
+├── 📄 vercel.json                   <- Deployment (Vercel)
 └── 📄 .gitignore, .pre-commit-config.yaml, commitlint.config.ts, ...
 ```
 
