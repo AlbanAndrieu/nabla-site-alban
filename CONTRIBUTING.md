@@ -16,7 +16,7 @@ Please be respectful and constructive in all interactions.
    ```
 3. **Install dependencies**:
    ```bash
-   npm install
+   npm ci
    ```
 
 ## Development Workflow
@@ -32,10 +32,10 @@ Please be respectful and constructive in all interactions.
 
 3. **Test your changes**:
    ```bash
-   # Run linting
-   npm run lint
+   # Canonical local validation
+   npm run check
 
-   # Test locally
+   # Run the production server after a successful build
    npm run start
    ```
 
@@ -89,7 +89,6 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 
 ```
 nabla-site-alban/
-├── public/              # Static website files (main site)
 ├── app/                 # Next.js App Router and Route Handlers
 ├── public/              # Static assets and legacy HTML kept during migration
 ├── unit-tests/          # Node.js contract tests
@@ -108,7 +107,8 @@ Before submitting a PR:
 
 2. **Test locally**:
    ```bash
-   # Next.js production server (requires a build first)
+   # Build and run the Next.js production server
+   npm run build
    npm run start
 
    # Or static legacy assets only

@@ -26,6 +26,15 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 	await assert.rejects(access(projectUrl("build.sh")));
 	await assert.rejects(access(projectUrl("public/package.json")));
 	await access(projectUrl("public/d3.v3.min.js"));
+	const vercelDocs = await read(".github/vercel-deployment-instructions.md");
+	assert.match(vercelDocs, /Vercel \*\*Git Integration\*\* owns deployments/);
+	assert.match(vercelDocs, /local Vercel CLI dependency.*intentionally retired/i);
+	assert.doesNotMatch(vercelDocs, /npm install -g vercel/i);
+	assert.doesNotMatch(vercelDocs, /^vercel (?:dev|deploy|--prod)\b/m);
+	assert.doesNotMatch(vercelDocs, /Wrangler/);
+	const publicDocs = await read("public/README.md");
+	assert.match(publicDocs, /static asset directory.*repository-root \*\*Next\.js\*\*/i);
+	assert.doesNotMatch(publicDocs, /served by Vercel, Cloudflare|my-app\//i);
 });
 
 test("Node and Next toolchain stay aligned with the reviewed targets", async () => {
@@ -34,13 +43,16 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	const [setup, ci, release, playwright, envrc, nvmrc] = await Promise.all([
+	const [setup, ci, release, playwright, envrc, nvmrc, mise, cicdDocs, architectureDocs] = await Promise.all([
 		read(".github/workflows/copilot-setup-steps.yml"),
 		read(".github/workflows/ci.yml"),
 		read(".github/workflows/release.yml"),
 		read(".github/workflows/playwright.yml"),
 		read(".envrc"),
 		read(".nvmrc"),
+		read("mise.toml"),
+		read(".github/copilot-instructions-cicd.md"),
+		read("docs/architecture.md"),
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <26");
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
@@ -52,8 +64,13 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		assert.doesNotMatch(workflow, /node-version:\s*"24"/);
 		assert.doesNotMatch(workflow, /node-version:\s*"25"/);
 	}
-	assert.match(envrc, /NODE_VERSIONS=.*v25\.4\.0/);
-	assert.equal(nvmrc.trim(), "25.4.0");
+	assert.match(envrc, /NODE_VERSIONS=.*v25\.9\.0/);
+	assert.equal(nvmrc.trim(), "25.9.0");
+	assert.match(mise, /node = "25\.9\.0"/);
+	for (const docs of [cicdDocs, architectureDocs]) {
+		assert.match(docs, /25\.9\.0/);
+		assert.doesNotMatch(docs, /25\.4\.0/);
+	}
 });
 
 test("active Alban-specific runtime dependencies remain explicit", async () => {
