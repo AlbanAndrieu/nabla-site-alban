@@ -187,6 +187,9 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 	]);
 
 	assert.match(explorer, /data-mobile-architecture-hierarchy/);
+	assert.match(explorer, /if \(document\.hidden\) return/);
+	assert.match(explorer, /document\.addEventListener\("visibilitychange"/);
+	assert.match(explorer, /document\.removeEventListener\("visibilitychange"/);
 	assert.match(explorer, /data-mobile-architecture-group=\{group\.key\}/);
 	assert.match(explorer, /data-mobile-architecture-item=\{entity\.id\}/);
 	assert.match(explorer, /relations=\{edges\}/);
