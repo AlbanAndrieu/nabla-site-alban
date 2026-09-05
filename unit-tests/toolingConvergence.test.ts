@@ -32,6 +32,9 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 	assert.doesNotMatch(vercelDocs, /npm install -g vercel/i);
 	assert.doesNotMatch(vercelDocs, /^vercel (?:dev|deploy|--prod)\b/m);
 	assert.doesNotMatch(vercelDocs, /Wrangler/);
+	const publicDocs = await read("public/README.md");
+	assert.match(publicDocs, /static asset directory.*repository-root \*\*Next\.js\*\*/i);
+	assert.doesNotMatch(publicDocs, /served by Vercel, Cloudflare|my-app\//i);
 });
 
 test("Node and Next toolchain stay aligned with the reviewed targets", async () => {
