@@ -35,7 +35,11 @@ test("Vercel skips CI-only changes", async () => {
 	assert.match(script, /git_ref.*vercel-preview-\*/s);
 	assert.match(
 		script,
-		/No previous successful deployment for validated checkpoint.*build deployment/s,
+		/if \[\[ "\$\{git_ref\}" == vercel-preview-\* \]\]; then[\s\S]*exit 1/,
+	);
+	assert.match(
+		script,
+		/Validated checkpoint.*build exact deployment/s,
 	);
 	assert.ok(script.includes("unit-tests/*"));
 	assert.ok(script.includes(".github/*"));
