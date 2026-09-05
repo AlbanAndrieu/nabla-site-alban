@@ -35,8 +35,10 @@ branche finale et le déploiement Vercel sont validés.
 - [ ] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
   et leurs traductions : statut indépendant, périodes d'expérience et temps
   verbaux doivent raconter la même chronologie.
-- [ ] Supprimer les anciennes traductions/props Jus Mundi devenues mortes ; ne pas
-  réintroduire de dictionnaire local dans les composants.
+- [x] Supprimer les anciennes traductions/props Jus Mundi devenues mortes :
+  le namespace `jm` ne conserve plus le footer historique, les anciens libellés
+  de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
+  le contrat actif sans dictionnaire local dans les composants.
 - [ ] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
   obsolètes héritées de la période Jus Mundi.
 - [ ] Maintenir les pages utilisées aussi dans `nabla-site-bababou` à parité
