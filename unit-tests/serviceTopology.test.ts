@@ -174,7 +174,6 @@ test("architecture route uses a static declared shell with live shared service h
 	}
 });
 
-
 test("hierarchical architecture exposes a compact mobile hierarchy driven by the same graph state", async () => {
 	const [explorer, css] = await Promise.all([
 		readFile(
@@ -192,9 +191,15 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 	assert.match(explorer, /data-mobile-architecture-item=\{entity\.id\}/);
 	assert.match(explorer, /relations=\{edges\}/);
 	assert.match(explorer, /nodeDataById=\{nodeDataById\}/);
+	assert.match(explorer, /maxBlastRadius = Math\.max/);
+	assert.match(explorer, /blastRatio >= 0\.5/);
+	assert.match(explorer, /blastRatio >= 0\.05/);
+	assert.match(explorer, /data-blast-radius-level=\{item\.blastRadiusLevel\}/);
 	assert.match(explorer, /<details[\s\S]*className=\{styles\.mobileGroup\}/);
 	assert.match(explorer, /<details className=\{styles\.mobileRelations\}>/);
 	assert.match(css, /\.mobileHierarchy\s*\{[\s\S]*display:\s*none/);
+	assert.match(css, /\.node\[data-blast-radius-level="dominant"\]/);
+	assert.match(css, /\.mobileItem\[data-blast-radius-level="dominant"\]/);
 	assert.match(
 		css,
 		/@media \(max-width: 700px\)[\s\S]*\.mobileHierarchy\s*\{[\s\S]*display:\s*grid/,
