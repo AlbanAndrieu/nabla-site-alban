@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 3 septembre 2026.
+Dernière vérification : 5 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -153,8 +153,11 @@ les autres chantiers.
 - [ ] Faire refléter ces couches d'hébergement dans le React Flow détaillé avec
   foundations/data/platform/apps clairement étagés et les nœuds à fort blast
   radius visuellement dominants.
-- [ ] Ajouter une représentation mobile compacte de cette hiérarchie avec
-  collapse/expand et, lorsque pertinent, filtres critical-only et optional-edge.
+- [x] Ajouter une représentation mobile compacte de cette hiérarchie avec
+  collapse/expand et filtres critical-only / optional-edge : sous 700 px, la
+  hiérarchie groupée réutilise exactement les mêmes groupes, états de santé,
+  niveaux de criticité et arêtes filtrées que React Flow, avec des `details`
+  repliables par couche puis par relations de service.
 - [x] Distinguer visuellement les arêtes de dépendance des chemins d'exposition :
   le graphe classe maintenant `dependency`, flux API/données, `exposure`,
   hébergement, observabilité et automatisation, tandis que le contrat réseau
@@ -176,9 +179,12 @@ les autres chantiers.
   comme une observation live.
 - [ ] Revalider le graphe de production après chaque évolution importante du
   catalogue `nabla-compose` / du contrat `fastapi-sample`.
-- [ ] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
-  multi-services (par exemple Elasticsearch/Kibana) et les services auxiliaires
-  qui ne doivent pas devenir des nœuds fonctionnels par erreur.
+- [x] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
+  multi-services et les services auxiliaires : le fallback Site verrouille
+  Elasticsearch → Docker, Kibana → Elasticsearch/Docker et Docker → TrueNAS ;
+  côté source autoritative, `nabla-compose/tests/test_service_topology_generator.py`
+  garantit qu'un service Compose non déclaré par `x-nabla` ne devient pas un
+  nœud fonctionnel.
 - [ ] Ajouter une couverture visuelle/Playwright light/dark/mobile des états
   `healthy`, `degraded`, `failed`, `stale` et `unknown` après migration des
   diagrammes vers le resolver partagé.
