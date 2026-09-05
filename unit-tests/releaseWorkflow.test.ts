@@ -43,7 +43,8 @@ test("release bootstrap anchors v0.0.0 before semantic-release workflow changes"
   assert.ok(identityPosition < tagPosition, "git identity must be configured before bootstrap mutations");
   assert.ok(configCommitPosition < tagPosition, "baseline must be resolved before creating v0.0.0");
   assert.match(release, /BASELINE_SHA="\$\(git rev-parse "\$\{RELEASE_CONFIG_COMMIT\}\^"\)"/);
-  assert.match(release, /gh api --method POST/);\n  assert.match(release, /repos\/\$\{GITHUB_REPOSITORY\}\/git\/refs/);
+  assert.match(release, /gh api --method POST/);
+  assert.match(release, /repos\/\$\{GITHUB_REPOSITORY\}\/git\/refs/);
   assert.match(release, /git config --local user.email/);
   assert.doesNotMatch(release, /git commit --allow-empty/);
   assert.doesNotMatch(release, /git push origin HEAD:master/);
