@@ -64,7 +64,22 @@
 			"reachable": "joignable",
 			"unreachable": "injoignable",
 			"lastGood": "dernière preuve saine conservée",
-			"unavailable": "La topologie runtime est actuellement indisponible."
+			"unavailable": "La topologie runtime est actuellement indisponible.",
+			"fastapi": "Runtime FastAPI",
+			"mode": "mode runtime : {mode}",
+			"redis": {
+				"title": "Télémétrie Redis de l’application",
+				"available": "Télémétrie Redis disponible",
+				"unavailable": "Télémétrie Redis indisponible",
+				"scope": "périmètre : {scope}",
+				"memory": "mémoire : {used} / {max}",
+				"unbounded": "aucune limite maxmemory signalée",
+				"clients": "clients : {connected} connectés · {blocked} bloqués",
+				"keys": "clés dans la base sélectionnée : {count}",
+				"hitRate": "taux de hits keyspace : {percent} %",
+				"ops": "opérations instantanées : {count}/s",
+				"evictions": "clés évincées : {evicted} · clés expirées : {expired}"
+			}
 		},
 		"deep": {
 			"title": "Diagnostics profonds des dépendances et intégrations",
@@ -107,6 +122,14 @@
 				"api": "Santé de l’API pfSense",
 				"apiTitle": "Ouvre l’endpoint système pfSense en lecture seule ; un accès API autorisé peut être requis.",
 				"note": "Les liens Admin/API sont des points d’entrée de diagnostic, pas une preuve que pfSense est la cause de l’incident."
+			},
+			"ingressPolicy": {
+				"title": "Blocage possible de la politique d’ingress pfSense",
+				"lead": "FastAPI Cloud n’a pas terminé la connexion TCP/TLS avant l’échéance de connexion. Il s’agit d’une preuve pré-HTTP : une dérive des sources approuvées ou un filtrage PF/Snort sont plausibles, pas un échec d’identifiants API.",
+				"egress": "egress FastAPI Cloud actifs : {ips}",
+				"causes": "causes possibles : {causes}",
+				"controlPath": "chemin de contrôle recommandé : {path}",
+				"noAttribution": "L’attribution PF/Snort courante est indisponible ; vérifiez depuis un chemin de contrôle hors bande avant de modifier l’application ou TrueNAS."
 			}
 		},
 		"serviceExposure": {
