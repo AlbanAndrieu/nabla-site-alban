@@ -17,7 +17,7 @@ OpenCommit is retained as local npm tooling, but there is no current OpenCommit 
 
 ## Runtime contract
 
-- GitHub Actions use `.nvmrc` (Node.js 25.4.0) and explicitly upgrade npm to 11.17.0. Vercel Functions remain on a Vercel-supported Node runtime (currently 24.x).
+- GitHub Actions use `.nvmrc` (Node.js 25.9.0) and explicitly upgrade npm to 11.17.0. Vercel Functions remain on a Vercel-supported Node runtime (currently 24.x).
 - npm `>=11.17.0 <12`.
 - Install from the repository root with `npm ci`.
 - `.npmrc` enables strict install-script policy; reviewed scripts are denied explicitly through `package.json#allowScripts`.
