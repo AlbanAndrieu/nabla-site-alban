@@ -1,3 +1,37 @@
+export type RuntimeRedisEvidence = {
+	backend?: string;
+	provider_attribution?: string;
+	telemetry_scope?: string;
+	key_count_scope?: string;
+	configured: boolean | null;
+	available: boolean | null;
+	telemetry_available: boolean | null;
+	reason?: string;
+	error_kind?: string;
+	failure_stage?: string;
+	exception_type?: string;
+	used_memory_bytes?: number;
+	used_memory_human?: string;
+	used_memory_rss_bytes?: number;
+	used_memory_rss_human?: string;
+	used_memory_peak_bytes?: number;
+	used_memory_peak_human?: string;
+	maxmemory_bytes?: number;
+	maxmemory_human?: string;
+	maxmemory_policy?: string;
+	memory_utilization_percent?: number;
+	mem_fragmentation_ratio?: number;
+	connected_clients?: number;
+	blocked_clients?: number;
+	keys?: number;
+	instantaneous_ops_per_sec?: number;
+	keyspace_hits?: number;
+	keyspace_misses?: number;
+	keyspace_hit_rate_percent?: number;
+	evicted_keys?: number;
+	expired_keys?: number;
+};
+
 export type RuntimeTopologyInstance = {
 	id: string;
 	last_seen_at?: string;
@@ -8,6 +42,7 @@ export type RuntimeTopologyInstance = {
 
 export type RuntimeTopologySnapshot = {
 	provider: string;
+	runtime_mode?: string;
 	observed_at: string;
 	platform_replica_count?: number | null;
 	platform_replica_count_available: boolean;
@@ -21,6 +56,7 @@ export type RuntimeTopologySnapshot = {
 	recent_egress_ips: string[];
 	aggregation?: string;
 	degraded?: boolean;
+	redis?: RuntimeRedisEvidence;
 };
 
 export const RUNTIME_TOPOLOGY_DEFAULT_API_URL =
@@ -30,6 +66,85 @@ const PRIMARY_TIMEOUT_MS = 5_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function optionalString(value: unknown): string | undefined {
+	return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function optionalNumber(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0
+		? value
+		: undefined;
+}
+
+function optionalBoolean(value: unknown): boolean | null {
+	return typeof value === "boolean" ? value : null;
+}
+
+function parseRedisEvidence(value: unknown): RuntimeRedisEvidence | undefined {
+	if (!isRecord(value)) return undefined;
+	return {
+		configured: optionalBoolean(value.configured),
+		available: optionalBoolean(value.available),
+		telemetry_available: optionalBoolean(value.telemetry_available),
+		...(optionalString(value.backend) ? { backend: optionalString(value.backend) } : {}),
+		...(optionalString(value.provider_attribution)
+			? { provider_attribution: optionalString(value.provider_attribution) }
+			: {}),
+		...(optionalString(value.telemetry_scope)
+			? { telemetry_scope: optionalString(value.telemetry_scope) }
+			: {}),
+		...(optionalString(value.key_count_scope)
+			? { key_count_scope: optionalString(value.key_count_scope) }
+			: {}),
+		...(optionalString(value.reason) ? { reason: optionalString(value.reason) } : {}),
+		...(optionalString(value.error_kind)
+			? { error_kind: optionalString(value.error_kind) }
+			: {}),
+		...(optionalString(value.failure_stage)
+			? { failure_stage: optionalString(value.failure_stage) }
+			: {}),
+		...(optionalString(value.exception_type)
+			? { exception_type: optionalString(value.exception_type) }
+			: {}),
+		...Object.fromEntries(
+			[
+				"used_memory_bytes",
+				"used_memory_rss_bytes",
+				"used_memory_peak_bytes",
+				"maxmemory_bytes",
+				"memory_utilization_percent",
+				"mem_fragmentation_ratio",
+				"connected_clients",
+				"blocked_clients",
+				"keys",
+				"instantaneous_ops_per_sec",
+				"keyspace_hits",
+				"keyspace_misses",
+				"keyspace_hit_rate_percent",
+				"evicted_keys",
+				"expired_keys",
+			]
+				.map((key) => [key, optionalNumber(value[key])])
+				.filter((entry): entry is [string, number] => entry[1] !== undefined),
+		),
+		...(optionalString(value.used_memory_human)
+			? { used_memory_human: optionalString(value.used_memory_human) }
+			: {}),
+		...(optionalString(value.used_memory_rss_human)
+			? { used_memory_rss_human: optionalString(value.used_memory_rss_human) }
+			: {}),
+		...(optionalString(value.used_memory_peak_human)
+			? { used_memory_peak_human: optionalString(value.used_memory_peak_human) }
+			: {}),
+		...(optionalString(value.maxmemory_human)
+			? { maxmemory_human: optionalString(value.maxmemory_human) }
+			: {}),
+		...(optionalString(value.maxmemory_policy)
+			? { maxmemory_policy: optionalString(value.maxmemory_policy) }
+			: {}),
+	};
 }
 
 function stringArray(value: unknown): string[] {
@@ -71,8 +186,12 @@ export function parseRuntimeTopology(value: unknown): RuntimeTopologySnapshot | 
 			},
 		];
 	});
+	const redis = parseRedisEvidence(value.redis);
 	return {
 		provider: value.provider,
+		...(optionalString(value.runtime_mode)
+			? { runtime_mode: optionalString(value.runtime_mode) }
+			: {}),
 		observed_at: value.observed_at,
 		platform_replica_count:
 			value.platform_replica_count === null ||
@@ -100,6 +219,7 @@ export function parseRuntimeTopology(value: unknown): RuntimeTopologySnapshot | 
 		aggregation:
 			typeof value.aggregation === "string" ? value.aggregation : undefined,
 		degraded: typeof value.degraded === "boolean" ? value.degraded : undefined,
+		...(redis ? { redis } : {}),
 	};
 }
 
