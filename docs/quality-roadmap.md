@@ -150,9 +150,11 @@ les autres chantiers.
 - [ ] Compléter les relations d'hébergement/runtime dans la topologie autoritative,
   notamment `service -> Docker/runtime -> TrueNAS`, uniquement lorsque la
   configuration réelle les prouve.
-- [ ] Faire refléter ces couches d'hébergement dans le React Flow détaillé avec
-  foundations/data/platform/apps clairement étagés et les nœuds à fort blast
-  radius visuellement dominants.
+- [x] Faire refléter ces couches d'hébergement dans le React Flow détaillé avec
+  foundations/data/platform/apps clairement étagés ; les nœuds sont triés par
+  criticité/blast radius et la dominance visuelle est calculée relativement au
+  rayon d'impact maximal de la topologie, sans hardcoder TrueNAS, Docker ou un
+  autre ID de service.
 - [x] Ajouter une représentation mobile compacte de cette hiérarchie avec
   collapse/expand et filtres critical-only / optional-edge : sous 700 px, la
   hiérarchie groupée réutilise exactement les mêmes groupes, états de santé,
@@ -375,28 +377,27 @@ Autres contrôles :
 
 ## Ordre de livraison réévalué
 
-1. Compléter la topologie d'hébergement/runtime à partir des sources autoritatives,
-   puis améliorer le React Flow détaillé avec les mêmes niveaux de criticité et
-   blast radius déjà utilisés dans la vue partagée.
-2. Rendre la hiérarchie Architecture/TrueNAS réellement compacte sur mobile avec
-   collapse/expand et filtres ciblés lorsque le graphe dense n'est pas adapté.
-3. Revalider régulièrement le graphe de production et ajouter les contrats pour
-   workloads multi-services/auxiliaires lorsque la topologie autoritative les expose.
-4. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
-5. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
+1. Compléter les dernières relations d'hébergement/runtime uniquement depuis les
+   sources autoritatives ; les vues desktop/mobile savent désormais déjà les
+   représenter et hiérarchiser leur blast radius sans règle par service.
+2. Revalider régulièrement le graphe de production après les évolutions
+   `nabla-compose` / `fastapi-sample` et étendre les contrats lorsqu'un nouveau
+   type de workload ou de relation apparaît.
+3. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
+4. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
    et le retrait de Bootstrap après les migrations déjà faites de RouteHeader,
    LocaleSwitcher, Footer et ContactHero.
-6. Terminer la migration native de `/security` et le durcissement CSP ; D3 v3 et
+5. Terminer la migration native de `/security` et le durcissement CSP ; D3 v3 et
    `arf.js` sont déjà retirés du runtime.
-7. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
-8. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
-9. Workstation, code mort, Bootstrap/CDN et budgets performance. Les CV
+6. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
+7. Accessibilité axe/clavier/reduced-motion sur les pages prioritaires.
+8. Workstation, code mort, Bootstrap/CDN et budgets performance. Les CV
    historiques restent volontairement hors de la migration Next.js native.
-10. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
+9. Résilience réseau/DNS : pfSense/Unbound, rôle de Pi-hole/AdGuard Home et tests
     de panne ; ce chantier reste volontairement derrière l'architecture/homelab UI.
-11. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
+10. **P0 — empêcher une nouvelle régression de merge**, en dernier comme demandé,
     puis conserver ces garde-fous pour tous les travaux ultérieurs.
-12. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
+11. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
     retrait ASN et nettoyer la rétention historique après le durcissement WAN et
     les travaux réseau prioritaires.
 
