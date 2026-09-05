@@ -27,7 +27,11 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 	await assert.rejects(access(projectUrl("public/package.json")));
 	await access(projectUrl("public/d3.v3.min.js"));
 	const vercelDocs = await read(".github/vercel-deployment-instructions.md");
-	assert.match(vercelDocs, /Vercel \*\*Git Integration\*\* owns deployments/);\n\tassert.match(vercelDocs, /local Vercel CLI dependency.*intentionally retired/i);\n\tassert.doesNotMatch(vercelDocs, /npm install -g vercel/i);\n\tassert.doesNotMatch(vercelDocs, /^vercel (?:dev|deploy|--prod)\\b/m);\n\tassert.doesNotMatch(vercelDocs, /Wrangler/);
+	assert.match(vercelDocs, /Vercel \*\*Git Integration\*\* owns deployments/);
+	assert.match(vercelDocs, /local Vercel CLI dependency.*intentionally retired/i);
+	assert.doesNotMatch(vercelDocs, /npm install -g vercel/i);
+	assert.doesNotMatch(vercelDocs, /^vercel (?:dev|deploy|--prod)\b/m);
+	assert.doesNotMatch(vercelDocs, /Wrangler/);
 });
 
 test("Node and Next toolchain stay aligned with the reviewed targets", async () => {
