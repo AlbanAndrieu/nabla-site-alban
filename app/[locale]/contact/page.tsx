@@ -89,7 +89,6 @@ export default async function ContactPage({
 			<ContactHero
 				contactCta={t("hero.contactCta")}
 				contactHref="#contact-details"
-				current={t("hero.current")}
 				cvCta={t("hero.cvCta")}
 				cvHref={canonicalPagePath("cv", locale)}
 				experience={t("hero.experience")}
