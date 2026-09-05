@@ -64,7 +64,22 @@
 			"reachable": "reachable",
 			"unreachable": "unreachable",
 			"lastGood": "last-good evidence retained",
-			"unavailable": "Runtime topology is currently unavailable."
+			"unavailable": "Runtime topology is currently unavailable.",
+			"fastapi": "FastAPI runtime",
+			"mode": "runtime mode: {mode}",
+			"redis": {
+				"title": "Application Redis telemetry",
+				"available": "Redis telemetry available",
+				"unavailable": "Redis telemetry unavailable",
+				"scope": "scope: {scope}",
+				"memory": "memory: {used} / {max}",
+				"unbounded": "no maxmemory limit reported",
+				"clients": "clients: {connected} connected · {blocked} blocked",
+				"keys": "keys in selected database: {count}",
+				"hitRate": "keyspace hit rate: {percent}%",
+				"ops": "instantaneous operations: {count}/s",
+				"evictions": "evicted keys: {evicted} · expired keys: {expired}"
+			}
 		},
 		"deep": {
 			"title": "Deep dependency and integration diagnostics",
@@ -107,6 +122,14 @@
 				"api": "pfSense API health",
 				"apiTitle": "Open the read-only pfSense system version endpoint; authorized API access may be required.",
 				"note": "Admin/API links are diagnostic entry points, not proof that pfSense caused the incident."
+			},
+			"ingressPolicy": {
+				"title": "Possible pfSense ingress-policy block",
+				"lead": "FastAPI Cloud could not complete the TCP/TLS connection before the connect deadline. This is pre-HTTP evidence: trusted-source drift or PF/Snort filtering are plausible, not an API credential failure.",
+				"egress": "active FastAPI Cloud egress: {ips}",
+				"causes": "possible causes: {causes}",
+				"controlPath": "recommended control path: {path}",
+				"noAttribution": "Current PF/Snort attribution is unavailable; verify from an out-of-band control path before changing the application or TrueNAS."
 			}
 		},
 		"serviceExposure": {
