@@ -203,4 +203,8 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 		css,
 		/@media \(max-width: 700px\)[\s\S]*\.flowShell\s*\{[\s\S]*display:\s*none/,
 	);
+	assert.match(
+		css,
+		/@media \(prefers-reduced-motion: reduce\)[\s\S]*react-flow__edge\.animated path[\s\S]*animation:\s*none !important/,
+	);
 });
