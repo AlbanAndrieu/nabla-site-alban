@@ -491,6 +491,7 @@ function MobileArchitectureHierarchy({
 		<div
 			className={styles.mobileHierarchy}
 			data-mobile-architecture-hierarchy
+			role="region"
 			aria-label={
 				french
 					? "Hiérarchie d’architecture compacte"
