@@ -628,6 +628,19 @@ export default function HomelabOperationalEvidence() {
 						<summary>{t("serviceExposure.title")}{exposureEntries.filter(([, exposure]) => exposure.state === "mismatch").length ? ` · ${exposureEntries.filter(([, exposure]) => exposure.state === "mismatch").length} mismatch` : ""}</summary>
 						<div className={styles.detailsBody}>
 							<p>{t("serviceExposure.lead")}</p>
+							{evidence.edgeEvidenceSkips.length ? (
+								<div className={styles.providerSummary} data-edge-evidence-skips>
+									<strong>{t("serviceExposure.skippedEdge")}</strong>
+									{evidence.edgeEvidenceSkips.map((skip) => (
+										<span key={skip.id}>
+											{t("serviceExposure.skippedEdgeItem", {
+												id: skip.id,
+												reason: skip.reason,
+											})}
+										</span>
+									))}
+								</div>
+							) : null}
 							{cloudflare ? (
 								<div className={styles.providerSummary} data-cloudflare-diagnostics>
 									<strong>{t("serviceExposure.cloudflare")}</strong>
