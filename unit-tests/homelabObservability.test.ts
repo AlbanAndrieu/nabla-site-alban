@@ -15,7 +15,8 @@ test("health board preserves runtime and unified observability consumes all aggr
 		refreshing: false,
 		generated_at: "2026-09-03T00:30:00Z",
 		runtime: {
-			provider: "fastapi-cloud",
+			provider: "FastAPI Cloud",
+			runtime_mode: "fastapi_cloud",
 			observed_at: "2026-09-03T00:29:59Z",
 			platform_replica_count: null,
 			platform_replica_count_available: false,
@@ -29,6 +30,29 @@ test("health board preserves runtime and unified observability consumes all aggr
 			recent_egress_ips: ["203.0.113.4"],
 			aggregation: "redis_heartbeat",
 			degraded: false,
+			redis: {
+				backend: "application_redis",
+				provider_attribution: "unavailable",
+				telemetry_scope: "redis_server_and_selected_database",
+				key_count_scope: "selected_database_total",
+				configured: true,
+				available: true,
+				telemetry_available: true,
+				used_memory_bytes: 1048576,
+				used_memory_human: "1M",
+				maxmemory_bytes: 8388608,
+				maxmemory_human: "8M",
+				memory_utilization_percent: 12.5,
+				connected_clients: 4,
+				blocked_clients: 0,
+				keys: 42,
+				instantaneous_ops_per_sec: 7,
+				keyspace_hits: 90,
+				keyspace_misses: 10,
+				keyspace_hit_rate_percent: 90,
+				evicted_keys: 0,
+				expired_keys: 5,
+			},
 		},
 		healthz: {
 			contract: "deep_diagnostic",
@@ -38,7 +62,27 @@ test("health board preserves runtime and unified observability consumes all aggr
 				postgres: { reachable: true },
 				redis: { reachable: true },
 				supabase: { reachable: true, http_status: 200, probe: "data_api", authentication: "publishable_key", resource: "note", path: "/rest/v1/note" },
-				pfsense: { reachable: false, stale: true, refresh_error: "read timeout", error_kind: "read_timeout", failure_stage: "response", exception_type: "ReadTimeout", cache_layer: "redis", cached: true, cache_age_seconds: 12, redis_available: true },
+				pfsense: {
+					reachable: false,
+					stale: true,
+					refresh_error: "connect timeout",
+					error_kind: "connect_timeout",
+					failure_stage: "connect",
+					exception_type: "ConnectTimeout",
+					cache_layer: "redis",
+					cached: true,
+					cache_age_seconds: 12,
+					redis_available: true,
+					ingress_policy: {
+						state: "possible_ingress_policy_block",
+						access_policy: "trusted_sources_only",
+						active_egress_ips: ["203.0.113.4"],
+						possible_causes: ["trusted_source_policy_drift", "pf_or_snort_filter"],
+						attribution_available: false,
+						detail: "Pre-HTTP ingress evidence",
+						recommended_control_path: "out_of_band",
+					},
+				},
 				tavily: { reachable: null, skipped: true, reason: "TAVILY_API_KEY not configured" },
 				garage: { reachable: true, http_status: 200, tls_trusted: true, display_label: "Garage", elapsed_ms: 44 },
 			},
@@ -90,6 +134,10 @@ test("health board preserves runtime and unified observability consumes all aggr
 
 	const evidence = parseHomelabObservability(board);
 	assert.equal(evidence.runtimeTopology?.observed_instance_count, 1);
+	assert.equal(evidence.runtimeTopology?.runtime_mode, "fastapi_cloud");
+	assert.equal(evidence.runtimeTopology?.redis?.telemetry_available, true);
+	assert.equal(evidence.runtimeTopology?.redis?.keyspace_hit_rate_percent, 90);
+	assert.equal(evidence.runtimeTopology?.redis?.keys, 42);
 	assert.equal(evidence.sources.runtime, "health-board");
 	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.running, true);
 	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.forwarding, false);
@@ -99,6 +147,13 @@ test("health board preserves runtime and unified observability consumes all aggr
 	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "tavily")?.category, "integration");
 	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "garage")?.category, "homelab");
 	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "pfsense")?.cache?.layer, "redis");
+	assert.equal(evidence.pfsenseIngressPolicy?.state, "possible_ingress_policy_block");
+	assert.deepEqual(evidence.pfsenseIngressPolicy?.activeEgressIps, ["203.0.113.4"]);
+	assert.deepEqual(evidence.pfsenseIngressPolicy?.possibleCauses, [
+		"trusted_source_policy_drift",
+		"pf_or_snort_filter",
+	]);
+	assert.equal(evidence.pfsenseIngressPolicy?.recommendedControlPath, "out_of_band");
 	assert.equal(evidence.controlPlaneDiagnostics.pfsense?.exceptionType, "ReadTimeout");
 	assert.equal(evidence.controlPlaneDiagnostics.pfsense?.cache?.ageSeconds, 12);
 	assert.equal(evidence.cloudflareCache?.stale, true);
