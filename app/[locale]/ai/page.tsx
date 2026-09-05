@@ -38,8 +38,8 @@ export default async function AiBestPracticesPage({ params }: Props) {
 				suppressHydrationWarning
 				omitElementIds={["workflow-automation-ai-tools"]}
 			/>
-			<AiNativeSections locale={locale} />
-			<AiPageGuide locale={locale} />
+			<AiNativeSections />
+			<AiPageGuide />
 		</>
 	);
 }
