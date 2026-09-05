@@ -300,6 +300,7 @@ export default function HomelabOperationalEvidence() {
 					: t("board.fresh");
 	const pfsenseComponent = evidence?.components.find((component) => component.id === "pfsense");
 	const pfsenseIngress = evidence?.diagnostics?.pfsense_ingress;
+	const pfsenseIngressPolicy = evidence?.pfsenseIngressPolicy;
 	const runtime = evidence?.runtimeTopology;
 	const truenasApi = evidence?.diagnostics?.truenas_api;
 	const cloudflare = evidence?.diagnostics?.cloudflare;
@@ -358,6 +359,44 @@ export default function HomelabOperationalEvidence() {
 						onInspectEvidence={openPfSenseEvidence}
 					/>
 
+					{pfsenseIngressPolicy?.state === "possible_ingress_policy_block" ? (
+						<div
+							className={styles.alertWarn}
+							role="status"
+							data-pfsense-ingress-policy={pfsenseIngressPolicy.state}
+						>
+							<strong>{t("pfsense.ingressPolicy.title")}</strong>
+							<span>{t("pfsense.ingressPolicy.lead")}</span>
+							{pfsenseIngressPolicy.activeEgressIps.length ? (
+								<code>
+									{t("pfsense.ingressPolicy.egress", {
+										ips: pfsenseIngressPolicy.activeEgressIps.join(" · "),
+									})}
+								</code>
+							) : null}
+							{pfsenseIngressPolicy.possibleCauses.length ? (
+								<small>
+									{t("pfsense.ingressPolicy.causes", {
+										causes: pfsenseIngressPolicy.possibleCauses.join(" · "),
+									})}
+								</small>
+							) : null}
+							{pfsenseIngressPolicy.recommendedControlPath ? (
+								<small>
+									{t("pfsense.ingressPolicy.controlPath", {
+										path: pfsenseIngressPolicy.recommendedControlPath,
+									})}
+								</small>
+							) : null}
+							{pfsenseIngressPolicy.detail ? (
+								<small>{pfsenseIngressPolicy.detail}</small>
+							) : null}
+							{pfsenseIngressPolicy.attributionAvailable === false ? (
+								<small>{t("pfsense.ingressPolicy.noAttribution")}</small>
+							) : null}
+						</div>
+					) : null}
+
 					<h3 className={styles.subheading}>{t("components.title")}</h3>
 					<div className={styles.componentGrid}>
 						{evidence.components.map((component) => {
@@ -389,11 +428,14 @@ export default function HomelabOperationalEvidence() {
 							<p>{t("runtime.lead")}</p>
 							<div className={styles.splitGrid}>
 								<div>
-									<h3>FastAPI Cloud</h3>
+									<h3>{t("runtime.fastapi")}</h3>
 									{runtime ? (
 										<>
 											<ul className={styles.compactList}>
 												<li>{t("runtime.provider", { provider: runtime.provider })}</li>
+												{runtime.runtime_mode ? (
+													<li>{t("runtime.mode", { mode: runtime.runtime_mode })}</li>
+												) : null}
 												<li>{t("runtime.observed", { timestamp: runtime.observed_at })}</li>
 												<li>{t("runtime.instances", { count: runtime.observed_instance_count })}</li>
 												{runtime.aggregation ? <li>{t("runtime.aggregation", { aggregation: runtime.aggregation })}{runtime.degraded ? " · degraded" : ""}</li> : null}
@@ -411,6 +453,80 @@ export default function HomelabOperationalEvidence() {
 												</ul>
 											) : null}
 											<small className={styles.detailText}>{runtime.count_semantics || t("runtime.countSemantics")}</small>
+											{runtime.redis ? (
+												<div data-runtime-redis-evidence>
+													<h4>{t("runtime.redis.title")}</h4>
+													<ul className={styles.compactList}>
+														<li>
+															{runtime.redis.telemetry_available
+																? t("runtime.redis.available")
+																: t("runtime.redis.unavailable")}
+															{runtime.redis.backend
+																? ` · ${runtime.redis.backend}`
+																: ""}
+														</li>
+														{runtime.redis.telemetry_scope ? (
+															<li>{t("runtime.redis.scope", { scope: runtime.redis.telemetry_scope })}</li>
+														) : null}
+														{runtime.redis.used_memory_human ? (
+															<li>
+																{t("runtime.redis.memory", {
+																	used: runtime.redis.used_memory_human,
+																	max: runtime.redis.maxmemory_human ?? t("runtime.redis.unbounded"),
+																})}
+																{typeof runtime.redis.memory_utilization_percent === "number"
+																	? ` · ${runtime.redis.memory_utilization_percent}%`
+																	: ""}
+															</li>
+														) : null}
+														{typeof runtime.redis.connected_clients === "number" ? (
+															<li>
+																{t("runtime.redis.clients", {
+																	connected: runtime.redis.connected_clients,
+																	blocked: runtime.redis.blocked_clients ?? 0,
+																})}
+															</li>
+														) : null}
+														{typeof runtime.redis.keys === "number" ? (
+															<li>{t("runtime.redis.keys", { count: runtime.redis.keys })}</li>
+														) : null}
+														{typeof runtime.redis.keyspace_hit_rate_percent === "number" ? (
+															<li>
+																{t("runtime.redis.hitRate", {
+																	percent: runtime.redis.keyspace_hit_rate_percent,
+																})}
+															</li>
+														) : null}
+														{typeof runtime.redis.instantaneous_ops_per_sec === "number" ? (
+															<li>
+																{t("runtime.redis.ops", {
+																	count: runtime.redis.instantaneous_ops_per_sec,
+																})}
+															</li>
+														) : null}
+														{typeof runtime.redis.evicted_keys === "number" ? (
+															<li>
+																{t("runtime.redis.evictions", {
+																	evicted: runtime.redis.evicted_keys,
+																	expired: runtime.redis.expired_keys ?? 0,
+																})}
+															</li>
+														) : null}
+														{runtime.redis.reason ? <li>{runtime.redis.reason}</li> : null}
+														{runtime.redis.failure_stage || runtime.redis.error_kind || runtime.redis.exception_type ? (
+															<li className={styles.stateWarn}>
+																{[
+																	runtime.redis.failure_stage,
+																	runtime.redis.error_kind,
+																	runtime.redis.exception_type,
+																]
+																	.filter(Boolean)
+																	.join(" / ")}
+															</li>
+														) : null}
+													</ul>
+												</div>
+											) : null}
 										</>
 									) : <p>{t("runtime.unavailable")}</p>}
 								</div>
