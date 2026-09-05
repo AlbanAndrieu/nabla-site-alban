@@ -247,8 +247,9 @@ Autres contrôles :
 
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
 - [ ] Étendre la vérification du focus visible et de la navigation clavier.
-- [ ] Vérifier `prefers-reduced-motion` pour React Flow et les interactions
-  animées.
+- [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
+  deviennent statiques lorsque l'utilisateur demande une réduction des
+  animations, sans perdre leur couleur, motif ni sémantique.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
