@@ -146,7 +146,9 @@
 			"tunnel": "Tunnel observé : {state}",
 			"access": "Access observé : {state}",
 			"accessPublic": "politique Access publique/bypass : {state}",
-			"none": "Aucune preuve d’exposition par service n’est présente dans ce snapshot."
+			"none": "Aucune preuve d’exposition par service n’est présente dans ce snapshot.",
+			"skippedEdge": "Sondes edge intentionnellement ignorées",
+			"skippedEdgeItem": "{id} : {reason}"
 		},
 		"exposure": {
 			"title": "Politique d’exposition par sources approuvées",
