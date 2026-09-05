@@ -6,46 +6,46 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("architecture exposes a mobile-first compact dependency hierarchy", async () => {
-	const [view, component, styles] = await Promise.all([
-		source("app/[locale]/architecture/ArchitectureTopologyView.tsx"),
-		source("app/[locale]/architecture/MobileArchitectureHierarchy.tsx"),
-		source("app/[locale]/architecture/MobileArchitectureHierarchy.module.css"),
-	]);
+test("architecture keeps the legacy standalone mobile hierarchy retired", async () => {
+	const legacyStyles = await source(
+		"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
+	);
 
-	assert.match(view, /MobileArchitectureHierarchy/);
-	assert.match(component, /data-mobile-architecture-hierarchy/);
-	assert.match(component, /data-mobile-criticality-tier/);
-	assert.match(component, /data-mobile-service=/);
-	assert.match(component, /<details/);
-	assert.match(component, /expandedTiers/);
-	assert.match(styles, /@media \(max-width: 760px\)/);
-	assert.match(styles, /\.mobileHierarchy/);
-	assert.match(styles, /display: none/);
-	assert.match(styles, /min-height: var\(--ui-control-min-height, 44px\)/);
+	assert.match(legacyStyles, /^\.mobileHierarchy \{\s*display: none;\s*\}\s*$/);
+	assert.doesNotMatch(legacyStyles, /@media/);
+	assert.doesNotMatch(legacyStyles, /display: grid/);
 });
 
-test("mobile hierarchy reuses effective health, criticality and blast radius", async () => {
+test("hierarchical explorer owns the single active compact mobile view", async () => {
+	const [component, styles] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css"),
+	]);
+
+	assert.match(component, /data-mobile-architecture-hierarchy/);
+	assert.match(component, /data-mobile-architecture-group=/);
+	assert.match(component, /data-mobile-architecture-item=/);
+	assert.match(component, /<details/);
+	assert.match(component, /groups=\{groups\}/);
+	assert.match(component, /nodeDataById=\{nodeDataById\}/);
+	assert.match(component, /relations=\{edges\}/);
+	assert.match(styles, /@media \(max-width: 700px\)/);
+	assert.match(styles, /\.mobileHierarchy \{[\s\S]*display: grid/);
+	assert.match(styles, /\.flowShell \{[\s\S]*display: none/);
+});
+
+test("integrated mobile hierarchy shares graph health, criticality and filters", async () => {
 	const component = await source(
-		"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 	);
+
 	assert.match(component, /resolveEffectiveServiceState/);
 	assert.match(component, /blockedDependencyLabels/);
 	assert.match(component, /analyzeServiceCriticality\(topology\)/);
-	assert.match(component, /transitiveDependents/);
-	assert.match(component, /data-health-state=/);
-	assert.match(component, /data-mobile-service-blockers/);
-});
-
-test("mobile hierarchy can reduce noise to critical and required relations", async () => {
-	const component = await source(
-		"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
-	);
-	assert.match(component, /criticalOnly/);
+	assert.match(component, /blastRadiusLevel/);
 	assert.match(component, /showOptional/);
-	assert.match(component, /tier !== "support"/);
-	assert.match(component, /relation\.strength === "required"/);
-	assert.match(component, /data-mobile-relation-strength/);
-	assert.match(component, /Critical only/);
-	assert.match(component, /Optional relations/);
+	assert.match(component, /scope/);
+	assert.match(component, /filtered\.visible/);
+	assert.match(component, /data-health-state=/);
+	assert.match(component, /data-blast-radius-level=/);
 });
