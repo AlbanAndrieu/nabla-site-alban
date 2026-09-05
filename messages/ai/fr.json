@@ -1,0 +1,104 @@
+{
+	"ai": {
+		"native": {
+			"documentPipelineIntro": "Un flux pratique du PDF vers la connaissance : normaliser les PDF localement, les archiver et les OCRiser dans Paperless, les enrichir avec Paperless-AI, puis exploiter le corpus dans AnythingLLM avec Paperless-ngx intégré pour des vérifications rapides."
+		},
+		"securePlatform": {
+			"title": "Ingénierie d’une plateforme IA sécurisée",
+			"lead": "L’objectif n’est pas d’accumuler des outils IA, mais d’exploiter modèles, agents, outils MCP et pipelines de connaissance derrière des frontières explicites de sécurité, de fiabilité, de coût et de gouvernance.",
+			"principles": "Principes d’architecture",
+			"pillars": {
+				"gateway": {
+					"title": "Gateway de modèles contrôlée",
+					"description": "Faire transiter l’inférence locale et distante par LiteLLM afin de mutualiser authentification, budgets, fallbacks, télémétrie et politiques fournisseur plutôt que d’appeler directement les modèles."
+				},
+				"identity": {
+					"title": "Identités, secrets et frontières de données",
+					"description": "Conserver les secrets côté serveur, limiter les accès par workload et séparer prompts, documents et données sensibles des chemins d’exécution publics ou moins fiables."
+				},
+				"mcp": {
+					"title": "Frontières de confiance MCP et agents",
+					"description": "Considérer chaque outil comme une capacité privilégiée : limiter les appels possibles, isoler l’exécution, réduire les accès réseau et fichiers, et conserver une validation humaine pour les actions destructives."
+				},
+				"rag": {
+					"title": "Provenance et cycle de vie RAG",
+					"description": "Suivre la provenance, l’état d’ingestion et la rétention entre Paperless, OCR et retrieval afin que les réponses générées restent rattachables à une connaissance maîtrisée."
+				},
+				"observability": {
+					"title": "Observabilité, évaluation et FinOps",
+					"description": "Tracer prompts, latence, sélection de modèle et coût en tokens avec Langfuse et les métriques opérationnelles, puis évaluer la qualité séparément plutôt que par contrôle manuel ponctuel."
+				},
+				"governance": {
+					"title": "Gouvernance dès la conception",
+					"description": "Relier les contrôles techniques aux enjeux RGPD, ISO 27001 et ISO 42001 : responsabilité, contrôle d’accès, preuves, résidence des données, risque fournisseur et politique d’usage des modèles."
+				}
+			},
+			"outcomesTitle": "Objectifs d’architecture",
+			"outcomes": {
+				"privacy": "confidentialité local-first avec fallback distant contrôlé",
+				"policy": "une couche de politique commune pour modèles et agents",
+				"measurement": "coût, latence et qualité mesurables",
+				"providers": "fournisseurs remplaçables plutôt que verrouillage propriétaire",
+				"audit": "flux d’exécution et de connaissance auditables"
+			}
+		},
+		"architecture": {
+			"title": "Architecture de ma plateforme IA",
+			"intro": "Une plateforme local-first structurée en couches plutôt qu’en catalogue de produits. LiteLLM constitue le plan de contrôle central entre interfaces, modèles, outils, workflows et observabilité.",
+			"aria": "Flux en couches de la plateforme IA",
+			"layers": {
+				"interfaces": "Interfaces et agents",
+				"gateway": "Gateway IA et politiques",
+				"inference": "Fournisseurs d’inférence",
+				"tools": "Outils, MCP et connaissance",
+				"workflow": "Workflow et orchestration",
+				"observability": "Observabilité, évaluation et FinOps"
+			},
+			"privacyTitle": "Local-first et confidentialité",
+			"privacyCopy": "Les charges courantes privilégient Ollama dans le homelab. Le passage par LiteLLM permet de garder une politique commune de routage et de protection avant tout recours à une inférence distante.",
+			"costTitle": "Coût et résilience",
+			"costCopy": "Le cache Redis, les fallbacks et le routage centralisé réduisent les appels distants inutiles et évitent de coupler les clients à un modèle unique.",
+			"measurableTitle": "Mesurable",
+			"measurableCopy": "Langfuse, Opik et Prometheus séparent l’observabilité LLM, l’évaluation de qualité et les métriques opérationnelles tout en conservant une vue cohérente de la plateforme."
+		},
+		"guide": {
+			"title": "Parcours de ma plateforme IA",
+			"lead": "La page suit désormais les couches de la plateforme, des agents jusqu’à la gouvernance. Utilisez ce parcours pour accéder directement à une responsabilité de l’architecture.",
+			"aria": "Navigation de la plateforme IA",
+			"sections": {
+				"automation": "Agents & automatisation",
+				"models": "Modèles & frameworks",
+				"knowledge": "Knowledge & RAG",
+				"architecture": "Architecture IA",
+				"observability": "Observabilité & FinOps",
+				"security": "Sécurité & pratiques"
+			}
+		},
+		"globalTools": {
+			"title": "Composants IA globaux",
+			"lead": "Capacités partagées et découplées des agents : exécution, connaissance et isolation peuvent être consommées par Open WebUI, les agents et les workflows.",
+			"terminal": "Terminal auto-hébergé exposant une API simple pour permettre aux agents et automatisations d’exécuter des commandes et manipuler des fichiers dans un environnement contrôlé.",
+			"openrag": "Couche RAG partagée alimentée par le corpus PDF validé issu de Paperless. OpenRAG combine des workflows Langflow, le parsing Docling et une recherche basée sur OpenSearch afin de fournir dans une même stack ingestion, recherche et chat sur les documents. Ses APIs peuvent ensuite être encapsulées par un serveur MCP personnalisé afin que les interfaces et agents IA réutilisent une surface de retrieval commune au lieu de réimplémenter l’accès à la base de connaissances.",
+			"openshell": "Runtime sandboxé pour agents autonomes avec isolation, politiques déclaratives et contrôle des accès réseau, fichiers, processus et credentials."
+		},
+		"observability": {
+			"title": "Observabilité, évaluation & FinOps LLM",
+			"lead": "Une vue unifiée de la qualité, des traces, des coûts, des tokens et des latences : évaluez les applications LLM, surveillez leur comportement en production et appliquez une discipline FinOps à la consommation des modèles.",
+			"opik": "Plateforme open source d’évaluation, de test et de monitoring des applications LLM, utile pour comparer les sorties des modèles et suivre leur qualité en production.",
+			"langfuse": "Plateforme open source d’observabilité LLM pour les traces, prompts, scores, coûts et latences. Langfuse collecte notamment la télémétrie de LiteLLM et du serveur MCP afin de fournir une vue transverse des appels IA.",
+			"documentation": "Documentation"
+		},
+		"usage": {
+			"description": "Suivez l’utilisation de ChatGPT et Codex : crédits, tokens, modèles, activité et consommation. Les vues disponibles dépendent du type d’espace de travail ; Codex expose également des détails d’utilisation et de limites dans les paramètres pris en charge.",
+			"analytics": "Analyses ChatGPT / Codex"
+		},
+		"workflow": {
+			"title": "Workflow & orchestration",
+			"lead": "Trois rôles complémentaires : n8n pour composer rapidement les automatisations, Temporal pour garantir l’exécution durable et Langflow pour expérimenter et assembler des flux IA.",
+			"n8n": "Couche d’automatisation visuelle pour connecter rapidement APIs, données, agents et services du homelab.",
+			"temporal": "Couche d’orchestration durable pour les workflows stateful, longs et critiques : retries, état persistant, timers, étapes human-in-the-loop et activités LLM.",
+			"langflow": "Atelier visuel pour prototyper des chaînes LLM, agents, outils et RAG avant leur industrialisation dans les couches d’orchestration et de services.",
+			"opencommit": "OpenCommit complète le workflow de développement avec des messages Conventional Commits cohérents ; il reste volontairement hors de la couche d’orchestration."
+		}
+	}
+}

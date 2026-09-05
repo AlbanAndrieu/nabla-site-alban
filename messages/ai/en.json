@@ -1,0 +1,104 @@
+{
+	"ai": {
+		"native": {
+			"documentPipelineIntro": "A practical PDF-to-knowledge flow: normalize PDFs locally, archive and OCR them in Paperless, enrich them with Paperless-AI, then work with the corpus in AnythingLLM with Paperless-ngx integrated for quick checks."
+		},
+		"securePlatform": {
+			"title": "Secure AI platform engineering",
+			"lead": "The goal is not to accumulate AI tools. It is to operate models, agents, MCP tools and knowledge pipelines behind explicit security, reliability, cost and governance boundaries.",
+			"principles": "Architecture principles",
+			"pillars": {
+				"gateway": {
+					"title": "Controlled model gateway",
+					"description": "Route local and remote inference through LiteLLM so clients share authentication, budgets, fallbacks, telemetry and provider policy instead of calling models directly."
+				},
+				"identity": {
+					"title": "Identity, secrets & data boundaries",
+					"description": "Keep credentials server-side, constrain access by workload, and separate sensitive prompts, documents and tenant data from public or lower-trust execution paths."
+				},
+				"mcp": {
+					"title": "MCP & agent trust boundaries",
+					"description": "Treat tools as privileged capabilities: scope what agents can call, isolate execution, minimize filesystem and network reach, and keep human approval for destructive actions."
+				},
+				"rag": {
+					"title": "RAG provenance & lifecycle",
+					"description": "Track source provenance, ingestion state and retention across Paperless, OCR and retrieval pipelines so generated answers remain traceable to controlled knowledge."
+				},
+				"observability": {
+					"title": "Observability, evaluation & FinOps",
+					"description": "Trace prompts, latency, model selection and token cost with Langfuse and operational metrics, then evaluate quality separately instead of relying on anecdotal output checks."
+				},
+				"governance": {
+					"title": "Governance by design",
+					"description": "Map technical controls to GDPR, ISO 27001 and ISO 42001 concerns: accountability, access control, evidence, data residency, supplier risk and model-use policy."
+				}
+			},
+			"outcomesTitle": "What this architecture optimizes for",
+			"outcomes": {
+				"privacy": "local-first privacy with controlled remote fallback",
+				"policy": "one policy layer for models and agents",
+				"measurement": "measurable cost, latency and quality",
+				"providers": "replaceable providers instead of vendor lock-in",
+				"audit": "auditable execution and knowledge flows"
+			}
+		},
+		"architecture": {
+			"title": "My AI platform architecture",
+			"intro": "A local-first platform structured as layers rather than a product catalogue. LiteLLM is the central control plane connecting interfaces, models, tools, workflows, and observability.",
+			"aria": "Layered AI platform flow",
+			"layers": {
+				"interfaces": "Interfaces & agents",
+				"gateway": "AI gateway & policy",
+				"inference": "Inference providers",
+				"tools": "Tools, MCP & knowledge",
+				"workflow": "Workflow & orchestration",
+				"observability": "Observability, evaluation & FinOps"
+			},
+			"privacyTitle": "Local-first & privacy",
+			"privacyCopy": "Routine workloads prefer Ollama inside the homelab. Routing through LiteLLM keeps one shared routing and protection policy before any remote inference.",
+			"costTitle": "Cost & resilience",
+			"costCopy": "Redis caching, fallbacks, and centralized routing reduce unnecessary remote calls and avoid coupling clients to a single model.",
+			"measurableTitle": "Measurable",
+			"measurableCopy": "Langfuse, Opik, and Prometheus separate LLM observability, quality evaluation, and operational metrics while preserving a coherent platform view."
+		},
+		"guide": {
+			"title": "My AI platform journey",
+			"lead": "The page now follows the platform layers from agents through governance. Use this journey to jump directly to an architectural responsibility.",
+			"aria": "AI platform navigation",
+			"sections": {
+				"automation": "Agents & automation",
+				"models": "Models & frameworks",
+				"knowledge": "Knowledge & RAG",
+				"architecture": "AI architecture",
+				"observability": "Observability & FinOps",
+				"security": "Security & practices"
+			}
+		},
+		"globalTools": {
+			"title": "Global AI components",
+			"lead": "Shared capabilities decoupled from agents: execution, knowledge, and isolation can be consumed by Open WebUI, agents, and workflows.",
+			"terminal": "Self-hosted terminal exposing a simple API so agents and automation can execute commands and manipulate files in a controlled environment.",
+			"openrag": "Shared RAG layer fed by the vetted PDF corpus produced through Paperless. OpenRAG combines Langflow workflows, Docling parsing, and OpenSearch-backed retrieval to provide document ingestion, search, and chat in one stack. Its APIs can then be wrapped by a custom MCP server so AI interfaces and agents reuse a common retrieval surface instead of reimplementing knowledge-base access.",
+			"openshell": "Sandboxed runtime for autonomous agents with isolation, declarative policies, and controlled network, filesystem, process, and credential access."
+		},
+		"observability": {
+			"title": "LLM observability, evaluation & FinOps",
+			"lead": "A unified view of quality, traces, costs, tokens, and latency: evaluate LLM applications, monitor production behavior, and apply FinOps discipline to model consumption.",
+			"opik": "Open-source platform for evaluating, testing, and monitoring LLM applications, useful for comparing model outputs and tracking production quality.",
+			"langfuse": "Open-source LLM observability platform for traces, prompts, scores, costs, and latency. Langfuse collects telemetry from LiteLLM and the MCP server to provide a cross-platform view of AI calls.",
+			"documentation": "Documentation"
+		},
+		"usage": {
+			"description": "Track ChatGPT and Codex usage across credits, tokens, models, activity, and consumption. Available analytics depend on the workspace plan; Codex also exposes usage and limit details in supported account settings.",
+			"analytics": "ChatGPT / Codex analytics"
+		},
+		"workflow": {
+			"title": "Workflow & orchestration",
+			"lead": "Three complementary roles: n8n for rapidly composing automations, Temporal for durable execution, and Langflow for experimenting with and assembling AI flows.",
+			"n8n": "Visual automation layer for rapidly connecting APIs, data, agents, and homelab services.",
+			"temporal": "Durable orchestration for stateful, long-running, critical workflows: retries, persistent state, timers, human-in-the-loop steps, and LLM activities.",
+			"langflow": "Visual workbench for prototyping LLM chains, agents, tools, and RAG before productionizing them in orchestration and service layers.",
+			"opencommit": "OpenCommit complements the development workflow with consistent Conventional Commit messages; it intentionally remains outside the orchestration layer."
+		}
+	}
+}

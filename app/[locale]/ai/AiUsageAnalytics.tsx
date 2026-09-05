@@ -1,10 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export default function AiUsageAnalytics({ locale }: { locale: string }) {
-	const french = locale === "fr";
+export default function AiUsageAnalytics() {
+	const t = useTranslations("ai");
 	const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null);
 
 	useEffect(() => {
@@ -32,11 +33,7 @@ export default function AiUsageAnalytics({ locale }: { locale: string }) {
 				/>{" "}
 				ChatGPT / Codex usage analytics
 			</h3>
-			<p>
-				{french
-					? "Suivez l’utilisation de ChatGPT et Codex : crédits, tokens, modèles, activité et consommation. Les vues disponibles dépendent du type d’espace de travail ; Codex expose également des détails d’utilisation et de limites dans les paramètres pris en charge."
-					: "Track ChatGPT and Codex usage across credits, tokens, models, activity, and consumption. Available analytics depend on the workspace plan; Codex also exposes usage and limit details in supported account settings."}
-			</p>
+			<p>{t("usage.description")}</p>
 			<a
 				href="https://help.openai.com/en/articles/12289294-global-admin-console"
 				target="_blank"
@@ -44,7 +41,7 @@ export default function AiUsageAnalytics({ locale }: { locale: string }) {
 				className="resource-link"
 			>
 				<i className="fas fa-external-link-alt" aria-hidden="true" />{" "}
-				{french ? "Analyses ChatGPT / Codex" : "ChatGPT / Codex analytics"}
+				{t("usage.analytics")}
 			</a>
 		</article>,
 		mountPoint,

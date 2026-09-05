@@ -12,33 +12,48 @@ const nativeSectionsPath = new URL(
 );
 
 test("AI page leads native content with secure platform engineering", async () => {
-	const [overview, nativeSections] = await Promise.all([
+	const [overview, nativeSections, englishRaw] = await Promise.all([
 		readFile(overviewPath, "utf8"),
 		readFile(nativeSectionsPath, "utf8"),
+		readFile("messages/ai/en.json", "utf8"),
 	]);
 
-	assert.match(
-		nativeSections,
-		/<AiSecurePlatformOverview locale=\{locale\} \/>/,
-	);
+	assert.match(nativeSections, /<AiSecurePlatformOverview \/>/);
 	assert.ok(
 		nativeSections.indexOf("<AiSecurePlatformOverview") <
 			nativeSections.indexOf("<AiWorkflowAutomation"),
 		"secure AI architecture should appear before the tool/workflow catalogue",
 	);
 
-	assert.match(overview, /Controlled model gateway/);
-	assert.match(overview, /MCP & agent trust boundaries/);
-	assert.match(overview, /RAG provenance & lifecycle/);
-	assert.match(overview, /Observability, evaluation & FinOps/);
-	assert.match(overview, /ISO 27001 and ISO 42001/);
+	assert.match(overview, /useTranslations\("ai"\)/);
+	assert.match(overview, /securePlatform\.pillars/);
+	const english = JSON.parse(englishRaw) as {
+		ai: {
+			securePlatform: {
+				pillars: Record<string, { title: string; description: string }>;
+			};
+		};
+	};
+	const copy = JSON.stringify(english.ai.securePlatform);
+	assert.match(copy, /Controlled model gateway/);
+	assert.match(copy, /MCP & agent trust boundaries/);
+	assert.match(copy, /RAG provenance & lifecycle/);
+	assert.match(copy, /Observability, evaluation & FinOps/);
+	assert.match(copy, /ISO 27001 and ISO 42001/);
 });
 
-test("secure AI architecture is localized for French readers", async () => {
-	const overview = await readFile(overviewPath, "utf8");
+test("secure AI architecture is localized for French readers through next-intl", async () => {
+	const [overview, frenchRaw] = await Promise.all([
+		readFile(overviewPath, "utf8"),
+		readFile("messages/ai/fr.json", "utf8"),
+	]);
+	const french = JSON.parse(frenchRaw) as { ai: { securePlatform: unknown } };
+	const copy = JSON.stringify(french.ai.securePlatform);
 
-	assert.match(overview, /Ingénierie d’une plateforme IA sécurisée/);
-	assert.match(overview, /Frontières de confiance MCP et agents/);
-	assert.match(overview, /Gouvernance dès la conception/);
-	assert.match(overview, /RGPD, ISO 27001 et ISO 42001/);
+	assert.match(overview, /useTranslations\("ai"\)/);
+	assert.doesNotMatch(overview, /locale === ["']fr["']/);
+	assert.match(copy, /Ingénierie d’une plateforme IA sécurisée/);
+	assert.match(copy, /Frontières de confiance MCP et agents/);
+	assert.match(copy, /Gouvernance dès la conception/);
+	assert.match(copy, /RGPD, ISO 27001 et ISO 42001/);
 });

@@ -1,5 +1,7 @@
-export default function AiGlobalTools({ locale }: { locale: string }) {
-	const french = locale === "fr";
+import { useTranslations } from "next-intl";
+
+export default function AiGlobalTools() {
+	const t = useTranslations("ai");
 	return (
 		<section
 			id="global-ai-tools"
@@ -8,7 +10,7 @@ export default function AiGlobalTools({ locale }: { locale: string }) {
 		>
 			<h2 id="global-ai-tools-heading" className="category-title">
 				<i className="fas fa-toolbox" aria-hidden="true" />{" "}
-				{french ? "Composants IA globaux" : "Global AI components"}
+				{t("globalTools.title")}
 			</h2>
 			<p
 				style={{
@@ -17,9 +19,7 @@ export default function AiGlobalTools({ locale }: { locale: string }) {
 					lineHeight: 1.65,
 				}}
 			>
-				{french
-					? "Capacités partagées et découplées des agents : exécution, connaissance et isolation peuvent être consommées par Open WebUI, les agents et les workflows."
-					: "Shared capabilities decoupled from agents: execution, knowledge, and isolation can be consumed by Open WebUI, agents, and workflows."}
+				{t("globalTools.lead")}
 			</p>
 			<div className="resource-grid">
 				<article id="open-terminal" className="resource-card">
@@ -30,11 +30,7 @@ export default function AiGlobalTools({ locale }: { locale: string }) {
 						/>{" "}
 						Open Terminal
 					</h3>
-					<p>
-						{french
-							? "Terminal auto-hébergé exposant une API simple pour permettre aux agents et automatisations d’exécuter des commandes et manipuler des fichiers dans un environnement contrôlé."
-							: "Self-hosted terminal exposing a simple API so agents and automation can execute commands and manipulate files in a controlled environment."}
-					</p>
+					<p>{t("globalTools.terminal")}</p>
 					<a
 						href="https://github.com/open-webui/open-terminal"
 						target="_blank"
@@ -52,11 +48,7 @@ export default function AiGlobalTools({ locale }: { locale: string }) {
 						/>{" "}
 						OpenRAG
 					</h3>
-					<p>
-						{french
-							? "Couche RAG partagée alimentée par le corpus PDF validé issu de Paperless. OpenRAG combine des workflows Langflow, le parsing Docling et une recherche basée sur OpenSearch afin de fournir dans une même stack ingestion, recherche et chat sur les documents. Ses APIs peuvent ensuite être encapsulées par un serveur MCP personnalisé afin que les interfaces et agents IA réutilisent une surface de retrieval commune au lieu de réimplémenter l’accès à la base de connaissances."
-							: "Shared RAG layer fed by the vetted PDF corpus produced through Paperless. OpenRAG combines Langflow workflows, Docling parsing, and OpenSearch-backed retrieval to provide document ingestion, search, and chat in one stack. Its APIs can then be wrapped by a custom MCP server so AI interfaces and agents reuse a common retrieval surface instead of reimplementing knowledge-base access."}
-					</p>
+					<p>{t("globalTools.openrag")}</p>
 					<a
 						href="https://github.com/langflow-ai/openrag"
 						target="_blank"
@@ -74,11 +66,7 @@ export default function AiGlobalTools({ locale }: { locale: string }) {
 						/>{" "}
 						NVIDIA OpenShell
 					</h3>
-					<p>
-						{french
-							? "Runtime sandboxé pour agents autonomes avec isolation, politiques déclaratives et contrôle des accès réseau, fichiers, processus et credentials."
-							: "Sandboxed runtime for autonomous agents with isolation, declarative policies, and controlled network, filesystem, process, and credential access."}
-					</p>
+					<p>{t("globalTools.openshell")}</p>
 					<a
 						href="https://github.com/NVIDIA/OpenShell"
 						target="_blank"

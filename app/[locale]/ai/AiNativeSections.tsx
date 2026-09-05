@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import AiGlobalTools from "./AiGlobalTools";
@@ -12,8 +13,10 @@ import AiWorkflowAutomation from "./AiWorkflowAutomation";
 const MIGRATED_PLATFORM_TAGS = new Set(["n8n", "temporal"]);
 const DUPLICATE_DOCUMENT_PIPELINE_TOOLS = ["Temporal", "OpenRAG"];
 
-export default function AiNativeSections({ locale }: { locale: string }) {
+export default function AiNativeSections() {
+	const t = useTranslations("ai");
 	const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null);
+	const documentPipelineIntro = t("native.documentPipelineIntro");
 
 	useEffect(() => {
 		const content = document.querySelector("#main-content .content-section");
@@ -44,14 +47,8 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 			}
 
 			const introduction = documentPipeline.querySelector(":scope > p");
-			if (introduction) {
-				introduction.textContent =
-					locale === "fr"
-						? "Un flux pratique du PDF vers la connaissance : normaliser les PDF localement, les archiver et les OCRiser dans Paperless, les enrichir avec Paperless-AI, puis exploiter le corpus dans AnythingLLM avec Paperless-ngx intégré pour des vérifications rapides."
-						: "A practical PDF-to-knowledge flow: normalize PDFs locally, archive and OCR them in Paperless, enrich them with Paperless-AI, then work with the corpus in AnythingLLM with Paperless-ngx integrated for quick checks.";
-			}
+			if (introduction) introduction.textContent = documentPipelineIntro;
 
-			// Keep the concrete document workflow as the final content section, immediately before the page footer.
 			content.append(documentPipeline);
 		}
 
@@ -62,18 +59,18 @@ export default function AiNativeSections({ locale }: { locale: string }) {
 		else content.append(host);
 		setMountPoint(host);
 		return () => host.remove();
-	}, [locale]);
+	}, [documentPipelineIntro]);
 
 	if (!mountPoint) return null;
 
 	return createPortal(
 		<>
-			<AiSecurePlatformOverview locale={locale} />
-			<AiWorkflowAutomation locale={locale} />
-			<AiGlobalTools locale={locale} />
-			<AiObservability locale={locale} />
-			<AiUsageAnalytics locale={locale} />
-			<AiHomelabArchitecture locale={locale} />
+			<AiSecurePlatformOverview />
+			<AiWorkflowAutomation />
+			<AiGlobalTools />
+			<AiObservability />
+			<AiUsageAnalytics />
+			<AiHomelabArchitecture />
 		</>,
 		mountPoint,
 	);
