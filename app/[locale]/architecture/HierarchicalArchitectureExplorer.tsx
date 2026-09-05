@@ -1012,12 +1012,20 @@ export default function HierarchicalArchitectureExplorer({
 				if (active) setHealthSource("unavailable");
 			}
 		};
-		const load = () => void Promise.all([loadRuntime(), loadHealth()]);
+		const load = () => {
+			if (document.hidden) return;
+			void Promise.all([loadRuntime(), loadHealth()]);
+		};
 		load();
 		const timer = window.setInterval(load, 30_000);
+		const onVisibilityChange = () => {
+			if (!document.hidden) load();
+		};
+		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
 			active = false;
 			window.clearInterval(timer);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, []);
 
