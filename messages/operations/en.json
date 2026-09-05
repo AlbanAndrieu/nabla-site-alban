@@ -146,7 +146,9 @@
 			"tunnel": "Tunnel observed: {state}",
 			"access": "Access observed: {state}",
 			"accessPublic": "public/bypass Access policy: {state}",
-			"none": "No per-service exposure evidence is present in this snapshot."
+			"none": "No per-service exposure evidence is present in this snapshot.",
+			"skippedEdge": "Intentional edge-probe skips",
+			"skippedEdgeItem": "{id}: {reason}"
 		},
 		"exposure": {
 			"title": "Trusted-source exposure policy",
