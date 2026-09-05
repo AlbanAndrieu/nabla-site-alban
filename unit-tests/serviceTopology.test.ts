@@ -173,3 +173,34 @@ test("architecture route uses a static declared shell with live shared service h
 		);
 	}
 });
+
+
+test("hierarchical architecture exposes a compact mobile hierarchy driven by the same graph state", async () => {
+	const [explorer, css] = await Promise.all([
+		readFile(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+			"utf8",
+		),
+	]);
+
+	assert.match(explorer, /data-mobile-architecture-hierarchy/);
+	assert.match(explorer, /data-mobile-architecture-group=\{group\.key\}/);
+	assert.match(explorer, /data-mobile-architecture-item=\{entity\.id\}/);
+	assert.match(explorer, /relations=\{edges\}/);
+	assert.match(explorer, /nodeDataById=\{nodeDataById\}/);
+	assert.match(explorer, /<details[\s\S]*className=\{styles\.mobileGroup\}/);
+	assert.match(explorer, /<details className=\{styles\.mobileRelations\}>/);
+	assert.match(css, /\.mobileHierarchy\s*\{[\s\S]*display:\s*none/);
+	assert.match(
+		css,
+		/@media \(max-width: 700px\)[\s\S]*\.mobileHierarchy\s*\{[\s\S]*display:\s*grid/,
+	);
+	assert.match(
+		css,
+		/@media \(max-width: 700px\)[\s\S]*\.flowShell\s*\{[\s\S]*display:\s*none/,
+	);
+});
