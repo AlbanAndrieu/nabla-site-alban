@@ -1,71 +1,43 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./AiHomelabArchitecture.module.css";
 
-type ArchitectureLayer = {
-	title: string;
-	items: string[];
-};
-
-const LAYERS: ArchitectureLayer[] = [
+const LAYERS = [
 	{
-		title: "Interfaces & agents",
+		id: "interfaces",
 		items: ["Open WebUI", "OpenClaw", "OpenCode / Codex / Cursor"],
 	},
 	{
-		title: "AI gateway & policy",
+		id: "gateway",
 		items: [
 			"LiteLLM",
 			"Redis cache",
 			"routing · budgets · fallbacks · telemetry",
 		],
 	},
+	{ id: "inference", items: ["Ollama · local", "OpenAI API · remote"] },
 	{
-		title: "Inference providers",
-		items: ["Ollama · local", "OpenAI API · remote"],
-	},
-	{
-		title: "Tools, MCP & knowledge",
+		id: "tools",
 		items: ["FastAPI MCP", "Open Terminal", "OpenRAG", "SearXNG", "Paperless"],
 	},
-	{
-		title: "Workflow & orchestration",
-		items: ["n8n", "Temporal", "Langflow"],
-	},
-	{
-		title: "Observability, evaluation & FinOps",
-		items: ["Langfuse", "Opik", "Prometheus"],
-	},
-];
+	{ id: "workflow", items: ["n8n", "Temporal", "Langflow"] },
+	{ id: "observability", items: ["Langfuse", "Opik", "Prometheus"] },
+] as const;
 
-const LAYER_TITLES_FR = [
-	"Interfaces et agents",
-	"Gateway IA et politiques",
-	"Fournisseurs d’inférence",
-	"Outils, MCP et connaissance",
-	"Workflow et orchestration",
-	"Observabilité, évaluation et FinOps",
-];
-
-function ArchitectureFlow({ french }: Readonly<{ french: boolean }>) {
+function ArchitectureFlow() {
+	const t = useTranslations("ai");
 	return (
-		<ol
-			className={styles.flow}
-			aria-label={
-				french
-					? "Flux en couches de la plateforme IA"
-					: "Layered AI platform flow"
-			}
-		>
+		<ol className={styles.flow} aria-label={t("architecture.aria")}>
 			{LAYERS.map((layer, index) => (
-				<li className={styles.layer} key={layer.title}>
+				<li className={styles.layer} key={layer.id}>
 					<div className={styles.layerHeader}>
 						<span className={styles.layerNumber} aria-hidden="true">
 							{index + 1}
 						</span>
-						<h3>{french ? LAYER_TITLES_FR[index] : layer.title}</h3>
+						<h3>{t(`architecture.layers.${layer.id}`)}</h3>
 					</div>
 					<ul className={styles.items}>
 						{layer.items.map((item) => (
@@ -78,8 +50,8 @@ function ArchitectureFlow({ french }: Readonly<{ french: boolean }>) {
 	);
 }
 
-export default function AiHomelabArchitecture({ locale }: { locale: string }) {
-	const french = locale === "fr";
+export default function AiHomelabArchitecture() {
+	const t = useTranslations("ai");
 	const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null);
 
 	useEffect(() => {
@@ -98,18 +70,10 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 		<section className="category-section" aria-labelledby="ai-homelab-heading">
 			<h2 id="ai-homelab-heading" className="category-title">
 				<i className="fas fa-network-wired" aria-hidden="true" />{" "}
-				{french
-					? "Architecture de ma plateforme IA"
-					: "My AI platform architecture"}
+				{t("architecture.title")}
 			</h2>
-			<p className={styles.intro}>
-				{french
-					? "Une plateforme local-first structurée en couches plutôt qu’en catalogue de produits. LiteLLM constitue le plan de contrôle central entre interfaces, modèles, outils, workflows et observabilité."
-					: "A local-first platform structured as layers rather than a product catalogue. LiteLLM is the central control plane connecting interfaces, models, tools, workflows, and observability."}
-			</p>
-
-			<ArchitectureFlow french={french} />
-
+			<p className={styles.intro}>{t("architecture.intro")}</p>
+			<ArchitectureFlow />
 			<div className="resource-grid">
 				<article className="resource-card">
 					<h3>
@@ -117,26 +81,16 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 							className="fas fa-user-shield resource-card-icon"
 							aria-hidden="true"
 						/>{" "}
-						{french
-							? "Local-first et confidentialité"
-							: "Local-first & privacy"}
+						{t("architecture.privacyTitle")}
 					</h3>
-					<p>
-						{french
-							? "Les charges courantes privilégient Ollama dans le homelab. Le passage par LiteLLM permet de garder une politique commune de routage et de protection avant tout recours à une inférence distante."
-							: "Routine workloads prefer Ollama inside the homelab. Routing through LiteLLM keeps one shared routing and protection policy before any remote inference."}
-					</p>
+					<p>{t("architecture.privacyCopy")}</p>
 				</article>
 				<article className="resource-card">
 					<h3>
 						<i className="fas fa-coins resource-card-icon" aria-hidden="true" />{" "}
-						{french ? "Coût et résilience" : "Cost & resilience"}
+						{t("architecture.costTitle")}
 					</h3>
-					<p>
-						{french
-							? "Le cache Redis, les fallbacks et le routage centralisé réduisent les appels distants inutiles et évitent de coupler les clients à un modèle unique."
-							: "Redis caching, fallbacks, and centralized routing reduce unnecessary remote calls and avoid coupling clients to a single model."}
-					</p>
+					<p>{t("architecture.costCopy")}</p>
 				</article>
 				<article className="resource-card">
 					<h3>
@@ -144,13 +98,9 @@ export default function AiHomelabArchitecture({ locale }: { locale: string }) {
 							className="fas fa-chart-line resource-card-icon"
 							aria-hidden="true"
 						/>{" "}
-						{french ? "Mesurable" : "Measurable"}
+						{t("architecture.measurableTitle")}
 					</h3>
-					<p>
-						{french
-							? "Langfuse, Opik et Prometheus séparent l’observabilité LLM, l’évaluation de qualité et les métriques opérationnelles tout en conservant une vue cohérente de la plateforme."
-							: "Langfuse, Opik, and Prometheus separate LLM observability, quality evaluation, and operational metrics while preserving a coherent platform view."}
-					</p>
+					<p>{t("architecture.measurableCopy")}</p>
 				</article>
 			</div>
 		</section>,
