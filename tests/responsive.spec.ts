@@ -120,4 +120,32 @@ test.describe("Responsive Design Tests", () => {
 			expect(fontSize).toBeGreaterThanOrEqual(12);
 		}
 	});
+	test("architecture switches to the compact hierarchy on mobile", async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 375, height: 812 });
+		await page.goto("/architecture", { waitUntil: "domcontentloaded" });
+
+		await page.getByRole("button", { name: "Nabla / TrueNAS" }).click();
+
+		const compactHierarchy = page.locator(
+			"[data-mobile-architecture-hierarchy]",
+		);
+		await expect(compactHierarchy).toBeVisible();
+		await expect(page.locator(".react-flow")).toBeHidden();
+
+		const firstGroup = compactHierarchy
+			.locator("[data-mobile-architecture-group]")
+			.first();
+		await expect(firstGroup).toBeVisible();
+		await firstGroup.locator("summary").first().click();
+		await expect(
+			firstGroup.locator("[data-mobile-architecture-item]").first(),
+		).toBeVisible();
+
+		await page.setViewportSize({ width: 1280, height: 900 });
+		await expect(compactHierarchy).toBeHidden();
+		await expect(page.locator(".react-flow")).toBeVisible();
+	});
+
 });
