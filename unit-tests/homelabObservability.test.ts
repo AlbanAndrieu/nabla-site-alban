@@ -127,7 +127,15 @@ test("health board preserves runtime and unified observability consumes all aggr
 				},
 			}],
 		},
-		sickz: {},
+		sickz: {
+			checks: {
+				pfsense_admin: {
+					http_evidence_skipped: true,
+					http_evidence_skip_reason:
+						"pfSense admin endpoint is not a Cloudflare edge target",
+				},
+			},
+		},
 	});
 	assert.ok(board);
 	assert.ok(board.runtime);
@@ -159,6 +167,12 @@ test("health board preserves runtime and unified observability consumes all aggr
 	assert.equal(evidence.cloudflareCache?.stale, true);
 	assert.equal(evidence.cloudflareCache?.cache?.refreshInProgress, true);
 	assert.equal(evidence.diagnostics?.exposure_by_service.openwebui?.state, "mismatch");
+	assert.deepEqual(evidence.edgeEvidenceSkips, [
+		{
+			id: "pfsense_admin",
+			reason: "pfSense admin endpoint is not a Cloudflare edge target",
+		},
+	]);
 });
 
 test("runtime endpoint remains a compatibility fallback only when aggregate runtime is absent", () => {
