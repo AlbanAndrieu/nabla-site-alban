@@ -31,6 +31,12 @@ test("Vercel skips CI-only changes", async () => {
 	const script = await readFile("scripts/vercel-ignore-build.sh", "utf8");
 
 	assert.ok(script.includes("VERCEL_GIT_PREVIOUS_SHA"));
+	assert.ok(script.includes("VERCEL_GIT_COMMIT_REF"));
+	assert.match(script, /git_ref.*vercel-preview-\*/s);
+	assert.match(
+		script,
+		/No previous successful deployment for validated checkpoint.*build deployment/s,
+	);
 	assert.ok(script.includes("unit-tests/*"));
 	assert.ok(script.includes(".github/*"));
 	assert.ok(!script.includes("Playwright workflow changed; build preview"));
