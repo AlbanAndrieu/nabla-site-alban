@@ -1,7 +1,7 @@
 min_version = "2024.9.5"
 
 [tools]
-node = "25.4.0"
+node = "25.9.0"
 python = "{{ get_env(name='PYTHON_VERSION', default='3.14') }}"
 pre-commit = "latest"
 
