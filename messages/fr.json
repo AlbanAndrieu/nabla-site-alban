@@ -327,18 +327,7 @@
 			"lead": "Résumé exécutif & livraisons annuelles chez Jusmundi",
 			"executive_title": "Résumé exécutif",
 			"executive_copy": "Au cours des 4 dernières années, j'ai accompli plus de 300 tâches dans l'infrastructure, la sécurité, les bases de données, le CI/CD et l’ingénierie de plateforme — démontrant régularité et leadership technique. Aucun incident majeur ni surcharge le soir ou week-end.",
-			"key_achievements": "Principales réalisations par axe stratégique",
-			"strategy": {
-				"cloud": "Modernisation de l’infrastructure & cloud",
-				"security": "Sécurité & conformité",
-				"db": "Excellence base de données",
-				"cicd": "CI/CD & excellence DevOps",
-				"aiml": "Support plateforme IA/ML",
-				"observability": "Observabilité & fiabilité du site"
-			},
-			"standout": "Réalisations techniques marquantes",
-			"career": "Évolution de carrière constatée",
-			"numbers": "Bilan chiffré des performances"
+			"key_achievements": "Principales réalisations par axe stratégique"
 		},
 		"pageTitle": "Jusmundi — 4 ans d'impact & KPIs clés | Alban Andrieu",
 		"metadataDescription": "Réalisations DevSecOps, infrastructure, sécurité et fiabilité menées par Alban Andrieu chez Jus Mundi.",
@@ -466,98 +455,7 @@
 				"description": "Vue d'ensemble société, financements, lancements produit (Jus Connect, Jus AI), expansion géographique, réalisation IA",
 				"externalLink": {
 					"label": "Jus Connect",
-					"href": "https://jusconnect.com/",
-					"home": {
-						"title": "Architecte Cloud & DevSecOps, plus de 20 ans d’expérience",
-						"subtitle": "Architecte cloud et ingénieur DevSecOps — J'aide les startups et scale-ups à sécuriser, automatiser et faire évoluer leur plateforme sans sacrifier la conformité.",
-						"stats": {
-							"ia": "4+ ans d’IA",
-							"security": "7+ ans en cybersécurité",
-							"infra": "10+ ans d’infrastructure",
-							"dev": "10+ ans de développement"
-						},
-						"cta": {
-							"book": "Prendre rendez-vous 30 min",
-							"start": "Lancer votre projet !",
-							"pdf": "Télécharger mon profil",
-							"linkedin": "Voir LinkedIn"
-						},
-						"lastExp": {
-							"intro": "Ma dernière expérience chez",
-							"company": "JusMundi",
-							"linkLabel": "JusMundi",
-							"wasTo": "était :",
-							"items": [
-								"Piloter l'infrastructure et accompagner l’initiative IA.",
-								"Réduire les risques d’incident et améliorer la conformité.",
-								"Réduire les coûts cloud/outillage grâce à l’architecture, au FinOps et à l’automatisation.",
-								"Accélérer la livraison avec un CI/CD robuste, de l’IaC et une production observable."
-							]
-						},
-						"servicesTitle": "Expertises et services techniques",
-						"outcomes": {
-							"title": "Exemples de projets livrés",
-							"subtitle": "Engagements représentatifs — détails sous NDA ; contactez-moi pour échanger sur des contextes similaires.",
-							"legal": {
-								"title": "Legal-tech IA scale-up",
-								"context": "Produit international, exigences de conformité élevées.",
-								"bullets": [
-									"Architecture Cloud AWS/OVH avec sécurité native.",
-									"Automatisation et contrôles pour ISO 27001, SOC 2, RGPD.",
-									"CI/CD et IaC pour des équipes qui publient souvent avec des garde-fous."
-								]
-							},
-							"devops": {
-								"title": "DevSecOps, Architecture, SRE, développement",
-								"context": "Clients Fortune 500 et startups.",
-								"bullets": [
-									"Sécurité pipeline, plateformes conteneurs, opérations Kubernetes.",
-									"Pont entre dev, ops & sécurité/Playbooks pratiques.",
-									"Migration legacy→cloud sans stop livraison."
-								]
-							},
-							"platform": {
-								"title": "Renforcement plateforme & clarté",
-								"context": "Multi-industries — finance.",
-								"bullets": [
-									"Microservices/tests autom. en environnements régulés.",
-									"Foundation observabilité & réponse incidents.",
-									"Architecture cost-aware & standards opérationnels."
-								]
-							},
-							"more": "Plus de projets & détails"
-						},
-						"cv": "Voir tous les CVs",
-						"professionalExperience": "Expérience Professionnelle",
-						"yearsExperience": "20+ ans d’expérience en solutions pour entreprises",
-						"education": {
-							"section": "Éducation & Certifications",
-							"internationalCollab": "Collaboration internationale",
-							"internationalText": "20+ ans en contexte global et multisite. Gestion d’équipes et partenaires internationaux. Travail quotidien en anglais avec équipes distribué(e)s, partenaires sécurité/produit.",
-							"degreeTitle": "Diplôme d’ingénieur",
-							"degreeInst": "Informatique & génie logiciel",
-							"degreeDesc": "Solide socle en génie logiciel, algorithmique et conception système",
-							"isoTitle": "Certifications ISO & SOC",
-							"isoInst": "Sécurité, conformité, protection données",
-							"isoDesc1": "ISO 27001 & RGPD — mise en place/maintien d’un système de management sécurité.",
-							"isoDesc2": "ISO 42001 — lead implementer systèmes management IA.",
-							"isoDesc3": "SOC 2 Type II — contrôles sécurité et attestation selon référentiels de confiance.",
-							"isoSeeAlso": "Voir aussi standards & conformité",
-							"cloudTitle": "Certifications Cloud",
-							"cloudInst": "AWS, Azure, Kubernetes, Nomad",
-							"cloudDesc": "Nombreuses certifs cloud & orchestration"
-						},
-						"contact": {
-							"workWithMe": "Travaillons ensemble",
-							"subtitle": "Envie d’optimiser votre cloud ou vos pratiques DevSecOps ? Prendre RDV ou écrivez-moi pour décrire votre besoin — réponse sous 2j ouvrés.",
-							"ctaSchedule": "Prendre RDV (Calendly)",
-							"ctaEmail": "M’écrire",
-							"email": "job@albandrieu.com",
-							"linkedin": "Contact LinkedIn",
-							"calendly": "Prendre un créneau",
-							"github": "Mon GitHub"
-						}
-					}
+					"href": "https://jusconnect.com/"
 				}
 			},
 			{
@@ -566,15 +464,7 @@
 				"iconClass": "fas fa-user-tie",
 				"description": "325+ tâches, infra, sécurité, bases, CI/CD, IA, observabilité (2022–2025)"
 			}
-		],
-		"footer": {
-			"pricing": "Tarifs",
-			"legal": "Mentions légales",
-			"cookies": "Cookies",
-			"returnToCv": "Retour à l'accueil",
-			"backToTop": "Retour en haut",
-			"summary": "Synthèse issue des revues Jusmundi sur 4 ans (2022–2025)."
-		}
+		]
 	},
 	"home": {
 		"meta": {
