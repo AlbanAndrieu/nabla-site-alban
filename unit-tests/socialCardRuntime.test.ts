@@ -51,3 +51,19 @@ test("Playwright ignores production deployment dispatches", async () => {
 		),
 	);
 });
+
+
+test("on-demand Vercel Preview requires exact Quality success and triggers a first ref update", async () => {
+	const workflow = await readFile(".github/workflows/vercel-preview.yml", "utf8");
+
+	assert.match(workflow, /actions:\s*read/);
+	assert.match(workflow, /listWorkflowRunsForRepo/);
+	assert.match(workflow, /head_sha:\s*sha/);
+	assert.match(workflow, /CI \(Quality and Security\)/);
+	assert.match(workflow, /qualityRun\.conclusion !== 'success'/);
+	assert.match(workflow, /sha:\s*pr\.base\.sha/);
+	assert.match(
+		workflow,
+		/createRef[\s\S]*sha:\s*pr\.base\.sha[\s\S]*updateRef[\s\S]*sha,/,
+	);
+});
