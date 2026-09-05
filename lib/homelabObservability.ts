@@ -82,6 +82,11 @@ export type DeepDiagnosticEvidence = {
 	checks: DeepDiagnosticCheckEvidence[];
 };
 
+export type EdgeEvidenceSkip = {
+	id: string;
+	reason: string;
+};
+
 export type CloudflareCacheEvidence = {
 	stale: boolean;
 	refreshError?: string;
@@ -97,6 +102,7 @@ export type HomelabObservabilitySnapshot = HomelabOperationalEvidence & {
 	diagnostics: HomelabDiagnosticsSnapshot | null;
 	cloudflareCache: CloudflareCacheEvidence | null;
 	pfsenseIngressPolicy: PfSenseIngressPolicyEvidence | null;
+	edgeEvidenceSkips: EdgeEvidenceSkip[];
 	controlPlaneDiagnostics: Partial<
 		Record<OperationalComponentEvidence["id"], ControlPlaneDiagnosticEvidence>
 	>;
@@ -243,6 +249,15 @@ function parseDeepDiagnostics(value: unknown): DeepDiagnosticEvidence {
 	};
 }
 
+function parseEdgeEvidenceSkips(sickzValue: unknown): EdgeEvidenceSkip[] {
+	if (!isRecord(sickzValue) || !isRecord(sickzValue.checks)) return [];
+	return Object.entries(sickzValue.checks).flatMap(([id, value]) => {
+		if (!isRecord(value) || value.http_evidence_skipped !== true) return [];
+		const reason = optionalString(value.http_evidence_skip_reason);
+		return reason ? [{ id, reason }] : [];
+	});
+}
+
 function parsePfSenseIngressPolicy(healthzValue: unknown): PfSenseIngressPolicyEvidence | null {
 	if (!isRecord(healthzValue) || !isRecord(healthzValue.checks)) return null;
 	const pfsense = healthzValue.checks.pfsense;
@@ -333,6 +348,7 @@ export function parseHomelabObservability(
 		diagnostics,
 		cloudflareCache: parseCloudflareCache(board.homelab),
 		pfsenseIngressPolicy: parsePfSenseIngressPolicy(board.healthz),
+		edgeEvidenceSkips: parseEdgeEvidenceSkips(board.sickz),
 		controlPlaneDiagnostics: parseControlPlaneDiagnostics(board.homelab),
 		sources: {
 			board: "health-board",
