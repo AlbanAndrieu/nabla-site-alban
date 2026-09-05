@@ -97,6 +97,7 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	applicationError?: string | null;
 	criticalityTier?: ServiceCriticalityTier;
 	blastRadius?: number;
+	blastRadiusLevel?: "dominant" | "elevated";
 };
 
 type GroupNodeData = Record<string, unknown> & {
@@ -350,6 +351,7 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 			data-reconciliation={item.reconciliation}
 			data-health-state={item.healthState}
 			data-criticality-tier={item.criticalityTier}
+			data-blast-radius-level={item.blastRadiusLevel}
 			style={
 				healthColor
 					? {
@@ -534,6 +536,7 @@ function MobileArchitectureHierarchy({
 									data-mobile-architecture-item={entity.id}
 									data-health-state={item.healthState}
 									data-criticality-tier={item.criticalityTier}
+									data-blast-radius-level={item.blastRadiusLevel}
 								>
 									<div className={styles.mobileItemHeading}>
 										<span>
@@ -794,6 +797,10 @@ function buildGroupedNodes(
 	criticality: Map<string, ServiceCriticality>,
 ): Node[] {
 	const nodes: Node[] = [];
+	const maxBlastRadius = Math.max(
+		0,
+		...[...criticality.values()].map((entry) => entry.transitiveDependents),
+	);
 	let y = 0;
 
 	for (const group of groups) {
@@ -825,6 +832,16 @@ function buildGroupedNodes(
 			const resolvedHealth = resolveEffectiveServiceState(health);
 			const blockers = blockedDependencyLabels(health);
 			const serviceCriticality = criticality.get(entity.id);
+			const blastRatio =
+				maxBlastRadius > 0 && serviceCriticality
+					? serviceCriticality.transitiveDependents / maxBlastRadius
+					: 0;
+			const blastRadiusLevel =
+				blastRatio >= 0.5
+					? "dominant"
+					: blastRatio >= 0.05
+						? "elevated"
+						: undefined;
 
 			nodes.push({
 				id: entity.id,
@@ -861,6 +878,7 @@ function buildGroupedNodes(
 					applicationError: health?.application_error,
 					criticalityTier: serviceCriticality?.tier,
 					blastRadius: serviceCriticality?.transitiveDependents,
+					blastRadiusLevel,
 				} satisfies ArchitectureNodeData,
 			});
 		});
