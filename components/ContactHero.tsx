@@ -4,7 +4,6 @@ import styles from "./ContactHero.module.css";
 type ContactHeroProps = {
 	contactCta: string;
 	contactHref: string;
-	current: string;
 	cvCta: string;
 	cvHref: string;
 	experience: string;
