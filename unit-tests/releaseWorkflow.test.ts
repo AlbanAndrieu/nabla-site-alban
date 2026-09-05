@@ -49,6 +49,23 @@ test("release bootstrap anchors v0.0.0 before semantic-release workflow changes"
   assert.doesNotMatch(release, /git push origin HEAD:master/);
 });
 
+test("release bootstrap rejects workflow-changing merge commits as baseline candidates", async () => {
+  const release = await source(".github/workflows/release.yml");
+  const bootstrapStart = release.indexOf("      - name: Bootstrap semantic-release baseline");
+  const bootstrapEnd = release.indexOf("      - name: Verify first-release bootstrap version");
+  const bootstrapStep = release.slice(bootstrapStart, bootstrapEnd);
+
+  assert.match(
+    bootstrapStep,
+    /git diff-tree --root -m --no-commit-id --name-only -r "\$\{BASELINE_SHA\}" -- \.github\/workflows/,
+  );
+  assert.doesNotMatch(
+    bootstrapStep,
+    /git diff-tree --no-commit-id --name-only -r "\$\{BASELINE_SHA\}" -- \.github\/workflows/,
+  );
+  assert.match(bootstrapStep, /Skipping workflow-changing baseline candidate/);
+});
+
 test("release bootstrap keeps authentication available when git invokes the gh credential helper", async () => {
   const release = await source(".github/workflows/release.yml");
   const bootstrapStart = release.indexOf("      - name: Bootstrap semantic-release baseline");

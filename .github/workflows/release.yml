@@ -116,9 +116,11 @@ jobs:
           # modifies a workflow file unless it has the separate workflows permission.
           # Keep the release token least-privileged: walk backwards from the commit
           # immediately before semantic-release until the candidate commit itself has
-          # no .github/workflows changes, then use that commit as the technical baseline.
+          # no .github/workflows changes. `-m --root` is intentional: plain diff-tree
+          # can hide paths introduced by merge commits, which caused GitHub to reject
+          # the v0.0.0 tag even though the candidate appeared workflow-safe locally.
           BASELINE_SHA="$(git rev-parse "${RELEASE_CONFIG_COMMIT}^")"
-          while git diff-tree --no-commit-id --name-only -r "${BASELINE_SHA}" -- .github/workflows | grep -q .; do
+          while git diff-tree --root -m --no-commit-id --name-only -r "${BASELINE_SHA}" -- .github/workflows | grep -q .; do
             echo "Skipping workflow-changing baseline candidate ${BASELINE_SHA}."
             if ! BASELINE_SHA="$(git rev-parse "${BASELINE_SHA}^")"; then
               echo "Cannot find a workflow-safe semantic-release baseline." >&2

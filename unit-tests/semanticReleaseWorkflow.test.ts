@@ -11,7 +11,10 @@ test("semantic-release bootstrap avoids workflow-changing tag targets", async ()
 	const workflow = await readFile(workflowPath, "utf8");
 
 	assert.match(workflow, /RELEASE_CONFIG_COMMIT=/);
-	assert.match(workflow, /git diff-tree --no-commit-id --name-only -r/);
+	assert.match(
+		workflow,
+		/git diff-tree --root -m --no-commit-id --name-only -r/,
+	);
 	assert.match(workflow, /-- \.github\/workflows \| grep -q \./);
 	assert.match(workflow, /Skipping workflow-changing baseline candidate/);
 	assert.match(workflow, /git rev-parse "\$\{BASELINE_SHA\}\^"/);
