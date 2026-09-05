@@ -186,7 +186,6 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 			<ContactHero
 				contactCta={contact("hero.contactCta")}
 				contactHref={canonicalPagePath("contact", locale)}
-				current={contact("hero.current")}
 				cvCta={contact("hero.cvCta")}
 				cvHref="#cv-formats"
 				experience={contact("hero.experience")}
