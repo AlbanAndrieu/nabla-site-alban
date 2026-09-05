@@ -327,18 +327,7 @@
 			"lead": "Executive summary & year-by-year delivery at Jusmundi",
 			"executive_title": "Executive summary",
 			"executive_copy": "Over the past 4 years, I have completed 300+ tracked tasks across infrastructure, security, databases, CI/CD, and platform engineering—demonstrating consistent delivery and technical leadership in cloud platform operations. With no significant downtime, night and weekend workload.",
-			"key_achievements": "Key achievements by strategic theme",
-			"strategy": {
-				"cloud": "Infrastructure modernization & cloud platform",
-				"security": "Security & compliance",
-				"db": "Database excellence",
-				"cicd": "CI/CD & DevOps excellence",
-				"aiml": "AI/ML platform support",
-				"observability": "Observability & site reliability"
-			},
-			"standout": "Standout technical achievements",
-			"career": "Career progression evidence",
-			"numbers": "Performance summary by numbers"
+			"key_achievements": "Key achievements by strategic theme"
 		},
 		"pageTitle": "Jusmundi — 4 Years Key Achievements & KPIs | Alban Andrieu",
 		"metadataDescription": "DevSecOps, infrastructure, security, and reliability achievements delivered by Alban Andrieu at Jus Mundi.",
@@ -466,98 +455,7 @@
 				"description": "Company overview, funding, product launches (Jus Connect, Jus AI), geographic expansion, AI achievements",
 				"externalLink": {
 					"label": "Jus Connect",
-					"href": "https://jusconnect.com/",
-					"home": {
-						"title": "Cloud & DevSecOps Architect, 20+ years experience",
-						"subtitle": "Cloud architect and DevSecOps engineer — I help startups and scale-ups secure, automate and scale their platforms so they ship faster without trading off compliance.",
-						"stats": {
-							"ia": "4+ years of IA",
-							"security": "7+ years in cybersecurity",
-							"infra": "10+ years in infrastructure",
-							"dev": "10+ years of development"
-						},
-						"cta": {
-							"book": "Book a 30-minute consultation",
-							"start": "Start your project!",
-							"pdf": "Download my profile",
-							"linkedin": "View LinkedIn"
-						},
-						"lastExp": {
-							"intro": "My last experience at",
-							"company": "JusMundi",
-							"linkLabel": "JusMundi",
-							"wasTo": "was to:",
-							"items": [
-								"Own infrastructure and support IA initiative.",
-								"Reduce incident risk and improve compliance posture.",
-								"Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
-								"Accelerate delivery with robust CI/CD, IaC and observable production systems."
-							]
-						},
-						"servicesTitle": "Services & technical expertise",
-						"outcomes": {
-							"title": "Example of delivered projects",
-							"subtitle": "Representative engagements — details under NDA; happy to discuss similar contexts on a call.",
-							"legal": {
-								"title": "Legal-tech AI scale-up",
-								"context": "International product, heavy compliance expectations.",
-								"bullets": [
-									"Cloud architecture on AWS and OVH with security-by-design.",
-									"Automation and controls supporting ISO 27001, SOC 2 and GDPR-aligned operations.",
-									"CI/CD and IaC so teams ship frequently with guardrails."
-								]
-							},
-							"devops": {
-								"title": "DevSecOps, Architecte, SRE, developer",
-								"context": "Fortune 500 and startup clients.",
-								"bullets": [
-									"Pipeline security, container platforms and Kubernetes operations.",
-									"Bridging development, security and ops with practical playbooks.",
-									"Legacy-to-cloud migration patterns without stopping delivery."
-								]
-							},
-							"platform": {
-								"title": "Platform hardening & clarity",
-								"context": "Cross-industry — financial services background.",
-								"bullets": [
-									"Microservices and automated testing in regulated-style environments.",
-									"Monitoring and observability foundations for incident response.",
-									"Cost-aware architecture and operational standards."
-								]
-							},
-							"more": "More detail on selected outcomes"
-						},
-						"cv": "View Full CVs",
-						"professionalExperience": "Professional Experience",
-						"yearsExperience": "20+ years of experience delivering enterprise solutions",
-						"education": {
-							"section": "Education & Certifications",
-							"internationalCollab": "International collaboration",
-							"internationalText": "20+ years in global, cross-location settings. Delivery and leadership with teams and stakeholders across countries and time zones. Professional working language English; used daily with distributed engineering, security, and product partners in multinational environments.",
-							"degreeTitle": "Engineering Degree",
-							"degreeInst": "Computer Science & Software Engineering",
-							"degreeDesc": "Strong foundation in software engineering, algorithms, and system design",
-							"isoTitle": "ISO & SOC certifications",
-							"isoInst": "Security, compliance & data protection",
-							"isoDesc1": "ISO 27001 & GDPR — implementing and maintaining information-security and data-protection frameworks.",
-							"isoDesc2": "ISO 42001 — lead implementer for AI management systems.",
-							"isoDesc3": "SOC 2 Type II — security controls and attestation in line with trust services criteria.",
-							"isoSeeAlso": "See also Security standards & compliance",
-							"cloudTitle": "Cloud Certifications",
-							"cloudInst": "AWS, Azure, Kubernetes, Nomad",
-							"cloudDesc": "Multiple cloud platform and orchestration certifications"
-						},
-						"contact": {
-							"workWithMe": "Work with me",
-							"subtitle": "Ready to improve your cloud platform or DevSecOps practices? Book a free 30-minute consultation, or email a short note about your context — I typically reply within two business day.",
-							"ctaSchedule": "Schedule a call (Calendly)",
-							"ctaEmail": "Email me",
-							"email": "job@albandrieu.com",
-							"linkedin": "Connect with me",
-							"calendly": "Book a time",
-							"github": "View my work"
-						}
-					}
+					"href": "https://jusconnect.com/"
 				}
 			},
 			{
@@ -566,15 +464,7 @@
 				"iconClass": "fas fa-user-tie",
 				"description": "325+ tasks, infrastructure, security, databases, CI/CD, AI, observability (2022–2025)"
 			}
-		],
-		"footer": {
-			"pricing": "Pricing",
-			"legal": "Legal notices",
-			"cookies": "Cookies",
-			"returnToCv": "Back to Main",
-			"backToTop": "Back to top",
-			"summary": "Summary derived from Jusmundi 4-year review materials (2022–2025)."
-		}
+		]
 	},
 	"home": {
 		"meta": {
