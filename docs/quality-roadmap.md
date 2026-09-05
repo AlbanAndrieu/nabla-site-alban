@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 5 septembre 2026.
+Dernière vérification : 6 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -147,9 +147,11 @@ les autres chantiers.
   transitif sans hardcoder les IDs des services.
 - [x] Fournir un drill-down d'impact distinguant dépendants directs, impact
   transitif et chemin de dépendances requis dans la vue de criticité partagée.
-- [ ] Compléter les relations d'hébergement/runtime dans la topologie autoritative,
-  notamment `service -> Docker/runtime -> TrueNAS`, uniquement lorsque la
-  configuration réelle les prouve.
+- [x] Compléter les relations d'hébergement/runtime dans la topologie autoritative :
+  `nabla-compose` dérive désormais les `hostedBy` depuis les bindings runtime
+  prouvés, relie Docker à TrueNAS et expose également Talos/Kubernetes lorsque les
+  sources Terraform/docs les prouvent ; FastAPI et Site Alban consomment ce type
+  sans le confondre avec une dépendance fonctionnelle.
 - [x] Faire refléter ces couches d'hébergement dans le React Flow détaillé avec
   foundations/data/platform/apps clairement étagés ; les nœuds sont triés par
   criticité/blast radius et la dominance visuelle est calculée relativement au
@@ -377,13 +379,12 @@ Autres contrôles :
 
 ## Ordre de livraison réévalué
 
-1. Compléter les dernières relations d'hébergement/runtime uniquement depuis les
-   sources autoritatives ; les vues desktop/mobile savent désormais déjà les
-   représenter et hiérarchiser leur blast radius sans règle par service.
-2. Revalider régulièrement le graphe de production après les évolutions
+1. Revalider régulièrement le graphe de production après les évolutions
    `nabla-compose` / `fastapi-sample` et étendre les contrats lorsqu'un nouveau
-   type de workload ou de relation apparaît.
-3. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
+   type de workload ou de relation apparaît. La revalidation du 6 septembre 2026
+   couvre 65 nœuds, 133 relations et 55 placements `hostedBy`, dont Talos et
+   Kubernetes.
+2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
 4. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
    et le retrait de Bootstrap après les migrations déjà faites de RouteHeader,
    LocaleSwitcher, Footer et ContactHero.

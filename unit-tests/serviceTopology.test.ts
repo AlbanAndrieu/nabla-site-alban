@@ -63,6 +63,46 @@ test("local fallback preserves the Elasticsearch and Kibana multi-service contra
 	assert.ok(hasRelation("docker", "truenas", "hostedBy"));
 });
 
+test("local fallback tracks current runtime placement and Talos topology", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const nodeIds = new Set(topology.nodes.map((node) => node.id));
+	for (const id of [
+		"fastapi-sample",
+		"influxdb",
+		"scrutiny",
+		"scrutiny-collector",
+		"talos",
+		"kubernetes",
+	]) {
+		assert.ok(nodeIds.has(id), `expected authoritative fallback node ${id}`);
+	}
+
+	const hasRelation = (
+		source: string,
+		target: string,
+		type: string,
+		strength = "required",
+	) =>
+		topology.relations.some(
+			(relation) =>
+				relation.source === source &&
+				relation.target === target &&
+				relation.type === type &&
+				relation.strength === strength,
+		);
+
+	assert.ok(hasRelation("fastapi-sample", "docker", "hostedBy"));
+	assert.ok(hasRelation("scrutiny", "influxdb", "storesIn"));
+	assert.ok(hasRelation("scrutiny-collector", "scrutiny", "consumesApi"));
+	assert.ok(hasRelation("kubernetes", "talos", "hostedBy"));
+	assert.ok(hasRelation("talos", "truenas", "hostedBy"));
+});
+
 test("static architecture topology never probes FastAPI during prerender", () => {
 	const originalFetch = globalThis.fetch;
 	let fetchCalled = false;
