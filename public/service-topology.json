@@ -60,6 +60,14 @@
       "icon": "🔎"
     },
     {
+      "id": "fastapi-sample",
+      "name": "FastAPI Sample",
+      "kind": "api",
+      "category": "development",
+      "sourcePath": "apps/sample/compose.yml",
+      "description": "Local TrueNAS deployment of FastAPI Sample for homelab and runtime validation."
+    },
+    {
       "id": "garage",
       "name": "Garage",
       "kind": "object-storage",
@@ -138,12 +146,29 @@
       "description": "Non-destructively reconciles generated Nabla applications through the Homarr API."
     },
     {
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "kind": "time-series-database",
+      "category": "data",
+      "sourcePath": "apps/influxdb/compose.yml",
+      "description": "Shared InfluxDB 2.x time-series database for Scrutiny and future homelab consumers."
+    },
+    {
       "id": "kibana",
       "name": "Kibana",
       "kind": "dashboard",
       "category": "observability",
       "sourcePath": "apps/elasticsearch/compose.yml",
       "icon": "📊"
+    },
+    {
+      "id": "kubernetes",
+      "name": "Kubernetes (Talos)",
+      "kind": "orchestrator",
+      "category": "infrastructure",
+      "sourcePath": "docs/truenas-talos-bootstrap.md",
+      "description": "Target Kubernetes cluster bootstrapped on Talos Linux VMs hosted by TrueNAS.",
+      "icon": "☸️"
     },
     {
       "id": "langflow",
@@ -373,6 +398,22 @@
       "icon": "🔴"
     },
     {
+      "id": "scrutiny",
+      "name": "Scrutiny",
+      "kind": "storage-monitoring",
+      "category": "observability",
+      "sourcePath": "apps/scrutiny/compose.yml",
+      "url": "https://scrutiny.albandrieu.com",
+      "description": "SMART disk health monitoring web/API backed by the shared InfluxDB service."
+    },
+    {
+      "id": "scrutiny-collector",
+      "name": "Scrutiny Collector",
+      "kind": "metrics-collector",
+      "category": "observability",
+      "sourcePath": "apps/scrutiny/compose.yml"
+    },
+    {
       "id": "searxng",
       "name": "SearXNG",
       "kind": "search",
@@ -413,6 +454,15 @@
       "category": "observability",
       "sourcePath": "apps/sybase-exporter/compose.yml",
       "icon": "📡"
+    },
+    {
+      "id": "talos",
+      "name": "Talos Linux",
+      "kind": "kubernetes-os",
+      "category": "infrastructure",
+      "sourcePath": "docs/truenas-talos-bootstrap.md",
+      "description": "Immutable Talos Linux platform for the Kubernetes control-plane and worker VMs on TrueNAS.",
+      "icon": "🔷"
     },
     {
       "id": "tempo",
@@ -666,6 +716,36 @@
       ]
     },
     {
+      "source": "fastapi-sample",
+      "target": "docker",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
+      "evidence": [
+        "apps/sample/compose.yml:fastapi-sample.x-nabla.runtime.containerService"
+      ]
+    },
+    {
+      "source": "fastapi-sample",
+      "target": "redis",
+      "type": "dependsOn",
+      "strength": "optional",
+      "description": "FastAPI Sample uses the shared Redis service for L2 probe caches and runtime heartbeat aggregation.",
+      "evidence": [
+        "apps/sample/compose.yml:/mnt/cpool/sample/.env.secrets:REDIS_URL"
+      ]
+    },
+    {
+      "source": "fastapi-sample",
+      "target": "traefik",
+      "type": "exposedBy",
+      "strength": "optional",
+      "description": "Traefik exposes the local FastAPI Sample endpoint on the trusted internal hostname.",
+      "evidence": [
+        "apps/sample/compose.yml:traefik.http.routers.fastapi-sample"
+      ]
+    },
+    {
       "source": "garage",
       "target": "docker",
       "type": "hostedBy",
@@ -879,6 +959,16 @@
       ]
     },
     {
+      "source": "influxdb",
+      "target": "docker",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
+      "evidence": [
+        "apps/influxdb/compose.yml:influxdb.x-nabla.runtime.containerService"
+      ]
+    },
+    {
       "source": "kibana",
       "target": "docker",
       "type": "hostedBy",
@@ -896,6 +986,16 @@
       "description": "Kibana queries Elasticsearch for indexed data and saved objects.",
       "evidence": [
         "apps/elasticsearch/compose.yml:ELASTICSEARCH_HOSTS"
+      ]
+    },
+    {
+      "source": "kubernetes",
+      "target": "talos",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "The Kubernetes cluster runs on Talos Linux control-plane and worker nodes.",
+      "evidence": [
+        "docs/truenas-talos-bootstrap.md:default Talos VM topology and bootstrap sequence"
       ]
     },
     {
@@ -1492,6 +1592,46 @@
       ]
     },
     {
+      "source": "scrutiny",
+      "target": "docker",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
+      "evidence": [
+        "apps/scrutiny/compose.yml:scrutiny.x-nabla.runtime.containerService"
+      ]
+    },
+    {
+      "source": "scrutiny",
+      "target": "influxdb",
+      "type": "storesIn",
+      "strength": "required",
+      "description": "Scrutiny stores SMART history in the shared InfluxDB service.",
+      "evidence": [
+        "apps/scrutiny/compose.yml:SCRUTINY_WEB_INFLUXDB_HOST"
+      ]
+    },
+    {
+      "source": "scrutiny-collector",
+      "target": "docker",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
+      "evidence": [
+        "apps/scrutiny/compose.yml:scrutiny-collector.x-nabla.runtime.containerService"
+      ]
+    },
+    {
+      "source": "scrutiny-collector",
+      "target": "scrutiny",
+      "type": "consumesApi",
+      "strength": "required",
+      "description": "The collector posts SMART inventory and metrics to the Scrutiny web/API service.",
+      "evidence": [
+        "apps/scrutiny/compose.yml:COLLECTOR_API_ENDPOINT"
+      ]
+    },
+    {
       "source": "sonarqube",
       "target": "docker",
       "type": "hostedBy",
@@ -1569,6 +1709,17 @@
       "description": "The exporter queries Sybase ASE through the FreeTDS driver.",
       "evidence": [
         "apps/sybase-exporter/compose.yml:SYBASE_DATA_SOURCE_NAME"
+      ]
+    },
+    {
+      "source": "talos",
+      "target": "truenas",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "Talos control-plane and worker nodes are provisioned as VMs on TrueNAS.",
+      "evidence": [
+        "docs/truenas-talos-bootstrap.md:TrueNAS VM bridge and default Talos VM topology",
+        "terraform/truenas/main.tf:truenas_vm"
       ]
     },
     {
