@@ -128,11 +128,12 @@ test.describe("Responsive Design Tests", () => {
 
 		await page.getByRole("button", { name: "Nabla / TrueNAS" }).click();
 
-		const compactHierarchy = page.locator(
-			"[data-mobile-architecture-hierarchy]",
-		);
+		const compactHierarchy = page
+			.locator("[data-mobile-architecture-hierarchy]")
+			.filter({ visible: true });
+		await expect(compactHierarchy).toHaveCount(1);
 		await expect(compactHierarchy).toBeVisible();
-		await expect(page.locator(".react-flow")).toBeHidden();
+		await expect(page.locator(".react-flow:visible")).toHaveCount(0);
 
 		const firstGroup = compactHierarchy
 			.locator("[data-mobile-architecture-group]")
@@ -144,8 +145,10 @@ test.describe("Responsive Design Tests", () => {
 		).toBeVisible();
 
 		await page.setViewportSize({ width: 1280, height: 900 });
-		await expect(compactHierarchy).toBeHidden();
-		await expect(page.locator(".react-flow")).toBeVisible();
+		await expect(
+			page.locator("[data-mobile-architecture-hierarchy]:visible"),
+		).toHaveCount(0);
+		await expect(page.locator(".react-flow:visible")).toHaveCount(1);
 	});
 
 });
