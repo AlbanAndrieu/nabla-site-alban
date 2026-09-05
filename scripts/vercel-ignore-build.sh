@@ -10,8 +10,13 @@ set -euo pipefail
 # dependencies, assets, messages and build scripts deploy-relevant.
 
 base_sha="${VERCEL_GIT_PREVIOUS_SHA:-}"
+git_ref="${VERCEL_GIT_COMMIT_REF:-}"
 
 if [[ -z "${base_sha}" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
+    if [[ "${git_ref}" == vercel-preview-* ]]; then
+        echo "No previous successful deployment for validated checkpoint ${git_ref}; build deployment."
+        exit 1
+    fi
     if git rev-parse HEAD^ >/dev/null 2>&1; then
         base_sha="$(git rev-parse HEAD^)"
         echo "VERCEL_GIT_PREVIOUS_SHA unavailable; falling back to parent commit ${base_sha}."
