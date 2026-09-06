@@ -1,8 +1,5 @@
 {
 	"ai": {
-		"native": {
-			"documentPipelineIntro": "A practical PDF-to-knowledge flow: normalize PDFs locally, archive and OCR them in Paperless, enrich them with Paperless-AI, then work with the corpus in AnythingLLM with Paperless-ngx integrated for quick checks."
-		},
 		"securePlatform": {
 			"title": "Secure AI platform engineering",
 			"lead": "The goal is not to accumulate AI tools. It is to operate models, agents, MCP tools and knowledge pipelines behind explicit security, reliability, cost and governance boundaries.",
@@ -66,12 +63,14 @@
 			"lead": "The page now follows the platform layers from agents through governance. Use this journey to jump directly to an architectural responsibility.",
 			"aria": "AI platform navigation",
 			"sections": {
-				"automation": "Agents & automation",
-				"models": "Models & frameworks",
-				"knowledge": "Knowledge & RAG",
-				"architecture": "AI architecture",
+				"secure": "Security & governance",
+				"architecture": "Platform architecture",
+				"automation": "Workflow & orchestration",
+				"tools": "Tools, MCP & knowledge",
+				"catalog": "Models & ecosystem",
 				"observability": "Observability & FinOps",
-				"security": "Security & practices"
+				"knowledge": "Document & RAG pipeline",
+				"practices": "Engineering practices"
 			}
 		},
 		"globalTools": {
@@ -86,11 +85,15 @@
 			"lead": "A unified view of quality, traces, costs, tokens, and latency: evaluate LLM applications, monitor production behavior, and apply FinOps discipline to model consumption.",
 			"opik": "Open-source platform for evaluating, testing, and monitoring LLM applications, useful for comparing model outputs and tracking production quality.",
 			"langfuse": "Open-source LLM observability platform for traces, prompts, scores, costs, and latency. Langfuse collects telemetry from LiteLLM and the MCP server to provide a cross-platform view of AI calls.",
-			"documentation": "Documentation"
+			"documentation": "Documentation",
+			"cursor": "Review Cursor account usage and token-consumption patterns to spot expensive workflows and plan limits before they become delivery friction.",
+			"cursorAnalytics": "Cursor analytics",
+			"litellm": "Use LiteLLM as the metered gateway for routing, budgets, fallbacks and provider-independent usage evidence rather than distributing cost controls across every client."
 		},
 		"usage": {
 			"description": "Track ChatGPT and Codex usage across credits, tokens, models, activity, and consumption. Available analytics depend on the workspace plan; Codex also exposes usage and limit details in supported account settings.",
-			"analytics": "ChatGPT / Codex analytics"
+			"analytics": "ChatGPT / Codex analytics",
+			"title": "ChatGPT / Codex usage"
 		},
 		"workflow": {
 			"title": "Workflow & orchestration",
@@ -99,6 +102,75 @@
 			"temporal": "Durable orchestration for stateful, long-running, critical workflows: retries, persistent state, timers, human-in-the-loop steps, and LLM activities.",
 			"langflow": "Visual workbench for prototyping LLM chains, agents, tools, and RAG before productionizing them in orchestration and service layers.",
 			"opencommit": "OpenCommit complements the development workflow with consistent Conventional Commit messages; it intentionally remains outside the orchestration layer."
+		},
+		"meta": {
+			"title": "Secure AI Platform Engineering — Alban Andrieu",
+			"description": "Secure AI platform architecture for models, agents, MCP, RAG, observability, FinOps and governance, with a local-first homelab implementation."
+		},
+		"hero": {
+			"title": "Secure AI Platform Engineering",
+			"subtitle": "Architecture, guardrails and operations for models, agents, MCP and RAG",
+			"description": "A practical platform view of AI engineering: central model policy, isolated agent capabilities, traceable knowledge, measurable quality and cost, and governance mapped to real controls."
+		},
+		"intro": {
+			"aria": "Secure AI platform overview and resources",
+			"first": "AI engineering is more than choosing a model. Production systems need identity, data boundaries, controlled tools, resilient routing, observability, evaluation and evidence that can survive audits and incidents.",
+			"second": "This page starts with the architecture and operating model I use, then keeps the broader tool ecosystem as a secondary reference rather than the product itself."
+		},
+		"resourceCatalog": {
+			"title": "Models, frameworks & ecosystem reference",
+			"lead": "Secondary reference material for technologies that can fit behind the platform controls above. Product names are examples, not architectural requirements.",
+			"modelsTitle": "Selected models & developer resources",
+			"nemotron": "A compact open model family useful when evaluating smaller local or edge inference footprints.",
+			"context7": "Context and documentation retrieval tooling for development assistants and agent workflows.",
+			"mcpServers": "A curated directory of MCP servers and integrations for exploring standardized tool capabilities.",
+			"learningTitle": "Learning & understanding",
+			"learning": "A visual guide to reasoning LLMs that helps explain how modern models approach multi-step reasoning and where evaluation still matters.",
+			"ecosystemTitle": "Ecosystem compass",
+			"compass": "Treat this list as replaceable implementation options. Keep authentication, routing, policy, telemetry and data lifecycle independent from any single provider.",
+			"groups": {
+				"providers": "LLM APIs & chat",
+				"coding": "Coding assistants & IDEs",
+				"cloud": "Cloud ML & notebooks",
+				"rag": "RAG, vectors & frameworks",
+				"automation": "Agents & automation",
+				"evals": "Evals, traces & monitoring",
+				"local": "Local & open inference"
+			},
+			"learnMore": "Learn more",
+			"website": "Website",
+			"repository": "Repository",
+			"article": "Read article"
+		},
+		"practices": {
+			"title": "Engineering & governance practices",
+			"lead": "The platform controls matter only when they are paired with repeatable engineering habits and explicit evidence.",
+			"objective": "Define a measurable objective and failure criteria before introducing an AI component.",
+			"measurement": "Monitor quality, latency, cost and failure modes continuously instead of validating only with anecdotal prompts.",
+			"security": "Threat-model prompts, tools, identities, data movement and supplier boundaries; review bias and misuse separately from infrastructure security.",
+			"automation": "Automate repetitive controls, but keep approval boundaries for destructive or high-impact agent actions.",
+			"change": "Version prompts, models, policies and retrieval pipelines so changes can be explained and rolled back.",
+			"testing": "Test deterministic code, retrieval quality, policy enforcement and model behavior at the appropriate layer.",
+			"evidence": "Keep architecture, data provenance, evaluation results and operational evidence understandable to engineering, security and governance stakeholders."
+		},
+		"documentPipeline": {
+			"title": "Document-to-knowledge pipeline",
+			"intro": "A controlled PDF-to-RAG flow with explicit preparation, archive/OCR, enrichment, durable orchestration, private review and a shared retrieval surface.",
+			"stages": {
+				"stirling": "Normalize, split, merge or clean PDFs locally before ingestion so the archive receives predictable inputs.",
+				"paperless": "Archive, OCR, tag and index the prepared documents in Paperless-ngx as the durable source corpus.",
+				"paperlessAi": "Enrich consumed documents with classification and metadata only after the canonical archive has accepted them.",
+				"temporal": "Run summarization, translation, retries and human-in-the-loop activities as durable workflows rather than fragile background scripts.",
+				"anythingllm": "Use a private workspace to inspect and question the processed corpus while validating OCR, tags and downstream transformations.",
+				"openrag": "Publish the vetted corpus to a shared RAG layer, then expose controlled retrieval capabilities through an MCP surface instead of reimplementing access per agent."
+			}
+		},
+		"contact": {
+			"title": "Build a secure AI platform",
+			"lead": "Need to turn an AI proof of concept into an operable platform with security, observability and governance boundaries?",
+			"contact": "Discuss your architecture",
+			"email": "Email me",
+			"calendar": "Schedule a call"
 		}
 	}
 }

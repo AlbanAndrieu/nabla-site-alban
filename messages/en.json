@@ -486,13 +486,10 @@
 				"infra": "10+ years in infrastructure",
 				"dev": "10+ years of development"
 			},
-			"lastexp": "My last experience at",
-			"jusmundi": "JusMundi",
-			"lastexp1": "Owned infrastructure and secured AI initiatives.",
-			"lastexp2": "Reduce incident risk and improve compliance posture.",
-			"lastexp3": "Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
-			"lastexp4": "Accelerate delivery with robust CI/CD, IaC and observable production systems.",
-			"purpose": "was to:",
+			"value1": "Owned infrastructure and secured AI initiatives.",
+			"value2": "Reduce incident risk and improve compliance posture.",
+			"value3": "Cut cloud and tooling spend through architecture, FinOps-minded design and automation.",
+			"value4": "Accelerate delivery with robust CI/CD, IaC and observable production systems.",
 			"services": "Services & technical expertise"
 		},
 		"outcomes": {
@@ -709,7 +706,7 @@
 			"title": "Contact Alban Andrieu — DevSecOps Cloud Architect",
 			"description": "Contact Alban Andrieu for cloud architecture, DevSecOps, AI infrastructure and security consulting."
 		},
-		"role": "DevSecOps Cloud Architect | Independent Consultant",
+		"role": "Independent Cybersecurity & DevSecOps Engineer | Cloud Architect",
 		"intro": "Open to challenges around AI integration, MLOps, cloud platforms and security.",
 		"hero": {
 			"profileAlt": "Portrait of Alban Andrieu, DevSecOps engineer and cloud architect",

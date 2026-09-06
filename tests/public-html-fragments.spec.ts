@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const pages = ["/ai.html", "/workstation.html"];
+const pages = ["/workstation.html"];
 
 test.describe("transitional public HTML fragments", () => {
 	for (const pathname of pages) {
@@ -40,5 +40,19 @@ test.describe("native security route", () => {
 		await expect(page.locator("#security-standards-compliance")).toBeVisible();
 		await expect(page.locator("#devsecops-tools")).toBeVisible();
 		await expect(page.locator("#security-visualizations")).toBeVisible();
+	});
+});
+
+
+test.describe("native AI route", () => {
+	test("legacy URL redirects to the native Secure AI page", async ({ page }) => {
+		const response = await page.goto("/ai.html");
+		expect(response?.ok()).toBeTruthy();
+		await expect(page).toHaveURL(/\/ai$/);
+		await expect(page.locator("h1")).toHaveCount(1);
+		await expect(page.locator("main#main-content")).toHaveCount(1);
+		await expect(page.locator("#secure-ai-platform")).toBeVisible();
+		await expect(page.locator("#ai-homelab-architecture")).toBeVisible();
+		await expect(page.locator("#document-pipeline")).toBeVisible();
 	});
 });

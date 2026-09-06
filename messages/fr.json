@@ -486,13 +486,10 @@
 				"infra": "10+ ans d'infrastructure",
 				"dev": "10+ ans de développement"
 			},
-			"lastexp": "Ma dernière expérience chez",
-			"jusmundi": "JusMundi",
-			"lastexp1": "Piloter l’infrastructure et sécuriser les initiatives d’IA.",
-			"lastexp2": "Réduire les risques d'incidents et améliorer la sécurité.",
-			"lastexp3": "Réduire les dépenses liées au cloud et aux outils grâce à une architecture, une conception et une automatisation axées sur FinOps.",
-			"lastexp4": "Accélérer la livraison avec des systèmes de production CI/CD, IaC et observables robustes.",
-			"purpose": "avait pour but de :",
+			"value1": "Piloter l’infrastructure et sécuriser les initiatives d’IA.",
+			"value2": "Réduire les risques d'incidents et améliorer la sécurité.",
+			"value3": "Réduire les dépenses liées au cloud et aux outils grâce à une architecture, une conception et une automatisation axées sur FinOps.",
+			"value4": "Accélérer la livraison avec des systèmes de production CI/CD, IaC et observables robustes.",
 			"services": "Services & expertise technique"
 		},
 		"outcomes": {
@@ -709,7 +706,7 @@
 			"title": "Contacter Alban Andrieu — Architecte Cloud DevSecOps",
 			"description": "Contacter Alban Andrieu pour des missions d’architecture cloud, DevSecOps, infrastructure IA et sécurité."
 		},
-		"role": "Architecte Cloud DevSecOps | Consultant indépendant",
+		"role": "Ingénieur cybersécurité & DevSecOps indépendant | Architecte cloud",
 		"intro": "Disponible pour des problématiques d’intégration IA, de MLOps, de plateformes cloud et de sécurité.",
 		"hero": {
 			"profileAlt": "Portrait d’Alban Andrieu, ingénieur DevSecOps et architecte cloud",

@@ -1,8 +1,5 @@
 {
 	"ai": {
-		"native": {
-			"documentPipelineIntro": "Un flux pratique du PDF vers la connaissance : normaliser les PDF localement, les archiver et les OCRiser dans Paperless, les enrichir avec Paperless-AI, puis exploiter le corpus dans AnythingLLM avec Paperless-ngx intégré pour des vérifications rapides."
-		},
 		"securePlatform": {
 			"title": "Ingénierie d’une plateforme IA sécurisée",
 			"lead": "L’objectif n’est pas d’accumuler des outils IA, mais d’exploiter modèles, agents, outils MCP et pipelines de connaissance derrière des frontières explicites de sécurité, de fiabilité, de coût et de gouvernance.",
@@ -66,12 +63,14 @@
 			"lead": "La page suit désormais les couches de la plateforme, des agents jusqu’à la gouvernance. Utilisez ce parcours pour accéder directement à une responsabilité de l’architecture.",
 			"aria": "Navigation de la plateforme IA",
 			"sections": {
-				"automation": "Agents & automatisation",
-				"models": "Modèles & frameworks",
-				"knowledge": "Knowledge & RAG",
-				"architecture": "Architecture IA",
+				"secure": "Sécurité & gouvernance",
+				"architecture": "Architecture de plateforme",
+				"automation": "Workflow & orchestration",
+				"tools": "Outils, MCP & connaissance",
+				"catalog": "Modèles & écosystème",
 				"observability": "Observabilité & FinOps",
-				"security": "Sécurité & pratiques"
+				"knowledge": "Pipeline document & RAG",
+				"practices": "Pratiques d’ingénierie"
 			}
 		},
 		"globalTools": {
@@ -86,11 +85,15 @@
 			"lead": "Une vue unifiée de la qualité, des traces, des coûts, des tokens et des latences : évaluez les applications LLM, surveillez leur comportement en production et appliquez une discipline FinOps à la consommation des modèles.",
 			"opik": "Plateforme open source d’évaluation, de test et de monitoring des applications LLM, utile pour comparer les sorties des modèles et suivre leur qualité en production.",
 			"langfuse": "Plateforme open source d’observabilité LLM pour les traces, prompts, scores, coûts et latences. Langfuse collecte notamment la télémétrie de LiteLLM et du serveur MCP afin de fournir une vue transverse des appels IA.",
-			"documentation": "Documentation"
+			"documentation": "Documentation",
+			"cursor": "Examiner l’usage Cursor et les tendances de consommation de tokens afin d’identifier les workflows coûteux et anticiper les limites avant qu’elles ne gênent la livraison.",
+			"cursorAnalytics": "Analyses Cursor",
+			"litellm": "Utiliser LiteLLM comme gateway mesurée pour le routage, les budgets, les fallbacks et les preuves d’usage indépendantes des fournisseurs plutôt que répartir les contrôles de coût dans chaque client."
 		},
 		"usage": {
 			"description": "Suivez l’utilisation de ChatGPT et Codex : crédits, tokens, modèles, activité et consommation. Les vues disponibles dépendent du type d’espace de travail ; Codex expose également des détails d’utilisation et de limites dans les paramètres pris en charge.",
-			"analytics": "Analyses ChatGPT / Codex"
+			"analytics": "Analyses ChatGPT / Codex",
+			"title": "Utilisation ChatGPT / Codex"
 		},
 		"workflow": {
 			"title": "Workflow & orchestration",
@@ -99,6 +102,75 @@
 			"temporal": "Couche d’orchestration durable pour les workflows stateful, longs et critiques : retries, état persistant, timers, étapes human-in-the-loop et activités LLM.",
 			"langflow": "Atelier visuel pour prototyper des chaînes LLM, agents, outils et RAG avant leur industrialisation dans les couches d’orchestration et de services.",
 			"opencommit": "OpenCommit complète le workflow de développement avec des messages Conventional Commits cohérents ; il reste volontairement hors de la couche d’orchestration."
+		},
+		"meta": {
+			"title": "Ingénierie de plateforme IA sécurisée — Alban Andrieu",
+			"description": "Architecture de plateforme IA sécurisée pour modèles, agents, MCP, RAG, observabilité, FinOps et gouvernance, avec une implémentation homelab local-first."
+		},
+		"hero": {
+			"title": "Ingénierie de plateforme IA sécurisée",
+			"subtitle": "Architecture, garde-fous et exploitation pour modèles, agents, MCP et RAG",
+			"description": "Une vision pratique de l’ingénierie IA : politique centralisée des modèles, capacités agents isolées, connaissance traçable, qualité et coûts mesurables, et gouvernance reliée à des contrôles concrets."
+		},
+		"intro": {
+			"aria": "Vue d’ensemble et ressources de la plateforme IA sécurisée",
+			"first": "L’ingénierie IA ne se limite pas au choix d’un modèle. Les systèmes de production ont besoin d’identités, de frontières de données, d’outils contrôlés, d’un routage résilient, d’observabilité, d’évaluation et de preuves exploitables en audit ou en incident.",
+			"second": "Cette page commence par l’architecture et le modèle d’exploitation que j’utilise, puis conserve l’écosystème d’outils comme référence secondaire plutôt que comme structure principale."
+		},
+		"resourceCatalog": {
+			"title": "Référence modèles, frameworks & écosystème",
+			"lead": "Références secondaires pour des technologies pouvant s’inscrire derrière les contrôles de plateforme décrits plus haut. Les produits sont des exemples, pas des dépendances architecturales.",
+			"modelsTitle": "Modèles et ressources développeur sélectionnés",
+			"nemotron": "Une famille de modèles ouverts compacts, utile pour évaluer des empreintes d’inférence locale ou edge plus réduites.",
+			"context7": "Outillage de récupération de contexte et de documentation pour assistants de développement et workflows agents.",
+			"mcpServers": "Un répertoire de serveurs et intégrations MCP pour explorer des capacités d’outils standardisées.",
+			"learningTitle": "Apprentissage & compréhension",
+			"learning": "Un guide visuel sur le raisonnement des LLM pour mieux comprendre les approches multi-étapes et pourquoi l’évaluation reste indispensable.",
+			"ecosystemTitle": "Boussole de l’écosystème",
+			"compass": "Considérez cette liste comme des options d’implémentation remplaçables. Authentification, routage, politique, télémétrie et cycle de vie des données doivent rester indépendants d’un fournisseur unique.",
+			"groups": {
+				"providers": "API LLM & chat",
+				"coding": "Assistants de code & IDE",
+				"cloud": "ML cloud & notebooks",
+				"rag": "RAG, vecteurs & frameworks",
+				"automation": "Agents & automatisation",
+				"evals": "Évaluations, traces & monitoring",
+				"local": "Inférence locale & open source"
+			},
+			"learnMore": "En savoir plus",
+			"website": "Site",
+			"repository": "Dépôt",
+			"article": "Lire l’article"
+		},
+		"practices": {
+			"title": "Pratiques d’ingénierie & gouvernance",
+			"lead": "Les contrôles de plateforme n’ont de valeur que s’ils sont associés à des pratiques reproductibles et à des preuves explicites.",
+			"objective": "Définir un objectif mesurable et des critères d’échec avant d’introduire un composant IA.",
+			"measurement": "Suivre qualité, latence, coût et modes de panne en continu plutôt que valider uniquement par quelques prompts.",
+			"security": "Modéliser les menaces sur prompts, outils, identités, mouvements de données et fournisseurs ; traiter biais et mésusage séparément de la sécurité d’infrastructure.",
+			"automation": "Automatiser les contrôles répétitifs tout en gardant des validations humaines pour les actions agents destructives ou à fort impact.",
+			"change": "Versionner prompts, modèles, politiques et pipelines de retrieval afin d’expliquer les changements et de revenir en arrière.",
+			"testing": "Tester le code déterministe, la qualité du retrieval, l’application des politiques et le comportement modèle au bon niveau.",
+			"evidence": "Conserver architecture, provenance des données, résultats d’évaluation et preuves opérationnelles compréhensibles par l’ingénierie, la sécurité et la gouvernance."
+		},
+		"documentPipeline": {
+			"title": "Pipeline du document vers la connaissance",
+			"intro": "Un flux PDF-vers-RAG contrôlé avec préparation explicite, archive/OCR, enrichissement, orchestration durable, revue privée et surface de retrieval partagée.",
+			"stages": {
+				"stirling": "Normaliser, découper, fusionner ou nettoyer les PDF localement avant ingestion afin de fournir des entrées prévisibles à l’archive.",
+				"paperless": "Archiver, OCRiser, taguer et indexer les documents préparés dans Paperless-ngx comme corpus durable de référence.",
+				"paperlessAi": "Enrichir les documents consommés avec classification et métadonnées uniquement après leur acceptation par l’archive canonique.",
+				"temporal": "Exécuter résumé, traduction, retries et étapes human-in-the-loop comme workflows durables plutôt que comme scripts de fond fragiles.",
+				"anythingllm": "Utiliser un workspace privé pour inspecter et questionner le corpus traité tout en validant OCR, tags et transformations aval.",
+				"openrag": "Publier le corpus validé vers une couche RAG partagée puis exposer des capacités de retrieval contrôlées via MCP plutôt que réimplémenter l’accès pour chaque agent."
+			}
+		},
+		"contact": {
+			"title": "Construire une plateforme IA sécurisée",
+			"lead": "Besoin de transformer une preuve de concept IA en plateforme exploitable avec des frontières de sécurité, d’observabilité et de gouvernance ?",
+			"contact": "Discuter de votre architecture",
+			"email": "M’écrire",
+			"calendar": "Planifier un appel"
 		}
 	}
 }
