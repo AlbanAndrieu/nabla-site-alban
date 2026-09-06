@@ -15,6 +15,7 @@ const priorityRoutes = [
 	"../app/[locale]/ciso/page.tsx",
 	"../app/[locale]/pricing/page.tsx",
 	"../app/[locale]/link/page.tsx",
+	"../app/[locale]/login/page.tsx",
 	"../app/[locale]/test/page.tsx",
 	"../components/payments/PaymentShell.tsx",
 ] as const;
@@ -31,12 +32,3 @@ for (const route of priorityRoutes) {
 	});
 }
 
-test("client-only login remains the documented manual skip-link exception", async () => {
-	const source = await readFile(
-		new URL("../app/[locale]/login/page.tsx", import.meta.url),
-		"utf8",
-	);
-
-	assert.match(source, /"use client"/);
-	assert.match(source, /className="skip-to-main"/);
-});
