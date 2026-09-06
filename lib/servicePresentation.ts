@@ -1,6 +1,7 @@
-import type {
-	HomelabService,
-	HomelabServicesCatalog,
+import {
+	homelabServiceId,
+	type HomelabService,
+	type HomelabServicesCatalog,
 } from "./homelabServices";
 import {
 	analyzeServiceCriticality,
@@ -237,7 +238,7 @@ export function analyzeServicePresentation(
 	const analysis = new Map<string, ServicePresentation>();
 
 	for (const service of catalog.services) {
-		const id = service.id?.trim() || service.name.trim().toLowerCase();
+		const id = homelabServiceId(service);
 		const node = nodes.get(id) ?? {
 			id,
 			name: service.name,
@@ -276,7 +277,7 @@ export function groupCatalogByPresentation(
 	const grouped = new Map<ServicePresentationGroup, typeof catalog.services>();
 
 	for (const service of catalog.services) {
-		const id = service.id?.trim() || service.name.trim().toLowerCase();
+		const id = homelabServiceId(service);
 		const group = presentation.get(id)?.group ?? "support";
 		grouped.set(group, [...(grouped.get(group) ?? []), service]);
 	}
@@ -285,8 +286,8 @@ export function groupCatalogByPresentation(
 		const services = grouped.get(group);
 		if (!services?.length) return [];
 		const sorted = [...services].sort((left, right) => {
-			const leftId = left.id?.trim() || left.name.trim().toLowerCase();
-			const rightId = right.id?.trim() || right.name.trim().toLowerCase();
+			const leftId = homelabServiceId(left);
+			const rightId = homelabServiceId(right);
 			const leftPresentation = presentation.get(leftId);
 			const rightPresentation = presentation.get(rightId);
 			return (
