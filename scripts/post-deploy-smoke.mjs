@@ -84,16 +84,21 @@ function metaContent(html, name) {
 
 async function fetchResponse(baseUrl, pathname, accept) {
   const target = new URL(pathname, baseUrl);
+  const headers = {
+    Accept: accept,
+    "User-Agent": "nabla-site-alban-production-smoke/1.1",
+  };
+  const automationBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+  if (automationBypass) {
+    headers["x-vercel-protection-bypass"] = automationBypass;
+  }
   let lastError = new Error(pathname + " request failed");
 
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
     try {
       const response = await fetch(target, {
         redirect: "follow",
-        headers: {
-          Accept: accept,
-          "User-Agent": "nabla-site-alban-production-smoke/1.1",
-        },
+        headers,
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
 
