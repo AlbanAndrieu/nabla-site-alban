@@ -1,0 +1,96 @@
+name: Production Post-deploy Smoke
+
+on:
+  repository_dispatch:
+    types:
+      - vercel.deployment.success
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Existing production deployment URL to test"
+        required: true
+        type: string
+      git_sha:
+        description: "Optional deployed Git SHA"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: production-post-deploy-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Verify deployed production contract
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'repository_dispatch' &&
+       github.event.client_payload.url != '' &&
+       github.event.client_payload.git.sha != '' &&
+       github.event.client_payload.git.ref == 'master' &&
+       github.event.client_payload.environment == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE_URL: >-
+        ${{
+          inputs.base_url ||
+          github.event.client_payload.url
+        }}
+      DEPLOYED_SHA: >-
+        ${{
+          inputs.git_sha ||
+          github.event.client_payload.git.sha ||
+          github.sha
+        }}
+
+    steps:
+      - name: Checkout deployed revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.DEPLOYED_SHA }}
+          sparse-checkout: |
+            .nvmrc
+            scripts/post-deploy-smoke.mjs
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Verify production HTTP and SEO contract
+        run: node scripts/post-deploy-smoke.mjs "$BASE_URL"
+
+      - name: Publish production smoke status
+        if: always() && github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS_SHA: ${{ env.DEPLOYED_SHA }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$JOB_STATUS" in
+            success) STATE=success; DESCRIPTION='Production post-deploy smoke passed' ;;
+            cancelled) STATE=error; DESCRIPTION='Production post-deploy smoke cancelled' ;;
+            *) STATE=failure; DESCRIPTION='Production post-deploy smoke failed' ;;
+          esac
+
+          payload="$(jq -n \
+            --arg state "$STATE" \
+            --arg target_url "$RUN_URL" \
+            --arg description "$DESCRIPTION" \
+            --arg context 'Production Post-deploy Smoke' \
+            '{state: $state, target_url: $target_url, description: $description, context: $context}')"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$STATUS_SHA" \
+            --data "$payload"

@@ -9,6 +9,7 @@ on:
       - "lib/**"
       - "messages/**"
       - "public/**/*.css"
+      - "public/robots.txt"
       - "scripts/**"
       - "tests/**"
       - "unit-tests/**"
@@ -23,6 +24,7 @@ on:
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
+      - ".github/workflows/production-smoke.yml"
       - ".github/workflows/vercel-preview.yml"
   push:
     branches:
@@ -34,6 +36,7 @@ on:
       - "lib/**"
       - "messages/**"
       - "public/**/*.css"
+      - "public/robots.txt"
       - "scripts/**"
       - "tests/**"
       - "unit-tests/**"
@@ -48,6 +51,7 @@ on:
       - ".github/workflows/ci.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
+      - ".github/workflows/production-smoke.yml"
       - ".github/workflows/vercel-preview.yml"
   workflow_dispatch:
 

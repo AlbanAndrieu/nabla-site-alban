@@ -29,11 +29,13 @@ export default [
 		languageOptions: {
 			globals: {
 				__dirname: "readonly",
+				AbortSignal: "readonly",
 				console: "readonly",
 				fetch: "readonly",
 				module: "readonly",
 				process: "readonly",
 				require: "readonly",
+				URL: "readonly",
 			},
 		},
 	},
