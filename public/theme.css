@@ -19,9 +19,9 @@
 	--shadow-hover: rgba(0, 0, 0, 0.15);
 
 	/* Interactive Elements */
-	--link-color: #007bff;
+	--link-color: #0b5ed7;
 	--link-hover: #0056b3;
-	--button-bg: #007bff;
+	--button-bg: #0b5ed7;
 	--button-hover: #0056b3;
 	--button-text: #ffffff;
 
@@ -45,7 +45,7 @@
 	--toggle-text: #ffffff;
 	--toggle-border: #ced4da;
 	--toggle-track-bg: #e9ecef;
-	--toggle-segment-muted: #6c757d;
+	--toggle-segment-muted: #495057;
 
 	/* Landing / section accents (landing-sections, special-message, contact card) */
 	--primary-color: #2563eb;
@@ -137,9 +137,9 @@ html[data-theme="light"] {
 	--shadow-color: rgba(0, 0, 0, 0.1);
 	--shadow-hover: rgba(0, 0, 0, 0.15);
 
-	--link-color: #007bff;
+	--link-color: #0b5ed7;
 	--link-hover: #0056b3;
-	--button-bg: #007bff;
+	--button-bg: #0b5ed7;
 	--button-hover: #0056b3;
 	--button-text: #ffffff;
 
@@ -160,7 +160,7 @@ html[data-theme="light"] {
 	--toggle-text: #ffffff;
 	--toggle-border: #ced4da;
 	--toggle-track-bg: #e9ecef;
-	--toggle-segment-muted: #6c757d;
+	--toggle-segment-muted: #495057;
 
 	--site-fab-bg: #156bd4;
 	--site-fab-fg: #0f172a;
