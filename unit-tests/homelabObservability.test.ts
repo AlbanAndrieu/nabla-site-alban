@@ -127,6 +127,52 @@ test("health board preserves runtime and unified observability consumes all aggr
 				},
 			}],
 		},
+		platform_metrics: {
+			schema_version: 1,
+			generated_at: "2026-09-03T00:29:57Z",
+			state: "degraded",
+			configured: true,
+			source: "prometheus",
+			metrics: {
+				truenas_memory_available_ratio: {
+					metric: "nabla:core:truenas_memory_available_ratio",
+					value: 0.42,
+				},
+				truenas_cpu_busy_ratio: {
+					metric: "nabla:core:truenas_cpu_busy_ratio",
+					value: 0.31,
+				},
+				truenas_node_up: {
+					metric: "nabla:telemetry:truenas_node_up",
+					value: 1,
+				},
+				truenas_cadvisor_up: {
+					metric: "nabla:telemetry:truenas_cadvisor_up",
+					value: 1,
+				},
+				pfsense_metrics_up: {
+					metric: "nabla:telemetry:pfsense_metrics_up",
+					value: 0,
+				},
+				prometheus_up: {
+					metric: "nabla:observability:prometheus_up",
+					value: 1,
+				},
+				unexpected_raw_series: {
+					metric: "unsafe:unbounded:metric",
+					value: 999,
+				},
+			},
+			summary: {
+				signals_available: 6,
+				signals_total: 6,
+				telemetry_up: 3,
+				telemetry_total: 4,
+				truenas_memory_available_ratio: 0.42,
+				truenas_cpu_busy_ratio: 0.31,
+				pfsense_metrics_up: 0,
+			},
+		},
 		sickz: {
 			checks: {
 				pfsense_admin: {
@@ -139,6 +185,7 @@ test("health board preserves runtime and unified observability consumes all aggr
 	});
 	assert.ok(board);
 	assert.ok(board.runtime);
+	assert.ok(board.platform_metrics);
 
 	const evidence = parseHomelabObservability(board);
 	assert.equal(evidence.runtimeTopology?.observed_instance_count, 1);
@@ -166,6 +213,22 @@ test("health board preserves runtime and unified observability consumes all aggr
 	assert.equal(evidence.controlPlaneDiagnostics.pfsense?.cache?.ageSeconds, 12);
 	assert.equal(evidence.cloudflareCache?.stale, true);
 	assert.equal(evidence.cloudflareCache?.cache?.refreshInProgress, true);
+	assert.equal(evidence.platformMetrics?.state, "degraded");
+	assert.equal(evidence.platformMetrics?.source, "prometheus");
+	assert.equal(evidence.platformMetrics?.summary.signalsAvailable, 6);
+	assert.equal(evidence.platformMetrics?.summary.telemetryUp, 3);
+	assert.equal(
+		evidence.platformMetrics?.metrics.truenas_memory_available_ratio?.value,
+		0.42,
+	);
+	assert.equal(evidence.platformMetrics?.metrics.pfsense_metrics_up?.value, 0);
+	assert.equal(
+		Object.prototype.hasOwnProperty.call(
+			evidence.platformMetrics?.metrics ?? {},
+			"unexpected_raw_series",
+		),
+		false,
+	);
 	assert.equal(evidence.diagnostics?.exposure_by_service.openwebui?.state, "mismatch");
 	assert.deepEqual(evidence.edgeEvidenceSkips, [
 		{
@@ -176,7 +239,7 @@ test("health board preserves runtime and unified observability consumes all aggr
 });
 
 test("runtime endpoint remains a compatibility fallback only when aggregate runtime is absent", () => {
-	const board = parseFastApiHealthBoard({ schema_version: 1, state: "fresh", refreshing: false, generated_at: null, runtime: null, healthz: {}, homelab: {}, sickz: {} });
+	const board = parseFastApiHealthBoard({ schema_version: 1, state: "fresh", refreshing: false, generated_at: null, runtime: null, healthz: {}, homelab: {}, platform_metrics: null, sickz: {} });
 	assert.ok(board);
 	const parsed = parseHomelabObservability(board);
 	const fallback = parseRuntimeTopology({
