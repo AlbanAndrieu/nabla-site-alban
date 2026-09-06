@@ -110,6 +110,8 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.doesNotMatch(workflow, /playwright/i);
 	assert.match(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
 	assert.match(script, /x-vercel-protection-bypass/);
+	assert.match(script, /redirect: "manual"/);
+	assert.match(script, /target\.origin === CANONICAL_ORIGIN/);
 
 	for (const pathname of [
 		'path: "/"',
@@ -149,9 +151,11 @@ test("production smoke validates pages, homelab API and social cards", async () 
 	const originalBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 	const requests: string[] = [];
 	const bypassHeaders: Array<string | null> = [];
+	const redirectModes: Array<string | undefined> = [];
 	process.env.VERCEL_AUTOMATION_BYPASS_SECRET = "test-bypass-secret";
 
 	globalThis.fetch = (async (input, init) => {
+		redirectModes.push(init?.redirect);
 		bypassHeaders.push(
 			new Headers(init?.headers).get("x-vercel-protection-bypass"),
 		);
@@ -244,6 +248,10 @@ test("production smoke validates pages, homelab API and social cards", async () 
 	assert.ok(
 		bypassHeaders.length > 0 &&
 			bypassHeaders.every((value) => value === "test-bypass-secret"),
+	);
+	assert.ok(
+		redirectModes.length > 0 &&
+			redirectModes.every((value) => value === "manual"),
 	);
 	assert.ok(requests.includes("/contact"));
 	assert.ok(requests.includes("/fr/contact"));
