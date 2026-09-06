@@ -11,6 +11,7 @@ import {
 } from "next-intl/server";
 import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
+import ThemeBootstrap from "@/components/ThemeBootstrap";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata, SITE_ORIGIN } from "@/lib/socialMetadata";
 
@@ -87,6 +88,7 @@ export default async function LocaleLayout({
 	return (
 		<html lang={locale} data-nabla-app="next-intl" suppressHydrationWarning>
 			<head>
+				<ThemeBootstrap />
 				<meta name="color-scheme" content="light dark" />
 				<link rel="stylesheet" href="/landing-sections.css" />
 				<link rel="stylesheet" href="/wireframe.css" />
