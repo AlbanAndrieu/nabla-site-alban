@@ -195,6 +195,44 @@ les autres chantiers.
   `healthy`, `degraded`, `failed`, `stale` et `unknown` après migration des
   diagrammes vers le resolver partagé.
 
+## P1 — Présentation service-first et métriques à l'échelle
+
+- [x] Séparer la présentation opérateur de la criticité de dépendance : les cartes
+  sont organisées `services et expérimentations -> socle critique -> contrôles de
+  sécurité -> plateforme/données partagées -> observabilité/support`, tandis que
+  le blast radius et la propagation `required` restent calculés par la topologie.
+- [x] Consommer les métadonnées optionnelles autoritatives
+  `presentationRole=service|core|support` et
+  `criticality=critical|high|medium|low`, avec fallback sémantique tant que le
+  catalogue n'est pas entièrement annoté. Le vocabulaire de criticité suit
+  `service.criticality` d'OpenTelemetry.
+- [x] Rendre les grandes listes navigables par recherche nom/ID et conserver un
+  résumé d'attention sur les groupes repliés afin que l'augmentation du nombre de
+  services ne masque pas un incident.
+- [x] Associer un profil de métriques au rôle sans inventer de valeur :
+  `RED` pour les services, `USE` pour le socle, `POSTURE` pour les contrôles
+  de sécurité et `RED + USE` pour les backends partagés.
+- [ ] Consommer les métriques sanitizées et bornées de `fastapi-sample#195`
+  lorsqu'elles sont disponibles, en conservant source, fraîcheur et disponibilité
+  de la télémétrie séparées de l'état direct de la plateforme.
+- [ ] Pour les services, exposer progressivement disponibilité, trafic/rate,
+  erreurs/error-rate et latence (p50/p95/p99 seulement lorsque le volume permet
+  une interprétation fiable), puis saturation pertinente et SLO/error budget pour
+  les expériences sélectionnées disposant de suffisamment d'historique.
+- [ ] Pour le socle critique, privilégier pression/capacité et santé spécifique :
+  TrueNAS/ZFS, Talos EPHEMERAL, Kubernetes Ready/MemoryPressure/DiskPressure/
+  PIDPressure/NetworkUnavailable, CNI/CSI, ainsi qu'etcd leader/membres/alarmes/
+  quota. Ne pas réduire ces composants à un simple probe HTTP.
+- [ ] Pour les contrôles de sécurité, maintenir deux dimensions distinctes :
+  disponibilité du contrôle et posture/policy. Un volume d'alertes, de blocages ou
+  de détections n'est jamais assimilé automatiquement à une panne de service.
+- [ ] N'autoriser côté API que des requêtes métriques prédéfinies, de cardinalité
+  bornée et sans PromQL fourni par le navigateur ; ne jamais exposer kubeconfig,
+  Talos config, credentials ou labels bruts de management.
+- [ ] Ajouter une vue temporelle courte (par exemple 1 h / 24 h) uniquement après
+  stabilisation des métriques instantanées, en privilégiant les tendances utiles
+  à l'expérimentation sécurité plutôt qu'un dashboard de capacité générique.
+
 ## P1 — Résilience DNS et politique de résolution
 
 - [ ] Sauvegarder/exporter la configuration pfSense avant la réactivation complète
