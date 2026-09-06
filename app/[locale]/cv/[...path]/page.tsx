@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
@@ -55,7 +56,6 @@ export default async function CvPathPage({ params }: Props) {
 		: routing.defaultLocale;
 	setRequestLocale(normalizedLocale);
 
-	const site = await getTranslations("site");
 	try {
 		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
 		const documentLocale = cvDocumentLocale(path, normalizedLocale);
@@ -64,9 +64,7 @@ export default async function CvPathPage({ params }: Props) {
 		return (
 			<div className="page-cv" suppressHydrationWarning>
 				<TopAnchor />
-				<a href="#main-content" className="skip-to-main">
-					{site("skipToMainContent")}
-				</a>
+				<SkipToMainContent />
 				{/* eslint-disable-next-line react/no-danger */}
 				<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
 				<nav

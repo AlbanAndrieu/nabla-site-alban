@@ -277,15 +277,17 @@ Déjà migrés :
 - [x] Checkout TJM
 - [x] CV catch-all
 - [x] Startup / Startup Thanks
+- [x] Link
+- [x] Test
+- [x] Login — shell serveur + interactions isolées dans un Client Component
+- [x] `components/payments/PaymentShell.tsx`
 
-Restant :
+Migration Next active terminée : les documents HTML historiques de `public/**`
+restent volontairement inchangés.
 
-- [ ] Link si le markup manuel subsiste après vérification.
-- [ ] `components/payments/PaymentShell.tsx` si le shell expose encore son propre
-  markup de skip-link.
-
-Critères d'acceptation : un composant partagé, aucun markup de skip-link dupliqué,
-chaque page expose `<main id="main-content">`, et des tests de non-régression.
+Critères d'acceptation : un composant partagé, aucun markup de skip-link dupliqué
+dans les routes Next actives, chaque page expose `<main id="main-content">`, et
+des tests de non-régression.
 
 Autres contrôles :
 

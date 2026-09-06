@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ThreatFeed from "@/components/ciso/ThreatFeed";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -37,18 +38,13 @@ export default async function CisoPage({ params }: Props) {
 	if (!hasLocale(routing.locales, requestedLocale)) notFound();
 	const locale = requestedLocale as AppLocale;
 	setRequestLocale(locale);
-	const [site, t] = await Promise.all([
-		getTranslations("site"),
-		getTranslations("ciso"),
-	]);
+	const t = await getTranslations("ciso");
 	const metrics = t.raw("metricItems") as MetricItem[];
 
 	return (
 		<>
 			<TopAnchor />
-			<a className="skip-to-main" href="#main-content">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<main id="main-content" className="site-content-page page-ciso page-dark">
 				<section
 					className="hero-section ciso-hero"

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata } from "@/lib/siteMetadata";
@@ -31,18 +32,13 @@ export default async function LinkPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const [site, t] = await Promise.all([
-		getTranslations("site"),
-		getTranslations("linkPage"),
-	]);
+	const t = await getTranslations("linkPage");
 	const homeHref = locale === "fr" ? "/fr" : "/";
 	const nablaHref = canonicalPagePath("nabla", locale);
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<nav
 				className="page-nav container py-3"
 				aria-label={t("breadcrumbLabel")}

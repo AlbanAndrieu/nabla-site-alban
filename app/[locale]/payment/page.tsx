@@ -27,7 +27,7 @@ export default async function PaymentPage({ params }: Props) {
 	const t = await getTranslations("checkout");
 
 	return (
-		<PaymentShell locale={locale}>
+		<PaymentShell>
 			<main id="main-content" className="checkout-page payment-options">
 				<header className="payment-options-intro">
 					<h1>{t("options.title")}</h1>

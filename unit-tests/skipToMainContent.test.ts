@@ -7,6 +7,17 @@ const priorityRoutes = [
 	"../app/[locale]/ai/page.tsx",
 	"../app/[locale]/truenas/page.tsx",
 	"../app/[locale]/workstation/page.tsx",
+	"../app/[locale]/freenas/page.tsx",
+	"../app/[locale]/checkout-tjm/page.tsx",
+	"../app/[locale]/cv/[...path]/page.tsx",
+	"../app/[locale]/email/page.tsx",
+	"../app/[locale]/expertise/page.tsx",
+	"../app/[locale]/ciso/page.tsx",
+	"../app/[locale]/pricing/page.tsx",
+	"../app/[locale]/link/page.tsx",
+	"../app/[locale]/login/page.tsx",
+	"../app/[locale]/test/page.tsx",
+	"../components/payments/PaymentShell.tsx",
 ] as const;
 
 for (const route of priorityRoutes) {
@@ -20,3 +31,4 @@ for (const route of priorityRoutes) {
 		);
 	});
 }
+
