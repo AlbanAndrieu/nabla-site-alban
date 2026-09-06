@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Script from "next/script";
 import { useState } from "react";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
@@ -29,7 +28,7 @@ export default function LoginClient() {
 				<div className="container">
 					<div className="row">
 						<a href="https://hostedscan.com">
-							<Image
+							<img
 								src="https://hostedscan.com/hostedscan-badge-light.svg"
 								alt="HostedScan | An automated vulnerability scanner"
 								height={81}
