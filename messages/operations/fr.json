@@ -189,6 +189,33 @@
 			"stale_evidence": "Fraîcheur d’abord : une ou plusieurs conclusions reposent sur des preuves périmées. Actualisez les observations avant de traiter une dépendance inconnue comme une panne réelle.",
 			"dependency_cycle": "Modèle de dépendances d’abord : un cycle de dépendances requises est signalé. Résolvez ou justifiez ce cycle car il rend la propagation de cause racine ambiguë.",
 			"dependencies": "Chemin de dépendances du service ensuite : les plans de contrôle ne donnent pas actuellement de cause racine plus forte. Inspectez l’état local du service, sa liste blocked_by et la hiérarchie des dépendances critiques."
+		},
+		"metrics": {
+			"title": "Métriques du socle",
+			"lead": "Recording rules Prometheus nettoyées et à cardinalité bornée fournies par FastAPI. Ces signaux décrivent la télémétrie et la pression de plateforme ; ils ne remplacent ni la santé directe des services ni les preuves de dépendance.",
+			"source": "source : {source}",
+			"generatedAt": "généré {timestamp}",
+			"signals": "{available}/{total} signaux bornés disponibles",
+			"telemetry": "{up}/{total} exporters de télémétrie disponibles",
+			"telemetryUnavailable": "La télémétrie Prometheus est indisponible ou incomplète",
+			"truenasMemoryAvailable": "Mémoire disponible TrueNAS",
+			"truenasCpuBusy": "CPU occupé TrueNAS",
+			"truenasNodeExporter": "Exporter node TrueNAS",
+			"truenasCadvisor": "cAdvisor TrueNAS",
+			"pfsenseExporter": "Exporter métriques pfSense",
+			"prometheus": "Prometheus",
+			"percent": "{value} %",
+			"up": "disponible",
+			"down": "indisponible",
+			"unavailable": "indisponible",
+			"healthSeparation": "La disponibilité de la télémétrie reste distincte de la santé fonctionnelle. Une métrique absente signale un angle mort d’observabilité, pas automatiquement une panne du service ou de la plateforme.",
+			"states": {
+				"healthy": "télémétrie saine",
+				"degraded": "télémétrie dégradée",
+				"not_configured": "non configuré",
+				"telemetry_unavailable": "télémétrie indisponible",
+				"unknown": "inconnu"
+			}
 		}
 	}
 }

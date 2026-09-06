@@ -93,6 +93,40 @@ export type CloudflareCacheEvidence = {
 	cache?: ProbeCacheEvidence;
 };
 
+
+export type PlatformMetricKey =
+	| "truenas_memory_available_ratio"
+	| "truenas_cpu_busy_ratio"
+	| "truenas_node_up"
+	| "truenas_cadvisor_up"
+	| "pfsense_metrics_up"
+	| "prometheus_up";
+
+export type PlatformMetricSample = {
+	metric: string;
+	value: number | null;
+};
+
+export type PlatformMetricsEvidence = {
+	schemaVersion?: number;
+	generatedAt?: string;
+	state: "healthy" | "degraded" | "not_configured" | "telemetry_unavailable" | "unknown";
+	configured: boolean | null;
+	source?: string;
+	errorKind?: string;
+	exceptionType?: string;
+	metrics: Partial<Record<PlatformMetricKey, PlatformMetricSample>>;
+	summary: {
+		signalsAvailable: number;
+		signalsTotal: number;
+		telemetryUp: number;
+		telemetryTotal: number;
+		truenasMemoryAvailableRatio?: number;
+		truenasCpuBusyRatio?: number;
+		pfsenseMetricsUp?: number;
+	};
+};
+
 export type HomelabObservabilitySource = "health-board" | "fallback" | "unavailable";
 
 export type HomelabObservabilitySnapshot = HomelabOperationalEvidence & {
@@ -101,6 +135,7 @@ export type HomelabObservabilitySnapshot = HomelabOperationalEvidence & {
 	deepDiagnostics: DeepDiagnosticEvidence;
 	diagnostics: HomelabDiagnosticsSnapshot | null;
 	cloudflareCache: CloudflareCacheEvidence | null;
+	platformMetrics: PlatformMetricsEvidence | null;
 	pfsenseIngressPolicy: PfSenseIngressPolicyEvidence | null;
 	edgeEvidenceSkips: EdgeEvidenceSkip[];
 	controlPlaneDiagnostics: Partial<
@@ -291,6 +326,82 @@ function parsePfSenseIngressPolicy(healthzValue: unknown): PfSenseIngressPolicyE
 	};
 }
 
+
+const PLATFORM_METRIC_KEYS = [
+	"truenas_memory_available_ratio",
+	"truenas_cpu_busy_ratio",
+	"truenas_node_up",
+	"truenas_cadvisor_up",
+	"pfsense_metrics_up",
+	"prometheus_up",
+] as const satisfies readonly PlatformMetricKey[];
+
+function metricState(value: unknown): PlatformMetricsEvidence["state"] {
+	return value === "healthy" ||
+		value === "degraded" ||
+		value === "not_configured" ||
+		value === "telemetry_unavailable"
+		? value
+		: "unknown";
+}
+
+function parsePlatformMetrics(value: unknown): PlatformMetricsEvidence | null {
+	if (!isRecord(value)) return null;
+	const rawMetrics = isRecord(value.metrics) ? value.metrics : {};
+	const metrics: PlatformMetricsEvidence["metrics"] = {};
+	for (const key of PLATFORM_METRIC_KEYS) {
+		const raw = rawMetrics[key];
+		if (!isRecord(raw)) continue;
+		const metric = optionalString(raw.metric);
+		const metricValue =
+			raw.value === null
+				? null
+				: typeof raw.value === "number" && Number.isFinite(raw.value)
+					? raw.value
+					: undefined;
+		if (!metric || metricValue === undefined) continue;
+		metrics[key] = { metric, value: metricValue };
+	}
+
+	const rawSummary = isRecord(value.summary) ? value.summary : {};
+	return {
+		...(optionalNumber(value.schema_version) !== undefined
+			? { schemaVersion: optionalNumber(value.schema_version) }
+			: {}),
+		...(optionalString(value.generated_at)
+			? { generatedAt: optionalString(value.generated_at) }
+			: {}),
+		state: metricState(value.state),
+		configured: nullableBoolean(value.configured),
+		...(optionalString(value.source) ? { source: optionalString(value.source) } : {}),
+		...(optionalString(value.error_kind)
+			? { errorKind: optionalString(value.error_kind) }
+			: {}),
+		...(optionalString(value.exception_type)
+			? { exceptionType: optionalString(value.exception_type) }
+			: {}),
+		metrics,
+		summary: {
+			signalsAvailable: optionalNumber(rawSummary.signals_available) ?? 0,
+			signalsTotal: optionalNumber(rawSummary.signals_total) ?? PLATFORM_METRIC_KEYS.length,
+			telemetryUp: optionalNumber(rawSummary.telemetry_up) ?? 0,
+			telemetryTotal: optionalNumber(rawSummary.telemetry_total) ?? 4,
+			...(typeof rawSummary.truenas_memory_available_ratio === "number" &&
+			Number.isFinite(rawSummary.truenas_memory_available_ratio)
+				? { truenasMemoryAvailableRatio: rawSummary.truenas_memory_available_ratio }
+				: {}),
+			...(typeof rawSummary.truenas_cpu_busy_ratio === "number" &&
+			Number.isFinite(rawSummary.truenas_cpu_busy_ratio)
+				? { truenasCpuBusyRatio: rawSummary.truenas_cpu_busy_ratio }
+				: {}),
+			...(typeof rawSummary.pfsense_metrics_up === "number" &&
+			Number.isFinite(rawSummary.pfsense_metrics_up)
+				? { pfsenseMetricsUp: rawSummary.pfsense_metrics_up }
+				: {}),
+		},
+	};
+}
+
 function parseCloudflareCache(homelabValue: unknown): CloudflareCacheEvidence | null {
 	if (!isRecord(homelabValue) || !isRecord(homelabValue.cloudflare)) return null;
 	const raw = homelabValue.cloudflare;
@@ -347,6 +458,7 @@ export function parseHomelabObservability(
 		deepDiagnostics: parseDeepDiagnostics(board.healthz),
 		diagnostics,
 		cloudflareCache: parseCloudflareCache(board.homelab),
+		platformMetrics: parsePlatformMetrics(board.platform_metrics),
 		pfsenseIngressPolicy: parsePfSenseIngressPolicy(board.healthz),
 		edgeEvidenceSkips: parseEdgeEvidenceSkips(board.sickz),
 		controlPlaneDiagnostics: parseControlPlaneDiagnostics(board.homelab),

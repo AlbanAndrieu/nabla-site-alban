@@ -93,6 +93,7 @@ const observability = {
 	deepDiagnostics: { checks: [] },
 	diagnostics: null,
 	cloudflareCache: null,
+	platformMetrics: null,
 	pfsenseIngressPolicy: null,
 	edgeEvidenceSkips: [],
 	controlPlaneDiagnostics: {},
