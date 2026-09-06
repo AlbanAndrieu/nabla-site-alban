@@ -40,6 +40,12 @@ type Props = {
 
 type HealthFilter = "all" | HomelabHealthState;
 type GroupFilter = "all" | ServicePresentationGroup;
+type PresentationGroupTitleKey =
+	| "presentation.groups.services"
+	| "presentation.groups.core-critical"
+	| "presentation.groups.security-controls"
+	| "presentation.groups.shared-core"
+	| "presentation.groups.support";
 
 type HealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
@@ -60,6 +66,17 @@ const GROUP_FILTERS: readonly GroupFilter[] = [
 	"shared-core",
 	"support",
 ];
+
+const PRESENTATION_GROUP_TITLE_KEY: Record<
+	ServicePresentationGroup,
+	PresentationGroupTitleKey
+> = {
+	services: "presentation.groups.services",
+	"core-critical": "presentation.groups.core-critical",
+	"security-controls": "presentation.groups.security-controls",
+	"shared-core": "presentation.groups.shared-core",
+	support: "presentation.groups.support",
+};
 
 function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
@@ -259,7 +276,9 @@ export default function ArchitectureTopologyView({
 
 	const ageSeconds = snapshotAgeSeconds(health?.checked_at, now);
 	const groupLabel = (group: GroupFilter) =>
-		group === "all" ? t("presentation.allGroups") : t(`presentation.groups.${group}`);
+		group === "all"
+			? t("presentation.allGroups")
+			: t(PRESENTATION_GROUP_TITLE_KEY[group]);
 
 	return (
 		<>
