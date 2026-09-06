@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import type { HomelabObservabilitySnapshot } from "@/lib/homelabObservability";
 
 const catalog = {
 	version: 1,
@@ -86,13 +87,15 @@ const observability = {
 	deepDiagnostics: { checks: [] },
 	diagnostics: null,
 	cloudflareCache: null,
+	pfsenseIngressPolicy: null,
+	edgeEvidenceSkips: [],
 	controlPlaneDiagnostics: {},
 	sources: {
 		board: "health-board",
 		runtime: "unavailable",
 		diagnostics: "unavailable",
 	},
-};
+} satisfies HomelabObservabilitySnapshot;
 
 async function mockHomelabApis(page: Page) {
 	await page.route("**/api/homelab-services", async (route) => {
