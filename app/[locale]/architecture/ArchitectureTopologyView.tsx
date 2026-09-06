@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CriticalDependencyHierarchy from "@/app/components/homelab/CriticalDependencyHierarchy";
 import homelabStyles from "@/app/components/homelab/HomelabServicesBlock.module.css";
@@ -16,9 +17,9 @@ import {
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
 import {
-	analyzeServiceCriticality,
-	type ServiceCriticalityTier,
-} from "@/lib/serviceCriticality";
+	analyzeServicePresentation,
+	type ServicePresentationGroup,
+} from "@/lib/servicePresentation";
 import {
 	parseServiceTopology,
 	type ServiceTopology,
@@ -38,7 +39,7 @@ type Props = {
 };
 
 type HealthFilter = "all" | HomelabHealthState;
-type TierFilter = "all" | ServiceCriticalityTier;
+type GroupFilter = "all" | ServicePresentationGroup;
 
 type HealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
@@ -51,12 +52,12 @@ const HEALTH_STATES: readonly HomelabHealthState[] = [
 	"fail",
 	"unknown",
 ];
-const TIER_FILTERS: readonly TierFilter[] = [
+const GROUP_FILTERS: readonly GroupFilter[] = [
 	"all",
-	"foundation",
-	"shared-data",
-	"shared-platform",
-	"application",
+	"services",
+	"core-critical",
+	"security-controls",
+	"shared-core",
 	"support",
 ];
 
@@ -103,6 +104,7 @@ export default function ArchitectureTopologyView({
 	initialTopologySource,
 }: Readonly<Props>) {
 	const french = locale === "fr";
+	const t = useTranslations("homelab");
 	const [catalog, setCatalog] = useState(initialCatalog);
 	const [catalogSource, setCatalogSource] = useState(initialCatalogSource);
 	const [topology, setTopology] = useState(initialTopology);
@@ -112,7 +114,8 @@ export default function ArchitectureTopologyView({
 	const [healthUnavailable, setHealthUnavailable] = useState(false);
 	const [refreshing, setRefreshing] = useState(true);
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
-	const [tierFilter, setTierFilter] = useState<TierFilter>("all");
+	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
+	const [searchQuery, setSearchQuery] = useState("");
 	const [now, setNow] = useState(() => Date.now());
 
 	useEffect(() => {
@@ -206,9 +209,9 @@ export default function ArchitectureTopologyView({
 	}, []);
 
 	const healthIndex = useMemo(() => indexHealth(health), [health]);
-	const criticality = useMemo(
-		() => analyzeServiceCriticality(topology),
-		[topology],
+	const presentation = useMemo(
+		() => analyzeServicePresentation(catalog, topology),
+		[catalog, topology],
 	);
 	const counts = useMemo(() => {
 		const result: Record<HomelabHealthState, number> = {
@@ -229,41 +232,34 @@ export default function ArchitectureTopologyView({
 	}, [catalog.services, healthIndex]);
 
 	const filteredCatalog = useMemo<HomelabServicesCatalog>(() => {
+		const query = searchQuery.trim().toLowerCase();
 		const services = catalog.services.filter((service) => {
 			const id = homelabServiceId(service);
 			const state = effectiveState(id, service.name, healthIndex);
-			const tier = criticality.get(id)?.tier ?? "support";
+			const group = presentation.get(id)?.group ?? "support";
+			const matchesSearch =
+				query.length === 0 ||
+				service.name.toLowerCase().includes(query) ||
+				id.includes(query);
 			return (
 				(healthFilter === "all" || state === healthFilter) &&
-				(tierFilter === "all" || tier === tierFilter)
+				(groupFilter === "all" || group === groupFilter) &&
+				matchesSearch
 			);
 		});
 		return { ...catalog, services };
-	}, [catalog, criticality, healthFilter, healthIndex, tierFilter]);
+	}, [
+		catalog,
+		groupFilter,
+		healthFilter,
+		healthIndex,
+		presentation,
+		searchQuery,
+	]);
 
 	const ageSeconds = snapshotAgeSeconds(health?.checked_at, now);
-	const tierLabel = (tier: TierFilter) => {
-		if (tier === "all") {
-			return french ? "Tous les groupes" : "All criticality groups";
-		}
-		const labels: Record<ServiceCriticalityTier, [string, string]> = {
-			foundation: [
-				"Infrastructure foundations",
-				"Fondations d’infrastructure",
-			],
-			"shared-data": ["Shared data and state", "Données et état partagés"],
-			"shared-platform": [
-				"Shared platform services",
-				"Services de plateforme partagés",
-			],
-			application: [
-				"Applications and consumers",
-				"Applications et consommateurs",
-			],
-			support: ["Support and low-impact", "Support et faible impact"],
-		};
-		return french ? labels[tier][1] : labels[tier][0];
-	};
+	const groupLabel = (group: GroupFilter) =>
+		group === "all" ? t("presentation.allGroups") : t(`presentation.groups.${group}`);
 
 	return (
 		<>
@@ -286,7 +282,7 @@ export default function ArchitectureTopologyView({
 							<p>
 								{french
 									? "Les filtres s’appliquent aux services déclarés du graphe ; la topologie complète reste utilisée pour calculer la criticité et le rayon d’impact."
-									: "Filters apply to declared services in the graph; the complete topology remains the basis for criticality and blast-radius calculations."}
+									: "Services stay first; filters use operator presentation roles while the complete topology remains the basis for dependency criticality and blast-radius calculations."}
 							</p>
 						</div>
 						<div
@@ -378,18 +374,32 @@ export default function ArchitectureTopologyView({
 						</label>
 						<label className={homelabStyles.filterField}>
 							<span className={homelabStyles.filterLabel}>
-								{french ? "Criticité" : "Criticality"}
+								{t("presentation.searchLabel")}
+							</span>
+							<input
+								type="search"
+								className={homelabStyles.filterSelect}
+								value={searchQuery}
+								onChange={(event) => setSearchQuery(event.currentTarget.value)}
+								placeholder={t("presentation.searchPlaceholder")}
+								data-architecture-service-search
+							/>
+						</label>
+						<label className={homelabStyles.filterField}>
+							<span className={homelabStyles.filterLabel}>
+								{t("presentation.filterLabel")}
 							</span>
 							<select
 								className={homelabStyles.filterSelect}
-								value={tierFilter}
+								value={groupFilter}
 								onChange={(event) =>
-									setTierFilter(event.target.value as TierFilter)
+									setGroupFilter(event.target.value as GroupFilter)
 								}
+								data-architecture-presentation-filter
 							>
-								{TIER_FILTERS.map((tier) => (
-									<option value={tier} key={tier}>
-										{tierLabel(tier)}
+								{GROUP_FILTERS.map((group) => (
+									<option value={group} key={group}>
+										{groupLabel(group)}
 									</option>
 								))}
 							</select>
@@ -400,7 +410,8 @@ export default function ArchitectureTopologyView({
 								className={homelabStyles.controlButton}
 								onClick={() => {
 									setHealthFilter("all");
-									setTierFilter("all");
+									setGroupFilter("all");
+									setSearchQuery("");
 								}}
 							>
 								{french ? "Réinitialiser" : "Reset filters"}
