@@ -31,16 +31,17 @@ test("homelab network policy details are enriched but collapsed by default", asy
 	assert.match(section, /network\.sourcesNote/);
 });
 
-test("service tiers are filterable and collapsible while criticality details are opt-in", async () => {
+test("service views are searchable and collapsible while technical criticality stays opt-in", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const hierarchy = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);
 
-	assert.match(block, /data-homelab-tier-filter/);
+	assert.match(block, /data-homelab-presentation-filter/);
+	assert.match(block, /data-homelab-service-search/);
 	assert.match(block, /data-homelab-health-filter/);
-	assert.match(block, /data-service-criticality-group/);
-	assert.match(block, /setExpandedTiers/);
+	assert.match(block, /data-service-presentation-group/);
+	assert.match(block, /setExpandedGroups/);
 	assert.match(block, /useState\(false\)/);
 	assert.match(block, /<CriticalDependencyHierarchy/);
 	assert.match(hierarchy, /data-criticality-toggle/);
