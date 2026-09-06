@@ -11,6 +11,7 @@ export type FastApiHealthBoardSnapshot = {
 	runtime: unknown | null;
 	healthz: unknown | null;
 	homelab: unknown | null;
+	platform_metrics: unknown | null;
 	sickz: unknown | null;
 };
 
@@ -70,6 +71,7 @@ export function parseFastApiHealthBoard(
 		runtime: value.runtime ?? null,
 		healthz: value.healthz ?? null,
 		homelab: value.homelab ?? null,
+		platform_metrics: value.platform_metrics ?? null,
 		sickz: value.sickz ?? null,
 	};
 }
