@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import type { HomelabObservabilitySnapshot } from "@/lib/homelabObservability";
 
 const catalog = {
 	version: 1,
@@ -94,7 +95,7 @@ const observability = {
 		runtime: "unavailable",
 		diagnostics: "unavailable",
 	},
-};
+} satisfies HomelabObservabilitySnapshot;
 
 async function mockHomelabApis(page: Page) {
 	await page.route("**/api/homelab-services", async (route) => {
@@ -144,7 +145,7 @@ test.describe("homelab delayed deep links", () => {
 	test("opens a service troubleshooting panel that mounts after navigation", async ({
 		page,
 	}) => {
-		await page.goto("/truenas#service-langflow");
+		await page.goto("/en/truenas#service-langflow");
 
 		const details = page.locator("#service-langflow");
 		await expect(details).toHaveAttribute("open", "");
@@ -156,7 +157,7 @@ test.describe("homelab delayed deep links", () => {
 	test("opens pfSense operational evidence after observability data arrives", async ({
 		page,
 	}) => {
-		await page.goto("/truenas#pfsense-operational-evidence");
+		await page.goto("/en/truenas#pfsense-operational-evidence");
 
 		const details = page.locator("#pfsense-operational-evidence");
 		await expect(details).toHaveAttribute("open", "");
