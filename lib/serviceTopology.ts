@@ -5,6 +5,8 @@ export type ServiceTopologyNode = {
 	name: string;
 	kind: string;
 	category: string;
+	presentationRole?: "service" | "core" | "support";
+	criticality?: "critical" | "high" | "medium" | "low";
 	sourcePath?: string;
 	url?: string;
 	description?: string;
@@ -84,7 +86,11 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.name === "string" &&
 				typeof node.kind === "string" &&
 				typeof node.category === "string" &&
-				(node.icon === undefined || typeof node.icon === "string"),
+				(node.icon === undefined || typeof node.icon === "string") &&
+				(node.presentationRole === undefined ||
+					["service", "core", "support"].includes(String(node.presentationRole))) &&
+				(node.criticality === undefined ||
+					["critical", "high", "medium", "low"].includes(String(node.criticality))),
 		)
 	) {
 		return null;
