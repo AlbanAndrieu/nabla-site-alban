@@ -269,3 +269,14 @@ test("same-origin observability route uses aggregate evidence first and conditio
 	assert.match(route, /X-Homelab-Runtime-Source/);
 	assert.match(route, /X-Homelab-Diagnostics-Source/);
 });
+
+test("operations UI presents bounded metrics separately from functional health", async () => {
+	const component = await readFile(
+		new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url),
+		"utf8",
+	);
+	assert.match(component, /data-platform-metrics/);
+	assert.match(component, /PLATFORM_METRIC_LABEL_KEY/);
+	assert.match(component, /metrics\.healthSeparation/);
+	assert.doesNotMatch(component, /data-effective-health=.*platformMetrics/);
+});
