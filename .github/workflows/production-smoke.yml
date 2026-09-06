@@ -34,6 +34,7 @@ jobs:
     env:
       BASE_URL: "https://www.albanandrieu.com"
       DEPLOYMENT_URL: ${{ github.event.client_payload.url || '' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       DEPLOYED_SHA: >-
         ${{
           inputs.git_sha ||
@@ -58,6 +59,11 @@ jobs:
 
       - name: Verify production HTTP and SEO contract
         run: |
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::GitHub Actions secret VERCEL_AUTOMATION_BYPASS_SECRET is not configured."
+            exit 1
+          fi
+
           echo "Public production target: $BASE_URL"
           if [[ -n "${DEPLOYMENT_URL:-}" ]]; then
             echo "Vercel deployment evidence: $DEPLOYMENT_URL"
