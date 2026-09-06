@@ -48,7 +48,7 @@ export default async function SuccessPage({ params, searchParams }: Props) {
 	const confirmed = await paymentIsConfirmed(sessionId);
 
 	return (
-		<PaymentShell locale={locale}>
+		<PaymentShell>
 			<main id="main-content" className="checkout-page">
 				<section className="checkout-card checkout-result">
 					<div

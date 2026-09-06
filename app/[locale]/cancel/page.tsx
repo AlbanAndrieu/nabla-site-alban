@@ -23,7 +23,7 @@ export default async function CancelPage({ params }: Props) {
 	const t = await getTranslations("checkout");
 
 	return (
-		<PaymentShell locale={locale}>
+		<PaymentShell>
 			<main id="main-content" className="checkout-page">
 				<section className="checkout-card checkout-result">
 					<div className="result-icon result-cancel" aria-hidden="true">
