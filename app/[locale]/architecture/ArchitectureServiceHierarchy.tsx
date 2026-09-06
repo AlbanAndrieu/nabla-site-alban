@@ -2,8 +2,13 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+} from "@/lib/homelabHealth";
+import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
+	homelabServiceId,
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
 import {
@@ -75,6 +80,14 @@ const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
 	support: "presentation.metrics.support",
 };
 
+function healthById(snapshot: HomelabHealthSnapshot | null): Map<string, HomelabHealthEntry> {
+	return new Map(
+		(snapshot?.services ?? [])
+			.filter((entry): entry is HomelabHealthEntry & { id: string } => Boolean(entry.id))
+			.map((entry) => [entry.id, entry]),
+	);
+}
+
 export default function ArchitectureServiceHierarchy({
 	catalog,
 	topology,
@@ -91,6 +104,7 @@ export default function ArchitectureServiceHierarchy({
 		() => groupCatalogByPresentation(catalog, topology),
 		[catalog, topology],
 	);
+	const indexedHealth = useMemo(() => healthById(snapshot), [snapshot]);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {
@@ -108,7 +122,12 @@ export default function ArchitectureServiceHierarchy({
 				data-homelab-service-hierarchy
 				data-architecture-services
 			>
-				{groups.map((group) => (
+				{groups.map((group) => {
+					const issueCount = group.catalog.services.filter((service) => {
+						const entry = indexedHealth.get(homelabServiceId(service));
+						return !entry || resolveEffectiveServiceState(entry).effectiveState !== "ok";
+					}).length;
+					return (
 					<details
 						className={styles.groupDetails}
 						key={group.group}
@@ -118,6 +137,7 @@ export default function ArchitectureServiceHierarchy({
 						}
 						data-service-presentation-group={group.group}
 						data-metrics-profile={group.metricsProfile}
+						data-needs-attention={issueCount > 0 ? "true" : "false"}
 					>
 						<summary className={styles.groupSummary}>
 							<span className={styles.groupTitle}>
@@ -135,6 +155,9 @@ export default function ArchitectureServiceHierarchy({
 										count: group.catalog.services.length,
 									})}
 								</span>
+								<span data-group-issue-count={issueCount}>
+									{t("presentation.issueCount", { count: issueCount })}
+								</span>
 							</span>
 						</summary>
 						<div className={`${styles.groupBody} homelab-service-subgrid`}>
@@ -146,7 +169,8 @@ export default function ArchitectureServiceHierarchy({
 							/>
 						</div>
 					</details>
-				))}
+					);
+				})}
 				{groups.length === 0 ? (
 					<p className={styles.matchCount} role="status">
 						{locale === "fr"
