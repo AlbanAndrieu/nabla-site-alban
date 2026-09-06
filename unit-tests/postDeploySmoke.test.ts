@@ -108,7 +108,8 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.doesNotMatch(workflow, /inputs\.base_url/);
 	assert.doesNotMatch(workflow, /npm ci/);
 	assert.doesNotMatch(workflow, /playwright/i);
-	assert.doesNotMatch(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
+	assert.match(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
+	assert.match(script, /x-vercel-protection-bypass/);
 
 	for (const pathname of [
 		'path: "/"',
@@ -145,9 +146,15 @@ test("production smoke stays lightweight and production-only", async () => {
 
 test("production smoke validates pages, homelab API and social cards", async () => {
 	const originalFetch = globalThis.fetch;
+	const originalBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 	const requests: string[] = [];
+	const bypassHeaders: Array<string | null> = [];
+	process.env.VERCEL_AUTOMATION_BYPASS_SECRET = "test-bypass-secret";
 
-	globalThis.fetch = (async (input) => {
+	globalThis.fetch = (async (input, init) => {
+		bypassHeaders.push(
+			new Headers(init?.headers).get("x-vercel-protection-bypass"),
+		);
 		const url = new URL(
 			typeof input === "string"
 				? input
@@ -227,8 +234,17 @@ test("production smoke validates pages, homelab API and social cards", async () 
 		await runProductionSmoke(ORIGIN);
 	} finally {
 		globalThis.fetch = originalFetch;
+		if (originalBypass === undefined) {
+			delete process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+		} else {
+			process.env.VERCEL_AUTOMATION_BYPASS_SECRET = originalBypass;
+		}
 	}
 
+	assert.ok(
+		bypassHeaders.length > 0 &&
+			bypassHeaders.every((value) => value === "test-bypass-secret"),
+	);
 	assert.ok(requests.includes("/contact"));
 	assert.ok(requests.includes("/fr/contact"));
 	assert.ok(requests.includes("/api/homelab-status"));
