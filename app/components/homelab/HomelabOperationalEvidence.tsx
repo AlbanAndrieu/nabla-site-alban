@@ -127,6 +127,17 @@ const PLATFORM_METRIC_LABEL_KEY: Record<PlatformMetricKey, string> = {
 	prometheus_up: "metrics.prometheus",
 };
 
+const PLATFORM_METRIC_STATE_KEY: Record<
+	NonNullable<HomelabObservabilitySnapshot["platformMetrics"]>["state"],
+	string
+> = {
+	healthy: "metrics.states.healthy",
+	degraded: "metrics.states.degraded",
+	not_configured: "metrics.states.not_configured",
+	telemetry_unavailable: "metrics.states.telemetry_unavailable",
+	unknown: "metrics.states.unknown",
+};
+
 function metricValue(
 	key: PlatformMetricKey,
 	value: number | null,
@@ -441,7 +452,7 @@ export default function HomelabOperationalEvidence() {
 					{evidence.platformMetrics ? (
 						<details className={styles.details} data-platform-metrics>
 							<summary>
-								{t("metrics.title")} · {t(`metrics.states.${evidence.platformMetrics.state}`)}
+								{t("metrics.title")} · {t(PLATFORM_METRIC_STATE_KEY[evidence.platformMetrics.state])}
 							</summary>
 							<div className={styles.detailsBody}>
 								<p>{t("metrics.lead")}</p>
