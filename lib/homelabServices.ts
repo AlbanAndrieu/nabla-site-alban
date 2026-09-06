@@ -7,6 +7,10 @@ const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export type HomelabService = {
 	id?: string;
 	name: string;
+	kind?: string;
+	category?: string;
+	presentationRole?: "service" | "core" | "support";
+	criticality?: "critical" | "high" | "medium" | "low";
 	description?: string;
 	icon?: string;
 	iconSrc?: string;
@@ -105,7 +109,11 @@ export function parseHomelabServicesCatalog(
 				service.name.trim().length > 0 &&
 				(service.id === undefined || typeof service.id === "string") &&
 				(service.endpointUrl === undefined ||
-					typeof service.endpointUrl === "string"),
+					typeof service.endpointUrl === "string") &&
+				(service.presentationRole === undefined ||
+					["service", "core", "support"].includes(String(service.presentationRole))) &&
+				(service.criticality === undefined ||
+					["critical", "high", "medium", "low"].includes(String(service.criticality))),
 		)
 	) {
 		return null;
