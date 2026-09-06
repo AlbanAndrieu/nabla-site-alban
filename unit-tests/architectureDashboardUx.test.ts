@@ -38,17 +38,19 @@ test("architecture exposes stable anchors for every major section", async () => 
 	assert.match(hierarchy, /id="service-directory"/);
 });
 
-test("architecture dashboard filters declared services by health and criticality", async () => {
+test("architecture dashboard filters declared services by health and operator presentation", async () => {
 	const topology = await source(
 		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
 	);
 
 	assert.match(topology, /type HealthFilter = "all" \| HomelabHealthState/);
-	assert.match(topology, /type TierFilter = "all" \| ServiceCriticalityTier/);
+	assert.match(topology, /type GroupFilter = "all" \| ServicePresentationGroup/);
 	assert.match(topology, /resolveEffectiveServiceState/);
-	assert.match(topology, /analyzeServiceCriticality/);
+	assert.match(topology, /analyzeServicePresentation/);
 	assert.match(topology, /filteredCatalog/);
 	assert.match(topology, /data-health-filter/);
+	assert.match(topology, /data-architecture-presentation-filter/);
+	assert.match(topology, /data-architecture-service-search/);
 	assert.match(topology, /Reset filters/);
 	assert.match(topology, /HomelabServicesBlock\.module\.css/);
 });

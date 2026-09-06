@@ -204,13 +204,13 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("TrueNAS grid is grouped by the same criticality tiers and health semantics", async () => {
+test("TrueNAS cards use service-first groups while technical criticality remains separate", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 
 	assert.match(block, /data-homelab-service-hierarchy/);
-	assert.match(block, /data-service-criticality-group/);
-	assert.match(block, /criticalityTierOrder/);
-	assert.match(block, /compareServiceCriticality/);
+	assert.match(block, /data-service-presentation-group/);
+	assert.match(block, /groupCatalogByPresentation/);
+	assert.match(block, /<CriticalDependencyHierarchy/);
 	assert.match(block, /parseHomelabHealthSnapshot/);
 	assert.match(block, /resolveEffectiveServiceState/);
 	assert.match(block, /data-homelab-health-filter/);

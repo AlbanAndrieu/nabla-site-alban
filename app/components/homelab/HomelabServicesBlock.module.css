@@ -197,9 +197,36 @@
 }
 
 .groupMeta {
+	display: flex;
 	flex: 0 0 auto;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: var(--ui-space-xs);
 	font-size: 0.8rem;
 	color: var(--ui-text-secondary);
+}
+
+.metricsProfileBadge {
+	display: inline-flex;
+	align-items: center;
+	min-height: 1.75rem;
+	padding: 0.15rem 0.5rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-primary);
+	font-size: 0.72rem;
+	font-weight: 800;
+	letter-spacing: 0.03em;
+}
+
+.groupDetails[data-needs-attention="true"] {
+	border-color: var(--ui-warning-border);
+}
+
+.groupDetails[data-needs-attention="true"] > .groupSummary {
+	background: var(--ui-warning-surface);
 }
 
 .groupBody {
@@ -310,6 +337,15 @@
 	}
 
 	.groupMeta {
-		display: none;
+		justify-content: flex-start;
+		width: 100%;
+	}
+
+	.groupSummary {
+		flex-wrap: wrap;
+	}
+
+	.metricsProfileBadge {
+		min-height: 1.75rem;
 	}
 }

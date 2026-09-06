@@ -2,17 +2,20 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+} from "@/lib/homelabHealth";
+import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	homelabServiceId,
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
 import {
-	analyzeServiceCriticality,
-	compareServiceCriticality,
-	criticalityTierOrder,
-	type ServiceCriticalityTier,
-} from "@/lib/serviceCriticality";
+	groupCatalogByPresentation,
+	type ServiceMetricsProfile,
+	type ServicePresentationGroup,
+} from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
@@ -24,48 +27,66 @@ type Props = {
 	healthUnavailable?: boolean;
 };
 
-type HierarchyGroup = {
-	tier: ServiceCriticalityTier;
-	catalog: HomelabServicesCatalog;
-};
+type HierarchyGroup = ReturnType<typeof groupCatalogByPresentation>[number];
 
-type TierTitleKey =
-	| "criticality.tiers.foundation"
-	| "criticality.tiers.shared-data"
-	| "criticality.tiers.shared-platform"
-	| "criticality.tiers.application"
-	| "criticality.tiers.support";
+type GroupTitleKey =
+	| "presentation.groups.services"
+	| "presentation.groups.core-critical"
+	| "presentation.groups.security-controls"
+	| "presentation.groups.shared-core"
+	| "presentation.groups.support";
 
-type TierDescriptionKey =
-	| "criticality.tierDescriptions.foundation"
-	| "criticality.tierDescriptions.shared-data"
-	| "criticality.tierDescriptions.shared-platform"
-	| "criticality.tierDescriptions.application"
-	| "criticality.tierDescriptions.support";
+type GroupDescriptionKey =
+	| "presentation.descriptions.services"
+	| "presentation.descriptions.core-critical"
+	| "presentation.descriptions.security-controls"
+	| "presentation.descriptions.shared-core"
+	| "presentation.descriptions.support";
 
-const ALL_TIERS: readonly ServiceCriticalityTier[] = [
-	"foundation",
-	"shared-data",
-	"shared-platform",
-	"application",
-	"support",
+type MetricsProfileKey =
+	| "presentation.metrics.red"
+	| "presentation.metrics.use"
+	| "presentation.metrics.security"
+	| "presentation.metrics.red-use"
+	| "presentation.metrics.support";
+
+const DEFAULT_OPEN_GROUPS: readonly ServicePresentationGroup[] = [
+	"services",
+	"core-critical",
+	"security-controls",
 ];
 
-const TIER_TITLE_KEY: Record<ServiceCriticalityTier, TierTitleKey> = {
-	foundation: "criticality.tiers.foundation",
-	"shared-data": "criticality.tiers.shared-data",
-	"shared-platform": "criticality.tiers.shared-platform",
-	application: "criticality.tiers.application",
-	support: "criticality.tiers.support",
+const GROUP_TITLE_KEY: Record<ServicePresentationGroup, GroupTitleKey> = {
+	services: "presentation.groups.services",
+	"core-critical": "presentation.groups.core-critical",
+	"security-controls": "presentation.groups.security-controls",
+	"shared-core": "presentation.groups.shared-core",
+	support: "presentation.groups.support",
 };
 
-const TIER_DESCRIPTION_KEY: Record<ServiceCriticalityTier, TierDescriptionKey> = {
-	foundation: "criticality.tierDescriptions.foundation",
-	"shared-data": "criticality.tierDescriptions.shared-data",
-	"shared-platform": "criticality.tierDescriptions.shared-platform",
-	application: "criticality.tierDescriptions.application",
-	support: "criticality.tierDescriptions.support",
+const GROUP_DESCRIPTION_KEY: Record<ServicePresentationGroup, GroupDescriptionKey> = {
+	services: "presentation.descriptions.services",
+	"core-critical": "presentation.descriptions.core-critical",
+	"security-controls": "presentation.descriptions.security-controls",
+	"shared-core": "presentation.descriptions.shared-core",
+	support: "presentation.descriptions.support",
 };
+
+const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
+	red: "presentation.metrics.red",
+	use: "presentation.metrics.use",
+	security: "presentation.metrics.security",
+	"red-use": "presentation.metrics.red-use",
+	support: "presentation.metrics.support",
+};
+
+function healthById(snapshot: HomelabHealthSnapshot | null): Map<string, HomelabHealthEntry> {
+	return new Map(
+		(snapshot?.services ?? [])
+			.filter((entry): entry is HomelabHealthEntry & { id: string } => Boolean(entry.id))
+			.map((entry) => [entry.id, entry]),
+	);
+}
 
 export default function ArchitectureServiceHierarchy({
 	catalog,
@@ -75,46 +96,21 @@ export default function ArchitectureServiceHierarchy({
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
 	const locale = useLocale();
-	const [expandedTiers, setExpandedTiers] = useState<Set<ServiceCriticalityTier>>(
-		() => new Set(ALL_TIERS),
+	const [expandedGroups, setExpandedGroups] = useState<Set<ServicePresentationGroup>>(
+		() => new Set(DEFAULT_OPEN_GROUPS),
 	);
 
-	const groups = useMemo<HierarchyGroup[]>(() => {
-		const analysis = analyzeServiceCriticality(topology);
-		const grouped = new Map<ServiceCriticalityTier, typeof catalog.services>();
+	const groups = useMemo<HierarchyGroup[]>(
+		() => groupCatalogByPresentation(catalog, topology),
+		[catalog, topology],
+	);
+	const indexedHealth = useMemo(() => healthById(snapshot), [snapshot]);
 
-		for (const service of catalog.services) {
-			const id = homelabServiceId(service);
-			const tier = analysis.get(id)?.tier ?? "support";
-			grouped.set(tier, [...(grouped.get(tier) ?? []), service]);
-		}
-
-		return [...grouped.entries()]
-			.map(([tier, services]) => ({
-				tier,
-				catalog: {
-					...catalog,
-					services: [...services].sort((left, right) =>
-						compareServiceCriticality(
-							homelabServiceId(left),
-							homelabServiceId(right),
-							topology,
-							analysis,
-						),
-					),
-				},
-			}))
-			.sort(
-				(left, right) =>
-					criticalityTierOrder(left.tier) - criticalityTierOrder(right.tier),
-			);
-	}, [catalog, topology]);
-
-	const setTierExpanded = (tier: ServiceCriticalityTier, open: boolean) => {
-		setExpandedTiers((current) => {
+	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
+		setExpandedGroups((current) => {
 			const next = new Set(current);
-			if (open) next.add(tier);
-			else next.delete(tier);
+			if (open) next.add(group);
+			else next.delete(group);
 			return next;
 		});
 	};
@@ -126,27 +122,42 @@ export default function ArchitectureServiceHierarchy({
 				data-homelab-service-hierarchy
 				data-architecture-services
 			>
-				{groups.map((group) => (
+				{groups.map((group) => {
+					const issueCount = group.catalog.services.filter((service) => {
+						const entry = indexedHealth.get(homelabServiceId(service));
+						return !entry || resolveEffectiveServiceState(entry).effectiveState !== "ok";
+					}).length;
+					return (
 					<details
 						className={styles.groupDetails}
-						key={group.tier}
-						open={expandedTiers.has(group.tier)}
+						key={group.group}
+						open={expandedGroups.has(group.group)}
 						onToggle={(event) =>
-							setTierExpanded(group.tier, event.currentTarget.open)
+							setGroupExpanded(group.group, event.currentTarget.open)
 						}
-						data-service-criticality-group={group.tier}
+						data-service-presentation-group={group.group}
+						data-metrics-profile={group.metricsProfile}
+						data-needs-attention={issueCount > 0 ? "true" : "false"}
 					>
 						<summary className={styles.groupSummary}>
 							<span className={styles.groupTitle}>
-								<strong>{t(TIER_TITLE_KEY[group.tier])}</strong>
+								<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
 								<span className={styles.groupDescription}>
-									{t(TIER_DESCRIPTION_KEY[group.tier])}
+									{t(GROUP_DESCRIPTION_KEY[group.group])}
 								</span>
 							</span>
 							<span className={styles.groupMeta}>
-								{t("criticality.componentCount", {
-									count: group.catalog.services.length,
-								})}
+								<span className={styles.metricsProfileBadge}>
+									{t(METRICS_PROFILE_KEY[group.metricsProfile])}
+								</span>
+								<span>
+									{t("presentation.componentCount", {
+										count: group.catalog.services.length,
+									})}
+								</span>
+								<span data-group-issue-count={issueCount}>
+									{t("presentation.issueCount", { count: issueCount })}
+								</span>
 							</span>
 						</summary>
 						<div className={`${styles.groupBody} homelab-service-subgrid`}>
@@ -158,7 +169,8 @@ export default function ArchitectureServiceHierarchy({
 							/>
 						</div>
 					</details>
-				))}
+					);
+				})}
 				{groups.length === 0 ? (
 					<p className={styles.matchCount} role="status">
 						{locale === "fr"

@@ -149,6 +149,35 @@
 				"unknown": "Unknown"
 			},
 			"stale": "Stale evidence — last observation retained"
+		},
+		"presentation": {
+			"filterLabel": "View",
+			"allGroups": "All views",
+			"searchLabel": "Search services",
+			"searchPlaceholder": "Service name or identifier",
+			"groups": {
+				"services": "1 · Services & experiments",
+				"core-critical": "2 · Critical core platform",
+				"security-controls": "3 · Security controls",
+				"shared-core": "4 · Shared platform & data",
+				"support": "5 · Observability & support"
+			},
+			"descriptions": {
+				"services": "Primary homelab outcomes: track service availability, errors, latency and traffic.",
+				"core-critical": "Foundations whose failure can remove a whole layer: track availability, quorum/readiness, pressure, capacity and errors.",
+				"security-controls": "Control availability and security posture stay separate dimensions.",
+				"shared-core": "Shared backends: track availability, latency, saturation and capacity without conflating impact with required dependency.",
+				"support": "Observability and auxiliary tools: important for diagnosis without automatically marking monitored services unavailable."
+			},
+			"metrics": {
+				"red": "RED",
+				"use": "USE",
+				"security": "POSTURE",
+				"red-use": "RED + USE",
+				"support": "SUPPORT"
+			},
+			"issueCount": "{count, plural, =0 {none need attention} one {# needs attention} other {# need attention}}",
+			"componentCount": "{count, plural, one {# component} other {# components}}"
 		}
 	}
 }

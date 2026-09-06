@@ -149,6 +149,35 @@
 				"unknown": "Inconnu"
 			},
 			"stale": "Preuve obsolète — dernière observation conservée"
+		},
+		"presentation": {
+			"filterLabel": "Vue",
+			"allGroups": "Toutes les vues",
+			"searchLabel": "Rechercher un service",
+			"searchPlaceholder": "Nom ou identifiant du service",
+			"groups": {
+				"services": "1 · Services et expérimentations",
+				"core-critical": "2 · Socle critique",
+				"security-controls": "3 · Contrôles de sécurité",
+				"shared-core": "4 · Plateforme et données partagées",
+				"support": "5 · Observabilité et support"
+			},
+			"descriptions": {
+				"services": "Finalité principale du homelab : disponibilité, erreurs, latence et trafic des services expérimentés.",
+				"core-critical": "Fondations dont la panne peut retirer une couche entière : disponibilité, quorum/readiness, pression, capacité et erreurs.",
+				"security-controls": "Disponibilité des contrôles et posture sécurité restent deux dimensions distinctes.",
+				"shared-core": "Backends partagés : disponibilité, latence, saturation et capacité sans confondre impact et dépendance requise.",
+				"support": "Observabilité et outils auxiliaires : importants pour diagnostiquer, sans rendre automatiquement les services indisponibles."
+			},
+			"metrics": {
+				"red": "RED",
+				"use": "USE",
+				"security": "POSTURE",
+				"red-use": "RED + USE",
+				"support": "SUPPORT"
+			},
+			"issueCount": "{count, plural, =0 {aucun en alerte} one {# en alerte} other {# en alerte}}",
+			"componentCount": "{count, plural, one {# composant} other {# composants}}"
 		}
 	}
 }

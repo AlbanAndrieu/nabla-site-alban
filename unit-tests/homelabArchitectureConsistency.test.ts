@@ -32,7 +32,7 @@ test("architecture renders the same homelab service cards as TrueNAS", async () 
 	assert.doesNotMatch(page, /ArchitectureServiceDirectory/);
 });
 
-test("TrueNAS provides health and criticality filters without a standalone DNS panel", async () => {
+test("TrueNAS provides health and service-presentation filters without a standalone DNS panel", async () => {
 	const source = await readFile(
 		new URL(
 			"../app/components/homelab/HomelabServicesBlock.tsx",
@@ -42,7 +42,8 @@ test("TrueNAS provides health and criticality filters without a standalone DNS p
 	);
 	assert.match(source, /data-homelab-health-filter/);
 	assert.match(source, /data-homelab-health-select/);
-	assert.match(source, /data-homelab-tier-filter/);
+	assert.match(source, /data-homelab-presentation-filter/);
+	assert.match(source, /data-homelab-service-search/);
 	assert.match(source, /effectiveState/);
 	assert.doesNotMatch(source, /PfSenseDnsPosture/);
 });
