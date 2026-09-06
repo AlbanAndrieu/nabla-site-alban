@@ -1,69 +1,22 @@
-"use client";
-
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import AiUsageAnalytics from "./AiUsageAnalytics";
+import styles from "./AiNativePage.module.css";
 
 export default function AiObservability() {
 	const t = useTranslations("ai");
-	const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null);
-
-	useEffect(() => {
-		const section = document.getElementById("ai-token-finops");
-		const heading = document.getElementById("ai-token-finops-heading");
-		const description = section?.querySelector(":scope > p");
-		const grid = section?.querySelector(".resource-grid");
-		if (!section || !heading || !grid) return;
-
-		heading.innerHTML = '<i class="fas fa-chart-line" aria-hidden="true"></i> ' + t("observability.title");
-		if (description) description.textContent = t("observability.lead");
-
-		const host = document.createElement("div");
-		host.style.display = "contents";
-		grid.prepend(host);
-		setMountPoint(host);
-		return () => host.remove();
-	}, [t]);
-
-	if (!mountPoint) return null;
-
-	return createPortal(
-		<>
-			<article id="opik" className="resource-card">
-				<h3>
-					<i
-						className="fas fa-chart-line resource-card-icon"
-						aria-hidden="true"
-					/>{" "}
-					Opik by Comet
-				</h3>
-				<p>{t("observability.opik")}</p>
-				<a
-					href="https://www.comet.com/docs/opik/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="resource-link"
-				>
-					<i className="fas fa-book" aria-hidden="true" />{" "}
-					{t("observability.documentation")}
-				</a>
-			</article>
-			<article id="langfuse" className="resource-card">
-				<h3>
-					<i className="fas fa-eye resource-card-icon" aria-hidden="true" />{" "}
-					Langfuse
-				</h3>
-				<p>{t("observability.langfuse")}</p>
-				<a
-					href="https://langfuse.com/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="resource-link"
-				>
-					<i className="fas fa-external-link-alt" aria-hidden="true" /> Langfuse
-				</a>
-			</article>
-		</>,
-		mountPoint,
+	return (
+		<section id="ai-observability" className="category-section" aria-labelledby="ai-observability-heading">
+			<h2 id="ai-observability-heading" className="category-title">
+				<i className="fas fa-chart-line" aria-hidden="true" /> {t("observability.title")}
+			</h2>
+			<p className={styles.sectionLead}>{t("observability.lead")}</p>
+			<div className="resource-grid">
+				<article id="opik" className="resource-card"><h3>Opik by Comet</h3><p>{t("observability.opik")}</p><a href="https://www.comet.com/docs/opik/" target="_blank" rel="noopener noreferrer" className="resource-link">{t("observability.documentation")}</a></article>
+				<article id="langfuse" className="resource-card"><h3>Langfuse</h3><p>{t("observability.langfuse")}</p><a href="https://langfuse.com/" target="_blank" rel="noopener noreferrer" className="resource-link">Langfuse</a></article>
+				<AiUsageAnalytics />
+				<article className="resource-card"><h3>Cursor</h3><p>{t("observability.cursor")}</p><a href="https://cursor.com/dashboard/analytics" target="_blank" rel="noopener noreferrer" className="resource-link">{t("observability.cursorAnalytics")}</a></article>
+				<article className="resource-card"><h3>LiteLLM</h3><p>{t("observability.litellm")}</p><a href="https://www.litellm.ai/" target="_blank" rel="noopener noreferrer" className="resource-link">LiteLLM</a></article>
+			</div>
+		</section>
 	);
 }

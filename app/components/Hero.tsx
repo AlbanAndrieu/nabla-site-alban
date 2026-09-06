@@ -61,10 +61,10 @@ export default function Hero() {
 					aria-label={t("home.hero.services")}
 				>
 					<ul>
-						<li>{t("home.hero.lastexp1")}</li>
-						<li>{t("home.hero.lastexp2")}</li>
-						<li>{t("home.hero.lastexp3")}</li>
-						<li>{t("home.hero.lastexp4")}</li>
+						<li>{t("home.hero.value1")}</li>
+						<li>{t("home.hero.value2")}</li>
+						<li>{t("home.hero.value3")}</li>
+						<li>{t("home.hero.value4")}</li>
 					</ul>
 				</div>
 				<div className="cta-buttons">

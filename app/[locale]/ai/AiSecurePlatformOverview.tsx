@@ -15,6 +15,7 @@ export default function AiSecurePlatformOverview() {
 	const t = useTranslations("ai");
 	return (
 		<section
+			id="secure-ai-platform"
 			className="category-section"
 			aria-labelledby="secure-ai-platform-heading"
 		>

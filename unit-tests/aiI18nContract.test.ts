@@ -3,11 +3,14 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const AI_COMPONENTS = [
+	"app/[locale]/ai/AiDocumentPipeline.tsx",
+	"app/[locale]/ai/AiEngineeringPractices.tsx",
 	"app/[locale]/ai/AiGlobalTools.tsx",
 	"app/[locale]/ai/AiHomelabArchitecture.tsx",
 	"app/[locale]/ai/AiNativeSections.tsx",
 	"app/[locale]/ai/AiObservability.tsx",
 	"app/[locale]/ai/AiPageGuide.tsx",
+	"app/[locale]/ai/AiResourceCatalog.tsx",
 	"app/[locale]/ai/AiSecurePlatformOverview.tsx",
 	"app/[locale]/ai/AiUsageAnalytics.tsx",
 	"app/[locale]/ai/AiWorkflowAutomation.tsx",
@@ -20,7 +23,7 @@ function leafKeys(value: unknown, prefix = ""): string[] {
 	);
 }
 
-test("AI native sections use the shared next-intl feature catalog", async () => {
+test("AI page is native Next.js and uses the shared next-intl feature catalog", async () => {
 	const [loader, page, enRaw, frRaw, ...components] = await Promise.all([
 		readFile("i18n/messages.ts", "utf8"),
 		readFile("app/[locale]/ai/page.tsx", "utf8"),
@@ -33,12 +36,15 @@ test("AI native sections use the shared next-intl feature catalog", async () => 
 	assert.match(loader, /\.\.\.ai/);
 	assert.match(page, /<AiNativeSections \/>/);
 	assert.match(page, /<AiPageGuide \/>/);
-	assert.match(page, /PublicHtmlFragment/);
+	assert.doesNotMatch(page, /PublicHtmlFragment/);
+	assert.doesNotMatch(page, /metadataFromPublicHtml/);
 
 	for (const component of components) {
 		assert.doesNotMatch(component, /locale === ["']fr["']/);
 		assert.doesNotMatch(component, /const COPY\b/);
 		assert.doesNotMatch(component, /\bfr:\s*["'{]/);
+		assert.doesNotMatch(component, /createPortal/);
+		assert.doesNotMatch(component, /document\.(getElementById|querySelector)/);
 	}
 
 	const en = JSON.parse(enRaw) as { ai: unknown };
