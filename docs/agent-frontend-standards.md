@@ -92,7 +92,7 @@ Every indexable page must remain search-engine friendly.
 - `lib/sitePageCatalog.ts` is the source of truth when adding/removing/categorizing/reprioritizing SEO pages.
 - `app/sitemap.ts` generates the App Router sitemap from `SEO_PAGE_SLUGS`; do **not** add a competing static sitemap under `public/`.
 - Keep `unit-tests/sitePageCatalog.test.ts` and `tests/seo-indexing.spec.ts` aligned with intentional sitemap/indexing-policy changes.
-- Preserve `Sitemap: https://albandrieu.com/sitemap.xml` in `public/robots.txt` `www` is the canonical production origin.
+- Preserve `Sitemap: https://www.albanandrieu.com/sitemap.xml` in `public/robots.txt`; `www` is the canonical production origin.
 - Search-engine-console submissions are an operational follow-up after relevant deployment changes, not a substitute for repository validation.
 
 ## Open Graph and social metadata
