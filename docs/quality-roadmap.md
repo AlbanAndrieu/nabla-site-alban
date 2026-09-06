@@ -71,6 +71,9 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Introduire des design tokens partagés de base pour les pages Next.js.
 - [x] Renforcer les tokens/contrastes spécifiques aux graphes Architecture et à
   la page TrueNAS dark-mode.
+- [x] Appliquer la préférence `light|dark|auto` globalement dans le layout Next
+  avant le premier paint, sans dépendre du chargement optionnel de
+  `SiteWidgetsScript` ni charger ses widgets legacy sur toutes les routes.
 - [ ] Auditer l'ensemble des pages en thème clair et sombre et supprimer les
   combinaisons incohérentes issues du mélange Bootstrap/CSS historique (par
   exemple texte clair forcé sur surface Bootstrap claire).
@@ -191,9 +194,10 @@ les autres chantiers.
   côté source autoritative, `nabla-compose/tests/test_service_topology_generator.py`
   garantit qu'un service Compose non déclaré par `x-nabla` ne devient pas un
   nœud fonctionnel.
-- [ ] Ajouter une couverture visuelle/Playwright light/dark/mobile des états
-  `healthy`, `degraded`, `failed`, `stale` et `unknown` après migration des
-  diagrammes vers le resolver partagé.
+- [x] Ajouter une couverture visuelle/Playwright light/dark/mobile des états
+  `healthy`, `degraded`, `failed`, `stale` et `unknown` : le test
+  déterministe couvre TrueNAS en thème clair/sombre, Architecture en mobile,
+  vérifie le contraste AA des badges, les cibles tactiles et l'absence d'overflow.
 
 ## P1 — Présentation service-first et métriques à l'échelle
 
