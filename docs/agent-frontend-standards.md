@@ -174,3 +174,4 @@ Do not reduce existing tests or quality gates.
 - After routing, SEO or metadata changes, verify the affected deployment, links, canonical routes, sitemap and robots behavior that can materially change.
 - Updating the sitemap means updating its source-of-truth catalog/tests, not maintaining a separate hand-written sitemap.
 - Preserve the repository's deployment gates and Vercel Preview/Playwright behavior; frontend optimization never justifies skipping a requested deployment validation.
+- Production SEO/HTTP automation must target the canonical public origin. A Vercel automation bypass may be used to avoid CI bot/deployment-protection challenges, but its credential must never be forwarded to a different origin or treated as proof that browser-facing protection is disabled.
