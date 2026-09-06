@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import HomelabOperationalEvidence from "@/app/components/homelab/HomelabOperationalEvidence";
 import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
 import AnchoredHeading from "@/components/AnchoredHeading";
+import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
@@ -205,6 +206,7 @@ export default async function ArchitecturePage({
 					</div>
 				</section>
 			</main>
+			<SiteWidgetsScript />
 		</div>
 	);
 }
