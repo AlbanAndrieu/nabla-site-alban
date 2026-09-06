@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { paymentLocale } from "@/lib/paymentPages";
@@ -25,19 +26,14 @@ export default async function PricingPage({ params }: Props) {
 	if (!hasLocale(routing.locales, rawLocale)) notFound();
 	const locale = paymentLocale(rawLocale);
 	setRequestLocale(locale);
-	const [site, t] = await Promise.all([
-		getTranslations("site"),
-		getTranslations("pricing"),
-	]);
+	const t = await getTranslations("pricing");
 	const how = t.raw("how") as string[];
 	const addons = t.raw("addons") as string[];
 
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<main id="main-content" className="container py-4 pb-5 pricing-page">
 				<header className="mb-4">
 					<h1 className="h2 mb-2">{t("title")}</h1>
