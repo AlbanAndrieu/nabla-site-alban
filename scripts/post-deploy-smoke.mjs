@@ -84,6 +84,10 @@ function metaContent(html, name) {
 
 async function fetchResponse(baseUrl, pathname, accept) {
   const target = new URL(pathname, baseUrl);
+  assertCondition(
+    target.origin === CANONICAL_ORIGIN,
+    pathname + " is outside the canonical production origin",
+  );
   const headers = {
     Accept: accept,
     "User-Agent": "nabla-site-alban-production-smoke/1.1",
@@ -97,7 +101,7 @@ async function fetchResponse(baseUrl, pathname, accept) {
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
     try {
       const response = await fetch(target, {
-        redirect: "follow",
+        redirect: "manual",
         headers,
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
