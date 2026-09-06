@@ -92,7 +92,7 @@ Every indexable page must remain search-engine friendly.
 - `lib/sitePageCatalog.ts` is the source of truth when adding/removing/categorizing/reprioritizing SEO pages.
 - `app/sitemap.ts` generates the App Router sitemap from `SEO_PAGE_SLUGS`; do **not** add a competing static sitemap under `public/`.
 - Keep `unit-tests/sitePageCatalog.test.ts` and `tests/seo-indexing.spec.ts` aligned with intentional sitemap/indexing-policy changes.
-- Preserve `Sitemap: https://albandrieu.com/sitemap.xml` in `public/robots.txt` unless the canonical domain policy itself is intentionally changed.
+- Preserve `Sitemap: https://www.albanandrieu.com/sitemap.xml` in `public/robots.txt`; `www` is the canonical production origin.
 - Search-engine-console submissions are an operational follow-up after relevant deployment changes, not a substitute for repository validation.
 
 ## Open Graph and social metadata
@@ -174,3 +174,4 @@ Do not reduce existing tests or quality gates.
 - After routing, SEO or metadata changes, verify the affected deployment, links, canonical routes, sitemap and robots behavior that can materially change.
 - Updating the sitemap means updating its source-of-truth catalog/tests, not maintaining a separate hand-written sitemap.
 - Preserve the repository's deployment gates and Vercel Preview/Playwright behavior; frontend optimization never justifies skipping a requested deployment validation.
+- Production SEO/HTTP automation must target the canonical public origin. A Vercel automation bypass may be used to avoid CI bot/deployment-protection challenges, but its credential must never be forwarded to a different origin or treated as proof that browser-facing protection is disabled.

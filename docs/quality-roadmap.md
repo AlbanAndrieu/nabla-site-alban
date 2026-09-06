@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 6 septembre 2026.
+Dernière vérification : 7 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -120,8 +120,10 @@ les autres chantiers.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
 - [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
   afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
-- [ ] Ajouter un smoke test post-déploiement sur accueil EN/FR, `/truenas`,
-  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
+- [ ] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
+  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales. Le
+  workflow reste ouvert jusqu’à un run `master` vert sur l’origine canonique
+  publique, et non sur l’URL Vercel immuable protégée.
 
 ## P1 — Architecture et homelab runtime
 
