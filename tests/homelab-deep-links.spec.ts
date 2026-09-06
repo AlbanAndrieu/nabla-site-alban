@@ -86,6 +86,8 @@ const observability = {
 	deepDiagnostics: { checks: [] },
 	diagnostics: null,
 	cloudflareCache: null,
+	pfsenseIngressPolicy: null,
+	edgeEvidenceSkips: [],
 	controlPlaneDiagnostics: {},
 	sources: {
 		board: "health-board",
