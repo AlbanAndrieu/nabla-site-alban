@@ -189,6 +189,33 @@
 			"stale_evidence": "Freshness first: one or more conclusions rely on stale evidence. Refresh observations before treating an unknown dependency as a real outage.",
 			"dependency_cycle": "Dependency model first: a required dependency cycle is reported. Resolve or justify that cycle because it makes root-cause propagation ambiguous.",
 			"dependencies": "Service dependency path next: control planes do not currently expose a stronger root cause. Inspect the affected service local state, blocked_by list and critical dependency hierarchy."
+		},
+		"metrics": {
+			"title": "Core platform metrics",
+			"lead": "Sanitized, fixed-cardinality Prometheus recording rules from FastAPI. These signals describe telemetry and platform pressure; they do not replace direct service health or dependency evidence.",
+			"source": "source: {source}",
+			"generatedAt": "generated {timestamp}",
+			"signals": "{available}/{total} bounded signals available",
+			"telemetry": "{up}/{total} telemetry exporters up",
+			"telemetryUnavailable": "Prometheus telemetry is unavailable or incomplete",
+			"truenasMemoryAvailable": "TrueNAS memory available",
+			"truenasCpuBusy": "TrueNAS CPU busy",
+			"truenasNodeExporter": "TrueNAS node exporter",
+			"truenasCadvisor": "TrueNAS cAdvisor",
+			"pfsenseExporter": "pfSense metrics exporter",
+			"prometheus": "Prometheus",
+			"percent": "{value}%",
+			"up": "up",
+			"down": "down",
+			"unavailable": "unavailable",
+			"healthSeparation": "Telemetry availability is shown separately from functional health. A missing metric is an observability gap, not automatic proof that the service or platform is down.",
+			"states": {
+				"healthy": "telemetry healthy",
+				"degraded": "telemetry degraded",
+				"not_configured": "not configured",
+				"telemetry_unavailable": "telemetry unavailable",
+				"unknown": "unknown"
+			}
 		}
 	}
 }
