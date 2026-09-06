@@ -4,6 +4,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import JsonLd from "@/components/JsonLd";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -38,10 +39,7 @@ export default async function ExpertisePage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
-	const [site, t] = await Promise.all([
-		getTranslations("site"),
-		getTranslations("expertisePage"),
-	]);
+	const t = await getTranslations("expertisePage");
 	const services = t.raw("services.items") as ExpertiseService[];
 	const aiBullets = t.raw("aiml.bullets") as string[];
 	const skillCategoryTitles = t.raw("skills.categoryTitles") as string[];
@@ -69,9 +67,7 @@ export default async function ExpertisePage({
 		<div className="site-content-page page-dark">
 			<JsonLd data={professionalServiceJsonLd} />
 			<TopAnchor />
-			<a href="#main-content" className="skip-to-main">
-				{site("skipToMainContent")}
-			</a>
+			<SkipToMainContent />
 			<main id="main-content">
 				<HeroSection
 					label={t("hero.label")}
