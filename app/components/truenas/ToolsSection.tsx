@@ -30,9 +30,8 @@ export default async function ToolsSection() {
 								src="/assets/logo-freenas-community-simple.jpeg"
 								width="72"
 								height="72"
-								className="rounded flex-shrink-0"
+								className="rounded flex-shrink-0 img-fluid"
 								alt={t("logoAlt")}
-								style={{ height: "auto" }}
 							/>
 							<span>
 								<span className="d-block fw-semibold text-body">

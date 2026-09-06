@@ -15,6 +15,7 @@ import { buildPageMetadata } from "@/lib/socialMetadata";
 import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
+import styles from "./ArchitecturePage.module.css";
 
 export async function generateMetadata({
 	params,
@@ -107,8 +108,7 @@ export default async function ArchitecturePage({
 				>
 					<div className="container py-5">
 						<div
-							className="text-center mx-auto mb-4"
-							style={{ maxWidth: "900px" }}
+							className={`text-center mx-auto mb-4 ${styles.networkIntro}`}
 						>
 							<AnchoredHeading id="homelab-network-ingress-paths">
 								{french
@@ -132,8 +132,7 @@ export default async function ArchitecturePage({
 				>
 					<div className="container py-5">
 						<div
-							className="text-center mx-auto mb-4"
-							style={{ maxWidth: "860px" }}
+							className={`text-center mx-auto mb-4 ${styles.evidenceIntro}`}
 						>
 							<AnchoredHeading id="declared-observed-health">
 								{french

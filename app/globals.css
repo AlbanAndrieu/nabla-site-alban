@@ -40,6 +40,14 @@
 	background: #fff;
 	border-radius: 0.5rem;
 }
+.cv-profile-qr {
+	width: 8.75rem;
+	height: auto;
+}
+.page-contact .contact-profile-qr {
+	width: 7.5rem;
+	height: auto;
+}
 .page-cv .cv-contact-qr {
 	display: flex;
 	width: fit-content;

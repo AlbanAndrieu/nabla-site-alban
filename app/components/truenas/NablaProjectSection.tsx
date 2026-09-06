@@ -24,7 +24,6 @@ export default async function NablaProjectSection({
 								width={140}
 								height={140}
 								alt={t("logoAlt")}
-								style={{ height: "auto" }}
 							/>
 							<div className="card-body text-center border-top border-secondary">
 								<h3 className="h5 card-title mb-2">Nabla</h3>

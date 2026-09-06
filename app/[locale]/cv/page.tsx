@@ -255,7 +255,7 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 									width={445}
 									height={440}
 									alt={t("professional.linkedinAlt")}
-									style={{ width: 140, height: "auto" }}
+									className="cv-profile-qr"
 								/>
 								<strong>LinkedIn</strong>
 							</a>
@@ -270,7 +270,7 @@ export default async function CvPage({ params }: PageProps<"/[locale]/cv">) {
 									width={996}
 									height={1507}
 									alt={t("professional.maltAlt")}
-									style={{ width: 140, height: "auto" }}
+									className="cv-profile-qr"
 								/>
 								<strong>Malt</strong>
 							</a>

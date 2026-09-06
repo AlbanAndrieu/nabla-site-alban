@@ -175,7 +175,7 @@ export default async function ContactPage({
 						width={954}
 						height={996}
 						alt={t("linkedinQrAlt")}
-						style={{ width: 120, height: "auto" }}
+						className="contact-profile-qr"
 					/>
 					<strong>LinkedIn</strong>
 				</ExternalLink>
