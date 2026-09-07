@@ -5,6 +5,7 @@ import test from "node:test";
 import { runProductionSmoke } from "../scripts/post-deploy-smoke.mjs";
 
 const ORIGIN = "https://www.albanandrieu.com";
+const DEPLOYED_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 const ROUTE_METADATA: Record<
 	string,
@@ -138,6 +139,7 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.match(script, /linkHref\(html, "alternate", "en"\)/);
 	assert.match(script, /linkHref\(html, "alternate", "fr"\)/);
 	assert.match(script, /linkHref\(html, "alternate", "x-default"\)/);
+	assert.match(script, /\/api\/deployment/);
 	assert.match(script, /\/api\/homelab-status/);
 	assert.match(script, /x-homelab-status-source/);
 	assert.match(script, /\/api\/social-card/);
@@ -204,6 +206,19 @@ test("production smoke validates pages, homelab API and social cards", async () 
 			);
 		}
 
+		if (url.pathname === "/api/deployment") {
+			return new Response(
+				JSON.stringify({
+					gitSha: DEPLOYED_SHA,
+					environment: "production",
+				}),
+				{
+					status: 200,
+					headers: { "content-type": "application/json" },
+				},
+			);
+		}
+
 		if (url.pathname === "/api/homelab-status") {
 			return new Response(
 				JSON.stringify({
@@ -240,7 +255,7 @@ test("production smoke validates pages, homelab API and social cards", async () 
 	}) as typeof fetch;
 
 	try {
-		await runProductionSmoke(ORIGIN);
+		await runProductionSmoke(ORIGIN, DEPLOYED_SHA);
 	} finally {
 		globalThis.fetch = originalFetch;
 		if (originalBypass === undefined) {
@@ -258,6 +273,7 @@ test("production smoke validates pages, homelab API and social cards", async () 
 		redirectModes.length > 0 &&
 			redirectModes.every((value) => value === "manual"),
 	);
+	assert.ok(requests.includes("/api/deployment"));
 	assert.ok(requests.includes("/contact"));
 	assert.ok(requests.includes("/fr/contact"));
 	assert.ok(requests.includes("/api/homelab-status"));
@@ -270,6 +286,31 @@ test("production smoke rejects non-canonical targets", async () => {
 		runProductionSmoke("https://example.com"),
 		/canonical origin https:\/\/www\.albanandrieu\.com/,
 	);
+});
+
+test("production smoke rejects a stale public deployment SHA", async () => {
+	const originalFetch = globalThis.fetch;
+
+	globalThis.fetch = (async () =>
+		new Response(
+			JSON.stringify({
+				gitSha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+				environment: "production",
+			}),
+			{
+				status: 200,
+				headers: { "content-type": "application/json" },
+			},
+		)) as typeof fetch;
+
+	try {
+		await assert.rejects(
+			runProductionSmoke(ORIGIN, DEPLOYED_SHA),
+			/api\/deployment mismatch: expected/,
+		);
+	} finally {
+		globalThis.fetch = originalFetch;
+	}
 });
 
 test("production smoke reports Vercel mitigation explicitly", async () => {
