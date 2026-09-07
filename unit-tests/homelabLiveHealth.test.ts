@@ -82,9 +82,9 @@ test("service cards promote effective health above runtime and troubleshooting d
 	const css = await source("app/components/homelab/HomelabServicesBlock.module.css");
 
 	assert.match(page, /EFFECTIVE_HEALTH_LABEL_KEY/);
-	assert.match(page, /data-effective-health=\{resolvedHealth\.effectiveState\}/);
+	assert.match(page, /data-effective-health=\{presentationState\}/);
 	assert.match(page, /className=\{styles\.serviceHealthBadge\}/);
-	assert.match(page, /data-health-state=\{resolvedHealth\.effectiveState\}/);
+	assert.match(page, /data-health-state=\{presentationState\}/);
 	assert.match(page, /data-health-stale/);
 	assert.match(css, /\.serviceHealthBadge\[data-health-state="fail"\]/);
 	assert.match(css, /\.serviceCard\[data-effective-health="warn"\]/);
@@ -100,7 +100,10 @@ test("TrueNAS dependency failures only affect services hosted on TrueNAS", async
 
 test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
-	assert.match(page, /internalPresentationState\(initialHealth\)/);
+	assert.match(page, /internalPresentationState\(/);
+	assert.match(page, /truenasRuntimeUnavailable \|\|/);
+	assert.match(page, /initialHealth\?\.runtime_stale === true/);
+	assert.match(page, /initialHealth\?\.runtime_reachable === false/);
 	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\)/);
 	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
 	assert.match(

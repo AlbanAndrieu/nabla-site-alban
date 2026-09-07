@@ -256,3 +256,54 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 		/@media \(prefers-reduced-motion: reduce\)[\s\S]*react-flow__edge\.animated path[\s\S]*animation:\s*none !important/,
 	);
 });
+
+
+test("local topology fallback is synchronized with the current Nabla Compose catalog", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	if (topology.catalogRevision !== undefined) {
+		assert.match(topology.catalogRevision, /^sha256:[0-9a-f]{64}$/);
+	}
+	assert.ok(topology.nodes.length >= 100);
+	assert.ok(topology.relations.length >= 200);
+
+	const nodeIds = new Set(topology.nodes.map((node) => node.id));
+	for (const id of [
+		"akvorado-console",
+		"akvorado-inlet",
+		"akvorado-orchestrator",
+		"akvorado-outlet",
+		"docker-socket-proxy",
+		"doco-cd",
+		"kafka",
+		"mongo",
+		"nexus",
+		"pihole-dns-sync",
+		"pyroscope",
+		"sentry-edge",
+		"sentry-relay",
+		"sentry-snuba-api",
+		"sentry-taskbroker",
+		"sentry-taskworker",
+	]) {
+		assert.ok(nodeIds.has(id), `expected synchronized topology node ${id}`);
+	}
+
+	const hasRelation = (source: string, target: string, type: string) =>
+		topology.relations.some(
+			(relation) =>
+				relation.source === source &&
+				relation.target === target &&
+				relation.type === type,
+		);
+
+	assert.ok(hasRelation("pihole-dns-sync", "pihole", "automates"));
+	assert.ok(hasRelation("akvorado-inlet", "kafka", "routesTo"));
+	assert.ok(hasRelation("akvorado-outlet", "clickhouse", "storesIn"));
+	assert.ok(hasRelation("pyroscope", "docker", "hostedBy"));
+	assert.ok(hasRelation("sentry-edge", "sentry-relay", "routesTo"));
+});

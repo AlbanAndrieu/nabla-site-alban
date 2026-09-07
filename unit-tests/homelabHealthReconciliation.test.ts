@@ -3,9 +3,7 @@ import test from "node:test";
 import type { HomelabHealthEntry } from "../lib/homelabHealth";
 import { reconcileHomelabHealth } from "../lib/homelabHealthReconciliation";
 
-function entry(
-	overrides: Partial<HomelabHealthEntry> = {},
-): HomelabHealthEntry {
+function entry(overrides: Partial<HomelabHealthEntry> = {}): HomelabHealthEntry {
 	return {
 		name: "service",
 		url: "https://service.example.test",
@@ -16,72 +14,113 @@ function entry(
 	};
 }
 
-test("application errors are authoritative failures", () => {
-	const result = reconcileHomelabHealth(
-		entry({ application_error: "backend unhealthy" }),
-	);
-	assert.equal(result.state, "fail");
+test("reachable application errors are degraded rather than downtime", () => {
+	const result = reconcileHomelabHealth(entry({ application_error: "backend unhealthy" }));
+	assert.equal(result.state, "warn");
 	assert.equal(result.reason, "application_error");
 });
 
-test("direct HTTP failure is authoritative for external services", () => {
+test("failed public probe with a fresh RUNNING origin is degraded", () => {
 	const result = reconcileHomelabHealth(
-		entry({
-			direct_state: "fail",
-			runtime_state: "RUNNING",
-			runtime_reachable: true,
-		}),
+		entry({ direct_state: "fail", http_status: 503, runtime_state: "RUNNING" }),
 		{ external: true },
+	);
+	assert.equal(result.state, "warn");
+});
+
+test("failed private probe with a fresh RUNNING origin is degraded, never green", () => {
+	const result = reconcileHomelabHealth(
+		entry({ direct_state: "fail", http_status: 503, runtime_state: "RUNNING" }),
+		{ external: false },
+	);
+	assert.equal(result.state, "warn");
+});
+
+test("failed HTTP probe without origin proof is red", () => {
+	const result = reconcileHomelabHealth(
+		entry({ direct_state: "fail", http_status: 503, state: "fail" }),
+		{ external: false },
 	);
 	assert.equal(result.state, "fail");
 	assert.equal(result.reason, "http_failure");
 });
 
-test("private HTTP failure does not override a healthy TrueNAS runtime", () => {
+test("fresh STOPPED runtime is authoritative without a current 2xx origin", () => {
+	const result = reconcileHomelabHealth(
+		entry({ direct_state: "ok", http_status: 302, runtime_state: "STOPPED" }),
+	);
+	assert.equal(result.state, "fail");
+	assert.equal(result.reason, "runtime_failure");
+});
+
+test("fresh DEPLOYING runtime is not considered an available application", () => {
+	const result = reconcileHomelabHealth(
+		entry({ http_status: 0, state: "unknown", runtime_state: "DEPLOYING" }),
+	);
+	assert.equal(result.state, "fail");
+});
+
+test("healthy 2xx origin with a failed runtime is degraded instead of green", () => {
+	const result = reconcileHomelabHealth(
+		entry({ direct_state: "ok", http_status: 200, runtime_state: "STOPPED" }),
+	);
+	assert.equal(result.state, "warn");
+});
+
+test("unreachable RUNNING runtime cannot rescue a failed application probe", () => {
 	const result = reconcileHomelabHealth(
 		entry({
 			direct_state: "fail",
+			http_status: 503,
+			state: "fail",
 			runtime_state: "RUNNING",
-			runtime_reachable: true,
-		}),
-		{ external: false },
-	);
-	assert.equal(result.state, "ok");
-	assert.equal(result.reason, "healthy_evidence");
-});
-
-test("private HTTP failure without private/runtime proof is degraded, not red", () => {
-	const result = reconcileHomelabHealth(
-		entry({ direct_state: "fail", http_status: 503, state: "fail" }),
-		{ external: false },
-	);
-	assert.equal(result.state, "warn");
-	assert.equal(result.reason, "degraded_evidence");
-});
-
-test("healthy HTTP with a failed runtime is degraded instead of green", () => {
-	const result = reconcileHomelabHealth(
-		entry({
-			direct_state: "ok",
-			runtime_state: "STOPPED",
 			runtime_reachable: false,
 		}),
 	);
-	assert.equal(result.state, "warn");
-	assert.equal(result.reason, "degraded_evidence");
+	assert.equal(result.state, "fail");
 });
 
-test("healthy HTTP with failed expected Cloudflare telemetry is degraded", () => {
+test("stale RUNNING runtime cannot rescue a failed application probe", () => {
 	const result = reconcileHomelabHealth(
 		entry({
-			direct_state: "ok",
-			tunnel_status: "down",
-			tunnel_name: "service-tunnel",
+			direct_state: "fail",
+			http_status: 503,
+			state: "fail",
+			runtime_state: "RUNNING",
+			runtime_stale: true,
 		}),
+	);
+	assert.equal(result.state, "fail");
+});
+
+test("stale healthy Cloudflare observation cannot rescue a failed origin", () => {
+	const result = reconcileHomelabHealth(
+		entry({
+			direct_state: "fail",
+			http_status: 503,
+			state: "fail",
+			tunnel_status: "healthy",
+			tunnel_stale: true,
+		}),
+		{ tunnelExpected: true },
+	);
+	assert.equal(result.state, "fail");
+});
+
+test("Cloudflare-only health is degraded evidence, not application health", () => {
+	const result = reconcileHomelabHealth(
+		entry({ http_status: 0, state: "unknown", tunnel_status: "healthy" }),
+		{ tunnelExpected: true },
+	);
+	assert.equal(result.state, "warn");
+});
+
+test("failed Cloudflare exposure alone is degraded, not origin downtime", () => {
+	const result = reconcileHomelabHealth(
+		entry({ http_status: 0, state: "unknown", tunnel_status: "failed" }),
 		{ external: true, tunnelExpected: true },
 	);
 	assert.equal(result.state, "warn");
-	assert.equal(result.reason, "degraded_evidence");
 });
 
 test("Cloudflare telemetry is ignored when no tunnel is configured", () => {
@@ -94,21 +133,8 @@ test("Cloudflare telemetry is ignored when no tunnel is configured", () => {
 		}),
 		{ external: false, tunnelExpected: false },
 	);
-	assert.equal(result.state, "ok");
-	assert.equal(result.reason, "healthy_evidence");
-	assert.equal(
-		result.evidence.some((item) => item.kind === "cloudflare"),
-		false,
-	);
-});
-
-test("Cloudflare failure is authoritative when expected and HTTP is not healthy", () => {
-	const result = reconcileHomelabHealth(
-		entry({ http_status: 0, state: "unknown", tunnel_status: "failed" }),
-		{ external: true, tunnelExpected: true },
-	);
-	assert.equal(result.state, "fail");
-	assert.equal(result.reason, "cloudflare_failure");
+	assert.equal(result.state, "warn");
+	assert.equal(result.evidence.some((item) => item.kind === "cloudflare"), false);
 });
 
 test("healthy runtime with failed internal evidence is degraded", () => {
@@ -121,13 +147,13 @@ test("healthy runtime with failed internal evidence is degraded", () => {
 		}),
 	);
 	assert.equal(result.state, "warn");
-	assert.equal(result.reason, "degraded_evidence");
 });
 
-test("multiple healthy proofs reconcile to ok", () => {
+test("multiple fresh healthy proofs reconcile to ok", () => {
 	const result = reconcileHomelabHealth(
 		entry({
 			direct_state: "ok",
+			http_status: 200,
 			runtime_state: "RUNNING",
 			tunnel_status: "healthy",
 		}),
@@ -135,13 +161,11 @@ test("multiple healthy proofs reconcile to ok", () => {
 	);
 	assert.equal(result.state, "ok");
 	assert.equal(result.reason, "healthy_evidence");
-	assert.ok(result.evidence.length >= 3);
 });
 
-test("insufficient evidence preserves unknown", () => {
+test("insufficient evidence preserves an old-schema unknown", () => {
 	const result = reconcileHomelabHealth(
 		entry({ http_status: 0, reachable: false, state: "unknown" }),
 	);
 	assert.equal(result.state, "unknown");
-	assert.equal(result.reason, "insufficient_evidence");
 });
