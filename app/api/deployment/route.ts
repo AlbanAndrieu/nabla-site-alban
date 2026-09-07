@@ -31,6 +31,7 @@ export function GET() {
 				status: 503,
 				headers: {
 					"Cache-Control": "no-store",
+					"X-Robots-Tag": "noindex, nofollow",
 				},
 			},
 		);
@@ -44,6 +45,7 @@ export function GET() {
 		{
 			headers: {
 				"Cache-Control": "no-store",
+				"X-Robots-Tag": "noindex, nofollow",
 			},
 		},
 	);
