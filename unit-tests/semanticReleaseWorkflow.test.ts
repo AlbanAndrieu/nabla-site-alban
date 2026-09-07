@@ -28,4 +28,10 @@ test("semantic-release keeps the release token least-privileged", async () => {
 	assert.doesNotMatch(workflow, /permission-workflows:/);
 	assert.doesNotMatch(workflow, /^\s*workflows:\s*write\s*$/m);
 	assert.match(workflow, /^\s*contents:\s*write\s*$/m);
+	assert.match(workflow, /RELEASE_APP_PRIVATE_KEY_CONFIGURED/);
+	assert.match(workflow, /steps\.release_app_token\.outputs\.token/);
+	assert.doesNotMatch(
+		workflow,
+		/steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN/,
+	);
 });
