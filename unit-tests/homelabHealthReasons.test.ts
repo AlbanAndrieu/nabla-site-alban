@@ -81,3 +81,18 @@ test("down Cloudflare tunnel is explicit when the service expects a tunnel", () 
 
 	assert.deepEqual(reasons, [{ kind: "tunnel_down", detail: "down" }]);
 });
+
+
+test("deploying runtime is explicitly reported as not ready", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			state: "fail",
+			runtime_state: "DEPLOYING",
+			direct_state: "warn",
+			http_status: 403,
+			reachable: true,
+		}),
+	);
+
+	assert.deepEqual(reasons, [{ kind: "runtime_down", detail: "DEPLOYING" }]);
+});
