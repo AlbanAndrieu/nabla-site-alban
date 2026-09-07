@@ -35,3 +35,70 @@ test("active professional copy is consistent across home and contact", async () 
 		for (const key of ["value1", "value2", "value3", "value4"]) assert.equal(typeof messages.home.hero[key], "string");
 	}
 });
+
+
+test("current CV sources close the Jus Mundi period in 2026", async () => {
+	const htmlPaths = [
+		"cv-small-en.html",
+		"cv-small-fr.html",
+		"cv-small-de.html",
+		"cv-small-no.html",
+		"cv-medium-en.html",
+		"cv-medium-fr.html",
+		"cv-medium-de.html",
+		"cv-medium-no.html",
+		"cv-large-en.html",
+		"cv-large-fr.html",
+		"cv-large-de.html",
+		"cv-large-no.html",
+		"cv-full-en.html",
+		"cv-full-fr.html",
+		"cv-full-de.html",
+		"cv-full-no.html",
+	];
+
+	for (const filename of htmlPaths) {
+		const source = await readFile(`public/cv/${filename}`, "utf8");
+		assert.match(source, /2022(?:-| – )2026/, filename);
+		assert.doesNotMatch(
+			source,
+			/Since March 2022|Depuis mars 2022|Seit März 2022|Siden mars 2022|Since 2022 - 4\+ years|Depuis 2022 - 4\+ ans|Seit 2022 - 4\+ Jahre/,
+			filename,
+		);
+	}
+
+	for (const filename of [
+		"cv-aandrieu-2026-03-29.json",
+		"cv-aandrieu-2026-03-29-en.json",
+		"cv-aandrieu-2026-03-29-fr.json",
+		"cv-large-en-rx.json",
+		"cv-large-fr-rx.json",
+		"cv-full-en-rx.json",
+		"cv-full-fr-rx.json",
+	]) {
+		const source = await readFile(`public/cv/${filename}`, "utf8");
+		assert.match(source, /"period": "2022-2026"/, filename);
+		assert.doesNotMatch(source, /"period": "2022 - Present"/, filename);
+	}
+
+	for (const filename of [
+		"cv-aandrieu-2026-en.tex",
+		"cv-aandrieu-2026-fr.tex",
+		"cv-aandrieu-2026-de.tex",
+		"cv-aandrieu-2026-no.tex",
+	]) {
+		const source = await readFile(`public/cv/${filename}`, "utf8");
+		assert.match(source, /\\cventry\{2022-2026\}/, filename);
+	}
+
+	for (const filename of [
+		"cv-aandrieu-2026-ts-en.tex",
+		"cv-aandrieu-2026-ts-fr.tex",
+		"cv-aandrieu-2026-ts-de.tex",
+		"cv-aandrieu-2026-ts-no.tex",
+	]) {
+		const source = await readFile(`public/cv/${filename}`, "utf8");
+		assert.match(source, /\{2026 -\}[\s\S]*\{2022\}[\s\S]*Jus Mundi/, filename);
+		assert.doesNotMatch(source, /\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/, filename);
+	}
+});
