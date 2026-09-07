@@ -73,3 +73,42 @@ jobs:
           path: ./public/cv/*.log
           retention-days: 7
           if-no-files-found: ignore
+
+
+  sync-cv-pdfs:
+    name: Sync rebuilt CV PDFs
+    needs: build-cv-pdfs
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Download rebuilt CV PDFs
+        uses: actions/download-artifact@v6
+        with:
+          name: cv-pdfs
+          path: public/cv
+
+      - name: Commit rebuilt CV PDFs when changed
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add --             public/cv/cv-aandrieu-2026-en.pdf             public/cv/cv-aandrieu-2026-fr.pdf
+          if git diff --cached --quiet; then
+            echo "Generated CV PDFs already match the branch."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(cv): rebuild corrected CV PDFs"
+          git push origin "HEAD:${HEAD_BRANCH}"
