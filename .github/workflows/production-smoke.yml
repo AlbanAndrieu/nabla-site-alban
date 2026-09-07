@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       git_sha:
-        description: "Optional deployed Git SHA"
-        required: false
+        description: "Production Git SHA expected on the canonical www origin"
+        required: true
         type: string
 
 permissions:
@@ -44,10 +44,18 @@ jobs:
         }}
 
     steps:
+      - name: Validate deployed SHA
+        run: |
+          if [[ ! "$DEPLOYED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::DEPLOYED_SHA must be a full lowercase 40-character Git SHA."
+            exit 1
+          fi
+
       - name: Checkout deployed revision
         uses: actions/checkout@v6
         with:
           ref: ${{ env.DEPLOYED_SHA }}
+          persist-credentials: false
           sparse-checkout: |
             .nvmrc
             scripts/post-deploy-smoke.mjs
