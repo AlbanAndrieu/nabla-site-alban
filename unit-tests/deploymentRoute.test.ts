@@ -23,6 +23,7 @@ test("deployment API exposes only the Vercel deployment identity", async () => {
 		const response = GET();
 		assert.equal(response.status, 200);
 		assert.equal(response.headers.get("cache-control"), "no-store");
+		assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
 		assert.deepEqual(await response.json(), {
 			gitSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			environment: "production",
@@ -45,6 +46,7 @@ test("deployment API fails closed when Vercel Git identity is unavailable", asyn
 		const response = GET();
 		assert.equal(response.status, 503);
 		assert.equal(response.headers.get("cache-control"), "no-store");
+		assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
 		assert.deepEqual(await response.json(), {
 			error: "Deployment identity unavailable",
 		});
