@@ -65,6 +65,15 @@
 	font-weight: 600;
 }
 
+.healthSemantics {
+	margin: var(--ui-space-md) 0 0;
+	padding: var(--ui-space-sm) var(--ui-space-md);
+	border-inline-start: 3px solid var(--ui-border);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.875rem;
+}
+
 .healthSummary {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
