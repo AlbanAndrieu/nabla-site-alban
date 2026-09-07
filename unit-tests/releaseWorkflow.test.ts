@@ -91,6 +91,7 @@ test("release skips repository mutation safely when App credentials are missing"
     release,
     /steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN/,
   );
+  assert.doesNotMatch(release, /echo "Configure repository variable `/);
 });
 
 test("release bootstrap keeps release App permissions minimal and scopes its private key", async () => {
