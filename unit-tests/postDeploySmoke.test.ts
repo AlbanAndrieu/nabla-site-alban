@@ -104,9 +104,15 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.match(workflow, /git\.ref == 'master'/);
 	assert.match(workflow, /environment == 'production'/);
 	assert.match(workflow, /BASE_URL: "https:\/\/www\.albanandrieu\.com"/);
+	assert.match(workflow, /DEPLOYED_SHA must be a full lowercase 40-character Git SHA/);
+	assert.match(workflow, /persist-credentials: false/);
 	assert.match(workflow, /node scripts\/post-deploy-smoke\.mjs/);
 	assert.match(workflow, /Production Post-deploy Smoke/);
 	assert.doesNotMatch(workflow, /inputs\.base_url/);
+	assert.match(
+		workflow,
+		/git_sha:[\s\S]*description: "Production Git SHA expected on the canonical www origin"[\s\S]*required: true/,
+	);
 	assert.doesNotMatch(workflow, /npm ci/);
 	assert.doesNotMatch(workflow, /playwright/i);
 	assert.match(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
