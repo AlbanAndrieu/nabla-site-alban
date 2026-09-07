@@ -18,7 +18,19 @@ type Props = {
 	runtimeStale?: boolean;
 };
 
-function reasonKey(reason: HomelabHealthReason): string {
+type HealthReasonMessageKey =
+	| "health.reasons.runtimeDown"
+	| "health.reasons.publicEndpointDown"
+	| "health.reasons.internalEndpointDown"
+	| "health.reasons.applicationError"
+	| "health.reasons.tunnelMissing"
+	| "health.reasons.tunnelDown"
+	| "health.reasons.tunnelUnobserved"
+	| "health.reasons.runtimeStale"
+	| "health.reasons.tunnelStale"
+	| "health.reasons.staleEvidence";
+
+function reasonKey(reason: HomelabHealthReason): HealthReasonMessageKey {
 	switch (reason.kind) {
 		case "runtime_down":
 			return "health.reasons.runtimeDown";
@@ -58,18 +70,6 @@ export default function ServiceHealthReasons({
 		cloudflareConfigured,
 		runtimeStale,
 	});
-	const visibleReasons =
-		reasons.length > 0
-			? reasons
-			: [
-					{
-						kind: state === "fail" ? "public_endpoint_down" : "stale_evidence",
-						detail:
-							state === "fail"
-								? t("health.reasons.genericFailure")
-								: t("health.reasons.genericDegraded"),
-					} satisfies HomelabHealthReason,
-				];
 
 	return (
 		<div
@@ -78,15 +78,23 @@ export default function ServiceHealthReasons({
 			data-health-severity={state}
 		>
 			<strong>{t("health.reasonTitle")}</strong>
-			<ul className="mb-0 mt-1 ps-3">
-				{visibleReasons.map((reason, index) => (
-					<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
-						{reason.detail
-							? t(reasonKey(reason), { detail: reason.detail })
-							: t(reasonKey(reason))}
-					</li>
-				))}
-			</ul>
+			{reasons.length > 0 ? (
+				<ul className="mb-0 mt-1 ps-3">
+					{reasons.map((reason, index) => (
+						<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
+							{reason.detail
+								? t(reasonKey(reason), { detail: reason.detail })
+								: t(reasonKey(reason))}
+						</li>
+					))}
+				</ul>
+			) : (
+				<p className="mb-0 mt-1">
+					{state === "fail"
+						? t("health.reasons.genericFailure")
+						: t("health.reasons.genericDegraded")}
+				</p>
+			)}
 		</div>
 	);
 }
