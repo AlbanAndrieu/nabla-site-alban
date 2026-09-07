@@ -41,6 +41,13 @@ const migratedSeoSlugs = [
 	"nabla",
 ] as const;
 
+const localizedSeoSlugs = [
+	...migratedSeoSlugs,
+	"architecture",
+	"cv",
+	"jm",
+] as const;
+
 const nonIndexablePages = [
 	"/ctid.html",
 	"/freenas.html",
@@ -60,10 +67,7 @@ const nonIndexablePages = [
 
 const indexablePages = [
 	"/",
-	...migratedSeoSlugs.map((slug) => `/${slug}`),
-	"/architecture",
-	"/cv",
-	"/jm",
+	...localizedSeoSlugs.map((slug) => `/${slug}`),
 	...policySlugs.map((slug) => `/policy/${slug}`),
 ];
 
@@ -95,8 +99,8 @@ test.describe("SEO indexing policy", () => {
 		}
 	});
 
-	test("migrated pages expose self-canonical and reciprocal extensionless hreflang", async ({ page }) => {
-		for (const slug of migratedSeoSlugs) {
+	test("localized SEO pages expose self-canonical and reciprocal extensionless hreflang", async ({ page }) => {
+		for (const slug of localizedSeoSlugs) {
 			const englishUrl = `${canonicalOrigin}/${slug}`;
 			const frenchUrl = `${canonicalOrigin}/fr/${slug}`;
 			for (const [pathname, canonical] of [[`/${slug}`, englishUrl], [`/fr/${slug}`, frenchUrl]] as const) {
@@ -105,6 +109,7 @@ test.describe("SEO indexing policy", () => {
 				await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonical);
 				await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute("href", englishUrl);
 				await expect(page.locator('link[rel="alternate"][hreflang="fr"]')).toHaveAttribute("href", frenchUrl);
+				await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute("href", englishUrl);
 			}
 		}
 	});
