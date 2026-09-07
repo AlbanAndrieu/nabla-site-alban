@@ -43,3 +43,105 @@ export function cloudflareIndicatorColor(entry?: HomelabHealthEntry): string {
 	}
 	return HEALTH_COLORS.warn;
 }
+
+
+export type HomelabHealthReasonKind =
+	| "runtime_down"
+	| "public_endpoint_down"
+	| "internal_endpoint_down"
+	| "application_error"
+	| "tunnel_missing"
+	| "tunnel_down"
+	| "tunnel_unobserved"
+	| "runtime_stale"
+	| "tunnel_stale"
+	| "stale_evidence";
+
+export type HomelabHealthReason = {
+	kind: HomelabHealthReasonKind;
+	detail?: string;
+};
+
+export type HomelabHealthReasonOptions = {
+	tunnelExpected?: boolean;
+	cloudflareConfigured?: boolean;
+	runtimeStale?: boolean;
+};
+
+const FAILED_RUNTIME_STATES = new Set([
+	"crashed",
+	"down",
+	"error",
+	"failed",
+	"stopped",
+]);
+const FAILED_TUNNEL_STATES = new Set([
+	"down",
+	"inactive",
+	"failed",
+	"error",
+]);
+
+export function homelabHealthReasons(
+	entry: HomelabHealthEntry | undefined,
+	options: HomelabHealthReasonOptions = {},
+): HomelabHealthReason[] {
+	if (!entry) return [];
+	const reasons: HomelabHealthReason[] = [];
+	const runtimeState = entry.runtime_state?.trim().toLowerCase();
+	const runtimeStale = options.runtimeStale === true || entry.runtime_stale === true;
+	const tunnelStatus = entry.tunnel_status?.trim().toLowerCase();
+
+	if (runtimeStale) {
+		reasons.push({ kind: "runtime_stale" });
+	} else if (runtimeState && FAILED_RUNTIME_STATES.has(runtimeState)) {
+		reasons.push({
+			kind: "runtime_down",
+			detail: entry.runtime_state ?? runtimeState,
+		});
+	}
+
+	if (entry.application_error) {
+		reasons.push({
+			kind: "application_error",
+			detail: entry.application_error,
+		});
+	}
+
+	if (entry.direct_state === "fail") {
+		reasons.push({
+			kind: "public_endpoint_down",
+			detail:
+				entry.error?.trim() ||
+				(entry.http_status > 0 ? `HTTP ${entry.http_status}` : "unreachable"),
+		});
+	}
+
+	if (entry.internal_state === "fail") {
+		reasons.push({
+			kind: "internal_endpoint_down",
+			detail: "internal probe failed",
+		});
+	}
+
+	if (options.tunnelExpected === true) {
+		if (entry.tunnel_stale === true) {
+			reasons.push({ kind: "tunnel_stale" });
+		} else if (options.cloudflareConfigured === false) {
+			reasons.push({ kind: "tunnel_unobserved" });
+		} else if (!tunnelStatus) {
+			reasons.push({ kind: "tunnel_missing" });
+		} else if (FAILED_TUNNEL_STATES.has(tunnelStatus)) {
+			reasons.push({
+				kind: "tunnel_down",
+				detail: entry.tunnel_status ?? tunnelStatus,
+			});
+		}
+	}
+
+	if (entry.observation_stale === true) {
+		reasons.push({ kind: "stale_evidence" });
+	}
+
+	return reasons;
+}
