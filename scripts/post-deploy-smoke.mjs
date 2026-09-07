@@ -63,13 +63,18 @@ function attributeValue(tag, name) {
   return match?.[1] ?? null;
 }
 
-function decodeHtmlAttributeValue(value) {
-  return value
-    .replace(/&amp;/gi, "&")
-    .replace(/&#38;/g, "&")
-    .replace(/&#x26;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#34;/g, '"');
+const HTML_ATTRIBUTE_ENTITY_PATTERN =
+  /&(amp|quot|#0*(?:34|38)|#x0*(?:22|26));/gi;
+
+export function decodeHtmlAttributeValue(value) {
+  return value.replace(HTML_ATTRIBUTE_ENTITY_PATTERN, (_entity, code) => {
+    const normalized = String(code).toLowerCase();
+    const isAmpersand =
+      normalized === "amp" ||
+      normalized.endsWith("38") ||
+      normalized.endsWith("26");
+    return isAmpersand ? "&" : '"';
+  });
 }
 
 function linkHref(html, rel, hreflang) {

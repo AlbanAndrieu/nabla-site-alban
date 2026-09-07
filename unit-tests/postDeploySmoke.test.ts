@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { runProductionSmoke } from "../scripts/post-deploy-smoke.mjs";
+import {
+	decodeHtmlAttributeValue,
+	runProductionSmoke,
+} from "../scripts/post-deploy-smoke.mjs";
 
 const ORIGIN = "https://www.albanandrieu.com";
 const DEPLOYED_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -89,6 +92,17 @@ function socialPng() {
 	png.writeUInt32BE(630, 20);
 	return png;
 }
+
+test("HTML attribute decoding is single-pass", () => {
+	assert.equal(decodeHtmlAttributeValue("&amp;"), "&");
+	assert.equal(decodeHtmlAttributeValue("&#38;"), "&");
+	assert.equal(decodeHtmlAttributeValue("&#x26;"), "&");
+	assert.equal(decodeHtmlAttributeValue("&quot;"), '"');
+	assert.equal(decodeHtmlAttributeValue("&#34;"), '"');
+	assert.equal(decodeHtmlAttributeValue("&#x22;"), '"');
+	assert.equal(decodeHtmlAttributeValue("&amp;quot;"), "&quot;");
+	assert.equal(decodeHtmlAttributeValue("&amp;amp;"), "&amp;");
+});
 
 test("production smoke stays lightweight and production-only", async () => {
 	const workflow = await readFile(
