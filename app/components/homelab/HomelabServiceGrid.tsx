@@ -178,7 +178,11 @@ function runtimeHealthState(state?: string | null): HomelabHealthState | null {
 	if (["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"].includes(normalized)) {
 		return "ok";
 	}
-	if (["CRASHED", "DOWN", "ERROR", "FAILED", "STOPPED"].includes(normalized)) {
+	if (
+		["CRASHED", "DEPLOYING", "DOWN", "ERROR", "FAILED", "STOPPED", "STOPPING"].includes(
+			normalized,
+		)
+	) {
 		return "fail";
 	}
 	return "warn";
