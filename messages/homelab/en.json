@@ -152,7 +152,7 @@
 			"semantics": "Red = service unavailable. Orange = service reachable but unhealthy, dependency-degraded, or exposure configuration incomplete. Gray = insufficient evidence.",
 			"reasonTitle": "Why this status?",
 			"reasons": {
-				"runtimeDown": "TrueNAS runtime is stopped or failed ({detail}).",
+				"runtimeDown": "TrueNAS runtime is not ready ({detail}).",
 				"publicEndpointDown": "Public endpoint is unavailable ({detail}).",
 				"internalEndpointDown": "Internal endpoint is unavailable ({detail}).",
 				"applicationError": "Application is reachable but reports an error: {detail}.",

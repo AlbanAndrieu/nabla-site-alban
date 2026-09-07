@@ -152,7 +152,7 @@
 			"semantics": "Rouge = service indisponible. Orange = service joignable mais en erreur, dépendance dégradée ou configuration d’exposition incomplète. Gris = preuve insuffisante.",
 			"reasonTitle": "Pourquoi ce statut ?",
 			"reasons": {
-				"runtimeDown": "Runtime TrueNAS arrêté ou en échec ({detail}).",
+				"runtimeDown": "Runtime TrueNAS non prêt ({detail}).",
 				"publicEndpointDown": "Point d’accès public indisponible ({detail}).",
 				"internalEndpointDown": "Point d’accès interne indisponible ({detail}).",
 				"applicationError": "Application joignable mais en erreur : {detail}.",

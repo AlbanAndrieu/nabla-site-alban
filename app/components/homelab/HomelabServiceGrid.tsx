@@ -178,7 +178,11 @@ function runtimeHealthState(state?: string | null): HomelabHealthState | null {
 	if (["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"].includes(normalized)) {
 		return "ok";
 	}
-	if (["CRASHED", "DOWN", "ERROR", "FAILED", "STOPPED"].includes(normalized)) {
+	if (
+		["CRASHED", "DEPLOYING", "DOWN", "ERROR", "FAILED", "STOPPED", "STOPPING"].includes(
+			normalized,
+		)
+	) {
 		return "fail";
 	}
 	return "warn";
@@ -186,10 +190,11 @@ function runtimeHealthState(state?: string | null): HomelabHealthState | null {
 
 function internalPresentationState(
 	entry: HomelabHealthEntry | undefined,
+	runtimeStale: boolean,
 ): HomelabHealthState {
 	return (
 		entry?.internal_state ??
-		runtimeHealthState(entry?.runtime_state) ??
+		(runtimeStale ? null : runtimeHealthState(entry?.runtime_state)) ??
 		entry?.local_state ??
 		entry?.state ??
 		"unknown"
@@ -204,7 +209,14 @@ function runtimePresentationState(
 	runtimeStale: boolean,
 ): RuntimePresentationState | null {
 	if (!dependsOnTrueNas || serviceId === "truenas") return null;
-	if (runtimeUnavailable || runtimeStale) return "missing";
+	if (
+		runtimeUnavailable ||
+		runtimeStale ||
+		entry?.runtime_stale === true ||
+		entry?.runtime_reachable === false
+	) {
+		return "missing";
+	}
 	return runtimeHealthState(entry?.runtime_state) ?? "missing";
 }
 
@@ -319,7 +331,13 @@ export default function HomelabServiceGrid({
 					const dependsOnTrueNas =
 						svc.internalHost === "172.17.0.24" ||
 						initialHealth?.runtime_app != null;
-					const internalState = internalPresentationState(initialHealth);
+					const internalState = internalPresentationState(
+						initialHealth,
+						truenasRuntimeUnavailable ||
+							truenasRuntimeStale ||
+							initialHealth?.runtime_stale === true ||
+							initialHealth?.runtime_reachable === false,
+					);
 					const internalColor = homelabHealthColor(internalState);
 					const runtimeState = runtimePresentationState(
 						initialHealth,

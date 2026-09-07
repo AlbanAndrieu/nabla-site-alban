@@ -28,27 +28,22 @@ const HEALTHY_TUNNEL_STATES = new Set(["healthy", "active", "up", "ok"]);
 const DEGRADED_TUNNEL_STATES = new Set(["degraded", "starting", "unknown"]);
 const FAILED_TUNNEL_STATES = new Set(["down", "inactive", "failed", "error"]);
 
-function normalizeRuntimeState(
-	value?: string | null,
-): HomelabHealthState | null {
+function normalizeRuntimeState(value?: string | null): HomelabHealthState | null {
 	const normalized = value?.trim().toLowerCase();
 	if (!normalized) return null;
-	if (["running", "active", "healthy", "up", "started"].includes(normalized))
-		return "ok";
+	if (["running", "active", "healthy", "up", "started"].includes(normalized)) return "ok";
 	if (
-		["deploying", "starting", "degraded", "warning", "paused"].includes(
+		["deploying", "stopping", "stopped", "failed", "error", "crashed", "down"].includes(
 			normalized,
 		)
-	)
-		return "warn";
-	if (["stopped", "failed", "error", "crashed", "down"].includes(normalized))
+	) {
 		return "fail";
+	}
+	if (["starting", "degraded", "warning", "paused"].includes(normalized)) return "warn";
 	return "unknown";
 }
 
-function normalizeTunnelState(
-	value?: string | null,
-): HomelabHealthState | null {
+function normalizeTunnelState(value?: string | null): HomelabHealthState | null {
 	const normalized = value?.trim().toLowerCase();
 	if (!normalized) return null;
 	if (HEALTHY_TUNNEL_STATES.has(normalized)) return "ok";
@@ -72,21 +67,15 @@ export function reconcileHomelabHealth(
 	policy: HomelabHealthPolicy = {},
 ): HomelabHealthReconciliation {
 	const evidence: HomelabHealthEvidence[] = [];
-	const external = policy.external ?? true;
 	const tunnelExpected = policy.tunnelExpected ?? true;
 
 	if (entry.application_error) {
-		addEvidence(evidence, "application", "fail", entry.application_error);
-		return { state: "fail", reason: "application_error", evidence };
+		addEvidence(evidence, "application", "warn", entry.application_error);
+		return { state: "warn", reason: "application_error", evidence };
 	}
 
 	if (entry.direct_state) {
-		addEvidence(
-			evidence,
-			"http",
-			entry.direct_state,
-			`direct ${entry.direct_state}`,
-		);
+		addEvidence(evidence, "http", entry.direct_state, `direct ${entry.direct_state}`);
 	} else if (entry.http_status > 0) {
 		const httpState: HomelabHealthState =
 			entry.http_status >= 200 && entry.http_status <= 399
@@ -97,7 +86,10 @@ export function reconcileHomelabHealth(
 		addEvidence(evidence, "http", httpState, `HTTP ${entry.http_status}`);
 	}
 
-	const runtimeState = normalizeRuntimeState(entry.runtime_state);
+	const runtimeState =
+		entry.runtime_stale === true || entry.runtime_reachable === false
+			? null
+			: normalizeRuntimeState(entry.runtime_state);
 	if (runtimeState) {
 		addEvidence(
 			evidence,
@@ -108,17 +100,13 @@ export function reconcileHomelabHealth(
 	}
 
 	if (entry.internal_state) {
-		addEvidence(
-			evidence,
-			"internal",
-			entry.internal_state,
-			`internal ${entry.internal_state}`,
-		);
+		addEvidence(evidence, "internal", entry.internal_state, `internal ${entry.internal_state}`);
 	}
 
-	const tunnelState = tunnelExpected
-		? normalizeTunnelState(entry.tunnel_status)
-		: null;
+	const tunnelState =
+		tunnelExpected && entry.tunnel_stale !== true
+			? normalizeTunnelState(entry.tunnel_status)
+			: null;
 	if (tunnelState) {
 		addEvidence(
 			evidence,
@@ -133,42 +121,53 @@ export function reconcileHomelabHealth(
 	const runtime = byKind.get("runtime");
 	const internal = byKind.get("internal");
 	const cloudflare = byKind.get("cloudflare");
+	const originProvenUp =
+		internal === "ok" || (entry.http_status >= 200 && entry.http_status < 300);
 
-	if (external && http === "fail") {
-		return { state: "fail", reason: "http_failure", evidence };
+	if (runtime === "fail") {
+		return originProvenUp
+			? { state: "warn", reason: "degraded_evidence", evidence }
+			: { state: "fail", reason: "runtime_failure", evidence };
 	}
 
-	if (runtime === "fail" && http !== "ok") {
-		return { state: "fail", reason: "runtime_failure", evidence };
-	}
-
-	if (tunnelExpected && cloudflare === "fail" && http !== "ok") {
-		return { state: "fail", reason: "cloudflare_failure", evidence };
-	}
-
-	if (!external && http === "fail") {
-		if (runtime === "ok" && internal !== "fail") {
-			return { state: "ok", reason: "healthy_evidence", evidence };
+	if (http === "ok") {
+		if (cloudflare === "fail") {
+			return internal === "ok" || runtime === "ok"
+				? { state: "warn", reason: "degraded_evidence", evidence }
+				: { state: "fail", reason: "cloudflare_failure", evidence };
 		}
-		if (internal === "ok" && runtime !== "fail") {
-			return { state: "ok", reason: "healthy_evidence", evidence };
+		return internal === "fail"
+			? { state: "warn", reason: "degraded_evidence", evidence }
+			: { state: "ok", reason: "healthy_evidence", evidence };
+	}
+
+	if (http === "warn") {
+		if (cloudflare === "fail") {
+			return internal === "ok" || runtime === "ok"
+				? { state: "warn", reason: "degraded_evidence", evidence }
+				: { state: "fail", reason: "cloudflare_failure", evidence };
 		}
 		return { state: "warn", reason: "degraded_evidence", evidence };
 	}
 
-	if ([http, runtime, internal, cloudflare].includes("warn")) {
-		return { state: "warn", reason: "degraded_evidence", evidence };
+	if (http === "fail") {
+		return internal === "ok" || runtime === "ok"
+			? { state: "warn", reason: "degraded_evidence", evidence }
+			: { state: "fail", reason: "http_failure", evidence };
 	}
 
-	if (
-		(http === "ok" && (runtime === "fail" || cloudflare === "fail")) ||
-		(runtime === "ok" && internal === "fail")
-	) {
+	if (internal === "ok") return { state: "ok", reason: "healthy_evidence", evidence };
+	if (internal === "fail") {
+		return runtime === "ok"
+			? { state: "warn", reason: "degraded_evidence", evidence }
+			: { state: "fail", reason: "http_failure", evidence };
+	}
+	if (runtime === "ok") return { state: "warn", reason: "degraded_evidence", evidence };
+	if (tunnelExpected && cloudflare) {
 		return { state: "warn", reason: "degraded_evidence", evidence };
 	}
-
-	if ([http, runtime, internal, cloudflare].some((state) => state === "ok")) {
-		return { state: "ok", reason: "healthy_evidence", evidence };
+	if (evidence.length > 0) {
+		return { state: "warn", reason: "degraded_evidence", evidence };
 	}
 
 	return {
