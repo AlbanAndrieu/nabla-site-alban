@@ -8,7 +8,6 @@ import {
 } from "@/lib/policyPages";
 import {
 	canonicalPageAlternates,
-	canonicalPagePath,
 	SEO_PAGE_SLUGS,
 	seoSettings,
 } from "@/lib/sitePageCatalog";

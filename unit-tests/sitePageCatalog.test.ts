@@ -90,8 +90,14 @@ test("SEO sitemap entries reuse reciprocal alternates including x-default", () =
 		const frenchPath = canonicalPagePath(slug, "fr");
 		const entry = entries.get(englishPath);
 		assert.ok(entry, englishPath);
-		assert.equal(entry.alternates?.languages?.en, `https://www.albanandrieu.com${englishPath === "/" ? "" : englishPath}/`.replace(/\/$/, englishPath === "/" ? "/" : ""));
-		assert.equal(entry.alternates?.languages?.fr, `https://www.albanandrieu.com${frenchPath}`);
+		assert.equal(
+			entry.alternates?.languages?.en,
+			new URL(englishPath, "https://www.albanandrieu.com").href,
+		);
+		assert.equal(
+			entry.alternates?.languages?.fr,
+			new URL(frenchPath, "https://www.albanandrieu.com").href,
+		);
 		assert.equal(entry.alternates?.languages?.["x-default"], entry.alternates?.languages?.en);
 	}
 });
