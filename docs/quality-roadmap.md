@@ -396,6 +396,12 @@ Autres contrôles :
 - [x] Aligner le développement et les workflows GitHub sur Node 25, conserver une plage `>=24.11.0 <26` compatible avec le runtime Vercel Node 24, et garder OpenCommit uniquement comme helper local/on-demand.
 - [x] Retirer `wrangler.jsonc` et les dernières instructions de déploiement Wrangler ; Vercel reste l’unique runtime web publié.
 - [x] Aligner Next.js et `eslint-config-next` sur 16.3.4 ainsi que `@types/node` sur la branche 25.
+- [x] Converger les correctifs CI partagés avec `nabla-site-bababou#156-#160` :
+  formatter ESLint GitHub natif tout en gardant le fallback GitLab, cache npm explicite
+  après sélection de Node, pin npm depuis `$RUNNER_TEMP` et authentification de
+  Semantic Release avant le contrôle de fraîcheur. Le bootstrap de thème et les
+  contrastes WCAG AA étaient déjà présents via #150/#152 ; le fallback Docker
+  non-root/Trivy/GHCR était déjà aligné via #154/#155.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du

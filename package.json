@@ -19,7 +19,7 @@
 		"npm": ">=11.17.0 <12"
 	},
 	"scripts": {
-		"lint": "eslint --format gitlab .",
+		"lint": "eslint --format ./scripts/eslint-github-formatter.mjs .",
 		"lint:css": "stylelint public/*.css",
 		"typecheck": "tsc --noEmit",
 		"quality:fix": "biome check --write .",
