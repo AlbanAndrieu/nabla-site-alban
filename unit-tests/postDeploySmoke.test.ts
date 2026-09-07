@@ -109,7 +109,12 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.doesNotMatch(workflow, /npm ci/);
 	assert.doesNotMatch(workflow, /playwright/i);
 	assert.match(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
+	assert.match(workflow, /SMOKE_LOG/);
+	assert.match(workflow, /GITHUB_STEP_SUMMARY/);
+	assert.match(workflow, /set -o pipefail/);
 	assert.match(script, /x-vercel-protection-bypass/);
+	assert.match(script, /x-vercel-mitigated/);
+	assert.match(script, /assertContentType/);
 	assert.match(script, /redirect: "manual"/);
 	assert.match(script, /target\.origin === CANONICAL_ORIGIN/);
 
@@ -265,6 +270,54 @@ test("production smoke rejects non-canonical targets", async () => {
 		runProductionSmoke("https://example.com"),
 		/canonical origin https:\/\/www\.albanandrieu\.com/,
 	);
+});
+
+test("production smoke reports Vercel mitigation explicitly", async () => {
+	const originalFetch = globalThis.fetch;
+	const originalBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+	process.env.VERCEL_AUTOMATION_BYPASS_SECRET = "test-bypass-secret";
+
+	globalThis.fetch = (async () =>
+		new Response("challenge", {
+			status: 429,
+			headers: {
+				"content-type": "text/html",
+				"x-vercel-mitigated": "challenge",
+			},
+		})) as typeof fetch;
+
+	try {
+		await assert.rejects(
+			runProductionSmoke(ORIGIN),
+			/intercepted by Vercel mitigation \(challenge\)/,
+		);
+	} finally {
+		globalThis.fetch = originalFetch;
+		if (originalBypass === undefined) {
+			delete process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+		} else {
+			process.env.VERCEL_AUTOMATION_BYPASS_SECRET = originalBypass;
+		}
+	}
+});
+
+test("production smoke rejects unexpected page content types", async () => {
+	const originalFetch = globalThis.fetch;
+
+	globalThis.fetch = (async () =>
+		new Response("not html", {
+			status: 200,
+			headers: { "content-type": "text/plain" },
+		})) as typeof fetch;
+
+	try {
+		await assert.rejects(
+			runProductionSmoke(ORIGIN),
+			/returned unexpected content-type text\/plain; expected text\/html/,
+		);
+	} finally {
+		globalThis.fetch = originalFetch;
+	}
 });
 
 test("robots advertises the clean canonical site contract", async () => {
