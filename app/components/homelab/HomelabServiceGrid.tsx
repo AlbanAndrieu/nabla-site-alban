@@ -20,6 +20,7 @@ import {
 } from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
+import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
@@ -305,8 +306,11 @@ export default function HomelabServiceGrid({
 						snapshot?.schema_version,
 					);
 					const resolvedHealth = resolveEffectiveServiceState(initialHealth);
+					const presentationState: HomelabHealthState = healthUnavailable
+						? "unknown"
+						: resolvedHealth.effectiveState;
 					const effectiveHealthLabel = t(
-						EFFECTIVE_HEALTH_LABEL_KEY[resolvedHealth.effectiveState],
+						EFFECTIVE_HEALTH_LABEL_KEY[presentationState],
 					);
 					const blockerLabels = blockedDependencyLabels(initialHealth);
 					const dependencyDegraded =
@@ -354,7 +358,7 @@ export default function HomelabServiceGrid({
 						>
 							<div
 								className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
-								data-effective-health={resolvedHealth.effectiveState}
+								data-effective-health={presentationState}
 							>
 								<img
 									className="img-fluid d-block mx-auto p-4"
@@ -382,17 +386,13 @@ export default function HomelabServiceGrid({
 										</h3>
 										<span
 											className={styles.serviceHealthBadge}
-											data-health-state={resolvedHealth.effectiveState}
+											data-health-state={presentationState}
 											aria-label={t("health.effectiveAria", {
 												state: effectiveHealthLabel,
 											})}
 										>
 											<i
-												className={
-													EFFECTIVE_HEALTH_ICON_CLASS[
-														resolvedHealth.effectiveState
-													]
-												}
+												className={EFFECTIVE_HEALTH_ICON_CLASS[presentationState]}
 												aria-hidden="true"
 											/>{" "}
 											{effectiveHealthLabel}
@@ -407,6 +407,13 @@ export default function HomelabServiceGrid({
 									<p className="card-text text-muted small mb-0">
 										{svc.description}
 									</p>
+									<ServiceHealthReasons
+										entry={initialHealth}
+										state={presentationState}
+										tunnelExpected={svc.tunnelSecure === true}
+										cloudflareConfigured={snapshot?.cloudflare_configured}
+										runtimeStale={truenasRuntimeStale}
+									/>
 									{dependencyDegraded && (
 										<div
 											className="alert alert-warning py-2 px-2 small text-start mt-3 mb-0"

@@ -161,7 +161,9 @@ function healthIndex(snapshot: HomelabHealthSnapshot | null): {
 function effectiveState(
 	service: HomelabService,
 	index: ReturnType<typeof healthIndex>,
+	healthUnavailable = false,
 ): HomelabHealthState {
+	if (healthUnavailable) return "unknown";
 	const entry =
 		index.byId.get(homelabServiceId(service)) ??
 		index.byName.get(normalizedName(service.name));
@@ -255,9 +257,9 @@ export default function HomelabServicesBlock() {
 	const indexedHealth = useMemo(() => healthIndex(state.snapshot), [state.snapshot]);
 	const healthCounts = useMemo(() => {
 		const counts: Record<HomelabHealthState, number> = { ok: 0, warn: 0, fail: 0, unknown: 0 };
-		for (const service of state.catalog?.services ?? []) counts[effectiveState(service, indexedHealth)] += 1;
+		for (const service of state.catalog?.services ?? []) counts[effectiveState(service, indexedHealth, state.healthUnavailable)] += 1;
 		return counts;
-	}, [indexedHealth, state.catalog?.services]);
+	}, [indexedHealth, state.catalog?.services, state.healthUnavailable]);
 
 	const hierarchyGroups = useMemo<HierarchyGroup[]>(() => {
 		if (!state.catalog) return [];
@@ -265,7 +267,7 @@ export default function HomelabServicesBlock() {
 		const filteredServices = state.catalog.services.filter((service) => {
 			const matchesHealth =
 				healthFilter === "all" ||
-				effectiveState(service, indexedHealth) === healthFilter;
+				effectiveState(service, indexedHealth, state.healthUnavailable) === healthFilter;
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
@@ -290,6 +292,7 @@ export default function HomelabServicesBlock() {
 		indexedHealth,
 		searchQuery,
 		state.catalog,
+		state.healthUnavailable,
 		state.topology,
 	]);
 
@@ -351,6 +354,8 @@ export default function HomelabServicesBlock() {
 						{state.healthRefreshing ? (french ? "Actualisation…" : "Refreshing…") : state.healthUnavailable ? (french ? "Dernier snapshot conservé" : "Keeping last snapshot") : (french ? "Snapshot courant" : "Current snapshot")}
 					</span>
 				</div>
+
+				<p className={styles.healthSemantics}>{t("health.semantics")}</p>
 
 				<div className={styles.healthSummary} aria-label={french ? "Résumé santé" : "Health summary"}>
 					{HEALTH_STATES.map((healthState) => (
@@ -428,7 +433,12 @@ export default function HomelabServicesBlock() {
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
 				{visibleHierarchyGroups.map((group) => {
 					const issueCount = group.catalog.services.filter(
-						(service) => effectiveState(service, indexedHealth) !== "ok",
+						(service) =>
+							effectiveState(
+								service,
+								indexedHealth,
+								state.healthUnavailable,
+							) !== "ok",
 					).length;
 					return (
 						<details

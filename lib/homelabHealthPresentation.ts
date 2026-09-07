@@ -113,15 +113,12 @@ export function homelabHealthReasons(
 			kind: "public_endpoint_down",
 			detail:
 				entry.error?.trim() ||
-				(entry.http_status > 0 ? `HTTP ${entry.http_status}` : "unreachable"),
+				(entry.http_status > 0 ? `HTTP ${entry.http_status}` : undefined),
 		});
 	}
 
 	if (entry.internal_state === "fail") {
-		reasons.push({
-			kind: "internal_endpoint_down",
-			detail: "internal probe failed",
-		});
+		reasons.push({ kind: "internal_endpoint_down" });
 	}
 
 	if (options.tunnelExpected === true) {
