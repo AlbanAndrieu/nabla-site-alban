@@ -61,6 +61,12 @@ function absolute(pathname: string) {
 	);
 }
 
+function metadataAbsolute(pathname: string) {
+	// Next.js may serialize the root URL without a trailing slash. It is
+	// semantically identical to the canonical origin with "/".
+	return pathname === "/" ? ORIGIN : absolute(pathname);
+}
+
 function pageHtml({
 	canonical,
 	en,
@@ -74,10 +80,10 @@ function pageHtml({
 	return `<!doctype html>
 <html>
 <head>
-<link rel="canonical" href="${absolute(canonical)}">
-<link rel="alternate" hreflang="en" href="${absolute(en)}">
-<link rel="alternate" hreflang="fr" href="${absolute(fr)}">
-<link rel="alternate" hreflang="x-default" href="${absolute(en)}">
+<link rel="canonical" href="${metadataAbsolute(canonical)}">
+<link rel="alternate" hreflang="en" href="${metadataAbsolute(en)}">
+<link rel="alternate" hreflang="fr" href="${metadataAbsolute(fr)}">
+<link rel="alternate" hreflang="x-default" href="${metadataAbsolute(en)}">
 <meta property="og:image" content="${socialCard}">
 <meta name="twitter:image" content="${socialCard}">
 </head>
