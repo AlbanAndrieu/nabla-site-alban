@@ -171,6 +171,56 @@ async function fetchText(baseUrl, pathname, expectedContentTypes) {
   return response.text();
 }
 
+async function checkDeploymentIdentity(baseUrl, expectedSha) {
+  if (!expectedSha) {
+    console.log("SKIP /api/deployment (no expected SHA provided)");
+    return;
+  }
+
+  let lastError = new Error(
+    "/api/deployment did not expose expected SHA " + expectedSha,
+  );
+
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    const response = await fetchResponse(
+      baseUrl,
+      "/api/deployment",
+      "application/json",
+    );
+    assertContentType(response, "/api/deployment", ["application/json"]);
+
+    const payload = await response.json();
+    const gitSha =
+      payload && typeof payload === "object" && typeof payload.gitSha === "string"
+        ? payload.gitSha
+        : "";
+    const environment =
+      payload &&
+      typeof payload === "object" &&
+      typeof payload.environment === "string"
+        ? payload.environment
+        : "";
+
+    if (gitSha === expectedSha && environment === "production") {
+      console.log("PASS /api/deployment " + expectedSha);
+      return;
+    }
+
+    lastError = new Error(
+      "/api/deployment mismatch: expected " +
+        expectedSha +
+        " in production, got " +
+        (gitSha || "<missing>") +
+        " in " +
+        (environment || "<unknown>"),
+    );
+
+    if (attempt < FETCH_ATTEMPTS) await delay(1_000 * attempt);
+  }
+
+  throw lastError;
+}
+
 async function checkPage(baseUrl, route) {
   const html = await fetchText(baseUrl, route.path, ["text/html"]);
   const expectedCanonical = absoluteCanonical(route.canonical);
@@ -317,10 +367,15 @@ async function checkSocialCard(baseUrl, pathname, locale, html) {
   console.log("PASS social card " + pathname + " (" + locale + ")");
 }
 
-export async function runProductionSmoke(baseUrl) {
+export async function runProductionSmoke(
+  baseUrl,
+  expectedSha = process.env.DEPLOYED_SHA?.trim(),
+) {
   const normalized = normalizedBaseUrl(baseUrl);
   const pages = new Map();
   console.log("Production smoke target: " + normalized);
+
+  await checkDeploymentIdentity(normalized, expectedSha);
 
   for (const route of ROUTES) {
     pages.set(route.path, await checkPage(normalized, route));
