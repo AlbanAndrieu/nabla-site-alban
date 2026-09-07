@@ -148,7 +148,23 @@
 				"fail": "Failed",
 				"unknown": "Unknown"
 			},
-			"stale": "Stale evidence — last observation retained"
+			"stale": "Stale evidence — last observation retained",
+			"semantics": "Red = service unavailable. Orange = service reachable but unhealthy, dependency-degraded, or exposure configuration incomplete. Gray = insufficient evidence.",
+			"reasonTitle": "Why this status?",
+			"reasons": {
+				"runtimeDown": "TrueNAS runtime is stopped or failed ({detail}).",
+				"publicEndpointDown": "Public endpoint is unavailable ({detail}).",
+				"internalEndpointDown": "Internal endpoint is unavailable ({detail}).",
+				"applicationError": "Application is reachable but reports an error: {detail}.",
+				"tunnelMissing": "Cloudflare tunnel is expected but no matching ingress is observed.",
+				"tunnelDown": "Cloudflare tunnel is observed but unhealthy ({detail}).",
+				"tunnelUnobserved": "Cloudflare observation is unavailable or not configured for this service.",
+				"runtimeStale": "TrueNAS runtime evidence is stale and is not used as healthy proof.",
+				"tunnelStale": "Cloudflare evidence is stale and is not used as healthy proof.",
+				"staleEvidence": "The latest service health evidence is stale.",
+				"genericFailure": "no fresh evidence confirms that the service is available",
+				"genericDegraded": "the service is only partially healthy or has a configuration mismatch"
+			}
 		},
 		"presentation": {
 			"filterLabel": "View",
