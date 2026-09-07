@@ -119,8 +119,8 @@ jobs:
       - name: Build Next.js production bundle
         run: npm run build
 
+      # Avoid container-action image preparation when Snyk is disabled.
+      # GitHub can prepare Docker actions before evaluating a step-level if.
       - name: Run Snyk vulnerability scan
         if: env.SNYK_TOKEN != ''
-        uses: snyk/actions/node@master
-        with:
-          command: test
+        run: npx --yes snyk test
