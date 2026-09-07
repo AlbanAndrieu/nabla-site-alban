@@ -34,6 +34,7 @@ jobs:
     env:
       BASE_URL: "https://www.albanandrieu.com"
       DEPLOYMENT_URL: ${{ github.event.client_payload.url || '' }}
+      SMOKE_LOG: ${{ runner.temp }}/production-smoke.log
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       DEPLOYED_SHA: >-
         ${{
@@ -68,7 +69,30 @@ jobs:
           if [[ -n "${DEPLOYMENT_URL:-}" ]]; then
             echo "Vercel deployment evidence: $DEPLOYMENT_URL"
           fi
-          node scripts/post-deploy-smoke.mjs "$BASE_URL"
+
+          set -o pipefail
+          node scripts/post-deploy-smoke.mjs "$BASE_URL" 2>&1 | tee "$SMOKE_LOG"
+
+      - name: Summarize production smoke
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          {
+            echo "## Production post-deploy smoke"
+            echo
+            echo "- Result: **$JOB_STATUS**"
+            echo "- Public target: $BASE_URL"
+            echo "- Deployed SHA: $DEPLOYED_SHA"
+            if [[ -n "${DEPLOYMENT_URL:-}" ]]; then
+              echo "- Vercel deployment: $DEPLOYMENT_URL"
+            fi
+            if [[ -s "$SMOKE_LOG" ]]; then
+              echo
+              echo "### Smoke output"
+              tail -n 80 "$SMOKE_LOG" | sed "s/^/    /"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish production smoke status
         if: always() && github.event_name != 'workflow_dispatch'
