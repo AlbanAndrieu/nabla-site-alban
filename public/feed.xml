@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
 	<channel>
 		<title><![CDATA[Alban Andrieu — albanandrieu.com]]></title>
 		<link>https://albanandrieu.com/</link>
-		<description><![CDATA[Highlights from albanandrieu.com: DevSecOps and cloud architecture services, C.V., security and AI resources, homelab notes, and contact. Pub dates follow the site sitemap lastmod values.]]></description>
+		<description><![CDATA[Announcements and highlights from albanandrieu.com: independent DevSecOps consulting, cloud security, secure AI, technical expertise, homelab notes, and contact.]]></description>
 		<language>en</language>
-		<lastBuildDate>Fri, 10 Apr 2026 00:00:00 GMT</lastBuildDate>
+		<lastBuildDate>Mon, 07 Sep 2026 00:00:00 GMT</lastBuildDate>
 		<atom:link href="https://albanandrieu.com/feed.xml" rel="self" type="application/rss+xml" />
+		<item>
+			<title><![CDATA[Alban Andrieu launches freelance consulting — DevSecOps, cloud security & secure AI]]></title>
+			<link>https://albanandrieu.com/pricing</link>
+			<guid isPermaLink="false">tag:albanandrieu.com,2026-09-07:freelance-launch</guid>
+			<pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+			<category>Freelance</category>
+			<category>DevSecOps</category>
+			<category>Cloud Security</category>
+			<category>Secure AI</category>
+			<description><![CDATA[
+				<p>Alban Andrieu is now available for independent consulting engagements in DevSecOps, cloud security, platform engineering, infrastructure automation, compliance, and secure AI.</p>
+				<p>Clients can review the <a href="https://albanandrieu.com/expertise">services and technical expertise</a>, see <a href="https://albanandrieu.com/pricing">engagement and pricing options</a>, then <a href="https://albanandrieu.com/startup">send a project brief</a> or use the <a href="https://albanandrieu.com/contact">contact page</a>. A short scoping conversation can be used to prepare a written estimate for the engagement.</p>
+			]]></description>
+			<media:content
+				url="https://albanandrieu.com/api/social-card?title=Freelance%20consulting%20is%20open&amp;description=DevSecOps%20%C2%B7%20Cloud%20security%20%C2%B7%20Secure%20AI%20%C2%B7%20Request%20a%20quote"
+				medium="image"
+				type="image/png"
+				width="1200"
+				height="630"
+			>
+				<media:title><![CDATA[Alban Andrieu — freelance DevSecOps consulting is open]]></media:title>
+				<media:description><![CDATA[DevSecOps, cloud security, secure AI and platform engineering — request a quote.]]></media:description>
+			</media:content>
+		</item>
 		<item>
 			<title><![CDATA[Workstation Docker Compose | Nabla - Alban Andrieu]]></title>
 			<link>https://albanandrieu.com/workstation</link>

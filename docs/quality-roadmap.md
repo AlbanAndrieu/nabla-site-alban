@@ -425,6 +425,10 @@ Autres contrôles :
   Semantic Release avant le contrôle de fraîcheur. Le bootstrap de thème et les
   contrastes WCAG AA étaient déjà présents via #150/#152 ; le fallback Docker
   non-root/Trivy/GHCR était déjà aligné via #154/#155.
+- [x] Éviter le bootstrap Docker inutile du scan Snyk optionnel : lorsque
+  `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
+  `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
+  et un test de contrat empêche la réintroduction du pull coûteux.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
