@@ -22,6 +22,8 @@ on:
       - ".envrc"
       - "mise.toml"
       - ".github/workflows/ci.yml"
+      - ".github/workflows/copilot-setup-steps.yml"
+      - ".github/workflows/docker-build.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
@@ -49,6 +51,8 @@ on:
       - ".envrc"
       - "mise.toml"
       - ".github/workflows/ci.yml"
+      - ".github/workflows/copilot-setup-steps.yml"
+      - ".github/workflows/docker-build.yml"
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
@@ -77,10 +81,22 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
-          cache: npm
 
-      - name: Upgrade npm
-        run: npm install --global npm@11.17.0 --no-audit --no-fund
+      - name: Cache npm downloads
+        id: npm-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Pin npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}"
+          npm install --global npm@11.17.0 --no-audit --no-fund
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
