@@ -37,6 +37,8 @@ export type ServiceTopologyRelation = {
 
 export type ServiceTopology = {
 	version: number;
+	catalogRevision?: string;
+	topologyVersion?: number;
 	name: string;
 	nodes: ServiceTopologyNode[];
 	relations: ServiceTopologyRelation[];
@@ -74,8 +76,16 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 	) {
 		return null;
 	}
-	if (typeof value.version !== "number" || typeof value.name !== "string")
+	if (
+		typeof value.version !== "number" ||
+		typeof value.name !== "string" ||
+		(value.catalogRevision !== undefined &&
+			typeof value.catalogRevision !== "string") ||
+		(value.topologyVersion !== undefined &&
+			typeof value.topologyVersion !== "number")
+	) {
 		return null;
+	}
 
 	const nodes = value.nodes;
 	if (

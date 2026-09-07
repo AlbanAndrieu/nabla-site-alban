@@ -200,8 +200,27 @@ les autres chantiers.
   du snapshot : l'UI distingue état courant, fraîcheur/cache, erreur de refresh et
   dernière preuve saine `last_good` afin qu'un ancien état vert ne soit pas lu
   comme une observation live.
-- [ ] Revalider le graphe de production après chaque évolution importante du
-  catalogue `nabla-compose` / du contrat `fastapi-sample`.
+- [x] Revalider le graphe de production après les évolutions `nabla-compose#128/#129` :
+  le fallback Site est resynchronisé sur 108 nœuds / 208 relations, incluant
+  Sentry, Pyroscope, Akvorado, Pi-hole auxiliaires, Doco-CD, Docker socket proxy,
+  Kafka, MongoDB et Nexus. La PR #130 est désormais fusionnée mais son smoke
+  Kubernetes/CSI reste à exécuter et observer ; la PR #131 n'est pas présentée
+  comme déployée tant que son catalogue/runtime n'est pas fusionné et observé.
+- [x] Aligner le fallback de réconciliation des anciens payloads sur
+  `fastapi-sample#212` : runtime TrueNAS frais arrêté/échoué non masqué par
+  Cloudflare, preuves runtime/tunnel périmées non utilisées comme preuve positive,
+  erreur applicative joignable classée dégradée et exposition Cloudflare seule
+  insuffisante pour déclarer l'application saine.
+- [ ] Exécuter puis consommer la progression Kubernetes préparée par
+  `nabla-compose#130` (fusionnée) dans l'ordre DNS/CNI → smoke FastAPI
+  `test.albandrieu.com` → CSI TrueNAS → secrets d'infrastructure. Le site doit
+  séparer santé applicative, réseau/DNS, persistance CSI et présence de
+  configuration ; aucune valeur de secret ne doit être exposée.
+- [ ] Après fusion de `nabla-compose#131`, avec `fastapi-sample#212` désormais
+  fusionnée, vérifier en production que les bindings runtime par `appId` rendent
+  2FAuth/Open WebUI
+  rouges pendant un état non prêt et qu'un tunnel Cloudflare sain ne masque jamais
+  l'origine.
 - [x] Ajouter un test de contrat couvrant explicitement les nouveaux workloads
   multi-services et les services auxiliaires : le fallback Site verrouille
   Elasticsearch → Docker, Kibana → Elasticsearch/Docker et Docker → TrueNAS ;
@@ -230,9 +249,13 @@ les autres chantiers.
 - [x] Associer un profil de métriques au rôle sans inventer de valeur :
   `RED` pour les services, `USE` pour le socle, `POSTURE` pour les contrôles
   de sécurité et `RED + USE` pour les backends partagés.
-- [ ] Consommer les métriques sanitizées et bornées de `fastapi-sample#195`
-  lorsqu'elles sont disponibles, en conservant source, fraîcheur et disponibilité
-  de la télémétrie séparées de l'état direct de la plateforme.
+- [x] Consommer les métriques sanitizées et bornées de `fastapi-sample#197`
+  via le contrat `platform_metrics` déjà intégré par Site Alban #151, en
+  conservant source, fraîcheur et disponibilité de la télémétrie séparées de
+  l'état direct de la plateforme.
+- [ ] Conserver Pyroscope (`fastapi-sample#211`) comme signal d'observabilité
+  optionnel/non bloquant : l'absence de profiling ne doit pas modifier la santé
+  fonctionnelle du service.
 - [ ] Pour les services, exposer progressivement disponibilité, trafic/rate,
   erreurs/error-rate et latence (p50/p95/p99 seulement lorsque le volume permet
   une interprétation fiable), puis saturation pertinente et SLO/error budget pour
@@ -402,6 +425,10 @@ Autres contrôles :
   Semantic Release avant le contrôle de fraîcheur. Le bootstrap de thème et les
   contrastes WCAG AA étaient déjà présents via #150/#152 ; le fallback Docker
   non-root/Trivy/GHCR était déjà aligné via #154/#155.
+- [x] Éviter le bootstrap Docker inutile du scan Snyk optionnel : lorsque
+  `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
+  `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
+  et un test de contrat empêche la réintroduction du pull coûteux.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du

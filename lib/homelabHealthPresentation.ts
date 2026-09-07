@@ -70,10 +70,12 @@ export type HomelabHealthReasonOptions = {
 
 const FAILED_RUNTIME_STATES = new Set([
 	"crashed",
+	"deploying",
 	"down",
 	"error",
 	"failed",
 	"stopped",
+	"stopping",
 ]);
 const FAILED_TUNNEL_STATES = new Set([
 	"down",

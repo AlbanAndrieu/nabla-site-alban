@@ -840,7 +840,7 @@
 			"description": "Garage service",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3909,
-			"internalSecure": true,
+			"internalSecure": false,
 			"tunnelUrl": "https://garage.int.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/garage.png",
