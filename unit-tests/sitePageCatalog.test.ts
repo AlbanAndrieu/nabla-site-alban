@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import sitemap from "../app/sitemap";
 import { POLICY_PAGE_SLUGS } from "../lib/policyPages";
 import {
+	canonicalPageAlternates,
 	canonicalPagePath,
 	PAGE_CATEGORIES,
 	SEO_PAGE_SLUGS,
@@ -56,6 +58,29 @@ test("sitemap uses localized extensionless canonical URLs", () => {
 	assert.equal(canonicalPagePath("cv", "fr"), "/fr/cv");
 	assert.equal(canonicalPagePath("jm", "en"), "/jm");
 	assert.equal(canonicalPagePath("jm", "fr"), "/fr/jm");
+});
+
+test("SEO alternates always expose reciprocal locales and an English x-default", () => {
+	assert.deepEqual(canonicalPageAlternates("index"), {
+		en: "/",
+		fr: "/fr",
+		"x-default": "/",
+	});
+	assert.deepEqual(canonicalPageAlternates("contact"), {
+		en: "/contact",
+		fr: "/fr/contact",
+		"x-default": "/contact",
+	});
+});
+
+test("manual SEO metadata pages reuse the canonical alternate helper", async () => {
+	for (const slug of ["contact", "cv", "nabla", "jm"] as const) {
+		const source = await readFile(
+			new URL(`../app/[locale]/${slug}/page.tsx`, import.meta.url),
+			"utf8",
+		);
+		assert.match(source, new RegExp(`languages:\\s*canonicalPageAlternates\\("${slug}"\\)`));
+	}
 });
 
 test("policy sitemap index and entries use clean localized routes and reciprocal alternates", () => {

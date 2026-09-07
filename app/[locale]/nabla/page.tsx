@@ -5,7 +5,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import {
+	canonicalPageAlternates,
+	canonicalPagePath,
+} from "@/lib/sitePageCatalog";
 import Hero from "../../components/Hero";
 import HomelabServicesSection from "../../components/homelab/HomelabServicesSection";
 import AnsibleHeroCard from "../../components/nabla/AnsibleHeroCard";
@@ -29,10 +32,7 @@ export async function generateMetadata({
 		description: t("description"),
 		alternates: {
 			canonical: canonicalPagePath("nabla", locale),
-			languages: {
-				en: canonicalPagePath("nabla", "en"),
-				fr: canonicalPagePath("nabla", "fr"),
-			},
+			languages: canonicalPageAlternates("nabla"),
 		},
 	};
 }

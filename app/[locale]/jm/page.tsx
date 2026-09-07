@@ -3,7 +3,10 @@ import Link from "next/link";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import {
+	canonicalPageAlternates,
+	canonicalPagePath,
+} from "@/lib/sitePageCatalog";
 
 export const dynamic = "force-static";
 
@@ -19,10 +22,7 @@ export async function generateMetadata({
 		description: t("metadataDescription"),
 		alternates: {
 			canonical: canonicalPagePath("jm", locale),
-			languages: {
-				en: canonicalPagePath("jm", "en"),
-				fr: canonicalPagePath("jm", "fr"),
-			},
+			languages: canonicalPageAlternates("jm"),
 		},
 	};
 }

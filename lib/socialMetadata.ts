@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { canonicalPagePath, type SeoPageSlug } from "@/lib/sitePageCatalog";
+import {
+	canonicalPageAlternates,
+	canonicalPagePath,
+	type SeoPageSlug,
+} from "@/lib/sitePageCatalog";
 
 export const SITE_NAME = "Alban Andrieu";
 export const SITE_ORIGIN = "https://www.albanandrieu.com";
@@ -68,11 +72,7 @@ export function buildPageMetadata({
 		publisher: SITE_NAME,
 		alternates: {
 			canonical,
-			languages: {
-				en: canonicalPagePath(slug, "en"),
-				fr: canonicalPagePath(slug, "fr"),
-				"x-default": canonicalPagePath(slug, "en"),
-			},
+			languages: canonicalPageAlternates(slug),
 		},
 		openGraph: {
 			type: openGraphType,

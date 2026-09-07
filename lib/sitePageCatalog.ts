@@ -143,3 +143,15 @@ export function canonicalPagePath(slug: SeoPageSlug, locale: "en" | "fr") {
 	if (slug === "index") return locale === "fr" ? "/fr" : "/";
 	return `${locale === "fr" ? "/fr" : ""}/${slug}`;
 }
+
+/**
+ * Reciprocal hreflang policy for indexable pages.
+ * English is also the x-default because it is the unprefixed default locale.
+ */
+export function canonicalPageAlternates(slug: SeoPageSlug) {
+	return {
+		en: canonicalPagePath(slug, "en"),
+		fr: canonicalPagePath(slug, "fr"),
+		"x-default": canonicalPagePath(slug, "en"),
+	} as const;
+}

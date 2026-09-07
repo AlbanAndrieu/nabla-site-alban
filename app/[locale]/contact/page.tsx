@@ -7,7 +7,10 @@ import ContactHero from "@/components/ContactHero";
 import ActionLink, { actionClassName } from "@/components/ui/ActionLink";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import {
+	canonicalPageAlternates,
+	canonicalPagePath,
+} from "@/lib/sitePageCatalog";
 
 const socials = [
 	[
@@ -65,10 +68,7 @@ export async function generateMetadata({
 		description: t("meta.description"),
 		alternates: {
 			canonical: canonicalPagePath("contact", locale),
-			languages: {
-				en: canonicalPagePath("contact", "en"),
-				fr: canonicalPagePath("contact", "fr"),
-			},
+			languages: canonicalPageAlternates("contact"),
 		},
 	};
 }
