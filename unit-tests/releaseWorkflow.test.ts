@@ -64,7 +64,7 @@ test("release bootstrap creates only the tag ref through the GitHub API", async 
   assert.doesNotMatch(bootstrapStep, /git diff-tree/);
 });
 
-test("release bootstrap keeps authentication available when git invokes the gh credential helper", async () => {
+test("release bootstrap requires the dedicated App token", async () => {
   const release = await source(".github/workflows/release.yml");
   const bootstrapStart = release.indexOf("      - name: Bootstrap semantic-release baseline");
   const bootstrapEnd = release.indexOf("      - name: Verify first-release bootstrap version");
@@ -74,9 +74,24 @@ test("release bootstrap keeps authentication available when git invokes the gh c
   assert.ok(bootstrapEnd > bootstrapStart, "bootstrap step must precede first-release validation");
   assert.match(
     bootstrapStep,
-    /env:\s+GH_TOKEN: \$\{\{ steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN \}\}/,
+    /env:\s+GH_TOKEN: \$\{\{ steps\.release_app_token\.outputs\.token \}\}/,
   );
+  assert.doesNotMatch(bootstrapStep, /secrets\.GITHUB_TOKEN/);
   assert.match(bootstrapStep, /gh api --method POST/);
+});
+
+test("release skips repository mutation safely when App credentials are missing", async () => {
+  const release = await source(".github/workflows/release.yml");
+
+  assert.match(release, /Resolve release credential policy/);
+  assert.match(release, /RELEASE_APP_PRIVATE_KEY_CONFIGURED/);
+  assert.match(release, /no repository mutation will be attempted with GITHUB_TOKEN/);
+  assert.match(release, /steps\.release_credentials\.outputs\.enabled == 'true'/);
+  assert.doesNotMatch(
+    release,
+    /steps\.release_app_token\.outputs\.token \|\| secrets\.GITHUB_TOKEN/,
+  );
+  assert.doesNotMatch(release, /echo "Configure repository variable `/);
 });
 
 test("release bootstrap keeps release App permissions minimal and scopes its private key", async () => {

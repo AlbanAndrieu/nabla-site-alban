@@ -32,9 +32,12 @@ branche finale et le déploiement Vercel sont validés.
 
 ## P0 — Cohérence produit et contenu
 
-- [ ] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
-  et leurs traductions : statut indépendant, périodes d'expérience et temps
-  verbaux doivent raconter la même chronologie.
+- [x] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
+  et leurs traductions : l'identité professionnelle affiche désormais
+  `Independent / Freelance` depuis 2007, explicitement comme activité parallèle
+  aux postes salariés lorsque pertinent. La chronologie des postes et des CV
+  courants ferme Jus Mundi à `2022–2026`; les PDF EN/FR ont été régénérés et
+  versionnés depuis les sources LaTeX corrigées.
 - [x] Supprimer les anciennes traductions/props Jus Mundi devenues mortes :
   le namespace `jm` ne conserve plus le footer historique, les anciens libellés
   de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
@@ -123,13 +126,16 @@ les autres chantiers.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
-  publication Docker Hub/GHCR.
+  publication. GHCR reste la cible systématique de `master` ; Docker Hub est un
+  miroir optionnel qui ne rend plus la CI rouge lorsque ses secrets sont absents.
 - [ ] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
   `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales. Le
   workflow doit également prouver via `/api/deployment` que l’origine canonique
   sert bien le SHA Vercel attendu, et non seulement une version précédente encore
-  saine. Il reste ouvert jusqu’à un run `master` vert sur l’origine canonique
-  publique, et non sur l’URL Vercel immuable protégée.
+  saine. Le run du 7 septembre 2026 a déjà prouvé le SHA attendu puis révélé une
+  comparaison textuelle trop stricte entre la racine avec/sans slash final ; la
+  comparaison est désormais normalisée comme URL. Le point reste ouvert jusqu’à
+  un run `master` vert sur l’origine canonique publique.
 
 ## P1 — Architecture et homelab runtime
 
@@ -392,7 +398,10 @@ Autres contrôles :
 - [x] Aligner Next.js et `eslint-config-next` sur 16.3.4 ainsi que `@types/node` sur la branche 25.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
-  une mutation manuelle de `master`.
+  une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
+  7 septembre 2026 a été refusé (HTTP 403) lors de la création du tag technique ;
+  le workflow échoue désormais fermé côté mutation et exige le GitHub App dédié
+  (`RELEASE_APP_CLIENT_ID` + `RELEASE_APP_PRIVATE_KEY`) avant de publier.
 - [ ] Configurer un ruleset GitHub avec Quality/Security comme check requis.
 - [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
   changements docs-only et les commits intermédiaires d'une même PR. Le correctif

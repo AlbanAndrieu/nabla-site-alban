@@ -58,6 +58,16 @@ function absoluteCanonical(pathname) {
   return new URL(pathname, CANONICAL_ORIGIN).href.replace(/\/$/, pathname === "/" ? "/" : "");
 }
 
+function urlsEquivalent(actual, expected) {
+  if (!actual) return false;
+
+  try {
+    return new URL(actual).href === new URL(expected).href;
+  } catch {
+    return false;
+  }
+}
+
 function attributeValue(tag, name) {
   const match = tag.match(new RegExp("\\b" + name + "=[\"']([^\"']+)[\"']", "i"));
   return match?.[1] ?? null;
@@ -232,21 +242,42 @@ async function checkPage(baseUrl, route) {
   const expectedEn = absoluteCanonical(route.en);
   const expectedFr = absoluteCanonical(route.fr);
 
+  const actualCanonical = linkHref(html, "canonical");
+  const actualEn = linkHref(html, "alternate", "en");
+  const actualFr = linkHref(html, "alternate", "fr");
+  const actualDefault = linkHref(html, "alternate", "x-default");
+
   assertCondition(
-    linkHref(html, "canonical") === expectedCanonical,
-    route.path + " canonical mismatch: expected " + expectedCanonical,
+    urlsEquivalent(actualCanonical, expectedCanonical),
+    route.path +
+      " canonical mismatch: expected " +
+      expectedCanonical +
+      ", got " +
+      (actualCanonical || "<missing>"),
   );
   assertCondition(
-    linkHref(html, "alternate", "en") === expectedEn,
-    route.path + " English hreflang mismatch: expected " + expectedEn,
+    urlsEquivalent(actualEn, expectedEn),
+    route.path +
+      " English hreflang mismatch: expected " +
+      expectedEn +
+      ", got " +
+      (actualEn || "<missing>"),
   );
   assertCondition(
-    linkHref(html, "alternate", "fr") === expectedFr,
-    route.path + " French hreflang mismatch: expected " + expectedFr,
+    urlsEquivalent(actualFr, expectedFr),
+    route.path +
+      " French hreflang mismatch: expected " +
+      expectedFr +
+      ", got " +
+      (actualFr || "<missing>"),
   );
   assertCondition(
-    linkHref(html, "alternate", "x-default") === expectedEn,
-    route.path + " x-default hreflang mismatch: expected " + expectedEn,
+    urlsEquivalent(actualDefault, expectedEn),
+    route.path +
+      " x-default hreflang mismatch: expected " +
+      expectedEn +
+      ", got " +
+      (actualDefault || "<missing>"),
   );
   assertCondition(
     !/<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html) &&

@@ -25,9 +25,9 @@ OpenCommit is retained as local npm tooling, but there is no current OpenCommit 
 
 ## Secrets
 
-- `DOCKER_USERNAME` / `DOCKER_PASSWORD`: Docker publishing when that workflow is used.
+- `DOCKER_USERNAME` / `DOCKER_PASSWORD`: optional Docker Hub mirror credentials. The validated fallback image is still published to GHCR when these secrets are absent.
 - `SNYK_TOKEN`: optional Snyk step in Quality/Security.
-- `RELEASE_APP_PRIVATE_KEY` with `RELEASE_APP_CLIENT_ID`: preferred semantic-release GitHub App credentials.
+- `RELEASE_APP_PRIVATE_KEY` with repository variable `RELEASE_APP_CLIENT_ID`: required for semantic-release repository mutations. The workflow intentionally does not fall back to `GITHUB_TOKEN` after the integration token was rejected while creating the bootstrap tag.
 - `PAT`: optional MegaLinter fallback where configured.
 
 The local OpenCommit helper does not require a GitHub Actions workflow. Add OCO/OpenCommit workflow secrets only if such a workflow is explicitly reviewed and reintroduced.

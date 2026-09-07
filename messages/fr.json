@@ -522,13 +522,13 @@
 			"title": "Expérience professionnelle",
 			"subtitle": "Plus de 20 ans d'expérience au service d'entreprises comme la vôtre",
 			"freelance": {
-				"title": "Ingénieur cybersécurité & DevSecOps indépendant",
-				"date": "Depuis 2026",
-				"desc": "Disponible pour des missions DevSecOps, sécurité cloud, automatisation des contrôles et sécurisation des plateformes d’IA."
+				"title": "Ingénieur cybersécurité & DevSecOps indépendant / freelance",
+				"date": "Freelance depuis 2007",
+				"desc": "Activité indépendante / freelance depuis 2007, exercée en parallèle de postes salariés selon les périodes. Disponible pour des missions DevSecOps, sécurité cloud, automatisation des contrôles et sécurisation des plateformes d’IA."
 			},
 			"architect": {
 				"title": "Architecte cloud DevSecOps",
-				"date": "2022 – 2025",
+				"date": "2022 – 2026",
 				"desc": "Pilotage DevSecOps et architecture cloud pour une legal tech internationale. Sécurisation et évolution des plateformes AWS et OVH, automatisation, observabilité et contrôles alignés sur ISO 27001, ISO 42001, SOC 2 et le RGPD.",
 				"more": "Plus ici",
 				"ach1": "Architecture cloud",
@@ -706,11 +706,11 @@
 			"title": "Contacter Alban Andrieu — Architecte Cloud DevSecOps",
 			"description": "Contacter Alban Andrieu pour des missions d’architecture cloud, DevSecOps, infrastructure IA et sécurité."
 		},
-		"role": "Ingénieur cybersécurité & DevSecOps indépendant | Architecte cloud",
+		"role": "Ingénieur cybersécurité & DevSecOps indépendant / freelance | Architecte cloud",
 		"intro": "Disponible pour des problématiques d’intégration IA, de MLOps, de plateformes cloud et de sécurité.",
 		"hero": {
 			"profileAlt": "Portrait d’Alban Andrieu, ingénieur DevSecOps et architecte cloud",
-			"experience": "Avec plus de 20 ans d’expérience dans des environnements d’entreprise, j’accompagne leur transformation par l’automatisation DevOps, la sécurité cloud et l’infrastructure as code.",
+			"experience": "Indépendant / freelance depuis 2007, en parallèle de postes salariés selon les périodes. Avec plus de 20 ans d’expérience dans des environnements d’entreprise, j’accompagne leur transformation par l’automatisation DevOps, la sécurité cloud et l’infrastructure as code.",
 			"contactCta": "Me contacter",
 			"cvCta": "Voir mon CV"
 		},

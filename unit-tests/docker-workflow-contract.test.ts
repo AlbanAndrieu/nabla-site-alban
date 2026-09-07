@@ -66,7 +66,7 @@ test("Docker fallback runtime stays non-root and keeps the protected static 404"
 	assert.match(workflow, /runtime_uid.*== "0"/s);
 });
 
-test("Docker publication is master-only and publishes immutable SHA tags", async () => {
+test("Docker publication is master-only, GHCR-first and SHA-addressable", async () => {
 	const workflow = await read(".github/workflows/docker-build.yml");
 
 	assert.match(
@@ -75,6 +75,18 @@ test("Docker publication is master-only and publishes immutable SHA tags", async
 	);
 	assert.match(workflow, /DOCKERHUB_IMAGE: nabla\/nabla-site-alban/);
 	assert.match(workflow, /GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/);
-	assert.match(workflow, /docker push "\$\{image\}:latest"/);
-	assert.match(workflow, /docker push "\$\{image\}:\$\{GITHUB_SHA\}"/);
+	assert.match(workflow, /Publish validated fallback image to GHCR/);
+	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:latest"/);
+	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:\$\{GITHUB_SHA\}"/);
+	assert.match(workflow, /Resolve registry publication policy/);
+	assert.match(workflow, /dockerhub_enabled=false/);
+	assert.match(
+		workflow,
+		/steps\.registry_policy\.outputs\.dockerhub_enabled == 'true'/,
+	);
+	assert.match(workflow, /docker push "\$\{DOCKERHUB_IMAGE\}:latest"/);
+	assert.match(
+		workflow,
+		/docker push "\$\{DOCKERHUB_IMAGE\}:\$\{GITHUB_SHA\}"/,
+	);
 });

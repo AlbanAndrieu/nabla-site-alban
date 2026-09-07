@@ -522,13 +522,13 @@
 			"title": "Professional Experience",
 			"subtitle": "20+ years of experience delivering enterprise solutions",
 			"freelance": {
-				"title": "Independent Cybersecurity & DevSecOps Engineer",
-				"date": "Since 2026",
-				"desc": "Available for DevSecOps, cloud security, control automation, and secure AI platform engagements."
+				"title": "Independent / Freelance Cybersecurity & DevSecOps Engineer",
+				"date": "Freelance since 2007",
+				"desc": "Independent / freelance activity since 2007, alongside salaried roles when applicable. Available for DevSecOps, cloud security, control automation, and secure AI platform engagements."
 			},
 			"architect": {
 				"title": "DevSecOps Cloud Architect",
-				"date": "2022 – 2025",
+				"date": "2022 – 2026",
 				"desc": "Led DevSecOps and cloud architecture for an international legal-tech company. Secured and scaled AWS and OVH platforms through automation, observability, and controls aligned with ISO 27001, ISO 42001, SOC 2, and GDPR.",
 				"more": "More here",
 				"ach1": "Cloud Architecture",
@@ -706,11 +706,11 @@
 			"title": "Contact Alban Andrieu — DevSecOps Cloud Architect",
 			"description": "Contact Alban Andrieu for cloud architecture, DevSecOps, AI infrastructure and security consulting."
 		},
-		"role": "Independent Cybersecurity & DevSecOps Engineer | Cloud Architect",
+		"role": "Independent / Freelance Cybersecurity & DevSecOps Engineer | Cloud Architect",
 		"intro": "Open to challenges around AI integration, MLOps, cloud platforms and security.",
 		"hero": {
 			"profileAlt": "Portrait of Alban Andrieu, DevSecOps engineer and cloud architect",
-			"experience": "With more than 20 years of experience in enterprise environments, I transform businesses through DevOps automation, cloud security and infrastructure as code.",
+			"experience": "Independent / freelance since 2007, alongside salaried roles when applicable. With more than 20 years of experience in enterprise environments, I transform businesses through DevOps automation, cloud security and infrastructure as code.",
 			"contactCta": "Get in touch",
 			"cvCta": "View my CV"
 		},

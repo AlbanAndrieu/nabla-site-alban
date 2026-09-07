@@ -43,6 +43,8 @@ export type HomelabHealthEntry = {
 	runtime_state?: string | null;
 	runtime_app?: string | null;
 	runtime_reachable?: boolean | null;
+	runtime_stale?: boolean;
+	tunnel_stale?: boolean;
 };
 
 export type HomelabInternalHealthEntry = {
@@ -280,7 +282,9 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalHealthState(entry.internal_state) &&
 		validOptionalString(entry.runtime_state) &&
 		validOptionalString(entry.runtime_app) &&
-		validOptionalBoolean(entry.runtime_reachable)
+		validOptionalBoolean(entry.runtime_reachable) &&
+		validOptionalBoolean(entry.runtime_stale) &&
+		validOptionalBoolean(entry.tunnel_stale)
 	);
 }
 

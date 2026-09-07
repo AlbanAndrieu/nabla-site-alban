@@ -148,7 +148,23 @@
 				"fail": "En échec",
 				"unknown": "Inconnu"
 			},
-			"stale": "Preuve obsolète — dernière observation conservée"
+			"stale": "Preuve obsolète — dernière observation conservée",
+			"semantics": "Rouge = service indisponible. Orange = service joignable mais en erreur, dépendance dégradée ou configuration d’exposition incomplète. Gris = preuve insuffisante.",
+			"reasonTitle": "Pourquoi ce statut ?",
+			"reasons": {
+				"runtimeDown": "Runtime TrueNAS arrêté ou en échec ({detail}).",
+				"publicEndpointDown": "Point d’accès public indisponible ({detail}).",
+				"internalEndpointDown": "Point d’accès interne indisponible ({detail}).",
+				"applicationError": "Application joignable mais en erreur : {detail}.",
+				"tunnelMissing": "Tunnel Cloudflare attendu mais aucun ingress correspondant n’est observé.",
+				"tunnelDown": "Tunnel Cloudflare observé mais non sain ({detail}).",
+				"tunnelUnobserved": "Observation Cloudflare indisponible ou non configurée pour ce service.",
+				"runtimeStale": "État runtime TrueNAS périmé : il n’est pas utilisé comme preuve de santé.",
+				"tunnelStale": "État Cloudflare périmé : il n’est pas utilisé comme preuve de santé.",
+				"staleEvidence": "Dernière preuve de santé du service périmée.",
+				"genericFailure": "aucune preuve fraîche ne confirme que le service est disponible",
+				"genericDegraded": "le service répond partiellement ou présente une incohérence de configuration"
+			}
 		},
 		"presentation": {
 			"filterLabel": "Vue",
