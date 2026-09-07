@@ -2,6 +2,7 @@
 name: Docker CI
 
 permissions:
+  actions: read
   contents: read
   packages: write
   security-events: write
@@ -11,16 +12,18 @@ on:
     branches: [master]
     paths:
       - "Dockerfile"
-      - "docker/**"
       - ".dockerignore"
-  schedule:
-    - cron: "0 6 * * 3"
+      - "public/**"
+      - ".github/workflows/docker-build.yml"
   pull_request:
     branches: [master]
     paths:
       - "Dockerfile"
-      - "docker/**"
       - ".dockerignore"
+      - "public/**"
+      - ".github/workflows/docker-build.yml"
+  schedule:
+    - cron: "0 6 * * 3"
   workflow_dispatch:
 
 concurrency:
@@ -28,24 +31,101 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE_NAME: nabla-site-alban
+  LOCAL_IMAGE: nabla-site-alban:ci
   DOCKERHUB_IMAGE: nabla/nabla-site-alban
   GHCR_IMAGE: ghcr.io/albanandrieu/nabla-site-alban
 
 jobs:
-  build-template:
-    name: Build Docker
+  build:
+    name: Build static fallback
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
-      - name: Login to DockerHub
+      - name: Build fallback image
+        id: docker_build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          tags: ${{ env.LOCAL_IMAGE }}
+          load: true
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Smoke test fallback container
+        shell: bash
+        run: |
+          set -euo pipefail
+          container_id="$(docker run --detach --rm --publish 127.0.0.1:18080:8080 "${LOCAL_IMAGE}")"
+          cleanup() {
+            docker stop "${container_id}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for attempt in {1..20}; do
+            if curl --fail --silent --show-error http://127.0.0.1:18080/ >/tmp/fallback-index.html; then
+              break
+            fi
+            if [[ "${attempt}" -eq 20 ]]; then
+              docker logs "${container_id}"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          grep --ignore-case --quiet "<html" /tmp/fallback-index.html
+          curl --fail --silent --show-error             http://127.0.0.1:18080/404.html             --output /tmp/fallback-404.html
+          grep --ignore-case --quiet "<html" /tmp/fallback-404.html
+
+          runtime_uid="$(docker exec "${container_id}" id -u)"
+          if [[ "${runtime_uid}" == "0" ]]; then
+            echo "Fallback container unexpectedly runs as root."
+            exit 1
+          fi
+          echo "Fallback container smoke test passed as UID ${runtime_uid}."
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.LOCAL_IMAGE }}
+          version: "v0.74.0"
+          scanners: "vuln"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          limit-severities-for-sarif: true
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+
+      - name: Preserve Trivy SARIF report
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: trivy-sarif-${{ github.sha }}
+          path: trivy-results.sarif
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Trivy scan results to GitHub Code Scanning
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Login to Docker Hub
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -53,45 +133,23 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and optionally push
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          tags: |
-            ${{ env.DOCKERHUB_IMAGE }}:latest
-            ${{ env.GHCR_IMAGE }}:latest
-          build-args: |
-            PG_MAJOR=18
-            GIT_SHA=${{ github.sha }}
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-          load: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master') }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Publish validated fallback image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for image in "${DOCKERHUB_IMAGE}" "${GHCR_IMAGE}"; do
+            docker tag "${LOCAL_IMAGE}" "${image}:latest"
+            docker tag "${LOCAL_IMAGE}" "${image}:${GITHUB_SHA}"
+            docker push "${image}:latest"
+            docker push "${image}:${GITHUB_SHA}"
+          done
 
       - name: Image digest
         run: echo "${{ steps.docker_build.outputs.digest }}"
-
-      - name: Run Trivy vulnerability scanner
-        if: github.event_name != 'schedule'
-        uses: aquasecurity/trivy-action@0.35.0
-        with:
-          image-ref: ${{ env.DOCKERHUB_IMAGE }}:latest
-          format: "template"
-          template: "@/contrib/sarif.tpl"
-          output: "trivy-results.sarif"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: github.event_name != 'schedule'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: "trivy-results.sarif"

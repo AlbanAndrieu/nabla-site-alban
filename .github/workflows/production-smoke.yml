@@ -6,13 +6,9 @@ on:
       - vercel.deployment.success
   workflow_dispatch:
     inputs:
-      base_url:
-        description: "Existing production deployment URL to test"
-        required: true
-        type: string
       git_sha:
-        description: "Optional deployed Git SHA"
-        required: false
+        description: "Production Git SHA expected on the canonical www origin"
+        required: true
         type: string
 
 permissions:
@@ -36,11 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      BASE_URL: >-
-        ${{
-          inputs.base_url ||
-          github.event.client_payload.url
-        }}
+      BASE_URL: "https://www.albanandrieu.com"
+      DEPLOYMENT_URL: ${{ github.event.client_payload.url || '' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       DEPLOYED_SHA: >-
         ${{
           inputs.git_sha ||
@@ -49,10 +43,18 @@ jobs:
         }}
 
     steps:
+      - name: Validate deployed SHA
+        run: |
+          if [[ ! "$DEPLOYED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::DEPLOYED_SHA must be a full lowercase 40-character Git SHA."
+            exit 1
+          fi
+
       - name: Checkout deployed revision
         uses: actions/checkout@v6
         with:
           ref: ${{ env.DEPLOYED_SHA }}
+          persist-credentials: false
           sparse-checkout: |
             .nvmrc
             scripts/post-deploy-smoke.mjs
@@ -63,8 +65,44 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
+      - name: Prepare smoke log path
+        run: echo "SMOKE_LOG=$RUNNER_TEMP/production-smoke.log" >> "$GITHUB_ENV"
+
       - name: Verify production HTTP and SEO contract
-        run: node scripts/post-deploy-smoke.mjs "$BASE_URL"
+        run: |
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::GitHub Actions secret VERCEL_AUTOMATION_BYPASS_SECRET is not configured."
+            exit 1
+          fi
+
+          echo "Public production target: $BASE_URL"
+          if [[ -n "${DEPLOYMENT_URL:-}" ]]; then
+            echo "Vercel deployment evidence: $DEPLOYMENT_URL"
+          fi
+
+          set -o pipefail
+          node scripts/post-deploy-smoke.mjs "$BASE_URL" 2>&1 | tee "$SMOKE_LOG"
+
+      - name: Summarize production smoke
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          {
+            echo "## Production post-deploy smoke"
+            echo
+            echo "- Result: **$JOB_STATUS**"
+            echo "- Public target: $BASE_URL"
+            echo "- Deployed SHA: $DEPLOYED_SHA"
+            if [[ -n "${DEPLOYMENT_URL:-}" ]]; then
+              echo "- Vercel deployment: $DEPLOYMENT_URL"
+            fi
+            if [[ -s "$SMOKE_LOG" ]]; then
+              echo
+              echo "### Smoke output"
+              tail -n 80 "$SMOKE_LOG" | sed "s/^/    /"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish production smoke status
         if: always() && github.event_name != 'workflow_dispatch'

@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 6 septembre 2026.
+Dernière vérification : 7 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -120,8 +120,16 @@ les autres chantiers.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
 - [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
   afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
-- [ ] Ajouter un smoke test post-déploiement sur accueil EN/FR, `/truenas`,
-  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
+- [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
+  sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
+  l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
+  publication Docker Hub/GHCR.
+- [ ] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
+  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales. Le
+  workflow doit également prouver via `/api/deployment` que l’origine canonique
+  sert bien le SHA Vercel attendu, et non seulement une version précédente encore
+  saine. Il reste ouvert jusqu’à un run `master` vert sur l’origine canonique
+  publique, et non sur l’URL Vercel immuable protégée.
 
 ## P1 — Architecture et homelab runtime
 
