@@ -33,10 +33,11 @@ branche finale et le déploiement Vercel sont validés.
 ## P0 — Cohérence produit et contenu
 
 - [x] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
-  et leurs traductions : statut indépendant, périodes d'expérience et temps
-  verbaux racontent désormais la même chronologie. Le contenu actif, les fallbacks
-  HTML, les sources CV 2026 et les PDF EN/FR régénérés affichent
-  `Independent / Freelance` depuis 2007 et Jus Mundi `2022–2026`.
+  et leurs traductions : l'identité professionnelle affiche désormais
+  `Independent / Freelance` depuis 2007, explicitement comme activité parallèle
+  aux postes salariés lorsque pertinent. La chronologie des postes et des CV
+  courants ferme Jus Mundi à `2022–2026`; les PDF EN/FR ont été régénérés et
+  versionnés depuis les sources LaTeX corrigées.
 - [x] Supprimer les anciennes traductions/props Jus Mundi devenues mortes :
   le namespace `jm` ne conserve plus le footer historique, les anciens libellés
   de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
