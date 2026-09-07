@@ -8,7 +8,7 @@
 		<lastBuildDate>Mon, 07 Sep 2026 00:00:00 GMT</lastBuildDate>
 		<atom:link href="https://albanandrieu.com/feed.xml" rel="self" type="application/rss+xml" />
 		<item>
-			<title><![CDATA[Independent consulting is open — DevSecOps, cloud security & secure AI]]></title>
+			<title><![CDATA[Alban Andrieu launches freelance consulting — DevSecOps, cloud security & secure AI]]></title>
 			<link>https://albanandrieu.com/pricing</link>
 			<guid isPermaLink="false">tag:albanandrieu.com,2026-09-07:freelance-launch</guid>
 			<pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
@@ -21,13 +21,13 @@
 				<p>Clients can review the <a href="https://albanandrieu.com/expertise">services and technical expertise</a>, see <a href="https://albanandrieu.com/pricing">engagement and pricing options</a>, then <a href="https://albanandrieu.com/startup">send a project brief</a> or use the <a href="https://albanandrieu.com/contact">contact page</a>. A short scoping conversation can be used to prepare a written estimate for the engagement.</p>
 			]]></description>
 			<media:content
-				url="https://albanandrieu.com/api/social-card?title=Independent%20consulting%20is%20open&amp;description=DevSecOps%20%C2%B7%20Cloud%20security%20%C2%B7%20Secure%20AI%20%C2%B7%20Request%20a%20quote"
+				url="https://albanandrieu.com/api/social-card?title=Freelance%20consulting%20is%20open&amp;description=DevSecOps%20%C2%B7%20Cloud%20security%20%C2%B7%20Secure%20AI%20%C2%B7%20Request%20a%20quote"
 				medium="image"
 				type="image/png"
 				width="1200"
 				height="630"
 			>
-				<media:title><![CDATA[Alban Andrieu — independent DevSecOps consulting is open]]></media:title>
+				<media:title><![CDATA[Alban Andrieu — freelance DevSecOps consulting is open]]></media:title>
 				<media:description><![CDATA[DevSecOps, cloud security, secure AI and platform engineering — request a quote.]]></media:description>
 			</media:content>
 		</item>
