@@ -11,8 +11,12 @@ test("active professional copy is consistent across home and contact", async () 
 	const en = JSON.parse(enRaw);
 	const fr = JSON.parse(frRaw);
 
-	assert.equal(en.home.timeline.freelance.date, "Since 2026");
-	assert.equal(fr.home.timeline.freelance.date, "Depuis 2026");
+	assert.equal(en.home.timeline.freelance.date, "Freelance since 2007");
+	assert.equal(fr.home.timeline.freelance.date, "Freelance depuis 2007");
+	assert.equal(en.home.timeline.architect.date, "2022 – 2026");
+	assert.equal(fr.home.timeline.architect.date, "2022 – 2026");
+	assert.match(en.home.timeline.freelance.title, /Independent \/ Freelance/);
+	assert.match(fr.home.timeline.freelance.title, /indépendant \/ freelance/);
 	assert.match(en.contactPage.role, /Independent/);
 	assert.match(fr.contactPage.role, /indépendant/);
 	assert.doesNotMatch(heroSource, /lastexp/);
