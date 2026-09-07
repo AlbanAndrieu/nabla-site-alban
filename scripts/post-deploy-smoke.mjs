@@ -24,6 +24,22 @@ function assertCondition(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function contentType(response) {
+  return response.headers.get("content-type")?.toLowerCase() ?? "";
+}
+
+function assertContentType(response, pathname, expected) {
+  const actual = contentType(response);
+  assertCondition(
+    expected.some((value) => actual.includes(value)),
+    pathname +
+      " returned unexpected content-type " +
+      (actual || "<missing>") +
+      "; expected " +
+      expected.join(" or "),
+  );
+}
+
 function normalizedBaseUrl(value) {
   const url = new URL(value);
   assertCondition(url.protocol === "https:", "Production smoke requires HTTPS");
@@ -106,6 +122,16 @@ async function fetchResponse(baseUrl, pathname, accept) {
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
 
+      const mitigated = response.headers.get("x-vercel-mitigated");
+      if (mitigated) {
+        throw new Error(
+          pathname +
+            " was intercepted by Vercel mitigation (" +
+            mitigated +
+            "); verify Protection Bypass for Automation",
+        );
+      }
+
       if (response.ok) {
         if (response.url) {
           const finalUrl = new URL(response.url);
@@ -117,7 +143,13 @@ async function fetchResponse(baseUrl, pathname, accept) {
         return response;
       }
 
-      lastError = new Error(pathname + " returned HTTP " + response.status);
+      const location = response.headers.get("location");
+      lastError = new Error(
+        pathname +
+          " returned HTTP " +
+          response.status +
+          (location ? " with redirect to " + new URL(location, target).origin : ""),
+      );
       if (!RETRYABLE_STATUSES.has(response.status)) break;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -129,17 +161,18 @@ async function fetchResponse(baseUrl, pathname, accept) {
   throw lastError;
 }
 
-async function fetchText(baseUrl, pathname) {
+async function fetchText(baseUrl, pathname, expectedContentTypes) {
   const response = await fetchResponse(
     baseUrl,
     pathname,
     "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8",
   );
+  assertContentType(response, pathname, expectedContentTypes);
   return response.text();
 }
 
 async function checkPage(baseUrl, route) {
-  const html = await fetchText(baseUrl, route.path);
+  const html = await fetchText(baseUrl, route.path, ["text/html"]);
   const expectedCanonical = absoluteCanonical(route.canonical);
   const expectedEn = absoluteCanonical(route.en);
   const expectedFr = absoluteCanonical(route.fr);
@@ -171,7 +204,10 @@ async function checkPage(baseUrl, route) {
 }
 
 async function checkSitemap(baseUrl) {
-  const xml = await fetchText(baseUrl, "/sitemap.xml");
+  const xml = await fetchText(baseUrl, "/sitemap.xml", [
+    "application/xml",
+    "text/xml",
+  ]);
   assertCondition(!xml.includes(".html"), "sitemap.xml contains a legacy .html URL");
 
   const required = [
@@ -194,7 +230,7 @@ async function checkSitemap(baseUrl) {
 }
 
 async function checkRobots(baseUrl) {
-  const robots = await fetchText(baseUrl, "/robots.txt");
+  const robots = await fetchText(baseUrl, "/robots.txt", ["text/plain"]);
   assertCondition(
     robots.includes("Sitemap: " + CANONICAL_ORIGIN + "/sitemap.xml"),
     "robots.txt does not advertise the canonical www sitemap",
@@ -213,10 +249,7 @@ async function checkRobots(baseUrl) {
 
 async function checkHomelabStatus(baseUrl) {
   const response = await fetchResponse(baseUrl, "/api/homelab-status", "application/json");
-  assertCondition(
-    response.headers.get("content-type")?.includes("application/json"),
-    "/api/homelab-status did not return JSON",
-  );
+  assertContentType(response, "/api/homelab-status", ["application/json"]);
   assertCondition(
     response.headers.get("x-homelab-status-source") === "fastapi",
     "/api/homelab-status is not backed by the FastAPI source",
@@ -269,10 +302,7 @@ async function checkSocialCard(baseUrl, pathname, locale, html) {
   );
 
   const response = await fetchResponse(baseUrl, imageUrl.href, "image/png");
-  assertCondition(
-    response.headers.get("content-type")?.startsWith("image/png"),
-    pathname + " social card is not PNG",
-  );
+  assertContentType(response, pathname + " social card", ["image/png"]);
 
   const image = Buffer.from(await response.arrayBuffer());
   assertCondition(
