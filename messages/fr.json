@@ -522,13 +522,13 @@
 			"title": "Expérience professionnelle",
 			"subtitle": "Plus de 20 ans d'expérience au service d'entreprises comme la vôtre",
 			"freelance": {
-				"title": "Ingénieur cybersécurité & DevSecOps indépendant",
-				"date": "Depuis 2026",
+				"title": "Ingénieur cybersécurité & DevSecOps indépendant / freelance",
+				"date": "Freelance depuis 2007",
 				"desc": "Disponible pour des missions DevSecOps, sécurité cloud, automatisation des contrôles et sécurisation des plateformes d’IA."
 			},
 			"architect": {
 				"title": "Architecte cloud DevSecOps",
-				"date": "2022 – 2025",
+				"date": "2022 – 2026",
 				"desc": "Pilotage DevSecOps et architecture cloud pour une legal tech internationale. Sécurisation et évolution des plateformes AWS et OVH, automatisation, observabilité et contrôles alignés sur ISO 27001, ISO 42001, SOC 2 et le RGPD.",
 				"more": "Plus ici",
 				"ach1": "Architecture cloud",
