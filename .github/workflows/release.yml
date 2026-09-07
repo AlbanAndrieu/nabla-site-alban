@@ -52,7 +52,7 @@ jobs:
             echo "## Semantic Release"
             echo
             echo "Release mutation skipped safely."
-            echo "Configure repository variable `RELEASE_APP_CLIENT_ID` and secret `RELEASE_APP_PRIVATE_KEY`, then rerun this workflow."
+            echo 'Configure repository variable `RELEASE_APP_CLIENT_ID` and secret `RELEASE_APP_PRIVATE_KEY`, then rerun this workflow.'
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Checkout validated master revision
