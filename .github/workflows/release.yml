@@ -27,11 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_APP_CLIENT_ID: ${{ vars.RELEASE_APP_CLIENT_ID }}
-      RELEASE_APP_PRIVATE_KEY_CONFIGURED: ${{ secrets.RELEASE_APP_PRIVATE_KEY != '' }}
 
     steps:
       - name: Resolve release credential policy
         id: release_credentials
+        env:
+          RELEASE_APP_PRIVATE_KEY_CONFIGURED: ${{ secrets.RELEASE_APP_PRIVATE_KEY != '' }}
         shell: bash
         run: |
           set -euo pipefail
