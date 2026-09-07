@@ -34,7 +34,11 @@ branche finale et le déploiement Vercel sont validés.
 
 - [ ] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
   et leurs traductions : statut indépendant, périodes d'expérience et temps
-  verbaux doivent raconter la même chronologie.
+  verbaux doivent raconter la même chronologie. Le contenu actif, les fallbacks
+  HTML et les sources CV 2026 affichent désormais `Independent / Freelance`
+  depuis 2007 et Jus Mundi `2022–2026`. Le point reste ouvert jusqu'à
+  régénération/validation des PDF CV déjà publiés depuis les sources LaTeX mises
+  à jour.
 - [x] Supprimer les anciennes traductions/props Jus Mundi devenues mortes :
   le namespace `jm` ne conserve plus le footer historique, les anciens libellés
   de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
