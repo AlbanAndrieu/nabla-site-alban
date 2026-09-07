@@ -18,6 +18,10 @@ test("semantic-release bootstraps Site Alban at 0.0.1 after green master CI", as
   assert.equal(pkg.version, "0.0.1");
   assert.match(release, /workflow_run:/);
   assert.match(release, /CI \(Quality and Security\)/);
+  assert.match(
+    release,
+    /workflow_run:[\s\S]*?branches:\s*\n\s*- master/,
+  );
   assert.match(release, /head_branch == 'master'/);
   assert.match(release, /semantic-release@25\.0\.8/);
   assert.match(release, /@semantic-release\/changelog@6\.0\.3/);
