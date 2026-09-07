@@ -83,6 +83,19 @@ test("manual SEO metadata pages reuse the canonical alternate helper", async () 
 	}
 });
 
+test("SEO sitemap entries reuse reciprocal alternates including x-default", () => {
+	const entries = new Map(sitemap().map((entry) => [new URL(entry.url).pathname, entry]));
+	for (const slug of SEO_PAGE_SLUGS) {
+		const englishPath = canonicalPagePath(slug, "en");
+		const frenchPath = canonicalPagePath(slug, "fr");
+		const entry = entries.get(englishPath);
+		assert.ok(entry, englishPath);
+		assert.equal(entry.alternates?.languages?.en, `https://www.albanandrieu.com${englishPath === "/" ? "" : englishPath}/`.replace(/\/$/, englishPath === "/" ? "/" : ""));
+		assert.equal(entry.alternates?.languages?.fr, `https://www.albanandrieu.com${frenchPath}`);
+		assert.equal(entry.alternates?.languages?.["x-default"], entry.alternates?.languages?.en);
+	}
+});
+
 test("policy sitemap index and entries use clean localized routes and reciprocal alternates", () => {
 	const entries = new Map(sitemap().map((entry) => [new URL(entry.url).pathname, entry]));
 	const indexEntry = entries.get("/policy");

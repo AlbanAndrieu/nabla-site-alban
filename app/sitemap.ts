@@ -7,6 +7,7 @@ import {
 	type PolicyPageSlug,
 } from "@/lib/policyPages";
 import {
+	canonicalPageAlternates,
 	canonicalPagePath,
 	SEO_PAGE_SLUGS,
 	seoSettings,
@@ -61,19 +62,20 @@ function policySitemapEntries(): MetadataRoute.Sitemap {
 
 export default function sitemap(): MetadataRoute.Sitemap {
 	const pageEntries = SEO_PAGE_SLUGS.map((slug) => {
-		const englishPath = canonicalPagePath(slug, "en");
-		const frenchPath = canonicalPagePath(slug, "fr");
+		const languagePaths = canonicalPageAlternates(slug);
 		const settings = seoSettings(slug);
 
 		return {
-			url: new URL(englishPath, SITE_ORIGIN).href,
+			url: new URL(languagePaths.en, SITE_ORIGIN).href,
 			changeFrequency: settings.changeFrequency,
 			priority: settings.priority,
 			alternates: {
-				languages: {
-					en: new URL(englishPath, SITE_ORIGIN).href,
-					fr: new URL(frenchPath, SITE_ORIGIN).href,
-				},
+				languages: Object.fromEntries(
+					Object.entries(languagePaths).map(([language, path]) => [
+						language,
+						new URL(path, SITE_ORIGIN).href,
+					]),
+				),
 			},
 		};
 	});
