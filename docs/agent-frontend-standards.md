@@ -175,3 +175,4 @@ Do not reduce existing tests or quality gates.
 - Updating the sitemap means updating its source-of-truth catalog/tests, not maintaining a separate hand-written sitemap.
 - Preserve the repository's deployment gates and Vercel Preview/Playwright behavior; frontend optimization never justifies skipping a requested deployment validation.
 - Production SEO/HTTP automation must target the canonical public origin. A Vercel automation bypass may be used to avoid CI bot/deployment-protection challenges, but its credential must never be forwarded to a different origin or treated as proof that browser-facing protection is disabled.
+- Post-deploy validation should correlate the public origin with the deployed Git SHA when Vercel exposes deployment identity; a healthy response from an older deployment is not sufficient evidence that the new release is live.
