@@ -130,7 +130,11 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.doesNotMatch(workflow, /npm ci/);
 	assert.doesNotMatch(workflow, /playwright/i);
 	assert.match(workflow, /VERCEL_AUTOMATION_BYPASS_SECRET/);
-	assert.match(workflow, /SMOKE_LOG/);
+	assert.match(
+		workflow,
+		/echo "SMOKE_LOG=\$RUNNER_TEMP\/production-smoke\.log" >> "\$GITHUB_ENV"/,
+	);
+	assert.doesNotMatch(workflow, /SMOKE_LOG:\s*\$\{\{\s*runner\.temp/);
 	assert.match(workflow, /GITHUB_STEP_SUMMARY/);
 	assert.match(workflow, /set -o pipefail/);
 	assert.match(script, /x-vercel-protection-bypass/);

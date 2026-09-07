@@ -34,7 +34,6 @@ jobs:
     env:
       BASE_URL: "https://www.albanandrieu.com"
       DEPLOYMENT_URL: ${{ github.event.client_payload.url || '' }}
-      SMOKE_LOG: ${{ runner.temp }}/production-smoke.log
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       DEPLOYED_SHA: >-
         ${{
@@ -65,6 +64,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
+
+      - name: Prepare smoke log path
+        run: echo "SMOKE_LOG=$RUNNER_TEMP/production-smoke.log" >> "$GITHUB_ENV"
 
       - name: Verify production HTTP and SEO contract
         run: |
