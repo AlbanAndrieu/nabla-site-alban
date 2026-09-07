@@ -392,11 +392,7 @@ export default function HomelabServiceGrid({
 											})}
 										>
 											<i
-												className={
-													EFFECTIVE_HEALTH_ICON_CLASS[
-														resolvedHealth.effectiveState
-													]
-												}
+												className={EFFECTIVE_HEALTH_ICON_CLASS[presentationState]}
 												aria-hidden="true"
 											/>{" "}
 											{effectiveHealthLabel}
