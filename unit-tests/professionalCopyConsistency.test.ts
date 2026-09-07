@@ -21,6 +21,8 @@ test("active professional copy is consistent across home and contact", async () 
 	assert.match(fr.home.timeline.freelance.title, /indépendant \/ freelance/);
 	assert.match(en.contactPage.role, /Independent \/ Freelance/);
 	assert.match(fr.contactPage.role, /indépendant \/ freelance/);
+	assert.match(en.contactPage.hero.experience, /freelance since 2007/i);
+	assert.match(fr.contactPage.hero.experience, /freelance depuis 2007/i);
 	assert.match(legacyEn, /Freelance since 2007/);
 	assert.match(legacyFr, /Freelance depuis 2007/);
 	assert.match(legacyEn, />2022 – 2026<\/time>/);
