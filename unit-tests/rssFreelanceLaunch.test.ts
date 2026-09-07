@@ -8,7 +8,7 @@ test("RSS promotes the independent consulting launch with quote paths and a soci
 	assert.match(feed, /xmlns:media="http:\/\/search\.yahoo\.com\/mrss\/"/);
 	assert.ok(feed.includes("<lastBuildDate>Mon, 07 Sep 2026 00:00:00 GMT</lastBuildDate>"));
 
-	const launchIndex = feed.indexOf("Independent consulting is open");
+	const launchIndex = feed.indexOf("Alban Andrieu launches freelance consulting");
 	const previousItemIndex = feed.indexOf("Workstation Docker Compose");
 	assert.ok(launchIndex >= 0, "freelance launch item should exist");
 	assert.ok(
