@@ -122,7 +122,9 @@ les autres chantiers.
   afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
 - [ ] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
   `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales. Le
-  workflow reste ouvert jusqu’à un run `master` vert sur l’origine canonique
+  workflow doit également prouver via `/api/deployment` que l’origine canonique
+  sert bien le SHA Vercel attendu, et non seulement une version précédente encore
+  saine. Il reste ouvert jusqu’à un run `master` vert sur l’origine canonique
   publique, et non sur l’URL Vercel immuable protégée.
 
 ## P1 — Architecture et homelab runtime
