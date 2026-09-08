@@ -9,9 +9,7 @@
 			"kind": "security-app",
 			"category": "security",
 			"sourcePath": "apps/2fauth/compose.yml",
-			"securityFunctions": [
-				"protect"
-			],
+			"securityFunctions": ["protect"],
 			"icon": "🔐"
 		},
 		{
@@ -32,10 +30,7 @@
 			"sourcePath": "apps/akvorado/compose.yml",
 			"presentationRole": "service",
 			"criticality": "medium",
-			"securityFunctions": [
-				"identify",
-				"detect"
-			]
+			"securityFunctions": ["identify", "detect"]
 		},
 		{
 			"id": "akvorado-inlet",
@@ -45,10 +40,7 @@
 			"sourcePath": "apps/akvorado/compose.yml",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"identify",
-				"detect"
-			]
+			"securityFunctions": ["identify", "detect"]
 		},
 		{
 			"id": "akvorado-orchestrator",
@@ -58,10 +50,7 @@
 			"sourcePath": "apps/akvorado/compose.yml",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"identify",
-				"detect"
-			]
+			"securityFunctions": ["identify", "detect"]
 		},
 		{
 			"id": "akvorado-outlet",
@@ -71,10 +60,7 @@
 			"sourcePath": "apps/akvorado/compose.yml",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"identify",
-				"detect"
-			]
+			"securityFunctions": ["identify", "detect"]
 		},
 		{
 			"id": "alloy",
@@ -133,10 +119,7 @@
 			"kind": "security-agent",
 			"category": "security",
 			"sourcePath": "apps/crowdsec/compose.yml",
-			"securityFunctions": [
-				"detect",
-				"respond"
-			],
+			"securityFunctions": ["detect", "respond"],
 			"icon": "🛡️"
 		},
 		{
@@ -166,9 +149,7 @@
 			"description": "Restricted read-only Docker Engine API boundary for repository automation.",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"protect"
-			]
+			"securityFunctions": ["protect"]
 		},
 		{
 			"id": "dockhand",
@@ -525,9 +506,7 @@
 			"description": "1Password Connect API for machine-readable secret access.",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"protect"
-			]
+			"securityFunctions": ["protect"]
 		},
 		{
 			"id": "op-connect-sync",
@@ -538,9 +517,7 @@
 			"description": "Synchronizes 1Password vault state for the Connect API.",
 			"presentationRole": "support",
 			"criticality": "high",
-			"securityFunctions": [
-				"protect"
-			]
+			"securityFunctions": ["protect"]
 		},
 		{
 			"id": "open-terminal",
@@ -652,10 +629,7 @@
 			"description": "External pfSense firewall running the lightweight CrowdSec remediation component.",
 			"presentationRole": "core",
 			"criticality": "critical",
-			"securityFunctions": [
-				"protect",
-				"respond"
-			],
+			"securityFunctions": ["protect", "respond"],
 			"icon": "🔥"
 		},
 		{
@@ -882,9 +856,7 @@
 			"kind": "ids",
 			"category": "security",
 			"sourcePath": "apps/suricata/compose.yml",
-			"securityFunctions": [
-				"detect"
-			],
+			"securityFunctions": ["detect"],
 			"icon": "🦈"
 		},
 		{
@@ -963,9 +935,7 @@
 			"description": "Self-hosted Bitwarden-compatible password and secret vault.",
 			"presentationRole": "service",
 			"criticality": "high",
-			"securityFunctions": [
-				"protect"
-			]
+			"securityFunctions": ["protect"]
 		},
 		{
 			"id": "vaultwarden-rest-api",
@@ -976,9 +946,7 @@
 			"description": "Legacy Doco-CD compatibility adapter for Vaultwarden secret retrieval.",
 			"presentationRole": "support",
 			"criticality": "medium",
-			"securityFunctions": [
-				"protect"
-			]
+			"securityFunctions": ["protect"]
 		},
 		{
 			"id": "wazuh",
@@ -1019,9 +987,7 @@
 			"kind": "security-manager",
 			"category": "security",
 			"sourcePath": "apps/wazuh/compose.yml",
-			"securityFunctions": [
-				"detect"
-			],
+			"securityFunctions": ["detect"],
 			"icon": "🛡️"
 		},
 		{
@@ -1042,9 +1008,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/2fauth/compose.yml:2fauth.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/2fauth/compose.yml:2fauth.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "aistor",
@@ -1052,9 +1016,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/aistor/compose.yml:aistor.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/aistor/compose.yml:aistor.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "akvorado-console",
@@ -1062,9 +1024,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "The Akvorado console queries flow history from the shared ClickHouse service.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:clickhousedb"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:clickhousedb"]
 		},
 		{
 			"source": "akvorado-console",
@@ -1082,9 +1042,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/akvorado/compose.yml:akvorado-inlet.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/akvorado/compose.yml:akvorado-inlet.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "akvorado-inlet",
@@ -1092,9 +1050,7 @@
 			"type": "routesTo",
 			"strength": "required",
 			"description": "Decoded IPFIX/NetFlow records are published to the dedicated Akvorado Kafka topic.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:kafka.topic"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:kafka.topic"]
 		},
 		{
 			"source": "akvorado-orchestrator",
@@ -1102,9 +1058,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Akvorado manages and queries its dedicated schema in the shared ClickHouse service.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:clickhousedb"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:clickhousedb"]
 		},
 		{
 			"source": "akvorado-orchestrator",
@@ -1122,9 +1076,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Akvorado uses the shared Kafka broker for its dedicated flow topic.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:kafka"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:kafka"]
 		},
 		{
 			"source": "akvorado-outlet",
@@ -1132,9 +1084,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Enriched network-flow records are persisted in the dedicated Akvorado ClickHouse database.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:clickhousedb"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:clickhousedb"]
 		},
 		{
 			"source": "akvorado-outlet",
@@ -1152,9 +1102,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Akvorado Outlet consumes the dedicated flow topic from shared Kafka.",
-			"evidence": [
-				"apps/akvorado/config/akvorado.yaml:kafka"
-			]
+			"evidence": ["apps/akvorado/config/akvorado.yaml:kafka"]
 		},
 		{
 			"source": "alloy",
@@ -1162,9 +1110,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/grafana/compose.yml:alloy.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/grafana/compose.yml:alloy.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "alloy",
@@ -1172,9 +1118,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Alloy forwards collected security logs to Loki.",
-			"evidence": [
-				"apps/grafana/config/alloy.alloy:loki.write"
-			]
+			"evidence": ["apps/grafana/config/alloy.alloy:loki.write"]
 		},
 		{
 			"source": "alloy",
@@ -1182,9 +1126,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Alloy remote-writes collected OTLP metrics to Mimir.",
-			"evidence": [
-				"apps/grafana/config/alloy.alloy:prometheus.remote_write"
-			]
+			"evidence": ["apps/grafana/config/alloy.alloy:prometheus.remote_write"]
 		},
 		{
 			"source": "alloy",
@@ -1192,9 +1134,7 @@
 			"type": "dependsOn",
 			"strength": "optional",
 			"description": "Alloy tails pfSense log files when they are mounted on the TrueNAS host.",
-			"evidence": [
-				"apps/grafana/compose.yml:PFSENSE_LOG_DIR"
-			]
+			"evidence": ["apps/grafana/compose.yml:PFSENSE_LOG_DIR"]
 		},
 		{
 			"source": "alloy",
@@ -1202,9 +1142,7 @@
 			"type": "dependsOn",
 			"strength": "optional",
 			"description": "Alloy tails Suricata JSON logs when available.",
-			"evidence": [
-				"apps/grafana/compose.yml:SURICATA_LOG_DIR"
-			]
+			"evidence": ["apps/grafana/compose.yml:SURICATA_LOG_DIR"]
 		},
 		{
 			"source": "alloy",
@@ -1212,9 +1150,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Alloy forwards collected OTLP traces to Tempo.",
-			"evidence": [
-				"apps/grafana/config/alloy.alloy:otelcol.exporter.otlp"
-			]
+			"evidence": ["apps/grafana/config/alloy.alloy:otelcol.exporter.otlp"]
 		},
 		{
 			"source": "autokuma",
@@ -1222,9 +1158,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/autokuma/compose.yml:autokuma.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/autokuma/compose.yml:autokuma.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "autokuma",
@@ -1232,9 +1166,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "AutoKuma reconciles generated monitors into Uptime Kuma.",
-			"evidence": [
-				"apps/autokuma/compose.yml:AUTOKUMA__KUMA__URL"
-			]
+			"evidence": ["apps/autokuma/compose.yml:AUTOKUMA__KUMA__URL"]
 		},
 		{
 			"source": "autoxpose",
@@ -1242,9 +1174,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/autoxpose/compose.yml:autoxpose.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/autoxpose/compose.yml:autoxpose.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "autoxpose",
@@ -1252,9 +1182,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "AutoXpose discovers containers through the restricted Docker API proxy.",
-			"evidence": [
-				"apps/autoxpose/compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"
-			]
+			"evidence": ["apps/autoxpose/compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"]
 		},
 		{
 			"source": "bichon",
@@ -1262,9 +1190,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/bichon/compose.yml:bichon.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/bichon/compose.yml:bichon.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "clickhouse",
@@ -1272,9 +1198,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/clickhouse/compose.yml:clickhouse.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/clickhouse/compose.yml:clickhouse.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "clickhouse",
@@ -1293,9 +1217,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/code/compose.yml:code-server.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/code/compose.yml:code-server.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "crowdsec",
@@ -1303,9 +1225,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/crowdsec/compose.yml:crowdsec.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/crowdsec/compose.yml:crowdsec.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "crowdsec",
@@ -1346,9 +1266,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Docker runtime is hosted on the TrueNAS platform.",
-			"evidence": [
-				"apps/homarr/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/homarr/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "docker-socket-proxy",
@@ -1356,9 +1274,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The proxy consumes the local Docker Engine API and exposes an allowlisted subset to trusted clients.",
-			"evidence": [
-				"docker-compose.yml:/var/run/docker.sock:ro"
-			]
+			"evidence": ["docker-compose.yml:/var/run/docker.sock:ro"]
 		},
 		{
 			"source": "docker-socket-proxy",
@@ -1366,9 +1282,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"docker-compose.yml:docker-socket-proxy.x-nabla.runtime.containerService"
-			]
+			"evidence": ["docker-compose.yml:docker-socket-proxy.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "dockhand",
@@ -1376,9 +1290,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/dockhand/compose.yml:dockhand.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/dockhand/compose.yml:dockhand.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "doco-cd",
@@ -1386,9 +1298,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"docker-compose.yml:doco-cd.x-nabla.runtime.containerService"
-			]
+			"evidence": ["docker-compose.yml:doco-cd.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "doco-cd",
@@ -1396,9 +1306,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "Doco-CD performs Docker discovery and deployments through the restricted proxy.",
-			"evidence": [
-				"docker-compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"
-			]
+			"evidence": ["docker-compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"]
 		},
 		{
 			"source": "dozzle",
@@ -1406,9 +1314,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/dozzle/compose.yml:dozzle.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/dozzle/compose.yml:dozzle.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "drawio",
@@ -1416,9 +1322,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/drawio/compose.yml:drawio.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/drawio/compose.yml:drawio.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "elasticsearch",
@@ -1446,9 +1350,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sample/compose.yml:fastapi-sample.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sample/compose.yml:fastapi-sample.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "fastapi-sample",
@@ -1456,9 +1358,7 @@
 			"type": "dependsOn",
 			"strength": "optional",
 			"description": "FastAPI Sample uses the shared Redis service for L2 probe caches and runtime heartbeat aggregation.",
-			"evidence": [
-				"apps/sample/compose.yml:/mnt/cpool/sample/.env.secrets:REDIS_URL"
-			]
+			"evidence": ["apps/sample/compose.yml:/mnt/cpool/sample/.env.secrets:REDIS_URL"]
 		},
 		{
 			"source": "fastapi-sample",
@@ -1466,9 +1366,7 @@
 			"type": "exposedBy",
 			"strength": "optional",
 			"description": "Traefik exposes the local FastAPI Sample endpoint on the trusted internal hostname.",
-			"evidence": [
-				"apps/sample/compose.yml:traefik.http.routers.fastapi-sample"
-			]
+			"evidence": ["apps/sample/compose.yml:traefik.http.routers.fastapi-sample"]
 		},
 		{
 			"source": "garage",
@@ -1476,9 +1374,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/garage/compose.yml:garage.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/garage/compose.yml:garage.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "garage",
@@ -1497,9 +1393,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/garage/compose.yml:webui.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/garage/compose.yml:webui.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "garage-webui",
@@ -1518,9 +1412,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/gatus/compose.yml:gatus.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/gatus/compose.yml:gatus.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "grafana",
@@ -1528,9 +1420,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/grafana/compose.yml:grafana.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/grafana/compose.yml:grafana.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "grafana",
@@ -1538,9 +1428,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Grafana queries Loki for logs.",
-			"evidence": [
-				"apps/grafana/config/grafana-datasources.yml"
-			]
+			"evidence": ["apps/grafana/config/grafana-datasources.yml"]
 		},
 		{
 			"source": "grafana",
@@ -1548,9 +1436,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Grafana queries Mimir for metrics.",
-			"evidence": [
-				"apps/grafana/config/grafana-datasources.yml"
-			]
+			"evidence": ["apps/grafana/config/grafana-datasources.yml"]
 		},
 		{
 			"source": "grafana",
@@ -1558,9 +1444,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Grafana queries Tempo for distributed traces.",
-			"evidence": [
-				"apps/grafana/config/grafana-datasources.yml"
-			]
+			"evidence": ["apps/grafana/config/grafana-datasources.yml"]
 		},
 		{
 			"source": "graylog",
@@ -1568,9 +1452,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/graylog/compose.yml:graylog.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/graylog/compose.yml:graylog.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "graylog",
@@ -1578,9 +1460,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Graylog stores application configuration and metadata in the shared MongoDB service.",
-			"evidence": [
-				"apps/graylog/compose.yml:GRAYLOG_MONGODB_URI"
-			]
+			"evidence": ["apps/graylog/compose.yml:GRAYLOG_MONGODB_URI"]
 		},
 		{
 			"source": "graylog",
@@ -1588,9 +1468,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Graylog stores log indices in the shared OpenSearch 2.x security cluster.",
-			"evidence": [
-				"apps/graylog/compose.yml:GRAYLOG_ELASTICSEARCH_HOSTS"
-			]
+			"evidence": ["apps/graylog/compose.yml:GRAYLOG_ELASTICSEARCH_HOSTS"]
 		},
 		{
 			"source": "haproxy-exporter",
@@ -1608,9 +1486,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter scrapes the HAProxy statistics endpoint exposed by pfSense.",
-			"evidence": [
-				"apps/haproxy-exporter/compose.yml:PFSENSE_HAPROXY_SCRAPE_URI"
-			]
+			"evidence": ["apps/haproxy-exporter/compose.yml:PFSENSE_HAPROXY_SCRAPE_URI"]
 		},
 		{
 			"source": "haproxy-exporter",
@@ -1618,9 +1494,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Prometheus scrapes HAProxy metrics from this exporter.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:job_name=haproxy"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:job_name=haproxy"]
 		},
 		{
 			"source": "hello-nginx",
@@ -1628,9 +1502,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/nginx/compose.yml:nginx.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/nginx/compose.yml:nginx.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "homarr",
@@ -1638,9 +1510,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Homarr discovers and manages containers through the read-only Docker socket proxy.",
-			"evidence": [
-				"apps/homarr/compose.yml:DOCKER_HOSTNAMES"
-			]
+			"evidence": ["apps/homarr/compose.yml:DOCKER_HOSTNAMES"]
 		},
 		{
 			"source": "homarr",
@@ -1648,9 +1518,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/homarr/compose.yml:homarr.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/homarr/compose.yml:homarr.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "homarr-sync",
@@ -1658,9 +1526,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/homarr/compose.yml:homarr-sync.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/homarr/compose.yml:homarr-sync.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "homarr-sync",
@@ -1668,9 +1534,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "Reconciles generated application desired state through the Homarr OpenAPI endpoints.",
-			"evidence": [
-				"apps/homarr/sync.py:/api/apps"
-			]
+			"evidence": ["apps/homarr/sync.py:/api/apps"]
 		},
 		{
 			"source": "homeassistant",
@@ -1688,9 +1552,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/influxdb/compose.yml:influxdb.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/influxdb/compose.yml:influxdb.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "kafka",
@@ -1698,9 +1560,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/kafka/compose.yml:kafka.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/kafka/compose.yml:kafka.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "kibana",
@@ -1708,9 +1568,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/elasticsearch/compose.yml:kibana.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/elasticsearch/compose.yml:kibana.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "kibana",
@@ -1718,9 +1576,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Kibana queries Elasticsearch for indexed data and saved objects.",
-			"evidence": [
-				"apps/elasticsearch/compose.yml:ELASTICSEARCH_HOSTS"
-			]
+			"evidence": ["apps/elasticsearch/compose.yml:ELASTICSEARCH_HOSTS"]
 		},
 		{
 			"source": "kubernetes",
@@ -1748,9 +1604,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/langflow/compose.yml:langflow.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/langflow/compose.yml:langflow.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "langflow",
@@ -1758,9 +1612,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "The OpenRAG Langflow runtime accesses the shared OpenSearch service.",
-			"evidence": [
-				"apps/langflow/compose.yml:OPENSEARCH_HOST"
-			]
+			"evidence": ["apps/langflow/compose.yml:OPENSEARCH_HOST"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1768,9 +1620,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Web reads and writes analytical event data in ClickHouse.",
-			"evidence": [
-				"apps/langfuse/compose.yml:CLICKHOUSE_URL"
-			]
+			"evidence": ["apps/langfuse/compose.yml:CLICKHOUSE_URL"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1778,9 +1628,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/langfuse/compose.yml:langfuse-web.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/langfuse/compose.yml:langfuse-web.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1788,9 +1636,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "The web application is a runtime workload of the logical Langfuse platform.",
-			"evidence": [
-				"apps/langfuse/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/langfuse/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1798,9 +1644,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Langfuse Web uses S3-compatible object storage for media and exports.",
-			"evidence": [
-				"apps/langfuse/compose.yml:LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT"
-			]
+			"evidence": ["apps/langfuse/compose.yml:LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1808,9 +1652,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Web stores transactional application data in PostgreSQL.",
-			"evidence": [
-				"apps/langfuse/compose.yml:DATABASE_URL"
-			]
+			"evidence": ["apps/langfuse/compose.yml:DATABASE_URL"]
 		},
 		{
 			"source": "langfuse-web",
@@ -1818,9 +1660,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Web uses Redis-backed queues and shared asynchronous state.",
-			"evidence": [
-				"apps/langfuse/compose.yml:REDIS_HOST"
-			]
+			"evidence": ["apps/langfuse/compose.yml:REDIS_HOST"]
 		},
 		{
 			"source": "langfuse-worker",
@@ -1828,9 +1668,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Worker stores analytical event data in ClickHouse.",
-			"evidence": [
-				"apps/langfuse/compose.yml:CLICKHOUSE_URL"
-			]
+			"evidence": ["apps/langfuse/compose.yml:CLICKHOUSE_URL"]
 		},
 		{
 			"source": "langfuse-worker",
@@ -1848,9 +1686,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "The worker is a runtime workload of the logical Langfuse platform.",
-			"evidence": [
-				"apps/langfuse/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/langfuse/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "langfuse-worker",
@@ -1869,9 +1705,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Worker stores transactional application data in PostgreSQL.",
-			"evidence": [
-				"apps/langfuse/compose.yml:DATABASE_URL"
-			]
+			"evidence": ["apps/langfuse/compose.yml:DATABASE_URL"]
 		},
 		{
 			"source": "langfuse-worker",
@@ -1879,9 +1713,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Langfuse Worker uses Redis for queues and asynchronous processing.",
-			"evidence": [
-				"apps/langfuse/compose.yml:REDIS_HOST"
-			]
+			"evidence": ["apps/langfuse/compose.yml:REDIS_HOST"]
 		},
 		{
 			"source": "languagetool",
@@ -1899,9 +1731,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/litellm/compose.yml:litellm.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/litellm/compose.yml:litellm.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "litellm",
@@ -1920,9 +1750,7 @@
 			"type": "routesTo",
 			"strength": "required",
 			"description": "LiteLLM routes local model and embedding requests to Ollama runtimes.",
-			"evidence": [
-				"apps/litellm/config.yaml:model_list"
-			]
+			"evidence": ["apps/litellm/config.yaml:model_list"]
 		},
 		{
 			"source": "litellm",
@@ -1930,9 +1758,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "LiteLLM enables its Prometheus callback and budget metrics.",
-			"evidence": [
-				"apps/litellm/config.yaml:callbacks.prometheus"
-			]
+			"evidence": ["apps/litellm/config.yaml:callbacks.prometheus"]
 		},
 		{
 			"source": "litellm",
@@ -1940,9 +1766,7 @@
 			"type": "dependsOn",
 			"strength": "optional",
 			"description": "LiteLLM can use Redis for its response cache.",
-			"evidence": [
-				"apps/litellm/config.yaml:cache_params.redis_url"
-			]
+			"evidence": ["apps/litellm/config.yaml:cache_params.redis_url"]
 		},
 		{
 			"source": "loki",
@@ -1950,9 +1774,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/grafana/compose.yml:loki.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/grafana/compose.yml:loki.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "mimir",
@@ -1960,9 +1782,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/grafana/compose.yml:mimir.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/grafana/compose.yml:mimir.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "minio",
@@ -1970,9 +1790,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/minio/compose.yml:minio.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/minio/compose.yml:minio.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "mongo",
@@ -1980,9 +1798,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/mongo/compose.yml:mongo.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/mongo/compose.yml:mongo.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "n8n",
@@ -1990,9 +1806,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/n8n/compose.yml:n8n.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/n8n/compose.yml:n8n.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "n8n",
@@ -2000,9 +1814,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "n8n is configured with PostgreSQL credentials for workflow persistence.",
-			"evidence": [
-				"apps/n8n/compose.yml:DB_POSTGRESDB_USER"
-			]
+			"evidence": ["apps/n8n/compose.yml:DB_POSTGRESDB_USER"]
 		},
 		{
 			"source": "n8n",
@@ -2010,9 +1822,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "n8n exposes metrics for Prometheus scraping.",
-			"evidence": [
-				"apps/n8n/compose.yml:prometheus.scrape"
-			]
+			"evidence": ["apps/n8n/compose.yml:prometheus.scrape"]
 		},
 		{
 			"source": "n8n",
@@ -2020,9 +1830,7 @@
 			"type": "dependsOn",
 			"strength": "optional",
 			"description": "n8n is configured with Redis credentials for queue-backed execution.",
-			"evidence": [
-				"apps/n8n/compose.yml:N8N_REDIS_PASSWORD"
-			]
+			"evidence": ["apps/n8n/compose.yml:N8N_REDIS_PASSWORD"]
 		},
 		{
 			"source": "n8n",
@@ -2030,9 +1838,7 @@
 			"type": "exposedBy",
 			"strength": "optional",
 			"description": "Traefik routes HTTPS traffic to n8n.",
-			"evidence": [
-				"apps/n8n/compose.yml:traefik.http.routers.n8n"
-			]
+			"evidence": ["apps/n8n/compose.yml:traefik.http.routers.n8n"]
 		},
 		{
 			"source": "nexus",
@@ -2040,9 +1846,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/nexus/compose.yml:nexus.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/nexus/compose.yml:nexus.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "nginx-proxy-manager",
@@ -2050,9 +1854,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/nginx-proxy-manager/compose.yml:app.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/nginx-proxy-manager/compose.yml:app.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "npmplus",
@@ -2060,9 +1862,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/npmplus/compose.yml:npmplus.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/npmplus/compose.yml:npmplus.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "ntopng",
@@ -2070,9 +1870,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "ntopng stores historical flow data in the existing ClickHouse service.",
-			"evidence": [
-				"apps/ntopng/compose.yml:CLICKHOUSE_HOST"
-			]
+			"evidence": ["apps/ntopng/compose.yml:CLICKHOUSE_HOST"]
 		},
 		{
 			"source": "ntopng",
@@ -2080,9 +1878,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/ntopng/compose.yml:ntopng.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/ntopng/compose.yml:ntopng.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "obsidian",
@@ -2090,9 +1886,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/obsidian/compose.yml:obsidian.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/obsidian/compose.yml:obsidian.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "ollama",
@@ -2100,9 +1894,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/ollama/compose.yml:ollama.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/ollama/compose.yml:ollama.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "ollama",
@@ -2110,9 +1902,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Ollama is marked for Prometheus scraping.",
-			"evidence": [
-				"apps/ollama/compose.yml:prometheus.scrape"
-			]
+			"evidence": ["apps/ollama/compose.yml:prometheus.scrape"]
 		},
 		{
 			"source": "ollama",
@@ -2120,9 +1910,7 @@
 			"type": "exposedBy",
 			"strength": "optional",
 			"description": "Traefik routes the internal Ollama endpoint.",
-			"evidence": [
-				"apps/ollama/compose.yml:traefik.http.routers.ollama"
-			]
+			"evidence": ["apps/ollama/compose.yml:traefik.http.routers.ollama"]
 		},
 		{
 			"source": "op-connect-api",
@@ -2150,9 +1938,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "Sync and API form the 1Password Connect deployment.",
-			"evidence": [
-				"apps/opconnect/compose.yml"
-			]
+			"evidence": ["apps/opconnect/compose.yml"]
 		},
 		{
 			"source": "openclaw-sandbox",
@@ -2170,9 +1956,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/openhands/compose.yml:openhands.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/openhands/compose.yml:openhands.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "openrag-backend",
@@ -2180,9 +1964,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/openrag/compose.yml:openrag-backend.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/openrag/compose.yml:openrag-backend.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "openrag-backend",
@@ -2190,9 +1972,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "OpenRAG backend invokes the shared Langflow service.",
-			"evidence": [
-				"apps/openrag/compose.yml:LANGFLOW_URL"
-			]
+			"evidence": ["apps/openrag/compose.yml:LANGFLOW_URL"]
 		},
 		{
 			"source": "openrag-backend",
@@ -2200,9 +1980,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "OpenRAG backend stores and retrieves indexed content through OpenSearch.",
-			"evidence": [
-				"apps/openrag/compose.yml:OPENSEARCH_HOST"
-			]
+			"evidence": ["apps/openrag/compose.yml:OPENSEARCH_HOST"]
 		},
 		{
 			"source": "openrag-frontend",
@@ -2220,9 +1998,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The OpenRAG frontend talks to the OpenRAG backend.",
-			"evidence": [
-				"apps/openrag/compose.yml:OPENRAG_BACKEND_HOST"
-			]
+			"evidence": ["apps/openrag/compose.yml:OPENRAG_BACKEND_HOST"]
 		},
 		{
 			"source": "opensearch",
@@ -2230,9 +2006,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/opensearch/compose.yml:opensearch.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/opensearch/compose.yml:opensearch.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "opensearch-dashboards",
@@ -2240,9 +2014,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/opensearch/compose.yml:dashboards.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/opensearch/compose.yml:dashboards.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "opensearch-dashboards",
@@ -2250,9 +2022,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "OpenSearch Dashboards queries the OpenRAG OpenSearch cluster.",
-			"evidence": [
-				"apps/opensearch/compose.yml:OPENSEARCH_HOSTS"
-			]
+			"evidence": ["apps/opensearch/compose.yml:OPENSEARCH_HOSTS"]
 		},
 		{
 			"source": "opensearch-exporter",
@@ -2270,9 +2040,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter collects metrics from the OpenRAG OpenSearch service.",
-			"evidence": [
-				"apps/opensearch-exporter/compose.yml:OPENSEARCH_EXPORTER_URI"
-			]
+			"evidence": ["apps/opensearch-exporter/compose.yml:OPENSEARCH_EXPORTER_URI"]
 		},
 		{
 			"source": "opensearch-exporter",
@@ -2280,9 +2048,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Prometheus scrapes metrics from the OpenSearch exporter.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:job_name=opensearch"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:job_name=opensearch"]
 		},
 		{
 			"source": "opensearch-security",
@@ -2310,9 +2076,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter collects metrics from the shared OpenSearch 2.x security cluster.",
-			"evidence": [
-				"apps/opensearch-exporter/compose.yml:opensearch-security:9200"
-			]
+			"evidence": ["apps/opensearch-exporter/compose.yml:opensearch-security:9200"]
 		},
 		{
 			"source": "opensearch-security-exporter",
@@ -2320,9 +2084,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Prometheus scrapes metrics from the OpenSearch Security exporter.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:job_name=opensearch-security"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:job_name=opensearch-security"]
 		},
 		{
 			"source": "openwebui",
@@ -2330,9 +2092,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/openwebui/compose.yml:open-webui.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/openwebui/compose.yml:open-webui.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "openwebui",
@@ -2351,9 +2111,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Open WebUI agents can invoke the Open Terminal tool API.",
-			"evidence": [
-				"apps/openwebui/compose.yml:x-nabla.relations[2]"
-			]
+			"evidence": ["apps/openwebui/compose.yml:x-nabla.relations[2]"]
 		},
 		{
 			"source": "openwebui",
@@ -2361,9 +2119,7 @@
 			"type": "consumesApi",
 			"strength": "optional",
 			"description": "Open WebUI can delegate web search to the SearXNG integration.",
-			"evidence": [
-				"apps/openwebui/compose.yml:x-nabla.relations[1]"
-			]
+			"evidence": ["apps/openwebui/compose.yml:x-nabla.relations[1]"]
 		},
 		{
 			"source": "openwebui-pipelines",
@@ -2371,9 +2127,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/openwebui/compose.yml:pipelines.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/openwebui/compose.yml:pipelines.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pfsense-exporter",
@@ -2391,9 +2145,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter queries pfSense for firewall and system metrics.",
-			"evidence": [
-				"apps/prometheus/compose.yml:exporter.config.yml"
-			]
+			"evidence": ["apps/prometheus/compose.yml:exporter.config.yml"]
 		},
 		{
 			"source": "pfsense-exporter",
@@ -2401,9 +2153,7 @@
 			"type": "observedBy",
 			"strength": "required",
 			"description": "Prometheus scrapes the pfSense exporter.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:job_name=pfsense_exporter"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:job_name=pfsense_exporter"]
 		},
 		{
 			"source": "pihole",
@@ -2411,9 +2161,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/pihole/compose.yml:pihole.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/pihole/compose.yml:pihole.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pihole-dns-sync",
@@ -2421,9 +2169,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/pihole/compose.yml:pihole-dns-sync.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/pihole/compose.yml:pihole-dns-sync.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pihole-dns-sync",
@@ -2431,9 +2177,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "DNS Sync discovers services through the restricted Docker socket proxy.",
-			"evidence": [
-				"apps/pihole/compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"
-			]
+			"evidence": ["apps/pihole/compose.yml:DOCKER_HOST=tcp://docker-socket-proxy:2375"]
 		},
 		{
 			"source": "pihole-dns-sync",
@@ -2441,9 +2185,7 @@
 			"type": "automates",
 			"strength": "required",
 			"description": "DNS Sync reconciles private service records through the Pi-hole API.",
-			"evidence": [
-				"apps/pihole/compose.yml:PIHOLE_URL=http://pihole"
-			]
+			"evidence": ["apps/pihole/compose.yml:PIHOLE_URL=http://pihole"]
 		},
 		{
 			"source": "pihole-exporter",
@@ -2451,9 +2193,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/pihole/compose.yml:pihole-exporter.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/pihole/compose.yml:pihole-exporter.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pihole-exporter",
@@ -2461,9 +2201,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "The exporter reads Pi-hole runtime statistics.",
-			"evidence": [
-				"apps/pihole/compose.yml:PIHOLE_HOSTNAME=pihole"
-			]
+			"evidence": ["apps/pihole/compose.yml:PIHOLE_HOSTNAME=pihole"]
 		},
 		{
 			"source": "portracker",
@@ -2471,9 +2209,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/portracker/compose.yml:portracker.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/portracker/compose.yml:portracker.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "postgres-exporter",
@@ -2491,9 +2227,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "The exporter queries the shared PostgreSQL service.",
-			"evidence": [
-				"apps/postgres/compose.yml:DATA_SOURCE_NAME"
-			]
+			"evidence": ["apps/postgres/compose.yml:DATA_SOURCE_NAME"]
 		},
 		{
 			"source": "prometheus",
@@ -2501,9 +2235,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/prometheus/compose.yml:prometheus.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/prometheus/compose.yml:prometheus.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "prometheus",
@@ -2511,9 +2243,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Prometheus remote-writes collected metrics to Mimir for durable storage.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:remote_write"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:remote_write"]
 		},
 		{
 			"source": "prometheus-alertmanager",
@@ -2521,9 +2251,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/prometheus/compose.yml:alertmanager.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/prometheus/compose.yml:alertmanager.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pyroscope",
@@ -2531,9 +2259,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/pyroscope/compose.yml:pyroscope.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/pyroscope/compose.yml:pyroscope.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "pyroscope",
@@ -2541,9 +2267,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Grafana queries Pyroscope as a profiling data source.",
-			"evidence": [
-				"apps/pyroscope/compose.yml:TCP/4040"
-			]
+			"evidence": ["apps/pyroscope/compose.yml:TCP/4040"]
 		},
 		{
 			"source": "redis",
@@ -2551,9 +2275,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/redis/compose.yml:redis.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/redis/compose.yml:redis.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "scrutiny",
@@ -2561,9 +2283,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/scrutiny/compose.yml:scrutiny.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/scrutiny/compose.yml:scrutiny.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "scrutiny",
@@ -2571,9 +2291,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "Scrutiny stores SMART history in the shared InfluxDB service.",
-			"evidence": [
-				"apps/scrutiny/compose.yml:SCRUTINY_WEB_INFLUXDB_HOST"
-			]
+			"evidence": ["apps/scrutiny/compose.yml:SCRUTINY_WEB_INFLUXDB_HOST"]
 		},
 		{
 			"source": "scrutiny-collector",
@@ -2591,9 +2309,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The collector posts SMART inventory and metrics to the Scrutiny web/API service.",
-			"evidence": [
-				"apps/scrutiny/compose.yml:COLLECTOR_API_ENDPOINT"
-			]
+			"evidence": ["apps/scrutiny/compose.yml:COLLECTOR_API_ENDPOINT"]
 		},
 		{
 			"source": "sentry",
@@ -2601,9 +2317,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sentry/compose.yml:sentry-web.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sentry/compose.yml:sentry-web.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sentry",
@@ -2611,9 +2325,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Sentry publishes and consumes event streams through shared Kafka.",
-			"evidence": [
-				"apps/sentry/compose.yml:SENTRY_EVENTSTREAM"
-			]
+			"evidence": ["apps/sentry/compose.yml:SENTRY_EVENTSTREAM"]
 		},
 		{
 			"source": "sentry",
@@ -2621,9 +2333,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Sentry application metadata is stored in the dedicated sentry PostgreSQL database.",
-			"evidence": [
-				"apps/sentry/compose.yml:SENTRY_POSTGRES_HOST=172.17.0.24"
-			]
+			"evidence": ["apps/sentry/compose.yml:SENTRY_POSTGRES_HOST=172.17.0.24"]
 		},
 		{
 			"source": "sentry",
@@ -2631,9 +2341,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Sentry uses the shared Redis database 3.",
-			"evidence": [
-				"apps/sentry/compose.yml:SENTRY_REDIS_HOST=redis"
-			]
+			"evidence": ["apps/sentry/compose.yml:SENTRY_REDIS_HOST=redis"]
 		},
 		{
 			"source": "sentry",
@@ -2641,9 +2349,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Sentry queries event data through Snuba.",
-			"evidence": [
-				"apps/sentry/compose.yml:SNUBA=http://snuba-api:1218"
-			]
+			"evidence": ["apps/sentry/compose.yml:SNUBA=http://snuba-api:1218"]
 		},
 		{
 			"source": "sentry-clickhouse",
@@ -2661,9 +2367,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sentry/compose.yml:nginx.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sentry/compose.yml:nginx.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sentry-edge",
@@ -2671,9 +2375,7 @@
 			"type": "routesTo",
 			"strength": "required",
 			"description": "The Sentry edge routes application traffic to Sentry web.",
-			"evidence": [
-				"apps/sentry/config/nginx.conf:sentry_upstream"
-			]
+			"evidence": ["apps/sentry/config/nginx.conf:sentry_upstream"]
 		},
 		{
 			"source": "sentry-edge",
@@ -2681,9 +2383,7 @@
 			"type": "routesTo",
 			"strength": "required",
 			"description": "The Sentry edge routes ingestion traffic through Relay.",
-			"evidence": [
-				"apps/sentry/config/nginx.conf:relay_upstream"
-			]
+			"evidence": ["apps/sentry/config/nginx.conf:relay_upstream"]
 		},
 		{
 			"source": "sentry-relay",
@@ -2691,9 +2391,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sentry/compose.yml:relay.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sentry/compose.yml:relay.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sentry-relay",
@@ -2701,9 +2399,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Relay publishes processing traffic to shared Kafka.",
-			"evidence": [
-				"apps/sentry/compose.yml:RELAY_KAFKA_BROKER_URL=kafka:9092"
-			]
+			"evidence": ["apps/sentry/compose.yml:RELAY_KAFKA_BROKER_URL=kafka:9092"]
 		},
 		{
 			"source": "sentry-relay",
@@ -2711,9 +2407,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Relay uses the shared Redis service.",
-			"evidence": [
-				"/mnt/cpool/sentry/.env.secrets:RELAY_REDIS_URL"
-			]
+			"evidence": ["/mnt/cpool/sentry/.env.secrets:RELAY_REDIS_URL"]
 		},
 		{
 			"source": "sentry-relay",
@@ -2721,9 +2415,7 @@
 			"type": "routesTo",
 			"strength": "required",
 			"description": "Relay forwards accepted traffic to Sentry web.",
-			"evidence": [
-				"apps/sentry/compose.yml:RELAY_UPSTREAM_URL=http://sentry-web:9000/"
-			]
+			"evidence": ["apps/sentry/compose.yml:RELAY_UPSTREAM_URL=http://sentry-web:9000/"]
 		},
 		{
 			"source": "sentry-snuba-api",
@@ -2731,9 +2423,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sentry/compose.yml:snuba-api.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sentry/compose.yml:snuba-api.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sentry-snuba-api",
@@ -2741,9 +2431,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Snuba consumes Sentry event streams from shared Kafka.",
-			"evidence": [
-				"apps/sentry/compose.yml:DEFAULT_BROKERS=kafka:9092"
-			]
+			"evidence": ["apps/sentry/compose.yml:DEFAULT_BROKERS=kafka:9092"]
 		},
 		{
 			"source": "sentry-snuba-api",
@@ -2751,9 +2439,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Snuba uses the shared Redis service for runtime state.",
-			"evidence": [
-				"apps/sentry/compose.yml:REDIS_HOST=redis"
-			]
+			"evidence": ["apps/sentry/compose.yml:REDIS_HOST=redis"]
 		},
 		{
 			"source": "sentry-snuba-api",
@@ -2761,9 +2447,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Snuba reads and writes Sentry analytical state in ClickHouse.",
-			"evidence": [
-				"apps/sentry/compose.yml:CLICKHOUSE_HOST=sentry-clickhouse"
-			]
+			"evidence": ["apps/sentry/compose.yml:CLICKHOUSE_HOST=sentry-clickhouse"]
 		},
 		{
 			"source": "sentry-taskbroker",
@@ -2771,9 +2455,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sentry/compose.yml:taskbroker.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sentry/compose.yml:taskbroker.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sentry-taskbroker",
@@ -2801,9 +2483,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Taskworker receives RPC work from Taskbroker.",
-			"evidence": [
-				"apps/sentry/compose.yml:--rpc-host=taskbroker:50051"
-			]
+			"evidence": ["apps/sentry/compose.yml:--rpc-host=taskbroker:50051"]
 		},
 		{
 			"source": "sonarqube",
@@ -2811,9 +2491,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/sonarqube/compose.yml:sonarqube.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/sonarqube/compose.yml:sonarqube.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sonarqube",
@@ -2821,9 +2499,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "SonarQube persists application state in the existing PostgreSQL service.",
-			"evidence": [
-				"apps/sonarqube/compose.yml:SONAR_JDBC_URL"
-			]
+			"evidence": ["apps/sonarqube/compose.yml:SONAR_JDBC_URL"]
 		},
 		{
 			"source": "squid",
@@ -2831,9 +2507,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/squid/compose.yml:squid.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/squid/compose.yml:squid.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "suricata",
@@ -2841,9 +2515,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Grafana Alloy tails Suricata JSON logs for Loki ingestion.",
-			"evidence": [
-				"apps/grafana/config/alloy.alloy:loki.source.file"
-			]
+			"evidence": ["apps/grafana/config/alloy.alloy:loki.source.file"]
 		},
 		{
 			"source": "suricata",
@@ -2851,9 +2523,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "CrowdSec consumes Suricata event logs for behavioral decisions.",
-			"evidence": [
-				"apps/crowdsec/acquis.d/security.yaml"
-			]
+			"evidence": ["apps/crowdsec/acquis.d/security.yaml"]
 		},
 		{
 			"source": "suricata",
@@ -2861,9 +2531,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/suricata/compose.yml:suricata.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/suricata/compose.yml:suricata.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "sybase-exporter",
@@ -2881,9 +2549,7 @@
 			"type": "observedBy",
 			"strength": "optional",
 			"description": "Prometheus scrapes Sybase database metrics from this exporter.",
-			"evidence": [
-				"apps/prometheus/prometheus.yml:job_name=sybase"
-			]
+			"evidence": ["apps/prometheus/prometheus.yml:job_name=sybase"]
 		},
 		{
 			"source": "sybase-exporter",
@@ -2891,9 +2557,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter queries Sybase ASE through the FreeTDS driver.",
-			"evidence": [
-				"apps/sybase-exporter/compose.yml:SYBASE_DATA_SOURCE_NAME"
-			]
+			"evidence": ["apps/sybase-exporter/compose.yml:SYBASE_DATA_SOURCE_NAME"]
 		},
 		{
 			"source": "talos",
@@ -2912,9 +2576,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/grafana/compose.yml:tempo.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/grafana/compose.yml:tempo.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "traefik",
@@ -2922,9 +2584,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/traefik/compose.yml:traefik.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/traefik/compose.yml:traefik.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "traefik",
@@ -2943,9 +2603,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/vaultwarden/compose.yml:vaultwarden.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/vaultwarden/compose.yml:vaultwarden.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "vaultwarden-rest-api",
@@ -2963,9 +2621,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The compatibility adapter authenticates against Vaultwarden.",
-			"evidence": [
-				"apps/vaultwarden/compose.yml:BW_HOST=https://vaultwarden.albandrieu.com"
-			]
+			"evidence": ["apps/vaultwarden/compose.yml:BW_HOST=https://vaultwarden.albandrieu.com"]
 		},
 		{
 			"source": "wazuh-dashboard",
@@ -2973,9 +2629,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/wazuh/compose.yml:wazuh.dashboard.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/wazuh/compose.yml:wazuh.dashboard.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "wazuh-dashboard",
@@ -2983,9 +2637,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "Wazuh Dashboard is a runtime workload of the Wazuh security platform.",
-			"evidence": [
-				"apps/wazuh/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/wazuh/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "wazuh-dashboard",
@@ -2993,9 +2645,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Wazuh Dashboard queries security data from Wazuh Indexer.",
-			"evidence": [
-				"apps/wazuh/config/wazuh_dashboard/opensearch_dashboards.yml"
-			]
+			"evidence": ["apps/wazuh/config/wazuh_dashboard/opensearch_dashboards.yml"]
 		},
 		{
 			"source": "wazuh-dashboard",
@@ -3003,9 +2653,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "Wazuh Dashboard consumes the Wazuh Manager API.",
-			"evidence": [
-				"apps/wazuh/compose.yml:WAZUH_API_URL"
-			]
+			"evidence": ["apps/wazuh/compose.yml:WAZUH_API_URL"]
 		},
 		{
 			"source": "wazuh-forwarder",
@@ -3013,9 +2661,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/wazuh/compose.yml:wazuh-forwarder.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/wazuh/compose.yml:wazuh-forwarder.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "wazuh-forwarder",
@@ -3023,9 +2669,7 @@
 			"type": "storesIn",
 			"strength": "required",
 			"description": "The forwarder replicates Wazuh alerts into the shared OpenSearch 2.x security cluster.",
-			"evidence": [
-				"apps/wazuh/config/logstash/wazuh-opensearch.conf"
-			]
+			"evidence": ["apps/wazuh/config/logstash/wazuh-opensearch.conf"]
 		},
 		{
 			"source": "wazuh-forwarder",
@@ -3033,9 +2677,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "The forwarder is an integration workload of the Wazuh security platform.",
-			"evidence": [
-				"apps/wazuh/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/wazuh/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "wazuh-forwarder",
@@ -3043,9 +2685,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "The forwarder reads Wazuh alert files produced by Wazuh Manager.",
-			"evidence": [
-				"apps/wazuh/compose.yml:wazuh_logs"
-			]
+			"evidence": ["apps/wazuh/compose.yml:wazuh_logs"]
 		},
 		{
 			"source": "wazuh-indexer",
@@ -3053,9 +2693,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/wazuh/compose.yml:wazuh.indexer.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/wazuh/compose.yml:wazuh.indexer.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "wazuh-indexer",
@@ -3063,9 +2701,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "Wazuh Indexer is a runtime workload of the Wazuh security platform.",
-			"evidence": [
-				"apps/wazuh/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/wazuh/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "wazuh-manager",
@@ -3073,9 +2709,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/wazuh/compose.yml:wazuh.manager.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/wazuh/compose.yml:wazuh.manager.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "wazuh-manager",
@@ -3083,9 +2717,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "Wazuh Manager is a runtime workload of the Wazuh security platform.",
-			"evidence": [
-				"apps/wazuh/compose.yml:x-nabla.relations[0]"
-			]
+			"evidence": ["apps/wazuh/compose.yml:x-nabla.relations[0]"]
 		},
 		{
 			"source": "wazuh-manager",
@@ -3093,9 +2725,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "Wazuh Manager indexes security events in the Wazuh Indexer.",
-			"evidence": [
-				"apps/wazuh/compose.yml:INDEXER_URL"
-			]
+			"evidence": ["apps/wazuh/compose.yml:INDEXER_URL"]
 		},
 		{
 			"source": "wordpress",
@@ -3103,9 +2733,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/wordpress/compose.yml:wordpress.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/wordpress/compose.yml:wordpress.x-nabla.runtime.containerService"]
 		},
 		{
 			"source": "wordpress",
@@ -3113,9 +2741,7 @@
 			"type": "dependsOn",
 			"strength": "required",
 			"description": "WordPress stores application state in PostgreSQL through PG4WP.",
-			"evidence": [
-				"apps/wordpress/compose.yml:WORDPRESS_DB_HOST=postgres:5432"
-			]
+			"evidence": ["apps/wordpress/compose.yml:WORDPRESS_DB_HOST=postgres:5432"]
 		},
 		{
 			"source": "cloudflared",
@@ -3123,9 +2749,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "The cloudflared tunnel connector runs on the TrueNAS Docker runtime.",
-			"evidence": [
-				"TrueNAS cloudflared connector runtime"
-			]
+			"evidence": ["TrueNAS cloudflared connector runtime"]
 		},
 		{
 			"source": "garage-webui",
@@ -3133,9 +2757,7 @@
 			"type": "exposedBy",
 			"strength": "required",
 			"description": "Cloudflare Tunnel exposes garage.albandrieu.com and forwards it through cloudflared to Garage WebUI :3909.",
-			"evidence": [
-				"Cloudflare Tunnel route: garage.albandrieu.com -> Garage WebUI :3909"
-			]
+			"evidence": ["Cloudflare Tunnel route: garage.albandrieu.com -> Garage WebUI :3909"]
 		},
 		{
 			"source": "garage-admin",
@@ -3143,9 +2765,7 @@
 			"type": "partOf",
 			"strength": "required",
 			"description": "Garage Admin :3903 is an administration surface of the Garage service.",
-			"evidence": [
-				"apps/garage/garage.toml:[admin] api_bind_addr=:3903"
-			]
+			"evidence": ["apps/garage/garage.toml:[admin] api_bind_addr=:3903"]
 		},
 		{
 			"source": "garage-admin",
