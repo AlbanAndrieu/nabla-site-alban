@@ -16,6 +16,9 @@ test("canonical package scripts own dependency installation and Playwright execu
 
 	assert.equal(packageJson.scripts?.test, "playwright test");
 	assert.equal(packageJson.scripts?.["test:ui"], "playwright test --ui");
-	assert.equal(packageJson.scripts?.["test:headed"], "playwright test --headed");
+	assert.equal(
+		packageJson.scripts?.["test:headed"],
+		"playwright test --headed",
+	);
 	assert.equal(packageJson.scripts?.["test:debug"], "playwright test --debug");
 });
