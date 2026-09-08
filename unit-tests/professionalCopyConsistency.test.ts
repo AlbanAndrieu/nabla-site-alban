@@ -34,7 +34,8 @@ test("active professional copy is consistent across home and contact", async () 
 		assert.equal("lastexp" in messages.home.hero, false);
 		assert.equal("jusmundi" in messages.home.hero, false);
 		assert.equal("purpose" in messages.home.hero, false);
-		for (const key of ["value1", "value2", "value3", "value4"]) assert.equal(typeof messages.home.hero[key], "string");
+		for (const key of ["value1", "value2", "value3", "value4"])
+			assert.equal(typeof messages.home.hero[key], "string");
 	}
 });
 
