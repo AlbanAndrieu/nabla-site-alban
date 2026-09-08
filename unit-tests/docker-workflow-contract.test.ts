@@ -62,6 +62,11 @@ test("Docker fallback runtime stays non-root and keeps the protected static 404"
 
 	assert.match(workflow, /127\.0\.0\.1:18080:8080/);
 	assert.match(workflow, /http:\/\/127\.0\.0\.1:18080\/404\.html/);
+	assert.ok(
+		workflow.includes(
+			'"http://127.0.0.1:18080/assets/fontawesome-free-7.1.0-web/js/${asset}"',
+		),
+	);
 	assert.match(workflow, /docker exec "\$\{container_id\}" id -u/);
 	assert.match(workflow, /runtime_uid.*== "0"/s);
 });
@@ -74,7 +79,10 @@ test("Docker publication is master-only, GHCR-first and SHA-addressable", async 
 		/github\.event_name == 'push' && github\.ref == 'refs\/heads\/master'/,
 	);
 	assert.match(workflow, /DOCKERHUB_IMAGE: nabla\/nabla-site-alban/);
-	assert.match(workflow, /GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/);
+	assert.match(
+		workflow,
+		/GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/,
+	);
 	assert.match(workflow, /Publish validated fallback image to GHCR/);
 	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:latest"/);
 	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:\$\{GITHUB_SHA\}"/);

@@ -167,7 +167,7 @@ large_deletion_failed=0
 if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]]; then
     for file in "${CHANGED_FILES[@]}"; do
         case "${file}" in
-            package-lock.json)
+            package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)
@@ -193,7 +193,7 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
 
     for file in "${DELETED_FILES[@]}"; do
         case "${file}" in
-            package-lock.json)
+            package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)

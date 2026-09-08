@@ -416,6 +416,15 @@ Autres contrôles :
   Turbopack prouve qu'ils sont consommés à la compilation.
 - [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
   maintenir une denylist explicite des scripts d'installation déjà examinés.
+- [x] Reprendre et adapter le nettoyage public validé par
+  `nabla-site-bababou#170` : conserver les trois bundles Font Awesome JS,
+  les trois CSS et leurs deux webfonts, plus les deux SVG réellement consommés
+  par Alban (`linkedin-in.svg` et `react.svg`). Le dépôt retire ainsi
+  5 698 fichiers vendus inutilisés, soit 26 729 419 octets (~25,49 MiB), sans
+  modifier les URLs runtime existantes.
+- [x] Sortir le convertisseur JPG/PNG des assets publics, réparer son wrapper,
+  supprimer les wrappers `run-install.sh` / `run-test.sh` orphelins et
+  verrouiller ces frontières avec des tests de contrat.
 - [ ] Compléter l'audit des licences et des dépendances restantes après plusieurs
   baselines CI post-nettoyage.
 - [ ] Évaluer Knip pour détecter fichiers, exports et dépendances morts.
@@ -429,6 +438,11 @@ Autres contrôles :
 - [x] Utiliser `repository_dispatch: vercel.deployment.success` pour le hand-off
   Preview → Playwright.
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
+- [x] Rejeter explicitement les réponses Vercel Security Checkpoint
+  (`HTTP 429` / `x-vercel-mitigated: challenge`) dans le preflight Preview au
+  lieu de les assimiler à un accès protégé valide.
+- [x] Faire vérifier au smoke Docker les trois bundles Font Awesome JS conservés ;
+  `public/**` était déjà couvert pour les événements push et pull_request.
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
 - [x] Aligner le développement et les workflows GitHub sur Node 25, conserver une plage `>=24.11.0 <26` compatible avec le runtime Vercel Node 24, et garder OpenCommit uniquement comme helper local/on-demand.

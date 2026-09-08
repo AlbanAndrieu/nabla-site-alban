@@ -118,6 +118,12 @@ jobs:
             --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
             "$BASE_URL/")"
           location="$(awk 'BEGIN { IGNORECASE=1 } /^location:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+
+          if [[ "$status" == "429" || "${mitigated,,}" == "challenge" ]]; then
+            echo "::error::Vercel Security Checkpoint rejected Preview automation (HTTP $status, x-vercel-mitigated=${mitigated:-unknown})."
+            exit 1
+          fi
 
           if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$response_headers" || \
             [[ "$status" == "401" || "$status" == "403" ]]; then
