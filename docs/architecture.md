@@ -33,7 +33,6 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 ## Données et APIs
 
 - `app/api/create-checkout-session/route.ts` : Checkout Stripe hébergé.
-- `app/actions/stripe.ts` : session Stripe Embedded Checkout.
 - `app/api/github-stars/route.ts` : compteur GitHub, cache d'une heure.
 - `app/api/homelab-services/route.ts` : catalogue homelab FastAPI-first avec
   fallback local.
@@ -87,6 +86,9 @@ dans les composants React.
 - Next DevTools MCP reste disponible à la demande via les configurations MCP qui
   exécutent `npx -y next-devtools-mcp@latest`, sans dépendance npm locale.
 - OpenCommit reste disponible comme helper local/on-demand via `npm run oco` / `npm run opencommit`; aucun workflow OpenCommit n’est actif.
+- L’ancienne surface Embedded Checkout non routée est retirée avec
+  `@stripe/react-stripe-js` et `@stripe/stripe-js`; le Route Handler de
+  Checkout conserve uniquement le SDK serveur `stripe`.
 - Wrangler et Express ne font plus partie du graphe npm du projet et `wrangler.jsonc` est retiré.
 
 ## Runtime Node.js
