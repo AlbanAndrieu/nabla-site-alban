@@ -108,7 +108,7 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
 	assert.match(
 		page,
-		/style=\{\{ color: internalColor, borderColor: internalColor \}\}/,
+		/style=\{\{\s*color:\s*internalColor,\s*borderColor:\s*internalColor,\s*\}\}/,
 	);
 	assert.match(page, /data-health-state=\{internalState\}/);
 });
