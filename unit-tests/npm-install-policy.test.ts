@@ -22,8 +22,18 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 		readFile(new URL("../.npmrc", import.meta.url), "utf8"),
 		readFile(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8"),
 	]);
-	const packageJson = JSON.parse(packageJsonSource) as {version?: string; engines?: {npm?: string}; allowScripts?: Record<string, boolean>};
-	const lock = JSON.parse(lockSource) as {version?: string; packages: Record<string, {version?: string; hasInstallScript?: boolean}>};
+	const packageJson = JSON.parse(packageJsonSource) as {
+		version?: string;
+		engines?: { npm?: string };
+		allowScripts?: Record<string, boolean>;
+	};
+	const lock = JSON.parse(lockSource) as {
+		version?: string;
+		packages: Record<
+			string,
+			{ version?: string; hasInstallScript?: boolean }
+		>;
+	};
 
 	assert.equal(packageJson.engines?.npm, ">=11.17.0 <12");
 	assert.deepEqual(packageJson.allowScripts, {
@@ -42,11 +52,19 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 	for (const [path, metadata] of Object.entries(lock.packages)) {
 		if (metadata.hasInstallScript !== true) continue;
 		const name = packageNameFromLockPath(path);
-		assert.equal(packageJson.allowScripts?.[name], false, `${name} has an install script but is not explicitly denied`);
+		assert.equal(
+			packageJson.allowScripts?.[name],
+			false,
+			`${name} has an install script but is not explicitly denied`,
+		);
 		if (!metadata.version) continue;
 		installed.set(name, [...(installed.get(name) ?? []), metadata.version]);
 	}
 	for (const [name, expected] of Object.entries(reviewedInstallScriptVersions)) {
-		assert.deepEqual([...(installed.get(name) ?? [])].sort(), [...expected].sort(), `${name} install-script versions changed and require explicit review`);
+		assert.deepEqual(
+			[...(installed.get(name) ?? [])].sort(),
+			[...expected].sort(),
+			`${name} install-script versions changed and require explicit review`,
+		);
 	}
 });
