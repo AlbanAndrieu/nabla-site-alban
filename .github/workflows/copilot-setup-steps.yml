@@ -49,8 +49,10 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Cache pre-commit environments
-        uses: actions/cache@v5
+      - name: Restore pre-commit environments
+        id: pre-commit-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
@@ -63,9 +65,22 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - name: Cache npm downloads
+      - name: Prepare pre-commit hook environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        run: pre-commit install-hooks
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Restore npm downloads
         id: npm-cache
-        uses: actions/cache@v5
+        continue-on-error: true
+        uses: actions/cache/restore@v5
         with:
           path: ~/.npm
           key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
@@ -81,3 +96,11 @@ jobs:
 
       - name: Install JavaScript dependencies
         run: npm ci --no-audit --no-fund
+
+      - name: Save npm downloads
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}

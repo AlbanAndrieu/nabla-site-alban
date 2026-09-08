@@ -84,12 +84,24 @@ test("CI runs the same agent gate before the production build without duplicate 
 		buildPosition > gateEnforcementPosition,
 		"build must start only after the agent gate is enforced",
 	);
-	assert.match(ci, /actions\/cache\/restore@v5/);
-	assert.match(ci, /actions\/cache\/save@v5/);
-	assert.match(ci, /continue-on-error: true/);
+	assert.match(
+		ci,
+		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+	);
+	assert.match(
+		ci,
+		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+	);
+	assert.match(
+		ci,
+		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+	);
+	assert.match(
+		ci,
+		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+	);
 	assert.match(ci, /steps\.agent-quality-gate\.outcome != 'success'/);
-	assert.match(ci, /steps\.pre-commit-cache\.outputs\.cache-primary-key/);
-	assert.match(ci, /steps\.npm-cache\.outputs\.cache-primary-key/);
+	assert.doesNotMatch(ci, /cache-primary-key/);
 	assert.match(ci, /fetch-depth: 0/);
 	assert.match(ci, /QUALITY_BASE_REF:/);
 	assert.match(ci, /github\.event\.before/);
@@ -107,6 +119,23 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	assert.match(setup, /persist-credentials: false/);
 	assert.match(setup, /actions\/setup-python@v6/);
 	assert.match(setup, /pre-commit==4\.6\.2/);
+	assert.match(setup, /pre-commit install-hooks/);
+	assert.match(
+		setup,
+		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+	);
+	assert.match(
+		setup,
+		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+	);
+	assert.match(
+		setup,
+		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+	);
+	assert.match(
+		setup,
+		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+	);
 	assert.match(setup, /npm ci --no-audit --no-fund/);
 });
 
