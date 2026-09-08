@@ -13,6 +13,10 @@ test("Preview E2E includes integration, pentest and performance baselines", asyn
 	const pkg = JSON.parse(pkgRaw) as { scripts?: Record<string, string> };
 
 	assert.equal(
+		pkg.scripts?.["test:baselines"],
+		"playwright test tests/integration-baseline.spec.ts tests/security-baseline.spec.ts tests/performance-baseline.spec.ts --project=chromium",
+	);
+	assert.equal(
 		pkg.scripts?.["test:integration"],
 		"playwright test tests/integration-baseline.spec.ts --project=chromium",
 	);
