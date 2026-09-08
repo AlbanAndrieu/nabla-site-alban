@@ -34,4 +34,14 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Run zero-config Knip audit
+        continue-on-error: true
         run: npx --yes --ignore-scripts knip@6.35.0 --reporter compact --no-progress
+
+      - name: Generate Stripe browser SDK removal patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm uninstall --package-lock-only --ignore-scripts \
+            @stripe/react-stripe-js \
+            @stripe/stripe-js
+          git diff -- package.json package-lock.json
