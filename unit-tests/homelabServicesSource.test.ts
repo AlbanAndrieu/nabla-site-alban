@@ -109,7 +109,7 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 		(service) => service.name === "pfSense",
 	);
 	const garageS3 = result.catalog.services.find(
-		(service) => service.id === "garage-s3",
+		(service) => service.id === "garage-webui",
 	);
 	const garage = result.catalog.services.find(
 		(service) => service.id === "garage",
