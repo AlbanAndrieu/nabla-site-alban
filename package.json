@@ -38,6 +38,7 @@
 		"test:headed": "playwright test --headed",
 		"test:debug": "playwright test --debug",
 		"test:report": "playwright show-report",
+		"test:baselines": "playwright test tests/integration-baseline.spec.ts tests/security-baseline.spec.ts tests/performance-baseline.spec.ts --project=chromium",
 		"test:integration": "playwright test tests/integration-baseline.spec.ts --project=chromium",
 		"test:security": "playwright test tests/security-baseline.spec.ts --project=chromium",
 		"test:performance": "playwright test tests/performance-baseline.spec.ts --project=chromium",
