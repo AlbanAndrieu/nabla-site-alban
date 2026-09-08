@@ -79,7 +79,10 @@ test("Docker publication is master-only, GHCR-first and SHA-addressable", async 
 		/github\.event_name == 'push' && github\.ref == 'refs\/heads\/master'/,
 	);
 	assert.match(workflow, /DOCKERHUB_IMAGE: nabla\/nabla-site-alban/);
-	assert.match(workflow, /GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/);
+	assert.match(
+		workflow,
+		/GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/,
+	);
 	assert.match(workflow, /Publish validated fallback image to GHCR/);
 	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:latest"/);
 	assert.match(workflow, /docker push "\$\{GHCR_IMAGE\}:\$\{GITHUB_SHA\}"/);
