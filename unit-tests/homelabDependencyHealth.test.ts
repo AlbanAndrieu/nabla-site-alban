@@ -149,7 +149,7 @@ test("service grid shows effective dependency degradation without replacing runt
 
 test("architecture graph uses the shared effective resolver and target health on required edges", async () => {
 	const explorer = await source(
-		"app/[locale]/architecture/ArchitectureExplorer.tsx",
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 	);
 
 	assert.match(explorer, /resolveEffectiveServiceState\(health\)/);
