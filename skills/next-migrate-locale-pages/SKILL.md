@@ -37,7 +37,7 @@ The repository supports two catalog classes:
 For the large legacy/global catalogs, prefer the repository merge helper:
 
 ```text
-node scripts/merge-i18n-message.js messages/en.json patch.json
+node scripts/merge-i18n-message.cjs messages/en.json patch.json
 ```
 
 Feature catalogs are intentionally small enough to review as complete files, but edits must still preserve unrelated keys and locale parity.
