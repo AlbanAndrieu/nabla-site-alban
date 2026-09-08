@@ -15,8 +15,16 @@ test("historical CV variants remain standalone static HTML documents", async () 
 				"utf8",
 			);
 
-			assert.match(source, /<!doctype html>/i, `${filename} must keep a doctype`);
-			assert.match(source, /<html\b/i, `${filename} must remain a full HTML page`);
+			assert.match(
+				source,
+				/<!doctype html>/i,
+				`${filename} must keep a doctype`,
+			);
+			assert.match(
+				source,
+				/<html\b/i,
+				`${filename} must remain a full HTML page`,
+			);
 			assert.match(source, /<body\b/i, `${filename} must keep its own body`);
 		}
 	}

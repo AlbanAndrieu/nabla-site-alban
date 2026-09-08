@@ -101,7 +101,11 @@ test("current CV sources close the Jus Mundi period in 2026", async () => {
 	]) {
 		const source = await readFile(`public/cv/${filename}`, "utf8");
 		assert.match(source, /\{2026 -\}[\s\S]*\{2022\}[\s\S]*Jus Mundi/, filename);
-		assert.doesNotMatch(source, /\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/, filename);
+		assert.doesNotMatch(
+			source,
+			/\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/,
+			filename,
+		);
 	}
 });
 
@@ -114,8 +118,14 @@ test("legacy priority EN/FR copy does not present Jus Mundi as a current role", 
 
 	assert.match(legacyContactEn, /Independent \/ freelance since 2007/i);
 	assert.match(legacyContactFr, /Indépendant \/ freelance depuis 2007/i);
-	assert.doesNotMatch(legacyContactEn, /Currently architecting[\s\S]{0,600}Jus Mundi/i);
-	assert.doesNotMatch(legacyContactFr, /Currently architecting[\s\S]{0,600}Jus Mundi/i);
+	assert.doesNotMatch(
+		legacyContactEn,
+		/Currently architecting[\s\S]{0,600}Jus Mundi/i,
+	);
+	assert.doesNotMatch(
+		legacyContactFr,
+		/Currently architecting[\s\S]{0,600}Jus Mundi/i,
+	);
 	assert.match(legacyFrHome, /Ma dernière expérience chez/);
 	assert.doesNotMatch(legacyFrHome, /experience chez chez/i);
 });
