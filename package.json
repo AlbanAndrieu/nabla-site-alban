@@ -86,7 +86,6 @@
 		"@parcel/watcher": false,
 		"@swc/core": false,
 		"esbuild": false,
-		"fsevents": false,
-		"unrs-resolver": false
+		"fsevents": false
 	}
 }
