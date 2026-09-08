@@ -101,7 +101,7 @@ const NODES: NetworkNodeSpec[] = [
 		data: {
 			name: "Cloudflare DNS",
 			role: "Public DNS / edge",
-			address: "garage.int + s3.int",
+			address: "s3.int only",
 			badge: "DNS ONLY",
 			icon: "☁️",
 			zone: "cloudflare",
@@ -113,7 +113,7 @@ const NODES: NetworkNodeSpec[] = [
 		data: {
 			name: "Cloudflare Tunnel",
 			role: "Managed ingress",
-			address: "OpenWebUI route",
+			address: "garage + garage-admin + OpenWebUI",
 			badge: "TUNNEL",
 			icon: "🔐",
 			zone: "cloudflare",
@@ -230,12 +230,35 @@ const NODES: NetworkNodeSpec[] = [
 		id: "garage",
 		domain: "truenas",
 		data: {
-			name: "Garage",
-			role: "Docker S3 storage + WebUI on TrueNAS",
+			name: "Garage S3",
+			role: "S3 API on TrueNAS",
 			address: "s3.int.albandrieu.com → :3900",
-			secondaryAddress: "garage.int.albandrieu.com → :3909",
 			badge: "TRAEFIK · DNS ONLY",
 			icon: "🪣",
+			zone: "app",
+		},
+	},
+	{
+		id: "garage-webui",
+		domain: "truenas",
+		data: {
+			name: "Garage",
+			role: "Garage WebUI on TrueNAS",
+			address: "garage.albandrieu.com → :3909",
+			badge: "CLOUDFLARE TUNNEL",
+			icon: "🖥️",
+			zone: "app",
+		},
+	},
+	{
+		id: "garage-admin",
+		domain: "truenas",
+		data: {
+			name: "Garage Admin",
+			role: "Garage Admin API on TrueNAS",
+			address: "garage-admin.albandrieu.com → :3903",
+			badge: "CLOUDFLARE TUNNEL",
+			icon: "🔐",
 			zone: "app",
 		},
 	},
@@ -268,8 +291,8 @@ const NODES: NetworkNodeSpec[] = [
 
 const EDGES: NetworkEdgeSpec[] = [
 	{ id: "internet-pfsense", source: "internet", target: "pfsense", label: "WAN direct", kind: "wan" },
-	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "garage.int + s3.int · DNS only", kind: "dns" },
-	{ id: "cloudflare-dns-tunnel", source: "cloudflare-dns", target: "cloudflare-tunnel", label: "proxied hostname", kind: "tunnel" },
+	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "s3.int · DNS only", kind: "dns" },
+	{ id: "cloudflare-dns-tunnel", source: "cloudflare-dns", target: "cloudflare-tunnel", label: "garage + garage-admin + OpenWebUI", kind: "tunnel" },
 	{ id: "pfsense-switch", source: "pfsense", target: "switch", label: "LAN", kind: "lan" },
 	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "direct HTTPS ingress", kind: "direct" },
 	{ id: "switch-truenas", source: "switch", target: "truenas", label: "Ethernet", kind: "lan" },
@@ -279,19 +302,23 @@ const EDGES: NetworkEdgeSpec[] = [
 	{ id: "haproxy-traefik", source: "haproxy", target: "traefik", label: "Traefik backend :443", kind: "direct" },
 	{ id: "truenas-homarr", source: "truenas", target: "homarr", label: "native App", kind: "lan" },
 	{ id: "truenas-traefik", source: "truenas", target: "traefik", label: "Docker host :80/:443", kind: "lan" },
-	{ id: "truenas-garage", source: "truenas", target: "garage", label: "Docker host :3900/:3909", kind: "lan" },
-	{ id: "traefik-garage", source: "traefik", target: "garage", label: "S3 :3900 · WebUI :3909", kind: "direct" },
+	{ id: "truenas-garage", source: "truenas", target: "garage", label: "Docker host :3900", kind: "lan" },
+	{ id: "truenas-garage-webui", source: "truenas", target: "garage-webui", label: "Docker host :3909", kind: "lan" },
+	{ id: "truenas-garage-admin", source: "truenas", target: "garage-admin", label: "Docker host :3903", kind: "lan" },
+	{ id: "traefik-garage", source: "traefik", target: "garage", label: "s3.int → S3 :3900", kind: "direct" },
 	{ id: "truenas-cloudflared", source: "truenas", target: "cloudflared", label: "Docker host", kind: "lan" },
 	{ id: "cloudflare-tunnel-cloudflared", source: "cloudflare-tunnel", target: "cloudflared", label: "encrypted tunnel", kind: "tunnel" },
-	{ id: "cloudflared-openwebui", source: "cloudflared", target: "openwebui", label: "tunnel ingress", kind: "tunnel" },
+	{ id: "cloudflared-garage-webui", source: "cloudflared", target: "garage-webui", label: "garage.albandrieu.com → :3909", kind: "tunnel" },
+	{ id: "cloudflared-garage-admin", source: "cloudflared", target: "garage-admin", label: "garage-admin.albandrieu.com → :3903", kind: "tunnel" },
+	{ id: "cloudflared-openwebui", source: "cloudflared", target: "openwebui", label: "open-webui.albandrieu.com", kind: "tunnel" },
 	{ id: "r7000-s24", source: "r7000", target: "s24", label: "Wi-Fi", kind: "wifi" },
 ];
 
 const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
 	all: new Set(NODES.map((node) => node.id)),
 	direct: new Set(["internet", "cloudflare-dns", "pfsense", "haproxy", "truenas", "traefik", "garage"]),
-	tunnel: new Set(["cloudflare-dns", "cloudflare-tunnel", "truenas", "cloudflared", "openwebui"]),
-	lan: new Set(["pfsense", "switch", "truenas", "workstation", "r7000", "s24", "homarr", "traefik", "garage"]),
+	tunnel: new Set(["cloudflare-dns", "cloudflare-tunnel", "truenas", "cloudflared", "garage-webui", "garage-admin", "openwebui"]),
+	lan: new Set(["pfsense", "switch", "truenas", "workstation", "r7000", "s24", "homarr", "traefik", "garage", "garage-webui", "garage-admin"]),
 };
 
 function domainCopy(

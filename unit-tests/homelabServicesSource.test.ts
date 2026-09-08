@@ -104,11 +104,17 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	const result = getStaticHomelabServicesCatalog();
 	const truenas = result.catalog.services.find((service) => service.name === "TrueNAS");
 	const pfsense = result.catalog.services.find((service) => service.name === "pfSense");
+	const garageS3 = result.catalog.services.find((service) => service.id === "garage-s3");
+	const garage = result.catalog.services.find((service) => service.id === "garage");
+	const garageAdmin = result.catalog.services.find((service) => service.id === "garage-admin");
 
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
 	assert.ok(truenas);
 	assert.ok(pfsense);
+	assert.ok(garageS3);
+	assert.ok(garage);
+	assert.ok(garageAdmin);
 	assert.equal(
 		homelabServiceEndpointUrl(truenas),
 		"https://truenas.albandrieu.com:7000/",
@@ -116,6 +122,18 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	assert.equal(
 		homelabServiceEndpointUrl(pfsense),
 		"https://home.albandrieu.com:10443/",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garageS3),
+		"https://s3.int.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garage),
+		"https://garage.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garageAdmin),
+		"https://garage-admin.albandrieu.com",
 	);
 });
 

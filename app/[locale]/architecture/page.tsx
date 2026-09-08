@@ -118,8 +118,8 @@ export default async function ArchitecturePage({
 							</AnchoredHeading>
 							<p>
 								{french
-									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Il distingue le chemin HAProxy direct, le DNS Cloudflare sans Tunnel pour Garage et le Cloudflare Tunnel terminé par le conteneur Docker cloudflared pour OpenWebUI."
-									: "This React Flow diagram is the exact same component used on the TrueNAS page. For Garage, client HTTPS terminates at HAProxy on pfSense, HAProxy re-encrypts the backend connection with TLS to Traefik :443 on TrueNAS, and Traefik then routes to Garage. Cloudflare provides DNS only for Garage, while OpenWebUI uses a Cloudflare Tunnel terminated by the cloudflared Docker container."}
+									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Garage expose désormais trois surfaces distinctes : s3.int.albandrieu.com reste en DNS Cloudflare uniquement et suit le chemin direct pfSense HAProxy → TLS ré-chiffré → Traefik → Garage S3 :3900 ; garage.albandrieu.com et garage-admin.albandrieu.com utilisent chacun Cloudflare Tunnel → cloudflared vers les surfaces Garage :3909 et Garage Admin :3903. Les anciens hostnames garage.int.albandrieu.com et garage-admin.int.albandrieu.com ne font plus partie du chemin public."
+									: "This React Flow diagram is the exact same component used on the TrueNAS page. Garage now exposes three distinct surfaces: s3.int.albandrieu.com remains Cloudflare DNS-only and follows the direct pfSense HAProxy → TLS re-encryption → Traefik → Garage S3 :3900 path; garage.albandrieu.com and garage-admin.albandrieu.com each use Cloudflare Tunnel → cloudflared to reach the Garage :3909 and Garage Admin :3903 surfaces. The former garage.int.albandrieu.com and garage-admin.int.albandrieu.com hostnames are no longer part of the public ingress path."}
 							</p>
 						</div>
 						<HomeLabNetworkFlow />

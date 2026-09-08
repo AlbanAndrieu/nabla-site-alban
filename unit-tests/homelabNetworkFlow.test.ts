@@ -21,17 +21,23 @@ test("shared homelab React Flow documents HAProxy, Traefik, DNS-only and tunnel 
 	assert.match(flow, /name: "Homarr"/);
 	assert.match(flow, /Native TrueNAS community App/);
 	assert.match(flow, /s3\.int\.albandrieu\.com → :3900/);
-	assert.match(flow, /garage\.int\.albandrieu\.com → :3909/);
+	assert.match(flow, /garage\.albandrieu\.com → :3909/);
+	assert.match(flow, /garage-admin\.albandrieu\.com → :3903/);
 	assert.match(flow, /TRAEFIK · DNS ONLY/);
+	assert.match(flow, /CLOUDFLARE TUNNEL/);
 	assert.match(flow, /open-webui\.albandrieu\.com/);
 	assert.match(flow, /CLOUDFLARE TUNNEL/);
 	assert.match(flow, /"pfsense-haproxy"/);
 	assert.match(flow, /"haproxy-traefik"/);
 	assert.match(flow, /"truenas-traefik"/);
 	assert.match(flow, /"traefik-garage"/);
-	assert.match(flow, /S3 :3900 · WebUI :3909/);
+	assert.match(flow, /s3\.int → S3 :3900/);
 	assert.match(flow, /"cloudflare-tunnel-cloudflared"/);
+	assert.match(flow, /"cloudflared-garage-webui"/);
+	assert.match(flow, /"cloudflared-garage-admin"/);
 	assert.match(flow, /"cloudflared-openwebui"/);
+	assert.doesNotMatch(flow, /garage\.int\.albandrieu\.com/);
+	assert.doesNotMatch(flow, /garage-admin\.int\.albandrieu\.com/);
 	assert.doesNotMatch(flow, /"pfsense-traefik"/);
 	assert.doesNotMatch(flow, /"haproxy-garage"/);
 	assert.doesNotMatch(flow, /"cloudflare-tunnel-garage"/);
@@ -51,6 +57,7 @@ test("network diagram is grouped by failure domain and can isolate ingress paths
 	assert.match(flow, /LAN \/ Wi-Fi/);
 	assert.match(flow, /PATH_NODE_IDS/);
 	assert.match(flow, /"traefik", "garage"/);
+	assert.match(flow, /"garage-webui", "garage-admin", "openwebui"/);
 	assert.match(flow, /nodesDraggable=\{false\}/);
 });
 

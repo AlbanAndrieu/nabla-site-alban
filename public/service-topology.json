@@ -150,6 +150,14 @@
       "criticality": "critical"
     },
     {
+      "id": "cloudflared",
+      "name": "Cloudflare Tunnel",
+      "kind": "tunnel-connector",
+      "category": "infrastructure",
+      "description": "Outbound cloudflared connector carrying managed public ingress to TrueNAS services.",
+      "icon": "🔐"
+    },
+    {
       "id": "docker-socket-proxy",
       "name": "Docker Socket Proxy",
       "kind": "security-proxy",
@@ -231,23 +239,33 @@
     },
     {
       "id": "garage",
-      "name": "Garage",
+      "name": "Garage S3",
       "kind": "object-storage",
       "category": "data",
       "sourcePath": "apps/garage/compose.yml",
       "url": "https://s3.int.albandrieu.com",
-      "description": "S3-compatible object storage exposed through Traefik on TrueNAS.",
+      "description": "Garage S3 API exposed directly through pfSense HAProxy and Traefik on TrueNAS.",
       "icon": "🪣"
     },
     {
       "id": "garage-webui",
-      "name": "Garage WebUI",
+      "name": "Garage",
       "kind": "application",
       "category": "data",
       "sourcePath": "apps/garage/compose.yml",
-      "url": "https://garage.int.albandrieu.com",
-      "description": "Web administration UI for Garage object storage.",
+      "url": "https://garage.albandrieu.com",
+      "description": "Garage WebUI exposed through Cloudflare Tunnel to the TrueNAS-hosted WebUI.",
       "icon": "🖥️"
+    },
+    {
+      "id": "garage-admin",
+      "name": "Garage Admin",
+      "kind": "api",
+      "category": "data",
+      "sourcePath": "apps/garage/compose.yml",
+      "url": "https://garage-admin.albandrieu.com",
+      "description": "Garage administration API exposed through Cloudflare Tunnel.",
+      "icon": "🔐"
     },
     {
       "id": "gatus",
@@ -1492,17 +1510,6 @@
       "evidence": [
         "apps/garage/compose.yml:API_BASE_URL",
         "apps/garage/compose.yml:S3_ENDPOINT_URL"
-      ]
-    },
-    {
-      "source": "garage-webui",
-      "target": "traefik",
-      "type": "exposedBy",
-      "strength": "optional",
-      "description": "Traefik routes garage.int.albandrieu.com to Garage WebUI.",
-      "evidence": [
-        "apps/garage/compose.yml:traefik.http.routers.garage-webui.rule",
-        "apps/garage/compose.yml:traefik.http.services.garage-webui.loadbalancer.server.port"
       ]
     },
     {
@@ -3108,6 +3115,46 @@
       "description": "WordPress stores application state in PostgreSQL through PG4WP.",
       "evidence": [
         "apps/wordpress/compose.yml:WORDPRESS_DB_HOST=postgres:5432"
+      ]
+    },
+    {
+      "source": "cloudflared",
+      "target": "docker",
+      "type": "hostedBy",
+      "strength": "required",
+      "description": "The cloudflared tunnel connector runs on the TrueNAS Docker runtime.",
+      "evidence": [
+        "TrueNAS cloudflared connector runtime"
+      ]
+    },
+    {
+      "source": "garage-webui",
+      "target": "cloudflared",
+      "type": "exposedBy",
+      "strength": "required",
+      "description": "Cloudflare Tunnel exposes garage.albandrieu.com and forwards it through cloudflared to Garage WebUI :3909.",
+      "evidence": [
+        "Cloudflare Tunnel route: garage.albandrieu.com -> Garage WebUI :3909"
+      ]
+    },
+    {
+      "source": "garage-admin",
+      "target": "garage",
+      "type": "partOf",
+      "strength": "required",
+      "description": "Garage Admin :3903 is an administration surface of the Garage service.",
+      "evidence": [
+        "apps/garage/garage.toml:[admin] api_bind_addr=:3903"
+      ]
+    },
+    {
+      "source": "garage-admin",
+      "target": "cloudflared",
+      "type": "exposedBy",
+      "strength": "required",
+      "description": "Cloudflare Tunnel exposes garage-admin.albandrieu.com and forwards it through cloudflared to Garage Admin :3903.",
+      "evidence": [
+        "Cloudflare Tunnel route: garage-admin.albandrieu.com -> Garage Admin :3903"
       ]
     }
   ]
