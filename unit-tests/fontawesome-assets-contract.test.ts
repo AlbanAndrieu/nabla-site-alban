@@ -95,8 +95,7 @@ test("Font Awesome CSS runtime keeps only loaded styles and their webfonts", asy
 
 test("project consumers only reference retained Font Awesome JS and SVG assets", async () => {
 	const referenced = new Set<string>();
-	const pattern =
-		/\/?assets\/fontawesome-free-7\.1\.0-web\/([^"'?\s<]+)/g;
+	const pattern = /\/?assets\/fontawesome-free-7\.1\.0-web\/([^"'?\s<]+)/g;
 
 	for (const path of await sourceFiles()) {
 		const source = await readFile(path, "utf8");
