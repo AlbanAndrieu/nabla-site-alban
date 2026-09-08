@@ -230,7 +230,10 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(explorer, /<MiniMap[\s\S]*nodeColor=\{\(node\) =>/);
 	assert.match(explorer, /homelabHealthColor\(data\.healthState\)/);
 	assert.match(explorer, /: "#38bdf8"/);
-	assert.match(explorer, /<Controls className=\\{styles\\.flowControls\\} showInteractive=\\{false\\} \\/>/);
+	assert.match(
+		explorer,
+		/<Controls className=\{styles\.flowControls\} showInteractive=\{false\} \/>/,
+	);
 	assert.match(explorer, /iconSrc: entity\.iconSrc/);
 	assert.match(explorer, /nodeIconFallback/);
 	assert.match(explorer, /className="fas fa-lock"/);
