@@ -59,6 +59,16 @@ const policyHtmlRedirects = policyNames.flatMap((name) => [
 	{ source: `/fr/policy/${name}.html`, destination: `/fr/policy/${name}`, permanent: true },
 ]);
 
+const baselineSecurityHeaders = [
+	{ key: "X-Content-Type-Options", value: "nosniff" },
+	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+	{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+	{
+		key: "Permissions-Policy",
+		value: "camera=(), microphone=(), geolocation=()",
+	},
+];
+
 const nextConfig = {
 	reactStrictMode: true,
 	experimental: {
@@ -69,6 +79,14 @@ const nextConfig = {
 	/** Parent `package-lock.json` exists; pin app root so Turbopack does not infer the wrong workspace. */
 	turbopack: {
 		root: __dirname,
+	},
+	async headers() {
+		return [
+			{
+				source: "/:path*",
+				headers: baselineSecurityHeaders,
+			},
+		];
 	},
 	async redirects() {
 		return [
