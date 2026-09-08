@@ -129,7 +129,7 @@ jobs:
       - name: Run agent-first quality gate before build
         env:
           QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || 'origin/master' }}
-          QUALITY_LOG_TAIL: "120"
+          QUALITY_LOG_TAIL: "800"
         run: bash scripts/agent-quality-gate.sh
 
       - name: Build Next.js production bundle
