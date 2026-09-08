@@ -368,6 +368,15 @@ Autres contrôles :
 
 ## P1 — Sécurité applicative
 
+- [x] Ajouter un pentest baseline Playwright non destructif sur le Preview Vercel :
+  headers défensifs, fichiers sensibles non exposés, méthode TRACE refusée,
+  méthode POST non déclarée refusée sur l’API homelab et sonde XSS réfléchie sans
+  création de markup exécutable. Le scan DAST complet reste séparé afin de ne pas
+  alourdir chaque PR.
+- [x] Ajouter les headers applicatifs de base `nosniff`, `SAMEORIGIN`,
+  `strict-origin-when-cross-origin` et une `Permissions-Policy` restrictive.
+  La CSP bloquante reste un chantier distinct tant que les assets/scripts legacy
+  ne sont pas tous réconciliés.
 - [x] Construire les URL de retour Stripe depuis une origine contrôlée côté
   serveur et non depuis le header `Host` client.
 - [ ] Évaluer un rate limiting adapté à `create-checkout-session`.
@@ -407,6 +416,10 @@ Autres contrôles :
 - [ ] Compléter Lighthouse desktop sur un déploiement stable.
 - [ ] Définir des budgets de non-régression pour LCP, CLS, INP, JS, CSS et
   JavaScript tiers.
+- [x] Ajouter un budget performance Preview minimal et peu flakey sur Chromium :
+  TTFB ≤ 3 s, DOMContentLoaded ≤ 5 s, load ≤ 8 s, ≤ 120 ressources et budgets de
+  transfert de 4 MB au total, 2 MB JS et 1 MB CSS. Ces seuils sont un garde-fou
+  grossier ; les budgets Web Vitals LCP/CLS/INP restent à définir séparément.
 - [ ] Remplacer progressivement Bootstrap CDN et Bootstrap Icons par les
   primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
 - [x] Exécuter un premier audit des dépendances et retirer les racines sans
@@ -454,6 +467,11 @@ Autres contrôles :
 
 - [x] Exécuter Playwright sur le Preview Vercel au lieu de rebuilder Next.js dans
   le workflow E2E.
+- [x] Ajouter un test d’intégration Preview reliant les Route Handlers
+  `/api/homelab-services` et `/api/homelab-topology` à la page
+  `/architecture`, avec vérification des contrats Garage/OpenWebUI et des
+  relations Traefik/cloudflared. Le même run Chromium exécute aussi le pentest
+  baseline et le budget performance afin d’éviter trois workflows redondants.
 - [x] Utiliser `repository_dispatch: vercel.deployment.success` pour le hand-off
   Preview → Playwright.
 - [x] Retirer le fallback OIDC et le chemin `deployment_status` devenus inutiles.
