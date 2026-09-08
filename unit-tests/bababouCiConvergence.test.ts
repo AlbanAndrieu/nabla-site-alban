@@ -90,7 +90,10 @@ test("Playwright Preview rejects Vercel Security Checkpoint responses", async ()
 	assert.match(workflow, /x-vercel-mitigated/);
 	assert.match(workflow, /status.*429/s);
 	assert.match(workflow, /mitigated.*challenge/s);
-	assert.match(workflow, /Vercel Security Checkpoint rejected Preview automation/);
+	assert.match(
+		workflow,
+		/Vercel Security Checkpoint rejected Preview automation/,
+	);
 });
 
 test("semantic release authenticates before freshness and avoids npm ci", async () => {
