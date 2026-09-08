@@ -198,8 +198,8 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
                 ;;
             # Reviewed dead-code retirements from the Knip audit. These paths are
             # absent after this change, so the exception cannot mask future edits.
-            app/[locale]/architecture/ArchitectureExplorer.tsx | \
-                app/[locale]/architecture/ArchitectureExplorer.module.css | \
+            app/\[locale\]/architecture/ArchitectureExplorer.tsx | \
+                app/\[locale\]/architecture/ArchitectureExplorer.module.css | \
                 app/components/truenas/HomeLabNetworkFlow.module.css | \
                 lib/resourcePages.ts)
                 continue
