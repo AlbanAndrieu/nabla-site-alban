@@ -161,7 +161,9 @@ test("blast radius includes direct and transitive required dependents", () => {
 		"langfuse",
 		"n8n",
 	]);
-	assert.deepEqual(analysis.get("openwebui")?.optionalDependencies, ["searxng"]);
+	assert.deepEqual(analysis.get("openwebui")?.optionalDependencies, [
+		"searxng",
+	]);
 });
 
 test("impact drill-down separates direct and indirect blast radius and exposes dependency path", () => {
@@ -172,7 +174,11 @@ test("impact drill-down separates direct and indirect blast radius and exposes d
 
 	assert.deepEqual(openWebUi?.requiredDependencyIds, ["litellm"]);
 	assert.deepEqual(openWebUi?.optionalDependencyIds, ["searxng"]);
-	assert.deepEqual(openWebUi?.dependencyPathIds, ["openwebui", "litellm", "ollama"]);
+	assert.deepEqual(openWebUi?.dependencyPathIds, [
+		"openwebui",
+		"litellm",
+		"ollama",
+	]);
 	assert.deepEqual(ollama?.directDependentIds, ["litellm"]);
 	assert.deepEqual(ollama?.indirectDependentIds, ["openwebui"]);
 	assert.deepEqual(postgresql?.directDependentIds, ["langfuse", "n8n"]);

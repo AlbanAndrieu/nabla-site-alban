@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 7 septembre 2026.
+Dernière vérification : 8 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -129,14 +129,12 @@ les autres chantiers.
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
   publication. GHCR reste la cible systématique de `master` ; Docker Hub est un
   miroir optionnel qui ne rend plus la CI rouge lorsque ses secrets sont absents.
-- [ ] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
-  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales. Le
-  workflow doit également prouver via `/api/deployment` que l’origine canonique
-  sert bien le SHA Vercel attendu, et non seulement une version précédente encore
-  saine. Le run du 7 septembre 2026 a déjà prouvé le SHA attendu puis révélé une
-  comparaison textuelle trop stricte entre la racine avec/sans slash final ; la
-  comparaison est désormais normalisée comme URL. Le point reste ouvert jusqu’à
-  un run `master` vert sur l’origine canonique publique.
+- [x] Valider en production le smoke post-déploiement sur accueil EN/FR, `/truenas`,
+  `/architecture`, `/contact`, `/api/homelab-status` et les cartes sociales.
+  Le run `34174782120` du 8 septembre 2026 est vert sur l’origine canonique
+  publique et prouve via `/api/deployment` le SHA Vercel
+  `7e0a0e880cbc4acb1d83505352b6d09b017c4569`. Il valide également canonical,
+  hreflang EN/FR/`x-default`, sitemap et robots sur les routes couvertes.
 
 ## P1 — Architecture et homelab runtime
 
@@ -418,6 +416,15 @@ Autres contrôles :
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
 - [x] Aligner le développement et les workflows GitHub sur Node 25, conserver une plage `>=24.11.0 <26` compatible avec le runtime Vercel Node 24, et garder OpenCommit uniquement comme helper local/on-demand.
+- [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.13 et
+  `pre-commit==4.6.2` : `.python-version`, mise, Copilot Setup Steps et
+  Quality/Security utilisent désormais les mêmes versions au lieu de laisser
+  `pre-commit = "latest"` dériver.
+- [x] Invalider les environnements pre-commit mis en cache lorsque
+  `.python-version` change et réparer les six fichiers laissés non canoniques
+  par le commit `master` `7f025e04` : le run Quality/Security
+  `34176979353` s'arrêtait correctement dans la gate avant le build, puis #162
+  réapplique le patch formatter exact avant la prochaine intégration.
 - [x] Retirer `wrangler.jsonc` et les dernières instructions de déploiement Wrangler ; Vercel reste l’unique runtime web publié.
 - [x] Aligner Next.js et `eslint-config-next` sur 16.3.4 ainsi que `@types/node` sur la branche 25.
 - [x] Converger les correctifs CI partagés avec `nabla-site-bababou#156-#160` :

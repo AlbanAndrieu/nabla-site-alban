@@ -10,426 +10,481 @@ const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
 const ROUTES = [
-  { path: "/", canonical: "/", en: "/", fr: "/fr" },
-  { path: "/fr", canonical: "/fr", en: "/", fr: "/fr" },
-  { path: "/truenas", canonical: "/truenas", en: "/truenas", fr: "/fr/truenas" },
-  { path: "/fr/truenas", canonical: "/fr/truenas", en: "/truenas", fr: "/fr/truenas" },
-  { path: "/architecture", canonical: "/architecture", en: "/architecture", fr: "/fr/architecture" },
-  { path: "/fr/architecture", canonical: "/fr/architecture", en: "/architecture", fr: "/fr/architecture" },
-  { path: "/contact", canonical: "/contact", en: "/contact", fr: "/fr/contact" },
-  { path: "/fr/contact", canonical: "/fr/contact", en: "/contact", fr: "/fr/contact" },
+	{ path: "/", canonical: "/", en: "/", fr: "/fr" },
+	{ path: "/fr", canonical: "/fr", en: "/", fr: "/fr" },
+	{
+		path: "/truenas",
+		canonical: "/truenas",
+		en: "/truenas",
+		fr: "/fr/truenas",
+	},
+	{
+		path: "/fr/truenas",
+		canonical: "/fr/truenas",
+		en: "/truenas",
+		fr: "/fr/truenas",
+	},
+	{
+		path: "/architecture",
+		canonical: "/architecture",
+		en: "/architecture",
+		fr: "/fr/architecture",
+	},
+	{
+		path: "/fr/architecture",
+		canonical: "/fr/architecture",
+		en: "/architecture",
+		fr: "/fr/architecture",
+	},
+	{
+		path: "/contact",
+		canonical: "/contact",
+		en: "/contact",
+		fr: "/fr/contact",
+	},
+	{
+		path: "/fr/contact",
+		canonical: "/fr/contact",
+		en: "/contact",
+		fr: "/fr/contact",
+	},
 ];
 
 function assertCondition(condition, message) {
-  if (!condition) throw new Error(message);
+	if (!condition) throw new Error(message);
 }
 
 function contentType(response) {
-  return response.headers.get("content-type")?.toLowerCase() ?? "";
+	return response.headers.get("content-type")?.toLowerCase() ?? "";
 }
 
 function assertContentType(response, pathname, expected) {
-  const actual = contentType(response);
-  assertCondition(
-    expected.some((value) => actual.includes(value)),
-    pathname +
-      " returned unexpected content-type " +
-      (actual || "<missing>") +
-      "; expected " +
-      expected.join(" or "),
-  );
+	const actual = contentType(response);
+	assertCondition(
+		expected.some((value) => actual.includes(value)),
+		pathname +
+			" returned unexpected content-type " +
+			(actual || "<missing>") +
+			"; expected " +
+			expected.join(" or "),
+	);
 }
 
 function normalizedBaseUrl(value) {
-  const url = new URL(value);
-  assertCondition(url.protocol === "https:", "Production smoke requires HTTPS");
-  assertCondition(!url.username && !url.password, "Production smoke URL must not contain credentials");
-  assertCondition(
-    url.origin === CANONICAL_ORIGIN,
-    "Production smoke must target the canonical origin " + CANONICAL_ORIGIN,
-  );
-  url.pathname = "/";
-  url.search = "";
-  url.hash = "";
-  return url.href.replace(/\/$/, "");
+	const url = new URL(value);
+	assertCondition(url.protocol === "https:", "Production smoke requires HTTPS");
+	assertCondition(
+		!url.username && !url.password,
+		"Production smoke URL must not contain credentials",
+	);
+	assertCondition(
+		url.origin === CANONICAL_ORIGIN,
+		"Production smoke must target the canonical origin " + CANONICAL_ORIGIN,
+	);
+	url.pathname = "/";
+	url.search = "";
+	url.hash = "";
+	return url.href.replace(/\/$/, "");
 }
 
 function absoluteCanonical(pathname) {
-  return new URL(pathname, CANONICAL_ORIGIN).href.replace(/\/$/, pathname === "/" ? "/" : "");
+	return new URL(pathname, CANONICAL_ORIGIN).href.replace(
+		/\/$/,
+		pathname === "/" ? "/" : "",
+	);
 }
 
 function urlsEquivalent(actual, expected) {
-  if (!actual) return false;
+	if (!actual) return false;
 
-  try {
-    return new URL(actual).href === new URL(expected).href;
-  } catch {
-    return false;
-  }
+	try {
+		return new URL(actual).href === new URL(expected).href;
+	} catch {
+		return false;
+	}
 }
 
 function attributeValue(tag, name) {
-  const match = tag.match(new RegExp("\\b" + name + "=[\"']([^\"']+)[\"']", "i"));
-  return match?.[1] ?? null;
+	const match = tag.match(
+		new RegExp("\\b" + name + "=[\"']([^\"']+)[\"']", "i"),
+	);
+	return match?.[1] ?? null;
 }
 
 const HTML_ATTRIBUTE_ENTITY_PATTERN =
-  /&(amp|quot|#0*(?:34|38)|#x0*(?:22|26));/gi;
+	/&(amp|quot|#0*(?:34|38)|#x0*(?:22|26));/gi;
 
 export function decodeHtmlAttributeValue(value) {
-  return value.replace(HTML_ATTRIBUTE_ENTITY_PATTERN, (_entity, code) => {
-    const normalized = String(code).toLowerCase();
-    const isAmpersand =
-      normalized === "amp" ||
-      normalized.endsWith("38") ||
-      normalized.endsWith("26");
-    return isAmpersand ? "&" : '"';
-  });
+	return value.replace(HTML_ATTRIBUTE_ENTITY_PATTERN, (_entity, code) => {
+		const normalized = String(code).toLowerCase();
+		const isAmpersand =
+			normalized === "amp" ||
+			normalized.endsWith("38") ||
+			normalized.endsWith("26");
+		return isAmpersand ? "&" : '"';
+	});
 }
 
 function linkHref(html, rel, hreflang) {
-  const tags = html.match(/<link\b[^>]*>/gi) ?? [];
-  for (const tag of tags) {
-    const relValue = attributeValue(tag, "rel");
-    if (!relValue || !relValue.split(/\s+/).includes(rel)) continue;
-    if (hreflang) {
-      const lang = attributeValue(tag, "hreflang");
-      if (!lang || lang.toLowerCase() !== hreflang.toLowerCase()) continue;
-    }
-    const href = attributeValue(tag, "href");
-    if (href) return decodeHtmlAttributeValue(href);
-  }
-  return null;
+	const tags = html.match(/<link\b[^>]*>/gi) ?? [];
+	for (const tag of tags) {
+		const relValue = attributeValue(tag, "rel");
+		if (!relValue || !relValue.split(/\s+/).includes(rel)) continue;
+		if (hreflang) {
+			const lang = attributeValue(tag, "hreflang");
+			if (!lang || lang.toLowerCase() !== hreflang.toLowerCase()) continue;
+		}
+		const href = attributeValue(tag, "href");
+		if (href) return decodeHtmlAttributeValue(href);
+	}
+	return null;
 }
 
 function metaContent(html, name) {
-  const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
-  for (const tag of tags) {
-    const metaName = attributeValue(tag, "property") ?? attributeValue(tag, "name");
-    if (!metaName || metaName.toLowerCase() !== name.toLowerCase()) continue;
-    const content = attributeValue(tag, "content");
-    if (content) return decodeHtmlAttributeValue(content);
-  }
-  return null;
+	const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
+	for (const tag of tags) {
+		const metaName =
+			attributeValue(tag, "property") ?? attributeValue(tag, "name");
+		if (!metaName || metaName.toLowerCase() !== name.toLowerCase()) continue;
+		const content = attributeValue(tag, "content");
+		if (content) return decodeHtmlAttributeValue(content);
+	}
+	return null;
 }
 
 async function fetchResponse(baseUrl, pathname, accept) {
-  const target = new URL(pathname, baseUrl);
-  assertCondition(
-    target.origin === CANONICAL_ORIGIN,
-    pathname + " is outside the canonical production origin",
-  );
-  const headers = {
-    Accept: accept,
-    "User-Agent": "nabla-site-alban-production-smoke/1.1",
-  };
-  const automationBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
-  if (automationBypass) {
-    headers["x-vercel-protection-bypass"] = automationBypass;
-  }
-  let lastError = new Error(pathname + " request failed");
+	const target = new URL(pathname, baseUrl);
+	assertCondition(
+		target.origin === CANONICAL_ORIGIN,
+		pathname + " is outside the canonical production origin",
+	);
+	const headers = {
+		Accept: accept,
+		"User-Agent": "nabla-site-alban-production-smoke/1.1",
+	};
+	const automationBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+	if (automationBypass) {
+		headers["x-vercel-protection-bypass"] = automationBypass;
+	}
+	let lastError = new Error(pathname + " request failed");
 
-  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
-    try {
-      const response = await fetch(target, {
-        redirect: "manual",
-        headers,
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      });
+	for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+		try {
+			const response = await fetch(target, {
+				redirect: "manual",
+				headers,
+				signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+			});
 
-      const mitigated = response.headers.get("x-vercel-mitigated");
-      if (mitigated) {
-        throw new Error(
-          pathname +
-            " was intercepted by Vercel mitigation (" +
-            mitigated +
-            "); verify Protection Bypass for Automation",
-        );
-      }
+			const mitigated = response.headers.get("x-vercel-mitigated");
+			if (mitigated) {
+				throw new Error(
+					pathname +
+						" was intercepted by Vercel mitigation (" +
+						mitigated +
+						"); verify Protection Bypass for Automation",
+				);
+			}
 
-      if (response.ok) {
-        if (response.url) {
-          const finalUrl = new URL(response.url);
-          assertCondition(
-            finalUrl.origin === CANONICAL_ORIGIN,
-            pathname + " escaped production origin to " + finalUrl.origin,
-          );
-        }
-        return response;
-      }
+			if (response.ok) {
+				if (response.url) {
+					const finalUrl = new URL(response.url);
+					assertCondition(
+						finalUrl.origin === CANONICAL_ORIGIN,
+						pathname + " escaped production origin to " + finalUrl.origin,
+					);
+				}
+				return response;
+			}
 
-      const location = response.headers.get("location");
-      lastError = new Error(
-        pathname +
-          " returned HTTP " +
-          response.status +
-          (location ? " with redirect to " + new URL(location, target).origin : ""),
-      );
-      if (!RETRYABLE_STATUSES.has(response.status)) break;
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-    }
+			const location = response.headers.get("location");
+			lastError = new Error(
+				pathname +
+					" returned HTTP " +
+					response.status +
+					(location
+						? " with redirect to " + new URL(location, target).origin
+						: ""),
+			);
+			if (!RETRYABLE_STATUSES.has(response.status)) break;
+		} catch (error) {
+			lastError = error instanceof Error ? error : new Error(String(error));
+		}
 
-    if (attempt < FETCH_ATTEMPTS) await delay(500 * attempt);
-  }
+		if (attempt < FETCH_ATTEMPTS) await delay(500 * attempt);
+	}
 
-  throw lastError;
+	throw lastError;
 }
 
 async function fetchText(baseUrl, pathname, expectedContentTypes) {
-  const response = await fetchResponse(
-    baseUrl,
-    pathname,
-    "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8",
-  );
-  assertContentType(response, pathname, expectedContentTypes);
-  return response.text();
+	const response = await fetchResponse(
+		baseUrl,
+		pathname,
+		"text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8",
+	);
+	assertContentType(response, pathname, expectedContentTypes);
+	return response.text();
 }
 
 async function checkDeploymentIdentity(baseUrl, expectedSha) {
-  if (!expectedSha) {
-    console.log("SKIP /api/deployment (no expected SHA provided)");
-    return;
-  }
+	if (!expectedSha) {
+		console.log("SKIP /api/deployment (no expected SHA provided)");
+		return;
+	}
 
-  let lastError = new Error(
-    "/api/deployment did not expose expected SHA " + expectedSha,
-  );
+	let lastError = new Error(
+		"/api/deployment did not expose expected SHA " + expectedSha,
+	);
 
-  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
-    const response = await fetchResponse(
-      baseUrl,
-      "/api/deployment",
-      "application/json",
-    );
-    assertContentType(response, "/api/deployment", ["application/json"]);
+	for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+		const response = await fetchResponse(
+			baseUrl,
+			"/api/deployment",
+			"application/json",
+		);
+		assertContentType(response, "/api/deployment", ["application/json"]);
 
-    const payload = await response.json();
-    const gitSha =
-      payload && typeof payload === "object" && typeof payload.gitSha === "string"
-        ? payload.gitSha
-        : "";
-    const environment =
-      payload &&
-      typeof payload === "object" &&
-      typeof payload.environment === "string"
-        ? payload.environment
-        : "";
+		const payload = await response.json();
+		const gitSha =
+			payload &&
+			typeof payload === "object" &&
+			typeof payload.gitSha === "string"
+				? payload.gitSha
+				: "";
+		const environment =
+			payload &&
+			typeof payload === "object" &&
+			typeof payload.environment === "string"
+				? payload.environment
+				: "";
 
-    if (gitSha === expectedSha && environment === "production") {
-      console.log("PASS /api/deployment " + expectedSha);
-      return;
-    }
+		if (gitSha === expectedSha && environment === "production") {
+			console.log("PASS /api/deployment " + expectedSha);
+			return;
+		}
 
-    lastError = new Error(
-      "/api/deployment mismatch: expected " +
-        expectedSha +
-        " in production, got " +
-        (gitSha || "<missing>") +
-        " in " +
-        (environment || "<unknown>"),
-    );
+		lastError = new Error(
+			"/api/deployment mismatch: expected " +
+				expectedSha +
+				" in production, got " +
+				(gitSha || "<missing>") +
+				" in " +
+				(environment || "<unknown>"),
+		);
 
-    if (attempt < FETCH_ATTEMPTS) await delay(1_000 * attempt);
-  }
+		if (attempt < FETCH_ATTEMPTS) await delay(1_000 * attempt);
+	}
 
-  throw lastError;
+	throw lastError;
 }
 
 async function checkPage(baseUrl, route) {
-  const html = await fetchText(baseUrl, route.path, ["text/html"]);
-  const expectedCanonical = absoluteCanonical(route.canonical);
-  const expectedEn = absoluteCanonical(route.en);
-  const expectedFr = absoluteCanonical(route.fr);
+	const html = await fetchText(baseUrl, route.path, ["text/html"]);
+	const expectedCanonical = absoluteCanonical(route.canonical);
+	const expectedEn = absoluteCanonical(route.en);
+	const expectedFr = absoluteCanonical(route.fr);
 
-  const actualCanonical = linkHref(html, "canonical");
-  const actualEn = linkHref(html, "alternate", "en");
-  const actualFr = linkHref(html, "alternate", "fr");
-  const actualDefault = linkHref(html, "alternate", "x-default");
+	const actualCanonical = linkHref(html, "canonical");
+	const actualEn = linkHref(html, "alternate", "en");
+	const actualFr = linkHref(html, "alternate", "fr");
+	const actualDefault = linkHref(html, "alternate", "x-default");
 
-  assertCondition(
-    urlsEquivalent(actualCanonical, expectedCanonical),
-    route.path +
-      " canonical mismatch: expected " +
-      expectedCanonical +
-      ", got " +
-      (actualCanonical || "<missing>"),
-  );
-  assertCondition(
-    urlsEquivalent(actualEn, expectedEn),
-    route.path +
-      " English hreflang mismatch: expected " +
-      expectedEn +
-      ", got " +
-      (actualEn || "<missing>"),
-  );
-  assertCondition(
-    urlsEquivalent(actualFr, expectedFr),
-    route.path +
-      " French hreflang mismatch: expected " +
-      expectedFr +
-      ", got " +
-      (actualFr || "<missing>"),
-  );
-  assertCondition(
-    urlsEquivalent(actualDefault, expectedEn),
-    route.path +
-      " x-default hreflang mismatch: expected " +
-      expectedEn +
-      ", got " +
-      (actualDefault || "<missing>"),
-  );
-  assertCondition(
-    !/<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html) &&
-      !/<meta\b[^>]*content=["'][^"']*noindex[^"']*["'][^>]*name=["']robots["']/i.test(html),
-    route.path + " unexpectedly exposes noindex",
-  );
+	assertCondition(
+		urlsEquivalent(actualCanonical, expectedCanonical),
+		route.path +
+			" canonical mismatch: expected " +
+			expectedCanonical +
+			", got " +
+			(actualCanonical || "<missing>"),
+	);
+	assertCondition(
+		urlsEquivalent(actualEn, expectedEn),
+		route.path +
+			" English hreflang mismatch: expected " +
+			expectedEn +
+			", got " +
+			(actualEn || "<missing>"),
+	);
+	assertCondition(
+		urlsEquivalent(actualFr, expectedFr),
+		route.path +
+			" French hreflang mismatch: expected " +
+			expectedFr +
+			", got " +
+			(actualFr || "<missing>"),
+	);
+	assertCondition(
+		urlsEquivalent(actualDefault, expectedEn),
+		route.path +
+			" x-default hreflang mismatch: expected " +
+			expectedEn +
+			", got " +
+			(actualDefault || "<missing>"),
+	);
+	assertCondition(
+		!/<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(
+			html,
+		) &&
+			!/<meta\b[^>]*content=["'][^"']*noindex[^"']*["'][^>]*name=["']robots["']/i.test(
+				html,
+			),
+		route.path + " unexpectedly exposes noindex",
+	);
 
-  console.log("PASS page " + route.path);
-  return html;
+	console.log("PASS page " + route.path);
+	return html;
 }
 
 async function checkSitemap(baseUrl) {
-  const xml = await fetchText(baseUrl, "/sitemap.xml", [
-    "application/xml",
-    "text/xml",
-  ]);
-  assertCondition(!xml.includes(".html"), "sitemap.xml contains a legacy .html URL");
+	const xml = await fetchText(baseUrl, "/sitemap.xml", [
+		"application/xml",
+		"text/xml",
+	]);
+	assertCondition(
+		!xml.includes(".html"),
+		"sitemap.xml contains a legacy .html URL",
+	);
 
-  const required = [
-    "/",
-    "/truenas",
-    "/architecture",
-    "/contact",
-    "/policy",
-    "/policy/legal",
-  ].map(absoluteCanonical);
+	const required = [
+		"/",
+		"/truenas",
+		"/architecture",
+		"/contact",
+		"/policy",
+		"/policy/legal",
+	].map(absoluteCanonical);
 
-  for (const url of required) {
-    assertCondition(
-      xml.includes("<loc>" + url + "</loc>"),
-      "sitemap.xml is missing canonical URL " + url,
-    );
-  }
+	for (const url of required) {
+		assertCondition(
+			xml.includes("<loc>" + url + "</loc>"),
+			"sitemap.xml is missing canonical URL " + url,
+		);
+	}
 
-  console.log("PASS sitemap.xml");
+	console.log("PASS sitemap.xml");
 }
 
 async function checkRobots(baseUrl) {
-  const robots = await fetchText(baseUrl, "/robots.txt", ["text/plain"]);
-  assertCondition(
-    robots.includes("Sitemap: " + CANONICAL_ORIGIN + "/sitemap.xml"),
-    "robots.txt does not advertise the canonical www sitemap",
-  );
-  assertCondition(
-    robots.includes("Allow: /nabla"),
-    "robots.txt does not expose the clean /nabla route",
-  );
-  assertCondition(
-    !robots.includes("/nabla/index.html"),
-    "robots.txt still references legacy /nabla/index.html",
-  );
+	const robots = await fetchText(baseUrl, "/robots.txt", ["text/plain"]);
+	assertCondition(
+		robots.includes("Sitemap: " + CANONICAL_ORIGIN + "/sitemap.xml"),
+		"robots.txt does not advertise the canonical www sitemap",
+	);
+	assertCondition(
+		robots.includes("Allow: /nabla"),
+		"robots.txt does not expose the clean /nabla route",
+	);
+	assertCondition(
+		!robots.includes("/nabla/index.html"),
+		"robots.txt still references legacy /nabla/index.html",
+	);
 
-  console.log("PASS robots.txt");
+	console.log("PASS robots.txt");
 }
 
 async function checkHomelabStatus(baseUrl) {
-  const response = await fetchResponse(baseUrl, "/api/homelab-status", "application/json");
-  assertContentType(response, "/api/homelab-status", ["application/json"]);
-  assertCondition(
-    response.headers.get("x-homelab-status-source") === "fastapi",
-    "/api/homelab-status is not backed by the FastAPI source",
-  );
+	const response = await fetchResponse(
+		baseUrl,
+		"/api/homelab-status",
+		"application/json",
+	);
+	assertContentType(response, "/api/homelab-status", ["application/json"]);
+	assertCondition(
+		response.headers.get("x-homelab-status-source") === "fastapi",
+		"/api/homelab-status is not backed by the FastAPI source",
+	);
 
-  const payload = await response.json();
-  assertCondition(
-    payload && typeof payload === "object",
-    "/api/homelab-status returned an invalid payload",
-  );
-  assertCondition(
-    typeof payload.schemaVersion === "number",
-    "/api/homelab-status is missing schemaVersion",
-  );
-  assertCondition(
-    typeof payload.checkedAt === "string",
-    "/api/homelab-status is missing checkedAt",
-  );
-  assertCondition(
-    Array.isArray(payload.services),
-    "/api/homelab-status is missing services",
-  );
+	const payload = await response.json();
+	assertCondition(
+		payload && typeof payload === "object",
+		"/api/homelab-status returned an invalid payload",
+	);
+	assertCondition(
+		typeof payload.schemaVersion === "number",
+		"/api/homelab-status is missing schemaVersion",
+	);
+	assertCondition(
+		typeof payload.checkedAt === "string",
+		"/api/homelab-status is missing checkedAt",
+	);
+	assertCondition(
+		Array.isArray(payload.services),
+		"/api/homelab-status is missing services",
+	);
 
-  console.log("PASS /api/homelab-status");
+	console.log("PASS /api/homelab-status");
 }
 
 async function checkSocialCard(baseUrl, pathname, locale, html) {
-  const ogImage = metaContent(html, "og:image");
-  const twitterImage = metaContent(html, "twitter:image");
+	const ogImage = metaContent(html, "og:image");
+	const twitterImage = metaContent(html, "twitter:image");
 
-  assertCondition(ogImage, pathname + " is missing og:image");
-  assertCondition(twitterImage, pathname + " is missing twitter:image");
-  assertCondition(
-    ogImage === twitterImage,
-    pathname + " Open Graph and Twitter image URLs differ",
-  );
+	assertCondition(ogImage, pathname + " is missing og:image");
+	assertCondition(twitterImage, pathname + " is missing twitter:image");
+	assertCondition(
+		ogImage === twitterImage,
+		pathname + " Open Graph and Twitter image URLs differ",
+	);
 
-  const imageUrl = new URL(ogImage);
-  assertCondition(
-    imageUrl.origin === CANONICAL_ORIGIN,
-    pathname + " social image is not hosted on the canonical origin",
-  );
-  assertCondition(
-    imageUrl.pathname === "/api/social-card",
-    pathname + " social image does not use /api/social-card",
-  );
-  assertCondition(
-    imageUrl.searchParams.get("locale") === locale,
-    pathname + " social image locale mismatch",
-  );
+	const imageUrl = new URL(ogImage);
+	assertCondition(
+		imageUrl.origin === CANONICAL_ORIGIN,
+		pathname + " social image is not hosted on the canonical origin",
+	);
+	assertCondition(
+		imageUrl.pathname === "/api/social-card",
+		pathname + " social image does not use /api/social-card",
+	);
+	assertCondition(
+		imageUrl.searchParams.get("locale") === locale,
+		pathname + " social image locale mismatch",
+	);
 
-  const response = await fetchResponse(baseUrl, imageUrl.href, "image/png");
-  assertContentType(response, pathname + " social card", ["image/png"]);
+	const response = await fetchResponse(baseUrl, imageUrl.href, "image/png");
+	assertContentType(response, pathname + " social card", ["image/png"]);
 
-  const image = Buffer.from(await response.arrayBuffer());
-  assertCondition(
-    image.length >= 24 && image.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE),
-    pathname + " social card is not a valid PNG response",
-  );
-  assertCondition(
-    image.readUInt32BE(16) === 1200 && image.readUInt32BE(20) === 630,
-    pathname + " social card is not 1200x630",
-  );
+	const image = Buffer.from(await response.arrayBuffer());
+	assertCondition(
+		image.length >= 24 &&
+			image.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE),
+		pathname + " social card is not a valid PNG response",
+	);
+	assertCondition(
+		image.readUInt32BE(16) === 1200 && image.readUInt32BE(20) === 630,
+		pathname + " social card is not 1200x630",
+	);
 
-  console.log("PASS social card " + pathname + " (" + locale + ")");
+	console.log("PASS social card " + pathname + " (" + locale + ")");
 }
 
 export async function runProductionSmoke(
-  baseUrl,
-  expectedSha = process.env.DEPLOYED_SHA?.trim(),
+	baseUrl,
+	expectedSha = process.env.DEPLOYED_SHA?.trim(),
 ) {
-  const normalized = normalizedBaseUrl(baseUrl);
-  const pages = new Map();
-  console.log("Production smoke target: " + normalized);
+	const normalized = normalizedBaseUrl(baseUrl);
+	const pages = new Map();
+	console.log("Production smoke target: " + normalized);
 
-  await checkDeploymentIdentity(normalized, expectedSha);
+	await checkDeploymentIdentity(normalized, expectedSha);
 
-  for (const route of ROUTES) {
-    pages.set(route.path, await checkPage(normalized, route));
-  }
-  await checkSitemap(normalized);
-  await checkRobots(normalized);
-  await checkHomelabStatus(normalized);
-  await checkSocialCard(normalized, "/", "en", pages.get("/"));
-  await checkSocialCard(normalized, "/fr", "fr", pages.get("/fr"));
+	for (const route of ROUTES) {
+		pages.set(route.path, await checkPage(normalized, route));
+	}
+	await checkSitemap(normalized);
+	await checkRobots(normalized);
+	await checkHomelabStatus(normalized);
+	await checkSocialCard(normalized, "/", "en", pages.get("/"));
+	await checkSocialCard(normalized, "/fr", "fr", pages.get("/fr"));
 
-  console.log("Production post-deploy smoke passed");
+	console.log("Production post-deploy smoke passed");
 }
 
 const baseUrl = process.argv[2] || process.env.BASE_URL || CANONICAL_ORIGIN;
 
 if (process.argv[1]?.endsWith("post-deploy-smoke.mjs")) {
-  runProductionSmoke(baseUrl).catch((error) => {
-    console.error("Production post-deploy smoke failed:", error);
-    process.exitCode = 1;
-  });
+	runProductionSmoke(baseUrl).catch((error) => {
+		console.error("Production post-deploy smoke failed:", error);
+		process.exitCode = 1;
+	});
 }

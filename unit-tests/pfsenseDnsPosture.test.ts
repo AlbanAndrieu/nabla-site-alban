@@ -68,7 +68,9 @@ async function source(path: string) {
 
 test("DNS resilience is rendered by unified operational evidence instead of a standalone service-grid panel", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const operations = await source("app/components/homelab/HomelabOperationalEvidence.tsx");
+	const operations = await source(
+		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	);
 	const observability = await source("lib/homelabObservability.ts");
 
 	assert.match(block, /parseHomelabHealthSnapshot\(await response\.json\(\)\)/);
@@ -82,7 +84,9 @@ test("DNS resilience is rendered by unified operational evidence instead of a st
 });
 
 test("DNS posture exposes explicit resilience states without raw network configuration", async () => {
-	const component = await source("app/components/homelab/PfSenseDnsPosture.tsx");
+	const component = await source(
+		"app/components/homelab/PfSenseDnsPosture.tsx",
+	);
 
 	assert.match(component, /data-pfsense-dns-policy/);
 	assert.match(component, /data-pfsense-dns-truenas-only/);

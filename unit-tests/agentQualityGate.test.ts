@@ -92,6 +92,45 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	assert.match(setup, /npm ci --no-audit --no-fund/);
 });
 
+test("local agent toolchain matches CI bootstrap pins", async () => {
+	const [mise, pythonVersion, nvmrc, ci, setup] = await Promise.all([
+		source("mise.toml"),
+		source(".python-version"),
+		source(".nvmrc"),
+		source(".github/workflows/ci.yml"),
+		source(".github/workflows/copilot-setup-steps.yml"),
+	]);
+
+	assert.equal(pythonVersion.trim(), "3.13");
+	assert.equal(nvmrc.trim(), "25.9.0");
+	assert.ok(mise.includes('node = "25.9.0"'));
+	assert.ok(mise.includes("default='3.13'"));
+	assert.ok(mise.includes('pre-commit = "4.6.2"'));
+	for (const workflow of [ci, setup]) {
+		assert.ok(workflow.includes('python-version-file: ".python-version"'));
+		assert.ok(!workflow.includes('python-version: "3.13"'));
+		assert.ok(workflow.includes("pre-commit==4.6.2"));
+		assert.ok(
+			workflow.includes(
+				"hashFiles('.pre-commit-config.yaml', '.python-version')",
+			),
+		);
+	}
+	assert.ok(ci.includes('- ".python-version"'));
+	for (const bootstrapInput of [
+		".python-version",
+		".nvmrc",
+		"package.json",
+		"package-lock.json",
+		".pre-commit-config.yaml",
+	]) {
+		assert.ok(
+			setup.includes("- " + bootstrapInput),
+			"Copilot setup trigger must include " + bootstrapInput,
+		);
+	}
+});
+
 test("pre-commit validation is deterministic and does not mutate hook revisions", async () => {
 	const config = await source(".pre-commit-config.yaml");
 

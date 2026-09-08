@@ -2,8 +2,8 @@ min_version = "2024.9.5"
 
 [tools]
 node = "25.9.0"
-python = "{{ get_env(name='PYTHON_VERSION', default='3.14') }}"
-pre-commit = "latest"
+python = "{{ get_env(name='PYTHON_VERSION', default='3.13') }}"
+pre-commit = "4.6.2"
 
 [settings]
 lockfile = true
