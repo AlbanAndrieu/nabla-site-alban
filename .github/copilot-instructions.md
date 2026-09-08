@@ -18,5 +18,6 @@
 - Prefer targeted repository reads and the smallest safe patch.
 - For frontend/i18n/accessibility/SEO work, load `docs/agent-frontend-standards.md`.
 - For Next.js-specific work, follow the targeted installed Next.js guidance required by `AGENTS.md`.
-- Run the closest checks first, then `bash scripts/quality-gate.sh` before publication when a local checkout is available.
-- CI remains authoritative for lint, type generation/type-check, unit tests, production build and configured security checks.
+- Run the closest checks first, then `npm run quality:agent:publish` before publication when a local checkout is available.
+- The Copilot setup installs full Git history, Python/pre-commit and Node dependencies required by the same agent-first gate used in CI.
+- CI remains authoritative for the agent gate, production build and configured security/deployment checks.

@@ -70,3 +70,10 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	assert.match(setup, /pre-commit==4\.6\.2/);
 	assert.match(setup, /npm ci --no-audit --no-fund/);
 });
+
+test("pre-commit validation is deterministic and does not mutate hook revisions", async () => {
+	const config = await source(".pre-commit-config.yaml");
+
+	assert.doesNotMatch(config, /pre-commit-update/);
+	assert.match(config, /autoupdate_schedule: monthly/);
+});

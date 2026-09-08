@@ -116,6 +116,7 @@ les autres chantiers.
   y compris pour les changements triviaux ou docs-only (`AGENTS.md` et
   `CONTRIBUTING.md`).
 - [x] Ajouter `npm run build` à la CI avant merge.
+- [x] Exécuter une quality gate agent-first identique localement et en CI avant le build : fraîcheur de branche, garde anti-troncature, bits exécutables, pre-commit déterministe, lint, types Next/TypeScript et tests unitaires ; le pre-push utilise `--publish` et le setup Copilot installe les dépendances requises.
 - [x] Rejouer le workflow Quality/Security sur `master` après merge.
 - [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.
 - [x] Consolider la politique metadata sociale et conserver une façade de
