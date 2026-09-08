@@ -16,7 +16,7 @@ test("GitHub lint is primary while GitLab remains available", async () => {
 		packageJson.scripts?.lint,
 		"eslint --format ./scripts/eslint-github-formatter.mjs .",
 	);
-	assert.equal(packageJson.devDependencies?.["eslint-formatter-gitlab"], "^7.2.0");
+	assert.equal(\n\t\tpackageJson.devDependencies?.["eslint-formatter-gitlab"],\n\t\t"^7.2.0",\n\t);
 	await access(new URL("../.gitlab-ci.yml", import.meta.url));
 	assert.match(await read(".gitlab-ci.yml"), /eslint --format gitlab/);
 });
@@ -30,15 +30,17 @@ test("GitHub Actions formatter escapes workflow commands", () => {
 		const output = githubActionsFormatter([
 			{
 				filePath: "/workspace/app/example.ts",
-				messages: [{
-					ruleId: "no-console",
-					severity: 2,
-					message: "bad, value: 100%\nnext",
-					line: 4,
-					column: 2,
-					endLine: 4,
-					endColumn: 9,
-				}],
+				messages: [
+					{
+						ruleId: "no-console",
+						severity: 2,
+						message: "bad, value: 100%\nnext",
+						line: 4,
+						column: 2,
+						endLine: 4,
+						endColumn: 9,
+					},
+				],
 			},
 		] as never);
 		assert.equal(
@@ -70,7 +72,7 @@ test("Node workflows cache npm only after selecting the reviewed runtime", async
 		);
 		assert.doesNotMatch(workflow, /cache:\s*"?npm"?/);
 		assert.match(workflow, /cd "\$\{RUNNER_TEMP\}"/);
-		assert.match(workflow, /npm install --global npm@11\.17\.0 --no-audit --no-fund/);
+		assert.match(\n\t\t\tworkflow,\n\t\t\t/npm install --global npm@11\\.17\\.0 --no-audit --no-fund/,\n\t\t);
 	}
 	assert.match(quality, /\.github\/workflows\/copilot-setup-steps\.yml/);
 	assert.match(quality, /\.github\/workflows\/docker-build\.yml/);
@@ -79,15 +81,15 @@ test("Node workflows cache npm only after selecting the reviewed runtime", async
 test("semantic release authenticates before freshness and avoids npm ci", async () => {
 	const release = await read(".github/workflows/release.yml");
 	const auth = release.indexOf("- name: Configure release Git authentication");
-	const freshness = release.indexOf("- name: Verify validated revision is still current master");
+	const freshness = release.indexOf(\n\t\t"- name: Verify validated revision is still current master",\n\t);
 	const node = release.indexOf("- name: Set up Node.js");
-	const baseline = release.indexOf("- name: Bootstrap semantic-release baseline");
-	assert.ok(auth >= 0 && freshness > auth, "Git auth must precede the freshness fetch");
-	assert.ok(node > freshness, "Node setup should happen only after freshness passes");
-	assert.ok(baseline > node, "release tooling must be ready before baseline checks");
-	assert.match(release, /GH_TOKEN: \$\{\{ steps\.release_app_token\.outputs\.token \}\}/);
+	const baseline = release.indexOf(\n\t\t"- name: Bootstrap semantic-release baseline",\n\t);
+	assert.ok(\n\t\tauth >= 0 && freshness > auth,\n\t\t"Git auth must precede the freshness fetch",\n\t);
+	assert.ok(\n\t\tnode > freshness,\n\t\t"Node setup should happen only after freshness passes",\n\t);
+	assert.ok(\n\t\tbaseline > node,\n\t\t"release tooling must be ready before baseline checks",\n\t);
+	assert.match(\n\t\trelease,\n\t\t/GH_TOKEN: \\$\\{\\{ steps\\.release_app_token\\.outputs\\.token \\$\\}\\}/,\n\t);
 	assert.match(release, /gh auth setup-git/);
-	assert.match(release, /git fetch --force origin master:refs\/remotes\/origin\/master --tags/);
+	assert.match(\n\t\trelease,\n\t\t/git fetch --force origin master:refs\\/remotes\\/origin\\/master --tags/,\n\t);
 	assert.doesNotMatch(release, /Install application dependencies/);
 	assert.doesNotMatch(release, /npm ci/);
 	assert.doesNotMatch(release, /cache:\s*npm/);
@@ -116,6 +118,6 @@ test("theme and Docker hardening from Bababou 159-160 are already converged", as
 	assert.match(dockerfile, /nginxinc\/nginx-unprivileged:1\.30\.4-alpine-slim/);
 	assert.match(dockerfile, /USER 101/);
 	assert.match(dockerWorkflow, /aquasecurity\/trivy-action@v0\.36\.0/);
-	assert.match(dockerWorkflow, /GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/);
+	assert.match(\n\t\tdockerWorkflow,\n\t\t/GHCR_IMAGE: ghcr\\.io\\/albanandrieu\\/nabla-site-alban/,\n\t);
 	assert.equal(dockerignore, "**\n!public/\n!public/**\n");
 });

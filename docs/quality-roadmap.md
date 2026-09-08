@@ -420,6 +420,9 @@ Autres contrôles :
   `pre-commit==4.6.2` : `.python-version`, mise, Copilot Setup Steps et
   Quality/Security utilisent désormais les mêmes versions au lieu de laisser
   `pre-commit = "latest"` dériver.
+  Un test de contrat verrouille désormais cette parité afin qu'une future mise à
+  jour de runtime ou de pre-commit échoue avant le build si un des bootstrap
+  agent/CI dérive.
 - [x] Invalider les environnements pre-commit mis en cache lorsque
   `.python-version` change et réparer les six fichiers laissés non canoniques
   par le commit `master` `7f025e04` : le run Quality/Security

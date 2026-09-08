@@ -73,6 +73,28 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	}
 });
 
+test("Python and pre-commit stay pinned consistently for agents and CI", async () => {
+	const [pythonVersion, mise, quality, copilot] = await Promise.all([
+		read(".python-version"),
+		read("mise.toml"),
+		read(".github/workflows/ci.yml"),
+		read(".github/workflows/copilot-setup-steps.yml"),
+	]);
+
+	assert.equal(pythonVersion.trim(), "3.13");
+	assert.match(mise, /default='3\.13'/);
+	assert.match(mise, /pre-commit = "4\.6\.2"/);
+
+	for (const workflow of [quality, copilot]) {
+		assert.match(workflow, /python-version-file:\s*"\.python-version"/);
+		assert.match(workflow, /pre-commit==4\.6\.2/);
+		assert.match(
+			workflow,
+			/hashFiles\('\.pre-commit-config\.yaml', '\.python-version'\)/,
+		);
+	}
+});
+
 test("active Alban-specific runtime dependencies remain explicit", async () => {
 	const packageJson = JSON.parse(await read("package.json")) as {
 		dependencies?: Record<string, string>;
