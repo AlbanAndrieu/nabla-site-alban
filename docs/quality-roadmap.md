@@ -428,6 +428,11 @@ Autres contrôles :
   par le commit `master` `7f025e04` : le run Quality/Security
   `34176979353` s'arrêtait correctement dans la gate avant le build, puis #162
   réapplique le patch formatter exact avant la prochaine intégration.
+- [x] Rendre les caches npm/pre-commit non bloquants : une indisponibilité du
+  backend GitHub Cache ne doit ni masquer ni provoquer un échec de la quality
+  gate. Copilot Setup restaure les mêmes caches et préchauffe les environnements
+  pre-commit uniquement sur cache miss afin que l'agent puisse exécuter la gate
+  sans réinstaller tous les hooks au moment de publier.
 - [x] Retirer `wrangler.jsonc` et les dernières instructions de déploiement Wrangler ; Vercel reste l’unique runtime web publié.
 - [x] Aligner Next.js et `eslint-config-next` sur 16.3.4 ainsi que `@types/node` sur la branche 25.
 - [x] Converger les correctifs CI partagés avec `nabla-site-bababou#156-#160` :
