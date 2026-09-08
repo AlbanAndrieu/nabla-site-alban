@@ -68,11 +68,17 @@ branche finale et le déploiement Vercel sont validés.
   historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
   exclus de la migration React/Next.js native ; voir `public/cv/README.md` et le
   test de contrat `unit-tests/legacyCvStaticPolicy.test.ts`.
-- [ ] Évaluer uniquement si le wrapper localisé `loadCvHtmlFragment` reste utile
-  pour la compatibilité App Router. Sa suppression éventuelle ne doit jamais
-  imposer de migrer les documents HTML historiques eux-mêmes.
+- [x] Évaluer uniquement si le wrapper localisé `loadCvHtmlFragment` reste utile
+  pour la compatibilité App Router : il reste volontairement requis par
+  `app/[locale]/cv/[...path]/page.tsx` pour rendre les variantes HTML historiques
+  explicitement allowlistées. Leur autonomie sous `public/cv/` reste inchangée
+  et un contrat verrouille ce lien de compatibilité sans imposer une migration
+  React de ces documents.
 - [ ] Réduire puis supprimer `PublicHtmlFragment` lorsqu'il n'a plus de
   consommateur justifié, hors exceptions statiques explicitement documentées.
+  L'audit du 8 septembre 2026 confirme que `/ai` et `/security` sont natifs ;
+  `/workstation` reste le dernier consommateur App Router direct, tandis que le
+  404 utilise séparément son exception statique documentée.
 
 ## P0 — Design system et cohérence UI/UX
 

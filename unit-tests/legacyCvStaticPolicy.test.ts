@@ -21,3 +21,20 @@ test("historical CV variants remain standalone static HTML documents", async () 
 		}
 	}
 });
+
+
+test("localized CV compatibility route keeps the allowlisted static loader", async () => {
+	const [routeSource, loaderSource] = await Promise.all([
+		readFile(
+			path.join(process.cwd(), "app", "[locale]", "cv", "[...path]", "page.tsx"),
+			"utf8",
+		),
+		readFile(path.join(process.cwd(), "lib", "cvFromPublic.ts"), "utf8"),
+	]);
+
+	assert.match(routeSource, /loadCvHtmlFragment/);
+	assert.match(routeSource, /loadCvHtmlFragment\(path, normalizedLocale\)/);
+	assert.match(loaderSource, /const CV_HTML_FILES = \{/);
+	assert.match(loaderSource, /public\/cv\/cv-small-en\.html/);
+	assert.doesNotMatch(loaderSource, /readdir|glob|fast-glob/);
+});

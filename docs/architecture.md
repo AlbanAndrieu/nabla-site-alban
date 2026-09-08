@@ -18,12 +18,17 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 - Les URLs SEO canoniques sont sans extension ; `next.config.mjs` conserve des
   redirections permanentes depuis les anciennes URLs `.html` pendant la
   migration SEO.
-- Chaque URL publique possède une route App Router dédiée. Les routes `ai`, `workstation` et certains CV chargent encore temporairement
-  des fragments HTML de `public/`. `/security` est désormais entièrement natif.
-- Ces fragments passent par `app/components/PublicHtmlFragment.tsx`, frontière
-  commune qui centralise l'usage transitoire de `dangerouslySetInnerHTML`.
+- Chaque URL publique possède une route App Router dédiée. `/workstation`
+  charge encore temporairement un fragment HTML de `public/` via
+  `app/components/PublicHtmlFragment.tsx`; `/ai` et `/security` sont
+  désormais entièrement natifs.
+- La route localisée `app/[locale]/cv/[...path]/page.tsx` conserve
+  `loadCvHtmlFragment` comme pont de compatibilité explicitement allowlisté vers
+  les CV HTML historiques autonomes de `public/cv/`; ces documents restent la
+  source de vérité et ne sont pas migrés vers React par ce wrapper.
 - `app/global-not-found.tsx` gère les URL inconnues hors du root layout
-  dynamique `[locale]` et reste exclu de l'indexation.
+  dynamique `[locale]`, reste exclu de l'indexation et conserve l'exception
+  explicite `public/404.html` via le loader de fragment statique.
 
 ## Données et APIs
 
@@ -105,7 +110,8 @@ au commit déployé.
 
 ## Dette de migration connue
 
-- Certaines pages injectent encore des fragments HTML via
-  `lib/htmlFromPublic.ts`; leur structure est contrôlée en navigateur.
+- `/workstation` reste le dernier consommateur App Router direct de
+  `PublicHtmlFragment`. Les CV localisés utilisent leur loader allowlisté dédié,
+  tandis que le 404 conserve son exception statique documentée.
 - Plusieurs grandes feuilles CSS et assets historiques sont encore sous
   `public/` et doivent être audités avant suppression.
