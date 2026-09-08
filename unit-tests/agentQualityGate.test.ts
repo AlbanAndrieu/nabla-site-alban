@@ -66,7 +66,9 @@ test("CI runs the same agent gate before the production build without duplicate 
 	const ci = await source(".github/workflows/ci.yml");
 	const gatePosition = ci.indexOf("Run agent-first quality gate before build");
 	const preCommitSavePosition = ci.indexOf("Save pre-commit environments");
-	const gateEnforcementPosition = ci.indexOf("Enforce agent-first quality gate");
+	const gateEnforcementPosition = ci.indexOf(
+		"Enforce agent-first quality gate",
+	);
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
 	assert.ok(gatePosition >= 0, "CI must run the agent-first gate");
