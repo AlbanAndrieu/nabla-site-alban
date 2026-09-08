@@ -6,6 +6,8 @@ on:
       - CI (Quality and Security)
     types:
       - completed
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:

@@ -3,9 +3,9 @@ repos:
   - repo: local
     hooks:
       - id: quality-gate-pre-push
-        name: "✅ quality · Run repository quality gate before push"
+        name: "✅ quality · Run agent-first publication gate before push"
         language: system
-        entry: bash scripts/quality-gate.sh
+        entry: bash scripts/agent-quality-gate.sh --publish
         pass_filenames: false
         always_run: true
         stages: [pre-push]

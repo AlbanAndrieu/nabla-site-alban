@@ -6,7 +6,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
+import {
+	canonicalPageAlternates,
+	canonicalPagePath,
+} from "@/lib/sitePageCatalog";
 
 type Link = { href: string; label: string; flag?: string; download?: boolean };
 
@@ -165,10 +168,7 @@ export async function generateMetadata({
 		description: t("meta.description"),
 		alternates: {
 			canonical: canonicalPagePath("cv", locale),
-			languages: {
-				en: canonicalPagePath("cv", "en"),
-				fr: canonicalPagePath("cv", "fr"),
-			},
+			languages: canonicalPageAlternates("cv"),
 		},
 	};
 }

@@ -87,15 +87,17 @@ Never force-update `master`. If an accidental direct mutation occurs, stop furth
 
 For a focused change, run the closest relevant formatter/linter or test first.
 
-Before considering a substantial change complete, and always before publishing repository changes, run:
+After an editing batch, use the repository-specific agent workflow:
 
 ```bash
-bash scripts/quality-gate.sh
+npm run quality:agent:fix
+# Review deterministic formatter changes and commit them.
+npm run quality:agent
 ```
 
-The canonical gate validates files touched by the branch plus staged, unstaged, and untracked working-tree files through the repository `pre-commit` stage. Fix every formatter, linter, YAML, workflow, configuration, generated-file, or security failure reported by the configured hooks. Re-run until the gate exits successfully and `git status --short` is empty.
+The agent-first gate checks branch/base freshness, suspicious large truncations or deletions, executable bits for shebang scripts, the canonical changed-file formatter/linter/security gate, ESLint, Stylelint, Next.js route type generation, TypeScript and the unit/contract suite. It intentionally stops before `next build`, Playwright, CodeQL and deployment validation so deterministic failures are caught before expensive CI/build work.
 
-Project-specific tests and expensive Playwright, production-build, CodeQL, and deployment checks remain in their native commands and CI; do not duplicate them inside the shared publication orchestrator.
+`scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. Publication mode is `scripts/quality-gate.sh --publish`, reached through `scripts/agent-quality-gate.sh --publish`.
 
 ## Mandatory agent publish policy
 
@@ -104,14 +106,14 @@ Agents must never publish changes immediately after editing files.
 Before every `git push`, GitHub API file update, or other remote repository mutation:
 
 1. Confirm the target is a dedicated non-default branch and is **not** `master`.
-2. Run `bash scripts/quality-gate.sh` from a local checkout whenever shell access is available.
-3. Fix every formatter, linter, YAML, workflow, configuration, generated-file, or security-check failure caused by the change.
-4. If the gate modifies files, review and commit those changes.
-5. Run `bash scripts/quality-gate.sh` again until it exits successfully with a clean working tree.
+2. Run `npm run quality:agent:fix` from a local checkout after the editing batch.
+3. Review and commit deterministic formatter changes.
+4. Run `npm run quality:agent:publish` until it exits successfully.
+5. Fix every formatter, linter, YAML, workflow, configuration, unit/contract, type, executable-bit, destructive-diff, or security-check failure caused by the change.
 6. Verify `git status --short` is empty.
-7. Only then publish the changes to the non-default branch and use a pull request for integration.
+7. Only then publish the complete validated batch to the non-default branch and use a pull request for integration.
 
-When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the canonical `pre-push` hook invokes the same `scripts/quality-gate.sh` automatically before push.
+When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the versioned `pre-push` hook invokes `scripts/agent-quality-gate.sh --publish`.
 
 An API-only agent must not silently treat remote API writes as a way to bypass local hooks. If its runtime cannot obtain or execute a checkout, it must explicitly report that limitation, reproduce the closest deterministic validations available, keep the remote patch minimal, and inspect the resulting CI immediately. It must never claim that the local quality gate passed when it was not executed.
 

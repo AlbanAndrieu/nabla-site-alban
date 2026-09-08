@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Canonical agent/human quality gate. Keep this file byte-for-byte identical
-# across Nabla repositories so local publication policy cannot drift by project.
+# Canonical agent/human quality gate.
+# Keep behavior aligned across Nabla repositories so publication policy does not drift.
+
+PUBLISH=false
+if [[ "${1:-}" == "--publish" ]]; then
+    PUBLISH=true
+    shift
+fi
+if (($# > 0)); then
+    echo "usage: $0 [--publish]" >&2
+    exit 2
+fi
 
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
@@ -43,14 +53,14 @@ mapfile -t CHANGED_FILES < <(
     done
 )
 
-if ((${#CHANGED_FILES[@]} > 0)); then
-    echo "🔧 Running repository formatters and linters on changed files..."
+if (("${#CHANGED_FILES[@]}" > 0)); then
+    echo "🔧 Validating ${#CHANGED_FILES[@]} changed file(s)..."
     if ! pre-commit run \
         --hook-stage pre-commit \
         --files "${CHANGED_FILES[@]}" \
         --show-diff-on-failure; then
         echo "❌ Pre-commit changed files or found validation errors."
-        echo "   Review/fix the output, then run scripts/quality-gate.sh again."
+        echo "   Review/fix the first failing hook, then run scripts/quality-gate.sh again."
         git status --short
         exit 1
     fi
@@ -62,12 +72,15 @@ echo "🔍 Checking whitespace errors..."
 git diff --check
 git diff --cached --check
 
-STATUS="$(git status --short)"
-if [[ -n "${STATUS}" ]]; then
-    echo "❌ Working tree is not clean after quality validation."
-    echo "   Review and commit generated/fixed files, then run scripts/quality-gate.sh again."
-    printf '%s\n' "${STATUS}"
-    exit 1
+if [[ "${PUBLISH}" == true ]]; then
+    STATUS="$(git status --short)"
+    if [[ -n "${STATUS}" ]]; then
+        echo "❌ Working tree is not clean enough to publish."
+        echo "   Review and commit generated/fixed files, then run scripts/quality-gate.sh --publish again."
+        printf '%s\n' "${STATUS}"
+        exit 1
+    fi
+    echo "✅ Publication quality gate passed; repository is clean and ready to publish."
+else
+    echo "✅ Quality gate passed. Review and commit the validated changes before publishing."
 fi
-
-echo "✅ Quality gate passed; repository is clean and ready to publish."
