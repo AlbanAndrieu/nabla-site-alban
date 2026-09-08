@@ -1,8 +1,13 @@
 ---
 name: next-migrate-locale-pages
-description: Migrate localized static or legacy HTML pages into Next.js App Router locale routes while preserving content, SEO, shared navigation, styles, links, scripts, and legacy URLs. Use for public/*.html plus localized public HTML trees, duplicated app/en and app/fr routes, inconsistent locale headers or breadcrumbs, incomplete static-to-Next migrations, rendering regressions after migration, or Turbopack file-tracing warnings caused by loading legacy files.
+description: >-
+  Migrate localized static or legacy HTML pages into Next.js App Router locale
+  routes while preserving content, SEO, shared navigation, styles, links,
+  scripts, and legacy URLs. Use for public/*.html plus localized public HTML
+  trees, duplicated app/en and app/fr routes, inconsistent locale headers or
+  breadcrumbs, incomplete static-to-Next migrations, rendering regressions after
+  migration, or Turbopack file-tracing warnings caused by loading legacy files.
 ---
-
 # Next.js Migration Skill — Best Practices (EN)
 
 Migrate pages into `app/[locale]/<route>/page.tsx` without losing information or treating a successful compile as proof of parity.
