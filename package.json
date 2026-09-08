@@ -40,7 +40,10 @@
 		"test:unit": "node --import tsx --test \"unit-tests/**/*.test.ts\"",
 		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs",
 		"oco": "node scripts/run-opencommit.mjs",
-		"opencommit": "node scripts/run-opencommit.mjs"
+		"opencommit": "node scripts/run-opencommit.mjs",
+		"quality:agent": "bash scripts/agent-quality-gate.sh",
+		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
+		"quality:agent:publish": "bash scripts/agent-quality-gate.sh --publish"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",
