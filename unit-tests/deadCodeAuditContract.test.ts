@@ -6,6 +6,8 @@ const projectUrl = (path: string) => new URL(`../${path}`, import.meta.url);
 
 const retiredFiles = [
 	"app/404.module.css",
+	"app/[locale]/architecture/ArchitectureExplorer.module.css",
+	"app/[locale]/architecture/ArchitectureExplorer.tsx",
 	"app/actions/stripe.ts",
 	"app/components/checkout.tsx",
 	"app/components/nabla/OpenSourceGridSection.tsx",
@@ -19,6 +21,8 @@ const retiredFiles = [
 	"lib/legacyPageMetadata.ts",
 	"lib/resourcePages.ts",
 	"purgecss.config.js",
+	"scripts/download-missing-icons.cjs",
+	"scripts/generate-missing-icons-json.cjs",
 ] as const;
 
 test("confirmed dead-code cluster stays retired", async () => {
