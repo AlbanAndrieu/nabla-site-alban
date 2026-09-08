@@ -166,7 +166,12 @@ test("topology parser accepts hostedBy placement edges", () => {
 		name: "hosting",
 		nodes: [
 			{ id: "service", name: "Service", kind: "application", category: "test" },
-			{ id: "docker", name: "Docker", kind: "container-runtime", category: "infrastructure" },
+			{
+				id: "docker",
+				name: "Docker",
+				kind: "container-runtime",
+				category: "infrastructure",
+			},
 		],
 		relations: [
 			{
@@ -294,7 +299,6 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 		/@media \(prefers-reduced-motion: reduce\)[\s\S]*react-flow__edge\.animated path[\s\S]*animation:\s*none !important/,
 	);
 });
-
 
 test("local topology fallback is synchronized with the current Nabla Compose catalog", async () => {
 	const raw = JSON.parse(

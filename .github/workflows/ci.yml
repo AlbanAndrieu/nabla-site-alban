@@ -145,7 +145,7 @@ jobs:
         continue-on-error: true
         env:
           QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "1000"
+          QUALITY_LOG_TAIL: "120"
         run: bash scripts/agent-quality-gate.sh
 
       - name: Save pre-commit environments

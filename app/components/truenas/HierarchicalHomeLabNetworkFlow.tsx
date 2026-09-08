@@ -26,7 +26,7 @@ type NetworkZone =
 	| "proxy"
 	| "container"
 	| "app";
-type PathMode = "all" | "direct" | "tunnel" | "lan";
+type PathMode = "all" | "direct" | "tunnel" | "dns" | "lan";
 type LinkKind = "wan" | "lan" | "wifi" | "direct" | "tunnel" | "dns";
 type FailureDomain = "external" | "gateway" | "lan" | "truenas";
 
@@ -96,6 +96,31 @@ const NODES: NetworkNodeSpec[] = [
 		data: { name: "Internet", role: "Public WAN", icon: "🌍", zone: "wan" },
 	},
 	{
+		id: "wan-switch",
+		domain: "external",
+		data: {
+			name: "WAN switch",
+			role: "ISP / WAN transit",
+			address: "Public edge ↔ pfSense WAN",
+			badge: "WAN TRANSIT",
+			icon: "🔀",
+			zone: "wan",
+		},
+	},
+	{
+		id: "public-dns",
+		domain: "external",
+		data: {
+			name: "Public DNS",
+			role: "Recursive authorities / public fallback",
+			address: "Quad9 9.9.9.9",
+			secondaryAddress: "Cloudflare 1.1.1.1",
+			badge: "PUBLIC ONLY",
+			icon: "🌐",
+			zone: "cloudflare",
+		},
+	},
+	{
 		id: "cloudflare-dns",
 		domain: "external",
 		data: {
@@ -124,10 +149,23 @@ const NODES: NetworkNodeSpec[] = [
 		domain: "gateway",
 		data: {
 			name: "pfSense",
-			role: "Gateway · DHCP · DNS",
+			role: "Gateway · DHCP · firewall",
 			address: "WAN 82.66.4.247",
 			secondaryAddress: "LAN 172.17.0.1",
 			icon: "🛡️",
+			zone: "gateway",
+		},
+	},
+	{
+		id: "unbound",
+		domain: "gateway",
+		data: {
+			name: "Unbound",
+			role: "pfSense LAN resolver / split DNS",
+			address: "172.17.0.1:53",
+			secondaryAddress: "int.albandrieu.com → Pi-hole 172.17.0.24:53",
+			badge: "OUTGOING ALL · FORWARDING OFF",
+			icon: "📖",
 			zone: "gateway",
 		},
 	},
@@ -227,6 +265,32 @@ const NODES: NetworkNodeSpec[] = [
 		},
 	},
 	{
+		id: "pihole",
+		domain: "truenas",
+		data: {
+			name: "Pi-hole",
+			role: "Private DNS authority / filtering",
+			address: "172.17.0.24:53",
+			secondaryAddress: "*.int.albandrieu.com",
+			badge: "DOMAIN OVERRIDE TARGET",
+			icon: "🕳️",
+			zone: "app",
+		},
+	},
+	{
+		id: "pihole-dns-sync",
+		domain: "truenas",
+		data: {
+			name: "Pi-hole DNS Sync",
+			role: "Traefik labels → private DNS records",
+			address: "TARGET_IP 172.17.0.24",
+			secondaryAddress: "DOMAIN_SUFFIX int.albandrieu.com",
+			badge: "DNS SYNC",
+			icon: "🔁",
+			zone: "container",
+		},
+	},
+	{
 		id: "garage",
 		domain: "truenas",
 		data: {
@@ -281,8 +345,8 @@ const NODES: NetworkNodeSpec[] = [
 			name: "OpenWebUI",
 			role: "TrueNAS-hosted AI web UI",
 			address: "open-webui.albandrieu.com",
-			secondaryAddress: "172.17.0.24:31028",
-			badge: "CLOUDFLARE TUNNEL",
+			secondaryAddress: "172.17.0.24:31028 · direct origin",
+			badge: "TUNNEL · NO TRAEFIK",
 			icon: "💬",
 			zone: "app",
 		},
@@ -290,35 +354,298 @@ const NODES: NetworkNodeSpec[] = [
 ];
 
 const EDGES: NetworkEdgeSpec[] = [
-	{ id: "internet-pfsense", source: "internet", target: "pfsense", label: "WAN direct", kind: "wan" },
-	{ id: "cloudflare-dns-pfsense", source: "cloudflare-dns", target: "pfsense", label: "s3.int · DNS only", kind: "dns" },
-	{ id: "cloudflare-dns-tunnel", source: "cloudflare-dns", target: "cloudflare-tunnel", label: "garage + garage-admin + OpenWebUI", kind: "tunnel" },
-	{ id: "pfsense-switch", source: "pfsense", target: "switch", label: "LAN", kind: "lan" },
-	{ id: "pfsense-haproxy", source: "pfsense", target: "haproxy", label: "direct HTTPS ingress", kind: "direct" },
-	{ id: "switch-truenas", source: "switch", target: "truenas", label: "Ethernet", kind: "lan" },
-	{ id: "switch-workstation", source: "switch", target: "workstation", label: "Ethernet", kind: "lan" },
-	{ id: "switch-r7000", source: "switch", target: "r7000", label: "Ethernet", kind: "lan" },
-	{ id: "haproxy-truenas", source: "haproxy", target: "truenas", label: "TrueNAS :7000", kind: "direct" },
-	{ id: "haproxy-traefik", source: "haproxy", target: "traefik", label: "Traefik backend :443", kind: "direct" },
-	{ id: "truenas-homarr", source: "truenas", target: "homarr", label: "native App", kind: "lan" },
-	{ id: "truenas-traefik", source: "truenas", target: "traefik", label: "Docker host :80/:443", kind: "lan" },
-	{ id: "truenas-garage", source: "truenas", target: "garage", label: "Docker host :3900", kind: "lan" },
-	{ id: "truenas-garage-webui", source: "truenas", target: "garage-webui", label: "Docker host :3909", kind: "lan" },
-	{ id: "truenas-garage-admin", source: "truenas", target: "garage-admin", label: "Docker host :3903", kind: "lan" },
-	{ id: "traefik-garage", source: "traefik", target: "garage", label: "s3.int → S3 :3900", kind: "direct" },
-	{ id: "truenas-cloudflared", source: "truenas", target: "cloudflared", label: "Docker host", kind: "lan" },
-	{ id: "cloudflare-tunnel-cloudflared", source: "cloudflare-tunnel", target: "cloudflared", label: "encrypted tunnel", kind: "tunnel" },
-	{ id: "cloudflared-garage-webui", source: "cloudflared", target: "garage-webui", label: "garage.albandrieu.com → :3909", kind: "tunnel" },
-	{ id: "cloudflared-garage-admin", source: "cloudflared", target: "garage-admin", label: "garage-admin.albandrieu.com → :3903", kind: "tunnel" },
-	{ id: "cloudflared-openwebui", source: "cloudflared", target: "openwebui", label: "open-webui.albandrieu.com", kind: "tunnel" },
-	{ id: "r7000-s24", source: "r7000", target: "s24", label: "Wi-Fi", kind: "wifi" },
+	{
+		id: "internet-wan-switch",
+		source: "internet",
+		target: "wan-switch",
+		label: "public WAN",
+		kind: "wan",
+	},
+	{
+		id: "cloudflare-dns-wan-switch",
+		source: "cloudflare-dns",
+		target: "wan-switch",
+		label: "s3.int · DNS-only public edge",
+		kind: "dns",
+	},
+	{
+		id: "cloudflare-dns-tunnel",
+		source: "cloudflare-dns",
+		target: "cloudflare-tunnel",
+		label: "garage + garage-admin + OpenWebUI",
+		kind: "tunnel",
+	},
+	{
+		id: "cloudflare-tunnel-wan-switch",
+		source: "cloudflare-tunnel",
+		target: "wan-switch",
+		label: "encrypted tunnel transport over WAN",
+		kind: "tunnel",
+	},
+	{
+		id: "wan-switch-pfsense",
+		source: "wan-switch",
+		target: "pfsense",
+		label: "WAN 82.66.4.247",
+		kind: "wan",
+	},
+	{
+		id: "pfsense-switch",
+		source: "pfsense",
+		target: "switch",
+		label: "LAN",
+		kind: "lan",
+	},
+	{
+		id: "pfsense-unbound",
+		source: "pfsense",
+		target: "unbound",
+		label: "LAN DNS resolver :53",
+		kind: "dns",
+	},
+	{
+		id: "pfsense-haproxy",
+		source: "pfsense",
+		target: "haproxy",
+		label: "direct HTTPS ingress",
+		kind: "direct",
+	},
+	{
+		id: "haproxy-switch",
+		source: "haproxy",
+		target: "switch",
+		label: "TLS re-encrypted backend via LAN",
+		kind: "direct",
+	},
+	{
+		id: "switch-truenas",
+		source: "switch",
+		target: "truenas",
+		label: "Ethernet",
+		kind: "lan",
+	},
+	{
+		id: "switch-workstation",
+		source: "switch",
+		target: "workstation",
+		label: "Ethernet",
+		kind: "lan",
+	},
+	{
+		id: "switch-r7000",
+		source: "switch",
+		target: "r7000",
+		label: "Ethernet",
+		kind: "lan",
+	},
+	{
+		id: "workstation-unbound",
+		source: "workstation",
+		target: "unbound",
+		label: "DNS #1 172.17.0.1",
+		kind: "dns",
+	},
+	{
+		id: "truenas-unbound",
+		source: "truenas",
+		target: "unbound",
+		label: "resolver #1 172.17.0.1",
+		kind: "dns",
+	},
+	{
+		id: "unbound-pihole",
+		source: "unbound",
+		target: "pihole",
+		label: "*.int Domain Override → :53",
+		kind: "dns",
+	},
+	{
+		id: "unbound-public-dns",
+		source: "unbound",
+		target: "public-dns",
+		label: "public recursion · Forwarding OFF",
+		kind: "dns",
+	},
+	{
+		id: "truenas-public-dns",
+		source: "truenas",
+		target: "public-dns",
+		label: "fallback #2/#3 · public only",
+		kind: "dns",
+	},
+	{
+		id: "truenas-homarr",
+		source: "truenas",
+		target: "homarr",
+		label: "native App",
+		kind: "lan",
+	},
+	{
+		id: "truenas-traefik",
+		source: "truenas",
+		target: "traefik",
+		label: "Docker host :80/:443",
+		kind: "lan",
+	},
+	{
+		id: "truenas-pihole",
+		source: "truenas",
+		target: "pihole",
+		label: "DNS host :53",
+		kind: "lan",
+	},
+	{
+		id: "truenas-pihole-dns-sync",
+		source: "truenas",
+		target: "pihole-dns-sync",
+		label: "Docker host",
+		kind: "lan",
+	},
+	{
+		id: "traefik-pihole-dns-sync",
+		source: "traefik",
+		target: "pihole-dns-sync",
+		label: "eligible *.int labels",
+		kind: "dns",
+	},
+	{
+		id: "pihole-dns-sync-pihole",
+		source: "pihole-dns-sync",
+		target: "pihole",
+		label: "private A records",
+		kind: "dns",
+	},
+	{
+		id: "truenas-garage",
+		source: "truenas",
+		target: "garage",
+		label: "Docker host :3900",
+		kind: "lan",
+	},
+	{
+		id: "truenas-garage-webui",
+		source: "truenas",
+		target: "garage-webui",
+		label: "Docker host :3909",
+		kind: "lan",
+	},
+	{
+		id: "truenas-garage-admin",
+		source: "truenas",
+		target: "garage-admin",
+		label: "Docker host :3903",
+		kind: "lan",
+	},
+	{
+		id: "traefik-garage",
+		source: "traefik",
+		target: "garage",
+		label: "s3.int → S3 :3900",
+		kind: "direct",
+	},
+	{
+		id: "truenas-cloudflared",
+		source: "truenas",
+		target: "cloudflared",
+		label: "Docker host",
+		kind: "lan",
+	},
+	{
+		id: "cloudflared-garage-webui",
+		source: "cloudflared",
+		target: "garage-webui",
+		label: "garage.albandrieu.com → :3909",
+		kind: "tunnel",
+	},
+	{
+		id: "cloudflared-garage-admin",
+		source: "cloudflared",
+		target: "garage-admin",
+		label: "garage-admin.albandrieu.com → :3903",
+		kind: "tunnel",
+	},
+	{
+		id: "cloudflared-openwebui",
+		source: "cloudflared",
+		target: "openwebui",
+		label: "open-webui.albandrieu.com → :31028 · no Traefik",
+		kind: "tunnel",
+	},
+	{
+		id: "r7000-s24",
+		source: "r7000",
+		target: "s24",
+		label: "Wi-Fi",
+		kind: "wifi",
+	},
+	{
+		id: "s24-unbound",
+		source: "s24",
+		target: "unbound",
+		label: "Wi-Fi DNS #1",
+		kind: "dns",
+	},
 ];
 
 const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
 	all: new Set(NODES.map((node) => node.id)),
-	direct: new Set(["internet", "cloudflare-dns", "pfsense", "haproxy", "truenas", "traefik", "garage"]),
-	tunnel: new Set(["cloudflare-dns", "cloudflare-tunnel", "truenas", "cloudflared", "garage-webui", "garage-admin", "openwebui"]),
-	lan: new Set(["pfsense", "switch", "truenas", "workstation", "r7000", "s24", "homarr", "traefik", "garage", "garage-webui", "garage-admin"]),
+	direct: new Set([
+		"internet",
+		"cloudflare-dns",
+		"wan-switch",
+		"pfsense",
+		"haproxy",
+		"switch",
+		"truenas",
+		"traefik",
+		"garage",
+	]),
+	tunnel: new Set([
+		"cloudflare-dns",
+		"cloudflare-tunnel",
+		"wan-switch",
+		"pfsense",
+		"switch",
+		"truenas",
+		"cloudflared",
+		"garage-webui",
+		"garage-admin",
+		"openwebui",
+	]),
+	dns: new Set([
+		"internet",
+		"public-dns",
+		"cloudflare-dns",
+		"wan-switch",
+		"pfsense",
+		"unbound",
+		"switch",
+		"truenas",
+		"workstation",
+		"r7000",
+		"s24",
+		"traefik",
+		"pihole",
+		"pihole-dns-sync",
+	]),
+	lan: new Set([
+		"pfsense",
+		"unbound",
+		"switch",
+		"truenas",
+		"workstation",
+		"r7000",
+		"s24",
+		"homarr",
+		"traefik",
+		"pihole",
+		"pihole-dns-sync",
+		"cloudflared",
+		"garage",
+		"garage-webui",
+		"garage-admin",
+		"openwebui",
+	]),
 };
 
 function domainCopy(
@@ -326,16 +653,40 @@ function domainCopy(
 	french: boolean,
 ): [string, string] {
 	const en: Record<FailureDomain, [string, string]> = {
-		external: ["1 · External / WAN", "Public Internet, DNS and managed Cloudflare edge."],
-		gateway: ["2 · Gateway & ingress", "pfSense is the LAN authority; HAProxy handles direct HTTPS ingress and routes TrueNAS :7000 plus the Traefik :443 backend."],
-		lan: ["3 · LAN access", "Ethernet/Wi-Fi fabric and trusted client devices."],
-		truenas: ["4 · TrueNAS failure domain", "Storage host plus native Apps, Traefik/cloudflared Docker ingress and hosted services."],
+		external: [
+			"1 · External / WAN",
+			"Public Internet, WAN transit, public DNS and the managed Cloudflare edge.",
+		],
+		gateway: [
+			"2 · Gateway, ingress & DNS",
+			"pfSense owns the LAN boundary; HAProxy handles direct HTTPS and Unbound handles recursive/split DNS.",
+		],
+		lan: [
+			"3 · LAN access",
+			"Ethernet/Wi-Fi fabric carrying direct, tunnel-origin and resolver traffic.",
+		],
+		truenas: [
+			"4 · TrueNAS failure domain",
+			"Storage host plus Traefik, cloudflared, Pi-hole and the hosted services.",
+		],
 	};
 	const fr: Record<FailureDomain, [string, string]> = {
-		external: ["1 · Externe / WAN", "Internet public, DNS et edge Cloudflare managé."],
-		gateway: ["2 · Gateway & ingress", "pfSense reste l’autorité LAN ; HAProxy porte l’ingress HTTPS direct et route TrueNAS :7000 ainsi que le backend Traefik :443."],
-		lan: ["3 · Accès LAN", "Réseau Ethernet/Wi-Fi et clients de confiance."],
-		truenas: ["4 · Domaine de panne TrueNAS", "Hôte stockage, Apps natives, ingress Docker Traefik/cloudflared et services hébergés."],
+		external: [
+			"1 · Externe / WAN",
+			"Internet public, transit WAN, DNS public et edge Cloudflare managé.",
+		],
+		gateway: [
+			"2 · Gateway, ingress & DNS",
+			"pfSense porte la frontière LAN ; HAProxy gère HTTPS direct et Unbound le DNS récursif/scindé.",
+		],
+		lan: [
+			"3 · Accès LAN",
+			"Réseau Ethernet/Wi-Fi transportant ingress direct, origine tunnel et résolution DNS.",
+		],
+		truenas: [
+			"4 · Domaine de panne TrueNAS",
+			"Hôte stockage avec Traefik, cloudflared, Pi-hole et les services hébergés.",
+		],
 	};
 	return (french ? fr : en)[domain];
 }
@@ -459,8 +810,20 @@ export default function HierarchicalHomeLabNetworkFlow() {
 	const edges = useMemo(() => buildEdges(visibleIds), [visibleIds]);
 
 	const labels: Record<PathMode, string> = french
-		? { all: "Tout", direct: "Ingress direct", tunnel: "Tunnel", lan: "LAN / Wi-Fi" }
-		: { all: "All paths", direct: "Direct ingress", tunnel: "Tunnel", lan: "LAN / Wi-Fi" };
+		? {
+				all: "Tout",
+				direct: "Ingress direct",
+				tunnel: "Tunnel",
+				dns: "DNS / DNS scindé",
+				lan: "LAN / Wi-Fi",
+			}
+		: {
+				all: "All paths",
+				direct: "Direct ingress",
+				tunnel: "Tunnel",
+				dns: "DNS / split DNS",
+				lan: "LAN / Wi-Fi",
+			};
 
 	return (
 		<div className={styles.wrapper} data-hierarchical-homelab-network>
@@ -474,7 +837,7 @@ export default function HierarchicalHomeLabNetworkFlow() {
 					</span>
 				</div>
 				<div className={styles.pathTabs} role="group" aria-label="Network path filter">
-					{(["all", "direct", "tunnel", "lan"] as const).map((mode) => (
+					{(["all", "direct", "tunnel", "dns", "lan"] as const).map((mode) => (
 						<button
 							key={mode}
 							type="button"
@@ -505,12 +868,30 @@ export default function HierarchicalHomeLabNetworkFlow() {
 					<Controls className={styles.controls} showInteractive={false} />
 				</ReactFlow>
 				<div className={styles.legend} aria-label="Network link legend">
-					<span><i className={styles.wanDot} />WAN</span>
-					<span><i className={styles.lanDot} />LAN / hosting</span>
-					<span><i className={styles.wifiDot} />Wi-Fi</span>
-					<span><i className={styles.haproxyDot} />Direct reverse proxy (HAProxy / Traefik)</span>
-					<span><i className={styles.tunnelDot} />Cloudflare Tunnel</span>
-					<span><i className={styles.dnsDot} />Cloudflare DNS only</span>
+					<span>
+						<i className={styles.wanDot} />
+						WAN transport
+					</span>
+					<span>
+						<i className={styles.lanDot} />
+						LAN / hosting
+					</span>
+					<span>
+						<i className={styles.wifiDot} />
+						Wi-Fi
+					</span>
+					<span>
+						<i className={styles.haproxyDot} />
+						Direct reverse proxy (HAProxy / Traefik)
+					</span>
+					<span>
+						<i className={styles.tunnelDot} />
+						Cloudflare Tunnel
+					</span>
+					<span>
+						<i className={styles.dnsDot} />
+						DNS resolution / split DNS
+					</span>
 				</div>
 			</div>
 		</div>
