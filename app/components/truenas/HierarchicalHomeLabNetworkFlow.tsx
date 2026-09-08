@@ -648,10 +648,7 @@ const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
 	]),
 };
 
-function domainCopy(
-	domain: FailureDomain,
-	french: boolean,
-): [string, string] {
+function domainCopy(domain: FailureDomain, french: boolean): [string, string] {
 	const en: Record<FailureDomain, [string, string]> = {
 		external: [
 			"1 · External / WAN",
@@ -751,7 +748,12 @@ function buildNodes(visibleIds: Set<string>, french: boolean): Node[] {
 			id: groupId,
 			type: "networkGroup",
 			position: { x: 0, y },
-			data: { label, description, domain, count: domainNodes.length } satisfies GroupNodeData,
+			data: {
+				label,
+				description,
+				domain,
+				count: domainNodes.length,
+			} satisfies GroupNodeData,
 			style: { width: GROUP_WIDTH, height: groupHeight },
 			selectable: false,
 			draggable: false,
@@ -849,7 +851,10 @@ export default function HierarchicalHomeLabNetworkFlow() {
 					))}
 				</div>
 			</div>
-			<div className={styles.shell} aria-label="Interactive grouped homelab network topology">
+			<div
+				className={styles.shell}
+				aria-label="Interactive grouped homelab network topology"
+			>
 				<ReactFlow
 					key={pathMode}
 					nodes={nodes}
