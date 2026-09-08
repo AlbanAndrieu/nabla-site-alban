@@ -20,9 +20,10 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Le catalogue homelab distingue déclaration, observation runtime et santé.
 - [x] Le connecteur de logs de build Vercel est de nouveau exploitable pour les
   validations ciblées ; les logs runtime restent à revalider séparément.
-- [x] Les composants partagés `RouteHeader`, `LocaleSwitcher`, Footer et
-  `ContactHero` utilisent désormais les tokens/primitives Next.js sans dépendre
-  de Bootstrap pour leur présentation principale.
+- [x] Les composants partagés `RouteHeader`, Footer et `ContactHero`
+  utilisent désormais les tokens/primitives Next.js sans dépendre de Bootstrap
+  pour leur présentation principale ; le sélecteur de langue est porté par
+  `RouteHeader` et l’ancien `LocaleSwitcher` autonome est retiré.
 - [x] Les variantes historiques `cv-{small,medium,large,full}-*.html` sont une
   exception statique intentionnelle et restent des documents HTML autonomes.
 - [x] Les six pages de policy sont natives, disposent d'un index `/policy`, de
@@ -410,8 +411,11 @@ Autres contrôles :
   primitives/styles réellement utilisés afin de réduire CSS tiers et CSP.
 - [x] Exécuter un premier audit des dépendances et retirer les racines sans
   consommateur : CLI Vercel local, D3 npm, Next DevTools MCP local,
-  SDK navigateur Datadog/Vercel inutilisés. OpenCommit est conservé comme outil local/on-demand par choix explicite. Conserver explicitement Stripe,
-  React Flow et le contrat `@vercel/otel` avec ses peers OTel requis
+  SDK navigateur Datadog/Vercel inutilisés. OpenCommit est conservé comme outil
+  local/on-demand par choix explicite. L’audit Knip suivant retire aussi les deux
+  SDK Stripe navigateur d’une surface Embedded Checkout non routée ; conserver
+  explicitement le SDK serveur `stripe`, React Flow et le contrat
+  `@vercel/otel` avec ses peers OTel requis
   (`api`, `api-logs`, `instrumentation`, `sdk-logs`) car le build
   Turbopack prouve qu'ils sont consommés à la compilation.
 - [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
@@ -427,9 +431,19 @@ Autres contrôles :
   verrouiller ces frontières avec des tests de contrat.
 - [ ] Compléter l'audit des licences et des dépendances restantes après plusieurs
   baselines CI post-nettoyage.
-- [ ] Évaluer Knip pour détecter fichiers, exports et dépendances morts.
-- [ ] Supprimer les props, composants et feuilles historiques sans consommateur
-  confirmé.
+- [x] Évaluer Knip 6.35.0 pour détecter fichiers, exports et dépendances morts :
+  un audit zéro-config puis une configuration repository-aware séparent les
+  assets statiques `public/**`, les outils on-demand et les vrais candidats.
+  `npm run audit:dead-code` reste volontairement on-demand et n’ajoute aucun
+  coût aux quality gates ordinaires.
+- [x] Retirer le premier lot de code mort prouvé : Embedded Checkout non routé,
+  ses deux SDK navigateur, `eslint-config-next`, `typescript-eslint`,
+  `postcss-selector-parser`, l’ancien `LocaleSwitcher`/navigation, le
+  `SiteFooter` remplacé, `ResourceDirectory`/resource catalog, deux sections
+  Nabla orphelines, `legacyPageMetadata`, une feuille React Flow obsolète,
+  `app/404.module.css` et la configuration PurgeCSS sans consommateur.
+- [ ] Poursuivre l’audit des exports/types et migrer les tests encore attachés à
+  l’ancien `ArchitectureExplorer` avant de retirer ce renderer.
 
 ## P2 — CI/CD et Vercel
 
@@ -529,7 +543,7 @@ Autres contrôles :
 2. Cohérence du contenu professionnel et suppression des données mortes Jus Mundi.
 4. Design system partagé : poursuivre l'audit light/dark, les primitives restantes
    et le retrait de Bootstrap après les migrations déjà faites de RouteHeader,
-   LocaleSwitcher, Footer et ContactHero.
+   Footer et ContactHero ; le sélecteur de langue autonome a été retiré.
 5. Terminer la migration native de `/security` et le durcissement CSP ; D3 v3 et
    `arf.js` sont déjà retirés du runtime.
 6. Recentrage `/ai` sur Secure AI en réutilisant la topologie existante.
