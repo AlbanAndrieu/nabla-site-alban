@@ -42,8 +42,13 @@ branche finale et le déploiement Vercel sont validés.
   le namespace `jm` ne conserve plus le footer historique, les anciens libellés
   de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
   le contrat actif sans dictionnaire local dans les composants.
-- [ ] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
-  obsolètes héritées de la période Jus Mundi.
+- [x] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
+  obsolètes héritées de la période Jus Mundi : les sources Next/i18n actives étaient
+  déjà alignées sur l'activité indépendante depuis 2007 et la fin de Jus Mundi en
+  2026 ; les pages legacy de transition `public/contact.html`,
+  `public/locales/fr/contact.html` et `public/locales/fr/index.html` ne
+  présentent plus Jus Mundi comme poste actuel et le contrat
+  `professionalCopyConsistency` verrouille cette cohérence.
 - [ ] Maintenir les pages utilisées aussi dans `nabla-site-bababou` à parité
   uniquement lorsqu'elles doivent volontairement être identiques.
 
