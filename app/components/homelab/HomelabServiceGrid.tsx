@@ -6,8 +6,8 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
+import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import {
 	blockedDependencyLabels,
 	resolveEffectiveServiceState,
@@ -42,7 +42,10 @@ type EffectiveHealthLabelKey =
 	| "health.states.fail"
 	| "health.states.unknown";
 
-const EFFECTIVE_HEALTH_LABEL_KEY: Record<HomelabHealthState, EffectiveHealthLabelKey> = {
+const EFFECTIVE_HEALTH_LABEL_KEY: Record<
+	HomelabHealthState,
+	EffectiveHealthLabelKey
+> = {
 	ok: "health.states.ok",
 	warn: "health.states.warn",
 	fail: "health.states.fail",
@@ -179,9 +182,15 @@ function runtimeHealthState(state?: string | null): HomelabHealthState | null {
 		return "ok";
 	}
 	if (
-		["CRASHED", "DEPLOYING", "DOWN", "ERROR", "FAILED", "STOPPED", "STOPPING"].includes(
-			normalized,
-		)
+		[
+			"CRASHED",
+			"DEPLOYING",
+			"DOWN",
+			"ERROR",
+			"FAILED",
+			"STOPPED",
+			"STOPPING",
+		].includes(normalized)
 	) {
 		return "fail";
 	}
@@ -294,7 +303,11 @@ export default function HomelabServiceGrid({
 			)}
 
 			{(truenasRuntimeUnavailable || truenasRuntimeStale) && (
-				<div className="alert alert-warning" role="alert" data-truenas-runtime-warning>
+				<div
+					className="alert alert-warning"
+					role="alert"
+					data-truenas-runtime-warning
+				>
 					<strong>
 						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
 						{t("truenas.runtimeDataUnavailable")}
@@ -370,10 +383,7 @@ export default function HomelabServiceGrid({
 										: undefined;
 
 					return (
-						<div
-							className="col-md-4 p-3"
-							key={`${serviceId}:${endpointUrl}`}
-						>
+						<div className="col-md-4 p-3" key={`${serviceId}:${endpointUrl}`}>
 							<div
 								className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
 								data-effective-health={presentationState}
@@ -410,7 +420,9 @@ export default function HomelabServiceGrid({
 											})}
 										>
 											<i
-												className={EFFECTIVE_HEALTH_ICON_CLASS[presentationState]}
+												className={
+													EFFECTIVE_HEALTH_ICON_CLASS[presentationState]
+												}
 												aria-hidden="true"
 											/>{" "}
 											{effectiveHealthLabel}
@@ -418,7 +430,10 @@ export default function HomelabServiceGrid({
 									</div>
 									{initialHealth?.observation_stale === true && (
 										<p className={styles.serviceFreshness} data-health-stale>
-											<i className="fas fa-clock-rotate-left" aria-hidden="true" />{" "}
+											<i
+												className="fas fa-clock-rotate-left"
+												aria-hidden="true"
+											/>{" "}
 											{t("health.stale")}
 										</p>
 									)}
@@ -438,7 +453,10 @@ export default function HomelabServiceGrid({
 											role="status"
 											data-dependency-health
 										>
-											<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
+											<i
+												className="fas fa-diagram-project"
+												aria-hidden="true"
+											/>{" "}
 											{blockerLabels.length > 0
 												? t("dependency.blockedBy", {
 														services: blockerLabels.join(" · "),
@@ -476,7 +494,10 @@ export default function HomelabServiceGrid({
 												className={`btn ${INTERNAL_HEALTH_CLASS[internalState]} btn-sm d-block`}
 												target="_blank"
 												rel="noopener noreferrer"
-												style={{ color: internalColor, borderColor: internalColor }}
+												style={{
+													color: internalColor,
+													borderColor: internalColor,
+												}}
 												data-health-state={internalState}
 												title={`FastAPI/TrueNAS: ${internalState}`}
 											>
@@ -546,8 +567,7 @@ export default function HomelabServiceGrid({
 				aria-label={t("dependency.legendTitle")}
 				data-dependency-health-legend
 			>
-				<strong>{t("dependency.legendTitle")}:</strong>{" "}
-				{t("dependency.legend")}
+				<strong>{t("dependency.legendTitle")}:</strong> {t("dependency.legend")}
 			</div>
 		</>
 	);

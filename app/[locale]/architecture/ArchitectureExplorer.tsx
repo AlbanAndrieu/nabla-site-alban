@@ -342,7 +342,9 @@ function requiredEdgeHealthState(
 	);
 	if (evidenceState) return evidenceState;
 	const targetHealth = healthById.get(relation.target);
-	return targetHealth ? resolveEffectiveServiceState(targetHealth).effectiveState : null;
+	return targetHealth
+		? resolveEffectiveServiceState(targetHealth).effectiveState
+		: null;
 }
 
 function makeEdges(

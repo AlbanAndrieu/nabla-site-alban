@@ -65,13 +65,31 @@ test("repository exposes fix, check and publish commands to agents", async () =>
 test("CI runs the same agent gate before the production build without duplicate checks", async () => {
 	const ci = await source(".github/workflows/ci.yml");
 	const gatePosition = ci.indexOf("Run agent-first quality gate before build");
+	const preCommitSavePosition = ci.indexOf("Save pre-commit environments");
+	const gateEnforcementPosition = ci.indexOf(
+		"Enforce agent-first quality gate",
+	);
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
 	assert.ok(gatePosition >= 0, "CI must run the agent-first gate");
 	assert.ok(
-		buildPosition > gatePosition,
-		"build must start only after the agent gate",
+		preCommitSavePosition > gatePosition,
+		"pre-commit cache must be saved after the gate populates hook environments",
 	);
+	assert.ok(
+		gateEnforcementPosition > preCommitSavePosition,
+		"gate failure must be enforced only after pre-commit cache persistence",
+	);
+	assert.ok(
+		buildPosition > gateEnforcementPosition,
+		"build must start only after the agent gate is enforced",
+	);
+	assert.match(ci, /actions\/cache\/restore@v5/);
+	assert.match(ci, /actions\/cache\/save@v5/);
+	assert.match(ci, /continue-on-error: true/);
+	assert.match(ci, /steps\.agent-quality-gate\.outcome != 'success'/);
+	assert.match(ci, /steps\.pre-commit-cache\.outputs\.cache-primary-key/);
+	assert.match(ci, /steps\.npm-cache\.outputs\.cache-primary-key/);
 	assert.match(ci, /fetch-depth: 0/);
 	assert.match(ci, /QUALITY_BASE_REF:/);
 	assert.match(ci, /github\.event\.before/);
@@ -90,6 +108,45 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	assert.match(setup, /actions\/setup-python@v6/);
 	assert.match(setup, /pre-commit==4\.6\.2/);
 	assert.match(setup, /npm ci --no-audit --no-fund/);
+});
+
+test("local agent toolchain matches CI bootstrap pins", async () => {
+	const [mise, pythonVersion, nvmrc, ci, setup] = await Promise.all([
+		source("mise.toml"),
+		source(".python-version"),
+		source(".nvmrc"),
+		source(".github/workflows/ci.yml"),
+		source(".github/workflows/copilot-setup-steps.yml"),
+	]);
+
+	assert.equal(pythonVersion.trim(), "3.13");
+	assert.equal(nvmrc.trim(), "25.9.0");
+	assert.ok(mise.includes('node = "25.9.0"'));
+	assert.ok(mise.includes("default='3.13'"));
+	assert.ok(mise.includes('pre-commit = "4.6.2"'));
+	for (const workflow of [ci, setup]) {
+		assert.ok(workflow.includes('python-version-file: ".python-version"'));
+		assert.ok(!workflow.includes('python-version: "3.13"'));
+		assert.ok(workflow.includes("pre-commit==4.6.2"));
+		assert.ok(
+			workflow.includes(
+				"hashFiles('.pre-commit-config.yaml', '.python-version')",
+			),
+		);
+	}
+	assert.ok(ci.includes('- ".python-version"'));
+	for (const bootstrapInput of [
+		".python-version",
+		".nvmrc",
+		"package.json",
+		"package-lock.json",
+		".pre-commit-config.yaml",
+	]) {
+		assert.ok(
+			setup.includes("- " + bootstrapInput),
+			"Copilot setup trigger must include " + bootstrapInput,
+		);
+	}
 });
 
 test("pre-commit validation is deterministic and does not mutate hook revisions", async () => {

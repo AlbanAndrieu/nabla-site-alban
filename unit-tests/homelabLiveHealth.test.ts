@@ -67,7 +67,10 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 test("TrueNAS application cards show runtime icons and a legend", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	assert.match(page, /function runtimePresentationState/);
-	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\) \?\? "missing"/);
+	assert.match(
+		page,
+		/runtimeHealthState\(entry\?\.runtime_state\) \?\? "missing"/,
+	);
 	assert.match(page, /"fas fa-circle-check"/);
 	assert.match(page, /"fas fa-triangle-exclamation"/);
 	assert.match(page, /"fas fa-circle-xmark"/);
@@ -79,7 +82,9 @@ test("TrueNAS application cards show runtime icons and a legend", async () => {
 
 test("service cards promote effective health above runtime and troubleshooting details", async () => {
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
-	const css = await source("app/components/homelab/HomelabServicesBlock.module.css");
+	const css = await source(
+		"app/components/homelab/HomelabServicesBlock.module.css",
+	);
 
 	assert.match(page, /EFFECTIVE_HEALTH_LABEL_KEY/);
 	assert.match(page, /data-effective-health=\{presentationState\}/);
@@ -108,7 +113,7 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
 	assert.match(
 		page,
-		/style=\{\{ color: internalColor, borderColor: internalColor \}\}/,
+		/style=\{\{\s*color:\s*internalColor,\s*borderColor:\s*internalColor,\s*\}\}/,
 	);
 	assert.match(page, /data-health-state=\{internalState\}/);
 });

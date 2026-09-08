@@ -1,17 +1,17 @@
 import type { FastApiHealthBoardSnapshot } from "./fastApiHealthBoard";
 import {
-	parseHomelabDiagnostics,
 	type HomelabDiagnosticsSnapshot,
+	parseHomelabDiagnostics,
 } from "./homelabDiagnostics";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthSnapshot,
+	parseHomelabHealthSnapshot,
 } from "./homelabHealth";
 import {
-	parseHomelabOperationalEvidence,
 	type HomelabOperationalEvidence,
 	type OperationalComponentEvidence,
 	type OperationalHealthState,
+	parseHomelabOperationalEvidence,
 } from "./homelabOperationalEvidence";
 import {
 	parseRuntimeTopology,
@@ -93,7 +93,6 @@ export type CloudflareCacheEvidence = {
 	cache?: ProbeCacheEvidence;
 };
 
-
 export type PlatformMetricKey =
 	| "truenas_memory_available_ratio"
 	| "truenas_cpu_busy_ratio"
@@ -110,7 +109,12 @@ export type PlatformMetricSample = {
 export type PlatformMetricsEvidence = {
 	schemaVersion?: number;
 	generatedAt?: string;
-	state: "healthy" | "degraded" | "not_configured" | "telemetry_unavailable" | "unknown";
+	state:
+		| "healthy"
+		| "degraded"
+		| "not_configured"
+		| "telemetry_unavailable"
+		| "unknown";
 	configured: boolean | null;
 	source?: string;
 	errorKind?: string;
@@ -127,7 +131,10 @@ export type PlatformMetricsEvidence = {
 	};
 };
 
-export type HomelabObservabilitySource = "health-board" | "fallback" | "unavailable";
+export type HomelabObservabilitySource =
+	| "health-board"
+	| "fallback"
+	| "unavailable";
 
 export type HomelabObservabilitySnapshot = HomelabOperationalEvidence & {
 	healthSnapshot: HomelabHealthSnapshot | null;
@@ -197,10 +204,18 @@ function stateForCheck(
 	id: string,
 	raw: Record<string, unknown>,
 ): OperationalHealthState {
-	if (raw.stale === true || raw.degraded === true || raw.tls_trusted === false) {
+	if (
+		raw.stale === true ||
+		raw.degraded === true ||
+		raw.tls_trusted === false
+	) {
 		return "warn";
 	}
-	if (raw.skipped === true || raw.reachable === null || raw.reachable === undefined) {
+	if (
+		raw.skipped === true ||
+		raw.reachable === null ||
+		raw.reachable === undefined
+	) {
 		return "unknown";
 	}
 	if (raw.reachable === true) return "ok";
@@ -211,9 +226,15 @@ function stateForCheck(
 function parseCache(value: unknown): ProbeCacheEvidence | undefined {
 	if (!isRecord(value)) return undefined;
 	const cache: ProbeCacheEvidence = {
-		...(optionalString(value.cache_layer) ? { layer: optionalString(value.cache_layer) } : {}),
-		...(optionalBoolean(value.cached) !== undefined ? { cached: optionalBoolean(value.cached) } : {}),
-		...(optionalBoolean(value.stale) !== undefined ? { stale: optionalBoolean(value.stale) } : {}),
+		...(optionalString(value.cache_layer)
+			? { layer: optionalString(value.cache_layer) }
+			: {}),
+		...(optionalBoolean(value.cached) !== undefined
+			? { cached: optionalBoolean(value.cached) }
+			: {}),
+		...(optionalBoolean(value.stale) !== undefined
+			? { stale: optionalBoolean(value.stale) }
+			: {}),
 		...(optionalBoolean(value.refresh_in_progress) !== undefined
 			? { refreshInProgress: optionalBoolean(value.refresh_in_progress) }
 			: {}),
@@ -232,7 +253,9 @@ function parseDeepDiagnostics(value: unknown): DeepDiagnosticEvidence {
 	const rawChecks = isRecord(value.checks) ? value.checks : {};
 	const checks = Object.entries(rawChecks).flatMap(([id, checkValue]) => {
 		if (!isRecord(checkValue)) return [];
-		const displayLabel = optionalString(checkValue.display_label) ?? optionalString(checkValue.name);
+		const displayLabel =
+			optionalString(checkValue.display_label) ??
+			optionalString(checkValue.name);
 		const cache = parseCache(checkValue);
 		return [
 			{
@@ -242,8 +265,12 @@ function parseDeepDiagnostics(value: unknown): DeepDiagnosticEvidence {
 				state: stateForCheck(id, checkValue),
 				reachable: nullableBoolean(checkValue.reachable),
 				skipped: checkValue.skipped === true,
-				...(optionalString(checkValue.reason) ? { reason: optionalString(checkValue.reason) } : {}),
-				...(optionalString(checkValue.error) ? { error: optionalString(checkValue.error) } : {}),
+				...(optionalString(checkValue.reason)
+					? { reason: optionalString(checkValue.reason) }
+					: {}),
+				...(optionalString(checkValue.error)
+					? { error: optionalString(checkValue.error) }
+					: {}),
 				...(optionalString(checkValue.error_kind)
 					? { errorKind: optionalString(checkValue.error_kind) }
 					: {}),
@@ -256,18 +283,25 @@ function parseDeepDiagnostics(value: unknown): DeepDiagnosticEvidence {
 				...(optionalNumber(checkValue.http_status) !== undefined
 					? { httpStatus: optionalNumber(checkValue.http_status) }
 					: {}),
-				...(checkValue.tls_trusted === null || typeof checkValue.tls_trusted === "boolean"
+				...(checkValue.tls_trusted === null ||
+				typeof checkValue.tls_trusted === "boolean"
 					? { tlsTrusted: checkValue.tls_trusted as boolean | null }
 					: {}),
-				...(optionalString(checkValue.probe) ? { probe: optionalString(checkValue.probe) } : {}),
+				...(optionalString(checkValue.probe)
+					? { probe: optionalString(checkValue.probe) }
+					: {}),
 				...(optionalString(checkValue.authentication)
 					? { authentication: optionalString(checkValue.authentication) }
 					: {}),
 				...(optionalString(checkValue.resource)
 					? { resource: optionalString(checkValue.resource) }
 					: {}),
-				...(optionalString(checkValue.path) ? { path: optionalString(checkValue.path) } : {}),
-				...(optionalString(checkValue.target) ? { target: optionalString(checkValue.target) } : {}),
+				...(optionalString(checkValue.path)
+					? { path: optionalString(checkValue.path) }
+					: {}),
+				...(optionalString(checkValue.target)
+					? { target: optionalString(checkValue.target) }
+					: {}),
 				...(optionalBoolean(checkValue.degraded) !== undefined
 					? { degraded: optionalBoolean(checkValue.degraded) }
 					: {}),
@@ -277,9 +311,15 @@ function parseDeepDiagnostics(value: unknown): DeepDiagnosticEvidence {
 	});
 
 	return {
-		...(optionalString(value.contract) ? { contract: optionalString(value.contract) } : {}),
-		...(optionalString(value.status) ? { status: optionalString(value.status) } : {}),
-		...(optionalString(value.version) ? { version: optionalString(value.version) } : {}),
+		...(optionalString(value.contract)
+			? { contract: optionalString(value.contract) }
+			: {}),
+		...(optionalString(value.status)
+			? { status: optionalString(value.status) }
+			: {}),
+		...(optionalString(value.version)
+			? { version: optionalString(value.version) }
+			: {}),
 		checks,
 	};
 }
@@ -293,7 +333,9 @@ function parseEdgeEvidenceSkips(sickzValue: unknown): EdgeEvidenceSkip[] {
 	});
 }
 
-function parsePfSenseIngressPolicy(healthzValue: unknown): PfSenseIngressPolicyEvidence | null {
+function parsePfSenseIngressPolicy(
+	healthzValue: unknown,
+): PfSenseIngressPolicyEvidence | null {
 	if (!isRecord(healthzValue) || !isRecord(healthzValue.checks)) return null;
 	const pfsense = healthzValue.checks.pfsense;
 	if (!isRecord(pfsense) || !isRecord(pfsense.ingress_policy)) return null;
@@ -307,25 +349,32 @@ function parsePfSenseIngressPolicy(healthzValue: unknown): PfSenseIngressPolicyE
 			: {}),
 		activeEgressIps: Array.isArray(policy.active_egress_ips)
 			? policy.active_egress_ips.filter(
-					(value): value is string => typeof value === "string" && Boolean(value.trim()),
+					(value): value is string =>
+						typeof value === "string" && Boolean(value.trim()),
 				)
 			: [],
 		possibleCauses: Array.isArray(policy.possible_causes)
 			? policy.possible_causes.filter(
-					(value): value is string => typeof value === "string" && Boolean(value.trim()),
+					(value): value is string =>
+						typeof value === "string" && Boolean(value.trim()),
 				)
 			: [],
 		attributionAvailable:
 			typeof policy.attribution_available === "boolean"
 				? policy.attribution_available
 				: null,
-		...(optionalString(policy.detail) ? { detail: optionalString(policy.detail) } : {}),
+		...(optionalString(policy.detail)
+			? { detail: optionalString(policy.detail) }
+			: {}),
 		...(optionalString(policy.recommended_control_path)
-			? { recommendedControlPath: optionalString(policy.recommended_control_path) }
+			? {
+					recommendedControlPath: optionalString(
+						policy.recommended_control_path,
+					),
+				}
 			: {}),
 	};
 }
-
 
 const PLATFORM_METRIC_KEYS = [
 	"truenas_memory_available_ratio",
@@ -373,7 +422,9 @@ function parsePlatformMetrics(value: unknown): PlatformMetricsEvidence | null {
 			: {}),
 		state: metricState(value.state),
 		configured: nullableBoolean(value.configured),
-		...(optionalString(value.source) ? { source: optionalString(value.source) } : {}),
+		...(optionalString(value.source)
+			? { source: optionalString(value.source) }
+			: {}),
 		...(optionalString(value.error_kind)
 			? { errorKind: optionalString(value.error_kind) }
 			: {}),
@@ -383,12 +434,16 @@ function parsePlatformMetrics(value: unknown): PlatformMetricsEvidence | null {
 		metrics,
 		summary: {
 			signalsAvailable: optionalNumber(rawSummary.signals_available) ?? 0,
-			signalsTotal: optionalNumber(rawSummary.signals_total) ?? PLATFORM_METRIC_KEYS.length,
+			signalsTotal:
+				optionalNumber(rawSummary.signals_total) ?? PLATFORM_METRIC_KEYS.length,
 			telemetryUp: optionalNumber(rawSummary.telemetry_up) ?? 0,
 			telemetryTotal: optionalNumber(rawSummary.telemetry_total) ?? 4,
 			...(typeof rawSummary.truenas_memory_available_ratio === "number" &&
 			Number.isFinite(rawSummary.truenas_memory_available_ratio)
-				? { truenasMemoryAvailableRatio: rawSummary.truenas_memory_available_ratio }
+				? {
+						truenasMemoryAvailableRatio:
+							rawSummary.truenas_memory_available_ratio,
+					}
 				: {}),
 			...(typeof rawSummary.truenas_cpu_busy_ratio === "number" &&
 			Number.isFinite(rawSummary.truenas_cpu_busy_ratio)
@@ -402,8 +457,11 @@ function parsePlatformMetrics(value: unknown): PlatformMetricsEvidence | null {
 	};
 }
 
-function parseCloudflareCache(homelabValue: unknown): CloudflareCacheEvidence | null {
-	if (!isRecord(homelabValue) || !isRecord(homelabValue.cloudflare)) return null;
+function parseCloudflareCache(
+	homelabValue: unknown,
+): CloudflareCacheEvidence | null {
+	if (!isRecord(homelabValue) || !isRecord(homelabValue.cloudflare))
+		return null;
 	const raw = homelabValue.cloudflare;
 	const nestedCache = parseCache(raw.cache);
 	return {
@@ -429,7 +487,9 @@ function parseControlPlaneDiagnostics(
 			...(optionalString(raw.exception_type)
 				? { exceptionType: optionalString(raw.exception_type) }
 				: {}),
-			...(optionalString(raw.probe) ? { probe: optionalString(raw.probe) } : {}),
+			...(optionalString(raw.probe)
+				? { probe: optionalString(raw.probe) }
+				: {}),
 			...(optionalString(raw.path) ? { path: optionalString(raw.path) } : {}),
 			...(optionalNumber(raw.retry_after_seconds) !== undefined
 				? { retryAfterSeconds: optionalNumber(raw.retry_after_seconds) }
@@ -477,7 +537,8 @@ export function withObservabilityFallbacks(
 		diagnostics?: HomelabDiagnosticsSnapshot | null;
 	},
 ): HomelabObservabilitySnapshot {
-	const runtimeTopology = snapshot.runtimeTopology ?? fallbacks.runtimeTopology ?? null;
+	const runtimeTopology =
+		snapshot.runtimeTopology ?? fallbacks.runtimeTopology ?? null;
 	const diagnostics = snapshot.diagnostics ?? fallbacks.diagnostics ?? null;
 	return {
 		...snapshot,
