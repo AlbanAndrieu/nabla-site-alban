@@ -210,10 +210,10 @@ test("topology parser rejects edges with unknown nodes", () => {
 test("architecture route uses a static declared shell with live shared service health indicators", async () => {
 	const [page, explorer, data, css, packageJson] = await Promise.all([
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
-		readFile("app/[locale]/architecture/ArchitectureExplorer.tsx", "utf8"),
+		readFile("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx", "utf8"),
 		readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
 		readFile(
-			"app/[locale]/architecture/ArchitectureExplorer.module.css",
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
 			"utf8",
 		),
 		readFile("package.json", "utf8"),
@@ -230,7 +230,7 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(explorer, /<MiniMap[\s\S]*nodeColor=\{\(node\) =>/);
 	assert.match(explorer, /homelabHealthColor\(data\.healthState\)/);
 	assert.match(explorer, /: "#38bdf8"/);
-	assert.match(explorer, /<Controls className=\{styles\.flowControls\} \/>/);
+	assert.match(explorer, /<Controls className=\\{styles\\.flowControls\\} showInteractive=\\{false\\} \\/>/);
 	assert.match(explorer, /iconSrc: entity\.iconSrc/);
 	assert.match(explorer, /nodeIconFallback/);
 	assert.match(explorer, /className="fas fa-lock"/);
