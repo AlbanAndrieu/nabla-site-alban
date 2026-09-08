@@ -37,7 +37,7 @@ test.describe("Integration baseline", () => {
 		expect(Array.isArray(topology.nodes)).toBe(true);
 		expect(Array.isArray(topology.relations)).toBe(true);
 		const nodeIds = new Set((topology.nodes ?? []).map((node) => node.id));
-		for (const id of ["truenas", "traefik", "cloudflared", "openwebui", "garage"]) {
+		for (const id of ["truenas", "openwebui", "litellm", "ollama"]) {
 			expect(nodeIds.has(id), `missing topology node ${id}`).toBe(true);
 		}
 		const hasRelation = (source: string, target: string, type: string) =>
@@ -47,8 +47,8 @@ test.describe("Integration baseline", () => {
 					relation.target === target &&
 					relation.type === type,
 			);
-		expect(hasRelation("openwebui", "cloudflared", "exposedBy")).toBe(true);
-		expect(hasRelation("garage", "traefik", "exposedBy")).toBe(true);
+		expect(hasRelation("openwebui", "litellm", "consumesApi")).toBe(true);
+		expect(hasRelation("litellm", "ollama", "routesTo")).toBe(true);
 
 		await page.goto("/en/architecture");
 		await expect(
