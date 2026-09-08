@@ -65,13 +65,29 @@ test("repository exposes fix, check and publish commands to agents", async () =>
 test("CI runs the same agent gate before the production build without duplicate checks", async () => {
 	const ci = await source(".github/workflows/ci.yml");
 	const gatePosition = ci.indexOf("Run agent-first quality gate before build");
+	const preCommitSavePosition = ci.indexOf("Save pre-commit environments");
+	const gateEnforcementPosition = ci.indexOf("Enforce agent-first quality gate");
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
 	assert.ok(gatePosition >= 0, "CI must run the agent-first gate");
 	assert.ok(
-		buildPosition > gatePosition,
-		"build must start only after the agent gate",
+		preCommitSavePosition > gatePosition,
+		"pre-commit cache must be saved after the gate populates hook environments",
 	);
+	assert.ok(
+		gateEnforcementPosition > preCommitSavePosition,
+		"gate failure must be enforced only after pre-commit cache persistence",
+	);
+	assert.ok(
+		buildPosition > gateEnforcementPosition,
+		"build must start only after the agent gate is enforced",
+	);
+	assert.match(ci, /actions\/cache\/restore@v5/);
+	assert.match(ci, /actions\/cache\/save@v5/);
+	assert.match(ci, /continue-on-error: true/);
+	assert.match(ci, /steps\.agent-quality-gate\.outcome != 'success'/);
+	assert.match(ci, /steps\.pre-commit-cache\.outputs\.cache-primary-key/);
+	assert.match(ci, /steps\.npm-cache\.outputs\.cache-primary-key/);
 	assert.match(ci, /fetch-depth: 0/);
 	assert.match(ci, /QUALITY_BASE_REF:/);
 	assert.match(ci, /github\.event\.before/);
