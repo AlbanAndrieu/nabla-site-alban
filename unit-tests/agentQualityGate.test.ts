@@ -31,15 +31,9 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 		);
 	}
 	assert.match(canonical, /--publish/);
-	assert.match(
-		gate,
-		/public\/assets\/fontawesome-free-7\.1\.0-web\/\*/,
-	);
+	assert.match(gate, /public\/assets\/fontawesome-free-7\.1\.0-web\/\*/);
 	assert.match(gate, /public\/assets\/fontawesome\/\*/);
-	assert.doesNotMatch(
-		gate,
-		/package-lock\.json \| public\/assets\/\*\)/,
-	);
+	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
 test("repository exposes fix, check and publish commands to agents", async () => {
