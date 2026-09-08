@@ -103,6 +103,44 @@ test("local fallback tracks current runtime placement and Talos topology", async
 	assert.ok(hasRelation("talos", "truenas", "hostedBy"));
 });
 
+test("Garage models direct S3 ingress separately from Cloudflare Tunnel administration surfaces", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const nodes = new Map(topology.nodes.map((node) => [node.id, node]));
+	assert.equal(nodes.get("garage")?.url, "https://s3.int.albandrieu.com");
+	assert.equal(nodes.get("garage-webui")?.url, "https://garage.albandrieu.com");
+	assert.equal(
+		nodes.get("garage-admin")?.url,
+		"https://garage-admin.albandrieu.com",
+	);
+	assert.ok(nodes.has("cloudflared"));
+
+	const hasRelation = (source: string, target: string, type: string) =>
+		topology.relations.some(
+			(relation) =>
+				relation.source === source &&
+				relation.target === target &&
+				relation.type === type,
+		);
+
+	assert.ok(hasRelation("garage", "traefik", "exposedBy"));
+	assert.ok(hasRelation("garage-webui", "cloudflared", "exposedBy"));
+	assert.ok(hasRelation("garage-admin", "cloudflared", "exposedBy"));
+	assert.equal(
+		topology.relations.some(
+			(relation) =>
+				relation.source === "garage-webui" &&
+				relation.target === "traefik" &&
+				relation.type === "exposedBy",
+		),
+		false,
+	);
+});
+
 test("static architecture topology never probes FastAPI during prerender", () => {
 	const originalFetch = globalThis.fetch;
 	let fetchCalled = false;
@@ -128,7 +166,12 @@ test("topology parser accepts hostedBy placement edges", () => {
 		name: "hosting",
 		nodes: [
 			{ id: "service", name: "Service", kind: "application", category: "test" },
-			{ id: "docker", name: "Docker", kind: "container-runtime", category: "infrastructure" },
+			{
+				id: "docker",
+				name: "Docker",
+				kind: "container-runtime",
+				category: "infrastructure",
+			},
 		],
 		relations: [
 			{
@@ -256,7 +299,6 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 		/@media \(prefers-reduced-motion: reduce\)[\s\S]*react-flow__edge\.animated path[\s\S]*animation:\s*none !important/,
 	);
 });
-
 
 test("local topology fallback is synchronized with the current Nabla Compose catalog", async () => {
 	const raw = JSON.parse(

@@ -102,13 +102,29 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	}) as typeof fetch;
 
 	const result = getStaticHomelabServicesCatalog();
-	const truenas = result.catalog.services.find((service) => service.name === "TrueNAS");
-	const pfsense = result.catalog.services.find((service) => service.name === "pfSense");
+	const truenas = result.catalog.services.find(
+		(service) => service.name === "TrueNAS",
+	);
+	const pfsense = result.catalog.services.find(
+		(service) => service.name === "pfSense",
+	);
+	const garageS3 = result.catalog.services.find(
+		(service) => service.id === "garage",
+	);
+	const garage = result.catalog.services.find(
+		(service) => service.id === "garage-webui",
+	);
+	const garageAdmin = result.catalog.services.find(
+		(service) => service.id === "garage-admin",
+	);
 
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
 	assert.ok(truenas);
 	assert.ok(pfsense);
+	assert.ok(garageS3);
+	assert.ok(garage);
+	assert.ok(garageAdmin);
 	assert.equal(
 		homelabServiceEndpointUrl(truenas),
 		"https://truenas.albandrieu.com:7000/",
@@ -116,6 +132,18 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	assert.equal(
 		homelabServiceEndpointUrl(pfsense),
 		"https://home.albandrieu.com:10443/",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garageS3),
+		"https://s3.int.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garage),
+		"https://garage.albandrieu.com",
+	);
+	assert.equal(
+		homelabServiceEndpointUrl(garageAdmin),
+		"https://garage-admin.albandrieu.com",
 	);
 });
 
@@ -145,15 +173,21 @@ test("homelab catalog prefers FastAPI and overlays site-owned navigation details
 	}) as typeof fetch;
 
 	const result = await loadHomelabServicesCatalog();
-	const truenas = result.catalog.services.find((service) => service.id === "truenas");
-	const pfsense = result.catalog.services.find((service) => service.id === "pfsense");
+	const truenas = result.catalog.services.find(
+		(service) => service.id === "truenas",
+	);
+	const pfsense = result.catalog.services.find(
+		(service) => service.id === "pfsense",
+	);
 
 	assert.equal(requestedUrl, HOMELAB_SERVICES_DEFAULT_API_URL);
 	assert.equal(result.source, "fastapi");
 	assert.equal(truenas?.endpointUrl, "https://truenas.albandrieu.com:7000/");
 	assert.equal(pfsense?.endpointUrl, "https://home.albandrieu.com:10443/");
 	assert.equal(
-		result.catalog.services.find((service) => service.name === "FastAPI service")?.name,
+		result.catalog.services.find(
+			(service) => service.name === "FastAPI service",
+		)?.name,
 		"FastAPI service",
 	);
 });

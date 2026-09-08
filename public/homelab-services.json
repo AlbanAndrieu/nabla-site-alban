@@ -835,16 +835,46 @@
 			"external": true
 		},
 		{
+			"id": "garage",
+			"name": "Garage S3",
+			"icons": ["fas fa-database"],
+			"description": "Garage S3 API via direct Traefik ingress",
+			"internalHost": "172.17.0.24",
+			"internalPort": 3900,
+			"internalSecure": false,
+			"endpointUrl": "https://s3.int.albandrieu.com",
+			"tunnelUrl": "https://s3.int.albandrieu.com",
+			"tunnelSecure": false,
+			"iconSrc": "assets/selfh-icons/garage.png",
+			"external": true
+		},
+		{
+			"id": "garage-webui",
 			"name": "Garage",
-			"icons": ["fas fa-terminal"],
-			"description": "Garage service",
+			"icons": ["fas fa-warehouse"],
+			"description": "Garage WebUI via Cloudflare Tunnel",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3909,
 			"internalSecure": false,
-			"tunnelUrl": "https://garage.int.albandrieu.com",
+			"endpointUrl": "https://garage.albandrieu.com",
+			"tunnelUrl": "https://garage.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"external": false
+			"external": true
+		},
+		{
+			"id": "garage-admin",
+			"name": "Garage Admin",
+			"icons": ["fas fa-user-shield"],
+			"description": "Garage administration API via Cloudflare Tunnel",
+			"internalHost": "172.17.0.24",
+			"internalPort": 3903,
+			"internalSecure": false,
+			"endpointUrl": "https://garage-admin.albandrieu.com",
+			"tunnelUrl": "https://garage-admin.albandrieu.com",
+			"tunnelSecure": true,
+			"iconSrc": "assets/selfh-icons/garage.png",
+			"external": true
 		}
 	]
 }

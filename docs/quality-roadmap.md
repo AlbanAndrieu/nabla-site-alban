@@ -42,8 +42,13 @@ branche finale et le déploiement Vercel sont validés.
   le namespace `jm` ne conserve plus le footer historique, les anciens libellés
   de revue non rendus ni le sous-arbre `home` accidentel ; un test EN/FR verrouille
   le contrat actif sans dictionnaire local dans les composants.
-- [ ] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
-  obsolètes héritées de la période Jus Mundi.
+- [x] Vérifier les contenus EN/FR prioritaires pour supprimer les formulations
+  obsolètes héritées de la période Jus Mundi : les sources Next/i18n actives étaient
+  déjà alignées sur l'activité indépendante depuis 2007 et la fin de Jus Mundi en
+  2026 ; les pages legacy de transition `public/contact.html`,
+  `public/locales/fr/contact.html` et `public/locales/fr/index.html` ne
+  présentent plus Jus Mundi comme poste actuel et le contrat
+  `professionalCopyConsistency` verrouille cette cohérence.
 - [ ] Maintenir les pages utilisées aussi dans `nabla-site-bababou` à parité
   uniquement lorsqu'elles doivent volontairement être identiques.
 
@@ -56,18 +61,29 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
   implémentation React intégrée au bundle ; `arf.json` reste une entrée de données
   uniquement, couverte par `unit-tests/securityRuntime.test.ts`.
-- [ ] Finir la migration du contenu historique encore nécessaire sur `/ai` et
-  recentrer la page sur l'architecture Secure AI actuelle.
+- [x] Finir la migration du contenu historique encore nécessaire sur `/ai` et
+  recentrer la page sur l'architecture Secure AI actuelle : la route est désormais
+  entièrement native Next.js/`next-intl`, sans `PublicHtmlFragment` ni
+  `metadataFromPublicHtml`. `AiSecurePlatformOverview` ouvre les sections
+  natives avant le catalogue outils/workflows, et les contrats
+  `aiI18nContract`/`aiSecurePlatform` verrouillent l'architecture Secure AI et
+  la parité EN/FR.
 - [ ] Migrer les derniers fragments nécessaires de `/workstation`.
 - [x] Conserver `cv-{small,medium,large,full}-{en,fr,de,no}.html` comme documents
   historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
   exclus de la migration React/Next.js native ; voir `public/cv/README.md` et le
   test de contrat `unit-tests/legacyCvStaticPolicy.test.ts`.
-- [ ] Évaluer uniquement si le wrapper localisé `loadCvHtmlFragment` reste utile
-  pour la compatibilité App Router. Sa suppression éventuelle ne doit jamais
-  imposer de migrer les documents HTML historiques eux-mêmes.
+- [x] Évaluer uniquement si le wrapper localisé `loadCvHtmlFragment` reste utile
+  pour la compatibilité App Router : il reste volontairement requis par
+  `app/[locale]/cv/[...path]/page.tsx` pour rendre les variantes HTML historiques
+  explicitement allowlistées. Leur autonomie sous `public/cv/` reste inchangée
+  et un contrat verrouille ce lien de compatibilité sans imposer une migration
+  React de ces documents.
 - [ ] Réduire puis supprimer `PublicHtmlFragment` lorsqu'il n'a plus de
   consommateur justifié, hors exceptions statiques explicitement documentées.
+  L'audit du 8 septembre 2026 confirme que `/ai` et `/security` sont natifs ;
+  `/workstation` reste le dernier consommateur App Router direct, tandis que le
+  404 utilise séparément son exception statique documentée.
 
 ## P0 — Design system et cohérence UI/UX
 

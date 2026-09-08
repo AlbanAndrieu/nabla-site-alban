@@ -34,10 +34,10 @@ test("active professional copy is consistent across home and contact", async () 
 		assert.equal("lastexp" in messages.home.hero, false);
 		assert.equal("jusmundi" in messages.home.hero, false);
 		assert.equal("purpose" in messages.home.hero, false);
-		for (const key of ["value1", "value2", "value3", "value4"]) assert.equal(typeof messages.home.hero[key], "string");
+		for (const key of ["value1", "value2", "value3", "value4"])
+			assert.equal(typeof messages.home.hero[key], "string");
 	}
 });
-
 
 test("current CV sources close the Jus Mundi period in 2026", async () => {
 	const htmlPaths = [
@@ -101,6 +101,31 @@ test("current CV sources close the Jus Mundi period in 2026", async () => {
 	]) {
 		const source = await readFile(`public/cv/${filename}`, "utf8");
 		assert.match(source, /\{2026 -\}[\s\S]*\{2022\}[\s\S]*Jus Mundi/, filename);
-		assert.doesNotMatch(source, /\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/, filename);
+		assert.doesNotMatch(
+			source,
+			/\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/,
+			filename,
+		);
 	}
+});
+
+test("legacy priority EN/FR copy does not present Jus Mundi as a current role", async () => {
+	const [legacyContactEn, legacyContactFr, legacyFrHome] = await Promise.all([
+		readFile("public/contact.html", "utf8"),
+		readFile("public/locales/fr/contact.html", "utf8"),
+		readFile("public/locales/fr/index.html", "utf8"),
+	]);
+
+	assert.match(legacyContactEn, /Independent \/ freelance since 2007/i);
+	assert.match(legacyContactFr, /Indépendant \/ freelance depuis 2007/i);
+	assert.doesNotMatch(
+		legacyContactEn,
+		/Currently architecting[\s\S]{0,600}Jus Mundi/i,
+	);
+	assert.doesNotMatch(
+		legacyContactFr,
+		/Currently architecting[\s\S]{0,600}Jus Mundi/i,
+	);
+	assert.match(legacyFrHome, /Ma dernière expérience chez/);
+	assert.doesNotMatch(legacyFrHome, /experience chez chez/i);
 });
