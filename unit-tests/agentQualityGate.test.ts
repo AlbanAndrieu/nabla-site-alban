@@ -39,7 +39,10 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 		"HomeLabNetworkFlow.module.css",
 		"lib/resourcePages.ts",
 	]) {
-		assert.ok(gate.includes(retired), `missing reviewed retirement: ${retired}`);
+		assert.ok(
+			gate.includes(retired),
+			`missing reviewed retirement: ${retired}`,
+		);
 	}
 	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });

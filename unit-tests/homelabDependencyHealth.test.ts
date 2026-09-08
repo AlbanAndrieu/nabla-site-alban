@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthEntry,
+	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
 import {
 	blockedDependencyLabels,
@@ -70,7 +70,10 @@ test("dependency-aware parser remains fail-soft per malformed service row", () =
 	});
 
 	assert.ok(snapshot);
-	assert.deepEqual(snapshot.services.map((entry) => entry.id), ["langfuse-web"]);
+	assert.deepEqual(
+		snapshot.services.map((entry) => entry.id),
+		["langfuse-web"],
+	);
 });
 
 test("shared resolver separates local and effective health", () => {
@@ -105,19 +108,11 @@ test("shared resolver remains compatible with legacy state-only rows", () => {
 test("blocker labels and required-edge evidence use the declared dependency", () => {
 	assert.deepEqual(blockedDependencyLabels(DEPENDENCY_ENTRY), ["PostgreSQL"]);
 	assert.equal(
-		requiredDependencyTargetState(
-			DEPENDENCY_ENTRY,
-			"postgresql",
-			"dependsOn",
-		),
+		requiredDependencyTargetState(DEPENDENCY_ENTRY, "postgresql", "dependsOn"),
 		"fail",
 	);
 	assert.equal(
-		requiredDependencyTargetState(
-			DEPENDENCY_ENTRY,
-			"postgresql",
-			"storesIn",
-		),
+		requiredDependencyTargetState(DEPENDENCY_ENTRY, "postgresql", "storesIn"),
 		null,
 	);
 });
@@ -158,6 +153,9 @@ test("architecture graph uses the shared effective resolver and target health on
 	assert.match(explorer, /requiredEdgeHealthState/);
 	assert.match(explorer, /relation\.optional/);
 	assert.match(explorer, /targetState === "fail"/);
-	assert.match(explorer, /targetState === "warn" \|\| targetState === "unknown"/);
+	assert.match(
+		explorer,
+		/targetState === "warn" \|\| targetState === "unknown"/,
+	);
 	assert.match(explorer, /data-dependency-health/);
 });

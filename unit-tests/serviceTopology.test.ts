@@ -210,7 +210,10 @@ test("topology parser rejects edges with unknown nodes", () => {
 test("architecture route uses a static declared shell with live shared service health indicators", async () => {
 	const [page, explorer, data, css, packageJson] = await Promise.all([
 		readFile("app/[locale]/architecture/page.tsx", "utf8"),
-		readFile("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx", "utf8"),
+		readFile(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+			"utf8",
+		),
 		readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
 		readFile(
 			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",

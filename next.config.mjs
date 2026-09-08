@@ -54,9 +54,21 @@ const policyNames = [
 
 /** Policy HTML files remain archival sources; public navigation uses native clean routes. */
 const policyHtmlRedirects = policyNames.flatMap((name) => [
-	{ source: `/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
-	{ source: `/en/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
-	{ source: `/fr/policy/${name}.html`, destination: `/fr/policy/${name}`, permanent: true },
+	{
+		source: `/policy/${name}.html`,
+		destination: `/policy/${name}`,
+		permanent: true,
+	},
+	{
+		source: `/en/policy/${name}.html`,
+		destination: `/policy/${name}`,
+		permanent: true,
+	},
+	{
+		source: `/fr/policy/${name}.html`,
+		destination: `/fr/policy/${name}`,
+		permanent: true,
+	},
 ]);
 
 const baselineSecurityHeaders = [
