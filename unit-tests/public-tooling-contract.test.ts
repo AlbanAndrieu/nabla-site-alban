@@ -11,7 +11,10 @@ test("image conversion tooling is not served from public assets", async () => {
 	);
 
 	const publicAssets = await readdir(projectUrl("public/assets"));
-	assert.equal(publicAssets.some((entry) => entry.endsWith(".py")), false);
+	assert.equal(
+		publicAssets.some((entry) => entry.endsWith(".py")),
+		false,
+	);
 });
 
 test("image conversion wrapper uses the repository script and preserves public/assets default", async () => {
