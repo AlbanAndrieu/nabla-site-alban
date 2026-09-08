@@ -61,8 +61,13 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Supprimer D3 v3 chargé depuis CDN et remplacer `arf.js` par une
   implémentation React intégrée au bundle ; `arf.json` reste une entrée de données
   uniquement, couverte par `unit-tests/securityRuntime.test.ts`.
-- [ ] Finir la migration du contenu historique encore nécessaire sur `/ai` et
-  recentrer la page sur l'architecture Secure AI actuelle.
+- [x] Finir la migration du contenu historique encore nécessaire sur `/ai` et
+  recentrer la page sur l'architecture Secure AI actuelle : la route est désormais
+  entièrement native Next.js/`next-intl`, sans `PublicHtmlFragment` ni
+  `metadataFromPublicHtml`. `AiSecurePlatformOverview` ouvre les sections
+  natives avant le catalogue outils/workflows, et les contrats
+  `aiI18nContract`/`aiSecurePlatform` verrouillent l'architecture Secure AI et
+  la parité EN/FR.
 - [ ] Migrer les derniers fragments nécessaires de `/workstation`.
 - [x] Conserver `cv-{small,medium,large,full}-{en,fr,de,no}.html` comme documents
   historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
