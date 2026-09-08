@@ -7,15 +7,17 @@ import { fileURLToPath } from "node:url";
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const publicRoot = resolve(projectRoot, "public");
 const vendorRoot = resolve(publicRoot, "assets/fontawesome-free-7.1.0-web");
+const cssVendorRoot = resolve(publicRoot, "assets/fontawesome");
 
 const retainedVendorFiles = [
 	"LICENSE.txt",
 	"js/brands.js",
 	"js/fontawesome.js",
 	"js/solid.js",
+	"svgs/brands/linkedin-in.svg",
+	"svgs/brands/react.svg",
 ] as const;
 
-const cssVendorRoot = resolve(publicRoot, "assets/fontawesome");
 const retainedCssVendorFiles = [
 	"css/brands.css",
 	"css/fontawesome.css",
@@ -54,7 +56,29 @@ async function collectFiles(
 	return files.sort();
 }
 
-test("vendored Font Awesome runtime keeps only files consumed by legacy pages", async () => {
+async function sourceFiles(): Promise<string[]> {
+	const roots = ["app", "components", "lib"].map((path) =>
+		resolve(projectRoot, path),
+	);
+	return [
+		...(await collectFiles(publicRoot, { skipAssets: true })).map((path) =>
+			resolve(publicRoot, path),
+		),
+		...(
+			await Promise.all(
+				roots.map(async (root) =>
+					(await collectFiles(root)).map((path) => resolve(root, path)),
+				),
+			)
+		).flat(),
+	].filter((path) =>
+		[".html", ".js", ".ts", ".tsx"].some((extension) =>
+			path.endsWith(extension),
+		),
+	);
+}
+
+test("vendored Font Awesome runtime keeps only files consumed by Alban", async () => {
 	assert.deepEqual(await collectFiles(vendorRoot), retainedVendorFiles);
 });
 
@@ -69,15 +93,13 @@ test("Font Awesome CSS runtime keeps only loaded styles and their webfonts", asy
 	assert.match(solid, /fa-solid-900\.woff2/);
 });
 
-test("legacy text consumers only reference retained Font Awesome runtime JS", async () => {
-	const textFiles = (
-		await collectFiles(publicRoot, { skipAssets: true })
-	).filter((path) => path.endsWith(".html") || path.endsWith(".js"));
+test("project consumers only reference retained Font Awesome JS and SVG assets", async () => {
 	const referenced = new Set<string>();
+	const pattern =
+		/\/?assets\/fontawesome-free-7\.1\.0-web\/([^"'?\s<]+)/g;
 
-	for (const path of textFiles) {
-		const source = await readFile(resolve(publicRoot, path), "utf8");
-		const pattern = /\/?assets\/fontawesome-free-7\.1\.0-web\/([^"'?\s<]+)/g;
+	for (const path of await sourceFiles()) {
+		const source = await readFile(path, "utf8");
 		for (const match of source.matchAll(pattern)) {
 			referenced.add(match[1]);
 		}
@@ -87,34 +109,16 @@ test("legacy text consumers only reference retained Font Awesome runtime JS", as
 		"js/brands.js",
 		"js/fontawesome.js",
 		"js/solid.js",
+		"svgs/brands/linkedin-in.svg",
+		"svgs/brands/react.svg",
 	]);
 });
 
 test("Next and legacy consumers only reference retained Font Awesome CSS", async () => {
-	const sourceRoots = ["app", "components", "lib"].map((path) =>
-		resolve(projectRoot, path),
-	);
-	const sourceFiles = [
-		...(await collectFiles(publicRoot, { skipAssets: true })).map((path) =>
-			resolve(publicRoot, path),
-		),
-		...(
-			await Promise.all(
-				sourceRoots.map(async (root) =>
-					(await collectFiles(root)).map((path) => resolve(root, path)),
-				),
-			)
-		).flat(),
-	].filter((path) =>
-		[".html", ".js", ".ts", ".tsx"].some((extension) =>
-			path.endsWith(extension),
-		),
-	);
-
 	const referenced = new Set<string>();
 	const pattern = /\/assets\/fontawesome\/([^"'?\s<]+)/g;
 
-	for (const path of sourceFiles) {
+	for (const path of await sourceFiles()) {
 		const source = await readFile(path, "utf8");
 		for (const match of source.matchAll(pattern)) {
 			referenced.add(match[1]);

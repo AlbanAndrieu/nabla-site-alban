@@ -416,11 +416,12 @@ Autres contrôles :
   Turbopack prouve qu'ils sont consommés à la compilation.
 - [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
   maintenir une denylist explicite des scripts d'installation déjà examinés.
-- [x] Reprendre le nettoyage public validé par `nabla-site-bababou#170` :
-  conserver uniquement les trois bundles Font Awesome JS réellement chargés,
-  les trois CSS réellement référencées et leurs deux webfonts. Le dépôt retire
-  ainsi 5 700 fichiers vendus inutilisés, soit 26 733 208 octets (~25,5 MiB),
-  sans modifier les URLs runtime existantes.
+- [x] Reprendre et adapter le nettoyage public validé par
+  `nabla-site-bababou#170` : conserver les trois bundles Font Awesome JS,
+  les trois CSS et leurs deux webfonts, plus les deux SVG réellement consommés
+  par Alban (`linkedin-in.svg` et `react.svg`). Le dépôt retire ainsi
+  5 698 fichiers vendus inutilisés, soit 26 729 419 octets (~25,49 MiB), sans
+  modifier les URLs runtime existantes.
 - [x] Sortir le convertisseur JPG/PNG des assets publics, réparer son wrapper,
   supprimer les wrappers `run-install.sh` / `run-test.sh` orphelins et
   verrouiller ces frontières avec des tests de contrat.
