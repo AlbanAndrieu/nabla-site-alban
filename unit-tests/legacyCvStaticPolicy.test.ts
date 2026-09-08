@@ -22,7 +22,6 @@ test("historical CV variants remain standalone static HTML documents", async () 
 	}
 });
 
-
 test("localized CV compatibility route keeps the allowlisted static loader", async () => {
 	const [routeSource, loaderSource] = await Promise.all([
 		readFile(
