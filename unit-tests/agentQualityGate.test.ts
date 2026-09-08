@@ -33,6 +33,14 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 	assert.match(canonical, /--publish/);
 	assert.match(gate, /public\/assets\/fontawesome-free-7\.1\.0-web\/\*/);
 	assert.match(gate, /public\/assets\/fontawesome\/\*/);
+	for (const retired of [
+		"ArchitectureExplorer.tsx",
+		"ArchitectureExplorer.module.css",
+		"HomeLabNetworkFlow.module.css",
+		"lib/resourcePages.ts",
+	]) {
+		assert.ok(gate.includes(retired), `missing reviewed retirement: ${retired}`);
+	}
 	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
