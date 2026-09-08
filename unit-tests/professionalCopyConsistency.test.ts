@@ -38,7 +38,6 @@ test("active professional copy is consistent across home and contact", async () 
 	}
 });
 
-
 test("current CV sources close the Jus Mundi period in 2026", async () => {
 	const htmlPaths = [
 		"cv-small-en.html",
@@ -104,7 +103,6 @@ test("current CV sources close the Jus Mundi period in 2026", async () => {
 		assert.doesNotMatch(source, /\{(?:Present|Présent|Heute|Nå) -\}[\s\S]*\{2022\}/, filename);
 	}
 });
-
 
 test("legacy priority EN/FR copy does not present Jus Mundi as a current role", async () => {
 	const [legacyContactEn, legacyContactFr, legacyFrHome] = await Promise.all([
