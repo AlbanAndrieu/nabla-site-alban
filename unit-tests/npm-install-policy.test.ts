@@ -29,10 +29,7 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 	};
 	const lock = JSON.parse(lockSource) as {
 		version?: string;
-		packages: Record<
-			string,
-			{ version?: string; hasInstallScript?: boolean }
-		>;
+		packages: Record<string, { version?: string; hasInstallScript?: boolean }>;
 	};
 
 	assert.equal(packageJson.engines?.npm, ">=11.17.0 <12");
@@ -60,7 +57,9 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 		if (!metadata.version) continue;
 		installed.set(name, [...(installed.get(name) ?? []), metadata.version]);
 	}
-	for (const [name, expected] of Object.entries(reviewedInstallScriptVersions)) {
+	for (const [name, expected] of Object.entries(
+		reviewedInstallScriptVersions,
+	)) {
 		assert.deepEqual(
 			[...(installed.get(name) ?? [])].sort(),
 			[...expected].sort(),
