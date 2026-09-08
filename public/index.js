@@ -31,4 +31,3 @@ button.addEventListener("click", () => {
 	//   'Signup Type': 'Referral'
 	// })
 });
-
