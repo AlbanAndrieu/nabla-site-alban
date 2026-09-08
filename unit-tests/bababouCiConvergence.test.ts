@@ -61,8 +61,8 @@ test("Node workflows cache npm only after selecting the reviewed runtime", async
 	]);
 	for (const workflow of [quality, copilot, playwright]) {
 		assert.match(workflow, /node-version-file:\s*"\.nvmrc"/);
-		assert.match(workflow, /- name: Cache npm downloads/);
-		assert.match(workflow, /actions\/cache@v5/);
+		assert.match(workflow, /- name: (?:Cache|Restore) npm downloads/);
+		assert.match(workflow, /actions\/cache(?:\/restore)?@v5/);
 		assert.match(workflow, /path: ~\/\.npm/);
 		assert.match(
 			workflow,
