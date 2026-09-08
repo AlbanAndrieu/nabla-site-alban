@@ -137,7 +137,7 @@ jobs:
 
           echo "Vercel Preview access accepted with Protection Bypass for Automation (HTTP $status)."
 
-      - name: Run Playwright against deployed preview
+      - name: Run Playwright integration, security, performance and E2E on Preview
         id: playwright
         run: npm test -- --project=chromium
         env:
@@ -176,9 +176,9 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           case "$JOB_STATUS" in
-            success) STATE=success; DESCRIPTION='Playwright preview tests passed' ;;
-            cancelled) STATE=error; DESCRIPTION='Playwright preview tests cancelled' ;;
-            *) STATE=failure; DESCRIPTION='Playwright preview tests failed' ;;
+            success) STATE=success; DESCRIPTION='Playwright preview baselines and E2E passed' ;;
+            cancelled) STATE=error; DESCRIPTION='Playwright preview baselines and E2E cancelled' ;;
+            *) STATE=failure; DESCRIPTION='Playwright preview baselines and E2E failed' ;;
           esac
 
           payload="$(jq -n \
