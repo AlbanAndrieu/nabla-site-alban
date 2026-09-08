@@ -56,7 +56,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <26");
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
-	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.3.4");
+	assert.equal(packageJson.devDependencies?.["eslint-config-next"], undefined);
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
 	for (const workflow of [setup, ci, release, playwright]) {
 		assert.match(workflow, /node-version-file:\s*"\.nvmrc"/);
@@ -78,9 +78,8 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	const [instrumentation, checkout, mcp] = await Promise.all([
+	const [instrumentation, mcp] = await Promise.all([
 		read("instrumentation.ts"),
-		read("app/components/checkout.tsx"),
 		read(".mcp.json"),
 	]);
 	for (const name of [
@@ -89,17 +88,26 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		"@opentelemetry/instrumentation",
 		"@opentelemetry/sdk-logs",
 		"@vercel/otel",
-		"@stripe/react-stripe-js",
-		"@stripe/stripe-js",
 		"stripe",
 		"@xyflow/react",
 	]) {
-		assert.ok(packageJson.dependencies?.[name], `${name} must stay installed while consumed`);
+		assert.ok(
+			packageJson.dependencies?.[name],
+			`${name} must stay installed while consumed`,
+		);
+	}
+	for (const name of ["@stripe/react-stripe-js", "@stripe/stripe-js"]) {
+		assert.equal(packageJson.dependencies?.[name], undefined);
+	}
+	for (const name of [
+		"eslint-config-next",
+		"postcss-selector-parser",
+		"typescript-eslint",
+	]) {
+		assert.equal(packageJson.devDependencies?.[name], undefined);
 	}
 	assert.ok(packageJson.devDependencies?.["lodash-es"]);
 	assert.equal(packageJson.dependencies?.["lodash-es"], undefined);
 	assert.match(instrumentation, /from "@vercel\/otel"/);
-	assert.match(checkout, /from "@stripe\/react-stripe-js"/);
-	assert.match(checkout, /from "@stripe\/stripe-js"/);
 	assert.match(mcp, /next-devtools-mcp@latest/);
 });
