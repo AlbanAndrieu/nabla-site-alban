@@ -4,7 +4,7 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-CONVERTER="$REPO_ROOT/public/assets/jpg_to_transparent_png.py"
+CONVERTER="$REPO_ROOT/scripts/jpg_to_transparent_png.py"
 
 if [[ ! -f "$CONVERTER" ]]; then
 	echo "Error: Converter not found: $CONVERTER" >&2

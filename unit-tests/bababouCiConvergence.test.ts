@@ -84,6 +84,15 @@ test("Node workflows cache npm only after selecting the reviewed runtime", async
 	assert.match(quality, /\.github\/workflows\/docker-build\.yml/);
 });
 
+test("Playwright Preview rejects Vercel Security Checkpoint responses", async () => {
+	const workflow = await read(".github/workflows/playwright.yml");
+
+	assert.match(workflow, /x-vercel-mitigated/);
+	assert.match(workflow, /status.*429/s);
+	assert.match(workflow, /mitigated.*challenge/s);
+	assert.match(workflow, /Vercel Security Checkpoint rejected Preview automation/);
+});
+
 test("semantic release authenticates before freshness and avoids npm ci", async () => {
 	const release = await read(".github/workflows/release.yml");
 	const auth = release.indexOf("- name: Configure release Git authentication");

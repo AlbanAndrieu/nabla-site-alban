@@ -87,6 +87,13 @@ jobs:
           curl --fail --silent --show-error             http://127.0.0.1:18080/404.html             --output /tmp/fallback-404.html
           grep --ignore-case --quiet "<html" /tmp/fallback-404.html
 
+          for asset in fontawesome.js solid.js brands.js; do
+            curl --fail --silent --show-error \
+              "http://127.0.0.1:18080/assets/fontawesome-free-7.1.0-web/js/${asset}" \
+              --output "/tmp/${asset}"
+            test -s "/tmp/${asset}"
+          done
+
           runtime_uid="$(docker exec "${container_id}" id -u)"
           if [[ "${runtime_uid}" == "0" ]]; then
             echo "Fallback container unexpectedly runs as root."
