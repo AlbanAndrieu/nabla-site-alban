@@ -39,7 +39,10 @@ test("SEO allowlist contains the intended site pages plus native policy index an
 test("technical pages stay outside the sitemap", () => {
 	const urls = sitemap().map(({ url }) => url);
 	for (const slug of PAGE_CATEGORIES.technicalFlow) {
-		assert.equal(urls.some((url) => url.includes(`/${slug}`)), false);
+		assert.equal(
+			urls.some((url) => url.includes(`/${slug}`)),
+			false,
+		);
 	}
 });
 
@@ -79,12 +82,17 @@ test("manual SEO metadata pages reuse the canonical alternate helper", async () 
 			new URL(`../app/[locale]/${slug}/page.tsx`, import.meta.url),
 			"utf8",
 		);
-		assert.match(source, new RegExp(`languages:\\s*canonicalPageAlternates\\("${slug}"\\)`));
+		assert.match(
+			source,
+			new RegExp(`languages:\\s*canonicalPageAlternates\\("${slug}"\\)`),
+		);
 	}
 });
 
 test("SEO sitemap entries reuse reciprocal alternates including x-default", () => {
-	const entries = new Map(sitemap().map((entry) => [new URL(entry.url).pathname, entry]));
+	const entries = new Map(
+		sitemap().map((entry) => [new URL(entry.url).pathname, entry]),
+	);
 	for (const slug of SEO_PAGE_SLUGS) {
 		const englishPath = canonicalPagePath(slug, "en");
 		const frenchPath = canonicalPagePath(slug, "fr");
@@ -98,24 +106,47 @@ test("SEO sitemap entries reuse reciprocal alternates including x-default", () =
 			entry.alternates?.languages?.fr,
 			new URL(frenchPath, "https://www.albanandrieu.com").href,
 		);
-		assert.equal(entry.alternates?.languages?.["x-default"], entry.alternates?.languages?.en);
+		assert.equal(
+			entry.alternates?.languages?.["x-default"],
+			entry.alternates?.languages?.en,
+		);
 	}
 });
 
 test("policy sitemap index and entries use clean localized routes and reciprocal alternates", () => {
-	const entries = new Map(sitemap().map((entry) => [new URL(entry.url).pathname, entry]));
+	const entries = new Map(
+		sitemap().map((entry) => [new URL(entry.url).pathname, entry]),
+	);
 	const indexEntry = entries.get("/policy");
 	assert.ok(indexEntry, "/policy");
-	assert.equal(indexEntry.alternates?.languages?.en, "https://www.albanandrieu.com/policy");
-	assert.equal(indexEntry.alternates?.languages?.fr, "https://www.albanandrieu.com/fr/policy");
-	assert.equal(indexEntry.alternates?.languages?.["x-default"], "https://www.albanandrieu.com/policy");
+	assert.equal(
+		indexEntry.alternates?.languages?.en,
+		"https://www.albanandrieu.com/policy",
+	);
+	assert.equal(
+		indexEntry.alternates?.languages?.fr,
+		"https://www.albanandrieu.com/fr/policy",
+	);
+	assert.equal(
+		indexEntry.alternates?.languages?.["x-default"],
+		"https://www.albanandrieu.com/policy",
+	);
 
 	for (const slug of POLICY_PAGE_SLUGS) {
 		const path = `/policy/${slug}`;
 		const entry = entries.get(path);
 		assert.ok(entry, path);
-		assert.equal(entry.alternates?.languages?.en, `https://www.albanandrieu.com${path}`);
-		assert.equal(entry.alternates?.languages?.fr, `https://www.albanandrieu.com/fr${path}`);
-		assert.equal(entry.alternates?.languages?.["x-default"], `https://www.albanandrieu.com${path}`);
+		assert.equal(
+			entry.alternates?.languages?.en,
+			`https://www.albanandrieu.com${path}`,
+		);
+		assert.equal(
+			entry.alternates?.languages?.fr,
+			`https://www.albanandrieu.com/fr${path}`,
+		);
+		assert.equal(
+			entry.alternates?.languages?.["x-default"],
+			`https://www.albanandrieu.com${path}`,
+		);
 	}
 });

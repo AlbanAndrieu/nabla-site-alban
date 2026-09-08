@@ -86,6 +86,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Python
@@ -128,8 +129,8 @@ jobs:
 
       - name: Run agent-first quality gate before build
         env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || 'origin/master' }}
-          QUALITY_LOG_TAIL: "800"
+          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "120"
         run: bash scripts/agent-quality-gate.sh
 
       - name: Build Next.js production bundle

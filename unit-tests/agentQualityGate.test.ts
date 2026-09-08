@@ -25,7 +25,10 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 		"npm run test:unit",
 		"bash scripts/quality-gate.sh --publish",
 	]) {
-		assert.ok(gate.includes(expected), "missing agent gate contract: " + expected);
+		assert.ok(
+			gate.includes(expected),
+			"missing agent gate contract: " + expected,
+		);
 	}
 	assert.match(canonical, /--publish/);
 });
@@ -41,10 +44,22 @@ test("repository exposes fix, check and publish commands to agents", async () =>
 	assert.match(mise, /\[tasks\.agent-fix\]/);
 	assert.match(mise, /\[tasks\.agent-quality\]/);
 	assert.match(mise, /\[tasks\.agent-publish\]/);
-	assert.equal(pkg.scripts["quality:agent"], "bash scripts/agent-quality-gate.sh");
-	assert.equal(pkg.scripts["quality:agent:fix"], "bash scripts/agent-quality-gate.sh --fix");
-	assert.equal(pkg.scripts["quality:agent:publish"], "bash scripts/agent-quality-gate.sh --publish");
-	assert.match(prePush, /entry: bash scripts\/agent-quality-gate\.sh --publish/);
+	assert.equal(
+		pkg.scripts["quality:agent"],
+		"bash scripts/agent-quality-gate.sh",
+	);
+	assert.equal(
+		pkg.scripts["quality:agent:fix"],
+		"bash scripts/agent-quality-gate.sh --fix",
+	);
+	assert.equal(
+		pkg.scripts["quality:agent:publish"],
+		"bash scripts/agent-quality-gate.sh --publish",
+	);
+	assert.match(
+		prePush,
+		/entry: bash scripts\/agent-quality-gate\.sh --publish/,
+	);
 });
 
 test("CI runs the same agent gate before the production build without duplicate checks", async () => {
@@ -53,9 +68,14 @@ test("CI runs the same agent gate before the production build without duplicate 
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
 	assert.ok(gatePosition >= 0, "CI must run the agent-first gate");
-	assert.ok(buildPosition > gatePosition, "build must start only after the agent gate");
+	assert.ok(
+		buildPosition > gatePosition,
+		"build must start only after the agent gate",
+	);
 	assert.match(ci, /fetch-depth: 0/);
 	assert.match(ci, /QUALITY_BASE_REF:/);
+	assert.match(ci, /github\.event\.before/);
+	assert.match(ci, /persist-credentials: false/);
 	assert.match(ci, /pre-commit==4\.6\.2/);
 	assert.doesNotMatch(ci, /- name: Lint JavaScript and TypeScript/);
 	assert.doesNotMatch(ci, /- name: Type-check/);
@@ -66,6 +86,7 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	const setup = await source(".github/workflows/copilot-setup-steps.yml");
 
 	assert.match(setup, /fetch-depth: 0/);
+	assert.match(setup, /persist-credentials: false/);
 	assert.match(setup, /actions\/setup-python@v6/);
 	assert.match(setup, /pre-commit==4\.6\.2/);
 	assert.match(setup, /npm ci --no-audit --no-fund/);

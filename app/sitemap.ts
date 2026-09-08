@@ -79,9 +79,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		};
 	});
 
-	return [
-		...pageEntries,
-		policyIndexSitemapEntry(),
-		...policySitemapEntries(),
-	];
+	return [...pageEntries, policyIndexSitemapEntry(), ...policySitemapEntries()];
 }
