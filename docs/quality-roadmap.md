@@ -442,8 +442,13 @@ Autres contrôles :
   `SiteFooter` remplacé, `ResourceDirectory`/resource catalog, deux sections
   Nabla orphelines, `legacyPageMetadata`, une feuille React Flow obsolète,
   `app/404.module.css` et la configuration PurgeCSS sans consommateur.
-- [ ] Poursuivre l’audit des exports/types et migrer les tests encore attachés à
-  l’ancien `ArchitectureExplorer` avant de retirer ce renderer.
+- [x] Migrer les contrats architecture vers `HierarchicalArchitectureExplorer`
+  puis retirer l’ancien renderer/CSS `ArchitectureExplorer`; supprimer aussi
+  les deux anciens helpers d’icônes sans consommateur et conserver explicitement
+  le helper i18n documenté.
+- [ ] Poursuivre l’audit Knip des exports et types publics inutilisés, en évitant
+  de retirer des types de contrat homelab uniquement parce qu’ils sont consommés
+  hors du graphe d’import applicatif courant.
 
 ## P2 — CI/CD et Vercel
 
