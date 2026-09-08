@@ -26,7 +26,6 @@ test("shared homelab React Flow documents HAProxy, Traefik, DNS-only and tunnel 
 	assert.match(flow, /TRAEFIK · DNS ONLY/);
 	assert.match(flow, /CLOUDFLARE TUNNEL/);
 	assert.match(flow, /open-webui\.albandrieu\.com/);
-	assert.match(flow, /CLOUDFLARE TUNNEL/);
 	assert.match(flow, /"pfsense-haproxy"/);
 	assert.match(flow, /"haproxy-traefik"/);
 	assert.match(flow, /"truenas-traefik"/);
