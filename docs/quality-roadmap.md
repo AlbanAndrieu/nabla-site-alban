@@ -469,8 +469,8 @@ Autres contrôles :
   le workflow E2E.
 - [x] Ajouter un test d’intégration Preview reliant les Route Handlers
   `/api/homelab-services` et `/api/homelab-topology` à la page
-  `/architecture`, avec vérification des contrats Garage/OpenWebUI et des
-  relations Traefik/cloudflared. Le même run Chromium exécute aussi le pentest
+  `/architecture`, avec vérification du chemin stable
+  `OpenWebUI → LiteLLM → Ollama`. Le même run Chromium exécute aussi le pentest
   baseline et le budget performance afin d’éviter trois workflows redondants.
 - [x] Utiliser `repository_dispatch: vercel.deployment.success` pour le hand-off
   Preview → Playwright.
