@@ -42,8 +42,13 @@ test("service views are searchable and collapsible while technical criticality s
 	assert.match(block, /data-homelab-health-filter/);
 	assert.match(block, /data-homelab-environment-filter/);
 	assert.match(block, /non-dev/);
-	assert.match(block, /serviceEnvironmentNames/);
-	assert.match(block, /node\?\.environments/);
+	assert.match(block, /resolveHomelabServiceEnvironments/);
+	assert.match(block, /homelabServiceMatchesEnvironment/);
+	assert.match(block, /defaulted/);
+	assert.match(
+		await source("lib/homelabEnvironments.ts"),
+		/node\?\.environments/,
+	);
 	assert.match(block, /setEnvironmentFilter\("all"\)/);
 	assert.doesNotMatch(
 		await source("lib/homelabServices.ts"),
