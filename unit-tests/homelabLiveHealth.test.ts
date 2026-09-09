@@ -56,9 +56,15 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	assert.match(page, /snapshot\?\.truenas_runtime_reachable === false/);
 	assert.match(page, /snapshot\?\.truenas_runtime_stale === true/);
 	assert.match(page, /data-truenas-runtime-warning/);
-	assert.match(block, /healthUnavailable: health\.snapshot === null/);
-	assert.match(block, /healthStatus: health\.status/);
-	assert.match(block, /snapshot: health\.snapshot \?\? current\.snapshot/);
+	assert.match(
+		block,
+		/healthUnavailable:\s*aggregate\.snapshot === null && probes\.snapshot === null/,
+	);
+	assert.match(block, /healthStatus: aggregate\.status \?\? probes\.status/);
+	assert.match(
+		block,
+		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+	);
 	assert.match(health, /export type TrueNasApiHealth/);
 	assert.match(health, /api\?: TrueNasApiHealth \| null/);
 	assert.match(health, /validTrueNasApiHealth/);
