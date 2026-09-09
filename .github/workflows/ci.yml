@@ -241,6 +241,11 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+      - name: Clean Semgrep SAST workspace
+        if: always() && hashFiles('semgrep.sarif') != ''
+        shell: bash
+        run: rm -f semgrep.sarif
+
       - name: Enforce Semgrep SAST
         if: steps.semgrep-sast.outcome != 'success'
         run: exit 1
