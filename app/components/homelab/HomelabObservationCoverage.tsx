@@ -93,8 +93,7 @@ export default function HomelabObservationCoverage({
 		0;
 	const internalEligible =
 		internalSummary?.eligible ?? internalSummary?.scheduled ?? internalSampled;
-	const publicSampled =
-		publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
+	const publicSampled = publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
 	const publicEligible =
 		publicSummary?.eligible ?? publicSummary?.scheduled ?? publicSampled;
 	const rotatingSample =
@@ -157,9 +156,8 @@ export default function HomelabObservationCoverage({
 								data-public-probe-count={publicSampled}
 								data-public-probe-eligible={publicEligible}
 							>
-								{french ? "sondes publiques" : "public probes"}:{" "}
-								{publicSampled}/{publicEligible}{" "}
-								{french ? "échantillonnées" : "sampled"} ·{" "}
+								{french ? "sondes publiques" : "public probes"}: {publicSampled}
+								/{publicEligible} {french ? "échantillonnées" : "sampled"} ·{" "}
 								{publicSummary.completed ?? 0}{" "}
 								{french ? "terminées" : "completed"} ·{" "}
 								{publicSummary.timed_out ?? 0} deadline
@@ -203,8 +201,8 @@ export default function HomelabObservationCoverage({
 						) : null}
 						{snapshot.health_board ? (
 							<span data-health-board-freshness>
-								{healthBoardIcon(snapshot.health_board.state)}{" "}
-								health-board {snapshot.health_board.state}
+								{healthBoardIcon(snapshot.health_board.state)} health-board{" "}
+								{snapshot.health_board.state}
 								{typeof snapshot.health_board.age_seconds === "number"
 									? ` · ${Math.round(snapshot.health_board.age_seconds)}s old`
 									: ""}
