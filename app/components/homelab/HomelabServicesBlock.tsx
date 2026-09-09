@@ -331,7 +331,9 @@ export default function HomelabServicesBlock() {
 			const matchesEnvironment =
 				environmentFilter === "all" ||
 				(environmentFilter === "non-dev"
-					? [...serviceEnvironments].some((environment) => environment !== "dev")
+					? [...serviceEnvironments].some(
+							(environment) => environment !== "dev",
+						)
 					: serviceEnvironments.has(environmentFilter));
 			const matchesSearch =
 				query.length === 0 ||
