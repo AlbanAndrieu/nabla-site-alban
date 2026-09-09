@@ -77,7 +77,9 @@ test("critical dependency hierarchy keeps the disclosure arrow next to its label
 
 test("runtime legend is promoted before service groups and links to criticality details", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const overview = await source("app/components/homelab/HomelabStatusOverview.tsx");
+	const overview = await source(
+		"app/components/homelab/HomelabStatusOverview.tsx",
+	);
 
 	assert.ok(
 		block.indexOf("<HomelabStatusOverview") <
@@ -90,7 +92,9 @@ test("runtime legend is promoted before service groups and links to criticality 
 
 test("health refresh has a transient status distinct from unavailable runtime evidence", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const overview = await source("app/components/homelab/HomelabStatusOverview.tsx");
+	const overview = await source(
+		"app/components/homelab/HomelabStatusOverview.tsx",
+	);
 
 	assert.match(block, /healthRefreshing: true/);
 	assert.match(block, /healthRefreshing: false/);
@@ -101,7 +105,9 @@ test("health refresh has a transient status distinct from unavailable runtime ev
 test("DNS posture remains sanitized while Operations owns the active presentation", async () => {
 	const posture = await source("app/components/homelab/PfSenseDnsPosture.tsx");
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const operations = await source("app/components/homelab/HomelabOperationalEvidence.tsx");
+	const operations = await source(
+		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	);
 
 	assert.match(posture, /data-pfsense-dns-evidence/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
