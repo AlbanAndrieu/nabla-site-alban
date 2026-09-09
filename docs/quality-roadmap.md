@@ -369,7 +369,7 @@ Autres contrôles :
 ## P1 — Sécurité applicative
 
 - [x] Conserver CodeQL comme SAST global et ajouter Semgrep CE 1.176.0 dans
-  Quality/Security pour scanner uniquement les fichiers applicatifs modifiés
+  Quality/Security pour scanner les fichiers applicatifs modifiés ainsi que les workflows GitHub Actions modifiés
   avec le ruleset `p/ci`. Le scan échoue avant l'installation npm lorsqu'une
   nouvelle violation SAST bloquante est introduite. Le rapport Semgrep est aussi
   exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
