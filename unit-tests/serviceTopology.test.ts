@@ -356,7 +356,6 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 	assert.ok(hasRelation("sentry-edge", "sentry-relay", "routesTo"));
 });
 
-
 test("local topology preserves FastAPI Sample production and staging environments", async () => {
 	const raw = JSON.parse(
 		await readFile("public/service-topology.json", "utf8"),

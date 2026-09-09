@@ -31,7 +31,8 @@ export function resolveHomelabServiceEnvironments(
 	const node = topology?.nodes.find(
 		(candidate) => candidate.id === homelabServiceId(service),
 	);
-	const declared = node?.environments?.map((environment) => environment.name) ?? [];
+	const declared =
+		node?.environments?.map((environment) => environment.name) ?? [];
 	if (declared.length > 0) {
 		return { names: new Set(declared), source: "topology" };
 	}

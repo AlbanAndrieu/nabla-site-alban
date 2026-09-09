@@ -3,17 +3,17 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
+	type HomelabEnvironmentFilter,
+	homelabServiceMatchesEnvironment,
+	resolveHomelabServiceEnvironments,
+} from "@/lib/homelabEnvironments";
+import {
 	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
-import {
-	type HomelabEnvironmentFilter,
-	homelabServiceMatchesEnvironment,
-	resolveHomelabServiceEnvironments,
-} from "@/lib/homelabEnvironments";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,
