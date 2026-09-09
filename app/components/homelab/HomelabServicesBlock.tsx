@@ -32,6 +32,7 @@ import {
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
+import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
@@ -389,10 +390,14 @@ export default function HomelabServicesBlock() {
 				healthUnavailable={state.healthUnavailable}
 				healthHttpStatus={state.healthStatus}
 				healthRefreshing={state.healthRefreshing}
+				onOpenCriticality={openCriticality}
+			/>
+
+			<HomelabObservationCoverage
+				snapshot={state.snapshot}
 				catalogServiceCount={state.catalog.services.length}
 				topologyNodeCount={state.topology?.nodes.length ?? 0}
 				topologyRelationCount={state.topology?.relations.length ?? 0}
-				onOpenCriticality={openCriticality}
 			/>
 
 			<section
@@ -647,7 +652,6 @@ export default function HomelabServicesBlock() {
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
-									topology={state.topology}
 									snapshot={state.snapshot}
 									healthUnavailable={state.healthUnavailable}
 									healthHttpStatus={state.healthStatus}

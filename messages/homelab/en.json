@@ -120,25 +120,6 @@
 			"reasonLabel": "Observed reason",
 			"evidenceNote": "This is control-plane policy evidence, not a synthetic DNS query from a LAN client. A fully proven resilient state requires an observed working resolver plus evidence that its resolution/upstream path is independent from TrueNAS."
 		},
-		"observer": {
-			"title": "Observation coverage",
-			"catalog": "{count} presentation services",
-			"topology": "{nodes} topology nodes · {relations} relations",
-			"serviceObservations": "{count} service health observations",
-			"internalProbes": "{count} LAN/internal probes ({state})",
-			"evidence": "evidence: direct {direct} · internal {internal} · runtime {runtime} · Cloudflare {tunnel} · dependencies {dependency}",
-			"cloudflareTunnels": "{count} Cloudflare tunnels observed",
-			"refresh": "health refresh {milliseconds} ms",
-			"enabled": "enabled",
-			"disabled": "disabled",
-			"unknown": "unknown",
-			"snapshotUnavailable": "runtime probe coverage unavailable until a valid health snapshot is received"
-		},
-		"metadata": {
-			"topology": "{kind} · {category}",
-			"criticality": "criticality {level}",
-			"securityFunctions": "NIST CSF {functions}"
-		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",

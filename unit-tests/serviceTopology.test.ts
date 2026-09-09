@@ -443,7 +443,6 @@ test("topology parser validates deployment environment names and URLs", () => {
 	);
 });
 
-
 test("synchronized topology preserves internal URL and security-function metadata", async () => {
 	const raw = JSON.parse(
 		await readFile("public/service-topology.json", "utf8"),
