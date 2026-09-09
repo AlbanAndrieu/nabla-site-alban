@@ -32,7 +32,9 @@ on:
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
+      - ".github/workflows/production-dast.yml"
       - ".github/workflows/vercel-preview.yml"
+      - ".zap/**"
   push:
     branches:
       - master
@@ -66,11 +68,14 @@ on:
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
+      - ".github/workflows/production-dast.yml"
       - ".github/workflows/vercel-preview.yml"
+      - ".zap/**"
   workflow_dispatch:
 
 permissions:
   contents: read
+  statuses: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -84,12 +89,185 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
+      - name: Verify current production baseline before PR build
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        with:
+          script: |
+            const baseSha = process.env.BASE_SHA;
+            const { data: combined } = await github.rest.repos.getCombinedStatusForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: baseSha,
+              per_page: 100,
+            });
+
+            const statuses = [...combined.statuses].sort(
+              (left, right) =>
+                new Date(right.created_at).getTime() -
+                new Date(left.created_at).getTime(),
+            );
+            const latestByContext = new Map();
+            for (const status of statuses) {
+              if (!latestByContext.has(status.context)) {
+                latestByContext.set(status.context, status);
+              }
+            }
+
+            const required = ['Vercel', 'Production Post-deploy Smoke'];
+            let productionDastExistsOnBase = true;
+            try {
+              await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: '.github/workflows/production-dast.yml',
+                ref: baseSha,
+              });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              productionDastExistsOnBase = false;
+              core.info(
+                'Production DAST is not present on the PR base yet; bootstrap requirement skipped for this PR only.',
+              );
+            }
+
+            if (productionDastExistsOnBase) {
+              required.push('Production DAST');
+            }
+
+            const failures = [];
+            for (const name of required) {
+              const status = latestByContext.get(name);
+              if (!status) {
+                failures.push(`${name}: missing on base ${baseSha}`);
+                continue;
+              }
+              if (status.state !== 'success') {
+                failures.push(`${name}: ${status.state}`);
+                continue;
+              }
+              core.info(`${name}: success (${status.target_url || 'no URL'})`);
+            }
+
+            if (failures.length > 0) {
+              core.setFailed(
+                `Current production baseline is not healthy for base ${baseSha}: ${failures.join('; ')}`,
+              );
+            }
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Run Semgrep SAST on changed source
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_sha="${BASE_SHA:-}"
+          if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
+            base_sha="$(git rev-parse "$HEAD_SHA^")"
+          fi
+
+          mapfile -t files < <(
+            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
+              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Restore pre-commit environments
+        id: pre-commit-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Install pre-commit
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Restore npm downloads
+        id: npm-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Pin npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}"
+          npm install --global npm@11.17.0 --no-audit --no-fund
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Save npm downloads
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Run agent-first quality gate before build
+        id: agent-quality-gate
+        continue-on-error: true
+        env:
+          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "120"
+        run: bash scripts/agent-quality-gate.sh
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Enforce agent-first quality gate
+        if: steps.agent-quality-gate.outcome != 'success'
+        run: exit 1
+
+      - name: Build Next.js production bundle
+        run: npm run build
+
+      # Avoid container-action image preparation when Snyk is disabled.
+      # GitHub can prepare Docker actions before evaluating a step-level if.
+      - name: Run Snyk vulnerability scan
+        if: env.SNYK_TOKEN != ''
+        run: npx --yes snyk test
+ ||
+              true
+          )
+
+          if (("${#files[@]}" == 0)); then
+            echo "No changed application source files require Semgrep."
+            exit 0
+          fi
+
+          printf 'Semgrep SAST targets:\n'
+          printf '  - %s\n' "${files[@]}"
+          docker run --rm             --env SEMGREP_SEND_METRICS=off             --volume "$PWD:/src"             --workdir /src             semgrep/semgrep:1.176.0             semgrep scan               --config p/ci               --error               --metrics=off               "${files[@]}"
 
       - name: Setup Python
         uses: actions/setup-python@v6
