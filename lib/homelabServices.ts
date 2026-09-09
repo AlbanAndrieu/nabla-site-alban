@@ -128,13 +128,19 @@ export function parseHomelabServicesCatalog(
 				service.name.trim().length > 0 &&
 				(service.id === undefined || typeof service.id === "string") &&
 				(service.environment === undefined ||
-					["production", "staging", "dev"].includes(String(service.environment))) &&
+					["production", "staging", "dev"].includes(
+						String(service.environment),
+					)) &&
 				(service.endpointUrl === undefined ||
 					typeof service.endpointUrl === "string") &&
 				(service.presentationRole === undefined ||
-					["service", "core", "support"].includes(String(service.presentationRole))) &&
+					["service", "core", "support"].includes(
+						String(service.presentationRole),
+					)) &&
 				(service.criticality === undefined ||
-					["critical", "high", "medium", "low"].includes(String(service.criticality))),
+					["critical", "high", "medium", "low"].includes(
+						String(service.criticality),
+					)),
 		)
 	) {
 		return null;
@@ -152,7 +158,10 @@ function requireLocalFallback(): HomelabServicesCatalog {
 
 const LOCAL_FALLBACK = requireLocalFallback();
 const LOCAL_PRESENTATION_BY_ID = new Map(
-	LOCAL_FALLBACK.services.map((service) => [homelabServiceId(service), service]),
+	LOCAL_FALLBACK.services.map((service) => [
+		homelabServiceId(service),
+		service,
+	]),
 );
 
 /**
