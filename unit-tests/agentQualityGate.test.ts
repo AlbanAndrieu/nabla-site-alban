@@ -100,19 +100,19 @@ test("CI runs the same agent gate before the production build without duplicate 
 	);
 	assert.match(
 		ci,
-		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		ci,
-		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		ci,
-		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		ci,
-		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(ci, /steps\.agent-quality-gate\.outcome != 'success'/);
 	assert.doesNotMatch(ci, /cache-primary-key/);
@@ -131,24 +131,24 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 
 	assert.match(setup, /fetch-depth: 0/);
 	assert.match(setup, /persist-credentials: false/);
-	assert.match(setup, /actions\/setup-python@v6/);
+	assert.match(setup, /actions\/setup-python@[0-9a-f]{40}\s+# v6/);
 	assert.match(setup, /pre-commit==4\.6\.2/);
 	assert.match(setup, /pre-commit install-hooks/);
 	assert.match(
 		setup,
-		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		setup,
-		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+		/- name: Save pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		setup,
-		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@v5/,
+		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		setup,
-		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@v5/,
+		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(setup, /npm ci --no-audit --no-fund/);
 });

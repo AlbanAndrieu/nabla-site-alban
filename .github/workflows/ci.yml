@@ -76,6 +76,7 @@ on:
 permissions:
   contents: read
   statuses: read
+  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -92,7 +93,7 @@ jobs:
       - name: Verify current production baseline before PR build
         id: production-baseline
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         with:
@@ -166,13 +167,32 @@ jobs:
             }
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Revalidate canonical production smoke before PR build
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_URL: "https://www.albanandrieu.com"
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for the pre-merge production smoke."
+            exit 1
+          fi
+          smoke_script="${RUNNER_TEMP}/post-deploy-smoke.mjs"
+          git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
+          DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
+
       - name: Run Semgrep SAST on changed source
+        id: semgrep-sast
+        continue-on-error: true
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -183,13 +203,52 @@ jobs:
           if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
             base_sha="$(git rev-parse "$HEAD_SHA^")"
           fi
-          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)$' || true)"
-          if [[ -z "$files" ]]; then
-            echo "No changed application source files require Semgrep."
+          mapfile -t files < <(
+            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
+              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^\.github/workflows/.*\.ya?ml$|^(next\.config\.mjs|proxy\.ts)$' || true
+          )
+          if (("${#files[@]}" == 0)); then
+            echo "No changed application or workflow source files require Semgrep."
             exit 0
           fi
-          printf 'Semgrep SAST targets:\n%s\n' "$files"
-          docker run --rm --env SEMGREP_SEND_METRICS=off --volume "$PWD:/src" --workdir /src semgrep/semgrep:1.176.0 semgrep scan --config p/ci --error --metrics=off $files
+          printf 'Semgrep SAST targets:\n%s\n' "${files[@]}"
+          docker run --rm \
+            --env SEMGREP_SEND_METRICS=off \
+            --volume "$PWD:/src" \
+            --workdir /src \
+            semgrep/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e \
+            semgrep scan \
+            --config p/ci \
+            --error \
+            --metrics=off \
+            --sarif \
+            --output /src/semgrep.sarif \
+            "${files[@]}"
+
+      - name: Upload Semgrep SARIF to GitHub Code Scanning
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        with:
+          sarif_file: "semgrep.sarif"
+          category: "semgrep-pr"
+
+      - name: Preserve Semgrep SAST report
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: semgrep-sast-report
+          path: semgrep.sarif
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Clean Semgrep SAST workspace
+        if: always() && hashFiles('semgrep.sarif') != ''
+        shell: bash
+        run: rm -f semgrep.sarif
+
+      - name: Enforce Semgrep SAST
+        if: steps.semgrep-sast.outcome != 'success'
+        run: exit 1
 
       - name: Verify production DAST can reach the application
         if: >-
@@ -217,7 +276,7 @@ jobs:
         if: >-
           github.event_name == 'pull_request' &&
           steps.production-baseline.outputs.bootstrap-dast == 'true'
-        uses: zaproxy/action-baseline@v0.15.0
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
         env:
           ZAP_AUTH_HEADER: x-vercel-protection-bypass
           ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
@@ -239,14 +298,14 @@ jobs:
         run: rm -f report_html.html report_json.json report_md.md zap.yaml
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version-file: ".python-version"
 
       - name: Restore pre-commit environments
         id: pre-commit-cache
         continue-on-error: true
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
@@ -255,14 +314,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: ".nvmrc"
 
       - name: Restore npm downloads
         id: npm-cache
         continue-on-error: true
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.npm
           key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
@@ -282,7 +341,7 @@ jobs:
       - name: Save npm downloads
         if: steps.npm-cache.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.npm
           key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
@@ -298,7 +357,7 @@ jobs:
       - name: Save pre-commit environments
         if: steps.pre-commit-cache.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}

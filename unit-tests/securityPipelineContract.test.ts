@@ -12,12 +12,18 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		"- name: Verify current production baseline before PR build",
 	);
 	const checkout = ci.indexOf("- name: Checkout");
+	const liveProductionSmoke = ci.indexOf(
+		"- name: Revalidate canonical production smoke before PR build",
+	);
 	const semgrep = ci.indexOf("- name: Run Semgrep SAST on changed source");
+	const semgrepEnforcement = ci.indexOf("- name: Enforce Semgrep SAST");
 	const install = ci.indexOf("- name: Install dependencies");
 	const build = ci.indexOf("- name: Build Next.js production bundle");
 
 	assert.ok(productionGate >= 0 && productionGate < checkout);
-	assert.ok(semgrep > checkout && semgrep < install);
+	assert.ok(liveProductionSmoke > checkout);
+	assert.ok(semgrep > liveProductionSmoke && semgrep < install);
+	assert.ok(semgrepEnforcement > semgrep && semgrepEnforcement < install);
 	assert.ok(install < build);
 
 	assert.match(ci, /statuses:\s*read/);
@@ -32,10 +38,28 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Production DAST preflight did not reach the application/);
 	assert.match(ci, /Clean ZAP bootstrap workspace/);
 	assert.match(ci, /zap-production-bootstrap-report/);
-	assert.match(ci, /semgrep\/semgrep:1\.176\.0/);
+	assert.match(
+		ci,
+		/semgrep\/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e/,
+	);
 	assert.match(ci, /--config p\/ci/);
 	assert.match(ci, /--metrics=off/);
+	assert.match(ci, /--sarif/);
+	assert.match(ci, /--output \/src\/semgrep\.sarif/);
+	assert.match(
+		ci,
+		/github\/codeql-action\/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4/,
+	);
+	assert.match(ci, /category:\s*"semgrep-pr"/);
+	assert.match(ci, /name:\s*semgrep-sast-report/);
+	assert.match(ci, /Clean Semgrep SAST workspace/);
+	assert.match(ci, /run: rm -f semgrep\.sarif/);
+	assert.match(ci, /security-events:\s*write/);
+	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
+	assert.match(ci, /\.github\/workflows\/\.\*\\\.ya\?ml/);
+	assert.match(ci, /git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/);
+	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node "\$smoke_script"/);
 });
 
 test("Preview and production DAST share a reviewed passive ZAP policy", async () => {
@@ -48,7 +72,10 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	]);
 
 	for (const workflow of [preview, production]) {
-		assert.match(workflow, /zaproxy\/action-baseline@v0\.15\.0/);
+		assert.match(
+			workflow,
+			/zaproxy\/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0\.15\.0/,
+		);
 		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
 		assert.match(workflow, /fail_action:\s*true/);
 		assert.match(workflow, /cmd_options:\s*"-I -T 5 -c \.zap\/rules\.tsv"/);
@@ -80,4 +107,41 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	}
 	assert.match(rules, /^10038\tWARN\t/m);
 	assert.match(checkpoint, /filename\.startsWith\('\.zap\/'\)/);
+	assert.match(checkpoint, /workflow_run:/);
+	assert.match(checkpoint, /CI \(Quality and Security\)/);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.conclusion == 'success'/,
+	);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.event == 'pull_request'/,
+	);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.pull_requests\[0\]\.number/,
+	);
+
+	const securityWorkflows = [
+		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
+		ciWorkflowPinContract(preview),
+		ciWorkflowPinContract(smoke),
+		ciWorkflowPinContract(production),
+		ciWorkflowPinContract(checkpoint),
+	];
+	assert.equal(securityWorkflows.length, 5);
 });
+
+function ciWorkflowPinContract(workflow: string) {
+	assert.doesNotMatch(
+		workflow,
+		/^\s*uses:\s+[^\s#]+@v\d+(?:\.\d+\.\d+)?\s*$/m,
+		"security workflows must not use mutable action version tags",
+	);
+	assert.match(
+		workflow,
+		/^\s*uses:\s+[^\s#]+@[0-9a-f]{40}\s+#\s+v/m,
+		"security workflows must pin actions to immutable commit SHAs",
+	);
+	return true;
+}
