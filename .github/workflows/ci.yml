@@ -76,6 +76,7 @@ on:
 permissions:
   contents: read
   statuses: read
+  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -172,7 +173,26 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Revalidate canonical production smoke before PR build
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_URL: "https://www.albanandrieu.com"
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for the pre-merge production smoke."
+            exit 1
+          fi
+          smoke_script="${RUNNER_TEMP}/post-deploy-smoke.mjs"
+          git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
+          DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
+
       - name: Run Semgrep SAST on changed source
+        id: semgrep-sast
+        continue-on-error: true
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -183,13 +203,171 @@ jobs:
           if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
             base_sha="$(git rev-parse "$HEAD_SHA^")"
           fi
-          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)$' || true)"
-          if [[ -z "$files" ]]; then
+          mapfile -t files < <(
+            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
+              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for production DAST."
+            exit 1
+          fi
+          response_headers="$(mktemp)"
+          trap 'rm -f "$response_headers"' EXIT
+          status="$(curl --silent --show-error --output /dev/null --dump-header "$response_headers" --write-out '%{http_code}' --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" https://www.albanandrieu.com/)"
+          mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
+            echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
+            exit 1
+          fi
+
+      - name: Bootstrap production DAST before first DAST-enabled merge
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        uses: zaproxy/action-baseline@v0.15.0
+        env:
+          ZAP_AUTH_HEADER: x-vercel-protection-bypass
+          ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          ZAP_AUTH_HEADER_SITE: www.albanandrieu.com
+        with:
+          target: "https://www.albanandrieu.com"
+          rules_file_name: ".zap/rules.tsv"
+          allow_issue_writing: false
+          fail_action: true
+          artifact_name: zap-production-bootstrap-report
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP bootstrap workspace
+        if: >-
+          always() &&
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Restore pre-commit environments
+        id: pre-commit-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Install pre-commit
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Restore npm downloads
+        id: npm-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Pin npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}"
+          npm install --global npm@11.17.0 --no-audit --no-fund
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Save npm downloads
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Run agent-first quality gate before build
+        id: agent-quality-gate
+        continue-on-error: true
+        env:
+          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "120"
+        run: bash scripts/agent-quality-gate.sh
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Enforce agent-first quality gate
+        if: steps.agent-quality-gate.outcome != 'success'
+        run: exit 1
+
+      - name: Build Next.js production bundle
+        run: npm run build
+
+      # Avoid container-action image preparation when Snyk is disabled.
+      # GitHub can prepare Docker actions before evaluating a step-level if.
+      - name: Run Snyk vulnerability scan
+        if: env.SNYK_TOKEN != ''
+        run: npx --yes snyk test
+ || true
+          )
+          if (("${#files[@]}" == 0)); then
             echo "No changed application source files require Semgrep."
             exit 0
           fi
-          printf 'Semgrep SAST targets:\n%s\n' "$files"
-          docker run --rm --env SEMGREP_SEND_METRICS=off --volume "$PWD:/src" --workdir /src semgrep/semgrep:1.176.0 semgrep scan --config p/ci --error --metrics=off $files
+          printf 'Semgrep SAST targets:\n%s\n' "${files[@]}"
+          docker run --rm \
+            --env SEMGREP_SEND_METRICS=off \
+            --volume "$PWD:/src" \
+            --workdir /src \
+            semgrep/semgrep:1.176.0 \
+            semgrep scan \
+            --config p/ci \
+            --error \
+            --metrics=off \
+            --sarif \
+            --output /src/semgrep.sarif \
+            "${files[@]}"
+
+      - name: Upload Semgrep SARIF to GitHub Code Scanning
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "semgrep.sarif"
+          category: "semgrep-pr"
+
+      - name: Preserve Semgrep SAST report
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: semgrep-sast-report
+          path: semgrep.sarif
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Enforce Semgrep SAST
+        if: steps.semgrep-sast.outcome != 'success'
+        run: exit 1
 
       - name: Verify production DAST can reach the application
         if: >-
