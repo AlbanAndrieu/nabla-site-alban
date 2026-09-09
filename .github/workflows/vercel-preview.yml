@@ -1,6 +1,11 @@
 name: Vercel Preview (On Demand)
 
 on:
+  workflow_run:
+    workflows:
+      - "CI (Quality and Security)"
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       pr_number:
@@ -20,6 +25,7 @@ concurrency:
   group: >-
     vercel-preview-${{
       inputs.pr_number ||
+      github.event.workflow_run.pull_requests[0].number ||
       github.event.pull_request.number ||
       github.ref
     }}
@@ -28,13 +34,21 @@ concurrency:
 jobs:
   checkpoint:
     name: Publish requested PR Preview checkpoint
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.pull_requests[0].number != null)
     runs-on: ubuntu-latest
     steps:
       - name: Publish deploy-relevant checkpoint only
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_NUMBER: ${{
+            inputs.pr_number ||
+            github.event.workflow_run.pull_requests[0].number
+          }}
         with:
           script: |
             const prNumber = Number(process.env.PR_NUMBER);
