@@ -25,6 +25,9 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Production DAST/);
 	assert.match(ci, /\.github\/workflows\/production-dast\.yml/);
 	assert.match(ci, /bootstrap requirement skipped for this PR only/);
+	assert.match(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
+	assert.match(ci, /Bootstrap production DAST before first DAST-enabled merge/);
+	assert.match(ci, /zap-production-bootstrap-report/);
 	assert.match(ci, /semgrep\/semgrep:1\.176\.0/);
 	assert.match(ci, /--config p\/ci/);
 	assert.match(ci, /--metrics=off/);
