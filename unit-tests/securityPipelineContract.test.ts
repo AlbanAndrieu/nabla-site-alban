@@ -12,12 +12,18 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		"- name: Verify current production baseline before PR build",
 	);
 	const checkout = ci.indexOf("- name: Checkout");
+	const liveProductionSmoke = ci.indexOf(
+		"- name: Revalidate canonical production smoke before PR build",
+	);
 	const semgrep = ci.indexOf("- name: Run Semgrep SAST on changed source");
+	const semgrepEnforcement = ci.indexOf("- name: Enforce Semgrep SAST");
 	const install = ci.indexOf("- name: Install dependencies");
 	const build = ci.indexOf("- name: Build Next.js production bundle");
 
 	assert.ok(productionGate >= 0 && productionGate < checkout);
-	assert.ok(semgrep > checkout && semgrep < install);
+	assert.ok(liveProductionSmoke > checkout);
+	assert.ok(semgrep > liveProductionSmoke && semgrep < install);
+	assert.ok(semgrepEnforcement > semgrep && semgrepEnforcement < install);
 	assert.ok(install < build);
 
 	assert.match(ci, /statuses:\s*read/);
@@ -35,7 +41,19 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /semgrep\/semgrep:1\.176\.0/);
 	assert.match(ci, /--config p\/ci/);
 	assert.match(ci, /--metrics=off/);
+	assert.match(ci, /--sarif/);
+	assert.match(ci, /--output \/src\/semgrep\.sarif/);
+	assert.match(ci, /github\/codeql-action\/upload-sarif@v4/);
+	assert.match(ci, /category:\s*"semgrep-pr"/);
+	assert.match(ci, /name:\s*semgrep-sast-report/);
+	assert.match(ci, /security-events:\s*write/);
+	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
+	assert.match(
+		ci,
+		/git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
+	);
+	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node "\$smoke_script"/);
 });
 
 test("Preview and production DAST share a reviewed passive ZAP policy", async () => {
