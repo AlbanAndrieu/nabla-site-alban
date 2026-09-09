@@ -63,10 +63,12 @@ export default function HomelabObservationCoverage({
 }: Readonly<Props>) {
 	const french = useLocale() === "fr";
 	const coverage = snapshot ? observationCoverage(snapshot) : null;
-	const probeState = probeStateLabel(
-		french,
-		snapshot?.internal_probes_enabled,
-	);
+	const probeState = probeStateLabel(french, snapshot?.internal_probes_enabled);
+	const probeSummary = snapshot?.probe_summary;
+	const internalSummary = probeSummary?.internal;
+	const publicSummary = probeSummary?.public;
+	const authoritativeCatalogCount =
+		probeSummary?.catalog_service_count ?? catalogServiceCount;
 	const topologyLabel = french
 		? `${topologyNodeCount} nœuds · ${topologyRelationCount} relations`
 		: `${topologyNodeCount} nodes · ${topologyRelationCount} relations`;
@@ -93,7 +95,7 @@ export default function HomelabObservationCoverage({
 					{french ? "Couverture d’observation :" : "Observation coverage:"}
 				</strong>
 				<span>
-					{catalogServiceCount}{" "}
+					{authoritativeCatalogCount}{" "}
 					{french ? "services catalogue" : "catalog services"}
 				</span>
 				<span>{topologyLabel}</span>
@@ -104,17 +106,43 @@ export default function HomelabObservationCoverage({
 							{french ? "services observés" : "services observed"}
 						</span>
 						<span
-							data-internal-probe-count={coverage.internalProbes}
+							data-internal-probe-count={
+								internalSummary?.scheduled ?? coverage.internalProbes
+							}
 							data-internal-probes-enabled={
 								snapshot?.internal_probes_enabled === undefined
 									? "unknown"
 									: String(snapshot.internal_probes_enabled)
 							}
 						>
-							{coverage.internalProbes}{" "}
-							{french ? "sondes LAN/internes" : "LAN/internal probes"} (
-							{probeState})
+							{french ? "sondes LAN/internes" : "LAN/internal probes"}:{" "}
+							{internalSummary?.scheduled ?? coverage.internalProbes}{" "}
+							{french ? "planifiées" : "scheduled"} ·{" "}
+							{internalSummary?.completed ?? coverage.internalProbes}{" "}
+							{french ? "terminées" : "completed"} ·{" "}
+							{internalSummary?.timed_out ?? 0} deadline ({probeState})
 						</span>
+						{publicSummary ? (
+							<span data-public-probe-count={publicSummary.scheduled ?? 0}>
+								{french ? "sondes publiques" : "public probes"}:{" "}
+								{publicSummary.scheduled ?? 0}{" "}
+								{french ? "planifiées" : "scheduled"} ·{" "}
+								{publicSummary.completed ?? 0}{" "}
+								{french ? "terminées" : "completed"} ·{" "}
+								{publicSummary.timed_out ?? 0} deadline
+							</span>
+						) : null}
+						{internalSummary?.max_concurrency !== undefined ? (
+							<span data-probe-fanout-policy>
+								fan-out: concurrency {internalSummary.max_concurrency}
+								{internalSummary.budget_seconds !== undefined
+									? ` · budget ${internalSummary.budget_seconds}s`
+									: ""}
+								{internalSummary.per_probe_timeout_seconds !== undefined
+									? ` · timeout ${internalSummary.per_probe_timeout_seconds}s/probe`
+									: ""}
+							</span>
+						) : null}
 						<span>{evidenceLabel}</span>
 						{typeof snapshot.cloudflare_tunnels_observed === "number" ? (
 							<span>

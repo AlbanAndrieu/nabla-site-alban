@@ -132,6 +132,31 @@ export type PfSenseDnsPosture = {
 	error?: string;
 };
 
+export type HomelabProbeStateCounts = {
+	ok?: number;
+	warn?: number;
+	fail?: number;
+};
+
+export type HomelabProbeScopeSummary = {
+	scope?: string;
+	enabled?: boolean;
+	scheduled?: number;
+	completed?: number;
+	timed_out?: number;
+	budget_seconds?: number;
+	per_probe_timeout_seconds?: number;
+	max_concurrency?: number;
+	elapsed_ms?: number;
+	states?: HomelabProbeStateCounts;
+};
+
+export type HomelabProbeSummary = {
+	public?: HomelabProbeScopeSummary;
+	internal?: HomelabProbeScopeSummary;
+	catalog_service_count?: number;
+};
+
 export type HomelabHealthSnapshot = {
 	schema_version: number;
 	checked_at: string;
@@ -140,6 +165,7 @@ export type HomelabHealthSnapshot = {
 	truenas?: TrueNasHealth | null;
 	internal_probes_enabled?: boolean;
 	internal_services?: HomelabInternalHealthEntry[];
+	probe_summary?: HomelabProbeSummary;
 	truenas_runtime_reachable?: boolean;
 	truenas_runtime_stale?: boolean;
 	cloudflare_configured?: boolean;
@@ -149,15 +175,21 @@ export type HomelabHealthSnapshot = {
 	};
 };
 
-export type HomelabHealthSource = "fastapi" | "unavailable";
+export type HomelabHealthSource =
+	| "fastapi"
+	| "fastapi-probes"
+	| "unavailable";
 
 export const HOMELAB_HEALTH_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
+export const HOMELAB_PROBES_DEFAULT_API_URL =
+	"https://fastapi-sample.fastapicloud.dev/api/homelab/probes";
 
 // FastAPI uses bounded probes plus short-lived caches. Keep this proxy timeout
 // above the cold-probe ceiling while still failing quickly enough for the UI to
 // retain its last known snapshot rather than hanging indefinitely.
 const PRIMARY_TIMEOUT_MS = 8_000;
+const PROBES_TIMEOUT_MS = 6_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -222,6 +254,69 @@ function validOptionalStringArray(value: unknown): boolean {
 				(item) => typeof item === "string" && item.trim().length > 0,
 			))
 	);
+}
+
+function optionalNonNegativeInteger(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isInteger(value) && value >= 0
+		? value
+		: undefined;
+}
+
+function parseProbeStateCounts(
+	value: unknown,
+): HomelabProbeStateCounts | undefined {
+	if (!isRecord(value)) return undefined;
+	const states: HomelabProbeStateCounts = {};
+	for (const state of ["ok", "warn", "fail"] as const) {
+		const count = optionalNonNegativeInteger(value[state]);
+		if (count !== undefined) states[state] = count;
+	}
+	return states;
+}
+
+function parseProbeScopeSummary(
+	value: unknown,
+): HomelabProbeScopeSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const summary: HomelabProbeScopeSummary = {};
+	if (typeof value.scope === "string" && value.scope.trim()) {
+		summary.scope = value.scope;
+	}
+	if (typeof value.enabled === "boolean") summary.enabled = value.enabled;
+	for (const field of [
+		"scheduled",
+		"completed",
+		"timed_out",
+		"max_concurrency",
+	] as const) {
+		const parsed = optionalNonNegativeInteger(value[field]);
+		if (parsed !== undefined) summary[field] = parsed;
+	}
+	for (const field of [
+		"budget_seconds",
+		"per_probe_timeout_seconds",
+		"elapsed_ms",
+	] as const) {
+		const parsed = value[field];
+		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
+			summary[field] = parsed;
+		}
+	}
+	const states = parseProbeStateCounts(value.states);
+	if (states) summary.states = states;
+	return summary;
+}
+
+function parseProbeSummary(value: unknown): HomelabProbeSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const summary: HomelabProbeSummary = {};
+	const publicSummary = parseProbeScopeSummary(value.public);
+	const internalSummary = parseProbeScopeSummary(value.internal);
+	const catalogCount = optionalNonNegativeInteger(value.catalog_service_count);
+	if (publicSummary) summary.public = publicSummary;
+	if (internalSummary) summary.internal = internalSummary;
+	if (catalogCount !== undefined) summary.catalog_service_count = catalogCount;
+	return summary;
 }
 
 function validDependencyEvidence(value: unknown): boolean {
@@ -553,6 +648,7 @@ export function parseHomelabHealthSnapshot(
 		if (!Array.isArray(value.internal_services)) return null;
 		internalServices = value.internal_services.filter(validInternalHealthEntry);
 	}
+	const probeSummary = parseProbeSummary(value.probe_summary);
 	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
 	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
 	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
@@ -567,6 +663,7 @@ export function parseHomelabHealthSnapshot(
 
 	const sanitizedValue = { ...value };
 	delete sanitizedValue.pfsense;
+	delete sanitizedValue.probe_summary;
 
 	return {
 		...sanitizedValue,
@@ -574,6 +671,7 @@ export function parseHomelabHealthSnapshot(
 		...(internalServices === undefined
 			? {}
 			: { internal_services: internalServices }),
+		...(probeSummary ? { probe_summary: probeSummary } : {}),
 		...(pfsense ? { pfsense } : {}),
 	} as HomelabHealthSnapshot;
 }
@@ -614,6 +712,46 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const reason = error instanceof Error ? error.message : String(error);
 		console.warn(
 			`[homelab-health] FastAPI snapshot unavailable (${primaryUrl}): ${reason}; using endpoint-level fallback`,
+		);
+		return { snapshot: null, source: "unavailable", primaryUrl };
+	} finally {
+		clearTimeout(timeout);
+	}
+}
+
+function probesApiUrl(): string {
+	return (
+		process.env.HOMELAB_PROBES_API_URL?.trim() ||
+		HOMELAB_PROBES_DEFAULT_API_URL
+	);
+}
+
+export async function loadHomelabProbeSnapshot(): Promise<{
+	snapshot: HomelabHealthSnapshot | null;
+	source: "fastapi-probes" | "unavailable";
+	primaryUrl: string;
+}> {
+	const primaryUrl = probesApiUrl();
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), PROBES_TIMEOUT_MS);
+
+	try {
+		const response = await fetch(primaryUrl, {
+			headers: {
+				Accept: "application/json",
+				"User-Agent": "nabla-site-homelab-probes/1.0",
+			},
+			signal: controller.signal,
+			cache: "no-store",
+		});
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const snapshot = parseHomelabHealthSnapshot(await response.json());
+		if (!snapshot) throw new Error("Invalid homelab probe payload");
+		return { snapshot, source: "fastapi-probes", primaryUrl };
+	} catch (error) {
+		const reason = error instanceof Error ? error.message : String(error);
+		console.warn(
+			`[homelab-probes] FastAPI probe matrix unavailable (${primaryUrl}): ${reason}`,
 		);
 		return { snapshot: null, source: "unavailable", primaryUrl };
 	} finally {

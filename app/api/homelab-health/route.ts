@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { loadFastApiHealthBoard } from "../../../lib/fastApiHealthBoard";
 import {
 	loadHomelabHealthSnapshot,
+	loadHomelabProbeSnapshot,
 	parseHomelabHealthSnapshot,
 } from "../../../lib/homelabHealth";
 
@@ -24,8 +25,25 @@ export async function GET() {
 	}
 
 	// A cold FastAPI worker can legitimately return `pending` before its first
-	// background health-board snapshot exists. Preserve the historical direct
-	// homelab endpoint as a compatibility fallback for that cold-start window.
+	// background health-board snapshot exists. Prefer FastAPI's bounded raw
+	// probe matrix so the UI gets scheduled/completed/deadline fan-out evidence
+	// without waiting for aggregate reconciliation.
+	const probes = await loadHomelabProbeSnapshot();
+	if (probes.snapshot) {
+		return NextResponse.json(probes.snapshot, {
+			headers: {
+				"Cache-Control":
+					"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
+				"X-Homelab-Health-Source": probes.source,
+				"X-Homelab-Health-Primary": probes.primaryUrl,
+				"X-Homelab-Health-Board-State":
+					boardResult.board?.state ?? "fallback",
+			},
+		});
+	}
+
+	// Preserve the historical aggregate endpoint as the final compatibility
+	// fallback because it can still provide richer reconciliation evidence.
 	const { snapshot, source, primaryUrl } = await loadHomelabHealthSnapshot();
 	if (!snapshot) {
 		return NextResponse.json(
