@@ -52,6 +52,8 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	);
 	assert.match(ci, /category:\s*"semgrep-pr"/);
 	assert.match(ci, /name:\s*semgrep-sast-report/);
+	assert.match(ci, /Clean Semgrep SAST workspace/);
+	assert.match(ci, /run: rm -f semgrep\.sarif/);
 	assert.match(ci, /security-events:\s*write/);
 	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
