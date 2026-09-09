@@ -26,7 +26,11 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /\.github\/workflows\/production-dast\.yml/);
 	assert.match(ci, /bootstrap requirement skipped for this PR only/);
 	assert.match(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
+	assert.match(ci, /Verify production DAST can reach the application/);
 	assert.match(ci, /Bootstrap production DAST before first DAST-enabled merge/);
+	assert.match(ci, /ZAP_AUTH_HEADER_VALUE/);
+	assert.match(ci, /Production DAST preflight did not reach the application/);
+	assert.match(ci, /Clean ZAP bootstrap workspace/);
 	assert.match(ci, /zap-production-bootstrap-report/);
 	assert.match(ci, /semgrep\/semgrep:1\.176\.0/);
 	assert.match(ci, /--config p\/ci/);
@@ -47,12 +51,13 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		assert.match(workflow, /zaproxy\/action-baseline@v0\.15\.0/);
 		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
 		assert.match(workflow, /fail_action:\s*true/);
-		assert.match(workflow, /cmd_options:\s*"-I -T 5"/);
+		assert.match(workflow, /cmd_options:\s*"-I -T 5 -c \.zap\/rules\.tsv"/);
 	}
 
 	assert.match(preview, /ZAP_AUTH_HEADER:\s*x-vercel-protection-bypass/);
 	assert.match(preview, /ZAP_AUTH_HEADER_VALUE/);
 	assert.match(preview, /ZAP_AUTH_HEADER_SITE/);
+	assert.match(preview, /Clean ZAP Preview workspace/);
 	assert.match(preview, /zap-preview-report/);
 
 	assert.match(production, /https:\/\/www\.albanandrieu\.com/);
@@ -62,6 +67,11 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		/github\.event\.client_payload\.git\.ref == 'master'/,
 	);
 	assert.match(production, /Production DAST/);
+	assert.match(production, /ZAP_AUTH_HEADER:\s*x-vercel-protection-bypass/);
+	assert.match(production, /ZAP_AUTH_HEADER_VALUE/);
+	assert.match(production, /ZAP_AUTH_HEADER_SITE:\s*www\.albanandrieu\.com/);
+	assert.match(production, /HTTP \$status, x-vercel-mitigated/);
+	assert.match(production, /Clean ZAP production workspace/);
 	assert.match(production, /zap-production-report/);
 	assert.match(smoke, /Production Post-deploy Smoke/);
 
