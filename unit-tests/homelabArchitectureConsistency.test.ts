@@ -72,7 +72,10 @@ test("critical dependency hierarchy uses one shared render and keeps chevron bes
 	);
 	assert.match(component, /ServiceCriticalityOverview/);
 	assert.match(component, /styles\.chevron/);
-	assert.match(architecture, /<CriticalDependencyHierarchy\s+topology={topology}/);
+	assert.match(
+		architecture,
+		/<CriticalDependencyHierarchy\s+topology={topology}/,
+	);
 	assert.match(
 		truenas,
 		/<CriticalDependencyHierarchy\s+topology={state\.topology}/,
