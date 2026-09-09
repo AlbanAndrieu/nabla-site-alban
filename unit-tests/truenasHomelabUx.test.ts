@@ -41,6 +41,7 @@ test("service views are searchable and collapsible while technical criticality s
 	assert.match(block, /data-homelab-service-search/);
 	assert.match(block, /data-homelab-health-filter/);
 	assert.match(block, /data-homelab-environment-filter/);
+	assert.match(block, /non-dev/);
 	assert.match(block, /homelabServiceEnvironment/);
 	assert.match(block, /setEnvironmentFilter\("all"\)/);
 	assert.match(block, /data-service-presentation-group/);
