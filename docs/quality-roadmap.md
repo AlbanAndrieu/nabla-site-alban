@@ -231,8 +231,13 @@ les autres chantiers.
   nombre de services du catalogue, nœuds/relations de topologie, observations
   de santé, sondes LAN/internes activées, couverture des preuves directes,
   runtime, Cloudflare et dépendances, tunnels observés et durée du refresh.
-  Ces compteurs décrivent les preuves disponibles et ne changent pas la
-  résolution de santé.
+  Les compteurs de fan-out consomment maintenant le contrat borné
+  `/api/homelab/probes` de FastAPI (`scheduled/completed/timed_out`, budget,
+  timeout par sonde et concurrence), propagé également dans `probe_summary`
+  du snapshot de santé. Le proxy du Site utilise cette matrice comme fallback
+  avant l'ancien agrégat lorsqu'un health-board n'est pas disponible. Ces
+  compteurs décrivent les preuves disponibles et ne changent pas la résolution
+  de santé.
 - [x] Dériver le filtre d'environnement TrueNAS depuis
   `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
   Un service sans déclaration reste `production` par compatibilité mais porte

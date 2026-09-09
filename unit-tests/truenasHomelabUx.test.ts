@@ -137,6 +137,13 @@ test("TrueNAS exposes runtime observation and internal probe coverage", async ()
 	assert.match(coverage, /data-homelab-observer-summary/);
 	assert.match(coverage, /data-internal-probe-count/);
 	assert.match(coverage, /internal_services\?\.length/);
+	assert.match(coverage, /probe_summary/);
+	assert.match(coverage, /scheduled/);
+	assert.match(coverage, /completed/);
+	assert.match(coverage, /timed_out/);
+	assert.match(coverage, /max_concurrency/);
+	assert.match(coverage, /budget_seconds/);
+	assert.match(coverage, /data-public-probe-count/);
 	assert.match(coverage, /cloudflare_tunnels_observed/);
 	assert.match(coverage, /refresh_elapsed_ms/);
 	assert.match(coverage, /dependency_evidence/);

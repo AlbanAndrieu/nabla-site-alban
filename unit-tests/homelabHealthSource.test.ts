@@ -3,13 +3,16 @@ import test from "node:test";
 import { GET } from "../app/api/homelab-health/route";
 import {
 	HOMELAB_HEALTH_DEFAULT_API_URL,
+	HOMELAB_PROBES_DEFAULT_API_URL,
 	homelabHealthForUrl,
 	loadHomelabHealthSnapshot,
+	loadHomelabProbeSnapshot,
 	normalizeHomelabHealthUrl,
 	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
 
 const ORIGINAL_API_URL = process.env.HOMELAB_HEALTH_API_URL;
+const ORIGINAL_PROBES_API_URL = process.env.HOMELAB_PROBES_API_URL;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 const VALID_SNAPSHOT = {
@@ -43,7 +46,42 @@ const VALID_SNAPSHOT = {
 	],
 	internal_probes_enabled: false,
 	internal_services: [],
+	probe_summary: {
+		public: {
+			scope: "public",
+			enabled: true,
+			scheduled: 1,
+			completed: 1,
+			timed_out: 0,
+			budget_seconds: 4,
+			per_probe_timeout_seconds: 5,
+			max_concurrency: 4,
+			elapsed_ms: 42,
+			states: { ok: 1, warn: 0, fail: 0 },
+		},
+		internal: {
+			scope: "internal",
+			enabled: false,
+			scheduled: 0,
+			completed: 0,
+			timed_out: 0,
+			budget_seconds: 4,
+			per_probe_timeout_seconds: 5,
+			max_concurrency: 4,
+			elapsed_ms: 0,
+			states: { ok: 0, warn: 0, fail: 0 },
+		},
+		catalog_service_count: 72,
+	},
 };
+
+function setProbesApiUrl(value: string | undefined) {
+	if (value === undefined) {
+		delete process.env.HOMELAB_PROBES_API_URL;
+	} else {
+		process.env.HOMELAB_PROBES_API_URL = value;
+	}
+}
 
 function setApiUrl(value: string | undefined) {
 	if (value === undefined) {
@@ -55,6 +93,7 @@ function setApiUrl(value: string | undefined) {
 
 test.afterEach(() => {
 	setApiUrl(ORIGINAL_API_URL);
+	setProbesApiUrl(ORIGINAL_PROBES_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
 });
 
@@ -195,6 +234,23 @@ test("homelab health prefers the FastAPI snapshot", async () => {
 	assert.equal(result.snapshot?.truenas?.state, "fail");
 });
 
+test("bounded homelab probes use the dedicated FastAPI probe matrix", async () => {
+	setProbesApiUrl(undefined);
+	let requestedUrl = "";
+	globalThis.fetch = (async (input) => {
+		requestedUrl = String(input);
+		return Response.json(VALID_SNAPSHOT);
+	}) as typeof fetch;
+
+	const result = await loadHomelabProbeSnapshot();
+
+	assert.equal(requestedUrl, HOMELAB_PROBES_DEFAULT_API_URL);
+	assert.equal(result.source, "fastapi-probes");
+	assert.equal(result.snapshot?.probe_summary?.public?.scheduled, 1);
+	assert.equal(result.snapshot?.probe_summary?.internal?.max_concurrency, 4);
+	assert.equal(result.snapshot?.probe_summary?.catalog_service_count, 72);
+});
+
 test("homelab health returns unavailable so endpoint-level fallback can run", async () => {
 	setApiUrl("https://health.example.test/homelab");
 	globalThis.fetch = (async () =>
@@ -209,8 +265,13 @@ test("homelab health returns unavailable so endpoint-level fallback can run", as
 
 test("homelab health proxy exposes the FastAPI snapshot and cache policy", async () => {
 	setApiUrl("https://health.example.test/homelab");
-	globalThis.fetch = (async () =>
-		Response.json(VALID_SNAPSHOT)) as typeof fetch;
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async (input) => {
+		if (String(input) === "https://probes.example.test/homelab") {
+			return new Response("probe fallback unavailable", { status: 503 });
+		}
+		return Response.json(VALID_SNAPSHOT);
+	}) as typeof fetch;
 
 	const response = await GET();
 	const body = await response.json();
@@ -236,4 +297,30 @@ test("homelab health proxy returns 503 when FastAPI is unavailable", async () =>
 	assert.equal(response.status, 503);
 	assert.equal(response.headers.get("cache-control"), "no-store");
 	assert.equal(response.headers.get("x-homelab-health-source"), "unavailable");
+});
+
+test("homelab health proxy prefers bounded probes when the board is unavailable", async () => {
+	setApiUrl("https://health.example.test/homelab");
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async (input) => {
+		const url = String(input);
+		if (url === "https://probes.example.test/homelab") {
+			return Response.json(VALID_SNAPSHOT);
+		}
+		return new Response("unavailable", { status: 503 });
+	}) as typeof fetch;
+
+	const response = await GET();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-probes",
+	);
+	assert.equal(
+		response.headers.get("x-homelab-health-primary"),
+		"https://probes.example.test/homelab",
+	);
+	assert.equal(body.probe_summary.public.scheduled, 1);
 });
