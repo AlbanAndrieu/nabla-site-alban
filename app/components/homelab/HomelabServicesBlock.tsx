@@ -16,7 +16,9 @@ import {
 	type ServicePresentationGroupEntry,
 } from "@/lib/servicePresentation";
 import {
+	homelabServiceEnvironment,
 	homelabServiceId,
+	type HomelabEnvironment,
 	type HomelabService,
 	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
@@ -59,6 +61,7 @@ type State = {
 type HierarchyGroup = ServicePresentationGroupEntry;
 
 type HealthFilter = "all" | HomelabHealthState;
+type EnvironmentFilter = "all" | HomelabEnvironment;
 type GroupFilter = "all" | ServicePresentationGroup;
 
 type GroupTitleKey =
@@ -183,6 +186,7 @@ export default function HomelabServicesBlock() {
 		healthRefreshing: true,
 	});
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
+	const [environmentFilter, setEnvironmentFilter] = useState<EnvironmentFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [expandedGroups, setExpandedGroups] = useState<Set<ServicePresentationGroup>>(
@@ -268,11 +272,14 @@ export default function HomelabServicesBlock() {
 			const matchesHealth =
 				healthFilter === "all" ||
 				effectiveState(service, indexedHealth, state.healthUnavailable) === healthFilter;
+			const matchesEnvironment =
+				environmentFilter === "all" ||
+				homelabServiceEnvironment(service) === environmentFilter;
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
 				homelabServiceId(service).includes(query);
-			return matchesHealth && matchesSearch;
+			return matchesHealth && matchesEnvironment && matchesSearch;
 		});
 		const filteredCatalog = { ...state.catalog, services: filteredServices };
 		if (!state.topology) {
@@ -288,6 +295,7 @@ export default function HomelabServicesBlock() {
 		}
 		return groupCatalogByPresentation(filteredCatalog, state.topology);
 	}, [
+		environmentFilter,
 		healthFilter,
 		indexedHealth,
 		searchQuery,
@@ -396,6 +404,20 @@ export default function HomelabServicesBlock() {
 						/>
 					</label>
 					<label className={styles.filterField}>
+						<span className={styles.filterLabel}>{french ? "Environnement" : "Environment"}</span>
+						<select
+							className={styles.filterSelect}
+							value={environmentFilter}
+							onChange={(event) => setEnvironmentFilter(event.currentTarget.value as EnvironmentFilter)}
+							data-homelab-environment-filter
+						>
+							<option value="all">{french ? "Tous les environnements" : "All environments"}</option>
+							<option value="production">Production</option>
+							<option value="staging">Staging</option>
+							<option value="dev">Dev</option>
+						</select>
+					</label>
+					<label className={styles.filterField}>
 						<span className={styles.filterLabel}>{t("presentation.filterLabel")}</span>
 						<select
 							className={styles.filterSelect}
@@ -416,7 +438,7 @@ export default function HomelabServicesBlock() {
 						</select>
 					</label>
 					<div className={styles.controlButtons}>
-						<button type="button" className={styles.controlButton} onClick={() => { setHealthFilter("all"); setGroupFilter("all"); setSearchQuery(""); }}>
+						<button type="button" className={styles.controlButton} onClick={() => { setHealthFilter("all"); setEnvironmentFilter("all"); setGroupFilter("all"); setSearchQuery(""); }}>
 							{french ? "Réinitialiser" : "Reset filters"}
 						</button>
 						<button type="button" className={styles.controlButton} onClick={() => setExpandedGroups(new Set(ALL_GROUPS))} aria-controls="homelab-service-hierarchy">
