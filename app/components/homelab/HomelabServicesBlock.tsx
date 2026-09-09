@@ -184,7 +184,6 @@ function serviceEnvironmentNames(
 	);
 }
 
-
 function healthIndex(snapshot: HomelabHealthSnapshot | null): {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
