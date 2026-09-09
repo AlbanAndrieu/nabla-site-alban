@@ -261,7 +261,10 @@ export default function HomelabServicesBlock() {
 	const indexedHealth = useMemo(() => healthIndex(state.snapshot), [state.snapshot]);
 	const healthCounts = useMemo(() => {
 		const counts: Record<HomelabHealthState, number> = { ok: 0, warn: 0, fail: 0, unknown: 0 };
-		for (const service of state.catalog?.services ?? []) counts[effectiveState(service, indexedHealth, state.healthUnavailable)] += 1;
+		for (const service of state.catalog?.services ?? [])
+			counts[
+				effectiveState(service, indexedHealth, state.healthUnavailable)
+			] += 1;
 		return counts;
 	}, [indexedHealth, state.catalog?.services, state.healthUnavailable]);
 
@@ -350,16 +353,34 @@ export default function HomelabServicesBlock() {
 				onOpenCriticality={openCriticality}
 			/>
 
-			<section id="truenas-health-dashboard" className={styles.healthDashboard} aria-labelledby="truenas-health-dashboard-title">
+			<section
+				id="truenas-health-dashboard"
+				className={styles.healthDashboard}
+				aria-labelledby="truenas-health-dashboard-title"
+			>
 				<div className={styles.healthDashboardHeader}>
 					<div>
 						<h3 id="truenas-health-dashboard-title" className={styles.healthDashboardTitle}>
 							{french ? "Santé et filtres des services" : "Service health and filters"}
 						</h3>
-						<p>{french ? "Les services restent la finalité de la vue ; le socle critique, la sécurité et le support sont séparés sans modifier la propagation des dépendances." : "Services remain the primary outcome; critical core, security and support are separated without changing dependency propagation."}</p>
+						<p>
+							{french
+								? "Les services restent la finalité de la vue ; le socle critique, la sécurité et le support sont séparés sans modifier la propagation des dépendances."
+								: "Services remain the primary outcome; critical core, security and support are separated without changing dependency propagation."}
+						</p>
 					</div>
 					<span className={styles.refreshStatus} role="status" aria-live="polite">
-						{state.healthRefreshing ? (french ? "Actualisation…" : "Refreshing…") : state.healthUnavailable ? (french ? "Dernier snapshot conservé" : "Keeping last snapshot") : (french ? "Snapshot courant" : "Current snapshot")}
+						{state.healthRefreshing
+							? french
+								? "Actualisation…"
+								: "Refreshing…"
+							: state.healthUnavailable
+								? french
+									? "Dernier snapshot conservé"
+									: "Keeping last snapshot"
+								: french
+									? "Snapshot courant"
+									: "Current snapshot"}
 					</span>
 				</div>
 
@@ -376,7 +397,21 @@ export default function HomelabServicesBlock() {
 							onClick={() => setHealthFilter((current) => current === healthState ? "all" : healthState)}
 						>
 							<strong>{healthCounts[healthState]}</strong>{" "}
-							{healthState === "ok" ? (french ? "sains" : "healthy") : healthState === "warn" ? (french ? "dégradés" : "degraded") : healthState === "fail" ? (french ? "en échec" : "failed") : (french ? "inconnus" : "unknown")}
+							{healthState === "ok"
+								? french
+									? "sains"
+									: "healthy"
+								: healthState === "warn"
+									? french
+										? "dégradés"
+										: "degraded"
+									: healthState === "fail"
+										? french
+											? "en échec"
+											: "failed"
+										: french
+											? "inconnus"
+											: "unknown"}
 						</button>
 					))}
 				</div>
@@ -384,7 +419,14 @@ export default function HomelabServicesBlock() {
 				<div className={styles.controls} data-homelab-hierarchy-controls>
 					<label className={styles.filterField}>
 						<span className={styles.filterLabel}>{french ? "Santé" : "Health"}</span>
-						<select className={styles.filterSelect} value={healthFilter} onChange={(event) => setHealthFilter(event.currentTarget.value as HealthFilter)} data-homelab-health-select>
+						<select
+							className={styles.filterSelect}
+							value={healthFilter}
+							onChange={(event) =>
+								setHealthFilter(event.currentTarget.value as HealthFilter)
+							}
+							data-homelab-health-select
+						>
 							<option value="all">{french ? "Tous les états" : "All health states"}</option>
 							<option value="ok">{french ? "Sain" : "Healthy"}</option>
 							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
@@ -438,18 +480,41 @@ export default function HomelabServicesBlock() {
 						</select>
 					</label>
 					<div className={styles.controlButtons}>
-						<button type="button" className={styles.controlButton} onClick={() => { setHealthFilter("all"); setEnvironmentFilter("all"); setGroupFilter("all"); setSearchQuery(""); }}>
+						<button
+							type="button"
+							className={styles.controlButton}
+							onClick={() => {
+								setHealthFilter("all");
+								setEnvironmentFilter("all");
+								setGroupFilter("all");
+								setSearchQuery("");
+							}}
+						>
 							{french ? "Réinitialiser" : "Reset filters"}
 						</button>
-						<button type="button" className={styles.controlButton} onClick={() => setExpandedGroups(new Set(ALL_GROUPS))} aria-controls="homelab-service-hierarchy">
+						<button
+							type="button"
+							className={styles.controlButton}
+							onClick={() => setExpandedGroups(new Set(ALL_GROUPS))}
+							aria-controls="homelab-service-hierarchy"
+						>
 							{t("criticality.expandAll")}
 						</button>
-						<button type="button" className={styles.controlButton} onClick={() => setExpandedGroups(new Set())} aria-controls="homelab-service-hierarchy">
+						<button
+							type="button"
+							className={styles.controlButton}
+							onClick={() => setExpandedGroups(new Set())}
+							aria-controls="homelab-service-hierarchy"
+						>
 							{t("criticality.collapseAll")}
 						</button>
 					</div>
 				</div>
-				<p className={styles.matchCount}>{french ? `${visibleCount} services affichés sur ${state.catalog.services.length}` : `${visibleCount} services shown of ${state.catalog.services.length}`}</p>
+				<p className={styles.matchCount}>
+					{french
+						? `${visibleCount} services affichés sur ${state.catalog.services.length}`
+						: `${visibleCount} services shown of ${state.catalog.services.length}`}
+				</p>
 			</section>
 
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
@@ -509,7 +574,11 @@ export default function HomelabServicesBlock() {
 			</div>
 
 			{state.topology ? (
-				<CriticalDependencyHierarchy topology={state.topology} open={criticalityOpen} onOpenChange={setCriticalityOpen} />
+				<CriticalDependencyHierarchy
+					topology={state.topology}
+					open={criticalityOpen}
+					onOpenChange={setCriticalityOpen}
+				/>
 			) : null}
 
 			<style jsx global>{`
