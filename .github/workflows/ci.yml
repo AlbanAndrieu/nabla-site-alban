@@ -141,19 +141,22 @@ jobs:
             for (const name of required) {
               const status = latestByContext.get(name);
               if (!status) {
-                failures.push(`${name}: missing on base ${baseSha}`);
+                failures.push(name + ': missing on base ' + baseSha);
                 continue;
               }
               if (status.state !== 'success') {
-                failures.push(`${name}: ${status.state}`);
+                failures.push(name + ': ' + status.state);
                 continue;
               }
-              core.info(`${name}: success (${status.target_url || 'no URL'})`);
+              core.info(name + ': success (' + (status.target_url || 'no URL') + ')');
             }
 
             if (failures.length > 0) {
               core.setFailed(
-                `Current production baseline is not healthy for base ${baseSha}: ${failures.join('; ')}`,
+                'Current production baseline is not healthy for base ' +
+                  baseSha +
+                  ': ' +
+                  failures.join('; '),
               );
             }
 
@@ -171,15 +174,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           base_sha="${BASE_SHA:-}"
           if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
             base_sha="$(git rev-parse "$HEAD_SHA^")"
           fi
-
-          mapfile -t files < <(
-            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
-              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)
+          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)
         uses: actions/setup-python@v6
         with:
           python-version-file: ".python-version"
@@ -256,18 +255,13 @@ jobs:
       - name: Run Snyk vulnerability scan
         if: env.SNYK_TOKEN != ''
         run: npx --yes snyk test
- ||
-              true
-          )
-
-          if (("${#files[@]}" == 0)); then
+ || true)"
+          if [[ -z "$files" ]]; then
             echo "No changed application source files require Semgrep."
             exit 0
           fi
-
-          printf 'Semgrep SAST targets:\n'
-          printf '  - %s\n' "${files[@]}"
-          docker run --rm             --env SEMGREP_SEND_METRICS=off             --volume "$PWD:/src"             --workdir /src             semgrep/semgrep:1.176.0             semgrep scan               --config p/ci               --error               --metrics=off               "${files[@]}"
+          printf 'Semgrep SAST targets:\n%s\n' "$files"
+          docker run --rm --env SEMGREP_SEND_METRICS=off --volume "$PWD:/src" --workdir /src semgrep/semgrep:1.176.0 semgrep scan --config p/ci --error --metrics=off $files
 
       - name: Setup Python
         uses: actions/setup-python@v6
