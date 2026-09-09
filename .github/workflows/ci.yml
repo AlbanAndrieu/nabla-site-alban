@@ -191,18 +191,52 @@ jobs:
           printf 'Semgrep SAST targets:\n%s\n' "$files"
           docker run --rm --env SEMGREP_SEND_METRICS=off --volume "$PWD:/src" --workdir /src semgrep/semgrep:1.176.0 semgrep scan --config p/ci --error --metrics=off $files
 
+      - name: Verify production DAST can reach the application
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for production DAST."
+            exit 1
+          fi
+          response_headers="$(mktemp)"
+          trap 'rm -f "$response_headers"' EXIT
+          status="$(curl --silent --show-error --output /dev/null --dump-header "$response_headers" --write-out '%{http_code}' --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" https://www.albanandrieu.com/)"
+          mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
+            echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
+            exit 1
+          fi
+
       - name: Bootstrap production DAST before first DAST-enabled merge
         if: >-
           github.event_name == 'pull_request' &&
           steps.production-baseline.outputs.bootstrap-dast == 'true'
         uses: zaproxy/action-baseline@v0.15.0
+        env:
+          ZAP_AUTH_HEADER: x-vercel-protection-bypass
+          ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          ZAP_AUTH_HEADER_SITE: www.albanandrieu.com
         with:
           target: "https://www.albanandrieu.com"
           rules_file_name: ".zap/rules.tsv"
           allow_issue_writing: false
           fail_action: true
           artifact_name: zap-production-bootstrap-report
-          cmd_options: "-I -T 5"
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP bootstrap workspace
+        if: >-
+          always() &&
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
 
       - name: Setup Python
         uses: actions/setup-python@v6
