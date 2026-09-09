@@ -1,0 +1,8 @@
+10020	FAIL	(Anti-clickjacking header must be present and valid)
+10021	FAIL	(X-Content-Type-Options must be nosniff)
+10033	FAIL	(Directory browsing must not be exposed)
+10035	FAIL	(Strict-Transport-Security must be present and valid)
+10015	WARN	(Cache-control findings are tracked but not blocking yet)
+10023	WARN	(Debug error disclosure is tracked for manual triage)
+10036	WARN	(Server header information disclosure is tracked)
+10038	WARN	(CSP remains report-only in the security roadmap until legacy assets are reconciled)
