@@ -45,7 +45,10 @@ test("service views are searchable and collapsible while technical criticality s
 	assert.match(block, /serviceEnvironmentNames/);
 	assert.match(block, /node\?\.environments/);
 	assert.match(block, /setEnvironmentFilter\("all"\)/);
-	assert.doesNotMatch(await source("lib/homelabServices.ts"), /DEV_NAME_SUFFIX_RE/);
+	assert.doesNotMatch(
+		await source("lib/homelabServices.ts"),
+		/DEV_NAME_SUFFIX_RE/,
+	);
 	assert.match(block, /data-service-presentation-group/);
 	assert.match(block, /setExpandedGroups/);
 	assert.match(block, /useState\(false\)/);
