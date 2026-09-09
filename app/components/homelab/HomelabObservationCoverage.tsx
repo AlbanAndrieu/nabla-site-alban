@@ -1,7 +1,10 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthSnapshot,
+	HomelabProbeEvidenceSummary,
+} from "@/lib/homelabHealth";
 import styles from "./HomelabServicesBlock.module.css";
 
 type Props = {
@@ -72,6 +75,26 @@ function healthBoardRefreshLabel(french: boolean, refreshing: boolean): string {
 	return french ? " · refresh en cours" : " · refresh in progress";
 }
 
+function probeEvidenceLabel(
+	french: boolean,
+	evidence: HomelabProbeEvidenceSummary | undefined,
+	eligible: number,
+): string | null {
+	if (!evidence || evidence.known === undefined) return null;
+	const parts = [
+		`${evidence.known}/${eligible} ${french ? "connues" : "known"}`,
+		`${evidence.fresh ?? 0} ${french ? "fraîches" : "fresh"}`,
+		`${evidence.cached ?? 0} cache`,
+	];
+	if (typeof evidence.coverage_percent === "number") {
+		parts.push(`${evidence.coverage_percent}%`);
+	}
+	if (typeof evidence.evidence_ttl_seconds === "number") {
+		parts.push(`TTL ${evidence.evidence_ttl_seconds}s`);
+	}
+	return parts.join(" · ");
+}
+
 export default function HomelabObservationCoverage({
 	snapshot,
 	catalogServiceCount,
@@ -96,6 +119,16 @@ export default function HomelabObservationCoverage({
 	const publicSampled = publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
 	const publicEligible =
 		publicSummary?.eligible ?? publicSummary?.scheduled ?? publicSampled;
+	const internalEvidenceLabel = probeEvidenceLabel(
+		french,
+		internalSummary?.evidence,
+		internalEligible,
+	);
+	const publicEvidenceLabel = probeEvidenceLabel(
+		french,
+		publicSummary?.evidence,
+		publicEligible,
+	);
 	const rotatingSample =
 		internalSummary?.rotating_sample === true ||
 		publicSummary?.rotating_sample === true;
@@ -151,6 +184,12 @@ export default function HomelabObservationCoverage({
 							{french ? "terminées" : "completed"} ·{" "}
 							{internalSummary?.timed_out ?? 0} deadline ({probeState})
 						</span>
+						{internalEvidenceLabel ? (
+							<span data-internal-probe-evidence>
+								{french ? "preuves LAN" : "LAN evidence"}:{" "}
+								{internalEvidenceLabel}
+							</span>
+						) : null}
 						{publicSummary ? (
 							<span
 								data-public-probe-count={publicSampled}
@@ -161,6 +200,12 @@ export default function HomelabObservationCoverage({
 								{publicSummary.completed ?? 0}{" "}
 								{french ? "terminées" : "completed"} ·{" "}
 								{publicSummary.timed_out ?? 0} deadline
+							</span>
+						) : null}
+						{publicEvidenceLabel ? (
+							<span data-public-probe-evidence>
+								{french ? "preuves publiques" : "public evidence"}:{" "}
+								{publicEvidenceLabel}
 							</span>
 						) : null}
 						{rotatingSample ? (

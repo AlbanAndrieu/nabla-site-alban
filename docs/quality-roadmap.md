@@ -243,6 +243,13 @@ les autres chantiers.
   health-board et la provenance de réconciliation. L'UI affiche donc
   `sampled/eligible` lorsqu'il est disponible et reste compatible avec
   `scheduled` sur le runtime actuellement déployé.
+  Après la release FastAPI `1.13.11`, le Site consomme aussi la couverture
+  roulante `probe_summary.*.evidence` (`known/fresh/cached/coverage_percent`
+  et TTL). La page TrueNAS suit l'architecture probe-first préparée dans
+  `fastapi-sample#232` : le proxy same-origin `/api/homelab-probes` est
+  rendu immédiatement en `no-store`, puis `/api/homelab-health` enrichit
+  l'état avec le health-board et la réconciliation sans bloquer le premier rendu.
+  Un échec de l'agrégat ne supprime donc plus une matrice de probes valide.
 - [x] Dériver le filtre d'environnement TrueNAS depuis
   `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
   Un service sans déclaration reste `production` par compatibilité mais porte

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { GET } from "../app/api/homelab-health/route";
+import { GET as GET_PROBES } from "../app/api/homelab-probes/route";
 import {
 	HOMELAB_HEALTH_DEFAULT_API_URL,
 	HOMELAB_PROBES_DEFAULT_API_URL,
@@ -154,6 +155,13 @@ test("homelab health parser accepts sampled probe/cache/reconciliation metadata 
 				scheduled: 12,
 				rotating_sample: true,
 				per_probe_timeout_seconds: 3,
+				evidence: {
+					known: 60,
+					fresh: 12,
+					cached: 48,
+					coverage_percent: 84.5,
+					evidence_ttl_seconds: 300,
+				},
 			},
 			internal: {
 				...VALID_SNAPSHOT.probe_summary.internal,
@@ -164,6 +172,13 @@ test("homelab health parser accepts sampled probe/cache/reconciliation metadata 
 				completed: 12,
 				rotating_sample: true,
 				per_probe_timeout_seconds: 1,
+				evidence: {
+					known: 71,
+					fresh: 12,
+					cached: 59,
+					coverage_percent: 100,
+					evidence_ttl_seconds: 300,
+				},
 			},
 			catalog_service_count: 72,
 			sampling: {
@@ -189,6 +204,10 @@ test("homelab health parser accepts sampled probe/cache/reconciliation metadata 
 	assert.equal(parsed.probe_summary?.internal?.sampled, 12);
 	assert.equal(parsed.probe_summary?.internal?.rotating_sample, true);
 	assert.equal(parsed.probe_summary?.internal?.per_probe_timeout_seconds, 1);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.known, 71);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.fresh, 12);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.cached, 59);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.coverage_percent, 100);
 	assert.equal(
 		parsed.probe_summary?.sampling?.strategy,
 		"priority-plus-rotating-window",
@@ -318,6 +337,20 @@ test("bounded homelab probes use the dedicated FastAPI probe matrix", async () =
 	assert.equal(result.snapshot?.probe_summary?.catalog_service_count, 72);
 });
 
+test("same-origin bounded probe route is no-store and exposes the dedicated source", async () => {
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async () => Response.json(VALID_SNAPSHOT)) as typeof fetch;
+
+	const response = await GET_PROBES();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(response.headers.get("cache-control"), "no-store, max-age=0");
+	assert.equal(response.headers.get("pragma"), "no-cache");
+	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi-probes");
+	assert.equal(body.probe_summary.public.scheduled, 1);
+});
+
 test("homelab health returns unavailable so endpoint-level fallback can run", async () => {
 	setApiUrl("https://health.example.test/homelab");
 	globalThis.fetch = (async () =>
@@ -401,7 +434,7 @@ test("homelab health proxy returns 503 when FastAPI is unavailable", async () =>
 	assert.equal(response.headers.get("x-homelab-health-source"), "unavailable");
 });
 
-test("homelab health proxy prefers bounded probes when the board is unavailable", async () => {
+test("homelab health proxy falls back to bounded probes when board and aggregate are unavailable", async () => {
 	setApiUrl("https://health.example.test/homelab");
 	setProbesApiUrl("https://probes.example.test/homelab");
 	globalThis.fetch = (async (input) => {

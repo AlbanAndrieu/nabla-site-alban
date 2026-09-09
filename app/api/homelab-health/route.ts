@@ -38,7 +38,9 @@ function withHealthBoardMetadata(
 }
 
 export async function GET() {
-	const boardResult = await loadFastApiHealthBoard();
+	const boardPromise = loadFastApiHealthBoard();
+	const aggregatePromise = loadHomelabHealthSnapshot();
+	const boardResult = await boardPromise;
 	const boardSnapshot = parseHomelabHealthSnapshot(boardResult.board?.homelab);
 	if (boardSnapshot && boardResult.board) {
 		return NextResponse.json(
@@ -58,18 +60,34 @@ export async function GET() {
 		);
 	}
 
-	// A cold FastAPI worker can legitimately return `pending` before its first
-	// background health-board snapshot exists. Prefer FastAPI's bounded raw
-	// probe matrix so the UI gets scheduled/completed/deadline fan-out evidence
-	// without waiting for aggregate reconciliation.
+	// The client renders the dedicated bounded probe route independently. This
+	// endpoint therefore prefers the richer reconciled aggregate as enrichment.
+	const aggregate = await aggregatePromise;
+	if (aggregate.snapshot) {
+		return NextResponse.json(
+			withHealthBoardMetadata(aggregate.snapshot, boardResult.board),
+			{
+				headers: {
+					"Cache-Control":
+						"public, max-age=0, s-maxage=15, stale-while-revalidate=30",
+					"X-Homelab-Health-Source": aggregate.source,
+					"X-Homelab-Health-Primary": aggregate.primaryUrl,
+					"X-Homelab-Health-Board-State":
+						boardResult.board?.state ?? "fallback",
+				},
+			},
+		);
+	}
+
+	// Backward-compatible fallback for consumers that only call this route.
 	const probes = await loadHomelabProbeSnapshot();
 	if (probes.snapshot) {
 		return NextResponse.json(
 			withHealthBoardMetadata(probes.snapshot, boardResult.board),
 			{
 				headers: {
-					"Cache-Control":
-						"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
+					"Cache-Control": "no-store, max-age=0",
+					Pragma: "no-cache",
 					"X-Homelab-Health-Source": probes.source,
 					"X-Homelab-Health-Primary": probes.primaryUrl,
 					"X-Homelab-Health-Board-State":
@@ -79,34 +97,16 @@ export async function GET() {
 		);
 	}
 
-	// Preserve the historical aggregate endpoint as the final compatibility
-	// fallback because it can still provide richer reconciliation evidence.
-	const { snapshot, source, primaryUrl } = await loadHomelabHealthSnapshot();
-	if (!snapshot) {
-		return NextResponse.json(
-			{ error: "FastAPI homelab health snapshot unavailable" },
-			{
-				status: 503,
-				headers: {
-					"Cache-Control": "no-store",
-					"X-Homelab-Health-Source": source,
-					"X-Homelab-Health-Primary": primaryUrl,
-					"X-Homelab-Health-Board-State":
-						boardResult.board?.state ?? "unavailable",
-				},
-			},
-		);
-	}
-
 	return NextResponse.json(
-		withHealthBoardMetadata(snapshot, boardResult.board),
+		{ error: "FastAPI homelab health snapshot unavailable" },
 		{
+			status: 503,
 			headers: {
-				"Cache-Control":
-					"public, max-age=0, s-maxage=15, stale-while-revalidate=30",
-				"X-Homelab-Health-Source": source,
-				"X-Homelab-Health-Primary": primaryUrl,
-				"X-Homelab-Health-Board-State": boardResult.board?.state ?? "fallback",
+				"Cache-Control": "no-store",
+				"X-Homelab-Health-Source": "unavailable",
+				"X-Homelab-Health-Primary": aggregate.primaryUrl,
+				"X-Homelab-Health-Board-State":
+					boardResult.board?.state ?? "unavailable",
 			},
 		},
 	);

@@ -154,3 +154,32 @@ test("TrueNAS exposes runtime observation and internal probe coverage", async ()
 	assert.match(coverage, /refresh_elapsed_ms/);
 	assert.match(coverage, /dependency_evidence/);
 });
+
+
+test("homelab renders bounded probes before aggregate enrichment", async () => {
+	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const probeProxy = await source("app/api/homelab-probes/route.ts");
+
+	const probeStart = block.indexOf("const probesPromise = fetchProbeHealth(signal)");
+	const probeRender = block.indexOf("const probes = await probesPromise");
+	const aggregateRender = block.indexOf("const aggregate = await aggregatePromise");
+	assert.ok(probeStart >= 0);
+	assert.ok(probeRender > probeStart);
+	assert.ok(aggregateRender > probeRender);
+	assert.match(block, /fetch\("\/api\/homelab-probes"/);
+	assert.match(block, /"Cache-Control": "no-cache"/);
+	assert.match(probeProxy, /loadHomelabProbeSnapshot/);
+	assert.match(probeProxy, /"Cache-Control": "no-store, max-age=0"/);
+});
+
+test("homelab exposes rolling probe evidence coverage from FastAPI", async () => {
+	const coverage = await source(
+		"app/components/homelab/HomelabObservationCoverage.tsx",
+	);
+	assert.match(coverage, /data-internal-probe-evidence/);
+	assert.match(coverage, /data-public-probe-evidence/);
+	assert.match(coverage, /coverage_percent/);
+	assert.match(coverage, /evidence_ttl_seconds/);
+	assert.match(coverage, /fresh/);
+	assert.match(coverage, /cached/);
+});

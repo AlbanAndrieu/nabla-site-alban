@@ -139,6 +139,14 @@ export type HomelabProbeStateCounts = {
 	fail?: number;
 };
 
+export type HomelabProbeEvidenceSummary = {
+	known?: number;
+	fresh?: number;
+	cached?: number;
+	coverage_percent?: number;
+	evidence_ttl_seconds?: number;
+};
+
 export type HomelabProbeScopeSummary = {
 	scope?: string;
 	enabled?: boolean;
@@ -153,6 +161,7 @@ export type HomelabProbeScopeSummary = {
 	max_concurrency?: number;
 	elapsed_ms?: number;
 	states?: HomelabProbeStateCounts;
+	evidence?: HomelabProbeEvidenceSummary;
 };
 
 export type HomelabProbeSampling = {
@@ -303,6 +312,24 @@ function parseProbeStateCounts(
 	return states;
 }
 
+function parseProbeEvidenceSummary(
+	value: unknown,
+): HomelabProbeEvidenceSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const evidence: HomelabProbeEvidenceSummary = {};
+	for (const field of ["known", "fresh", "cached"] as const) {
+		const parsed = optionalNonNegativeInteger(value[field]);
+		if (parsed !== undefined) evidence[field] = parsed;
+	}
+	for (const field of ["coverage_percent", "evidence_ttl_seconds"] as const) {
+		const parsed = value[field];
+		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
+			evidence[field] = parsed;
+		}
+	}
+	return evidence;
+}
+
 function parseProbeScopeSummary(
 	value: unknown,
 ): HomelabProbeScopeSummary | undefined {
@@ -338,6 +365,8 @@ function parseProbeScopeSummary(
 	}
 	const states = parseProbeStateCounts(value.states);
 	if (states) summary.states = states;
+	const evidence = parseProbeEvidenceSummary(value.evidence);
+	if (evidence) summary.evidence = evidence;
 	return summary;
 }
 
@@ -871,6 +900,7 @@ export async function loadHomelabProbeSnapshot(): Promise<{
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
+				"Cache-Control": "no-cache",
 				"User-Agent": "nabla-site-homelab-probes/1.0",
 			},
 			signal: controller.signal,
