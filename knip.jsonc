@@ -1,0 +1,12 @@
+{
+	"$schema": "https://unpkg.com/knip@6.35.0/schema.json",
+	"entry": [
+		"commitlint.config.ts",
+		"eslint.config.js",
+		"postcss.config.mjs",
+		"scripts/merge-i18n-message.cjs",
+		"scripts/run-opencommit.mjs"
+	],
+	"ignoreFiles": ["public/**"],
+	"ignoreDependencies": ["eslint-formatter-gitlab", "opencommit"]
+}

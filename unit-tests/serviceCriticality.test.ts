@@ -228,7 +228,7 @@ test("architecture and TrueNAS share dependency, optional-edge and blast-radius 
 		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
 	);
 	const explorer = await source(
-		"app/[locale]/architecture/ArchitectureExplorer.tsx",
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 	);
 	const hierarchy = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",

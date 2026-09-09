@@ -11,7 +11,12 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	for (const name of ["@datadog/browser-rum", "@vercel/analytics", "@vercel/speed-insights", "@vercel/toolbar"]) {
+	for (const name of [
+		"@datadog/browser-rum",
+		"@vercel/analytics",
+		"@vercel/speed-insights",
+		"@vercel/toolbar",
+	]) {
 		assert.equal(packageJson.dependencies?.[name], undefined);
 	}
 	for (const name of ["d3", "next-devtools-mcp", "vercel", "wrangler"]) {
@@ -19,7 +24,10 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 	}
 	assert.ok(packageJson.devDependencies?.opencommit);
 	assert.equal(packageJson.scripts?.oco, "node scripts/run-opencommit.mjs");
-	assert.equal(packageJson.scripts?.opencommit, "node scripts/run-opencommit.mjs");
+	assert.equal(
+		packageJson.scripts?.opencommit,
+		"node scripts/run-opencommit.mjs",
+	);
 	await access(projectUrl(".opencommit-commitlint"));
 	await access(projectUrl("scripts/run-opencommit.mjs"));
 	await assert.rejects(access(projectUrl("wrangler.jsonc")));
@@ -28,12 +36,18 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 	await access(projectUrl("public/d3.v3.min.js"));
 	const vercelDocs = await read(".github/vercel-deployment-instructions.md");
 	assert.match(vercelDocs, /Vercel \*\*Git Integration\*\* owns deployments/);
-	assert.match(vercelDocs, /local Vercel CLI dependency.*intentionally retired/i);
+	assert.match(
+		vercelDocs,
+		/local Vercel CLI dependency.*intentionally retired/i,
+	);
 	assert.doesNotMatch(vercelDocs, /npm install -g vercel/i);
 	assert.doesNotMatch(vercelDocs, /^vercel (?:dev|deploy|--prod)\b/m);
 	assert.doesNotMatch(vercelDocs, /Wrangler/);
 	const publicDocs = await read("public/README.md");
-	assert.match(publicDocs, /static asset directory.*repository-root \*\*Next\.js\*\*/i);
+	assert.match(
+		publicDocs,
+		/static asset directory.*repository-root \*\*Next\.js\*\*/i,
+	);
 	assert.doesNotMatch(publicDocs, /served by Vercel, Cloudflare|my-app\//i);
 });
 
@@ -43,7 +57,17 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	const [setup, ci, release, playwright, envrc, nvmrc, mise, cicdDocs, architectureDocs] = await Promise.all([
+	const [
+		setup,
+		ci,
+		release,
+		playwright,
+		envrc,
+		nvmrc,
+		mise,
+		cicdDocs,
+		architectureDocs,
+	] = await Promise.all([
 		read(".github/workflows/copilot-setup-steps.yml"),
 		read(".github/workflows/ci.yml"),
 		read(".github/workflows/release.yml"),
@@ -56,7 +80,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <26");
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
-	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.3.4");
+	assert.equal(packageJson.devDependencies?.["eslint-config-next"], undefined);
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
 	for (const workflow of [setup, ci, release, playwright]) {
 		assert.match(workflow, /node-version-file:\s*"\.nvmrc"/);
@@ -78,9 +102,8 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
-	const [instrumentation, checkout, mcp] = await Promise.all([
+	const [instrumentation, mcp] = await Promise.all([
 		read("instrumentation.ts"),
-		read("app/components/checkout.tsx"),
 		read(".mcp.json"),
 	]);
 	for (const name of [
@@ -89,17 +112,26 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		"@opentelemetry/instrumentation",
 		"@opentelemetry/sdk-logs",
 		"@vercel/otel",
-		"@stripe/react-stripe-js",
-		"@stripe/stripe-js",
 		"stripe",
 		"@xyflow/react",
 	]) {
-		assert.ok(packageJson.dependencies?.[name], `${name} must stay installed while consumed`);
+		assert.ok(
+			packageJson.dependencies?.[name],
+			`${name} must stay installed while consumed`,
+		);
+	}
+	for (const name of ["@stripe/react-stripe-js", "@stripe/stripe-js"]) {
+		assert.equal(packageJson.dependencies?.[name], undefined);
+	}
+	for (const name of [
+		"eslint-config-next",
+		"postcss-selector-parser",
+		"typescript-eslint",
+	]) {
+		assert.equal(packageJson.devDependencies?.[name], undefined);
 	}
 	assert.ok(packageJson.devDependencies?.["lodash-es"]);
 	assert.equal(packageJson.dependencies?.["lodash-es"], undefined);
 	assert.match(instrumentation, /from "@vercel\/otel"/);
-	assert.match(checkout, /from "@stripe\/react-stripe-js"/);
-	assert.match(checkout, /from "@stripe\/stripe-js"/);
 	assert.match(mcp, /next-devtools-mcp@latest/);
 });

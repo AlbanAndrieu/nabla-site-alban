@@ -54,10 +54,32 @@ const policyNames = [
 
 /** Policy HTML files remain archival sources; public navigation uses native clean routes. */
 const policyHtmlRedirects = policyNames.flatMap((name) => [
-	{ source: `/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
-	{ source: `/en/policy/${name}.html`, destination: `/policy/${name}`, permanent: true },
-	{ source: `/fr/policy/${name}.html`, destination: `/fr/policy/${name}`, permanent: true },
+	{
+		source: `/policy/${name}.html`,
+		destination: `/policy/${name}`,
+		permanent: true,
+	},
+	{
+		source: `/en/policy/${name}.html`,
+		destination: `/policy/${name}`,
+		permanent: true,
+	},
+	{
+		source: `/fr/policy/${name}.html`,
+		destination: `/fr/policy/${name}`,
+		permanent: true,
+	},
 ]);
+
+const baselineSecurityHeaders = [
+	{ key: "X-Content-Type-Options", value: "nosniff" },
+	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+	{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+	{
+		key: "Permissions-Policy",
+		value: "camera=(), microphone=(), geolocation=()",
+	},
+];
 
 const nextConfig = {
 	reactStrictMode: true,
@@ -69,6 +91,14 @@ const nextConfig = {
 	/** Parent `package-lock.json` exists; pin app root so Turbopack does not infer the wrong workspace. */
 	turbopack: {
 		root: __dirname,
+	},
+	async headers() {
+		return [
+			{
+				source: "/:path*",
+				headers: baselineSecurityHeaders,
+			},
+		];
 	},
 	async redirects() {
 		return [

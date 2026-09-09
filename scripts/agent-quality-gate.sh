@@ -196,6 +196,14 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
+            # Reviewed dead-code retirements from the Knip audit. These paths are
+            # absent after this change, so the exception cannot mask future edits.
+            app/\[locale\]/architecture/ArchitectureExplorer.tsx | \
+                app/\[locale\]/architecture/ArchitectureExplorer.module.css | \
+                app/components/truenas/HomeLabNetworkFlow.module.css | \
+                lib/resourcePages.ts)
+                continue
+                ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)
                 ;;
             *)

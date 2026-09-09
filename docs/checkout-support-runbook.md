@@ -15,13 +15,6 @@ Routes de retour :
 
 La locale acceptée est `en` ou `fr`; toute autre valeur retombe sur `en`.
 
-## Embedded Checkout
-
-`app/components/checkout.tsx` et `app/actions/stripe.ts` constituent une seconde
-surface native : le Server Action crée une session avec `ui_mode: "embedded"`
-et renvoie son `client_secret`. Cette surface utilise un petit catalogue local
-et n’est pas le formulaire principal de `/checkout`.
-
 ## Stripe Buy Button
 
 `app/[locale]/checkout-tjm/page.tsx` intègre un Stripe Buy Button et un QR code.
@@ -34,7 +27,6 @@ La clé `pk_` est publiable et peut être exposée au navigateur. Une clé secr�
 | --- | --- |
 | `STRIPE_SECRET_KEY` ou `STRIPE_KEY` | API Stripe côté serveur |
 | `STRIPE_PRICE_ID` ou `PRICE_ID` | prix du Checkout hébergé |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Embedded Checkout navigateur |
 | `DOMAIN` | origine de confiance des URLs de retour |
 | `VERCEL_URL` | fallback fourni par Vercel |
 
@@ -49,8 +41,10 @@ npm run dev
 ```
 
 Tester `/checkout`, `/fr/checkout`, `/checkout-tjm` et `/fr/checkout-tjm` avec
-les cartes de test Stripe. En production, vérifier aussi que `DOMAIN` correspond
-exactement à l’origine publique.
+les cartes de test Stripe. Le checkout applicatif utilise uniquement le SDK
+serveur `stripe`; les anciens SDK navigateur Embedded Checkout ont été retirés.
+En production, vérifier aussi que `DOMAIN` correspond exactement à l’origine
+publique.
 
 ## Chemins historiques
 
