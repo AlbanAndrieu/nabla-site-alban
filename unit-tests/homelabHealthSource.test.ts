@@ -379,14 +379,14 @@ test("homelab health proxy propagates health-board freshness into the JSON contr
 	const body = await response.json();
 
 	assert.equal(response.status, 200);
-	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi-health-board");
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-health-board",
+	);
 	assert.equal(body.health_board.state, "stale");
 	assert.equal(body.health_board.refreshing, true);
 	assert.equal(body.health_board.age_seconds, 33.4);
-	assert.equal(
-		body.health_board.generated_at,
-		"2026-09-09T14:21:06Z",
-	);
+	assert.equal(body.health_board.generated_at, "2026-09-09T14:21:06Z");
 });
 
 test("homelab health proxy returns 503 when FastAPI is unavailable", async () => {

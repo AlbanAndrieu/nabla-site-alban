@@ -55,6 +55,23 @@ function probeStateLabel(
 	return french ? "désactivées" : "disabled";
 }
 
+function probeCacheIcon(source: "origin" | "memory" | undefined): string {
+	if (source === "memory") return "🧊";
+	if (source === "origin") return "🟢";
+	return "◌";
+}
+
+function healthBoardIcon(state: "pending" | "fresh" | "stale"): string {
+	if (state === "fresh") return "●";
+	if (state === "stale") return "◐";
+	return "◌";
+}
+
+function healthBoardRefreshLabel(french: boolean, refreshing: boolean): string {
+	if (!refreshing) return "";
+	return french ? " · refresh en cours" : " · refresh in progress";
+}
+
 export default function HomelabObservationCoverage({
 	snapshot,
 	catalogServiceCount,
@@ -175,11 +192,7 @@ export default function HomelabObservationCoverage({
 						) : null}
 						{snapshot.probe_cache ? (
 							<span data-probe-cache-freshness>
-								{snapshot.probe_cache.source === "memory"
-									? "🧊"
-									: snapshot.probe_cache.source === "origin"
-										? "🟢"
-										: "◌"}{" "}
+								{probeCacheIcon(snapshot.probe_cache.source)}{" "}
 								{french ? "cache sondes" : "probe cache"}:{" "}
 								{snapshot.probe_cache.source ?? "unknown"}
 								{typeof snapshot.probe_cache.age_seconds === "number"
@@ -190,20 +203,15 @@ export default function HomelabObservationCoverage({
 						) : null}
 						{snapshot.health_board ? (
 							<span data-health-board-freshness>
-								{snapshot.health_board.state === "fresh"
-									? "●"
-									: snapshot.health_board.state === "stale"
-										? "◐"
-										: "◌"}{" "}
+								{healthBoardIcon(snapshot.health_board.state)}{" "}
 								health-board {snapshot.health_board.state}
 								{typeof snapshot.health_board.age_seconds === "number"
 									? ` · ${Math.round(snapshot.health_board.age_seconds)}s old`
 									: ""}
-								{snapshot.health_board.refreshing
-									? french
-										? " · refresh en cours"
-										: " · refresh in progress"
-									: ""}
+								{healthBoardRefreshLabel(
+									french,
+									snapshot.health_board.refreshing,
+								)}
 							</span>
 						) : null}
 						{snapshot.reconciliation?.provider_reads_reused ? (
