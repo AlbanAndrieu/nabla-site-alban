@@ -58,10 +58,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
 	assert.match(ci, /\.github\/workflows\/\.\*\\\.ya\?ml/);
-	assert.match(
-		ci,
-		/git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
-	);
+	assert.match(ci, /git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/);
 	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node "\$smoke_script"/);
 });
 
@@ -112,8 +109,14 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(checkpoint, /filename\.startsWith\('\.zap\/'\)/);
 	assert.match(checkpoint, /workflow_run:/);
 	assert.match(checkpoint, /CI \(Quality and Security\)/);
-	assert.match(checkpoint, /github\.event\.workflow_run\.conclusion == 'success'/);
-	assert.match(checkpoint, /github\.event\.workflow_run\.event == 'pull_request'/);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.conclusion == 'success'/,
+	);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.event == 'pull_request'/,
+	);
 	assert.match(
 		checkpoint,
 		/github\.event\.workflow_run\.pull_requests\[0\]\.number/,
