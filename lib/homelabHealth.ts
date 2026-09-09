@@ -175,10 +175,7 @@ export type HomelabHealthSnapshot = {
 	};
 };
 
-export type HomelabHealthSource =
-	| "fastapi"
-	| "fastapi-probes"
-	| "unavailable";
+export type HomelabHealthSource = "fastapi" | "fastapi-probes" | "unavailable";
 
 export const HOMELAB_HEALTH_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
@@ -250,9 +247,7 @@ function validOptionalStringArray(value: unknown): boolean {
 	return (
 		value === undefined ||
 		(Array.isArray(value) &&
-			value.every(
-				(item) => typeof item === "string" && item.trim().length > 0,
-			))
+			value.every((item) => typeof item === "string" && item.trim().length > 0))
 	);
 }
 
@@ -327,7 +322,8 @@ function validDependencyEvidence(value: unknown): boolean {
 			isRecord(item) &&
 			typeof item.target === "string" &&
 			item.target.trim().length > 0 &&
-			(item.target_name === undefined || typeof item.target_name === "string") &&
+			(item.target_name === undefined ||
+				typeof item.target_name === "string") &&
 			typeof item.relation_type === "string" &&
 			item.relation_type.trim().length > 0 &&
 			isHealthState(item.target_state) &&
@@ -463,7 +459,9 @@ function parseSecurityFilters(
 	return filters.length > 0 ? filters : undefined;
 }
 
-function parseIngressEndpoint(value: unknown): PfSenseIngressEndpoint | undefined {
+function parseIngressEndpoint(
+	value: unknown,
+): PfSenseIngressEndpoint | undefined {
 	if (!isRecord(value)) return undefined;
 	if (
 		!validOptionalString(value.ip) ||
@@ -477,13 +475,17 @@ function parseIngressEndpoint(value: unknown): PfSenseIngressEndpoint | undefine
 		return undefined;
 	}
 	return {
-		...(value.ip === null || typeof value.ip === "string" ? { ip: value.ip } : {}),
+		...(value.ip === null || typeof value.ip === "string"
+			? { ip: value.ip }
+			: {}),
 		...(typeof value.port === "number" ? { port: value.port } : {}),
 		...(typeof value.role === "string" ? { role: value.role } : {}),
 	};
 }
 
-function parseIngressBlock(value: unknown): PfSenseIngressBlockObservation | undefined {
+function parseIngressBlock(
+	value: unknown,
+): PfSenseIngressBlockObservation | undefined {
 	if (!isRecord(value)) return undefined;
 	if (
 		typeof value.state !== "string" ||
@@ -516,7 +518,9 @@ function parseIngressBlock(value: unknown): PfSenseIngressBlockObservation | und
 		evidence: value.evidence,
 		...(typeof value.engine === "string" ? { engine: value.engine } : {}),
 		...(typeof value.firewall === "string" ? { firewall: value.firewall } : {}),
-		...(typeof value.mechanism === "string" ? { mechanism: value.mechanism } : {}),
+		...(typeof value.mechanism === "string"
+			? { mechanism: value.mechanism }
+			: {}),
 		...(parseIngressEndpoint(value.source)
 			? { source: parseIngressEndpoint(value.source) }
 			: {}),
@@ -721,8 +725,7 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 
 function probesApiUrl(): string {
 	return (
-		process.env.HOMELAB_PROBES_API_URL?.trim() ||
-		HOMELAB_PROBES_DEFAULT_API_URL
+		process.env.HOMELAB_PROBES_API_URL?.trim() || HOMELAB_PROBES_DEFAULT_API_URL
 	);
 }
 

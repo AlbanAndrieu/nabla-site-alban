@@ -15,11 +15,14 @@ export async function GET() {
 	if (boardSnapshot && boardResult.board) {
 		return NextResponse.json(boardSnapshot, {
 			headers: {
-				"Cache-Control": "public, max-age=0, s-maxage=10, stale-while-revalidate=30",
+				"Cache-Control":
+					"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
 				"X-Homelab-Health-Source": "fastapi-health-board",
 				"X-Homelab-Health-Primary": boardResult.primaryUrl,
 				"X-Homelab-Health-Board-State": boardResult.board.state,
-				"X-Homelab-Health-Board-Refreshing": String(boardResult.board.refreshing),
+				"X-Homelab-Health-Board-Refreshing": String(
+					boardResult.board.refreshing,
+				),
 			},
 		});
 	}
@@ -54,7 +57,8 @@ export async function GET() {
 					"Cache-Control": "no-store",
 					"X-Homelab-Health-Source": source,
 					"X-Homelab-Health-Primary": primaryUrl,
-					"X-Homelab-Health-Board-State": boardResult.board?.state ?? "unavailable",
+					"X-Homelab-Health-Board-State":
+						boardResult.board?.state ?? "unavailable",
 				},
 			},
 		);
@@ -62,10 +66,12 @@ export async function GET() {
 
 	return NextResponse.json(snapshot, {
 		headers: {
-			"Cache-Control": "public, max-age=0, s-maxage=15, stale-while-revalidate=30",
+			"Cache-Control":
+				"public, max-age=0, s-maxage=15, stale-while-revalidate=30",
 			"X-Homelab-Health-Source": source,
 			"X-Homelab-Health-Primary": primaryUrl,
-			"X-Homelab-Health-Board-State": boardResult.board?.state ?? "fallback",
+			"X-Homelab-Health-Board-State":
+				boardResult.board?.state ?? "fallback",
 		},
 	});
 }

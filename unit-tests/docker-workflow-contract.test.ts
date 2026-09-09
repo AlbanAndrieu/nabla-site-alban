@@ -14,7 +14,10 @@ test("Docker CI follows the real fallback inputs and modern CodeQL path", async 
 	assert.match(workflow, /actions: read/);
 	assert.match(workflow, /fetch-depth: 2/);
 	assert.match(workflow, /Resolve Trivy scan policy/);
-	assert.match(workflow, /git diff --quiet HEAD\^1 HEAD -- Dockerfile \.dockerignore/);
+	assert.match(
+		workflow,
+		/git diff --quiet HEAD\^1 HEAD -- Dockerfile \.dockerignore/,
+	);
 	assert.match(workflow, /run-trivy=false/);
 	assert.match(
 		workflow,
@@ -123,14 +126,10 @@ test("Docker publication is master-only, GHCR-first and SHA-addressable", async 
 	);
 });
 
-
 test("Docker security actions are pinned to immutable commit SHAs", async () => {
 	const workflow = await read(".github/workflows/docker-build.yml");
 
-	assert.doesNotMatch(
-		workflow,
-		/^\s*uses:\s+[^\s#]+@v\d+(?:\.\d+\.\d+)?\s*$/m,
-	);
+	assert.doesNotMatch(workflow, /^\s*uses:\s+[^\s#]+@v\d+(?:\.\d+\.\d+)?\s*$/m);
 	for (const action of [
 		"actions/checkout",
 		"docker/setup-buildx-action",
