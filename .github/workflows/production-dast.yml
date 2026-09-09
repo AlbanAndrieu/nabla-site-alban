@@ -1,0 +1,137 @@
+name: Production DAST
+
+on:
+  repository_dispatch:
+    types:
+      - vercel.deployment.success
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+    inputs:
+      git_sha:
+        description: "Production Git SHA to associate with this DAST run"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: production-dast
+  cancel-in-progress: true
+
+jobs:
+  zap-baseline:
+    name: OWASP ZAP baseline on production
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'repository_dispatch' &&
+       github.event.client_payload.url != '' &&
+       github.event.client_payload.git.sha != '' &&
+       github.event.client_payload.git.ref == 'master' &&
+       github.event.client_payload.environment == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      BASE_URL: "https://www.albanandrieu.com"
+      DEPLOYED_SHA: >-
+        ${{
+          inputs.git_sha ||
+          github.event.client_payload.git.sha ||
+          github.sha
+        }}
+
+    steps:
+      - name: Validate target SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$DEPLOYED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::DEPLOYED_SHA must be a full lowercase 40-character Git SHA."
+            exit 1
+          fi
+
+      - name: Checkout deployed ZAP policy
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.DEPLOYED_SHA }}
+          persist-credentials: false
+          sparse-checkout: |
+            .zap/rules.tsv
+          sparse-checkout-cone-mode: false
+
+      - name: Verify production DAST can reach the application
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for production DAST."
+            exit 1
+          fi
+          response_headers="$(mktemp)"
+          trap 'rm -f "$response_headers"' EXIT
+          status="$(curl --silent --show-error --output /dev/null --dump-header "$response_headers" --write-out '%{http_code}' --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$BASE_URL/")"
+          mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
+            echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
+            exit 1
+          fi
+
+      - name: Run OWASP ZAP baseline on canonical production
+        uses: zaproxy/action-baseline@v0.15.0
+        env:
+          ZAP_AUTH_HEADER: x-vercel-protection-bypass
+          ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          ZAP_AUTH_HEADER_SITE: www.albanandrieu.com
+        with:
+          target: ${{ env.BASE_URL }}
+          rules_file_name: ".zap/rules.tsv"
+          allow_issue_writing: false
+          fail_action: true
+          artifact_name: zap-production-report
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP production workspace
+        if: always()
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
+
+      - name: Summarize production DAST
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          {
+            echo "## Production DAST"
+            echo
+            echo "- Result: **$JOB_STATUS**"
+            echo "- Target: $BASE_URL"
+            echo "- Associated SHA: $DEPLOYED_SHA"
+            echo "- Scan: OWASP ZAP Baseline (passive, blocking only explicit FAIL rules)"
+            echo "- Report artifact: **zap-production-report**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish production DAST status
+        if: always() && github.event_name != 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS_SHA: ${{ env.DEPLOYED_SHA }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$JOB_STATUS" in
+            success) STATE=success; DESCRIPTION='Production ZAP baseline passed' ;;
+            cancelled) STATE=error; DESCRIPTION='Production ZAP baseline cancelled' ;;
+            *) STATE=failure; DESCRIPTION='Production ZAP baseline failed' ;;
+          esac
+
+          payload="$(jq -n             --arg state "$STATE"             --arg target_url "$RUN_URL"             --arg description "$DESCRIPTION"             --arg context 'Production DAST'             '{state: $state, target_url: $target_url, description: $description, context: $context}')"
+
+          curl --fail-with-body --silent --show-error             --request POST             --header "Authorization: Bearer $GH_TOKEN"             --header 'Accept: application/vnd.github+json'             --header 'X-GitHub-Api-Version: 2022-11-28'             "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$STATUS_SHA"             --data "$payload"

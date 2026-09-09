@@ -137,6 +137,33 @@ jobs:
 
           echo "Vercel Preview access accepted with Protection Bypass for Automation (HTTP $status)."
 
+      - name: Scope ZAP authentication to the Preview host
+        id: zap-preview-target
+        env:
+          PREVIEW_URL: ${{ env.PREVIEW_BASE_URL }}
+        run: |
+          host="$(node --input-type=module -e 'console.log(new URL(process.env.PREVIEW_URL).hostname)')"
+          echo "host=$host" >> "$GITHUB_OUTPUT"
+
+      - name: Run OWASP ZAP baseline on Preview
+        uses: zaproxy/action-baseline@v0.15.0
+        env:
+          ZAP_AUTH_HEADER: x-vercel-protection-bypass
+          ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          ZAP_AUTH_HEADER_SITE: ${{ steps.zap-preview-target.outputs.host }}
+        with:
+          target: ${{ env.PREVIEW_BASE_URL }}
+          rules_file_name: ".zap/rules.tsv"
+          allow_issue_writing: false
+          fail_action: true
+          artifact_name: zap-preview-report
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP Preview workspace
+        if: always()
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
+
       - name: Run Playwright integration, security, performance and E2E on Preview
         id: playwright
         run: npm test -- --project=chromium
@@ -163,7 +190,7 @@ jobs:
           echo "## Playwright tests failed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Target: $BASE_URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the **playwright-report** artifact for traces and screenshots when tests reached Playwright." >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the **zap-preview-report** and **playwright-report** artifacts for security findings, traces, and screenshots." >> "$GITHUB_STEP_SUMMARY"
         env:
           BASE_URL: ${{ env.PREVIEW_BASE_URL }}
 
@@ -176,9 +203,9 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           case "$JOB_STATUS" in
-            success) STATE=success; DESCRIPTION='Playwright preview baselines and E2E passed' ;;
-            cancelled) STATE=error; DESCRIPTION='Playwright preview baselines and E2E cancelled' ;;
-            *) STATE=failure; DESCRIPTION='Playwright preview baselines and E2E failed' ;;
+            success) STATE=success; DESCRIPTION='Preview ZAP baseline and Playwright E2E passed' ;;
+            cancelled) STATE=error; DESCRIPTION='Preview security and E2E cancelled' ;;
+            *) STATE=failure; DESCRIPTION='Preview ZAP baseline or Playwright E2E failed' ;;
           esac
 
           payload="$(jq -n \

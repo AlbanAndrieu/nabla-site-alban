@@ -32,7 +32,9 @@ on:
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
+      - ".github/workflows/production-dast.yml"
       - ".github/workflows/vercel-preview.yml"
+      - ".zap/**"
   push:
     branches:
       - master
@@ -66,11 +68,14 @@ on:
       - ".github/workflows/release.yml"
       - ".github/workflows/playwright.yml"
       - ".github/workflows/production-smoke.yml"
+      - ".github/workflows/production-dast.yml"
       - ".github/workflows/vercel-preview.yml"
+      - ".zap/**"
   workflow_dispatch:
 
 permissions:
   contents: read
+  statuses: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -84,12 +89,154 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
+      - name: Verify current production baseline before PR build
+        id: production-baseline
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        with:
+          script: |
+            const baseSha = process.env.BASE_SHA;
+            const { data: combined } = await github.rest.repos.getCombinedStatusForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: baseSha,
+              per_page: 100,
+            });
+
+            const statuses = [...combined.statuses].sort(
+              (left, right) =>
+                new Date(right.created_at).getTime() -
+                new Date(left.created_at).getTime(),
+            );
+            const latestByContext = new Map();
+            for (const status of statuses) {
+              if (!latestByContext.has(status.context)) {
+                latestByContext.set(status.context, status);
+              }
+            }
+
+            const required = ['Vercel', 'Production Post-deploy Smoke'];
+            let productionDastExistsOnBase = true;
+            try {
+              await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: '.github/workflows/production-dast.yml',
+                ref: baseSha,
+              });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              productionDastExistsOnBase = false;
+              core.info(
+                'Production DAST is not present on the PR base yet; bootstrap requirement skipped for this PR only.',
+              );
+            }
+
+            if (productionDastExistsOnBase) {
+              required.push('Production DAST');
+            }
+            core.setOutput(
+              'bootstrap-dast',
+              productionDastExistsOnBase ? 'false' : 'true',
+            );
+
+            const failures = [];
+            for (const name of required) {
+              const status = latestByContext.get(name);
+              if (!status) {
+                failures.push(name + ': missing on base ' + baseSha);
+                continue;
+              }
+              if (status.state !== 'success') {
+                failures.push(name + ': ' + status.state);
+                continue;
+              }
+              core.info(name + ': success (' + (status.target_url || 'no URL') + ')');
+            }
+
+            if (failures.length > 0) {
+              core.setFailed(
+                'Current production baseline is not healthy for base ' +
+                  baseSha +
+                  ': ' +
+                  failures.join('; '),
+              );
+            }
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Run Semgrep SAST on changed source
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_sha="${BASE_SHA:-}"
+          if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
+            base_sha="$(git rev-parse "$HEAD_SHA^")"
+          fi
+          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)$' || true)"
+          if [[ -z "$files" ]]; then
+            echo "No changed application source files require Semgrep."
+            exit 0
+          fi
+          printf 'Semgrep SAST targets:\n%s\n' "$files"
+          docker run --rm --env SEMGREP_SEND_METRICS=off --volume "$PWD:/src" --workdir /src semgrep/semgrep:1.176.0 semgrep scan --config p/ci --error --metrics=off $files
+
+      - name: Verify production DAST can reach the application
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]]; then
+            echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for production DAST."
+            exit 1
+          fi
+          response_headers="$(mktemp)"
+          trap 'rm -f "$response_headers"' EXIT
+          status="$(curl --silent --show-error --output /dev/null --dump-header "$response_headers" --write-out '%{http_code}' --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" https://www.albanandrieu.com/)"
+          mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
+            echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
+            exit 1
+          fi
+
+      - name: Bootstrap production DAST before first DAST-enabled merge
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        uses: zaproxy/action-baseline@v0.15.0
+        env:
+          ZAP_AUTH_HEADER: x-vercel-protection-bypass
+          ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          ZAP_AUTH_HEADER_SITE: www.albanandrieu.com
+        with:
+          target: "https://www.albanandrieu.com"
+          rules_file_name: ".zap/rules.tsv"
+          allow_issue_writing: false
+          fail_action: true
+          artifact_name: zap-production-bootstrap-report
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP bootstrap workspace
+        if: >-
+          always() &&
+          github.event_name == 'pull_request' &&
+          steps.production-baseline.outputs.bootstrap-dast == 'true'
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
 
       - name: Setup Python
         uses: actions/setup-python@v6
