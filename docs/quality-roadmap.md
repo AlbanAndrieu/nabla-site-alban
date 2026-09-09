@@ -478,8 +478,10 @@ Autres contrôles :
   d'une PR : Quality/Security exige `Vercel` et
   `Production Post-deploy Smoke` verts sur le SHA `master` de base. Dès que
   `production-dast.yml` existe sur ce SHA, le statut `Production DAST`
-  devient lui aussi obligatoire. Cette exception de bootstrap ne s'applique
-  qu'à la première PR qui introduit le workflow.
+  devient lui aussi obligatoire. La première PR qui introduit le workflow ne
+  contourne pas le contrôle : elle exécute un ZAP production de bootstrap contre
+  le site canonique, puis les PR suivantes réutilisent le statut publié sur
+  `master`.
 - [x] Publier `Production DAST` sur le SHA réellement déployé après
   `vercel.deployment.success`, en complément du smoke HTTP/SEO post-déploiement
   déjà existant. Le scan planifié quotidien surveille aussi la production sans
