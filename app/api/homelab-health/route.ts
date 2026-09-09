@@ -72,8 +72,8 @@ export async function GET() {
 					"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
 				"X-Homelab-Health-Source": probes.source,
 				"X-Homelab-Health-Primary": probes.primaryUrl,
-					"X-Homelab-Health-Board-State":
-						boardResult.board?.state ?? "fallback",
+				"X-Homelab-Health-Board-State":
+					boardResult.board?.state ?? "fallback",
 				},
 			},
 		);
