@@ -371,7 +371,9 @@ Autres contrôles :
 - [x] Conserver CodeQL comme SAST global et ajouter Semgrep CE 1.176.0 dans
   Quality/Security pour scanner uniquement les fichiers applicatifs modifiés
   avec le ruleset `p/ci`. Le scan échoue avant l'installation npm lorsqu'une
-  nouvelle violation SAST bloquante est introduite.
+  nouvelle violation SAST bloquante est introduite. Le rapport Semgrep est aussi
+  exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
+  afin de rendre le diagnostic exploitable sans relancer le scan.
 - [x] Ajouter OWASP ZAP Baseline 0.15.0 comme DAST passif partagé : le Preview
   protégé utilise le header Vercel Automation Bypass, tandis que la production
   canonique est scannée après les déploiements `master` et quotidiennement.
@@ -487,6 +489,10 @@ Autres contrôles :
   contourne pas le contrôle : elle exécute un ZAP production de bootstrap contre
   le site canonique, puis les PR suivantes réutilisent le statut publié sur
   `master`.
+- [x] Rejouer en plus le smoke HTTP/SEO réel contre
+  `https://www.albanandrieu.com` sur chaque PR, avant SAST et avant build, en
+  exécutant le script récupéré depuis le SHA `master` de base avec
+  `git show`. Une PR ne peut donc pas affaiblir son propre smoke pré-merge.
 - [x] Publier `Production DAST` sur le SHA réellement déployé après
   `vercel.deployment.success`, en complément du smoke HTTP/SEO post-déploiement
   déjà existant. Le scan planifié quotidien surveille aussi la production sans
@@ -544,7 +550,11 @@ Autres contrôles :
   7 septembre 2026 a été refusé (HTTP 403) lors de la création du tag technique ;
   le workflow échoue désormais fermé côté mutation et exige le GitHub App dédié
   (`RELEASE_APP_CLIENT_ID` + `RELEASE_APP_PRIVATE_KEY`) avant de publier.
-- [ ] Configurer un ruleset GitHub avec Quality/Security comme check requis.
+- [ ] Configurer un ruleset GitHub pour rendre réellement obligatoires avant
+  merge les statuts de PR `CI (Quality and Security)`, `Vercel` et
+  `Playwright Preview E2E`. Le repository ne possède actuellement aucun
+  ruleset ; les contrôles production Post-deploy Smoke/DAST sont vérifiés par
+  Quality sur le SHA `master` de base.
 - [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
   changements docs-only et les commits intermédiaires d'une même PR. Le correctif
   `deploymentEnabled["**"] = false` est préparé pour empêcher les branches
