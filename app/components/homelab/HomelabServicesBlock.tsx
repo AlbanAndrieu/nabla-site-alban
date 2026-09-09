@@ -647,6 +647,7 @@ export default function HomelabServicesBlock() {
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
+									topology={state.topology}
 									snapshot={state.snapshot}
 									healthUnavailable={state.healthUnavailable}
 									healthHttpStatus={state.healthStatus}

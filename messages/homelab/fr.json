@@ -134,6 +134,11 @@
 			"unknown": "inconnu",
 			"snapshotUnavailable": "couverture des sondes runtime indisponible tant qu’aucun snapshot de santé valide n’est reçu"
 		},
+		"metadata": {
+			"topology": "{kind} · {category}",
+			"criticality": "criticité {level}",
+			"securityFunctions": "NIST CSF {functions}"
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",

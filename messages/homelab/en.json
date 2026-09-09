@@ -134,6 +134,11 @@
 			"unknown": "unknown",
 			"snapshotUnavailable": "runtime probe coverage unavailable until a valid health snapshot is received"
 		},
+		"metadata": {
+			"topology": "{kind} · {category}",
+			"criticality": "criticality {level}",
+			"securityFunctions": "NIST CSF {functions}"
+		},
 		"truenas": {
 			"down": "TrueNAS appears to be down",
 			"degraded": "TrueNAS connectivity is degraded",
