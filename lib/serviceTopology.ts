@@ -117,9 +117,13 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 								typeof environment.cloudflareTunnel === "boolean",
 						))) &&
 				(node.presentationRole === undefined ||
-					["service", "core", "support"].includes(String(node.presentationRole))) &&
+					["service", "core", "support"].includes(
+						String(node.presentationRole),
+					)) &&
 				(node.criticality === undefined ||
-					["critical", "high", "medium", "low"].includes(String(node.criticality))),
+					["critical", "high", "medium", "low"].includes(
+						String(node.criticality),
+					)),
 		)
 	) {
 		return null;
