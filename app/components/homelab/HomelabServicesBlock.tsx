@@ -3,25 +3,25 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
 	type HomelabHealthState,
+	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
+import {
+	type HomelabEnvironment,
+	type HomelabService,
+	type HomelabServicesCatalog,
+	homelabServiceEnvironment,
+	homelabServiceId,
+} from "@/lib/homelabServices";
 import {
 	groupCatalogByPresentation,
 	type ServiceMetricsProfile,
 	type ServicePresentationGroup,
 	type ServicePresentationGroupEntry,
 } from "@/lib/servicePresentation";
-import {
-	homelabServiceEnvironment,
-	homelabServiceId,
-	type HomelabEnvironment,
-	type HomelabService,
-	type HomelabServicesCatalog,
-} from "@/lib/homelabServices";
 import {
 	parseServiceTopology,
 	type ServiceTopology,
@@ -34,7 +34,12 @@ import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
 
 const HEALTH_REFRESH_MS = 30_000;
-const HEALTH_STATES: readonly HomelabHealthState[] = ["ok", "warn", "fail", "unknown"];
+const HEALTH_STATES: readonly HomelabHealthState[] = [
+	"ok",
+	"warn",
+	"fail",
+	"unknown",
+];
 const ALL_GROUPS: readonly ServicePresentationGroup[] = [
 	"services",
 	"core-critical",
@@ -93,7 +98,10 @@ const GROUP_TITLE_KEY: Record<ServicePresentationGroup, GroupTitleKey> = {
 	support: "presentation.groups.support",
 };
 
-const GROUP_DESCRIPTION_KEY: Record<ServicePresentationGroup, GroupDescriptionKey> = {
+const GROUP_DESCRIPTION_KEY: Record<
+	ServicePresentationGroup,
+	GroupDescriptionKey
+> = {
 	services: "presentation.descriptions.services",
 	"core-critical": "presentation.descriptions.core-critical",
 	"security-controls": "presentation.descriptions.security-controls",
@@ -109,13 +117,20 @@ const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
 	support: "presentation.metrics.support",
 };
 
-async function fetchCatalog(signal: AbortSignal): Promise<HomelabServicesCatalog> {
-	const response = await fetch("/api/homelab-services", { cache: "no-store", signal });
+async function fetchCatalog(
+	signal: AbortSignal,
+): Promise<HomelabServicesCatalog> {
+	const response = await fetch("/api/homelab-services", {
+		cache: "no-store",
+		signal,
+	});
 	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
 	return (await response.json()) as HomelabServicesCatalog;
 }
 
-async function fetchTopology(signal: AbortSignal): Promise<ServiceTopology | null> {
+async function fetchTopology(
+	signal: AbortSignal,
+): Promise<ServiceTopology | null> {
 	try {
 		const response = await fetch("/api/homelab-topology", {
 			cache: "no-store",
@@ -132,7 +147,10 @@ async function fetchTopology(signal: AbortSignal): Promise<ServiceTopology | nul
 
 async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	try {
-		const response = await fetch("/api/homelab-health", { cache: "no-store", signal });
+		const response = await fetch("/api/homelab-health", {
+			cache: "no-store",
+			signal,
+		});
 		if (!response.ok) return { snapshot: null, status: response.status };
 		return {
 			snapshot: parseHomelabHealthSnapshot(await response.json()),
@@ -186,12 +204,13 @@ export default function HomelabServicesBlock() {
 		healthRefreshing: true,
 	});
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
-	const [environmentFilter, setEnvironmentFilter] = useState<EnvironmentFilter>("all");
+	const [environmentFilter, setEnvironmentFilter] =
+		useState<EnvironmentFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [expandedGroups, setExpandedGroups] = useState<Set<ServicePresentationGroup>>(
-		() => new Set(["services", "core-critical", "security-controls"]),
-	);
+	const [expandedGroups, setExpandedGroups] = useState<
+		Set<ServicePresentationGroup>
+	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 
 	useEffect(() => {
@@ -245,7 +264,10 @@ export default function HomelabServicesBlock() {
 				}
 			});
 
-		const interval = window.setInterval(() => void refreshHealth(), HEALTH_REFRESH_MS);
+		const interval = window.setInterval(
+			() => void refreshHealth(),
+			HEALTH_REFRESH_MS,
+		);
 		const onVisibilityChange = () => {
 			if (!document.hidden) void refreshHealth();
 		};
@@ -258,13 +280,20 @@ export default function HomelabServicesBlock() {
 		};
 	}, []);
 
-	const indexedHealth = useMemo(() => healthIndex(state.snapshot), [state.snapshot]);
+	const indexedHealth = useMemo(
+		() => healthIndex(state.snapshot),
+		[state.snapshot],
+	);
 	const healthCounts = useMemo(() => {
-		const counts: Record<HomelabHealthState, number> = { ok: 0, warn: 0, fail: 0, unknown: 0 };
+		const counts: Record<HomelabHealthState, number> = {
+			ok: 0,
+			warn: 0,
+			fail: 0,
+			unknown: 0,
+		};
 		for (const service of state.catalog?.services ?? [])
-			counts[
-				effectiveState(service, indexedHealth, state.healthUnavailable)
-			] += 1;
+			counts[effectiveState(service, indexedHealth, state.healthUnavailable)] +=
+				1;
 		return counts;
 	}, [indexedHealth, state.catalog?.services, state.healthUnavailable]);
 
@@ -274,7 +303,8 @@ export default function HomelabServicesBlock() {
 		const filteredServices = state.catalog.services.filter((service) => {
 			const matchesHealth =
 				healthFilter === "all" ||
-				effectiveState(service, indexedHealth, state.healthUnavailable) === healthFilter;
+				effectiveState(service, indexedHealth, state.healthUnavailable) ===
+					healthFilter;
 			const matchesEnvironment =
 				environmentFilter === "all" ||
 				homelabServiceEnvironment(service) === environmentFilter;
@@ -331,7 +361,9 @@ export default function HomelabServicesBlock() {
 	const openCriticality = () => {
 		setCriticalityOpen(true);
 		window.requestAnimationFrame(() => {
-			document.getElementById(CRITICAL_DEPENDENCY_HIERARCHY_ID)?.scrollIntoView({ block: "start" });
+			document
+				.getElementById(CRITICAL_DEPENDENCY_HIERARCHY_ID)
+				?.scrollIntoView({ block: "start" });
 		});
 	};
 
@@ -360,8 +392,13 @@ export default function HomelabServicesBlock() {
 			>
 				<div className={styles.healthDashboardHeader}>
 					<div>
-						<h3 id="truenas-health-dashboard-title" className={styles.healthDashboardTitle}>
-							{french ? "Santé et filtres des services" : "Service health and filters"}
+						<h3
+							id="truenas-health-dashboard-title"
+							className={styles.healthDashboardTitle}
+						>
+							{french
+								? "Santé et filtres des services"
+								: "Service health and filters"}
 						</h3>
 						<p>
 							{french
@@ -369,7 +406,11 @@ export default function HomelabServicesBlock() {
 								: "Services remain the primary outcome; critical core, security and support are separated without changing dependency propagation."}
 						</p>
 					</div>
-					<span className={styles.refreshStatus} role="status" aria-live="polite">
+					<span
+						className={styles.refreshStatus}
+						role="status"
+						aria-live="polite"
+					>
 						{state.healthRefreshing
 							? french
 								? "Actualisation…"
@@ -386,7 +427,10 @@ export default function HomelabServicesBlock() {
 
 				<p className={styles.healthSemantics}>{t("health.semantics")}</p>
 
-				<div className={styles.healthSummary} aria-label={french ? "Résumé santé" : "Health summary"}>
+				<div
+					className={styles.healthSummary}
+					aria-label={french ? "Résumé santé" : "Health summary"}
+				>
 					{HEALTH_STATES.map((healthState) => (
 						<button
 							type="button"
@@ -394,7 +438,11 @@ export default function HomelabServicesBlock() {
 							className={styles.healthChip}
 							aria-pressed={healthFilter === healthState}
 							data-homelab-health-filter={healthState}
-							onClick={() => setHealthFilter((current) => current === healthState ? "all" : healthState)}
+							onClick={() =>
+								setHealthFilter((current) =>
+									current === healthState ? "all" : healthState,
+								)
+							}
 						>
 							<strong>{healthCounts[healthState]}</strong>{" "}
 							{healthState === "ok"
@@ -418,7 +466,9 @@ export default function HomelabServicesBlock() {
 
 				<div className={styles.controls} data-homelab-hierarchy-controls>
 					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>{french ? "Santé" : "Health"}</span>
+						<span className={styles.filterLabel}>
+							{french ? "Santé" : "Health"}
+						</span>
 						<select
 							className={styles.filterSelect}
 							value={healthFilter}
@@ -427,7 +477,9 @@ export default function HomelabServicesBlock() {
 							}
 							data-homelab-health-select
 						>
-							<option value="all">{french ? "Tous les états" : "All health states"}</option>
+							<option value="all">
+								{french ? "Tous les états" : "All health states"}
+							</option>
 							<option value="ok">{french ? "Sain" : "Healthy"}</option>
 							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
 							<option value="fail">{french ? "En échec" : "Failed"}</option>
@@ -435,7 +487,9 @@ export default function HomelabServicesBlock() {
 						</select>
 					</label>
 					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>{t("presentation.searchLabel")}</span>
+						<span className={styles.filterLabel}>
+							{t("presentation.searchLabel")}
+						</span>
 						<input
 							type="search"
 							className={styles.filterSelect}
@@ -446,21 +500,31 @@ export default function HomelabServicesBlock() {
 						/>
 					</label>
 					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>{french ? "Environnement" : "Environment"}</span>
+						<span className={styles.filterLabel}>
+							{french ? "Environnement" : "Environment"}
+						</span>
 						<select
 							className={styles.filterSelect}
 							value={environmentFilter}
-							onChange={(event) => setEnvironmentFilter(event.currentTarget.value as EnvironmentFilter)}
+							onChange={(event) =>
+								setEnvironmentFilter(
+									event.currentTarget.value as EnvironmentFilter,
+								)
+							}
 							data-homelab-environment-filter
 						>
-							<option value="all">{french ? "Tous les environnements" : "All environments"}</option>
+							<option value="all">
+								{french ? "Tous les environnements" : "All environments"}
+							</option>
 							<option value="production">Production</option>
 							<option value="staging">Staging</option>
 							<option value="dev">Dev</option>
 						</select>
 					</label>
 					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>{t("presentation.filterLabel")}</span>
+						<span className={styles.filterLabel}>
+							{t("presentation.filterLabel")}
+						</span>
 						<select
 							className={styles.filterSelect}
 							value={groupFilter}
