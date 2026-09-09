@@ -154,7 +154,10 @@ test("theme and Docker hardening from Bababou 159-160 are already converged", as
 	assert.match(theme, /--toggle-segment-muted:\s*#495057/);
 	assert.match(dockerfile, /nginxinc\/nginx-unprivileged:1\.30\.4-alpine-slim/);
 	assert.match(dockerfile, /USER 101/);
-	assert.match(dockerWorkflow, /aquasecurity\/trivy-action@v0\.36\.0/);
+	assert.match(
+		dockerWorkflow,
+		/aquasecurity\/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0\.36\.0/,
+	);
 	assert.match(
 		dockerWorkflow,
 		/GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/,
