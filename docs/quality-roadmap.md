@@ -270,6 +270,10 @@ les autres chantiers.
   `healthy`, `degraded`, `failed`, `stale` et `unknown` : le test
   déterministe couvre TrueNAS en thème clair/sombre, Architecture en mobile,
   vérifie le contraste AA des badges, les cibles tactiles et l'absence d'overflow.
+  Le contrat UI traite aussi `runtime_missing=true` comme un drift d’inventaire
+  lorsque des preuves d’origine fraîches (`internal_state=ok` ou HTTP 2xx)
+  démontrent que le workload répond : l’état présenté devient `warn`, avec
+  un motif explicite, au lieu d’un faux `fail` (cas Vaultwarden).
 
 ## P1 — Présentation service-first et métriques à l'échelle
 

@@ -1,4 +1,5 @@
 import type { HomelabHealthEntry, HomelabHealthState } from "./homelabHealth";
+import { hasFreshRuntimeInventoryConflict } from "./homelabHealthResolver";
 
 export type HomelabPresentationState = HomelabHealthState | "pending";
 
@@ -46,6 +47,7 @@ export function cloudflareIndicatorColor(entry?: HomelabHealthEntry): string {
 
 
 export type HomelabHealthReasonKind =
+	| "runtime_inventory_mismatch"
 	| "runtime_down"
 	| "public_endpoint_down"
 	| "internal_endpoint_down"
@@ -93,6 +95,10 @@ export function homelabHealthReasons(
 	const runtimeState = entry.runtime_state?.trim().toLowerCase();
 	const runtimeStale = options.runtimeStale === true || entry.runtime_stale === true;
 	const tunnelStatus = entry.tunnel_status?.trim().toLowerCase();
+
+	if (hasFreshRuntimeInventoryConflict(entry)) {
+		reasons.push({ kind: "runtime_inventory_mismatch" });
+	}
 
 	if (runtimeStale) {
 		reasons.push({ kind: "runtime_stale" });

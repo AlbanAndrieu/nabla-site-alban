@@ -19,6 +19,7 @@ type Props = {
 };
 
 type HealthReasonMessageKey =
+	| "health.reasons.runtimeInventoryMismatch"
 	| "health.reasons.runtimeDown"
 	| "health.reasons.publicEndpointDown"
 	| "health.reasons.internalEndpointDown"
@@ -32,6 +33,8 @@ type HealthReasonMessageKey =
 
 function reasonKey(reason: HomelabHealthReason): HealthReasonMessageKey {
 	switch (reason.kind) {
+		case "runtime_inventory_mismatch":
+			return "health.reasons.runtimeInventoryMismatch";
 		case "runtime_down":
 			return "health.reasons.runtimeDown";
 		case "public_endpoint_down":

@@ -10,6 +10,7 @@ import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import {
 	blockedDependencyLabels,
+	hasFreshRuntimeInventoryConflict,
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
 import {
@@ -331,6 +332,8 @@ export default function HomelabServiceGrid({
 						snapshot?.schema_version,
 					);
 					const resolvedHealth = resolveEffectiveServiceState(initialHealth);
+					const runtimeInventoryConflict =
+						hasFreshRuntimeInventoryConflict(initialHealth);
 					const presentationState: HomelabHealthState = healthUnavailable
 						? "unknown"
 						: resolvedHealth.effectiveState;
@@ -387,6 +390,9 @@ export default function HomelabServiceGrid({
 							<div
 								className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
 								data-effective-health={presentationState}
+								data-runtime-inventory-conflict={
+									runtimeInventoryConflict ? "true" : undefined
+								}
 							>
 								<img
 									className="img-fluid d-block mx-auto p-4"
