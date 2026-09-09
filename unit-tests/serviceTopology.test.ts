@@ -355,3 +355,85 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 	assert.ok(hasRelation("pyroscope", "docker", "hostedBy"));
 	assert.ok(hasRelation("sentry-edge", "sentry-relay", "routesTo"));
 });
+
+
+test("local topology preserves FastAPI Sample production and staging environments", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const sample = topology.nodes.find((node) => node.id === "fastapi-sample");
+	assert.deepEqual(
+		sample?.environments?.map((environment) => environment.name),
+		["production", "staging"],
+	);
+});
+
+test("topology parser validates deployment environment names and URLs", () => {
+	const base = {
+		version: 1,
+		name: "environment-contract",
+		relations: [],
+	};
+
+	assert.ok(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [],
+				},
+			],
+		}),
+	);
+	assert.equal(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [
+						{
+							name: "qa",
+							url: "https://qa.example.com",
+							external: true,
+							cloudflareTunnel: false,
+						},
+					],
+				},
+			],
+		}),
+		null,
+	);
+	assert.equal(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [
+						{
+							name: "production",
+							url: " ",
+							external: true,
+							cloudflareTunnel: false,
+						},
+					],
+				},
+			],
+		}),
+		null,
+	);
+});

@@ -1,7 +1,7 @@
 import localTopology from "../public/service-topology.json";
 
 export type ServiceDeploymentEnvironment = {
-	name: string;
+	name: "production" | "staging" | "dev";
 	url: string;
 	external: boolean;
 	cloudflareTunnel: boolean;
@@ -58,6 +58,10 @@ export const SERVICE_TOPOLOGY_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab-topology";
 
 const PRIMARY_TIMEOUT_MS = 2500;
+const DEPLOYMENT_ENVIRONMENT_NAMES = new Set<
+	ServiceDeploymentEnvironment["name"]
+>(["production", "staging", "dev"]);
+
 const RELATION_TYPES = new Set<ServiceRelationType>([
 	"dependsOn",
 	"consumesApi",
@@ -107,12 +111,15 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				(node.icon === undefined || typeof node.icon === "string") &&
 				(node.environments === undefined ||
 					(Array.isArray(node.environments) &&
-						node.environments.length > 0 &&
 						node.environments.every(
 							(environment) =>
 								isRecord(environment) &&
 								typeof environment.name === "string" &&
+								DEPLOYMENT_ENVIRONMENT_NAMES.has(
+									environment.name as ServiceDeploymentEnvironment["name"],
+								) &&
 								typeof environment.url === "string" &&
+								environment.url.trim().length > 0 &&
 								typeof environment.external === "boolean" &&
 								typeof environment.cloudflareTunnel === "boolean",
 						))) &&

@@ -10,10 +10,13 @@ import {
 } from "@/lib/homelabHealth";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
-	type HomelabEnvironment,
+	type HomelabEnvironmentFilter,
+	homelabServiceMatchesEnvironment,
+	resolveHomelabServiceEnvironments,
+} from "@/lib/homelabEnvironments";
+import {
 	type HomelabService,
 	type HomelabServicesCatalog,
-	homelabServiceEnvironment,
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import {
@@ -66,7 +69,6 @@ type State = {
 type HierarchyGroup = ServicePresentationGroupEntry;
 
 type HealthFilter = "all" | HomelabHealthState;
-type EnvironmentFilter = "all" | "non-dev" | HomelabEnvironment;
 type GroupFilter = "all" | ServicePresentationGroup;
 
 type GroupTitleKey =
@@ -166,24 +168,6 @@ function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
 }
 
-function serviceEnvironmentNames(
-	service: HomelabService,
-	topology: ServiceTopology | null,
-): Set<HomelabEnvironment> {
-	const node = topology?.nodes.find(
-		(candidate) => candidate.id === homelabServiceId(service),
-	);
-	const declared = (node?.environments ?? [])
-		.map((environment) => environment.name)
-		.filter(
-			(name): name is HomelabEnvironment =>
-				name === "production" || name === "staging" || name === "dev",
-		);
-	return new Set(
-		declared.length > 0 ? declared : [homelabServiceEnvironment(service)],
-	);
-}
-
 function healthIndex(snapshot: HomelabHealthSnapshot | null): {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
@@ -223,7 +207,7 @@ export default function HomelabServicesBlock() {
 	});
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [environmentFilter, setEnvironmentFilter] =
-		useState<EnvironmentFilter>("all");
+		useState<HomelabEnvironmentFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [expandedGroups, setExpandedGroups] = useState<
@@ -323,17 +307,14 @@ export default function HomelabServicesBlock() {
 				healthFilter === "all" ||
 				effectiveState(service, indexedHealth, state.healthUnavailable) ===
 					healthFilter;
-			const serviceEnvironments = serviceEnvironmentNames(
+			const serviceEnvironments = resolveHomelabServiceEnvironments(
 				service,
 				state.topology,
 			);
-			const matchesEnvironment =
-				environmentFilter === "all" ||
-				(environmentFilter === "non-dev"
-					? [...serviceEnvironments].some(
-							(environment) => environment !== "dev",
-						)
-					: serviceEnvironments.has(environmentFilter));
+			const matchesEnvironment = homelabServiceMatchesEnvironment(
+				serviceEnvironments,
+				environmentFilter,
+			);
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
@@ -534,7 +515,7 @@ export default function HomelabServicesBlock() {
 							value={environmentFilter}
 							onChange={(event) =>
 								setEnvironmentFilter(
-									event.currentTarget.value as EnvironmentFilter,
+									event.currentTarget.value as HomelabEnvironmentFilter,
 								)
 							}
 							data-homelab-environment-filter
@@ -550,6 +531,11 @@ export default function HomelabServicesBlock() {
 							<option value="production">Production</option>
 							<option value="staging">Staging</option>
 							<option value="dev">Dev</option>
+							<option value="defaulted">
+								{french
+									? "Production par défaut (métadonnées à revoir)"
+									: "Default production (review metadata)"}
+							</option>
 						</select>
 					</label>
 					<label className={styles.filterField}>
