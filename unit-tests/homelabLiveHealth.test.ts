@@ -203,7 +203,13 @@ test("homelab health refreshes every thirty seconds, preserves context and expos
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
-	assert.match(page, /snapshot: health\.snapshot \?\? current\.snapshot/);
-	assert.match(page, /healthUnavailable: health\.snapshot === null/);
+	assert.match(
+		page,
+		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+	);
+	assert.match(
+		page,
+		/healthUnavailable:\s*aggregate\.snapshot === null && probes\.snapshot === null/,
+	);
 	assert.match(page, /healthHttpStatus=\{state\.healthStatus\}/);
 });
