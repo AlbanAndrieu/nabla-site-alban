@@ -238,3 +238,13 @@ test("homelab proxy exposes which source served the catalog", async () => {
 	);
 	assert.equal(body.services[0].name, "Remote through proxy");
 });
+
+test("local fallback keeps the PostgreSQL identity aligned with dependency topology", () => {
+	const local = getStaticHomelabServicesCatalog().catalog;
+	const postgres = local.services.find(
+		(service) => homelabServiceId(service) === "postgresql",
+	);
+	assert.ok(postgres);
+	assert.equal(postgres.id, "postgresql");
+	assert.equal(postgres.internalPort, 5432);
+});

@@ -238,6 +238,11 @@ les autres chantiers.
   avant l'ancien agrégat lorsqu'un health-board n'est pas disponible. Ces
   compteurs décrivent les preuves disponibles et ne changent pas la résolution
   de santé.
+  Compatibilité anticipée avec `fastapi-sample#231` : le Site comprend aussi
+  `eligible/sampled/rotating_sample`, `probe_cache`, la fraîcheur du
+  health-board et la provenance de réconciliation. L'UI affiche donc
+  `sampled/eligible` lorsqu'il est disponible et reste compatible avec
+  `scheduled` sur le runtime actuellement déployé.
 - [x] Dériver le filtre d'environnement TrueNAS depuis
   `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
   Un service sans déclaration reste `production` par compatibilité mais porte
@@ -577,7 +582,8 @@ Autres contrôles :
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque
   `Dockerfile/.dockerignore` change ainsi que sur `master`, en schedule et
-  en exécution manuelle. Le changement du workflow a aussi fait entrer
+  en exécution manuelle. Le correctif CI de #170 supprime aussi les lignes
+  blanches réécrites par Prettier avant la quality gate. Le changement du workflow a aussi fait entrer
   `docker-build.yml` dans le périmètre Semgrep : toutes ses actions critiques
   sont désormais verrouillées sur des SHA Git immuables au lieu de tags
   mutables.

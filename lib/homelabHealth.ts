@@ -141,9 +141,12 @@ export type HomelabProbeStateCounts = {
 export type HomelabProbeScopeSummary = {
 	scope?: string;
 	enabled?: boolean;
+	eligible?: number;
+	sampled?: number;
 	scheduled?: number;
 	completed?: number;
 	timed_out?: number;
+	rotating_sample?: boolean;
 	budget_seconds?: number;
 	per_probe_timeout_seconds?: number;
 	max_concurrency?: number;
@@ -151,10 +154,37 @@ export type HomelabProbeScopeSummary = {
 	states?: HomelabProbeStateCounts;
 };
 
+export type HomelabProbeSampling = {
+	strategy?: string;
+	cache_ttl_seconds?: number;
+};
+
 export type HomelabProbeSummary = {
 	public?: HomelabProbeScopeSummary;
 	internal?: HomelabProbeScopeSummary;
 	catalog_service_count?: number;
+	sampling?: HomelabProbeSampling;
+};
+
+export type HomelabProbeCache = {
+	source?: "origin" | "memory";
+	age_seconds?: number;
+	ttl_seconds?: number;
+	stale?: boolean;
+};
+
+export type HomelabHealthBoardMetadata = {
+	state: "pending" | "fresh" | "stale";
+	refreshing: boolean;
+	generated_at: string | null;
+	age_seconds?: number;
+	retry_after_seconds?: number;
+	error?: string | null;
+};
+
+export type HomelabReconciliationMetadata = {
+	provider_reads_reused?: boolean;
+	truenas_runtime_source?: string;
 };
 
 export type HomelabHealthSnapshot = {
@@ -166,6 +196,9 @@ export type HomelabHealthSnapshot = {
 	internal_probes_enabled?: boolean;
 	internal_services?: HomelabInternalHealthEntry[];
 	probe_summary?: HomelabProbeSummary;
+	probe_cache?: HomelabProbeCache;
+	health_board?: HomelabHealthBoardMetadata;
+	reconciliation?: HomelabReconciliationMetadata;
 	truenas_runtime_reachable?: boolean;
 	truenas_runtime_stale?: boolean;
 	cloudflare_configured?: boolean;
@@ -278,7 +311,12 @@ function parseProbeScopeSummary(
 		summary.scope = value.scope;
 	}
 	if (typeof value.enabled === "boolean") summary.enabled = value.enabled;
+	if (typeof value.rotating_sample === "boolean") {
+		summary.rotating_sample = value.rotating_sample;
+	}
 	for (const field of [
+		"eligible",
+		"sampled",
 		"scheduled",
 		"completed",
 		"timed_out",
@@ -311,7 +349,87 @@ function parseProbeSummary(value: unknown): HomelabProbeSummary | undefined {
 	if (publicSummary) summary.public = publicSummary;
 	if (internalSummary) summary.internal = internalSummary;
 	if (catalogCount !== undefined) summary.catalog_service_count = catalogCount;
+	if (isRecord(value.sampling)) {
+		const sampling: HomelabProbeSampling = {};
+		if (
+			typeof value.sampling.strategy === "string" &&
+			value.sampling.strategy.trim()
+		) {
+			sampling.strategy = value.sampling.strategy;
+		}
+		if (
+			typeof value.sampling.cache_ttl_seconds === "number" &&
+			Number.isFinite(value.sampling.cache_ttl_seconds) &&
+			value.sampling.cache_ttl_seconds >= 0
+		) {
+			sampling.cache_ttl_seconds = value.sampling.cache_ttl_seconds;
+		}
+		summary.sampling = sampling;
+	}
 	return summary;
+}
+
+function parseProbeCache(value: unknown): HomelabProbeCache | undefined {
+	if (!isRecord(value)) return undefined;
+	const cache: HomelabProbeCache = {};
+	if (value.source === "origin" || value.source === "memory") {
+		cache.source = value.source;
+	}
+	for (const field of ["age_seconds", "ttl_seconds"] as const) {
+		const raw = value[field];
+		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+			cache[field] = raw;
+		}
+	}
+	if (typeof value.stale === "boolean") cache.stale = value.stale;
+	return cache;
+}
+
+function parseHealthBoardMetadata(
+	value: unknown,
+): HomelabHealthBoardMetadata | undefined {
+	if (!isRecord(value)) return undefined;
+	if (
+		(value.state !== "pending" &&
+			value.state !== "fresh" &&
+			value.state !== "stale") ||
+		typeof value.refreshing !== "boolean" ||
+		(value.generated_at !== null && typeof value.generated_at !== "string")
+	) {
+		return undefined;
+	}
+	const metadata: HomelabHealthBoardMetadata = {
+		state: value.state,
+		refreshing: value.refreshing,
+		generated_at: value.generated_at,
+	};
+	for (const field of ["age_seconds", "retry_after_seconds"] as const) {
+		const raw = value[field];
+		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+			metadata[field] = raw;
+		}
+	}
+	if (typeof value.error === "string" || value.error === null) {
+		metadata.error = value.error;
+	}
+	return metadata;
+}
+
+function parseReconciliationMetadata(
+	value: unknown,
+): HomelabReconciliationMetadata | undefined {
+	if (!isRecord(value)) return undefined;
+	const metadata: HomelabReconciliationMetadata = {};
+	if (typeof value.provider_reads_reused === "boolean") {
+		metadata.provider_reads_reused = value.provider_reads_reused;
+	}
+	if (
+		typeof value.truenas_runtime_source === "string" &&
+		value.truenas_runtime_source.trim()
+	) {
+		metadata.truenas_runtime_source = value.truenas_runtime_source;
+	}
+	return metadata;
 }
 
 function validDependencyEvidence(value: unknown): boolean {
@@ -653,6 +771,9 @@ export function parseHomelabHealthSnapshot(
 		internalServices = value.internal_services.filter(validInternalHealthEntry);
 	}
 	const probeSummary = parseProbeSummary(value.probe_summary);
+	const probeCache = parseProbeCache(value.probe_cache);
+	const healthBoard = parseHealthBoardMetadata(value.health_board);
+	const reconciliation = parseReconciliationMetadata(value.reconciliation);
 	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
 	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
 	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
@@ -668,6 +789,9 @@ export function parseHomelabHealthSnapshot(
 	const sanitizedValue = { ...value };
 	delete sanitizedValue.pfsense;
 	delete sanitizedValue.probe_summary;
+	delete sanitizedValue.probe_cache;
+	delete sanitizedValue.health_board;
+	delete sanitizedValue.reconciliation;
 
 	return {
 		...sanitizedValue,
@@ -676,6 +800,9 @@ export function parseHomelabHealthSnapshot(
 			? {}
 			: { internal_services: internalServices }),
 		...(probeSummary ? { probe_summary: probeSummary } : {}),
+		...(probeCache ? { probe_cache: probeCache } : {}),
+		...(healthBoard ? { health_board: healthBoard } : {}),
+		...(reconciliation ? { reconciliation } : {}),
 		...(pfsense ? { pfsense } : {}),
 	} as HomelabHealthSnapshot;
 }

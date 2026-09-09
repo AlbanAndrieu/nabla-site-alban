@@ -13,6 +13,7 @@ import {
 
 const ORIGINAL_API_URL = process.env.HOMELAB_HEALTH_API_URL;
 const ORIGINAL_PROBES_API_URL = process.env.HOMELAB_PROBES_API_URL;
+const ORIGINAL_BOARD_API_URL = process.env.HOMELAB_HEALTH_BOARD_API_URL;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 const VALID_SNAPSHOT = {
@@ -91,9 +92,18 @@ function setApiUrl(value: string | undefined) {
 	}
 }
 
+function setBoardApiUrl(value: string | undefined) {
+	if (value === undefined) {
+		delete process.env.HOMELAB_HEALTH_BOARD_API_URL;
+	} else {
+		process.env.HOMELAB_HEALTH_BOARD_API_URL = value;
+	}
+}
+
 test.afterEach(() => {
 	setApiUrl(ORIGINAL_API_URL);
 	setProbesApiUrl(ORIGINAL_PROBES_API_URL);
+	setBoardApiUrl(ORIGINAL_BOARD_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
 });
 
@@ -130,6 +140,63 @@ test("homelab health parser accepts legacy and complete service-health contracts
 		parseHomelabHealthSnapshot(unknownServiceSnapshot),
 		unknownServiceSnapshot,
 	);
+});
+
+test("homelab health parser accepts sampled probe/cache/reconciliation metadata from FastAPI schema 6", () => {
+	const future = {
+		...VALID_SNAPSHOT,
+		schema_version: 6,
+		probe_summary: {
+			public: {
+				...VALID_SNAPSHOT.probe_summary.public,
+				eligible: 71,
+				sampled: 12,
+				scheduled: 12,
+				rotating_sample: true,
+				per_probe_timeout_seconds: 3,
+			},
+			internal: {
+				...VALID_SNAPSHOT.probe_summary.internal,
+				enabled: true,
+				eligible: 71,
+				sampled: 12,
+				scheduled: 12,
+				completed: 12,
+				rotating_sample: true,
+				per_probe_timeout_seconds: 1,
+			},
+			catalog_service_count: 72,
+			sampling: {
+				strategy: "priority-plus-rotating-window",
+				cache_ttl_seconds: 30,
+			},
+		},
+		probe_cache: {
+			source: "memory",
+			age_seconds: 12.4,
+			ttl_seconds: 30,
+			stale: false,
+		},
+		reconciliation: {
+			provider_reads_reused: true,
+			truenas_runtime_source: "health_api",
+		},
+	};
+
+	const parsed = parseHomelabHealthSnapshot(future);
+	assert.ok(parsed);
+	assert.equal(parsed.probe_summary?.internal?.eligible, 71);
+	assert.equal(parsed.probe_summary?.internal?.sampled, 12);
+	assert.equal(parsed.probe_summary?.internal?.rotating_sample, true);
+	assert.equal(parsed.probe_summary?.internal?.per_probe_timeout_seconds, 1);
+	assert.equal(
+		parsed.probe_summary?.sampling?.strategy,
+		"priority-plus-rotating-window",
+	);
+	assert.equal(parsed.probe_cache?.source, "memory");
+	assert.equal(parsed.probe_cache?.age_seconds, 12.4);
+	assert.equal(parsed.reconciliation?.provider_reads_reused, true);
+	assert.equal(parsed.reconciliation?.truenas_runtime_source, "health_api");
 });
 
 test("homelab health parser drops malformed service rows without discarding valid TrueNAS evidence", () => {
@@ -285,6 +352,41 @@ test("homelab health proxy exposes the FastAPI snapshot and cache policy", async
 	assert.match(response.headers.get("cache-control") ?? "", /s-maxage=15/);
 	assert.equal(body.services[0].http_status, 200);
 	assert.equal(body.truenas.state, "fail");
+});
+
+test("homelab health proxy propagates health-board freshness into the JSON contract", async () => {
+	setBoardApiUrl("https://board.example.test/api");
+	globalThis.fetch = (async (input) => {
+		if (String(input) === "https://board.example.test/api") {
+			return Response.json({
+				schema_version: 1,
+				state: "stale",
+				refreshing: true,
+				generated_at: "2026-09-09T14:21:06Z",
+				age_seconds: 33.4,
+				error: "health board refresh deadline exceeded",
+				runtime: null,
+				healthz: null,
+				homelab: VALID_SNAPSHOT,
+				platform_metrics: null,
+				sickz: null,
+			});
+		}
+		return new Response("unexpected fallback", { status: 503 });
+	}) as typeof fetch;
+
+	const response = await GET();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi-health-board");
+	assert.equal(body.health_board.state, "stale");
+	assert.equal(body.health_board.refreshing, true);
+	assert.equal(body.health_board.age_seconds, 33.4);
+	assert.equal(
+		body.health_board.generated_at,
+		"2026-09-09T14:21:06Z",
+	);
 });
 
 test("homelab health proxy returns 503 when FastAPI is unavailable", async () => {

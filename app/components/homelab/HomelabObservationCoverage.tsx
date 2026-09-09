@@ -69,6 +69,20 @@ export default function HomelabObservationCoverage({
 	const publicSummary = probeSummary?.public;
 	const authoritativeCatalogCount =
 		probeSummary?.catalog_service_count ?? catalogServiceCount;
+	const internalSampled =
+		internalSummary?.sampled ??
+		internalSummary?.scheduled ??
+		coverage?.internalProbes ??
+		0;
+	const internalEligible =
+		internalSummary?.eligible ?? internalSummary?.scheduled ?? internalSampled;
+	const publicSampled =
+		publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
+	const publicEligible =
+		publicSummary?.eligible ?? publicSummary?.scheduled ?? publicSampled;
+	const rotatingSample =
+		internalSummary?.rotating_sample === true ||
+		publicSummary?.rotating_sample === true;
 	const topologyLabel = french
 		? `${topologyNodeCount} nœuds · ${topologyRelationCount} relations`
 		: `${topologyNodeCount} nodes · ${topologyRelationCount} relations`;
@@ -106,9 +120,8 @@ export default function HomelabObservationCoverage({
 							{french ? "services observés" : "services observed"}
 						</span>
 						<span
-							data-internal-probe-count={
-								internalSummary?.scheduled ?? coverage.internalProbes
-							}
+							data-internal-probe-count={internalSampled}
+							data-internal-probe-eligible={internalEligible}
 							data-internal-probes-enabled={
 								snapshot?.internal_probes_enabled === undefined
 									? "unknown"
@@ -116,20 +129,34 @@ export default function HomelabObservationCoverage({
 							}
 						>
 							{french ? "sondes LAN/internes" : "LAN/internal probes"}:{" "}
-							{internalSummary?.scheduled ?? coverage.internalProbes}{" "}
-							{french ? "planifiées" : "scheduled"} ·{" "}
+							{internalSampled}/{internalEligible}{" "}
+							{french ? "échantillonnées" : "sampled"} ·{" "}
 							{internalSummary?.completed ?? coverage.internalProbes}{" "}
 							{french ? "terminées" : "completed"} ·{" "}
 							{internalSummary?.timed_out ?? 0} deadline ({probeState})
 						</span>
 						{publicSummary ? (
-							<span data-public-probe-count={publicSummary.scheduled ?? 0}>
+							<span
+								data-public-probe-count={publicSampled}
+								data-public-probe-eligible={publicEligible}
+							>
 								{french ? "sondes publiques" : "public probes"}:{" "}
-								{publicSummary.scheduled ?? 0}{" "}
-								{french ? "planifiées" : "scheduled"} ·{" "}
+								{publicSampled}/{publicEligible}{" "}
+								{french ? "échantillonnées" : "sampled"} ·{" "}
 								{publicSummary.completed ?? 0}{" "}
 								{french ? "terminées" : "completed"} ·{" "}
 								{publicSummary.timed_out ?? 0} deadline
+							</span>
+						) : null}
+						{rotatingSample ? (
+							<span data-probe-rotating-sample>
+								↻{" "}
+								{french
+									? "échantillon rotatif, services prioritaires conservés"
+									: "rotating sample, priority services retained"}
+								{probeSummary?.sampling?.strategy
+									? ` · ${probeSummary.sampling.strategy}`
+									: ""}
 							</span>
 						) : null}
 						{internalSummary?.max_concurrency !== undefined ? (
@@ -139,7 +166,51 @@ export default function HomelabObservationCoverage({
 									? ` · budget ${internalSummary.budget_seconds}s`
 									: ""}
 								{internalSummary.per_probe_timeout_seconds !== undefined
-									? ` · timeout ${internalSummary.per_probe_timeout_seconds}s/probe`
+									? ` · LAN timeout ${internalSummary.per_probe_timeout_seconds}s`
+									: ""}
+								{publicSummary?.per_probe_timeout_seconds !== undefined
+									? ` · public timeout ${publicSummary.per_probe_timeout_seconds}s`
+									: ""}
+							</span>
+						) : null}
+						{snapshot.probe_cache ? (
+							<span data-probe-cache-freshness>
+								{snapshot.probe_cache.source === "memory"
+									? "🧊"
+									: snapshot.probe_cache.source === "origin"
+										? "🟢"
+										: "◌"}{" "}
+								{french ? "cache sondes" : "probe cache"}:{" "}
+								{snapshot.probe_cache.source ?? "unknown"}
+								{typeof snapshot.probe_cache.age_seconds === "number"
+									? ` · ${Math.round(snapshot.probe_cache.age_seconds)}s old`
+									: ""}
+								{snapshot.probe_cache.stale === true ? " · stale" : ""}
+							</span>
+						) : null}
+						{snapshot.health_board ? (
+							<span data-health-board-freshness>
+								{snapshot.health_board.state === "fresh"
+									? "●"
+									: snapshot.health_board.state === "stale"
+										? "◐"
+										: "◌"}{" "}
+								health-board {snapshot.health_board.state}
+								{typeof snapshot.health_board.age_seconds === "number"
+									? ` · ${Math.round(snapshot.health_board.age_seconds)}s old`
+									: ""}
+								{snapshot.health_board.refreshing
+									? french
+										? " · refresh en cours"
+										: " · refresh in progress"
+									: ""}
+							</span>
+						) : null}
+						{snapshot.reconciliation?.provider_reads_reused ? (
+							<span data-reconciliation-provenance>
+								♻ provider reads reused
+								{snapshot.reconciliation.truenas_runtime_source
+									? ` · TrueNAS ${snapshot.reconciliation.truenas_runtime_source}`
 									: ""}
 							</span>
 						) : null}

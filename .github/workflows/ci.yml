@@ -348,7 +348,6 @@ jobs:
           restore-keys: |
             next-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}-
 
-
       - name: Save npm downloads
         if: steps.npm-cache.outputs.cache-hit != 'true'
         continue-on-error: true
@@ -387,7 +386,6 @@ jobs:
         with:
           path: .next/cache
           key: next-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}-${{ github.event.pull_request.number || github.ref_name }}
-
 
       # Avoid container-action image preparation when Snyk is disabled.
       # GitHub can prepare Docker actions before evaluating a step-level if.
