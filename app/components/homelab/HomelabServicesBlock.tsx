@@ -166,6 +166,25 @@ function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
 }
 
+function serviceEnvironmentNames(
+	service: HomelabService,
+	topology: ServiceTopology | null,
+): Set<HomelabEnvironment> {
+	const node = topology?.nodes.find(
+		(candidate) => candidate.id === homelabServiceId(service),
+	);
+	const declared = (node?.environments ?? [])
+		.map((environment) => environment.name)
+		.filter(
+			(name): name is HomelabEnvironment =>
+				name === "production" || name === "staging" || name === "dev",
+		);
+	return new Set(
+		declared.length > 0 ? declared : [homelabServiceEnvironment(service)],
+	);
+}
+
+
 function healthIndex(snapshot: HomelabHealthSnapshot | null): {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
@@ -305,12 +324,15 @@ export default function HomelabServicesBlock() {
 				healthFilter === "all" ||
 				effectiveState(service, indexedHealth, state.healthUnavailable) ===
 					healthFilter;
-			const serviceEnvironment = homelabServiceEnvironment(service);
+			const serviceEnvironments = serviceEnvironmentNames(
+				service,
+				state.topology,
+			);
 			const matchesEnvironment =
 				environmentFilter === "all" ||
 				(environmentFilter === "non-dev"
-					? serviceEnvironment !== "dev"
-					: serviceEnvironment === environmentFilter);
+					? [...serviceEnvironments].some((environment) => environment !== "dev")
+					: serviceEnvironments.has(environmentFilter));
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
