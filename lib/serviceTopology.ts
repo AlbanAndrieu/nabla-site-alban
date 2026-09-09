@@ -16,8 +16,10 @@ export type ServiceTopologyNode = {
 	criticality?: "critical" | "high" | "medium" | "low";
 	sourcePath?: string;
 	url?: string;
+	internalUrl?: string;
 	description?: string;
 	icon?: string;
+	securityFunctions?: string[];
 	environments?: ServiceDeploymentEnvironment[];
 };
 
@@ -109,6 +111,15 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.kind === "string" &&
 				typeof node.category === "string" &&
 				(node.icon === undefined || typeof node.icon === "string") &&
+				(node.internalUrl === undefined ||
+					typeof node.internalUrl === "string") &&
+				(node.securityFunctions === undefined ||
+					(Array.isArray(node.securityFunctions) &&
+						node.securityFunctions.every(
+							(securityFunction) =>
+								typeof securityFunction === "string" &&
+								securityFunction.trim().length > 0,
+						))) &&
 				(node.environments === undefined ||
 					(Array.isArray(node.environments) &&
 						node.environments.every(

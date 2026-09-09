@@ -117,6 +117,9 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	const garageAdmin = result.catalog.services.find(
 		(service) => service.id === "garage-admin",
 	);
+	const scrutinyCollector = result.catalog.services.find(
+		(service) => service.name === "Scrutiny Collector - albandrieu",
+	);
 
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
@@ -125,6 +128,12 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	assert.ok(garageS3);
 	assert.ok(garage);
 	assert.ok(garageAdmin);
+	assert.ok(scrutinyCollector);
+	assert.equal(scrutinyCollector.endpointEnabled, false);
+	assert.equal(
+		scrutinyCollector.healthNote,
+		"Expected upstream target: http://172.17.0.24:31054",
+	);
 	assert.equal(
 		homelabServiceEndpointUrl(truenas),
 		"https://truenas.albandrieu.com:7000/",

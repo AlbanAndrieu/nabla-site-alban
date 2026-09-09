@@ -15,6 +15,7 @@ export type HomelabService = {
 	presentationRole?: "service" | "core" | "support";
 	criticality?: "critical" | "high" | "medium" | "low";
 	description?: string;
+	healthNote?: string;
 	icon?: string;
 	iconSrc?: string;
 	/** Browser navigation target. May intentionally differ from tunnelUrl. */
@@ -130,6 +131,10 @@ export function parseHomelabServicesCatalog(
 					)) &&
 				(service.endpointUrl === undefined ||
 					typeof service.endpointUrl === "string") &&
+				(service.endpointEnabled === undefined ||
+					typeof service.endpointEnabled === "boolean") &&
+				(service.healthNote === undefined ||
+					typeof service.healthNote === "string") &&
 				(service.presentationRole === undefined ||
 					["service", "core", "support"].includes(
 						String(service.presentationRole),

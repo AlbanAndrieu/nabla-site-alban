@@ -216,12 +216,12 @@ les autres chantiers.
   du snapshot : l'UI distingue état courant, fraîcheur/cache, erreur de refresh et
   dernière preuve saine `last_good` afin qu'un ancien état vert ne soit pas lu
   comme une observation live.
-- [x] Revalider le graphe de production après les évolutions `nabla-compose#128/#129` :
-  le fallback Site est resynchronisé sur 108 nœuds / 208 relations, incluant
-  Sentry, Pyroscope, Akvorado, Pi-hole auxiliaires, Doco-CD, Docker socket proxy,
-  Kafka, MongoDB et Nexus. La PR #130 est désormais fusionnée mais son smoke
-  Kubernetes/CSI reste à exécuter et observer ; la PR #131 n'est pas présentée
-  comme déployée tant que son catalogue/runtime n'est pas fusionné et observé.
+- [x] Revalider le graphe après les merges `nabla-compose` jusqu'à la release
+  0.30.0 : le fallback Site est resynchronisé sémantiquement sur 113 nœuds /
+  216 relations et inclut désormais ClamAV, Keycloak et pfSense Unbound, ainsi
+  que les dernières preuves Garage, Cloudflare, CrowdSec et pfSense exporter.
+  Le catalogue de présentation reste aligné sur 72 services et conserve les
+  annotations runtime récentes de Scrutiny.
 - [x] Aligner le fallback de réconciliation des anciens payloads sur
   `fastapi-sample#212` : runtime TrueNAS frais arrêté/échoué non masqué par
   Cloudflare, preuves runtime/tunnel périmées non utilisées comme preuve positive,
