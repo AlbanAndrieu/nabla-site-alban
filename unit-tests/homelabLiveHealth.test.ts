@@ -201,12 +201,3 @@ test("homelab health refreshes every thirty seconds, preserves context and expos
 	assert.match(page, /healthUnavailable: health\.snapshot === null/);
 	assert.match(page, /healthHttpStatus=\{state\.healthStatus\}/);
 });
-
-
-test("service cards consume synchronized topology metadata and catalog health notes", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
-	assert.match(page, /topologyById/);
-	assert.match(page, /data-service-topology-metadata/);
-	assert.match(page, /securityFunctions/);
-	assert.match(page, /data-service-health-note/);
-});

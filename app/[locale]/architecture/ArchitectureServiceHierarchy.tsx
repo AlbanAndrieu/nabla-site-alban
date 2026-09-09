@@ -163,7 +163,6 @@ export default function ArchitectureServiceHierarchy({
 						<div className={`${styles.groupBody} homelab-service-subgrid`}>
 							<HomelabServiceGrid
 								catalog={group.catalog}
-								topology={topology}
 								snapshot={snapshot}
 								healthUnavailable={healthUnavailable}
 								healthHttpStatus={null}

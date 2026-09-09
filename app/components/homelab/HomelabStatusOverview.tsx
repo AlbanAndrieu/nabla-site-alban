@@ -1,10 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import {
-	type HomelabHealthSnapshot,
-	summarizeHomelabObservation,
-} from "@/lib/homelabHealth";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import styles from "./HomelabServicesBlock.module.css";
 
@@ -20,9 +17,6 @@ type Props = {
 	healthUnavailable: boolean;
 	healthHttpStatus: number | null;
 	healthRefreshing: boolean;
-	catalogServiceCount: number;
-	topologyNodeCount: number;
-	topologyRelationCount: number;
 	onOpenCriticality: () => void;
 };
 
@@ -31,9 +25,6 @@ export default function HomelabStatusOverview({
 	healthUnavailable,
 	healthHttpStatus,
 	healthRefreshing,
-	catalogServiceCount,
-	topologyNodeCount,
-	topologyRelationCount,
 	onOpenCriticality,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
@@ -47,7 +38,6 @@ export default function HomelabStatusOverview({
 	const truenasRuntimeStale = snapshot?.truenas_runtime_stale === true;
 	const refreshInProgress = healthRefreshing && (healthUnavailable || snapshot === null);
 	const runtimeWarningDetails: string[] = [];
-	const observation = summarizeHomelabObservation(snapshot);
 
 	if (healthUnavailable) {
 		runtimeWarningDetails.push(
@@ -106,73 +96,6 @@ export default function HomelabStatusOverview({
 			)}
 
 			<div className={styles.statusLegend}>
-				<div
-					className={styles.legendGroup}
-					role="note"
-					aria-label={t("observer.title")}
-					data-homelab-observer-summary
-				>
-					<strong>{t("observer.title")}:</strong>
-					<span>{t("observer.catalog", { count: catalogServiceCount })}</span>
-					<span>
-						{t("observer.topology", {
-							nodes: topologyNodeCount,
-							relations: topologyRelationCount,
-						})}
-					</span>
-					{observation ? (
-						<>
-							<span>
-								{t("observer.serviceObservations", {
-									count: observation.serviceObservations,
-								})}
-							</span>
-							<span
-								data-internal-probe-count={observation.internalProbes}
-								data-internal-probes-enabled={
-									observation.internalProbesEnabled === null
-										? "unknown"
-										: String(observation.internalProbesEnabled)
-								}
-							>
-								{t("observer.internalProbes", {
-									count: observation.internalProbes,
-									state:
-										observation.internalProbesEnabled === null
-											? t("observer.unknown")
-											: observation.internalProbesEnabled
-												? t("observer.enabled")
-												: t("observer.disabled"),
-								})}
-							</span>
-							<span>
-								{t("observer.evidence", {
-									direct: observation.directEvidence,
-									internal: observation.internalEvidence,
-									runtime: observation.runtimeEvidence,
-									tunnel: observation.tunnelEvidence,
-									dependency: observation.dependencyEvidence,
-								})}
-							</span>
-							{observation.cloudflareTunnelsObserved !== null ? (
-								<span>
-									{t("observer.cloudflareTunnels", {
-										count: observation.cloudflareTunnelsObserved,
-									})}
-								</span>
-							) : null}
-							{observation.refreshElapsedMs !== null ? (
-								<span>
-									{t("observer.refresh", {
-										milliseconds: observation.refreshElapsedMs,
-									})}
-								</span>
-							) : null}
-						</>
-					) : (
-						<span>{t("observer.snapshotUnavailable")}</span>
-					)}
-				</div>
 				<div className={styles.legendGroup} role="note" aria-label={t("runtime.legendTitle")} data-truenas-runtime-legend>
 					<strong>{t("runtime.legendTitle")}:</strong>
 					<span><i className={RUNTIME_ICON_CLASS.ok} style={{ color: homelabHealthColor("ok") }} aria-hidden="true" /> {t("runtime.legendRunning")}</span>

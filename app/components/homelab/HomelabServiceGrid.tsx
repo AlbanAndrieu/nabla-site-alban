@@ -18,14 +18,12 @@ import {
 	homelabServiceEndpointUrl,
 	homelabServiceId,
 } from "@/lib/homelabServices";
-import type { ServiceTopology } from "@/lib/serviceTopology";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
 import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
-	topology?: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
@@ -233,7 +231,6 @@ function runtimePresentationState(
 
 export default function HomelabServiceGrid({
 	catalog,
-	topology = null,
 	snapshot,
 	healthUnavailable = false,
 	healthHttpStatus = null,
@@ -241,9 +238,6 @@ export default function HomelabServiceGrid({
 	const t = useTranslations("homelab");
 	const services: HomelabService[] = catalog.services;
 	const serviceHealth = healthIndex(snapshot);
-	const topologyById = new Map(
-		(topology?.nodes ?? []).map((node) => [node.id, node]),
-	);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
 	const truenasApi = snapshot?.truenas?.api;
@@ -326,7 +320,6 @@ export default function HomelabServiceGrid({
 			<div className="row service-grid">
 				{services.map((svc) => {
 					const serviceId = homelabServiceId(svc);
-					const topologyNode = topologyById.get(serviceId);
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 					const isExternal = svc.external === true;
@@ -447,36 +440,6 @@ export default function HomelabServiceGrid({
 									<p className="card-text text-muted small mb-0">
 										{svc.description}
 									</p>
-									{typeof svc.healthNote === "string" && svc.healthNote.trim() ? (
-										<p
-											className="small text-muted mt-2 mb-0"
-											data-service-health-note
-										>
-											<i className="fas fa-stethoscope" aria-hidden="true" />{" "}
-											{svc.healthNote}
-										</p>
-									) : null}
-									{topologyNode ? (
-										<p
-											className="small text-muted mt-2 mb-0"
-											data-service-topology-metadata
-										>
-											{t("metadata.topology", {
-												kind: topologyNode.kind,
-												category: topologyNode.category,
-											})}
-											{topologyNode.criticality
-												? ` · ${t("metadata.criticality", {
-														level: topologyNode.criticality,
-													})}`
-												: ""}
-											{topologyNode.securityFunctions?.length
-												? ` · ${t("metadata.securityFunctions", {
-														functions: topologyNode.securityFunctions.join(", "),
-													})}`
-												: ""}
-										</p>
-									) : null}
 									<ServiceHealthReasons
 										entry={initialHealth}
 										state={presentationState}

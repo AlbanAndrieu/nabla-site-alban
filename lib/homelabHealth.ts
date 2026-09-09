@@ -149,61 +149,6 @@ export type HomelabHealthSnapshot = {
 	};
 };
 
-export type HomelabObservationSummary = {
-	serviceObservations: number;
-	internalProbesEnabled: boolean | null;
-	internalProbes: number;
-	directEvidence: number;
-	internalEvidence: number;
-	runtimeEvidence: number;
-	tunnelEvidence: number;
-	dependencyEvidence: number;
-	cloudflareTunnelsObserved: number | null;
-	refreshElapsedMs: number | null;
-};
-
-export function summarizeHomelabObservation(
-	snapshot: HomelabHealthSnapshot | null,
-): HomelabObservationSummary | null {
-	if (!snapshot) return null;
-
-	return {
-		serviceObservations: snapshot.services.length,
-		internalProbesEnabled:
-			typeof snapshot.internal_probes_enabled === "boolean"
-				? snapshot.internal_probes_enabled
-				: null,
-		internalProbes: snapshot.internal_services?.length ?? 0,
-		directEvidence: snapshot.services.filter(
-			(entry) => entry.direct_state !== undefined && entry.direct_state !== null,
-		).length,
-		internalEvidence: snapshot.services.filter(
-			(entry) =>
-				entry.internal_state !== undefined && entry.internal_state !== null,
-		).length,
-		runtimeEvidence: snapshot.services.filter(
-			(entry) =>
-				entry.runtime_state != null ||
-				entry.runtime_app != null ||
-				entry.runtime_reachable != null,
-		).length,
-		tunnelEvidence: snapshot.services.filter(
-			(entry) => entry.tunnel_status != null || entry.tunnel_name != null,
-		).length,
-		dependencyEvidence: snapshot.services.filter(
-			(entry) => (entry.dependency_evidence?.length ?? 0) > 0,
-		).length,
-		cloudflareTunnelsObserved:
-			typeof snapshot.cloudflare_tunnels_observed === "number"
-				? snapshot.cloudflare_tunnels_observed
-				: null,
-		refreshElapsedMs:
-			typeof snapshot.refresh_elapsed_ms === "number"
-				? snapshot.refresh_elapsed_ms
-				: null,
-	};
-}
-
 export type HomelabHealthSource = "fastapi" | "unavailable";
 
 export const HOMELAB_HEALTH_DEFAULT_API_URL =
