@@ -23,6 +23,7 @@
 - Semgrep CE 1.176.0 scans changed application source and GitHub Actions workflow YAML before dependency installation. Its SARIF is uploaded to GitHub Code Scanning and preserved as a short-lived artifact; the workflow fails closed on a Semgrep finding or scan error.
 - Security-critical GitHub Actions are pinned to immutable 40-character commit SHAs with the reviewed release tag kept as a comment, and the Semgrep container image is pinned by digest. This prevents a mutable upstream tag from silently changing the code executed by CI.
 - The Vercel Preview is tested with a blocking OWASP ZAP Baseline scan before Playwright integration, security and performance coverage.
+- A successful PR Quality run automatically publishes the dedicated Vercel Preview checkpoint for deploy-relevant changes; the manual workflow-dispatch path remains available for recovery/replay.
 - Production has independent post-deploy HTTP/SEO smoke and OWASP ZAP DAST workflows; production DAST also runs daily.
 - `CI (Quality and Security)` then runs lint, type generation/type-check, unit tests and the production build.
 - Snyk runs when `SNYK_TOKEN` is configured.
