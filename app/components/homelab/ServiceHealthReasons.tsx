@@ -6,8 +6,8 @@ import type {
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
-	homelabHealthReasons,
 	type HomelabHealthReason,
+	homelabHealthReasons,
 } from "@/lib/homelabHealthPresentation";
 
 type Props = {

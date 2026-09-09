@@ -59,7 +59,9 @@ export function blockedDependencyLabels(entry?: HomelabHealthEntry): string[] {
 			evidence.target_name?.trim() || evidence.target,
 		]),
 	);
-	return resolved.blockedBy.map((serviceId) => names.get(serviceId) ?? serviceId);
+	return resolved.blockedBy.map(
+		(serviceId) => names.get(serviceId) ?? serviceId,
+	);
 }
 
 export function requiredDependencyTargetState(

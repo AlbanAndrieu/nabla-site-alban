@@ -102,12 +102,11 @@ export async function GET() {
 		withHealthBoardMetadata(snapshot, boardResult.board),
 		{
 			headers: {
-			"Cache-Control":
-				"public, max-age=0, s-maxage=15, stale-while-revalidate=30",
-			"X-Homelab-Health-Source": source,
-			"X-Homelab-Health-Primary": primaryUrl,
-				"X-Homelab-Health-Board-State":
-					boardResult.board?.state ?? "fallback",
+				"Cache-Control":
+					"public, max-age=0, s-maxage=15, stale-while-revalidate=30",
+				"X-Homelab-Health-Source": source,
+				"X-Homelab-Health-Primary": primaryUrl,
+				"X-Homelab-Health-Board-State": boardResult.board?.state ?? "fallback",
 			},
 		},
 	);

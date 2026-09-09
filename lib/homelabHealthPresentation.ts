@@ -45,7 +45,6 @@ export function cloudflareIndicatorColor(entry?: HomelabHealthEntry): string {
 	return HEALTH_COLORS.warn;
 }
 
-
 export type HomelabHealthReasonKind =
 	| "runtime_inventory_mismatch"
 	| "runtime_down"
@@ -79,12 +78,7 @@ const FAILED_RUNTIME_STATES = new Set([
 	"stopped",
 	"stopping",
 ]);
-const FAILED_TUNNEL_STATES = new Set([
-	"down",
-	"inactive",
-	"failed",
-	"error",
-]);
+const FAILED_TUNNEL_STATES = new Set(["down", "inactive", "failed", "error"]);
 
 export function homelabHealthReasons(
 	entry: HomelabHealthEntry | undefined,
@@ -93,7 +87,8 @@ export function homelabHealthReasons(
 	if (!entry) return [];
 	const reasons: HomelabHealthReason[] = [];
 	const runtimeState = entry.runtime_state?.trim().toLowerCase();
-	const runtimeStale = options.runtimeStale === true || entry.runtime_stale === true;
+	const runtimeStale =
+		options.runtimeStale === true || entry.runtime_stale === true;
 	const tunnelStatus = entry.tunnel_status?.trim().toLowerCase();
 
 	if (hasFreshRuntimeInventoryConflict(entry)) {

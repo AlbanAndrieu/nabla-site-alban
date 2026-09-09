@@ -5,12 +5,12 @@ import {
 	type HomelabHealthEntry,
 	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
+import { homelabHealthReasons } from "../lib/homelabHealthPresentation";
 import {
 	blockedDependencyLabels,
 	requiredDependencyTargetState,
 	resolveEffectiveServiceState,
 } from "../lib/homelabHealthResolver";
-import { homelabHealthReasons } from "../lib/homelabHealthPresentation";
 
 const DEPENDENCY_ENTRY: HomelabHealthEntry = {
 	id: "langfuse-web",
@@ -175,7 +175,10 @@ test("schema v6 parser preserves runtime_missing evidence used by UI reconciliat
 
 	assert.ok(snapshot);
 	assert.equal(snapshot.services[0].runtime_missing, true);
-	assert.equal(resolveEffectiveServiceState(snapshot.services[0]).effectiveState, "warn");
+	assert.equal(
+		resolveEffectiveServiceState(snapshot.services[0]).effectiveState,
+		"warn",
+	);
 });
 
 test("shared resolver remains compatible with legacy state-only rows", () => {
