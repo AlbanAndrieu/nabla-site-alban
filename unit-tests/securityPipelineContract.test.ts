@@ -38,12 +38,18 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Production DAST preflight did not reach the application/);
 	assert.match(ci, /Clean ZAP bootstrap workspace/);
 	assert.match(ci, /zap-production-bootstrap-report/);
-	assert.match(ci, /semgrep\/semgrep:1\.176\.0/);
+	assert.match(
+		ci,
+		/semgrep\/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e/,
+	);
 	assert.match(ci, /--config p\/ci/);
 	assert.match(ci, /--metrics=off/);
 	assert.match(ci, /--sarif/);
 	assert.match(ci, /--output \/src\/semgrep\.sarif/);
-	assert.match(ci, /github\/codeql-action\/upload-sarif@v4/);
+	assert.match(
+		ci,
+		/github\/codeql-action\/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4/,
+	);
 	assert.match(ci, /category:\s*"semgrep-pr"/);
 	assert.match(ci, /name:\s*semgrep-sast-report/);
 	assert.match(ci, /security-events:\s*write/);
@@ -67,7 +73,10 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	]);
 
 	for (const workflow of [preview, production]) {
-		assert.match(workflow, /zaproxy\/action-baseline@v0\.15\.0/);
+		assert.match(
+			workflow,
+			/zaproxy\/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0\.15\.0/,
+		);
 		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
 		assert.match(workflow, /fail_action:\s*true/);
 		assert.match(workflow, /cmd_options:\s*"-I -T 5 -c \.zap\/rules\.tsv"/);
@@ -99,4 +108,27 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	}
 	assert.match(rules, /^10038\tWARN\t/m);
 	assert.match(checkpoint, /filename\.startsWith\('\.zap\/'\)/);
+
+	const securityWorkflows = [
+		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
+		ciWorkflowPinContract(preview),
+		ciWorkflowPinContract(smoke),
+		ciWorkflowPinContract(production),
+		ciWorkflowPinContract(checkpoint),
+	];
+	assert.equal(securityWorkflows.length, 5);
 });
+
+function ciWorkflowPinContract(workflow: string) {
+	assert.doesNotMatch(
+		workflow,
+		/^\s*uses:\s+[^\s#]+@v\d+(?:\.\d+\.\d+)?\s*$/m,
+		"security workflows must not use mutable action version tags",
+	);
+	assert.match(
+		workflow,
+		/^\s*uses:\s+[^\s#]+@[0-9a-f]{40}\s+#\s+v/m,
+		"security workflows must pin actions to immutable commit SHAs",
+	);
+	return true;
+}
