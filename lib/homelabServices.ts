@@ -4,9 +4,12 @@ import localCatalog from "../public/homelab-services.json";
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+export type HomelabEnvironment = "production" | "staging" | "dev";
+
 export type HomelabService = {
 	id?: string;
 	name: string;
+	environment?: HomelabEnvironment;
 	kind?: string;
 	category?: string;
 	presentationRole?: "service" | "core" | "support";
@@ -62,6 +65,22 @@ export function homelabServiceId(service: HomelabService): string {
 		: slugifyServiceName(service.name);
 }
 
+const DEV_NAME_SUFFIX_RE = /\s+-\s*albandrieu\s*$/i;
+
+/**
+ * Resolve the service environment used by presentation filters.
+ *
+ * Explicit catalog metadata wins. During the catalog migration, workstation
+ * duplicates named `<service> - albandrieu` are development environments.
+ * Every other service defaults to production until it is explicitly reviewed.
+ */
+export function homelabServiceEnvironment(
+	service: HomelabService,
+): HomelabEnvironment {
+	if (service.environment) return service.environment;
+	return DEV_NAME_SUFFIX_RE.test(service.name) ? "dev" : "production";
+}
+
 const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(
 	Object.entries(navigationOverrides),
 );
@@ -108,6 +127,8 @@ export function parseHomelabServicesCatalog(
 				typeof service.name === "string" &&
 				service.name.trim().length > 0 &&
 				(service.id === undefined || typeof service.id === "string") &&
+				(service.environment === undefined ||
+					["production", "staging", "dev"].includes(String(service.environment))) &&
 				(service.endpointUrl === undefined ||
 					typeof service.endpointUrl === "string") &&
 				(service.presentationRole === undefined ||
