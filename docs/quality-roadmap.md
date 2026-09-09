@@ -368,6 +368,15 @@ Autres contrôles :
 
 ## P1 — Sécurité applicative
 
+- [x] Conserver CodeQL comme SAST global et ajouter Semgrep CE 1.176.0 dans
+  Quality/Security pour scanner uniquement les fichiers applicatifs modifiés
+  avec le ruleset `p/ci`. Le scan échoue avant l'installation npm lorsqu'une
+  nouvelle violation SAST bloquante est introduite.
+- [x] Ajouter OWASP ZAP Baseline 0.15.0 comme DAST passif partagé : le Preview
+  protégé utilise le header Vercel Automation Bypass, tandis que la production
+  canonique est scannée après les déploiements `master` et quotidiennement.
+  Les règles anti-clickjacking, `nosniff`, directory browsing et HSTS sont
+  bloquantes ; CSP reste en WARN jusqu'au chantier de durcissement dédié.
 - [x] Ajouter un pentest baseline Playwright non destructif sur le Preview Vercel :
   headers défensifs, fichiers sensibles non exposés, méthode TRACE refusée,
   méthode POST non déclarée refusée sur l’API homelab et sonde XSS réfléchie sans
@@ -465,6 +474,16 @@ Autres contrôles :
 
 ## P2 — CI/CD et Vercel
 
+- [x] Vérifier l'état de la production courante avant de consommer le budget CI
+  d'une PR : Quality/Security exige `Vercel` et
+  `Production Post-deploy Smoke` verts sur le SHA `master` de base. Dès que
+  `production-dast.yml` existe sur ce SHA, le statut `Production DAST`
+  devient lui aussi obligatoire. Cette exception de bootstrap ne s'applique
+  qu'à la première PR qui introduit le workflow.
+- [x] Publier `Production DAST` sur le SHA réellement déployé après
+  `vercel.deployment.success`, en complément du smoke HTTP/SEO post-déploiement
+  déjà existant. Le scan planifié quotidien surveille aussi la production sans
+  réécrire artificiellement le statut d'un SHA non redéployé.
 - [x] Exécuter Playwright sur le Preview Vercel au lieu de rebuilder Next.js dans
   le workflow E2E.
 - [x] Ajouter un test d’intégration Preview reliant les Route Handlers
