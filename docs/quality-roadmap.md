@@ -216,23 +216,24 @@ les autres chantiers.
   du snapshot : l'UI distingue état courant, fraîcheur/cache, erreur de refresh et
   dernière preuve saine `last_good` afin qu'un ancien état vert ne soit pas lu
   comme une observation live.
-- [x] Revalider le graphe de production après les évolutions `nabla-compose` :
-  le fallback Site est resynchronisé sur 113 nœuds / 216 relations, incluant
-  ClamAV, Keycloak et le nœud critique `pfsense-unbound`. Les environnements
-  `x-nabla.environments[]` sont conservés dans le fallback ; FastAPI Sample
-  expose ainsi explicitement production + staging même si l'API distante est
-  indisponible.
-- [x] Dériver le filtre d'environnement TrueNAS depuis
-  `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
-  Un service sans déclaration reste `production` par compatibilité mais porte
-  la provenance `default` et peut être isolé via le filtre « Production par
-  défaut / métadonnées à revoir » au lieu d'être confondu avec une déclaration
-  de production explicite.
+- [x] Revalider le graphe de production après les évolutions `nabla-compose#128/#129` :
+  le fallback Site est resynchronisé sur 108 nœuds / 208 relations, incluant
+  Sentry, Pyroscope, Akvorado, Pi-hole auxiliaires, Doco-CD, Docker socket proxy,
+  Kafka, MongoDB et Nexus. La PR #130 est désormais fusionnée mais son smoke
+  Kubernetes/CSI reste à exécuter et observer ; la PR #131 n'est pas présentée
+  comme déployée tant que son catalogue/runtime n'est pas fusionné et observé.
 - [x] Aligner le fallback de réconciliation des anciens payloads sur
   `fastapi-sample#212` : runtime TrueNAS frais arrêté/échoué non masqué par
   Cloudflare, preuves runtime/tunnel périmées non utilisées comme preuve positive,
   erreur applicative joignable classée dégradée et exposition Cloudflare seule
   insuffisante pour déclarer l'application saine.
+- [x] Dériver le filtre d'environnement TrueNAS depuis
+  `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
+  Un service sans déclaration reste `production` par compatibilité mais porte
+  la provenance `default` et peut être isolé via le filtre « Production par
+  défaut / métadonnées à revoir ». Le fallback local conserve explicitement les
+  environnements production + staging de FastAPI Sample sans resynchroniser tout
+  le graphe dans cette PR thématique.
 - [ ] Exécuter puis consommer la progression Kubernetes préparée par
   `nabla-compose#130` (fusionnée) dans l'ordre DNS/CNI → smoke FastAPI
   `test.albandrieu.com` → CSI TrueNAS → secrets d'infrastructure. Le site doit
