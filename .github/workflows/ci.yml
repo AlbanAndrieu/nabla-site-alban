@@ -169,7 +169,7 @@ jobs:
 
       - name: Run Semgrep SAST on changed source
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
@@ -178,84 +178,7 @@ jobs:
           if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
             base_sha="$(git rev-parse "$HEAD_SHA^")"
           fi
-          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: ".python-version"
-
-      - name: Restore pre-commit environments
-        id: pre-commit-cache
-        continue-on-error: true
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
-
-      - name: Install pre-commit
-        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: Restore npm downloads
-        id: npm-cache
-        continue-on-error: true
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-${{ runner.os }}-${{ runner.arch }}-
-
-      - name: Pin npm
-        shell: bash
-        run: |
-          set -euo pipefail
-          cd "${RUNNER_TEMP}"
-          npm install --global npm@11.17.0 --no-audit --no-fund
-
-      - name: Install dependencies
-        run: npm ci --no-audit --no-fund
-
-      - name: Save npm downloads
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        uses: actions/cache/save@v5
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Run agent-first quality gate before build
-        id: agent-quality-gate
-        continue-on-error: true
-        env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "120"
-        run: bash scripts/agent-quality-gate.sh
-
-      - name: Save pre-commit environments
-        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        uses: actions/cache/save@v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
-
-      - name: Enforce agent-first quality gate
-        if: steps.agent-quality-gate.outcome != 'success'
-        run: exit 1
-
-      - name: Build Next.js production bundle
-        run: npm run build
-
-      # Avoid container-action image preparation when Snyk is disabled.
-      # GitHub can prepare Docker actions before evaluating a step-level if.
-      - name: Run Snyk vulnerability scan
-        if: env.SNYK_TOKEN != ''
-        run: npx --yes snyk test
- || true)"
+          files="$(git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" | grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^(next\.config\.mjs|proxy\.ts)$' || true)"
           if [[ -z "$files" ]]; then
             echo "No changed application source files require Semgrep."
             exit 0
