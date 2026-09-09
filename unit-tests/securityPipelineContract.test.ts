@@ -49,6 +49,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /security-events:\s*write/);
 	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
+	assert.match(ci, /\.github\/workflows\/\.\*\\\.ya\?ml/);
 	assert.match(
 		ci,
 		/git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
