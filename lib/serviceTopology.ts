@@ -1,5 +1,12 @@
 import localTopology from "../public/service-topology.json";
 
+export type ServiceDeploymentEnvironment = {
+	name: string;
+	url: string;
+	external: boolean;
+	cloudflareTunnel: boolean;
+};
+
 export type ServiceTopologyNode = {
 	id: string;
 	name: string;
@@ -11,6 +18,7 @@ export type ServiceTopologyNode = {
 	url?: string;
 	description?: string;
 	icon?: string;
+	environments?: ServiceDeploymentEnvironment[];
 };
 
 export type ServiceRelationType =
@@ -97,6 +105,17 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.kind === "string" &&
 				typeof node.category === "string" &&
 				(node.icon === undefined || typeof node.icon === "string") &&
+				(node.environments === undefined ||
+					(Array.isArray(node.environments) &&
+						node.environments.length > 0 &&
+						node.environments.every(
+							(environment) =>
+								isRecord(environment) &&
+								typeof environment.name === "string" &&
+								typeof environment.url === "string" &&
+								typeof environment.external === "boolean" &&
+								typeof environment.cloudflareTunnel === "boolean",
+						))) &&
 				(node.presentationRole === undefined ||
 					["service", "core", "support"].includes(String(node.presentationRole))) &&
 				(node.criticality === undefined ||
