@@ -110,6 +110,14 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	}
 	assert.match(rules, /^10038\tWARN\t/m);
 	assert.match(checkpoint, /filename\.startsWith\('\.zap\/'\)/);
+	assert.match(checkpoint, /workflow_run:/);
+	assert.match(checkpoint, /CI \(Quality and Security\)/);
+	assert.match(checkpoint, /github\.event\.workflow_run\.conclusion == 'success'/);
+	assert.match(checkpoint, /github\.event\.workflow_run\.event == 'pull_request'/);
+	assert.match(
+		checkpoint,
+		/github\.event\.workflow_run\.pull_requests\[0\]\.number/,
+	);
 
 	const securityWorkflows = [
 		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
