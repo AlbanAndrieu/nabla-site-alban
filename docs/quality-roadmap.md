@@ -377,6 +377,11 @@ Autres contrôles :
   canonique est scannée après les déploiements `master` et quotidiennement.
   Les règles anti-clickjacking, `nosniff`, directory browsing et HSTS sont
   bloquantes ; CSP reste en WARN jusqu'au chantier de durcissement dédié.
+  Les scans Preview et production passent explicitement `-c .zap/rules.tsv`.
+  Le DAST production utilise le Vercel Automation Bypass et un preflight 200
+  qui rejette `429` / Security Checkpoint afin qu'un scan de page de challenge
+  ne puisse jamais produire un faux vert. Les rapports ZAP conteneurisés sont
+  supprimés du workspace après leur archivage pour ne pas polluer pre-commit.
 - [x] Ajouter un pentest baseline Playwright non destructif sur le Preview Vercel :
   headers défensifs, fichiers sensibles non exposés, méthode TRACE refusée,
   méthode POST non déclarée refusée sur l’API homelab et sonde XSS réfléchie sans
