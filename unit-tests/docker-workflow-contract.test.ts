@@ -16,10 +16,22 @@ test("Docker CI follows the real fallback inputs and modern CodeQL path", async 
 	assert.match(workflow, /Resolve Trivy scan policy/);
 	assert.match(workflow, /git diff --quiet HEAD\^1 HEAD -- Dockerfile \.dockerignore/);
 	assert.match(workflow, /run-trivy=false/);
-	assert.match(workflow, /docker\/setup-buildx-action@v4/);
-	assert.match(workflow, /docker\/build-push-action@v7/);
-	assert.match(workflow, /docker\/login-action@v4/);
-	assert.match(workflow, /github\/codeql-action\/upload-sarif@v4/);
+	assert.match(
+		workflow,
+		/docker\/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4/,
+	);
+	assert.match(
+		workflow,
+		/docker\/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7/,
+	);
+	assert.match(
+		workflow,
+		/docker\/login-action@dbcb813823bdd20940b903addbd779551569679f # v4/,
+	);
+	assert.match(
+		workflow,
+		/github\/codeql-action\/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4/,
+	);
 	assert.doesNotMatch(workflow, /upload-sarif@v3/);
 });
 
@@ -40,7 +52,10 @@ test("Docker CI scans the local image before any registry publication", async ()
 		/if: steps\.trivy-policy\.outputs\.run-trivy == 'true'/,
 	);
 	assert.match(workflow, /static-content-only PR/);
-	assert.match(workflow, /aquasecurity\/trivy-action@v0\.36\.0/);
+	assert.match(
+		workflow,
+		/aquasecurity\/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0\.36\.0/,
+	);
 	assert.match(workflow, /version: "v0\.74\.0"/);
 	assert.match(workflow, /scanners: "vuln"/);
 	assert.match(workflow, /format: "sarif"/);
@@ -106,4 +121,28 @@ test("Docker publication is master-only, GHCR-first and SHA-addressable", async 
 		workflow,
 		/docker push "\$\{DOCKERHUB_IMAGE\}:\$\{GITHUB_SHA\}"/,
 	);
+});
+
+
+test("Docker security actions are pinned to immutable commit SHAs", async () => {
+	const workflow = await read(".github/workflows/docker-build.yml");
+
+	assert.doesNotMatch(
+		workflow,
+		/^\s*uses:\s+[^\s#]+@v\d+(?:\.\d+\.\d+)?\s*$/m,
+	);
+	for (const action of [
+		"actions/checkout",
+		"docker/setup-buildx-action",
+		"docker/build-push-action",
+		"aquasecurity/trivy-action",
+		"actions/upload-artifact",
+		"github/codeql-action/upload-sarif",
+		"docker/login-action",
+	]) {
+		assert.match(
+			workflow,
+			new RegExp(`uses: ${action.replace("/", "\\/")}@[0-9a-f]{40}`),
+		);
+	}
 });

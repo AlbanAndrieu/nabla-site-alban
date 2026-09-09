@@ -577,7 +577,10 @@ Autres contrôles :
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque
   `Dockerfile/.dockerignore` change ainsi que sur `master`, en schedule et
-  en exécution manuelle.
+  en exécution manuelle. Le changement du workflow a aussi fait entrer
+  `docker-build.yml` dans le périmètre Semgrep : toutes ses actions critiques
+  sont désormais verrouillées sur des SHA Git immuables au lieu de tags
+  mutables.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
