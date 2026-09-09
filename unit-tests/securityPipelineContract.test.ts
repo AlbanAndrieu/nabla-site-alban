@@ -18,13 +18,19 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	const semgrep = ci.indexOf("- name: Run Semgrep SAST on changed source");
 	const semgrepEnforcement = ci.indexOf("- name: Enforce Semgrep SAST");
 	const install = ci.indexOf("- name: Install dependencies");
+	const agentGate = ci.indexOf("- name: Run agent-first quality gate before build");
+	const restoreNextCache = ci.indexOf("- name: Restore Next.js build cache");
 	const build = ci.indexOf("- name: Build Next.js production bundle");
+	const saveNextCache = ci.indexOf("- name: Save Next.js build cache");
 
 	assert.ok(productionGate >= 0 && productionGate < checkout);
 	assert.ok(liveProductionSmoke > checkout);
-	assert.ok(semgrep > liveProductionSmoke && semgrep < install);
-	assert.ok(semgrepEnforcement > semgrep && semgrepEnforcement < install);
-	assert.ok(install < build);
+	assert.ok(install > liveProductionSmoke);
+	assert.ok(restoreNextCache > install && restoreNextCache < agentGate);
+	assert.ok(agentGate > install && agentGate < semgrep);
+	assert.ok(semgrep > agentGate && semgrep < build);
+	assert.ok(semgrepEnforcement > semgrep && semgrepEnforcement < build);
+	assert.ok(saveNextCache > build);
 
 	assert.match(ci, /statuses:\s*read/);
 	assert.match(ci, /Production Post-deploy Smoke/);
@@ -60,6 +66,8 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /\.github\/workflows\/\.\*\\\.ya\?ml/);
 	assert.match(ci, /git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/);
 	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node "\$smoke_script"/);
+	assert.match(ci, /path: \.next\/cache/);
+	assert.match(ci, /steps\.next-cache\.outputs\.cache-hit != 'true'/);
 });
 
 test("Preview and production DAST share a reviewed passive ZAP policy", async () => {

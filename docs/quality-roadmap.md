@@ -388,8 +388,10 @@ Autres contrôles :
 
 - [x] Conserver CodeQL comme SAST global et ajouter Semgrep CE 1.176.0 dans
   Quality/Security pour scanner les fichiers applicatifs modifiés ainsi que les workflows GitHub Actions modifiés
-  avec le ruleset `p/ci`. Le scan échoue avant l'installation npm lorsqu'une
-  nouvelle violation SAST bloquante est introduite. Le rapport Semgrep est aussi
+  avec le ruleset `p/ci`. La gate déterministe agent/Biome/types/tests passe
+  désormais avant Semgrep afin qu'une erreur locale peu coûteuse arrête la CI
+  avant le démarrage du conteneur SAST ; Semgrep reste obligatoire avant
+  `next build`. Le rapport Semgrep est aussi
   exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
   afin de rendre le diagnostic exploitable sans relancer le scan.
 - [x] Fermer le risque supply-chain détecté par Semgrep dans les workflows
@@ -572,6 +574,12 @@ Autres contrôles :
   `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
   `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
   et un test de contrat empêche la réintroduction du pull coûteux.
+- [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
+  avec fallback sur un cache compatible `package-lock`, exécuter la quality
+  gate avant Semgrep, et ne pas répéter Trivy OS/library sur une PR qui ne
+  modifie que `public/**`. Le scan Trivy reste forcé lorsque
+  `Dockerfile/.dockerignore` change ainsi que sur `master`, en schedule et
+  en exécution manuelle.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du

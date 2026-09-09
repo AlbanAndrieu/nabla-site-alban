@@ -190,66 +190,6 @@ jobs:
           git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
           DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
 
-      - name: Run Semgrep SAST on changed source
-        id: semgrep-sast
-        continue-on-error: true
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          base_sha="${BASE_SHA:-}"
-          if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
-            base_sha="$(git rev-parse "$HEAD_SHA^")"
-          fi
-          mapfile -t files < <(
-            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
-              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^\.github/workflows/.*\.ya?ml$|^(next\.config\.mjs|proxy\.ts)$' || true
-          )
-          if (("${#files[@]}" == 0)); then
-            echo "No changed application or workflow source files require Semgrep."
-            exit 0
-          fi
-          printf 'Semgrep SAST targets:\n%s\n' "${files[@]}"
-          docker run --rm \
-            --env SEMGREP_SEND_METRICS=off \
-            --volume "$PWD:/src" \
-            --workdir /src \
-            semgrep/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e \
-            semgrep scan \
-            --config p/ci \
-            --error \
-            --metrics=off \
-            --sarif \
-            --output /src/semgrep.sarif \
-            "${files[@]}"
-
-      - name: Upload Semgrep SARIF to GitHub Code Scanning
-        if: always() && hashFiles('semgrep.sarif') != ''
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
-        with:
-          sarif_file: "semgrep.sarif"
-          category: "semgrep-pr"
-
-      - name: Preserve Semgrep SAST report
-        if: always() && hashFiles('semgrep.sarif') != ''
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
-        with:
-          name: semgrep-sast-report
-          path: semgrep.sarif
-          retention-days: 7
-          if-no-files-found: error
-
-      - name: Clean Semgrep SAST workspace
-        if: always() && hashFiles('semgrep.sarif') != ''
-        shell: bash
-        run: rm -f semgrep.sarif
-
-      - name: Enforce Semgrep SAST
-        if: steps.semgrep-sast.outcome != 'success'
-        run: exit 1
-
       - name: Verify production DAST can reach the application
         if: >-
           github.event_name == 'pull_request' &&
@@ -338,6 +278,17 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Restore Next.js build cache
+        id: next-cache
+        continue-on-error: true
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}-${{ github.event.pull_request.number || github.ref_name }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}-
+
+
       - name: Save npm downloads
         if: steps.npm-cache.outputs.cache-hit != 'true'
         continue-on-error: true
@@ -364,6 +315,83 @@ jobs:
 
       - name: Enforce agent-first quality gate
         if: steps.agent-quality-gate.outcome != 'success'
+        run: exit 1
+
+      - name: Run Semgrep SAST on changed source
+        id: semgrep-sast
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_sha="${BASE_SHA:-}"
+          if [[ ! "$base_sha" =~ ^[0-9a-f]{40}$ ]] || [[ "$base_sha" =~ ^0+$ ]]; then
+            base_sha="$(git rev-parse "$HEAD_SHA^")"
+          fi
+          mapfile -t files < <(
+            git diff --name-only --diff-filter=ACMR "$base_sha" "$HEAD_SHA" |
+              grep -E '^(app|components|i18n|lib|scripts|api)/.*\.(cjs|js|jsx|mjs|py|ts|tsx)$|^\.github/workflows/.*\.ya?ml$|^(next\.config\.mjs|proxy\.ts)      - name: Build Next.js production bundle
+        run: npm run build
+
+      - name: Save Next.js build cache
+        if: steps.next-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}-${{ github.event.pull_request.number || github.ref_name }}
+
+
+      # Avoid container-action image preparation when Snyk is disabled.
+      # GitHub can prepare Docker actions before evaluating a step-level if.
+      - name: Run Snyk vulnerability scan
+        if: env.SNYK_TOKEN != ''
+        run: npx --yes snyk test
+ || true
+          )
+          if (("${#files[@]}" == 0)); then
+            echo "No changed application or workflow source files require Semgrep."
+            exit 0
+          fi
+          printf 'Semgrep SAST targets:\n%s\n' "${files[@]}"
+          docker run --rm \
+            --env SEMGREP_SEND_METRICS=off \
+            --volume "$PWD:/src" \
+            --workdir /src \
+            semgrep/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e \
+            semgrep scan \
+            --config p/ci \
+            --error \
+            --metrics=off \
+            --sarif \
+            --output /src/semgrep.sarif \
+            "${files[@]}"
+
+      - name: Upload Semgrep SARIF to GitHub Code Scanning
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        with:
+          sarif_file: "semgrep.sarif"
+          category: "semgrep-pr"
+
+      - name: Preserve Semgrep SAST report
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: semgrep-sast-report
+          path: semgrep.sarif
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Clean Semgrep SAST workspace
+        if: always() && hashFiles('semgrep.sarif') != ''
+        shell: bash
+        run: rm -f semgrep.sarif
+
+      - name: Enforce Semgrep SAST
+        if: steps.semgrep-sast.outcome != 'success'
         run: exit 1
 
       - name: Build Next.js production bundle

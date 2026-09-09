@@ -12,6 +12,10 @@ test("Docker CI follows the real fallback inputs and modern CodeQL path", async 
 	assert.match(workflow, /"public\/\*\*"/);
 	assert.match(workflow, /"\.github\/workflows\/docker-build\.yml"/);
 	assert.match(workflow, /actions: read/);
+	assert.match(workflow, /fetch-depth: 2/);
+	assert.match(workflow, /Resolve Trivy scan policy/);
+	assert.match(workflow, /git diff --quiet HEAD\^1 HEAD -- Dockerfile \.dockerignore/);
+	assert.match(workflow, /run-trivy=false/);
 	assert.match(workflow, /docker\/setup-buildx-action@v4/);
 	assert.match(workflow, /docker\/build-push-action@v7/);
 	assert.match(workflow, /docker\/login-action@v4/);
@@ -31,6 +35,11 @@ test("Docker CI scans the local image before any registry publication", async ()
 	assert.match(workflow, /load: true/);
 	assert.match(workflow, /push: false/);
 	assert.match(workflow, /image-ref: \$\{\{ env\.LOCAL_IMAGE \}\}/);
+	assert.match(
+		workflow,
+		/if: steps\.trivy-policy\.outputs\.run-trivy == 'true'/,
+	);
+	assert.match(workflow, /static-content-only PR/);
 	assert.match(workflow, /aquasecurity\/trivy-action@v0\.36\.0/);
 	assert.match(workflow, /version: "v0\.74\.0"/);
 	assert.match(workflow, /scanners: "vuln"/);

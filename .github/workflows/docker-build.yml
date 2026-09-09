@@ -44,6 +44,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Resolve Trivy scan policy
+        id: trivy-policy
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" != "pull_request" ]]; then
+            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          # The fallback image is nginx + public/. A PR that only changes static
+          # files cannot alter the OS/library vulnerability set already scanned
+          # on master; Dockerfile/.dockerignore changes still force Trivy.
+          if git diff --quiet HEAD^1 HEAD -- Dockerfile .dockerignore; then
+            echo "run-trivy=false" >> "${GITHUB_OUTPUT}"
+            echo "::notice::Skipping duplicate Trivy OS/library scan for static-content-only PR."
+          else
+            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -102,6 +126,7 @@ jobs:
           echo "Fallback container smoke test passed as UID ${runtime_uid}."
 
       - name: Run Trivy vulnerability scanner
+        if: steps.trivy-policy.outputs.run-trivy == 'true'
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.LOCAL_IMAGE }}
@@ -116,7 +141,10 @@ jobs:
           severity: "CRITICAL,HIGH"
 
       - name: Preserve Trivy SARIF report
-        if: always() && hashFiles('trivy-results.sarif') != ''
+        if: >-
+          always() &&
+          steps.trivy-policy.outputs.run-trivy == 'true' &&
+          hashFiles('trivy-results.sarif') != ''
         uses: actions/upload-artifact@v6
         with:
           name: trivy-sarif-${{ github.sha }}
@@ -125,7 +153,10 @@ jobs:
           retention-days: 14
 
       - name: Upload Trivy scan results to GitHub Code Scanning
-        if: always() && hashFiles('trivy-results.sarif') != ''
+        if: >-
+          always() &&
+          steps.trivy-policy.outputs.run-trivy == 'true' &&
+          hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: "trivy-results.sarif"
