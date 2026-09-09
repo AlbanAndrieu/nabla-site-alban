@@ -505,6 +505,10 @@ Autres contrôles :
   réécrire artificiellement le statut d'un SHA non redéployé.
 - [x] Exécuter Playwright sur le Preview Vercel au lieu de rebuilder Next.js dans
   le workflow E2E.
+- [x] Déclencher automatiquement le checkpoint Vercel des PR déployables après
+  succès du workflow `CI (Quality and Security)` via `workflow_run`, puis
+  laisser le webhook de déploiement enchaîner ZAP Preview et Playwright. Le
+  `workflow_dispatch` reste disponible pour une relance manuelle contrôlée.
 - [x] Ajouter un test d’intégration Preview reliant les Route Handlers
   `/api/homelab-services` et `/api/homelab-topology` à la page
   `/architecture`, avec vérification du chemin stable
