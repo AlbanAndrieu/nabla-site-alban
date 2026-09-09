@@ -129,7 +129,7 @@ export default function HomelabObservationCoverage({
 					{french ? "services catalogue" : "catalog services"}
 				</span>
 				<span>{topologyLabel}</span>
-				{coverage ? (
+				{coverage && snapshot ? (
 					<>
 						<span>
 							{coverage.serviceObservations}{" "}
