@@ -45,14 +45,14 @@ export async function GET() {
 			withHealthBoardMetadata(boardSnapshot, boardResult.board),
 			{
 				headers: {
-				"Cache-Control":
-					"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
-				"X-Homelab-Health-Source": "fastapi-health-board",
-				"X-Homelab-Health-Primary": boardResult.primaryUrl,
-				"X-Homelab-Health-Board-State": boardResult.board.state,
-				"X-Homelab-Health-Board-Refreshing": String(
-					boardResult.board.refreshing,
-				),
+					"Cache-Control":
+						"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
+					"X-Homelab-Health-Source": "fastapi-health-board",
+					"X-Homelab-Health-Primary": boardResult.primaryUrl,
+					"X-Homelab-Health-Board-State": boardResult.board.state,
+					"X-Homelab-Health-Board-Refreshing": String(
+						boardResult.board.refreshing,
+					),
 				},
 			},
 		);
@@ -68,12 +68,12 @@ export async function GET() {
 			withHealthBoardMetadata(probes.snapshot, boardResult.board),
 			{
 				headers: {
-				"Cache-Control":
-					"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
-				"X-Homelab-Health-Source": probes.source,
-				"X-Homelab-Health-Primary": probes.primaryUrl,
-				"X-Homelab-Health-Board-State":
-					boardResult.board?.state ?? "fallback",
+					"Cache-Control":
+						"public, max-age=0, s-maxage=10, stale-while-revalidate=30",
+					"X-Homelab-Health-Source": probes.source,
+					"X-Homelab-Health-Primary": probes.primaryUrl,
+					"X-Homelab-Health-Board-State":
+						boardResult.board?.state ?? "fallback",
 				},
 			},
 		);
