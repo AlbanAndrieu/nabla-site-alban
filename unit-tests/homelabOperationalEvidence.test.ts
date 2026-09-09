@@ -103,13 +103,16 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 	assert.doesNotMatch(JSON.stringify(evidence), /MUST_NOT_ESCAPE/);
 });
 
-test("same-origin health proxy prefers the cached FastAPI health board with direct cold-start fallback", async () => {
+test("same-origin health proxy prefers fresh health-board evidence without letting stale data mask fresher paths", async () => {
 	const source = await readFile(new URL("../app/api/homelab-health/route.ts", import.meta.url), "utf8");
 	assert.match(source, /loadFastApiHealthBoard/);
 	assert.match(source, /parseHomelabHealthSnapshot\(boardResult\.board\?\.homelab\)/);
 	assert.match(source, /fastapi-health-board/);
-	assert.match(source, /cold FastAPI worker/);
+	assert.match(source, /boardResult\.board\?\.state === "fresh"/);
 	assert.match(source, /loadHomelabHealthSnapshot/);
+	assert.match(source, /loadHomelabProbeSnapshot/);
+	assert.match(source, /fastapi-health-board-stale/);
+	assert.match(source, /must never overwrite a newer aggregate or bounded probe snapshot/);
 });
 
 test("TrueNAS and Architecture render the same unified operational-evidence panel", async () => {

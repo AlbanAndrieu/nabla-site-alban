@@ -42,7 +42,7 @@ export async function GET() {
 	const aggregatePromise = loadHomelabHealthSnapshot();
 	const boardResult = await boardPromise;
 	const boardSnapshot = parseHomelabHealthSnapshot(boardResult.board?.homelab);
-	if (boardSnapshot && boardResult.board) {
+	if (boardSnapshot && boardResult.board?.state === "fresh") {
 		return NextResponse.json(
 			withHealthBoardMetadata(boardSnapshot, boardResult.board),
 			{
@@ -92,6 +92,25 @@ export async function GET() {
 					"X-Homelab-Health-Primary": probes.primaryUrl,
 					"X-Homelab-Health-Board-State":
 						boardResult.board?.state ?? "fallback",
+				},
+			},
+		);
+	}
+
+	// A stale health-board may still be useful when every fresher path is down,
+	// but it must never overwrite a newer aggregate or bounded probe snapshot.
+	if (boardSnapshot && boardResult.board) {
+		return NextResponse.json(
+			withHealthBoardMetadata(boardSnapshot, boardResult.board),
+			{
+				headers: {
+					"Cache-Control": "no-store, max-age=0",
+					"X-Homelab-Health-Source": "fastapi-health-board-stale",
+					"X-Homelab-Health-Primary": boardResult.primaryUrl,
+					"X-Homelab-Health-Board-State": boardResult.board.state,
+					"X-Homelab-Health-Board-Refreshing": String(
+						boardResult.board.refreshing,
+					),
 				},
 			},
 		);
