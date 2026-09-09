@@ -157,7 +157,12 @@ jobs:
           allow_issue_writing: false
           fail_action: true
           artifact_name: zap-preview-report
-          cmd_options: "-I -T 5"
+          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+
+      - name: Clean ZAP Preview workspace
+        if: always()
+        shell: bash
+        run: rm -f report_html.html report_json.json report_md.md zap.yaml
 
       - name: Run Playwright integration, security, performance and E2E on Preview
         id: playwright
