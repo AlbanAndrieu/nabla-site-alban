@@ -66,7 +66,7 @@ type State = {
 type HierarchyGroup = ServicePresentationGroupEntry;
 
 type HealthFilter = "all" | HomelabHealthState;
-type EnvironmentFilter = "all" | HomelabEnvironment;
+type EnvironmentFilter = "all" | "non-dev" | HomelabEnvironment;
 type GroupFilter = "all" | ServicePresentationGroup;
 
 type GroupTitleKey =
@@ -305,9 +305,12 @@ export default function HomelabServicesBlock() {
 				healthFilter === "all" ||
 				effectiveState(service, indexedHealth, state.healthUnavailable) ===
 					healthFilter;
+			const serviceEnvironment = homelabServiceEnvironment(service);
 			const matchesEnvironment =
 				environmentFilter === "all" ||
-				homelabServiceEnvironment(service) === environmentFilter;
+				(environmentFilter === "non-dev"
+					? serviceEnvironment !== "dev"
+					: serviceEnvironment === environmentFilter);
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
@@ -515,6 +518,11 @@ export default function HomelabServicesBlock() {
 						>
 							<option value="all">
 								{french ? "Tous les environnements" : "All environments"}
+							</option>
+							<option value="non-dev">
+								{french
+									? "Production + Staging (sans Dev)"
+									: "Production + Staging (exclude Dev)"}
 							</option>
 							<option value="production">Production</option>
 							<option value="staging">Staging</option>
