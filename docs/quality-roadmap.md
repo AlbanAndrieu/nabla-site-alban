@@ -227,6 +227,12 @@ les autres chantiers.
   Cloudflare, preuves runtime/tunnel périmées non utilisées comme preuve positive,
   erreur applicative joignable classée dégradée et exposition Cloudflare seule
   insuffisante pour déclarer l'application saine.
+- [x] Afficher la couverture d'observation directement dans la vue TrueNAS :
+  nombre de services du catalogue, nœuds/relations de topologie, observations
+  de santé, sondes LAN/internes activées, couverture des preuves directes,
+  runtime, Cloudflare et dépendances, tunnels observés et durée du refresh.
+  Ces compteurs décrivent les preuves disponibles et ne changent pas la
+  résolution de santé.
 - [x] Dériver le filtre d'environnement TrueNAS depuis
   `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
   Un service sans déclaration reste `production` par compatibilité mais porte

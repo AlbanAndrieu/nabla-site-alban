@@ -5,6 +5,7 @@ import {
 	HOMELAB_HEALTH_DEFAULT_API_URL,
 	homelabHealthForUrl,
 	loadHomelabHealthSnapshot,
+	summarizeHomelabObservation,
 	normalizeHomelabHealthUrl,
 	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
@@ -236,4 +237,55 @@ test("homelab health proxy returns 503 when FastAPI is unavailable", async () =>
 	assert.equal(response.status, 503);
 	assert.equal(response.headers.get("cache-control"), "no-store");
 	assert.equal(response.headers.get("x-homelab-health-source"), "unavailable");
+});
+
+
+test("observation summary counts runtime probe and evidence coverage", () => {
+	const snapshot = parseHomelabHealthSnapshot({
+		...VALID_SNAPSHOT,
+		refresh_elapsed_ms: 431,
+		internal_probes_enabled: true,
+		internal_services: [
+			{
+				name: "PostgreSQL",
+				host: "172.17.0.24",
+				port: 5432,
+				reachable: true,
+				state: "ok",
+			},
+		],
+		cloudflare_tunnels_observed: 3,
+		services: [
+			{
+				...VALID_SNAPSHOT.services[0],
+				direct_state: "ok",
+				internal_state: "ok",
+				runtime_state: "RUNNING",
+				runtime_app: "truenas",
+				tunnel_status: "healthy",
+				dependency_evidence: [
+					{
+						target: "docker",
+						relation_type: "dependsOn",
+						target_state: "ok",
+						evidence: ["runtime"],
+					},
+				],
+			},
+		],
+	});
+
+	assert.ok(snapshot);
+	assert.deepEqual(summarizeHomelabObservation(snapshot), {
+		serviceObservations: 1,
+		internalProbesEnabled: true,
+		internalProbes: 1,
+		directEvidence: 1,
+		internalEvidence: 1,
+		runtimeEvidence: 1,
+		tunnelEvidence: 1,
+		dependencyEvidence: 1,
+		cloudflareTunnelsObserved: 3,
+		refreshElapsedMs: 431,
+	});
 });

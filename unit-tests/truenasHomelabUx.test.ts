@@ -41,6 +41,9 @@ test("service views are searchable and collapsible while technical criticality s
 	assert.match(block, /data-homelab-service-search/);
 	assert.match(block, /data-homelab-health-filter/);
 	assert.match(block, /data-homelab-environment-filter/);
+	assert.match(block, /catalogServiceCount={state\.catalog\.services\.length}/);
+	assert.match(block, /topologyNodeCount={state\.topology\?\.nodes\.length \?\? 0}/);
+	assert.match(block, /topologyRelationCount={state\.topology\?\.relations\.length \?\? 0}/);
 	assert.match(block, /non-dev/);
 	assert.match(block, /resolveHomelabServiceEnvironments/);
 	assert.match(block, /homelabServiceMatchesEnvironment/);
@@ -124,4 +127,15 @@ test("DNS posture remains sanitized while Operations owns the active presentatio
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 	assert.match(operations, /evidence\.pfsense\.reason/);
 	assert.match(operations, /data-pfsense-security-evidence/);
+});
+
+
+test("TrueNAS overview exposes probe and topology coverage without changing health semantics", async () => {
+	const overview = await source(
+		"app/components/homelab/HomelabStatusOverview.tsx",
+	);
+	assert.match(overview, /data-homelab-observer-summary/);
+	assert.match(overview, /data-internal-probe-count/);
+	assert.match(overview, /summarizeHomelabObservation/);
+	assert.match(overview, /observer\.evidence/);
 });

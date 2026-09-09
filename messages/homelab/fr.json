@@ -120,6 +120,20 @@
 			"reasonLabel": "Raison observée",
 			"evidenceNote": "Il s’agit d’une preuve de politique du plan de contrôle, pas d’une requête DNS synthétique depuis un client du LAN. Un état résilient pleinement prouvé exige un resolver fonctionnel observé et la preuve que son chemin de résolution/upstream est indépendant de TrueNAS."
 		},
+		"observer": {
+			"title": "Couverture d’observation",
+			"catalog": "{count} services de présentation",
+			"topology": "{nodes} nœuds de topologie · {relations} relations",
+			"serviceObservations": "{count} observations de santé de services",
+			"internalProbes": "{count} sondes LAN/internes ({state})",
+			"evidence": "preuves : directes {direct} · internes {internal} · runtime {runtime} · Cloudflare {tunnel} · dépendances {dependency}",
+			"cloudflareTunnels": "{count} tunnels Cloudflare observés",
+			"refresh": "actualisation santé {milliseconds} ms",
+			"enabled": "activées",
+			"disabled": "désactivées",
+			"unknown": "inconnu",
+			"snapshotUnavailable": "couverture des sondes runtime indisponible tant qu’aucun snapshot de santé valide n’est reçu"
+		},
 		"truenas": {
 			"down": "TrueNAS semble indisponible",
 			"degraded": "La connectivité TrueNAS est dégradée",

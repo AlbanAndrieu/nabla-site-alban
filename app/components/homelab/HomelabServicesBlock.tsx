@@ -389,6 +389,9 @@ export default function HomelabServicesBlock() {
 				healthUnavailable={state.healthUnavailable}
 				healthHttpStatus={state.healthStatus}
 				healthRefreshing={state.healthRefreshing}
+				catalogServiceCount={state.catalog.services.length}
+				topologyNodeCount={state.topology?.nodes.length ?? 0}
+				topologyRelationCount={state.topology?.relations.length ?? 0}
 				onOpenCriticality={openCriticality}
 			/>
 
