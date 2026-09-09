@@ -155,14 +155,17 @@ test("TrueNAS exposes runtime observation and internal probe coverage", async ()
 	assert.match(coverage, /dependency_evidence/);
 });
 
-
 test("homelab renders bounded probes before aggregate enrichment", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const probeProxy = await source("app/api/homelab-probes/route.ts");
 
-	const probeStart = block.indexOf("const probesPromise = fetchProbeHealth(signal)");
+	const probeStart = block.indexOf(
+		"const probesPromise = fetchProbeHealth(signal)",
+	);
 	const probeRender = block.indexOf("const probes = await probesPromise");
-	const aggregateRender = block.indexOf("const aggregate = await aggregatePromise");
+	const aggregateRender = block.indexOf(
+		"const aggregate = await aggregatePromise",
+	);
 	assert.ok(probeStart >= 0);
 	assert.ok(probeRender > probeStart);
 	assert.ok(aggregateRender > probeRender);

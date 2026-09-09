@@ -339,7 +339,8 @@ test("bounded homelab probes use the dedicated FastAPI probe matrix", async () =
 
 test("same-origin bounded probe route is no-store and exposes the dedicated source", async () => {
 	setProbesApiUrl("https://probes.example.test/homelab");
-	globalThis.fetch = (async () => Response.json(VALID_SNAPSHOT)) as typeof fetch;
+	globalThis.fetch = (async () =>
+		Response.json(VALID_SNAPSHOT)) as typeof fetch;
 
 	const response = await GET_PROBES();
 	const body = await response.json();
@@ -347,7 +348,10 @@ test("same-origin bounded probe route is no-store and exposes the dedicated sour
 	assert.equal(response.status, 200);
 	assert.equal(response.headers.get("cache-control"), "no-store, max-age=0");
 	assert.equal(response.headers.get("pragma"), "no-cache");
-	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi-probes");
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-probes",
+	);
 	assert.equal(body.probe_summary.public.scheduled, 1);
 });
 
