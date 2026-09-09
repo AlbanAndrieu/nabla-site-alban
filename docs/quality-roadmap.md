@@ -374,6 +374,12 @@ Autres contrôles :
   nouvelle violation SAST bloquante est introduite. Le rapport Semgrep est aussi
   exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
   afin de rendre le diagnostic exploitable sans relancer le scan.
+- [x] Fermer le risque supply-chain détecté par Semgrep dans les workflows
+  critiques : pinner Checkout, GitHub Script, Setup Python/Node, Cache,
+  Upload Artifact, CodeQL SARIF et OWASP ZAP sur leurs SHA Git immuables, en
+  conservant le tag revu en commentaire. L'image Semgrep 1.176.0 est elle-même
+  verrouillée par digest SHA-256 ; un contrat empêche la réintroduction de
+  `uses: ...@vN` mutables dans la chaîne sécurité.
 - [x] Ajouter OWASP ZAP Baseline 0.15.0 comme DAST passif partagé : le Preview
   protégé utilise le header Vercel Automation Bypass, tandis que la production
   canonique est scannée après les déploiements `master` et quotidiennement.
