@@ -54,7 +54,10 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 
 	assert.match(production, /https:\/\/www\.albanandrieu\.com/);
 	assert.match(production, /vercel\.deployment\.success/);
-	assert.match(production, /github\.event\.client_payload\.git\.ref == 'master'/);
+	assert.match(
+		production,
+		/github\.event\.client_payload\.git\.ref == 'master'/,
+	);
 	assert.match(production, /Production DAST/);
 	assert.match(production, /zap-production-report/);
 	assert.match(smoke, /Production Post-deploy Smoke/);
