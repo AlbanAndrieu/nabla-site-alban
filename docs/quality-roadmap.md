@@ -141,14 +141,16 @@ les autres chantiers.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
 - [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
   afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
-- [ ] Valider opérationnellement le workflow post-merge de #173 : sur un échec ou
-  timeout de `CI (Quality and Security)` après push sur `master`, une correction
-  déterministe convergente doit ouvrir une PR `automation/quality-remediation-*`
-  puis déclencher explicitement `ci.yml`; si aucune correction sûre ne converge,
-  une issue diagnostique dédupliquée doit être ouverte. La validation doit aussi
-  confirmer le fallback issue lorsque GitHub refuse la création de PR ou le
-  dispatch CI avec `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et
-  ne remplace jamais la quality gate pré-publication.
+- [ ] Valider opérationnellement le workflow post-merge de #173 après son merge,
+  car GitHub exige qu'un workflow `workflow_run` existe sur la branche par défaut
+  avant de pouvoir être déclenché. Sur un échec ou timeout de
+  `CI (Quality and Security)` après push sur `master`, une correction déterministe
+  convergente doit ouvrir une PR `automation/quality-remediation-*` puis déclencher
+  explicitement `ci.yml`; si aucune correction sûre ne converge, une issue
+  diagnostique dédupliquée doit être ouverte. La validation doit aussi confirmer
+  le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
+  `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
+  la quality gate pré-publication.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
