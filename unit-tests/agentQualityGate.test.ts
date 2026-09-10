@@ -47,7 +47,7 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
-test("repository exposes fix, check and publish commands to agents", async () => {
+test("repository exposes local fix, check and strict pre-push publication commands", async () => {
 	const [mise, pkgRaw, prePush] = await Promise.all([
 		source("mise.toml"),
 		source("package.json"),
@@ -70,41 +70,85 @@ test("repository exposes fix, check and publish commands to agents", async () =>
 		pkg.scripts["quality:agent:publish"],
 		"bash scripts/agent-quality-gate.sh --publish",
 	);
+	assert.match(pkg.scripts["lint:fix"], /eslint --fix/);
+	assert.match(pkg.scripts["lint:css:fix"], /stylelint --fix/);
 	assert.match(
 		prePush,
 		/entry: bash scripts\/agent-quality-gate\.sh --publish/,
 	);
 });
 
-test("CI runs the same agent gate before the production build without duplicate checks", async () => {
+test("local fix phase converges formatter and npm lint fixes before publication", async () => {
+	const gate = await source("scripts/agent-quality-gate.sh");
+
+	assert.match(gate, /QUALITY_FIX_PASSES:-6/);
+	assert.match(gate, /precommit_fix_until_stable/);
+	assert.match(gate, /for \(\(pass = 1; pass <= FIX_PASSES; pass\+\+\)\)/);
+	assert.match(gate, /applied deterministic fixes; retrying without log analysis/);
+	assert.match(gate, /npm run lint:fix/);
+	assert.match(gate, /npm run lint:css:fix/);
+	assert.match(gate, /QG_FIX_DID_NOT_CONVERGE/);
+	assert.match(gate, /QG_PRECOMMIT_FAILED/);
+});
+
+test("canonical quality gate distinguishes auto-fix mutations from semantic failures", async () => {
+	const canonical = await source("scripts/quality-gate.sh");
+
+	assert.match(canonical, /QUALITY_LOG_TAIL:-40/);
+	assert.match(canonical, /QG_AUTOFIX_REQUIRED/);
+	assert.match(canonical, /QG_PRECOMMIT_FAILED/);
+	assert.match(canonical, /No CI-log analysis is required for this condition/);
+	assert.match(canonical, /--fail-fast/);
+	assert.match(canonical, /QUALITY_SHOW_DIFF:-0/);
+	assert.doesNotMatch(
+		canonical,
+		/pre-commit run[\s\S]*--show-diff-on-failure[\s\S]*QG_AUTOFIX_REQUIRED/,
+	);
+});
+
+test("CI rejects formatting before npm bootstrap and does not rerun the canonical gate", async () => {
 	const ci = await source(".github/workflows/ci.yml");
+	const canonicalPosition = ci.indexOf(
+		"Run canonical changed-file quality gate before npm bootstrap",
+	);
+	const canonicalEnforcementPosition = ci.indexOf(
+		"Enforce canonical changed-file quality gate",
+	);
+	const setupNodePosition = ci.indexOf("Setup Node.js");
+	const npmInstallPosition = ci.indexOf("Install dependencies");
 	const gatePosition = ci.indexOf("Run agent-first quality gate before build");
-	const preCommitSavePosition = ci.indexOf("Save pre-commit environments");
 	const gateEnforcementPosition = ci.indexOf(
 		"Enforce agent-first quality gate",
 	);
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
-	assert.ok(gatePosition >= 0, "CI must run the agent-first gate");
+	assert.ok(canonicalPosition >= 0, "CI must run the canonical gate early");
 	assert.ok(
-		preCommitSavePosition > gatePosition,
-		"pre-commit cache must be saved after the gate populates hook environments",
+		canonicalEnforcementPosition > canonicalPosition,
+		"early canonical gate must be enforced",
 	);
 	assert.ok(
-		gateEnforcementPosition > preCommitSavePosition,
-		"gate failure must be enforced only after pre-commit cache persistence",
+		setupNodePosition > canonicalEnforcementPosition,
+		"Node setup must not run for formatter-only failures",
+	);
+	assert.ok(
+		npmInstallPosition > canonicalEnforcementPosition,
+		"npm bootstrap must not run for formatter-only failures",
+	);
+	assert.ok(gatePosition > npmInstallPosition, "application gate requires npm deps");
+	assert.ok(
+		gateEnforcementPosition > gatePosition,
+		"agent gate must be enforced before build",
 	);
 	assert.ok(
 		buildPosition > gateEnforcementPosition,
 		"build must start only after the agent gate is enforced",
 	);
+	assert.match(ci, /QUALITY_CANONICAL_GATE_VERIFIED: "1"/);
+	assert.match(ci, /QUALITY_LOG_TAIL: "40"/);
 	assert.match(
 		ci,
 		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
-	);
-	assert.match(
-		ci,
-		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
 	);
 	assert.match(
 		ci,
@@ -112,8 +156,13 @@ test("CI runs the same agent gate before the production build without duplicate 
 	);
 	assert.match(
 		ci,
+		/- name: Restore npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
+	);
+	assert.match(
+		ci,
 		/- name: Save npm downloads[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/save@[0-9a-f]{40}\s+# v5/,
 	);
+	assert.match(ci, /steps\.canonical-quality-gate\.outcome != 'success'/);
 	assert.match(ci, /steps\.agent-quality-gate\.outcome != 'success'/);
 	assert.doesNotMatch(ci, /cache-primary-key/);
 	assert.match(ci, /fetch-depth: 0/);
@@ -126,7 +175,18 @@ test("CI runs the same agent gate before the production build without duplicate 
 	assert.doesNotMatch(ci, /- name: Run unit tests/);
 });
 
-test("Copilot bootstrap can execute the repository agent gate", async () => {
+test("successful Semgrep results use Code Scanning without storing a duplicate artifact", async () => {
+	const ci = await source(".github/workflows/ci.yml");
+
+	assert.match(ci, /Upload Semgrep SARIF to GitHub Code Scanning/);
+	assert.match(ci, /Preserve failed Semgrep SAST report/);
+	assert.match(
+		ci,
+		/steps\.semgrep-sast\.outcome != 'success' && hashFiles\('semgrep\.sarif'\) != ''/,
+	);
+});
+
+test("Copilot bootstrap installs repository hooks before the agent starts", async () => {
 	const setup = await source(".github/workflows/copilot-setup-steps.yml");
 
 	assert.match(setup, /fetch-depth: 0/);
@@ -134,6 +194,14 @@ test("Copilot bootstrap can execute the repository agent gate", async () => {
 	assert.match(setup, /actions\/setup-python@[0-9a-f]{40}\s+# v6/);
 	assert.match(setup, /pre-commit==4\.6\.2/);
 	assert.match(setup, /pre-commit install-hooks/);
+	assert.match(
+		setup,
+		/pre-commit install --hook-type pre-commit --hook-type commit-msg/,
+	);
+	assert.match(
+		setup,
+		/pre-commit install --config \.pre-commit-pre-push\.yaml --hook-type pre-push/,
+	);
 	assert.match(
 		setup,
 		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,
@@ -184,6 +252,7 @@ test("local agent toolchain matches CI bootstrap pins", async () => {
 		"package.json",
 		"package-lock.json",
 		".pre-commit-config.yaml",
+		".pre-commit-pre-push.yaml",
 	]) {
 		assert.ok(
 			setup.includes("- " + bootstrapInput),
