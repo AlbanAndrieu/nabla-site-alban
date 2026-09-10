@@ -22,7 +22,10 @@ test("ZAP scans only exact Vercel Preview checkpoint deployments", async () => {
 	assert.match(workflow, /github\.event\.client_payload\.url/);
 	assert.match(workflow, /github\.event\.client_payload\.git\.sha/);
 	assert.match(workflow, /github\.rest\.git\.getRef/);
-	assert.match(workflow, /checkpoint\.object\.sha !== process\.env\.DEPLOYED_SHA/);
+	assert.match(
+		workflow,
+		/checkpoint\.object\.sha !== process\.env\.DEPLOYED_SHA/,
+	);
 	assert.match(workflow, /\.vercel\.app/);
 
 	assert.doesNotMatch(workflow, /www\.albanandrieu\.com/);
@@ -34,7 +37,9 @@ test("ZAP checks out the exact deployed policy before scanning", async () => {
 
 	const verify = workflow.indexOf("Verify Preview checkpoint exact SHA");
 	const checkout = workflow.indexOf("Checkout exact deployed ZAP policy");
-	const scan = workflow.indexOf("Run OWASP ZAP baseline against Vercel Preview");
+	const scan = workflow.indexOf(
+		"Run OWASP ZAP baseline against Vercel Preview",
+	);
 
 	assert.ok(verify >= 0);
 	assert.ok(checkout > verify);
@@ -88,7 +93,10 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.match(workflow, /high=\$high/);
 	assert.match(workflow, /medium=\$medium/);
 	assert.match(workflow, /Enforce ZAP Preview policy/);
-	assert.match(workflow, /scanner\/configuration error, not a security finding/);
+	assert.match(
+		workflow,
+		/scanner\/configuration error, not a security finding/,
+	);
 	assert.match(workflow, /blocking finding/);
 	assert.match(workflow, /context 'OWASP ZAP Preview'/);
 	assert.match(workflow, /statuses: write/);
