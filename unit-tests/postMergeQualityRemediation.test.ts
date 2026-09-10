@@ -4,6 +4,7 @@ import test from "node:test";
 
 const WORKFLOW = ".github/workflows/post-merge-quality-remediation.yml";
 const CI_WORKFLOW = ".github/workflows/ci.yml";
+const AGENT_RULES = "AGENTS.md";
 
 test("post-merge remediation only reacts to a red Quality workflow on master pushes", async () => {
 	const workflow = await readFile(WORKFLOW, "utf8");
@@ -84,4 +85,12 @@ test("changes to the post-merge remediation workflow are themselves quality-gate
 	);
 
 	assert.equal(occurrences?.length, 2);
+});
+
+test("agent policy documents post-merge remediation as recovery-only", async () => {
+	const rules = await readFile(AGENT_RULES, "utf8");
+
+	assert.match(rules, /Post-merge remediation is recovery only/);
+	assert.match(rules, /workflow file exists on the default branch/);
+	assert.match(rules, /must never rely on this post-merge workflow/);
 });
