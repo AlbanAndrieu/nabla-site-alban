@@ -121,7 +121,7 @@ Never bypass repository hooks with `git push --no-verify`. Never weaken or disab
 
 ### Post-merge remediation is recovery only
 
-`.github/workflows/post-merge-quality-remediation.yml` is a recovery safety net for a failed or timed-out `CI (Quality and Security)` run after a push has already reached `master`. It may create a non-default automated remediation PR when deterministic formatter/pre-commit fixes converge, or a diagnostic issue when they do not or when GitHub refuses PR publication/validation.
+`.github/workflows/post-merge-quality-remediation.yml` is a recovery safety net for a failed or timed-out `CI (Quality and Security)` run after a push has already reached `master`. GitHub only activates this `workflow_run` trigger once the workflow file exists on the default branch. It may create a non-default automated remediation PR when deterministic formatter/pre-commit fixes converge, or a diagnostic issue when they do not or when GitHub refuses PR publication/validation.
 
 Agents must never rely on this post-merge workflow as justification for publishing a branch with a failing or unexecuted quality gate. The mandatory pre-publish policy above remains authoritative. An automated remediation PR is itself untrusted until its explicitly dispatched Quality/Security validation succeeds and it is reviewed/merged through the normal PR path.
 
