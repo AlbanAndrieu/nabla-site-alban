@@ -10,6 +10,7 @@ test("post-merge remediation only reacts to a red Quality workflow on master pus
 
 	assert.match(workflow, /workflow_run:/);
 	assert.match(workflow, /CI \(Quality and Security\)/);
+	assert.match(workflow, /branches:\n\s+- master/);
 	assert.match(workflow, /workflow_run\.event == 'push'/);
 	assert.match(workflow, /workflow_run\.head_branch == 'master'/);
 	assert.match(workflow, /workflow_run\.conclusion == 'failure'/);
@@ -62,6 +63,9 @@ test("post-merge remediation opens a PR for stable fixes and otherwise a dedupli
 	assert.match(workflow, /github\.rest\.issues\.create/);
 	assert.match(workflow, /post-merge-quality-remediation:/);
 	assert.match(workflow, /github\.paginate\(github\.rest\.issues\.listForRepo/);
+	assert.match(workflow, /unable to open remediation PR/);
+	assert.match(workflow, /canonical CI dispatch failed/);
+	assert.match(workflow, /Automation fallback/);
 });
 
 test("automated remediation PR explicitly dispatches canonical CI", async () => {
