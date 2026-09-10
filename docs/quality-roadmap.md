@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 10 septembre 2026.
+Dernière vérification : 11 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -151,6 +151,17 @@ les autres chantiers.
   le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
   `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
   la quality gate pré-publication.
+- [ ] Valider le nouveau chemin local-first sur plusieurs modifications réelles
+  d'agents : `quality:agent:fix` doit converger seul sur les corrections
+  déterministes, les hooks Git doivent être installés dans le workspace agent, le
+  pre-push doit exécuter une seule gate stricte et un défaut uniquement de
+  formatage/pre-commit doit s'arrêter dans la CI avant `setup-node` / `npm ci` avec
+  `QG_AUTOFIX_REQUIRED`, sans analyse large des logs.
+- [ ] Supprimer la double autorité Stylelint après vérification de parité des
+  règles : le hook pre-commit transporte actuellement Stylelint 14.x alors que la
+  toolchain npm utilise Stylelint 17.x. Conserver ensuite npm/package-lock comme
+  source de vérité CSS unique afin que auto-fix local, pre-push et CI ne puissent
+  pas diverger sur la version de linter.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
@@ -416,9 +427,9 @@ Autres contrôles :
   Quality/Security pour scanner les fichiers applicatifs modifiés ainsi que les workflows GitHub Actions modifiés
   avec le ruleset `p/ci`. Le scan reste diff-scoped et s'exécute avant
   l'installation npm afin de bloquer tôt une nouvelle violation SAST. Le
-  rapport Semgrep est aussi
-  exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
-  afin de rendre le diagnostic exploitable sans relancer le scan.
+  rapport Semgrep est exporté en SARIF vers GitHub Code Scanning ; l'artifact
+  brut est conservé 7 jours seulement en cas d'échec afin de garder le diagnostic
+  utile sans dupliquer le stockage sur les runs verts.
 - [x] Fermer le risque supply-chain détecté par Semgrep dans les workflows
   critiques : pinner Checkout, GitHub Script, Setup Python/Node, Cache,
   Upload Artifact, CodeQL SARIF et OWASP ZAP sur leurs SHA Git immuables, en
@@ -608,6 +619,12 @@ Autres contrôles :
   `docker-build.yml` dans le périmètre Semgrep : toutes ses actions critiques
   sont désormais verrouillées sur des SHA Git immuables au lieu de tags
   mutables.
+- [ ] Mesurer après merge le gain du pipeline local-first sur plusieurs runs : la
+  CI doit arrêter les défauts formatter/pre-commit avant le bootstrap npm, ne pas
+  rejouer le canonical gate plus tard dans le même job, limiter les logs à 40
+  lignes utiles et ne conserver l'artifact Semgrep brut que lors des échecs.
+  Comparer notamment à la baseline Quality `master` d'environ 96 s observée avant
+  ce changement, sans transformer cette durée en seuil bloquant/flakey.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
