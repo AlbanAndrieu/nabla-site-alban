@@ -1,6 +1,6 @@
 # Homelab integration roadmap
 
-Last reconciled: 10 September 2026.
+Last reconciled: 11 September 2026.
 
 This document is the focused backlog for the TrueNAS / FastAPI / `nabla-compose`
 integration. `docs/quality-roadmap.md` remains the cross-project quality roadmap;
@@ -104,16 +104,24 @@ same path to the compatibility catalog and explicit missing-component policy.
 
 ## P0 — Post-merge Quality remediation
 
-- [ ] Merge and operationally validate
-  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
-  `workflow_run` workflow once the workflow file exists on the default branch.
-  After activation, a failed or timed out `CI (Quality and Security)` push on
-  `master` with a converged deterministic formatter/pre-commit repair must open a
-  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
-  failure must instead open one deduplicated diagnostic issue with the failed jobs
-  and source run. Also validate the fallback issue path when GitHub refuses PR
-  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
-  never as permission for agents to skip their pre-publish gate.
+- [ ] Operationally validate the merged
+  `.github/workflows/post-merge-quality-remediation.yml`: after an actual failed
+  or timed out `CI (Quality and Security)` push on `master`, a converged
+  deterministic formatter/pre-commit repair must open a non-default remediation
+  PR and dispatch canonical CI on it; a non-auto-fixable failure must instead open
+  one deduplicated diagnostic issue with the failed jobs and source run. Also
+  validate the fallback issue path when GitHub refuses PR creation or CI dispatch
+  with `GITHUB_TOKEN`. Keep this as a recovery safety net, never as permission for
+  agents to skip their pre-publish gate.
+- [ ] Validate the local-first quality pipeline introduced after #173 on real agent
+  edits: one `quality:agent:fix` call must converge deterministic formatter/linter
+  changes before commit, the installed pre-push hook must execute the strict
+  publication gate once, and formatter-only CI failures must stop before npm
+  bootstrap with `QG_AUTOFIX_REQUIRED` rather than requiring broad log analysis.
+- [ ] Remove the remaining duplicate Stylelint authority after proving rule parity:
+  pre-commit currently carries its own Stylelint 14.x environment while the npm
+  project uses Stylelint 17.x. Keep npm/package-lock as the eventual CSS lint
+  source of truth so local fix, pre-push and CI cannot disagree on tool versions.
 
 ## P1 — Refactoring / code-size debt
 
