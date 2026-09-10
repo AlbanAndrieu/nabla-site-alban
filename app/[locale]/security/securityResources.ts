@@ -6,7 +6,7 @@ export type ResourceLink =
 			icon?: ResourceLinkIcon;
 	  }
 	| {
-			page: "ai";
+			page: "ai" | "truenas";
 			hash: string;
 			icon: ResourceLinkIcon;
 	  };
@@ -16,6 +16,7 @@ export type SecuritySectionKey =
 	| "personal"
 	| "network"
 	| "hardening"
+	| "zeroTrustKubernetes"
 	| "ssh"
 	| "openclaw"
 	| "compliance"
@@ -114,6 +115,24 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 		],
 	},
 	{
+		key: "zeroTrustKubernetes",
+		id: "zero-trust-kubernetes",
+		iconClass: "fa-solid fa-shield",
+		links: [
+			{ page: "truenas", hash: "homelab", icon: "terminal" },
+			{ href: "https://blog.stephane-robert.info/docs/securiser/kubernetes/" },
+			{
+				href: "https://kubernetes.io/docs/concepts/security/pod-security-standards/",
+			},
+			{ href: "https://kyverno.io/" },
+			{ href: "https://open-policy-agent.github.io/gatekeeper/website/" },
+			{ href: "https://falco.org/" },
+			{ href: "https://docs.cilium.io/en/stable/security/policy/" },
+			{ href: "https://docs.cilium.io/en/stable/observability/hubble/" },
+			{ href: "https://tetragon.io/" },
+		],
+	},
+	{
 		key: "ssh",
 		id: "ssh-security-hardening",
 		iconClass: "fa-solid fa-terminal",
@@ -134,7 +153,9 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 		id: "openclaw-security",
 		iconClass: "fa-solid fa-robot",
 		links: [
-			{ href: "https://aimaker.substack.com/p/openclaw-security-hardening-guide" },
+			{
+				href: "https://aimaker.substack.com/p/openclaw-security-hardening-guide",
+			},
 			{
 				href: "https://github.com/Next-Kick/openclaw-hardened-ansible",
 				icon: "github",
