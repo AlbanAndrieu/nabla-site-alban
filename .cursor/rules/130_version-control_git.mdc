@@ -8,8 +8,10 @@ alwaysApply: true
 
 Follow `/AGENTS.md` as the canonical policy.
 
-- `master` is the protected default branch. Never write, push, merge-agent changes or move its ref directly.
+- `master` is the default branch and must be treated as protected by agent policy. Never write, push, merge-agent changes or move its ref directly.
 - Create/reuse a non-default branch, validate it, then integrate through a pull request targeting `master`.
+- After edits, run the self-converging `npm run quality:agent:fix`, commit the result, then push normally so the installed pre-push hook runs the strict publication gate once.
+- `QG_AUTOFIX_REQUIRED` means rerun the local fix path; do not spend context on broad CI-log analysis unless the failure is non-auto-fixable.
 - Use Conventional Commits and the rules in `commitlint.config.ts`.
 - OpenCommit and `.opencommit-commitlint` are intentionally retained as local/on-demand commit-message tooling; Conventional Commits remain authoritative.
 - Never bypass hooks or quality gates with `--no-verify`.
