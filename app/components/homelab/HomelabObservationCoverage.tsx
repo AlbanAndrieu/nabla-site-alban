@@ -71,7 +71,10 @@ function healthBoardIcon(state: "pending" | "fresh" | "stale"): string {
 	return "◌";
 }
 
-function healthBoardRefreshLabel(french: boolean, refreshing: boolean): string {
+function healthBoardRefreshLabel(
+	french: boolean,
+	refreshing: boolean,
+): string {
 	if (!refreshing) return "";
 	return french ? " · refresh en cours" : " · refresh in progress";
 }
@@ -92,6 +95,10 @@ function healthyRollingEvidence(
 	).length;
 }
 
+function coverageSuffix(value: number | null): string {
+	return value === null ? "" : ` (${value}%)`;
+}
+
 function probeEvidenceLabel(
 	french: boolean,
 	evidence: HomelabProbeEvidenceSummary | undefined,
@@ -99,24 +106,28 @@ function probeEvidenceLabel(
 	healthy: number,
 ): string | null {
 	if (!evidence || evidence.known === undefined) return null;
+
 	const evidenceCoverage =
 		typeof evidence.coverage_percent === "number"
 			? evidence.coverage_percent
 			: percent(evidence.known, eligible);
 	const healthyCoverage = percent(healthy, eligible);
+	const evidenceWord = french ? "preuves" : "evidence";
+	const healthyWord = french ? "sains" : "healthy";
+	const freshWord = french ? "fraîches" : "fresh";
 	const parts = [
-		`${french ? "preuves" : "evidence"} ${evidence.known}/${eligible}${evidenceCoverage === null ? "" : ` (${evidenceCoverage}%)`}`,
-		`${french ? "sains" : "healthy"} ${healthy}/${eligible}${healthyCoverage === null ? "" : ` (${healthyCoverage}%)`}`,
-		`${evidence.fresh ?? 0} ${french ? "fraîches" : "fresh"}`,
+		`${evidenceWord} ${evidence.known}/${eligible}${coverageSuffix(evidenceCoverage)}`,
+		`${healthyWord} ${healthy}/${eligible}${coverageSuffix(healthyCoverage)}`,
+		`${evidence.fresh ?? 0} ${freshWord}`,
 		`${evidence.cached ?? 0} cache`,
 	];
+
 	if (typeof evidence.evidence_ttl_seconds === "number") {
 		parts.push(`TTL ${evidence.evidence_ttl_seconds}s`);
 	}
 	if (typeof evidence.evidence_max_retention_seconds === "number") {
-		parts.push(
-			`${french ? "rétention max" : "max retention"} ${evidence.evidence_max_retention_seconds}s`,
-		);
+		const label = french ? "rétention max" : "max retention";
+		parts.push(`${label} ${evidence.evidence_max_retention_seconds}s`);
 	}
 	return parts.join(" · ");
 }
@@ -145,7 +156,9 @@ export default function HomelabObservationCoverage({
 	const publicSampled = publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
 	const publicEligible =
 		publicSummary?.eligible ?? publicSummary?.scheduled ?? publicSampled;
-	const internalHealthy = healthyRollingEvidence(snapshot?.internal_services ?? []);
+	const internalHealthy = healthyRollingEvidence(
+		snapshot?.internal_services ?? [],
+	);
 	const publicHealthy = healthyRollingEvidence(snapshot?.services ?? []);
 	const internalEvidenceLabel = probeEvidenceLabel(
 		french,
@@ -202,7 +215,7 @@ export default function HomelabObservationCoverage({
 							data-internal-probe-count={internalSampled}
 							data-internal-probe-eligible={internalEligible}
 							data-internal-probes-enabled={
-								snapshot?.internal_probes_enabled === undefined
+								snapshot.internal_probes_enabled === undefined
 									? "unknown"
 									: String(snapshot.internal_probes_enabled)
 							}
@@ -222,7 +235,8 @@ export default function HomelabObservationCoverage({
 									percent(internalHealthy, internalEligible) ?? "n/a"
 								}
 							>
-								{french ? "couverture LAN" : "LAN coverage"}: {internalEvidenceLabel}
+								{french ? "couverture LAN" : "LAN coverage"}:{" "}
+								{internalEvidenceLabel}
 							</span>
 						) : null}
 						{publicSummary ? (
@@ -230,8 +244,9 @@ export default function HomelabObservationCoverage({
 								data-public-probe-count={publicSampled}
 								data-public-probe-eligible={publicEligible}
 							>
-								{french ? "sondes publiques" : "public probes"}: {publicSampled}
-								/{publicEligible} {french ? "échantillonnées" : "sampled"} ·{" "}
+								{french ? "sondes publiques" : "public probes"}:{" "}
+								{publicSampled}/{publicEligible}{" "}
+								{french ? "échantillonnées" : "sampled"} ·{" "}
 								{publicSummary.completed ?? 0}{" "}
 								{french ? "terminées" : "completed"} ·{" "}
 								{publicSummary.timed_out ?? 0} deadline
@@ -245,7 +260,8 @@ export default function HomelabObservationCoverage({
 									percent(publicHealthy, publicEligible) ?? "n/a"
 								}
 							>
-								{french ? "couverture publique" : "public coverage"}: {publicEvidenceLabel}
+								{french ? "couverture publique" : "public coverage"}:{" "}
+								{publicEvidenceLabel}
 							</span>
 						) : null}
 						{rotatingSample ? (
