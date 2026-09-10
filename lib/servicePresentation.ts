@@ -1,16 +1,13 @@
 import {
-	homelabServiceId,
 	type HomelabService,
 	type HomelabServicesCatalog,
+	homelabServiceId,
 } from "./homelabServices";
 import {
 	analyzeServiceCriticality,
 	compareServiceCriticality,
 } from "./serviceCriticality";
-import type {
-	ServiceTopology,
-	ServiceTopologyNode,
-} from "./serviceTopology";
+import type { ServiceTopology, ServiceTopologyNode } from "./serviceTopology";
 
 export type ServicePresentationRole = "service" | "core" | "support";
 export type ServiceOperationalCriticality =
@@ -24,7 +21,12 @@ export type ServicePresentationGroup =
 	| "security-controls"
 	| "shared-core"
 	| "support";
-export type ServiceMetricsProfile = "red" | "use" | "security" | "red-use" | "support";
+export type ServiceMetricsProfile =
+	| "red"
+	| "use"
+	| "security"
+	| "red-use"
+	| "support";
 
 export type ServicePresentation = {
 	id: string;
@@ -128,7 +130,11 @@ const OBSERVABILITY_KINDS = new Set([
 	"trace-store",
 ]);
 
-const VALID_ROLES = new Set<ServicePresentationRole>(["service", "core", "support"]);
+const VALID_ROLES = new Set<ServicePresentationRole>([
+	"service",
+	"core",
+	"support",
+]);
 const VALID_CRITICALITIES = new Set<ServiceOperationalCriticality>([
 	"critical",
 	"high",
@@ -157,13 +163,16 @@ function inferredRole(
 	directDependencies: number,
 	transitiveDependents: number,
 ): ServicePresentationRole {
-	if (FOUNDATION_IDS.has(node.id) || FOUNDATION_KINDS.has(node.kind)) return "core";
+	if (FOUNDATION_IDS.has(node.id) || FOUNDATION_KINDS.has(node.kind))
+		return "core";
 	if (SECURITY_CONTROL_KINDS.has(node.kind)) return "core";
 	if (SERVICE_KINDS.has(node.kind)) return "service";
 	if (
 		directDependencies > 0 &&
 		transitiveDependents === 0 &&
-		!["infrastructure", "network", "data", "observability"].includes(node.category)
+		!["infrastructure", "network", "data", "observability"].includes(
+			node.category,
+		)
 	) {
 		return "service";
 	}
@@ -198,9 +207,22 @@ function presentationGroup(
 	criticality: ServiceOperationalCriticality,
 	transitiveDependents: number,
 ): ServicePresentationGroup {
-	if (role === "service") return "services";
+	// Canonical nabla-compose metadata controls presentation. Security-category
+	// components belong with controls unless they are platform foundations.
+	if (node.category === "security" && !FOUNDATION_IDS.has(node.id)) {
+		return "security-controls";
+	}
 	if (criticality === "critical") return "core-critical";
 	if (SECURITY_CONTROL_KINDS.has(node.kind)) return "security-controls";
+
+	// Explicit support/service roles must win over dependency blast radius so
+	// presentation remains independent from technical impact propagation.
+	if (role === "support") return "support";
+	if (role === "service") return "services";
+
+	// Observability components stay in support even when other services depend
+	// on them. Dependency impact remains available separately in the analysis.
+	if (OBSERVABILITY_KINDS.has(node.kind)) return "support";
 	if (
 		role === "core" ||
 		transitiveDependents > 0 ||
@@ -208,7 +230,6 @@ function presentationGroup(
 	) {
 		return "shared-core";
 	}
-	if (OBSERVABILITY_KINDS.has(node.kind) || role === "support") return "support";
 	return "support";
 }
 
@@ -254,7 +275,12 @@ export function analyzeServicePresentation(
 		const criticality =
 			explicitCriticality(service, node) ??
 			inferredCriticality(node, role, transitiveDependents);
-		const group = presentationGroup(node, role, criticality, transitiveDependents);
+		const group = presentationGroup(
+			node,
+			role,
+			criticality,
+			transitiveDependents,
+		);
 		analysis.set(id, {
 			id,
 			role,
@@ -306,6 +332,8 @@ export function groupCatalogByPresentation(
 	});
 }
 
-export function servicePresentationGroupOrder(group: ServicePresentationGroup): number {
+export function servicePresentationGroupOrder(
+	group: ServicePresentationGroup,
+): number {
 	return PRESENTATION_GROUP_ORDER.indexOf(group);
 }
