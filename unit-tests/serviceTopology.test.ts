@@ -316,8 +316,8 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 	if (topology.catalogRevision !== undefined) {
 		assert.match(topology.catalogRevision, /^sha256:[0-9a-f]{64}$/);
 	}
-	assert.ok(topology.nodes.length >= 100);
-	assert.ok(topology.relations.length >= 200);
+	assert.equal(topology.nodes.length, 113);
+	assert.equal(topology.relations.length, 216);
 
 	const nodeIds = new Set(topology.nodes.map((node) => node.id));
 	for (const id of [
@@ -325,11 +325,14 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 		"akvorado-inlet",
 		"akvorado-orchestrator",
 		"akvorado-outlet",
+		"clamav",
 		"docker-socket-proxy",
 		"doco-cd",
 		"kafka",
+		"keycloak",
 		"mongo",
 		"nexus",
+		"pfsense-unbound",
 		"pihole-dns-sync",
 		"pyroscope",
 		"sentry-edge",
@@ -349,9 +352,109 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 				relation.type === type,
 		);
 
+	assert.ok(hasRelation("pfsense-unbound", "pihole", "dependsOn"));
+	assert.ok(hasRelation("keycloak", "postgresql", "dependsOn"));
+	assert.ok(hasRelation("openwebui", "cloudflared", "exposedBy"));
 	assert.ok(hasRelation("pihole-dns-sync", "pihole", "automates"));
 	assert.ok(hasRelation("akvorado-inlet", "kafka", "routesTo"));
 	assert.ok(hasRelation("akvorado-outlet", "clickhouse", "storesIn"));
 	assert.ok(hasRelation("pyroscope", "docker", "hostedBy"));
 	assert.ok(hasRelation("sentry-edge", "sentry-relay", "routesTo"));
+});
+
+test("local topology preserves FastAPI Sample production and staging environments", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const sample = topology.nodes.find((node) => node.id === "fastapi-sample");
+	assert.deepEqual(
+		sample?.environments?.map((environment) => environment.name),
+		["production", "staging"],
+	);
+});
+
+test("topology parser validates deployment environment names and URLs", () => {
+	const base = {
+		version: 1,
+		name: "environment-contract",
+		relations: [],
+	};
+
+	assert.ok(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [],
+				},
+			],
+		}),
+	);
+	assert.equal(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [
+						{
+							name: "qa",
+							url: "https://qa.example.com",
+							external: true,
+							cloudflareTunnel: false,
+						},
+					],
+				},
+			],
+		}),
+		null,
+	);
+	assert.equal(
+		parseServiceTopology({
+			...base,
+			nodes: [
+				{
+					id: "sample",
+					name: "Sample",
+					kind: "api",
+					category: "test",
+					environments: [
+						{
+							name: "production",
+							url: " ",
+							external: true,
+							cloudflareTunnel: false,
+						},
+					],
+				},
+			],
+		}),
+		null,
+	);
+});
+
+test("synchronized topology preserves internal URL and security-function metadata", async () => {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+
+	assert.ok(topology);
+	const clamav = topology.nodes.find((node) => node.id === "clamav");
+	assert.equal(clamav?.internalUrl, "https://clamav.int.albandrieu.com");
+	assert.deepEqual(clamav?.securityFunctions, ["protect", "detect"]);
+	assert.equal(
+		topology.nodes.find((node) => node.id === "pfsense-unbound")?.criticality,
+		"critical",
+	);
 });

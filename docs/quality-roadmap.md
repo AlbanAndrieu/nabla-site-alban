@@ -216,17 +216,47 @@ les autres chantiers.
   du snapshot : l'UI distingue état courant, fraîcheur/cache, erreur de refresh et
   dernière preuve saine `last_good` afin qu'un ancien état vert ne soit pas lu
   comme une observation live.
-- [x] Revalider le graphe de production après les évolutions `nabla-compose#128/#129` :
-  le fallback Site est resynchronisé sur 108 nœuds / 208 relations, incluant
-  Sentry, Pyroscope, Akvorado, Pi-hole auxiliaires, Doco-CD, Docker socket proxy,
-  Kafka, MongoDB et Nexus. La PR #130 est désormais fusionnée mais son smoke
-  Kubernetes/CSI reste à exécuter et observer ; la PR #131 n'est pas présentée
-  comme déployée tant que son catalogue/runtime n'est pas fusionné et observé.
+- [x] Revalider le graphe après les merges `nabla-compose` jusqu'à la release
+  0.30.0 : le fallback Site est resynchronisé sémantiquement sur 113 nœuds /
+  216 relations et inclut désormais ClamAV, Keycloak et pfSense Unbound, ainsi
+  que les dernières preuves Garage, Cloudflare, CrowdSec et pfSense exporter.
+  Le catalogue de présentation reste aligné sur 72 services et conserve les
+  annotations runtime récentes de Scrutiny.
 - [x] Aligner le fallback de réconciliation des anciens payloads sur
   `fastapi-sample#212` : runtime TrueNAS frais arrêté/échoué non masqué par
   Cloudflare, preuves runtime/tunnel périmées non utilisées comme preuve positive,
   erreur applicative joignable classée dégradée et exposition Cloudflare seule
   insuffisante pour déclarer l'application saine.
+- [x] Afficher la couverture d'observation directement dans la vue TrueNAS :
+  nombre de services du catalogue, nœuds/relations de topologie, observations
+  de santé, sondes LAN/internes activées, couverture des preuves directes,
+  runtime, Cloudflare et dépendances, tunnels observés et durée du refresh.
+  Les compteurs de fan-out consomment maintenant le contrat borné
+  `/api/homelab/probes` de FastAPI (`scheduled/completed/timed_out`, budget,
+  timeout par sonde et concurrence), propagé également dans `probe_summary`
+  du snapshot de santé. Le proxy du Site utilise cette matrice comme fallback
+  avant l'ancien agrégat lorsqu'un health-board n'est pas disponible. Ces
+  compteurs décrivent les preuves disponibles et ne changent pas la résolution
+  de santé.
+  Compatibilité anticipée avec `fastapi-sample#231` : le Site comprend aussi
+  `eligible/sampled/rotating_sample`, `probe_cache`, la fraîcheur du
+  health-board et la provenance de réconciliation. L'UI affiche donc
+  `sampled/eligible` lorsqu'il est disponible et reste compatible avec
+  `scheduled` sur le runtime actuellement déployé.
+  Après la release FastAPI `1.13.11`, le Site consomme aussi la couverture
+  roulante `probe_summary.*.evidence` (`known/fresh/cached/coverage_percent`
+  et TTL). La page TrueNAS suit l'architecture probe-first préparée dans
+  `fastapi-sample#232` : le proxy same-origin `/api/homelab-probes` est
+  rendu immédiatement en `no-store`, puis `/api/homelab-health` enrichit
+  l'état avec le health-board et la réconciliation sans bloquer le premier rendu.
+  Un échec de l'agrégat ne supprime donc plus une matrice de probes valide.
+- [x] Dériver le filtre d'environnement TrueNAS depuis
+  `service-topology.nodes[].environments` avant le metadata legacy du catalogue.
+  Un service sans déclaration reste `production` par compatibilité mais porte
+  la provenance `default` et peut être isolé via le filtre « Production par
+  défaut / métadonnées à revoir ». Le fallback local conserve explicitement les
+  environnements production + staging de FastAPI Sample sans resynchroniser tout
+  le graphe dans cette PR thématique.
 - [ ] Exécuter puis consommer la progression Kubernetes préparée par
   `nabla-compose#130` (fusionnée) dans l'ordre DNS/CNI → smoke FastAPI
   `test.albandrieu.com` → CSI TrueNAS → secrets d'infrastructure. Le site doit
@@ -247,6 +277,10 @@ les autres chantiers.
   `healthy`, `degraded`, `failed`, `stale` et `unknown` : le test
   déterministe couvre TrueNAS en thème clair/sombre, Architecture en mobile,
   vérifie le contraste AA des badges, les cibles tactiles et l'absence d'overflow.
+  Le contrat UI traite aussi `runtime_missing=true` comme un drift d’inventaire
+  lorsque des preuves d’origine fraîches (`internal_state=ok` ou HTTP 2xx)
+  démontrent que le workload répond : l’état présenté devient `warn`, avec
+  un motif explicite, au lieu d’un faux `fail` (cas Vaultwarden).
 
 ## P1 — Présentation service-first et métriques à l'échelle
 
@@ -370,8 +404,9 @@ Autres contrôles :
 
 - [x] Conserver CodeQL comme SAST global et ajouter Semgrep CE 1.176.0 dans
   Quality/Security pour scanner les fichiers applicatifs modifiés ainsi que les workflows GitHub Actions modifiés
-  avec le ruleset `p/ci`. Le scan échoue avant l'installation npm lorsqu'une
-  nouvelle violation SAST bloquante est introduite. Le rapport Semgrep est aussi
+  avec le ruleset `p/ci`. Le scan reste diff-scoped et s'exécute avant
+  l'installation npm afin de bloquer tôt une nouvelle violation SAST. Le
+  rapport Semgrep est aussi
   exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
   afin de rendre le diagnostic exploitable sans relancer le scan.
 - [x] Fermer le risque supply-chain détecté par Semgrep dans les workflows
@@ -554,6 +589,15 @@ Autres contrôles :
   `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
   `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
   et un test de contrat empêche la réintroduction du pull coûteux.
+- [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
+  avec fallback sur un cache compatible `package-lock`, et ne pas répéter
+  Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque
+  `Dockerfile/.dockerignore` change ainsi que sur `master`, en schedule et
+  en exécution manuelle. Le correctif CI de #170 supprime aussi les lignes
+  blanches réécrites par Prettier avant la quality gate. Le changement du workflow a aussi fait entrer
+  `docker-build.yml` dans le périmètre Semgrep : toutes ses actions critiques
+  sont désormais verrouillées sur des SHA Git immuables au lieu de tags
+  mutables.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du

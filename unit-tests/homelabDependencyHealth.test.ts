@@ -5,6 +5,7 @@ import {
 	type HomelabHealthEntry,
 	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
+import { homelabHealthReasons } from "../lib/homelabHealthPresentation";
 import {
 	blockedDependencyLabels,
 	requiredDependencyTargetState,
@@ -86,6 +87,100 @@ test("shared resolver separates local and effective health", () => {
 	assert.deepEqual(resolved.blockedBy, ["postgresql"]);
 });
 
+test("Vaultwarden runtime inventory drift is degraded when fresh origin evidence proves it is up", () => {
+	const vaultwarden: HomelabHealthEntry = {
+		id: "vaultwarden",
+		name: "Vaultwarden",
+		url: "https://vaultwarden.albandrieu.com/",
+		reachable: false,
+		http_status: 503,
+		state: "fail",
+		local_state: "fail",
+		effective_state: "fail",
+		direct_state: "fail",
+		internal_state: "ok",
+		runtime_reachable: true,
+		runtime_missing: true,
+		runtime_stale: false,
+		observation_stale: false,
+	};
+
+	const resolved = resolveEffectiveServiceState(vaultwarden);
+	assert.equal(resolved.localState, "fail");
+	assert.equal(resolved.effectiveState, "warn");
+	assert.deepEqual(homelabHealthReasons(vaultwarden), [
+		{ kind: "runtime_inventory_mismatch" },
+		{ kind: "public_endpoint_down", detail: "HTTP 503" },
+	]);
+});
+
+test("runtime missing remains failed without fresh positive origin proof", () => {
+	const missing: HomelabHealthEntry = {
+		id: "missing-runtime",
+		name: "Missing runtime",
+		url: "https://missing.example.com/",
+		reachable: false,
+		http_status: 0,
+		state: "fail",
+		effective_state: "fail",
+		direct_state: "fail",
+		internal_state: "fail",
+		runtime_reachable: true,
+		runtime_missing: true,
+		observation_stale: false,
+	};
+
+	assert.equal(resolveEffectiveServiceState(missing).effectiveState, "fail");
+});
+
+test("stale origin evidence cannot override runtime missing failure", () => {
+	const stale: HomelabHealthEntry = {
+		id: "stale-runtime",
+		name: "Stale runtime",
+		url: "https://stale.example.com/",
+		reachable: true,
+		http_status: 200,
+		state: "fail",
+		effective_state: "fail",
+		direct_state: "ok",
+		internal_state: "ok",
+		runtime_reachable: true,
+		runtime_missing: true,
+		observation_stale: true,
+	};
+
+	assert.equal(resolveEffectiveServiceState(stale).effectiveState, "fail");
+});
+
+test("schema v6 parser preserves runtime_missing evidence used by UI reconciliation", () => {
+	const snapshot = parseHomelabHealthSnapshot({
+		schema_version: 6,
+		checked_at: "2026-09-09T15:00:00Z",
+		services: [
+			{
+				id: "vaultwarden",
+				name: "Vaultwarden",
+				url: "https://vaultwarden.albandrieu.com/",
+				reachable: false,
+				http_status: 503,
+				state: "fail",
+				direct_state: "fail",
+				internal_state: "ok",
+				runtime_reachable: true,
+				runtime_missing: true,
+				observation_stale: false,
+			},
+		],
+	});
+
+	assert.ok(snapshot);
+	assert.equal(snapshot.services[0].runtime_missing, true);
+	assert.equal(
+		resolveEffectiveServiceState(snapshot.services[0]).effectiveState,
+		"warn",
+	);
+});
+
 test("shared resolver remains compatible with legacy state-only rows", () => {
 	const legacy: HomelabHealthEntry = {
 		name: "Legacy",
@@ -139,6 +234,7 @@ test("service grid shows effective dependency degradation without replacing runt
 	assert.match(grid, /blockedDependencyLabels\(initialHealth\)/);
 	assert.match(grid, /data-dependency-health/);
 	assert.match(grid, /data-truenas-runtime-state=\{runtimeState\}/);
+	assert.match(grid, /data-runtime-inventory-conflict/);
 	assert.match(grid, /data-dependency-health-legend/);
 });
 

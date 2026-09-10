@@ -169,19 +169,20 @@
 			"tunnelUrl": "https://scrutiny.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/scrutiny.png",
-			"external": false
+			"external": false,
+			"internalTitle": "Scrutiny LAN endpoint: http://172.17.0.24:31054/",
+			"tunnelTitle": "Scrutiny via Cloudflare Tunnel + Access"
 		},
 		{
 			"name": "Scrutiny Collector - albandrieu",
 			"icons": ["fas fa-hard-drive"],
-			"description": "Hard drive health monitoring",
+			"description": "Workstation SMART collector posting disk telemetry to the Scrutiny Web/API hosted on TrueNAS.",
 			"internalHost": "172.17.0.57",
-			"internalPort": 31054,
-			"internalSecure": false,
-			"tunnelUrl": "https://scrutiny-albandrieu.albandrieu.com",
-			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/scrutiny.png",
-			"external": false
+			"external": false,
+			"endpointEnabled": false,
+			"internalTitle": "Collector-only runtime on workstation 172.17.0.57; no local web endpoint.",
+			"healthNote": "Expected upstream target: http://172.17.0.24:31054"
 		},
 		{
 			"name": "IT Tools",
@@ -496,6 +497,7 @@
 			"external": false
 		},
 		{
+			"id": "postgresql",
 			"name": "PostgreSQL",
 			"icons": ["fas fa-database"],
 			"description": "Database server (TCP — use a Postgres client, not a normal web browser tab)",
@@ -835,42 +837,39 @@
 			"external": true
 		},
 		{
-			"id": "garage",
 			"name": "Garage S3",
 			"icons": ["fas fa-database"],
-			"description": "Garage S3 API via direct Traefik ingress",
+			"description": "Garage S3-compatible object-storage API exposed through the direct HAProxy/TLS re-encryption/Traefik path.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3900,
 			"internalSecure": false,
-			"endpointUrl": "https://s3.int.albandrieu.com",
 			"tunnelUrl": "https://s3.int.albandrieu.com",
 			"tunnelSecure": false,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"external": true
+			"external": true,
+			"id": "garage"
 		},
 		{
-			"id": "garage-webui",
 			"name": "Garage",
-			"icons": ["fas fa-warehouse"],
-			"description": "Garage WebUI via Cloudflare Tunnel",
+			"icons": ["fas fa-terminal"],
+			"description": "Garage WebUI exposed through Cloudflare Tunnel directly to the LAN-bound :3909 origin without Traefik.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3909,
 			"internalSecure": false,
-			"endpointUrl": "https://garage.albandrieu.com",
 			"tunnelUrl": "https://garage.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"external": true
+			"external": true,
+			"id": "garage-webui"
 		},
 		{
 			"id": "garage-admin",
 			"name": "Garage Admin",
-			"icons": ["fas fa-user-shield"],
-			"description": "Garage administration API via Cloudflare Tunnel",
+			"icons": ["fas fa-lock"],
+			"description": "Garage Admin API exposed through Cloudflare Tunnel directly to the LAN-bound :3903 origin without Traefik.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3903,
 			"internalSecure": false,
-			"endpointUrl": "https://garage-admin.albandrieu.com",
 			"tunnelUrl": "https://garage-admin.albandrieu.com",
 			"tunnelSecure": true,
 			"iconSrc": "assets/selfh-icons/garage.png",

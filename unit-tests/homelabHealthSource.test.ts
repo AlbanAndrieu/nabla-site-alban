@@ -1,15 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { GET } from "../app/api/homelab-health/route";
+import { GET as GET_PROBES } from "../app/api/homelab-probes/route";
 import {
 	HOMELAB_HEALTH_DEFAULT_API_URL,
+	HOMELAB_PROBES_DEFAULT_API_URL,
 	homelabHealthForUrl,
 	loadHomelabHealthSnapshot,
+	loadHomelabProbeSnapshot,
 	normalizeHomelabHealthUrl,
 	parseHomelabHealthSnapshot,
 } from "../lib/homelabHealth";
 
 const ORIGINAL_API_URL = process.env.HOMELAB_HEALTH_API_URL;
+const ORIGINAL_PROBES_API_URL = process.env.HOMELAB_PROBES_API_URL;
+const ORIGINAL_BOARD_API_URL = process.env.HOMELAB_HEALTH_BOARD_API_URL;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 const VALID_SNAPSHOT = {
@@ -43,7 +48,42 @@ const VALID_SNAPSHOT = {
 	],
 	internal_probes_enabled: false,
 	internal_services: [],
+	probe_summary: {
+		public: {
+			scope: "public",
+			enabled: true,
+			scheduled: 1,
+			completed: 1,
+			timed_out: 0,
+			budget_seconds: 4,
+			per_probe_timeout_seconds: 5,
+			max_concurrency: 4,
+			elapsed_ms: 42,
+			states: { ok: 1, warn: 0, fail: 0 },
+		},
+		internal: {
+			scope: "internal",
+			enabled: false,
+			scheduled: 0,
+			completed: 0,
+			timed_out: 0,
+			budget_seconds: 4,
+			per_probe_timeout_seconds: 5,
+			max_concurrency: 4,
+			elapsed_ms: 0,
+			states: { ok: 0, warn: 0, fail: 0 },
+		},
+		catalog_service_count: 72,
+	},
 };
+
+function setProbesApiUrl(value: string | undefined) {
+	if (value === undefined) {
+		delete process.env.HOMELAB_PROBES_API_URL;
+	} else {
+		process.env.HOMELAB_PROBES_API_URL = value;
+	}
+}
 
 function setApiUrl(value: string | undefined) {
 	if (value === undefined) {
@@ -53,8 +93,18 @@ function setApiUrl(value: string | undefined) {
 	}
 }
 
+function setBoardApiUrl(value: string | undefined) {
+	if (value === undefined) {
+		delete process.env.HOMELAB_HEALTH_BOARD_API_URL;
+	} else {
+		process.env.HOMELAB_HEALTH_BOARD_API_URL = value;
+	}
+}
+
 test.afterEach(() => {
 	setApiUrl(ORIGINAL_API_URL);
+	setProbesApiUrl(ORIGINAL_PROBES_API_URL);
+	setBoardApiUrl(ORIGINAL_BOARD_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
 });
 
@@ -91,6 +141,81 @@ test("homelab health parser accepts legacy and complete service-health contracts
 		parseHomelabHealthSnapshot(unknownServiceSnapshot),
 		unknownServiceSnapshot,
 	);
+});
+
+test("homelab health parser accepts sampled probe/cache/reconciliation metadata from FastAPI schema 6", () => {
+	const future = {
+		...VALID_SNAPSHOT,
+		schema_version: 6,
+		probe_summary: {
+			public: {
+				...VALID_SNAPSHOT.probe_summary.public,
+				eligible: 71,
+				sampled: 12,
+				scheduled: 12,
+				rotating_sample: true,
+				per_probe_timeout_seconds: 3,
+				evidence: {
+					known: 60,
+					fresh: 12,
+					cached: 48,
+					coverage_percent: 84.5,
+					evidence_ttl_seconds: 300,
+				},
+			},
+			internal: {
+				...VALID_SNAPSHOT.probe_summary.internal,
+				enabled: true,
+				eligible: 71,
+				sampled: 12,
+				scheduled: 12,
+				completed: 12,
+				rotating_sample: true,
+				per_probe_timeout_seconds: 1,
+				evidence: {
+					known: 71,
+					fresh: 12,
+					cached: 59,
+					coverage_percent: 100,
+					evidence_ttl_seconds: 300,
+				},
+			},
+			catalog_service_count: 72,
+			sampling: {
+				strategy: "priority-plus-rotating-window",
+				cache_ttl_seconds: 30,
+			},
+		},
+		probe_cache: {
+			source: "memory",
+			age_seconds: 12.4,
+			ttl_seconds: 30,
+			stale: false,
+		},
+		reconciliation: {
+			provider_reads_reused: true,
+			truenas_runtime_source: "health_api",
+		},
+	};
+
+	const parsed = parseHomelabHealthSnapshot(future);
+	assert.ok(parsed);
+	assert.equal(parsed.probe_summary?.internal?.eligible, 71);
+	assert.equal(parsed.probe_summary?.internal?.sampled, 12);
+	assert.equal(parsed.probe_summary?.internal?.rotating_sample, true);
+	assert.equal(parsed.probe_summary?.internal?.per_probe_timeout_seconds, 1);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.known, 71);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.fresh, 12);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.cached, 59);
+	assert.equal(parsed.probe_summary?.internal?.evidence?.coverage_percent, 100);
+	assert.equal(
+		parsed.probe_summary?.sampling?.strategy,
+		"priority-plus-rotating-window",
+	);
+	assert.equal(parsed.probe_cache?.source, "memory");
+	assert.equal(parsed.probe_cache?.age_seconds, 12.4);
+	assert.equal(parsed.reconciliation?.provider_reads_reused, true);
+	assert.equal(parsed.reconciliation?.truenas_runtime_source, "health_api");
 });
 
 test("homelab health parser drops malformed service rows without discarding valid TrueNAS evidence", () => {
@@ -195,6 +320,41 @@ test("homelab health prefers the FastAPI snapshot", async () => {
 	assert.equal(result.snapshot?.truenas?.state, "fail");
 });
 
+test("bounded homelab probes use the dedicated FastAPI probe matrix", async () => {
+	setProbesApiUrl(undefined);
+	let requestedUrl = "";
+	globalThis.fetch = (async (input) => {
+		requestedUrl = String(input);
+		return Response.json(VALID_SNAPSHOT);
+	}) as typeof fetch;
+
+	const result = await loadHomelabProbeSnapshot();
+
+	assert.equal(requestedUrl, HOMELAB_PROBES_DEFAULT_API_URL);
+	assert.equal(result.source, "fastapi-probes");
+	assert.equal(result.snapshot?.probe_summary?.public?.scheduled, 1);
+	assert.equal(result.snapshot?.probe_summary?.internal?.max_concurrency, 4);
+	assert.equal(result.snapshot?.probe_summary?.catalog_service_count, 72);
+});
+
+test("same-origin bounded probe route is no-store and exposes the dedicated source", async () => {
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async () =>
+		Response.json(VALID_SNAPSHOT)) as typeof fetch;
+
+	const response = await GET_PROBES();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(response.headers.get("cache-control"), "no-store, max-age=0");
+	assert.equal(response.headers.get("pragma"), "no-cache");
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-probes",
+	);
+	assert.equal(body.probe_summary.public.scheduled, 1);
+});
+
 test("homelab health returns unavailable so endpoint-level fallback can run", async () => {
 	setApiUrl("https://health.example.test/homelab");
 	globalThis.fetch = (async () =>
@@ -209,8 +369,13 @@ test("homelab health returns unavailable so endpoint-level fallback can run", as
 
 test("homelab health proxy exposes the FastAPI snapshot and cache policy", async () => {
 	setApiUrl("https://health.example.test/homelab");
-	globalThis.fetch = (async () =>
-		Response.json(VALID_SNAPSHOT)) as typeof fetch;
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async (input) => {
+		if (String(input) === "https://probes.example.test/homelab") {
+			return new Response("probe fallback unavailable", { status: 503 });
+		}
+		return Response.json(VALID_SNAPSHOT);
+	}) as typeof fetch;
 
 	const response = await GET();
 	const body = await response.json();
@@ -226,6 +391,82 @@ test("homelab health proxy exposes the FastAPI snapshot and cache policy", async
 	assert.equal(body.truenas.state, "fail");
 });
 
+test("homelab health proxy propagates health-board freshness into the JSON contract", async () => {
+	setBoardApiUrl("https://board.example.test/api");
+	globalThis.fetch = (async (input) => {
+		if (String(input) === "https://board.example.test/api") {
+			return Response.json({
+				schema_version: 1,
+				state: "fresh",
+				refreshing: false,
+				generated_at: "2026-09-09T14:21:06Z",
+				age_seconds: 3.4,
+				error: null,
+				runtime: null,
+				healthz: null,
+				homelab: VALID_SNAPSHOT,
+				platform_metrics: null,
+				sickz: null,
+			});
+		}
+		return new Response("unexpected fallback", { status: 503 });
+	}) as typeof fetch;
+
+	const response = await GET();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-health-board",
+	);
+	assert.equal(body.health_board.state, "fresh");
+	assert.equal(body.health_board.refreshing, false);
+	assert.equal(body.health_board.age_seconds, 3.4);
+	assert.equal(body.health_board.generated_at, "2026-09-09T14:21:06Z");
+});
+
+test("stale health-board does not overwrite a fresher aggregate snapshot", async () => {
+	setBoardApiUrl("https://board.example.test/api");
+	setApiUrl("https://health.example.test/homelab");
+	globalThis.fetch = (async (input) => {
+		const url = String(input);
+		if (url === "https://board.example.test/api") {
+			return Response.json({
+				schema_version: 1,
+				state: "stale",
+				refreshing: true,
+				generated_at: "2026-09-09T14:21:06Z",
+				age_seconds: 63.4,
+				error: null,
+				runtime: null,
+				healthz: null,
+				homelab: {
+					...VALID_SNAPSHOT,
+					services: [
+						{ ...VALID_SNAPSHOT.services[0], state: "fail", reachable: false },
+					],
+				},
+				platform_metrics: null,
+				sickz: null,
+			});
+		}
+		if (url === "https://health.example.test/homelab") {
+			return Response.json(VALID_SNAPSHOT);
+		}
+		return new Response("unexpected", { status: 503 });
+	}) as typeof fetch;
+
+	const response = await GET();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi");
+	assert.equal(response.headers.get("x-homelab-health-board-state"), "stale");
+	assert.equal(body.services[0].state, "ok");
+	assert.equal(body.health_board.state, "stale");
+});
+
 test("homelab health proxy returns 503 when FastAPI is unavailable", async () => {
 	setApiUrl("https://health.example.test/homelab");
 	globalThis.fetch = (async () =>
@@ -236,4 +477,30 @@ test("homelab health proxy returns 503 when FastAPI is unavailable", async () =>
 	assert.equal(response.status, 503);
 	assert.equal(response.headers.get("cache-control"), "no-store");
 	assert.equal(response.headers.get("x-homelab-health-source"), "unavailable");
+});
+
+test("homelab health proxy falls back to bounded probes when board and aggregate are unavailable", async () => {
+	setApiUrl("https://health.example.test/homelab");
+	setProbesApiUrl("https://probes.example.test/homelab");
+	globalThis.fetch = (async (input) => {
+		const url = String(input);
+		if (url === "https://probes.example.test/homelab") {
+			return Response.json(VALID_SNAPSHOT);
+		}
+		return new Response("unavailable", { status: 503 });
+	}) as typeof fetch;
+
+	const response = await GET();
+	const body = await response.json();
+
+	assert.equal(response.status, 200);
+	assert.equal(
+		response.headers.get("x-homelab-health-source"),
+		"fastapi-probes",
+	);
+	assert.equal(
+		response.headers.get("x-homelab-health-primary"),
+		"https://probes.example.test/homelab",
+	);
+	assert.equal(body.probe_summary.public.scheduled, 1);
 });

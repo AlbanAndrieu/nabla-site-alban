@@ -43,6 +43,7 @@ export type HomelabHealthEntry = {
 	runtime_state?: string | null;
 	runtime_app?: string | null;
 	runtime_reachable?: boolean | null;
+	runtime_missing?: boolean;
 	runtime_stale?: boolean;
 	tunnel_stale?: boolean;
 };
@@ -132,6 +133,70 @@ export type PfSenseDnsPosture = {
 	error?: string;
 };
 
+export type HomelabProbeStateCounts = {
+	ok?: number;
+	warn?: number;
+	fail?: number;
+};
+
+export type HomelabProbeEvidenceSummary = {
+	known?: number;
+	fresh?: number;
+	cached?: number;
+	coverage_percent?: number;
+	evidence_ttl_seconds?: number;
+};
+
+export type HomelabProbeScopeSummary = {
+	scope?: string;
+	enabled?: boolean;
+	eligible?: number;
+	sampled?: number;
+	scheduled?: number;
+	completed?: number;
+	timed_out?: number;
+	rotating_sample?: boolean;
+	budget_seconds?: number;
+	per_probe_timeout_seconds?: number;
+	max_concurrency?: number;
+	elapsed_ms?: number;
+	states?: HomelabProbeStateCounts;
+	evidence?: HomelabProbeEvidenceSummary;
+};
+
+export type HomelabProbeSampling = {
+	strategy?: string;
+	cache_ttl_seconds?: number;
+};
+
+export type HomelabProbeSummary = {
+	public?: HomelabProbeScopeSummary;
+	internal?: HomelabProbeScopeSummary;
+	catalog_service_count?: number;
+	sampling?: HomelabProbeSampling;
+};
+
+export type HomelabProbeCache = {
+	source?: "origin" | "memory";
+	age_seconds?: number;
+	ttl_seconds?: number;
+	stale?: boolean;
+};
+
+export type HomelabHealthBoardMetadata = {
+	state: "pending" | "fresh" | "stale";
+	refreshing: boolean;
+	generated_at: string | null;
+	age_seconds?: number;
+	retry_after_seconds?: number;
+	error?: string | null;
+};
+
+export type HomelabReconciliationMetadata = {
+	provider_reads_reused?: boolean;
+	truenas_runtime_source?: string;
+};
+
 export type HomelabHealthSnapshot = {
 	schema_version: number;
 	checked_at: string;
@@ -140,6 +205,10 @@ export type HomelabHealthSnapshot = {
 	truenas?: TrueNasHealth | null;
 	internal_probes_enabled?: boolean;
 	internal_services?: HomelabInternalHealthEntry[];
+	probe_summary?: HomelabProbeSummary;
+	probe_cache?: HomelabProbeCache;
+	health_board?: HomelabHealthBoardMetadata;
+	reconciliation?: HomelabReconciliationMetadata;
 	truenas_runtime_reachable?: boolean;
 	truenas_runtime_stale?: boolean;
 	cloudflare_configured?: boolean;
@@ -149,15 +218,18 @@ export type HomelabHealthSnapshot = {
 	};
 };
 
-export type HomelabHealthSource = "fastapi" | "unavailable";
+export type HomelabHealthSource = "fastapi" | "fastapi-probes" | "unavailable";
 
 export const HOMELAB_HEALTH_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
+export const HOMELAB_PROBES_DEFAULT_API_URL =
+	"https://fastapi-sample.fastapicloud.dev/api/homelab/probes";
 
 // FastAPI uses bounded probes plus short-lived caches. Keep this proxy timeout
 // above the cold-probe ceiling while still failing quickly enough for the UI to
 // retain its last known snapshot rather than hanging indefinitely.
 const PRIMARY_TIMEOUT_MS = 8_000;
+const PROBES_TIMEOUT_MS = 6_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -218,10 +290,176 @@ function validOptionalStringArray(value: unknown): boolean {
 	return (
 		value === undefined ||
 		(Array.isArray(value) &&
-			value.every(
-				(item) => typeof item === "string" && item.trim().length > 0,
-			))
+			value.every((item) => typeof item === "string" && item.trim().length > 0))
 	);
+}
+
+function optionalNonNegativeInteger(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isInteger(value) && value >= 0
+		? value
+		: undefined;
+}
+
+function parseProbeStateCounts(
+	value: unknown,
+): HomelabProbeStateCounts | undefined {
+	if (!isRecord(value)) return undefined;
+	const states: HomelabProbeStateCounts = {};
+	for (const state of ["ok", "warn", "fail"] as const) {
+		const count = optionalNonNegativeInteger(value[state]);
+		if (count !== undefined) states[state] = count;
+	}
+	return states;
+}
+
+function parseProbeEvidenceSummary(
+	value: unknown,
+): HomelabProbeEvidenceSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const evidence: HomelabProbeEvidenceSummary = {};
+	for (const field of ["known", "fresh", "cached"] as const) {
+		const parsed = optionalNonNegativeInteger(value[field]);
+		if (parsed !== undefined) evidence[field] = parsed;
+	}
+	for (const field of ["coverage_percent", "evidence_ttl_seconds"] as const) {
+		const parsed = value[field];
+		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
+			evidence[field] = parsed;
+		}
+	}
+	return evidence;
+}
+
+function parseProbeScopeSummary(
+	value: unknown,
+): HomelabProbeScopeSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const summary: HomelabProbeScopeSummary = {};
+	if (typeof value.scope === "string" && value.scope.trim()) {
+		summary.scope = value.scope;
+	}
+	if (typeof value.enabled === "boolean") summary.enabled = value.enabled;
+	if (typeof value.rotating_sample === "boolean") {
+		summary.rotating_sample = value.rotating_sample;
+	}
+	for (const field of [
+		"eligible",
+		"sampled",
+		"scheduled",
+		"completed",
+		"timed_out",
+		"max_concurrency",
+	] as const) {
+		const parsed = optionalNonNegativeInteger(value[field]);
+		if (parsed !== undefined) summary[field] = parsed;
+	}
+	for (const field of [
+		"budget_seconds",
+		"per_probe_timeout_seconds",
+		"elapsed_ms",
+	] as const) {
+		const parsed = value[field];
+		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
+			summary[field] = parsed;
+		}
+	}
+	const states = parseProbeStateCounts(value.states);
+	if (states) summary.states = states;
+	const evidence = parseProbeEvidenceSummary(value.evidence);
+	if (evidence) summary.evidence = evidence;
+	return summary;
+}
+
+function parseProbeSummary(value: unknown): HomelabProbeSummary | undefined {
+	if (!isRecord(value)) return undefined;
+	const summary: HomelabProbeSummary = {};
+	const publicSummary = parseProbeScopeSummary(value.public);
+	const internalSummary = parseProbeScopeSummary(value.internal);
+	const catalogCount = optionalNonNegativeInteger(value.catalog_service_count);
+	if (publicSummary) summary.public = publicSummary;
+	if (internalSummary) summary.internal = internalSummary;
+	if (catalogCount !== undefined) summary.catalog_service_count = catalogCount;
+	if (isRecord(value.sampling)) {
+		const sampling: HomelabProbeSampling = {};
+		if (
+			typeof value.sampling.strategy === "string" &&
+			value.sampling.strategy.trim()
+		) {
+			sampling.strategy = value.sampling.strategy;
+		}
+		if (
+			typeof value.sampling.cache_ttl_seconds === "number" &&
+			Number.isFinite(value.sampling.cache_ttl_seconds) &&
+			value.sampling.cache_ttl_seconds >= 0
+		) {
+			sampling.cache_ttl_seconds = value.sampling.cache_ttl_seconds;
+		}
+		summary.sampling = sampling;
+	}
+	return summary;
+}
+
+function parseProbeCache(value: unknown): HomelabProbeCache | undefined {
+	if (!isRecord(value)) return undefined;
+	const cache: HomelabProbeCache = {};
+	if (value.source === "origin" || value.source === "memory") {
+		cache.source = value.source;
+	}
+	for (const field of ["age_seconds", "ttl_seconds"] as const) {
+		const raw = value[field];
+		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+			cache[field] = raw;
+		}
+	}
+	if (typeof value.stale === "boolean") cache.stale = value.stale;
+	return cache;
+}
+
+function parseHealthBoardMetadata(
+	value: unknown,
+): HomelabHealthBoardMetadata | undefined {
+	if (!isRecord(value)) return undefined;
+	if (
+		(value.state !== "pending" &&
+			value.state !== "fresh" &&
+			value.state !== "stale") ||
+		typeof value.refreshing !== "boolean" ||
+		(value.generated_at !== null && typeof value.generated_at !== "string")
+	) {
+		return undefined;
+	}
+	const metadata: HomelabHealthBoardMetadata = {
+		state: value.state,
+		refreshing: value.refreshing,
+		generated_at: value.generated_at,
+	};
+	for (const field of ["age_seconds", "retry_after_seconds"] as const) {
+		const raw = value[field];
+		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+			metadata[field] = raw;
+		}
+	}
+	if (typeof value.error === "string" || value.error === null) {
+		metadata.error = value.error;
+	}
+	return metadata;
+}
+
+function parseReconciliationMetadata(
+	value: unknown,
+): HomelabReconciliationMetadata | undefined {
+	if (!isRecord(value)) return undefined;
+	const metadata: HomelabReconciliationMetadata = {};
+	if (typeof value.provider_reads_reused === "boolean") {
+		metadata.provider_reads_reused = value.provider_reads_reused;
+	}
+	if (
+		typeof value.truenas_runtime_source === "string" &&
+		value.truenas_runtime_source.trim()
+	) {
+		metadata.truenas_runtime_source = value.truenas_runtime_source;
+	}
+	return metadata;
 }
 
 function validDependencyEvidence(value: unknown): boolean {
@@ -232,7 +470,8 @@ function validDependencyEvidence(value: unknown): boolean {
 			isRecord(item) &&
 			typeof item.target === "string" &&
 			item.target.trim().length > 0 &&
-			(item.target_name === undefined || typeof item.target_name === "string") &&
+			(item.target_name === undefined ||
+				typeof item.target_name === "string") &&
 			typeof item.relation_type === "string" &&
 			item.relation_type.trim().length > 0 &&
 			isHealthState(item.target_state) &&
@@ -283,6 +522,7 @@ function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalString(entry.runtime_state) &&
 		validOptionalString(entry.runtime_app) &&
 		validOptionalBoolean(entry.runtime_reachable) &&
+		validOptionalBoolean(entry.runtime_missing) &&
 		validOptionalBoolean(entry.runtime_stale) &&
 		validOptionalBoolean(entry.tunnel_stale)
 	);
@@ -368,7 +608,9 @@ function parseSecurityFilters(
 	return filters.length > 0 ? filters : undefined;
 }
 
-function parseIngressEndpoint(value: unknown): PfSenseIngressEndpoint | undefined {
+function parseIngressEndpoint(
+	value: unknown,
+): PfSenseIngressEndpoint | undefined {
 	if (!isRecord(value)) return undefined;
 	if (
 		!validOptionalString(value.ip) ||
@@ -382,13 +624,17 @@ function parseIngressEndpoint(value: unknown): PfSenseIngressEndpoint | undefine
 		return undefined;
 	}
 	return {
-		...(value.ip === null || typeof value.ip === "string" ? { ip: value.ip } : {}),
+		...(value.ip === null || typeof value.ip === "string"
+			? { ip: value.ip }
+			: {}),
 		...(typeof value.port === "number" ? { port: value.port } : {}),
 		...(typeof value.role === "string" ? { role: value.role } : {}),
 	};
 }
 
-function parseIngressBlock(value: unknown): PfSenseIngressBlockObservation | undefined {
+function parseIngressBlock(
+	value: unknown,
+): PfSenseIngressBlockObservation | undefined {
 	if (!isRecord(value)) return undefined;
 	if (
 		typeof value.state !== "string" ||
@@ -421,7 +667,9 @@ function parseIngressBlock(value: unknown): PfSenseIngressBlockObservation | und
 		evidence: value.evidence,
 		...(typeof value.engine === "string" ? { engine: value.engine } : {}),
 		...(typeof value.firewall === "string" ? { firewall: value.firewall } : {}),
-		...(typeof value.mechanism === "string" ? { mechanism: value.mechanism } : {}),
+		...(typeof value.mechanism === "string"
+			? { mechanism: value.mechanism }
+			: {}),
 		...(parseIngressEndpoint(value.source)
 			? { source: parseIngressEndpoint(value.source) }
 			: {}),
@@ -553,6 +801,10 @@ export function parseHomelabHealthSnapshot(
 		if (!Array.isArray(value.internal_services)) return null;
 		internalServices = value.internal_services.filter(validInternalHealthEntry);
 	}
+	const probeSummary = parseProbeSummary(value.probe_summary);
+	const probeCache = parseProbeCache(value.probe_cache);
+	const healthBoard = parseHealthBoardMetadata(value.health_board);
+	const reconciliation = parseReconciliationMetadata(value.reconciliation);
 	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
 	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
 	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
@@ -567,6 +819,10 @@ export function parseHomelabHealthSnapshot(
 
 	const sanitizedValue = { ...value };
 	delete sanitizedValue.pfsense;
+	delete sanitizedValue.probe_summary;
+	delete sanitizedValue.probe_cache;
+	delete sanitizedValue.health_board;
+	delete sanitizedValue.reconciliation;
 
 	return {
 		...sanitizedValue,
@@ -574,6 +830,10 @@ export function parseHomelabHealthSnapshot(
 		...(internalServices === undefined
 			? {}
 			: { internal_services: internalServices }),
+		...(probeSummary ? { probe_summary: probeSummary } : {}),
+		...(probeCache ? { probe_cache: probeCache } : {}),
+		...(healthBoard ? { health_board: healthBoard } : {}),
+		...(reconciliation ? { reconciliation } : {}),
 		...(pfsense ? { pfsense } : {}),
 	} as HomelabHealthSnapshot;
 }
@@ -614,6 +874,46 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		const reason = error instanceof Error ? error.message : String(error);
 		console.warn(
 			`[homelab-health] FastAPI snapshot unavailable (${primaryUrl}): ${reason}; using endpoint-level fallback`,
+		);
+		return { snapshot: null, source: "unavailable", primaryUrl };
+	} finally {
+		clearTimeout(timeout);
+	}
+}
+
+function probesApiUrl(): string {
+	return (
+		process.env.HOMELAB_PROBES_API_URL?.trim() || HOMELAB_PROBES_DEFAULT_API_URL
+	);
+}
+
+export async function loadHomelabProbeSnapshot(): Promise<{
+	snapshot: HomelabHealthSnapshot | null;
+	source: "fastapi-probes" | "unavailable";
+	primaryUrl: string;
+}> {
+	const primaryUrl = probesApiUrl();
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), PROBES_TIMEOUT_MS);
+
+	try {
+		const response = await fetch(primaryUrl, {
+			headers: {
+				Accept: "application/json",
+				"Cache-Control": "no-cache",
+				"User-Agent": "nabla-site-homelab-probes/1.0",
+			},
+			signal: controller.signal,
+			cache: "no-store",
+		});
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const snapshot = parseHomelabHealthSnapshot(await response.json());
+		if (!snapshot) throw new Error("Invalid homelab probe payload");
+		return { snapshot, source: "fastapi-probes", primaryUrl };
+	} catch (error) {
+		const reason = error instanceof Error ? error.message : String(error);
+		console.warn(
+			`[homelab-probes] FastAPI probe matrix unavailable (${primaryUrl}): ${reason}`,
 		);
 		return { snapshot: null, source: "unavailable", primaryUrl };
 	} finally {

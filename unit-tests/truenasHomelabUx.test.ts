@@ -42,8 +42,18 @@ test("service views are searchable and collapsible while technical criticality s
 	assert.match(block, /data-homelab-health-filter/);
 	assert.match(block, /data-homelab-environment-filter/);
 	assert.match(block, /non-dev/);
-	assert.match(block, /homelabServiceEnvironment/);
+	assert.match(block, /resolveHomelabServiceEnvironments/);
+	assert.match(block, /homelabServiceMatchesEnvironment/);
+	assert.match(block, /defaulted/);
+	assert.match(
+		await source("lib/homelabEnvironments.ts"),
+		/node\?\.environments/,
+	);
 	assert.match(block, /setEnvironmentFilter\("all"\)/);
+	assert.doesNotMatch(
+		await source("lib/homelabServices.ts"),
+		/DEV_NAME_SUFFIX_RE/,
+	);
 	assert.match(block, /data-service-presentation-group/);
 	assert.match(block, /setExpandedGroups/);
 	assert.match(block, /useState\(false\)/);
@@ -114,4 +124,65 @@ test("DNS posture remains sanitized while Operations owns the active presentatio
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 	assert.match(operations, /evidence\.pfsense\.reason/);
 	assert.match(operations, /data-pfsense-security-evidence/);
+});
+
+test("TrueNAS exposes runtime observation and internal probe coverage", async () => {
+	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const coverage = await source(
+		"app/components/homelab/HomelabObservationCoverage.tsx",
+	);
+
+	assert.match(block, /HomelabObservationCoverage/);
+	assert.match(block, /catalogServiceCount={state\.catalog\.services\.length}/);
+	assert.match(coverage, /data-homelab-observer-summary/);
+	assert.match(coverage, /data-internal-probe-count/);
+	assert.match(coverage, /internal_services\?\.length/);
+	assert.match(coverage, /probe_summary/);
+	assert.match(coverage, /sampled/);
+	assert.match(coverage, /eligible/);
+	assert.match(coverage, /rotating_sample/);
+	assert.match(coverage, /scheduled/);
+	assert.match(coverage, /completed/);
+	assert.match(coverage, /timed_out/);
+	assert.match(coverage, /max_concurrency/);
+	assert.match(coverage, /budget_seconds/);
+	assert.match(coverage, /data-public-probe-count/);
+	assert.match(coverage, /data-probe-cache-freshness/);
+	assert.match(coverage, /data-health-board-freshness/);
+	assert.match(coverage, /data-reconciliation-provenance/);
+	assert.match(coverage, /cloudflare_tunnels_observed/);
+	assert.match(coverage, /refresh_elapsed_ms/);
+	assert.match(coverage, /dependency_evidence/);
+});
+
+test("homelab renders bounded probes before aggregate enrichment", async () => {
+	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const probeProxy = await source("app/api/homelab-probes/route.ts");
+
+	const probeStart = block.indexOf(
+		"const probesPromise = fetchProbeHealth(signal)",
+	);
+	const probeRender = block.indexOf("const probes = await probesPromise");
+	const aggregateRender = block.indexOf(
+		"const aggregate = await aggregatePromise",
+	);
+	assert.ok(probeStart >= 0);
+	assert.ok(probeRender > probeStart);
+	assert.ok(aggregateRender > probeRender);
+	assert.match(block, /fetch\("\/api\/homelab-probes"/);
+	assert.match(block, /"Cache-Control": "no-cache"/);
+	assert.match(probeProxy, /loadHomelabProbeSnapshot/);
+	assert.match(probeProxy, /"Cache-Control": "no-store, max-age=0"/);
+});
+
+test("homelab exposes rolling probe evidence coverage from FastAPI", async () => {
+	const coverage = await source(
+		"app/components/homelab/HomelabObservationCoverage.tsx",
+	);
+	assert.match(coverage, /data-internal-probe-evidence/);
+	assert.match(coverage, /data-public-probe-evidence/);
+	assert.match(coverage, /coverage_percent/);
+	assert.match(coverage, /evidence_ttl_seconds/);
+	assert.match(coverage, /fresh/);
+	assert.match(coverage, /cached/);
 });

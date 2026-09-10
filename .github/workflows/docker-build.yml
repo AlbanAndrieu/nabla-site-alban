@@ -43,14 +43,38 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 2
+
+      - name: Resolve Trivy scan policy
+        id: trivy-policy
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" != "pull_request" ]]; then
+            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          # The fallback image is nginx + public/. A PR that only changes static
+          # files cannot alter the OS/library vulnerability set already scanned
+          # on master; Dockerfile/.dockerignore changes still force Trivy.
+          if git diff --quiet HEAD^1 HEAD -- Dockerfile .dockerignore; then
+            echo "run-trivy=false" >> "${GITHUB_OUTPUT}"
+            echo "::notice::Skipping duplicate Trivy OS/library scan for static-content-only PR."
+          else
+            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
 
       - name: Build fallback image
         id: docker_build
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
         with:
           context: .
           tags: ${{ env.LOCAL_IMAGE }}
@@ -102,7 +126,8 @@ jobs:
           echo "Fallback container smoke test passed as UID ${runtime_uid}."
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.36.0
+        if: steps.trivy-policy.outputs.run-trivy == 'true'
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.LOCAL_IMAGE }}
           version: "v0.74.0"
@@ -116,8 +141,11 @@ jobs:
           severity: "CRITICAL,HIGH"
 
       - name: Preserve Trivy SARIF report
-        if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: actions/upload-artifact@v6
+        if: >-
+          always() &&
+          steps.trivy-policy.outputs.run-trivy == 'true' &&
+          hashFiles('trivy-results.sarif') != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: trivy-sarif-${{ github.sha }}
           path: trivy-results.sarif
@@ -125,8 +153,11 @@ jobs:
           retention-days: 14
 
       - name: Upload Trivy scan results to GitHub Code Scanning
-        if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v4
+        if: >-
+          always() &&
+          steps.trivy-policy.outputs.run-trivy == 'true' &&
+          hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
         with:
           sarif_file: "trivy-results.sarif"
 
@@ -151,7 +182,7 @@ jobs:
           github.event_name == 'push' &&
           github.ref == 'refs/heads/master' &&
           steps.registry_policy.outputs.dockerhub_enabled == 'true'
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -159,7 +190,7 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

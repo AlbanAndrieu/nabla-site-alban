@@ -15,6 +15,7 @@ export type HomelabService = {
 	presentationRole?: "service" | "core" | "support";
 	criticality?: "critical" | "high" | "medium" | "low";
 	description?: string;
+	healthNote?: string;
 	icon?: string;
 	iconSrc?: string;
 	/** Browser navigation target. May intentionally differ from tunnelUrl. */
@@ -65,20 +66,17 @@ export function homelabServiceId(service: HomelabService): string {
 		: slugifyServiceName(service.name);
 }
 
-const DEV_NAME_SUFFIX_RE = /\s+-\s*albandrieu\s*$/i;
-
 /**
- * Resolve the service environment used by presentation filters.
+ * Resolve legacy single-environment metadata.
  *
- * Explicit catalog metadata wins. During the catalog migration, workstation
- * duplicates named `<service> - albandrieu` are development environments.
- * Every other service defaults to production until it is explicitly reviewed.
+ * Deployment environments are owned by nabla-compose x-nabla.environments and
+ * consumed through service-topology. This helper is only the fallback for
+ * presentation-catalog entries that do not have topology environments.
  */
 export function homelabServiceEnvironment(
 	service: HomelabService,
 ): HomelabEnvironment {
-	if (service.environment) return service.environment;
-	return DEV_NAME_SUFFIX_RE.test(service.name) ? "dev" : "production";
+	return service.environment ?? "production";
 }
 
 const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(
@@ -133,6 +131,10 @@ export function parseHomelabServicesCatalog(
 					)) &&
 				(service.endpointUrl === undefined ||
 					typeof service.endpointUrl === "string") &&
+				(service.endpointEnabled === undefined ||
+					typeof service.endpointEnabled === "boolean") &&
+				(service.healthNote === undefined ||
+					typeof service.healthNote === "string") &&
 				(service.presentationRole === undefined ||
 					["service", "core", "support"].includes(
 						String(service.presentationRole),

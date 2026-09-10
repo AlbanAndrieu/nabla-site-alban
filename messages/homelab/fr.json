@@ -163,7 +163,8 @@
 				"tunnelStale": "État Cloudflare périmé : il n’est pas utilisé comme preuve de santé.",
 				"staleEvidence": "Dernière preuve de santé du service périmée.",
 				"genericFailure": "aucune preuve fraîche ne confirme que le service est disponible",
-				"genericDegraded": "le service répond partiellement ou présente une incohérence de configuration"
+				"genericDegraded": "le service répond partiellement ou présente une incohérence de configuration",
+				"runtimeInventoryMismatch": "L’origine répond, mais le binding runtime TrueNAS déclaré n’est pas retrouvé dans l’inventaire des apps : dérive d’inventaire, service dégradé plutôt qu’indisponible."
 			}
 		},
 		"presentation": {

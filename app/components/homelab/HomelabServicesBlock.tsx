@@ -3,6 +3,11 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
+	type HomelabEnvironmentFilter,
+	homelabServiceMatchesEnvironment,
+	resolveHomelabServiceEnvironments,
+} from "@/lib/homelabEnvironments";
+import {
 	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
 	type HomelabHealthState,
@@ -10,10 +15,8 @@ import {
 } from "@/lib/homelabHealth";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
-	type HomelabEnvironment,
 	type HomelabService,
 	type HomelabServicesCatalog,
-	homelabServiceEnvironment,
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import {
@@ -29,6 +32,7 @@ import {
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
+import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
@@ -66,7 +70,6 @@ type State = {
 type HierarchyGroup = ServicePresentationGroupEntry;
 
 type HealthFilter = "all" | HomelabHealthState;
-type EnvironmentFilter = "all" | "non-dev" | HomelabEnvironment;
 type GroupFilter = "all" | ServicePresentationGroup;
 
 type GroupTitleKey =
@@ -156,8 +159,29 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 			snapshot: parseHomelabHealthSnapshot(await response.json()),
 			status: response.status,
 		};
-	} catch (error) {
-		if (signal.aborted) throw error;
+	} catch {
+		return { snapshot: null, status: null };
+	}
+}
+
+async function fetchProbeHealth(
+	signal: AbortSignal,
+): Promise<HealthFetchResult> {
+	try {
+		const response = await fetch("/api/homelab-probes", {
+			cache: "no-store",
+			signal,
+			headers: {
+				Accept: "application/json",
+				"Cache-Control": "no-cache",
+			},
+		});
+		if (!response.ok) return { snapshot: null, status: response.status };
+		return {
+			snapshot: parseHomelabHealthSnapshot(await response.json()),
+			status: response.status,
+		};
+	} catch {
 		return { snapshot: null, status: null };
 	}
 }
@@ -205,7 +229,7 @@ export default function HomelabServicesBlock() {
 	});
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [environmentFilter, setEnvironmentFilter] =
-		useState<EnvironmentFilter>("all");
+		useState<HomelabEnvironmentFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [expandedGroups, setExpandedGroups] = useState<
@@ -217,59 +241,71 @@ export default function HomelabServicesBlock() {
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
 
-		const refreshHealth = async () => {
+		const runHealthCycle = async (signal: AbortSignal) => {
+			setState((current) => ({ ...current, healthRefreshing: true }));
+			const probesPromise = fetchProbeHealth(signal);
+			const aggregatePromise = fetchHealth(signal);
+
+			const probes = await probesPromise;
+			if (signal.aborted) return;
+			if (probes.snapshot) {
+				setState((current) => ({
+					...current,
+					snapshot: probes.snapshot,
+					healthUnavailable: false,
+					healthStatus: probes.status,
+					healthRefreshing: true,
+					error: false,
+				}));
+			}
+
+			const aggregate = await aggregatePromise;
+			if (signal.aborted) return;
+			setState((current) => ({
+				...current,
+				snapshot: aggregate.snapshot ?? probes.snapshot ?? current.snapshot,
+				healthUnavailable:
+					aggregate.snapshot === null && probes.snapshot === null,
+				healthStatus: aggregate.status ?? probes.status,
+				healthRefreshing: false,
+				error:
+					current.catalog === null &&
+					aggregate.snapshot === null &&
+					probes.snapshot === null,
+			}));
+		};
+
+		const refreshHealth = () => {
 			if (document.hidden) return;
 			refreshController?.abort();
 			refreshController = new AbortController();
-			setState((current) => ({ ...current, healthRefreshing: true }));
-			const health = await fetchHealth(refreshController.signal);
-			if (!refreshController.signal.aborted) {
-				setState((current) => ({
-					...current,
-					snapshot: health.snapshot ?? current.snapshot,
-					healthUnavailable: health.snapshot === null,
-					healthStatus: health.status,
-					healthRefreshing: false,
-					error: current.catalog === null && health.snapshot === null,
-				}));
-			}
+			void runHealthCycle(refreshController.signal);
 		};
 
 		void Promise.all([
 			fetchCatalog(initialController.signal),
 			fetchTopology(initialController.signal),
-			fetchHealth(initialController.signal),
 		])
-			.then(([catalog, topology, health]) => {
+			.then(([catalog, topology]) => {
 				if (!initialController.signal.aborted) {
-					setState({
+					setState((current) => ({
+						...current,
 						catalog,
 						topology,
-						snapshot: health.snapshot,
 						error: false,
-						healthUnavailable: health.snapshot === null,
-						healthStatus: health.status,
-						healthRefreshing: false,
-					});
+					}));
 				}
 			})
 			.catch(() => {
 				if (!initialController.signal.aborted) {
-					setState((current) => ({
-						...current,
-						error: true,
-						healthUnavailable: true,
-						healthRefreshing: false,
-					}));
+					setState((current) => ({ ...current, error: true }));
 				}
 			});
+		void runHealthCycle(initialController.signal);
 
-		const interval = window.setInterval(
-			() => void refreshHealth(),
-			HEALTH_REFRESH_MS,
-		);
+		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);
 		const onVisibilityChange = () => {
-			if (!document.hidden) void refreshHealth();
+			if (!document.hidden) refreshHealth();
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
@@ -305,12 +341,14 @@ export default function HomelabServicesBlock() {
 				healthFilter === "all" ||
 				effectiveState(service, indexedHealth, state.healthUnavailable) ===
 					healthFilter;
-			const serviceEnvironment = homelabServiceEnvironment(service);
-			const matchesEnvironment =
-				environmentFilter === "all" ||
-				(environmentFilter === "non-dev"
-					? serviceEnvironment !== "dev"
-					: serviceEnvironment === environmentFilter);
+			const serviceEnvironments = resolveHomelabServiceEnvironments(
+				service,
+				state.topology,
+			);
+			const matchesEnvironment = homelabServiceMatchesEnvironment(
+				serviceEnvironments,
+				environmentFilter,
+			);
 			const matchesSearch =
 				query.length === 0 ||
 				service.name.toLowerCase().includes(query) ||
@@ -386,6 +424,13 @@ export default function HomelabServicesBlock() {
 				healthHttpStatus={state.healthStatus}
 				healthRefreshing={state.healthRefreshing}
 				onOpenCriticality={openCriticality}
+			/>
+
+			<HomelabObservationCoverage
+				snapshot={state.snapshot}
+				catalogServiceCount={state.catalog.services.length}
+				topologyNodeCount={state.topology?.nodes.length ?? 0}
+				topologyRelationCount={state.topology?.relations.length ?? 0}
 			/>
 
 			<section
@@ -511,7 +556,7 @@ export default function HomelabServicesBlock() {
 							value={environmentFilter}
 							onChange={(event) =>
 								setEnvironmentFilter(
-									event.currentTarget.value as EnvironmentFilter,
+									event.currentTarget.value as HomelabEnvironmentFilter,
 								)
 							}
 							data-homelab-environment-filter
@@ -527,6 +572,11 @@ export default function HomelabServicesBlock() {
 							<option value="production">Production</option>
 							<option value="staging">Staging</option>
 							<option value="dev">Dev</option>
+							<option value="defaulted">
+								{french
+									? "Production par défaut (métadonnées à revoir)"
+									: "Default production (review metadata)"}
+							</option>
 						</select>
 					</label>
 					<label className={styles.filterField}>

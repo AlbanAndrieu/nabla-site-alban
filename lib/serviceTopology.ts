@@ -1,5 +1,12 @@
 import localTopology from "../public/service-topology.json";
 
+export type ServiceDeploymentEnvironment = {
+	name: "production" | "staging" | "dev";
+	url: string;
+	external: boolean;
+	cloudflareTunnel: boolean;
+};
+
 export type ServiceTopologyNode = {
 	id: string;
 	name: string;
@@ -9,8 +16,11 @@ export type ServiceTopologyNode = {
 	criticality?: "critical" | "high" | "medium" | "low";
 	sourcePath?: string;
 	url?: string;
+	internalUrl?: string;
 	description?: string;
 	icon?: string;
+	securityFunctions?: string[];
+	environments?: ServiceDeploymentEnvironment[];
 };
 
 export type ServiceRelationType =
@@ -50,6 +60,10 @@ export const SERVICE_TOPOLOGY_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab-topology";
 
 const PRIMARY_TIMEOUT_MS = 2500;
+const DEPLOYMENT_ENVIRONMENT_NAMES = new Set<
+	ServiceDeploymentEnvironment["name"]
+>(["production", "staging", "dev"]);
+
 const RELATION_TYPES = new Set<ServiceRelationType>([
 	"dependsOn",
 	"consumesApi",
@@ -97,10 +111,37 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.kind === "string" &&
 				typeof node.category === "string" &&
 				(node.icon === undefined || typeof node.icon === "string") &&
+				(node.internalUrl === undefined ||
+					typeof node.internalUrl === "string") &&
+				(node.securityFunctions === undefined ||
+					(Array.isArray(node.securityFunctions) &&
+						node.securityFunctions.every(
+							(securityFunction) =>
+								typeof securityFunction === "string" &&
+								securityFunction.trim().length > 0,
+						))) &&
+				(node.environments === undefined ||
+					(Array.isArray(node.environments) &&
+						node.environments.every(
+							(environment) =>
+								isRecord(environment) &&
+								typeof environment.name === "string" &&
+								DEPLOYMENT_ENVIRONMENT_NAMES.has(
+									environment.name as ServiceDeploymentEnvironment["name"],
+								) &&
+								typeof environment.url === "string" &&
+								environment.url.trim().length > 0 &&
+								typeof environment.external === "boolean" &&
+								typeof environment.cloudflareTunnel === "boolean",
+						))) &&
 				(node.presentationRole === undefined ||
-					["service", "core", "support"].includes(String(node.presentationRole))) &&
+					["service", "core", "support"].includes(
+						String(node.presentationRole),
+					)) &&
 				(node.criticality === undefined ||
-					["critical", "high", "medium", "low"].includes(String(node.criticality))),
+					["critical", "high", "medium", "low"].includes(
+						String(node.criticality),
+					)),
 		)
 	) {
 		return null;

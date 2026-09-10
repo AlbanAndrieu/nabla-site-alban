@@ -134,11 +134,13 @@
 		},
 		{
 			"id": "cloudflared",
-			"name": "Cloudflare Tunnel",
+			"name": "Cloudflare Tunnel Connector",
 			"kind": "tunnel-connector",
-			"category": "infrastructure",
-			"description": "Outbound cloudflared connector carrying managed public ingress to TrueNAS services.",
-			"icon": "🔐"
+			"category": "network",
+			"sourcePath": "docs/dns-ingress-ownership.md",
+			"description": "TrueNAS-hosted cloudflared connector for outbound-established Cloudflare Tunnel ingress that bypasses Traefik.",
+			"presentationRole": "support",
+			"criticality": "high"
 		},
 		{
 			"id": "docker-socket-proxy",
@@ -216,7 +218,22 @@
 			"kind": "api",
 			"category": "development",
 			"sourcePath": "apps/sample/compose.yml",
-			"description": "Local TrueNAS deployment of FastAPI Sample for homelab and runtime validation."
+			"description": "FastAPI Sample service with FastAPI Cloud production and TrueNAS staging environments.",
+			"presentationRole": "service",
+			"environments": [
+				{
+					"name": "production",
+					"url": "https://fastapi-sample.fastapicloud.dev/api",
+					"external": false,
+					"cloudflareTunnel": false
+				},
+				{
+					"name": "staging",
+					"url": "https://sample.albandrieu.com/api",
+					"external": false,
+					"cloudflareTunnel": false
+				}
+			]
 		},
 		{
 			"id": "garage",
@@ -225,7 +242,7 @@
 			"category": "data",
 			"sourcePath": "apps/garage/compose.yml",
 			"url": "https://s3.int.albandrieu.com",
-			"description": "Garage S3 API exposed directly through pfSense HAProxy and Traefik on TrueNAS.",
+			"description": "S3-compatible object storage exposed directly through pfSense HAProxy, TLS re-encryption and Traefik on TrueNAS.",
 			"icon": "🪣"
 		},
 		{
@@ -235,7 +252,7 @@
 			"category": "data",
 			"sourcePath": "apps/garage/compose.yml",
 			"url": "https://garage.albandrieu.com",
-			"description": "Garage WebUI exposed through Cloudflare Tunnel to the TrueNAS-hosted WebUI.",
+			"description": "Garage web administration UI exposed by Cloudflare Tunnel directly to the LAN-bound :3909 origin without Traefik.",
 			"icon": "🖥️"
 		},
 		{
@@ -245,8 +262,10 @@
 			"category": "data",
 			"sourcePath": "apps/garage/compose.yml",
 			"url": "https://garage-admin.albandrieu.com",
-			"description": "Garage administration API exposed through Cloudflare Tunnel.",
-			"icon": "🔐"
+			"internalUrl": "http://172.17.0.24:3903",
+			"description": "Garage Admin API exposed through Cloudflare Tunnel to the LAN-bound :3903 origin without Traefik.",
+			"presentationRole": "support",
+			"criticality": "high"
 		},
 		{
 			"id": "gatus",
@@ -999,6 +1018,39 @@
 			"description": "Lab WordPress deployment backed by PostgreSQL through PG4WP.",
 			"presentationRole": "service",
 			"criticality": "low"
+		},
+		{
+			"id": "clamav",
+			"name": "ClamAV",
+			"kind": "antivirus-engine",
+			"category": "security",
+			"sourcePath": "catalog/homelab-services.json",
+			"url": "https://clamav.albandrieu.com",
+			"internalUrl": "https://clamav.int.albandrieu.com",
+			"description": "Internal ClamAV/clamd service. The .int URL is the private DNS identity; functional health remains a TCP/3310 probe.",
+			"presentationRole": "support",
+			"criticality": "high",
+			"securityFunctions": ["protect", "detect"]
+		},
+		{
+			"id": "keycloak",
+			"name": "Keycloak",
+			"kind": "identity-provider",
+			"category": "security",
+			"sourcePath": "apps/keycloak/compose.yml",
+			"description": "Central OIDC/SAML identity provider backed by the shared PostgreSQL service.",
+			"presentationRole": "core",
+			"criticality": "critical"
+		},
+		{
+			"id": "pfsense-unbound",
+			"name": "pfSense Unbound",
+			"kind": "dns-resolver",
+			"category": "network",
+			"sourcePath": "docs/dns-ingress-ownership.md",
+			"description": "Primary LAN recursive resolver at 172.17.0.1:53; delegates int.albandrieu.com to Pi-hole with Forwarding Mode disabled and outgoing interfaces set to All.",
+			"presentationRole": "core",
+			"criticality": "critical"
 		}
 	],
 	"relations": [
@@ -1008,9 +1060,7 @@
 			"type": "hostedBy",
 			"strength": "required",
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
-			"evidence": [
-				"apps/2fauth/compose.yml:2fauth.x-nabla.runtime.containerService"
-			]
+			"evidence": ["apps/2fauth/compose.yml:2fauth.x-nabla.runtime.appId"]
 		},
 		{
 			"source": "aistor",
@@ -1176,7 +1226,7 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "AutoKuma reconciles generated monitors into Uptime Kuma.",
-			"evidence": ["apps/autokuma/compose.yml:AUTOKUMA__KUMA__URL"]
+			"evidence": ["/mnt/cpool/autokuma/.env.secrets:AUTOKUMA__KUMA__URL"]
 		},
 		{
 			"source": "autoxpose",
@@ -1257,7 +1307,7 @@
 			"description": "CrowdSec provides the central LAPI consumed by the pfSense firewall bouncer in Small/remediation-only mode.",
 			"evidence": [
 				"apps/crowdsec/compose.yml:CROWDSEC_LAPI_PORT",
-				"apps/crowdsec/compose.yml:CROWDSEC_PFSENSE_BOUNCER_KEY"
+				"apps/crowdsec/compose.yml:BOUNCER_KEY_PFSENSE_FIREWALL"
 			]
 		},
 		{
@@ -1416,17 +1466,6 @@
 			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
 			"evidence": [
 				"apps/garage/compose.yml:garage.x-nabla.runtime.containerService"
-			]
-		},
-		{
-			"source": "garage",
-			"target": "traefik",
-			"type": "exposedBy",
-			"strength": "optional",
-			"description": "Traefik routes the S3 hostname and bucket subdomains to the Garage S3 API.",
-			"evidence": [
-				"apps/garage/compose.yml:traefik.http.routers.garage-s3.rule",
-				"apps/garage/compose.yml:traefik.http.services.garage-s3.loadbalancer.server.port"
 			]
 		},
 		{
@@ -2255,7 +2294,9 @@
 			"type": "consumesApi",
 			"strength": "required",
 			"description": "The exporter queries pfSense for firewall and system metrics.",
-			"evidence": ["apps/prometheus/compose.yml:exporter.config.yml"]
+			"evidence": [
+				"apps/prometheus/compose.yml:/mnt/cpool/prometheus/secrets/pfsense-exporter.yml"
+			]
 		},
 		{
 			"source": "pfsense-exporter",
@@ -2912,29 +2953,19 @@
 			"evidence": ["apps/wordpress/compose.yml:WORDPRESS_DB_HOST=postgres:5432"]
 		},
 		{
-			"source": "cloudflared",
-			"target": "docker",
-			"type": "hostedBy",
-			"strength": "required",
-			"description": "The cloudflared tunnel connector runs on the TrueNAS Docker runtime.",
-			"evidence": ["TrueNAS cloudflared connector runtime"]
-		},
-		{
 			"source": "garage-webui",
 			"target": "cloudflared",
 			"type": "exposedBy",
 			"strength": "required",
-			"description": "Cloudflare Tunnel exposes garage.albandrieu.com and forwards it through cloudflared to Garage WebUI :3909.",
-			"evidence": [
-				"Cloudflare Tunnel route: garage.albandrieu.com -> Garage WebUI :3909"
-			]
+			"description": "Cloudflare Tunnel forwards garage.albandrieu.com through cloudflared directly to the Garage WebUI :3909 origin.",
+			"evidence": ["docs/dns-ingress-ownership.md:Garage exposure boundary"]
 		},
 		{
 			"source": "garage-admin",
 			"target": "garage",
 			"type": "partOf",
 			"strength": "required",
-			"description": "Garage Admin :3903 is an administration surface of the Garage service.",
+			"description": "Garage Admin :3903 is the administration API of the Garage object-storage service.",
 			"evidence": ["apps/garage/garage.toml:[admin] api_bind_addr=:3903"]
 		},
 		{
@@ -2942,9 +2973,71 @@
 			"target": "cloudflared",
 			"type": "exposedBy",
 			"strength": "required",
-			"description": "Cloudflare Tunnel exposes garage-admin.albandrieu.com and forwards it through cloudflared to Garage Admin :3903.",
+			"description": "Cloudflare Tunnel forwards garage-admin.albandrieu.com through cloudflared directly to Garage Admin :3903.",
+			"evidence": ["docs/dns-ingress-ownership.md:Garage exposure boundary"]
+		},
+		{
+			"source": "garage",
+			"target": "traefik",
+			"type": "exposedBy",
+			"strength": "required",
+			"description": "Traefik routes the direct s3.int.albandrieu.com S3 ingress to Garage :3900 after pfSense HAProxy TLS re-encryption.",
 			"evidence": [
-				"Cloudflare Tunnel route: garage-admin.albandrieu.com -> Garage Admin :3903"
+				"apps/garage/compose.yml:traefik.http.routers.garage-s3.rule",
+				"apps/garage/compose.yml:traefik.http.services.garage-s3.loadbalancer.server.port"
+			]
+		},
+		{
+			"source": "keycloak",
+			"target": "docker",
+			"type": "hostedBy",
+			"strength": "required",
+			"description": "Compose workload is hosted by the Docker runtime on TrueNAS.",
+			"evidence": [
+				"apps/keycloak/compose.yml:keycloak.x-nabla.runtime.containerService"
+			]
+		},
+		{
+			"source": "keycloak",
+			"target": "postgresql",
+			"type": "dependsOn",
+			"strength": "required",
+			"description": "Keycloak stores realm, client and identity state in the shared PostgreSQL service.",
+			"evidence": ["apps/keycloak/compose.yml:KC_DB_URL"]
+		},
+		{
+			"source": "keycloak",
+			"target": "prometheus",
+			"type": "observedBy",
+			"strength": "optional",
+			"description": "Prometheus scrapes Keycloak metrics from the private management interface.",
+			"evidence": ["apps/keycloak/compose.yml:KC_METRICS_ENABLED"]
+		},
+		{
+			"source": "openrag-frontend",
+			"target": "langflow",
+			"type": "dependsOn",
+			"strength": "required",
+			"description": "Frontend collective health checks the shared global Langflow service.",
+			"evidence": ["apps/openrag/compose.yml:LANGFLOW_HOST"]
+		},
+		{
+			"source": "openwebui",
+			"target": "cloudflared",
+			"type": "exposedBy",
+			"strength": "required",
+			"description": "Cloudflare Tunnel forwards open-webui.albandrieu.com through cloudflared directly to the published :31028 origin; Traefik is not in this path.",
+			"evidence": ["apps/openwebui/compose.yml:ports"]
+		},
+		{
+			"source": "pfsense-unbound",
+			"target": "pihole",
+			"type": "dependsOn",
+			"strength": "required",
+			"description": "Private int.albandrieu.com resolution through pfSense/Unbound depends on the Pi-hole authority at 172.17.0.24:53; public recursion remains independent.",
+			"evidence": [
+				"docs/dns-ingress-ownership.md:Resolver architecture and precedence",
+				"docs/dns-ingress-ownership.md:pfSense / Unbound"
 			]
 		}
 	]

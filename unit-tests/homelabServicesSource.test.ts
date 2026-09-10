@@ -117,6 +117,9 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	const garageAdmin = result.catalog.services.find(
 		(service) => service.id === "garage-admin",
 	);
+	const scrutinyCollector = result.catalog.services.find(
+		(service) => service.name === "Scrutiny Collector - albandrieu",
+	);
 
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
@@ -125,6 +128,12 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	assert.ok(garageS3);
 	assert.ok(garage);
 	assert.ok(garageAdmin);
+	assert.ok(scrutinyCollector);
+	assert.equal(scrutinyCollector.endpointEnabled, false);
+	assert.equal(
+		scrutinyCollector.healthNote,
+		"Expected upstream target: http://172.17.0.24:31054",
+	);
 	assert.equal(
 		homelabServiceEndpointUrl(truenas),
 		"https://truenas.albandrieu.com:7000/",
@@ -228,4 +237,14 @@ test("homelab proxy exposes which source served the catalog", async () => {
 		"https://catalog.example.test/homelab",
 	);
 	assert.equal(body.services[0].name, "Remote through proxy");
+});
+
+test("local fallback keeps the PostgreSQL identity aligned with dependency topology", () => {
+	const local = getStaticHomelabServicesCatalog().catalog;
+	const postgres = local.services.find(
+		(service) => homelabServiceId(service) === "postgresql",
+	);
+	assert.ok(postgres);
+	assert.equal(postgres.id, "postgresql");
+	assert.equal(postgres.internalPort, 5432);
 });
