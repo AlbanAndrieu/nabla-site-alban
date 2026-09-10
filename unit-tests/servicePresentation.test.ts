@@ -18,6 +18,30 @@ const catalog: HomelabServicesCatalog = {
 		{ id: "prometheus", name: "Prometheus", kind: "observability", category: "observability" },
 		{ id: "talos", name: "Talos", kind: "kubernetes-os", category: "infrastructure" },
 		{
+			id: "keycloak",
+			name: "Keycloak",
+			kind: "identity-provider",
+			category: "security",
+			presentationRole: "core",
+			criticality: "critical",
+		},
+		{
+			id: "homarr",
+			name: "Homarr",
+			kind: "dashboard",
+			category: "operations",
+			presentationRole: "support",
+			criticality: "medium",
+		},
+		{
+			id: "pfsense",
+			name: "pfSense",
+			kind: "firewall",
+			category: "security",
+			presentationRole: "core",
+			criticality: "critical",
+		},
+		{
 			id: "explicit-service",
 			name: "Explicit service",
 			kind: "database",
@@ -44,12 +68,50 @@ const topology: ServiceTopology = {
 			presentationRole: "core",
 			criticality: "critical",
 		},
+		{
+			id: "keycloak",
+			name: "Keycloak",
+			kind: "identity-provider",
+			category: "security",
+			presentationRole: "core",
+			criticality: "critical",
+		},
+		{
+			id: "homarr",
+			name: "Homarr",
+			kind: "dashboard",
+			category: "operations",
+			presentationRole: "support",
+			criticality: "medium",
+		},
+		{
+			id: "pfsense",
+			name: "pfSense",
+			kind: "firewall",
+			category: "security",
+			presentationRole: "core",
+			criticality: "critical",
+		},
 		{ id: "explicit-service", name: "Explicit service", kind: "database", category: "data" },
 	],
 	relations: [
 		{
 			source: "experiment",
 			target: "postgresql",
+			type: "dependsOn",
+			strength: "required",
+			evidence: ["fixture"],
+		},
+		{
+			source: "experiment",
+			target: "prometheus",
+			type: "dependsOn",
+			strength: "required",
+			evidence: ["fixture"],
+		},
+		{
+			source: "experiment",
+			target: "homarr",
 			type: "dependsOn",
 			strength: "required",
 			evidence: ["fixture"],
@@ -96,7 +158,32 @@ test("service presentation separates role, criticality and dependency impact", (
 	assert.equal(analysis.get("postgresql")?.metricsProfile, "red-use");
 
 	assert.equal(analysis.get("prometheus")?.group, "support");
+	assert.equal(analysis.get("homarr")?.group, "support");
 	assert.equal(analysis.get("explicit-service")?.group, "services");
+});
+
+test("canonical security category can group critical controls without weakening criticality", () => {
+	const analysis = analyzeServicePresentation(catalog, topology);
+
+	assert.equal(analysis.get("keycloak")?.role, "core");
+	assert.equal(analysis.get("keycloak")?.criticality, "critical");
+	assert.equal(analysis.get("keycloak")?.group, "security-controls");
+	assert.equal(analysis.get("keycloak")?.metricsProfile, "security");
+
+	assert.equal(analysis.get("pfsense")?.criticality, "critical");
+	assert.equal(analysis.get("pfsense")?.group, "core-critical");
+});
+
+test("canonical support and observability presentation wins over blast radius", () => {
+	const analysis = analyzeServicePresentation(catalog, topology);
+
+	assert.equal(analysis.get("homarr")?.transitiveDependents, 1);
+	assert.equal(analysis.get("homarr")?.role, "support");
+	assert.equal(analysis.get("homarr")?.group, "support");
+
+	assert.equal(analysis.get("prometheus")?.transitiveDependents, 1);
+	assert.equal(analysis.get("prometheus")?.role, "core");
+	assert.equal(analysis.get("prometheus")?.group, "support");
 });
 
 test("service-first grouping keeps user outcomes ahead of critical foundations", () => {
