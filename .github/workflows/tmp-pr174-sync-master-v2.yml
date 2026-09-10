@@ -1,0 +1,56 @@
+name: Temporary PR174 sync master v2
+
+on:
+  push:
+    branches:
+      - feat/homelab-probe-evidence-convergence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tmp-pr174-sync-master-v2
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/homelab-probe-evidence-convergence
+          fetch-depth: 0
+      - name: Merge exact current master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin master
+          set +e
+          git merge --no-commit --no-ff FETCH_HEAD
+          merge_rc=$?
+          set -e
+          if (( merge_rc != 0 )); then
+            conflicts="$(git diff --name-only --diff-filter=U)"
+            unexpected="$(printf '%s\n' "${conflicts}" | grep -v '^docs/homelab-roadmap.md$' || true)"
+            if [[ -n "${unexpected}" ]]; then
+              echo "Unexpected merge conflicts:"
+              printf '%s\n' "${unexpected}"
+              exit 1
+            fi
+            if printf '%s\n' "${conflicts}" | grep -qx 'docs/homelab-roadmap.md'; then
+              git checkout --ours docs/homelab-roadmap.md
+              git add docs/homelab-roadmap.md
+            fi
+          fi
+          unresolved="$(git diff --name-only --diff-filter=U)"
+          test -z "${unresolved}" || { printf 'Unresolved conflicts:\n%s\n' "${unresolved}"; exit 1; }
+      - name: Commit merge and remove helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/tmp-pr174-sync-master-v2.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'merge: reconcile current master into PR 174'
+          git push origin HEAD:feat/homelab-probe-evidence-convergence
