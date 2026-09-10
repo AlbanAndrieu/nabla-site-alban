@@ -105,14 +105,15 @@ same path to the compatibility catalog and explicit missing-component policy.
 ## P0 — Post-merge Quality remediation
 
 - [ ] Merge and operationally validate
-  `.github/workflows/post-merge-quality-remediation.yml`: after a failed or timed
-  out `CI (Quality and Security)` push on `master`, a converged deterministic
-  formatter/pre-commit repair must open a non-default remediation PR and dispatch
-  canonical CI on it; a non-auto-fixable failure must instead open one deduplicated
-  diagnostic issue with the failed jobs and source run. Also validate the fallback
-  issue path when GitHub refuses PR creation or CI dispatch with `GITHUB_TOKEN`.
-  Keep this as a recovery safety net, never as permission for agents to skip their
-  pre-publish gate.
+  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
+  `workflow_run` workflow once the workflow file exists on the default branch.
+  After activation, a failed or timed out `CI (Quality and Security)` push on
+  `master` with a converged deterministic formatter/pre-commit repair must open a
+  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
+  failure must instead open one deduplicated diagnostic issue with the failed jobs
+  and source run. Also validate the fallback issue path when GitHub refuses PR
+  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
+  never as permission for agents to skip their pre-publish gate.
 
 ## P1 — Refactoring / code-size debt
 
