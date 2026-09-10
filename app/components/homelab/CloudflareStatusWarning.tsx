@@ -13,8 +13,6 @@ type ObservabilitySnapshot = {
 	components?: CloudflareComponent[];
 };
 
-const REFRESH_MS = 30_000;
-
 function cloudflareUnconfirmed(snapshot: ObservabilitySnapshot | null): boolean {
 	const cloudflare = snapshot?.components?.find(
 		(component) => component.id === "cloudflare",
@@ -51,7 +49,6 @@ export default function CloudflareStatusWarning() {
 		};
 
 		void load();
-		const timer = window.setInterval(() => void load(), REFRESH_MS);
 		const onVisibilityChange = () => {
 			if (!document.hidden) void load();
 		};
@@ -59,7 +56,6 @@ export default function CloudflareStatusWarning() {
 		return () => {
 			active = false;
 			controller?.abort();
-			window.clearInterval(timer);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, []);
