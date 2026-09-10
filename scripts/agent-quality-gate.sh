@@ -26,13 +26,15 @@ Usage:
 
 Modes:
     default    strict deterministic pre-build validation
-    --fix      apply/check pre-commit hooks on changed files
+    --fix      converge deterministic pre-commit + npm lint auto-fixes locally
     --publish  strict gate plus clean-tree publication validation
 
 Environment:
-    QUALITY_BASE_REF                 override comparison base
-    QUALITY_LOG_TAIL                 failure log lines to print (default: 80)
-    QUALITY_ALLOW_LARGE_DELETION=1   acknowledge an intentional large truncation
+    QUALITY_BASE_REF                    override comparison base
+    QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
+    QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 6)
+    QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
+    QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
 EOF
         exit 0
         ;;
@@ -49,7 +51,12 @@ if (($# > 0)); then
     exit 2
 fi
 
-LOG_TAIL="${QUALITY_LOG_TAIL:-80}"
+LOG_TAIL="${QUALITY_LOG_TAIL:-40}"
+FIX_PASSES="${QUALITY_FIX_PASSES:-6}"
+if [[ ! "${FIX_PASSES}" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ QUALITY_FIX_PASSES must be a positive integer" >&2
+    exit 2
+fi
 
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
@@ -116,6 +123,68 @@ collect_deleted_files() {
         sort -u
 }
 
+workspace_fingerprint() {
+    local file
+    {
+        git diff --binary
+        git diff --cached --binary
+        git status --porcelain=v1 --untracked-files=all
+        while IFS= read -r file; do
+            [[ -f "${file}" ]] || continue
+            printf 'file:%s\n' "${file}"
+            sha256sum "${file}"
+        done < <(collect_changed_files)
+    } | sha256sum | awk '{print $1}'
+}
+
+precommit_fix_until_stable() {
+    local pass
+    local before
+    local after
+    local log
+    local rc
+
+    for ((pass = 1; pass <= FIX_PASSES; pass++)); do
+        mapfile -t fix_files < <(collect_changed_files)
+        if (("${#fix_files[@]}" == 0)); then
+            echo "✅ no changed files require pre-commit auto-fixes"
+            return 0
+        fi
+
+        before="$(workspace_fingerprint)"
+        log="$(mktemp)"
+        set +e
+        pre-commit run --hook-stage pre-commit --files "${fix_files[@]}" >"${log}" 2>&1
+        rc=$?
+        set -e
+        after="$(workspace_fingerprint)"
+
+        if ((rc == 0)); then
+            rm -f "${log}"
+            printf '✅ pre-commit auto-fix convergence (%d pass%s)\n' \
+                "${pass}" "$([[ "${pass}" == "1" ]] && printf '' || printf 'es')"
+            return 0
+        fi
+
+        if [[ "${before}" != "${after}" ]]; then
+            printf '🔧 pre-commit pass %d/%d applied deterministic fixes; retrying without log analysis\n' \
+                "${pass}" "${FIX_PASSES}"
+            rm -f "${log}"
+            continue
+        fi
+
+        echo "❌ QG_PRECOMMIT_FAILED: auto-fix made no further progress." >&2
+        tail -n "${LOG_TAIL}" "${log}" >&2 || true
+        rm -f "${log}"
+        return "${rc}"
+    done
+
+    echo "❌ QG_FIX_DID_NOT_CONVERGE: pre-commit kept changing files after ${FIX_PASSES} passes." >&2
+    echo "   Inspect 'git status --short' and only the relevant changed files." >&2
+    git status --short >&2
+    return 1
+}
+
 mapfile -t CHANGED_FILES < <(collect_changed_files)
 mapfile -t DELETED_FILES < <(collect_deleted_files)
 
@@ -125,14 +194,27 @@ command -v pre-commit >/dev/null 2>&1 || {
 }
 
 agent_gate_changed=false
+javascript_lint_needed=false
+stylelint_needed=false
 for file in "${CHANGED_FILES[@]}"; do
-    if [[ "${file}" == "scripts/agent-quality-gate.sh" ]]; then
-        agent_gate_changed=true
-        break
-    fi
+    case "${file}" in
+        scripts/agent-quality-gate.sh)
+            agent_gate_changed=true
+            ;;
+    esac
+    case "${file}" in
+        *.js | *.jsx | *.mjs | *.cjs | *.ts | *.tsx | eslint.config.js)
+            javascript_lint_needed=true
+            ;;
+    esac
+    case "${file}" in
+        *.css | stylelint.config.cjs)
+            stylelint_needed=true
+            ;;
+    esac
 done
 
-if [[ "${MODE}" != "fix" && "${agent_gate_changed}" == true ]]; then
+if [[ "${MODE}" != "fix" && "${agent_gate_changed}" == true && "${QUALITY_CANONICAL_GATE_VERIFIED:-0}" != "1" ]]; then
     run_compact "agent gate shell formatting" \
         pre-commit run shfmt-docker --files scripts/agent-quality-gate.sh
     run_compact "agent gate shell lint" \
@@ -142,12 +224,27 @@ if [[ "${MODE}" != "fix" && "${agent_gate_changed}" == true ]]; then
 fi
 
 if [[ "${MODE}" == "fix" ]]; then
-    if (("${#CHANGED_FILES[@]}" > 0)); then
-        run_compact "apply/check pre-commit hooks on changed files" \
-            pre-commit run --hook-stage pre-commit \
-            --files "${CHANGED_FILES[@]}" --show-diff-on-failure
+    precommit_fix_until_stable
+
+    if [[ "${javascript_lint_needed}" == true || "${stylelint_needed}" == true ]]; then
+        if command -v npm >/dev/null 2>&1 && [[ -d node_modules ]]; then
+            if [[ "${javascript_lint_needed}" == true ]]; then
+                run_compact "ESLint local auto-fix" npm run lint:fix
+            fi
+            if [[ "${stylelint_needed}" == true ]]; then
+                run_compact "Stylelint local auto-fix" npm run lint:css:fix
+            fi
+            # npm lint auto-fixes may change files covered by Biome/other hooks.
+            precommit_fix_until_stable
+        else
+            echo "⚠️ QG_NODE_FIX_SKIPPED: node_modules unavailable; pre-commit fixes ran, but npm lint auto-fixes were skipped." >&2
+            echo "   Run 'npm ci --no-audit --no-fund' before the strict publication gate." >&2
+        fi
     fi
-    echo "ℹ️  review 'git diff' and 'git status --short', commit the result, then run this gate without --fix"
+
+    echo "✅ deterministic local auto-fix phase converged."
+    git status --short
+    echo "ℹ️ review the short diff, commit the result, then let the pre-push publication gate validate it."
     exit 0
 fi
 
@@ -258,6 +355,8 @@ fi
 if [[ "${PUBLISH}" == true ]]; then
     run_compact "canonical formatter/linter/security publication gate" \
         bash scripts/quality-gate.sh --publish
+elif [[ "${QUALITY_CANONICAL_GATE_VERIFIED:-0}" == "1" ]]; then
+    echo "✅ canonical formatter/linter/security gate already verified earlier in this CI job"
 else
     run_compact "canonical formatter/linter/security gate" \
         bash scripts/quality-gate.sh
