@@ -1,6 +1,6 @@
 # Homelab integration roadmap
 
-Last reconciled: 10 September 2026.
+Last reconciled: 11 September 2026.
 
 This document is the focused backlog for the TrueNAS / FastAPI / `nabla-compose`
 integration. `docs/quality-roadmap.md` remains the cross-project quality roadmap;
