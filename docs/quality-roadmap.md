@@ -145,8 +145,10 @@ les autres chantiers.
   timeout de `CI (Quality and Security)` après push sur `master`, une correction
   déterministe convergente doit ouvrir une PR `automation/quality-remediation-*`
   puis déclencher explicitement `ci.yml`; si aucune correction sûre ne converge,
-  une issue diagnostique dédupliquée doit être ouverte. Ce mécanisme reste un
-  filet de récupération et ne remplace jamais la quality gate pré-publication.
+  une issue diagnostique dédupliquée doit être ouverte. La validation doit aussi
+  confirmer le fallback issue lorsque GitHub refuse la création de PR ou le
+  dispatch CI avec `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et
+  ne remplace jamais la quality gate pré-publication.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
