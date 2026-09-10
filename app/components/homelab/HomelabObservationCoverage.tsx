@@ -71,10 +71,7 @@ function healthBoardIcon(state: "pending" | "fresh" | "stale"): string {
 	return "◌";
 }
 
-function healthBoardRefreshLabel(
-	french: boolean,
-	refreshing: boolean,
-): string {
+function healthBoardRefreshLabel(french: boolean, refreshing: boolean): string {
 	if (!refreshing) return "";
 	return french ? " · refresh en cours" : " · refresh in progress";
 }
@@ -244,9 +241,8 @@ export default function HomelabObservationCoverage({
 								data-public-probe-count={publicSampled}
 								data-public-probe-eligible={publicEligible}
 							>
-								{french ? "sondes publiques" : "public probes"}:{" "}
-								{publicSampled}/{publicEligible}{" "}
-								{french ? "échantillonnées" : "sampled"} ·{" "}
+								{french ? "sondes publiques" : "public probes"}: {publicSampled}
+								/{publicEligible} {french ? "échantillonnées" : "sampled"} ·{" "}
 								{publicSummary.completed ?? 0}{" "}
 								{french ? "terminées" : "completed"} ·{" "}
 								{publicSummary.timed_out ?? 0} deadline
