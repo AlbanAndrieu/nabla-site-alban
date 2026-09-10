@@ -36,6 +36,7 @@ test("post-merge remediation isolates untrusted auto-fix work from write permiss
 	assert.doesNotMatch(prepare, /contents: write/);
 	assert.doesNotMatch(prepare, /issues: write/);
 	assert.doesNotMatch(prepare, /pull-requests: write/);
+	assert.doesNotMatch(prepare, /actions: write/);
 
 	assert.match(publish, /actions: write/);
 	assert.match(publish, /contents: write/);
