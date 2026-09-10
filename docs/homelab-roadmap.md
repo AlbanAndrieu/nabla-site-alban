@@ -109,8 +109,10 @@ same path to the compatibility catalog and explicit missing-component policy.
   out `CI (Quality and Security)` push on `master`, a converged deterministic
   formatter/pre-commit repair must open a non-default remediation PR and dispatch
   canonical CI on it; a non-auto-fixable failure must instead open one deduplicated
-  diagnostic issue with the failed jobs and source run. Keep this as a recovery
-  safety net, never as permission for agents to skip their pre-publish gate.
+  diagnostic issue with the failed jobs and source run. Also validate the fallback
+  issue path when GitHub refuses PR creation or CI dispatch with `GITHUB_TOKEN`.
+  Keep this as a recovery safety net, never as permission for agents to skip their
+  pre-publish gate.
 
 ## P1 — Refactoring / code-size debt
 
