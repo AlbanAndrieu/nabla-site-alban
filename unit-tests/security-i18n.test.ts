@@ -21,6 +21,7 @@ const EXPECTED_LINK_COUNTS = {
 	personal: 3,
 	network: 5,
 	hardening: 9,
+	zeroTrustKubernetes: 9,
 	ssh: 7,
 	openclaw: 3,
 	compliance: 7,
@@ -53,6 +54,9 @@ test("security uses its dedicated next-intl catalog", async () => {
 	assert.match(sections, /canonicalPagePath/);
 	assert.match(sections, /nativeSections\.\$\{definition\.key\}/);
 	assert.doesNotMatch(resources, /\/ai\.html#/);
+	assert.match(resources, /page: "truenas"/);
+	assert.match(resources, /hash: "homelab"/);
+	assert.match(resources, /zero-trust-kubernetes/);
 	assert.match(loader, /SECURITY_LOADERS/);
 	assert.match(loader, /"securityPage"/);
 });

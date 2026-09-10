@@ -67,6 +67,22 @@
 					"Script automatisé de durcissement système et d’audit de sécurité (Medium)"
 				]
 			},
+			"zeroTrustKubernetes": {
+				"badge": "Zero Trust / Kubernetes",
+				"title": "Kubernetes Security First et Zero Trust",
+				"description": "Ma cible est la configuration la plus restrictive qui reste fonctionnelle : durcir d’abord la racine de confiance Talos, réduire les identités et les credentials ServiceAccount, imposer PSS Restricted aux workloads standards, appliquer des politiques réseau default-deny avec des autorisations explicites, puis ajouter policy-as-code, vérification de la supply chain et détection runtime. Les exceptions privilégiées restent isolées, justifiées et observables.",
+				"links": [
+					"Implémentation homelab / TrueNAS et Kubernetes Talos",
+					"Sécuriser Kubernetes — Stéphane Robert",
+					"Kubernetes Pod Security Standards (PSS)",
+					"Kyverno — policy-as-code native Kubernetes",
+					"OPA Gatekeeper — alternative Rego pour l’admission",
+					"Falco — détection de menaces runtime",
+					"Cilium — politiques réseau orientées identité",
+					"Hubble — observabilité des flux réseau Kubernetes",
+					"Tetragon — observabilité et enforcement runtime eBPF"
+				]
+			},
 			"ssh": {
 				"badge": "Sécurité SSH",
 				"title": "Sécurité et durcissement SSH",
@@ -133,17 +149,13 @@
 				"badge": "Tests d’intrusion",
 				"title": "Pentest-Tools.com",
 				"description": "Plateforme en ligne de tests d’intrusion et d’analyse des vulnérabilités.",
-				"links": [
-					"Pentest-Tools.com App — tests de sécurité réseau et web"
-				]
+				"links": ["Pentest-Tools.com App — tests de sécurité réseau et web"]
 			},
 			"siem": {
 				"badge": "SIEM / Détection de logiciels malveillants",
 				"title": "SIEM / Détection de logiciels malveillants",
 				"description": "Ressources de supervision de sécurité et de détection des logiciels malveillants.",
-				"links": [
-					"Wazuh — collecte des journaux de détection ClamAV"
-				]
+				"links": ["Wazuh — collecte des journaux de détection ClamAV"]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -180,9 +192,7 @@
 				"badge": "Sécurité des applications et infrastructures",
 				"title": "Sécurité des applications et infrastructures",
 				"description": "Bonnes pratiques pour sécuriser les applications et les plateformes d’infrastructure.",
-				"links": [
-					"TrueNAS — sécurisation des applications"
-				]
+				"links": ["TrueNAS — sécurisation des applications"]
 			},
 			"cloud": {
 				"badge": "Sécurité cloud",

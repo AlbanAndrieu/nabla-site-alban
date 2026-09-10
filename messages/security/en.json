@@ -67,6 +67,22 @@
 					"Automated System Hardening & Security Audit Script (Medium)"
 				]
 			},
+			"zeroTrustKubernetes": {
+				"badge": "Zero Trust / Kubernetes",
+				"title": "Security First Kubernetes & Zero Trust",
+				"description": "My target posture is the most restrictive configuration that remains functional: harden the Talos trust root first, minimize identities and ServiceAccount credentials, enforce PSS Restricted for normal workloads, introduce default-deny network policy with explicit allows, then add policy-as-code, supply-chain verification and runtime detection. Privileged exceptions stay isolated, justified and observable.",
+				"links": [
+					"Live homelab / TrueNAS and Talos Kubernetes implementation",
+					"Securing Kubernetes — Stéphane Robert",
+					"Kubernetes Pod Security Standards (PSS)",
+					"Kyverno — Kubernetes-native policy as code",
+					"OPA Gatekeeper — Rego admission policy alternative",
+					"Falco — runtime threat detection",
+					"Cilium — identity-aware network policy",
+					"Hubble — Kubernetes network-flow observability",
+					"Tetragon — eBPF runtime observability and enforcement"
+				]
+			},
 			"ssh": {
 				"badge": "SSH Security",
 				"title": "SSH Security & Hardening",
@@ -133,17 +149,13 @@
 				"badge": "Penetration Testing",
 				"title": "Pentest-Tools.com",
 				"description": "Online penetration testing and vulnerability scanning platform.",
-				"links": [
-					"Pentest-Tools.com App — network and web security testing"
-				]
+				"links": ["Pentest-Tools.com App — network and web security testing"]
 			},
 			"siem": {
 				"badge": "SIEM / Malware Detection",
 				"title": "SIEM / Malware Detection",
 				"description": "Security monitoring and malware detection resources.",
-				"links": [
-					"Wazuh — ClamAV malware detection logs"
-				]
+				"links": ["Wazuh — ClamAV malware detection logs"]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -180,9 +192,7 @@
 				"badge": "App & Infrastructure Security",
 				"title": "App & Infrastructure Security",
 				"description": "Best practices for securing applications and infrastructure platforms.",
-				"links": [
-					"TrueNAS — securing applications"
-				]
+				"links": ["TrueNAS — securing applications"]
 			},
 			"cloud": {
 				"badge": "Cloud Security",
