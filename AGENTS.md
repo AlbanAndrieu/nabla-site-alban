@@ -149,7 +149,7 @@ Safety, compatibility, accessibility or browser fixes may be made around the sta
 
 ## Next.js
 
-For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/` before editing. Do not enable, generate or load broad Next.js agent-rule/documentation indexes by default; keep framework guidance targeted to the feature being changed.
+For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/` before editing. Do not enable, generate or load broad framework documentation indexes by default; keep framework guidance targeted to the feature being changed.
 
 ## Completion
 
