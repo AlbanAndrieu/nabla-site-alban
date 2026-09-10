@@ -9,3 +9,4 @@ Follow `/AGENTS.md` as the canonical repository policy.
 - The Next DevTools MCP configured in `.vscode/mcp.json` runs with `npx -y next-devtools-mcp@latest`; do not add it back to `package.json`.
 - For frontend work, load `docs/agent-frontend-standards.md` on demand.
 - Never mutate `master` directly; use a branch, validate, then open a PR.
+- After edits, run `npm run quality:agent:fix`, commit the converged fixes, then push normally; the installed pre-push hook performs the strict publication gate. Treat `QG_AUTOFIX_REQUIRED` as a local-fix instruction rather than a CI-log investigation.
