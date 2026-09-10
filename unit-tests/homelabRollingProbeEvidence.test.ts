@@ -101,7 +101,10 @@ test("stale FastAPI rolling evidence keeps null current reachability and last-kn
 	assert.equal(snapshot.services[0].probe_stale, true);
 	assert.equal(snapshot.services[0].last_known_state, "ok");
 	assert.equal(snapshot.services[0].last_known_reachable, true);
-	assert.equal(snapshot.services[0].probe_refresh_error, "service probe fan-out budget exceeded");
+	assert.equal(
+		snapshot.services[0].probe_refresh_error,
+		"service probe fan-out budget exceeded",
+	);
 	assert.equal(snapshot.internal_services?.length, 1);
 	assert.equal(snapshot.internal_services?.[0].reachable, null);
 	assert.equal(snapshot.internal_services?.[0].last_known_state, "ok");
