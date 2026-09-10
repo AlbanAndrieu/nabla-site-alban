@@ -88,12 +88,22 @@ same path to the compatibility catalog and explicit missing-component policy.
   **unconfirmed** evidence rather than global degradation. Site Alban now adds an
   explicit ⚠️ warning when Cloudflare cannot be confirmed while leaving service
   health unchanged.
-- [ ] Consume the remaining per-row rolling probe metadata from FastAPI 1.13.15:
+- [x] Consume the remaining per-row rolling probe metadata from FastAPI 1.13.15:
   `probe_source`, observation age, stale threshold, estimated interval,
   `next_probe_in_seconds`, refresh error and last-known state/reachability.
-- [ ] After `fastapi-sample#236` is merged and its schema is stable, consume its
-  local-runtime dependency report and separate **evidence coverage** from
-  **healthy coverage**. Do not code against the open PR's schema as if final.
+  Retained stale rows preserve the upstream `reachable: null` meaning instead of
+  being silently discarded by the older boolean-only parser.
+- [x] Consume the stable rolling-evidence semantics delivered with
+  `fastapi-sample#236` and separate **evidence coverage** from **healthy
+  coverage**. Healthy coverage is derived from retained `origin`/`memory` rows
+  that are currently non-stale and healthy; it is not derived from
+  `probe_summary.states`, which describes only the current sampled wave.
+- [ ] If FastAPI exposes the six-dependency operator diagnostic as a stable API
+  contract, consume its normalized `configured / reachable / authenticated /
+  application_result / stale / error_stage / error_kind / evidence_complete`
+  fields. `fastapi-sample#236` currently provides this report as an operator CLI
+  assembled from existing health-board data, so Site Alban must not scrape CLI
+  output or invent a second wire contract.
 - [ ] Evaluate adaptive UI polling (cached aggregate ~5 s, faster while a server
   refresh is active) separately from provider probe cadence. Browser refresh
   frequency must not increase TrueNAS/pfSense/Cloudflare fan-out.
@@ -104,7 +114,10 @@ Refactor cohesive responsibilities instead of raising size thresholds. The first
 three targets are:
 
 - [ ] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
-  transport loaders.
+  transport loaders. The rolling-probe convergence work introduced a thin public
+  facade and moved the pre-existing parser to `lib/homelabHealthBase.ts` so the
+  compatibility boundary can evolve safely; finish the split and remove this
+  temporary base module rather than letting it become permanent debt.
 - [ ] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
   platform-metric parsing and fallback orchestration.
 - [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
