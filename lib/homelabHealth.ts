@@ -253,31 +253,119 @@ export const HOMELAB_PROBES_DEFAULT_API_URL = BASE_PROBES_DEFAULT_API_URL;
 const PRIMARY_TIMEOUT_MS = 8_000;
 const PROBES_TIMEOUT_MS = 6_000;
 
+const ROLLING_PROBE_KEYS = [
+	"probe_source",
+	"probe_observed_at",
+	"probe_age_seconds",
+	"probe_stale",
+	"probe_stale_after_seconds",
+	"probe_interval_seconds",
+	"next_probe_in_seconds",
+	"probe_refresh_error",
+	"last_known_state",
+	"last_known_reachable",
+	"last_known_http_status",
+	"warning",
+	"timed_out",
+	"error_kind",
+] as const;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isRollingUnknownReachability(value: unknown): boolean {
+function isHealthState(value: unknown): value is HomelabHealthState {
 	return (
-		isRecord(value) &&
-		value.reachable === null &&
-		(value.probe_stale === true || value.probe_source === "memory")
+		value === "ok" ||
+		value === "warn" ||
+		value === "fail" ||
+		value === "unknown"
 	);
+}
+
+function isProbeSource(value: unknown): value is HomelabProbeSource {
+	return value === "origin" || value === "memory" || value === "deadline";
+}
+
+function finiteNonNegative(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0
+		? value
+		: undefined;
+}
+
+function nullableNonNegative(value: unknown): number | null | undefined {
+	if (value === null) return null;
+	return finiteNonNegative(value);
+}
+
+function nullableBoolean(value: unknown): boolean | null | undefined {
+	return value === null || typeof value === "boolean" ? value : undefined;
+}
+
+function nullableString(value: unknown): string | null | undefined {
+	return value === null || typeof value === "string" ? value : undefined;
+}
+
+function sanitizeRollingProbeEvidence(
+	value: unknown,
+): HomelabRollingProbeEvidence {
+	if (!isRecord(value)) return {};
+	const evidence: HomelabRollingProbeEvidence = {};
+	if (isProbeSource(value.probe_source)) evidence.probe_source = value.probe_source;
+	const observedAt = nullableString(value.probe_observed_at);
+	if (observedAt !== undefined) evidence.probe_observed_at = observedAt;
+	const age = nullableNonNegative(value.probe_age_seconds);
+	if (age !== undefined) evidence.probe_age_seconds = age;
+	if (typeof value.probe_stale === "boolean") evidence.probe_stale = value.probe_stale;
+	for (const field of [
+		"probe_stale_after_seconds",
+		"probe_interval_seconds",
+		"next_probe_in_seconds",
+	] as const) {
+		const parsed = finiteNonNegative(value[field]);
+		if (parsed !== undefined) evidence[field] = parsed;
+	}
+	for (const field of ["probe_refresh_error", "warning", "error_kind"] as const) {
+		if (typeof value[field] === "string") evidence[field] = value[field];
+	}
+	if (value.last_known_state === null || isHealthState(value.last_known_state)) {
+		evidence.last_known_state = value.last_known_state;
+	}
+	const lastReachable = nullableBoolean(value.last_known_reachable);
+	if (lastReachable !== undefined) evidence.last_known_reachable = lastReachable;
+	const lastStatus = nullableNonNegative(value.last_known_http_status);
+	if (lastStatus !== undefined) evidence.last_known_http_status = lastStatus;
+	if (typeof value.timed_out === "boolean") evidence.timed_out = value.timed_out;
+	return evidence;
+}
+
+function stripRollingProbeEvidence<T extends object>(value: T): T {
+	const sanitized = { ...value } as T & Record<string, unknown>;
+	for (const key of ROLLING_PROBE_KEYS) delete sanitized[key];
+	return sanitized;
+}
+
+function isRollingUnknownReachability(value: unknown): boolean {
+	if (!isRecord(value) || value.reachable !== null) return false;
+	const evidence = sanitizeRollingProbeEvidence(value);
+	return evidence.probe_stale === true || evidence.probe_source === "memory";
 }
 
 function normalizeRollingProbeRow(value: unknown): unknown {
 	if (!isRollingUnknownReachability(value)) return value;
-	// The retained FastAPI evidence intentionally uses reachable=null to mean
-	// "not currently confirmed". The previous parser predates that contract and
-	// accepts booleans only, so normalize only at its compatibility boundary and
-	// restore null after validation below.
-	return { ...value, reachable: false };
+	// Retained evidence uses reachable=null to mean "not currently confirmed".
+	// The compatibility parser predates that contract and accepts booleans only.
+	return { ...(value as Record<string, unknown>), reachable: false };
 }
 
 function normalizeRollingProbePayload(value: unknown): unknown {
 	if (!isRecord(value)) return value;
 	const normalized: Record<string, unknown> = { ...value };
-	for (const field of ["services", "public_probe_results", "internal_services"] as const) {
+	for (const field of [
+		"services",
+		"public_probe_results",
+		"internal_services",
+	] as const) {
 		if (Array.isArray(value[field])) {
 			normalized[field] = value[field].map(normalizeRollingProbeRow);
 		}
@@ -294,51 +382,56 @@ function normalizeRollingProbePayload(value: unknown): unknown {
 function rollingRowKey(value: unknown): string | null {
 	if (!isRecord(value)) return null;
 	if (typeof value.id === "string" && value.id.trim()) return `id:${value.id}`;
-	if (typeof value.name === "string" && value.name.trim()) return `name:${value.name}`;
+	if (typeof value.name === "string" && value.name.trim()) {
+		return `name:${value.name}`;
+	}
 	return null;
 }
 
-function unknownReachabilityKeys(value: unknown): Set<string> {
-	if (!Array.isArray(value)) return new Set();
-	return new Set(
-		value
-			.filter(isRollingUnknownReachability)
-			.map(rollingRowKey)
-			.filter((key): key is string => key !== null),
-	);
+function rawRowsByKey(value: unknown): Map<string, Record<string, unknown>> {
+	const rows = new Map<string, Record<string, unknown>>();
+	if (!Array.isArray(value)) return rows;
+	for (const row of value) {
+		if (!isRecord(row)) continue;
+		const key = rollingRowKey(row);
+		if (key) rows.set(key, row);
+	}
+	return rows;
 }
 
-function restorePublicReachability(
+function enrichPublicRollingEvidence(
 	entries: HomelabHealthEntry[],
 	raw: unknown,
 ): HomelabHealthEntry[] {
-	const unknownKeys = unknownReachabilityKeys(raw);
-	if (unknownKeys.size === 0) return entries;
-	return entries.map((entry) =>
-		unknownKeys.has(rollingRowKey(entry) ?? "")
-			? { ...entry, reachable: null }
-			: entry,
-	);
+	const rows = rawRowsByKey(raw);
+	return entries.map((entry) => {
+		const rawEntry = rows.get(rollingRowKey(entry) ?? "");
+		if (!rawEntry) return entry;
+		const base = stripRollingProbeEvidence(entry);
+		return {
+			...base,
+			...sanitizeRollingProbeEvidence(rawEntry),
+			reachable: isRollingUnknownReachability(rawEntry) ? null : entry.reachable,
+		};
+	});
 }
 
-function restoreInternalReachability(
+function enrichInternalRollingEvidence(
 	entries: HomelabInternalHealthEntry[] | undefined,
 	raw: unknown,
 ): HomelabInternalHealthEntry[] | undefined {
 	if (!entries) return entries;
-	const unknownKeys = unknownReachabilityKeys(raw);
-	if (unknownKeys.size === 0) return entries;
-	return entries.map((entry) =>
-		unknownKeys.has(rollingRowKey(entry) ?? "")
-			? { ...entry, reachable: null }
-			: entry,
-	);
-}
-
-function finiteNonNegative(value: unknown): number | undefined {
-	return typeof value === "number" && Number.isFinite(value) && value >= 0
-		? value
-		: undefined;
+	const rows = rawRowsByKey(raw);
+	return entries.map((entry) => {
+		const rawEntry = rows.get(rollingRowKey(entry) ?? "");
+		if (!rawEntry) return entry;
+		const base = stripRollingProbeEvidence(entry);
+		return {
+			...base,
+			...sanitizeRollingProbeEvidence(rawEntry),
+			reachable: isRollingUnknownReachability(rawEntry) ? null : entry.reachable,
+		};
+	});
 }
 
 function enrichEvidenceRetention(
@@ -352,7 +445,11 @@ function enrichEvidenceRetention(
 	for (const scope of ["public", "internal"] as const) {
 		const rawScope = raw.probe_summary[scope];
 		const parsedScope = probeSummary[scope];
-		if (!isRecord(rawScope) || !isRecord(rawScope.evidence) || !parsedScope?.evidence) {
+		if (
+			!isRecord(rawScope) ||
+			!isRecord(rawScope.evidence) ||
+			!parsedScope?.evidence
+		) {
 			continue;
 		}
 		const maxRetention = finiteNonNegative(
@@ -383,23 +480,26 @@ export function parseHomelabHealthSnapshot(
 	let snapshot = parsed as unknown as HomelabHealthSnapshot;
 	snapshot = {
 		...snapshot,
-		services: restorePublicReachability(snapshot.services, raw.services),
-		internal_services: restoreInternalReachability(
+		services: enrichPublicRollingEvidence(snapshot.services, raw.services),
+		internal_services: enrichInternalRollingEvidence(
 			snapshot.internal_services,
 			raw.internal_services,
 		),
 	};
 
-	if (
-		isRecord(raw.truenas) &&
-		isRollingUnknownReachability(raw.truenas.public) &&
-		snapshot.truenas?.public
-	) {
+	if (isRecord(raw.truenas) && snapshot.truenas?.public) {
+		const base = stripRollingProbeEvidence(snapshot.truenas.public);
 		snapshot = {
 			...snapshot,
 			truenas: {
 				...snapshot.truenas,
-				public: { ...snapshot.truenas.public, reachable: null },
+				public: {
+					...base,
+					...sanitizeRollingProbeEvidence(raw.truenas.public),
+					reachable: isRollingUnknownReachability(raw.truenas.public)
+						? null
+						: snapshot.truenas.public.reachable,
+				},
 			},
 		};
 	}
