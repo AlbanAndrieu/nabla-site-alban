@@ -311,12 +311,14 @@ function sanitizeRollingProbeEvidence(
 ): HomelabRollingProbeEvidence {
 	if (!isRecord(value)) return {};
 	const evidence: HomelabRollingProbeEvidence = {};
-	if (isProbeSource(value.probe_source)) evidence.probe_source = value.probe_source;
+	if (isProbeSource(value.probe_source))
+		evidence.probe_source = value.probe_source;
 	const observedAt = nullableString(value.probe_observed_at);
 	if (observedAt !== undefined) evidence.probe_observed_at = observedAt;
 	const age = nullableNonNegative(value.probe_age_seconds);
 	if (age !== undefined) evidence.probe_age_seconds = age;
-	if (typeof value.probe_stale === "boolean") evidence.probe_stale = value.probe_stale;
+	if (typeof value.probe_stale === "boolean")
+		evidence.probe_stale = value.probe_stale;
 	for (const field of [
 		"probe_stale_after_seconds",
 		"probe_interval_seconds",
@@ -325,17 +327,26 @@ function sanitizeRollingProbeEvidence(
 		const parsed = finiteNonNegative(value[field]);
 		if (parsed !== undefined) evidence[field] = parsed;
 	}
-	for (const field of ["probe_refresh_error", "warning", "error_kind"] as const) {
+	for (const field of [
+		"probe_refresh_error",
+		"warning",
+		"error_kind",
+	] as const) {
 		if (typeof value[field] === "string") evidence[field] = value[field];
 	}
-	if (value.last_known_state === null || isHealthState(value.last_known_state)) {
+	if (
+		value.last_known_state === null ||
+		isHealthState(value.last_known_state)
+	) {
 		evidence.last_known_state = value.last_known_state;
 	}
 	const lastReachable = nullableBoolean(value.last_known_reachable);
-	if (lastReachable !== undefined) evidence.last_known_reachable = lastReachable;
+	if (lastReachable !== undefined)
+		evidence.last_known_reachable = lastReachable;
 	const lastStatus = nullableNonNegative(value.last_known_http_status);
 	if (lastStatus !== undefined) evidence.last_known_http_status = lastStatus;
-	if (typeof value.timed_out === "boolean") evidence.timed_out = value.timed_out;
+	if (typeof value.timed_out === "boolean")
+		evidence.timed_out = value.timed_out;
 	return evidence;
 }
 
@@ -411,7 +422,9 @@ function enrichPublicRollingEvidence(
 		return {
 			...base,
 			...sanitizeRollingProbeEvidence(rawEntry),
-			reachable: isRollingUnknownReachability(rawEntry) ? null : entry.reachable,
+			reachable: isRollingUnknownReachability(rawEntry)
+				? null
+				: entry.reachable,
 		};
 	});
 }
@@ -429,7 +442,9 @@ function enrichInternalRollingEvidence(
 		return {
 			...base,
 			...sanitizeRollingProbeEvidence(rawEntry),
-			reachable: isRollingUnknownReachability(rawEntry) ? null : entry.reachable,
+			reachable: isRollingUnknownReachability(rawEntry)
+				? null
+				: entry.reachable,
 		};
 	});
 }
