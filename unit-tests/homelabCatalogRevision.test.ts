@@ -15,7 +15,8 @@ test.afterEach(() => {
 });
 
 test("homelab catalog proxy exposes the canonical catalog revision", async () => {
-	process.env.HOMELAB_SERVICES_API_URL = "https://catalog.example.test/services";
+	process.env.HOMELAB_SERVICES_API_URL =
+		"https://catalog.example.test/services";
 	globalThis.fetch = (async () =>
 		Response.json({
 			version: 1,
