@@ -1,0 +1,396 @@
+name: Post-merge Quality Remediation
+
+on:
+  workflow_run:
+    workflows:
+      - "CI (Quality and Security)"
+    types:
+      - completed
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-merge-quality-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: prepare deterministic remediation
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      (github.event.workflow_run.conclusion == 'failure' ||
+       github.event.workflow_run.conclusion == 'timed_out')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    outputs:
+      action: ${{ steps.remediate.outputs.action }}
+      branch: ${{ steps.remediate.outputs.branch }}
+      reason: ${{ steps.remediate.outputs.reason }}
+      artifact_name: ${{ steps.remediate.outputs.artifact_name }}
+
+    steps:
+      - name: Checkout failed master SHA without persisted credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Install deterministic quality tooling
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Attempt bounded deterministic auto-remediation
+        id: remediate
+        env:
+          FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
+          FAILED_RUN_ID: ${{ github.event.workflow_run.id }}
+          FAILED_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_ref="${FAILED_SHA}^"
+          branch="automation/quality-remediation-${FAILED_RUN_ID}-${FAILED_RUN_ATTEMPT}"
+          artifact_name="quality-remediation-${FAILED_RUN_ID}-${FAILED_RUN_ATTEMPT}"
+          stable=false
+          reason=""
+
+          workspace_fingerprint() {
+            {
+              git diff --binary
+              git diff --cached --binary
+              git status --porcelain=v1 --untracked-files=all
+              while IFS= read -r -d '' file; do
+                printf 'untracked:%s\n' "${file}"
+                sha256sum "${file}"
+              done < <(git ls-files --others --exclude-standard -z)
+            } | sha256sum | awk '{print $1}'
+          }
+
+          # fail_fast means one formatter can modify files and stop the pass before
+          # later hooks execute. Retry only while the workspace fingerprint changes.
+          for pass in 1 2 3; do
+            before="$(workspace_fingerprint)"
+            echo "Deterministic remediation pass ${pass}/3"
+
+            set +e
+            QUALITY_BASE_REF="${base_ref}" \
+              bash scripts/agent-quality-gate.sh --fix
+            rc=$?
+            set -e
+
+            after="$(workspace_fingerprint)"
+            if ((rc == 0)); then
+              stable=true
+              reason="deterministic auto-fix reached a clean pass"
+              break
+            fi
+            if [[ "${before}" == "${after}" ]]; then
+              reason="quality gate still fails and deterministic auto-fix made no further changes"
+              break
+            fi
+          done
+
+          status="$(git status --porcelain=v1 --untracked-files=all)"
+          if [[ "${stable}" == true && -n "${status}" ]]; then
+            action="pr"
+            git add -A
+            git diff --cached --check
+            git diff --cached --binary --full-index >remediation.patch
+            test -s remediation.patch
+            git reset
+          elif [[ "${stable}" == true ]]; then
+            action="issue"
+            reason="the deterministic formatter/linter pass is clean; the master failure needs non-formatting diagnosis"
+          else
+            action="issue"
+            reason="${reason:-deterministic auto-remediation did not converge within three passes}"
+          fi
+
+          {
+            echo "action=${action}"
+            echo "branch=${branch}"
+            echo "reason=${reason}"
+            echo "artifact_name=${artifact_name}"
+          } >>"${GITHUB_OUTPUT}"
+
+          echo "Remediation decision: ${action} (${reason})"
+          git status --short
+
+      - name: Preserve deterministic remediation patch
+        if: steps.remediate.outputs.action == 'pr'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: ${{ steps.remediate.outputs.artifact_name }}
+          path: remediation.patch
+          retention-days: 7
+          if-no-files-found: error
+
+  publish:
+    name: publish remediation PR or issue
+    needs:
+      - prepare
+    if: always() && needs.prepare.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      actions: write
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Find existing remediation PR for this master SHA
+        id: existing
+        if: needs.prepare.result == 'success' && needs.prepare.outputs.action == 'pr'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const marker = `<!-- post-merge-quality-remediation:${process.env.FAILED_SHA} -->`;
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: 'open',
+              base: 'master',
+              per_page: 100,
+            });
+            const existing = pulls.find((pull) => pull.body?.includes(marker));
+            core.setOutput('found', existing ? 'true' : 'false');
+            core.setOutput('branch', existing?.head?.ref || '');
+            core.setOutput('number', existing?.number?.toString() || '');
+            core.setOutput('url', existing?.html_url || '');
+
+      - name: Checkout failed master SHA for patch publication
+        if: >-
+          needs.prepare.result == 'success' &&
+          needs.prepare.outputs.action == 'pr' &&
+          steps.existing.outputs.found != 'true'
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Download deterministic remediation patch
+        if: >-
+          needs.prepare.result == 'success' &&
+          needs.prepare.outputs.action == 'pr' &&
+          steps.existing.outputs.found != 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ needs.prepare.outputs.artifact_name }}
+
+      - name: Publish remediation branch
+        id: publish
+        if: >-
+          needs.prepare.result == 'success' &&
+          needs.prepare.outputs.action == 'pr' &&
+          steps.existing.outputs.found != 'true'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REMEDIATION_BRANCH: ${{ needs.prepare.outputs.branch }}
+          FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git switch -c "${REMEDIATION_BRANCH}"
+          git apply --binary --index remediation.patch
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(ci): auto-remediate quality gate after ${FAILED_SHA:0:12}"
+
+          auth="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w0)"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic ${auth}" \
+            push origin "HEAD:refs/heads/${REMEDIATION_BRANCH}"
+
+      - name: Open remediation PR or diagnostic issue
+        if: always()
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          PREPARE_RESULT: ${{ needs.prepare.result }}
+          REMEDIATION_ACTION: ${{ needs.prepare.outputs.action }}
+          REMEDIATION_BRANCH: ${{ needs.prepare.outputs.branch }}
+          REMEDIATION_REASON: ${{ needs.prepare.outputs.reason }}
+          PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
+          EXISTING_PR_FOUND: ${{ steps.existing.outputs.found }}
+          EXISTING_PR_BRANCH: ${{ steps.existing.outputs.branch }}
+          EXISTING_PR_NUMBER: ${{ steps.existing.outputs.number }}
+          EXISTING_PR_URL: ${{ steps.existing.outputs.url }}
+          FAILED_RUN_ID: ${{ github.event.workflow_run.id }}
+          FAILED_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
+          FAILED_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const runId = Number(process.env.FAILED_RUN_ID);
+            const failedSha = process.env.FAILED_SHA;
+            const shortSha = failedSha.slice(0, 12);
+            const requestedAction = process.env.REMEDIATION_ACTION;
+            const publishSucceeded = process.env.PUBLISH_OUTCOME === 'success';
+            const existingPrFound = process.env.EXISTING_PR_FOUND === 'true';
+            const marker = `<!-- post-merge-quality-remediation:${failedSha} -->`;
+            let fallbackReason = '';
+
+            let failedJobs = [];
+            try {
+              failedJobs = await github.paginate(
+                github.rest.actions.listJobsForWorkflowRun,
+                {
+                  owner,
+                  repo,
+                  run_id: runId,
+                  per_page: 100,
+                },
+              );
+              failedJobs = failedJobs.filter((job) =>
+                ['failure', 'timed_out', 'action_required'].includes(job.conclusion),
+              );
+            } catch (error) {
+              core.warning(`Unable to list failed jobs: ${error.message}`);
+            }
+
+            const jobSummary = failedJobs.length
+              ? failedJobs
+                  .map((job) => `- ${job.name}: ${job.conclusion} (${job.html_url})`)
+                  .join('\n')
+              : '- Failed job metadata was unavailable; inspect the source workflow run.';
+
+            const diagnostics = [
+              `- source run: ${process.env.FAILED_RUN_URL}`,
+              `- master SHA: \`${failedSha}\``,
+              `- conclusion: \`${process.env.FAILED_CONCLUSION}\``,
+              `- preparation job: \`${process.env.PREPARE_RESULT}\``,
+              `- remediation decision: \`${requestedAction || 'unavailable'}\``,
+              `- reason: ${process.env.REMEDIATION_REASON || 'preparation did not reach the decision step'}`,
+            ].join('\n');
+
+            async function dispatchQuality(branch) {
+              try {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  workflow_id: 'ci.yml',
+                  ref: branch,
+                });
+                core.notice(`Dispatched CI (Quality and Security) on ${branch}`);
+                return true;
+              } catch (error) {
+                fallbackReason = `canonical CI dispatch failed for ${branch}: ${error.message}`;
+                core.warning(fallbackReason);
+                return false;
+              }
+            }
+
+            if (requestedAction === 'pr' && existingPrFound) {
+              const branch = process.env.EXISTING_PR_BRANCH;
+              if (await dispatchQuality(branch)) {
+                core.notice(
+                  `Reused remediation PR #${process.env.EXISTING_PR_NUMBER}: ${process.env.EXISTING_PR_URL}`,
+                );
+                return;
+              }
+            }
+
+            if (requestedAction === 'pr' && publishSucceeded) {
+              const branch = process.env.REMEDIATION_BRANCH;
+              try {
+                const created = await github.rest.pulls.create({
+                  owner,
+                  repo,
+                  head: branch,
+                  base: 'master',
+                  title: `fix(ci): auto-remediate master quality failure ${shortSha}`,
+                  body: [
+                    marker,
+                    '## Automated post-merge remediation',
+                    '',
+                    'The canonical Quality/Security workflow failed after this SHA reached `master`.',
+                    'A bounded deterministic formatter/pre-commit repair converged and produced this patch.',
+                    '',
+                    '### Source failure',
+                    diagnostics,
+                    '',
+                    '### Failed jobs',
+                    jobSummary,
+                    '',
+                    'This PR is a recovery safety net, not a substitute for the agent pre-publish quality gate.',
+                    'Do not merge until its explicitly dispatched CI validation is green.',
+                  ].join('\n'),
+                });
+                core.notice(`Opened remediation PR #${created.data.number}: ${created.data.html_url}`);
+
+                // GITHUB_TOKEN-created pushes do not trigger ordinary push workflows.
+                // workflow_dispatch is the explicit exception used for unattended
+                // canonical Quality validation of this remediation branch.
+                if (await dispatchQuality(branch)) return;
+                fallbackReason = `remediation PR #${created.data.number} exists, but ${fallbackReason}`;
+              } catch (error) {
+                fallbackReason = `unable to open remediation PR from ${branch}: ${error.message}`;
+                core.warning(fallbackReason);
+              }
+            }
+
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const existingIssue = openIssues.find(
+              (issue) => !issue.pull_request && issue.body?.includes(marker),
+            );
+            if (existingIssue) {
+              core.notice(`Diagnostic issue already exists: ${existingIssue.html_url}`);
+              return;
+            }
+
+            const notes = [];
+            if (requestedAction === 'pr' && !publishSucceeded && !existingPrFound) {
+              notes.push('remediation branch publication failed; inspect this remediation workflow run');
+            }
+            if (fallbackReason) notes.push(fallbackReason);
+
+            const created = await github.rest.issues.create({
+              owner,
+              repo,
+              title: `CI: master quality failure requires remediation (${shortSha})`,
+              body: [
+                marker,
+                '## Automated post-merge diagnostic',
+                '',
+                'The canonical Quality/Security workflow is red on `master`, and no fully validated automatic remediation completed.',
+                '',
+                '### Diagnostics',
+                diagnostics,
+                ...(notes.length ? ['', '### Automation fallback', ...notes.map((note) => `- ${note}`)] : []),
+                '',
+                '### Failed jobs',
+                jobSummary,
+                '',
+                'Investigate the failing job, fix it on a non-default branch, run the agent publication gate until clean, and merge through a reviewed PR.',
+              ].join('\n'),
+            });
+            core.notice(`Opened remediation issue #${created.data.number}: ${created.data.html_url}`);

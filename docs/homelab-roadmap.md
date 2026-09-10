@@ -91,12 +91,29 @@ same path to the compatibility catalog and explicit missing-component policy.
 - [ ] Consume the remaining per-row rolling probe metadata from FastAPI 1.13.15:
   `probe_source`, observation age, stale threshold, estimated interval,
   `next_probe_in_seconds`, refresh error and last-known state/reachability.
-- [ ] After `fastapi-sample#236` is merged and its schema is stable, consume its
-  local-runtime dependency report and separate **evidence coverage** from
-  **healthy coverage**. Do not code against the open PR's schema as if final.
+- [ ] Consume the merged `fastapi-sample#236` local-runtime dependency report and
+  keep **evidence coverage** distinct from **healthy coverage**. Only consume the
+  fields present in the merged contract; do not preserve assumptions made while
+  the PR schema was still open.
+- [ ] Add Site contract fixtures/tests for the merged #236 fields, including cold
+  evidence warm-up, retained `memory` evidence, disabled/non-eligible probes and
+  incomplete authentication/application evidence without false-green states.
 - [ ] Evaluate adaptive UI polling (cached aggregate ~5 s, faster while a server
   refresh is active) separately from provider probe cadence. Browser refresh
   frequency must not increase TrueNAS/pfSense/Cloudflare fan-out.
+
+## P0 — Post-merge Quality remediation
+
+- [ ] Merge and operationally validate
+  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
+  `workflow_run` workflow once the workflow file exists on the default branch.
+  After activation, a failed or timed out `CI (Quality and Security)` push on
+  `master` with a converged deterministic formatter/pre-commit repair must open a
+  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
+  failure must instead open one deduplicated diagnostic issue with the failed jobs
+  and source run. Also validate the fallback issue path when GitHub refuses PR
+  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
+  never as permission for agents to skip their pre-publish gate.
 
 ## P1 — Refactoring / code-size debt
 
@@ -125,10 +142,13 @@ line-count target.
 Before an agent reports a homelab task complete:
 
 1. run the closest deterministic quality gate and inspect the final CI;
-2. list every requested or discovered item that remains incomplete;
-3. add each deferred item as an unchecked roadmap entry here (and in
+2. if a formatter/linter hook modifies files, commit the fixes and rerun the gate
+   until the final pass is clean; a successful auto-fix pass is not itself a
+   successful quality gate;
+3. list every requested or discovered item that remains incomplete;
+4. add each deferred item as an unchecked roadmap entry here (and in
    `docs/quality-roadmap.md` when it is cross-cutting);
-4. never leave the only record of unfinished work in chat, a transient scratchpad
+5. never leave the only record of unfinished work in chat, a transient scratchpad
    or a TODO comment;
-5. record any dependency on an unmerged upstream PR as pending rather than
+6. record any dependency on an unmerged upstream PR as pending rather than
    claiming it is implemented.
