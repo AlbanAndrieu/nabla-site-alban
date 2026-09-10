@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import AnchoredHeading from "@/components/AnchoredHeading";
 import CloudflareStatusWarning from "@/app/components/homelab/CloudflareStatusWarning";
+import AnchoredHeading from "@/components/AnchoredHeading";
 import HomeLabNetworkFlow from "./HomeLabNetworkFlow";
 import styles from "./HomeLabSection.module.css";
 
@@ -20,7 +20,10 @@ export default async function HomeLabSection() {
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<CloudflareStatusWarning />
 				<p>{t("purpose")}</p>
-				<aside className={styles.networkCard} aria-label={t("network.ariaLabel")}>
+				<aside
+					className={styles.networkCard}
+					aria-label={t("network.ariaLabel")}
+				>
 					<div className={styles.header}>
 						<span className={styles.eyebrow}>{t("network.eyebrow")}</span>
 						<strong>{t("network.path")}</strong>
