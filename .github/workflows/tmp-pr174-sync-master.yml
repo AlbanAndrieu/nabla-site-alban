@@ -41,50 +41,54 @@ jobs:
             fi
             cp /tmp/pr174-roadmap.md docs/homelab-roadmap.md
             python - <<'PY'
-from pathlib import Path
-p = Path('docs/homelab-roadmap.md')
-s = p.read_text()
-section = '''## P0 — Post-merge Quality remediation
+          from pathlib import Path
 
-- [ ] Merge and operationally validate
-  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
-  `workflow_run` workflow once the workflow file exists on the default branch.
-  After activation, a failed or timed out `CI (Quality and Security)` push on
-  `master` with a converged deterministic formatter/pre-commit repair must open a
-  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
-  failure must instead open one deduplicated diagnostic issue with the failed jobs
-  and source run. Also validate the fallback issue path when GitHub refuses PR
-  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
-  never as permission for agents to skip their pre-publish gate.
+          p = Path("docs/homelab-roadmap.md")
+          s = p.read_text()
+          section = """## P0 — Post-merge Quality remediation
 
-'''
-if '## P0 — Post-merge Quality remediation' not in s:
-    s = s.replace('## P1 — Refactoring / code-size debt\n', section + '## P1 — Refactoring / code-size debt\n')
-old = '''1. run the closest deterministic quality gate and inspect the final CI;
-2. list every requested or discovered item that remains incomplete;
-3. add each deferred item as an unchecked roadmap entry here (and in
-   `docs/quality-roadmap.md` when it is cross-cutting);
-4. never leave the only record of unfinished work in chat, a transient scratchpad
-   or a TODO comment;
-5. record any dependency on an unmerged upstream PR as pending rather than
-   claiming it is implemented.
-'''
-new = '''1. run the closest deterministic quality gate and inspect the final CI;
-2. if a formatter/linter hook modifies files, commit the fixes and rerun the gate
-   until the final pass is clean; a successful auto-fix pass is not itself a
-   successful quality gate;
-3. list every requested or discovered item that remains incomplete;
-4. add each deferred item as an unchecked roadmap entry here (and in
-   `docs/quality-roadmap.md` when it is cross-cutting);
-5. never leave the only record of unfinished work in chat, a transient scratchpad
-   or a TODO comment;
-6. record any dependency on an unmerged upstream PR as pending rather than
-   claiming it is implemented.
-'''
-if old in s:
-    s = s.replace(old, new)
-p.write_text(s)
-PY
+          - [ ] Merge and operationally validate
+            `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
+            `workflow_run` workflow once the workflow file exists on the default branch.
+            After activation, a failed or timed out `CI (Quality and Security)` push on
+            `master` with a converged deterministic formatter/pre-commit repair must open a
+            non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
+            failure must instead open one deduplicated diagnostic issue with the failed jobs
+            and source run. Also validate the fallback issue path when GitHub refuses PR
+            creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
+            never as permission for agents to skip their pre-publish gate.
+
+          """
+          section = "\n".join(line[10:] if line.startswith("          ") else line for line in section.splitlines()) + "\n"
+          if "## P0 — Post-merge Quality remediation" not in s:
+              s = s.replace("## P1 — Refactoring / code-size debt\n", section + "## P1 — Refactoring / code-size debt\n")
+          old = """1. run the closest deterministic quality gate and inspect the final CI;
+          2. list every requested or discovered item that remains incomplete;
+          3. add each deferred item as an unchecked roadmap entry here (and in
+             `docs/quality-roadmap.md` when it is cross-cutting);
+          4. never leave the only record of unfinished work in chat, a transient scratchpad
+             or a TODO comment;
+          5. record any dependency on an unmerged upstream PR as pending rather than
+             claiming it is implemented.
+          """
+          old = "\n".join(line[10:] if line.startswith("          ") else line for line in old.splitlines()) + "\n"
+          new = """1. run the closest deterministic quality gate and inspect the final CI;
+          2. if a formatter/linter hook modifies files, commit the fixes and rerun the gate
+             until the final pass is clean; a successful auto-fix pass is not itself a
+             successful quality gate;
+          3. list every requested or discovered item that remains incomplete;
+          4. add each deferred item as an unchecked roadmap entry here (and in
+             `docs/quality-roadmap.md` when it is cross-cutting);
+          5. never leave the only record of unfinished work in chat, a transient scratchpad
+             or a TODO comment;
+          6. record any dependency on an unmerged upstream PR as pending rather than
+             claiming it is implemented.
+          """
+          new = "\n".join(line[10:] if line.startswith("          ") else line for line in new.splitlines()) + "\n"
+          if old in s:
+              s = s.replace(old, new)
+          p.write_text(s)
+          PY
             git add docs/homelab-roadmap.md
           fi
           unresolved="$(git diff --name-only --diff-filter=U)"
