@@ -6,6 +6,8 @@ Ce répertoire contient les runbooks maintenus avec l’application Next.js.
 
 - [Architecture et exploitation](architecture.md)
 - [Feuille de route qualité](quality-roadmap.md)
+- [Feuille de route homelab / TrueNAS / FastAPI](homelab-roadmap.md)
+- [Catalogue des services homelab](homelab-services-catalog.md)
 - [Baseline de performance frontend](performance-baseline.md)
 - [Upgrade Next.js 16.3](nextjs-16-3-upgrade.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)
@@ -22,4 +24,6 @@ Ce répertoire contient les runbooks maintenus avec l’application Next.js.
   historiques tant qu’ils n’ont pas été supprimés.
 - Toute modification d’architecture, de variable d’environnement ou de
   déploiement doit mettre à jour le runbook associé.
+- Tout travail homelab différé doit être ajouté à `homelab-roadmap.md`; les
+  éléments transverses restent également suivis dans `quality-roadmap.md`.
 - Avant publication, exécuter `npm run check`.
