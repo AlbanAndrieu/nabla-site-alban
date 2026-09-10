@@ -13,12 +13,15 @@ type ObservabilitySnapshot = {
 	components?: CloudflareComponent[];
 };
 
-function cloudflareUnconfirmed(snapshot: ObservabilitySnapshot | null): boolean {
+function cloudflareUnconfirmed(
+	snapshot: ObservabilitySnapshot | null,
+): boolean {
 	const cloudflare = snapshot?.components?.find(
 		(component) => component.id === "cloudflare",
 	);
 	if (!cloudflare) return true;
-	if (cloudflare.state === "fail" || cloudflare.reachable === false) return false;
+	if (cloudflare.state === "fail" || cloudflare.reachable === false)
+		return false;
 	return cloudflare.state === "unknown" || cloudflare.reachable === null;
 }
 
