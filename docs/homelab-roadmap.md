@@ -102,6 +102,16 @@ same path to the compatibility catalog and explicit missing-component policy.
   refresh is active) separately from provider probe cadence. Browser refresh
   frequency must not increase TrueNAS/pfSense/Cloudflare fan-out.
 
+## P0 — Post-merge Quality remediation
+
+- [ ] Merge and operationally validate
+  `.github/workflows/post-merge-quality-remediation.yml`: after a failed or timed
+  out `CI (Quality and Security)` push on `master`, a converged deterministic
+  formatter/pre-commit repair must open a non-default remediation PR and dispatch
+  canonical CI on it; a non-auto-fixable failure must instead open one deduplicated
+  diagnostic issue with the failed jobs and source run. Keep this as a recovery
+  safety net, never as permission for agents to skip their pre-publish gate.
+
 ## P1 — Refactoring / code-size debt
 
 Refactor cohesive responsibilities instead of raising size thresholds. The first
