@@ -1,0 +1,105 @@
+name: Temporary PR174 sync master
+
+on:
+  push:
+    branches:
+      - feat/homelab-probe-evidence-convergence
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tmp-pr174-sync-master
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]' || contains(github.event.head_commit.message, 'temporary master sync')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/homelab-probe-evidence-convergence
+          fetch-depth: 0
+      - name: Merge current master and resolve roadmap intentionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp docs/homelab-roadmap.md /tmp/pr174-roadmap.md
+          git fetch origin master
+          set +e
+          git merge --no-commit --no-ff origin/master
+          merge_rc=$?
+          set -e
+          if (( merge_rc != 0 )); then
+            conflicts="$(git diff --name-only --diff-filter=U)"
+            unexpected="$(printf '%s\n' "${conflicts}" | grep -v '^docs/homelab-roadmap.md$' || true)"
+            if [[ -n "${unexpected}" ]]; then
+              echo "Unexpected merge conflicts:"
+              printf '%s\n' "${unexpected}"
+              exit 1
+            fi
+            cp /tmp/pr174-roadmap.md docs/homelab-roadmap.md
+            python - <<'PY'
+from pathlib import Path
+p = Path('docs/homelab-roadmap.md')
+s = p.read_text()
+section = '''## P0 — Post-merge Quality remediation
+
+- [ ] Merge and operationally validate
+  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
+  `workflow_run` workflow once the workflow file exists on the default branch.
+  After activation, a failed or timed out `CI (Quality and Security)` push on
+  `master` with a converged deterministic formatter/pre-commit repair must open a
+  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
+  failure must instead open one deduplicated diagnostic issue with the failed jobs
+  and source run. Also validate the fallback issue path when GitHub refuses PR
+  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
+  never as permission for agents to skip their pre-publish gate.
+
+'''
+if '## P0 — Post-merge Quality remediation' not in s:
+    s = s.replace('## P1 — Refactoring / code-size debt\n', section + '## P1 — Refactoring / code-size debt\n')
+old = '''1. run the closest deterministic quality gate and inspect the final CI;
+2. list every requested or discovered item that remains incomplete;
+3. add each deferred item as an unchecked roadmap entry here (and in
+   `docs/quality-roadmap.md` when it is cross-cutting);
+4. never leave the only record of unfinished work in chat, a transient scratchpad
+   or a TODO comment;
+5. record any dependency on an unmerged upstream PR as pending rather than
+   claiming it is implemented.
+'''
+new = '''1. run the closest deterministic quality gate and inspect the final CI;
+2. if a formatter/linter hook modifies files, commit the fixes and rerun the gate
+   until the final pass is clean; a successful auto-fix pass is not itself a
+   successful quality gate;
+3. list every requested or discovered item that remains incomplete;
+4. add each deferred item as an unchecked roadmap entry here (and in
+   `docs/quality-roadmap.md` when it is cross-cutting);
+5. never leave the only record of unfinished work in chat, a transient scratchpad
+   or a TODO comment;
+6. record any dependency on an unmerged upstream PR as pending rather than
+   claiming it is implemented.
+'''
+if old in s:
+    s = s.replace(old, new)
+p.write_text(s)
+PY
+            git add docs/homelab-roadmap.md
+          fi
+          unresolved="$(git diff --name-only --diff-filter=U)"
+          if [[ -n "${unresolved}" ]]; then
+            echo "Unresolved conflicts remain:"
+            printf '%s\n' "${unresolved}"
+            exit 1
+          fi
+      - name: Commit merge and remove helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/tmp-pr174-sync-master.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'merge: sync master into PR 174'
+          git push origin HEAD:feat/homelab-probe-evidence-convergence
