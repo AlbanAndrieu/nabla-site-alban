@@ -13,13 +13,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-python@v6
         with:
-          node-version-file: .nvmrc
-      - name: Install dependencies
-        run: npm ci --no-audit --no-fund
-      - name: Apply canonical Biome formatter
-        run: npx --no-install biome check --write lib/servicePresentation.ts unit-tests/servicePresentation.test.ts
+          python-version-file: .python-version
+      - name: Install pre-commit
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+      - name: Apply canonical Biome pre-commit hook
+        continue-on-error: true
+        run: pre-commit run biome-check --files lib/servicePresentation.ts unit-tests/servicePresentation.test.ts
       - name: Commit formatting
         run: |
           if git diff --quiet; then
