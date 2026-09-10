@@ -6,6 +6,8 @@ on:
       - "CI (Quality and Security)"
     types:
       - completed
+    branches:
+      - master
 
 permissions:
   contents: read
@@ -250,16 +252,20 @@ jobs:
             const publishSucceeded = process.env.PUBLISH_OUTCOME === 'success';
             const existingPrFound = process.env.EXISTING_PR_FOUND === 'true';
             const marker = `<!-- post-merge-quality-remediation:${failedSha} -->`;
+            let fallbackReason = '';
 
             let failedJobs = [];
             try {
-              const { data } = await github.rest.actions.listJobsForWorkflowRun({
-                owner,
-                repo,
-                run_id: runId,
-                per_page: 100,
-              });
-              failedJobs = data.jobs.filter((job) =>
+              failedJobs = await github.paginate(
+                github.rest.actions.listJobsForWorkflowRun,
+                {
+                  owner,
+                  repo,
+                  run_id: runId,
+                  per_page: 100,
+                },
+              );
+              failedJobs = failedJobs.filter((job) =>
                 ['failure', 'timed_out', 'action_required'].includes(job.conclusion),
               );
             } catch (error) {
@@ -281,59 +287,70 @@ jobs:
               `- reason: ${process.env.REMEDIATION_REASON || 'preparation did not reach the decision step'}`,
             ].join('\n');
 
+            async function dispatchQuality(branch) {
+              try {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  workflow_id: 'ci.yml',
+                  ref: branch,
+                });
+                core.notice(`Dispatched CI (Quality and Security) on ${branch}`);
+                return true;
+              } catch (error) {
+                fallbackReason = `canonical CI dispatch failed for ${branch}: ${error.message}`;
+                core.warning(fallbackReason);
+                return false;
+              }
+            }
+
             if (requestedAction === 'pr' && existingPrFound) {
               const branch = process.env.EXISTING_PR_BRANCH;
-              await github.rest.actions.createWorkflowDispatch({
-                owner,
-                repo,
-                workflow_id: 'ci.yml',
-                ref: branch,
-              });
-              core.notice(
-                `Reused remediation PR #${process.env.EXISTING_PR_NUMBER}: ${process.env.EXISTING_PR_URL}`,
-              );
-              core.notice(`Dispatched CI (Quality and Security) on ${branch}`);
-              return;
+              if (await dispatchQuality(branch)) {
+                core.notice(
+                  `Reused remediation PR #${process.env.EXISTING_PR_NUMBER}: ${process.env.EXISTING_PR_URL}`,
+                );
+                return;
+              }
             }
 
             if (requestedAction === 'pr' && publishSucceeded) {
               const branch = process.env.REMEDIATION_BRANCH;
-              const created = await github.rest.pulls.create({
-                owner,
-                repo,
-                head: branch,
-                base: 'master',
-                title: `fix(ci): auto-remediate master quality failure ${shortSha}`,
-                body: [
-                  marker,
-                  '## Automated post-merge remediation',
-                  '',
-                  'The canonical Quality/Security workflow failed after this SHA reached `master`.',
-                  'A bounded deterministic formatter/pre-commit repair converged and produced this patch.',
-                  '',
-                  '### Source failure',
-                  diagnostics,
-                  '',
-                  '### Failed jobs',
-                  jobSummary,
-                  '',
-                  'This PR is a recovery safety net, not a substitute for the agent pre-publish quality gate.',
-                  'Do not merge until its explicit CI validation is green.',
-                ].join('\n'),
-              });
-              core.notice(`Opened remediation PR #${created.data.number}: ${created.data.html_url}`);
+              try {
+                const created = await github.rest.pulls.create({
+                  owner,
+                  repo,
+                  head: branch,
+                  base: 'master',
+                  title: `fix(ci): auto-remediate master quality failure ${shortSha}`,
+                  body: [
+                    marker,
+                    '## Automated post-merge remediation',
+                    '',
+                    'The canonical Quality/Security workflow failed after this SHA reached `master`.',
+                    'A bounded deterministic formatter/pre-commit repair converged and produced this patch.',
+                    '',
+                    '### Source failure',
+                    diagnostics,
+                    '',
+                    '### Failed jobs',
+                    jobSummary,
+                    '',
+                    'This PR is a recovery safety net, not a substitute for the agent pre-publish quality gate.',
+                    'Do not merge until its explicitly dispatched CI validation is green.',
+                  ].join('\n'),
+                });
+                core.notice(`Opened remediation PR #${created.data.number}: ${created.data.html_url}`);
 
-              // GITHUB_TOKEN-created pushes do not trigger ordinary push workflows.
-              // Explicit workflow_dispatch is an allowed exception and gives this
-              // automated remediation branch an immediate canonical Quality run.
-              await github.rest.actions.createWorkflowDispatch({
-                owner,
-                repo,
-                workflow_id: 'ci.yml',
-                ref: branch,
-              });
-              core.notice(`Dispatched CI (Quality and Security) on ${branch}`);
-              return;
+                // GITHUB_TOKEN-created pushes do not trigger ordinary push workflows.
+                // workflow_dispatch is the explicit exception used for unattended
+                // canonical Quality validation of this remediation branch.
+                if (await dispatchQuality(branch)) return;
+                fallbackReason = `remediation PR #${created.data.number} exists, but ${fallbackReason}`;
+              } catch (error) {
+                fallbackReason = `unable to open remediation PR from ${branch}: ${error.message}`;
+                core.warning(fallbackReason);
+              }
             }
 
             const openIssues = await github.paginate(github.rest.issues.listForRepo, {
@@ -350,10 +367,12 @@ jobs:
               return;
             }
 
-            const publishNote =
-              requestedAction === 'pr' && !publishSucceeded
-                ? '\n- remediation branch publication failed; inspect this remediation workflow run.'
-                : '';
+            const notes = [];
+            if (requestedAction === 'pr' && !publishSucceeded && !existingPrFound) {
+              notes.push('remediation branch publication failed; inspect this remediation workflow run');
+            }
+            if (fallbackReason) notes.push(fallbackReason);
+
             const created = await github.rest.issues.create({
               owner,
               repo,
@@ -362,10 +381,11 @@ jobs:
                 marker,
                 '## Automated post-merge diagnostic',
                 '',
-                'The canonical Quality/Security workflow is red on `master`, and no safe deterministic patch was published automatically.',
+                'The canonical Quality/Security workflow is red on `master`, and no fully validated automatic remediation completed.',
                 '',
                 '### Diagnostics',
-                diagnostics + publishNote,
+                diagnostics,
+                ...(notes.length ? ['', '### Automation fallback', ...notes.map((note) => `- ${note}`)] : []),
                 '',
                 '### Failed jobs',
                 jobSummary,
