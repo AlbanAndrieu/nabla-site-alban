@@ -20,5 +20,6 @@ test("Cloudflare uncertainty stays explicit and non-degrading", async () => {
 	assert.match(banner, /data-cloudflare-status-unconfirmed/);
 	assert.match(banner, /does not mark services down or degraded/);
 	assert.match(banner, /ne passe pas les services en panne ou en état dégradé/);
+	assert.doesNotMatch(banner, /setInterval/);
 	assert.match(section, /<CloudflareStatusWarning \/>/);
 });
