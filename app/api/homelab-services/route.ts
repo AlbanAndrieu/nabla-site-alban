@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
 	const { catalog, source, primaryUrl } = await loadHomelabServicesCatalog();
 	const catalogRevision =
-		typeof catalog.catalogRevision === "string" && catalog.catalogRevision.trim()
+		typeof catalog.catalogRevision === "string" &&
+		catalog.catalogRevision.trim()
 			? catalog.catalogRevision.trim()
 			: null;
 	return NextResponse.json(catalog, {
