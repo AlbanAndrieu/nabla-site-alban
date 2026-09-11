@@ -175,49 +175,73 @@ test("same-origin health proxy prefers fresh health-board evidence without letti
 });
 
 test("TrueNAS keeps unified operational evidence behind its disclosure while Architecture renders it directly", async () => {
-	const section = await readFile(
-		new URL(
-			"../app/components/homelab/HomelabServicesSection.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
-	const disclosure = await readFile(
-		new URL(
-			"../app/components/homelab/HomelabOperationsDisclosure.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
-	const architecturePage = await readFile(
-		new URL("../app/[locale]/architecture/page.tsx", import.meta.url),
-		"utf8",
-	);
-	const architectureNav = await readFile(
-		new URL(
-			"../app/[locale]/architecture/ArchitectureSectionNav.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
-	const component = await readFile(
-		new URL(
-			"../app/components/homelab/HomelabOperationalEvidence.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
+	const source = (path: string) =>
+		readFile(new URL(`../${path}`, import.meta.url), "utf8");
+	const [
+		section,
+		disclosure,
+		architecturePage,
+		architectureNav,
+		facade,
+		controlPlane,
+		runtime,
+		deepDiagnostics,
+		pfsenseDetails,
+		exposure,
+		freshness,
+	] = await Promise.all([
+		source("app/components/homelab/HomelabServicesSection.tsx"),
+		source("app/components/homelab/HomelabOperationsDisclosure.tsx"),
+		source("app/[locale]/architecture/page.tsx"),
+		source("app/[locale]/architecture/ArchitectureSectionNav.tsx"),
+		source("app/components/homelab/HomelabOperationalEvidence.tsx"),
+		source("app/components/homelab/HomelabOperationalControlPlane.tsx"),
+		source("app/components/homelab/HomelabOperationalRuntime.tsx"),
+		source("app/components/homelab/HomelabOperationalDeepDiagnostics.tsx"),
+		source("app/components/homelab/HomelabOperationalPfSenseDetails.tsx"),
+		source("app/components/homelab/HomelabOperationalExposure.tsx"),
+		source("app/components/homelab/HomelabOperationalFreshness.tsx"),
+	]);
+
 	assert.match(section, /HomelabOperationsDisclosure/);
 	assert.doesNotMatch(section, /HomelabOperationalEvidence/);
 	assert.match(disclosure, /HomelabOperationalEvidence/);
 	assert.match(disclosure, /data-homelab-operations-disclosure/);
 	assert.match(architecturePage, /HomelabOperationalEvidence/);
 	assert.doesNotMatch(architectureNav, /HomelabOperationalEvidence/);
-	assert.match(component, /data-runtime-transport-evidence/);
-	assert.match(component, /data-deep-diagnostics/);
-	assert.match(component, /data-pfsense-security-evidence/);
-	assert.match(component, /data-service-exposure-diagnostics/);
-	assert.match(component, /data-trusted-source-exposure/);
-	assert.match(component, /data-evidence-freshness/);
-	assert.match(component, /data-provider-credential-evidence/);
+
+	for (const sectionName of [
+		"HomelabOperationalControlPlane",
+		"HomelabOperationalMetrics",
+		"HomelabOperationalRuntime",
+		"HomelabOperationalDeepDiagnostics",
+		"HomelabOperationalPfSenseDetails",
+		"HomelabOperationalExposure",
+		"HomelabOperationalFreshness",
+	]) {
+		assert.match(facade, new RegExp(sectionName));
+	}
+	assert.match(facade, /fetch\("\/api\/homelab-observability"/);
+	assert.match(facade, /window\.setInterval/);
+	assert.match(facade, /new AbortController/);
+	for (const presentationSource of [
+		controlPlane,
+		runtime,
+		deepDiagnostics,
+		pfsenseDetails,
+		exposure,
+		freshness,
+	]) {
+		assert.doesNotMatch(presentationSource, /fetch\(/);
+		assert.doesNotMatch(presentationSource, /setInterval\(/);
+		assert.doesNotMatch(presentationSource, /new AbortController/);
+	}
+
+	assert.match(runtime, /data-runtime-transport-evidence/);
+	assert.match(deepDiagnostics, /data-deep-diagnostics/);
+	assert.match(pfsenseDetails, /data-pfsense-security-evidence/);
+	assert.match(exposure, /data-service-exposure-diagnostics/);
+	assert.match(exposure, /data-trusted-source-exposure/);
+	assert.match(freshness, /data-evidence-freshness/);
+	assert.match(freshness, /data-provider-credential-evidence/);
 });
