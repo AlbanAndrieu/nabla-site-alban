@@ -202,7 +202,7 @@ for file in "${CHANGED_FILES[@]}"; do
             ;;
     esac
     case "${file}" in
-        *.js | *.jsx | *.mjs | *.cjs | *.ts | *.tsx | eslint.config.js)
+        *.js | *.jsx | *.mjs | *.cjs | *.ts | *.tsx)
             javascript_lint_needed=true
             ;;
     esac
