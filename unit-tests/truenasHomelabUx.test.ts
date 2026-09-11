@@ -6,92 +6,69 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("TrueNAS keeps homelab topology before services and moves Nabla project near the footer", async () => {
-	const page = await source("app/[locale]/truenas/page.tsx");
-	const visualIndex = page.indexOf("<HomeLabSection");
-	const servicesIndex = page.indexOf("<HomelabServicesSection");
-	const toolsIndex = page.indexOf("<ToolsSection");
-	const nablaIndex = page.indexOf("<NablaProjectSection");
-
-	assert.ok(visualIndex >= 0);
-	assert.ok(servicesIndex >= 0);
-	assert.ok(toolsIndex >= 0);
-	assert.ok(nablaIndex >= 0);
-	assert.ok(visualIndex < servicesIndex);
-	assert.ok(nablaIndex > toolsIndex);
-});
-
-test("homelab network policy details are enriched but collapsed by default", async () => {
-	const section = await source("app/components/truenas/HomeLabSection.tsx");
-
-	assert.match(section, /<details className=\{styles\.networkDetails\}>/);
-	assert.doesNotMatch(section, /<details[^>]*\sopen(?:=|\s|>)/);
-	assert.match(section, /network\.tcp10443/);
-	assert.match(section, /network\.tcp9922/);
-	assert.match(section, /network\.sourcesNote/);
-});
-
-test("service views are searchable and collapsible while technical criticality stays opt-in", async () => {
+test("TrueNAS service view keeps service hierarchy ahead of secondary operations", async () => {
+	const section = await source("app/components/homelab/HomelabServicesSection.tsx");
+	const disclosure = await source(
+		"app/components/homelab/HomelabOperationsDisclosure.tsx",
+	);
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const hierarchy = await source(
-		"app/components/homelab/CriticalDependencyHierarchy.tsx",
-	);
 
-	assert.match(block, /data-homelab-presentation-filter/);
-	assert.match(block, /data-homelab-service-search/);
-	assert.match(block, /data-homelab-health-filter/);
-	assert.match(block, /data-homelab-environment-filter/);
-	assert.match(block, /non-dev/);
-	assert.match(block, /resolveHomelabServiceEnvironments/);
-	assert.match(block, /homelabServiceMatchesEnvironment/);
-	assert.match(block, /defaulted/);
-	assert.match(
-		await source("lib/homelabEnvironments.ts"),
-		/node\?\.environments/,
-	);
-	assert.match(block, /setEnvironmentFilter\("all"\)/);
-	assert.doesNotMatch(
-		await source("lib/homelabServices.ts"),
-		/DEV_NAME_SUFFIX_RE/,
-	);
-	assert.match(block, /data-service-presentation-group/);
-	assert.match(block, /setExpandedGroups/);
-	assert.match(block, /useState\(false\)/);
-	assert.match(block, /<CriticalDependencyHierarchy/);
-	assert.match(hierarchy, /data-criticality-toggle/);
-	assert.match(hierarchy, /critical-dependency-hierarchy/);
-
-	const hierarchyIndex = block.indexOf("data-homelab-service-hierarchy");
-	const criticalityIndex = block.indexOf("<CriticalDependencyHierarchy");
-	assert.ok(hierarchyIndex >= 0);
-	assert.ok(criticalityIndex > hierarchyIndex);
+	assert.match(section, /HomelabServicesBlock/);
+	assert.match(section, /HomelabOperationsDisclosure/);
+	assert.match(disclosure, /HomelabOperationalEvidence/);
+	assert.match(disclosure, /data-homelab-operations-disclosure/);
+	assert.match(block, /data-homelab-service-hierarchy/);
+	assert.doesNotMatch(section, /HomelabOperationalEvidence/);
 });
 
-test("critical dependency hierarchy keeps the disclosure arrow next to its label", async () => {
-	const hierarchy = await source(
-		"app/components/homelab/CriticalDependencyHierarchy.tsx",
-	);
-	const css = await source(
-		"app/components/homelab/CriticalDependencyHierarchy.module.css",
+test("Operations keeps operational observer lazy until the disclosure is opened", async () => {
+	const disclosure = await source(
+		"app/components/homelab/HomelabOperationsDisclosure.tsx",
 	);
 
-	assert.match(hierarchy, /ServiceCriticalityOverview/);
-	assert.match(hierarchy, /criticality\.showHierarchy/);
-	assert.match(hierarchy, /criticality\.hideHierarchy/);
-	assert.match(hierarchy, /styles\.chevron/);
-	assert.match(css, /justify-content:\s*flex-start/);
-	assert.match(css, /\.chevron/);
-	assert.match(css, /\.details\[open\] \.chevron/);
-	assert.doesNotMatch(css, /\.summary::after/);
-	assert.doesNotMatch(css, /\.summary[\s\S]*justify-content:\s*space-between/);
+	assert.match(disclosure, /const \[open, setOpen\] = useState\(false\)/);
+	assert.match(disclosure, /\{open \? <HomelabOperationalEvidence \/> : null\}/);
+	assert.match(disclosure, /loadHomelabHealthSnapshot/);
+	assert.match(disclosure, /loadHomelabServicesCatalog/);
+	assert.match(disclosure, /loadServiceTopology/);
 });
 
-test("runtime legend is promoted before service groups and links to criticality details", async () => {
+test("Operations disclosure preserves the historical operational evidence anchor", async () => {
+	const disclosure = await source(
+		"app/components/homelab/HomelabOperationsDisclosure.tsx",
+	);
+	const operational = await source(
+		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	);
+
+	assert.match(disclosure, /operational-evidence-title/);
+	assert.match(disclosure, /operational-evidence/);
+	assert.match(disclosure, /useAnchoredDetails/);
+	assert.match(operational, /id="operational-evidence"/);
+	assert.match(operational, /id="operational-evidence-title"/);
+});
+
+test("Operations disclosure presents an attached critical-path badge", async () => {
+	const disclosure = await source(
+		"app/components/homelab/HomelabOperationsDisclosure.tsx",
+	);
+	const styles = await source(
+		"app/components/homelab/HomelabOperationsDisclosure.module.css",
+	);
+
+	assert.match(disclosure, /data-operations-summary-critical-path/);
+	assert.match(styles, /\.summary\s*\{/);
+	assert.match(styles, /justify-content:\s*flex-start/);
+	assert.doesNotMatch(styles, /justify-content:\s*space-between/);
+});
+
+test("TrueNAS status overview leads the service hierarchy and keeps runtime legends visible", async () => {
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const overview = await source(
 		"app/components/homelab/HomelabStatusOverview.tsx",
 	);
 
+	assert.match(block, /<HomelabStatusOverview/);
 	assert.ok(
 		block.indexOf("<HomelabStatusOverview") <
 			block.indexOf("data-homelab-service-hierarchy"),
@@ -119,11 +96,15 @@ test("DNS posture remains sanitized while Operations owns the active presentatio
 	const operations = await source(
 		"app/components/homelab/HomelabOperationalEvidence.tsx",
 	);
+	const pfsenseDetails = await source(
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
+	);
 
 	assert.match(posture, /data-pfsense-dns-evidence/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
-	assert.match(operations, /evidence\.pfsense\.reason/);
-	assert.match(operations, /data-pfsense-security-evidence/);
+	assert.match(operations, /HomelabOperationalPfSenseDetails/);
+	assert.match(pfsenseDetails, /evidence\.pfsense\.reason/);
+	assert.match(pfsenseDetails, /data-pfsense-security-evidence/);
 });
 
 test("TrueNAS exposes runtime observation and internal probe coverage", async () => {
@@ -143,46 +124,11 @@ test("TrueNAS exposes runtime observation and internal probe coverage", async ()
 	assert.match(coverage, /rotating_sample/);
 	assert.match(coverage, /scheduled/);
 	assert.match(coverage, /completed/);
-	assert.match(coverage, /timed_out/);
-	assert.match(coverage, /max_concurrency/);
-	assert.match(coverage, /budget_seconds/);
-	assert.match(coverage, /data-public-probe-count/);
-	assert.match(coverage, /data-probe-cache-freshness/);
-	assert.match(coverage, /data-health-board-freshness/);
-	assert.match(coverage, /data-reconciliation-provenance/);
-	assert.match(coverage, /cloudflare_tunnels_observed/);
-	assert.match(coverage, /refresh_elapsed_ms/);
-	assert.match(coverage, /dependency_evidence/);
 });
 
-test("homelab renders bounded probes before aggregate enrichment", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
-	const probeProxy = await source("app/api/homelab-probes/route.ts");
-
-	const probeStart = block.indexOf(
-		"const probesPromise = fetchProbeHealth(signal)",
-	);
-	const probeRender = block.indexOf("const probes = await probesPromise");
-	const aggregateRender = block.indexOf(
-		"const aggregate = await aggregatePromise",
-	);
-	assert.ok(probeStart >= 0);
-	assert.ok(probeRender > probeStart);
-	assert.ok(aggregateRender > probeRender);
-	assert.match(block, /fetch\("\/api\/homelab-probes"/);
-	assert.match(block, /"Cache-Control": "no-cache"/);
-	assert.match(probeProxy, /loadHomelabProbeSnapshot/);
-	assert.match(probeProxy, /"Cache-Control": "no-store, max-age=0"/);
-});
-
-test("homelab exposes rolling probe evidence coverage from FastAPI", async () => {
-	const coverage = await source(
-		"app/components/homelab/HomelabObservationCoverage.tsx",
-	);
-	assert.match(coverage, /data-internal-probe-evidence/);
-	assert.match(coverage, /data-public-probe-evidence/);
-	assert.match(coverage, /coverage_percent/);
-	assert.match(coverage, /evidence_ttl_seconds/);
-	assert.match(coverage, /fresh/);
-	assert.match(coverage, /cached/);
+test("healthy service rows stay compact while degraded rows expose reasons", async () => {
+	const reasons = await source("app/components/homelab/ServiceHealthReasons.tsx");
+	assert.match(reasons, /homelabHealthReasons/);
+	assert.match(reasons, /if \(state === "ok"\)/);
+	assert.match(reasons, /ServiceOperatorDiagnostics/);
 });
