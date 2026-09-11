@@ -31,12 +31,14 @@ const HEALTH_BOARD_STALE_CACHE_MS = 1_000;
 
 type HealthBoardCacheEntry = {
 	primaryUrl: string;
+	fetchImpl: typeof fetch;
 	expiresAt: number;
 	result: FastApiHealthBoardLoadResult;
 };
 
 type HealthBoardInFlight = {
 	primaryUrl: string;
+	fetchImpl: typeof fetch;
 	promise: Promise<FastApiHealthBoardLoadResult>;
 };
 
@@ -119,12 +121,13 @@ function healthBoardApiUrl(): string {
 
 async function loadFastApiHealthBoardUncached(
 	primaryUrl: string,
+	fetchImpl: typeof fetch,
 ): Promise<FastApiHealthBoardLoadResult> {
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), HEALTH_BOARD_TIMEOUT_MS);
 
 	try {
-		const response = await fetch(primaryUrl, {
+		const response = await fetchImpl(primaryUrl, {
 			headers: {
 				Accept: "application/json",
 				"User-Agent": "nabla-site-health-board/1.0",
@@ -149,30 +152,38 @@ async function loadFastApiHealthBoardUncached(
 
 export async function loadFastApiHealthBoard(): Promise<FastApiHealthBoardLoadResult> {
 	const primaryUrl = healthBoardApiUrl();
+	const fetchImpl = globalThis.fetch;
 	const now = Date.now();
 
 	if (
 		cachedHealthBoard?.primaryUrl === primaryUrl &&
+		cachedHealthBoard.fetchImpl === fetchImpl &&
 		cachedHealthBoard.expiresAt > now
 	) {
 		return cachedHealthBoard.result;
 	}
-	if (inFlightHealthBoard?.primaryUrl === primaryUrl) {
+	if (
+		inFlightHealthBoard?.primaryUrl === primaryUrl &&
+		inFlightHealthBoard.fetchImpl === fetchImpl
+	) {
 		return inFlightHealthBoard.promise;
 	}
 
-	const promise = loadFastApiHealthBoardUncached(primaryUrl).then((result) => {
-		const ttlMs = fastApiHealthBoardCacheTtlMs(result.board);
-		if (ttlMs > 0) {
-			cachedHealthBoard = {
-				primaryUrl,
-				expiresAt: Date.now() + ttlMs,
-				result,
-			};
-		}
-		return result;
-	});
-	inFlightHealthBoard = { primaryUrl, promise };
+	const promise = loadFastApiHealthBoardUncached(primaryUrl, fetchImpl).then(
+		(result) => {
+			const ttlMs = fastApiHealthBoardCacheTtlMs(result.board);
+			if (ttlMs > 0) {
+				cachedHealthBoard = {
+					primaryUrl,
+					fetchImpl,
+					expiresAt: Date.now() + ttlMs,
+					result,
+				};
+			}
+			return result;
+		},
+	);
+	inFlightHealthBoard = { primaryUrl, fetchImpl, promise };
 	try {
 		return await promise;
 	} finally {
