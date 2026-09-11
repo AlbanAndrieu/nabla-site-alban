@@ -64,8 +64,9 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	assert.match(block, /healthStatus: aggregate\.status \?\? probes\.status/);
 	assert.match(
 		block,
-		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+		/mergeHomelabProbeDiagnostics\(aggregate\.snapshot,\s*probes\.snapshot\)/,
 	);
+	assert.match(block, /probes\.snapshot \?\? current\.snapshot/);
 	assert.match(health, /export \* from "\.\/homelabHealthTypes"/);
 	assert.match(healthValidation, /validTrueNasApiHealth/);
 });
@@ -205,8 +206,9 @@ test("homelab health refreshes every thirty seconds, preserves context and expos
 	assert.match(page, /visibilitychange/);
 	assert.match(
 		page,
-		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+		/mergeHomelabProbeDiagnostics\(aggregate\.snapshot,\s*probes\.snapshot\)/,
 	);
+	assert.match(page, /probes\.snapshot \?\? current\.snapshot/);
 	assert.match(
 		page,
 		/healthUnavailable:\s*aggregate\.snapshot === null && probes\.snapshot === null/,
