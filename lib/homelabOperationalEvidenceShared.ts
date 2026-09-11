@@ -20,12 +20,18 @@ export function optionalBoolean(value: unknown): boolean | null {
 
 export function stringArray(value: unknown): string[] {
 	return Array.isArray(value)
-		? value.filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
+		? value.filter(
+				(item): item is string =>
+					typeof item === "string" && Boolean(item.trim()),
+			)
 		: [];
 }
 
 export function healthState(value: unknown): OperationalHealthState | null {
-	return value === "ok" || value === "warn" || value === "fail" || value === "unknown"
+	return value === "ok" ||
+		value === "warn" ||
+		value === "fail" ||
+		value === "unknown"
 		? value
 		: null;
 }

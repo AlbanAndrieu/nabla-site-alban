@@ -29,7 +29,9 @@ export function parseProviderCredentials(
 					? { credentialMode: optionalString(value.credential_mode) }
 					: {}),
 				missingVariables: stringArray(value.missing_variables),
-				invalidReferenceVariables: stringArray(value.invalid_reference_variables),
+				invalidReferenceVariables: stringArray(
+					value.invalid_reference_variables,
+				),
 				...(optionalString(value.required_privilege)
 					? { requiredPrivilege: optionalString(value.required_privilege) }
 					: {}),

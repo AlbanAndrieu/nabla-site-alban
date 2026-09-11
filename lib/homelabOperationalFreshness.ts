@@ -23,14 +23,19 @@ export function parseOperationalFreshness(homelab: Record<string, unknown>): {
 	}
 	const staleServices = services.flatMap((value) => {
 		if (!isRecord(value) || value.observation_stale !== true) return [];
-		const id = optionalString(value.id) ?? optionalString(value.name) ?? "unknown";
+		const id =
+			optionalString(value.id) ?? optionalString(value.name) ?? "unknown";
 		const name = optionalString(value.name) ?? id;
 		return [
 			{
 				id,
 				name,
 				...(optionalNumber(value.observation_age_seconds) !== undefined
-					? { observationAgeSeconds: optionalNumber(value.observation_age_seconds) }
+					? {
+							observationAgeSeconds: optionalNumber(
+								value.observation_age_seconds,
+							),
+						}
 					: {}),
 			},
 		];

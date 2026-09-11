@@ -11,11 +11,14 @@ import type {
 	OperationalHealthState,
 } from "./homelabOperationalEvidenceTypes";
 
-function deriveComponentState(raw: Record<string, unknown>): OperationalHealthState {
+function deriveComponentState(
+	raw: Record<string, unknown>,
+): OperationalHealthState {
 	const explicit = healthState(raw.state);
 	if (explicit) return explicit;
 	if (raw.reachable === false) return "fail";
-	if (raw.stale === true || raw.degraded === true || raw.tls_trusted === false) return "warn";
+	if (raw.stale === true || raw.degraded === true || raw.tls_trusted === false)
+		return "warn";
 	if (raw.reachable === true) return "ok";
 	return "unknown";
 }
@@ -48,7 +51,9 @@ function componentEvidence(
 		...(optionalString(raw.failure_stage)
 			? { failureStage: optionalString(raw.failure_stage) }
 			: {}),
-		...(optionalString(raw.error_kind) ? { errorKind: optionalString(raw.error_kind) } : {}),
+		...(optionalString(raw.error_kind)
+			? { errorKind: optionalString(raw.error_kind) }
+			: {}),
 		...(optionalString(raw.error) ? { error: optionalString(raw.error) } : {}),
 		...(optionalString(raw.refresh_error)
 			? { refreshError: optionalString(raw.refresh_error) }

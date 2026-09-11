@@ -19,13 +19,22 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 		state: optionalString(value.state) ?? "unknown",
 		telemetryAvailable: optionalBoolean(value.telemetry_available),
 		attributionAvailable: optionalBoolean(value.attribution_available),
-		...(optionalString(value.engine) ? { engine: optionalString(value.engine) } : {}),
-		...(optionalString(value.firewall) ? { firewall: optionalString(value.firewall) } : {}),
-		...(optionalString(value.mechanism) ? { mechanism: optionalString(value.mechanism) } : {}),
-		...(optionalString(value.evidence) ? { evidence: optionalString(value.evidence) } : {}),
+		...(optionalString(value.engine)
+			? { engine: optionalString(value.engine) }
+			: {}),
+		...(optionalString(value.firewall)
+			? { firewall: optionalString(value.firewall) }
+			: {}),
+		...(optionalString(value.mechanism)
+			? { mechanism: optionalString(value.mechanism) }
+			: {}),
+		...(optionalString(value.evidence)
+			? { evidence: optionalString(value.evidence) }
+			: {}),
 		...(source
 			? {
-					sourceIp: source.ip === null ? null : optionalString(source.ip) ?? null,
+					sourceIp:
+						source.ip === null ? null : (optionalString(source.ip) ?? null),
 				}
 			: {}),
 		...(destination
@@ -33,7 +42,7 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 					destinationIp:
 						destination.ip === null
 							? null
-							: optionalString(destination.ip) ?? null,
+							: (optionalString(destination.ip) ?? null),
 					...(optionalNumber(destination.port) !== undefined
 						? { destinationPort: optionalNumber(destination.port) }
 						: {}),
@@ -42,7 +51,9 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 		...(control
 			? {
 					controlPath: {
-						...(optionalString(control.mode) ? { mode: optionalString(control.mode) } : {}),
+						...(optionalString(control.mode)
+							? { mode: optionalString(control.mode) }
+							: {}),
 						independentFromWanFilter: optionalBoolean(
 							control.independent_from_wan_filter,
 						),
@@ -69,15 +80,21 @@ export function parsePfSensePosture(
 				const label = optionalString(value.label);
 				const state = optionalString(value.state);
 				const detail = optionalString(value.detail);
-				return id && label && state && detail ? [{ id, label, state, detail }] : [];
+				return id && label && state && detail
+					? [{ id, label, state, detail }]
+					: [];
 			})
 		: [];
 	return {
 		configured: optionalBoolean(dns.configured),
 		reachable: optionalBoolean(dns.reachable),
 		policyState: healthState(dns.policy_state) ?? "unknown",
-		...(optionalString(dns.reason) ? { reason: optionalString(dns.reason) } : {}),
-		...(optionalString(dns.error_stage) ? { errorStage: optionalString(dns.error_stage) } : {}),
+		...(optionalString(dns.reason)
+			? { reason: optionalString(dns.reason) }
+			: {}),
+		...(optionalString(dns.error_stage)
+			? { errorStage: optionalString(dns.error_stage) }
+			: {}),
 		...(optionalString(dns.error) ? { error: optionalString(dns.error) } : {}),
 		securityFilters: filters,
 		ingressBlock: parseIngressBlock(dns.ingress_block),

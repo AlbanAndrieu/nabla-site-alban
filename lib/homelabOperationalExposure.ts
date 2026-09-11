@@ -19,7 +19,9 @@ function exposureState(
 	return trustedSourcesOnly ? "warn" : "ok";
 }
 
-export function parseExposurePorts(sickzValue: unknown): ExposurePortEvidence[] {
+export function parseExposurePorts(
+	sickzValue: unknown,
+): ExposurePortEvidence[] {
 	if (!isRecord(sickzValue) || !isRecord(sickzValue.checks)) return [];
 	const pfsense = Object.values(sickzValue.checks).find(
 		(value) => isRecord(value) && isRecord(value.pfsense_tcp_port_policy),
@@ -48,7 +50,9 @@ export function parseExposurePorts(sickzValue: unknown): ExposurePortEvidence[] 
 					: {}),
 				expectedFrom: stringArray(policy.expected_from),
 				negativeProbeRequired: policy.negative_probe_required === true,
-				...(optionalString(policy.reason) ? { reason: optionalString(policy.reason) } : {}),
+				...(optionalString(policy.reason)
+					? { reason: optionalString(policy.reason) }
+					: {}),
 				state: exposureState(
 					observed,
 					expected,

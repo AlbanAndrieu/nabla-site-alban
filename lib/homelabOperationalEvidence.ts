@@ -32,12 +32,15 @@ export function parseHomelabOperationalEvidence(
 	const homelab = isRecord(board.homelab) ? board.homelab : {};
 	const components = parseOperationalComponents(homelab);
 	const pfsense = parsePfSensePosture(homelab);
-	const { staleServices, dependencyCycles } = parseOperationalFreshness(homelab);
+	const { staleServices, dependencyCycles } =
+		parseOperationalFreshness(homelab);
 	return {
 		board: {
 			state: board.state,
 			refreshing: board.refreshing,
-			...(typeof board.age_seconds === "number" ? { ageSeconds: board.age_seconds } : {}),
+			...(typeof board.age_seconds === "number"
+				? { ageSeconds: board.age_seconds }
+				: {}),
 			generatedAt: board.generated_at,
 			...(board.error !== undefined ? { error: board.error } : {}),
 		},

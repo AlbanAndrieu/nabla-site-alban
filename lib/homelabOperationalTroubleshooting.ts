@@ -21,11 +21,14 @@ export function deriveTroubleshootingFocus(
 	) {
 		return "pfsense_blind_spot";
 	}
-	const byId = new Map(components.map((component) => [component.id, component]));
+	const byId = new Map(
+		components.map((component) => [component.id, component]),
+	);
 	if (byId.get("pfsense")?.state === "fail") return "pfsense_control";
 	if (byId.get("cloudflare")?.state === "fail") return "cloudflare";
 	if (byId.get("truenas")?.state === "fail") return "truenas";
-	if (board.state === "stale" || staleServices.length > 0) return "stale_evidence";
+	if (board.state === "stale" || staleServices.length > 0)
+		return "stale_evidence";
 	if (cycles.length > 0) return "dependency_cycle";
 	return "dependencies";
 }
