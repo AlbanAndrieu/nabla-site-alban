@@ -30,7 +30,8 @@ function rowsList(rows: Row[], key: string) {
 
 function add(rows: Row[], label: string, value: unknown, suffix = "") {
 	const formatted = present(value);
-	if (formatted !== undefined) rows.push({ label, value: `${formatted}${suffix}` });
+	if (formatted !== undefined)
+		rows.push({ label, value: `${formatted}${suffix}` });
 }
 
 export default function HomelabProbeDiagnostics({ snapshot }: Props) {
@@ -47,18 +48,35 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	add(probeRows, "Runtime", probe?.state);
 	add(probeRows, french ? "Démarré" : "Started", probe?.startedAt);
 	add(probeRows, "Uptime", probe?.uptimeSeconds, "s");
-	add(probeRows, french ? "Couverture" : "Coverage", probe?.coveragePercent, "%");
-	if (probe?.knownProbeSlots !== undefined || probe?.eligibleProbeSlots !== undefined)
+	add(
+		probeRows,
+		french ? "Couverture" : "Coverage",
+		probe?.coveragePercent,
+		"%",
+	);
+	if (
+		probe?.knownProbeSlots !== undefined ||
+		probe?.eligibleProbeSlots !== undefined
+	)
 		probeRows.push({
 			label: french ? "Slots connus / éligibles" : "Known / eligible slots",
 			value: `${probe?.knownProbeSlots ?? "?"} / ${probe?.eligibleProbeSlots ?? "?"}`,
 		});
-	add(probeRows, french ? "Cycle complet estimé" : "Estimated full cycle", probe?.estimatedFullCycleSeconds, "s");
-
-	const performanceRows = Object.entries(diagnostics.performance?.phasesMs ?? {}).map(
-		([label, value]) => ({ label, value: `${value} ms` }),
+	add(
+		probeRows,
+		french ? "Cycle complet estimé" : "Estimated full cycle",
+		probe?.estimatedFullCycleSeconds,
+		"s",
 	);
-	add(performanceRows, "fixed_cardinality", diagnostics.performance?.fixedCardinality);
+
+	const performanceRows = Object.entries(
+		diagnostics.performance?.phasesMs ?? {},
+	).map(([label, value]) => ({ label, value: `${value} ms` }));
+	add(
+		performanceRows,
+		"fixed_cardinality",
+		diagnostics.performance?.fixedCardinality,
+	);
 	add(performanceRows, "phase_count", diagnostics.performance?.phaseCount);
 
 	const apiRows: Row[] = [];
@@ -82,9 +100,15 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	add(apiRows, "Username env", api?.usernameVariable);
 	add(apiRows, "API-key env", api?.apiKeyVariable);
 	if (api?.shadowedUsernameVariables.length)
-		apiRows.push({ label: "Shadowed username env", value: api.shadowedUsernameVariables.join(", ") });
+		apiRows.push({
+			label: "Shadowed username env",
+			value: api.shadowedUsernameVariables.join(", "),
+		});
 	if (api?.shadowedApiKeyVariables.length)
-		apiRows.push({ label: "Shadowed API-key env", value: api.shadowedApiKeyVariables.join(", ") });
+		apiRows.push({
+			label: "Shadowed API-key env",
+			value: api.shadowedApiKeyVariables.join(", "),
+		});
 	add(apiRows, "Runtime error", diagnostics.trueNasRuntimeError);
 
 	const pfsenseRows: Row[] = [];
@@ -99,8 +123,16 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 			value: `${pfsenseOperator.successful_endpoint_count ?? 0} / ${pfsenseOperator.endpoint_count}`,
 		});
 	add(pfsenseRows, "Services observed", pfsenseOperator?.services_observed);
-	add(pfsenseRows, "Running services", pfsenseOperator?.service_summary?.running);
-	add(pfsenseRows, "Stopped services", pfsenseOperator?.service_summary?.stopped);
+	add(
+		pfsenseRows,
+		"Running services",
+		pfsenseOperator?.service_summary?.running,
+	);
+	add(
+		pfsenseRows,
+		"Stopped services",
+		pfsenseOperator?.service_summary?.stopped,
+	);
 	add(pfsenseRows, "Stale", pfsenseOperator?.stale);
 	add(pfsenseRows, "Last good available", pfsenseOperator?.last_good_available);
 	add(pfsenseRows, "Refresh stage", pfsenseOperator?.refresh_error_stage);
@@ -117,10 +149,15 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	if (!hasEvidence) return null;
 
 	return (
-		<details className="card box-shadow p-3 mb-4" data-homelab-operator-diagnostics>
+		<details
+			className="card box-shadow p-3 mb-4"
+			data-homelab-operator-diagnostics
+		>
 			<summary className="h5 mb-0">
 				<i className="fas fa-stethoscope" aria-hidden="true" />{" "}
-				{french ? "Diagnostic opérateur des sondes" : "Probe operator diagnostics"}
+				{french
+					? "Diagnostic opérateur des sondes"
+					: "Probe operator diagnostics"}
 			</summary>
 			<p className="small text-muted mt-3">
 				{french
@@ -130,11 +167,14 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 
 			{probeRows.length > 0 && <h4 className="h6">Probe runtime</h4>}
 			{rowsList(probeRows, "probe-runtime")}
-			{performanceRows.length > 0 && <h4 className="h6">Aggregate performance</h4>}
+			{performanceRows.length > 0 && (
+				<h4 className="h6">Aggregate performance</h4>
+			)}
 			{rowsList(performanceRows, "aggregate-performance")}
 			{diagnostics.evidencePriority.length > 0 && (
 				<p className="small" data-evidence-priority>
-					<strong>Evidence priority:</strong> {diagnostics.evidencePriority.join(" → ")}
+					<strong>Evidence priority:</strong>{" "}
+					{diagnostics.evidencePriority.join(" → ")}
 				</p>
 			)}
 
@@ -152,11 +192,21 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 						{transport.stages.map((stage) => (
 							<li key={stage.id} data-stage-state={stage.state}>
 								<strong>{stage.label}</strong> — {stage.state}
-								{stage.elapsedMs !== undefined ? ` · ${stage.elapsedMs} ms` : ""}
-								{stage.httpStatus !== undefined ? ` · HTTP ${stage.httpStatus}` : ""}
+								{stage.elapsedMs !== undefined
+									? ` · ${stage.elapsedMs} ms`
+									: ""}
+								{stage.httpStatus !== undefined
+									? ` · HTTP ${stage.httpStatus}`
+									: ""}
 								{stage.resolved.length ? ` · ${stage.resolved.join(", ")}` : ""}
-								{stage.detail ? <span className="d-block text-muted">{stage.detail}</span> : null}
-								{stage.failureStage ? <span className="d-block text-danger">failure: {stage.failureStage}</span> : null}
+								{stage.detail ? (
+									<span className="d-block text-muted">{stage.detail}</span>
+								) : null}
+								{stage.failureStage ? (
+									<span className="d-block text-danger">
+										failure: {stage.failureStage}
+									</span>
+								) : null}
 							</li>
 						))}
 					</ol>
@@ -167,12 +217,14 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 			{rowsList(pfsenseRows, "pfsense")}
 			{pfsenseOperator?.endpoint_status && (
 				<ul className="small" data-pfsense-endpoint-status>
-					{Object.entries(pfsenseOperator.endpoint_status).map(([name, evidence]) => (
-						<li key={name}>
-							{name}: {evidence.observed ? "observed" : "failed"}
-							{evidence.error ? ` · ${evidence.error}` : ""}
-						</li>
-					))}
+					{Object.entries(pfsenseOperator.endpoint_status).map(
+						([name, evidence]) => (
+							<li key={name}>
+								{name}: {evidence.observed ? "observed" : "failed"}
+								{evidence.error ? ` · ${evidence.error}` : ""}
+							</li>
+						),
+					)}
 				</ul>
 			)}
 		</details>

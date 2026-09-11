@@ -1,3 +1,4 @@
+import { isRecord } from "./homelabHealthValidation";
 import type {
 	PfSenseCacheEvidence,
 	PfSenseEndpointEvidence,
@@ -5,7 +6,6 @@ import type {
 	PfSenseOperatorEvidence,
 	PfSenseServiceSummary,
 } from "./homelabPfSenseOperatorTypes";
-import { isRecord } from "./homelabHealthValidation";
 
 function optionalString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -26,7 +26,9 @@ function parseEndpointStatus(
 		if (!isRecord(raw) || typeof raw.observed !== "boolean") continue;
 		result[name] = {
 			observed: raw.observed,
-			...(optionalString(raw.error) ? { error: optionalString(raw.error) } : {}),
+			...(optionalString(raw.error)
+				? { error: optionalString(raw.error) }
+				: {}),
 		};
 	}
 	return Object.keys(result).length > 0 ? result : undefined;
@@ -51,7 +53,9 @@ function parseServices(value: unknown): PfSenseObservedService[] | undefined {
 	return rows.length > 0 ? rows : undefined;
 }
 
-function parseServiceSummary(value: unknown): PfSenseServiceSummary | undefined {
+function parseServiceSummary(
+	value: unknown,
+): PfSenseServiceSummary | undefined {
 	if (!isRecord(value)) return undefined;
 	const result: PfSenseServiceSummary = {};
 	for (const key of ["running", "stopped", "unknown", "total"] as const) {
@@ -64,11 +68,20 @@ function parseServiceSummary(value: unknown): PfSenseServiceSummary | undefined 
 function parseCache(value: unknown): PfSenseCacheEvidence | undefined {
 	if (!isRecord(value)) return undefined;
 	const result: PfSenseCacheEvidence = {};
-	if (optionalString(value.cache_layer)) result.cache_layer = optionalString(value.cache_layer);
-	for (const key of ["cached", "stale", "refresh_in_progress", "redis_available"] as const) {
+	if (optionalString(value.cache_layer))
+		result.cache_layer = optionalString(value.cache_layer);
+	for (const key of [
+		"cached",
+		"stale",
+		"refresh_in_progress",
+		"redis_available",
+	] as const) {
 		if (typeof value[key] === "boolean") result[key] = value[key];
 	}
-	if (typeof value.cache_age_seconds === "number" && value.cache_age_seconds >= 0)
+	if (
+		typeof value.cache_age_seconds === "number" &&
+		value.cache_age_seconds >= 0
+	)
 		result.cache_age_seconds = value.cache_age_seconds;
 	return Object.keys(result).length > 0 ? result : undefined;
 }
@@ -86,7 +99,11 @@ export function parsePfSenseOperatorEvidence(
 			? { api_evidence_state: optionalString(value.api_evidence_state) }
 			: {}),
 		...(optionalInteger(value.successful_endpoint_count) !== undefined
-			? { successful_endpoint_count: optionalInteger(value.successful_endpoint_count) }
+			? {
+					successful_endpoint_count: optionalInteger(
+						value.successful_endpoint_count,
+					),
+				}
 			: {}),
 		...(optionalInteger(value.endpoint_count) !== undefined
 			? { endpoint_count: optionalInteger(value.endpoint_count) }

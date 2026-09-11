@@ -43,22 +43,54 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(rows, french ? "URL sondée" : "Probed URL", scalar(raw, "url"));
 	add(rows, french ? "HTTP" : "HTTP", status(scalar(raw, "http_status")));
 	add(rows, "TLS trusted", scalar(raw, "tls_trusted"));
-	add(rows, french ? "Latence" : "Latency", scalar(raw, "latency_ms") ? `${scalar(raw, "latency_ms")} ms` : undefined);
+	add(
+		rows,
+		french ? "Latence" : "Latency",
+		scalar(raw, "latency_ms") ? `${scalar(raw, "latency_ms")} ms` : undefined,
+	);
 	add(rows, french ? "Observé à" : "Observed at", scalar(raw, "observed_at"));
-	add(rows, french ? "Âge observation" : "Observation age", seconds(scalar(raw, "observation_age_seconds")));
-	add(rows, french ? "Observation stale" : "Observation stale", scalar(raw, "observation_stale"));
+	add(
+		rows,
+		french ? "Âge observation" : "Observation age",
+		seconds(scalar(raw, "observation_age_seconds")),
+	);
+	add(
+		rows,
+		french ? "Observation stale" : "Observation stale",
+		scalar(raw, "observation_stale"),
+	);
 
 	for (const prefix of ["direct", "internal"] as const) {
 		const title = prefix === "direct" ? "Direct" : "Internal";
 		add(rows, `${title} probe source`, scalar(raw, `${prefix}_probe_source`));
-		add(rows, `${title} probe observed`, scalar(raw, `${prefix}_probe_observed_at`));
-		add(rows, `${title} probe age`, seconds(scalar(raw, `${prefix}_probe_age_seconds`)));
-		add(rows, `${title} refresh error`, scalar(raw, `${prefix}_probe_refresh_error`));
+		add(
+			rows,
+			`${title} probe observed`,
+			scalar(raw, `${prefix}_probe_observed_at`),
+		);
+		add(
+			rows,
+			`${title} probe age`,
+			seconds(scalar(raw, `${prefix}_probe_age_seconds`)),
+		);
+		add(
+			rows,
+			`${title} refresh error`,
+			scalar(raw, `${prefix}_probe_refresh_error`),
+		);
 	}
 	add(rows, "Rolling probe source", scalar(raw, "probe_source"));
 	add(rows, "Rolling probe age", seconds(scalar(raw, "probe_age_seconds")));
-	add(rows, "Rolling stale after", seconds(scalar(raw, "probe_stale_after_seconds")));
-	add(rows, "Next rolling probe", seconds(scalar(raw, "next_probe_in_seconds")));
+	add(
+		rows,
+		"Rolling stale after",
+		seconds(scalar(raw, "probe_stale_after_seconds")),
+	);
+	add(
+		rows,
+		"Next rolling probe",
+		seconds(scalar(raw, "next_probe_in_seconds")),
+	);
 	add(rows, "Probe timed out", scalar(raw, "timed_out"));
 	add(rows, "Probe error kind", scalar(raw, "error_kind"));
 	add(rows, "Probe refresh error", scalar(raw, "probe_refresh_error"));
@@ -74,29 +106,66 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(rows, "Cloudflare confirmed", scalar(raw, "cloudflare_status_confirmed"));
 	add(rows, "Cloudflare warning", scalar(raw, "cloudflare_warning"));
 
-	add(rows, "HTTP auth mode", scalar(raw, "public_probe_auth_mode") ?? scalar(raw, "http_probe_auth_mode"));
+	add(
+		rows,
+		"HTTP auth mode",
+		scalar(raw, "public_probe_auth_mode") ??
+			scalar(raw, "http_probe_auth_mode"),
+	);
 	add(rows, "Anonymous HTTP", status(scalar(raw, "anonymous_http_status")));
 	add(rows, "Edge HTTP evidence", scalar(raw, "cloudflare_http_evidence"));
 	add(rows, "Access signal", scalar(raw, "cloudflare_access_signal"));
 	add(rows, "Default deny", scalar(raw, "cloudflare_default_deny"));
-	add(rows, "Service token configured", scalar(raw, "cloudflare_service_token_configured"));
-	add(rows, "Service auth attempted", scalar(raw, "cloudflare_service_auth_attempted"));
-	add(rows, "Service token passed", scalar(raw, "cloudflare_service_token_access_passed"));
-	add(rows, "Service-token HTTP", status(scalar(raw, "cloudflare_service_token_http_status")));
-	add(rows, "Service-token signal", scalar(raw, "cloudflare_service_token_access_signal"));
-	add(rows, "Service-token error", scalar(raw, "cloudflare_service_token_error_kind"));
+	add(
+		rows,
+		"Service token configured",
+		scalar(raw, "cloudflare_service_token_configured"),
+	);
+	add(
+		rows,
+		"Service auth attempted",
+		scalar(raw, "cloudflare_service_auth_attempted"),
+	);
+	add(
+		rows,
+		"Service token passed",
+		scalar(raw, "cloudflare_service_token_access_passed"),
+	);
+	add(
+		rows,
+		"Service-token HTTP",
+		status(scalar(raw, "cloudflare_service_token_http_status")),
+	);
+	add(
+		rows,
+		"Service-token signal",
+		scalar(raw, "cloudflare_service_token_access_signal"),
+	);
+	add(
+		rows,
+		"Service-token error",
+		scalar(raw, "cloudflare_service_token_error_kind"),
+	);
 	add(rows, "HTTP evidence skipped", scalar(raw, "http_evidence_skipped"));
 	add(rows, "HTTP skip reason", scalar(raw, "http_evidence_skip_reason"));
 
 	add(rows, french ? "Erreur réseau" : "Network error", scalar(raw, "error"));
-	add(rows, french ? "Erreur applicative" : "Application error", scalar(raw, "application_error"));
+	add(
+		rows,
+		french ? "Erreur applicative" : "Application error",
+		scalar(raw, "application_error"),
+	);
 	if (rows.length === 0) return null;
 
 	return (
-		<details className="text-start small mt-3" data-service-operator-diagnostics>
+		<details
+			className="text-start small mt-3"
+			data-service-operator-diagnostics
+		>
 			<summary className="fw-semibold">
 				<i className="fas fa-stethoscope" aria-hidden="true" />{" "}
-				{french ? "Diagnostic opérateur" : "Operator diagnostics"} ({rows.length})
+				{french ? "Diagnostic opérateur" : "Operator diagnostics"} (
+				{rows.length})
 			</summary>
 			<dl className="row g-1 mt-2 mb-0">
 				{rows.map((row, index) => (

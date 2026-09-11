@@ -74,12 +74,15 @@ function boolean(value: unknown): boolean | undefined {
 function strings(value: unknown): string[] {
 	return Array.isArray(value)
 		? value.filter(
-				(item): item is string => typeof item === "string" && Boolean(item.trim()),
+				(item): item is string =>
+					typeof item === "string" && Boolean(item.trim()),
 			)
 		: [];
 }
 
-function readCircuitBreaker(value: unknown): CircuitBreakerEvidence | undefined {
+function readCircuitBreaker(
+	value: unknown,
+): CircuitBreakerEvidence | undefined {
 	if (!isRecord(value)) return undefined;
 	return {
 		...(text(value.provider) ? { provider: text(value.provider) } : {}),
@@ -179,7 +182,8 @@ export function readTrueNasTransportEvidence(
 						...(number(item.http_status) !== undefined
 							? { httpStatus: number(item.http_status) }
 							: {}),
-						...(typeof item.tls_trusted === "boolean" || item.tls_trusted === null
+						...(typeof item.tls_trusted === "boolean" ||
+						item.tls_trusted === null
 							? { tlsTrusted: item.tls_trusted }
 							: {}),
 						...(text(item.failure_stage)

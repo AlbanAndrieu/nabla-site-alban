@@ -13,8 +13,8 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
+import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,

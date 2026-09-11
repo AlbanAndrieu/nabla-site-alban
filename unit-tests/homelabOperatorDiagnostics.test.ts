@@ -175,12 +175,13 @@ test("pfSense operator evidence is explicit and strips raw configuration", () =>
 });
 
 test("homelab UI keeps reconciled health and exposes progressive operator diagnostics", async () => {
-	const [block, globalDiagnostics, serviceDiagnostics, reasons] = await Promise.all([
-		readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
-		readFile("app/components/homelab/HomelabProbeDiagnostics.tsx", "utf8"),
-		readFile("app/components/homelab/ServiceOperatorDiagnostics.tsx", "utf8"),
-		readFile("app/components/homelab/ServiceHealthReasons.tsx", "utf8"),
-	]);
+	const [block, globalDiagnostics, serviceDiagnostics, reasons] =
+		await Promise.all([
+			readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
+			readFile("app/components/homelab/HomelabProbeDiagnostics.tsx", "utf8"),
+			readFile("app/components/homelab/ServiceOperatorDiagnostics.tsx", "utf8"),
+			readFile("app/components/homelab/ServiceHealthReasons.tsx", "utf8"),
+		]);
 	assert.match(block, /mergeHomelabProbeDiagnostics/);
 	assert.match(block, /<HomelabProbeDiagnostics snapshot=\{state\.snapshot\}/);
 	assert.match(globalDiagnostics, /data-truenas-diagnostic-stages/);

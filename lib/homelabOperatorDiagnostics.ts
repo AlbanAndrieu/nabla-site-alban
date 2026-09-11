@@ -50,12 +50,15 @@ function number(value: unknown): number | undefined {
 function strings(value: unknown): string[] {
 	return Array.isArray(value)
 		? value.filter(
-				(item): item is string => typeof item === "string" && Boolean(item.trim()),
+				(item): item is string =>
+					typeof item === "string" && Boolean(item.trim()),
 			)
 		: [];
 }
 
-function readProbeRuntime(raw: UnknownRecord): ProbeRuntimeEvidence | undefined {
+function readProbeRuntime(
+	raw: UnknownRecord,
+): ProbeRuntimeEvidence | undefined {
 	if (!isRecord(raw.probe_runtime)) return undefined;
 	const value = raw.probe_runtime;
 	return {
@@ -76,7 +79,11 @@ function readProbeRuntime(raw: UnknownRecord): ProbeRuntimeEvidence | undefined 
 		...(value.estimated_full_cycle_seconds === null
 			? { estimatedFullCycleSeconds: null }
 			: number(value.estimated_full_cycle_seconds) !== undefined
-				? { estimatedFullCycleSeconds: number(value.estimated_full_cycle_seconds) }
+				? {
+						estimatedFullCycleSeconds: number(
+							value.estimated_full_cycle_seconds,
+						),
+					}
 				: {}),
 	};
 }
