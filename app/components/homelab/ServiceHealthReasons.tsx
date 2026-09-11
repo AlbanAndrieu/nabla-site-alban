@@ -88,7 +88,8 @@ export default function ServiceHealthReasons({
 		cloudflareConfigured,
 		runtimeStale,
 	});
-	const severityClass = state === "fail" ? statusStyles.fail : statusStyles.warn;
+	const severityClass =
+		state === "fail" ? statusStyles.fail : statusStyles.warn;
 
 	return (
 		<>

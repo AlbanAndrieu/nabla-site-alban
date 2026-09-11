@@ -81,9 +81,7 @@ export default function PfSenseDnsPosture({
 			role="status"
 			data-pfsense-dns-policy={state}
 			data-pfsense-dns-configured={posture?.configured ?? false}
-			data-pfsense-dns-truenas-only={
-				posture?.upstream?.truenas_only ?? false
-			}
+			data-pfsense-dns-truenas-only={posture?.upstream?.truenas_only ?? false}
 		>
 			<strong>
 				<i className={ICON_CLASS[state]} aria-hidden="true" /> {t("dns.title")}

@@ -62,7 +62,8 @@ export default function HomelabStatusOverview({
 	if (snapshot?.truenas_runtime_reachable === false) {
 		runtimeWarningDetails.push(t("truenas.runtimeUnavailable"));
 	}
-	if (truenasRuntimeStale) runtimeWarningDetails.push(t("truenas.runtimeStale"));
+	if (truenasRuntimeStale)
+		runtimeWarningDetails.push(t("truenas.runtimeStale"));
 
 	const runtimeObservationIncomplete =
 		!refreshInProgress &&

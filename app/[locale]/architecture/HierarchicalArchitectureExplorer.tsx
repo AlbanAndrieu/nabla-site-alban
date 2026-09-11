@@ -650,9 +650,7 @@ function MobileArchitectureHierarchy({
 													return (
 														<li key={relation.id}>
 															<span>
-																{dependencyState
-																	? `${dependencyState} · `
-																	: ""}
+																{dependencyState ? `${dependencyState} · ` : ""}
 																{String(relation.label ?? relation.target)}
 															</span>
 															<strong>{targetName}</strong>
@@ -1373,7 +1371,10 @@ export default function HierarchicalArchitectureExplorer({
 				french={french}
 			/>
 
-			<p id="architecture-flow-interaction-hint" className={styles.flowInteractionHint}>
+			<p
+				id="architecture-flow-interaction-hint"
+				className={styles.flowInteractionHint}
+			>
 				<i className="fas fa-computer-mouse" aria-hidden="true" />{" "}
 				{french
 					? "La molette fait défiler la page. Utilisez Ctrl/Cmd + molette ou les contrôles +/− pour zoomer dans le diagramme."

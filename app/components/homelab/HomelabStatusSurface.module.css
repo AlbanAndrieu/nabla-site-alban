@@ -26,7 +26,11 @@
 }
 
 .ok {
-	border-color: color-mix(in srgb, var(--ui-success-border) 82%, var(--ui-border));
+	border-color: color-mix(
+		in srgb,
+		var(--ui-success-border) 82%,
+		var(--ui-border)
+	);
 	border-left-color: var(--ui-success-text);
 	background: linear-gradient(
 		135deg,
@@ -40,7 +44,11 @@
 }
 
 .warn {
-	border-color: color-mix(in srgb, var(--ui-warning-border) 88%, var(--ui-border));
+	border-color: color-mix(
+		in srgb,
+		var(--ui-warning-border) 88%,
+		var(--ui-border)
+	);
 	border-left-color: var(--ui-warning-text);
 	background: linear-gradient(
 		135deg,
@@ -54,7 +62,11 @@
 }
 
 .fail {
-	border-color: color-mix(in srgb, var(--ui-danger-border) 88%, var(--ui-border));
+	border-color: color-mix(
+		in srgb,
+		var(--ui-danger-border) 88%,
+		var(--ui-border)
+	);
 	border-left-color: var(--ui-danger-text);
 	background: linear-gradient(
 		135deg,

@@ -122,7 +122,8 @@
 	max-width: 72rem;
 	margin: 0;
 	padding: 0.8rem 1rem;
-	border-left: 3px solid color-mix(in srgb, var(--ui-link) 70%, var(--ui-border));
+	border-left: 3px solid
+		color-mix(in srgb, var(--ui-link) 70%, var(--ui-border));
 	border-radius: 0 var(--ui-radius-md) var(--ui-radius-md) 0;
 	background: color-mix(in srgb, var(--ui-link) 5%, var(--ui-surface-card));
 	line-height: 1.5;
