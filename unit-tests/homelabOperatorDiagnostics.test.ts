@@ -227,20 +227,29 @@ test("pfSense operator evidence is explicit and strips raw configuration", () =>
 });
 
 test("homelab UI keeps reconciled health and exposes progressive operator metrics", async () => {
-	const [block, globalDiagnostics, serviceDiagnostics, reasons] =
-		await Promise.all([
-			readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
-			readFile("app/components/homelab/HomelabProbeDiagnostics.tsx", "utf8"),
-			readFile("app/components/homelab/ServiceOperatorDiagnostics.tsx", "utf8"),
-			readFile("app/components/homelab/ServiceHealthReasons.tsx", "utf8"),
-		]);
+	const [
+		block,
+		globalDiagnostics,
+		trueNasDiagnostics,
+		pfSenseDiagnostics,
+		serviceDiagnostics,
+		reasons,
+	] = await Promise.all([
+		readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
+		readFile("app/components/homelab/HomelabProbeDiagnostics.tsx", "utf8"),
+		readFile("app/components/homelab/HomelabTrueNasProbeDiagnostics.tsx", "utf8"),
+		readFile("app/components/homelab/HomelabPfSenseProbeDiagnostics.tsx", "utf8"),
+		readFile("app/components/homelab/ServiceOperatorDiagnostics.tsx", "utf8"),
+		readFile("app/components/homelab/ServiceHealthReasons.tsx", "utf8"),
+	]);
 	assert.match(block, /mergeHomelabProbeDiagnostics/);
 	assert.match(block, /<HomelabProbeDiagnostics snapshot=\{state\.snapshot\}/);
 	assert.match(globalDiagnostics, /probeScopeMetricRows/);
-	assert.match(globalDiagnostics, /Budget utilization/);
-	assert.match(globalDiagnostics, /data-truenas-diagnostic-stages/);
-	assert.match(globalDiagnostics, /data-pfsense-endpoint-status/);
+	assert.match(globalDiagnostics, /HomelabTrueNasProbeDiagnostics/);
+	assert.match(globalDiagnostics, /HomelabPfSenseProbeDiagnostics/);
 	assert.match(globalDiagnostics, /Evidence priority/);
+	assert.match(trueNasDiagnostics, /data-truenas-diagnostic-stages/);
+	assert.match(pfSenseDiagnostics, /data-pfsense-endpoint-status/);
 	assert.match(serviceDiagnostics, /cloudflare_service_token_access_passed/);
 	assert.match(serviceDiagnostics, /\["direct", "internal"\]/);
 	assert.match(serviceDiagnostics, /\$\{prefix\}_probe_source/);
