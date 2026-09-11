@@ -24,23 +24,24 @@ test("static architecture topology never probes FastAPI during prerender", () =>
 });
 
 test("architecture route uses a static declared shell with live shared service health indicators", async () => {
-	const [page, explorer, healthPolling, data, css, packageJson] = await Promise.all([
-		readFile("app/[locale]/architecture/page.tsx", "utf8"),
-		readFile(
-			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-			"utf8",
-		),
-		readFile(
-			"app/[locale]/architecture/useArchitectureHealthPolling.ts",
-			"utf8",
-		),
-		readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
-		readFile(
-			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
-			"utf8",
-		),
-		readFile("package.json", "utf8"),
-	]);
+	const [page, explorer, healthPolling, data, css, packageJson] =
+		await Promise.all([
+			readFile("app/[locale]/architecture/page.tsx", "utf8"),
+			readFile(
+				"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+				"utf8",
+			),
+			readFile(
+				"app/[locale]/architecture/useArchitectureHealthPolling.ts",
+				"utf8",
+			),
+			readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
+			readFile(
+				"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+				"utf8",
+			),
+			readFile("package.json", "utf8"),
+		]);
 
 	assert.match(page, /buildPageMetadata\(/);
 	assert.match(page, /slug: "architecture"/);
@@ -88,7 +89,10 @@ test("architecture route uses a static declared shell with live shared service h
 test("architecture keeps one standalone compact mobile hierarchy beside the desktop graph", async () => {
 	const [view, explorer, runtimePolling, mobile, mobileCss, explorerCss] =
 		await Promise.all([
-			readFile("app/[locale]/architecture/ArchitectureTopologyView.tsx", "utf8"),
+			readFile(
+				"app/[locale]/architecture/ArchitectureTopologyView.tsx",
+				"utf8",
+			),
 			readFile(
 				"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 				"utf8",
@@ -125,11 +129,23 @@ test("architecture keeps one standalone compact mobile hierarchy beside the desk
 	assert.match(mobile, /itemCriticality\?\.transitiveDependents/);
 	assert.match(mobile, /showOptional \|\| relation\.strength === "required"/);
 	assert.doesNotMatch(explorer, /data-mobile-architecture-hierarchy/);
-	assert.doesNotMatch(explorer, /document\.addEventListener\("visibilitychange"/);
-	assert.doesNotMatch(explorer, /document\.removeEventListener\("visibilitychange"/);
+	assert.doesNotMatch(
+		explorer,
+		/document\.addEventListener\("visibilitychange"/,
+	);
+	assert.doesNotMatch(
+		explorer,
+		/document\.removeEventListener\("visibilitychange"/,
+	);
 	assert.match(runtimePolling, /if \(document\.hidden\) return/);
-	assert.match(runtimePolling, /document\.addEventListener\("visibilitychange"/);
-	assert.match(runtimePolling, /document\.removeEventListener\("visibilitychange"/);
+	assert.match(
+		runtimePolling,
+		/document\.addEventListener\("visibilitychange"/,
+	);
+	assert.match(
+		runtimePolling,
+		/document\.removeEventListener\("visibilitychange"/,
+	);
 	assert.match(explorer, /maxBlastRadius = Math\.max/);
 	assert.match(explorer, /blastRatio >= 0\.5/);
 	assert.match(explorer, /blastRatio >= 0\.05/);
