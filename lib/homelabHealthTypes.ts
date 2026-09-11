@@ -148,6 +148,7 @@ export type PfSenseDnsPosture = {
 	upstream?: PfSenseDnsUpstreamPosture;
 	security_filters?: PfSenseSecurityFilterObservation[];
 	ingress_block?: PfSenseIngressBlockObservation;
+	operator?: import("./homelabPfSenseOperatorTypes").PfSenseOperatorEvidence;
 	error_stage?: string;
 	error?: string;
 };

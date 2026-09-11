@@ -9,6 +9,7 @@ import {
 	type HomelabHealthReason,
 	homelabHealthReasons,
 } from "@/lib/homelabHealthPresentation";
+import ServiceOperatorDiagnostics from "./ServiceOperatorDiagnostics";
 import ServiceProbeEvidence from "./ServiceProbeEvidence";
 
 type Props = {
@@ -68,7 +69,15 @@ export default function ServiceHealthReasons({
 }: Props) {
 	const t = useTranslations("homelab");
 	const probeEvidence = <ServiceProbeEvidence entry={entry} />;
-	if (state !== "fail" && state !== "warn") return probeEvidence;
+	const operatorDiagnostics = <ServiceOperatorDiagnostics entry={entry} />;
+	if (state !== "fail" && state !== "warn") {
+		return (
+			<>
+				{probeEvidence}
+				{operatorDiagnostics}
+			</>
+		);
+	}
 
 	const reasons = homelabHealthReasons(entry, {
 		tunnelExpected,
@@ -103,6 +112,7 @@ export default function ServiceHealthReasons({
 					</p>
 				)}
 			</div>
+			{operatorDiagnostics}
 		</>
 	);
 }

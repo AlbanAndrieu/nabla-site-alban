@@ -13,6 +13,7 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
+import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	type HomelabService,
@@ -33,6 +34,7 @@ import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
+import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
@@ -263,7 +265,9 @@ export default function HomelabServicesBlock() {
 			if (signal.aborted) return;
 			setState((current) => ({
 				...current,
-				snapshot: aggregate.snapshot ?? probes.snapshot ?? current.snapshot,
+				snapshot: aggregate.snapshot
+					? mergeHomelabProbeDiagnostics(aggregate.snapshot, probes.snapshot)
+					: (probes.snapshot ?? current.snapshot),
 				healthUnavailable:
 					aggregate.snapshot === null && probes.snapshot === null,
 				healthStatus: aggregate.status ?? probes.status,
@@ -432,6 +436,7 @@ export default function HomelabServicesBlock() {
 				topologyNodeCount={state.topology?.nodes.length ?? 0}
 				topologyRelationCount={state.topology?.relations.length ?? 0}
 			/>
+			<HomelabProbeDiagnostics snapshot={state.snapshot} />
 
 			<section
 				id="truenas-health-dashboard"

@@ -13,6 +13,7 @@ import {
 	validOptionalBoolean,
 	validOptionalString,
 } from "./homelabHealthValidation";
+import { parsePfSenseOperatorEvidence } from "./homelabPfSenseOperatorParsing";
 
 function parseSecurityFilters(
 	value: unknown,
@@ -186,6 +187,7 @@ export function parsePfSenseDnsPosture(
 
 	const securityFilters = parseSecurityFilters(value.security_filters);
 	const ingressBlock = parseIngressBlock(value.ingress_block);
+	const operator = parsePfSenseOperatorEvidence(value);
 	return {
 		configured: value.configured,
 		reachable: value.reachable,
@@ -195,6 +197,7 @@ export function parsePfSenseDnsPosture(
 		...(upstream ? { upstream } : {}),
 		...(securityFilters ? { security_filters: securityFilters } : {}),
 		...(ingressBlock ? { ingress_block: ingressBlock } : {}),
+		...(operator ? { operator } : {}),
 		...(typeof value.error_stage === "string"
 			? { error_stage: value.error_stage }
 			: {}),
