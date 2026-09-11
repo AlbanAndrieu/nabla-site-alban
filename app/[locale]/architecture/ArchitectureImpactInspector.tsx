@@ -9,8 +9,13 @@ import {
 	type HealthCause,
 } from "@/lib/homelabImpact";
 import { fetchHomelabHealthOnce } from "@/lib/homelabTroubleshootingClient";
-import type { ServiceTopology } from "@/lib/serviceTopology";
+import {
+	getStaticServiceTopology,
+	type ServiceTopology,
+} from "@/lib/serviceTopology";
 import styles from "./ArchitectureImpactInspector.module.css";
+
+const FALLBACK_TOPOLOGY = getStaticServiceTopology().topology;
 
 function stateClass(state?: string): string {
 	if (state === "ok") return styles.stateOk;
@@ -57,12 +62,12 @@ function initialHashService(): string {
 
 type Props = {
 	locale: string;
-	initialTopology: ServiceTopology;
+	initialTopology?: ServiceTopology;
 };
 
 export default function ArchitectureImpactInspector({
 	locale,
-	initialTopology,
+	initialTopology = FALLBACK_TOPOLOGY,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const topology = initialTopology;
@@ -119,7 +124,7 @@ export default function ArchitectureImpactInspector({
 			className="content-section"
 			aria-labelledby="service-impact-inspector-title"
 			data-architecture-impact-inspector
-			data-topology-contract="server-initial"
+			data-topology-contract="server-static-fallback"
 		>
 			<div className="container py-4">
 				<div className={styles.panel}>
