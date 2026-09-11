@@ -68,12 +68,12 @@
 	margin-top: 1.5rem;
 }
 
-/* These diagnostics still receive the live service snapshot in the legacy block,
- * but the user-facing copy now lives inside the collapsed Operations disclosure.
- * Keeping the original nodes hidden avoids changing polling/data ownership in the
- * same UI-focused PR. */
+/* Observation mechanics remain available in the collapsed Operations disclosure.
+ * The primary surface keeps only actionable service outcomes and exceptions. */
 .serviceFirst :global([data-homelab-observer-summary]),
-.serviceFirst :global([data-homelab-operator-diagnostics]) {
+.serviceFirst :global([data-homelab-operator-diagnostics]),
+.serviceFirst :global([data-truenas-runtime-legend]),
+.serviceFirst :global([data-dependency-health-legend]) {
 	display: none !important;
 }
 
