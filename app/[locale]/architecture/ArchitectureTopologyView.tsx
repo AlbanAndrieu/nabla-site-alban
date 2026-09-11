@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import CriticalDependencyHierarchy from "@/app/components/homelab/CriticalDependencyHierarchy";
 import homelabStyles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
 	type HomelabHealthState,
@@ -29,6 +28,7 @@ import ArchitectureServiceHierarchy from "./ArchitectureServiceHierarchy";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
 import styles from "./ArchitectureTopologyView.module.css";
+import useArchitectureHealthPolling from "./useArchitectureHealthPolling";
 
 type Props = {
 	locale: string;
@@ -127,13 +127,11 @@ export default function ArchitectureTopologyView({
 	const [topology, setTopology] = useState(initialTopology);
 	const [topologySource, setTopologySource] =
 		useState<ServiceTopologySource>(initialTopologySource);
-	const [health, setHealth] = useState<HomelabHealthSnapshot | null>(null);
-	const [healthUnavailable, setHealthUnavailable] = useState(false);
-	const [refreshing, setRefreshing] = useState(true);
+	const { health, healthUnavailable, refreshing, now, healthSource } =
+		useArchitectureHealthPolling();
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [now, setNow] = useState(() => Date.now());
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -173,56 +171,6 @@ export default function ArchitectureTopologyView({
 
 		void Promise.allSettled([loadCatalog(), loadTopology()]);
 		return () => controller.abort();
-	}, []);
-
-	useEffect(() => {
-		let active = true;
-		let controller: AbortController | null = null;
-
-		const loadHealth = async () => {
-			if (document.hidden) return;
-			controller?.abort();
-			controller = new AbortController();
-			setRefreshing(true);
-			try {
-				const response = await fetch("/api/homelab-health", {
-					cache: "no-store",
-					signal: controller.signal,
-					headers: { Accept: "application/json" },
-				});
-				if (!response.ok) {
-					throw new Error(`health HTTP ${response.status}`);
-				}
-				const parsed = parseHomelabHealthSnapshot(await response.json());
-				if (!parsed) throw new Error("invalid health payload");
-				if (active) {
-					setHealth(parsed);
-					setHealthUnavailable(false);
-					setNow(Date.now());
-				}
-			} catch (error) {
-				if (active && !controller.signal.aborted) {
-					setHealthUnavailable(true);
-				}
-			} finally {
-				if (active && !controller.signal.aborted) setRefreshing(false);
-			}
-		};
-
-		void loadHealth();
-		const refreshTimer = window.setInterval(() => void loadHealth(), 30_000);
-		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
-		const onVisibilityChange = () => {
-			if (!document.hidden) void loadHealth();
-		};
-		document.addEventListener("visibilitychange", onVisibilityChange);
-		return () => {
-			active = false;
-			controller?.abort();
-			window.clearInterval(refreshTimer);
-			window.clearInterval(clockTimer);
-			document.removeEventListener("visibilitychange", onVisibilityChange);
-		};
 	}, []);
 
 	const healthIndex = useMemo(() => indexHealth(health), [health]);
@@ -486,6 +434,8 @@ export default function ArchitectureTopologyView({
 					catalogSource={catalogSource}
 					topology={topology}
 					topologySource={topologySource}
+					healthStatus={health}
+					healthSource={healthSource}
 				/>
 			</section>
 		</>

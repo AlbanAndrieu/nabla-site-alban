@@ -14,12 +14,11 @@ import {
 	ReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo, useState } from "react";
-import {
-	type HomelabHealthEntry,
-	type HomelabHealthSnapshot,
-	type HomelabHealthState,
-	parseHomelabHealthSnapshot,
+import { useMemo, useState } from "react";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
 	cloudflareIndicatorColor,
@@ -37,10 +36,9 @@ import {
 	unconfirmedDependencyLabels,
 } from "@/lib/homelabHealthResolver";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
-import {
-	type HomelabStatusService,
-	type HomelabStatusSnapshot,
-	parseHomelabStatusSnapshot,
+import type {
+	HomelabStatusService,
+	HomelabStatusSnapshot,
 } from "@/lib/homelabStatus";
 import {
 	analyzeServiceCriticality,
@@ -65,6 +63,8 @@ import {
 	buildNablaRelations,
 } from "./architectureData";
 import styles from "./HierarchicalArchitectureExplorer.module.css";
+import type { ArchitectureHealthSource } from "./useArchitectureHealthPolling";
+import useArchitectureRuntimeStatus from "./useArchitectureRuntimeStatus";
 
 type GraphMode = "ai" | "services";
 type GraphScope = "critical" | "all";
@@ -121,6 +121,8 @@ type Props = {
 	catalogSource: string;
 	topology: ServiceTopology;
 	topologySource: ServiceTopologySource;
+	healthStatus: HomelabHealthSnapshot | null;
+	healthSource: ArchitectureHealthSource;
 };
 
 type GraphGroup = {
@@ -860,74 +862,15 @@ export default function HierarchicalArchitectureExplorer({
 	catalogSource,
 	topology,
 	topologySource,
+	healthStatus,
+	healthSource,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const [mode, setMode] = useState<GraphMode>("ai");
 	const [scope, setScope] = useState<GraphScope>("critical");
 	const [showOptional, setShowOptional] = useState(true);
 	const [query, setQuery] = useState("");
-	const [runtimeStatus, setRuntimeStatus] =
-		useState<HomelabStatusSnapshot | null>(null);
-	const [healthStatus, setHealthStatus] =
-		useState<HomelabHealthSnapshot | null>(null);
-	const [runtimeSource, setRuntimeSource] = useState<
-		"loading" | "fastapi" | "unavailable"
-	>("loading");
-	const [healthSource, setHealthSource] = useState<
-		"loading" | "fastapi" | "unavailable"
-	>("loading");
-
-	useEffect(() => {
-		let active = true;
-		const loadRuntime = async () => {
-			try {
-				const response = await fetch("/api/homelab-status", {
-					cache: "no-store",
-				});
-				if (!response.ok) throw new Error(`HTTP ${response.status}`);
-				const snapshot = parseHomelabStatusSnapshot(await response.json());
-				if (!snapshot) throw new Error("Invalid homelab status payload");
-				if (active) {
-					setRuntimeStatus(snapshot);
-					setRuntimeSource("fastapi");
-				}
-			} catch {
-				if (active) setRuntimeSource("unavailable");
-			}
-		};
-		const loadHealth = async () => {
-			try {
-				const response = await fetch("/api/homelab-health", {
-					cache: "no-store",
-					headers: { Accept: "application/json" },
-				});
-				if (!response.ok) throw new Error(`HTTP ${response.status}`);
-				const snapshot = parseHomelabHealthSnapshot(await response.json());
-				if (!snapshot) throw new Error("Invalid homelab health payload");
-				if (active) {
-					setHealthStatus(snapshot);
-					setHealthSource("fastapi");
-				}
-			} catch {
-				if (active) setHealthSource("unavailable");
-			}
-		};
-		const load = () => {
-			if (document.hidden) return;
-			void Promise.all([loadRuntime(), loadHealth()]);
-		};
-		load();
-		const timer = window.setInterval(load, 30_000);
-		const onVisibilityChange = () => {
-			if (!document.hidden) load();
-		};
-		document.addEventListener("visibilitychange", onVisibilityChange);
-		return () => {
-			active = false;
-			window.clearInterval(timer);
-			document.removeEventListener("visibilitychange", onVisibilityChange);
-		};
-	}, []);
+	const { runtimeStatus, runtimeSource } = useArchitectureRuntimeStatus();
 
 	const statusById = useMemo(
 		() =>
