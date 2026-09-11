@@ -8,6 +8,9 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
+# shellcheck source=scripts/lib/agent-quality-support.sh
+source scripts/lib/agent-quality-support.sh
+
 MODE="check"
 PUBLISH=false
 case "${1:-}" in
@@ -20,22 +23,7 @@ case "${1:-}" in
         shift
         ;;
     -h | --help)
-        cat <<'EOF'
-Usage:
-    bash scripts/agent-quality-gate.sh [--fix|--publish]
-
-Modes:
-    default    strict deterministic pre-build validation
-    --fix      converge deterministic pre-commit + npm lint auto-fixes locally
-    --publish  strict gate plus clean-tree publication validation
-
-Environment:
-    QUALITY_BASE_REF                    override comparison base
-    QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
-    QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
-    QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
-    QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
-EOF
+        print_agent_quality_usage
         exit 0
         ;;
     "")
@@ -58,8 +46,6 @@ if [[ ! "${FIX_PASSES}" =~ ^[1-9][0-9]*$ ]]; then
     exit 2
 fi
 
-# shellcheck source=scripts/lib/agent-quality-support.sh
-source scripts/lib/agent-quality-support.sh
 BASE_REF="$(resolve_base_ref)"
 
 precommit_fix_until_stable() {
