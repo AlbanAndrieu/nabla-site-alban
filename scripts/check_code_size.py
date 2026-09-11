@@ -12,8 +12,8 @@ import argparse
 import fnmatch
 import subprocess
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 DEFAULT_WARNING_LINES = 300
 DEFAULT_FAILURE_LINES = 600
@@ -48,7 +48,7 @@ def _baseline_line_count(path: Path, baseline_ref: str | None) -> int | None:
     if not baseline_ref or path.is_absolute():
         return None
 
-    result = subprocess.run(  # noqa: S603 -- fixed git executable and validated file path
+    result = subprocess.run(
         ["git", "show", f"{baseline_ref}:{path.as_posix()}"],
         check=False,
         capture_output=True,
