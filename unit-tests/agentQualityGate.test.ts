@@ -84,7 +84,10 @@ test("local fix phase converges formatter and npm lint fixes before publication"
 	assert.match(gate, /QUALITY_FIX_PASSES:-12/);
 	assert.match(gate, /precommit_fix_until_stable/);
 	assert.match(gate, /for \(\(pass = 1; pass <= FIX_PASSES; pass\+\+\)\)/);
-	assert.match(gate, /applied deterministic fixes; retrying without log analysis/);
+	assert.match(
+		gate,
+		/applied deterministic fixes; retrying without log analysis/,
+	);
 	assert.match(gate, /npm run lint:fix/);
 	assert.match(gate, /npm run lint:css:fix/);
 	assert.match(gate, /QG_FIX_DID_NOT_CONVERGE/);
