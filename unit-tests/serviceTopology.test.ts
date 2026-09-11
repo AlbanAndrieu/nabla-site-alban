@@ -3,11 +3,11 @@ import test from "node:test";
 
 import { parseServiceTopology } from "../lib/serviceTopology";
 import {
-	assertRequiredRelation as required,
 	hasRequiredTopologyRelation,
 	hasTopologyEdge,
 	hasTopologyRelation,
 	loadLocalServiceTopology,
+	assertRequiredRelation as required,
 } from "./helpers/serviceTopology";
 
 test("local topology fallback is a valid connected graph", async () => {
