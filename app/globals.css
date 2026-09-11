@@ -143,7 +143,11 @@ html body .table {
 	--bs-table-bg: transparent;
 	--bs-table-border-color: var(--ui-border);
 	--bs-table-striped-color: var(--ui-text-primary);
-	--bs-table-striped-bg: color-mix(in srgb, var(--ui-text-primary) 5%, transparent);
+	--bs-table-striped-bg: color-mix(
+		in srgb,
+		var(--ui-text-primary) 5%,
+		transparent
+	);
 	--bs-table-hover-color: var(--ui-text-primary);
 	--bs-table-hover-bg: color-mix(in srgb, var(--ui-link) 9%, transparent);
 	color: var(--ui-text-primary);
@@ -192,8 +196,16 @@ html body .form-control::placeholder {
 	--truenas-accent-red: #f87171;
 	--truenas-accent-red-strong: #dc2626;
 	--truenas-accent-cyan: #67e8f9;
-	--truenas-blue-surface: color-mix(in srgb, var(--truenas-accent-blue) 12%, var(--truenas-card-bg));
-	--truenas-red-surface: color-mix(in srgb, var(--truenas-accent-red) 11%, var(--truenas-card-bg));
+	--truenas-blue-surface: color-mix(
+		in srgb,
+		var(--truenas-accent-blue) 12%,
+		var(--truenas-card-bg)
+	);
+	--truenas-red-surface: color-mix(
+		in srgb,
+		var(--truenas-accent-red) 11%,
+		var(--truenas-card-bg)
+	);
 	color: var(--truenas-text-primary);
 }
 

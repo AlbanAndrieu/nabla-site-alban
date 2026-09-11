@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+} from "@/lib/homelabHealth";
 import {
 	affectedDependents,
 	explainHealth,
-	incidentDependencyPath,
 	type HealthCause,
+	incidentDependencyPath,
 } from "@/lib/homelabImpact";
 import { fetchHomelabHealthOnce } from "@/lib/homelabTroubleshootingClient";
 import {
@@ -27,9 +30,13 @@ function stateClass(state?: string): string {
 function causeLabel(cause: HealthCause, french: boolean): string {
 	switch (cause.code) {
 		case "application_error":
-			return french ? "Erreur applicative observée" : "Observed application error";
+			return french
+				? "Erreur applicative observée"
+				: "Observed application error";
 		case "local_failure":
-			return french ? "Le service échoue localement" : "The service is failing locally";
+			return french
+				? "Le service échoue localement"
+				: "The service is failing locally";
 		case "dependency_failure":
 			return french
 				? `Dépendance requise en échec : ${(cause.targets ?? []).join(" · ")}`
@@ -39,7 +46,9 @@ function causeLabel(cause: HealthCause, french: boolean): string {
 				? `Dépendance requise dégradée/inconnue : ${(cause.targets ?? []).join(" · ")}`
 				: `Degraded/unknown required dependency: ${(cause.targets ?? []).join(" · ")}`;
 		case "stale_observation":
-			return french ? "Preuve d’observation obsolète" : "Stale observation evidence";
+			return french
+				? "Preuve d’observation obsolète"
+				: "Stale observation evidence";
 		case "runtime_degraded":
 			return french
 				? "Runtime TrueNAS dégradé ou transitionnel"
@@ -145,7 +154,10 @@ export default function ArchitectureImpactInspector({
 							</p>
 						</div>
 					</div>
-					<label className={styles.label} htmlFor="architecture-service-inspector">
+					<label
+						className={styles.label}
+						htmlFor="architecture-service-inspector"
+					>
 						{french ? "Service" : "Service"}
 						<span className={styles.serviceCount}>{nodes.length}</span>
 					</label>
@@ -178,12 +190,21 @@ export default function ArchitectureImpactInspector({
 							{entry ? (
 								<>
 									<p className="mb-1 mt-2">
-										{french ? "État local / effectif" : "Local / effective state"}: {" "}
-										<span className={stateClass(entry.local_state ?? entry.state)}>
+										{french
+											? "État local / effectif"
+											: "Local / effective state"}
+										:{" "}
+										<span
+											className={stateClass(entry.local_state ?? entry.state)}
+										>
 											{entry.local_state ?? entry.state}
 										</span>
 										{" → "}
-										<span className={stateClass(entry.effective_state ?? entry.state)}>
+										<span
+											className={stateClass(
+												entry.effective_state ?? entry.state,
+											)}
+										>
 											{entry.effective_state ?? entry.state}
 										</span>
 									</p>
@@ -208,7 +229,9 @@ export default function ArchitectureImpactInspector({
 
 							{incidentPath.length > 1 ? (
 								<p data-architecture-incident-path>
-									<strong>{french ? "Chemin probable" : "Probable path"}:</strong>{" "}
+									<strong>
+										{french ? "Chemin probable" : "Probable path"}:
+									</strong>{" "}
 									{incidentPath.map((id) => names.get(id) ?? id).join(" → ")}
 								</p>
 							) : null}
@@ -240,7 +263,10 @@ export default function ArchitectureImpactInspector({
 												>
 													{impact.name}
 												</a>{" "}
-												· {impact.distance === 1 ? "direct" : `${impact.distance} hops`}
+												·{" "}
+												{impact.distance === 1
+													? "direct"
+													: `${impact.distance} hops`}
 											</li>
 										))}
 									</ul>

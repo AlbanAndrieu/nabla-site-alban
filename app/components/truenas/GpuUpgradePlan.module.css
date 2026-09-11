@@ -23,7 +23,8 @@
 }
 
 .recommendedBadge {
-	border: 1px solid color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 72%, #fff);
+	border: 1px solid
+		color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 72%, #fff);
 	background: var(--truenas-accent-blue-strong, #2563eb);
 	color: #fff;
 }
@@ -36,11 +37,17 @@
 	margin-top: 0.35rem;
 	border-radius: 999px;
 	background: var(--truenas-accent-red, #f87171);
-	box-shadow: 0 0 0 3px color-mix(in srgb, var(--truenas-accent-red, #f87171) 16%, transparent);
+	box-shadow: 0 0 0 3px
+		color-mix(in srgb, var(--truenas-accent-red, #f87171) 16%, transparent);
 }
 
 .ramNote {
-	border: 1px solid color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 52%, var(--truenas-card-border, #475569));
+	border: 1px solid
+		color-mix(
+			in srgb,
+			var(--truenas-accent-blue, #60a5fa) 52%,
+			var(--truenas-card-border, #475569)
+		);
 	border-left: 4px solid var(--truenas-accent-blue, #60a5fa);
 	border-radius: var(--ui-radius-control);
 	background: var(--truenas-blue-surface, #142033);

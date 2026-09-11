@@ -170,7 +170,11 @@
 		padding: 0.5rem 0.6rem;
 		border-left: 3px solid var(--ui-danger-text);
 		border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
-		background: color-mix(in srgb, var(--ui-danger-surface) 68%, var(--ui-surface-card));
+		background: color-mix(
+			in srgb,
+			var(--ui-danger-surface) 68%,
+			var(--ui-surface-card)
+		);
 		color: var(--ui-danger-text);
 		font-size: 0.74rem;
 		font-weight: 700;

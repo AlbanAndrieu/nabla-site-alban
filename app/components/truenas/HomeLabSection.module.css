@@ -6,7 +6,11 @@
 	border-radius: 0.75rem;
 	background: linear-gradient(
 		135deg,
-		color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 7%, var(--truenas-card-bg, #111827)),
+		color-mix(
+			in srgb,
+			var(--truenas-accent-blue, #60a5fa) 7%,
+			var(--truenas-card-bg, #111827)
+		),
 		var(--truenas-card-bg, #111827) 44%
 	);
 	color: var(--truenas-text-primary, #f8fafc);
@@ -40,18 +44,30 @@
 	margin: 0;
 	padding: 1rem;
 	overflow-x: auto;
-	border: 1px solid color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 44%, var(--truenas-card-border, #475569));
+	border: 1px solid
+		color-mix(
+			in srgb,
+			var(--truenas-accent-blue, #60a5fa) 44%,
+			var(--truenas-card-border, #475569)
+		);
 	border-radius: 0.5rem;
 	background: #0b1220;
 	color: #f8fafc;
-	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+	font-family: var(
+		--bs-font-monospace,
+		ui-monospace,
+		SFMono-Regular,
+		Menlo,
+		monospace
+	);
 	line-height: 1.55;
 	white-space: pre;
 }
 
 .networkDetails {
 	margin-top: 1rem;
-	border-top: 1px solid color-mix(in srgb, var(--truenas-card-border, #475569) 75%, transparent);
+	border-top: 1px solid
+		color-mix(in srgb, var(--truenas-card-border, #475569) 75%, transparent);
 }
 
 .networkSummary {
@@ -83,10 +99,15 @@
 
 .factGroup {
 	padding: 1rem;
-	border: 1px solid color-mix(in srgb, var(--truenas-card-border, #475569) 72%, transparent);
+	border: 1px solid
+		color-mix(in srgb, var(--truenas-card-border, #475569) 72%, transparent);
 	border-top-width: 3px;
 	border-radius: 0.6rem;
-	background: color-mix(in srgb, var(--truenas-card-bg, #111827) 84%, #ffffff 16%);
+	background: color-mix(
+		in srgb,
+		var(--truenas-card-bg, #111827) 84%,
+		#ffffff 16%
+	);
 }
 
 .factGroup:nth-child(1) {

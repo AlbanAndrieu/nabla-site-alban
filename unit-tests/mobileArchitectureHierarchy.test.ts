@@ -29,7 +29,9 @@ test("architecture uses the standalone mobile hierarchy as the single compact vi
 test("desktop React Flow remains the single interactive graph and yields to page scrolling", async () => {
 	const [explorer, styles] = await Promise.all([
 		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css"),
+		source(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+		),
 	]);
 
 	assert.match(explorer, /<ReactFlow/);

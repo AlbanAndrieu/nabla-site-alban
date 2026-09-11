@@ -32,7 +32,10 @@ test("TrueNAS AI and homelab surfaces share the blue red cyan palette", async ()
 		"--truenas-blue-surface",
 		"--truenas-red-surface",
 	]) {
-		assert.ok(globals.includes(token), `missing TrueNAS palette token ${token}`);
+		assert.ok(
+			globals.includes(token),
+			`missing TrueNAS palette token ${token}`,
+		);
 	}
 	assert.match(globals, /\.page-truenas \.table/);
 	assert.match(gpu, /data-recommended="true"/);
