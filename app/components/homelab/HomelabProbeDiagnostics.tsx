@@ -134,9 +134,13 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 			{rowsList(coordinatorRows, "coordinator")}
 			{runtimeRows.length > 0 ? <h4 className="h6">Probe runtime</h4> : null}
 			{rowsList(runtimeRows, "probe-runtime")}
-			{publicRows.length > 0 ? <h4 className="h6">Public probe batch</h4> : null}
+			{publicRows.length > 0 ? (
+				<h4 className="h6">Public probe batch</h4>
+			) : null}
 			{rowsList(publicRows, "public-probes")}
-			{internalRows.length > 0 ? <h4 className="h6">Internal probe batch</h4> : null}
+			{internalRows.length > 0 ? (
+				<h4 className="h6">Internal probe batch</h4>
+			) : null}
 			{rowsList(internalRows, "internal-probes")}
 			{aggregateRows.length > 0 ? (
 				<h4 className="h6">Aggregate performance</h4>

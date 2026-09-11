@@ -237,8 +237,14 @@ test("homelab UI keeps reconciled health and exposes progressive operator metric
 	] = await Promise.all([
 		readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
 		readFile("app/components/homelab/HomelabProbeDiagnostics.tsx", "utf8"),
-		readFile("app/components/homelab/HomelabTrueNasProbeDiagnostics.tsx", "utf8"),
-		readFile("app/components/homelab/HomelabPfSenseProbeDiagnostics.tsx", "utf8"),
+		readFile(
+			"app/components/homelab/HomelabTrueNasProbeDiagnostics.tsx",
+			"utf8",
+		),
+		readFile(
+			"app/components/homelab/HomelabPfSenseProbeDiagnostics.tsx",
+			"utf8",
+		),
 		readFile("app/components/homelab/ServiceOperatorDiagnostics.tsx", "utf8"),
 		readFile("app/components/homelab/ServiceHealthReasons.tsx", "utf8"),
 	]);
