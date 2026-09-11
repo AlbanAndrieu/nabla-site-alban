@@ -192,6 +192,42 @@ jobs:
           git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
           DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
 
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Restore pre-commit environments
+        id: pre-commit-cache
+        continue-on-error: true
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Install pre-commit
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Run canonical changed-file quality gate before SAST/npm bootstrap
+        id: canonical-quality-gate
+        continue-on-error: true
+        env:
+          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "40"
+        run: bash scripts/quality-gate.sh
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Enforce canonical changed-file quality gate
+        if: steps.canonical-quality-gate.outcome != 'success'
+        run: exit 1
+
       - name: Run Semgrep SAST on changed source
         id: semgrep-sast
         continue-on-error: true
@@ -298,42 +334,6 @@ jobs:
           steps.production-baseline.outputs.bootstrap-dast == 'true'
         shell: bash
         run: rm -f report_html.html report_json.json report_md.md zap.yaml
-
-      - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version-file: ".python-version"
-
-      - name: Restore pre-commit environments
-        id: pre-commit-cache
-        continue-on-error: true
-        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
-
-      - name: Install pre-commit
-        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
-
-      - name: Run canonical changed-file quality gate before npm bootstrap
-        id: canonical-quality-gate
-        continue-on-error: true
-        env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "40"
-        run: bash scripts/quality-gate.sh
-
-      - name: Save pre-commit environments
-        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
-
-      - name: Enforce canonical changed-file quality gate
-        if: steps.canonical-quality-gate.outcome != 'success'
-        run: exit 1
 
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
