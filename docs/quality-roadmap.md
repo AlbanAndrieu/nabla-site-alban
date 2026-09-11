@@ -699,3 +699,20 @@ Autres contrôles :
 11. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
     retrait ASN et nettoyer la rétention historique après le durcissement WAN et
     les travaux réseau prioritaires.
+
+## Contrôles de sortie
+
+```bash
+npm run lint
+npm run lint:css
+npm run typecheck
+npm run test:unit
+npm test
+npm run build
+```
+
+Pour une modification Next.js visible, compléter ces commandes avec une
+vérification dans un navigateur réel et le diagnostic `/_next/mcp` du serveur de
+développement. Sur une PR Vercel, le Playwright Preview E2E reste l'autorité pour
+le rendu déployé. Sur `master`, le build Quality/Security et le statut Vercel
+doivent tous les deux être verts.
