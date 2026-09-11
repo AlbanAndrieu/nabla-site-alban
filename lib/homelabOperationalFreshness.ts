@@ -1,10 +1,4 @@
 import type { FastApiHealthBoardSnapshot } from "./fastApiHealthBoard";
-import {
-	isRecord,
-	optionalNumber,
-	optionalString,
-	stringArray,
-} from "./homelabOperationalEvidenceParsing";
 import type {
 	DependencyCycleEvidence,
 	OperationalComponentEvidence,
@@ -12,6 +6,12 @@ import type {
 	StaleServiceEvidence,
 	TroubleshootingFocus,
 } from "./homelabOperationalEvidence";
+import {
+	isRecord,
+	optionalNumber,
+	optionalString,
+	stringArray,
+} from "./homelabOperationalEvidenceParsing";
 
 export function parseFreshnessEvidence(homelab: Record<string, unknown>): {
 	staleServices: StaleServiceEvidence[];
@@ -27,7 +27,8 @@ export function parseFreshnessEvidence(homelab: Record<string, unknown>): {
 	}
 	const staleServices = services.flatMap((value) => {
 		if (!isRecord(value) || value.observation_stale !== true) return [];
-		const id = optionalString(value.id) ?? optionalString(value.name) ?? "unknown";
+		const id =
+			optionalString(value.id) ?? optionalString(value.name) ?? "unknown";
 		const name = optionalString(value.name) ?? id;
 		return [
 			{
@@ -74,11 +75,14 @@ export function deriveTroubleshootingFocus(
 	) {
 		return "pfsense_blind_spot";
 	}
-	const byId = new Map(components.map((component) => [component.id, component]));
+	const byId = new Map(
+		components.map((component) => [component.id, component]),
+	);
 	if (byId.get("pfsense")?.state === "fail") return "pfsense_control";
 	if (byId.get("cloudflare")?.state === "fail") return "cloudflare";
 	if (byId.get("truenas")?.state === "fail") return "truenas";
-	if (board.state === "stale" || staleServices.length > 0) return "stale_evidence";
+	if (board.state === "stale" || staleServices.length > 0)
+		return "stale_evidence";
 	if (cycles.length > 0) return "dependency_cycle";
 	return "dependencies";
 }
