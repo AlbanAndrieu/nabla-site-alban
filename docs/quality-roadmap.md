@@ -151,17 +151,20 @@ les autres chantiers.
   le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
   `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
   la quality gate pré-publication.
-- [ ] Valider le nouveau chemin local-first sur plusieurs modifications réelles
-  d'agents : `quality:agent:fix` doit converger seul sur les corrections
-  déterministes, les hooks Git doivent être installés dans le workspace agent, le
-  pre-push doit exécuter une seule gate stricte et un défaut uniquement de
-  formatage/pre-commit doit s'arrêter dans la CI avant `setup-node` / `npm ci` avec
-  `QG_AUTOFIX_REQUIRED`, sans analyse large des logs.
-- [ ] Supprimer la double autorité Stylelint après vérification de parité des
-  règles : le hook pre-commit transporte actuellement Stylelint 14.x alors que la
-  toolchain npm utilise Stylelint 17.x. Conserver ensuite npm/package-lock comme
-  source de vérité CSS unique afin que auto-fix local, pre-push et CI ne puissent
-  pas diverger sur la version de linter.
+- [ ] Terminer la validation du chemin local-first sur un workspace agent réel.
+  La moitié CI est désormais prouvée à plusieurs reprises dans #177 : un défaut
+  formatter/pre-commit s'arrête avant Semgrep, `setup-node`, `npm ci` et le build,
+  émet `QG_AUTOFIX_REQUIRED` avec le patch exact, puis la passe corrigée traverse
+  la gate complète. Le cold bootstrap Copilot est aussi validé avec npm 11.17
+  installé avant les hooks Node de pre-commit. Il reste à observer un cycle local
+  réel `quality:agent:fix` → commit → pre-push démontrant que la publication gate
+  stricte ne s'exécute qu'une fois et laisse l'arbre propre.
+- [x] Supprimer la double autorité Stylelint après vérification de parité des
+  règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
+  `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
+  détecté les faux positifs CSS Modules `:global()` et deux vrais sélecteurs
+  dupliqués avant suppression de `pre-commit-stylelint`, Stylelint 14 et
+  `stylelint-config-standard-scss@3.0.0`. Un contrat interdit leur réintroduction.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
@@ -544,13 +547,12 @@ Autres contrôles :
 ## P2 — CI/CD et Vercel
 
 - [x] Vérifier l'état de la production courante avant de consommer le budget CI
-  d'une PR : Quality/Security exige `Vercel` et
-  `Production Post-deploy Smoke` verts sur le SHA `master` de base. Dès que
-  `production-dast.yml` existe sur ce SHA, le statut `Production DAST`
-  devient lui aussi obligatoire. La première PR qui introduit le workflow ne
-  contourne pas le contrôle : elle exécute un ZAP production de bootstrap contre
-  le site canonique, puis les PR suivantes réutilisent le statut publié sur
-  `master`.
+  d'une PR : Quality/Security résout désormais une seule fois le HEAD courant de
+  `pull_request.base.ref`, expose ce SHA comme `base-sha`, puis le réutilise pour
+  les statuts `Vercel`, `Production Post-deploy Smoke` et `Production DAST`, le
+  smoke récupéré par `git show`, `QUALITY_BASE_REF` et le diff Semgrep. La CI ne
+  dépend donc plus de `github.event.pull_request.base.sha`, qui peut devenir
+  périmé lorsque `master` avance pendant qu'une PR reste ouverte.
 - [x] Rejouer en plus le smoke HTTP/SEO réel contre
   `https://www.albanandrieu.com` sur chaque PR, avant SAST et avant build, en
   exécutant le script récupéré depuis le SHA `master` de base avec
@@ -697,20 +699,3 @@ Autres contrôles :
 11. **P3 — maintenance pfSense/pfBlockerNG**, hors chemin critique : terminer le
     retrait ASN et nettoyer la rétention historique après le durcissement WAN et
     les travaux réseau prioritaires.
-
-## Contrôles de sortie
-
-```bash
-npm run lint
-npm run lint:css
-npm run typecheck
-npm run test:unit
-npm test
-npm run build
-```
-
-Pour une modification Next.js visible, compléter ces commandes avec une
-vérification dans un navigateur réel et le diagnostic `/_next/mcp` du serveur de
-développement. Sur une PR Vercel, le Playwright Preview E2E reste l'autorité pour
-le rendu déployé. Sur `master`, le build Quality/Security et le statut Vercel
-doivent tous les deux être verts.
