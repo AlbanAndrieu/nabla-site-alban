@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { parseServiceTopology } from "../lib/serviceTopology";
 import {
+	assertRequiredRelation as required,
 	hasRequiredTopologyRelation,
 	hasTopologyEdge,
 	hasTopologyRelation,
@@ -34,9 +35,7 @@ test("local fallback preserves the Elasticsearch and Kibana multi-service contra
 			"dependsOn",
 		),
 	);
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "elasticsearch", "docker", "hostedBy"),
-	);
+	required(topology, "elasticsearch", "docker", "hostedBy");
 	assert.ok(
 		hasRequiredTopologyRelation(topology, "kibana", "docker", "hostedBy"),
 	);
@@ -59,20 +58,11 @@ test("local fallback tracks current runtime placement and Talos topology", async
 		assert.ok(nodeIds.has(id), `expected authoritative fallback node ${id}`);
 	}
 
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "fastapi-sample", "docker", "hostedBy"),
-	);
+	required(topology, "fastapi-sample", "docker", "hostedBy");
 	assert.ok(
 		hasRequiredTopologyRelation(topology, "scrutiny", "influxdb", "storesIn"),
 	);
-	assert.ok(
-		hasRequiredTopologyRelation(
-			topology,
-			"scrutiny-collector",
-			"scrutiny",
-			"consumesApi",
-		),
-	);
+	required(topology, "scrutiny-collector", "scrutiny", "consumesApi");
 	assert.ok(
 		hasRequiredTopologyRelation(topology, "kubernetes", "talos", "hostedBy"),
 	);

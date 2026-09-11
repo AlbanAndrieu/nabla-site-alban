@@ -50,3 +50,12 @@ export function hasRequiredTopologyRelation(
 ) {
 	return hasTopologyRelation(topology, source, target, type, "required");
 }
+
+export function assertRequiredRelation(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+	type: string,
+) {
+	assert.ok(hasRequiredTopologyRelation(topology, source, target, type));
+}
