@@ -128,15 +128,72 @@
 	}
 }
 
+/* Bootstrap contrast bridge. Bootstrap is linked after the theme stylesheet,
+ * so keep these selectors intentionally more specific than Bootstrap utilities. */
+html body .text-muted {
+	color: var(--ui-text-muted) !important;
+}
+
+html body .text-secondary {
+	color: var(--ui-text-secondary) !important;
+}
+
+html body .table {
+	--bs-table-color: var(--ui-text-primary);
+	--bs-table-bg: transparent;
+	--bs-table-border-color: var(--ui-border);
+	--bs-table-striped-color: var(--ui-text-primary);
+	--bs-table-striped-bg: color-mix(in srgb, var(--ui-text-primary) 5%, transparent);
+	--bs-table-hover-color: var(--ui-text-primary);
+	--bs-table-hover-bg: color-mix(in srgb, var(--ui-link) 9%, transparent);
+	color: var(--ui-text-primary);
+}
+
+html body .table > :not(caption) > * > * {
+	color: var(--ui-text-primary);
+	border-bottom-color: var(--ui-border);
+}
+
+html body :is(.form-control, .form-select) {
+	border-color: var(--ui-border);
+	background-color: var(--ui-surface-muted);
+	color: var(--ui-text-primary);
+	color-scheme: light dark;
+}
+
+html body :is(.form-control, .form-select):focus {
+	border-color: var(--ui-link);
+	background-color: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--ui-link) 25%, transparent);
+}
+
+html body .form-select option {
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+}
+
+html body .form-control::placeholder {
+	color: var(--ui-text-muted);
+	opacity: 1;
+}
+
 /* TrueNAS page: keep Bootstrap utility text readable on the dark site surface. */
 .page-truenas {
 	--truenas-text-primary: #f8fafc;
 	--truenas-text-secondary: #d7e0ec;
-	--truenas-text-muted: #b9c6d8;
+	--truenas-text-muted: #c3cfdf;
 	--truenas-link: #7dd3fc;
 	--truenas-link-hover: #bae6fd;
 	--truenas-card-bg: #111827;
 	--truenas-card-border: #475569;
+	--truenas-accent-blue: #60a5fa;
+	--truenas-accent-blue-strong: #2563eb;
+	--truenas-accent-red: #f87171;
+	--truenas-accent-red-strong: #dc2626;
+	--truenas-accent-cyan: #67e8f9;
+	--truenas-blue-surface: color-mix(in srgb, var(--truenas-accent-blue) 12%, var(--truenas-card-bg));
+	--truenas-red-surface: color-mix(in srgb, var(--truenas-accent-red) 11%, var(--truenas-card-bg));
 	color: var(--truenas-text-primary);
 }
 
@@ -156,6 +213,18 @@
 .page-truenas :is(.card, .list-group-item) {
 	border-color: var(--truenas-card-border);
 	background-color: var(--truenas-card-bg);
+}
+
+.page-truenas .table {
+	--bs-table-color: var(--truenas-text-primary);
+	--bs-table-border-color: var(--truenas-card-border);
+	--bs-table-striped-color: var(--truenas-text-primary);
+	--bs-table-hover-color: #fff;
+	color: var(--truenas-text-primary);
+}
+
+.page-truenas .table > :not(caption) > * > * {
+	color: var(--truenas-text-primary);
 }
 
 .page-truenas :is(.card-title, h1, h2, h3, h4, h5, h6, .hardware-pill__title) {
@@ -180,5 +249,5 @@
 .page-truenas .hardware-bom-li__icon,
 .page-truenas .hardware-bom-heading__icon,
 .page-truenas .hardware-pill__icon {
-	color: #67e8f9;
+	color: var(--truenas-accent-cyan);
 }
