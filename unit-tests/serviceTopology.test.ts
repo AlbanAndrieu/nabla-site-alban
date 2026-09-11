@@ -270,7 +270,10 @@ test("architecture keeps one standalone compact mobile hierarchy beside the desk
 			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 			"utf8",
 		),
-		readFile("app/[locale]/architecture/MobileArchitectureHierarchy.tsx", "utf8"),
+		readFile(
+			"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
+			"utf8",
+		),
 		readFile(
 			"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
 			"utf8",
