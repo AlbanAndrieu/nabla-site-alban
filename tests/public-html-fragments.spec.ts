@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { RESOURCE_SECTIONS } from "../app/[locale]/security/securityResources";
 
 const pages = ["/workstation.html"];
 
@@ -35,14 +36,15 @@ test.describe("native security route", () => {
 
 		expect(response?.ok()).toBeTruthy();
 		await expect(page).toHaveURL(/\/security$/);
-		await expect(page.locator("main#main-content .resource-card")).toHaveCount(16);
-		await expect(page.locator("#openclaw-security")).toBeVisible();
-		await expect(page.locator("#security-standards-compliance")).toBeVisible();
-		await expect(page.locator("#devsecops-tools")).toBeVisible();
+		await expect(page.locator("main#main-content .resource-card")).toHaveCount(
+			RESOURCE_SECTIONS.length,
+		);
+		for (const section of RESOURCE_SECTIONS) {
+			await expect(page.locator(`#${section.id}`)).toBeVisible();
+		}
 		await expect(page.locator("#security-visualizations")).toBeVisible();
 	});
 });
-
 
 test.describe("native AI route", () => {
 	test("legacy URL redirects to the native Secure AI page", async ({ page }) => {

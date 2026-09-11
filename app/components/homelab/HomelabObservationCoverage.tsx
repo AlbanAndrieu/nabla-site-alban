@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import type {
 	HomelabHealthSnapshot,
 	HomelabProbeEvidenceSummary,
+	HomelabRollingProbeEvidence,
 } from "@/lib/homelabHealth";
 import styles from "./HomelabServicesBlock.module.css";
 
@@ -75,22 +76,55 @@ function healthBoardRefreshLabel(french: boolean, refreshing: boolean): string {
 	return french ? " · refresh en cours" : " · refresh in progress";
 }
 
+function percent(numerator: number, denominator: number): number | null {
+	if (denominator <= 0) return null;
+	return Math.round((numerator / denominator) * 1000) / 10;
+}
+
+function healthyRollingEvidence(
+	rows: Array<HomelabRollingProbeEvidence & { state: string }>,
+): number {
+	return rows.filter(
+		(row) =>
+			(row.probe_source === "origin" || row.probe_source === "memory") &&
+			row.probe_stale !== true &&
+			row.state === "ok",
+	).length;
+}
+
+function coverageSuffix(value: number | null): string {
+	return value === null ? "" : ` (${value}%)`;
+}
+
 function probeEvidenceLabel(
 	french: boolean,
 	evidence: HomelabProbeEvidenceSummary | undefined,
 	eligible: number,
+	healthy: number,
 ): string | null {
 	if (!evidence || evidence.known === undefined) return null;
+
+	const evidenceCoverage =
+		typeof evidence.coverage_percent === "number"
+			? evidence.coverage_percent
+			: percent(evidence.known, eligible);
+	const healthyCoverage = percent(healthy, eligible);
+	const evidenceWord = french ? "preuves" : "evidence";
+	const healthyWord = french ? "sains" : "healthy";
+	const freshWord = french ? "fraîches" : "fresh";
 	const parts = [
-		`${evidence.known}/${eligible} ${french ? "connues" : "known"}`,
-		`${evidence.fresh ?? 0} ${french ? "fraîches" : "fresh"}`,
+		`${evidenceWord} ${evidence.known}/${eligible}${coverageSuffix(evidenceCoverage)}`,
+		`${healthyWord} ${healthy}/${eligible}${coverageSuffix(healthyCoverage)}`,
+		`${evidence.fresh ?? 0} ${freshWord}`,
 		`${evidence.cached ?? 0} cache`,
 	];
-	if (typeof evidence.coverage_percent === "number") {
-		parts.push(`${evidence.coverage_percent}%`);
-	}
+
 	if (typeof evidence.evidence_ttl_seconds === "number") {
 		parts.push(`TTL ${evidence.evidence_ttl_seconds}s`);
+	}
+	if (typeof evidence.evidence_max_retention_seconds === "number") {
+		const label = french ? "rétention max" : "max retention";
+		parts.push(`${label} ${evidence.evidence_max_retention_seconds}s`);
 	}
 	return parts.join(" · ");
 }
@@ -119,15 +153,21 @@ export default function HomelabObservationCoverage({
 	const publicSampled = publicSummary?.sampled ?? publicSummary?.scheduled ?? 0;
 	const publicEligible =
 		publicSummary?.eligible ?? publicSummary?.scheduled ?? publicSampled;
+	const internalHealthy = healthyRollingEvidence(
+		snapshot?.internal_services ?? [],
+	);
+	const publicHealthy = healthyRollingEvidence(snapshot?.services ?? []);
 	const internalEvidenceLabel = probeEvidenceLabel(
 		french,
 		internalSummary?.evidence,
 		internalEligible,
+		internalHealthy,
 	);
 	const publicEvidenceLabel = probeEvidenceLabel(
 		french,
 		publicSummary?.evidence,
 		publicEligible,
+		publicHealthy,
 	);
 	const rotatingSample =
 		internalSummary?.rotating_sample === true ||
@@ -172,7 +212,7 @@ export default function HomelabObservationCoverage({
 							data-internal-probe-count={internalSampled}
 							data-internal-probe-eligible={internalEligible}
 							data-internal-probes-enabled={
-								snapshot?.internal_probes_enabled === undefined
+								snapshot.internal_probes_enabled === undefined
 									? "unknown"
 									: String(snapshot.internal_probes_enabled)
 							}
@@ -185,8 +225,14 @@ export default function HomelabObservationCoverage({
 							{internalSummary?.timed_out ?? 0} deadline ({probeState})
 						</span>
 						{internalEvidenceLabel ? (
-							<span data-internal-probe-evidence>
-								{french ? "preuves LAN" : "LAN evidence"}:{" "}
+							<span
+								data-internal-probe-evidence
+								data-internal-probe-healthy={internalHealthy}
+								data-internal-probe-healthy-coverage={
+									percent(internalHealthy, internalEligible) ?? "n/a"
+								}
+							>
+								{french ? "couverture LAN" : "LAN coverage"}:{" "}
 								{internalEvidenceLabel}
 							</span>
 						) : null}
@@ -203,8 +249,14 @@ export default function HomelabObservationCoverage({
 							</span>
 						) : null}
 						{publicEvidenceLabel ? (
-							<span data-public-probe-evidence>
-								{french ? "preuves publiques" : "public evidence"}:{" "}
+							<span
+								data-public-probe-evidence
+								data-public-probe-healthy={publicHealthy}
+								data-public-probe-healthy-coverage={
+									percent(publicHealthy, publicEligible) ?? "n/a"
+								}
+							>
+								{french ? "couverture publique" : "public coverage"}:{" "}
 								{publicEvidenceLabel}
 							</span>
 						) : null}

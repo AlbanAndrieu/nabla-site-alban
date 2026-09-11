@@ -9,6 +9,7 @@ import {
 	type HomelabHealthReason,
 	homelabHealthReasons,
 } from "@/lib/homelabHealthPresentation";
+import ServiceProbeEvidence from "./ServiceProbeEvidence";
 
 type Props = {
 	entry?: HomelabHealthEntry;
@@ -66,7 +67,8 @@ export default function ServiceHealthReasons({
 	runtimeStale,
 }: Props) {
 	const t = useTranslations("homelab");
-	if (state !== "fail" && state !== "warn") return null;
+	const probeEvidence = <ServiceProbeEvidence entry={entry} />;
+	if (state !== "fail" && state !== "warn") return probeEvidence;
 
 	const reasons = homelabHealthReasons(entry, {
 		tunnelExpected,
@@ -75,29 +77,32 @@ export default function ServiceHealthReasons({
 	});
 
 	return (
-		<div
-			className={`alert ${state === "fail" ? "alert-danger" : "alert-warning"} py-2 px-2 small text-start mt-3 mb-0`}
-			data-health-reasons
-			data-health-severity={state}
-		>
-			<strong>{t("health.reasonTitle")}</strong>
-			{reasons.length > 0 ? (
-				<ul className="mb-0 mt-1 ps-3">
-					{reasons.map((reason, index) => (
-						<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
-							{reason.detail
-								? t(reasonKey(reason), { detail: reason.detail })
-								: t(reasonKey(reason))}
-						</li>
-					))}
-				</ul>
-			) : (
-				<p className="mb-0 mt-1">
-					{state === "fail"
-						? t("health.reasons.genericFailure")
-						: t("health.reasons.genericDegraded")}
-				</p>
-			)}
-		</div>
+		<>
+			{probeEvidence}
+			<div
+				className={`alert ${state === "fail" ? "alert-danger" : "alert-warning"} py-2 px-2 small text-start mt-3 mb-0`}
+				data-health-reasons
+				data-health-severity={state}
+			>
+				<strong>{t("health.reasonTitle")}</strong>
+				{reasons.length > 0 ? (
+					<ul className="mb-0 mt-1 ps-3">
+						{reasons.map((reason, index) => (
+							<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
+								{reason.detail
+									? t(reasonKey(reason), { detail: reason.detail })
+									: t(reasonKey(reason))}
+							</li>
+						))}
+					</ul>
+				) : (
+					<p className="mb-0 mt-1">
+						{state === "fail"
+							? t("health.reasons.genericFailure")
+							: t("health.reasons.genericDegraded")}
+					</p>
+				)}
+			</div>
+		</>
 	);
 }

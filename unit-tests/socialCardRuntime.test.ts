@@ -37,10 +37,7 @@ test("Vercel skips CI-only changes", async () => {
 		script,
 		/if \[\[ "\$\{git_ref\}" == vercel-preview-\* \]\]; then[\s\S]*exit 1/,
 	);
-	assert.match(
-		script,
-		/Validated checkpoint.*build exact deployment/s,
-	);
+	assert.match(script, /Validated checkpoint.*build exact deployment/s);
 	assert.ok(script.includes("unit-tests/*"));
 	assert.ok(script.includes(".github/*"));
 	assert.ok(!script.includes("Playwright workflow changed; build preview"));
@@ -49,9 +46,8 @@ test("Vercel skips CI-only changes", async () => {
 test("Playwright ignores production deployment dispatches", async () => {
 	const workflow = await readFile(".github/workflows/playwright.yml", "utf8");
 
-	assert.ok(
-		workflow.includes("github.event.client_payload.git.sha != github.sha"),
-	);
+	assert.ok(workflow.includes("github.event.client_payload.url != ''"));
+	assert.ok(workflow.includes("github.event.client_payload.git.sha != ''"));
 	assert.ok(
 		workflow.includes("github.event.client_payload.git.ref != 'master'"),
 	);
@@ -62,9 +58,11 @@ test("Playwright ignores production deployment dispatches", async () => {
 	);
 });
 
-
 test("on-demand Vercel Preview requires exact Quality success and triggers a first ref update", async () => {
-	const workflow = await readFile(".github/workflows/vercel-preview.yml", "utf8");
+	const workflow = await readFile(
+		".github/workflows/vercel-preview.yml",
+		"utf8",
+	);
 
 	assert.match(workflow, /actions:\s*read/);
 	assert.match(workflow, /listWorkflowRunsForRepo/);
