@@ -31,6 +31,7 @@ test("TrueNAS services are the primary surface and operations are secondary", as
 	assert.match(disclosure, /HomelabProbeDiagnostics/);
 	assert.match(disclosure, /HomelabOperationalEvidence/);
 	assert.match(disclosure, /if \(!open \|\| coverage\.loaded\) return/);
+	assert.match(disclosure, /open \? <HomelabOperationalEvidence \/> : null/);
 
 	for (const secondarySignal of [
 		"data-homelab-observer-summary",

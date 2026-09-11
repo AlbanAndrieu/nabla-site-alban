@@ -152,7 +152,7 @@ export default function HomelabOperationsDisclosure() {
 							: "Part of the observation coverage could not be confirmed; this does not automatically change service health."}
 					</p>
 				) : null}
-				<HomelabOperationalEvidence />
+				{open ? <HomelabOperationalEvidence /> : null}
 			</div>
 		</details>
 	);
