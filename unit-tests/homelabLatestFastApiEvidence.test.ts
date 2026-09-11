@@ -42,7 +42,9 @@ test("operations UI consumes the latest FastAPI runtime and pfSense evidence", a
 		const messages = JSON.parse(raw) as {
 			operations?: {
 				runtime?: { fastapi?: string; redis?: { title?: string } };
-				pfsense?: { ingressPolicy?: { title?: string; noAttribution?: string } };
+				pfsense?: {
+					ingressPolicy?: { title?: string; noAttribution?: string };
+				};
 				serviceExposure?: { skippedEdge?: string };
 			};
 		};

@@ -1,7 +1,5 @@
 import type { HomelabDiagnosticsSnapshot } from "./homelabDiagnostics";
-import type {
-	HomelabObservabilitySnapshot,
-} from "./homelabObservabilityTypes";
+import type { HomelabObservabilitySnapshot } from "./homelabObservabilityTypes";
 import type { RuntimeTopologySnapshot } from "./runtimeTopology";
 
 export function withObservabilityFallbacks(

@@ -2,9 +2,6 @@ import type { FastApiHealthBoardSnapshot } from "./fastApiHealthBoard";
 import { parseHomelabDiagnostics } from "./homelabDiagnostics";
 import { parseHomelabHealthSnapshot } from "./homelabHealth";
 import {
-	parseHomelabOperationalEvidence,
-} from "./homelabOperationalEvidence";
-import {
 	parseCloudflareCache,
 	parseControlPlaneDiagnostics,
 	parseEdgeEvidenceSkips,
@@ -13,6 +10,7 @@ import {
 import { parseDeepDiagnostics } from "./homelabObservabilityDeepDiagnostics";
 import { parsePlatformMetrics } from "./homelabObservabilityPlatformMetrics";
 import type { HomelabObservabilitySnapshot } from "./homelabObservabilityTypes";
+import { parseHomelabOperationalEvidence } from "./homelabOperationalEvidence";
 import { parseRuntimeTopology } from "./runtimeTopology";
 
 export { withObservabilityFallbacks } from "./homelabObservabilityFallbacks";

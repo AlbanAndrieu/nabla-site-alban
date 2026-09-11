@@ -1,4 +1,3 @@
-import type { OperationalComponentEvidence } from "./homelabOperationalEvidence";
 import {
 	isRecord,
 	optionalBoolean,
@@ -12,8 +11,11 @@ import type {
 	EdgeEvidenceSkip,
 	PfSenseIngressPolicyEvidence,
 } from "./homelabObservabilityTypes";
+import type { OperationalComponentEvidence } from "./homelabOperationalEvidence";
 
-export function parseEdgeEvidenceSkips(sickzValue: unknown): EdgeEvidenceSkip[] {
+export function parseEdgeEvidenceSkips(
+	sickzValue: unknown,
+): EdgeEvidenceSkip[] {
 	if (!isRecord(sickzValue) || !isRecord(sickzValue.checks)) return [];
 	return Object.entries(sickzValue.checks).flatMap(([id, value]) => {
 		if (!isRecord(value) || value.http_evidence_skipped !== true) return [];

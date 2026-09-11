@@ -1,4 +1,3 @@
-import type { OperationalHealthState } from "./homelabOperationalEvidence";
 import {
 	isRecord,
 	nullableBoolean,
@@ -12,6 +11,7 @@ import type {
 	DeepDiagnosticCheckEvidence,
 	DeepDiagnosticEvidence,
 } from "./homelabObservabilityTypes";
+import type { OperationalHealthState } from "./homelabOperationalEvidence";
 
 const REQUIRED_CHECKS = new Set(["postgres", "redis", "supabase"]);
 const CONTROL_PLANE_CHECKS = new Set(["cloudflare", "pfsense"]);
