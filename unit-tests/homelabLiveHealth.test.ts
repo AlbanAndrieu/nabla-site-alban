@@ -51,6 +51,7 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const health = await source("lib/homelabHealth.ts");
+	const healthBase = await source("lib/homelabHealthBase.ts");
 	assert.match(page, /healthUnavailable \|\|/);
 	assert.match(page, /truenasApi\?\.reachable === false/);
 	assert.match(page, /snapshot\?\.truenas_runtime_reachable === false/);
@@ -67,7 +68,7 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	);
 	assert.match(health, /export type TrueNasApiHealth/);
 	assert.match(health, /api\?: TrueNasApiHealth \| null/);
-	assert.match(health, /validTrueNasApiHealth/);
+	assert.match(healthBase, /validTrueNasApiHealth/);
 });
 
 test("TrueNAS application cards show runtime icons and a legend", async () => {

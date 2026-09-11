@@ -68,15 +68,17 @@ test("quality gate checks production health before build and runs diff-scoped SA
 });
 
 test("Preview and production DAST share a reviewed passive ZAP policy", async () => {
-	const [preview, production, rules, smoke, checkpoint] = await Promise.all([
-		read(".github/workflows/playwright.yml"),
-		read(".github/workflows/production-dast.yml"),
-		read(".zap/rules.tsv"),
-		read(".github/workflows/production-smoke.yml"),
-		read(".github/workflows/vercel-preview.yml"),
-	]);
+	const [playwright, zapPreview, production, rules, smoke, checkpoint] =
+		await Promise.all([
+			read(".github/workflows/playwright.yml"),
+			read(".github/workflows/zap-preview.yml"),
+			read(".github/workflows/production-dast.yml"),
+			read(".zap/rules.tsv"),
+			read(".github/workflows/production-smoke.yml"),
+			read(".github/workflows/vercel-preview.yml"),
+		]);
 
-	for (const workflow of [preview, production]) {
+	for (const workflow of [zapPreview, production]) {
 		assert.match(
 			workflow,
 			/zaproxy\/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0\.15\.0/,
@@ -86,11 +88,20 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		assert.match(workflow, /cmd_options:\s*"-I -T 5 -c \.zap\/rules\.tsv"/);
 	}
 
-	assert.match(preview, /ZAP_AUTH_HEADER:\s*x-vercel-protection-bypass/);
-	assert.match(preview, /ZAP_AUTH_HEADER_VALUE/);
-	assert.match(preview, /ZAP_AUTH_HEADER_SITE/);
-	assert.match(preview, /Clean ZAP Preview workspace/);
-	assert.match(preview, /zap-preview-report/);
+	assert.doesNotMatch(playwright, /zaproxy\/action-baseline/);
+	assert.match(playwright, /context 'Playwright Preview E2E'/);
+	assert.match(playwright, /id-token:\s*write/);
+	assert.match(playwright, /x-vercel-protection-bypass/);
+	assert.match(playwright, /x-vercel-trusted-oidc-idp-token/);
+
+	assert.match(zapPreview, /ZAP_AUTH_HEADER=/);
+	assert.match(zapPreview, /ZAP_AUTH_HEADER_VALUE=/);
+	assert.match(zapPreview, /ZAP_AUTH_HEADER_SITE=/);
+	assert.match(zapPreview, /Clean ZAP Preview workspace/);
+	assert.match(zapPreview, /zap-preview-report/);
+	assert.match(zapPreview, /OWASP ZAP Preview/);
+	assert.match(zapPreview, /report_json\.json/);
+	assert.match(zapPreview, /context 'OWASP ZAP Preview'/);
 
 	assert.match(production, /https:\/\/www\.albanandrieu\.com/);
 	assert.match(production, /vercel\.deployment\.success/);
@@ -129,12 +140,13 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 
 	const securityWorkflows = [
 		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
-		ciWorkflowPinContract(preview),
+		ciWorkflowPinContract(playwright),
+		ciWorkflowPinContract(zapPreview),
 		ciWorkflowPinContract(smoke),
 		ciWorkflowPinContract(production),
 		ciWorkflowPinContract(checkpoint),
 	];
-	assert.equal(securityWorkflows.length, 5);
+	assert.equal(securityWorkflows.length, 6);
 });
 
 function ciWorkflowPinContract(workflow: string) {

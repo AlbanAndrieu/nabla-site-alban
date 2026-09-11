@@ -1,5 +1,13 @@
+import {
+	HOMELAB_HEALTH_DEFAULT_API_URL as BASE_HEALTH_DEFAULT_API_URL,
+	HOMELAB_PROBES_DEFAULT_API_URL as BASE_PROBES_DEFAULT_API_URL,
+	normalizeHomelabHealthUrl as normalizeBaseHealthUrl,
+	parseHomelabHealthSnapshot as parseBaseHealthSnapshot,
+} from "./homelabHealthBase";
+
 export type VerifiedHomelabHealthState = "ok" | "warn" | "fail";
 export type HomelabHealthState = VerifiedHomelabHealthState | "unknown";
+export type HomelabProbeSource = "origin" | "memory" | "deadline";
 
 export type HomelabDependencyEvidence = {
 	target: string;
@@ -14,12 +22,29 @@ export type HomelabDependencyEvidence = {
 	description?: string;
 };
 
-export type HomelabHealthEntry = {
+export type HomelabRollingProbeEvidence = {
+	probe_source?: HomelabProbeSource;
+	probe_observed_at?: string | null;
+	probe_age_seconds?: number | null;
+	probe_stale?: boolean;
+	probe_stale_after_seconds?: number;
+	probe_interval_seconds?: number;
+	next_probe_in_seconds?: number;
+	probe_refresh_error?: string;
+	last_known_state?: HomelabHealthState | null;
+	last_known_reachable?: boolean | null;
+	last_known_http_status?: number | null;
+	warning?: string;
+	timed_out?: boolean;
+	error_kind?: string;
+};
+
+export type HomelabHealthEntry = HomelabRollingProbeEvidence & {
 	id?: string;
 	name: string;
 	url: string;
 	url_derived?: boolean;
-	reachable: boolean;
+	reachable: boolean | null;
 	http_status: number;
 	state: HomelabHealthState;
 	local_state?: HomelabHealthState;
@@ -48,11 +73,12 @@ export type HomelabHealthEntry = {
 	tunnel_stale?: boolean;
 };
 
-export type HomelabInternalHealthEntry = {
+export type HomelabInternalHealthEntry = HomelabRollingProbeEvidence & {
+	id?: string;
 	name: string;
 	host: string;
 	port: number;
-	reachable: boolean;
+	reachable: boolean | null;
 	state: VerifiedHomelabHealthState;
 	latency_ms?: number;
 	error?: string;
@@ -145,6 +171,7 @@ export type HomelabProbeEvidenceSummary = {
 	cached?: number;
 	coverage_percent?: number;
 	evidence_ttl_seconds?: number;
+	evidence_max_retention_seconds?: number;
 };
 
 export type HomelabProbeScopeSummary = {
@@ -220,16 +247,28 @@ export type HomelabHealthSnapshot = {
 
 export type HomelabHealthSource = "fastapi" | "fastapi-probes" | "unavailable";
 
-export const HOMELAB_HEALTH_DEFAULT_API_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
-export const HOMELAB_PROBES_DEFAULT_API_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/homelab/probes";
+export const HOMELAB_HEALTH_DEFAULT_API_URL = BASE_HEALTH_DEFAULT_API_URL;
+export const HOMELAB_PROBES_DEFAULT_API_URL = BASE_PROBES_DEFAULT_API_URL;
 
-// FastAPI uses bounded probes plus short-lived caches. Keep this proxy timeout
-// above the cold-probe ceiling while still failing quickly enough for the UI to
-// retain its last known snapshot rather than hanging indefinitely.
 const PRIMARY_TIMEOUT_MS = 8_000;
 const PROBES_TIMEOUT_MS = 6_000;
+
+const ROLLING_PROBE_KEYS = [
+	"probe_source",
+	"probe_observed_at",
+	"probe_age_seconds",
+	"probe_stale",
+	"probe_stale_after_seconds",
+	"probe_interval_seconds",
+	"next_probe_in_seconds",
+	"probe_refresh_error",
+	"last_known_state",
+	"last_known_reachable",
+	"last_known_http_status",
+	"warning",
+	"timed_out",
+	"error_kind",
+] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -244,598 +283,243 @@ function isHealthState(value: unknown): value is HomelabHealthState {
 	);
 }
 
-function isVerifiedHealthState(
-	value: unknown,
-): value is VerifiedHomelabHealthState {
-	return value === "ok" || value === "warn" || value === "fail";
+function isProbeSource(value: unknown): value is HomelabProbeSource {
+	return value === "origin" || value === "memory" || value === "deadline";
 }
 
-export function normalizeHomelabHealthUrl(url?: string): string | null {
-	if (!url) return null;
-	try {
-		const parsed = new URL(url);
-		if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
-			return null;
-		parsed.hash = "";
-		return parsed.href;
-	} catch {
-		return null;
-	}
-}
-
-function validOptionalBoolean(value: unknown): boolean {
-	return value === undefined || value === null || typeof value === "boolean";
-}
-
-function validOptionalNumber(value: unknown): boolean {
-	return (
-		value === undefined ||
-		(typeof value === "number" && Number.isFinite(value) && value >= 0)
-	);
-}
-
-function validOptionalNullableNumber(value: unknown): boolean {
-	return value === null || validOptionalNumber(value);
-}
-
-function validOptionalString(value: unknown): boolean {
-	return value === undefined || value === null || typeof value === "string";
-}
-
-function validOptionalHealthState(value: unknown): boolean {
-	return value === undefined || value === null || isHealthState(value);
-}
-
-function validOptionalStringArray(value: unknown): boolean {
-	return (
-		value === undefined ||
-		(Array.isArray(value) &&
-			value.every((item) => typeof item === "string" && item.trim().length > 0))
-	);
-}
-
-function optionalNonNegativeInteger(value: unknown): number | undefined {
-	return typeof value === "number" && Number.isInteger(value) && value >= 0
+function finiteNonNegative(value: unknown): number | undefined {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0
 		? value
 		: undefined;
 }
 
-function parseProbeStateCounts(
-	value: unknown,
-): HomelabProbeStateCounts | undefined {
-	if (!isRecord(value)) return undefined;
-	const states: HomelabProbeStateCounts = {};
-	for (const state of ["ok", "warn", "fail"] as const) {
-		const count = optionalNonNegativeInteger(value[state]);
-		if (count !== undefined) states[state] = count;
-	}
-	return states;
+function nullableNonNegative(value: unknown): number | null | undefined {
+	if (value === null) return null;
+	return finiteNonNegative(value);
 }
 
-function parseProbeEvidenceSummary(
+function nullableBoolean(value: unknown): boolean | null | undefined {
+	return value === null || typeof value === "boolean" ? value : undefined;
+}
+
+function nullableString(value: unknown): string | null | undefined {
+	return value === null || typeof value === "string" ? value : undefined;
+}
+
+function sanitizeRollingProbeEvidence(
 	value: unknown,
-): HomelabProbeEvidenceSummary | undefined {
-	if (!isRecord(value)) return undefined;
-	const evidence: HomelabProbeEvidenceSummary = {};
-	for (const field of ["known", "fresh", "cached"] as const) {
-		const parsed = optionalNonNegativeInteger(value[field]);
+): HomelabRollingProbeEvidence {
+	if (!isRecord(value)) return {};
+	const evidence: HomelabRollingProbeEvidence = {};
+	if (isProbeSource(value.probe_source))
+		evidence.probe_source = value.probe_source;
+	const observedAt = nullableString(value.probe_observed_at);
+	if (observedAt !== undefined) evidence.probe_observed_at = observedAt;
+	const age = nullableNonNegative(value.probe_age_seconds);
+	if (age !== undefined) evidence.probe_age_seconds = age;
+	if (typeof value.probe_stale === "boolean")
+		evidence.probe_stale = value.probe_stale;
+	for (const field of [
+		"probe_stale_after_seconds",
+		"probe_interval_seconds",
+		"next_probe_in_seconds",
+	] as const) {
+		const parsed = finiteNonNegative(value[field]);
 		if (parsed !== undefined) evidence[field] = parsed;
 	}
-	for (const field of ["coverage_percent", "evidence_ttl_seconds"] as const) {
-		const parsed = value[field];
-		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
-			evidence[field] = parsed;
-		}
+	for (const field of [
+		"probe_refresh_error",
+		"warning",
+		"error_kind",
+	] as const) {
+		if (typeof value[field] === "string") evidence[field] = value[field];
 	}
+	if (
+		value.last_known_state === null ||
+		isHealthState(value.last_known_state)
+	) {
+		evidence.last_known_state = value.last_known_state;
+	}
+	const lastReachable = nullableBoolean(value.last_known_reachable);
+	if (lastReachable !== undefined)
+		evidence.last_known_reachable = lastReachable;
+	const lastStatus = nullableNonNegative(value.last_known_http_status);
+	if (lastStatus !== undefined) evidence.last_known_http_status = lastStatus;
+	if (typeof value.timed_out === "boolean")
+		evidence.timed_out = value.timed_out;
 	return evidence;
 }
 
-function parseProbeScopeSummary(
-	value: unknown,
-): HomelabProbeScopeSummary | undefined {
-	if (!isRecord(value)) return undefined;
-	const summary: HomelabProbeScopeSummary = {};
-	if (typeof value.scope === "string" && value.scope.trim()) {
-		summary.scope = value.scope;
-	}
-	if (typeof value.enabled === "boolean") summary.enabled = value.enabled;
-	if (typeof value.rotating_sample === "boolean") {
-		summary.rotating_sample = value.rotating_sample;
-	}
+function stripRollingProbeEvidence<T extends object>(value: T): T {
+	const sanitized = { ...value } as T & Record<string, unknown>;
+	for (const key of ROLLING_PROBE_KEYS) delete sanitized[key];
+	return sanitized;
+}
+
+function isRollingUnknownReachability(value: unknown): boolean {
+	if (!isRecord(value) || value.reachable !== null) return false;
+	const evidence = sanitizeRollingProbeEvidence(value);
+	return evidence.probe_stale === true || evidence.probe_source === "memory";
+}
+
+function normalizeRollingProbeRow(value: unknown): unknown {
+	if (!isRollingUnknownReachability(value)) return value;
+	// Retained evidence uses reachable=null to mean "not currently confirmed".
+	// The compatibility parser predates that contract and accepts booleans only.
+	return { ...(value as Record<string, unknown>), reachable: false };
+}
+
+function normalizeRollingProbePayload(value: unknown): unknown {
+	if (!isRecord(value)) return value;
+	const normalized: Record<string, unknown> = { ...value };
 	for (const field of [
-		"eligible",
-		"sampled",
-		"scheduled",
-		"completed",
-		"timed_out",
-		"max_concurrency",
+		"services",
+		"public_probe_results",
+		"internal_services",
 	] as const) {
-		const parsed = optionalNonNegativeInteger(value[field]);
-		if (parsed !== undefined) summary[field] = parsed;
-	}
-	for (const field of [
-		"budget_seconds",
-		"per_probe_timeout_seconds",
-		"elapsed_ms",
-	] as const) {
-		const parsed = value[field];
-		if (typeof parsed === "number" && Number.isFinite(parsed) && parsed >= 0) {
-			summary[field] = parsed;
+		if (Array.isArray(value[field])) {
+			normalized[field] = value[field].map(normalizeRollingProbeRow);
 		}
 	}
-	const states = parseProbeStateCounts(value.states);
-	if (states) summary.states = states;
-	const evidence = parseProbeEvidenceSummary(value.evidence);
-	if (evidence) summary.evidence = evidence;
-	return summary;
-}
-
-function parseProbeSummary(value: unknown): HomelabProbeSummary | undefined {
-	if (!isRecord(value)) return undefined;
-	const summary: HomelabProbeSummary = {};
-	const publicSummary = parseProbeScopeSummary(value.public);
-	const internalSummary = parseProbeScopeSummary(value.internal);
-	const catalogCount = optionalNonNegativeInteger(value.catalog_service_count);
-	if (publicSummary) summary.public = publicSummary;
-	if (internalSummary) summary.internal = internalSummary;
-	if (catalogCount !== undefined) summary.catalog_service_count = catalogCount;
-	if (isRecord(value.sampling)) {
-		const sampling: HomelabProbeSampling = {};
-		if (
-			typeof value.sampling.strategy === "string" &&
-			value.sampling.strategy.trim()
-		) {
-			sampling.strategy = value.sampling.strategy;
-		}
-		if (
-			typeof value.sampling.cache_ttl_seconds === "number" &&
-			Number.isFinite(value.sampling.cache_ttl_seconds) &&
-			value.sampling.cache_ttl_seconds >= 0
-		) {
-			sampling.cache_ttl_seconds = value.sampling.cache_ttl_seconds;
-		}
-		summary.sampling = sampling;
-	}
-	return summary;
-}
-
-function parseProbeCache(value: unknown): HomelabProbeCache | undefined {
-	if (!isRecord(value)) return undefined;
-	const cache: HomelabProbeCache = {};
-	if (value.source === "origin" || value.source === "memory") {
-		cache.source = value.source;
-	}
-	for (const field of ["age_seconds", "ttl_seconds"] as const) {
-		const raw = value[field];
-		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
-			cache[field] = raw;
-		}
-	}
-	if (typeof value.stale === "boolean") cache.stale = value.stale;
-	return cache;
-}
-
-function parseHealthBoardMetadata(
-	value: unknown,
-): HomelabHealthBoardMetadata | undefined {
-	if (!isRecord(value)) return undefined;
-	if (
-		(value.state !== "pending" &&
-			value.state !== "fresh" &&
-			value.state !== "stale") ||
-		typeof value.refreshing !== "boolean" ||
-		(value.generated_at !== null && typeof value.generated_at !== "string")
-	) {
-		return undefined;
-	}
-	const metadata: HomelabHealthBoardMetadata = {
-		state: value.state,
-		refreshing: value.refreshing,
-		generated_at: value.generated_at,
-	};
-	for (const field of ["age_seconds", "retry_after_seconds"] as const) {
-		const raw = value[field];
-		if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
-			metadata[field] = raw;
-		}
-	}
-	if (typeof value.error === "string" || value.error === null) {
-		metadata.error = value.error;
-	}
-	return metadata;
-}
-
-function parseReconciliationMetadata(
-	value: unknown,
-): HomelabReconciliationMetadata | undefined {
-	if (!isRecord(value)) return undefined;
-	const metadata: HomelabReconciliationMetadata = {};
-	if (typeof value.provider_reads_reused === "boolean") {
-		metadata.provider_reads_reused = value.provider_reads_reused;
-	}
-	if (
-		typeof value.truenas_runtime_source === "string" &&
-		value.truenas_runtime_source.trim()
-	) {
-		metadata.truenas_runtime_source = value.truenas_runtime_source;
-	}
-	return metadata;
-}
-
-function validDependencyEvidence(value: unknown): boolean {
-	if (value === undefined) return true;
-	if (!Array.isArray(value)) return false;
-	return value.every(
-		(item) =>
-			isRecord(item) &&
-			typeof item.target === "string" &&
-			item.target.trim().length > 0 &&
-			(item.target_name === undefined ||
-				typeof item.target_name === "string") &&
-			typeof item.relation_type === "string" &&
-			item.relation_type.trim().length > 0 &&
-			isHealthState(item.target_state) &&
-			validOptionalHealthState(item.target_effective_state) &&
-			validOptionalString(item.target_observed_at) &&
-			validOptionalNullableNumber(item.target_observation_age_seconds) &&
-			validOptionalBoolean(item.target_observation_stale) &&
-			Array.isArray(item.evidence) &&
-			item.evidence.every(
-				(evidence) =>
-					typeof evidence === "string" && evidence.trim().length > 0,
-			) &&
-			(item.description === undefined || typeof item.description === "string"),
-	);
-}
-
-function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
-	if (!isRecord(entry)) return false;
-	return (
-		(entry.id === undefined || typeof entry.id === "string") &&
-		typeof entry.name === "string" &&
-		entry.name.trim().length > 0 &&
-		typeof entry.url === "string" &&
-		normalizeHomelabHealthUrl(entry.url) !== null &&
-		validOptionalBoolean(entry.url_derived) &&
-		typeof entry.reachable === "boolean" &&
-		typeof entry.http_status === "number" &&
-		Number.isFinite(entry.http_status) &&
-		isHealthState(entry.state) &&
-		validOptionalHealthState(entry.local_state) &&
-		validOptionalHealthState(entry.dependency_state) &&
-		validOptionalHealthState(entry.effective_state) &&
-		validOptionalStringArray(entry.required_dependencies) &&
-		validOptionalStringArray(entry.blocked_by) &&
-		validOptionalStringArray(entry.dependency_cycle) &&
-		validDependencyEvidence(entry.dependency_evidence) &&
-		validOptionalString(entry.observed_at) &&
-		validOptionalNullableNumber(entry.observation_age_seconds) &&
-		validOptionalBoolean(entry.observation_stale) &&
-		validOptionalBoolean(entry.tls_trusted) &&
-		validOptionalNumber(entry.latency_ms) &&
-		(entry.error === undefined || typeof entry.error === "string") &&
-		validOptionalString(entry.application_error) &&
-		validOptionalString(entry.tunnel_status) &&
-		validOptionalString(entry.tunnel_name) &&
-		validOptionalHealthState(entry.direct_state) &&
-		validOptionalHealthState(entry.internal_state) &&
-		validOptionalString(entry.runtime_state) &&
-		validOptionalString(entry.runtime_app) &&
-		validOptionalBoolean(entry.runtime_reachable) &&
-		validOptionalBoolean(entry.runtime_missing) &&
-		validOptionalBoolean(entry.runtime_stale) &&
-		validOptionalBoolean(entry.tunnel_stale)
-	);
-}
-
-function validInternalHealthEntry(
-	entry: unknown,
-): entry is HomelabInternalHealthEntry {
-	if (!isRecord(entry)) return false;
-	return (
-		typeof entry.name === "string" &&
-		entry.name.trim().length > 0 &&
-		typeof entry.host === "string" &&
-		entry.host.trim().length > 0 &&
-		typeof entry.port === "number" &&
-		Number.isInteger(entry.port) &&
-		entry.port >= 1 &&
-		entry.port <= 65535 &&
-		typeof entry.reachable === "boolean" &&
-		isVerifiedHealthState(entry.state) &&
-		validOptionalNumber(entry.latency_ms) &&
-		(entry.error === undefined || typeof entry.error === "string")
-	);
-}
-
-function validTrueNasApiHealth(value: unknown): value is TrueNasApiHealth {
-	if (!isRecord(value) || typeof value.reachable !== "boolean") return false;
-	return value.error === undefined || typeof value.error === "string";
-}
-
-function validTrueNasHealth(value: unknown): value is TrueNasHealth {
-	if (!isRecord(value) || !isVerifiedHealthState(value.state)) return false;
-	if (
-		value.public !== undefined &&
-		value.public !== null &&
-		!validHealthEntry(value.public)
-	) {
-		return false;
-	}
-	if (
-		value.internal !== undefined &&
-		value.internal !== null &&
-		!validInternalHealthEntry(value.internal)
-	) {
-		return false;
-	}
-	if (
-		value.api !== undefined &&
-		value.api !== null &&
-		!validTrueNasApiHealth(value.api)
-	) {
-		return false;
-	}
-	return (
-		validOptionalBoolean(value.internal_probe_enabled) &&
-		validOptionalBoolean(value.verify_ssl)
-	);
-}
-
-function parseSecurityFilters(
-	value: unknown,
-): PfSenseSecurityFilterObservation[] | undefined {
-	if (!Array.isArray(value)) return undefined;
-	const filters = value.flatMap((item) => {
-		if (
-			!isRecord(item) ||
-			typeof item.id !== "string" ||
-			typeof item.label !== "string" ||
-			typeof item.state !== "string" ||
-			typeof item.detail !== "string"
-		) {
-			return [];
-		}
-		return [
-			{
-				id: item.id,
-				label: item.label,
-				state: item.state,
-				detail: item.detail,
-			},
-		];
-	});
-	return filters.length > 0 ? filters : undefined;
-}
-
-function parseIngressEndpoint(
-	value: unknown,
-): PfSenseIngressEndpoint | undefined {
-	if (!isRecord(value)) return undefined;
-	if (
-		!validOptionalString(value.ip) ||
-		(value.port !== undefined &&
-			(typeof value.port !== "number" ||
-				!Number.isInteger(value.port) ||
-				value.port < 1 ||
-				value.port > 65535)) ||
-		!validOptionalString(value.role)
-	) {
-		return undefined;
-	}
-	return {
-		...(value.ip === null || typeof value.ip === "string"
-			? { ip: value.ip }
-			: {}),
-		...(typeof value.port === "number" ? { port: value.port } : {}),
-		...(typeof value.role === "string" ? { role: value.role } : {}),
-	};
-}
-
-function parseIngressBlock(
-	value: unknown,
-): PfSenseIngressBlockObservation | undefined {
-	if (!isRecord(value)) return undefined;
-	if (
-		typeof value.state !== "string" ||
-		typeof value.telemetry_available !== "boolean" ||
-		typeof value.attribution_available !== "boolean" ||
-		typeof value.evidence !== "string"
-	) {
-		return undefined;
-	}
-	let controlPath: PfSenseIngressControlPath | undefined;
-	if (
-		isRecord(value.control_path) &&
-		typeof value.control_path.mode === "string" &&
-		typeof value.control_path.independent_from_wan_filter === "boolean" &&
-		typeof value.control_path.blind_spot === "boolean" &&
-		typeof value.control_path.detail === "string"
-	) {
-		controlPath = {
-			mode: value.control_path.mode,
-			independent_from_wan_filter:
-				value.control_path.independent_from_wan_filter,
-			blind_spot: value.control_path.blind_spot,
-			detail: value.control_path.detail,
+	if (isRecord(value.truenas) && value.truenas.public !== undefined) {
+		normalized.truenas = {
+			...value.truenas,
+			public: normalizeRollingProbeRow(value.truenas.public),
 		};
 	}
-	return {
-		state: value.state,
-		telemetry_available: value.telemetry_available,
-		attribution_available: value.attribution_available,
-		evidence: value.evidence,
-		...(typeof value.engine === "string" ? { engine: value.engine } : {}),
-		...(typeof value.firewall === "string" ? { firewall: value.firewall } : {}),
-		...(typeof value.mechanism === "string"
-			? { mechanism: value.mechanism }
-			: {}),
-		...(parseIngressEndpoint(value.source)
-			? { source: parseIngressEndpoint(value.source) }
-			: {}),
-		...(parseIngressEndpoint(value.destination)
-			? { destination: parseIngressEndpoint(value.destination) }
-			: {}),
-		...(typeof value.table_entry_count === "number" &&
-		Number.isInteger(value.table_entry_count) &&
-		value.table_entry_count >= 0
-			? { table_entry_count: value.table_entry_count }
-			: {}),
-		...(controlPath ? { control_path: controlPath } : {}),
-	};
+	return normalized;
 }
 
-function parsePfSenseDnsPosture(value: unknown): PfSenseDnsPosture | null {
+function rollingRowKey(value: unknown): string | null {
 	if (!isRecord(value)) return null;
-	if (
-		typeof value.configured !== "boolean" ||
-		(value.reachable !== null && typeof value.reachable !== "boolean") ||
-		!isHealthState(value.policy_state) ||
-		typeof value.reason !== "string" ||
-		value.reason.trim().length === 0 ||
-		!validOptionalString(value.error_stage) ||
-		!validOptionalString(value.error)
-	) {
-		return null;
+	if (typeof value.id === "string" && value.id.trim()) return `id:${value.id}`;
+	if (typeof value.name === "string" && value.name.trim()) {
+		return `name:${value.name}`;
 	}
-
-	let resolver: PfSenseDnsResolverPosture | undefined;
-	if (value.resolver !== undefined) {
-		if (!isRecord(value.resolver)) return null;
-		const raw = value.resolver;
-		if (
-			!validOptionalBoolean(raw.enabled) ||
-			!validOptionalBoolean(raw.running) ||
-			!validOptionalBoolean(raw.forwarding) ||
-			!validOptionalBoolean(raw.forward_tls_upstream) ||
-			(raw.port !== undefined &&
-				raw.port !== null &&
-				(typeof raw.port !== "number" ||
-					!Number.isInteger(raw.port) ||
-					raw.port < 1 ||
-					raw.port > 65535))
-		) {
-			return null;
-		}
-		resolver = {
-			enabled: raw.enabled as boolean | null | undefined,
-			running: raw.running as boolean | null | undefined,
-			forwarding: raw.forwarding as boolean | null | undefined,
-			forward_tls_upstream: raw.forward_tls_upstream as
-				| boolean
-				| null
-				| undefined,
-			port: raw.port as number | null | undefined,
-		};
-	}
-
-	let upstream: PfSenseDnsUpstreamPosture | undefined;
-	if (value.upstream !== undefined) {
-		if (!isRecord(value.upstream)) return null;
-		const raw = value.upstream;
-		if (
-			typeof raw.count !== "number" ||
-			!Number.isInteger(raw.count) ||
-			raw.count < 0 ||
-			!validOptionalBoolean(raw.independent_from_truenas) ||
-			!validOptionalBoolean(raw.truenas_only)
-		) {
-			return null;
-		}
-		upstream = {
-			count: raw.count,
-			independent_from_truenas: raw.independent_from_truenas as
-				| boolean
-				| null
-				| undefined,
-			truenas_only: raw.truenas_only as boolean | null | undefined,
-		};
-	}
-
-	return {
-		configured: value.configured,
-		reachable: value.reachable,
-		policy_state: value.policy_state,
-		reason: value.reason,
-		...(resolver ? { resolver } : {}),
-		...(upstream ? { upstream } : {}),
-		...(parseSecurityFilters(value.security_filters)
-			? { security_filters: parseSecurityFilters(value.security_filters) }
-			: {}),
-		...(parseIngressBlock(value.ingress_block)
-			? { ingress_block: parseIngressBlock(value.ingress_block) }
-			: {}),
-		...(typeof value.error_stage === "string"
-			? { error_stage: value.error_stage }
-			: {}),
-		...(typeof value.error === "string" ? { error: value.error } : {}),
-	};
+	return null;
 }
+
+function rawRowsByKey(value: unknown): Map<string, Record<string, unknown>> {
+	const rows = new Map<string, Record<string, unknown>>();
+	if (!Array.isArray(value)) return rows;
+	for (const row of value) {
+		if (!isRecord(row)) continue;
+		const key = rollingRowKey(row);
+		if (key) rows.set(key, row);
+	}
+	return rows;
+}
+
+function enrichPublicRollingEvidence(
+	entries: HomelabHealthEntry[],
+	raw: unknown,
+): HomelabHealthEntry[] {
+	const rows = rawRowsByKey(raw);
+	return entries.map((entry) => {
+		const rawEntry = rows.get(rollingRowKey(entry) ?? "");
+		if (!rawEntry) return entry;
+		const base = stripRollingProbeEvidence(entry);
+		return {
+			...base,
+			...sanitizeRollingProbeEvidence(rawEntry),
+			reachable: isRollingUnknownReachability(rawEntry)
+				? null
+				: entry.reachable,
+		};
+	});
+}
+
+function enrichInternalRollingEvidence(
+	entries: HomelabInternalHealthEntry[] | undefined,
+	raw: unknown,
+): HomelabInternalHealthEntry[] | undefined {
+	if (!entries) return entries;
+	const rows = rawRowsByKey(raw);
+	return entries.map((entry) => {
+		const rawEntry = rows.get(rollingRowKey(entry) ?? "");
+		if (!rawEntry) return entry;
+		const base = stripRollingProbeEvidence(entry);
+		return {
+			...base,
+			...sanitizeRollingProbeEvidence(rawEntry),
+			reachable: isRollingUnknownReachability(rawEntry)
+				? null
+				: entry.reachable,
+		};
+	});
+}
+
+function enrichEvidenceRetention(
+	parsed: HomelabHealthSnapshot,
+	raw: unknown,
+): HomelabHealthSnapshot {
+	if (!isRecord(raw) || !isRecord(raw.probe_summary) || !parsed.probe_summary) {
+		return parsed;
+	}
+	const probeSummary = { ...parsed.probe_summary };
+	for (const scope of ["public", "internal"] as const) {
+		const rawScope = raw.probe_summary[scope];
+		const parsedScope = probeSummary[scope];
+		if (
+			!isRecord(rawScope) ||
+			!isRecord(rawScope.evidence) ||
+			!parsedScope?.evidence
+		) {
+			continue;
+		}
+		const maxRetention = finiteNonNegative(
+			rawScope.evidence.evidence_max_retention_seconds,
+		);
+		if (maxRetention === undefined) continue;
+		probeSummary[scope] = {
+			...parsedScope,
+			evidence: {
+				...parsedScope.evidence,
+				evidence_max_retention_seconds: maxRetention,
+			},
+		};
+	}
+	return { ...parsed, probe_summary: probeSummary };
+}
+
+export const normalizeHomelabHealthUrl = normalizeBaseHealthUrl;
 
 export function parseHomelabHealthSnapshot(
 	value: unknown,
 ): HomelabHealthSnapshot | null {
-	if (!isRecord(value) || !Array.isArray(value.services)) {
-		return null;
-	}
-	if (
-		typeof value.schema_version !== "number" ||
-		!Number.isFinite(value.schema_version) ||
-		typeof value.checked_at !== "string" ||
-		value.checked_at.trim().length === 0
-	) {
-		return null;
+	const normalized = normalizeRollingProbePayload(value);
+	const parsed = parseBaseHealthSnapshot(normalized);
+	if (!parsed) return null;
+
+	const raw = isRecord(value) ? value : {};
+	let snapshot = parsed as unknown as HomelabHealthSnapshot;
+	snapshot = {
+		...snapshot,
+		services: enrichPublicRollingEvidence(snapshot.services, raw.services),
+		internal_services: enrichInternalRollingEvidence(
+			snapshot.internal_services,
+			raw.internal_services,
+		),
+	};
+
+	if (isRecord(raw.truenas) && snapshot.truenas?.public) {
+		const base = stripRollingProbeEvidence(snapshot.truenas.public);
+		snapshot = {
+			...snapshot,
+			truenas: {
+				...snapshot.truenas,
+				public: {
+					...base,
+					...sanitizeRollingProbeEvidence(raw.truenas.public),
+					reachable: isRollingUnknownReachability(raw.truenas.public)
+						? null
+						: snapshot.truenas.public.reachable,
+				},
+			},
+		};
 	}
 
-	const services = value.services.filter(validHealthEntry);
-	if (
-		value.truenas !== undefined &&
-		value.truenas !== null &&
-		!validTrueNasHealth(value.truenas)
-	) {
-		return null;
-	}
-	if (!validOptionalBoolean(value.internal_probes_enabled)) return null;
-	let internalServices: HomelabInternalHealthEntry[] | undefined;
-	if (value.internal_services !== undefined) {
-		if (!Array.isArray(value.internal_services)) return null;
-		internalServices = value.internal_services.filter(validInternalHealthEntry);
-	}
-	const probeSummary = parseProbeSummary(value.probe_summary);
-	const probeCache = parseProbeCache(value.probe_cache);
-	const healthBoard = parseHealthBoardMetadata(value.health_board);
-	const reconciliation = parseReconciliationMetadata(value.reconciliation);
-	if (!validOptionalBoolean(value.truenas_runtime_reachable)) return null;
-	if (!validOptionalBoolean(value.truenas_runtime_stale)) return null;
-	if (!validOptionalBoolean(value.cloudflare_configured)) return null;
-	if (!validOptionalNumber(value.cloudflare_tunnels_observed)) return null;
-	if (!validOptionalNumber(value.refresh_elapsed_ms)) return null;
-
-	let pfsense: HomelabHealthSnapshot["pfsense"] | undefined;
-	if (isRecord(value.pfsense)) {
-		const dns = parsePfSenseDnsPosture(value.pfsense.dns);
-		if (dns) pfsense = { dns };
-	}
-
-	const sanitizedValue = { ...value };
-	delete sanitizedValue.pfsense;
-	delete sanitizedValue.probe_summary;
-	delete sanitizedValue.probe_cache;
-	delete sanitizedValue.health_board;
-	delete sanitizedValue.reconciliation;
-
-	return {
-		...sanitizedValue,
-		services,
-		...(internalServices === undefined
-			? {}
-			: { internal_services: internalServices }),
-		...(probeSummary ? { probe_summary: probeSummary } : {}),
-		...(probeCache ? { probe_cache: probeCache } : {}),
-		...(healthBoard ? { health_board: healthBoard } : {}),
-		...(reconciliation ? { reconciliation } : {}),
-		...(pfsense ? { pfsense } : {}),
-	} as HomelabHealthSnapshot;
+	return enrichEvidenceRetention(snapshot, raw);
 }
 
 function primaryApiUrl(): string {
@@ -844,47 +528,62 @@ function primaryApiUrl(): string {
 	);
 }
 
+function probesApiUrl(): string {
+	return (
+		process.env.HOMELAB_PROBES_API_URL?.trim() || HOMELAB_PROBES_DEFAULT_API_URL
+	);
+}
+
+async function loadSnapshot(
+	primaryUrl: string,
+	timeoutMs: number,
+	userAgent: string,
+	cacheControl?: string,
+): Promise<HomelabHealthSnapshot> {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), timeoutMs);
+	try {
+		const response = await fetch(primaryUrl, {
+			headers: {
+				Accept: "application/json",
+				"User-Agent": userAgent,
+				...(cacheControl ? { "Cache-Control": cacheControl } : {}),
+			},
+			signal: controller.signal,
+			cache: "no-store",
+		});
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const snapshot = parseHomelabHealthSnapshot(await response.json());
+		if (!snapshot) throw new Error("Invalid homelab health payload");
+		return snapshot;
+	} finally {
+		clearTimeout(timeout);
+	}
+}
+
 export async function loadHomelabHealthSnapshot(): Promise<{
 	snapshot: HomelabHealthSnapshot | null;
 	source: HomelabHealthSource;
 	primaryUrl: string;
 }> {
 	const primaryUrl = primaryApiUrl();
-	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
-
 	try {
-		const response = await fetch(primaryUrl, {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-health/5.0",
-			},
-			signal: controller.signal,
-			cache: "no-store",
-		});
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}`);
-		}
-		const snapshot = parseHomelabHealthSnapshot(await response.json());
-		if (!snapshot) {
-			throw new Error("Invalid homelab health payload");
-		}
-		return { snapshot, source: "fastapi", primaryUrl };
+		return {
+			snapshot: await loadSnapshot(
+				primaryUrl,
+				PRIMARY_TIMEOUT_MS,
+				"nabla-site-homelab-health/6.0",
+			),
+			source: "fastapi",
+			primaryUrl,
+		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
 		console.warn(
 			`[homelab-health] FastAPI snapshot unavailable (${primaryUrl}): ${reason}; using endpoint-level fallback`,
 		);
 		return { snapshot: null, source: "unavailable", primaryUrl };
-	} finally {
-		clearTimeout(timeout);
 	}
-}
-
-function probesApiUrl(): string {
-	return (
-		process.env.HOMELAB_PROBES_API_URL?.trim() || HOMELAB_PROBES_DEFAULT_API_URL
-	);
 }
 
 export async function loadHomelabProbeSnapshot(): Promise<{
@@ -893,31 +592,23 @@ export async function loadHomelabProbeSnapshot(): Promise<{
 	primaryUrl: string;
 }> {
 	const primaryUrl = probesApiUrl();
-	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), PROBES_TIMEOUT_MS);
-
 	try {
-		const response = await fetch(primaryUrl, {
-			headers: {
-				Accept: "application/json",
-				"Cache-Control": "no-cache",
-				"User-Agent": "nabla-site-homelab-probes/1.0",
-			},
-			signal: controller.signal,
-			cache: "no-store",
-		});
-		if (!response.ok) throw new Error(`HTTP ${response.status}`);
-		const snapshot = parseHomelabHealthSnapshot(await response.json());
-		if (!snapshot) throw new Error("Invalid homelab probe payload");
-		return { snapshot, source: "fastapi-probes", primaryUrl };
+		return {
+			snapshot: await loadSnapshot(
+				primaryUrl,
+				PROBES_TIMEOUT_MS,
+				"nabla-site-homelab-probes/2.0",
+				"no-cache",
+			),
+			source: "fastapi-probes",
+			primaryUrl,
+		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
 		console.warn(
 			`[homelab-probes] FastAPI probe matrix unavailable (${primaryUrl}): ${reason}`,
 		);
 		return { snapshot: null, source: "unavailable", primaryUrl };
-	} finally {
-		clearTimeout(timeout);
 	}
 }
 
