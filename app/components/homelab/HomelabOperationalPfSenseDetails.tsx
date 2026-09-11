@@ -56,7 +56,10 @@ export default function HomelabOperationalPfSenseDetails({
 				) : null}
 				{evidence.pfsense.reason ? <p>{evidence.pfsense.reason}</p> : null}
 				{pfsenseIngress ? (
-					<div className={styles.telemetrySummary} data-pfsense-ingress-diagnostics>
+					<div
+						className={styles.telemetrySummary}
+						data-pfsense-ingress-diagnostics
+					>
 						<span>
 							{t("pfsense.telemetry", {
 								state: pfsenseIngress.telemetry_available

@@ -47,7 +47,9 @@ export default function HomelabOperationalTrueNasRuntime({
 					{truenasApi.redis_available === false ? (
 						<li>{t("cache.redisUnavailable")}</li>
 					) : null}
-					{truenasApi.refresh_in_progress ? <li>{t("cache.refreshing")}</li> : null}
+					{truenasApi.refresh_in_progress ? (
+						<li>{t("cache.refreshing")}</li>
+					) : null}
 					{truenasApi.last_success_at ? (
 						<li>
 							{t("components.lastSuccess", {

@@ -89,16 +89,22 @@ function componentDetails(
 	if (component.failureStage) {
 		rows.push(t("components.failureStage", { stage: component.failureStage }));
 	}
-	if (diagnostic?.probe) rows.push(t("components.probe", { probe: diagnostic.probe }));
-	if (diagnostic?.path) rows.push(t("components.path", { path: diagnostic.path }));
+	if (diagnostic?.probe)
+		rows.push(t("components.probe", { probe: diagnostic.probe }));
+	if (diagnostic?.path)
+		rows.push(t("components.path", { path: diagnostic.path }));
 	if (diagnostic?.exceptionType) {
-		rows.push(t("components.exception", { exception: diagnostic.exceptionType }));
+		rows.push(
+			t("components.exception", { exception: diagnostic.exceptionType }),
+		);
 	}
 	if (typeof diagnostic?.retryAfterSeconds === "number") {
 		rows.push(t("components.retry", { seconds: diagnostic.retryAfterSeconds }));
 	}
 	if (component.lastSuccessAt) {
-		rows.push(t("components.lastSuccess", { timestamp: component.lastSuccessAt }));
+		rows.push(
+			t("components.lastSuccess", { timestamp: component.lastSuccessAt }),
+		);
 	}
 	if (component.refreshError) {
 		rows.push(t("components.refreshError", { error: component.refreshError }));
@@ -167,7 +173,8 @@ export default function HomelabOperationalControlPlane({
 					{t("sources.runtime")}: {t(SOURCE_KEY[evidence.sources.runtime])}
 				</span>
 				<span>
-					{t("sources.diagnostics")}: {t(SOURCE_KEY[evidence.sources.diagnostics])}
+					{t("sources.diagnostics")}:{" "}
+					{t(SOURCE_KEY[evidence.sources.diagnostics])}
 				</span>
 			</div>
 
@@ -230,7 +237,9 @@ export default function HomelabOperationalControlPlane({
 								<i className={STATE_ICON[component.state]} aria-hidden="true" />
 							</div>
 							<div>{t(STATE_LABEL_KEY[component.state])}</div>
-							{component.stale ? <span className={styles.badge}>stale</span> : null}
+							{component.stale ? (
+								<span className={styles.badge}>stale</span>
+							) : null}
 							{details.map((detail) => (
 								<small className={styles.detailText} key={detail}>
 									{detail}

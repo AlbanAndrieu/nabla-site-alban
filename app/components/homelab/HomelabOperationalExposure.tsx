@@ -84,7 +84,8 @@ function ExposurePortRow({
 					{t("exposure.observed", {
 						state: reachabilityLabel(port.observedReachable, t),
 					})}{" "}
-					· {t("exposure.expected", {
+					·{" "}
+					{t("exposure.expected", {
 						state: reachabilityLabel(port.expectedReachable, t),
 					})}
 				</div>
@@ -99,7 +100,9 @@ function ExposurePortRow({
 						<span>{t("exposure.negativeRequired")}</span>
 					) : null}
 				</div>
-				{port.reason ? <div className={styles.detailText}>{port.reason}</div> : null}
+				{port.reason ? (
+					<div className={styles.detailText}>{port.reason}</div>
+				) : null}
 			</div>
 			<i
 				className={`${STATE_ICON[port.state]} ${stateClass(port.state)}`}
@@ -214,12 +217,14 @@ export default function HomelabOperationalExposure({
 												exposure.observed.public_https_reachable ?? "unknown",
 											),
 										})}{" "}
-										· {t("serviceExposure.tunnel", {
+										·{" "}
+										{t("serviceExposure.tunnel", {
 											state: String(
 												exposure.observed.cloudflare_tunnel_observed ?? false,
 											),
 										})}{" "}
-										· {t("serviceExposure.access", {
+										·{" "}
+										{t("serviceExposure.access", {
 											state: String(
 												exposure.observed.cloudflare_access_observed ?? false,
 											),

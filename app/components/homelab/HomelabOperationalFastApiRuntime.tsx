@@ -98,7 +98,8 @@ export default function HomelabOperationalFastApiRuntime({
 												runtime.redis.maxmemory_human ??
 												t("runtime.redis.unbounded"),
 										})}
-										{typeof runtime.redis.memory_utilization_percent === "number"
+										{typeof runtime.redis.memory_utilization_percent ===
+										"number"
 											? ` · ${runtime.redis.memory_utilization_percent}%`
 											: ""}
 									</li>
@@ -112,7 +113,9 @@ export default function HomelabOperationalFastApiRuntime({
 									</li>
 								) : null}
 								{typeof runtime.redis.keys === "number" ? (
-									<li>{t("runtime.redis.keys", { count: runtime.redis.keys })}</li>
+									<li>
+										{t("runtime.redis.keys", { count: runtime.redis.keys })}
+									</li>
 								) : null}
 								{typeof runtime.redis.keyspace_hit_rate_percent === "number" ? (
 									<li>

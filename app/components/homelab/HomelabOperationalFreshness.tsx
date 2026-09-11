@@ -72,7 +72,9 @@ export default function HomelabOperationalFreshness({
 									</span>
 									{credential.credentialMode ? (
 										<small>
-											{t("credentials.mode", { mode: credential.credentialMode })}
+											{t("credentials.mode", {
+												mode: credential.credentialMode,
+											})}
 										</small>
 									) : null}
 									{credential.missingVariables.length ? (

@@ -93,7 +93,9 @@ function DeepCheckRow({
 			{check.reason ? <small>{check.reason}</small> : null}
 			{check.error ? (
 				<small
-					className={check.state === "fail" ? styles.stateFail : styles.stateWarn}
+					className={
+						check.state === "fail" ? styles.stateFail : styles.stateWarn
+					}
 				>
 					{[check.errorKind, check.exceptionType, check.error]
 						.filter(Boolean)
@@ -123,35 +125,37 @@ export default function HomelabOperationalDeepDiagnostics({
 						<span>{t("deep.status", { status: diagnostics.status })}</span>
 					) : null}
 					{diagnostics.contract ? (
-						<span>{t("deep.contract", { contract: diagnostics.contract })}</span>
+						<span>
+							{t("deep.contract", { contract: diagnostics.contract })}
+						</span>
 					) : null}
 					{diagnostics.version ? (
 						<span>{t("deep.version", { version: diagnostics.version })}</span>
 					) : null}
 				</div>
 				{diagnostics.checks.length ? (
-					(["required", "control-plane", "integration", "homelab"] as const).map(
-						(category) => {
-							const checks = diagnostics.checks.filter(
-								(check) => check.category === category,
-							);
-							if (!checks.length) return null;
-							return (
-								<section
-									key={category}
-									className={styles.diagnosticGroup}
-									aria-labelledby={`deep-${category}`}
-								>
-									<h3 id={`deep-${category}`}>{t(CATEGORY_KEY[category])}</h3>
-									<ul className={styles.evidenceList}>
-										{checks.map((check) => (
-											<DeepCheckRow check={check} t={t} key={check.id} />
-										))}
-									</ul>
-								</section>
-							);
-						},
-					)
+					(
+						["required", "control-plane", "integration", "homelab"] as const
+					).map((category) => {
+						const checks = diagnostics.checks.filter(
+							(check) => check.category === category,
+						);
+						if (!checks.length) return null;
+						return (
+							<section
+								key={category}
+								className={styles.diagnosticGroup}
+								aria-labelledby={`deep-${category}`}
+							>
+								<h3 id={`deep-${category}`}>{t(CATEGORY_KEY[category])}</h3>
+								<ul className={styles.evidenceList}>
+									{checks.map((check) => (
+										<DeepCheckRow check={check} t={t} key={check.id} />
+									))}
+								</ul>
+							</section>
+						);
+					})
 				) : (
 					<p>{t("deep.none")}</p>
 				)}

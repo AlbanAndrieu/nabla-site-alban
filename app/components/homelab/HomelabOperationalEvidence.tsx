@@ -19,7 +19,9 @@ const REFRESH_MS = 30_000;
 
 export default function HomelabOperationalEvidence() {
 	const t = useTranslations("operations");
-	const [evidence, setEvidence] = useState<HomelabObservabilitySnapshot | null>(null);
+	const [evidence, setEvidence] = useState<HomelabObservabilitySnapshot | null>(
+		null,
+	);
 	const [refreshing, setRefreshing] = useState(true);
 	const [unavailable, setUnavailable] = useState(false);
 	const pfsenseDetails = useAnchoredDetails(
@@ -131,7 +133,9 @@ export default function HomelabOperationalEvidence() {
 					{evidence.healthSnapshot?.pfsense?.dns ? (
 						<PfSenseDnsPosture
 							snapshot={evidence.healthSnapshot}
-							healthUnavailable={unavailable || evidence.board.state === "stale"}
+							healthUnavailable={
+								unavailable || evidence.board.state === "stale"
+							}
 						/>
 					) : null}
 					<HomelabOperationalRuntime evidence={evidence} />
@@ -145,7 +149,10 @@ export default function HomelabOperationalEvidence() {
 					<HomelabOperationalFreshness evidence={evidence} />
 				</>
 			) : (
-				<div className={styles.emptyState} role={unavailable ? "alert" : "status"}>
+				<div
+					className={styles.emptyState}
+					role={unavailable ? "alert" : "status"}
+				>
 					{boardStatus}
 				</div>
 			)}
