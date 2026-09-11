@@ -6,12 +6,13 @@ import type {
 	HomelabHealthState,
 	PfSenseDnsPosture,
 } from "@/lib/homelabHealth";
+import statusStyles from "./HomelabStatusSurface.module.css";
 
-const ALERT_CLASS: Record<HomelabHealthState, string> = {
-	ok: "alert-success",
-	warn: "alert-warning",
-	fail: "alert-danger",
-	unknown: "alert-secondary",
+const STATUS_CLASS: Record<HomelabHealthState, string> = {
+	ok: statusStyles.ok,
+	warn: statusStyles.warn,
+	fail: statusStyles.fail,
+	unknown: statusStyles.unknown,
 };
 
 const ICON_CLASS: Record<HomelabHealthState, string> = {
@@ -76,11 +77,13 @@ export default function PfSenseDnsPosture({
 
 	return (
 		<div
-			className={`alert ${ALERT_CLASS[state]} mb-3`}
+			className={`${statusStyles.surface} ${STATUS_CLASS[state]} mb-3`}
 			role="status"
 			data-pfsense-dns-policy={state}
 			data-pfsense-dns-configured={posture?.configured ?? false}
-			data-pfsense-dns-truenas-only={posture?.upstream?.truenas_only ?? false}
+			data-pfsense-dns-truenas-only={
+				posture?.upstream?.truenas_only ?? false
+			}
 		>
 			<strong>
 				<i className={ICON_CLASS[state]} aria-hidden="true" /> {t("dns.title")}
@@ -92,8 +95,11 @@ export default function PfSenseDnsPosture({
 				? ` ${t("dns.upstreamCount", { count: upstreamCount })}.`
 				: ""}
 			{healthUnavailable ? ` ${t("dns.snapshotStale")}` : ""}
-			<details className="small mt-2" data-pfsense-dns-evidence>
-				<summary className="fw-semibold">{t("dns.details")}</summary>
+			<details
+				className={`${statusStyles.details} small`}
+				data-pfsense-dns-evidence
+			>
+				<summary>{t("dns.details")}</summary>
 				{posture?.reason ? (
 					<div className="mt-1">
 						<strong>{t("dns.reasonLabel")}:</strong> {posture.reason}

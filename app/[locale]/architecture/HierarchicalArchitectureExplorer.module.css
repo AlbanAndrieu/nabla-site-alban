@@ -201,7 +201,6 @@
 	line-height: 1.4;
 }
 
-
 .mobileHierarchy {
 	display: none;
 }
@@ -394,6 +393,20 @@
 .mobileOpenLink:focus-visible {
 	outline: var(--ui-focus-width) solid #7dd3fc;
 	outline-offset: var(--ui-focus-offset);
+}
+
+.flowInteractionHint {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	margin: 0 0 0.55rem;
+	color: #cbd5e1;
+	font-size: 0.78rem;
+	line-height: 1.4;
+}
+
+.flowInteractionHint i {
+	color: #7dd3fc;
 }
 
 .flowShell {
@@ -748,6 +761,7 @@
 		gap: 0.65rem;
 	}
 
+	.flowInteractionHint,
 	.flowShell {
 		display: none;
 	}

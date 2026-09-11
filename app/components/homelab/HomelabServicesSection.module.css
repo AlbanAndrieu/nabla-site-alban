@@ -4,15 +4,28 @@
 }
 
 .heading {
+	display: block;
+	margin-bottom: 0.75rem;
+	text-align: center;
+}
+
+.heading > a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.9rem;
-	margin-bottom: 0.75rem;
+	max-width: 100%;
+}
+
+.heading > a > span:last-child {
+	margin-left: 0.2rem;
+	font-size: 0.72em;
+	line-height: 1;
 }
 
 .headingGlyph {
 	display: inline-grid;
+	flex: 0 0 3.4rem;
 	width: 3.4rem;
 	height: 3.4rem;
 	place-items: center;
@@ -72,6 +85,7 @@
  * The primary surface keeps only actionable service outcomes and exceptions. */
 .serviceFirst :global([data-homelab-observer-summary]),
 .serviceFirst :global([data-homelab-operator-diagnostics]),
+.serviceFirst :global([data-homelab-status-legend]),
 .serviceFirst :global([data-truenas-runtime-legend]),
 .serviceFirst :global([data-dependency-health-legend]) {
 	display: none !important;
@@ -188,8 +202,12 @@
 
 @media (max-width: 760px) {
 	.heading {
-		align-items: flex-start;
 		text-align: left;
+	}
+
+	.heading > a {
+		align-items: flex-start;
+		justify-content: flex-start;
 	}
 
 	.introCard {

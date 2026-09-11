@@ -2,10 +2,7 @@ import type { CSSProperties } from "react";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import styles from "./HierarchicalArchitectureExplorer.module.css";
 
-export type DependencyEvidenceState =
-	| "blocked"
-	| "degraded"
-	| "unconfirmed";
+export type DependencyEvidenceState = "blocked" | "degraded" | "unconfirmed";
 
 type Props = {
 	blockedBy?: string[];
@@ -74,14 +71,19 @@ export function ArchitectureDependencyEvidenceLegend({
 	return (
 		<div className={styles.relationLegend} data-dependency-evidence-legend>
 			<strong>
-				{french ? "Évidence des dépendances requises" : "Required dependency evidence"}
+				{french
+					? "Évidence des dépendances requises"
+					: "Required dependency evidence"}
 			</strong>
 			<div className={styles.relationLegendItems}>
 				{(["blocked", "degraded", "unconfirmed"] as const).map((state) => (
 					<span key={state} data-dependency-evidence-state={state}>
 						<i
 							className={styles.relationSwatch}
-							style={{ color: STATE_COLOR[state], borderTopStyle: state === "unconfirmed" ? "dashed" : undefined }}
+							style={{
+								color: STATE_COLOR[state],
+								borderTopStyle: state === "unconfirmed" ? "dashed" : undefined,
+							}}
 							aria-hidden="true"
 						/>
 						{label(state, french)}

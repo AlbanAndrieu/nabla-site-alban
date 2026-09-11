@@ -1,23 +1,24 @@
 .disclosure {
-	margin-top: 2rem;
+	margin-top: var(--ui-space-xl);
+	overflow: clip;
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius-card);
 	background: var(--ui-surface-card);
 	box-shadow: var(--ui-shadow-sm);
-	overflow: clip;
+	scroll-margin-top: 6rem;
 }
 
 .summary {
 	display: flex;
 	align-items: center;
-	gap: 1rem;
-	min-height: 4.5rem;
-	padding: 1rem 1.2rem;
+	gap: var(--ui-space-md);
+	min-height: 5rem;
+	padding: var(--ui-space-md) var(--ui-space-lg);
 	cursor: pointer;
 	list-style: none;
 	background: linear-gradient(
 		135deg,
-		color-mix(in srgb, var(--ui-link) 7%, var(--ui-surface-card)),
+		color-mix(in srgb, var(--ui-link) 6%, var(--ui-surface-card)),
 		var(--ui-surface-card)
 	);
 	color: var(--ui-text-primary);
@@ -27,10 +28,27 @@
 	display: none;
 }
 
+.disclosure[open] > .summary {
+	border-bottom: 1px solid var(--ui-border);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-link) 10%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
 .summary::after {
 	content: "▾";
-	margin-left: auto;
-	font-size: 1rem;
+	display: inline-grid;
+	flex: 0 0 1.8rem;
+	width: 1.8rem;
+	height: 1.8rem;
+	margin-left: 0.1rem;
+	place-items: center;
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.82rem;
 	transition: transform 120ms ease;
 }
 
@@ -38,27 +56,35 @@
 	transform: rotate(-90deg);
 }
 
+.summary:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: -3px;
+}
+
 .summaryIcon {
 	display: grid;
-	flex: 0 0 auto;
-	width: 2.8rem;
-	height: 2.8rem;
+	flex: 0 0 2.9rem;
+	width: 2.9rem;
+	height: 2.9rem;
 	place-items: center;
-	border: 1px solid var(--ui-border);
+	border: 1px solid color-mix(in srgb, var(--ui-link) 42%, var(--ui-border));
 	border-radius: 0.85rem;
-	background: var(--ui-surface-muted);
+	background: color-mix(in srgb, var(--ui-link) 12%, var(--ui-surface-card));
+	box-shadow: var(--ui-shadow-sm);
 	color: var(--ui-link);
-	font-size: 1.1rem;
+	font-size: 1.05rem;
 }
 
 .summaryText {
 	display: grid;
 	flex: 1 1 auto;
-	gap: 0.2rem;
+	gap: 0.18rem;
+	min-width: 0;
 }
 
 .summaryText strong {
-	font-size: 1.05rem;
+	font-size: 1rem;
+	line-height: 1.3;
 }
 
 .summaryText small,
@@ -67,40 +93,64 @@
 	color: var(--ui-text-secondary);
 }
 
+.summaryText small {
+	max-width: 54rem;
+	font-size: 0.82rem;
+	font-weight: 500;
+	line-height: 1.45;
+}
+
 .summaryHint {
 	flex: 0 0 auto;
 	padding: 0.35rem 0.65rem;
-	border: 1px solid var(--ui-border);
+	border: 1px solid color-mix(in srgb, var(--ui-link) 28%, var(--ui-border));
 	border-radius: 999px;
-	background: var(--ui-surface-muted);
+	background: color-mix(in srgb, var(--ui-link) 8%, var(--ui-surface-card));
 	color: var(--ui-text-secondary);
-	font-size: 0.8rem;
-	font-weight: 700;
+	font-size: 0.78rem;
+	font-weight: 750;
 }
 
 .body {
-	padding: 1.2rem;
-	border-top: 1px solid var(--ui-border);
+	display: grid;
+	gap: var(--ui-space-md);
+	padding: var(--ui-space-lg);
+	background: var(--ui-surface-card);
 }
 
 .context {
-	max-width: 68rem;
-	margin: 0 auto 1rem;
-	text-align: center;
+	max-width: 72rem;
+	margin: 0;
+	padding: 0.8rem 1rem;
+	border-left: 3px solid color-mix(in srgb, var(--ui-link) 70%, var(--ui-border));
+	border-radius: 0 var(--ui-radius-md) var(--ui-radius-md) 0;
+	background: color-mix(in srgb, var(--ui-link) 5%, var(--ui-surface-card));
+	line-height: 1.5;
+	text-align: left;
 }
 
 .loading,
 .warning {
-	margin: 0 0 1rem;
-	padding: 0.75rem 1rem;
+	margin: 0;
+	padding: 0.8rem 1rem;
 	border-radius: var(--ui-radius-md);
+}
+
+.loading {
+	border: 1px solid var(--ui-border);
 	background: var(--ui-surface-muted);
 }
 
 .warning {
 	border: 1px solid var(--ui-warning-border);
-	background: var(--ui-warning-surface);
-	color: var(--ui-warning-text);
+	border-left: 4px solid var(--ui-warning-text);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-warning-surface) 72%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+	box-shadow: var(--ui-shadow-sm);
+	color: var(--ui-text-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -113,9 +163,18 @@
 	.summary {
 		align-items: flex-start;
 		flex-wrap: wrap;
+		padding-inline: var(--ui-space-md);
 	}
 
 	.summaryHint {
-		margin-left: 3.8rem;
+		margin-left: calc(2.9rem + var(--ui-space-md));
+	}
+
+	.summary::after {
+		margin-left: auto;
+	}
+
+	.body {
+		padding-inline: var(--ui-space-md);
 	}
 }

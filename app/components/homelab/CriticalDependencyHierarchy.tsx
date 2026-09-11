@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import styles from "./CriticalDependencyHierarchy.module.css";
@@ -22,6 +22,7 @@ export default function CriticalDependencyHierarchy({
 	className,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
+	const french = useLocale() === "fr";
 	const [internalOpen, setInternalOpen] = useState(false);
 	const controlled = open !== undefined;
 	const resolvedOpen = controlled ? open : internalOpen;
@@ -40,12 +41,27 @@ export default function CriticalDependencyHierarchy({
 			data-criticality-toggle
 		>
 			<summary className={styles.summary}>
-				<span className={styles.label}>
-					<i className="fas fa-sitemap" aria-hidden="true" />
-					{resolvedOpen
-						? t("criticality.hideHierarchy")
-						: t("criticality.showHierarchy")}
-					<span className={styles.chevron} aria-hidden="true">▾</span>
+				<span className={styles.summaryIcon} aria-hidden="true">
+					<i className="fas fa-sitemap" />
+				</span>
+				<span className={styles.summaryText}>
+					<strong>
+						{resolvedOpen
+							? t("criticality.hideHierarchy")
+							: t("criticality.showHierarchy")}
+					</strong>
+					<small>
+						{french
+							? "Comprendre le rayon d’impact et remonter des consommateurs vers les dépendances requises."
+							: "Understand blast radius and trace consumers back to their required dependencies."}
+					</small>
+				</span>
+				<span className={styles.summaryHint}>
+					<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
+					{french ? "Chemin critique" : "Critical path"}
+				</span>
+				<span className={styles.chevron} aria-hidden="true">
+					▾
 				</span>
 			</summary>
 			<div className={styles.body}>

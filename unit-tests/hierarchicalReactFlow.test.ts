@@ -19,6 +19,18 @@ test("architecture topology view uses the grouped hierarchical React Flow", asyn
 	assert.match(explorer, /nodesDraggable=\{false\}/);
 });
 
+test("React Flow preserves document scrolling and makes graph zoom explicit", async () => {
+	const explorer = await source(
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+	);
+	assert.match(explorer, /zoomOnScroll=\{false\}/);
+	assert.match(explorer, /panOnScroll=\{false\}/);
+	assert.match(explorer, /preventScrolling=\{false\}/);
+	assert.match(explorer, /zoomActivationKeyCode=\{\["Control", "Meta"\]\}/);
+	assert.match(explorer, /architecture-flow-interaction-hint/);
+	assert.match(explorer, /<Controls/);
+});
+
 test("Nabla TrueNAS graph reuses criticality tiers, blast radius and required dependency direction", async () => {
 	const explorer = await source(
 		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
@@ -29,7 +41,10 @@ test("Nabla TrueNAS graph reuses criticality tiers, blast radius and required de
 	assert.match(explorer, /"shared-data"/);
 	assert.match(explorer, /"shared-platform"/);
 	assert.match(explorer, /"application"/);
-	assert.match(explorer, /blastRadius: serviceCriticality\?\.transitiveDependents/);
+	assert.match(
+		explorer,
+		/blastRadius: serviceCriticality\?\.transitiveDependents/,
+	);
 	assert.match(explorer, /required dependencies ↑/);
 	assert.match(explorer, /Critical path/);
 	assert.match(explorer, /All components/);
@@ -47,14 +62,20 @@ test("AI Platform is rendered as functional swimlanes and optional edges remain 
 		"Orchestration",
 		"Observability & evaluation",
 	]) {
-		assert.match(explorer, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+		assert.match(
+			explorer,
+			new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+		);
 	}
 	assert.match(explorer, /Optional relations/);
-	assert.match(explorer, /relationStrengthLabel\(Boolean\(relation\.optional\), french\)/);
+	assert.match(
+		explorer,
+		/relationStrengthLabel\(Boolean\(relation\.optional\), french\)/,
+	);
 	assert.match(explorer, /strokeDasharray/);
 });
 
-test("hierarchical graph keeps consumer-side dependency evidence on required edges", async () => {
+test("hierarchical graph keeps consumer-side dependency evidence on service dependency edges", async () => {
 	const [explorer, evidence] = await Promise.all([
 		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
 		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
@@ -65,6 +86,7 @@ test("hierarchical graph keeps consumer-side dependency evidence on required edg
 	assert.match(explorer, /unconfirmedDependencyLabels\(health\)/);
 	assert.match(explorer, /requiredDependencyRelationHealth/);
 	assert.match(explorer, /requiredEdgeDependencyState/);
+	assert.match(explorer, /mode === "services" && semantic === "dependency"/);
 	assert.match(explorer, /dependencyState === "blocked"/);
 	assert.match(explorer, /dependencyState === "degraded"/);
 	assert.match(explorer, /dependencyState === "unconfirmed"/);
@@ -78,7 +100,9 @@ test("hierarchical graph keeps consumer-side dependency evidence on required edg
 test("architecture graph distinguishes relation purpose from required or optional strength", async () => {
 	const [explorer, styles] = await Promise.all([
 		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css"),
+		source(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+		),
 	]);
 	assert.match(explorer, /type RelationSemantic/);
 	assert.match(explorer, /relationSemantic\(relation\.type\)/);
@@ -91,7 +115,10 @@ test("architecture graph distinguishes relation purpose from required or optiona
 		"observation",
 		"automation",
 	]) {
-		assert.match(explorer, new RegExp(`data-relation-kind=\\{semantic\\}|\\[\\"${semantic}\\"`));
+		assert.match(
+			explorer,
+			new RegExp(`data-relation-kind=\\{semantic\\}|\\[\\"${semantic}\\"`),
+		);
 	}
 	for (const className of [
 		"edgeDependency",
