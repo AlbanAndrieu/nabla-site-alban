@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034
 # Shared mechanics for scripts/agent-quality-gate.sh.
 # This file is sourced by the agent gate; it is intentionally not executable and
 # does not own formatter, linter, security or publication policy.
