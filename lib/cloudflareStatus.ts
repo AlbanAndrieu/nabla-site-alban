@@ -73,7 +73,9 @@ export function parseCloudflareControlPlaneStatus(
 		...(optionalString(raw.error_kind)
 			? { errorKind: optionalString(raw.error_kind) }
 			: {}),
-		...(optionalString(raw.error) ? { message: optionalString(raw.error) } : {}),
+		...(optionalString(raw.error)
+			? { message: optionalString(raw.error) }
+			: {}),
 		...(optionalString(raw.warning)
 			? { warning: optionalString(raw.warning) }
 			: {}),

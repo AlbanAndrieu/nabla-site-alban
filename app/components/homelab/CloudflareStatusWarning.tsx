@@ -27,7 +27,8 @@ function statusIcon(value: boolean | null): string {
 
 export default function CloudflareStatusWarning() {
 	const french = useLocale() === "fr";
-	const [status, setStatus] = useState<CloudflareControlPlaneStatus>(EMPTY_STATUS);
+	const [status, setStatus] =
+		useState<CloudflareControlPlaneStatus>(EMPTY_STATUS);
 	const [loaded, setLoaded] = useState(false);
 
 	useEffect(() => {
@@ -101,12 +102,14 @@ export default function CloudflareStatusWarning() {
 				</span>
 				{typeof status.httpStatus === "number" ? (
 					<span>
-						<i className="fas fa-code" aria-hidden="true" /> HTTP {status.httpStatus}
+						<i className="fas fa-code" aria-hidden="true" /> HTTP{" "}
+						{status.httpStatus}
 					</span>
 				) : null}
 				{typeof status.tunnelCount === "number" ? (
 					<span>
-						<i className="fas fa-route" aria-hidden="true" /> {status.tunnelCount}{" "}
+						<i className="fas fa-route" aria-hidden="true" />{" "}
+						{status.tunnelCount}{" "}
 						{french ? "tunnel(s) observé(s)" : "tunnel(s) observed"}
 					</span>
 				) : null}

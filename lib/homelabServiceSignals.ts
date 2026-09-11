@@ -1,7 +1,4 @@
-import type {
-	HomelabHealthEntry,
-	HomelabHealthState,
-} from "./homelabHealth";
+import type { HomelabHealthEntry, HomelabHealthState } from "./homelabHealth";
 
 export type HomelabServiceSignalId =
 	| "public"
@@ -19,11 +16,17 @@ export type HomelabServiceSignal = {
 };
 
 function runtimeState(entry: HomelabHealthEntry): HomelabHealthState {
-	if (entry.runtime_stale === true || entry.runtime_reachable === false) return "unknown";
+	if (entry.runtime_stale === true || entry.runtime_reachable === false)
+		return "unknown";
 	const state = entry.runtime_state?.trim().toUpperCase();
 	if (!state) return entry.runtime_reachable === true ? "ok" : "unknown";
-	if (["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"].includes(state)) return "ok";
-	if (["CRASHED", "DOWN", "ERROR", "FAILED", "STOPPED", "STOPPING"].includes(state)) {
+	if (["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"].includes(state))
+		return "ok";
+	if (
+		["CRASHED", "DOWN", "ERROR", "FAILED", "STOPPED", "STOPPING"].includes(
+			state,
+		)
+	) {
 		return "fail";
 	}
 	return "warn";
@@ -32,10 +35,12 @@ function runtimeState(entry: HomelabHealthEntry): HomelabHealthState {
 function cloudflareState(entry: HomelabHealthEntry): HomelabHealthState {
 	if (entry.cloudflare_status_confirmed === false) return "unknown";
 	const status = entry.tunnel_status?.trim().toLowerCase();
-	if (!status) return entry.cloudflare_status_confirmed === true ? "ok" : "unknown";
+	if (!status)
+		return entry.cloudflare_status_confirmed === true ? "ok" : "unknown";
 	if (["healthy", "active", "up", "ok"].includes(status)) return "ok";
 	if (["degraded", "warning", "warn"].includes(status)) return "warn";
-	if (["down", "failed", "fail", "inactive", "error"].includes(status)) return "fail";
+	if (["down", "failed", "fail", "inactive", "error"].includes(status))
+		return "fail";
 	return "unknown";
 }
 
@@ -43,19 +48,26 @@ function dependencyState(entry: HomelabHealthEntry): HomelabHealthState {
 	if ((entry.blocked_by?.length ?? 0) > 0) return "fail";
 	if ((entry.degraded_by?.length ?? 0) > 0) return "warn";
 	if ((entry.unconfirmed_dependencies?.length ?? 0) > 0) return "unknown";
-	return entry.dependency_state ??
-		(entry.required_dependencies?.length ? "unknown" : "ok");
+	return (
+		entry.dependency_state ??
+		(entry.required_dependencies?.length ? "unknown" : "ok")
+	);
 }
 
 function probeState(entry: HomelabHealthEntry): HomelabHealthState {
-	if (entry.timed_out === true || entry.probe_source === "deadline") return "warn";
-	if (entry.probe_stale === true || entry.observation_stale === true) return "warn";
+	if (entry.timed_out === true || entry.probe_source === "deadline")
+		return "warn";
+	if (entry.probe_stale === true || entry.observation_stale === true)
+		return "warn";
 	if (entry.probe_source === "origin") return "ok";
 	if (entry.probe_source === "memory") return "warn";
 	return "unknown";
 }
 
-function listDetail(prefix: string, values: string[] | undefined): string | null {
+function listDetail(
+	prefix: string,
+	values: string[] | undefined,
+): string | null {
 	return values?.length ? `${prefix}: ${values.join(", ")}` : null;
 }
 
@@ -70,9 +82,13 @@ export function homelabServiceSignals(
 		state: publicState,
 		detail: [
 			`public ${publicState}`,
-			typeof entry.http_status === "number" ? `HTTP ${entry.http_status}` : null,
+			typeof entry.http_status === "number"
+				? `HTTP ${entry.http_status}`
+				: null,
 			typeof entry.latency_ms === "number" ? `${entry.latency_ms} ms` : null,
-		].filter(Boolean).join(" · "),
+		]
+			.filter(Boolean)
+			.join(" · "),
 	});
 
 	if (entry.internal_state !== undefined && entry.internal_state !== null) {
@@ -96,7 +112,9 @@ export function homelabServiceSignals(
 				`runtime ${entry.runtime_state ?? state}`,
 				entry.runtime_stale === true ? "stale" : null,
 				entry.runtime_missing === true ? "missing inventory" : null,
-			].filter(Boolean).join(" · "),
+			]
+				.filter(Boolean)
+				.join(" · "),
 		});
 	}
 
@@ -116,7 +134,9 @@ export function homelabServiceSignals(
 				listDetail("blocked", entry.blocked_by),
 				listDetail("degraded", entry.degraded_by),
 				listDetail("unconfirmed", entry.unconfirmed_dependencies),
-			].filter(Boolean).join(" · "),
+			]
+				.filter(Boolean)
+				.join(" · "),
 		});
 	}
 
@@ -132,15 +152,23 @@ export function homelabServiceSignals(
 			detail: [
 				`Cloudflare ${state}`,
 				entry.tunnel_status ? `tunnel ${entry.tunnel_status}` : null,
-				entry.cloudflare_status_confirmed === false ? "global status unconfirmed" : null,
+				entry.cloudflare_status_confirmed === false
+					? "global status unconfirmed"
+					: null,
 				entry.cloudflare_warning ?? null,
-			].filter(Boolean).join(" · "),
+			]
+				.filter(Boolean)
+				.join(" · "),
 		});
 	}
 
 	if (entry.url.startsWith("https://") || entry.tls_trusted !== undefined) {
 		const state: HomelabHealthState =
-			entry.tls_trusted === true ? "ok" : entry.tls_trusted === false ? "fail" : "unknown";
+			entry.tls_trusted === true
+				? "ok"
+				: entry.tls_trusted === false
+					? "fail"
+					: "unknown";
 		signals.push({
 			id: "tls",
 			state,
@@ -167,7 +195,9 @@ export function homelabServiceSignals(
 				typeof entry.next_probe_in_seconds === "number"
 					? `next ~${Math.round(entry.next_probe_in_seconds)}s`
 					: null,
-			].filter(Boolean).join(" · "),
+			]
+				.filter(Boolean)
+				.join(" · "),
 		});
 	}
 	return signals;

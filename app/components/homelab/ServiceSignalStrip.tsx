@@ -1,11 +1,14 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import type { HomelabHealthEntry, HomelabHealthState } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthState,
+} from "@/lib/homelabHealth";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import {
-	homelabServiceSignals,
 	type HomelabServiceSignalId,
+	homelabServiceSignals,
 } from "@/lib/homelabServiceSignals";
 
 type Props = { entry?: HomelabHealthEntry };
@@ -46,7 +49,9 @@ export default function ServiceSignalStrip({ entry }: Readonly<Props>) {
 		<div
 			className="d-flex flex-wrap justify-content-center gap-2 mt-2 small"
 			role="list"
-			aria-label={french ? "Signaux de santé du service" : "Service health signals"}
+			aria-label={
+				french ? "Signaux de santé du service" : "Service health signals"
+			}
 			data-service-signal-strip
 		>
 			{signals.map((signal) => {

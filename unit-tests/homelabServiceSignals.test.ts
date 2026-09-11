@@ -5,8 +5,8 @@ import {
 	cloudflareUnconfirmedReason,
 	parseCloudflareControlPlaneStatus,
 } from "../lib/cloudflareStatus";
-import { homelabServiceSignals } from "../lib/homelabServiceSignals";
 import type { HomelabHealthEntry } from "../lib/homelabHealth";
+import { homelabServiceSignals } from "../lib/homelabServiceSignals";
 
 test("Cloudflare empty tunnel inventory remains unknown while preserving API evidence", () => {
 	const status = parseCloudflareControlPlaneStatus({
