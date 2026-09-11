@@ -1,3 +1,7 @@
+import type {
+	PfSenseIngressEvidence,
+	PfSensePostureEvidence,
+} from "./homelabOperationalEvidence";
 import {
 	healthState,
 	isRecord,
@@ -5,10 +9,6 @@ import {
 	optionalNumber,
 	optionalString,
 } from "./homelabOperationalEvidenceParsing";
-import type {
-	PfSenseIngressEvidence,
-	PfSensePostureEvidence,
-} from "./homelabOperationalEvidence";
 
 function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 	if (!isRecord(value)) return null;
@@ -19,8 +19,12 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 		state: optionalString(value.state) ?? "unknown",
 		telemetryAvailable: optionalBoolean(value.telemetry_available),
 		attributionAvailable: optionalBoolean(value.attribution_available),
-		...(optionalString(value.engine) ? { engine: optionalString(value.engine) } : {}),
-		...(optionalString(value.firewall) ? { firewall: optionalString(value.firewall) } : {}),
+		...(optionalString(value.engine)
+			? { engine: optionalString(value.engine) }
+			: {}),
+		...(optionalString(value.firewall)
+			? { firewall: optionalString(value.firewall) }
+			: {}),
 		...(optionalString(value.mechanism)
 			? { mechanism: optionalString(value.mechanism) }
 			: {}),
@@ -29,7 +33,8 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 			: {}),
 		...(source
 			? {
-					sourceIp: source.ip === null ? null : optionalString(source.ip) ?? null,
+					sourceIp:
+						source.ip === null ? null : (optionalString(source.ip) ?? null),
 				}
 			: {}),
 		...(destination
@@ -37,7 +42,7 @@ function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 					destinationIp:
 						destination.ip === null
 							? null
-							: optionalString(destination.ip) ?? null,
+							: (optionalString(destination.ip) ?? null),
 					...(optionalNumber(destination.port) !== undefined
 						? { destinationPort: optionalNumber(destination.port) }
 						: {}),
@@ -75,14 +80,18 @@ export function parsePfSensePosture(
 				const label = optionalString(value.label);
 				const state = optionalString(value.state);
 				const detail = optionalString(value.detail);
-				return id && label && state && detail ? [{ id, label, state, detail }] : [];
+				return id && label && state && detail
+					? [{ id, label, state, detail }]
+					: [];
 			})
 		: [];
 	return {
 		configured: optionalBoolean(dns.configured),
 		reachable: optionalBoolean(dns.reachable),
 		policyState: healthState(dns.policy_state) ?? "unknown",
-		...(optionalString(dns.reason) ? { reason: optionalString(dns.reason) } : {}),
+		...(optionalString(dns.reason)
+			? { reason: optionalString(dns.reason) }
+			: {}),
 		...(optionalString(dns.error_stage)
 			? { errorStage: optionalString(dns.error_stage) }
 			: {}),
