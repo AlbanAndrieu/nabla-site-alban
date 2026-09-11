@@ -101,7 +101,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     if args.warn < 1 or args.fail <= args.warn:
-        raise SystemExit("--fail must be greater than --warn, and both must be positive")
+        raise SystemExit(
+            "--fail must be greater than --warn, and both must be positive"
+        )
     if args.legacy_growth_percent < 0:
         raise SystemExit("--legacy-growth-percent must be non-negative")
 
