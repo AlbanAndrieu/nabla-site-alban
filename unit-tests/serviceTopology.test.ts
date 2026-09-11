@@ -4,6 +4,7 @@ import test from "node:test";
 import { parseServiceTopology } from "../lib/serviceTopology";
 import {
 	hasRequiredTopologyRelation,
+	hasTopologyEdge,
 	hasTopologyRelation,
 	loadLocalServiceTopology,
 } from "./helpers/serviceTopology";
@@ -13,18 +14,8 @@ test("local topology fallback is a valid connected graph", async () => {
 
 	assert.ok(topology.nodes.length >= 10);
 	assert.ok(topology.relations.length >= 10);
-	assert.ok(
-		topology.relations.some(
-			(relation) =>
-				relation.source === "openwebui" && relation.target === "litellm",
-		),
-	);
-	assert.ok(
-		topology.relations.some(
-			(relation) =>
-				relation.source === "litellm" && relation.target === "ollama",
-		),
-	);
+	assert.ok(hasTopologyEdge(topology, "openwebui", "litellm"));
+	assert.ok(hasTopologyEdge(topology, "litellm", "ollama"));
 });
 
 test("local fallback preserves the Elasticsearch and Kibana multi-service contract", async () => {
@@ -68,25 +59,26 @@ test("local fallback tracks current runtime placement and Talos topology", async
 		assert.ok(nodeIds.has(id), `expected authoritative fallback node ${id}`);
 	}
 
-	const hasRelation = (
-		source: string,
-		target: string,
-		type: string,
-		strength = "required",
-	) =>
-		topology.relations.some(
-			(relation) =>
-				relation.source === source &&
-				relation.target === target &&
-				relation.type === type &&
-				relation.strength === strength,
-		);
-
-	assert.ok(hasRelation("fastapi-sample", "docker", "hostedBy"));
-	assert.ok(hasRelation("scrutiny", "influxdb", "storesIn"));
-	assert.ok(hasRelation("scrutiny-collector", "scrutiny", "consumesApi"));
-	assert.ok(hasRelation("kubernetes", "talos", "hostedBy"));
-	assert.ok(hasRelation("talos", "truenas", "hostedBy"));
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "fastapi-sample", "docker", "hostedBy"),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "scrutiny", "influxdb", "storesIn"),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(
+			topology,
+			"scrutiny-collector",
+			"scrutiny",
+			"consumesApi",
+		),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "kubernetes", "talos", "hostedBy"),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "talos", "truenas", "hostedBy"),
+	);
 });
 
 test("Garage models direct S3 ingress separately from Cloudflare Tunnel administration surfaces", async () => {

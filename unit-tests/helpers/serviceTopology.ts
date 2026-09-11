@@ -16,6 +16,16 @@ export async function loadLocalServiceTopology() {
 	return topology;
 }
 
+export function hasTopologyEdge(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+) {
+	return topology.relations.some(
+		(relation) => relation.source === source && relation.target === target,
+	);
+}
+
 export function hasTopologyRelation(
 	topology: ParsedServiceTopology,
 	source: string,
