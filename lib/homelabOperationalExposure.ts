@@ -1,13 +1,13 @@
+import type {
+	ExposurePortEvidence,
+	OperationalHealthState,
+} from "./homelabOperationalEvidence";
 import {
 	isRecord,
 	optionalBoolean,
 	optionalString,
 	stringArray,
 } from "./homelabOperationalEvidenceParsing";
-import type {
-	ExposurePortEvidence,
-	OperationalHealthState,
-} from "./homelabOperationalEvidence";
 
 function exposureState(
 	observed: boolean | null,
@@ -19,7 +19,9 @@ function exposureState(
 	return trustedSourcesOnly ? "warn" : "ok";
 }
 
-export function parseExposurePorts(sickzValue: unknown): ExposurePortEvidence[] {
+export function parseExposurePorts(
+	sickzValue: unknown,
+): ExposurePortEvidence[] {
 	if (!isRecord(sickzValue) || !isRecord(sickzValue.checks)) return [];
 	const pfsense = Object.values(sickzValue.checks).find(
 		(value) => isRecord(value) && isRecord(value.pfsense_tcp_port_policy),
