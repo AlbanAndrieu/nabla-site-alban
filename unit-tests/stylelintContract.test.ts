@@ -25,7 +25,11 @@ test("npm Stylelint 17 covers every maintained stylesheet surface before legacy 
 		pkg.scripts["lint:css:fix"],
 		'stylelint --fix "app/**/*.css" "components/**/*.css" "public/*.css"',
 	);
-	for (const maintainedScope of ["app/**/*.css", "components/**/*.css", "public/*.css"]) {
+	for (const maintainedScope of [
+		"app/**/*.css",
+		"components/**/*.css",
+		"public/*.css",
+	]) {
 		assert.ok(
 			pkg.scripts["lint:css"].includes(maintainedScope),
 			`Stylelint must cover ${maintainedScope}`,
