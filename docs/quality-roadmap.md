@@ -156,15 +156,23 @@ les autres chantiers.
   formatter/pre-commit s'arrête avant Semgrep, `setup-node`, `npm ci` et le build,
   émet `QG_AUTOFIX_REQUIRED` avec le patch exact, puis la passe corrigée traverse
   la gate complète. Le cold bootstrap Copilot est aussi validé avec npm 11.17
-  installé avant les hooks Node de pre-commit. Il reste à observer un cycle local
-  réel `quality:agent:fix` → commit → pre-push démontrant que la publication gate
-  stricte ne s'exécute qu'une fois et laisse l'arbre propre.
+  installé avant les hooks Node de pre-commit. Ruff utilise maintenant une seule
+  autorité de lint auto-fixante, `ruff-check --fix --unsafe-fixes`, avant
+  `ruff-format`, et un contrat empêche le retour du hook `ruff` redondant. Il reste
+  à observer un cycle local réel `quality:agent:fix` → commit → pre-push démontrant
+  que la publication gate stricte ne s'exécute qu'une fois et laisse l'arbre propre.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
   détecté les faux positifs CSS Modules `:global()` et deux vrais sélecteurs
   dupliqués avant suppression de `pre-commit-stylelint`, Stylelint 14 et
   `stylelint-config-standard-scss@3.0.0`. Un contrat interdit leur réintroduction.
+- [x] Ajouter un garde de non-régression code-size baseline-aware au gate agent :
+  seuls les fichiers source/test modifiés sont inspectés, un warning apparaît au-
+  dessus de 300 lignes, un nouveau dépassement au-dessus de 600 lignes échoue et
+  les fichiers legacy déjà au-dessus de 600 ne peuvent croître que de +2 %. Le
+  rapport compact reste visible sur les runs verts et les contrats couvrent
+  warning, hard fail, grandfathering et dépassement de la marge legacy.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
