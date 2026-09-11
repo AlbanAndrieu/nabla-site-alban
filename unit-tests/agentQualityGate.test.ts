@@ -81,7 +81,7 @@ test("repository exposes local fix, check and strict pre-push publication comman
 test("local fix phase converges formatter and npm lint fixes before publication", async () => {
 	const gate = await source("scripts/agent-quality-gate.sh");
 
-	assert.match(gate, /QUALITY_FIX_PASSES:-6/);
+	assert.match(gate, /QUALITY_FIX_PASSES:-12/);
 	assert.match(gate, /precommit_fix_until_stable/);
 	assert.match(gate, /for \(\(pass = 1; pass <= FIX_PASSES; pass\+\+\)\)/);
 	assert.match(gate, /applied deterministic fixes; retrying without log analysis/);
