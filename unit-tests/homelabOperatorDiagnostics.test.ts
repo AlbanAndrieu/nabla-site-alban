@@ -69,7 +69,10 @@ test("raw probe diagnostics enrich but never override reconciled service health"
 	assert.equal(service.last_known_state, "ok");
 	assert.equal(service.last_known_reachable, true);
 	assert.equal(service.last_known_http_status, 200);
-	assert.equal(service.warning, "cached evidence retained after refresh timeout");
+	assert.equal(
+		service.warning,
+		"cached evidence retained after refresh timeout",
+	);
 	assert.equal("api_key" in service, false);
 	assert.equal("raw_config" in service, false);
 	assert.equal(

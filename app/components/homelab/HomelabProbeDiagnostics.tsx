@@ -4,9 +4,9 @@ import { useLocale } from "next-intl";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { readHomelabOperatorDiagnostics } from "@/lib/homelabOperatorDiagnostics";
 import {
+	type HomelabProbeMetricRow,
 	probeCoordinatorMetricRows,
 	probeScopeMetricRows,
-	type HomelabProbeMetricRow,
 } from "@/lib/homelabProbeMetrics";
 
 type Props = { snapshot: HomelabHealthSnapshot | null };
@@ -35,10 +35,15 @@ function rowsList(rows: Row[], key: string) {
 
 function add(rows: Row[], label: string, value: unknown, suffix = "") {
 	const formatted = present(value);
-	if (formatted !== undefined) rows.push({ label, value: `${formatted}${suffix}` });
+	if (formatted !== undefined)
+		rows.push({ label, value: `${formatted}${suffix}` });
 }
 
-function performanceRows(phases: Record<string, number>, fixed?: boolean, count?: number): Row[] {
+function performanceRows(
+	phases: Record<string, number>,
+	fixed?: boolean,
+	count?: number,
+): Row[] {
 	const total = phases.total;
 	const rows = Object.entries(phases).map(([label, value]) => ({
 		label,
@@ -50,7 +55,11 @@ function performanceRows(phases: Record<string, number>, fixed?: boolean, count?
 	const ranked = Object.entries(phases)
 		.filter(([key]) => key !== "total")
 		.sort((left, right) => right[1] - left[1]);
-	if (ranked[0]) rows.push({ label: "slowest_phase", value: `${ranked[0][0]} · ${ranked[0][1]} ms` });
+	if (ranked[0])
+		rows.push({
+			label: "slowest_phase",
+			value: `${ranked[0][0]} · ${ranked[0][1]} ms`,
+		});
 	add(rows, "fixed_cardinality", fixed);
 	add(rows, "phase_count", count);
 	return rows;
@@ -66,15 +75,29 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	const pfsense = snapshot.pfsense?.dns;
 	const pfsenseOperator = pfsense?.operator;
 	const coordinatorRows = probeCoordinatorMetricRows(snapshot, french);
-	const publicRows = probeScopeMetricRows(snapshot.probe_summary?.public, french);
-	const internalRows = probeScopeMetricRows(snapshot.probe_summary?.internal, french);
+	const publicRows = probeScopeMetricRows(
+		snapshot.probe_summary?.public,
+		french,
+	);
+	const internalRows = probeScopeMetricRows(
+		snapshot.probe_summary?.internal,
+		french,
+	);
 
 	const runtimeRows: Row[] = [];
 	add(runtimeRows, "Runtime", probe?.state);
 	add(runtimeRows, french ? "Démarré" : "Started", probe?.startedAt);
 	add(runtimeRows, "Uptime", probe?.uptimeSeconds, "s");
-	add(runtimeRows, french ? "Couverture" : "Coverage", probe?.coveragePercent, "%");
-	if (probe?.knownProbeSlots !== undefined || probe?.eligibleProbeSlots !== undefined) {
+	add(
+		runtimeRows,
+		french ? "Couverture" : "Coverage",
+		probe?.coveragePercent,
+		"%",
+	);
+	if (
+		probe?.knownProbeSlots !== undefined ||
+		probe?.eligibleProbeSlots !== undefined
+	) {
 		runtimeRows.push({
 			label: french ? "Slots connus / éligibles" : "Known / eligible slots",
 			value: `${probe?.knownProbeSlots ?? "?"} / ${probe?.eligibleProbeSlots ?? "?"}`,
@@ -117,10 +140,16 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	add(apiRows, "Username env", api?.usernameVariable);
 	add(apiRows, "API-key env", api?.apiKeyVariable);
 	if (api?.shadowedUsernameVariables.length) {
-		apiRows.push({ label: "Shadowed username env", value: api.shadowedUsernameVariables.join(", ") });
+		apiRows.push({
+			label: "Shadowed username env",
+			value: api.shadowedUsernameVariables.join(", "),
+		});
 	}
 	if (api?.shadowedApiKeyVariables.length) {
-		apiRows.push({ label: "Shadowed API-key env", value: api.shadowedApiKeyVariables.join(", ") });
+		apiRows.push({
+			label: "Shadowed API-key env",
+			value: api.shadowedApiKeyVariables.join(", "),
+		});
 	}
 	add(apiRows, "Runtime error", diagnostics.trueNasRuntimeError);
 
@@ -137,9 +166,21 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 		});
 	}
 	add(pfsenseRows, "Services observed", pfsenseOperator?.services_observed);
-	add(pfsenseRows, "Running services", pfsenseOperator?.service_summary?.running);
-	add(pfsenseRows, "Stopped services", pfsenseOperator?.service_summary?.stopped);
-	add(pfsenseRows, "Unknown services", pfsenseOperator?.service_summary?.unknown);
+	add(
+		pfsenseRows,
+		"Running services",
+		pfsenseOperator?.service_summary?.running,
+	);
+	add(
+		pfsenseRows,
+		"Stopped services",
+		pfsenseOperator?.service_summary?.stopped,
+	);
+	add(
+		pfsenseRows,
+		"Unknown services",
+		pfsenseOperator?.service_summary?.unknown,
+	);
 	add(pfsenseRows, "Total services", pfsenseOperator?.service_summary?.total);
 	add(pfsenseRows, "Stale", pfsenseOperator?.stale);
 	add(pfsenseRows, "Last good available", pfsenseOperator?.last_good_available);
@@ -149,25 +190,35 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 	add(pfsenseRows, "Cache age", pfsenseOperator?.cache?.cache_age_seconds, "s");
 	add(pfsenseRows, "Cache hit", pfsenseOperator?.cache?.cached);
 	add(pfsenseRows, "Cache stale", pfsenseOperator?.cache?.stale);
-	add(pfsenseRows, "Cache refreshing", pfsenseOperator?.cache?.refresh_in_progress);
+	add(
+		pfsenseRows,
+		"Cache refreshing",
+		pfsenseOperator?.cache?.refresh_in_progress,
+	);
 	add(pfsenseRows, "Cache Redis", pfsenseOperator?.cache?.redis_available);
 
-	const hasEvidence = [
-		coordinatorRows,
-		runtimeRows,
-		publicRows,
-		internalRows,
-		aggregateRows,
-		apiRows,
-		pfsenseRows,
-	].some((rows) => rows.length > 0) || Boolean(transport?.stages.length);
+	const hasEvidence =
+		[
+			coordinatorRows,
+			runtimeRows,
+			publicRows,
+			internalRows,
+			aggregateRows,
+			apiRows,
+			pfsenseRows,
+		].some((rows) => rows.length > 0) || Boolean(transport?.stages.length);
 	if (!hasEvidence) return null;
 
 	return (
-		<details className="card box-shadow p-3 mb-4" data-homelab-operator-diagnostics>
+		<details
+			className="card box-shadow p-3 mb-4"
+			data-homelab-operator-diagnostics
+		>
 			<summary className="h5 mb-0">
 				<i className="fas fa-chart-line" aria-hidden="true" />{" "}
-				{french ? "Métriques et diagnostic des sondes" : "Probe metrics and diagnostics"}
+				{french
+					? "Métriques et diagnostic des sondes"
+					: "Probe metrics and diagnostics"}
 			</summary>
 			<p className="small text-muted mt-3">
 				{french
@@ -183,11 +234,14 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 			{rowsList(publicRows, "public-probes")}
 			{internalRows.length > 0 && <h4 className="h6">Internal probe batch</h4>}
 			{rowsList(internalRows, "internal-probes")}
-			{aggregateRows.length > 0 && <h4 className="h6">Aggregate performance</h4>}
+			{aggregateRows.length > 0 && (
+				<h4 className="h6">Aggregate performance</h4>
+			)}
 			{rowsList(aggregateRows, "aggregate-performance")}
 			{diagnostics.evidencePriority.length > 0 && (
 				<p className="small" data-evidence-priority>
-					<strong>Evidence priority:</strong> {diagnostics.evidencePriority.join(" → ")}
+					<strong>Evidence priority:</strong>{" "}
+					{diagnostics.evidencePriority.join(" → ")}
 				</p>
 			)}
 
@@ -200,7 +254,9 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 						{[transport.target, transport.pathMode, transport.websocketUri]
 							.filter(Boolean)
 							.join(" · ")}
-						{transport.verifySsl !== undefined ? ` · verify TLS=${transport.verifySsl}` : ""}
+						{transport.verifySsl !== undefined
+							? ` · verify TLS=${transport.verifySsl}`
+							: ""}
 						{transport.timedOut ? " · timed out" : ""}
 						{transport.errorKind ? ` · ${transport.errorKind}` : ""}
 					</p>
@@ -208,13 +264,23 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 						{transport.stages.map((stage) => (
 							<li key={stage.id} data-stage-state={stage.state}>
 								<strong>{stage.label}</strong> — {stage.state}
-								{stage.elapsedMs !== undefined ? ` · ${stage.elapsedMs} ms` : ""}
-								{stage.httpStatus !== undefined ? ` · HTTP ${stage.httpStatus}` : ""}
-								{stage.tlsTrusted !== undefined ? ` · TLS=${String(stage.tlsTrusted)}` : ""}
+								{stage.elapsedMs !== undefined
+									? ` · ${stage.elapsedMs} ms`
+									: ""}
+								{stage.httpStatus !== undefined
+									? ` · HTTP ${stage.httpStatus}`
+									: ""}
+								{stage.tlsTrusted !== undefined
+									? ` · TLS=${String(stage.tlsTrusted)}`
+									: ""}
 								{stage.resolved.length ? ` · ${stage.resolved.join(", ")}` : ""}
-								{stage.detail ? <span className="d-block text-muted">{stage.detail}</span> : null}
+								{stage.detail ? (
+									<span className="d-block text-muted">{stage.detail}</span>
+								) : null}
 								{stage.failureStage ? (
-									<span className="d-block text-danger">failure: {stage.failureStage}</span>
+									<span className="d-block text-danger">
+										failure: {stage.failureStage}
+									</span>
 								) : null}
 							</li>
 						))}
@@ -226,12 +292,14 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 			{rowsList(pfsenseRows, "pfsense")}
 			{pfsenseOperator?.endpoint_status && (
 				<ul className="small" data-pfsense-endpoint-status>
-					{Object.entries(pfsenseOperator.endpoint_status).map(([name, evidence]) => (
-						<li key={name}>
-							{name}: {evidence.observed ? "observed" : "failed"}
-							{evidence.error ? ` · ${evidence.error}` : ""}
-						</li>
-					))}
+					{Object.entries(pfsenseOperator.endpoint_status).map(
+						([name, evidence]) => (
+							<li key={name}>
+								{name}: {evidence.observed ? "observed" : "failed"}
+								{evidence.error ? ` · ${evidence.error}` : ""}
+							</li>
+						),
+					)}
 				</ul>
 			)}
 		</details>

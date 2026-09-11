@@ -21,7 +21,9 @@ function scalar(raw: UnknownRecord, key: string): string | undefined {
 function stringList(raw: UnknownRecord, key: string): string | undefined {
 	const value = raw[key];
 	if (!Array.isArray(value)) return undefined;
-	const items = value.filter((item): item is string => typeof item === "string" && Boolean(item.trim()));
+	const items = value.filter(
+		(item): item is string => typeof item === "string" && Boolean(item.trim()),
+	);
 	return items.length > 0 ? items.join(" · ") : undefined;
 }
 
@@ -56,7 +58,11 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(rows, french ? "HTTP" : "HTTP", status(scalar(raw, "http_status")));
 	add(rows, "Reachable", scalar(raw, "reachable"));
 	add(rows, "TLS trusted", scalar(raw, "tls_trusted"));
-	add(rows, french ? "Latence" : "Latency", milliseconds(scalar(raw, "latency_ms")));
+	add(
+		rows,
+		french ? "Latence" : "Latency",
+		milliseconds(scalar(raw, "latency_ms")),
+	);
 	add(rows, "Local state", scalar(raw, "local_state"));
 	add(rows, "Dependency state", scalar(raw, "dependency_state"));
 	add(rows, "Effective state", scalar(raw, "effective_state"));
@@ -66,15 +72,35 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(rows, "Blocked by", stringList(raw, "blocked_by"));
 	add(rows, "Dependency cycle", stringList(raw, "dependency_cycle"));
 	add(rows, french ? "Observé à" : "Observed at", scalar(raw, "observed_at"));
-	add(rows, french ? "Âge observation" : "Observation age", seconds(scalar(raw, "observation_age_seconds")));
-	add(rows, french ? "Observation stale" : "Observation stale", scalar(raw, "observation_stale"));
+	add(
+		rows,
+		french ? "Âge observation" : "Observation age",
+		seconds(scalar(raw, "observation_age_seconds")),
+	);
+	add(
+		rows,
+		french ? "Observation stale" : "Observation stale",
+		scalar(raw, "observation_stale"),
+	);
 
 	for (const prefix of ["direct", "internal"] as const) {
 		const title = prefix === "direct" ? "Direct" : "Internal";
 		add(rows, `${title} probe source`, scalar(raw, `${prefix}_probe_source`));
-		add(rows, `${title} probe observed`, scalar(raw, `${prefix}_probe_observed_at`));
-		add(rows, `${title} probe age`, seconds(scalar(raw, `${prefix}_probe_age_seconds`)));
-		add(rows, `${title} refresh error`, scalar(raw, `${prefix}_probe_refresh_error`));
+		add(
+			rows,
+			`${title} probe observed`,
+			scalar(raw, `${prefix}_probe_observed_at`),
+		);
+		add(
+			rows,
+			`${title} probe age`,
+			seconds(scalar(raw, `${prefix}_probe_age_seconds`)),
+		);
+		add(
+			rows,
+			`${title} refresh error`,
+			scalar(raw, `${prefix}_probe_refresh_error`),
+		);
 	}
 
 	add(rows, "Rolling probe source", scalar(raw, "probe_source"));
@@ -82,8 +108,16 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(rows, "Rolling probe age", seconds(scalar(raw, "probe_age_seconds")));
 	add(rows, "Rolling interval", seconds(scalar(raw, "probe_interval_seconds")));
 	add(rows, "Rolling stale", scalar(raw, "probe_stale"));
-	add(rows, "Rolling stale after", seconds(scalar(raw, "probe_stale_after_seconds")));
-	add(rows, "Next rolling probe", seconds(scalar(raw, "next_probe_in_seconds")));
+	add(
+		rows,
+		"Rolling stale after",
+		seconds(scalar(raw, "probe_stale_after_seconds")),
+	);
+	add(
+		rows,
+		"Next rolling probe",
+		seconds(scalar(raw, "next_probe_in_seconds")),
+	);
 	add(rows, "Last-known state", scalar(raw, "last_known_state"));
 	add(rows, "Last-known reachable", scalar(raw, "last_known_reachable"));
 	add(rows, "Last-known HTTP", status(scalar(raw, "last_known_http_status")));
@@ -106,33 +140,74 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 	add(
 		rows,
 		"HTTP auth mode",
-		scalar(raw, "public_probe_auth_mode") ?? scalar(raw, "http_probe_auth_mode"),
+		scalar(raw, "public_probe_auth_mode") ??
+			scalar(raw, "http_probe_auth_mode"),
 	);
 	add(rows, "HTTP evidence status", scalar(raw, "http_evidence_status"));
 	add(rows, "Anonymous HTTP", status(scalar(raw, "anonymous_http_status")));
 	add(rows, "Edge HTTP evidence", scalar(raw, "cloudflare_http_evidence"));
 	add(rows, "Access signal", scalar(raw, "cloudflare_access_signal"));
 	add(rows, "Default deny", scalar(raw, "cloudflare_default_deny"));
-	add(rows, "Service token configured", scalar(raw, "cloudflare_service_token_configured"));
-	add(rows, "Service-token config stage", scalar(raw, "cloudflare_service_token_configuration_stage"));
-	add(rows, "Service auth attempted", scalar(raw, "cloudflare_service_auth_attempted"));
-	add(rows, "Service token passed", scalar(raw, "cloudflare_service_token_access_passed"));
-	add(rows, "Service-token HTTP", status(scalar(raw, "cloudflare_service_token_http_status")));
-	add(rows, "Service-token default deny", scalar(raw, "cloudflare_service_token_default_deny"));
-	add(rows, "Service-token signal", scalar(raw, "cloudflare_service_token_access_signal"));
-	add(rows, "Service-token error", scalar(raw, "cloudflare_service_token_error_kind"));
+	add(
+		rows,
+		"Service token configured",
+		scalar(raw, "cloudflare_service_token_configured"),
+	);
+	add(
+		rows,
+		"Service-token config stage",
+		scalar(raw, "cloudflare_service_token_configuration_stage"),
+	);
+	add(
+		rows,
+		"Service auth attempted",
+		scalar(raw, "cloudflare_service_auth_attempted"),
+	);
+	add(
+		rows,
+		"Service token passed",
+		scalar(raw, "cloudflare_service_token_access_passed"),
+	);
+	add(
+		rows,
+		"Service-token HTTP",
+		status(scalar(raw, "cloudflare_service_token_http_status")),
+	);
+	add(
+		rows,
+		"Service-token default deny",
+		scalar(raw, "cloudflare_service_token_default_deny"),
+	);
+	add(
+		rows,
+		"Service-token signal",
+		scalar(raw, "cloudflare_service_token_access_signal"),
+	);
+	add(
+		rows,
+		"Service-token error",
+		scalar(raw, "cloudflare_service_token_error_kind"),
+	);
 	add(rows, "HTTP evidence skipped", scalar(raw, "http_evidence_skipped"));
 	add(rows, "HTTP skip reason", scalar(raw, "http_evidence_skip_reason"));
 
 	add(rows, french ? "Erreur réseau" : "Network error", scalar(raw, "error"));
-	add(rows, french ? "Erreur applicative" : "Application error", scalar(raw, "application_error"));
+	add(
+		rows,
+		french ? "Erreur applicative" : "Application error",
+		scalar(raw, "application_error"),
+	);
 	if (rows.length === 0) return null;
 
 	return (
-		<details className="text-start small mt-3" data-service-operator-diagnostics>
+		<details
+			className="text-start small mt-3"
+			data-service-operator-diagnostics
+		>
 			<summary className="fw-semibold">
 				<i className="fas fa-chart-line" aria-hidden="true" />{" "}
-				{french ? "Métriques / diagnostic" : "Metrics / diagnostics"} ({rows.length})
+				{french ? "Métriques / diagnostic" : "Metrics / diagnostics"} (
+				{rows.length})
 			</summary>
 			<dl className="row g-1 mt-2 mb-0">
 				{rows.map((row, index) => (
