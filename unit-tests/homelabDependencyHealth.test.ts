@@ -303,9 +303,10 @@ test("service grid shows effective dependency degradation without replacing runt
 });
 
 test("architecture graph uses explicit consumer-side dependency evidence on required edges", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const [explorer, evidence] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
+	]);
 
 	assert.match(explorer, /blockedDependencyLabels\(health\)/);
 	assert.match(explorer, /degradedDependencyLabels\(health\)/);
@@ -315,5 +316,7 @@ test("architecture graph uses explicit consumer-side dependency evidence on requ
 	assert.match(explorer, /dependencyState === "blocked"/);
 	assert.match(explorer, /dependencyState === "degraded"/);
 	assert.match(explorer, /dependencyState === "unconfirmed"/);
-	assert.match(explorer, /data-dependency-evidence-legend/);
+	assert.match(explorer, /ArchitectureDependencyEvidenceLegend/);
+	assert.match(evidence, /data-dependency-evidence-legend/);
+	assert.match(evidence, /data-dependency-evidence-state=\{state\}/);
 });
