@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import ActionLink from "@/components/ui/ActionLink";
-import HomelabOperationalEvidence from "./HomelabOperationalEvidence";
+import HomelabOperationsDisclosure from "./HomelabOperationsDisclosure";
 import HomelabServicesBlock from "./HomelabServicesBlock";
+import styles from "./HomelabServicesSection.module.css";
 
 type Props = {
 	headingId?: string;
@@ -19,13 +20,30 @@ export default async function HomelabServicesSection({
 			aria-labelledby={headingId}
 		>
 			<div className="container">
-				<div className="row mb-4">
-					<div className="col-12 text-center">
-						<AnchoredHeading id={headingId} className="display-4 mb-3">
-							{t("title")}
+				<div className={styles.sectionHeader}>
+					<div className="text-center">
+						<AnchoredHeading id={headingId} className={styles.heading}>
+							<span className={styles.headingGlyph} aria-hidden="true">
+								<i className="fas fa-cubes-stacked" />
+							</span>
+							<span>{t("title")}</span>
 						</AnchoredHeading>
-						<p className="lead mb-2 stack-page-hero__lead">{t("lead")}</p>
-						<p className="small text-secondary homelab-services-foss-note mb-3">
+						<div className={styles.introCard}>
+							<span className={styles.introIcon} aria-hidden="true">
+								<i className="fas fa-heart-pulse" />
+							</span>
+							<p className={styles.introText}>{t("lead")}</p>
+							<div className={styles.architectureLink}>
+								<ActionLink
+									href="architecture#declared-observed-architecture"
+									variant="secondary"
+								>
+									<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
+									Architecture
+								</ActionLink>
+							</div>
+						</div>
+						<p className="small text-secondary homelab-services-foss-note mt-3 mb-0">
 							{t("iconsBefore")}{" "}
 							<a
 								href="https://selfh.st/icons/"
@@ -44,18 +62,13 @@ export default async function HomelabServicesSection({
 							</a>
 							.
 						</p>
-						<div className="d-flex flex-wrap gap-2 justify-content-center">
-							<ActionLink
-								href="architecture#declared-observed-architecture"
-								variant="secondary"
-							>
-								Architecture · Declared / Observed / Health
-							</ActionLink>
-						</div>
 					</div>
 				</div>
-				<HomelabOperationalEvidence />
-				<HomelabServicesBlock />
+
+				<div className={styles.serviceFirst} data-service-first-homelab-view>
+					<HomelabServicesBlock />
+				</div>
+				<HomelabOperationsDisclosure />
 			</div>
 		</section>
 	);

@@ -1,0 +1,121 @@
+.disclosure {
+	margin-top: 2rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+	overflow: clip;
+}
+
+.summary {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	min-height: 4.5rem;
+	padding: 1rem 1.2rem;
+	cursor: pointer;
+	list-style: none;
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-link) 7%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+	color: var(--ui-text-primary);
+}
+
+.summary::-webkit-details-marker {
+	display: none;
+}
+
+.summary::after {
+	content: "▾";
+	margin-left: auto;
+	font-size: 1rem;
+	transition: transform 120ms ease;
+}
+
+.disclosure:not([open]) > .summary::after {
+	transform: rotate(-90deg);
+}
+
+.summaryIcon {
+	display: grid;
+	flex: 0 0 auto;
+	width: 2.8rem;
+	height: 2.8rem;
+	place-items: center;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.85rem;
+	background: var(--ui-surface-muted);
+	color: var(--ui-link);
+	font-size: 1.1rem;
+}
+
+.summaryText {
+	display: grid;
+	flex: 1 1 auto;
+	gap: 0.2rem;
+}
+
+.summaryText strong {
+	font-size: 1.05rem;
+}
+
+.summaryText small,
+.context,
+.loading {
+	color: var(--ui-text-secondary);
+}
+
+.summaryHint {
+	flex: 0 0 auto;
+	padding: 0.35rem 0.65rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+.body {
+	padding: 1.2rem;
+	border-top: 1px solid var(--ui-border);
+}
+
+.context {
+	max-width: 68rem;
+	margin: 0 auto 1rem;
+	text-align: center;
+}
+
+.loading,
+.warning {
+	margin: 0 0 1rem;
+	padding: 0.75rem 1rem;
+	border-radius: var(--ui-radius-md);
+	background: var(--ui-surface-muted);
+}
+
+.warning {
+	border: 1px solid var(--ui-warning-border);
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.summary::after {
+		transition: none;
+	}
+}
+
+@media (max-width: 760px) {
+	.summary {
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.summaryHint {
+		margin-left: 3.8rem;
+	}
+}
