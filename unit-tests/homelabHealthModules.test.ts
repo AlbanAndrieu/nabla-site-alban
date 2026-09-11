@@ -23,5 +23,7 @@ test("homelab health facade keeps contracts, parsing and transport separated", a
 });
 
 test("temporary homelabHealthBase module is removed", async () => {
-	await assert.rejects(access(new URL("../lib/homelabHealthBase.ts", import.meta.url)));
+	await assert.rejects(
+		access(new URL("../lib/homelabHealthBase.ts", import.meta.url)),
+	);
 });

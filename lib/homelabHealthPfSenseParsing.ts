@@ -115,7 +115,9 @@ function parseIngressBlock(
 	};
 }
 
-export function parsePfSenseDnsPosture(value: unknown): PfSenseDnsPosture | null {
+export function parsePfSenseDnsPosture(
+	value: unknown,
+): PfSenseDnsPosture | null {
 	if (!isRecord(value)) return null;
 	if (
 		typeof value.configured !== "boolean" ||

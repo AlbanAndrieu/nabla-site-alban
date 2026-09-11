@@ -1,7 +1,3 @@
-import type {
-	HomelabHealthSnapshot,
-	HomelabInternalHealthEntry,
-} from "./homelabHealthTypes";
 import { parsePfSenseDnsPosture } from "./homelabHealthPfSenseParsing";
 import {
 	parseHealthBoardMetadata,
@@ -13,6 +9,10 @@ import {
 	enrichRollingProbeSnapshot,
 	normalizeRollingProbePayload,
 } from "./homelabHealthRollingProbe";
+import type {
+	HomelabHealthSnapshot,
+	HomelabInternalHealthEntry,
+} from "./homelabHealthTypes";
 import {
 	isRecord,
 	validHealthEntry,

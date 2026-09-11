@@ -8,7 +8,10 @@ import type {
 	HomelabProbeSummary,
 	HomelabReconciliationMetadata,
 } from "./homelabHealthTypes";
-import { isRecord, optionalNonNegativeInteger } from "./homelabHealthValidation";
+import {
+	isRecord,
+	optionalNonNegativeInteger,
+} from "./homelabHealthValidation";
 
 function parseProbeStateCounts(
 	value: unknown,

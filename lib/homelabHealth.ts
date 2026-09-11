@@ -4,7 +4,6 @@ import type {
 } from "./homelabHealthTypes";
 import { normalizeHomelabHealthUrl } from "./homelabHealthValidation";
 
-export * from "./homelabHealthTypes";
 export { parseHomelabHealthSnapshot } from "./homelabHealthParser";
 export {
 	HOMELAB_HEALTH_DEFAULT_API_URL,
@@ -12,6 +11,7 @@ export {
 	loadHomelabHealthSnapshot,
 	loadHomelabProbeSnapshot,
 } from "./homelabHealthTransport";
+export * from "./homelabHealthTypes";
 export { normalizeHomelabHealthUrl } from "./homelabHealthValidation";
 
 export function homelabHealthForUrl(

@@ -164,7 +164,9 @@ export function validInternalHealthEntry(
 	);
 }
 
-export function validTrueNasApiHealth(value: unknown): value is TrueNasApiHealth {
+export function validTrueNasApiHealth(
+	value: unknown,
+): value is TrueNasApiHealth {
 	if (!isRecord(value) || typeof value.reachable !== "boolean") return false;
 	return value.error === undefined || typeof value.error === "string";
 }
