@@ -228,7 +228,7 @@ test("service troubleshooting exposes stable anchors, causal explanation and bla
 
 test("operational evidence distinguishes current probe failure from historical last-good evidence", async () => {
 	const component = await source(
-		"app/components/homelab/HomelabOperationalEvidence.tsx",
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
 	);
 	assert.match(component, /data-current-probe-failure/);
 	assert.match(component, /data-last-good-evidence/);
