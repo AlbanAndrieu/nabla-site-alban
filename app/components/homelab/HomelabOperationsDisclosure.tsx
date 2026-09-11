@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
@@ -31,6 +31,8 @@ const EMPTY_COVERAGE: CoverageState = {
 	error: false,
 };
 
+const OPERATIONS_ANCHOR = "operational-evidence-title";
+
 function catalogCount(value: unknown): number {
 	if (!value || typeof value !== "object") return 0;
 	const services = (value as Partial<HomelabServicesCatalog>).services;
@@ -40,8 +42,20 @@ function catalogCount(value: unknown): number {
 export default function HomelabOperationsDisclosure() {
 	const t = useTranslations("operations");
 	const french = useLocale() === "fr";
+	const detailsRef = useRef<HTMLDetailsElement>(null);
 	const [open, setOpen] = useState(false);
 	const [coverage, setCoverage] = useState<CoverageState>(EMPTY_COVERAGE);
+
+	useEffect(() => {
+		const revealFromHash = () => {
+			if (window.location.hash !== `#${OPERATIONS_ANCHOR}`) return;
+			if (detailsRef.current) detailsRef.current.open = true;
+			setOpen(true);
+		};
+		revealFromHash();
+		window.addEventListener("hashchange", revealFromHash);
+		return () => window.removeEventListener("hashchange", revealFromHash);
+	}, []);
 
 	useEffect(() => {
 		if (!open || coverage.loaded) return;
@@ -98,6 +112,8 @@ export default function HomelabOperationsDisclosure() {
 
 	return (
 		<details
+			ref={detailsRef}
+			id={open ? undefined : OPERATIONS_ANCHOR}
 			className={styles.disclosure}
 			onToggle={(event) => setOpen(event.currentTarget.open)}
 			data-homelab-operations-disclosure
