@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import {
 	chmod,
-	mkdtemp,
 	mkdir,
+	mkdtemp,
 	readFile,
 	rm,
 	writeFile,
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import test from "node:test";
 
 const execFileAsync = promisify(execFile);
 const SCRIPT = fileURLToPath(
@@ -71,7 +71,10 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		assert.match(first.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
 		const second = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(second.stdout, /QG_PUBLISH_PROOF_REUSED/);
-		assert.equal((await readFile(counter, "utf8")).trim().split("\n").length, 1);
+		assert.equal(
+			(await readFile(counter, "utf8")).trim().split("\n").length,
+			1,
+		);
 
 		await writeFile(path.join(cwd, "README.md"), "dirty\n");
 		await assert.rejects(
@@ -91,7 +94,10 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		await git(cwd, "commit", "-m", "new-head");
 		const third = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(third.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
-		assert.equal((await readFile(counter, "utf8")).trim().split("\n").length, 2);
+		assert.equal(
+			(await readFile(counter, "utf8")).trim().split("\n").length,
+			2,
+		);
 	} finally {
 		await rm(cwd, { recursive: true, force: true });
 	}
