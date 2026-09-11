@@ -176,14 +176,24 @@ Refactor cohesive responsibilities instead of raising size thresholds.
 Next maintained P1 targets should preserve cohesive scenario boundaries rather
 than merely moving lines:
 
-- [ ] Split `unit-tests/homelabObservability.test.ts`, separating the large
-  aggregate-evidence fixture/scenario from compatibility fallback, route contract
-  and UI ownership tests without duplicating fixtures.
-- [ ] Split `unit-tests/serviceTopology.test.ts` by catalog/topology contract
-  scenario while keeping shared fixtures centralized.
-- [ ] Extract cohesive responsibilities from `scripts/agent-quality-gate.sh`
-  without creating a second formatter/linter authority or weakening early-fail
-  behavior.
+- [x] Split `unit-tests/homelabObservability.test.ts` by cohesive scenario. The
+  aggregate runtime fixture is centralized under `unit-tests/fixtures`, runtime
+  compatibility fallback and route/UI source contracts have dedicated test files,
+  and the aggregate scenario remains at the 300-line boundary without a deletion
+  bypass. CI #1035 validated the formatter-clean split through SAST and build.
+- [x] Split `unit-tests/serviceTopology.test.ts` by catalog/topology versus
+  Architecture UI contracts. Shared fallback loading and relation predicates live
+  in one test helper; the main catalog/parser suite is 293 lines after canonical
+  formatting, remains below the destructive-diff threshold without an exception,
+  and CI #1041 validates the converged split through SAST and build.
+- [x] Extract mechanical support from `scripts/agent-quality-gate.sh` without
+  creating a second formatter/linter authority. Base resolution, compact logging,
+  changed/deleted-file collection, workspace fingerprinting and changed-file
+  classification live in `scripts/lib/agent-quality-support.sh`; the main wrapper
+  retains auto-fix convergence, destructive-diff, executable-bit, canonical gate,
+  lint/typecheck/tests and publication policy. CI scope and Copilot setup track the
+  support file explicitly, and a contract test prevents quality policy drifting
+  into the support module.
 - [ ] Continue reducing `HierarchicalArchitectureExplorer.tsx` only when a
   substantive functional change provides a natural extraction boundary; do not
   churn the React Flow surface only to satisfy a line-count target.
