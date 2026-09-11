@@ -9,6 +9,7 @@ import {
 	type HomelabHealthReason,
 	homelabHealthReasons,
 } from "@/lib/homelabHealthPresentation";
+import statusStyles from "./HomelabStatusSurface.module.css";
 import ServiceOperatorDiagnostics from "./ServiceOperatorDiagnostics";
 import ServiceProbeEvidence from "./ServiceProbeEvidence";
 import ServiceSignalStrip from "./ServiceSignalStrip";
@@ -87,13 +88,15 @@ export default function ServiceHealthReasons({
 		cloudflareConfigured,
 		runtimeStale,
 	});
+	const severityClass =
+		state === "fail" ? statusStyles.fail : statusStyles.warn;
 
 	return (
 		<>
 			{signalStrip}
 			{probeEvidence}
 			<div
-				className={`alert ${state === "fail" ? "alert-danger" : "alert-warning"} py-2 px-2 small text-start mt-3 mb-0`}
+				className={`${statusStyles.surface} ${severityClass} small text-start mt-3 mb-0`}
 				data-health-reasons
 				data-health-severity={state}
 			>

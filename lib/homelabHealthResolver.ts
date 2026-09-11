@@ -4,12 +4,20 @@ import type {
 	HomelabHealthState,
 } from "./homelabHealth";
 
+export type DependencyRelationHealth =
+	| "healthy"
+	| "blocked"
+	| "degraded"
+	| "unconfirmed";
+
 export type ResolvedHomelabHealth = {
 	localState: HomelabHealthState;
 	dependencyState: HomelabHealthState | null;
 	effectiveState: HomelabHealthState;
 	requiredDependencies: string[];
 	blockedBy: string[];
+	degradedBy: string[];
+	unconfirmedDependencies: string[];
 	dependencyEvidence: HomelabDependencyEvidence[];
 };
 
@@ -47,21 +55,70 @@ export function resolveEffectiveServiceState(
 		effectiveState,
 		requiredDependencies: entry?.required_dependencies ?? [],
 		blockedBy: entry?.blocked_by ?? [],
+		degradedBy: entry?.degraded_by ?? [],
+		unconfirmedDependencies: entry?.unconfirmed_dependencies ?? [],
 		dependencyEvidence: entry?.dependency_evidence ?? [],
 	};
 }
 
-export function blockedDependencyLabels(entry?: HomelabHealthEntry): string[] {
-	const resolved = resolveEffectiveServiceState(entry);
+function dependencyLabels(
+	entry: HomelabHealthEntry | undefined,
+	serviceIds: readonly string[],
+): string[] {
 	const names = new Map(
-		resolved.dependencyEvidence.map((evidence) => [
+		(entry?.dependency_evidence ?? []).map((evidence) => [
 			evidence.target,
 			evidence.target_name?.trim() || evidence.target,
 		]),
 	);
-	return resolved.blockedBy.map(
-		(serviceId) => names.get(serviceId) ?? serviceId,
+	return serviceIds.map((serviceId) => names.get(serviceId) ?? serviceId);
+}
+
+export function blockedDependencyLabels(entry?: HomelabHealthEntry): string[] {
+	return dependencyLabels(entry, entry?.blocked_by ?? []);
+}
+
+export function degradedDependencyLabels(entry?: HomelabHealthEntry): string[] {
+	return dependencyLabels(entry, entry?.degraded_by ?? []);
+}
+
+export function unconfirmedDependencyLabels(
+	entry?: HomelabHealthEntry,
+): string[] {
+	return dependencyLabels(entry, entry?.unconfirmed_dependencies ?? []);
+}
+
+function evidenceForRequiredDependency(
+	entry: HomelabHealthEntry | undefined,
+	target: string,
+	relationType?: string,
+): HomelabDependencyEvidence | undefined {
+	return entry?.dependency_evidence?.find(
+		(item) =>
+			item.target === target &&
+			(relationType === undefined || item.relation_type === relationType),
 	);
+}
+
+export function requiredDependencyRelationHealth(
+	entry: HomelabHealthEntry | undefined,
+	target: string,
+	relationType?: string,
+): DependencyRelationHealth {
+	if (entry?.blocked_by?.includes(target)) return "blocked";
+	if (entry?.degraded_by?.includes(target)) return "degraded";
+	if (entry?.unconfirmed_dependencies?.includes(target)) return "unconfirmed";
+
+	const evidence = evidenceForRequiredDependency(entry, target, relationType);
+	const state = evidence?.target_effective_state ?? evidence?.target_state;
+	if (state === "fail") return "blocked";
+	if (state === "warn") return "degraded";
+	if (state === "unknown") return "unconfirmed";
+	if (state === "ok") return "healthy";
+
+	// A declared required edge without consumer-side observation is not healthy evidence.
+	// Keep Declared != Observed != Healthy explicit until FastAPI confirms the target.
+	return "unconfirmed";
 }
 
 export function requiredDependencyTargetState(
@@ -69,10 +126,6 @@ export function requiredDependencyTargetState(
 	target: string,
 	relationType?: string,
 ): HomelabHealthState | null {
-	const evidence = entry?.dependency_evidence?.find(
-		(item) =>
-			item.target === target &&
-			(relationType === undefined || item.relation_type === relationType),
-	);
-	return evidence?.target_state ?? null;
+	const evidence = evidenceForRequiredDependency(entry, target, relationType);
+	return evidence?.target_effective_state ?? evidence?.target_state ?? null;
 }

@@ -8,7 +8,10 @@ async function source(path: string): Promise<string> {
 
 test("operations UI consumes the latest FastAPI runtime and pfSense evidence", async () => {
 	const [
-		component,
+		facade,
+		runtimeComponent,
+		controlPlaneComponent,
+		exposureComponent,
 		runtimeParser,
 		observability,
 		observabilityTypes,
@@ -17,6 +20,9 @@ test("operations UI consumes the latest FastAPI runtime and pfSense evidence", a
 		frRaw,
 	] = await Promise.all([
 		source("app/components/homelab/HomelabOperationalEvidence.tsx"),
+		source("app/components/homelab/HomelabOperationalFastApiRuntime.tsx"),
+		source("app/components/homelab/HomelabOperationalControlPlane.tsx"),
+		source("app/components/homelab/HomelabOperationalExposure.tsx"),
 		source("lib/runtimeTopology.ts"),
 		source("lib/homelabObservability.ts"),
 		source("lib/homelabObservabilityTypes.ts"),
@@ -33,10 +39,13 @@ test("operations UI consumes the latest FastAPI runtime and pfSense evidence", a
 	assert.match(controlPlane, /http_evidence_skipped/);
 	assert.match(observability, /parsePfSenseIngressPolicy/);
 
-	assert.match(component, /data-runtime-redis-evidence/);
-	assert.match(component, /data-pfsense-ingress-policy/);
-	assert.match(component, /data-edge-evidence-skips/);
-	assert.doesNotMatch(component, /<h3>FastAPI Cloud<\/h3>/);
+	assert.match(facade, /HomelabOperationalRuntime/);
+	assert.match(facade, /HomelabOperationalControlPlane/);
+	assert.match(facade, /HomelabOperationalExposure/);
+	assert.match(runtimeComponent, /data-runtime-redis-evidence/);
+	assert.match(controlPlaneComponent, /data-pfsense-ingress-policy/);
+	assert.match(exposureComponent, /data-edge-evidence-skips/);
+	assert.doesNotMatch(runtimeComponent, /<h3>FastAPI Cloud<\/h3>/);
 
 	for (const raw of [enRaw, frRaw]) {
 		const messages = JSON.parse(raw) as {

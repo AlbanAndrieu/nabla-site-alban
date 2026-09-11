@@ -1,0 +1,87 @@
+.card {
+	height: 100%;
+	border: 1px solid var(--truenas-card-border, #475569);
+	border-top-width: 3px;
+	border-radius: var(--ui-radius-card);
+	background: var(--truenas-card-bg, #111827);
+	color: var(--truenas-text-primary, #f8fafc);
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.card[data-recommended="true"] {
+	border-top-color: var(--truenas-accent-blue, #60a5fa);
+	background: var(--truenas-blue-surface, #142033);
+}
+
+.card[data-recommended="false"] {
+	border-top-color: var(--truenas-accent-red, #f87171);
+	background: var(--truenas-red-surface, #21151b);
+}
+
+.card :is(h6, dt, dd) {
+	color: var(--truenas-text-primary, #f8fafc);
+}
+
+.recommendedBadge {
+	border: 1px solid
+		color-mix(in srgb, var(--truenas-accent-blue, #60a5fa) 72%, #fff);
+	background: var(--truenas-accent-blue-strong, #2563eb);
+	color: #fff;
+}
+
+.alternativeMarker {
+	display: inline-flex;
+	align-items: center;
+	width: 0.55rem;
+	height: 0.55rem;
+	margin-top: 0.35rem;
+	border-radius: 999px;
+	background: var(--truenas-accent-red, #f87171);
+	box-shadow: 0 0 0 3px
+		color-mix(in srgb, var(--truenas-accent-red, #f87171) 16%, transparent);
+}
+
+.ramNote {
+	border: 1px solid
+		color-mix(
+			in srgb,
+			var(--truenas-accent-blue, #60a5fa) 52%,
+			var(--truenas-card-border, #475569)
+		);
+	border-left: 4px solid var(--truenas-accent-blue, #60a5fa);
+	border-radius: var(--ui-radius-control);
+	background: var(--truenas-blue-surface, #142033);
+	color: var(--truenas-text-primary, #f8fafc);
+}
+
+.ramNote strong {
+	color: #fff;
+}
+
+@media (prefers-color-scheme: light) {
+	.card {
+		background: #fff;
+		color: #0f172a;
+	}
+
+	.card[data-recommended="true"] {
+		background: #f4f8ff;
+	}
+
+	.card[data-recommended="false"] {
+		background: #fff8f8;
+	}
+
+	.card :is(h6, dt, dd) {
+		color: #0f172a;
+	}
+
+	.ramNote {
+		background: #eff6ff;
+		color: #0f172a;
+	}
+
+	.ramNote strong {
+		color: #0f172a;
+	}
+}

@@ -8,8 +8,11 @@ import {
 import { homelabHealthReasons } from "../lib/homelabHealthPresentation";
 import {
 	blockedDependencyLabels,
+	degradedDependencyLabels,
+	requiredDependencyRelationHealth,
 	requiredDependencyTargetState,
 	resolveEffectiveServiceState,
+	unconfirmedDependencyLabels,
 } from "../lib/homelabHealthResolver";
 
 const DEPENDENCY_ENTRY: HomelabHealthEntry = {
@@ -22,8 +25,10 @@ const DEPENDENCY_ENTRY: HomelabHealthEntry = {
 	local_state: "ok",
 	dependency_state: "fail",
 	effective_state: "warn",
-	required_dependencies: ["postgresql", "clickhouse"],
+	required_dependencies: ["postgresql", "clickhouse", "redis", "minio"],
 	blocked_by: ["postgresql"],
+	degraded_by: ["redis"],
+	unconfirmed_dependencies: ["minio"],
 	dependency_evidence: [
 		{
 			target: "postgresql",
@@ -39,6 +44,20 @@ const DEPENDENCY_ENTRY: HomelabHealthEntry = {
 			target_state: "ok",
 			evidence: ["compose:langfuse"],
 		},
+		{
+			target: "redis",
+			target_name: "Redis",
+			relation_type: "cache",
+			target_state: "warn",
+			evidence: ["compose:langfuse"],
+		},
+		{
+			target: "minio",
+			target_name: "MinIO",
+			relation_type: "storesIn",
+			target_state: "unknown",
+			evidence: ["topology:declared"],
+		},
 	],
 };
 
@@ -52,6 +71,8 @@ test("schema v5 parser preserves dependency-aware health evidence", () => {
 	assert.ok(snapshot);
 	assert.equal(snapshot.schema_version, 5);
 	assert.deepEqual(snapshot.services[0].blocked_by, ["postgresql"]);
+	assert.deepEqual(snapshot.services[0].degraded_by, ["redis"]);
+	assert.deepEqual(snapshot.services[0].unconfirmed_dependencies, ["minio"]);
 	assert.equal(snapshot.services[0].local_state, "ok");
 	assert.equal(snapshot.services[0].effective_state, "warn");
 });
@@ -65,7 +86,7 @@ test("dependency-aware parser remains fail-soft per malformed service row", () =
 			{
 				...DEPENDENCY_ENTRY,
 				id: "bad",
-				url: "https://invalid host.example/",
+				degraded_by: [42],
 			},
 		],
 	});
@@ -77,14 +98,55 @@ test("dependency-aware parser remains fail-soft per malformed service row", () =
 	);
 });
 
-test("shared resolver separates local and effective health", () => {
+test("shared resolver separates local and effective dependency health", () => {
 	const resolved = resolveEffectiveServiceState(DEPENDENCY_ENTRY);
 
 	assert.equal(resolved.localState, "ok");
 	assert.equal(resolved.dependencyState, "fail");
 	assert.equal(resolved.effectiveState, "warn");
-	assert.deepEqual(resolved.requiredDependencies, ["postgresql", "clickhouse"]);
+	assert.deepEqual(resolved.requiredDependencies, [
+		"postgresql",
+		"clickhouse",
+		"redis",
+		"minio",
+	]);
 	assert.deepEqual(resolved.blockedBy, ["postgresql"]);
+	assert.deepEqual(resolved.degradedBy, ["redis"]);
+	assert.deepEqual(resolved.unconfirmedDependencies, ["minio"]);
+});
+
+test("dependency labels and relation state preserve FastAPI semantics", () => {
+	assert.deepEqual(blockedDependencyLabels(DEPENDENCY_ENTRY), ["PostgreSQL"]);
+	assert.deepEqual(degradedDependencyLabels(DEPENDENCY_ENTRY), ["Redis"]);
+	assert.deepEqual(unconfirmedDependencyLabels(DEPENDENCY_ENTRY), ["MinIO"]);
+	assert.equal(
+		requiredDependencyRelationHealth(
+			DEPENDENCY_ENTRY,
+			"postgresql",
+			"dependsOn",
+		),
+		"blocked",
+	);
+	assert.equal(
+		requiredDependencyRelationHealth(
+			DEPENDENCY_ENTRY,
+			"clickhouse",
+			"dependsOn",
+		),
+		"healthy",
+	);
+	assert.equal(
+		requiredDependencyRelationHealth(DEPENDENCY_ENTRY, "redis", "cache"),
+		"degraded",
+	);
+	assert.equal(
+		requiredDependencyRelationHealth(DEPENDENCY_ENTRY, "minio", "storesIn"),
+		"unconfirmed",
+	);
+	assert.equal(
+		requiredDependencyRelationHealth(DEPENDENCY_ENTRY, "missing", "dependsOn"),
+		"unconfirmed",
+	);
 });
 
 test("Vaultwarden runtime inventory drift is degraded when fresh origin evidence proves it is up", () => {
@@ -196,6 +258,8 @@ test("shared resolver remains compatible with legacy state-only rows", () => {
 		effectiveState: "ok",
 		requiredDependencies: [],
 		blockedBy: [],
+		degradedBy: [],
+		unconfirmedDependencies: [],
 		dependencyEvidence: [],
 	});
 });
@@ -238,20 +302,21 @@ test("service grid shows effective dependency degradation without replacing runt
 	assert.match(grid, /data-dependency-health-legend/);
 });
 
-test("architecture graph uses the shared effective resolver and target health on required edges", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+test("architecture graph uses explicit consumer-side dependency evidence on required edges", async () => {
+	const [explorer, evidence] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
+	]);
 
-	assert.match(explorer, /resolveEffectiveServiceState\(health\)/);
 	assert.match(explorer, /blockedDependencyLabels\(health\)/);
-	assert.match(explorer, /requiredDependencyTargetState/);
-	assert.match(explorer, /requiredEdgeHealthState/);
-	assert.match(explorer, /relation\.optional/);
-	assert.match(explorer, /targetState === "fail"/);
-	assert.match(
-		explorer,
-		/targetState === "warn" \|\| targetState === "unknown"/,
-	);
-	assert.match(explorer, /data-dependency-health/);
+	assert.match(explorer, /degradedDependencyLabels\(health\)/);
+	assert.match(explorer, /unconfirmedDependencyLabels\(health\)/);
+	assert.match(explorer, /requiredDependencyRelationHealth/);
+	assert.match(explorer, /requiredEdgeDependencyState/);
+	assert.match(explorer, /dependencyState === "blocked"/);
+	assert.match(explorer, /dependencyState === "degraded"/);
+	assert.match(explorer, /dependencyState === "unconfirmed"/);
+	assert.match(explorer, /ArchitectureDependencyEvidenceLegend/);
+	assert.match(evidence, /data-dependency-evidence-legend/);
+	assert.match(evidence, /data-dependency-evidence-state=\{state\}/);
 });

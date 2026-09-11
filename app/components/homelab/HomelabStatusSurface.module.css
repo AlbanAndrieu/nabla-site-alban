@@ -1,0 +1,129 @@
+.surface {
+	position: relative;
+	margin-bottom: 1rem;
+	padding: 0.9rem 1rem;
+	border: 1px solid var(--ui-border);
+	border-left-width: 4px;
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+	color: var(--ui-text-primary);
+	line-height: 1.5;
+}
+
+.surface strong {
+	color: inherit;
+}
+
+.surface > strong:first-child {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.surface > strong:first-child i {
+	font-size: 0.95rem;
+}
+
+.ok {
+	border-color: color-mix(
+		in srgb,
+		var(--ui-success-border) 82%,
+		var(--ui-border)
+	);
+	border-left-color: var(--ui-success-text);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-success-surface) 78%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
+.ok > strong:first-child i {
+	color: var(--ui-success-text);
+}
+
+.warn {
+	border-color: color-mix(
+		in srgb,
+		var(--ui-warning-border) 88%,
+		var(--ui-border)
+	);
+	border-left-color: var(--ui-warning-text);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-warning-surface) 72%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
+.warn > strong:first-child i {
+	color: var(--ui-warning-text);
+}
+
+.fail {
+	border-color: color-mix(
+		in srgb,
+		var(--ui-danger-border) 88%,
+		var(--ui-border)
+	);
+	border-left-color: var(--ui-danger-text);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-danger-surface) 72%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
+.fail > strong:first-child i {
+	color: var(--ui-danger-text);
+}
+
+.info {
+	border-color: color-mix(in srgb, var(--ui-link) 46%, var(--ui-border));
+	border-left-color: var(--ui-link);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-link) 9%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
+.info > strong:first-child i {
+	color: var(--ui-link);
+}
+
+.unknown {
+	border-color: var(--ui-border);
+	border-left-color: var(--ui-text-secondary);
+	background: linear-gradient(
+		135deg,
+		var(--ui-surface-muted),
+		var(--ui-surface-card)
+	);
+}
+
+.unknown > strong:first-child i {
+	color: var(--ui-text-secondary);
+}
+
+.details {
+	margin-top: 0.7rem;
+	padding-top: 0.65rem;
+	border-top: 1px solid color-mix(in srgb, currentcolor 16%, transparent);
+}
+
+.details summary {
+	cursor: pointer;
+	color: var(--ui-text-primary);
+	font-weight: 750;
+}
+
+.details summary:hover {
+	color: var(--ui-link);
+}
+
+.details summary:focus-visible {
+	outline: 2px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+}

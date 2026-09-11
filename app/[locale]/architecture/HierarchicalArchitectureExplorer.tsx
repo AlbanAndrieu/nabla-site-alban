@@ -30,26 +30,32 @@ import {
 } from "@/lib/homelabHealthPresentation";
 import {
 	blockedDependencyLabels,
-	requiredDependencyTargetState,
+	type DependencyRelationHealth,
+	degradedDependencyLabels,
+	requiredDependencyRelationHealth,
 	resolveEffectiveServiceState,
+	unconfirmedDependencyLabels,
 } from "@/lib/homelabHealthResolver";
-import {
-	analyzeServiceCriticality,
-	compareServiceCriticality,
-	type ServiceCriticality,
-	type ServiceCriticalityTier,
-} from "@/lib/serviceCriticality";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
 	type HomelabStatusService,
 	type HomelabStatusSnapshot,
 	parseHomelabStatusSnapshot,
 } from "@/lib/homelabStatus";
+import {
+	analyzeServiceCriticality,
+	compareServiceCriticality,
+	type ServiceCriticality,
+	type ServiceCriticalityTier,
+} from "@/lib/serviceCriticality";
 import type {
 	ServiceTopology,
 	ServiceTopologySource,
 } from "@/lib/serviceTopology";
-import styles from "./HierarchicalArchitectureExplorer.module.css";
+import {
+	ArchitectureDependencyBadges,
+	ArchitectureDependencyEvidenceLegend,
+} from "./ArchitectureDependencyEvidence";
 import {
 	AI_ENTITIES,
 	AI_RELATIONS,
@@ -58,14 +64,12 @@ import {
 	buildNablaEntities,
 	buildNablaRelations,
 } from "./architectureData";
+import styles from "./HierarchicalArchitectureExplorer.module.css";
 
 type GraphMode = "ai" | "services";
 type GraphScope = "critical" | "all";
 type FlowDirection = "down" | "up";
-type ServiceGroupKey =
-	| ServiceCriticalityTier
-	| "external"
-	| "runtime-drift";
+type ServiceGroupKey = ServiceCriticalityTier | "external" | "runtime-drift";
 type GroupKey = `ai-${number}` | ServiceGroupKey;
 type RelationSemantic =
 	| "dependency"
@@ -85,11 +89,14 @@ type ArchitectureNodeData = Record<string, unknown> & {
 	iconSrc?: string;
 	openLabel: string;
 	flowDirection: FlowDirection;
+	french: boolean;
 	reconciliation?: string;
 	runtimeState?: string;
 	healthState?: HomelabHealthState;
 	localHealthState?: HomelabHealthState;
 	blockedBy?: string[];
+	degradedBy?: string[];
+	unconfirmedDependencies?: string[];
 	tlsTrusted?: boolean | null;
 	cloudflareObserved?: boolean;
 	cloudflareStatus?: string | null;
@@ -134,7 +141,9 @@ const GROUP_GAP = 36;
 const COLUMN_GAP = 30;
 const MAX_COLUMNS = 5;
 const GROUP_WIDTH =
-	GROUP_PADDING_X * 2 + NODE_WIDTH * MAX_COLUMNS + COLUMN_GAP * (MAX_COLUMNS - 1);
+	GROUP_PADDING_X * 2 +
+	NODE_WIDTH * MAX_COLUMNS +
+	COLUMN_GAP * (MAX_COLUMNS - 1);
 
 const SERVICE_GROUP_ORDER: readonly ServiceGroupKey[] = [
 	"foundation",
@@ -163,28 +172,58 @@ const AI_GROUP_COPY: Record<
 	{ en: [string, string]; fr: [string, string] }
 > = {
 	0: {
-		en: ["Interfaces & agents", "Human-facing clients and coding/agent entry points."],
-		fr: ["Interfaces & agents", "Clients utilisateurs et points d’entrée des agents/coding agents."],
+		en: [
+			"Interfaces & agents",
+			"Human-facing clients and coding/agent entry points.",
+		],
+		fr: [
+			"Interfaces & agents",
+			"Clients utilisateurs et points d’entrée des agents/coding agents.",
+		],
 	},
 	1: {
-		en: ["Control plane", "Shared model gateway, routing policy and hot state."],
-		fr: ["Plan de contrôle", "Gateway de modèles, politiques de routage et état partagé à chaud."],
+		en: [
+			"Control plane",
+			"Shared model gateway, routing policy and hot state.",
+		],
+		fr: [
+			"Plan de contrôle",
+			"Gateway de modèles, politiques de routage et état partagé à chaud.",
+		],
 	},
 	2: {
 		en: ["Inference", "Local and remote model execution targets."],
 		fr: ["Inférence", "Cibles d’exécution locales et distantes des modèles."],
 	},
 	3: {
-		en: ["Tools & knowledge", "MCP tools, search, RAG and document knowledge boundaries."],
-		fr: ["Outils & connaissances", "Outils MCP, recherche, RAG et sources documentaires."],
+		en: [
+			"Tools & knowledge",
+			"MCP tools, search, RAG and document knowledge boundaries.",
+		],
+		fr: [
+			"Outils & connaissances",
+			"Outils MCP, recherche, RAG et sources documentaires.",
+		],
 	},
 	4: {
-		en: ["Orchestration", "Workflow engines coordinating long-running and automated work."],
-		fr: ["Orchestration", "Moteurs de workflow coordonnant automatisations et traitements longs."],
+		en: [
+			"Orchestration",
+			"Workflow engines coordinating long-running and automated work.",
+		],
+		fr: [
+			"Orchestration",
+			"Moteurs de workflow coordonnant automatisations et traitements longs.",
+		],
 	},
 	5: {
-		en: ["Observability & evaluation", "Tracing, metrics, quality and evaluation feedback loops."],
-		fr: ["Observabilité & évaluation", "Tracing, métriques, qualité et boucles d’évaluation."],
+		en: [
+			"Observability & evaluation",
+			"Tracing, metrics, quality and evaluation feedback loops.",
+		],
+		fr: [
+			"Observabilité & évaluation",
+			"Tracing, métriques, qualité et boucles d’évaluation.",
+		],
 	},
 };
 
@@ -194,14 +233,21 @@ function relationSemantic(type: string): RelationSemantic {
 	}
 	if (["exposedBy"].includes(type)) return "exposure";
 	if (["partOf", "hostedBy"].includes(type)) return "placement";
-	if (["observedBy", "telemetry", "metrics", "traces", "evaluation"].includes(type)) {
+	if (
+		["observedBy", "telemetry", "metrics", "traces", "evaluation"].includes(
+			type,
+		)
+	) {
 		return "observation";
 	}
 	if (["automates", "document workflow"].includes(type)) return "automation";
 	return "flow";
 }
 
-function relationSemanticLabel(semantic: RelationSemantic, french: boolean): string {
+function relationSemanticLabel(
+	semantic: RelationSemantic,
+	french: boolean,
+): string {
 	const labels: Record<RelationSemantic, [string, string]> = {
 		dependency: ["dependency", "dépendance"],
 		flow: ["API/data flow", "flux API/données"],
@@ -305,10 +351,7 @@ function serviceGroupCopy(
 function ArchitectureGroupNode({ data }: NodeProps) {
 	const item = data as GroupNodeData;
 	return (
-		<div
-			className={styles.groupNode}
-			data-architecture-group={item.groupKey}
-		>
+		<div className={styles.groupNode} data-architecture-group={item.groupKey}>
 			<div className={styles.groupHeading}>
 				<div>
 					<strong>{item.label}</strong>
@@ -337,13 +380,6 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 	const healthLabel = item.healthState
 		? `Health: ${item.healthState}${item.localHealthState && item.localHealthState !== item.healthState ? ` (local ${item.localHealthState})` : ""}`
 		: "Health unavailable";
-	const dependencyDegraded =
-		(item.blockedBy?.length ?? 0) > 0 ||
-		Boolean(
-			item.localHealthState &&
-				item.healthState &&
-				item.localHealthState !== item.healthState,
-		);
 
 	return (
 		<div
@@ -361,7 +397,11 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 					: undefined
 			}
 		>
-			<Handle type="target" position={targetPosition} className={styles.handle} />
+			<Handle
+				type="target"
+				position={targetPosition}
+				className={styles.handle}
+			/>
 			<div className={styles.nodeMeta}>
 				<span>{item.category}</span>
 				<span style={healthColor ? { color: healthColor } : undefined}>
@@ -434,16 +474,12 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 					{item.runtimeState ? ` · ${item.runtimeState}` : ""}
 				</span>
 			) : null}
-			{dependencyDegraded ? (
-				<span
-					className={styles.runtimeBadge}
-					data-dependency-health
-					title={healthLabel}
-				>
-					⚠ dependency
-					{item.blockedBy?.length ? ` · ${item.blockedBy.join(", ")}` : ""}
-				</span>
-			) : null}
+			<ArchitectureDependencyBadges
+				blockedBy={item.blockedBy}
+				degradedBy={item.degradedBy}
+				unconfirmed={item.unconfirmedDependencies}
+				french={item.french}
+			/>
 			{item.detail ? (
 				<small className={styles.nodeDetail}>{item.detail}</small>
 			) : null}
@@ -464,174 +500,11 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 					{item.openLabel} ↗
 				</a>
 			) : null}
-			<Handle type="source" position={sourcePosition} className={styles.handle} />
-		</div>
-	);
-}
-
-
-function MobileArchitectureHierarchy({
-	groups,
-	nodeDataById,
-	relations,
-	french,
-}: Readonly<{
-	groups: GraphGroup[];
-	nodeDataById: Map<string, ArchitectureNodeData>;
-	relations: Edge[];
-	french: boolean;
-}>) {
-	const relationsBySource = new Map<string, Edge[]>();
-	for (const relation of relations) {
-		relationsBySource.set(relation.source, [
-			...(relationsBySource.get(relation.source) ?? []),
-			relation,
-		]);
-	}
-
-	return (
-		<div
-			className={styles.mobileHierarchy}
-			data-mobile-architecture-hierarchy
-			role="region"
-			aria-label={
-				french
-					? "Hiérarchie d’architecture compacte"
-					: "Compact architecture hierarchy"
-			}
-		>
-			<p className={styles.mobileHierarchyHint}>
-				{french
-					? "Vue mobile compacte : ouvrez une couche puis un service pour afficher ses relations visibles."
-					: "Compact mobile view: expand a layer, then a service, to inspect its visible relations."}
-			</p>
-			{groups.map((group) => (
-				<details
-					key={group.id}
-					className={styles.mobileGroup}
-					data-mobile-architecture-group={group.key}
-				>
-					<summary className={styles.mobileGroupSummary}>
-						<span>
-							<strong>{group.label}</strong>
-							<small>{group.description}</small>
-						</span>
-						<span className={styles.mobileGroupMeta}>
-							{group.entities.length} {french ? "nœuds" : "nodes"} · {group.flowHint}
-						</span>
-					</summary>
-					<ul className={styles.mobileItemList}>
-						{group.entities.map((entity) => {
-							const item = nodeDataById.get(entity.id);
-							if (!item) return null;
-							const itemRelations = relationsBySource.get(entity.id) ?? [];
-							const healthColor = item.healthState
-								? homelabHealthColor(item.healthState)
-								: undefined;
-
-							return (
-								<li
-									key={entity.id}
-									className={styles.mobileItem}
-									data-mobile-architecture-item={entity.id}
-									data-health-state={item.healthState}
-									data-criticality-tier={item.criticalityTier}
-									data-blast-radius-level={item.blastRadiusLevel}
-								>
-									<div className={styles.mobileItemHeading}>
-										<span>
-											<strong>{item.name}</strong>
-											<small>
-												{item.category} · {item.kind}
-											</small>
-										</span>
-										{item.healthState ? (
-											<span
-												className={styles.mobileHealthBadge}
-												style={{
-													borderColor: healthColor,
-													color: healthColor,
-												}}
-											>
-												{item.healthState}
-											</span>
-										) : null}
-									</div>
-									<div className={styles.mobileBadges}>
-										{item.criticalityTier ? (
-											<span>
-												{item.criticalityTier.replaceAll("-", " ")}
-												{typeof item.blastRadius === "number"
-													? ` · blast radius ${item.blastRadius}`
-													: ""}
-											</span>
-										) : null}
-										{item.reconciliation ? (
-											<span>
-												{item.reconciliation.replaceAll("_", " ")}
-												{item.runtimeState ? ` · ${item.runtimeState}` : ""}
-											</span>
-										) : null}
-										{item.localHealthState &&
-										item.healthState &&
-										item.localHealthState !== item.healthState ? (
-											<span>
-												local · {item.localHealthState}
-											</span>
-										) : null}
-									</div>
-									{item.blockedBy?.length ? (
-										<p className={styles.mobileBlockedBy}>
-											⚠ {french ? "Bloqué par" : "Blocked by"}:{" "}
-											{item.blockedBy.join(", ")}
-										</p>
-									) : null}
-									{item.detail ? (
-										<p className={styles.mobileItemDetail}>{item.detail}</p>
-									) : null}
-									{itemRelations.length ? (
-										<details className={styles.mobileRelations}>
-											<summary>
-												{itemRelations.length}{" "}
-												{french
-													? itemRelations.length > 1
-														? "relations"
-														: "relation"
-													: itemRelations.length > 1
-														? "relations"
-														: "relation"}
-											</summary>
-											<ul>
-												{itemRelations.map((relation) => {
-													const targetName =
-														nodeDataById.get(relation.target)?.name ??
-														relation.target;
-													return (
-														<li key={relation.id}>
-															<span>{String(relation.label ?? relation.target)}</span>
-															<strong>{targetName}</strong>
-														</li>
-													);
-												})}
-											</ul>
-										</details>
-									) : null}
-									{item.url ? (
-										<a
-											className={styles.mobileOpenLink}
-											href={item.url}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{item.openLabel} ↗
-										</a>
-									) : null}
-								</li>
-							);
-						})}
-					</ul>
-				</details>
-			))}
+			<Handle
+				type="source"
+				position={sourcePosition}
+				className={styles.handle}
+			/>
 		</div>
 	);
 }
@@ -732,7 +605,9 @@ function aiGroups(
 				label,
 				description,
 				flowHint: french ? "flux principal ↓" : "main flow ↓",
-				entities: [...layerEntities].sort((a, b) => a.name.localeCompare(b.name)),
+				entities: [...layerEntities].sort((a, b) =>
+					a.name.localeCompare(b.name),
+				),
 				flowDirection: "down" as const,
 			};
 		});
@@ -766,7 +641,10 @@ function serviceGroups(
 			if (analysis.has(left.id) || analysis.has(right.id)) {
 				return compareServiceCriticality(left.id, right.id, topology, analysis);
 			}
-			return left.category.localeCompare(right.category) || left.name.localeCompare(right.name);
+			return (
+				left.category.localeCompare(right.category) ||
+				left.name.localeCompare(right.name)
+			);
 		});
 		const [label, description] = serviceGroupCopy(key, french);
 		return {
@@ -795,6 +673,7 @@ function buildGroupedNodes(
 	statusById: Map<string, HomelabStatusService>,
 	healthById: Map<string, HomelabHealthEntry>,
 	criticality: Map<string, ServiceCriticality>,
+	french: boolean,
 ): Node[] {
 	const nodes: Node[] = [];
 	const maxBlastRadius = Math.max(
@@ -805,7 +684,8 @@ function buildGroupedNodes(
 
 	for (const group of groups) {
 		const rows = Math.ceil(group.entities.length / MAX_COLUMNS);
-		const groupHeight = GROUP_HEADER_HEIGHT + GROUP_PADDING_X + rows * NODE_ROW_HEIGHT;
+		const groupHeight =
+			GROUP_HEADER_HEIGHT + GROUP_PADDING_X + rows * NODE_ROW_HEIGHT;
 		nodes.push({
 			id: group.id,
 			type: "architectureGroup",
@@ -828,9 +708,12 @@ function buildGroupedNodes(
 			const row = Math.floor(index / MAX_COLUMNS);
 			const runtimeStatus =
 				mode === "services" ? statusById.get(entity.id) : undefined;
-			const health = mode === "services" ? healthById.get(entity.id) : undefined;
+			const health =
+				mode === "services" ? healthById.get(entity.id) : undefined;
 			const resolvedHealth = resolveEffectiveServiceState(health);
 			const blockers = blockedDependencyLabels(health);
+			const degraded = degradedDependencyLabels(health);
+			const unconfirmed = unconfirmedDependencyLabels(health);
 			const serviceCriticality = criticality.get(entity.id);
 			const blastRatio =
 				maxBlastRadius > 0 && serviceCriticality
@@ -862,6 +745,7 @@ function buildGroupedNodes(
 					iconSrc: entity.iconSrc,
 					openLabel,
 					flowDirection: group.flowDirection,
+					french,
 					reconciliation: runtimeStatus?.reconciliation,
 					runtimeState: runtimeStatus?.observed?.appState,
 					healthState: health?.application_error
@@ -871,6 +755,8 @@ function buildGroupedNodes(
 							: undefined,
 					localHealthState: health ? resolvedHealth.localState : undefined,
 					blockedBy: blockers,
+					degradedBy: degraded,
+					unconfirmedDependencies: unconfirmed,
 					tlsTrusted: health?.tls_trusted,
 					cloudflareObserved: hasCloudflareEvidence(health),
 					cloudflareStatus: health?.tunnel_status,
@@ -888,20 +774,17 @@ function buildGroupedNodes(
 	return nodes;
 }
 
-function requiredEdgeHealthState(
+function requiredEdgeDependencyState(
 	relation: ArchitectureRelation,
 	healthById: Map<string, HomelabHealthEntry>,
-): HomelabHealthState | null {
-	if (relation.optional || ["partOf", "hostedBy"].includes(relation.type)) return null;
-	const sourceHealth = healthById.get(relation.source);
-	const evidenceState = requiredDependencyTargetState(
-		sourceHealth,
+): DependencyRelationHealth | null {
+	if (relation.optional || ["partOf", "hostedBy"].includes(relation.type))
+		return null;
+	return requiredDependencyRelationHealth(
+		healthById.get(relation.source),
 		relation.target,
 		relation.type,
 	);
-	if (evidenceState) return evidenceState;
-	const targetHealth = healthById.get(relation.target);
-	return targetHealth ? resolveEffectiveServiceState(targetHealth).effectiveState : null;
 }
 
 function makeEdges(
@@ -910,6 +793,7 @@ function makeEdges(
 	healthById: Map<string, HomelabHealthEntry>,
 	showOptional: boolean,
 	french: boolean,
+	mode: GraphMode,
 ): Edge[] {
 	return relations
 		.filter(
@@ -919,28 +803,41 @@ function makeEdges(
 				(showOptional || !relation.optional),
 		)
 		.map((relation, index) => {
-			const targetState = requiredEdgeHealthState(relation, healthById);
 			const semantic = relationSemantic(relation.type);
+			const dependencyState =
+				mode === "services" && semantic === "dependency"
+					? requiredEdgeDependencyState(relation, healthById)
+					: null;
 			const semanticStyle = RELATION_STYLE[semantic];
 			const stroke =
-				targetState === "fail"
+				dependencyState === "blocked"
 					? homelabHealthColor("fail")
-					: targetState === "warn" || targetState === "unknown"
+					: dependencyState === "degraded"
 						? homelabHealthColor("warn")
-						: semanticStyle.color;
-			const strokeDasharray = relation.optional
-				? semanticStyle.dash ?? "7 6"
-				: semanticStyle.dash;
+						: dependencyState === "unconfirmed"
+							? homelabHealthColor("unknown")
+							: semanticStyle.color;
+			const strokeDasharray =
+				dependencyState === "unconfirmed"
+					? "3 6"
+					: relation.optional
+						? (semanticStyle.dash ?? "7 6")
+						: semanticStyle.dash;
 			return {
 				id: `${relation.source}-${relation.type}-${relation.target}-${index}`,
 				source: relation.source,
 				target: relation.target,
-				label: `${relationStrengthLabel(Boolean(relation.optional), french)} · ${relationSemanticLabel(semantic, french)} · ${relation.type}`,
-				animated: Boolean(!relation.optional && semanticStyle.animated),
+				label: `${dependencyState ? `${dependencyState} · ` : ""}${relationStrengthLabel(Boolean(relation.optional), french)} · ${relationSemanticLabel(semantic, french)} · ${relation.type}`,
+				animated: Boolean(
+					dependencyState !== "unconfirmed" &&
+						!relation.optional &&
+						semanticStyle.animated,
+				),
 				markerEnd: { type: MarkerType.ArrowClosed, color: stroke },
 				style: {
 					stroke,
-					strokeWidth: relation.optional ? 1.5 : 2.4,
+					strokeWidth:
+						dependencyState === "blocked" ? 3 : relation.optional ? 1.5 : 2.4,
 					strokeDasharray,
 				},
 				labelStyle: { fill: "#f8fafc", fontSize: 10, fontWeight: 700 },
@@ -951,6 +848,7 @@ function makeEdges(
 				data: {
 					semantic,
 					strength: relation.optional ? "optional" : "required",
+					dependencyState,
 				},
 			};
 		});
@@ -983,7 +881,9 @@ export default function HierarchicalArchitectureExplorer({
 		let active = true;
 		const loadRuntime = async () => {
 			try {
-				const response = await fetch("/api/homelab-status", { cache: "no-store" });
+				const response = await fetch("/api/homelab-status", {
+					cache: "no-store",
+				});
 				if (!response.ok) throw new Error(`HTTP ${response.status}`);
 				const snapshot = parseHomelabStatusSnapshot(await response.json());
 				if (!snapshot) throw new Error("Invalid homelab status payload");
@@ -1040,7 +940,10 @@ export default function HierarchicalArchitectureExplorer({
 		[runtimeStatus],
 	);
 	const healthById = useMemo(() => healthMap(healthStatus), [healthStatus]);
-	const criticality = useMemo(() => analyzeServiceCriticality(topology), [topology]);
+	const criticality = useMemo(
+		() => analyzeServiceCriticality(topology),
+		[topology],
+	);
 	const servicesEntities = useMemo(() => {
 		const declared = buildNablaEntities(catalog.services, topology);
 		const existingIds = new Set(declared.map((entity) => entity.id));
@@ -1051,7 +954,10 @@ export default function HierarchicalArchitectureExplorer({
 			),
 		];
 	}, [catalog.services, topology, runtimeStatus]);
-	const servicesRelations = useMemo(() => buildNablaRelations(topology), [topology]);
+	const servicesRelations = useMemo(
+		() => buildNablaRelations(topology),
+		[topology],
+	);
 	const allEntities = mode === "ai" ? AI_ENTITIES : servicesEntities;
 	const relations = mode === "ai" ? AI_RELATIONS : servicesRelations;
 	const topologyIds = useMemo(
@@ -1059,7 +965,8 @@ export default function HierarchicalArchitectureExplorer({
 		[topology],
 	);
 	const scopedEntities = useMemo(() => {
-		if (mode !== "services" || scope === "all" || query.trim()) return allEntities;
+		if (mode !== "services" || scope === "all" || query.trim())
+			return allEntities;
 		return allEntities.filter((entity) => {
 			if (!topologyIds.has(entity.id)) return false;
 			const entry = criticality.get(entity.id);
@@ -1086,21 +993,21 @@ export default function HierarchicalArchitectureExplorer({
 				statusById,
 				healthById,
 				criticality,
+				french,
 			),
 		[criticality, french, groups, healthById, mode, statusById],
 	);
 	const edges = useMemo(
-		() => makeEdges(relations, filtered.visible, healthById, showOptional, french),
-		[filtered.visible, french, healthById, relations, showOptional],
-	);
-	const nodeDataById = useMemo(
 		() =>
-			new Map(
-				nodes
-					.filter((node) => node.type === "architecture")
-					.map((node) => [node.id, node.data as ArchitectureNodeData]),
+			makeEdges(
+				relations,
+				filtered.visible,
+				healthById,
+				showOptional,
+				french,
+				mode,
 			),
-		[nodes],
+		[filtered.visible, french, healthById, mode, relations, showOptional],
 	);
 	const availability = runtimeAvailability(runtimeStatus, french);
 
@@ -1108,7 +1015,9 @@ export default function HierarchicalArchitectureExplorer({
 		<section
 			className={styles.explorer}
 			aria-label={
-				french ? "Explorateur d’architecture hiérarchique" : "Hierarchical architecture explorer"
+				french
+					? "Explorateur d’architecture hiérarchique"
+					: "Hierarchical architecture explorer"
 			}
 			data-hierarchical-architecture-explorer
 		>
@@ -1131,7 +1040,11 @@ export default function HierarchicalArchitectureExplorer({
 						</button>
 					</div>
 					{mode === "services" ? (
-						<div className={styles.tabs} role="group" aria-label="Topology scope">
+						<div
+							className={styles.tabs}
+							role="group"
+							aria-label="Topology scope"
+						>
 							<button
 								type="button"
 								aria-pressed={scope === "critical"}
@@ -1154,7 +1067,9 @@ export default function HierarchicalArchitectureExplorer({
 							checked={showOptional}
 							onChange={(event) => setShowOptional(event.target.checked)}
 						/>
-						<span>{french ? "Relations optionnelles" : "Optional relations"}</span>
+						<span>
+							{french ? "Relations optionnelles" : "Optional relations"}
+						</span>
 					</label>
 				</div>
 				<label className={styles.search}>
@@ -1206,16 +1121,27 @@ export default function HierarchicalArchitectureExplorer({
 				</div>
 				<small>
 					{french
-						? "La couleur et le motif indiquent la nature de la relation ; required/optional indique séparément son poids fonctionnel. Un état de santé rouge/orange peut temporairement remplacer la couleur d’une relation requise sans changer sa sémantique."
-						: "Color and line pattern identify relation purpose; required/optional separately identifies functional strength. A required edge may temporarily inherit red/orange health without changing its semantic category."}
+						? "La couleur et le motif indiquent la nature de la relation ; required/optional indique séparément son poids fonctionnel. L’évidence FastAPI d’une dépendance requise peut surcharger sa couleur sans modifier sa sémantique."
+						: "Color and line pattern identify relation purpose; required/optional separately identifies functional strength. FastAPI evidence for a required dependency may override its color without changing its semantic category."}
 				</small>
 			</div>
+			{mode === "services" ? (
+				<ArchitectureDependencyEvidenceLegend french={french} />
+			) : null}
 
 			{mode === "services" ? (
 				<aside className={styles.exposureContract} data-exposure-path-contract>
 					<div className={styles.exposureContractHeader}>
-						<strong>{french ? "Contrat des chemins d’exposition" : "Exposure path contract"}</strong>
-						<span>{french ? "Réseau ≠ dépendances fonctionnelles" : "Network ≠ functional dependencies"}</span>
+						<strong>
+							{french
+								? "Contrat des chemins d’exposition"
+								: "Exposure path contract"}
+						</strong>
+						<span>
+							{french
+								? "Réseau ≠ dépendances fonctionnelles"
+								: "Network ≠ functional dependencies"}
+						</span>
 					</div>
 					<div className={styles.exposurePathGrid}>
 						<div data-exposure-path="direct">
@@ -1258,14 +1184,15 @@ export default function HierarchicalArchitectureExplorer({
 				</aside>
 			) : null}
 
-
-			<MobileArchitectureHierarchy
-				groups={groups}
-				nodeDataById={nodeDataById}
-				relations={edges}
-				french={french}
-			/>
-
+			<p
+				id="architecture-flow-interaction-hint"
+				className={styles.flowInteractionHint}
+			>
+				<i className="fas fa-computer-mouse" aria-hidden="true" />{" "}
+				{french
+					? "La molette fait défiler la page. Utilisez Ctrl/Cmd + molette ou les contrôles +/− pour zoomer dans le diagramme."
+					: "The wheel scrolls the page. Use Ctrl/Cmd + wheel or the +/− controls to zoom the diagram."}
+			</p>
 			<div className={styles.flowShell}>
 				<ReactFlow
 					key={`${mode}-${scope}`}
@@ -1278,9 +1205,14 @@ export default function HierarchicalArchitectureExplorer({
 					nodesDraggable={false}
 					nodesConnectable={false}
 					deleteKeyCode={null}
+					zoomOnScroll={false}
+					panOnScroll={false}
+					preventScrolling={false}
+					zoomActivationKeyCode={["Control", "Meta"]}
 					minZoom={0.1}
 					maxZoom={1.8}
 					proOptions={{ hideAttribution: true }}
+					aria-describedby="architecture-flow-interaction-hint"
 					aria-label={
 						french
 							? "Topologie interactive hiérarchisée et groupée"
@@ -1310,8 +1242,8 @@ export default function HierarchicalArchitectureExplorer({
 			<p className={styles.legend}>
 				{mode === "services"
 					? french
-						? "Les swimlanes reprennent exactement les niveaux de criticité de la section Critical dependency hierarchy. Les fondations sont en haut ; les flèches requises remontent depuis les consommateurs vers leurs cibles. La couleur et le motif distinguent désormais dépendance, flux API/données, exposition, hébergement, observabilité et automatisation. Le mode Chemin critique masque les composants support et externes pour réduire le bruit ; la recherche réactive automatiquement l’ensemble du catalogue."
-						: "Swimlanes reuse the exact criticality tiers from Critical dependency hierarchy. Foundations sit at the top; required arrows point upward from consumers to their targets. Color and line pattern now distinguish dependency, API/data flow, exposure, placement, observation, and automation. Critical path hides support and external components to reduce noise; searching automatically considers the full catalog."
+						? "Les swimlanes reprennent les niveaux de criticité de Critical dependency hierarchy. Les flèches requises remontent des consommateurs vers leurs cibles ; leur état blocked/degraded/unconfirmed vient de l’évidence FastAPI côté consommateur. Déclaré ≠ observé ≠ sain : une cible verte ne confirme pas à elle seule la relation."
+						: "Swimlanes reuse the Critical dependency hierarchy tiers. Required arrows point from consumers toward their targets; blocked/degraded/unconfirmed state comes from consumer-side FastAPI evidence. Declared ≠ observed ≠ healthy: a green target alone does not confirm the relation."
 					: french
 						? "AI Platform est regroupé par couches fonctionnelles. Le flux principal descend des interfaces vers le control plane, l’inférence, les outils, l’orchestration et l’observabilité ; la sémantique des arêtes reste distincte de leur caractère requis ou optionnel."
 						: "AI Platform is grouped by functional layers. The main flow moves from interfaces through control plane, inference, tools, orchestration and observability; edge semantics remain distinct from required/optional strength."}

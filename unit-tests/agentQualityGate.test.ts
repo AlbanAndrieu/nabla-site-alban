@@ -47,11 +47,12 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
-test("repository exposes local fix, check and strict pre-push publication commands", async () => {
-	const [mise, pkgRaw, prePush] = await Promise.all([
+test("repository exposes local fix, check and reusable strict publication commands", async () => {
+	const [mise, pkgRaw, prePush, publish] = await Promise.all([
 		source("mise.toml"),
 		source("package.json"),
 		source(".pre-commit-pre-push.yaml"),
+		source("scripts/agent-publish.sh"),
 	]);
 	const pkg = JSON.parse(pkgRaw) as { scripts: Record<string, string> };
 
@@ -68,14 +69,16 @@ test("repository exposes local fix, check and strict pre-push publication comman
 	);
 	assert.equal(
 		pkg.scripts["quality:agent:publish"],
-		"bash scripts/agent-quality-gate.sh --publish",
+		"bash scripts/agent-publish.sh",
 	);
 	assert.match(pkg.scripts["lint:fix"], /eslint --fix/);
 	assert.match(pkg.scripts["lint:css:fix"], /stylelint --fix/);
-	assert.match(
-		prePush,
-		/entry: bash scripts\/agent-quality-gate\.sh --publish/,
-	);
+	assert.match(mise, /run = "bash scripts\/agent-publish\.sh"/);
+	assert.match(prePush, /entry: bash scripts\/agent-publish\.sh/);
+	assert.match(publish, /agent-quality-gate\.sh --publish/);
+	assert.match(publish, /QG_PUBLISH_PROOF_REUSED/);
+	assert.match(publish, /QG_PUBLISH_DIRTY/);
+	assert.match(publish, /git rev-parse --git-path agent-publication-proof/);
 });
 
 test("local fix phase converges formatter and npm lint fixes before publication", async () => {
@@ -109,8 +112,9 @@ test("canonical quality gate distinguishes auto-fix mutations from semantic fail
 	);
 });
 
-test("CI rejects formatting before SAST/npm bootstrap and does not rerun the canonical gate", async () => {
+test("CI rejects formatting before expensive work and scopes application SAST/build conservatively", async () => {
 	const ci = await source(".github/workflows/ci.yml");
+	const scopePosition = ci.indexOf("Classify CI change scope");
 	const canonicalPosition = ci.indexOf(
 		"Run canonical changed-file quality gate before SAST/npm bootstrap",
 	);
@@ -126,6 +130,7 @@ test("CI rejects formatting before SAST/npm bootstrap and does not rerun the can
 	);
 	const buildPosition = ci.indexOf("Build Next.js production bundle");
 
+	assert.ok(scopePosition >= 0, "CI must classify changed-file scope");
 	assert.ok(canonicalPosition >= 0, "CI must run the canonical gate early");
 	assert.ok(
 		canonicalEnforcementPosition > canonicalPosition,
@@ -155,6 +160,10 @@ test("CI rejects formatting before SAST/npm bootstrap and does not rerun the can
 		buildPosition > gateEnforcementPosition,
 		"build must start only after the agent gate is enforced",
 	);
+	assert.match(ci, /id: ci-scope/);
+	assert.match(ci, /bash scripts\/ci-scope\.sh/);
+	assert.match(ci, /steps\.ci-scope\.outputs\.sast == 'true'/);
+	assert.match(ci, /steps\.ci-scope\.outputs\.build == 'true'/);
 	assert.match(ci, /QUALITY_CANONICAL_GATE_VERIFIED: "1"/);
 	assert.match(ci, /QUALITY_LOG_TAIL: "40"/);
 	assert.match(
@@ -181,6 +190,7 @@ test("CI rejects formatting before SAST/npm bootstrap and does not rerun the can
 	assert.match(ci, /github\.event\.before/);
 	assert.match(ci, /persist-credentials: false/);
 	assert.match(ci, /pre-commit==4\.6\.2/);
+	assert.match(ci, /package-manager-cache: false/);
 	assert.doesNotMatch(ci, /- name: Lint JavaScript and TypeScript/);
 	assert.doesNotMatch(ci, /- name: Type-check/);
 	assert.doesNotMatch(ci, /- name: Run unit tests/);

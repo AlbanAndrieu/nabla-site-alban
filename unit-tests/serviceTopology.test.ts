@@ -263,10 +263,19 @@ test("architecture route uses a static declared shell with live shared service h
 	}
 });
 
-test("hierarchical architecture exposes a compact mobile hierarchy driven by the same graph state", async () => {
-	const [explorer, css] = await Promise.all([
+test("architecture keeps one standalone compact mobile hierarchy beside the desktop graph", async () => {
+	const [view, explorer, mobile, mobileCss, explorerCss] = await Promise.all([
+		readFile("app/[locale]/architecture/ArchitectureTopologyView.tsx", "utf8"),
 		readFile(
 			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
 			"utf8",
 		),
 		readFile(
@@ -275,33 +284,39 @@ test("hierarchical architecture exposes a compact mobile hierarchy driven by the
 		),
 	]);
 
-	assert.match(explorer, /data-mobile-architecture-hierarchy/);
+	assert.match(view, /<MobileArchitectureHierarchy/);
+	assert.match(view, /catalog=\{filteredCatalog\}/);
+	assert.match(view, /topology=\{topology\}/);
+	assert.match(view, /snapshot=\{health\}/);
+	assert.match(view, /<HierarchicalArchitectureExplorer/);
+	assert.match(mobile, /data-mobile-architecture-hierarchy/);
+	assert.match(mobile, /analyzeServiceCriticality\(topology\)/);
+	assert.match(mobile, /resolveEffectiveServiceState/);
+	assert.match(mobile, /blockedDependencyLabels\(health\)/);
+	assert.match(mobile, /data-mobile-criticality-tier=\{group\.tier\}/);
+	assert.match(mobile, /data-mobile-service=\{id\}/);
+	assert.match(mobile, /itemCriticality\?\.transitiveDependents/);
+	assert.match(mobile, /showOptional \|\| relation\.strength === "required"/);
+	assert.doesNotMatch(explorer, /data-mobile-architecture-hierarchy/);
 	assert.match(explorer, /if \(document\.hidden\) return/);
 	assert.match(explorer, /document\.addEventListener\("visibilitychange"/);
 	assert.match(explorer, /document\.removeEventListener\("visibilitychange"/);
-	assert.match(explorer, /data-mobile-architecture-group=\{group\.key\}/);
-	assert.match(explorer, /data-mobile-architecture-item=\{entity\.id\}/);
-	assert.match(explorer, /relations=\{edges\}/);
-	assert.match(explorer, /nodeDataById=\{nodeDataById\}/);
 	assert.match(explorer, /maxBlastRadius = Math\.max/);
 	assert.match(explorer, /blastRatio >= 0\.5/);
 	assert.match(explorer, /blastRatio >= 0\.05/);
 	assert.match(explorer, /data-blast-radius-level=\{item\.blastRadiusLevel\}/);
-	assert.match(explorer, /<details[\s\S]*className=\{styles\.mobileGroup\}/);
-	assert.match(explorer, /<details className=\{styles\.mobileRelations\}>/);
-	assert.match(css, /\.mobileHierarchy\s*\{[\s\S]*display:\s*none/);
-	assert.match(css, /\.node\[data-blast-radius-level="dominant"\]/);
-	assert.match(css, /\.mobileItem\[data-blast-radius-level="dominant"\]/);
+	assert.match(mobileCss, /\.mobileHierarchy\s*\{[\s\S]*display:\s*none/);
 	assert.match(
-		css,
+		mobileCss,
 		/@media \(max-width: 700px\)[\s\S]*\.mobileHierarchy\s*\{[\s\S]*display:\s*grid/,
 	);
+	assert.match(explorerCss, /\.node\[data-blast-radius-level="dominant"\]/);
 	assert.match(
-		css,
+		explorerCss,
 		/@media \(max-width: 700px\)[\s\S]*\.flowShell\s*\{[\s\S]*display:\s*none/,
 	);
 	assert.match(
-		css,
+		explorerCss,
 		/@media \(prefers-reduced-motion: reduce\)[\s\S]*react-flow__edge\.animated path[\s\S]*animation:\s*none !important/,
 	);
 });

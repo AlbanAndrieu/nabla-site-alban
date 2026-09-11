@@ -119,11 +119,15 @@ test("DNS posture remains sanitized while Operations owns the active presentatio
 	const operations = await source(
 		"app/components/homelab/HomelabOperationalEvidence.tsx",
 	);
+	const pfsenseDetails = await source(
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
+	);
 
 	assert.match(posture, /data-pfsense-dns-evidence/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
-	assert.match(operations, /evidence\.pfsense\.reason/);
-	assert.match(operations, /data-pfsense-security-evidence/);
+	assert.match(operations, /HomelabOperationalPfSenseDetails/);
+	assert.match(pfsenseDetails, /evidence\.pfsense\.reason/);
+	assert.match(pfsenseDetails, /data-pfsense-security-evidence/);
 });
 
 test("TrueNAS exposes runtime observation and internal probe coverage", async () => {

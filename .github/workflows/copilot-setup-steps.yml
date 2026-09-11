@@ -16,6 +16,8 @@ on:
       - package-lock.json
       - .pre-commit-config.yaml
       - .pre-commit-pre-push.yaml
+      - scripts/agent-publish.sh
+      - scripts/agent-quality-gate.sh
   pull_request:
     paths:
       - .github/workflows/copilot-setup-steps.yml
@@ -25,6 +27,8 @@ on:
       - package-lock.json
       - .pre-commit-config.yaml
       - .pre-commit-pre-push.yaml
+      - scripts/agent-publish.sh
+      - scripts/agent-quality-gate.sh
 
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
@@ -73,6 +77,7 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: ".nvmrc"
+          package-manager-cache: false
 
       - name: Restore npm downloads
         id: npm-cache

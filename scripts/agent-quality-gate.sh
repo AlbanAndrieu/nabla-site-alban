@@ -303,7 +303,8 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             # Reviewed P1 module splits: these facades intentionally shrink below
             # the destructive-diff threshold while behavior moves to cohesive
             # modules. Once merged, their new <200-line baselines make this inert.
-            lib/homelabHealth.ts | lib/homelabObservability.ts)
+            app/components/homelab/HomelabOperationalEvidence.tsx | \
+                lib/homelabHealth.ts | lib/homelabObservability.ts)
                 continue
                 ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)

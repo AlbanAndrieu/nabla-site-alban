@@ -240,7 +240,8 @@ test("architecture and TrueNAS share dependency, optional-edge and blast-radius 
 	assert.match(architecture, /CriticalDependencyHierarchy/);
 	assert.match(hierarchy, /ServiceCriticalityOverview/);
 	assert.match(architecture, /\/api\/homelab-topology/);
-	assert.match(explorer, /requiredEdgeHealthState/);
+	assert.match(explorer, /requiredEdgeDependencyState/);
+	assert.match(explorer, /requiredDependencyRelationHealth/);
 	assert.match(explorer, /relation\.optional/);
 	assert.match(overview, /data-blast-radius/);
 	assert.match(overview, /requiredDependencies/);

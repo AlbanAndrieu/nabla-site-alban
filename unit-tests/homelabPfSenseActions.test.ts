@@ -10,8 +10,11 @@ test("pfSense degraded or stale evidence surfaces diagnostic actions", async () 
 	const actions = await source(
 		"app/components/homelab/PfSenseAttentionActions.tsx",
 	);
-	const evidence = await source(
-		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	const controlPlane = await source(
+		"app/components/homelab/HomelabOperationalControlPlane.tsx",
+	);
+	const pfsenseDetails = await source(
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
 	);
 	const messages = JSON.parse(await source("messages/operations/en.json"));
 
@@ -23,8 +26,8 @@ test("pfSense degraded or stale evidence surfaces diagnostic actions", async () 
 	assert.match(actions, /https:\/\/home\.albandrieu\.com:10443\//);
 	assert.match(actions, /\/api\/v2\/system\/version/);
 	assert.doesNotMatch(actions, /pfsense\.albandrieu\.com:10443/);
-	assert.match(evidence, /<PfSenseAttentionActions/);
-	assert.match(evidence, /id="pfsense-operational-evidence"/);
+	assert.match(controlPlane, /<PfSenseAttentionActions/);
+	assert.match(pfsenseDetails, /id="pfsense-operational-evidence"/);
 	assert.equal(messages.operations.pfsense.details, "Inspect pfSense evidence");
 	assert.equal(messages.operations.pfsense.actions.admin, "pfSense Admin");
 	assert.equal(messages.operations.pfsense.actions.api, "pfSense API health");

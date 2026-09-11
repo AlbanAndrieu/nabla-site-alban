@@ -101,7 +101,7 @@ git push
 
 `quality:agent:fix` is intentionally self-converging: it reruns mutating pre-commit hooks until stable, then applies npm-backed ESLint/Stylelint fixes when relevant and revalidates pre-commit. A pass that merely rewrites files is not a successful final state; the command must reach a clean deterministic fix pass before the result is committed.
 
-The versioned pre-push hook is the canonical strict local publication gate and invokes `scripts/agent-quality-gate.sh --publish`. When that hook is installed, **do not run an identical full `quality:agent:publish` immediately before `git push`**; that only duplicates expensive local work. Let pre-push perform the strict branch freshness, destructive-diff, executable-bit, formatter/linter/security, ESLint, Stylelint, Next.js type generation, TypeScript and unit/contract validation once.
+The versioned pre-push hook is the canonical strict local publication guard and invokes `scripts/agent-publish.sh`. That wrapper keys a reusable proof by the exact committed `HEAD`, resolved comparison-base SHA and local toolchain fingerprint. Running `npm run quality:agent:publish` before `git push` is therefore safe when useful: if the same proof is still valid, pre-push reuses it instead of rerunning the expensive gate. Any dirty tree, new commit, base-branch movement or toolchain change invalidates the proof and forces the full strict gate again.
 
 `scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. In CI it runs early, before npm dependency bootstrap, so formatting/pre-commit regressions fail cheaply. The later application gate may reuse that proof in the same CI job but publication mode can never bypass the canonical gate.
 
@@ -114,12 +114,12 @@ Before every `git push`, GitHub API file update, or other remote repository muta
 1. Confirm the target is a dedicated non-default branch and is **not** `master`.
 2. Run `npm run quality:agent:fix` from a local checkout after the editing batch and let it converge without manually investigating intermediate formatter passes.
 3. Review `git status --short` and `git diff --stat`, then inspect only the affected diff necessary to confirm the deterministic fixes are safe; commit the complete intended batch.
-4. When repository hooks are installed, push normally and let the versioned pre-push hook execute `npm run quality:agent:publish` exactly once.
+4. Run or reuse `npm run quality:agent:publish`; when repository hooks are installed, the versioned pre-push hook calls the same proof-aware wrapper automatically.
 5. When hooks are unavailable, or for an API-only mutation path with an executable checkout, explicitly run `npm run quality:agent:publish` until it succeeds before publishing.
 6. Fix every non-auto-fixable formatter, linter, YAML, workflow, configuration, unit/contract, type, executable-bit, destructive-diff, or security-check failure caused by the change.
 7. Verify `git status --short` is empty after the strict publication gate, then publish through a pull request.
 
-When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the versioned `pre-push` hook invokes `scripts/agent-quality-gate.sh --publish`. Copilot setup installs the same hooks automatically before an agent starts.
+When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the versioned `pre-push` hook invokes `scripts/agent-publish.sh`. Copilot setup installs the same hooks automatically before an agent starts.
 
 An API-only agent must not silently treat remote API writes as a way to bypass local hooks. If its runtime cannot obtain or execute a checkout, it must explicitly report that limitation, reproduce the closest deterministic validations available, keep the remote patch minimal, and inspect the resulting CI immediately. It must never claim that the local quality gate passed when it was not executed.
 

@@ -15,7 +15,12 @@ const topology: ServiceTopology = {
 	version: 1,
 	name: "test",
 	nodes: [
-		{ id: "postgresql", name: "PostgreSQL", kind: "database", category: "data" },
+		{
+			id: "postgresql",
+			name: "PostgreSQL",
+			kind: "database",
+			category: "data",
+		},
 		{ id: "langfuse", name: "Langfuse", kind: "app", category: "app" },
 		{ id: "gateway", name: "Gateway", kind: "app", category: "app" },
 	],
@@ -74,7 +79,8 @@ test("runtime topology parser preserves observed-count semantics and egress sets
 		observed_at: "2026-09-03T00:00:00Z",
 		platform_replica_count: null,
 		platform_replica_count_available: false,
-		count_semantics: "Observed active application runtimes; not control-plane replicas.",
+		count_semantics:
+			"Observed active application runtimes; not control-plane replicas.",
 		observed_instance_count: 2,
 		instances: [
 			{ id: "runtime-a", egress_ip: "52.1.1.1", egress_observed: true },
@@ -137,7 +143,8 @@ test("diagnostic parser preserves current failures separately from stale last-go
 					refresh_error: "timeout",
 					last_success_at: "2026-09-02T23:58:00Z",
 					last_known_match: true,
-					evidence: "Last-known-good snort2c table retained; current attribution withheld",
+					evidence:
+						"Last-known-good snort2c table retained; current attribution withheld",
 				},
 			},
 		},
@@ -228,7 +235,7 @@ test("service troubleshooting exposes stable anchors, causal explanation and bla
 
 test("operational evidence distinguishes current probe failure from historical last-good evidence", async () => {
 	const component = await source(
-		"app/components/homelab/HomelabOperationalEvidence.tsx",
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
 	);
 	assert.match(component, /data-current-probe-failure/);
 	assert.match(component, /data-last-good-evidence/);
@@ -241,7 +248,9 @@ test("architecture exposes an anchored impact and root-cause inspector", async (
 	const inspector = await source(
 		"app/[locale]/architecture/ArchitectureImpactInspector.tsx",
 	);
-	const nav = await source("app/[locale]/architecture/ArchitectureSectionNav.tsx");
+	const nav = await source(
+		"app/[locale]/architecture/ArchitectureSectionNav.tsx",
+	);
 	assert.match(page, /ArchitectureImpactInspector/);
 	assert.match(inspector, /id="service-impact-inspector"/);
 	assert.match(inspector, /Show affected dependents/);

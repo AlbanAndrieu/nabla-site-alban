@@ -1,0 +1,221 @@
+.sectionHeader {
+	max-width: 64rem;
+	margin-inline: auto;
+}
+
+.heading {
+	display: block;
+	margin-bottom: 0.75rem;
+	text-align: center;
+}
+
+.heading > a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.9rem;
+	max-width: 100%;
+}
+
+.heading > a > span:last-child {
+	margin-left: 0.2rem;
+	font-size: 0.72em;
+	line-height: 1;
+}
+
+.headingGlyph {
+	display: inline-grid;
+	flex: 0 0 3.4rem;
+	width: 3.4rem;
+	height: 3.4rem;
+	place-items: center;
+	border: 1px solid color-mix(in srgb, var(--ui-link) 55%, var(--ui-border));
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--ui-link) 14%, var(--ui-surface-card));
+	box-shadow: var(--ui-shadow-sm);
+	color: var(--ui-link);
+	font-size: 1.45rem;
+}
+
+.introCard {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	max-width: 58rem;
+	margin: 1.25rem auto 0;
+	padding: 1rem 1.2rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--ui-link) 8%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+	box-shadow: var(--ui-shadow-sm);
+	text-align: left;
+}
+
+.introIcon {
+	display: grid;
+	flex: 0 0 auto;
+	width: 2.8rem;
+	height: 2.8rem;
+	place-items: center;
+	border-radius: 0.85rem;
+	background: var(--ui-success-surface);
+	color: var(--ui-success-text);
+	font-size: 1.15rem;
+}
+
+.introText {
+	flex: 1 1 auto;
+	margin: 0;
+	color: var(--ui-text-secondary);
+}
+
+.architectureLink {
+	flex: 0 0 auto;
+}
+
+.serviceFirst {
+	margin-top: 1.5rem;
+}
+
+/* Observation mechanics remain available in the collapsed Operations disclosure.
+ * The primary surface keeps only actionable service outcomes and exceptions. */
+.serviceFirst :global([data-homelab-observer-summary]),
+.serviceFirst :global([data-homelab-operator-diagnostics]),
+.serviceFirst :global([data-homelab-status-legend]),
+.serviceFirst :global([data-truenas-runtime-legend]),
+.serviceFirst :global([data-dependency-health-legend]) {
+	display: none !important;
+}
+
+.serviceFirst :global(.service-card-ux) {
+	position: relative;
+	overflow: hidden;
+	border-width: 1px;
+	background: linear-gradient(
+		180deg,
+		var(--ui-surface-card),
+		var(--ui-surface-muted)
+	);
+	transition:
+		transform 140ms ease,
+		box-shadow 140ms ease,
+		border-color 140ms ease;
+}
+
+.serviceFirst :global(.service-card-ux:hover) {
+	transform: translateY(-2px);
+	box-shadow: var(--ui-shadow-md);
+}
+
+.serviceFirst :global(.service-card-ux > img) {
+	box-sizing: content-box;
+	margin-top: 1rem;
+	padding: 1rem !important;
+	border: 1px solid var(--ui-border);
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--ui-surface-card) 88%, transparent);
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.serviceFirst :global(.service-card-ux[data-effective-health="ok"]) {
+	border-color: var(--ui-success-border);
+	box-shadow:
+		inset 0 3px 0 var(--ui-success-text),
+		var(--ui-shadow-sm);
+}
+
+.serviceFirst :global(.service-card-ux[data-effective-health="warn"]) {
+	border-color: var(--ui-warning-border);
+	box-shadow:
+		inset 0 3px 0 var(--ui-warning-text),
+		var(--ui-shadow-sm);
+}
+
+.serviceFirst :global(.service-card-ux[data-effective-health="fail"]) {
+	border-color: var(--ui-danger-border);
+	box-shadow:
+		inset 0 3px 0 var(--ui-danger-text),
+		var(--ui-shadow-sm);
+}
+
+.serviceFirst :global(.service-card-ux[data-effective-health="unknown"]) {
+	box-shadow:
+		inset 0 3px 0 var(--ui-text-secondary),
+		var(--ui-shadow-sm);
+}
+
+.serviceFirst :global([data-homelab-health-filter]) {
+	position: relative;
+	min-height: 4.4rem;
+	border-width: 1px;
+	box-shadow: var(--ui-shadow-sm);
+	font-size: 0.9rem;
+}
+
+.serviceFirst :global([data-homelab-health-filter]::before) {
+	display: inline-grid;
+	width: 1.7rem;
+	height: 1.7rem;
+	margin-right: 0.45rem;
+	place-items: center;
+	border-radius: 999px;
+	font-weight: 800;
+}
+
+.serviceFirst :global([data-homelab-health-filter="ok"]::before) {
+	content: "✓";
+	background: var(--ui-success-surface);
+	color: var(--ui-success-text);
+}
+
+.serviceFirst :global([data-homelab-health-filter="warn"]::before) {
+	content: "!";
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+.serviceFirst :global([data-homelab-health-filter="fail"]::before) {
+	content: "×";
+	background: var(--ui-danger-surface);
+	color: var(--ui-danger-text);
+}
+
+.serviceFirst :global([data-homelab-health-filter="unknown"]::before) {
+	content: "?";
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+}
+
+.serviceFirst :global([data-service-presentation-group]) {
+	box-shadow: var(--ui-shadow-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.serviceFirst :global(.service-card-ux) {
+		transition: none;
+	}
+}
+
+@media (max-width: 760px) {
+	.heading {
+		text-align: left;
+	}
+
+	.heading > a {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+
+	.introCard {
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.architectureLink {
+		width: 100%;
+	}
+}

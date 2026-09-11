@@ -6,46 +6,54 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("architecture keeps the legacy standalone mobile hierarchy retired", async () => {
-	const legacyStyles = await source(
-		"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
-	);
-
-	assert.match(legacyStyles, /^\.mobileHierarchy \{\s*display: none;\s*\}\s*$/);
-	assert.doesNotMatch(legacyStyles, /@media/);
-	assert.doesNotMatch(legacyStyles, /display: grid/);
-});
-
-test("hierarchical explorer owns the single active compact mobile view", async () => {
-	const [component, styles] = await Promise.all([
+test("architecture uses the standalone mobile hierarchy as the single compact view", async () => {
+	const [view, mobile, mobileStyles, explorer] = await Promise.all([
+		source("app/[locale]/architecture/ArchitectureTopologyView.tsx"),
+		source("app/[locale]/architecture/MobileArchitectureHierarchy.tsx"),
+		source("app/[locale]/architecture/MobileArchitectureHierarchy.module.css"),
 		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css"),
 	]);
 
-	assert.match(component, /data-mobile-architecture-hierarchy/);
-	assert.match(component, /data-mobile-architecture-group=/);
-	assert.match(component, /data-mobile-architecture-item=/);
-	assert.match(component, /<details/);
-	assert.match(component, /groups=\{groups\}/);
-	assert.match(component, /nodeDataById=\{nodeDataById\}/);
-	assert.match(component, /relations=\{edges\}/);
+	assert.match(view, /<MobileArchitectureHierarchy/);
+	assert.match(mobile, /data-mobile-architecture-hierarchy/);
+	assert.match(mobile, /data-mobile-criticality-tier=/);
+	assert.match(mobile, /data-mobile-service=/);
+	assert.match(mobile, /analyzeServiceCriticality\(topology\)/);
+	assert.match(mobile, /blockedDependencyLabels\(health\)/);
+	assert.match(mobileStyles, /@media \(max-width: 700px\)/);
+	assert.match(mobileStyles, /\.mobileHierarchy \{[\s\S]*display: grid/);
+	assert.doesNotMatch(explorer, /function MobileArchitectureHierarchy/);
+	assert.doesNotMatch(explorer, /data-mobile-architecture-hierarchy/);
+});
+
+test("desktop React Flow remains the single interactive graph and yields to page scrolling", async () => {
+	const [explorer, styles] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+		),
+	]);
+
+	assert.match(explorer, /<ReactFlow/);
+	assert.match(explorer, /zoomOnScroll=\{false\}/);
+	assert.match(explorer, /panOnScroll=\{false\}/);
+	assert.match(explorer, /preventScrolling=\{false\}/);
+	assert.match(explorer, /zoomActivationKeyCode=\{\["Control", "Meta"\]\}/);
+	assert.match(explorer, /architecture-flow-interaction-hint/);
 	assert.match(styles, /@media \(max-width: 700px\)/);
-	assert.match(styles, /\.mobileHierarchy \{[\s\S]*display: grid/);
 	assert.match(styles, /\.flowShell \{[\s\S]*display: none/);
 });
 
-test("integrated mobile hierarchy shares graph health, criticality and filters", async () => {
+test("mobile hierarchy shares service health, criticality and relation filters", async () => {
 	const component = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+		"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
 	);
 
 	assert.match(component, /resolveEffectiveServiceState/);
 	assert.match(component, /blockedDependencyLabels/);
 	assert.match(component, /analyzeServiceCriticality\(topology\)/);
-	assert.match(component, /blastRadiusLevel/);
+	assert.match(component, /criticalOnly/);
 	assert.match(component, /showOptional/);
-	assert.match(component, /scope/);
-	assert.match(component, /filtered\.visible/);
 	assert.match(component, /data-health-state=/);
-	assert.match(component, /data-blast-radius-level=/);
+	assert.match(component, /data-mobile-relation-strength=/);
 });

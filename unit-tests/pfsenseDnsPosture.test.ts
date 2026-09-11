@@ -71,6 +71,9 @@ test("DNS resilience is rendered by unified operational evidence instead of a st
 	const operations = await source(
 		"app/components/homelab/HomelabOperationalEvidence.tsx",
 	);
+	const pfsenseDetails = await source(
+		"app/components/homelab/HomelabOperationalPfSenseDetails.tsx",
+	);
 	const observability = await source("lib/homelabObservability.ts");
 	const observabilityTypes = await source("lib/homelabObservabilityTypes.ts");
 
@@ -81,7 +84,8 @@ test("DNS resilience is rendered by unified operational evidence instead of a st
 	assert.match(observability, /parseHomelabHealthSnapshot\(board\.homelab\)/);
 	assert.match(operations, /import PfSenseDnsPosture/);
 	assert.match(operations, /snapshot=\{evidence\.healthSnapshot\}/);
-	assert.match(operations, /data-pfsense-security-evidence/);
+	assert.match(operations, /HomelabOperationalPfSenseDetails/);
+	assert.match(pfsenseDetails, /data-pfsense-security-evidence/);
 });
 
 test("DNS posture exposes explicit resilience states without raw network configuration", async () => {
