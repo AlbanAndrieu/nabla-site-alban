@@ -11,6 +11,7 @@ import {
 } from "@/lib/homelabHealthPresentation";
 import ServiceOperatorDiagnostics from "./ServiceOperatorDiagnostics";
 import ServiceProbeEvidence from "./ServiceProbeEvidence";
+import ServiceSignalStrip from "./ServiceSignalStrip";
 
 type Props = {
 	entry?: HomelabHealthEntry;
@@ -68,11 +69,13 @@ export default function ServiceHealthReasons({
 	runtimeStale,
 }: Props) {
 	const t = useTranslations("homelab");
+	const signalStrip = <ServiceSignalStrip entry={entry} />;
 	const probeEvidence = <ServiceProbeEvidence entry={entry} />;
 	const operatorDiagnostics = <ServiceOperatorDiagnostics entry={entry} />;
 	if (state !== "fail" && state !== "warn") {
 		return (
 			<>
+				{signalStrip}
 				{probeEvidence}
 				{operatorDiagnostics}
 			</>
@@ -87,6 +90,7 @@ export default function ServiceHealthReasons({
 
 	return (
 		<>
+			{signalStrip}
 			{probeEvidence}
 			<div
 				className={`alert ${state === "fail" ? "alert-danger" : "alert-warning"} py-2 px-2 small text-start mt-3 mb-0`}

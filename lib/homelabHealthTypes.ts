@@ -32,39 +32,55 @@ export type HomelabRollingProbeEvidence = {
 	error_kind?: string;
 };
 
-export type HomelabHealthEntry = HomelabRollingProbeEvidence & {
-	id?: string;
-	name: string;
-	url: string;
-	url_derived?: boolean;
-	reachable: boolean | null;
-	http_status: number;
-	state: HomelabHealthState;
-	local_state?: HomelabHealthState;
-	dependency_state?: HomelabHealthState | null;
-	effective_state?: HomelabHealthState;
-	required_dependencies?: string[];
-	blocked_by?: string[];
-	dependency_cycle?: string[];
-	dependency_evidence?: HomelabDependencyEvidence[];
-	observed_at?: string | null;
-	observation_age_seconds?: number | null;
-	observation_stale?: boolean;
-	tls_trusted?: boolean | null;
-	latency_ms?: number;
-	error?: string;
-	application_error?: string | null;
-	tunnel_status?: string | null;
-	tunnel_name?: string | null;
-	direct_state?: HomelabHealthState | null;
-	internal_state?: HomelabHealthState | null;
-	runtime_state?: string | null;
-	runtime_app?: string | null;
-	runtime_reachable?: boolean | null;
-	runtime_missing?: boolean;
-	runtime_stale?: boolean;
-	tunnel_stale?: boolean;
+export type HomelabScopedProbeEvidence = {
+	direct_probe_source?: HomelabProbeSource;
+	direct_probe_observed_at?: string | null;
+	direct_probe_age_seconds?: number | null;
+	direct_probe_refresh_error?: string;
+	internal_probe_source?: HomelabProbeSource;
+	internal_probe_observed_at?: string | null;
+	internal_probe_age_seconds?: number | null;
+	internal_probe_refresh_error?: string;
 };
+
+export type HomelabHealthEntry = HomelabRollingProbeEvidence &
+	HomelabScopedProbeEvidence & {
+		id?: string;
+		name: string;
+		url: string;
+		url_derived?: boolean;
+		reachable: boolean | null;
+		http_status: number;
+		state: HomelabHealthState;
+		local_state?: HomelabHealthState;
+		dependency_state?: HomelabHealthState | null;
+		effective_state?: HomelabHealthState;
+		required_dependencies?: string[];
+		blocked_by?: string[];
+		degraded_by?: string[];
+		unconfirmed_dependencies?: string[];
+		dependency_cycle?: string[];
+		dependency_evidence?: HomelabDependencyEvidence[];
+		observed_at?: string | null;
+		observation_age_seconds?: number | null;
+		observation_stale?: boolean;
+		tls_trusted?: boolean | null;
+		latency_ms?: number;
+		error?: string;
+		application_error?: string | null;
+		tunnel_status?: string | null;
+		tunnel_name?: string | null;
+		cloudflare_status_confirmed?: boolean;
+		cloudflare_warning?: string;
+		direct_state?: HomelabHealthState | null;
+		internal_state?: HomelabHealthState | null;
+		runtime_state?: string | null;
+		runtime_app?: string | null;
+		runtime_reachable?: boolean | null;
+		runtime_missing?: boolean;
+		runtime_stale?: boolean;
+		tunnel_stale?: boolean;
+	};
 
 export type HomelabInternalHealthEntry = HomelabRollingProbeEvidence & {
 	id?: string;

@@ -32,6 +32,15 @@ function sourceLabel(
 	}
 }
 
+function sourceIcon(entry: HomelabHealthEntry): string {
+	if (entry.probe_stale === true) return "fas fa-clock-rotate-left";
+	if (entry.probe_source === "origin") return "fas fa-satellite-dish";
+	if (entry.probe_source === "memory") return "fas fa-database";
+	if (entry.probe_source === "deadline" || entry.timed_out === true)
+		return "fas fa-stopwatch";
+	return "fas fa-circle-question";
+}
+
 function reachabilityLabel(
 	value: boolean | null | undefined,
 	french: boolean,
@@ -77,16 +86,13 @@ export default function ServiceProbeEvidence({ entry }: Readonly<Props>) {
 			data-probe-stale={entry.probe_stale === true ? "true" : "false"}
 		>
 			<span>
-				{entry.probe_stale === true
-					? "⚠️"
-					: entry.probe_source === "origin"
-						? "●"
-						: "◐"}{" "}
+				<i className={sourceIcon(entry)} aria-hidden="true" />{" "}
 				{sourceLabel(entry.probe_source, french)}
 				{details.length > 0 ? ` · ${details.join(" · ")}` : ""}
 			</span>
 			{entry.probe_stale === true ? (
 				<span className="d-block" data-probe-last-known>
+					<i className="fas fa-clock-rotate-left" aria-hidden="true" />{" "}
 					{french ? "Dernier état connu" : "Last known state"}:{" "}
 					{entry.last_known_state ?? "unknown"}
 					{" · "}
@@ -98,7 +104,8 @@ export default function ServiceProbeEvidence({ entry }: Readonly<Props>) {
 			) : null}
 			{entry.probe_refresh_error ? (
 				<span className="d-block" data-probe-refresh-error>
-					Refresh: {entry.probe_refresh_error}
+					<i className="fas fa-rotate" aria-hidden="true" /> Refresh:{" "}
+					{entry.probe_refresh_error}
 				</span>
 			) : null}
 		</div>
