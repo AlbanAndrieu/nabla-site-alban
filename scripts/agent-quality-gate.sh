@@ -356,6 +356,15 @@ if ((exec_bit_failed != 0)); then
 fi
 printf '✅ executable-script contract\n'
 
+if (("${#CHANGED_FILES[@]}" > 0)); then
+    run_compact "baseline-aware code-size report" \
+        python3 scripts/check_code_size.py \
+        --baseline-ref "${BASE_REF}" \
+        "${CHANGED_FILES[@]}"
+else
+    echo "✅ baseline-aware code-size report (no changed files)"
+fi
+
 command -v npm >/dev/null 2>&1 || {
     echo "❌ npm is required" >&2
     exit 1
