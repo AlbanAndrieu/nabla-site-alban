@@ -143,11 +143,15 @@ same path to the compatibility catalog and explicit missing-component policy.
 Refactor cohesive responsibilities instead of raising size thresholds. The first
 three targets are:
 
-- [ ] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
-  transport loaders. The rolling-probe convergence work introduced a thin public
-  facade and moved the pre-existing parser to `lib/homelabHealthBase.ts` so the
-  compatibility boundary can evolve safely; finish the split and remove this
-  temporary base module rather than letting it become permanent debt.
+- [x] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
+  transport loaders. The public module is now a thin compatibility facade over
+  dedicated types, validation, rolling-probe parsing, pfSense parsing, aggregate
+  parsing and HTTP transport modules; the temporary 933-line
+  `lib/homelabHealthBase.ts` has been removed. The destructive-diff guard keeps a
+  path-scoped reviewed exception for this split rather than enabling the global
+  large-deletion bypass, and CI #957 validated canonical formatting, Semgrep,
+  code-size reporting, ESLint, Stylelint, Next type generation, TypeScript,
+  unit/contract tests and the production build.
 - [ ] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
   platform-metric parsing and fallback orchestration.
 - [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
