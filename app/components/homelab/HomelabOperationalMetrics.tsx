@@ -57,9 +57,13 @@ export default function HomelabOperationalMetrics({
 			<div className={styles.detailsBody}>
 				<p>{t("metrics.lead")}</p>
 				<div className={styles.sourceRow}>
-					<span>{t("metrics.source", { source: metrics.source ?? "prometheus" })}</span>
+					<span>
+						{t("metrics.source", { source: metrics.source ?? "prometheus" })}
+					</span>
 					{metrics.generatedAt ? (
-						<span>{t("metrics.generatedAt", { timestamp: metrics.generatedAt })}</span>
+						<span>
+							{t("metrics.generatedAt", { timestamp: metrics.generatedAt })}
+						</span>
 					) : null}
 					<span>
 						{t("metrics.signals", {
@@ -78,7 +82,9 @@ export default function HomelabOperationalMetrics({
 					<div className={styles.alertWarn} role="status">
 						<strong>{t("metrics.telemetryUnavailable")}</strong>
 						<small>
-							{[metrics.errorKind, metrics.exceptionType].filter(Boolean).join(" · ")}
+							{[metrics.errorKind, metrics.exceptionType]
+								.filter(Boolean)
+								.join(" · ")}
 						</small>
 					</div>
 				) : null}
@@ -107,7 +113,9 @@ export default function HomelabOperationalMetrics({
 						);
 					})}
 				</ul>
-				<small className={styles.detailText}>{t("metrics.healthSeparation")}</small>
+				<small className={styles.detailText}>
+					{t("metrics.healthSeparation")}
+				</small>
 			</div>
 		</details>
 	);
