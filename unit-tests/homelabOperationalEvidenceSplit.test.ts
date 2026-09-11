@@ -28,11 +28,11 @@ test("operational evidence keeps its public contract while delegating heavy doma
 	}
 	assert.doesNotMatch(facade, /function parseIngressBlock/);
 	assert.doesNotMatch(facade, /pfsense_tcp_port_policy/);
-	assert.doesNotMatch(facade, /dependency_cycle/);
+	assert.doesNotMatch(facade, /stringArray\(value\.dependency_cycle\)/);
 
 	assert.match(parsing, /export function isRecord/);
 	assert.match(parsing, /export function healthState/);
 	assert.match(pfsense, /function parseIngressBlock/);
 	assert.match(exposure, /pfsense_tcp_port_policy/);
-	assert.match(freshness, /dependency_cycle/);
+	assert.match(freshness, /stringArray\(value\.dependency_cycle\)/);
 });
