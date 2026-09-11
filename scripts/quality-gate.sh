@@ -93,6 +93,9 @@ if (("${#CHANGED_FILES[@]}" > 0)); then
             echo "   Run 'npm run quality:agent:fix', review/commit the changes, then retry publication." >&2
             echo "   No CI-log analysis is required for this condition." >&2
             git status --short >&2
+            echo "--- exact formatter patch ---" >&2
+            git diff --no-ext-diff -- "${CHANGED_FILES[@]}" >&2 || true
+            echo "--- end formatter patch ---" >&2
         else
             echo "❌ QG_PRECOMMIT_FAILED: pre-commit found a non-auto-fixed validation error." >&2
             tail -n "${LOG_TAIL}" "${log}" >&2 || true
