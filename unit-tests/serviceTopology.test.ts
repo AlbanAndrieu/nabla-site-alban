@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { parseServiceTopology } from "../lib/serviceTopology";
 import {
+	hasRequiredTopologyRelation,
 	hasTopologyRelation,
 	loadLocalServiceTopology,
 } from "./helpers/serviceTopology";
@@ -34,24 +35,23 @@ test("local fallback preserves the Elasticsearch and Kibana multi-service contra
 	assert.ok(nodeIds.has("docker"));
 	assert.ok(nodeIds.has("truenas"));
 
-	const hasRelation = (
-		source: string,
-		target: string,
-		type: string,
-		strength = "required",
-	) =>
-		topology.relations.some(
-			(relation) =>
-				relation.source === source &&
-				relation.target === target &&
-				relation.type === type &&
-				relation.strength === strength,
-		);
-
-	assert.ok(hasRelation("kibana", "elasticsearch", "dependsOn"));
-	assert.ok(hasRelation("elasticsearch", "docker", "hostedBy"));
-	assert.ok(hasRelation("kibana", "docker", "hostedBy"));
-	assert.ok(hasRelation("docker", "truenas", "hostedBy"));
+	assert.ok(
+		hasRequiredTopologyRelation(
+			topology,
+			"kibana",
+			"elasticsearch",
+			"dependsOn",
+		),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "elasticsearch", "docker", "hostedBy"),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "kibana", "docker", "hostedBy"),
+	);
+	assert.ok(
+		hasRequiredTopologyRelation(topology, "docker", "truenas", "hostedBy"),
+	);
 });
 
 test("local fallback tracks current runtime placement and Talos topology", async () => {
@@ -199,14 +199,28 @@ test("local topology fallback is synchronized with the current Nabla Compose cat
 		assert.ok(nodeIds.has(id), `expected synchronized topology node ${id}`);
 	}
 
-	assert.ok(hasTopologyRelation(topology, "pfsense-unbound", "pihole", "dependsOn"));
-	assert.ok(hasTopologyRelation(topology, "keycloak", "postgresql", "dependsOn"));
-	assert.ok(hasTopologyRelation(topology, "openwebui", "cloudflared", "exposedBy"));
-	assert.ok(hasTopologyRelation(topology, "pihole-dns-sync", "pihole", "automates"));
-	assert.ok(hasTopologyRelation(topology, "akvorado-inlet", "kafka", "routesTo"));
-	assert.ok(hasTopologyRelation(topology, "akvorado-outlet", "clickhouse", "storesIn"));
+	assert.ok(
+		hasTopologyRelation(topology, "pfsense-unbound", "pihole", "dependsOn"),
+	);
+	assert.ok(
+		hasTopologyRelation(topology, "keycloak", "postgresql", "dependsOn"),
+	);
+	assert.ok(
+		hasTopologyRelation(topology, "openwebui", "cloudflared", "exposedBy"),
+	);
+	assert.ok(
+		hasTopologyRelation(topology, "pihole-dns-sync", "pihole", "automates"),
+	);
+	assert.ok(
+		hasTopologyRelation(topology, "akvorado-inlet", "kafka", "routesTo"),
+	);
+	assert.ok(
+		hasTopologyRelation(topology, "akvorado-outlet", "clickhouse", "storesIn"),
+	);
 	assert.ok(hasTopologyRelation(topology, "pyroscope", "docker", "hostedBy"));
-	assert.ok(hasTopologyRelation(topology, "sentry-edge", "sentry-relay", "routesTo"));
+	assert.ok(
+		hasTopologyRelation(topology, "sentry-edge", "sentry-relay", "routesTo"),
+	);
 });
 
 test("local topology preserves FastAPI Sample production and staging environments", async () => {

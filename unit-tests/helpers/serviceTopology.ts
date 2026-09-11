@@ -21,11 +21,22 @@ export function hasTopologyRelation(
 	source: string,
 	target: string,
 	type: string,
+	strength?: string,
 ) {
 	return topology.relations.some(
 		(relation) =>
 			relation.source === source &&
 			relation.target === target &&
-			relation.type === type,
+			relation.type === type &&
+			(strength === undefined || relation.strength === strength),
 	);
+}
+
+export function hasRequiredTopologyRelation(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+	type: string,
+) {
+	return hasTopologyRelation(topology, source, target, type, "required");
 }
