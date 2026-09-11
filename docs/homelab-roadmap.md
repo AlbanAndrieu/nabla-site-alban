@@ -111,16 +111,18 @@ same path to the compatibility catalog and explicit missing-component policy.
   fields. `fastapi-sample#236` currently provides this report as an operator CLI
   assembled from existing health-board data, so Site Alban must not scrape CLI
   output or invent a second wire contract.
-- [ ] Finish adaptive UI polling separately from provider probe cadence. Site
-  Alban now coalesces concurrent health-board reads and keeps a deliberately short
+- [x] Finish adaptive UI polling separately from provider probe cadence. Site
+  Alban coalesces concurrent health-board reads and keeps a deliberately short
   server cache (fresh 5 s, refreshing 2 s, pending/stale 1 s, failures 0 s).
-  `/api/homelab-health` also defers the richer aggregate request until the cached
-  board proves insufficient; a contract test proves that a fresh board starts
-  zero aggregate/probe fallback requests. Remaining work is client ownership:
-  remove the second `/api/homelab-health` poll from
-  `HierarchicalArchitectureExplorer`, then move the single browser owner to an
-  adaptive fresh/refreshing schedule without increasing TrueNAS/pfSense/Cloudflare
-  fan-out. Stale/pending/unavailable evidence must stay on a conservative cadence.
+  `/api/homelab-health` defers the richer aggregate request until the cached board
+  proves insufficient; a contract test proves that a fresh board starts zero
+  aggregate/probe fallback requests. `ArchitectureTopologyView` is now the single
+  browser owner through `useArchitectureHealthPolling`: refreshing evidence polls
+  every 2 s, fresh evidence every 5 s, and stale/pending/unavailable evidence every
+  30 s. `HierarchicalArchitectureExplorer` receives the shared health snapshot and
+  source as props and cannot create a second health fetch; its distinct runtime
+  drift observation remains isolated at 30 s. Source contracts lock these owners
+  so the faster browser cadence cannot silently become additional provider fan-out.
 
 ## P0 — Post-merge Quality remediation
 
@@ -202,14 +204,16 @@ Refactor cohesive responsibilities instead of raising size thresholds.
   destructive-diff, executable-bit, canonical quality, lint/type/test and publish
   policy. `ci-scope.sh`, Copilot setup and source contracts follow the helper, and
   the wrapper is below the 300-line warning threshold.
-- [ ] Continue reducing `HierarchicalArchitectureExplorer.tsx` only when a
-  substantive functional change provides a natural extraction boundary; do not
-  churn the React Flow surface only to satisfy a line-count target. The next
-  boundary is now concrete: `ArchitectureTopologyView` and the explorer both own
-  `/api/homelab-health` polling. Move that health ownership entirely to the parent,
-  pass the snapshot/source into the explorer, retain only its distinct runtime
-  `/api/homelab-status` responsibility, and lock the single-owner contract before
-  considering a further runtime hook extraction.
+- [x] Reduce `HierarchicalArchitectureExplorer.tsx` only through a substantive
+  functional boundary rather than line-count churn. #179 moves health ownership
+  entirely to `ArchitectureTopologyView` through `useArchitectureHealthPolling`,
+  passes the health snapshot/source into the explorer, and extracts the explorer's
+  distinct `/api/homelab-status` ownership to `useArchitectureRuntimeStatus`.
+  `unit-tests/architecturePollingOwnership.test.ts` plus the reconciled
+  Architecture source contracts prevent either concern from drifting back into the
+  React Flow surface. The explorer drops from the 1253-line baseline to 1196 lines
+  while preserving its rendering semantics; CI #1056 and Copilot Setup #189
+  validate the formatter-clean functional extraction.
 
 - [x] Add a non-regression code-size report to the Site agent quality gate. The
   diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or
