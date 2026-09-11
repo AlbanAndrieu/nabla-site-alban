@@ -1,3 +1,211 @@
 .mobileHierarchy {
 	display: none;
 }
+
+@media (max-width: 700px) {
+	.mobileHierarchy {
+		display: grid;
+		gap: 0.8rem;
+		margin: 1rem;
+		padding: 1rem;
+		border: 1px solid var(--ui-border);
+		border-left: 4px solid var(--ui-link);
+		border-radius: var(--ui-radius-card);
+		background: var(--ui-surface-card);
+		color: var(--ui-text-primary);
+		box-shadow: var(--ui-shadow-sm);
+	}
+
+	.header {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.header h2 {
+		margin: 0;
+		color: var(--ui-text-primary);
+		font-size: 1.1rem;
+	}
+
+	.header p {
+		margin: 0.25rem 0 0;
+		color: var(--ui-text-secondary);
+		font-size: 0.82rem;
+		line-height: 1.5;
+	}
+
+	.controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem 0.8rem;
+	}
+
+	.controls label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		min-height: var(--ui-control-min-height);
+		color: var(--ui-text-primary);
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+
+	.controls input {
+		accent-color: var(--ui-link);
+	}
+
+	.groups,
+	.serviceList {
+		display: grid;
+		gap: 0.65rem;
+	}
+
+	.group {
+		overflow: hidden;
+		border: 1px solid var(--ui-border);
+		border-radius: var(--ui-radius-control);
+		background: var(--ui-surface-muted);
+	}
+
+	.group > summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		min-height: var(--ui-control-min-height);
+		padding: 0.7rem 0.8rem;
+		color: var(--ui-text-primary);
+		cursor: pointer;
+	}
+
+	.group > summary > span:first-child {
+		display: grid;
+		gap: 0.15rem;
+	}
+
+	.group > summary strong {
+		color: var(--ui-text-primary);
+	}
+
+	.group > summary small,
+	.serviceHeading small,
+	.noRelations {
+		color: var(--ui-text-secondary);
+		font-size: 0.72rem;
+	}
+
+	.group > summary:focus-visible {
+		outline: 3px solid var(--ui-focus-ring);
+		outline-offset: -3px;
+	}
+
+	.serviceList {
+		padding: 0 0.65rem 0.65rem;
+	}
+
+	.service {
+		display: grid;
+		gap: 0.55rem;
+		padding: 0.7rem;
+		border: 1px solid var(--ui-border);
+		border-radius: var(--ui-radius-control);
+		background: var(--ui-surface-card);
+		color: var(--ui-text-primary);
+	}
+
+	.serviceHeading {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.7rem;
+	}
+
+	.serviceHeading > div {
+		display: grid;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.serviceHeading strong {
+		color: var(--ui-text-primary);
+		overflow-wrap: anywhere;
+	}
+
+	.state {
+		flex: 0 0 auto;
+		padding: 0.16rem 0.42rem;
+		border: 1px solid var(--ui-border);
+		border-radius: 999px;
+		background: var(--ui-surface-muted);
+		font-size: 0.66rem;
+		font-weight: 800;
+		letter-spacing: 0.025em;
+		text-transform: uppercase;
+	}
+
+	.state[data-health-state="ok"] {
+		border-color: var(--ui-success-border);
+		background: var(--ui-success-surface);
+		color: var(--ui-success-text);
+	}
+
+	.state[data-health-state="warn"] {
+		border-color: var(--ui-warning-border);
+		background: var(--ui-warning-surface);
+		color: var(--ui-warning-text);
+	}
+
+	.state[data-health-state="fail"] {
+		border-color: var(--ui-danger-border);
+		background: var(--ui-danger-surface);
+		color: var(--ui-danger-text);
+	}
+
+	.state[data-health-state="unknown"] {
+		color: var(--ui-text-secondary);
+	}
+
+	.blocked {
+		margin: 0;
+		padding: 0.5rem 0.6rem;
+		border-left: 3px solid var(--ui-danger-text);
+		border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+		background: color-mix(in srgb, var(--ui-danger-surface) 68%, var(--ui-surface-card));
+		color: var(--ui-danger-text);
+		font-size: 0.74rem;
+		font-weight: 700;
+	}
+
+	.relations {
+		display: grid;
+		gap: 0.35rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.relations li {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.6rem;
+		padding-top: 0.35rem;
+		border-top: 1px solid var(--ui-border);
+		color: var(--ui-text-primary);
+		font-size: 0.75rem;
+	}
+
+	.relations li small {
+		color: var(--ui-text-muted);
+		text-align: right;
+	}
+
+	.relations li[data-mobile-relation-strength="required"] {
+		border-left: 2px solid var(--ui-link);
+		padding-left: 0.45rem;
+	}
+
+	.noRelations {
+		display: block;
+	}
+}
