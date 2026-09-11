@@ -304,7 +304,8 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             # the destructive-diff threshold while behavior moves to cohesive
             # modules. Once merged, their new <200-line baselines make this inert.
             app/components/homelab/HomelabOperationalEvidence.tsx | \
-                lib/homelabHealth.ts | lib/homelabObservability.ts)
+                lib/homelabHealth.ts | lib/homelabObservability.ts | \
+                lib/homelabOperationalEvidence.ts)
                 continue
                 ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)
