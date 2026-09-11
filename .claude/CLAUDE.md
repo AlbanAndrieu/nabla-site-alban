@@ -6,4 +6,6 @@ Keep default context minimal: search first, read only relevant files/ranges, and
 
 For frontend/accessibility/i18n/SEO/print work, load `docs/agent-frontend-standards.md` on demand. For Next.js-specific work, locate and read only the relevant installed guide under `node_modules/next/dist/docs/`; do not generate or load broad framework documentation indexes by default.
 
+After edits, use the self-converging `npm run quality:agent:fix`, commit the result, then rely on the installed pre-push hook for the strict publication gate. `QG_AUTOFIX_REQUIRED` means run that local fix path; only inspect targeted CI logs for non-auto-fixable failures.
+
 For CI failures, follow the progressive workflow in `/AGENTS.md`: status → failed job → failed step → targeted logs → richer artifacts only when needed.

@@ -110,29 +110,57 @@ same path to the compatibility catalog and explicit missing-component policy.
 
 ## P0 — Post-merge Quality remediation
 
-- [ ] Merge and operationally validate
-  `.github/workflows/post-merge-quality-remediation.yml`: GitHub only activates a
-  `workflow_run` workflow once the workflow file exists on the default branch.
-  After activation, a failed or timed out `CI (Quality and Security)` push on
-  `master` with a converged deterministic formatter/pre-commit repair must open a
-  non-default remediation PR and dispatch canonical CI on it; a non-auto-fixable
-  failure must instead open one deduplicated diagnostic issue with the failed jobs
-  and source run. Also validate the fallback issue path when GitHub refuses PR
-  creation or CI dispatch with `GITHUB_TOKEN`. Keep this as a recovery safety net,
-  never as permission for agents to skip their pre-publish gate.
+- [ ] Operationally validate the merged
+  `.github/workflows/post-merge-quality-remediation.yml`: after an actual failed
+  or timed out `CI (Quality and Security)` push on `master`, a converged
+  deterministic formatter/pre-commit repair must open a non-default remediation
+  PR and dispatch canonical CI on it; a non-auto-fixable failure must instead open
+  one deduplicated diagnostic issue with the failed jobs and source run. Also
+  validate the fallback issue path when GitHub refuses PR creation or CI dispatch
+  with `GITHUB_TOKEN`. Keep this as a recovery safety net, never as permission for
+  agents to skip their pre-publish gate.
+- [ ] Finish validating the local-first pipeline on a real agent workspace. The CI
+  half is now proven repeatedly in #177: formatter-only changes emit
+  `QG_AUTOFIX_REQUIRED` with the exact patch and stop before Semgrep/npm/build,
+  then a clean retry proceeds through the full gate. Copilot cold bootstrap also
+  succeeds with npm 11.17 pinned before Node-backed pre-commit hook installation.
+  Ruff now has a single lint authority, `ruff-check --fix --unsafe-fixes`, before
+  `ruff-format`, so fixable Python diagnostics no longer stop before their own
+  auto-fix hook; a contract prevents the old duplicate `ruff` hook from returning.
+  The remaining operational proof is one real local `quality:agent:fix` → commit →
+  strict pre-push publication cycle showing that the canonical publication gate
+  executes once and leaves a clean tree.
+- [x] Remove the duplicate Stylelint authority after proving rule parity. npm /
+  `package-lock.json` + Stylelint 17 is now the single CSS lint authority across
+  maintained `app/**/*.css`, `components/**/*.css` and `public/*.css`. The parity
+  expansion exposed and fixed the CSS Modules `:global()` false positives plus
+  two genuine duplicate selectors before the old pre-commit Stylelint 14
+  environment and `stylelint-config-standard-scss@3.0.0` were removed. Contract
+  tests prevent reintroducing that second toolchain.
 
 ## P1 — Refactoring / code-size debt
 
 Refactor cohesive responsibilities instead of raising size thresholds. The first
 three targets are:
 
-- [ ] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
-  transport loaders. The rolling-probe convergence work introduced a thin public
-  facade and moved the pre-existing parser to `lib/homelabHealthBase.ts` so the
-  compatibility boundary can evolve safely; finish the split and remove this
-  temporary base module rather than letting it become permanent debt.
-- [ ] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
-  platform-metric parsing and fallback orchestration.
+- [x] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
+  transport loaders. The public module is now a thin compatibility facade over
+  dedicated types, validation, rolling-probe parsing, pfSense parsing, aggregate
+  parsing and HTTP transport modules; the temporary 933-line
+  `lib/homelabHealthBase.ts` has been removed. The destructive-diff guard keeps a
+  path-scoped reviewed exception for this split rather than enabling the global
+  large-deletion bypass, and CI #957 validated canonical formatting, Semgrep,
+  code-size reporting, ESLint, Stylelint, Next type generation, TypeScript,
+  unit/contract tests and the production build.
+- [x] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
+  platform-metric parsing and fallback orchestration. The former monolith is now a
+  thin composition facade over dedicated types/shared parsing, deep-diagnostic,
+  platform-metric, control-plane/edge and fallback modules. The facade lost 534
+  lines while every extracted module remains below the 300-line warning threshold.
+  A contract test prevents the cohesive parsers from drifting back into the facade;
+  the destructive-diff exception remains path-scoped, and CI #961 plus Copilot
+  Setup #110 validate the final formatter-clean split, SAST, TypeScript,
+  unit/contracts and production build.
 - [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
   control-plane, deep-diagnostic, exposure, freshness and metrics sections.
 
@@ -141,10 +169,16 @@ Then review and split other maintained homelab files over ~300 lines, including
 scenario boundary. Do not refactor generated JSON or static data merely to meet a
 line-count target.
 
-- [ ] Add a non-regression code-size report to the Site agent quality gate. New or
-  modified source/test files above agreed thresholds should warn/fail using the
-  same baseline-aware philosophy as `fastapi-sample` rather than imposing a
-  repository-wide big-bang refactor.
+- [x] Add a non-regression code-size report to the Site agent quality gate. The
+  diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or
+  newly oversized maintained source/test files above 600 lines, and grandfathers
+  files already above 600 only within a +2% baseline growth margin. Generated,
+  public and dependency trees are excluded. The agent gate runs it before npm
+  lint/tests and exposes only `WARNING` lines plus the compact summary on success;
+  the validated #177 run reported 8 inspected files, 1 warning and 0 errors.
+  Contract tests cover soft warnings, hard failures, legacy grandfathering,
+  growth beyond +2% and report integration, avoiding a repository-wide big-bang
+  refactor while making new size debt visible.
 
 ## Completion rule
 

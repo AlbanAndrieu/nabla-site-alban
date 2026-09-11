@@ -22,6 +22,8 @@ if ! command -v pre-commit >/dev/null 2>&1; then
     exit 1
 fi
 
+LOG_TAIL="${QUALITY_LOG_TAIL:-40}"
+
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
         printf '%s\n' "${QUALITY_BASE_REF}"
@@ -53,17 +55,56 @@ mapfile -t CHANGED_FILES < <(
     done
 )
 
+workspace_fingerprint() {
+    {
+        git diff --binary
+        git diff --cached --binary
+        for file in "${CHANGED_FILES[@]}"; do
+            [[ -f "${file}" ]] || continue
+            printf 'file:%s\n' "${file}"
+            sha256sum "${file}"
+        done
+    } | sha256sum | awk '{print $1}'
+}
+
 if (("${#CHANGED_FILES[@]}" > 0)); then
     echo "🔧 Validating ${#CHANGED_FILES[@]} changed file(s)..."
-    if ! pre-commit run \
-        --hook-stage pre-commit \
-        --files "${CHANGED_FILES[@]}" \
-        --show-diff-on-failure; then
-        echo "❌ Pre-commit changed files or found validation errors."
-        echo "   Review/fix the first failing hook, then run scripts/quality-gate.sh again."
-        git status --short
-        exit 1
+    before="$(workspace_fingerprint)"
+    log="$(mktemp)"
+    pre_commit_args=(
+        run
+        --hook-stage pre-commit
+        --fail-fast
+        --files "${CHANGED_FILES[@]}"
+    )
+    if [[ "${QUALITY_SHOW_DIFF:-0}" == "1" ]]; then
+        pre_commit_args+=(--show-diff-on-failure)
     fi
+
+    set +e
+    pre-commit "${pre_commit_args[@]}" >"${log}" 2>&1
+    rc=$?
+    set -e
+
+    if ((rc != 0)); then
+        after="$(workspace_fingerprint)"
+        if [[ "${before}" != "${after}" ]]; then
+            echo "❌ QG_AUTOFIX_REQUIRED: deterministic pre-commit hooks changed files." >&2
+            echo "   Run 'npm run quality:agent:fix', review/commit the changes, then retry publication." >&2
+            echo "   No CI-log analysis is required for this condition." >&2
+            git status --short >&2
+            echo "--- exact formatter patch ---" >&2
+            git diff --no-ext-diff -- "${CHANGED_FILES[@]}" >&2 || true
+            echo "--- end formatter patch ---" >&2
+        else
+            echo "❌ QG_PRECOMMIT_FAILED: pre-commit found a non-auto-fixed validation error." >&2
+            tail -n "${LOG_TAIL}" "${log}" >&2 || true
+        fi
+        rm -f "${log}"
+        exit "${rc}"
+    fi
+    rm -f "${log}"
+    echo "✅ canonical pre-commit validation"
 else
     echo "✅ No changed files require formatter/linter validation."
 fi
@@ -75,9 +116,9 @@ git diff --cached --check
 if [[ "${PUBLISH}" == true ]]; then
     STATUS="$(git status --short)"
     if [[ -n "${STATUS}" ]]; then
-        echo "❌ Working tree is not clean enough to publish."
-        echo "   Review and commit generated/fixed files, then run scripts/quality-gate.sh --publish again."
-        printf '%s\n' "${STATUS}"
+        echo "❌ Working tree is not clean enough to publish." >&2
+        echo "   Run 'npm run quality:agent:fix', review and commit the result, then retry." >&2
+        printf '%s\n' "${STATUS}" >&2
         exit 1
     fi
     echo "✅ Publication quality gate passed; repository is clean and ready to publish."

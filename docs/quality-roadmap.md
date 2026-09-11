@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 10 septembre 2026.
+Dernière vérification : 11 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -151,6 +151,28 @@ les autres chantiers.
   le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
   `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
   la quality gate pré-publication.
+- [ ] Terminer la validation du chemin local-first sur un workspace agent réel.
+  La moitié CI est désormais prouvée à plusieurs reprises dans #177 : un défaut
+  formatter/pre-commit s'arrête avant Semgrep, `setup-node`, `npm ci` et le build,
+  émet `QG_AUTOFIX_REQUIRED` avec le patch exact, puis la passe corrigée traverse
+  la gate complète. Le cold bootstrap Copilot est aussi validé avec npm 11.17
+  installé avant les hooks Node de pre-commit. Ruff utilise maintenant une seule
+  autorité de lint auto-fixante, `ruff-check --fix --unsafe-fixes`, avant
+  `ruff-format`, et un contrat empêche le retour du hook `ruff` redondant. Il reste
+  à observer un cycle local réel `quality:agent:fix` → commit → pre-push démontrant
+  que la publication gate stricte ne s'exécute qu'une fois et laisse l'arbre propre.
+- [x] Supprimer la double autorité Stylelint après vérification de parité des
+  règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
+  `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
+  détecté les faux positifs CSS Modules `:global()` et deux vrais sélecteurs
+  dupliqués avant suppression de `pre-commit-stylelint`, Stylelint 14 et
+  `stylelint-config-standard-scss@3.0.0`. Un contrat interdit leur réintroduction.
+- [x] Ajouter un garde de non-régression code-size baseline-aware au gate agent :
+  seuls les fichiers source/test modifiés sont inspectés, un warning apparaît au-
+  dessus de 300 lignes, un nouveau dépassement au-dessus de 600 lignes échoue et
+  les fichiers legacy déjà au-dessus de 600 ne peuvent croître que de +2 %. Le
+  rapport compact reste visible sur les runs verts et les contrats couvrent
+  warning, hard fail, grandfathering et dépassement de la marge legacy.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
@@ -416,9 +438,9 @@ Autres contrôles :
   Quality/Security pour scanner les fichiers applicatifs modifiés ainsi que les workflows GitHub Actions modifiés
   avec le ruleset `p/ci`. Le scan reste diff-scoped et s'exécute avant
   l'installation npm afin de bloquer tôt une nouvelle violation SAST. Le
-  rapport Semgrep est aussi
-  exporté en SARIF vers GitHub Code Scanning et conservé 7 jours comme artifact
-  afin de rendre le diagnostic exploitable sans relancer le scan.
+  rapport Semgrep est exporté en SARIF vers GitHub Code Scanning ; l'artifact
+  brut est conservé 7 jours seulement en cas d'échec afin de garder le diagnostic
+  utile sans dupliquer le stockage sur les runs verts.
 - [x] Fermer le risque supply-chain détecté par Semgrep dans les workflows
   critiques : pinner Checkout, GitHub Script, Setup Python/Node, Cache,
   Upload Artifact, CodeQL SARIF et OWASP ZAP sur leurs SHA Git immuables, en
@@ -533,13 +555,12 @@ Autres contrôles :
 ## P2 — CI/CD et Vercel
 
 - [x] Vérifier l'état de la production courante avant de consommer le budget CI
-  d'une PR : Quality/Security exige `Vercel` et
-  `Production Post-deploy Smoke` verts sur le SHA `master` de base. Dès que
-  `production-dast.yml` existe sur ce SHA, le statut `Production DAST`
-  devient lui aussi obligatoire. La première PR qui introduit le workflow ne
-  contourne pas le contrôle : elle exécute un ZAP production de bootstrap contre
-  le site canonique, puis les PR suivantes réutilisent le statut publié sur
-  `master`.
+  d'une PR : Quality/Security résout désormais une seule fois le HEAD courant de
+  `pull_request.base.ref`, expose ce SHA comme `base-sha`, puis le réutilise pour
+  les statuts `Vercel`, `Production Post-deploy Smoke` et `Production DAST`, le
+  smoke récupéré par `git show`, `QUALITY_BASE_REF` et le diff Semgrep. La CI ne
+  dépend donc plus de `github.event.pull_request.base.sha`, qui peut devenir
+  périmé lorsque `master` avance pendant qu'une PR reste ouverte.
 - [x] Rejouer en plus le smoke HTTP/SEO réel contre
   `https://www.albanandrieu.com` sur chaque PR, avant SAST et avant build, en
   exécutant le script récupéré depuis le SHA `master` de base avec
@@ -608,6 +629,12 @@ Autres contrôles :
   `docker-build.yml` dans le périmètre Semgrep : toutes ses actions critiques
   sont désormais verrouillées sur des SHA Git immuables au lieu de tags
   mutables.
+- [ ] Mesurer après merge le gain du pipeline local-first sur plusieurs runs : la
+  CI doit arrêter les défauts formatter/pre-commit avant le bootstrap npm, ne pas
+  rejouer le canonical gate plus tard dans le même job, limiter les logs à 40
+  lignes utiles et ne conserver l'artifact Semgrep brut que lors des échecs.
+  Comparer notamment à la baseline Quality `master` d'environ 96 s observée avant
+  ce changement, sans transformer cette durée en seuil bloquant/flakey.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du

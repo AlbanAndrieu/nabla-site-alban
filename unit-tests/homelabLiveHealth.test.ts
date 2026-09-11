@@ -51,7 +51,7 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const health = await source("lib/homelabHealth.ts");
-	const healthBase = await source("lib/homelabHealthBase.ts");
+	const healthValidation = await source("lib/homelabHealthValidation.ts");
 	assert.match(page, /healthUnavailable \|\|/);
 	assert.match(page, /truenasApi\?\.reachable === false/);
 	assert.match(page, /snapshot\?\.truenas_runtime_reachable === false/);
@@ -64,11 +64,11 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 	assert.match(block, /healthStatus: aggregate\.status \?\? probes\.status/);
 	assert.match(
 		block,
-		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+		/mergeHomelabProbeDiagnostics\(aggregate\.snapshot,\s*probes\.snapshot\)/,
 	);
-	assert.match(health, /export type TrueNasApiHealth/);
-	assert.match(health, /api\?: TrueNasApiHealth \| null/);
-	assert.match(healthBase, /validTrueNasApiHealth/);
+	assert.match(block, /probes\.snapshot \?\? current\.snapshot/);
+	assert.match(health, /export \* from "\.\/homelabHealthTypes"/);
+	assert.match(healthValidation, /validTrueNasApiHealth/);
 });
 
 test("TrueNAS application cards show runtime icons and a legend", async () => {
@@ -206,8 +206,9 @@ test("homelab health refreshes every thirty seconds, preserves context and expos
 	assert.match(page, /visibilitychange/);
 	assert.match(
 		page,
-		/snapshot: aggregate\.snapshot \?\? probes\.snapshot \?\? current\.snapshot/,
+		/mergeHomelabProbeDiagnostics\(aggregate\.snapshot,\s*probes\.snapshot\)/,
 	);
+	assert.match(page, /probes\.snapshot \?\? current\.snapshot/);
 	assert.match(
 		page,
 		/healthUnavailable:\s*aggregate\.snapshot === null && probes\.snapshot === null/,

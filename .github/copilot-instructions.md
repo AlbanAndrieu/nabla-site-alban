@@ -18,6 +18,7 @@
 - Prefer targeted repository reads and the smallest safe patch.
 - For frontend/i18n/accessibility/SEO work, load `docs/agent-frontend-standards.md`.
 - For Next.js-specific work, follow the targeted installed Next.js guidance required by `AGENTS.md`.
-- Run the closest checks first, then `npm run quality:agent:publish` before publication when a local checkout is available.
-- The Copilot setup installs full Git history, Python/pre-commit and Node dependencies required by the same agent-first gate used in CI.
-- CI remains authoritative for the agent gate, production build and configured security/deployment checks.
+- After edits, run `npm run quality:agent:fix`, commit the converged deterministic fixes, then push normally; the installed pre-push hook performs the strict publication gate once. Do not duplicate that full gate manually immediately before push.
+- Treat `QG_AUTOFIX_REQUIRED` as an instruction to run the local fix phase, not as a reason to consume tokens on broad CI-log analysis.
+- The Copilot setup installs full Git history, repository Git hooks, Python/pre-commit and Node dependencies required by the same local-first gate used in CI.
+- CI remains authoritative for independent verification, the production build and configured security/deployment checks.

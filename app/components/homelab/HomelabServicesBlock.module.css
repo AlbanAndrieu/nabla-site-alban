@@ -343,15 +343,12 @@
 
 	.groupSummary {
 		align-items: flex-start;
+		flex-wrap: wrap;
 	}
 
 	.groupMeta {
 		justify-content: flex-start;
 		width: 100%;
-	}
-
-	.groupSummary {
-		flex-wrap: wrap;
 	}
 
 	.metricsProfileBadge {

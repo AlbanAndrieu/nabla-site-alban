@@ -8,9 +8,9 @@ import type {
 } from "@/lib/homelabOperationalEvidence";
 import styles from "./PfSenseAttentionActions.module.css";
 
-const PFSENSE_ADMIN_URL = "https://pfsense.albandrieu.com:10443/";
+const PFSENSE_ADMIN_URL = "https://home.albandrieu.com:10443/";
 const PFSENSE_API_HEALTH_URL =
-	"https://pfsense.albandrieu.com:10443/api/v2/system/version";
+	"https://home.albandrieu.com:10443/api/v2/system/version";
 
 type Props = {
 	component: OperationalComponentEvidence | undefined;

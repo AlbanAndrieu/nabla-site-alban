@@ -96,11 +96,18 @@ jobs:
         id: production-baseline
         if: github.event_name == 'pull_request'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         with:
           script: |
-            const baseSha = process.env.BASE_SHA;
+            const baseRef = context.payload.pull_request.base.ref;
+            const { data: baseBranch } = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: baseRef,
+            });
+            const baseSha = baseBranch.commit.sha;
+            core.setOutput('base-sha', baseSha);
+            core.info('Resolved current ' + baseRef + ' HEAD to ' + baseSha);
+
             const { data: combined } = await github.rest.repos.getCombinedStatusForRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -178,7 +185,7 @@ jobs:
       - name: Revalidate canonical production smoke before PR build
         if: github.event_name == 'pull_request'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha }}
           BASE_URL: "https://www.albanandrieu.com"
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
@@ -192,11 +199,47 @@ jobs:
           git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
           DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
 
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Restore pre-commit environments
+        id: pre-commit-cache
+        continue-on-error: true
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Install pre-commit
+        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Run canonical changed-file quality gate before SAST/npm bootstrap
+        id: canonical-quality-gate
+        continue-on-error: true
+        env:
+          QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "40"
+        run: bash scripts/quality-gate.sh
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+
+      - name: Enforce canonical changed-file quality gate
+        if: steps.canonical-quality-gate.outcome != 'success'
+        run: exit 1
+
       - name: Run Semgrep SAST on changed source
         id: semgrep-sast
         continue-on-error: true
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
@@ -234,8 +277,8 @@ jobs:
           sarif_file: "semgrep.sarif"
           category: "semgrep-pr"
 
-      - name: Preserve Semgrep SAST report
-        if: always() && hashFiles('semgrep.sarif') != ''
+      - name: Preserve failed Semgrep SAST report
+        if: always() && steps.semgrep-sast.outcome != 'success' && hashFiles('semgrep.sarif') != ''
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: semgrep-sast-report
@@ -299,22 +342,6 @@ jobs:
         shell: bash
         run: rm -f report_html.html report_json.json report_md.md zap.yaml
 
-      - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version-file: ".python-version"
-
-      - name: Restore pre-commit environments
-        id: pre-commit-cache
-        continue-on-error: true
-        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
-
-      - name: Install pre-commit
-        run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -362,17 +389,10 @@ jobs:
         id: agent-quality-gate
         continue-on-error: true
         env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "120"
+          QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
+          QUALITY_LOG_TAIL: "40"
+          QUALITY_CANONICAL_GATE_VERIFIED: "1"
         run: bash scripts/agent-quality-gate.sh
-
-      - name: Save pre-commit environments
-        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
 
       - name: Enforce agent-first quality gate
         if: steps.agent-quality-gate.outcome != 'success'

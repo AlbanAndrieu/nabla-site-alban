@@ -15,6 +15,7 @@ on:
       - package.json
       - package-lock.json
       - .pre-commit-config.yaml
+      - .pre-commit-pre-push.yaml
   pull_request:
     paths:
       - .github/workflows/copilot-setup-steps.yml
@@ -23,6 +24,7 @@ on:
       - package.json
       - package-lock.json
       - .pre-commit-config.yaml
+      - .pre-commit-pre-push.yaml
 
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
@@ -55,27 +57,22 @@ jobs:
         uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
+          key: pre-commit-v4.6.2-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}-${{ hashFiles('.nvmrc') }}
 
       - name: Install pre-commit
         run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
+
+      - name: Install repository Git hooks
+        shell: bash
+        run: |
+          set -euo pipefail
+          pre-commit install --hook-type pre-commit --hook-type commit-msg
+          pre-commit install --config .pre-commit-pre-push.yaml --hook-type pre-push
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: ".nvmrc"
-
-      - name: Prepare pre-commit hook environments
-        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
-        run: pre-commit install-hooks
-
-      - name: Save pre-commit environments
-        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}
 
       - name: Restore npm downloads
         id: npm-cache
@@ -87,12 +84,25 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Pin npm
+      - name: Pin npm before Node-backed pre-commit bootstrap
         shell: bash
         run: |
           set -euo pipefail
           cd "${RUNNER_TEMP}"
           npm install --global npm@11.17.0 --no-audit --no-fund
+          npm --version
+
+      - name: Prepare pre-commit hook environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        run: pre-commit install-hooks
+
+      - name: Save pre-commit environments
+        if: steps.pre-commit-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-v4.6.2-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml', '.python-version') }}-${{ hashFiles('.nvmrc') }}
 
       - name: Install JavaScript dependencies
         run: npm ci --no-audit --no-fund

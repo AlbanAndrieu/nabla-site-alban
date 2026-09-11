@@ -10,14 +10,15 @@ Git hook configuration is versioned, but Git does not install repository hooks a
 mise run hooks
 ```
 
-This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push` quality-gate hooks. CI remains the authoritative enforcement layer because local hooks can be absent or explicitly bypassed.
+This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push` quality-gate hooks. CI remains the authoritative enforcement layer because local hooks can be absent or explicitly bypassed. Agent bootstrap workflows must install these hooks too so ordinary agent pushes receive the same local publication guard.
 
 ## Workflow
 
 1. Inspect only files relevant to the request.
 2. Reuse existing patterns and make the smallest safe patch.
 3. Validate narrowly first, then broaden checks.
-4. For CI failures, inspect the failing job/step and affected files before unrelated code.
+4. After an editing batch, run the self-converging local fix phase before committing or publishing.
+5. For CI failures, inspect the failing job/step and affected files before unrelated code.
 
 ## Tool and context efficiency
 
@@ -41,7 +42,7 @@ The classification is repository-specific and may change when the code or deploy
 
 ### Repository context
 
-Prefer `git diff`, `git status`, `git ls-files`, `rg`, changed-file lists and explicit file/range reads over recursive repository scans. Do not load large lockfiles, generated files, reports, artifacts or whole instruction/skill trees when a manifest, diff, summary or targeted fragment answers the question.
+Prefer `git status --short`, `git diff --stat`, targeted `git diff -- <paths>`, `git ls-files`, `rg`, changed-file lists and explicit file/range reads over recursive repository scans. Start with the short status/stat; only read a full diff when the changed paths or a failing check require it. Do not load large lockfiles, generated files, reports, artifacts or whole instruction/skill trees when a manifest, diff, summary or targeted fragment answers the question.
 
 `docs/agent-frontend-standards.md` contains detailed frontend/accessibility/i18n/SEO/print conventions and is intentionally **on-demand**. Load it when a task touches those concerns rather than carrying it in every agent session.
 
@@ -54,6 +55,8 @@ Inspect failures progressively:
 3. failing step;
 4. targeted logs around the error;
 5. full logs, report, artifact, trace, screenshot or video only when the targeted evidence does not explain the failure or when the richer artifact materially improves the diagnosis.
+
+`QG_AUTOFIX_REQUIRED` is not a debugging condition. Do not spend tokens reading broad CI logs for it: run `npm run quality:agent:fix` locally, review the short status/diff, commit the deterministic changes, and retry publication. Only diagnose logs when the fix phase reports `QG_PRECOMMIT_FAILED`, `QG_FIX_DID_NOT_CONVERGE`, or a semantic lint/type/test/security failure.
 
 Keep existing test and E2E coverage. For Playwright failures, use the uploaded report, traces, screenshots and other artifacts whenever they are useful; difficult failures justify retrieving the complete artifact set. Apply the same progressive approach to Vercel, FastAPI Cloud, GitHub security results and other observability platforms.
 
@@ -87,17 +90,20 @@ Never force-update `master`. If an accidental direct mutation occurs, stop furth
 
 For a focused change, run the closest relevant formatter/linter or test first.
 
-After an editing batch, use the repository-specific agent workflow:
+After an editing batch, use the repository-specific local-first workflow:
 
 ```bash
 npm run quality:agent:fix
-# Review deterministic formatter changes and commit them.
-npm run quality:agent
+# Inspect git status --short / git diff --stat and the affected diff only.
+# Commit deterministic fixes together with the intended change.
+git push
 ```
 
-The agent-first gate checks branch/base freshness, suspicious large truncations or deletions, executable bits for shebang scripts, the canonical changed-file formatter/linter/security gate, ESLint, Stylelint, Next.js route type generation, TypeScript and the unit/contract suite. It intentionally stops before `next build`, Playwright, CodeQL and deployment validation so deterministic failures are caught before expensive CI/build work.
+`quality:agent:fix` is intentionally self-converging: it reruns mutating pre-commit hooks until stable, then applies npm-backed ESLint/Stylelint fixes when relevant and revalidates pre-commit. A pass that merely rewrites files is not a successful final state; the command must reach a clean deterministic fix pass before the result is committed.
 
-`scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. Publication mode is `scripts/quality-gate.sh --publish`, reached through `scripts/agent-quality-gate.sh --publish`.
+The versioned pre-push hook is the canonical strict local publication gate and invokes `scripts/agent-quality-gate.sh --publish`. When that hook is installed, **do not run an identical full `quality:agent:publish` immediately before `git push`**; that only duplicates expensive local work. Let pre-push perform the strict branch freshness, destructive-diff, executable-bit, formatter/linter/security, ESLint, Stylelint, Next.js type generation, TypeScript and unit/contract validation once.
+
+`scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. In CI it runs early, before npm dependency bootstrap, so formatting/pre-commit regressions fail cheaply. The later application gate may reuse that proof in the same CI job but publication mode can never bypass the canonical gate.
 
 ## Mandatory agent publish policy
 
@@ -106,14 +112,14 @@ Agents must never publish changes immediately after editing files.
 Before every `git push`, GitHub API file update, or other remote repository mutation:
 
 1. Confirm the target is a dedicated non-default branch and is **not** `master`.
-2. Run `npm run quality:agent:fix` from a local checkout after the editing batch.
-3. Review and commit deterministic formatter changes.
-4. Run `npm run quality:agent:publish` until it exits successfully.
-5. Fix every formatter, linter, YAML, workflow, configuration, unit/contract, type, executable-bit, destructive-diff, or security-check failure caused by the change.
-6. Verify `git status --short` is empty.
-7. Only then publish the complete validated batch to the non-default branch and use a pull request for integration.
+2. Run `npm run quality:agent:fix` from a local checkout after the editing batch and let it converge without manually investigating intermediate formatter passes.
+3. Review `git status --short` and `git diff --stat`, then inspect only the affected diff necessary to confirm the deterministic fixes are safe; commit the complete intended batch.
+4. When repository hooks are installed, push normally and let the versioned pre-push hook execute `npm run quality:agent:publish` exactly once.
+5. When hooks are unavailable, or for an API-only mutation path with an executable checkout, explicitly run `npm run quality:agent:publish` until it succeeds before publishing.
+6. Fix every non-auto-fixable formatter, linter, YAML, workflow, configuration, unit/contract, type, executable-bit, destructive-diff, or security-check failure caused by the change.
+7. Verify `git status --short` is empty after the strict publication gate, then publish through a pull request.
 
-When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the versioned `pre-push` hook invokes `scripts/agent-quality-gate.sh --publish`.
+When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the versioned `pre-push` hook invokes `scripts/agent-quality-gate.sh --publish`. Copilot setup installs the same hooks automatically before an agent starts.
 
 An API-only agent must not silently treat remote API writes as a way to bypass local hooks. If its runtime cannot obtain or execute a checkout, it must explicitly report that limitation, reproduce the closest deterministic validations available, keep the remote patch minimal, and inspect the resulting CI immediately. It must never claim that the local quality gate passed when it was not executed.
 

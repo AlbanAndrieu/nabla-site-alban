@@ -20,7 +20,9 @@
 	},
 	"scripts": {
 		"lint": "eslint --format ./scripts/eslint-github-formatter.mjs .",
-		"lint:css": "stylelint public/*.css",
+		"lint:fix": "eslint --fix --format ./scripts/eslint-github-formatter.mjs .",
+		"lint:css": "stylelint \"app/**/*.css\" \"components/**/*.css\" \"public/*.css\"",
+		"lint:css:fix": "stylelint --fix \"app/**/*.css\" \"components/**/*.css\" \"public/*.css\"",
 		"typecheck": "tsc --noEmit",
 		"quality:fix": "bash scripts/agent-quality-gate.sh --fix",
 		"quality:gate": "bash scripts/quality-gate.sh",

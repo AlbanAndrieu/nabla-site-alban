@@ -7,10 +7,20 @@ async function source(path: string): Promise<string> {
 }
 
 test("operations UI consumes the latest FastAPI runtime and pfSense evidence", async () => {
-	const [component, runtimeParser, observability, enRaw, frRaw] = await Promise.all([
+	const [
+		component,
+		runtimeParser,
+		observability,
+		observabilityTypes,
+		controlPlane,
+		enRaw,
+		frRaw,
+	] = await Promise.all([
 		source("app/components/homelab/HomelabOperationalEvidence.tsx"),
 		source("lib/runtimeTopology.ts"),
 		source("lib/homelabObservability.ts"),
+		source("lib/homelabObservabilityTypes.ts"),
+		source("lib/homelabObservabilityControlPlane.ts"),
 		source("messages/operations/en.json"),
 		source("messages/operations/fr.json"),
 	]);
@@ -18,9 +28,10 @@ test("operations UI consumes the latest FastAPI runtime and pfSense evidence", a
 	assert.match(runtimeParser, /RuntimeRedisEvidence/);
 	assert.match(runtimeParser, /runtime_mode/);
 	assert.match(runtimeParser, /keyspace_hit_rate_percent/);
-	assert.match(observability, /PfSenseIngressPolicyEvidence/);
-	assert.match(observability, /possible_causes/);
-	assert.match(observability, /http_evidence_skipped/);
+	assert.match(observabilityTypes, /PfSenseIngressPolicyEvidence/);
+	assert.match(controlPlane, /possible_causes/);
+	assert.match(controlPlane, /http_evidence_skipped/);
+	assert.match(observability, /parsePfSenseIngressPolicy/);
 
 	assert.match(component, /data-runtime-redis-evidence/);
 	assert.match(component, /data-pfsense-ingress-policy/);
@@ -31,7 +42,9 @@ test("operations UI consumes the latest FastAPI runtime and pfSense evidence", a
 		const messages = JSON.parse(raw) as {
 			operations?: {
 				runtime?: { fastapi?: string; redis?: { title?: string } };
-				pfsense?: { ingressPolicy?: { title?: string; noAttribution?: string } };
+				pfsense?: {
+					ingressPolicy?: { title?: string; noAttribution?: string };
+				};
 				serviceExposure?: { skippedEdge?: string };
 			};
 		};

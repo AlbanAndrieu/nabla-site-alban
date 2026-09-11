@@ -20,8 +20,9 @@ test("pfSense degraded or stale evidence surfaces diagnostic actions", async () 
 	assert.match(actions, /focus\.startsWith\("pfsense_"\)/);
 	assert.match(actions, /data-pfsense-attention-actions/);
 	assert.match(actions, /#pfsense-operational-evidence/);
-	assert.match(actions, /https:\/\/pfsense\.albandrieu\.com:10443\//);
+	assert.match(actions, /https:\/\/home\.albandrieu\.com:10443\//);
 	assert.match(actions, /\/api\/v2\/system\/version/);
+	assert.doesNotMatch(actions, /pfsense\.albandrieu\.com:10443/);
 	assert.match(evidence, /<PfSenseAttentionActions/);
 	assert.match(evidence, /id="pfsense-operational-evidence"/);
 	assert.equal(messages.operations.pfsense.details, "Inspect pfSense evidence");

@@ -12,7 +12,10 @@ module.exports = {
 		"no-empty-source": true,
 		"no-invalid-double-slash-comments": true,
 		"property-no-unknown": true,
-		"selector-pseudo-class-no-unknown": true,
+		"selector-pseudo-class-no-unknown": [
+			true,
+			{ ignorePseudoClasses: ["global"] },
+		],
 		"selector-pseudo-element-no-unknown": true,
 		"string-no-newline": true,
 		"unit-no-unknown": true,
