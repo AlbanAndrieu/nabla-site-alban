@@ -152,8 +152,15 @@ three targets are:
   large-deletion bypass, and CI #957 validated canonical formatting, Semgrep,
   code-size reporting, ESLint, Stylelint, Next type generation, TypeScript,
   unit/contract tests and the production build.
-- [ ] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
-  platform-metric parsing and fallback orchestration.
+- [x] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
+  platform-metric parsing and fallback orchestration. The former monolith is now a
+  thin composition facade over dedicated types/shared parsing, deep-diagnostic,
+  platform-metric, control-plane/edge and fallback modules. The facade lost 534
+  lines while every extracted module remains below the 300-line warning threshold.
+  A contract test prevents the cohesive parsers from drifting back into the facade;
+  the destructive-diff exception remains path-scoped, and CI #961 plus Copilot
+  Setup #110 validate the final formatter-clean split, SAST, TypeScript,
+  unit/contracts and production build.
 - [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
   control-plane, deep-diagnostic, exposure, freshness and metrics sections.
 
