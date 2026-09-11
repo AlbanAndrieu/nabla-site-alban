@@ -8,14 +8,14 @@ test("architecture operational evidence exposes observed TrueNAS WebSocket trans
 			"app/components/homelab/HomelabOperationalTrueNasTransport.tsx",
 			"utf8",
 		),
-		readFile(
-			"app/components/homelab/HomelabOperationalEvidence.tsx",
-			"utf8",
-		),
+		readFile("app/components/homelab/HomelabOperationalEvidence.tsx", "utf8"),
 	]);
 
 	assert.match(transport, /readHomelabOperatorDiagnostics/);
-	assert.match(transport, /data-observed-truenas-api-transport="websocket-jsonrpc"/);
+	assert.match(
+		transport,
+		/data-observed-truenas-api-transport="websocket-jsonrpc"/,
+	);
 	assert.match(transport, /transport\.websocketUri/);
 	assert.doesNotMatch(transport, /fetch\(/);
 	assert.match(operational, /HomelabOperationalTrueNasTransport/);

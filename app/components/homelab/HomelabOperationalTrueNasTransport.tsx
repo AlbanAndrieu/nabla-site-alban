@@ -28,7 +28,9 @@ export default function HomelabOperationalTrueNasTransport({
 			}
 		>
 			<h3 className="h6 mb-2">
-				{french ? "Transport API TrueNAS observé" : "Observed TrueNAS API transport"}
+				{french
+					? "Transport API TrueNAS observé"
+					: "Observed TrueNAS API transport"}
 			</h3>
 			<p className="small mb-0 text-break">
 				<code>websocket-jsonrpc</code>
