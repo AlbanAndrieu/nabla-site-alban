@@ -54,17 +54,25 @@ test("AI Platform is rendered as functional swimlanes and optional edges remain 
 	assert.match(explorer, /strokeDasharray/);
 });
 
-test("hierarchical graph keeps dependency-aware health on required edges", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+test("hierarchical graph keeps consumer-side dependency evidence on required edges", async () => {
+	const [explorer, evidence] = await Promise.all([
+		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
+	]);
 	assert.match(explorer, /resolveEffectiveServiceState\(health\)/);
 	assert.match(explorer, /blockedDependencyLabels\(health\)/);
-	assert.match(explorer, /requiredDependencyTargetState/);
-	assert.match(explorer, /requiredEdgeHealthState/);
-	assert.match(explorer, /targetState === "fail"/);
-	assert.match(explorer, /targetState === "warn" \|\| targetState === "unknown"/);
-	assert.match(explorer, /data-dependency-health/);
+	assert.match(explorer, /degradedDependencyLabels\(health\)/);
+	assert.match(explorer, /unconfirmedDependencyLabels\(health\)/);
+	assert.match(explorer, /requiredDependencyRelationHealth/);
+	assert.match(explorer, /requiredEdgeDependencyState/);
+	assert.match(explorer, /dependencyState === "blocked"/);
+	assert.match(explorer, /dependencyState === "degraded"/);
+	assert.match(explorer, /dependencyState === "unconfirmed"/);
+	assert.match(explorer, /dependencyState !== "unconfirmed"/);
+	assert.match(explorer, /dependencyState,/);
+	assert.match(evidence, /data-dependency-health=\{state\}/);
+	assert.match(evidence, /data-dependency-evidence-legend/);
+	assert.match(evidence, /Declared ≠ observed ≠ healthy/);
 });
 
 test("architecture graph distinguishes relation purpose from required or optional strength", async () => {

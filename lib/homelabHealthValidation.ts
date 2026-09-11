@@ -121,6 +121,8 @@ export function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalHealthState(entry.effective_state) &&
 		validOptionalStringArray(entry.required_dependencies) &&
 		validOptionalStringArray(entry.blocked_by) &&
+		validOptionalStringArray(entry.degraded_by) &&
+		validOptionalStringArray(entry.unconfirmed_dependencies) &&
 		validOptionalStringArray(entry.dependency_cycle) &&
 		validDependencyEvidence(entry.dependency_evidence) &&
 		validOptionalString(entry.observed_at) &&
