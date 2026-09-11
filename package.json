@@ -50,7 +50,7 @@
 		"opencommit": "node scripts/run-opencommit.mjs",
 		"quality:agent": "bash scripts/agent-quality-gate.sh",
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
-		"quality:agent:publish": "bash scripts/agent-quality-gate.sh --publish"
+		"quality:agent:publish": "bash scripts/agent-publish.sh"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",

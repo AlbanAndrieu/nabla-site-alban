@@ -33,5 +33,5 @@ description = "Apply deterministic pre-commit fixes on changed files"
 run = "bash scripts/agent-quality-gate.sh --fix"
 
 [tasks.agent-publish]
-description = "Run the strict agent gate and clean-tree publication check"
-run = "bash scripts/agent-quality-gate.sh --publish"
+description = "Run or reuse the exact strict publication proof for the current HEAD/base/toolchain"
+run = "bash scripts/agent-publish.sh"
