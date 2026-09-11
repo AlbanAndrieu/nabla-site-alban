@@ -11,7 +11,7 @@ test("TrueNAS page scopes accessible dark-theme contrast overrides", async () =>
 	assert.match(page, /page-dark page-truenas/);
 	assert.match(globals, /\.page-truenas \{/);
 	assert.match(globals, /--truenas-text-secondary: #d7e0ec/);
-	assert.match(globals, /--truenas-text-muted: #b9c6d8/);
+	assert.match(globals, /--truenas-text-muted: #c3cfdf/);
 	assert.match(globals, /\.page-truenas :is\(\.text-secondary, \.text-muted\)/);
 	assert.match(globals, /\.page-truenas a:not\(\.btn\)/);
 });
