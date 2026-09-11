@@ -7,11 +7,11 @@ import {
 	optionalString,
 	stringArray,
 } from "./homelabOperationalEvidenceParsing";
+import { parseExposurePorts } from "./homelabOperationalExposure";
 import {
 	deriveTroubleshootingFocus,
 	parseFreshnessEvidence,
 } from "./homelabOperationalFreshness";
-import { parseExposurePorts } from "./homelabOperationalExposure";
 import { parsePfSensePosture } from "./homelabOperationalPfSense";
 
 export type OperationalHealthState = "ok" | "warn" | "fail" | "unknown";
@@ -244,7 +244,9 @@ function parseProviderCredentials(
 					? { credentialMode: optionalString(value.credential_mode) }
 					: {}),
 				missingVariables: stringArray(value.missing_variables),
-				invalidReferenceVariables: stringArray(value.invalid_reference_variables),
+				invalidReferenceVariables: stringArray(
+					value.invalid_reference_variables,
+				),
 				...(optionalString(value.required_privilege)
 					? { requiredPrivilege: optionalString(value.required_privilege) }
 					: {}),
