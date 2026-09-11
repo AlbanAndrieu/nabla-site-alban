@@ -48,7 +48,8 @@ test("homelab health parser preserves troubleshooting evidence from FastAPI sche
 				configured: true,
 				reachable: true,
 				policy_state: "ok",
-				reason: "pfSense DNS Resolver is running with a TrueNAS-independent path",
+				reason:
+					"pfSense DNS Resolver is running with a TrueNAS-independent path",
 				security_filters: [
 					{
 						id: "snort",
