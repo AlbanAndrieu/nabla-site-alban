@@ -83,7 +83,11 @@
 	padding: 1rem;
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius-control);
-	background: color-mix(in srgb, var(--ui-surface-muted) 72%, var(--ui-surface-card));
+	background: color-mix(
+		in srgb,
+		var(--ui-surface-muted) 72%,
+		var(--ui-surface-card)
+	);
 }
 
 .impact {
