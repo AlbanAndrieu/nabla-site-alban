@@ -8,7 +8,7 @@ import {
 import type {
 	PfSenseIngressEvidence,
 	PfSensePostureEvidence,
-} from "./homelabOperationalEvidenceTypes";
+} from "./homelabOperationalEvidence";
 
 function parseIngressBlock(value: unknown): PfSenseIngressEvidence | null {
 	if (!isRecord(value)) return null;
