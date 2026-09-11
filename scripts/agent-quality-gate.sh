@@ -32,7 +32,7 @@ Modes:
 Environment:
     QUALITY_BASE_REF                    override comparison base
     QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
-    QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 6)
+    QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
     QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
     QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
 EOF
@@ -52,7 +52,7 @@ if (($# > 0)); then
 fi
 
 LOG_TAIL="${QUALITY_LOG_TAIL:-40}"
-FIX_PASSES="${QUALITY_FIX_PASSES:-6}"
+FIX_PASSES="${QUALITY_FIX_PASSES:-12}"
 if [[ ! "${FIX_PASSES}" =~ ^[1-9][0-9]*$ ]]; then
     echo "❌ QUALITY_FIX_PASSES must be a positive integer" >&2
     exit 2
@@ -161,8 +161,7 @@ precommit_fix_until_stable() {
 
         if ((rc == 0)); then
             rm -f "${log}"
-            printf '✅ pre-commit auto-fix convergence (%d pass%s)\n' \
-                "${pass}" "$([[ "${pass}" == "1" ]] && printf '' || printf 'es')"
+            printf '✅ pre-commit auto-fix converged after pass %d\n' "${pass}"
             return 0
         fi
 
