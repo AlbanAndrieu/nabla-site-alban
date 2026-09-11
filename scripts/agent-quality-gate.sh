@@ -193,8 +193,10 @@ command -v pre-commit >/dev/null 2>&1 || {
 }
 
 agent_gate_changed=false
-javascript_lint_needed=false
-stylelint_needed=false
+javascript_lint_all=false
+stylelint_all=false
+JAVASCRIPT_LINT_FILES=()
+STYLELINT_FILES=()
 for file in "${CHANGED_FILES[@]}"; do
     case "${file}" in
         scripts/agent-quality-gate.sh)
@@ -202,13 +204,19 @@ for file in "${CHANGED_FILES[@]}"; do
             ;;
     esac
     case "${file}" in
+        eslint.config.js)
+            javascript_lint_all=true
+            ;;
         *.js | *.jsx | *.mjs | *.cjs | *.ts | *.tsx)
-            javascript_lint_needed=true
+            JAVASCRIPT_LINT_FILES+=("${file}")
             ;;
     esac
     case "${file}" in
-        *.css | stylelint.config.cjs)
-            stylelint_needed=true
+        stylelint.config.cjs)
+            stylelint_all=true
+            ;;
+        *.css)
+            STYLELINT_FILES+=("${file}")
             ;;
     esac
 done
@@ -225,13 +233,19 @@ fi
 if [[ "${MODE}" == "fix" ]]; then
     precommit_fix_until_stable
 
-    if [[ "${javascript_lint_needed}" == true || "${stylelint_needed}" == true ]]; then
+    if [[ "${javascript_lint_all}" == true || "${stylelint_all}" == true || "${#JAVASCRIPT_LINT_FILES[@]}" -gt 0 || "${#STYLELINT_FILES[@]}" -gt 0 ]]; then
         if command -v npm >/dev/null 2>&1 && [[ -d node_modules ]]; then
-            if [[ "${javascript_lint_needed}" == true ]]; then
+            if [[ "${javascript_lint_all}" == true ]]; then
                 run_compact "ESLint local auto-fix" npm run lint:fix
+            elif (("${#JAVASCRIPT_LINT_FILES[@]}" > 0)); then
+                run_compact "ESLint changed-file auto-fix" \
+                    npx eslint --fix --format ./scripts/eslint-github-formatter.mjs "${JAVASCRIPT_LINT_FILES[@]}"
             fi
-            if [[ "${stylelint_needed}" == true ]]; then
+            if [[ "${stylelint_all}" == true ]]; then
                 run_compact "Stylelint local auto-fix" npm run lint:css:fix
+            elif (("${#STYLELINT_FILES[@]}" > 0)); then
+                run_compact "Stylelint changed-file auto-fix" \
+                    npx stylelint --fix "${STYLELINT_FILES[@]}"
             fi
             # npm lint auto-fixes may change files covered by Biome/other hooks.
             precommit_fix_until_stable
