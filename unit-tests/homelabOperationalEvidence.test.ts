@@ -174,10 +174,17 @@ test("same-origin health proxy prefers fresh health-board evidence without letti
 	);
 });
 
-test("TrueNAS and Architecture render the same unified operational-evidence panel", async () => {
+test("TrueNAS keeps unified operational evidence behind its disclosure while Architecture renders it directly", async () => {
 	const section = await readFile(
 		new URL(
 			"../app/components/homelab/HomelabServicesSection.tsx",
+			import.meta.url,
+		),
+		"utf8",
+	);
+	const disclosure = await readFile(
+		new URL(
+			"../app/components/homelab/HomelabOperationsDisclosure.tsx",
 			import.meta.url,
 		),
 		"utf8",
@@ -200,7 +207,10 @@ test("TrueNAS and Architecture render the same unified operational-evidence pane
 		),
 		"utf8",
 	);
-	assert.match(section, /HomelabOperationalEvidence/);
+	assert.match(section, /HomelabOperationsDisclosure/);
+	assert.doesNotMatch(section, /HomelabOperationalEvidence/);
+	assert.match(disclosure, /HomelabOperationalEvidence/);
+	assert.match(disclosure, /data-homelab-operations-disclosure/);
 	assert.match(architecturePage, /HomelabOperationalEvidence/);
 	assert.doesNotMatch(architectureNav, /HomelabOperationalEvidence/);
 	assert.match(component, /data-runtime-transport-evidence/);
