@@ -72,11 +72,12 @@ test("DNS resilience is rendered by unified operational evidence instead of a st
 		"app/components/homelab/HomelabOperationalEvidence.tsx",
 	);
 	const observability = await source("lib/homelabObservability.ts");
+	const observabilityTypes = await source("lib/homelabObservabilityTypes.ts");
 
 	assert.match(block, /parseHomelabHealthSnapshot\(await response\.json\(\)\)/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 	assert.equal(block.match(/setInterval\(/g)?.length, 1);
-	assert.match(observability, /healthSnapshot:\s*HomelabHealthSnapshot/);
+	assert.match(observabilityTypes, /healthSnapshot:\s*HomelabHealthSnapshot/);
 	assert.match(observability, /parseHomelabHealthSnapshot\(board\.homelab\)/);
 	assert.match(operations, /import PfSenseDnsPosture/);
 	assert.match(operations, /snapshot=\{evidence\.healthSnapshot\}/);

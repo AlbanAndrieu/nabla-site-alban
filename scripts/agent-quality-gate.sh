@@ -300,10 +300,10 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
-            # Reviewed P1 module split: the facade intentionally shrinks below the
-            # destructive-diff threshold while behavior moves to cohesive modules.
-            # Once merged, its new <200-line baseline makes this exception inert.
-            lib/homelabHealth.ts)
+            # Reviewed P1 module splits: these facades intentionally shrink below
+            # the destructive-diff threshold while behavior moves to cohesive
+            # modules. Once merged, their new <200-line baselines make this inert.
+            lib/homelabHealth.ts | lib/homelabObservability.ts)
                 continue
                 ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)
