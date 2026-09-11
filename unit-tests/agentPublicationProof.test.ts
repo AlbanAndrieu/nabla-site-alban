@@ -64,6 +64,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		const env = {
 			...process.env,
 			PATH: `${bin}:${process.env.PATH ?? ""}`,
+			QUALITY_BASE_REF: "",
 			QUALITY_TEST_COUNTER: counter,
 		};
 
