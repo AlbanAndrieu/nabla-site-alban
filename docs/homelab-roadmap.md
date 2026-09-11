@@ -119,16 +119,21 @@ same path to the compatibility catalog and explicit missing-component policy.
   validate the fallback issue path when GitHub refuses PR creation or CI dispatch
   with `GITHUB_TOKEN`. Keep this as a recovery safety net, never as permission for
   agents to skip their pre-publish gate.
-- [ ] Validate the local-first quality pipeline introduced after #173 on real agent
-  edits: one `quality:agent:fix` call must converge deterministic formatter/linter
-  changes before commit, the installed pre-push hook must execute the strict
-  publication gate once, and formatter-only CI failures must stop before npm
-  bootstrap with `QG_AUTOFIX_REQUIRED`. The failure output must include the exact
-  formatter patch so API-only agents can apply it without broad CI-log analysis.
-- [ ] Remove the remaining duplicate Stylelint authority after proving rule parity:
-  pre-commit currently carries its own Stylelint 14.x environment while the npm
-  project uses Stylelint 17.x. Keep npm/package-lock as the eventual CSS lint
-  source of truth so local fix, pre-push and CI cannot disagree on tool versions.
+- [ ] Finish validating the local-first pipeline on a real agent workspace. The CI
+  half is now proven repeatedly in #177: formatter-only changes emit
+  `QG_AUTOFIX_REQUIRED` with the exact patch and stop before Semgrep/npm/build,
+  then a clean retry proceeds through the full gate. Copilot cold bootstrap also
+  succeeds with npm 11.17 pinned before Node-backed pre-commit hook installation.
+  The remaining operational proof is one real local `quality:agent:fix` → commit →
+  strict pre-push publication cycle showing that the canonical publication gate
+  executes once and leaves a clean tree.
+- [x] Remove the duplicate Stylelint authority after proving rule parity. npm /
+  `package-lock.json` + Stylelint 17 is now the single CSS lint authority across
+  maintained `app/**/*.css`, `components/**/*.css` and `public/*.css`. The parity
+  expansion exposed and fixed the CSS Modules `:global()` false positives plus
+  two genuine duplicate selectors before the old pre-commit Stylelint 14
+  environment and `stylelint-config-standard-scss@3.0.0` were removed. Contract
+  tests prevent reintroducing that second toolchain.
 
 ## P1 — Refactoring / code-size debt
 
