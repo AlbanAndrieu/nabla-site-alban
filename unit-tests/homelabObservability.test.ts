@@ -25,7 +25,15 @@ test("health board preserves runtime and unified observability consumes all aggr
 			active_window_seconds: 120,
 			recent_egress_window_seconds: 86400,
 			observed_instance_count: 1,
-			instances: [{ id: "runtime-a", last_seen_at: "2026-09-03T00:29:50Z", egress_ip: "203.0.113.4", egress_observed: true, egress_cached: false }],
+			instances: [
+				{
+					id: "runtime-a",
+					last_seen_at: "2026-09-03T00:29:50Z",
+					egress_ip: "203.0.113.4",
+					egress_observed: true,
+					egress_cached: false,
+				},
+			],
 			active_egress_ips: ["203.0.113.4"],
 			recent_egress_ips: ["203.0.113.4"],
 			aggregation: "redis_heartbeat",
@@ -61,7 +69,14 @@ test("health board preserves runtime and unified observability consumes all aggr
 			checks: {
 				postgres: { reachable: true },
 				redis: { reachable: true },
-				supabase: { reachable: true, http_status: 200, probe: "data_api", authentication: "publishable_key", resource: "note", path: "/rest/v1/note" },
+				supabase: {
+					reachable: true,
+					http_status: 200,
+					probe: "data_api",
+					authentication: "publishable_key",
+					resource: "note",
+					path: "/rest/v1/note",
+				},
 				pfsense: {
 					reachable: false,
 					stale: true,
@@ -77,14 +92,27 @@ test("health board preserves runtime and unified observability consumes all aggr
 						state: "possible_ingress_policy_block",
 						access_policy: "trusted_sources_only",
 						active_egress_ips: ["203.0.113.4"],
-						possible_causes: ["trusted_source_policy_drift", "pf_or_snort_filter"],
+						possible_causes: [
+							"trusted_source_policy_drift",
+							"pf_or_snort_filter",
+						],
 						attribution_available: false,
 						detail: "Pre-HTTP ingress evidence",
 						recommended_control_path: "out_of_band",
 					},
 				},
-				tavily: { reachable: null, skipped: true, reason: "TAVILY_API_KEY not configured" },
-				garage: { reachable: true, http_status: 200, tls_trusted: true, display_label: "Garage", elapsed_ms: 44 },
+				tavily: {
+					reachable: null,
+					skipped: true,
+					reason: "TAVILY_API_KEY not configured",
+				},
+				garage: {
+					reachable: true,
+					http_status: 200,
+					tls_trusted: true,
+					display_label: "Garage",
+					elapsed_ms: 44,
+				},
 			},
 		},
 		homelab: {
@@ -93,7 +121,18 @@ test("health board preserves runtime and unified observability consumes all aggr
 			components_status: "degraded",
 			components: {
 				truenas: { reachable: true, state: "ok" },
-				pfsense: { reachable: false, stale: true, refresh_error: "read timeout", error_kind: "read_timeout", failure_stage: "response", exception_type: "ReadTimeout", cache_layer: "redis", cached: true, cache_age_seconds: 12, redis_available: true },
+				pfsense: {
+					reachable: false,
+					stale: true,
+					refresh_error: "read timeout",
+					error_kind: "read_timeout",
+					failure_stage: "response",
+					exception_type: "ReadTimeout",
+					cache_layer: "redis",
+					cached: true,
+					cache_age_seconds: 12,
+					redis_available: true,
+				},
 				cloudflare: { reachable: true, state: "ok" },
 			},
 			pfsense: {
@@ -101,9 +140,20 @@ test("health board preserves runtime and unified observability consumes all aggr
 					configured: true,
 					reachable: true,
 					policy_state: "ok",
-					reason: "pfSense / Unbound keeps a resolution path independent from TrueNAS",
-					resolver: { enabled: true, running: true, forwarding: false, forward_tls_upstream: false, port: 53 },
-					upstream: { count: 2, independent_from_truenas: true, truenas_only: false },
+					reason:
+						"pfSense / Unbound keeps a resolution path independent from TrueNAS",
+					resolver: {
+						enabled: true,
+						running: true,
+						forwarding: false,
+						forward_tls_upstream: false,
+						port: 53,
+					},
+					upstream: {
+						count: 2,
+						independent_from_truenas: true,
+						truenas_only: false,
+					},
 				},
 			},
 			cloudflare: {
@@ -114,18 +164,47 @@ test("health board preserves runtime and unified observability consumes all aggr
 				access_observer_state: "ok",
 				stale: true,
 				refresh_error: "Cloudflare refresh in progress",
-				cache: { cache_layer: "redis", cached: true, stale: true, refresh_in_progress: true, redis_available: true, cache_age_seconds: 18 },
-			},
-			services: [{
-				id: "openwebui",
-				name: "Open WebUI",
-				exposure: {
-					state: "mismatch",
-					reasons: ["Cloudflare Access is required but no matching application was observed"],
-					declared: { external: true, endpoint_enabled: true, edge_mode: "cloudflare", cloudflare_access_required: true, security_exception_declared: false },
-					observed: { public_https_reachable: true, cloudflare_tunnel_observed: true, cloudflare_tunnel_name: "homelab", cloudflare_tunnel_status: "healthy", cloudflare_access_observed: false, cloudflare_access_application_count: 0, cloudflare_access_policy_count: 0, cloudflare_access_policy_decisions: [], cloudflare_access_public: null, cloudflare_access_public_scope: null, cloudflare_access_public_policy_count: 0 },
+				cache: {
+					cache_layer: "redis",
+					cached: true,
+					stale: true,
+					refresh_in_progress: true,
+					redis_available: true,
+					cache_age_seconds: 18,
 				},
-			}],
+			},
+			services: [
+				{
+					id: "openwebui",
+					name: "Open WebUI",
+					exposure: {
+						state: "mismatch",
+						reasons: [
+							"Cloudflare Access is required but no matching application was observed",
+						],
+						declared: {
+							external: true,
+							endpoint_enabled: true,
+							edge_mode: "cloudflare",
+							cloudflare_access_required: true,
+							security_exception_declared: false,
+						},
+						observed: {
+							public_https_reachable: true,
+							cloudflare_tunnel_observed: true,
+							cloudflare_tunnel_name: "homelab",
+							cloudflare_tunnel_status: "healthy",
+							cloudflare_access_observed: false,
+							cloudflare_access_application_count: 0,
+							cloudflare_access_policy_count: 0,
+							cloudflare_access_policy_decisions: [],
+							cloudflare_access_public: null,
+							cloudflare_access_public_scope: null,
+							cloudflare_access_public_policy_count: 0,
+						},
+					},
+				},
+			],
 		},
 		platform_metrics: {
 			schema_version: 1,
@@ -195,21 +274,51 @@ test("health board preserves runtime and unified observability consumes all aggr
 	assert.equal(evidence.runtimeTopology?.redis?.keys, 42);
 	assert.equal(evidence.sources.runtime, "health-board");
 	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.running, true);
-	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.resolver?.forwarding, false);
+	assert.equal(
+		evidence.healthSnapshot?.pfsense?.dns?.resolver?.forwarding,
+		false,
+	);
 	assert.equal(evidence.healthSnapshot?.pfsense?.dns?.upstream?.count, 2);
 	assert.equal(evidence.deepDiagnostics.status, "degraded");
-	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "postgres")?.category, "required");
-	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "tavily")?.category, "integration");
-	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "garage")?.category, "homelab");
-	assert.equal(evidence.deepDiagnostics.checks.find((check) => check.id === "pfsense")?.cache?.layer, "redis");
-	assert.equal(evidence.pfsenseIngressPolicy?.state, "possible_ingress_policy_block");
-	assert.deepEqual(evidence.pfsenseIngressPolicy?.activeEgressIps, ["203.0.113.4"]);
+	assert.equal(
+		evidence.deepDiagnostics.checks.find((check) => check.id === "postgres")
+			?.category,
+		"required",
+	);
+	assert.equal(
+		evidence.deepDiagnostics.checks.find((check) => check.id === "tavily")
+			?.category,
+		"integration",
+	);
+	assert.equal(
+		evidence.deepDiagnostics.checks.find((check) => check.id === "garage")
+			?.category,
+		"homelab",
+	);
+	assert.equal(
+		evidence.deepDiagnostics.checks.find((check) => check.id === "pfsense")
+			?.cache?.layer,
+		"redis",
+	);
+	assert.equal(
+		evidence.pfsenseIngressPolicy?.state,
+		"possible_ingress_policy_block",
+	);
+	assert.deepEqual(evidence.pfsenseIngressPolicy?.activeEgressIps, [
+		"203.0.113.4",
+	]);
 	assert.deepEqual(evidence.pfsenseIngressPolicy?.possibleCauses, [
 		"trusted_source_policy_drift",
 		"pf_or_snort_filter",
 	]);
-	assert.equal(evidence.pfsenseIngressPolicy?.recommendedControlPath, "out_of_band");
-	assert.equal(evidence.controlPlaneDiagnostics.pfsense?.exceptionType, "ReadTimeout");
+	assert.equal(
+		evidence.pfsenseIngressPolicy?.recommendedControlPath,
+		"out_of_band",
+	);
+	assert.equal(
+		evidence.controlPlaneDiagnostics.pfsense?.exceptionType,
+		"ReadTimeout",
+	);
 	assert.equal(evidence.controlPlaneDiagnostics.pfsense?.cache?.ageSeconds, 12);
 	assert.equal(evidence.cloudflareCache?.stale, true);
 	assert.equal(evidence.cloudflareCache?.cache?.refreshInProgress, true);
@@ -229,7 +338,10 @@ test("health board preserves runtime and unified observability consumes all aggr
 		),
 		false,
 	);
-	assert.equal(evidence.diagnostics?.exposure_by_service.openwebui?.state, "mismatch");
+	assert.equal(
+		evidence.diagnostics?.exposure_by_service.openwebui?.state,
+		"mismatch",
+	);
 	assert.deepEqual(evidence.edgeEvidenceSkips, [
 		{
 			id: "pfsense_admin",
@@ -239,7 +351,17 @@ test("health board preserves runtime and unified observability consumes all aggr
 });
 
 test("runtime endpoint remains a compatibility fallback only when aggregate runtime is absent", () => {
-	const board = parseFastApiHealthBoard({ schema_version: 1, state: "fresh", refreshing: false, generated_at: null, runtime: null, healthz: {}, homelab: {}, platform_metrics: null, sickz: {} });
+	const board = parseFastApiHealthBoard({
+		schema_version: 1,
+		state: "fresh",
+		refreshing: false,
+		generated_at: null,
+		runtime: null,
+		healthz: {},
+		homelab: {},
+		platform_metrics: null,
+		sickz: {},
+	});
 	assert.ok(board);
 	const parsed = parseHomelabObservability(board);
 	const fallback = parseRuntimeTopology({
@@ -257,26 +379,43 @@ test("runtime endpoint remains a compatibility fallback only when aggregate runt
 		recent_egress_ips: [],
 	});
 	assert.ok(fallback);
-	const enriched = withObservabilityFallbacks(parsed, { runtimeTopology: fallback });
+	const enriched = withObservabilityFallbacks(parsed, {
+		runtimeTopology: fallback,
+	});
 	assert.equal(enriched.sources.runtime, "fallback");
 });
 
 test("same-origin observability route uses aggregate evidence first and conditional fallbacks", async () => {
-	const route = await readFile(new URL("../app/api/homelab-observability/route.ts", import.meta.url), "utf8");
+	const route = await readFile(
+		new URL("../app/api/homelab-observability/route.ts", import.meta.url),
+		"utf8",
+	);
 	assert.match(route, /parseHomelabObservability/);
-	assert.match(route, /parsed\.runtimeTopology \? Promise\.resolve\(null\) : loadRuntimeTopology\(\)/);
-	assert.match(route, /parsed\.diagnostics \? Promise\.resolve\(null\) : loadHomelabDiagnostics\(\)/);
+	assert.match(
+		route,
+		/parsed\.runtimeTopology \? Promise\.resolve\(null\) : loadRuntimeTopology\(\)/,
+	);
+	assert.match(
+		route,
+		/parsed\.diagnostics \? Promise\.resolve\(null\) : loadHomelabDiagnostics\(\)/,
+	);
 	assert.match(route, /X-Homelab-Runtime-Source/);
 	assert.match(route, /X-Homelab-Diagnostics-Source/);
 });
 
 test("operations UI presents bounded metrics separately from functional health", async () => {
 	const facade = await readFile(
-		new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url),
+		new URL(
+			"../app/components/homelab/HomelabOperationalEvidence.tsx",
+			import.meta.url,
+		),
 		"utf8",
 	);
 	const component = await readFile(
-		new URL("../app/components/homelab/HomelabOperationalMetrics.tsx", import.meta.url),
+		new URL(
+			"../app/components/homelab/HomelabOperationalMetrics.tsx",
+			import.meta.url,
+		),
 		"utf8",
 	);
 	assert.match(facade, /HomelabOperationalMetrics/);
