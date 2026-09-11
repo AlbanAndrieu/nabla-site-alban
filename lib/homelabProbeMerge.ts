@@ -6,6 +6,25 @@ import type {
 
 type UnknownRecord = Record<string, unknown>;
 
+const ROLLING_DIAGNOSTIC_KEYS = [
+	"probe_source",
+	"probe_observed_at",
+	"probe_age_seconds",
+	"probe_stale",
+	"probe_stale_after_seconds",
+	"probe_interval_seconds",
+	"next_probe_in_seconds",
+	"probe_refresh_error",
+	"last_known_state",
+	"last_known_reachable",
+	"last_known_http_status",
+	"warning",
+	"timed_out",
+	"error_kind",
+	"latency_ms",
+	"error",
+] as const;
+
 const SERVICE_DIAGNOSTIC_KEYS = [
 	"anonymous_http_status",
 	"public_probe_auth_mode",
@@ -24,35 +43,11 @@ const SERVICE_DIAGNOSTIC_KEYS = [
 	"cloudflare_service_token_default_deny",
 	"cloudflare_service_token_access_signal",
 	"cloudflare_service_token_error_kind",
-	"probe_source",
-	"probe_observed_at",
-	"probe_age_seconds",
-	"probe_stale",
-	"probe_stale_after_seconds",
-	"probe_interval_seconds",
-	"next_probe_in_seconds",
-	"probe_refresh_error",
-	"timed_out",
-	"error_kind",
-	"latency_ms",
-	"error",
+	...ROLLING_DIAGNOSTIC_KEYS,
 	"application_error",
 ] as const;
 
-const INTERNAL_DIAGNOSTIC_KEYS = [
-	"probe_source",
-	"probe_observed_at",
-	"probe_age_seconds",
-	"probe_stale",
-	"probe_stale_after_seconds",
-	"probe_interval_seconds",
-	"next_probe_in_seconds",
-	"probe_refresh_error",
-	"timed_out",
-	"error_kind",
-	"latency_ms",
-	"error",
-] as const;
+const INTERNAL_DIAGNOSTIC_KEYS = ROLLING_DIAGNOSTIC_KEYS;
 
 function isRecord(value: unknown): value is UnknownRecord {
 	return typeof value === "object" && value !== null && !Array.isArray(value);

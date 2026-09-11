@@ -5,6 +5,7 @@ import type { HomelabHealthSnapshot } from "../lib/homelabHealth";
 import { parsePfSenseDnsPosture } from "../lib/homelabHealthPfSenseParsing";
 import { readHomelabOperatorDiagnostics } from "../lib/homelabOperatorDiagnostics";
 import { mergeHomelabProbeDiagnostics } from "../lib/homelabProbeMerge";
+import { probeScopeMetricRows } from "../lib/homelabProbeMetrics";
 
 const aggregate = {
 	schema_version: 6,
@@ -42,7 +43,12 @@ test("raw probe diagnostics enrich but never override reconciled service health"
 				public_probe_auth_mode: "cloudflare_service_token",
 				cloudflare_service_token_access_passed: true,
 				cloudflare_service_token_http_status: 200,
-				probe_source: "origin",
+				probe_source: "memory",
+				probe_interval_seconds: 120,
+				last_known_state: "ok",
+				last_known_reachable: true,
+				last_known_http_status: 200,
+				warning: "cached evidence retained after refresh timeout",
 				api_key: "must-not-survive",
 				raw_config: { secret: true },
 			},
@@ -58,13 +64,52 @@ test("raw probe diagnostics enrich but never override reconciled service health"
 	assert.equal(service.cloudflare_service_token_access_passed, true);
 	assert.equal(service.cloudflare_service_token_http_status, 200);
 	assert.equal(service.public_probe_auth_mode, "cloudflare_service_token");
-	assert.equal(service.probe_source, "origin");
+	assert.equal(service.probe_source, "memory");
+	assert.equal(service.probe_interval_seconds, 120);
+	assert.equal(service.last_known_state, "ok");
+	assert.equal(service.last_known_reachable, true);
+	assert.equal(service.last_known_http_status, 200);
+	assert.equal(service.warning, "cached evidence retained after refresh timeout");
 	assert.equal("api_key" in service, false);
 	assert.equal("raw_config" in service, false);
 	assert.equal(
 		(merged as unknown as Record<string, unknown>).probe_runtime !== undefined,
 		true,
 	);
+});
+
+test("probe metric rows expose sampling, completion, timeout, cache and budget ratios", () => {
+	const rows = probeScopeMetricRows(
+		{
+			enabled: true,
+			eligible: 20,
+			sampled: 10,
+			scheduled: 10,
+			completed: 9,
+			timed_out: 1,
+			budget_seconds: 4,
+			elapsed_ms: 2000,
+			per_probe_timeout_seconds: 1,
+			max_concurrency: 4,
+			states: { ok: 7, warn: 1, fail: 1 },
+			evidence: {
+				known: 20,
+				fresh: 8,
+				cached: 12,
+				coverage_percent: 100,
+				evidence_ttl_seconds: 300,
+				evidence_max_retention_seconds: 900,
+			},
+		},
+		false,
+	);
+	const byLabel = new Map(rows.map((row) => [row.label, row.value]));
+	assert.equal(byLabel.get("Sample ratio"), "50.0%");
+	assert.equal(byLabel.get("Completion ratio"), "90.0%");
+	assert.equal(byLabel.get("Timeout ratio"), "10.0%");
+	assert.equal(byLabel.get("Budget utilization"), "50.0%");
+	assert.equal(byLabel.get("Fresh ratio"), "40.0%");
+	assert.equal(byLabel.get("Cached ratio"), "60.0%");
 });
 
 test("operator diagnostics decode FastAPI probe runtime, performance and TrueNAS stages", () => {
@@ -103,7 +148,9 @@ test("operator diagnostics decode FastAPI probe runtime, performance and TrueNAS
 					provider: "truenas",
 					state: "open",
 					failures: 3,
+					retry_after_seconds: 27,
 					origin_suppressed: true,
+					redis_shared: true,
 				},
 				credential_selection: {
 					username_variable: "TRUENAS_API_USERNAME",
@@ -139,6 +186,8 @@ test("operator diagnostics decode FastAPI probe runtime, performance and TrueNAS
 	]);
 	assert.equal(parsed.trueNasApi?.stage, "websocket");
 	assert.equal(parsed.trueNasApi?.circuitBreaker?.state, "open");
+	assert.equal(parsed.trueNasApi?.circuitBreaker?.retryAfterSeconds, 27);
+	assert.equal(parsed.trueNasApi?.circuitBreaker?.redisShared, true);
 	assert.equal(parsed.trueNasTransport?.stages[1]?.failureStage, "upgrade");
 	assert.equal(parsed.trueNasRuntimeError, "deadline exceeded");
 });
@@ -174,7 +223,7 @@ test("pfSense operator evidence is explicit and strips raw configuration", () =>
 	assert.equal("api_key" in (parsed.operator ?? {}), false);
 });
 
-test("homelab UI keeps reconciled health and exposes progressive operator diagnostics", async () => {
+test("homelab UI keeps reconciled health and exposes progressive operator metrics", async () => {
 	const [block, globalDiagnostics, serviceDiagnostics, reasons] =
 		await Promise.all([
 			readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
@@ -184,11 +233,14 @@ test("homelab UI keeps reconciled health and exposes progressive operator diagno
 		]);
 	assert.match(block, /mergeHomelabProbeDiagnostics/);
 	assert.match(block, /<HomelabProbeDiagnostics snapshot=\{state\.snapshot\}/);
+	assert.match(globalDiagnostics, /probeScopeMetricRows/);
+	assert.match(globalDiagnostics, /Budget utilization/);
 	assert.match(globalDiagnostics, /data-truenas-diagnostic-stages/);
 	assert.match(globalDiagnostics, /data-pfsense-endpoint-status/);
 	assert.match(globalDiagnostics, /Evidence priority/);
 	assert.match(serviceDiagnostics, /cloudflare_service_token_access_passed/);
-	assert.match(serviceDiagnostics, /direct_probe_source/);
-	assert.match(serviceDiagnostics, /internal_probe_source/);
+	assert.match(serviceDiagnostics, /\["direct", "internal"\]/);
+	assert.match(serviceDiagnostics, /\$\{prefix\}_probe_source/);
+	assert.match(serviceDiagnostics, /last_known_http_status/);
 	assert.match(reasons, /ServiceOperatorDiagnostics/);
 });
