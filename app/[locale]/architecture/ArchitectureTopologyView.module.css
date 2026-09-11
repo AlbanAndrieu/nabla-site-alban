@@ -1,6 +1,8 @@
 .explorerSection {
 	width: min(100% - 2rem, 1200px);
 	margin-inline: auto;
+	padding-block: var(--ui-space-xl);
+	scroll-margin-top: 1rem;
 }
 
 /* Mirror Bootstrap's .container breakpoints used by the TrueNAS services section so
@@ -14,11 +16,6 @@
 
 .criticalitySection > :first-child {
 	margin-block: 0;
-}
-
-.explorerSection {
-	padding-block: var(--ui-space-xl);
-	scroll-margin-top: 1rem;
 }
 
 .sectionHeading {
