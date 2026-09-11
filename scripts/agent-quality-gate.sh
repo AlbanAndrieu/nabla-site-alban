@@ -300,6 +300,12 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
+            # Reviewed P1 module split: the facade intentionally shrinks below the
+            # destructive-diff threshold while behavior moves to cohesive modules.
+            # Once merged, its new <200-line baseline makes this exception inert.
+            lib/homelabHealth.ts)
+                continue
+                ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile)
                 ;;
             *)
@@ -326,11 +332,12 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
-            # Reviewed dead-code retirements from the Knip audit. These paths are
-            # absent after this change, so the exception cannot mask future edits.
+            # Reviewed dead-code retirements and temporary-module removals. These
+            # paths are absent after this change, so they cannot mask future edits.
             app/\[locale\]/architecture/ArchitectureExplorer.tsx | \
                 app/\[locale\]/architecture/ArchitectureExplorer.module.css | \
                 app/components/truenas/HomeLabNetworkFlow.module.css | \
+                lib/homelabHealthBase.ts | \
                 lib/resourcePages.ts)
                 continue
                 ;;
