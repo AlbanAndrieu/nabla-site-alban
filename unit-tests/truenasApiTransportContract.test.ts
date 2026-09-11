@@ -7,7 +7,14 @@ import { readTrueNasTransportEvidence } from "../lib/homelabTrueNasDiagnostics";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const runtimeRoots = ["app", "lib"] as const;
-const sourceExtensions = new Set([".cjs", ".js", ".jsx", ".mjs", ".ts", ".tsx"]);
+const sourceExtensions = new Set([
+	".cjs",
+	".js",
+	".jsx",
+	".mjs",
+	".ts",
+	".tsx",
+]);
 const legacyTrueNasRest = /\/api\/v2(?:[/?#"'`]|$)/;
 
 async function runtimeSourceFiles(root: string): Promise<string[]> {
@@ -33,7 +40,9 @@ function ownsTrueNasRuntime(path: string, source: string): boolean {
 test("maintained TrueNAS runtime code cannot reintroduce legacy /api/v2 REST endpoints", async () => {
 	const files = (
 		await Promise.all(
-			runtimeRoots.map((root) => runtimeSourceFiles(join(repositoryRoot, root))),
+			runtimeRoots.map((root) =>
+				runtimeSourceFiles(join(repositoryRoot, root)),
+			),
 		)
 	).flat();
 	const violations: string[] = [];
@@ -64,7 +73,10 @@ test("TrueNAS transport evidence preserves the observed WebSocket endpoint", () 
 		stages: [],
 	});
 
-	assert.equal(evidence?.websocketUri, "wss://truenas.example.invalid/api/current");
+	assert.equal(
+		evidence?.websocketUri,
+		"wss://truenas.example.invalid/api/current",
+	);
 	assert.equal(evidence?.pathMode, "direct");
 	assert.equal(evidence?.verifySsl, true);
 });

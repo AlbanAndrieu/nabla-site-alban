@@ -51,7 +51,9 @@ function isState(value: unknown): value is FastApiHealthBoardState {
 	return value === "pending" || value === "fresh" || value === "stale";
 }
 
-function optionalNonNegativeNumber(value: unknown): value is number | undefined {
+function optionalNonNegativeNumber(
+	value: unknown,
+): value is number | undefined {
 	return (
 		value === undefined ||
 		(typeof value === "number" && Number.isFinite(value) && value >= 0)

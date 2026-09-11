@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	type FastApiHealthBoardSnapshot,
 	fastApiHealthBoardCacheTtlMs,
 	loadFastApiHealthBoard,
-	type FastApiHealthBoardSnapshot,
 } from "../lib/fastApiHealthBoard";
 
 function board(
