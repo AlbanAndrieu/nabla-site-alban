@@ -140,8 +140,7 @@ same path to the compatibility catalog and explicit missing-component policy.
 
 ## P1 — Refactoring / code-size debt
 
-Refactor cohesive responsibilities instead of raising size thresholds. The first
-three targets are:
+Refactor cohesive responsibilities instead of raising size thresholds.
 
 - [x] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
   transport loaders. The public module is now a thin compatibility facade over
@@ -161,13 +160,33 @@ three targets are:
   the destructive-diff exception remains path-scoped, and CI #961 plus Copilot
   Setup #110 validate the final formatter-clean split, SAST, TypeScript,
   unit/contracts and production build.
-- [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
-  control-plane, deep-diagnostic, exposure, freshness and metrics sections.
+- [x] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
+  control-plane, deep-diagnostic, exposure, freshness and metrics sections. #178
+  keeps one polling owner in the facade (one `/api/homelab-observability` fetch,
+  one timer and one `AbortController`) while child sections remain presentation
+  owners only; source contracts prevent polling ownership from drifting downward.
+- [x] Refactor `lib/homelabOperationalEvidence.ts` without changing its public
+  evidence contract. #179 keeps the public compatibility/composition surface and
+  extracts generic parsing, pfSense DNS/security/ingress parsing, trusted-source
+  TCP exposure parsing, stale-service/dependency-cycle parsing and troubleshooting
+  focus into cohesive modules. The split remains below the destructive-diff guard
+  naturally, requires no global or new path-scoped bypass, and a source contract
+  prevents heavy parser responsibilities from drifting back into the facade.
 
-Then review and split other maintained homelab files over ~300 lines, including
-`lib/homelabOperationalEvidence.ts` and any tests that grow beyond a cohesive
-scenario boundary. Do not refactor generated JSON or static data merely to meet a
-line-count target.
+Next maintained P1 targets should preserve cohesive scenario boundaries rather
+than merely moving lines:
+
+- [ ] Split `unit-tests/homelabObservability.test.ts`, separating the large
+  aggregate-evidence fixture/scenario from compatibility fallback, route contract
+  and UI ownership tests without duplicating fixtures.
+- [ ] Split `unit-tests/serviceTopology.test.ts` by catalog/topology contract
+  scenario while keeping shared fixtures centralized.
+- [ ] Extract cohesive responsibilities from `scripts/agent-quality-gate.sh`
+  without creating a second formatter/linter authority or weakening early-fail
+  behavior.
+- [ ] Continue reducing `HierarchicalArchitectureExplorer.tsx` only when a
+  substantive functional change provides a natural extraction boundary; do not
+  churn the React Flow surface only to satisfy a line-count target.
 
 - [x] Add a non-regression code-size report to the Site agent quality gate. The
   diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or
