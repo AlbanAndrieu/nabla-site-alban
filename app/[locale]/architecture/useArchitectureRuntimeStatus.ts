@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-	parseHomelabStatusSnapshot,
 	type HomelabStatusSnapshot,
+	parseHomelabStatusSnapshot,
 } from "@/lib/homelabStatus";
 
-export type ArchitectureRuntimeSource =
-	| "loading"
-	| "fastapi"
-	| "unavailable";
+export type ArchitectureRuntimeSource = "loading" | "fastapi" | "unavailable";
 
 const RUNTIME_POLL_MS = 30_000;
 

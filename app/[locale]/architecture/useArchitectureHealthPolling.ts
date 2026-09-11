@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthSnapshot,
+	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 
-export type ArchitectureHealthSource =
-	| "loading"
-	| "fastapi"
-	| "unavailable";
+export type ArchitectureHealthSource = "loading" | "fastapi" | "unavailable";
 
 const HEALTH_POLL_REFRESHING_MS = 2_000;
 const HEALTH_POLL_FRESH_MS = 5_000;

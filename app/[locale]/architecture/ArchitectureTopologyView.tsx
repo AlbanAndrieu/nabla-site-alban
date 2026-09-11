@@ -11,9 +11,9 @@ import {
 } from "@/lib/homelabHealth";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
+	type HomelabServicesCatalog,
 	homelabServiceId,
 	parseHomelabServicesCatalog,
-	type HomelabServicesCatalog,
 } from "@/lib/homelabServices";
 import {
 	analyzeServicePresentation,
@@ -25,9 +25,9 @@ import {
 	type ServiceTopologySource,
 } from "@/lib/serviceTopology";
 import ArchitectureServiceHierarchy from "./ArchitectureServiceHierarchy";
+import styles from "./ArchitectureTopologyView.module.css";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
-import styles from "./ArchitectureTopologyView.module.css";
 import useArchitectureHealthPolling from "./useArchitectureHealthPolling";
 
 type Props = {
@@ -98,8 +98,7 @@ function effectiveState(
 	index: HealthIndex,
 ): HomelabHealthState {
 	const entry =
-		index.byId.get(serviceId) ??
-		index.byName.get(normalizedName(serviceName));
+		index.byId.get(serviceId) ?? index.byName.get(normalizedName(serviceName));
 	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
 }
 
@@ -125,8 +124,9 @@ export default function ArchitectureTopologyView({
 	const [catalog, setCatalog] = useState(initialCatalog);
 	const [catalogSource, setCatalogSource] = useState(initialCatalogSource);
 	const [topology, setTopology] = useState(initialTopology);
-	const [topologySource, setTopologySource] =
-		useState<ServiceTopologySource>(initialTopologySource);
+	const [topologySource, setTopologySource] = useState<ServiceTopologySource>(
+		initialTopologySource,
+	);
 	const { health, healthUnavailable, refreshing, now, healthSource } =
 		useArchitectureHealthPolling();
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
@@ -162,8 +162,7 @@ export default function ArchitectureTopologyView({
 			if (!parsed) throw new Error("invalid topology");
 			setTopology(parsed);
 			setTopologySource(
-				response.headers.get("X-Homelab-Topology-Source") ===
-					"local-fallback"
+				response.headers.get("X-Homelab-Topology-Source") === "local-fallback"
 					? "local-fallback"
 					: "fastapi",
 			);
@@ -328,12 +327,8 @@ export default function ArchitectureTopologyView({
 									{french ? "Tous les états" : "All health states"}
 								</option>
 								<option value="ok">{french ? "Sain" : "Healthy"}</option>
-								<option value="warn">
-									{french ? "Dégradé" : "Degraded"}
-								</option>
-								<option value="fail">
-									{french ? "En échec" : "Failed"}
-								</option>
+								<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
+								<option value="fail">{french ? "En échec" : "Failed"}</option>
 								<option value="unknown">
 									{french ? "Inconnu" : "Unknown"}
 								</option>
