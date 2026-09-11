@@ -7,7 +7,7 @@ import {
 import type {
 	ExposurePortEvidence,
 	OperationalHealthState,
-} from "./homelabOperationalEvidenceTypes";
+} from "./homelabOperationalEvidence";
 
 function exposureState(
 	observed: boolean | null,
