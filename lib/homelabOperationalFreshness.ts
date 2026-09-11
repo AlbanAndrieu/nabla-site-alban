@@ -11,7 +11,7 @@ import type {
 	PfSensePostureEvidence,
 	StaleServiceEvidence,
 	TroubleshootingFocus,
-} from "./homelabOperationalEvidenceTypes";
+} from "./homelabOperationalEvidence";
 
 export function parseFreshnessEvidence(homelab: Record<string, unknown>): {
 	staleServices: StaleServiceEvidence[];
