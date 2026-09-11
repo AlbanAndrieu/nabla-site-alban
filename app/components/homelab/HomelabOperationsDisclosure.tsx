@@ -10,8 +10,8 @@ import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import { parseServiceTopology } from "@/lib/serviceTopology";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabOperationalEvidence from "./HomelabOperationalEvidence";
-import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import styles from "./HomelabOperationsDisclosure.module.css";
+import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 
 type CoverageState = {
 	snapshot: HomelabHealthSnapshot | null;
@@ -86,7 +86,10 @@ export default function HomelabOperationsDisclosure() {
 			})
 			.catch((error: unknown) => {
 				if (controller.signal.aborted) return;
-				console.warn("Unable to load optional homelab operations coverage", error);
+				console.warn(
+					"Unable to load optional homelab operations coverage",
+					error,
+				);
 				setCoverage((current) => ({ ...current, loaded: true, error: true }));
 			});
 

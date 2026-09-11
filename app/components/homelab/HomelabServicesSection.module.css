@@ -81,7 +81,11 @@
 	position: relative;
 	overflow: hidden;
 	border-width: 1px;
-	background: linear-gradient(180deg, var(--ui-surface-card), var(--ui-surface-muted));
+	background: linear-gradient(
+		180deg,
+		var(--ui-surface-card),
+		var(--ui-surface-muted)
+	);
 	transition:
 		transform 140ms ease,
 		box-shadow 140ms ease,
@@ -105,21 +109,29 @@
 
 .serviceFirst :global(.service-card-ux[data-effective-health="ok"]) {
 	border-color: var(--ui-success-border);
-	box-shadow: inset 0 3px 0 var(--ui-success-text), var(--ui-shadow-sm);
+	box-shadow:
+		inset 0 3px 0 var(--ui-success-text),
+		var(--ui-shadow-sm);
 }
 
 .serviceFirst :global(.service-card-ux[data-effective-health="warn"]) {
 	border-color: var(--ui-warning-border);
-	box-shadow: inset 0 3px 0 var(--ui-warning-text), var(--ui-shadow-sm);
+	box-shadow:
+		inset 0 3px 0 var(--ui-warning-text),
+		var(--ui-shadow-sm);
 }
 
 .serviceFirst :global(.service-card-ux[data-effective-health="fail"]) {
 	border-color: var(--ui-danger-border);
-	box-shadow: inset 0 3px 0 var(--ui-danger-text), var(--ui-shadow-sm);
+	box-shadow:
+		inset 0 3px 0 var(--ui-danger-text),
+		var(--ui-shadow-sm);
 }
 
 .serviceFirst :global(.service-card-ux[data-effective-health="unknown"]) {
-	box-shadow: inset 0 3px 0 var(--ui-text-secondary), var(--ui-shadow-sm);
+	box-shadow:
+		inset 0 3px 0 var(--ui-text-secondary),
+		var(--ui-shadow-sm);
 }
 
 .serviceFirst :global([data-homelab-health-filter]) {
