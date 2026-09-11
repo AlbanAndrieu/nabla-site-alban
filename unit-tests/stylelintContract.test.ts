@@ -6,10 +6,11 @@ async function source(path: string) {
 	return readFile(new URL("../" + path, import.meta.url), "utf8");
 }
 
-test("npm Stylelint 17 covers every maintained stylesheet surface before legacy hook removal", async () => {
-	const [pkgRaw, config] = await Promise.all([
+test("npm Stylelint 17 is the single CSS lint authority over maintained stylesheets", async () => {
+	const [pkgRaw, config, preCommitConfig] = await Promise.all([
 		source("package.json"),
 		source("stylelint.config.cjs"),
+		source(".pre-commit-config.yaml"),
 	]);
 	const pkg = JSON.parse(pkgRaw) as {
 		scripts: Record<string, string>;
@@ -38,4 +39,7 @@ test("npm Stylelint 17 covers every maintained stylesheet surface before legacy 
 	assert.match(config, /"public\/assets\/\*\*\/\*\.css"/);
 	assert.match(config, /"\.next\/\*\*\/\*"/);
 	assert.match(config, /"dist\/\*\*\/\*"/);
+	assert.doesNotMatch(preCommitConfig, /pre-commit-stylelint/);
+	assert.doesNotMatch(preCommitConfig, /stylelint@14\.4\.0/);
+	assert.doesNotMatch(preCommitConfig, /stylelint-config-standard-scss/);
 });

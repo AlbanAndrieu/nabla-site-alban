@@ -372,17 +372,6 @@ repos:
         name: "📝 markdown · Toc markdown"
         args: [--maxdepth, "3", -i]
 
--   repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v17.14.1
-    hooks:
-    -   id: stylelint
-        name: "🟦 css · Lint with Stylelint"
-        additional_dependencies:
-          # stylelint itself needs to be here when using additional_dependencies.
-        -   stylelint@14.4.0
-        -   stylelint-config-standard-scss@3.0.0
-          # Package names starting with `@` need to be quoted.
-          # - "@scope/my-awesome-plugin@0.12.0"
     ### PNG Images ###
     # - repo: https://github.com/shssoichiro/oxipng
     #   rev: v9.1.5
@@ -532,6 +521,7 @@ repos:
   #   rev: v9.23.0
   #   hooks:
   #     - id: commitlint
+  #       name: "🌳 git · Validate commit message"
   #       stages: [commit-msg]
   #       additional_dependencies:
   #         - "@commitlint/config-conventional"
