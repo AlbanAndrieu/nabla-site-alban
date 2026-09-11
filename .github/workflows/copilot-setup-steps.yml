@@ -73,6 +73,9 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: ".nvmrc"
+          # ~/.npm is restored explicitly below. Keep one cache authority so the
+          # agent bootstrap does not perform overlapping setup-node cache work.
+          package-manager-cache: false
 
       - name: Restore npm downloads
         id: npm-cache
