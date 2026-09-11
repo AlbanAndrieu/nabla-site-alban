@@ -124,6 +124,9 @@ same path to the compatibility catalog and explicit missing-component policy.
   `QG_AUTOFIX_REQUIRED` with the exact patch and stop before Semgrep/npm/build,
   then a clean retry proceeds through the full gate. Copilot cold bootstrap also
   succeeds with npm 11.17 pinned before Node-backed pre-commit hook installation.
+  Ruff now has a single lint authority, `ruff-check --fix --unsafe-fixes`, before
+  `ruff-format`, so fixable Python diagnostics no longer stop before their own
+  auto-fix hook; a contract prevents the old duplicate `ruff` hook from returning.
   The remaining operational proof is one real local `quality:agent:fix` → commit →
   strict pre-push publication cycle showing that the canonical publication gate
   executes once and leaves a clean tree.
@@ -155,10 +158,16 @@ Then review and split other maintained homelab files over ~300 lines, including
 scenario boundary. Do not refactor generated JSON or static data merely to meet a
 line-count target.
 
-- [ ] Add a non-regression code-size report to the Site agent quality gate. New or
-  modified source/test files above agreed thresholds should warn/fail using the
-  same baseline-aware philosophy as `fastapi-sample` rather than imposing a
-  repository-wide big-bang refactor.
+- [x] Add a non-regression code-size report to the Site agent quality gate. The
+  diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or
+  newly oversized maintained source/test files above 600 lines, and grandfathers
+  files already above 600 only within a +2% baseline growth margin. Generated,
+  public and dependency trees are excluded. The agent gate runs it before npm
+  lint/tests and exposes only `WARNING` lines plus the compact summary on success;
+  the validated #177 run reported 8 inspected files, 1 warning and 0 errors.
+  Contract tests cover soft warnings, hard failures, legacy grandfathering,
+  growth beyond +2% and report integration, avoiding a repository-wide big-bang
+  refactor while making new size debt visible.
 
 ## Completion rule
 
