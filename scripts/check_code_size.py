@@ -155,7 +155,7 @@ def main() -> int:
             )
 
     print(
-        f"Code-size gate: {inspected} file(s), {warnings} warning(s), {failures} error(s)"
+        f"Code-size gate: {inspected} file(s), {warnings} warning(s), {failures} error(s)",
     )
     return 1 if failures else 0
 
