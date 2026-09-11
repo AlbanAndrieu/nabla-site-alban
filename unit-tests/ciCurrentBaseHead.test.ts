@@ -14,7 +14,10 @@ test("PR CI resolves and reuses the current base branch HEAD", async () => {
 		/github\.event\.pull_request\.base\.sha/,
 		"PR CI must not trust the event-time base SHA for production or diff baselines",
 	);
-	assert.match(ci, /const baseRef = context\.payload\.pull_request\.base\.ref;/);
+	assert.match(
+		ci,
+		/const baseRef = context\.payload\.pull_request\.base\.ref;/,
+	);
 	assert.match(
 		ci,
 		/github\.rest\.repos\.getBranch\(\{[\s\S]*?branch: baseRef,[\s\S]*?\}\);/,
