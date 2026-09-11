@@ -271,10 +271,15 @@ test("same-origin observability route uses aggregate evidence first and conditio
 });
 
 test("operations UI presents bounded metrics separately from functional health", async () => {
-	const component = await readFile(
+	const facade = await readFile(
 		new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url),
 		"utf8",
 	);
+	const component = await readFile(
+		new URL("../app/components/homelab/HomelabOperationalMetrics.tsx", import.meta.url),
+		"utf8",
+	);
+	assert.match(facade, /HomelabOperationalMetrics/);
 	assert.match(component, /data-platform-metrics/);
 	assert.match(component, /PLATFORM_METRIC_LABEL_KEY/);
 	assert.match(component, /metrics\.healthSeparation/);
