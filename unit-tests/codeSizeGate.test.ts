@@ -102,7 +102,10 @@ test("code-size gate rejects legacy growth beyond the allowed percentage", async
 		);
 
 		assert.equal(result.status, 1);
-		assert.match(result.stderr, /ERROR legacy\.ts: 7 lines exceeds 5 \(baseline: 6\)/);
+		assert.match(
+			result.stderr,
+			/ERROR legacy\.ts: 7 lines exceeds 5 \(baseline: 6\)/,
+		);
 		assert.match(result.stdout, /0 warning\(s\), 1 error\(s\)/);
 	} finally {
 		await rm(directory, { recursive: true, force: true });
@@ -118,6 +121,9 @@ test("agent quality gate invokes and surfaces the baseline-aware code-size repor
 	assert.match(agentGate, /python3 scripts\/check_code_size\.py/);
 	assert.match(agentGate, /--baseline-ref "\$\{BASE_REF\}"/);
 	assert.match(agentGate, /"\$\{CHANGED_FILES\[@\]\}"/);
-	assert.match(agentGate, /run_compact_report "baseline-aware code-size report"/);
+	assert.match(
+		agentGate,
+		/run_compact_report "baseline-aware code-size report"/,
+	);
 	assert.match(agentGate, /WARNING \|Code-size gate:/);
 });
