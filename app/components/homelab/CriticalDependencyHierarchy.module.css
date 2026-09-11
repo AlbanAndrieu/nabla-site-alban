@@ -12,6 +12,7 @@
 .summary {
 	display: flex;
 	align-items: center;
+	justify-content: flex-start;
 	gap: var(--ui-space-md);
 	min-height: 5rem;
 	padding: var(--ui-space-md) var(--ui-space-lg);
