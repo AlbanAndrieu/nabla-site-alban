@@ -140,7 +140,10 @@ test("CI rejects formatting before SAST/npm bootstrap and does not rerun the can
 		npmInstallPosition > canonicalEnforcementPosition,
 		"npm bootstrap must not run for formatter-only failures",
 	);
-	assert.ok(gatePosition > npmInstallPosition, "application gate requires npm deps");
+	assert.ok(
+		gatePosition > npmInstallPosition,
+		"application gate requires npm deps",
+	);
 	assert.ok(
 		gateEnforcementPosition > gatePosition,
 		"agent gate must be enforced before build",
