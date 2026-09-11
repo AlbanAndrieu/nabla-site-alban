@@ -106,14 +106,15 @@ test("canonical quality gate distinguishes auto-fix mutations from semantic fail
 	);
 });
 
-test("CI rejects formatting before npm bootstrap and does not rerun the canonical gate", async () => {
+test("CI rejects formatting before SAST/npm bootstrap and does not rerun the canonical gate", async () => {
 	const ci = await source(".github/workflows/ci.yml");
 	const canonicalPosition = ci.indexOf(
-		"Run canonical changed-file quality gate before npm bootstrap",
+		"Run canonical changed-file quality gate before SAST/npm bootstrap",
 	);
 	const canonicalEnforcementPosition = ci.indexOf(
 		"Enforce canonical changed-file quality gate",
 	);
+	const semgrepPosition = ci.indexOf("Run Semgrep SAST on changed source");
 	const setupNodePosition = ci.indexOf("Setup Node.js");
 	const npmInstallPosition = ci.indexOf("Install dependencies");
 	const gatePosition = ci.indexOf("Run agent-first quality gate before build");
@@ -126,6 +127,10 @@ test("CI rejects formatting before npm bootstrap and does not rerun the canonica
 	assert.ok(
 		canonicalEnforcementPosition > canonicalPosition,
 		"early canonical gate must be enforced",
+	);
+	assert.ok(
+		semgrepPosition > canonicalEnforcementPosition,
+		"SAST must not consume resources for formatter-only failures",
 	);
 	assert.ok(
 		setupNodePosition > canonicalEnforcementPosition,
