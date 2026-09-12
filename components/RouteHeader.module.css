@@ -8,6 +8,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: wrap;
 	gap: clamp(var(--ui-space-sm), 2vw, var(--ui-space-lg));
 	min-width: 0;
 	min-height: 3.75rem;
@@ -31,15 +32,16 @@
 	flex: 1 1 auto;
 	flex-wrap: wrap;
 	min-width: 0;
-	row-gap: 0.25rem;
+	row-gap: var(--ui-space-2xs);
 }
 
 .home,
 .parent {
 	min-width: 0;
-	min-height: 2.75rem;
+	min-height: var(--ui-control-min-height);
 	color: inherit;
 	font-weight: var(--ui-font-weight-action);
+	overflow-wrap: anywhere;
 	text-decoration: none;
 }
 
@@ -67,8 +69,14 @@
 }
 
 .locale {
-	flex: 0 0 auto;
+	flex: 0 1 auto;
+	justify-content: flex-end;
 	min-width: 0;
+}
+
+.locale > span {
+	min-width: 0;
+	overflow-wrap: anywhere;
 }
 
 .select {
@@ -88,67 +96,65 @@
 	border-color: var(--ui-link);
 }
 
-@media (max-width: 56.25rem) {
-	.locale > span {
-		display: none;
-	}
-
-	.select {
-		min-width: 6.5rem;
-	}
-}
-
-@media (max-width: 40rem) {
+@media (max-width: 900px) {
 	.inner {
 		align-items: stretch;
-		flex-direction: column;
-		gap: var(--ui-space-xs);
-		padding-block: var(--ui-space-sm);
+		gap: var(--ui-space-sm);
+	}
+
+	.nav {
+		flex-basis: 100%;
+		order: 1;
+	}
+
+	.locale {
+		justify-content: space-between;
+		order: 2;
+		width: 100%;
 	}
 
 	.root .inner {
 		align-items: stretch;
 	}
 
-	.nav {
-		width: 100%;
-	}
-
-	.locale {
-		justify-content: space-between;
-		width: 100%;
-	}
-
-	.locale > span {
-		display: inline;
-		overflow-wrap: anywhere;
-	}
-
 	.select {
-		width: min(12rem, 60%);
+		width: min(15rem, 55vw);
 	}
 }
 
-@media (max-width: 26rem) {
+@media (max-width: 575.98px) {
+	.inner {
+		gap: var(--ui-space-xs);
+		padding-block: var(--ui-space-xs);
+	}
+
 	.nav {
 		column-gap: var(--ui-space-xs);
 	}
 
+	.home,
+	.parent {
+		max-width: 100%;
+	}
+
+	.locale {
+		align-items: stretch;
+		flex-direction: column;
+		gap: var(--ui-space-2xs);
+	}
+
+	.select {
+		width: 100%;
+		min-width: 0;
+	}
+}
+
+@media (max-width: 26rem) {
 	.separator {
 		display: none;
 	}
 
 	.parent {
 		flex-basis: 100%;
-	}
-
-	.locale {
-		align-items: stretch;
-		flex-direction: column;
-	}
-
-	.select {
-		width: 100%;
-		min-width: 0;
 	}
 }
