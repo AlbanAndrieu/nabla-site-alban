@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
 
 const FEEDS_CONFIG_URL = "/ciso-rss-feeds.json";
 const FEED_CONCURRENCY = 8;
@@ -190,13 +191,13 @@ export default function ThreatFeed({
 		return (
 			<div className="ciso-feed-status" role="alert">
 				<p>{usedLabels.error}</p>
-				<button
-					className="btn btn-outline-primary btn-sm"
-					type="button"
+				<Button
+					size="compact"
+					variant="outline"
 					onClick={() => void loadFeeds()}
 				>
 					{usedLabels.retry}
-				</button>
+				</Button>
 			</div>
 		);
 	}

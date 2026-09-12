@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
+import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
@@ -63,12 +64,12 @@ export default async function StartupThanksPage({
 					</a>
 					.
 				</p>
-				<a href={homePath} className="btn btn-primary me-2">
-					{t("thanks.backHome")}
-				</a>
-				<a href={startupPath} className="btn btn-outline-secondary">
-					{t("thanks.another")}
-				</a>
+				<div className="cta-buttons">
+					<ActionLink href={homePath}>{t("thanks.backHome")}</ActionLink>
+					<ActionLink href={startupPath} variant="outline">
+						{t("thanks.another")}
+					</ActionLink>
+				</div>
 			</main>
 			<SiteWidgetsScript printPdf />
 		</div>
