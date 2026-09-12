@@ -127,19 +127,112 @@ const topology: ServiceTopology = {
 	],
 };
 
-test("criticality ranks foundations and shared state ahead of leaf applications", () => {
+test("criticality follows lifecycle foundations, shared state, platforms, and applications", () => {
 	const analysis = analyzeServiceCriticality(topology);
 
 	assert.equal(analysis.get("truenas")?.tier, "foundation");
 	for (const id of ["postgresql", "redis", "clickhouse", "minio"]) {
 		assert.equal(analysis.get(id)?.tier, "shared-data", id);
 	}
-	assert.equal(analysis.get("ollama")?.tier, "shared-platform");
-	assert.equal(analysis.get("litellm")?.tier, "shared-platform");
+	for (const id of ["ollama", "litellm", "prometheus", "n8n"]) {
+		assert.equal(analysis.get(id)?.tier, "shared-platform", id);
+	}
 	assert.equal(analysis.get("openwebui")?.tier, "application");
 	assert.equal(analysis.get("langfuse")?.tier, "application");
-	assert.equal(analysis.get("n8n")?.tier, "application");
-	assert.equal(analysis.get("prometheus")?.tier, "support");
+});
+
+test("compatibility lifecycle mirrors the Nabla Compose phase priorities", () => {
+	const analysis = analyzeServiceCriticality(topology);
+
+	assert.deepEqual(
+		[
+			analysis.get("truenas")?.lifecyclePhase,
+			analysis.get("truenas")?.lifecyclePriority,
+		],
+		["foundation", 10],
+	);
+	assert.deepEqual(
+		[
+			analysis.get("postgresql")?.lifecyclePhase,
+			analysis.get("postgresql")?.lifecyclePriority,
+		],
+		["primary-data", 20],
+	);
+	assert.deepEqual(
+		[
+			analysis.get("clickhouse")?.lifecyclePhase,
+			analysis.get("clickhouse")?.lifecyclePriority,
+		],
+		["secondary-data", 30],
+	);
+	assert.deepEqual(
+		[
+			analysis.get("prometheus")?.lifecyclePhase,
+			analysis.get("prometheus")?.lifecyclePriority,
+		],
+		["platform-services", 40],
+	);
+	assert.equal(analysis.get("prometheus")?.lifecycleSource, "compatibility");
+});
+
+test("catalog lifecycle metadata overrides compatibility inference", () => {
+	const explicit: ServiceTopology = {
+		version: 1,
+		name: "explicit lifecycle",
+		nodes: [
+			{
+				id: "custom",
+				name: "Custom",
+				kind: "application",
+				category: "app",
+				lifecycle: { phase: "foundation", priority: 7 },
+			},
+		],
+		relations: [],
+	};
+	const analysis = analyzeServiceCriticality(explicit);
+	assert.equal(analysis.get("custom")?.tier, "foundation");
+	assert.equal(analysis.get("custom")?.lifecyclePriority, 7);
+	assert.equal(analysis.get("custom")?.lifecycleSource, "catalog");
+});
+
+test("required dependencies remain authoritative over conflicting lifecycle priority", () => {
+	const requiredFirst: ServiceTopology = {
+		version: 1,
+		name: "required beats priority",
+		nodes: [
+			{
+				id: "consumer",
+				name: "Consumer",
+				kind: "application",
+				category: "app",
+				lifecycle: { phase: "foundation", priority: 1 },
+			},
+			{
+				id: "database",
+				name: "Database",
+				kind: "database",
+				category: "data",
+				lifecycle: { phase: "primary-data", priority: 99 },
+			},
+		],
+		relations: [
+			{
+				source: "consumer",
+				target: "database",
+				type: "dependsOn",
+				strength: "required",
+				evidence: ["fixture"],
+			},
+		],
+	};
+	const analysis = analyzeServiceCriticality(requiredFirst);
+	const ids = requiredFirst.nodes
+		.map((node) => node.id)
+		.sort((left, right) =>
+			compareServiceCriticality(left, right, requiredFirst, analysis),
+		);
+	assert.deepEqual(ids, ["database", "consumer"]);
 });
 
 test("semantic data kinds stay shared-data even when their category is not data", () => {
@@ -192,7 +285,7 @@ test("required observability links do not inflate startup criticality", () => {
 	assert.equal(analysis.get("prometheus")?.transitiveDependents, 0);
 });
 
-test("criticality sorting is deterministic and impact-first within a tier", () => {
+test("criticality sorting is deterministic and dependency-first before lifecycle priority", () => {
 	const analysis = analyzeServiceCriticality(topology);
 	const ids = topology.nodes
 		.map((node) => node.id)
@@ -223,7 +316,7 @@ test("TrueNAS cards use service-first groups while technical criticality remains
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
 });
 
-test("architecture and TrueNAS share dependency, optional-edge and blast-radius semantics", async () => {
+test("architecture and TrueNAS share dependency, lifecycle, optional-edge and blast-radius semantics", async () => {
 	const architecture = await source(
 		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
 	);
@@ -239,11 +332,15 @@ test("architecture and TrueNAS share dependency, optional-edge and blast-radius 
 
 	assert.match(architecture, /CriticalDependencyHierarchy/);
 	assert.match(hierarchy, /ServiceCriticalityOverview/);
+	assert.match(hierarchy, /phase \+ priorité/);
 	assert.match(architecture, /\/api\/homelab-topology/);
 	assert.match(explorer, /requiredEdgeDependencyState/);
 	assert.match(explorer, /requiredDependencyRelationHealth/);
 	assert.match(explorer, /relation\.optional/);
 	assert.match(overview, /data-blast-radius/);
+	assert.match(overview, /data-lifecycle-phase/);
+	assert.match(overview, /data-lifecycle-priority/);
+	assert.match(overview, /data-lifecycle-source/);
 	assert.match(overview, /requiredDependencies/);
 	assert.match(overview, /optionalDependencies/);
 	assert.match(overview, /transitiveDependentIds/);
