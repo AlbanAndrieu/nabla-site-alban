@@ -110,8 +110,12 @@ test.describe("Navigation and Links Tests", () => {
 	test("should handle link hover states", async ({ page }) => {
 		await page.goto("/");
 
-		// Stable primary CTA in hero (many other links live in main)
-		const link = page.locator("main .hero-section a.btn-primary[href]").first();
+		// Stable semantic CTA; deliberately independent from Bootstrap/CSS-module classes.
+		const link = page
+			.locator(
+				'main .hero-section a[href="https://calendly.com/alban-andrieu"]',
+			)
+			.first();
 		await expect(link).toBeVisible();
 		await link.scrollIntoViewIfNeeded();
 
