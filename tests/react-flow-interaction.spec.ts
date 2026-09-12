@@ -1,13 +1,25 @@
 import { expect, test, type Page } from "@playwright/test";
 
+const SCROLL_POLICY_SELECTOR =
+	'[data-react-flow-scroll-policy="modifier-to-zoom"]';
+
+async function scrollPolicyIntoView(page: Page) {
+	await page.locator(SCROLL_POLICY_SELECTOR).waitFor({ state: "visible" });
+	await page.evaluate((selector) => {
+		const element = document.querySelector(selector);
+		if (!(element instanceof HTMLElement)) {
+			throw new Error(`React Flow scroll-policy guard not found: ${selector}`);
+		}
+		element.scrollIntoView({ block: "center" });
+	}, SCROLL_POLICY_SELECTOR);
+}
+
 async function expectModifierToZoomPolicy(page: Page, path: string) {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(path, { waitUntil: "domcontentloaded" });
 
-	const guard = page.locator(
-		'[data-react-flow-scroll-policy="modifier-to-zoom"]',
-	);
-	await guard.scrollIntoViewIfNeeded();
+	await scrollPolicyIntoView(page);
+	const guard = page.locator(SCROLL_POLICY_SELECTOR);
 	await expect(guard).toBeVisible();
 
 	const flow = guard.locator(".react-flow");
@@ -27,7 +39,7 @@ async function expectModifierToZoomPolicy(page: Page, path: string) {
 		transformBeforePlainWheel ?? "",
 	);
 
-	await guard.scrollIntoViewIfNeeded();
+	await scrollPolicyIntoView(page);
 	await guard.hover();
 	const transformBeforeZoom = await viewport.getAttribute("style");
 	await page.keyboard.down("Control");
