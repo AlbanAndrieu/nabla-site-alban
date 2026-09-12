@@ -10,6 +10,10 @@ const serviceSource = await readFile(
 	"app/components/homelab/ServiceTroubleshootingEvidence.tsx",
 	"utf8",
 );
+const disclosureSource = await readFile(
+	"app/components/homelab/HomelabOperationsDisclosure.tsx",
+	"utf8",
+);
 const operationalSource = await readFile(
 	"app/components/homelab/HomelabOperationalEvidence.tsx",
 	"utf8",
@@ -20,6 +24,16 @@ test("delayed homelab details reveal themselves when their hash becomes active",
 	assert.match(hookSource, /window\.addEventListener\("hashchange"/);
 	assert.match(hookSource, /setOpen\(true\)/);
 	assert.match(hookSource, /scrollIntoView/);
+});
+
+test("operations disclosure mounts nested pfSense evidence for direct deep links", () => {
+	assert.match(disclosureSource, /"#pfsense-operational-evidence"/);
+	assert.match(
+		disclosureSource,
+		/OPERATIONS_DEEP_LINKS\.has\(window\.location\.hash\)/,
+	);
+	assert.match(disclosureSource, /setOpen\(true\)/);
+	assert.match(disclosureSource, /open \? <HomelabOperationalEvidence \/>/);
 });
 
 test("service troubleshooting and pfSense evidence share delayed hash handling", () => {
