@@ -1,4 +1,6 @@
 import type {
+	ServiceLifecycle,
+	ServiceLifecyclePhase,
 	ServiceRelationType,
 	ServiceTopology,
 	ServiceTopologyNode,
@@ -15,6 +17,9 @@ export type ServiceCriticalityTier =
 export type ServiceCriticality = {
 	id: string;
 	tier: ServiceCriticalityTier;
+	lifecyclePhase: ServiceLifecyclePhase;
+	lifecyclePriority: number;
+	lifecycleSource: "catalog" | "compatibility";
 	directDependents: number;
 	transitiveDependents: number;
 	directDependencies: number;
@@ -51,10 +56,15 @@ const IMPACT_RELATION_TYPES = new Set<ServiceRelationType>([
 const FOUNDATION_KINDS = new Set([
 	"storage-platform",
 	"container-runtime",
+	"reverse-proxy",
+]);
+
+const NETWORK_EDGE_KINDS = new Set([
 	"firewall",
 	"edge",
 	"network-gateway",
-	"reverse-proxy",
+	"dns",
+	"dns-server",
 ]);
 
 const SHARED_DATA_KINDS = new Set([
@@ -69,6 +79,45 @@ const SHARED_DATA_KINDS = new Set([
 	"log-store",
 	"metrics-store",
 	"trace-store",
+	"time-series-database",
+]);
+
+const FOUNDATION_IDS = new Set([
+	"pihole",
+	"adguard-home",
+	"traefik",
+	"vaultwarden",
+]);
+const PRIMARY_DATA_IDS = new Set([
+	"postgresql",
+	"mongo",
+	"mongodb",
+	"influxdb",
+	"redis",
+	"kafka",
+]);
+const SECONDARY_DATA_IDS = new Set([
+	"clickhouse",
+	"sentry-clickhouse",
+	"opensearch",
+	"elasticsearch",
+	"elastic-search",
+	"minio",
+	"garage",
+]);
+const PLATFORM_CATEGORIES = new Set([
+	"observability",
+	"security",
+	"automation",
+]);
+const PLATFORM_KINDS = new Set([
+	"observability",
+	"workflow",
+	"model-runtime",
+	"gateway",
+	"siem",
+	"ids",
+	"monitoring",
 ]);
 
 const TIER_ORDER: Record<ServiceCriticalityTier, number> = {
@@ -77,6 +126,16 @@ const TIER_ORDER: Record<ServiceCriticalityTier, number> = {
 	"shared-platform": 2,
 	application: 3,
 	support: 4,
+};
+
+const LIFECYCLE_PHASE_ORDER: Record<ServiceLifecyclePhase, number> = {
+	"bootstrap-runtime": 0,
+	foundation: 1,
+	"network-edge": 2,
+	"primary-data": 3,
+	"secondary-data": 4,
+	"platform-services": 5,
+	applications: 6,
 };
 
 export const SERVICE_CRITICALITY_TIERS = [
@@ -109,6 +168,41 @@ function semanticSharedData(node: ServiceTopologyNode): boolean {
 	return node.category === "data" || SHARED_DATA_KINDS.has(node.kind);
 }
 
+function compatibilityLifecycle(node: ServiceTopologyNode): ServiceLifecycle {
+	const id = node.id.toLowerCase();
+	if (id === "docker-socket-proxy") {
+		return { phase: "bootstrap-runtime", priority: 0 };
+	}
+	if (FOUNDATION_IDS.has(id) || semanticFoundation(node)) {
+		return { phase: "foundation", priority: 10 };
+	}
+	if (NETWORK_EDGE_KINDS.has(node.kind)) {
+		return { phase: "network-edge", priority: 15 };
+	}
+	if (PRIMARY_DATA_IDS.has(id)) {
+		return { phase: "primary-data", priority: 20 };
+	}
+	if (SECONDARY_DATA_IDS.has(id) || semanticSharedData(node)) {
+		return { phase: "secondary-data", priority: 30 };
+	}
+	if (
+		PLATFORM_CATEGORIES.has(node.category) ||
+		PLATFORM_KINDS.has(node.kind)
+	) {
+		return { phase: "platform-services", priority: 40 };
+	}
+	return { phase: "applications", priority: 50 };
+}
+
+export function resolveServiceLifecycle(node: ServiceTopologyNode): {
+	lifecycle: ServiceLifecycle;
+	source: "catalog" | "compatibility";
+} {
+	return node.lifecycle
+		? { lifecycle: node.lifecycle, source: "catalog" }
+		: { lifecycle: compatibilityLifecycle(node), source: "compatibility" };
+}
+
 function collectReachable(
 	start: string,
 	adjacency: Map<string, Set<string>>,
@@ -128,14 +222,25 @@ function collectReachable(
 
 function tierFor(
 	node: ServiceTopologyNode,
+	lifecycle: ServiceLifecycle,
 	directDependencies: number,
 	transitiveDependents: number,
 ): ServiceCriticalityTier {
-	if (semanticFoundation(node)) return "foundation";
-	if (semanticSharedData(node) && transitiveDependents > 0) return "shared-data";
-	if (transitiveDependents > 0) return "shared-platform";
-	if (directDependencies > 0) return "application";
-	return "support";
+	switch (lifecycle.phase) {
+		case "bootstrap-runtime":
+		case "foundation":
+		case "network-edge":
+			return "foundation";
+		case "primary-data":
+		case "secondary-data":
+			return "shared-data";
+		case "platform-services":
+			return "shared-platform";
+		case "applications":
+			if (node.presentationRole === "support") return "support";
+			if (directDependencies > 0 || transitiveDependents > 0) return "application";
+			return "support";
+	}
 }
 
 export function analyzeServiceCriticality(
@@ -173,15 +278,20 @@ export function analyzeServiceCriticality(
 			const transitiveDependentIds = [
 				...collectReachable(node.id, impactDependents),
 			].sort();
+			const { lifecycle, source } = resolveServiceLifecycle(node);
 			return [
 				node.id,
 				{
 					id: node.id,
 					tier: tierFor(
 						node,
+						lifecycle,
 						directDependencyIds.length,
 						transitiveDependentIds.length,
 					),
+					lifecyclePhase: lifecycle.phase,
+					lifecyclePriority: lifecycle.priority,
+					lifecycleSource: source,
 					directDependents: directDependentIds.length,
 					transitiveDependents: transitiveDependentIds.length,
 					directDependencies: directDependencyIds.length,
@@ -221,6 +331,23 @@ function longestRequiredDependencyPath(
 	return [startId, ...(candidates[0] ?? [])];
 }
 
+function requiresTransitively(
+	sourceId: string,
+	targetId: string,
+	analysis: Map<string, ServiceCriticality>,
+): boolean {
+	const seen = new Set<string>();
+	const pending = [...(analysis.get(sourceId)?.requiredDependencies ?? [])];
+	while (pending.length > 0) {
+		const current = pending.pop();
+		if (!current || seen.has(current)) continue;
+		if (current === targetId) return true;
+		seen.add(current);
+		pending.push(...(analysis.get(current)?.requiredDependencies ?? []));
+	}
+	return false;
+}
+
 export function buildServiceImpactFocus(
 	id: string,
 	topology: ServiceTopology,
@@ -255,7 +382,15 @@ export function compareServiceCriticality(
 	if (!left && !right) return leftId.localeCompare(rightId);
 	if (!left) return 1;
 	if (!right) return -1;
+
+	const leftRequiresRight = requiresTransitively(leftId, rightId, analysis);
+	const rightRequiresLeft = requiresTransitively(rightId, leftId, analysis);
+	if (leftRequiresRight !== rightRequiresLeft) return leftRequiresRight ? 1 : -1;
+
 	return (
+		left.lifecyclePriority - right.lifecyclePriority ||
+		LIFECYCLE_PHASE_ORDER[left.lifecyclePhase] -
+			LIFECYCLE_PHASE_ORDER[right.lifecyclePhase] ||
 		TIER_ORDER[left.tier] - TIER_ORDER[right.tier] ||
 		right.transitiveDependents - left.transitiveDependents ||
 		right.directDependents - left.directDependents ||
