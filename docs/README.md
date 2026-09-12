@@ -6,6 +6,7 @@ Ce répertoire contient les runbooks maintenus avec l’application Next.js.
 
 - [Architecture et exploitation](architecture.md)
 - [Feuille de route qualité](quality-roadmap.md)
+- [Feuille de route de sortie Tailwind / PostCSS](tailwind-exit-roadmap.md)
 - [Feuille de route homelab / TrueNAS / FastAPI](homelab-roadmap.md)
 - [Catalogue des services homelab](homelab-services-catalog.md)
 - [Baseline de performance frontend](performance-baseline.md)
@@ -26,4 +27,6 @@ Ce répertoire contient les runbooks maintenus avec l’application Next.js.
   déploiement doit mettre à jour le runbook associé.
 - Tout travail homelab différé doit être ajouté à `homelab-roadmap.md`; les
   éléments transverses restent également suivis dans `quality-roadmap.md`.
+- Les sous-plans thématiques, comme `tailwind-exit-roadmap.md`, détaillent les
+  checkpoints d’exécution sans remplacer `quality-roadmap.md` comme source canonique.
 - Avant publication, exécuter `npm run check`.
