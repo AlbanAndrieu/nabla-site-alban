@@ -6,7 +6,7 @@ on:
       - refactor/tailwind-exit-phase2
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh-lock:
@@ -42,7 +42,25 @@ jobs:
             console.error('Tailwind packages still present:', stale);
             process.exit(1);
           }
+          const root = lock.packages?.[''] ?? {};
+          if (root.devDependencies?.tailwindcss || root.devDependencies?.['@tailwindcss/postcss']) {
+            console.error('Tailwind root dependencies still present');
+            process.exit(1);
+          }
           NODE
+
+      - name: Commit regenerated lockfile
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- package-lock.json; then
+            echo 'package-lock.json is already canonical.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          git commit -m 'chore(css): regenerate lockfile without Tailwind'
+          git push origin HEAD:refactor/tailwind-exit-phase2
 
       - name: Upload regenerated lockfile
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
