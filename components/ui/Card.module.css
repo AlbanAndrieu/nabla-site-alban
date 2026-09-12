@@ -1,0 +1,25 @@
+.card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	color: var(--ui-text-primary);
+	overflow-wrap: break-word;
+	background: var(--ui-surface-card);
+	background-clip: border-box;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+}
+
+.elevated {
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.borderless {
+	border: 0;
+}
+
+.body {
+	flex: 1 1 auto;
+	padding: var(--ui-space-md);
+}
