@@ -36,7 +36,10 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /bash scripts\/verify-production-baseline\.sh/);
 	assert.match(ci, /QUALITY_BASELINE_RELEASE_HOPS:\s*"3"/);
 	assert.match(ci, /QUALITY_BASELINE_MAINTENANCE_HOPS:\s*"5"/);
-	assert.match(ci, /steps\.production-baseline\.outputs\.baseline_sha/);
+	assert.match(
+		ci,
+		/steps\.verified-production-baseline\.outputs\.baseline_sha/,
+	);
 	assert.match(baseline, /Production Post-deploy Smoke/);
 	assert.match(baseline, /Production DAST/);
 	assert.match(baseline, /maintenance_only_hop/);
@@ -139,8 +142,8 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(checkpoint, /workflow_dispatch:/);
 	assert.doesNotMatch(checkpoint, /workflow_run:/);
 	assert.match(checkpoint, /CI \(Quality and Security\)/);
-	assert.match(checkpoint, /quality\.conclusion !== 'success'/);
-	assert.match(checkpoint, /git push --force origin/);
+	assert.match(checkpoint, /qualityRun\.conclusion !== 'success'/);
+	assert.match(checkpoint, /updateRef/);
 
 	const securityWorkflows = [
 		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
