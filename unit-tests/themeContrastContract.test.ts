@@ -61,5 +61,8 @@ test("fastpool and Cloudflare warnings use accessible semantic state colors", as
 	assert.doesNotMatch(cloudflare, /alert alert-warning/);
 	assert.match(cloudflareCss, /background: var\(--ui-warning-surface\)/);
 	assert.match(cloudflareCss, /color: var\(--ui-warning-text\)/);
-	assert.match(cloudflareCss, /border-left: 4px solid var\(--ui-warning-text\)/);
+	assert.match(
+		cloudflareCss,
+		/border-left: 4px solid var\(--ui-warning-text\)/,
+	);
 });
