@@ -1,0 +1,99 @@
+name: Node 24 production compatibility
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - ".nvmrc-production"
+      - ".npmrc"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "next.config.mjs"
+      - "proxy.ts"
+      - "vercel.json"
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "lib/**"
+      - "messages/**"
+      - "unit-tests/nodeRuntimeCompatibility.test.ts"
+      - ".github/workflows/node24-compat.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - ".nvmrc-production"
+      - ".npmrc"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "next.config.mjs"
+      - "proxy.ts"
+      - "vercel.json"
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "lib/**"
+      - "messages/**"
+      - "unit-tests/nodeRuntimeCompatibility.test.ts"
+      - ".github/workflows/node24-compat.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  minimum-runtime:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup minimum production-compatible Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: ".nvmrc-production"
+          package-manager-cache: false
+
+      - name: Restore npm downloads
+        id: npm-cache
+        continue-on-error: true
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.npm
+          key: npm-node24-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-node24-${{ runner.os }}-${{ runner.arch }}-
+            npm-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Pin npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}"
+          npm install --global npm@11.17.0 --no-audit --no-fund
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify minimum Node 24 compatibility
+        shell: bash
+        run: npm run test:unit
+
+      - name: Save npm downloads
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.npm
+          key: npm-node24-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
