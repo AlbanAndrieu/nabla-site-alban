@@ -62,7 +62,10 @@ test("TrueNAS service presentation borrows the shared hardware section language"
 		source("app/components/homelab/HomelabServicesSection.module.css"),
 	]);
 
-	assert.match(section, /<SectionHeading id=\{headingId\} iconClass="fa-server">/);
+	assert.match(
+		section,
+		/<SectionHeading id=\{headingId\} iconClass="fa-server">/,
+	);
 	assert.doesNotMatch(section, /fa-cubes-stacked/);
 	assert.match(section, /fa-heart-pulse/);
 	assert.match(section, /fa-diagram-project/);
