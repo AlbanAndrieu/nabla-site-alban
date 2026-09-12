@@ -43,7 +43,10 @@ test("Nabla hero badges and CTAs no longer use Bootstrap badge/button primitives
 	]);
 
 	for (const source of [docker, ansible, devSecOps]) {
-		assert.match(source, /import ActionLink from "@\/components\/ui\/ActionLink"/);
+		assert.match(
+			source,
+			/import ActionLink from "@\/components\/ui\/ActionLink"/,
+		);
 		assert.match(source, /import Badge from "@\/components\/ui\/Badge"/);
 		assert.doesNotMatch(source, /className="badge /);
 		assert.doesNotMatch(source, /className="btn /);
