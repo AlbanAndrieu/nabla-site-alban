@@ -68,6 +68,30 @@
 	color: var(--ui-primary-text);
 }
 
+.outlineSecondary {
+	border-color: var(--ui-secondary-bg);
+	background: transparent;
+	color: var(--ui-secondary-bg);
+}
+
+.outlineSecondary:hover {
+	border-color: var(--ui-secondary-bg-hover);
+	background: var(--ui-secondary-bg);
+	color: var(--ui-secondary-text);
+}
+
+.inverted {
+	border-color: var(--ui-inverted-text);
+	background: transparent;
+	color: var(--ui-inverted-text);
+}
+
+.inverted:hover {
+	border-color: var(--ui-inverted-bg-hover);
+	background: var(--ui-inverted-bg-hover);
+	color: var(--ui-inverted-text-hover);
+}
+
 @media (max-width: 575.98px) {
 	.action {
 		width: min(100%, 22rem);

@@ -4,6 +4,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
+import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { paymentLocale } from "@/lib/paymentPages";
 import { PRICING_TIERS } from "@/lib/pricingTiers";
@@ -76,12 +77,13 @@ export default async function PricingPage({ params }: Props) {
 											<li key={item}>{item}</li>
 										))}
 									</ul>
-									<a
+									<ActionLink
 										href={tier.href}
-										className="btn btn-outline-primary btn-sm"
+										size="compact"
+										variant="outline"
 									>
 										{tier.cta}
-									</a>
+									</ActionLink>
 								</div>
 							</article>
 						))}
@@ -107,20 +109,19 @@ export default async function PricingPage({ params }: Props) {
 					</h2>
 					<p>{t("next")}</p>
 					<div className="d-flex flex-wrap gap-2">
-						<a
+						<ActionLink
 							href="https://calendly.com/alban-andrieu"
-							className="btn btn-primary"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
 							{t("book")}
-						</a>
-						<a
+						</ActionLink>
+						<ActionLink
 							href={`/${locale}/expertise#services`}
-							className="btn btn-outline-secondary"
+							variant="outlineSecondary"
 						>
 							{t("services")}
-						</a>
+						</ActionLink>
 					</div>
 				</section>
 			</main>

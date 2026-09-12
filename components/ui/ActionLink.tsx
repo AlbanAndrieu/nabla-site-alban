@@ -1,7 +1,12 @@
 import type { ComponentPropsWithoutRef } from "react";
 import styles from "./Action.module.css";
 
-export type ActionVariant = "primary" | "secondary" | "outline";
+export type ActionVariant =
+	| "primary"
+	| "secondary"
+	| "outline"
+	| "outlineSecondary"
+	| "inverted";
 export type ActionSize = "default" | "compact";
 
 type ActionLinkProps = ComponentPropsWithoutRef<"a"> & {

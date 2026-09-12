@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import ActionLink from "@/components/ui/ActionLink";
 
 export default function Hero() {
 	const t = useTranslations();
@@ -24,37 +25,36 @@ export default function Hero() {
 					<li>{t("home.hero.stats.dev")}</li>
 				</ul>
 				<div className="cta-buttons">
-					<a
+					<ActionLink
 						href="https://calendly.com/alban-andrieu"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="btn btn-primary"
 					>
 						<i className="fa fa-calendar-plus"></i> {t("home.hero.cta.book")}
-					</a>
-					<a
+					</ActionLink>
+					<ActionLink
 						href={`${localePrefix}/startup.html`}
-						className="btn btn-outline-light"
+						variant="inverted"
 					>
 						<i className="fas fa-rocket" aria-hidden="true"></i>{" "}
 						{t("home.hero.cta.start")}
-					</a>
-					<a
+					</ActionLink>
+					<ActionLink
 						href={`${localePrefix}/cv/cv-small-${locale}.html`}
-						className="btn btn-secondary"
+						variant="secondary"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
 						<i className="fas fa-file-pdf"></i> {t("home.hero.cta.pdf")}
-					</a>
-					<a
+					</ActionLink>
+					<ActionLink
 						href="https://www.linkedin.com/in/nabla/"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="btn btn-secondary"
+						variant="secondary"
 					>
 						<i className="fab fa-linkedin"></i> {t("home.hero.cta.linkedin")}
-					</a>
+					</ActionLink>
 				</div>
 				<div
 					className="hero-value-list"
@@ -68,10 +68,13 @@ export default function Hero() {
 					</ul>
 				</div>
 				<div className="cta-buttons">
-					<a href={`${localePrefix}/expertise`} className="btn btn-secondary">
+					<ActionLink
+						href={`${localePrefix}/expertise`}
+						variant="secondary"
+					>
 						<i className="fas fa-layer-group" aria-hidden="true"></i>{" "}
 						{t("home.hero.services")}
-					</a>
+					</ActionLink>
 				</div>
 			</div>
 		</section>

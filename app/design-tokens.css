@@ -43,6 +43,9 @@
 	--ui-secondary-bg: #6c757d;
 	--ui-secondary-bg-hover: #5c636a;
 	--ui-secondary-text: #fff;
+	--ui-inverted-text: #fff;
+	--ui-inverted-bg-hover: #fff;
+	--ui-inverted-text-hover: #1f2937;
 	--ui-focus-ring: #9ec5fe;
 }
 

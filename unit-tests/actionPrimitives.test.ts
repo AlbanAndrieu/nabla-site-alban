@@ -23,6 +23,15 @@ const threatFeedPath = new URL(
 	"../components/ciso/ThreatFeed.tsx",
 	import.meta.url,
 );
+const heroPath = new URL("../app/components/Hero.tsx", import.meta.url);
+const homeContactPath = new URL(
+	"../app/components/home/HomeContactSection.tsx",
+	import.meta.url,
+);
+const pricingPath = new URL(
+	"../app/[locale]/pricing/page.tsx",
+	import.meta.url,
+);
 
 test("link and button actions share the tokenized action style contract", async () => {
 	const [actionLink, button, styles] = await Promise.all([
@@ -33,12 +42,16 @@ test("link and button actions share the tokenized action style contract", async 
 
 	assert.match(actionLink, /export type ActionVariant/);
 	assert.match(actionLink, /export type ActionSize/);
+	assert.match(actionLink, /"outlineSecondary"/);
+	assert.match(actionLink, /"inverted"/);
 	assert.match(actionLink, /actionClassName\(variant, size, className\)/);
 	assert.match(button, /ComponentPropsWithoutRef<"button">/);
 	assert.match(button, /type = "button"/);
 	assert.match(button, /actionClassName\(variant, size, className\)/);
 	assert.match(styles, /min-height: var\(--ui-control-min-height\)/);
 	assert.match(styles, /outline: 3px solid var\(--ui-focus-ring\)/);
+	assert.match(styles, /\.inverted \{/);
+	assert.match(styles, /\.outlineSecondary \{/);
 });
 
 test("migrated active actions no longer depend on Bootstrap button classes", async () => {
@@ -61,4 +74,27 @@ test("migrated active actions no longer depend on Bootstrap button classes", asy
 	assert.match(threatFeed, /size="compact"/);
 	assert.match(threatFeed, /variant="outline"/);
 	assert.doesNotMatch(threatFeed, /className="btn btn-outline-primary btn-sm"/);
+});
+
+test("homepage and pricing CTA links use the shared action primitive", async () => {
+	const [hero, homeContact, pricing] = await Promise.all([
+		readFile(heroPath, "utf8"),
+		readFile(homeContactPath, "utf8"),
+		readFile(pricingPath, "utf8"),
+	]);
+
+	assert.match(hero, /import ActionLink from/);
+	assert.match(hero, /variant="inverted"/);
+	assert.match(hero, /variant="secondary"/);
+	assert.doesNotMatch(hero, /className="btn /);
+
+	assert.match(homeContact, /import ActionLink from/);
+	assert.match(homeContact, /variant="secondary"/);
+	assert.doesNotMatch(homeContact, /className="btn /);
+
+	assert.match(pricing, /import ActionLink from/);
+	assert.match(pricing, /size="compact"/);
+	assert.match(pricing, /variant="outline"/);
+	assert.match(pricing, /variant="outlineSecondary"/);
+	assert.doesNotMatch(pricing, /className="btn /);
 });
