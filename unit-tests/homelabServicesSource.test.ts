@@ -156,7 +156,7 @@ test("static homelab catalog never probes FastAPI during prerender", () => {
 	);
 });
 
-test("homelab catalog prefers FastAPI and overlays site-owned navigation details", async () => {
+test("homelab catalog prefers FastAPI and keeps upstream inventory/exposure authoritative", async () => {
 	setApiUrl(undefined);
 	let requestedUrl = "";
 	globalThis.fetch = (async (input) => {
@@ -176,6 +176,18 @@ test("homelab catalog prefers FastAPI and overlays site-owned navigation details
 					tunnelUrl: "https://pfsense.albandrieu.com",
 					external: false,
 				},
+				{
+					id: "adguard-home",
+					name: "AdGuard Home",
+					tunnelUrl: "https://adguardhome.albandrieu.com",
+					external: true,
+				},
+				{
+					id: "joplin",
+					name: "Joplin",
+					tunnelUrl: "https://joplin.int.albandrieu.com",
+					external: true,
+				},
 				{ name: "FastAPI service", external: true },
 			],
 		});
@@ -188,11 +200,20 @@ test("homelab catalog prefers FastAPI and overlays site-owned navigation details
 	const pfsense = result.catalog.services.find(
 		(service) => service.id === "pfsense",
 	);
+	const adguard = result.catalog.services.find(
+		(service) => service.id === "adguard-home",
+	);
+	const joplin = result.catalog.services.find(
+		(service) => service.id === "joplin",
+	);
 
 	assert.equal(requestedUrl, HOMELAB_SERVICES_DEFAULT_API_URL);
 	assert.equal(result.source, "fastapi");
 	assert.equal(truenas?.endpointUrl, "https://truenas.albandrieu.com:7000/");
 	assert.equal(pfsense?.endpointUrl, "https://home.albandrieu.com:10443/");
+	assert.equal(adguard?.external, true);
+	assert.equal(joplin?.external, true);
+	assert.equal(joplin?.tunnelUrl, "https://joplin.int.albandrieu.com");
 	assert.equal(
 		result.catalog.services.find(
 			(service) => service.name === "FastAPI service",
