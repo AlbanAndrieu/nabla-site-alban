@@ -28,7 +28,9 @@ export default async function GpuUpgradePlan() {
 								<div className="d-flex align-items-start justify-content-between gap-2">
 									<h6 className="card-title">{gpu.name}</h6>
 									{gpu.recommended ? (
-										<span className="badge text-bg-primary">{t("recommended")}</span>
+										<span className="badge text-bg-primary">
+											{t("recommended")}
+										</span>
 									) : null}
 								</div>
 								<dl className="small mb-3">
