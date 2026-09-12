@@ -42,8 +42,14 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(baseline, /maintenance_only_hop/);
 	assert.match(baseline, /--diff-filter=ACMRD/);
 	assert.match(baseline, /semantic-release metadata hop/);
-	assert.doesNotMatch(ci, /Bootstrap production DAST before first DAST-enabled merge/);
-	assert.doesNotMatch(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
+	assert.doesNotMatch(
+		ci,
+		/Bootstrap production DAST before first DAST-enabled merge/,
+	);
+	assert.doesNotMatch(
+		ci,
+		/steps\.production-baseline\.outputs\.bootstrap-dast/,
+	);
 	assert.match(
 		ci,
 		/semgrep\/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e/,
