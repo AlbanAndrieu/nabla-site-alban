@@ -8,6 +8,7 @@
 }
 
 .card {
+	min-width: 0;
 	width: min(100%, 25rem);
 }
 
@@ -17,6 +18,7 @@
 	justify-content: center;
 	flex-wrap: wrap;
 	gap: 0.5rem;
+	min-width: 0;
 	padding: clamp(1.25rem, 4vw, 1.75rem) clamp(1rem, 4vw, 1.5rem) 0.5rem;
 	text-align: center;
 }
@@ -57,6 +59,7 @@
 .badgeRow {
 	display: flex;
 	justify-content: center;
+	min-width: 0;
 	width: 100%;
 }
 
@@ -68,6 +71,7 @@
 	display: flex;
 	align-items: center;
 	flex-direction: column;
+	min-width: 0;
 	padding: clamp(1rem, 4vw, 1.5rem);
 	text-align: center;
 }
@@ -76,6 +80,7 @@
 	margin: 0 0 0.5rem;
 	font-size: clamp(1.15rem, 3vw, 1.35rem);
 	line-height: 1.25;
+	overflow-wrap: anywhere;
 	text-wrap: balance;
 }
 
