@@ -52,11 +52,11 @@ test("Nabla hero badges and CTAs no longer use Bootstrap badge/button primitives
 		assert.doesNotMatch(source, /className="btn /);
 	}
 
-	assert.match(docker, /<Badge className="ms-2" variant="info">/);
+	assert.match(docker, /<Badge className=\{styles\.inlineBadge\} variant="info">/);
 	assert.match(docker, /variant="outlineInfo"/);
-	assert.match(ansible, /<Badge className="mt-2" variant="success">/);
+	assert.match(ansible, /<Badge className=\{styles\.stackedBadge\} variant="success">/);
 	assert.match(ansible, /variant="outline"/);
-	assert.match(devSecOps, /<Badge className="ms-2">/);
+	assert.match(devSecOps, /<Badge className=\{styles\.inlineBadge\}>/);
 	assert.match(devSecOps, /variant="outline"/);
 	assert.match(actionLink, /\| "outlineInfo"/);
 });
