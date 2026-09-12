@@ -55,18 +55,19 @@ test("TrueNAS services are the primary surface and operations are secondary", as
 	assert.match(styles, /display: none !important/);
 });
 
-test("TrueNAS service presentation borrows the hardware card language", async () => {
-	const section = await source(
-		"app/components/homelab/HomelabServicesSection.tsx",
-	);
-	const styles = await source(
-		"app/components/homelab/HomelabServicesSection.module.css",
-	);
+test("TrueNAS service presentation borrows the shared hardware section language", async () => {
+	const [section, sharedHeading, styles] = await Promise.all([
+		source("app/components/homelab/HomelabServicesSection.tsx"),
+		source("components/SectionHeading.module.css"),
+		source("app/components/homelab/HomelabServicesSection.module.css"),
+	]);
 
-	assert.match(section, /fa-cubes-stacked/);
+	assert.match(section, /<SectionHeading id=\{headingId\} iconClass="fa-server">/);
+	assert.doesNotMatch(section, /fa-cubes-stacked/);
 	assert.match(section, /fa-heart-pulse/);
 	assert.match(section, /fa-diagram-project/);
-	assert.match(styles, /\.heading > a/);
+	assert.match(sharedHeading, /color: var\(--ui-link\)/);
+	assert.match(sharedHeading, /font-size: clamp\(2\.25rem, 4\.5vw, 3\.5rem\)/);
 	assert.match(styles, /service-card-ux/);
 	assert.match(styles, /data-effective-health="ok"/);
 	assert.match(styles, /data-effective-health="warn"/);
