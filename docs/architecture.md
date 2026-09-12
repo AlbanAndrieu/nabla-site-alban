@@ -93,7 +93,7 @@ dans les composants React.
 
 ## Runtime Node.js
 
-Le développement local et GitHub Actions utilisent Node.js 25.9.0 via `.nvmrc`/mise, avec npm 11.17.0. `package.json` accepte `>=24.11.0 <26` afin que Vercel puisse continuer à sélectionner son runtime Node 24 supporté pour les Route Handlers.
+Le développement local et GitHub Actions utilisent Node.js 26.8.2 via `.nvmrc`/mise, avec npm 11.17.0. `package.json` accepte `>=24.11.0 <27` afin que Vercel puisse continuer à sélectionner son runtime Node 24 supporté pour les Route Handlers tout en autorisant le runtime local/CI Node 26.
 
 ## Contrôles
 

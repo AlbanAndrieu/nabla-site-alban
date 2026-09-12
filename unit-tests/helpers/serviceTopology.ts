@@ -1,0 +1,61 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+import { parseServiceTopology } from "../../lib/serviceTopology";
+
+type ParsedServiceTopology = NonNullable<
+	ReturnType<typeof parseServiceTopology>
+>;
+
+export async function loadLocalServiceTopology() {
+	const raw = JSON.parse(
+		await readFile("public/service-topology.json", "utf8"),
+	) as unknown;
+	const topology = parseServiceTopology(raw);
+	assert.ok(topology);
+	return topology;
+}
+
+export function hasTopologyEdge(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+) {
+	return topology.relations.some(
+		(relation) => relation.source === source && relation.target === target,
+	);
+}
+
+export function hasTopologyRelation(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+	type: string,
+	strength?: string,
+) {
+	return topology.relations.some(
+		(relation) =>
+			relation.source === source &&
+			relation.target === target &&
+			relation.type === type &&
+			(strength === undefined || relation.strength === strength),
+	);
+}
+
+export function hasRequiredTopologyRelation(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+	type: string,
+) {
+	return hasTopologyRelation(topology, source, target, type, "required");
+}
+
+export function assertRequiredRelation(
+	topology: ParsedServiceTopology,
+	source: string,
+	target: string,
+	type: string,
+) {
+	assert.ok(hasRequiredTopologyRelation(topology, source, target, type));
+}

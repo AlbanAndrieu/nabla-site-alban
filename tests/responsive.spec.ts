@@ -129,7 +129,7 @@ test.describe("Responsive Design Tests", () => {
 		await page.getByRole("button", { name: "Nabla / TrueNAS" }).click();
 
 		const explorer = page.locator("#service-architecture-explorer");
-		const compactHierarchy = explorer
+		const compactHierarchy = page
 			.locator("[data-mobile-architecture-hierarchy]")
 			.filter({ visible: true });
 		await expect(compactHierarchy).toHaveCount(1);
@@ -137,19 +137,19 @@ test.describe("Responsive Design Tests", () => {
 		await expect(explorer.locator(".react-flow:visible")).toHaveCount(0);
 
 		const firstGroup = compactHierarchy
-			.locator("[data-mobile-architecture-group]")
+			.locator("[data-mobile-criticality-tier]")
 			.first();
 		await expect(firstGroup).toBeVisible();
-		await firstGroup.locator("summary").first().click();
-		await expect(
-			firstGroup.locator("[data-mobile-architecture-item]").first(),
-		).toBeVisible();
+		const groupOpen = await firstGroup.evaluate(
+			(element) => (element as HTMLDetailsElement).open,
+		);
+		if (!groupOpen) await firstGroup.locator("summary").first().click();
+		await expect(firstGroup.locator("[data-mobile-service]").first()).toBeVisible();
 
 		await page.setViewportSize({ width: 1280, height: 900 });
 		await expect(
-			explorer.locator("[data-mobile-architecture-hierarchy]:visible"),
+			page.locator("[data-mobile-architecture-hierarchy]:visible"),
 		).toHaveCount(0);
 		await expect(explorer.locator(".react-flow:visible")).toHaveCount(1);
 	});
-
 });

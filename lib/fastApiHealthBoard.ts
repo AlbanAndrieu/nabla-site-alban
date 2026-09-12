@@ -15,10 +15,35 @@ export type FastApiHealthBoardSnapshot = {
 	sickz: unknown | null;
 };
 
+export type FastApiHealthBoardLoadResult = {
+	board: FastApiHealthBoardSnapshot | null;
+	primaryUrl: string;
+	error: string | null;
+};
+
 export const FASTAPI_HEALTH_BOARD_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/health-board";
 
 const HEALTH_BOARD_TIMEOUT_MS = 8_000;
+const HEALTH_BOARD_FRESH_CACHE_MS = 5_000;
+const HEALTH_BOARD_REFRESHING_CACHE_MS = 2_000;
+const HEALTH_BOARD_STALE_CACHE_MS = 1_000;
+
+type HealthBoardCacheEntry = {
+	primaryUrl: string;
+	fetchImpl: typeof fetch;
+	expiresAt: number;
+	result: FastApiHealthBoardLoadResult;
+};
+
+type HealthBoardInFlight = {
+	primaryUrl: string;
+	fetchImpl: typeof fetch;
+	promise: Promise<FastApiHealthBoardLoadResult>;
+};
+
+let cachedHealthBoard: HealthBoardCacheEntry | null = null;
+let inFlightHealthBoard: HealthBoardInFlight | null = null;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -28,7 +53,9 @@ function isState(value: unknown): value is FastApiHealthBoardState {
 	return value === "pending" || value === "fresh" || value === "stale";
 }
 
-function optionalNonNegativeNumber(value: unknown): value is number | undefined {
+function optionalNonNegativeNumber(
+	value: unknown,
+): value is number | undefined {
 	return (
 		value === undefined ||
 		(typeof value === "number" && Number.isFinite(value) && value >= 0)
@@ -76,6 +103,15 @@ export function parseFastApiHealthBoard(
 	};
 }
 
+export function fastApiHealthBoardCacheTtlMs(
+	board: FastApiHealthBoardSnapshot | null,
+): number {
+	if (!board) return 0;
+	if (board.refreshing) return HEALTH_BOARD_REFRESHING_CACHE_MS;
+	if (board.state === "fresh") return HEALTH_BOARD_FRESH_CACHE_MS;
+	return HEALTH_BOARD_STALE_CACHE_MS;
+}
+
 function healthBoardApiUrl(): string {
 	return (
 		process.env.HOMELAB_HEALTH_BOARD_API_URL?.trim() ||
@@ -83,17 +119,15 @@ function healthBoardApiUrl(): string {
 	);
 }
 
-export async function loadFastApiHealthBoard(): Promise<{
-	board: FastApiHealthBoardSnapshot | null;
-	primaryUrl: string;
-	error: string | null;
-}> {
-	const primaryUrl = healthBoardApiUrl();
+async function loadFastApiHealthBoardUncached(
+	primaryUrl: string,
+	fetchImpl: typeof fetch,
+): Promise<FastApiHealthBoardLoadResult> {
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), HEALTH_BOARD_TIMEOUT_MS);
 
 	try {
-		const response = await fetch(primaryUrl, {
+		const response = await fetchImpl(primaryUrl, {
 			headers: {
 				Accept: "application/json",
 				"User-Agent": "nabla-site-health-board/1.0",
@@ -107,9 +141,54 @@ export async function loadFastApiHealthBoard(): Promise<{
 		return { board, primaryUrl, error: null };
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(`[health-board] FastAPI aggregate unavailable (${primaryUrl}): ${reason}`);
+		console.warn(
+			`[health-board] FastAPI aggregate unavailable (${primaryUrl}): ${reason}`,
+		);
 		return { board: null, primaryUrl, error: reason };
 	} finally {
 		clearTimeout(timeout);
+	}
+}
+
+export async function loadFastApiHealthBoard(): Promise<FastApiHealthBoardLoadResult> {
+	const primaryUrl = healthBoardApiUrl();
+	const fetchImpl = globalThis.fetch;
+	const now = Date.now();
+
+	if (
+		cachedHealthBoard?.primaryUrl === primaryUrl &&
+		cachedHealthBoard.fetchImpl === fetchImpl &&
+		cachedHealthBoard.expiresAt > now
+	) {
+		return cachedHealthBoard.result;
+	}
+	if (
+		inFlightHealthBoard?.primaryUrl === primaryUrl &&
+		inFlightHealthBoard.fetchImpl === fetchImpl
+	) {
+		return inFlightHealthBoard.promise;
+	}
+
+	const promise = loadFastApiHealthBoardUncached(primaryUrl, fetchImpl).then(
+		(result) => {
+			const ttlMs = fastApiHealthBoardCacheTtlMs(result.board);
+			if (ttlMs > 0) {
+				cachedHealthBoard = {
+					primaryUrl,
+					fetchImpl,
+					expiresAt: Date.now() + ttlMs,
+					result,
+				};
+			}
+			return result;
+		},
+	);
+	inFlightHealthBoard = { primaryUrl, fetchImpl, promise };
+	try {
+		return await promise;
+	} finally {
+		if (inFlightHealthBoard?.promise === promise) {
+			inFlightHealthBoard = null;
+		}
 	}
 }

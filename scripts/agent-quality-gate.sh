@@ -8,6 +8,9 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
+# shellcheck source=scripts/lib/agent-quality-support.sh
+source scripts/lib/agent-quality-support.sh
+
 MODE="check"
 PUBLISH=false
 case "${1:-}" in
@@ -20,22 +23,7 @@ case "${1:-}" in
         shift
         ;;
     -h | --help)
-        cat <<'EOF'
-Usage:
-    bash scripts/agent-quality-gate.sh [--fix|--publish]
-
-Modes:
-    default    strict deterministic pre-build validation
-    --fix      converge deterministic pre-commit + npm lint auto-fixes locally
-    --publish  strict gate plus clean-tree publication validation
-
-Environment:
-    QUALITY_BASE_REF                    override comparison base
-    QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
-    QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
-    QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
-    QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
-EOF
+        print_agent_quality_usage
         exit 0
         ;;
     "")
@@ -58,104 +46,7 @@ if [[ ! "${FIX_PASSES}" =~ ^[1-9][0-9]*$ ]]; then
     exit 2
 fi
 
-resolve_base_ref() {
-    if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
-        printf '%s\n' "${QUALITY_BASE_REF}"
-    elif git symbolic-ref --quiet refs/remotes/origin/HEAD >/dev/null 2>&1; then
-        git symbolic-ref --quiet --short refs/remotes/origin/HEAD
-    elif git rev-parse --verify origin/main >/dev/null 2>&1; then
-        printf '%s\n' "origin/main"
-    elif git rev-parse --verify origin/master >/dev/null 2>&1; then
-        printf '%s\n' "origin/master"
-    elif git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
-        printf '%s\n' "HEAD~1"
-    else
-        printf '%s\n' "HEAD"
-    fi
-}
-
 BASE_REF="$(resolve_base_ref)"
-
-run_compact() {
-    local label="$1"
-    shift
-    local log
-    local rc
-    log="$(mktemp)"
-    if "$@" >"${log}" 2>&1; then
-        rm -f "${log}"
-        printf '✅ %s\n' "${label}"
-        return 0
-    else
-        rc=$?
-    fi
-    printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
-    rm -f "${log}"
-    return "${rc}"
-}
-
-run_compact_report() {
-    local label="$1"
-    shift
-    local log
-    local rc
-    log="$(mktemp)"
-    if "$@" >"${log}" 2>&1; then
-        grep -E '^(WARNING |Code-size gate:)' "${log}" || true
-        rm -f "${log}"
-        printf '✅ %s\n' "${label}"
-        return 0
-    else
-        rc=$?
-    fi
-    printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
-    rm -f "${log}"
-    return "${rc}"
-}
-
-collect_changed_files() {
-    {
-        if [[ "${BASE_REF}" != "HEAD" ]] && git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null 2>&1; then
-            git diff --name-only --diff-filter=ACMR "${BASE_REF}...HEAD"
-        fi
-        git diff --name-only --diff-filter=ACMR
-        git diff --cached --name-only --diff-filter=ACMR
-        git ls-files --others --exclude-standard
-    } |
-        awk 'NF' |
-        sort -u |
-        while IFS= read -r file; do
-            [[ -f "${file}" ]] && printf '%s\n' "${file}"
-        done
-}
-
-collect_deleted_files() {
-    {
-        if [[ "${BASE_REF}" != "HEAD" ]] && git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null 2>&1; then
-            git diff --name-only --diff-filter=D "${BASE_REF}...HEAD"
-        fi
-        git diff --name-only --diff-filter=D
-        git diff --cached --name-only --diff-filter=D
-    } |
-        awk 'NF' |
-        sort -u
-}
-
-workspace_fingerprint() {
-    local file
-    {
-        git diff --binary
-        git diff --cached --binary
-        git status --porcelain=v1 --untracked-files=all
-        while IFS= read -r file; do
-            [[ -f "${file}" ]] || continue
-            printf 'file:%s\n' "${file}"
-            sha256sum "${file}"
-        done < <(collect_changed_files)
-    } | sha256sum | awk '{print $1}'
-}
 
 precommit_fix_until_stable() {
     local pass
@@ -212,42 +103,15 @@ command -v pre-commit >/dev/null 2>&1 || {
     exit 1
 }
 
-agent_gate_changed=false
-javascript_lint_all=false
-stylelint_all=false
-JAVASCRIPT_LINT_FILES=()
-STYLELINT_FILES=()
-for file in "${CHANGED_FILES[@]}"; do
-    case "${file}" in
-        scripts/agent-quality-gate.sh)
-            agent_gate_changed=true
-            ;;
-    esac
-    case "${file}" in
-        eslint.config.js)
-            javascript_lint_all=true
-            ;;
-        *.js | *.jsx | *.mjs | *.cjs | *.ts | *.tsx)
-            JAVASCRIPT_LINT_FILES+=("${file}")
-            ;;
-    esac
-    case "${file}" in
-        stylelint.config.cjs)
-            stylelint_all=true
-            ;;
-        *.css)
-            STYLELINT_FILES+=("${file}")
-            ;;
-    esac
-done
+classify_changed_files "${CHANGED_FILES[@]}"
 
 if [[ "${MODE}" != "fix" && "${agent_gate_changed}" == true && "${QUALITY_CANONICAL_GATE_VERIFIED:-0}" != "1" ]]; then
     run_compact "agent gate shell formatting" \
-        pre-commit run shfmt-docker --files scripts/agent-quality-gate.sh
+        pre-commit run shfmt-docker --files "${AGENT_GATE_SHELL_FILES[@]}"
     run_compact "agent gate shell lint" \
-        pre-commit run shell-lint --files scripts/agent-quality-gate.sh
+        pre-commit run shell-lint --files "${AGENT_GATE_SHELL_FILES[@]}"
     run_compact "agent gate shell style" \
-        pre-commit run bashate --files scripts/agent-quality-gate.sh
+        pre-commit run bashate --files "${AGENT_GATE_SHELL_FILES[@]}"
 fi
 
 if [[ "${MODE}" == "fix" ]]; then

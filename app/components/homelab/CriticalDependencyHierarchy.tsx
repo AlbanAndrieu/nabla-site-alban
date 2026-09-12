@@ -52,8 +52,8 @@ export default function CriticalDependencyHierarchy({
 					</strong>
 					<small>
 						{french
-							? "Comprendre le rayon d’impact et remonter des consommateurs vers les dépendances requises."
-							: "Understand blast radius and trace consumers back to their required dependencies."}
+							? "Lire les dépendances requises, le rayon d’impact et l’ordre lifecycle canonique (phase + priorité) issu de Nabla Compose."
+							: "Read required dependencies, blast radius, and the canonical Nabla Compose lifecycle order (phase + priority)."}
 					</small>
 				</span>
 				<span className={styles.summaryHint}>

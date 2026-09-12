@@ -38,9 +38,7 @@ function withHealthBoardMetadata(
 }
 
 export async function GET() {
-	const boardPromise = loadFastApiHealthBoard();
-	const aggregatePromise = loadHomelabHealthSnapshot();
-	const boardResult = await boardPromise;
+	const boardResult = await loadFastApiHealthBoard();
 	const boardSnapshot = parseHomelabHealthSnapshot(boardResult.board?.homelab);
 	if (boardSnapshot && boardResult.board?.state === "fresh") {
 		return NextResponse.json(
@@ -60,9 +58,10 @@ export async function GET() {
 		);
 	}
 
-	// The client renders the dedicated bounded probe route independently. This
-	// endpoint therefore prefers the richer reconciled aggregate as enrichment.
-	const aggregate = await aggregatePromise;
+	// Only start the richer aggregate request after the cached health-board has
+	// proved insufficient. A fresh board therefore stays on the low-cost path and
+	// faster browser refreshes cannot accidentally fan out to the aggregate probe.
+	const aggregate = await loadHomelabHealthSnapshot();
 	if (aggregate.snapshot) {
 		return NextResponse.json(
 			withHealthBoardMetadata(aggregate.snapshot, boardResult.board),

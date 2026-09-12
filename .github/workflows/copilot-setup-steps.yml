@@ -18,6 +18,7 @@ on:
       - .pre-commit-pre-push.yaml
       - scripts/agent-publish.sh
       - scripts/agent-quality-gate.sh
+      - scripts/lib/agent-quality-support.sh
   pull_request:
     paths:
       - .github/workflows/copilot-setup-steps.yml
@@ -29,6 +30,7 @@ on:
       - .pre-commit-pre-push.yaml
       - scripts/agent-publish.sh
       - scripts/agent-quality-gate.sh
+      - scripts/lib/agent-quality-support.sh
 
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.

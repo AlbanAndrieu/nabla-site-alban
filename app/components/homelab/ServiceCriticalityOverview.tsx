@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 import {
 	analyzeServiceCriticality,
@@ -9,7 +9,10 @@ import {
 	SERVICE_CRITICALITY_TIERS,
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
-import type { ServiceTopology } from "@/lib/serviceTopology";
+import type {
+	ServiceLifecyclePhase,
+	ServiceTopology,
+} from "@/lib/serviceTopology";
 
 type MessageKey =
 	| "criticality.tiers.foundation"
@@ -34,12 +37,29 @@ type Props = {
 	compact?: boolean;
 };
 
+function lifecycleLabel(phase: ServiceLifecyclePhase, french: boolean): string {
+	const labels: Record<ServiceLifecyclePhase, [string, string]> = {
+		"bootstrap-runtime": ["Bootstrap runtime", "Bootstrap runtime"],
+		foundation: ["Foundation", "Fondations"],
+		"network-edge": ["Network & edge", "Réseau & edge"],
+		"primary-data": ["Primary data", "Données primaires"],
+		"secondary-data": ["Secondary data", "Données secondaires"],
+		"platform-services": ["Platform services", "Services de plateforme"],
+		applications: ["Applications", "Applications"],
+	};
+	return labels[phase][french ? 1 : 0];
+}
+
 export default function ServiceCriticalityOverview({
 	topology,
 	compact = false,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
-	const analysis = useMemo(() => analyzeServiceCriticality(topology), [topology]);
+	const french = useLocale() === "fr";
+	const analysis = useMemo(
+		() => analyzeServiceCriticality(topology),
+		[topology],
+	);
 	const nodesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node])),
 		[topology],
@@ -72,6 +92,11 @@ export default function ServiceCriticalityOverview({
 					{t("criticality.title")}
 				</h2>
 				<p className="mb-1">{t("criticality.lead")}</p>
+				<small className="text-body-secondary" data-lifecycle-ordering-note>
+					{french
+						? "Ordre lifecycle canonique de Nabla Compose : les dépendances requises restent prioritaires, puis la phase et la priorité numérique déterminent l’ordre opérationnel."
+						: "Canonical Nabla Compose lifecycle order: required dependencies remain authoritative, then lifecycle phase and numeric priority determine operational order."}
+				</small>
 			</div>
 
 			<div className="row g-3" data-criticality-hierarchy>
@@ -83,7 +108,11 @@ export default function ServiceCriticalityOverview({
 								<div className="d-flex flex-column gap-2">
 									{nodes.slice(0, MAX_PER_TIER).map((node) => {
 										const criticality = analysis.get(node.id);
-										const focus = buildServiceImpactFocus(node.id, topology, analysis);
+										const focus = buildServiceImpactFocus(
+											node.id,
+											topology,
+											analysis,
+										);
 										const required = namesFor(
 											criticality?.requiredDependencies ?? [],
 										).slice(0, 4);
@@ -93,12 +122,19 @@ export default function ServiceCriticalityOverview({
 										const impacted = namesFor(
 											criticality?.transitiveDependentIds ?? [],
 										).slice(0, MAX_IMPACT_NAMES);
-										const directImpact = namesFor(focus?.directDependentIds ?? []);
-										const indirectImpact = namesFor(focus?.indirectDependentIds ?? []);
-										const dependencyPath = namesFor(focus?.dependencyPathIds ?? []);
+										const directImpact = namesFor(
+											focus?.directDependentIds ?? [],
+										);
+										const indirectImpact = namesFor(
+											focus?.indirectDependentIds ?? [],
+										);
+										const dependencyPath = namesFor(
+											focus?.dependencyPathIds ?? [],
+										);
 										const hiddenImpact = Math.max(
 											0,
-											(criticality?.transitiveDependents ?? 0) - impacted.length,
+											(criticality?.transitiveDependents ?? 0) -
+												impacted.length,
 										);
 										const hasDrilldown =
 											dependencyPath.length > 1 ||
@@ -110,7 +146,12 @@ export default function ServiceCriticalityOverview({
 												key={node.id}
 												data-criticality-node={node.id}
 												data-criticality-tier={tier}
-												data-blast-radius={criticality?.transitiveDependents ?? 0}
+												data-lifecycle-phase={criticality?.lifecyclePhase}
+												data-lifecycle-priority={criticality?.lifecyclePriority}
+												data-lifecycle-source={criticality?.lifecycleSource}
+												data-blast-radius={
+													criticality?.transitiveDependents ?? 0
+												}
 											>
 												<div className="d-flex justify-content-between gap-2 align-items-start">
 													<strong>
@@ -123,8 +164,23 @@ export default function ServiceCriticalityOverview({
 														})}
 													</span>
 												</div>
-												<small className="d-block text-body-secondary">
-													{node.kind}
+												<small className="d-flex flex-wrap gap-1 align-items-center text-body-secondary">
+													<span>{node.kind}</span>
+													{criticality ? (
+														<span
+															className="badge text-bg-light border"
+															data-lifecycle-badge
+														>
+															P{criticality.lifecyclePriority} ·{" "}
+															{lifecycleLabel(
+																criticality.lifecyclePhase,
+																french,
+															)}
+															{criticality.lifecycleSource === "compatibility"
+																? " · compat"
+																: ""}
+														</span>
+													) : null}
 												</small>
 												{required.length > 0 ? (
 													<small className="d-block mt-1">
@@ -148,26 +204,49 @@ export default function ServiceCriticalityOverview({
 													</small>
 												) : null}
 												{hasDrilldown ? (
-													<details className="mt-2" data-impact-drilldown={node.id}>
+													<details
+														className="mt-2"
+														data-impact-drilldown={node.id}
+													>
 														<summary className="small fw-semibold">
 															{t("criticality.details")}
 														</summary>
 														<div className="small mt-2 ps-2 border-start">
 															{dependencyPath.length > 1 ? (
-																<div data-dependency-path={focus?.dependencyPathIds.join(",")}>
-																	<strong>{t("criticality.dependencyPath")}</strong>{" "}
+																<div
+																	data-dependency-path={focus?.dependencyPathIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.dependencyPath")}
+																	</strong>{" "}
 																	{dependencyPath.join(" → ")}
 																</div>
 															) : null}
 															{directImpact.length > 0 ? (
-																<div className="mt-1" data-direct-impact={focus?.directDependentIds.join(",")}>
-																	<strong>{t("criticality.directImpact")}</strong>{" "}
+																<div
+																	className="mt-1"
+																	data-direct-impact={focus?.directDependentIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.directImpact")}
+																	</strong>{" "}
 																	{directImpact.join(", ")}
 																</div>
 															) : null}
 															{indirectImpact.length > 0 ? (
-																<div className="mt-1" data-indirect-impact={focus?.indirectDependentIds.join(",")}>
-																	<strong>{t("criticality.transitiveImpact")}</strong>{" "}
+																<div
+																	className="mt-1"
+																	data-indirect-impact={focus?.indirectDependentIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.transitiveImpact")}
+																	</strong>{" "}
 																	{indirectImpact.join(", ")}
 																</div>
 															) : null}

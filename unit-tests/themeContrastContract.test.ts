@@ -18,10 +18,10 @@ test("global Bootstrap bridge keeps text tables and form controls theme-aware", 
 	assert.match(globals, /color-scheme: light dark/);
 });
 
-test("TrueNAS AI and homelab surfaces share the blue red cyan palette", async () => {
+test("TrueNAS homelab keeps its palette while GPU options retain the classic Bootstrap card UX", async () => {
 	const [globals, gpu, homelab] = await Promise.all([
 		source("app/globals.css"),
-		source("app/components/truenas/GpuUpgradePlan.module.css"),
+		source("app/components/truenas/GpuUpgradePlan.tsx"),
 		source("app/components/truenas/HomeLabSection.module.css"),
 	]);
 
@@ -38,10 +38,31 @@ test("TrueNAS AI and homelab surfaces share the blue red cyan palette", async ()
 		);
 	}
 	assert.match(globals, /\.page-truenas \.table/);
-	assert.match(gpu, /data-recommended="true"/);
-	assert.match(gpu, /var\(--truenas-accent-blue/);
-	assert.match(gpu, /var\(--truenas-accent-red/);
+	assert.doesNotMatch(gpu, /GpuUpgradePlan\.module\.css/);
+	assert.match(gpu, /card h-100/);
+	assert.match(gpu, /border-primary/);
+	assert.match(gpu, /border-secondary/);
+	assert.match(gpu, /badge text-bg-primary/);
+	assert.match(gpu, /alert alert-info/);
 	assert.match(homelab, /var\(--truenas-accent-blue/);
 	assert.match(homelab, /var\(--truenas-accent-red/);
 	assert.match(homelab, /var\(--truenas-accent-cyan/);
+});
+
+test("fastpool and Cloudflare warnings use accessible semantic state colors", async () => {
+	const [fastPool, cloudflare, cloudflareCss] = await Promise.all([
+		source("app/components/truenas/FastPoolPlan.tsx"),
+		source("app/components/homelab/CloudflareStatusWarning.tsx"),
+		source("app/components/homelab/CloudflareStatusWarning.module.css"),
+	]);
+
+	assert.match(fastPool, /var\(--ui-danger-text\)/);
+	assert.match(cloudflare, /CloudflareStatusWarning\.module\.css/);
+	assert.doesNotMatch(cloudflare, /alert alert-warning/);
+	assert.match(cloudflareCss, /background: var\(--ui-warning-surface\)/);
+	assert.match(cloudflareCss, /color: var\(--ui-warning-text\)/);
+	assert.match(
+		cloudflareCss,
+		/border-left: 4px solid var\(--ui-warning-text\)/,
+	);
 });

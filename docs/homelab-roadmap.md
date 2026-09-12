@@ -1,6 +1,6 @@
 # Homelab integration roadmap
 
-Last reconciled: 11 September 2026.
+Last reconciled: 12 September 2026.
 
 This document is the focused backlog for the TrueNAS / FastAPI / `nabla-compose`
 integration. `docs/quality-roadmap.md` remains the cross-project quality roadmap;
@@ -20,13 +20,20 @@ items discovered during homelab work must not remain only in chat or PR comments
   behaviour and sanitized errors.
 - [ ] Preserve the current health distinction between HTTPS listener reachability
   and authenticated TrueNAS API health (`system.version`, `app.query`, etc.).
-- [ ] Add contract tests that fail if a new TrueNAS `/api/v2*` REST endpoint is
-  introduced in maintained runtime code.
+- [x] Add contract tests that fail if a new TrueNAS `/api/v2*` REST endpoint is
+  introduced in maintained runtime code. `unit-tests/truenasApiTransportContract.test.ts`
+  now scans TrueNAS-owned runtime code under `app/` and `lib/` while leaving the
+  legitimate pfSense v2 API contract untouched, and separately locks preservation
+  of the observed TrueNAS WebSocket URI/path/TLS evidence.
 - [ ] Validate WebSocket authentication/RBAC with the read-only observer account,
   then run a pre-upgrade smoke covering DNS → TCP/TLS → WebSocket → auth →
   `system.version` + `app.query`.
-- [ ] Update the architecture UI to expose the observed TrueNAS API transport
-  (`websocket-jsonrpc`) so a future REST regression is visible.
+- [x] Update the architecture UI to expose the observed TrueNAS API transport
+  (`websocket-jsonrpc`) so a future REST regression is visible. The architecture
+  page already owns `HomelabOperationalEvidence`; it now renders
+  `HomelabOperationalTrueNasTransport` directly from that existing health snapshot,
+  including observed WebSocket URI/path/TLS evidence, and the source contract
+  explicitly forbids the transport surface from creating another `fetch()` owner.
 
 Official references:
 
@@ -104,9 +111,18 @@ same path to the compatibility catalog and explicit missing-component policy.
   fields. `fastapi-sample#236` currently provides this report as an operator CLI
   assembled from existing health-board data, so Site Alban must not scrape CLI
   output or invent a second wire contract.
-- [ ] Evaluate adaptive UI polling (cached aggregate ~5 s, faster while a server
-  refresh is active) separately from provider probe cadence. Browser refresh
-  frequency must not increase TrueNAS/pfSense/Cloudflare fan-out.
+- [x] Finish adaptive UI polling separately from provider probe cadence. Site
+  Alban coalesces concurrent health-board reads and keeps a deliberately short
+  server cache (fresh 5 s, refreshing 2 s, pending/stale 1 s, failures 0 s).
+  `/api/homelab-health` defers the richer aggregate request until the cached board
+  proves insufficient; a contract test proves that a fresh board starts zero
+  aggregate/probe fallback requests. `ArchitectureTopologyView` is now the single
+  browser owner through `useArchitectureHealthPolling`: refreshing evidence polls
+  every 2 s, fresh evidence every 5 s, and stale/pending/unavailable evidence every
+  30 s. `HierarchicalArchitectureExplorer` receives the shared health snapshot and
+  source as props and cannot create a second health fetch; its distinct runtime
+  drift observation remains isolated at 30 s. Source contracts lock these owners
+  so the faster browser cadence cannot silently become additional provider fan-out.
 
 ## P0 — Post-merge Quality remediation
 
@@ -140,8 +156,7 @@ same path to the compatibility catalog and explicit missing-component policy.
 
 ## P1 — Refactoring / code-size debt
 
-Refactor cohesive responsibilities instead of raising size thresholds. The first
-three targets are:
+Refactor cohesive responsibilities instead of raising size thresholds.
 
 - [x] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
   transport loaders. The public module is now a thin compatibility facade over
@@ -161,13 +176,44 @@ three targets are:
   the destructive-diff exception remains path-scoped, and CI #961 plus Copilot
   Setup #110 validate the final formatter-clean split, SAST, TypeScript,
   unit/contracts and production build.
-- [ ] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
-  control-plane, deep-diagnostic, exposure, freshness and metrics sections.
-
-Then review and split other maintained homelab files over ~300 lines, including
-`lib/homelabOperationalEvidence.ts` and any tests that grow beyond a cohesive
-scenario boundary. Do not refactor generated JSON or static data merely to meet a
-line-count target.
+- [x] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
+  control-plane, deep-diagnostic, exposure, freshness and metrics sections. #178
+  keeps one polling owner in the facade (one `/api/homelab-observability` fetch,
+  one timer and one `AbortController`) while child sections remain presentation
+  owners only; source contracts prevent polling ownership from drifting downward.
+- [x] Refactor `lib/homelabOperationalEvidence.ts` without changing its public
+  evidence contract. #179 keeps the public compatibility/composition surface and
+  extracts generic parsing, pfSense DNS/security/ingress parsing, trusted-source
+  TCP exposure parsing, stale-service/dependency-cycle parsing and troubleshooting
+  focus into cohesive modules. The split remains below the destructive-diff guard
+  naturally, requires no global or new path-scoped bypass, and a source contract
+  prevents heavy parser responsibilities from drifting back into the facade.
+- [x] Split `unit-tests/homelabObservability.test.ts` by cohesive scenario while
+  keeping the aggregate fixture centralized. Compatibility fallback, route
+  contract and UI ownership checks now live separately; the main test file is at
+  the 300-line boundary without a destructive-diff bypass, and CI #1035 validated
+  the split.
+- [x] Split `unit-tests/serviceTopology.test.ts` by catalog/topology versus
+  Architecture UI contracts while keeping shared fallback loading/relation helpers
+  centralized. The main topology test settles below the 300-line warning threshold
+  after canonical formatting; CI #1041 validated the formatter-clean split.
+- [x] Extract cohesive mechanics from `scripts/agent-quality-gate.sh` without
+  creating a second formatter/linter authority. Base resolution, compact logging,
+  workspace diff/fingerprint collection and changed-file classification now live in
+  sourced `scripts/lib/agent-quality-support.sh`; the wrapper retains auto-fix,
+  destructive-diff, executable-bit, canonical quality, lint/type/test and publish
+  policy. `ci-scope.sh`, Copilot setup and source contracts follow the helper, and
+  the wrapper is below the 300-line warning threshold.
+- [x] Reduce `HierarchicalArchitectureExplorer.tsx` only through a substantive
+  functional boundary rather than line-count churn. #179 moves health ownership
+  entirely to `ArchitectureTopologyView` through `useArchitectureHealthPolling`,
+  passes the health snapshot/source into the explorer, and extracts the explorer's
+  distinct `/api/homelab-status` ownership to `useArchitectureRuntimeStatus`.
+  `unit-tests/architecturePollingOwnership.test.ts` plus the reconciled
+  Architecture source contracts prevent either concern from drifting back into the
+  React Flow surface. The explorer drops from the 1253-line baseline to 1196 lines
+  while preserving its rendering semantics; CI #1056 and Copilot Setup #189
+  validate the formatter-clean functional extraction.
 
 - [x] Add a non-regression code-size report to the Site agent quality gate. The
   diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or

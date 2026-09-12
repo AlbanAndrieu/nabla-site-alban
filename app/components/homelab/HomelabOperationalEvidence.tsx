@@ -12,6 +12,7 @@ import HomelabOperationalFreshness from "./HomelabOperationalFreshness";
 import HomelabOperationalMetrics from "./HomelabOperationalMetrics";
 import HomelabOperationalPfSenseDetails from "./HomelabOperationalPfSenseDetails";
 import HomelabOperationalRuntime from "./HomelabOperationalRuntime";
+import HomelabOperationalTrueNasTransport from "./HomelabOperationalTrueNasTransport";
 import PfSenseDnsPosture from "./PfSenseDnsPosture";
 import useAnchoredDetails from "./useAnchoredDetails";
 
@@ -129,6 +130,7 @@ export default function HomelabOperationalEvidence() {
 						evidence={evidence}
 						onInspectPfSense={() => pfsenseDetails.reveal("smooth")}
 					/>
+					<HomelabOperationalTrueNasTransport evidence={evidence} />
 					<HomelabOperationalMetrics evidence={evidence} />
 					{evidence.healthSnapshot?.pfsense?.dns ? (
 						<PfSenseDnsPosture

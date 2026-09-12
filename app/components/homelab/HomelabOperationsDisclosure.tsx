@@ -32,6 +32,10 @@ const EMPTY_COVERAGE: CoverageState = {
 };
 
 const OPERATIONS_ANCHOR = "operational-evidence-title";
+const OPERATIONS_DEEP_LINKS = new Set([
+	`#${OPERATIONS_ANCHOR}`,
+	"#pfsense-operational-evidence",
+]);
 
 function catalogCount(value: unknown): number {
 	if (!value || typeof value !== "object") return 0;
@@ -48,7 +52,7 @@ export default function HomelabOperationsDisclosure() {
 
 	useEffect(() => {
 		const revealFromHash = () => {
-			if (window.location.hash !== `#${OPERATIONS_ANCHOR}`) return;
+			if (!OPERATIONS_DEEP_LINKS.has(window.location.hash)) return;
 			if (detailsRef.current) detailsRef.current.open = true;
 			setOpen(true);
 		};

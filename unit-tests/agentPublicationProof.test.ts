@@ -51,7 +51,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		const bin = path.join(cwd, ".git", "fake-bin");
 		await mkdir(bin);
 		for (const [name, version] of [
-			["node", "v25.9.0"],
+			["node", "v26.8.2"],
 			["npm", "11.17.0"],
 			["python3", "Python 3.13.15"],
 			["pre-commit", "pre-commit 4.6.2"],

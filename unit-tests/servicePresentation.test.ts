@@ -236,7 +236,7 @@ test("canonical support and observability presentation wins over blast radius", 
 	assert.equal(analysis.get("prometheus")?.group, "support");
 });
 
-test("service-first grouping keeps user outcomes ahead of critical foundations", () => {
+test("service-first grouping keeps user outcomes first while lifecycle priority orders peers", () => {
 	const groups = groupCatalogByPresentation(catalog, topology);
 	assert.deepEqual(
 		groups.map((group) => group.group),
@@ -250,7 +250,7 @@ test("service-first grouping keeps user outcomes ahead of critical foundations",
 	);
 	assert.deepEqual(
 		groups[0]?.catalog.services.map((service) => service.id),
-		["experiment", "explicit-service"],
+		["explicit-service", "experiment"],
 	);
 });
 

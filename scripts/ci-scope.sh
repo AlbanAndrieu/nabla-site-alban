@@ -39,6 +39,7 @@ is_maintenance_only_path() {
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             scripts/agent-quality-gate.sh | \
+            scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
             scripts/check_code_size.py | \

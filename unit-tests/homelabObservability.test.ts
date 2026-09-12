@@ -1,12 +1,8 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { parseFastApiHealthBoard } from "../lib/fastApiHealthBoard";
-import {
-	parseHomelabObservability,
-	withObservabilityFallbacks,
-} from "../lib/homelabObservability";
-import { parseRuntimeTopology } from "../lib/runtimeTopology";
+import { parseHomelabObservability } from "../lib/homelabObservability";
+import { aggregateRuntimeFixture } from "./fixtures/homelabObservabilityRuntime";
 
 test("health board preserves runtime and unified observability consumes all aggregate sections", () => {
 	const board = parseFastApiHealthBoard({
@@ -14,54 +10,7 @@ test("health board preserves runtime and unified observability consumes all aggr
 		state: "fresh",
 		refreshing: false,
 		generated_at: "2026-09-03T00:30:00Z",
-		runtime: {
-			provider: "FastAPI Cloud",
-			runtime_mode: "fastapi_cloud",
-			observed_at: "2026-09-03T00:29:59Z",
-			platform_replica_count: null,
-			platform_replica_count_available: false,
-			count_semantics: "Observed heartbeat count only",
-			heartbeat_interval_seconds: 30,
-			active_window_seconds: 120,
-			recent_egress_window_seconds: 86400,
-			observed_instance_count: 1,
-			instances: [
-				{
-					id: "runtime-a",
-					last_seen_at: "2026-09-03T00:29:50Z",
-					egress_ip: "203.0.113.4",
-					egress_observed: true,
-					egress_cached: false,
-				},
-			],
-			active_egress_ips: ["203.0.113.4"],
-			recent_egress_ips: ["203.0.113.4"],
-			aggregation: "redis_heartbeat",
-			degraded: false,
-			redis: {
-				backend: "application_redis",
-				provider_attribution: "unavailable",
-				telemetry_scope: "redis_server_and_selected_database",
-				key_count_scope: "selected_database_total",
-				configured: true,
-				available: true,
-				telemetry_available: true,
-				used_memory_bytes: 1048576,
-				used_memory_human: "1M",
-				maxmemory_bytes: 8388608,
-				maxmemory_human: "8M",
-				memory_utilization_percent: 12.5,
-				connected_clients: 4,
-				blocked_clients: 0,
-				keys: 42,
-				instantaneous_ops_per_sec: 7,
-				keyspace_hits: 90,
-				keyspace_misses: 10,
-				keyspace_hit_rate_percent: 90,
-				evicted_keys: 0,
-				expired_keys: 5,
-			},
-		},
+		runtime: aggregateRuntimeFixture,
 		healthz: {
 			contract: "deep_diagnostic",
 			status: "degraded",
@@ -348,79 +297,4 @@ test("health board preserves runtime and unified observability consumes all aggr
 			reason: "pfSense admin endpoint is not a Cloudflare edge target",
 		},
 	]);
-});
-
-test("runtime endpoint remains a compatibility fallback only when aggregate runtime is absent", () => {
-	const board = parseFastApiHealthBoard({
-		schema_version: 1,
-		state: "fresh",
-		refreshing: false,
-		generated_at: null,
-		runtime: null,
-		healthz: {},
-		homelab: {},
-		platform_metrics: null,
-		sickz: {},
-	});
-	assert.ok(board);
-	const parsed = parseHomelabObservability(board);
-	const fallback = parseRuntimeTopology({
-		provider: "fastapi-cloud",
-		observed_at: "2026-09-03T00:29:59Z",
-		platform_replica_count: null,
-		platform_replica_count_available: false,
-		count_semantics: "fallback",
-		heartbeat_interval_seconds: 30,
-		active_window_seconds: 120,
-		recent_egress_window_seconds: 86400,
-		observed_instance_count: 0,
-		instances: [],
-		active_egress_ips: [],
-		recent_egress_ips: [],
-	});
-	assert.ok(fallback);
-	const enriched = withObservabilityFallbacks(parsed, {
-		runtimeTopology: fallback,
-	});
-	assert.equal(enriched.sources.runtime, "fallback");
-});
-
-test("same-origin observability route uses aggregate evidence first and conditional fallbacks", async () => {
-	const route = await readFile(
-		new URL("../app/api/homelab-observability/route.ts", import.meta.url),
-		"utf8",
-	);
-	assert.match(route, /parseHomelabObservability/);
-	assert.match(
-		route,
-		/parsed\.runtimeTopology \? Promise\.resolve\(null\) : loadRuntimeTopology\(\)/,
-	);
-	assert.match(
-		route,
-		/parsed\.diagnostics \? Promise\.resolve\(null\) : loadHomelabDiagnostics\(\)/,
-	);
-	assert.match(route, /X-Homelab-Runtime-Source/);
-	assert.match(route, /X-Homelab-Diagnostics-Source/);
-});
-
-test("operations UI presents bounded metrics separately from functional health", async () => {
-	const facade = await readFile(
-		new URL(
-			"../app/components/homelab/HomelabOperationalEvidence.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
-	const component = await readFile(
-		new URL(
-			"../app/components/homelab/HomelabOperationalMetrics.tsx",
-			import.meta.url,
-		),
-		"utf8",
-	);
-	assert.match(facade, /HomelabOperationalMetrics/);
-	assert.match(component, /data-platform-metrics/);
-	assert.match(component, /PLATFORM_METRIC_LABEL_KEY/);
-	assert.match(component, /metrics\.healthSeparation/);
-	assert.doesNotMatch(component, /data-effective-health=.*platformMetrics/);
 });

@@ -113,10 +113,13 @@ test("code-size gate rejects legacy growth beyond the allowed percentage", async
 });
 
 test("agent quality gate invokes and surfaces the baseline-aware code-size report", async () => {
-	const agentGate = await readFile(
-		join(repositoryRoot, "scripts/agent-quality-gate.sh"),
-		"utf8",
-	);
+	const [agentGate, support] = await Promise.all([
+		readFile(join(repositoryRoot, "scripts/agent-quality-gate.sh"), "utf8"),
+		readFile(
+			join(repositoryRoot, "scripts/lib/agent-quality-support.sh"),
+			"utf8",
+		),
+	]);
 
 	assert.match(agentGate, /python3 scripts\/check_code_size\.py/);
 	assert.match(agentGate, /--baseline-ref "\$\{BASE_REF\}"/);
@@ -125,5 +128,6 @@ test("agent quality gate invokes and surfaces the baseline-aware code-size repor
 		agentGate,
 		/run_compact_report "baseline-aware code-size report"/,
 	);
-	assert.match(agentGate, /WARNING \|Code-size gate:/);
+	assert.match(support, /WARNING \|Code-size gate:/);
+	assert.doesNotMatch(agentGate, /WARNING \|Code-size gate:/);
 });
