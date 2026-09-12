@@ -28,12 +28,25 @@ async function expectModifierToZoomPolicy(page: Page, path: string) {
 	await expect(viewport).toBeVisible();
 
 	await guard.hover();
-	const pageScrollBefore = await page.evaluate(() => window.scrollY);
+	const { pageScrollBefore, maxScrollY } = await page.evaluate(() => ({
+		pageScrollBefore: window.scrollY,
+		maxScrollY: Math.max(
+			0,
+			document.documentElement.scrollHeight - window.innerHeight,
+		),
+	}));
+	const plainWheelDelta = maxScrollY - pageScrollBefore >= 240 ? 480 : -480;
 	const transformBeforePlainWheel = await viewport.getAttribute("style");
-	await page.mouse.wheel(0, 480);
-	await expect
-		.poll(() => page.evaluate(() => window.scrollY))
-		.toBeGreaterThan(pageScrollBefore);
+	await page.mouse.wheel(0, plainWheelDelta);
+	if (plainWheelDelta > 0) {
+		await expect
+			.poll(() => page.evaluate(() => window.scrollY))
+			.toBeGreaterThan(pageScrollBefore);
+	} else {
+		await expect
+			.poll(() => page.evaluate(() => window.scrollY))
+			.toBeLessThan(pageScrollBefore);
+	}
 	await expect(viewport).toHaveAttribute(
 		"style",
 		transformBeforePlainWheel ?? "",
