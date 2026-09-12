@@ -88,7 +88,8 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		);
 		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
 		assert.match(workflow, /fail_action:\s*true/);
-		assert.match(workflow, /cmd_options:\s*"-I -T 5 -c \.zap\/rules\.tsv"/);
+		assert.match(workflow, /cmd_options:\s*"-I -T 5"/);
+		assert.doesNotMatch(workflow, /cmd_options:.*-c \.zap\/rules\.tsv/);
 	}
 
 	assert.doesNotMatch(playwright, /zaproxy\/action-baseline/);
