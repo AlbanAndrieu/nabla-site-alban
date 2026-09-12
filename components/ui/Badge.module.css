@@ -1,0 +1,29 @@
+.badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--ui-space-2xs) var(--ui-space-xs);
+	border: 1px solid transparent;
+	border-radius: var(--ui-radius-sm);
+	font-size: 1rem;
+	font-weight: var(--ui-font-weight-action);
+	line-height: 1.1;
+	vertical-align: top;
+}
+
+.info {
+	border-color: var(--ui-info-border);
+	background: var(--ui-info-surface);
+	color: var(--ui-info-text);
+}
+
+.success {
+	border-color: var(--ui-success-border);
+	background: var(--ui-success-surface);
+	color: var(--ui-success-text);
+}
+
+.primary {
+	background: var(--ui-primary-bg);
+	color: var(--ui-primary-text);
+}
