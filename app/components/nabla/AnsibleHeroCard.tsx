@@ -1,4 +1,8 @@
 import Image from "next/image";
+import ActionLink from "@/components/ui/ActionLink";
+import Badge from "@/components/ui/Badge";
+import Card, { CardBody } from "@/components/ui/Card";
+import styles from "./NablaHeroCard.module.css";
 
 type Props = {
 	title: string;
@@ -18,52 +22,47 @@ export default function AnsibleHeroCard({
 	imageAlt,
 }: Props) {
 	return (
-		<div className="d-flex justify-content-center align-items-center mb-5">
-			<div
-				className="card shadow border-0"
-				style={{ maxWidth: 400, minWidth: 320 }}
+		<div className={styles.wrapper}>
+			<Card
+				borderless
+				className={styles.card}
+				data-nabla-hero-card="ansible"
+				elevated
 			>
-				<div className="text-center pt-4 pb-2">
+				<div className={styles.header}>
 					{imageSrc ? (
 						<Image
 							src={imageSrc}
 							alt={imageAlt || "Ansible logo"}
 							width={64}
 							height={64}
-							className="mb-2 mx-auto d-block"
-							style={{ maxHeight: 70, height: "auto" }}
+							className={styles.ansibleImage}
 						/>
 					) : (
-						<span
-							style={{
-								fontSize: 60,
-								color: "#e25528",
-								display: "inline-block",
-							}}
-						>
+						<span className={`${styles.brandIcon} ${styles.ansibleFallback}`}>
 							<i className="fab fa-ansible" aria-hidden="true"></i>
 						</span>
 					)}
-					<div className="w-100">
-						<span className="badge bg-success mt-2" style={{ fontSize: 16 }}>
+					<div className={styles.badgeRow}>
+						<Badge className={styles.stackedBadge} variant="success">
 							open source
-						</span>
+						</Badge>
 					</div>
 				</div>
-				<div className="card-body text-center">
-					<h3 className="h5">{title}</h3>
-					<p className="card-text text-muted mb-3">{description}</p>
-					<a
+				<CardBody className={styles.body}>
+					<h3 className={styles.title}>{title}</h3>
+					<p className={styles.description}>{description}</p>
+					<ActionLink
 						href={linkUrl}
-						className="btn btn-outline-primary"
 						target="_blank"
 						rel="noopener noreferrer"
+						variant="outline"
 					>
-						<i className="fab fa-github me-2"></i>
+						<i className="fab fa-github" aria-hidden="true"></i>
 						{linkLabel}
-					</a>
-				</div>
-			</div>
+					</ActionLink>
+				</CardBody>
+			</Card>
 		</div>
 	);
 }

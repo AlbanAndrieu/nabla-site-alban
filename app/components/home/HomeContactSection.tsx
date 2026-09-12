@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
+import ActionLink from "@/components/ui/ActionLink";
 
 type Props = {
 	locale: string;
@@ -16,20 +17,19 @@ export default async function HomeContactSection({ locale }: Props) {
 			</AnchoredHeading>
 			<p className="section-subtitle">{t("contact.subtitle")}</p>
 			<div className="cta-buttons contact-hero-ctas">
-				<a
-					className="btn btn-primary"
+				<ActionLink
 					href="https://calendly.com/alban-andrieu"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
 					<i className="fa fa-calendar-plus" /> {t("contact.cta.calendly")}
-				</a>
-				<a
-					className="btn btn-secondary"
+				</ActionLink>
+				<ActionLink
 					href={`mailto:${t("contact.email.value")}`}
+					variant="secondary"
 				>
 					<i className="fas fa-envelope" /> {t("contact.cta.email")}
-				</a>
+				</ActionLink>
 			</div>
 			<div className="contact-methods">
 				<ContactMethod

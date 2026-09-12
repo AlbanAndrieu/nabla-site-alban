@@ -1,16 +1,33 @@
 import type { ComponentPropsWithoutRef } from "react";
 import styles from "./Action.module.css";
 
-type ActionVariant = "primary" | "secondary" | "outline";
-type ActionSize = "default" | "compact";
+export type ActionVariant =
+	| "primary"
+	| "secondary"
+	| "outline"
+	| "outlineSecondary"
+	| "outlineInfo"
+	| "inverted";
+export type ActionSize = "default" | "compact";
 
 type ActionLinkProps = ComponentPropsWithoutRef<"a"> & {
 	variant?: ActionVariant;
 	size?: ActionSize;
 };
 
-export function actionClassName(variant: ActionVariant = "primary") {
-	return `${styles.action} ${styles[variant]}`;
+export function actionClassName(
+	variant: ActionVariant = "primary",
+	size: ActionSize = "default",
+	className?: string,
+) {
+	return [
+		styles.action,
+		styles[variant],
+		size === "compact" ? styles.compact : undefined,
+		className,
+	]
+		.filter(Boolean)
+		.join(" ");
 }
 
 export default function ActionLink({
@@ -19,13 +36,5 @@ export default function ActionLink({
 	className,
 	...props
 }: ActionLinkProps) {
-	const classes = [
-		actionClassName(variant),
-		size === "compact" ? styles.compact : undefined,
-		className,
-	]
-		.filter(Boolean)
-		.join(" ");
-
-	return <a {...props} className={classes} />;
+	return <a {...props} className={actionClassName(variant, size, className)} />;
 }

@@ -33,7 +33,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Production Post-deploy Smoke/);
 	assert.match(ci, /Production DAST/);
 	assert.match(ci, /\.github\/workflows\/production-dast\.yml/);
-	assert.match(ci, /bootstrap requirement skipped for this PR only/);
+	assert.match(ci, /production branch yet; bootstrap requirement enabled/);
 	assert.match(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
 	assert.match(ci, /Verify production DAST can reach the application/);
 	assert.match(ci, /Bootstrap production DAST before first DAST-enabled merge/);
@@ -61,8 +61,11 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /steps\.semgrep-sast\.outcome != 'success'/);
 	assert.match(ci, /git diff --name-only --diff-filter=ACMR/);
 	assert.match(ci, /\.github\/workflows\/\.\*\\\.ya\?ml/);
-	assert.match(ci, /git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/);
-	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node "\$smoke_script"/);
+	assert.match(
+		ci,
+		/git show "\$\{PRODUCTION_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
+	);
+	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$smoke_script"/);
 	assert.match(ci, /path: \.next\/cache/);
 	assert.match(ci, /steps\.next-cache\.outputs\.cache-hit != 'true'/);
 });

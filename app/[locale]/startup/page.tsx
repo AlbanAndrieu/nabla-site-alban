@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
+import Button from "@/components/ui/Button";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
@@ -166,10 +167,10 @@ export default async function StartupPage({
 								{t("form.privacyConnector")}
 								<a href="/policy/privacy_policy.html">{t("form.privacy")}</a>.
 							</p>
-							<button type="submit" className="btn btn-primary">
+							<Button type="submit">
 								<i className="fas fa-paper-plane" aria-hidden="true"></i>{" "}
 								{t("form.submit")} job@albandrieu.com
-							</button>
+							</Button>
 						</form>
 					</div>
 				</div>
