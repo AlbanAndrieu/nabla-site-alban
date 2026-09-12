@@ -16,12 +16,14 @@ accessibility, responsive behavior or Bootstrap compatibility surfaces.
 
 ## Current evidence
 
-- [x] Tailwind was wired through `@import "tailwindcss"` in `app/globals.css`.
-- [x] `postcss.config.mjs` owns the `@tailwindcss/postcss` plugin.
-- [x] `package.json` still declares `tailwindcss` and `@tailwindcss/postcss`.
-- [x] Repository search found no maintained `@apply` or `@theme` consumers.
+- [x] Phase 1 replaced the rendered `@import "tailwindcss"` entrypoint with the
+  project-owned `app/reset.css`.
+- [x] Repository contracts find no maintained `@apply`, `@theme` or other
+  Tailwind directive consumers.
 - [x] The active Next layout still loads Bootstrap; existing Bootstrap utility
   classes are not treated as proof of Tailwind utility consumption.
+- [x] Phase 2 removes the Tailwind/PostCSS plugin configuration and direct
+  development dependencies without broadening the scope into Bootstrap cleanup.
 
 ## Phase 1 — detach rendered CSS from Tailwind
 
@@ -40,20 +42,23 @@ accessibility, responsive behavior or Bootstrap compatibility surfaces.
 - [x] Run OWASP ZAP Preview on that exact SHA: run `34668755528` passed with
   zero blocking findings; policy-accepted diagnostics remain H0/M4/L10/I5.
 - [ ] Compare CSS transfer/build evidence with the pre-migration baseline and
-  record any material regression before dependency cleanup.
+  record any material regression before closing the migration.
 
 ## Phase 2 — remove Tailwind/PostCSS build graph
 
-Only start after Phase 1 exact-SHA proof is green.
+Phase 1 exact-SHA proof is green, so dependency cleanup is active.
 
-- [ ] Remove `tailwindcss` and `@tailwindcss/postcss` from `package.json`.
-- [ ] Delete `postcss.config.mjs` if no remaining PostCSS consumer justifies it.
-- [ ] Regenerate/prune `package-lock.json` atomically; do not hand-edit or retain
-  orphaned Tailwind packages simply to obtain a small diff.
-- [ ] Tighten the CSS toolchain contract so Tailwind packages, PostCSS plugin
-  config and lockfile entries are required to be absent.
+- [x] Remove `tailwindcss` and `@tailwindcss/postcss` from `package.json`.
+- [x] Delete `postcss.config.mjs`; no remaining maintained PostCSS consumer
+  justifies a project-level plugin configuration.
+- [x] Regenerate/prune `package-lock.json` atomically with Node 26.8.2 and npm
+  11.17.0 rather than hand-editing it. The generated diff removes 726 lockfile
+  lines and also reconciles the root Node engine metadata to `<27`.
+- [x] Tighten the CSS toolchain contract so direct dependencies, project PostCSS
+  config and all `node_modules/tailwindcss` / `node_modules/@tailwindcss/*`
+  lockfile packages are required to be absent.
 - [ ] Re-run `npm ci`, lint/stylelint, TypeScript, unit tests and Next build.
-- [ ] Compare npm bootstrap time, `node_modules` footprint, CSS transfer and build
+- [ ] Compare npm bootstrap time, dependency footprint, CSS transfer and build
   output with the Phase 1 checkpoint.
 - [ ] Re-run exact-SHA Vercel, Playwright Preview E2E and OWASP ZAP Preview.
 
