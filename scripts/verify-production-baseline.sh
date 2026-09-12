@@ -144,7 +144,7 @@ release_only_hop() {
 		return 1
 	fi
 
-	normalized_filter='del(.version) | if ((.packages // {}) | has("") ) then .packages[""] |= del(.version) else . end'
+	normalized_filter='del(.version) | if ((.packages // {}) | has("")) then .packages[""] |= del(.version) else . end'
 	if ! cmp -s \
 		<(git show "${parent}:package-lock.json" | jq -S "${normalized_filter}") \
 		<(git show "${child}:package-lock.json" | jq -S "${normalized_filter}"); then
