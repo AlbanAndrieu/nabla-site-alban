@@ -61,7 +61,9 @@ test("hosting expands infrastructure blast radius without becoming a functional 
 
 	assert.deepEqual(analysis.get("openwebui")?.requiredDependencies, ["litellm"]);
 	assert.deepEqual(analysis.get("prometheus")?.requiredDependencies, []);
-	assert.equal(analysis.get("prometheus")?.tier, "support");
+	assert.equal(analysis.get("prometheus")?.tier, "shared-platform");
+	assert.equal(analysis.get("prometheus")?.lifecyclePhase, "platform-services");
+	assert.equal(analysis.get("prometheus")?.lifecyclePriority, 40);
 	assert.equal(analysis.get("docker")?.tier, "foundation");
 	assert.equal(analysis.get("truenas")?.tier, "foundation");
 	assert.deepEqual(analysis.get("docker")?.directDependentIds, ["openwebui", "prometheus"]);
