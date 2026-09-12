@@ -6,13 +6,13 @@ async function source(path: string) {
 	return readFile(new URL("../" + path, import.meta.url), "utf8");
 }
 
-test("PR CI resolves and reuses the current base branch HEAD", async () => {
+test("PR CI separates the current diff base from the production branch HEAD", async () => {
 	const ci = await source(".github/workflows/ci.yml");
 
 	assert.doesNotMatch(
 		ci,
 		/github\.event\.pull_request\.base\.sha/,
-		"PR CI must not trust the event-time base SHA for production or diff baselines",
+		"PR CI must not trust the event-time base SHA for diff baselines",
 	);
 	assert.match(
 		ci,
@@ -23,25 +23,39 @@ test("PR CI resolves and reuses the current base branch HEAD", async () => {
 		/github\.rest\.repos\.getBranch\(\{[\s\S]*?branch: baseRef,[\s\S]*?\}\);/,
 	);
 	assert.match(ci, /core\.setOutput\('base-sha', baseSha\);/);
+	assert.match(
+		ci,
+		/const productionRef = context\.payload\.repository\.default_branch;/,
+	);
+	assert.match(
+		ci,
+		/github\.rest\.repos\.getBranch\(\{[\s\S]*?branch: productionRef,[\s\S]*?\}\);/,
+	);
+	assert.match(ci, /core\.setOutput\('production-sha', productionSha\);/);
+	assert.match(ci, /ref: productionSha,/);
 
 	const resolvedBaseUsages =
 		ci.match(/steps\.production-baseline\.outputs\.base-sha/g) ?? [];
 	assert.ok(
 		resolvedBaseUsages.length >= 4,
-		"resolved base SHA must be shared by production smoke, canonical gate, Semgrep and agent gate",
-	);
-	assert.match(
-		ci,
-		/BASE_SHA: \$\{\{ steps\.production-baseline\.outputs\.base-sha \}\}/,
-	);
-	assert.match(ci, /git show "\$\{BASE_SHA\}:scripts\/post-deploy-smoke\.mjs"/);
-	assert.match(ci, /DEPLOYED_SHA="\$BASE_SHA" node/);
-	assert.match(
-		ci,
-		/QUALITY_BASE_REF: \$\{\{ steps\.production-baseline\.outputs\.base-sha \|\| github\.event\.before \|\| 'origin\/master' \}\}/,
+		"resolved PR base SHA must be shared by change scope, canonical gate, Semgrep and agent gate",
 	);
 	assert.match(
 		ci,
 		/BASE_SHA: \$\{\{ steps\.production-baseline\.outputs\.base-sha \|\| github\.event\.before \|\| github\.sha \}\}/,
 	);
+	assert.match(
+		ci,
+		/QUALITY_BASE_REF: \$\{\{ steps\.production-baseline\.outputs\.base-sha \|\| github\.event\.before \|\| 'origin\/master' \}\}/,
+	);
+
+	assert.match(
+		ci,
+		/PRODUCTION_SHA: \$\{\{ steps\.production-baseline\.outputs\.production-sha \}\}/,
+	);
+	assert.match(
+		ci,
+		/git show "\$\{PRODUCTION_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
+	);
+	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node/);
 });

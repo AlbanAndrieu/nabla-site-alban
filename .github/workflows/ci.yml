@@ -106,12 +106,27 @@ jobs:
             });
             const baseSha = baseBranch.commit.sha;
             core.setOutput('base-sha', baseSha);
-            core.info('Resolved current ' + baseRef + ' HEAD to ' + baseSha);
+            core.info('Resolved current PR base ' + baseRef + ' HEAD to ' + baseSha);
+
+            const productionRef = context.payload.repository.default_branch;
+            const { data: productionBranch } = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: productionRef,
+            });
+            const productionSha = productionBranch.commit.sha;
+            core.setOutput('production-sha', productionSha);
+            core.info(
+              'Resolved current production branch ' +
+                productionRef +
+                ' HEAD to ' +
+                productionSha,
+            );
 
             const { data: combined } = await github.rest.repos.getCombinedStatusForRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: baseSha,
+              ref: productionSha,
               per_page: 100,
             });
 
@@ -128,35 +143,35 @@ jobs:
             }
 
             const required = ['Vercel', 'Production Post-deploy Smoke'];
-            let productionDastExistsOnBase = true;
+            let productionDastExistsOnProduction = true;
             try {
               await github.rest.repos.getContent({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 path: '.github/workflows/production-dast.yml',
-                ref: baseSha,
+                ref: productionSha,
               });
             } catch (error) {
               if (error.status !== 404) throw error;
-              productionDastExistsOnBase = false;
+              productionDastExistsOnProduction = false;
               core.info(
-                'Production DAST is not present on the PR base yet; bootstrap requirement skipped for this PR only.',
+                'Production DAST is not present on the production branch yet; bootstrap requirement enabled for this PR.',
               );
             }
 
-            if (productionDastExistsOnBase) {
+            if (productionDastExistsOnProduction) {
               required.push('Production DAST');
             }
             core.setOutput(
               'bootstrap-dast',
-              productionDastExistsOnBase ? 'false' : 'true',
+              productionDastExistsOnProduction ? 'false' : 'true',
             );
 
             const failures = [];
             for (const name of required) {
               const status = latestByContext.get(name);
               if (!status) {
-                failures.push(name + ': missing on base ' + baseSha);
+                failures.push(name + ': missing on production ' + productionSha);
                 continue;
               }
               if (status.state !== 'success') {
@@ -168,8 +183,10 @@ jobs:
 
             if (failures.length > 0) {
               core.setFailed(
-                'Current production baseline is not healthy for base ' +
-                  baseSha +
+                'Current production baseline is not healthy for ' +
+                  productionRef +
+                  ' ' +
+                  productionSha +
                   ': ' +
                   failures.join('; '),
               );
@@ -193,7 +210,7 @@ jobs:
       - name: Revalidate canonical production smoke before PR build
         if: github.event_name == 'pull_request'
         env:
-          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha }}
+          PRODUCTION_SHA: ${{ steps.production-baseline.outputs.production-sha }}
           BASE_URL: "https://www.albanandrieu.com"
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
@@ -204,8 +221,8 @@ jobs:
             exit 1
           fi
           smoke_script="${RUNNER_TEMP}/post-deploy-smoke.mjs"
-          git show "${BASE_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
-          DEPLOYED_SHA="$BASE_SHA" node "$smoke_script" "$BASE_URL"
+          git show "${PRODUCTION_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
+          DEPLOYED_SHA="$PRODUCTION_SHA" node "$smoke_script" "$BASE_URL"
 
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
