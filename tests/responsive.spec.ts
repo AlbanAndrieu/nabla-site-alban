@@ -137,13 +137,14 @@ test.describe("Responsive Design Tests", () => {
 		await expect(explorer.locator(".react-flow:visible")).toHaveCount(0);
 
 		const firstGroup = compactHierarchy
-			.locator("[data-mobile-architecture-group]")
+			.locator("[data-mobile-criticality-tier]")
 			.first();
 		await expect(firstGroup).toBeVisible();
-		await firstGroup.locator("summary").first().click();
-		await expect(
-			firstGroup.locator("[data-mobile-architecture-item]").first(),
-		).toBeVisible();
+		const groupOpen = await firstGroup.evaluate(
+			(element) => (element as HTMLDetailsElement).open,
+		);
+		if (!groupOpen) await firstGroup.locator("summary").first().click();
+		await expect(firstGroup.locator("[data-mobile-service]").first()).toBeVisible();
 
 		await page.setViewportSize({ width: 1280, height: 900 });
 		await expect(
