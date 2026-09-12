@@ -28,7 +28,9 @@ test.describe("Navigation and Links Tests", () => {
 			const text = (await link.textContent())?.trim();
 			const ariaLabel = await link.getAttribute("aria-label");
 			const title = await link.getAttribute("title");
-			const imgAlt = await link.locator("img").first().getAttribute("alt");
+			const image = link.locator("img").first();
+			const imgAlt =
+				(await image.count()) > 0 ? await image.getAttribute("alt") : null;
 
 			const hasDescription = Boolean(text || ariaLabel || title || imgAlt);
 			expect(hasDescription).toBeTruthy();
