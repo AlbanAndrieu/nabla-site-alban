@@ -100,6 +100,37 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
+      - name: Resolve current PR base and production branch heads
+        id: production-baseline
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const baseRef = context.payload.pull_request.base.ref;
+            const { data: baseBranch } = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: baseRef,
+            });
+            const baseSha = baseBranch.commit.sha;
+            core.setOutput('base-sha', baseSha);
+            core.info('Resolved current PR base ' + baseRef + ' HEAD to ' + baseSha);
+
+            const productionRef = context.payload.repository.default_branch;
+            const { data: productionBranch } = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: productionRef,
+            });
+            const productionSha = productionBranch.commit.sha;
+            core.setOutput('production-sha', productionSha);
+            core.info(
+              'Resolved current production branch ' +
+                productionRef +
+                ' HEAD to ' +
+                productionSha,
+            );
+
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -108,11 +139,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Verify current production baseline before PR build
-        id: production-baseline
+        id: verified-production-baseline
         if: github.event_name == 'pull_request'
         shell: bash
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ steps.production-baseline.outputs.production-sha }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           QUALITY_BASELINE_RELEASE_HOPS: "3"
           QUALITY_BASELINE_MAINTENANCE_HOPS: "5"
@@ -121,7 +152,7 @@ jobs:
       - name: Classify CI change scope
         id: ci-scope
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: bash scripts/ci-scope.sh "${BASE_SHA}" "${HEAD_SHA}"
@@ -129,7 +160,7 @@ jobs:
       - name: Revalidate canonical production smoke before PR build
         if: github.event_name == 'pull_request'
         env:
-          PRODUCTION_SHA: ${{ steps.production-baseline.outputs.baseline_sha }}
+          PRODUCTION_SHA: ${{ steps.verified-production-baseline.outputs.baseline_sha }}
           BASE_URL: "https://www.albanandrieu.com"
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
@@ -163,7 +194,7 @@ jobs:
         id: canonical-quality-gate
         continue-on-error: true
         env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
           QUALITY_LOG_TAIL: "40"
         run: bash scripts/quality-gate.sh
 
@@ -184,7 +215,7 @@ jobs:
         if: steps.ci-scope.outputs.sast == 'true'
         continue-on-error: true
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha || github.event.before || github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         shell: bash
         run: |
@@ -289,7 +320,7 @@ jobs:
         id: agent-quality-gate
         continue-on-error: true
         env:
-          QUALITY_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}
+          QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
           QUALITY_LOG_TAIL: "40"
           QUALITY_CANONICAL_GATE_VERIFIED: "1"
         run: bash scripts/agent-quality-gate.sh
