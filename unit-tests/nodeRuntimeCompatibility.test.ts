@@ -22,7 +22,7 @@ test("Node runtime policy separates development Current from production compatib
 		packages?: { ""?: { engines?: { node?: string; npm?: string } } };
 	};
 
-	assert.equal(nvmrc.trim(), "v26.8.2");
+	assert.equal(nvmrc.trim(), "26.8.2");
 	assert.equal(productionNvmrc.trim(), "v24.11.0");
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <27");
 	assert.deepEqual(
