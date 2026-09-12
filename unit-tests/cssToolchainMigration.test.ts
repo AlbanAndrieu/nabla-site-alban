@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
-import { readFile, readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function cssFiles(directory: URL): Promise<URL[]> {
 	const entries = await readdir(directory, { withFileTypes: true });
 	const files = await Promise.all(
 		entries.map(async (entry) => {
-			const url = new URL(entry.isDirectory() ? `${entry.name}/` : entry.name, directory);
+			const url = new URL(
+				entry.isDirectory() ? `${entry.name}/` : entry.name,
+				directory,
+			);
 			if (entry.isDirectory()) {
 				return cssFiles(url);
 			}
@@ -52,9 +55,13 @@ test("phase 1 owns the browser reset and detaches rendered CSS from Tailwind", a
 });
 
 test("maintained CSS no longer imports Tailwind or uses Tailwind directives", async () => {
-	const roots = [new URL("../app/", import.meta.url), new URL("../components/", import.meta.url)];
+	const roots = [
+		new URL("../app/", import.meta.url),
+		new URL("../components/", import.meta.url),
+	];
 	const files = (await Promise.all(roots.map(cssFiles))).flat();
-	const tailwindDirective = /@(apply|theme|utility|source|variant|custom-variant)\b/;
+	const tailwindDirective =
+		/@(apply|theme|utility|source|variant|custom-variant)\b/;
 	const tailwindImport =
 		/@import\s+["'][^"']*tailwindcss|tailwindcss\/(?:preflight|theme|utilities)\.css/;
 
