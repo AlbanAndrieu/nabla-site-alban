@@ -80,6 +80,18 @@
 	color: var(--ui-secondary-text);
 }
 
+.outlineInfo {
+	border-color: var(--ui-info-text);
+	background: transparent;
+	color: var(--ui-info-text);
+}
+
+.outlineInfo:hover {
+	border-color: var(--ui-info-border);
+	background: var(--ui-info-surface);
+	color: var(--ui-info-text);
+}
+
 .inverted {
 	border-color: var(--ui-inverted-text);
 	background: transparent;
