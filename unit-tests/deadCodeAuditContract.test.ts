@@ -12,7 +12,6 @@ const retiredFiles = [
 	"app/components/checkout.tsx",
 	"app/components/nabla/OpenSourceGridSection.tsx",
 	"app/components/nabla/PlatformsMatrixSection.tsx",
-	"app/components/truenas/HomeLabNetworkFlow.module.css",
 	"components/LocaleSwitcher.module.css",
 	"components/LocaleSwitcher.tsx",
 	"components/ResourceDirectory.tsx",
