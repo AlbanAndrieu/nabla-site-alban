@@ -2,44 +2,50 @@
 	--contact-hero-foreground: #fff;
 	--contact-hero-primary-text: #0d6efd;
 	--contact-hero-primary-hover: #e9ecef;
-	padding: 4rem 2rem;
+	padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2rem);
 	background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
 	color: var(--contact-hero-foreground);
 	text-align: center;
 }
 
 .content {
-	max-width: 760px;
+	max-width: 48rem;
 	margin-inline: auto;
 }
 
 .profileImage {
 	display: block;
-	width: 150px;
-	height: 150px;
-	margin: 0 auto var(--ui-space-lg);
+	width: clamp(7rem, 14vw, 9.375rem);
+	height: clamp(7rem, 14vw, 9.375rem);
+	margin: 0 auto clamp(var(--ui-space-md), 3vw, var(--ui-space-lg));
 	border: 5px solid var(--contact-hero-foreground);
 	border-radius: 50%;
 	box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 .title {
+	margin-inline: auto;
 	color: var(--contact-hero-foreground);
-	font-size: clamp(2.35rem, 6vw, 3rem);
+	font-size: clamp(2rem, 4vw + 0.5rem, 3rem);
+	line-height: 1.1;
+	text-wrap: balance;
 }
 
 .subtitle {
 	color: var(--contact-hero-foreground);
-	font-size: 1.5rem;
+	font-size: clamp(1.125rem, 1.5vw + 0.7rem, 1.5rem);
+	line-height: 1.35;
 	opacity: 0.95;
+	text-wrap: balance;
 }
 
 .description {
-	max-width: 700px;
+	max-width: 43.75rem;
 	margin: 0 auto 1.25rem;
 	color: var(--contact-hero-foreground);
-	font-size: 1.1rem;
+	font-size: clamp(1rem, 0.4vw + 0.95rem, 1.1rem);
 	line-height: 1.65;
+	text-wrap: pretty;
 }
 
 .actions {
@@ -47,7 +53,7 @@
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: var(--ui-space-md);
-	margin-top: 1.75rem;
+	margin-top: clamp(var(--ui-space-lg), 3vw, 1.75rem);
 }
 
 .cta {
@@ -55,12 +61,14 @@
 	align-items: center;
 	justify-content: center;
 	gap: var(--ui-space-xs);
+	max-width: 100%;
 	min-height: var(--ui-control-min-height);
 	padding: var(--ui-space-sm) var(--ui-space-lg);
 	border: 1px solid transparent;
 	border-radius: var(--ui-radius-control);
 	font-weight: var(--ui-font-weight-action);
 	line-height: 1.2;
+	overflow-wrap: anywhere;
 	text-align: center;
 	text-decoration: none;
 	transition:
@@ -105,8 +113,17 @@
 	color: var(--contact-hero-primary-text);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 575.98px) {
 	.hero {
-		padding: 3rem 1.25rem;
+		padding-block: 2.5rem;
+	}
+
+	.actions {
+		display: grid;
+		grid-template-columns: 1fr;
+	}
+
+	.cta {
+		width: 100%;
 	}
 }

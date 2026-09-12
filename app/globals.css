@@ -12,11 +12,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 2rem;
+	flex-wrap: wrap;
+	gap: clamp(var(--ui-space-lg), 4vw, var(--ui-space-xl));
 	text-align: left;
 }
 .cv-page-section {
-	padding-block: 2.5rem;
+	padding-block: clamp(var(--ui-space-xl), 5vw, 2.5rem);
 }
 .cv-page-links {
 	display: flex;
@@ -25,8 +26,8 @@
 	margin-block: 1rem;
 }
 .cv-page-qr-grid {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 	gap: 1.5rem;
 }
 .cv-page-qr {
@@ -34,31 +35,39 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 0.5rem;
+	min-width: 0;
 	padding: 0.75rem;
 }
 .cv-page-qr img {
+	max-width: 100%;
+	height: auto;
 	background: #fff;
 	border-radius: 0.5rem;
 }
 .page-cv .cv-contact-qr {
 	display: flex;
 	width: fit-content;
+	max-width: 100%;
 	margin-inline: auto;
 	text-align: center;
 }
 .cv-page-format-row {
 	margin-top: 1.25rem;
 }
-@media (max-width: 640px) {
+@media (max-width: 575.98px) {
 	.cv-page-identity {
 		flex-direction: column;
 		text-align: center;
+	}
+
+	.cv-page-links {
+		justify-content: center;
 	}
 }
 
 .page-contact .location-section,
 .page-contact .contact-open-source {
-	margin: 3rem 0;
+	margin: clamp(2rem, 6vw, 3rem) 0;
 	text-align: center;
 }
 .page-contact .proof-section {
@@ -78,7 +87,8 @@
 .page-contact .location-address {
 	margin-bottom: 0.5rem;
 	color: var(--ui-text-secondary);
-	font-size: 1.05rem;
+	font-size: clamp(1rem, 0.4vw + 0.95rem, 1.05rem);
+	overflow-wrap: anywhere;
 }
 .page-contact .map-container {
 	max-width: 800px;
@@ -91,7 +101,7 @@
 .page-contact .map-container iframe {
 	display: block;
 	width: 100%;
-	height: 450px;
+	height: clamp(18rem, 45vw, 28.125rem);
 	border: 0;
 }
 .page-contact .contact-map-caption {
@@ -100,9 +110,10 @@
 	color: var(--ui-text-secondary);
 	font-size: 0.9rem;
 	line-height: 1.5;
+	overflow-wrap: anywhere;
 }
 .page-contact .contact-open-source {
-	padding: 2.5rem 1.5rem;
+	padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.5rem);
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius-card);
 	background: var(--ui-surface-card);
@@ -116,15 +127,21 @@
 	margin-top: 2rem;
 }
 .page-contact .contact-github-badges iframe {
+	max-width: 100%;
 	border: 0;
 }
 .page-contact .contact-stack-badge {
 	display: inline-block;
+	max-width: 100%;
 	margin-top: 2.5rem;
 }
-@media (max-width: 640px) {
+@media (max-width: 575.98px) {
 	.page-contact .map-container iframe {
-		height: 360px;
+		height: 18rem;
+	}
+
+	.page-contact .contact-open-source {
+		padding-inline: var(--ui-space-md);
 	}
 }
 

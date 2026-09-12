@@ -129,6 +129,16 @@ export default function HomelabProbeDiagnostics({ snapshot }: Props) {
 					? "Métriques FastAPI détaillées pour distinguer panne de service, sous-échantillonnage, cache, donnée stale, timeout et saturation du budget. L’état réconcilié reste l’autorité."
 					: "Detailed FastAPI metrics distinguish service failures from sampling, cache, stale evidence, timeouts and probe-budget saturation. Reconciled health remains authoritative."}
 			</p>
+			<p className="small text-muted" data-probe-sampling-semantics>
+				{french
+					? "Le fan-out LAN/TCP et HTTP public est borné et rotatif : un service non échantillonné dans le cycle courant n’est pas considéré injoignable. L’état runtime TrueNAS, la joignabilité LAN/TCP et la santé HTTP publique sont des couches de preuve indépendantes et ne s’infèrent pas entre elles."
+					: "LAN/TCP and public HTTP fan-out is bounded and rotating: a service not sampled in the current cycle is not considered unreachable. TrueNAS runtime state, LAN/TCP reachability, and public HTTP health are independent evidence layers and do not infer one another."}
+			</p>
+			<p className="small text-muted" data-truenas-evidence-layer-semantics>
+				{french
+					? "Pour TrueNAS, la joignabilité du listener HTTPS, la santé de l’API authentifiée et le chemin de transport JSON-RPC sont des preuves distinctes. Une note de fraîcheur ou d’implémentation n’est pas une erreur de plateforme."
+					: "For TrueNAS, HTTPS listener reachability, authenticated API health, and the JSON-RPC transport path are distinct evidence layers. An implementation or freshness note is not a platform error."}
+			</p>
 
 			<h4 className="h6">Coordinator / cache</h4>
 			{rowsList(coordinatorRows, "coordinator")}

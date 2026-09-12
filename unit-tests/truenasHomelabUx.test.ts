@@ -190,3 +190,23 @@ test("homelab exposes rolling probe evidence coverage from FastAPI", async () =>
 	assert.match(coverage, /fresh/);
 	assert.match(coverage, /cached/);
 });
+
+test("probe diagnostics explain bounded sampling and independent TrueNAS evidence layers", async () => {
+	const diagnostics = await source(
+		"app/components/homelab/HomelabProbeDiagnostics.tsx",
+	);
+
+	assert.match(diagnostics, /data-probe-sampling-semantics/);
+	assert.match(
+		diagnostics,
+		/not sampled in the current cycle is not considered unreachable/,
+	);
+	assert.match(diagnostics, /independent evidence layers/);
+	assert.match(diagnostics, /data-truenas-evidence-layer-semantics/);
+	assert.match(diagnostics, /HTTPS listener reachability/);
+	assert.match(diagnostics, /authenticated API health/);
+	assert.match(
+		diagnostics,
+		/implementation or freshness note is not a platform error/,
+	);
+});
