@@ -1,105 +1,43 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectNoHorizontalOverflow(page: Page) {
+	const dimensions = await page.evaluate(() => ({
+		clientWidth: document.documentElement.clientWidth,
+		scrollWidth: document.documentElement.scrollWidth,
+	}));
+
+	expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+}
+
+async function expectContainedInViewport(
+	page: Page,
+	selector: string,
+	viewportWidth: number,
+) {
+	const elements = page.locator(selector);
+	const count = await elements.count();
+	expect(count).toBeGreaterThan(0);
+
+	for (let index = 0; index < count; index++) {
+		const element = elements.nth(index);
+		if (!(await element.isVisible())) continue;
+		const box = await element.boundingBox();
+		if (!box) continue;
+
+		expect(box.x).toBeGreaterThanOrEqual(-1);
+		expect(box.x + box.width).toBeLessThanOrEqual(viewportWidth + 1);
+	}
+}
 
 test.describe("Responsive Design Tests", () => {
-	test("should be responsive on mobile devices", async ({ page }) => {
-		// Set mobile viewport
-		await page.setViewportSize({ width: 375, height: 667 }); // iPhone SE
-		await page.goto("/");
-
-		// Check that page is visible
-		await expect(page.locator("body")).toBeVisible();
-
-		// Check that viewport meta tag exists
-		const viewport = page.locator('meta[name="viewport"]');
-		await expect(viewport).toHaveAttribute("content", /width=device-width/);
-	});
-
-	test("should be responsive on tablet devices", async ({ page }) => {
-		// Set tablet viewport
-		await page.setViewportSize({ width: 768, height: 1024 }); // iPad
-		await page.goto("/");
-
-		// Check that page is visible
-		await expect(page.locator("body")).toBeVisible();
-	});
-
-	test("should be responsive on desktop", async ({ page }) => {
-		// Set desktop viewport
-		await page.setViewportSize({ width: 1920, height: 1080 });
-		await page.goto("/");
-
-		// Check that page is visible
-		await expect(page.locator("body")).toBeVisible();
-	});
-
-	test("should have touch-friendly interactive elements on mobile", async ({
+	test("Nabla UI stays contained across mobile, tablet, and desktop", async ({
 		page,
 	}) => {
-		// Set mobile viewport
-		await page.setViewportSize({ width: 375, height: 667 });
-		await page.goto("/");
-
-		// Get all buttons and links
-		const interactiveElements = page.locator(
-			'button, a, input[type="button"], input[type="submit"]',
-		);
-		const count = await interactiveElements.count();
-
-		// At least one visible interactive element should be touch-friendly (≥40px in one dimension, WCAG-style)
-		let foundTouchFriendly = false;
-		for (let i = 0; i < count; i++) {
-			const element = interactiveElements.nth(i);
-			if (await element.isVisible()) {
-				const box = await element.boundingBox();
-				if (box && (box.width >= 40 || box.height >= 40)) {
-					foundTouchFriendly = true;
-					break;
-				}
-			}
-		}
-		expect(foundTouchFriendly).toBeTruthy();
-	});
-
-	test("should not have horizontal scroll on mobile", async ({ page }) => {
-		// Set mobile viewport
-		await page.setViewportSize({ width: 375, height: 667 });
-		await page.goto("/");
-
-		// Check for horizontal scroll
-		const hasHorizontalScroll = await page.evaluate(() => {
-			return (
-				document.documentElement.scrollWidth >
-				document.documentElement.clientWidth
-			);
-		});
-
-		expect(hasHorizontalScroll).toBeFalsy();
-	});
-
-	test("should adapt layout between mobile and desktop", async ({ page }) => {
-		// Check mobile layout
-		await page.setViewportSize({ width: 375, height: 667 });
-		await page.goto("/", { waitUntil: "domcontentloaded" });
-		const mobileBodyWidth = await page.evaluate(
-			() => document.body.offsetWidth,
-		);
-
-		// Check desktop layout
-		await page.setViewportSize({ width: 1920, height: 1080 });
-		await page.goto("/", { waitUntil: "domcontentloaded" });
-		const desktopBodyWidth = await page.evaluate(
-			() => document.body.offsetWidth,
-		);
-
-		// Desktop should be wider than mobile
-		expect(desktopBodyWidth).toBeGreaterThan(mobileBodyWidth);
-	});
-
-	test("should have readable text on all viewport sizes", async ({ page }) => {
 		const viewports = [
-			{ width: 375, height: 667, name: "mobile" },
+			{ width: 320, height: 700, name: "small mobile" },
+			{ width: 375, height: 812, name: "mobile" },
 			{ width: 768, height: 1024, name: "tablet" },
-			{ width: 1920, height: 1080, name: "desktop" },
+			{ width: 1440, height: 900, name: "desktop" },
 		];
 
 		for (const viewport of viewports) {
@@ -107,19 +45,65 @@ test.describe("Responsive Design Tests", () => {
 				width: viewport.width,
 				height: viewport.height,
 			});
-			await page.goto("/", { waitUntil: "domcontentloaded" });
+			await page.goto("/nabla", { waitUntil: "domcontentloaded" });
 
-			// Check that body text is visible and has reasonable font size
-			const fontSize = await page.evaluate(() => {
-				const body = document.body;
-				const styles = window.getComputedStyle(body);
-				return Number.parseFloat(styles.fontSize);
-			});
+			await expect(page.locator("[data-responsive-hero]")).toBeVisible();
+			await expectNoHorizontalOverflow(page);
+			await expectContainedInViewport(
+				page,
+				'[data-hero-actions="primary"] a',
+				viewport.width,
+			);
+			await expectContainedInViewport(
+				page,
+				"[data-nabla-hero-card]",
+				viewport.width,
+			);
 
-			// Font size should be at least 12px
-			expect(fontSize).toBeGreaterThanOrEqual(12);
+			const fontSize = await page.evaluate(() =>
+				Number.parseFloat(window.getComputedStyle(document.body).fontSize),
+			);
+			expect(fontSize, `${viewport.name} body text`).toBeGreaterThanOrEqual(12);
 		}
 	});
+
+	test("should have touch-friendly interactive elements on mobile", async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 375, height: 812 });
+		await page.goto("/nabla", { waitUntil: "domcontentloaded" });
+
+		const heroActions = page.locator('[data-hero-actions="primary"] a');
+		const count = await heroActions.count();
+		expect(count).toBeGreaterThan(0);
+
+		for (let index = 0; index < count; index++) {
+			const box = await heroActions.nth(index).boundingBox();
+			expect(box).not.toBeNull();
+			if (box) {
+				expect(box.height).toBeGreaterThanOrEqual(44);
+			}
+		}
+	});
+
+	test("route header reflows between tablet and mobile", async ({ page }) => {
+		await page.setViewportSize({ width: 768, height: 1024 });
+		await page.goto("/architecture", { waitUntil: "domcontentloaded" });
+		await expectNoHorizontalOverflow(page);
+
+		const localeLabel = page.locator(
+			'label[for="route-header-locale"] > span',
+		);
+		const localeSelect = page.locator("#route-header-locale");
+		await expect(localeSelect).toBeVisible();
+		await expect(localeLabel).toBeHidden();
+
+		await page.setViewportSize({ width: 375, height: 812 });
+		await expectNoHorizontalOverflow(page);
+		await expect(localeLabel).toBeVisible();
+		await expect(localeSelect).toBeVisible();
+	});
+
 	test("architecture switches to the compact hierarchy on mobile", async ({
 		page,
 	}) => {
