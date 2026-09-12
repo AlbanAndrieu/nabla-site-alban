@@ -1,0 +1,16 @@
+.warning {
+	border: 1px solid var(--ui-warning-border);
+	border-left: 4px solid var(--ui-warning-text);
+	border-radius: var(--ui-radius-control);
+	background: var(--ui-warning-surface);
+	color: var(--ui-warning-text);
+}
+
+.warning :global(.text-warning) {
+	color: var(--ui-warning-text) !important;
+}
+
+.warning p,
+.warning small {
+	color: inherit;
+}
