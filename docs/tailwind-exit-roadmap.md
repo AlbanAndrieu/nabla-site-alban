@@ -31,11 +31,14 @@ accessibility, responsive behavior or Bootstrap compatibility surfaces.
   `app/globals.css`.
 - [x] Add `unit-tests/cssToolchainMigration.test.ts` to reject Tailwind imports
   and Tailwind directives in maintained CSS.
-- [ ] Obtain a green canonical Quality/Security run on the exact branch SHA.
-- [ ] Obtain Vercel Preview success on the same SHA.
-- [ ] Run the full Playwright Preview suite, including light/dark/mobile and
-  accessibility/contrast coverage, on that exact SHA.
-- [ ] Run OWASP ZAP Preview on that exact SHA.
+- [x] Obtain a green canonical Quality/Security run on the exact branch SHA:
+  CI #1099 / run `34668654199` on `f8e0500e0c97a5cda474754ed6d920cd7b03ec42`.
+- [x] Obtain Vercel Preview success on the same SHA.
+- [x] Run the full Playwright Preview suite, including light/dark/mobile and
+  accessibility/contrast coverage, on that exact SHA: 141/141 passed in
+  Playwright #871 / run `34668755500`.
+- [x] Run OWASP ZAP Preview on that exact SHA: run `34668755528` passed with
+  zero blocking findings; policy-accepted diagnostics remain H0/M4/L10/I5.
 - [ ] Compare CSS transfer/build evidence with the pre-migration baseline and
   record any material regression before dependency cleanup.
 
