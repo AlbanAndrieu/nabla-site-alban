@@ -65,10 +65,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		ci,
 		/git show "\$\{PRODUCTION_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
 	);
-	assert.match(
-		ci,
-		/DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$smoke_script"/,
-	);
+	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$smoke_script"/);
 	assert.match(ci, /path: \.next\/cache/);
 	assert.match(ci, /steps\.next-cache\.outputs\.cache-hit != 'true'/);
 });

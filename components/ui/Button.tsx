@@ -1,8 +1,8 @@
 import type { ComponentPropsWithoutRef } from "react";
 import {
-	actionClassName,
 	type ActionSize,
 	type ActionVariant,
+	actionClassName,
 } from "./ActionLink";
 
 type ButtonProps = ComponentPropsWithoutRef<"button"> & {

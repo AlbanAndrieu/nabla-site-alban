@@ -2,15 +2,27 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const actionLinkPath = new URL("../components/ui/ActionLink.tsx", import.meta.url);
+const actionLinkPath = new URL(
+	"../components/ui/ActionLink.tsx",
+	import.meta.url,
+);
 const buttonPath = new URL("../components/ui/Button.tsx", import.meta.url);
-const actionStylesPath = new URL("../components/ui/Action.module.css", import.meta.url);
-const startupPath = new URL("../app/[locale]/startup/page.tsx", import.meta.url);
+const actionStylesPath = new URL(
+	"../components/ui/Action.module.css",
+	import.meta.url,
+);
+const startupPath = new URL(
+	"../app/[locale]/startup/page.tsx",
+	import.meta.url,
+);
 const startupThanksPath = new URL(
 	"../app/[locale]/startup-thanks/page.tsx",
 	import.meta.url,
 );
-const threatFeedPath = new URL("../components/ciso/ThreatFeed.tsx", import.meta.url);
+const threatFeedPath = new URL(
+	"../components/ciso/ThreatFeed.tsx",
+	import.meta.url,
+);
 
 test("link and button actions share the tokenized action style contract", async () => {
 	const [actionLink, button, styles] = await Promise.all([

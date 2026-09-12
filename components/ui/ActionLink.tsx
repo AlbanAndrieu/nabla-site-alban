@@ -30,7 +30,5 @@ export default function ActionLink({
 	className,
 	...props
 }: ActionLinkProps) {
-	return (
-		<a {...props} className={actionClassName(variant, size, className)} />
-	);
+	return <a {...props} className={actionClassName(variant, size, className)} />;
 }
