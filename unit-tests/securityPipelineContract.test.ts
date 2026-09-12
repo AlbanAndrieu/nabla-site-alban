@@ -6,12 +6,15 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("quality gate checks production health before build and runs diff-scoped SAST", async () => {
-	const ci = await read(".github/workflows/ci.yml");
+	const [ci, baseline] = await Promise.all([
+		read(".github/workflows/ci.yml"),
+		read("scripts/verify-production-baseline.sh"),
+	]);
 
+	const checkout = ci.indexOf("- name: Checkout");
 	const productionGate = ci.indexOf(
 		"- name: Verify current production baseline before PR build",
 	);
-	const checkout = ci.indexOf("- name: Checkout");
 	const liveProductionSmoke = ci.indexOf(
 		"- name: Revalidate canonical production smoke before PR build",
 	);
@@ -22,25 +25,25 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	const build = ci.indexOf("- name: Build Next.js production bundle");
 	const saveNextCache = ci.indexOf("- name: Save Next.js build cache");
 
-	assert.ok(productionGate >= 0 && productionGate < checkout);
-	assert.ok(liveProductionSmoke > checkout);
+	assert.ok(checkout >= 0 && checkout < productionGate);
+	assert.ok(productionGate > checkout && productionGate < liveProductionSmoke);
 	assert.ok(semgrep > liveProductionSmoke && semgrep < install);
 	assert.ok(semgrepEnforcement > semgrep && semgrepEnforcement < install);
 	assert.ok(install < restoreNextCache && restoreNextCache < build);
 	assert.ok(saveNextCache > build);
 
 	assert.match(ci, /statuses:\s*read/);
-	assert.match(ci, /Production Post-deploy Smoke/);
-	assert.match(ci, /Production DAST/);
-	assert.match(ci, /\.github\/workflows\/production-dast\.yml/);
-	assert.match(ci, /production branch yet; bootstrap requirement enabled/);
-	assert.match(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
-	assert.match(ci, /Verify production DAST can reach the application/);
-	assert.match(ci, /Bootstrap production DAST before first DAST-enabled merge/);
-	assert.match(ci, /ZAP_AUTH_HEADER_VALUE/);
-	assert.match(ci, /Production DAST preflight did not reach the application/);
-	assert.match(ci, /Clean ZAP bootstrap workspace/);
-	assert.match(ci, /zap-production-bootstrap-report/);
+	assert.match(ci, /bash scripts\/verify-production-baseline\.sh/);
+	assert.match(ci, /QUALITY_BASELINE_RELEASE_HOPS:\s*"3"/);
+	assert.match(ci, /QUALITY_BASELINE_MAINTENANCE_HOPS:\s*"5"/);
+	assert.match(ci, /steps\.production-baseline\.outputs\.baseline_sha/);
+	assert.match(baseline, /Production Post-deploy Smoke/);
+	assert.match(baseline, /Production DAST/);
+	assert.match(baseline, /maintenance_only_hop/);
+	assert.match(baseline, /--diff-filter=ACMRD/);
+	assert.match(baseline, /semantic-release metadata hop/);
+	assert.doesNotMatch(ci, /Bootstrap production DAST before first DAST-enabled merge/);
+	assert.doesNotMatch(ci, /steps\.production-baseline\.outputs\.bootstrap-dast/);
 	assert.match(
 		ci,
 		/semgrep\/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e/,
@@ -126,21 +129,12 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		assert.match(rules, new RegExp(`^${rule}\\tFAIL\\t`, "m"));
 	}
 	assert.match(rules, /^10038\tWARN\t/m);
-	assert.match(checkpoint, /filename\.startsWith\('\.zap\/'\)/);
-	assert.match(checkpoint, /workflow_run:/);
+	assert.match(checkpoint, /filename\.startsWith\('\.github\/'\)/);
+	assert.match(checkpoint, /workflow_dispatch:/);
+	assert.doesNotMatch(checkpoint, /workflow_run:/);
 	assert.match(checkpoint, /CI \(Quality and Security\)/);
-	assert.match(
-		checkpoint,
-		/github\.event\.workflow_run\.conclusion == 'success'/,
-	);
-	assert.match(
-		checkpoint,
-		/github\.event\.workflow_run\.event == 'pull_request'/,
-	);
-	assert.match(
-		checkpoint,
-		/github\.event\.workflow_run\.pull_requests\[0\]\.number/,
-	);
+	assert.match(checkpoint, /quality\.conclusion !== 'success'/);
+	assert.match(checkpoint, /git push --force origin/);
 
 	const securityWorkflows = [
 		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
