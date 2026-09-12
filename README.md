@@ -21,7 +21,7 @@ assets historiques progressivement migrés vers les composants de `app/`.
 
 ## Prérequis
 
-- Node.js 25 pour le développement local et la CI
+- Node.js 26.8.2 pour le développement local et la CI
 - npm 11.17 ou supérieur
 
 ## Démarrage local

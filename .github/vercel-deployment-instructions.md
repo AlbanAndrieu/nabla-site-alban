@@ -14,9 +14,9 @@ Follow `/AGENTS.md` as the canonical repository policy.
 
 ## Runtime versions
 
-- Local and GitHub Actions runtime: read `.nvmrc` (Node.js **25.9.0**).
+- Local and GitHub Actions runtime: read `.nvmrc` (Node.js **26.8.2**).
 - npm: **11.17.0** in CI.
-- `package.json#engines.node` remains `>=24.11.0 <26` so the connected Vercel project can continue using its supported Node 24.x runtime.
+- `package.json#engines.node` is `>=24.11.0 <27`: local/CI use Node 26.8.2 while the connected Vercel project continues to select its supported Node 24.x runtime.
 - Build command: `npm run build`.
 - Install command: `npm ci`.
 
