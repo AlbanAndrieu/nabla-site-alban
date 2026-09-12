@@ -23,7 +23,10 @@ type IndexCopy = Readonly<{
 	metadataDescription: string;
 	title: string;
 	lead: string;
-	labels: Record<PolicyPageSlug, Readonly<{ title: string; description: string }>>;
+	labels: Record<
+		PolicyPageSlug,
+		Readonly<{ title: string; description: string }>
+	>;
 }>;
 
 const COPY: Record<AppLocale, IndexCopy> = {
@@ -40,23 +43,28 @@ const COPY: Record<AppLocale, IndexCopy> = {
 			},
 			privacy_policy: {
 				title: "Privacy Policy",
-				description: "Personal-data processing, GDPR rights, retention and recipients.",
+				description:
+					"Personal-data processing, GDPR rights, retention and recipients.",
 			},
 			cookie_policy: {
 				title: "Cookie Policy",
-				description: "Browser storage, analytics, optional providers and preference controls.",
+				description:
+					"Browser storage, analytics, optional providers and preference controls.",
 			},
 			service_terms: {
 				title: "Terms of Service",
-				description: "Rules governing use of the website and its public services.",
+				description:
+					"Rules governing use of the website and its public services.",
 			},
 			accessibility_statement: {
 				title: "Accessibility Statement",
-				description: "Accessibility target, known limitations and contact options.",
+				description:
+					"Accessibility target, known limitations and contact options.",
 			},
 			impressum: {
 				title: "Impressum",
-				description: "German publisher information and the applicable § 5 DDG framing.",
+				description:
+					"German publisher information and the applicable § 5 DDG framing.",
 			},
 		},
 	},
@@ -73,23 +81,28 @@ const COPY: Record<AppLocale, IndexCopy> = {
 			},
 			privacy_policy: {
 				title: "Politique de confidentialité",
-				description: "Traitements de données, droits RGPD, conservation et destinataires.",
+				description:
+					"Traitements de données, droits RGPD, conservation et destinataires.",
 			},
 			cookie_policy: {
 				title: "Politique relative aux cookies",
-				description: "Stockage navigateur, analytics, fournisseurs optionnels et préférences.",
+				description:
+					"Stockage navigateur, analytics, fournisseurs optionnels et préférences.",
 			},
 			service_terms: {
 				title: "Conditions de service",
-				description: "Règles applicables à l’utilisation du site et de ses services publics.",
+				description:
+					"Règles applicables à l’utilisation du site et de ses services publics.",
 			},
 			accessibility_statement: {
 				title: "Déclaration d’accessibilité",
-				description: "Objectif d’accessibilité, limites connues et moyens de contact.",
+				description:
+					"Objectif d’accessibilité, limites connues et moyens de contact.",
 			},
 			impressum: {
 				title: "Impressum",
-				description: "Informations éditeur pour l’Allemagne et cadre applicable du § 5 DDG.",
+				description:
+					"Informations éditeur pour l’Allemagne et cadre applicable du § 5 DDG.",
 			},
 		},
 	},
@@ -112,7 +125,10 @@ export async function generateMetadata({
 	const copy = COPY[locale];
 	const canonical = localizedIndexPath(locale);
 	const languages = Object.fromEntries(
-		routing.locales.map((candidate) => [candidate, localizedIndexPath(candidate)]),
+		routing.locales.map((candidate) => [
+			candidate,
+			localizedIndexPath(candidate),
+		]),
 	);
 
 	return {
@@ -140,7 +156,9 @@ export async function generateMetadata({
 	};
 }
 
-export default async function PolicyIndexPage({ params }: PageProps<"/[locale]/policy">) {
+export default async function PolicyIndexPage({
+	params,
+}: PageProps<"/[locale]/policy">) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
@@ -150,7 +168,11 @@ export default async function PolicyIndexPage({ params }: PageProps<"/[locale]/p
 		<>
 			<TopAnchor />
 			<SkipToMainContent />
-			<main id="main-content" className={`site-content-page ${layout.main}`} lang={locale}>
+			<main
+				id="main-content"
+				className={`site-content-page ${layout.main}`}
+				lang={locale}
+			>
 				<Container>
 					<header className={layout.centeredHeader}>
 						<AnchoredHeading id="policy-index-title" className={layout.title}>
@@ -164,10 +186,14 @@ export default async function PolicyIndexPage({ params }: PageProps<"/[locale]/p
 							return (
 								<article className={surface.card} key={policy}>
 									<h2 className={styles.cardTitle}>
-										<Link href={localizedPolicyPath(policy, locale)}>{item.title}</Link>
+										<Link href={localizedPolicyPath(policy, locale)}>
+											{item.title}
+										</Link>
 									</h2>
 									<p className={surface.text}>{item.description}</p>
-									<code className={styles.slug}>{getPolicyPage(policy).canonicalPath}</code>
+									<code className={styles.slug}>
+										{getPolicyPage(policy).canonicalPath}
+									</code>
 								</article>
 							);
 						})}
