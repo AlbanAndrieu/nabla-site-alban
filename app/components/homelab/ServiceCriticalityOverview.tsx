@@ -9,7 +9,10 @@ import {
 	SERVICE_CRITICALITY_TIERS,
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
-import type { ServiceLifecyclePhase, ServiceTopology } from "@/lib/serviceTopology";
+import type {
+	ServiceLifecyclePhase,
+	ServiceTopology,
+} from "@/lib/serviceTopology";
 
 type MessageKey =
 	| "criticality.tiers.foundation"
@@ -53,7 +56,10 @@ export default function ServiceCriticalityOverview({
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
 	const french = useLocale() === "fr";
-	const analysis = useMemo(() => analyzeServiceCriticality(topology), [topology]);
+	const analysis = useMemo(
+		() => analyzeServiceCriticality(topology),
+		[topology],
+	);
 	const nodesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node])),
 		[topology],
@@ -102,7 +108,11 @@ export default function ServiceCriticalityOverview({
 								<div className="d-flex flex-column gap-2">
 									{nodes.slice(0, MAX_PER_TIER).map((node) => {
 										const criticality = analysis.get(node.id);
-										const focus = buildServiceImpactFocus(node.id, topology, analysis);
+										const focus = buildServiceImpactFocus(
+											node.id,
+											topology,
+											analysis,
+										);
 										const required = namesFor(
 											criticality?.requiredDependencies ?? [],
 										).slice(0, 4);
@@ -112,12 +122,19 @@ export default function ServiceCriticalityOverview({
 										const impacted = namesFor(
 											criticality?.transitiveDependentIds ?? [],
 										).slice(0, MAX_IMPACT_NAMES);
-										const directImpact = namesFor(focus?.directDependentIds ?? []);
-										const indirectImpact = namesFor(focus?.indirectDependentIds ?? []);
-										const dependencyPath = namesFor(focus?.dependencyPathIds ?? []);
+										const directImpact = namesFor(
+											focus?.directDependentIds ?? [],
+										);
+										const indirectImpact = namesFor(
+											focus?.indirectDependentIds ?? [],
+										);
+										const dependencyPath = namesFor(
+											focus?.dependencyPathIds ?? [],
+										);
 										const hiddenImpact = Math.max(
 											0,
-											(criticality?.transitiveDependents ?? 0) - impacted.length,
+											(criticality?.transitiveDependents ?? 0) -
+												impacted.length,
 										);
 										const hasDrilldown =
 											dependencyPath.length > 1 ||
@@ -132,7 +149,9 @@ export default function ServiceCriticalityOverview({
 												data-lifecycle-phase={criticality?.lifecyclePhase}
 												data-lifecycle-priority={criticality?.lifecyclePriority}
 												data-lifecycle-source={criticality?.lifecycleSource}
-												data-blast-radius={criticality?.transitiveDependents ?? 0}
+												data-blast-radius={
+													criticality?.transitiveDependents ?? 0
+												}
 											>
 												<div className="d-flex justify-content-between gap-2 align-items-start">
 													<strong>
@@ -152,8 +171,14 @@ export default function ServiceCriticalityOverview({
 															className="badge text-bg-light border"
 															data-lifecycle-badge
 														>
-															P{criticality.lifecyclePriority} · {lifecycleLabel(criticality.lifecyclePhase, french)}
-															{criticality.lifecycleSource === "compatibility" ? " · compat" : ""}
+															P{criticality.lifecyclePriority} ·{" "}
+															{lifecycleLabel(
+																criticality.lifecyclePhase,
+																french,
+															)}
+															{criticality.lifecycleSource === "compatibility"
+																? " · compat"
+																: ""}
 														</span>
 													) : null}
 												</small>
@@ -179,26 +204,49 @@ export default function ServiceCriticalityOverview({
 													</small>
 												) : null}
 												{hasDrilldown ? (
-													<details className="mt-2" data-impact-drilldown={node.id}>
+													<details
+														className="mt-2"
+														data-impact-drilldown={node.id}
+													>
 														<summary className="small fw-semibold">
 															{t("criticality.details")}
 														</summary>
 														<div className="small mt-2 ps-2 border-start">
 															{dependencyPath.length > 1 ? (
-																<div data-dependency-path={focus?.dependencyPathIds.join(",")}>
-																	<strong>{t("criticality.dependencyPath")}</strong>{" "}
+																<div
+																	data-dependency-path={focus?.dependencyPathIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.dependencyPath")}
+																	</strong>{" "}
 																	{dependencyPath.join(" → ")}
 																</div>
 															) : null}
 															{directImpact.length > 0 ? (
-																<div className="mt-1" data-direct-impact={focus?.directDependentIds.join(",")}>
-																	<strong>{t("criticality.directImpact")}</strong>{" "}
+																<div
+																	className="mt-1"
+																	data-direct-impact={focus?.directDependentIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.directImpact")}
+																	</strong>{" "}
 																	{directImpact.join(", ")}
 																</div>
 															) : null}
 															{indirectImpact.length > 0 ? (
-																<div className="mt-1" data-indirect-impact={focus?.indirectDependentIds.join(",")}>
-																	<strong>{t("criticality.transitiveImpact")}</strong>{" "}
+																<div
+																	className="mt-1"
+																	data-indirect-impact={focus?.indirectDependentIds.join(
+																		",",
+																	)}
+																>
+																	<strong>
+																		{t("criticality.transitiveImpact")}
+																	</strong>{" "}
 																	{indirectImpact.join(", ")}
 																</div>
 															) : null}
