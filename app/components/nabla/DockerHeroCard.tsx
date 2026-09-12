@@ -1,4 +1,6 @@
 import React from "react";
+import ActionLink from "@/components/ui/ActionLink";
+import Badge from "@/components/ui/Badge";
 import Card, { CardBody } from "@/components/ui/Card";
 
 type Props = {
@@ -21,25 +23,22 @@ export default function DockerHeroCard({
 					<span style={{ fontSize: 48, color: "#2496ed" }}>
 						<i className="fab fa-docker" aria-hidden="true"></i>
 					</span>
-					<span
-						className="badge ms-2 bg-info text-dark"
-						style={{ verticalAlign: "top", fontSize: 16 }}
-					>
+					<Badge className="ms-2" variant="info">
 						open source
-					</span>
+					</Badge>
 				</div>
 				<CardBody className="text-center">
 					<h3 className="h5">{title}</h3>
 					<p className="card-text text-muted mb-3">{description}</p>
-					<a
+					<ActionLink
 						href={linkUrl}
-						className="btn btn-outline-info"
 						target="_blank"
 						rel="noopener noreferrer"
+						variant="outlineInfo"
 					>
 						<i className="fab fa-docker me-2"></i>
 						{linkLabel}
-					</a>
+					</ActionLink>
 				</CardBody>
 			</Card>
 		</div>
