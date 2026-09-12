@@ -78,7 +78,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		read(".github/copilot-instructions-cicd.md"),
 		read("docs/architecture.md"),
 	]);
-	assert.equal(packageJson.engines?.node, ">=24.11.0 <26");
+	assert.equal(packageJson.engines?.node, ">=24.11.0 <27");
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
 	assert.equal(packageJson.devDependencies?.["eslint-config-next"], undefined);
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
@@ -87,13 +87,14 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		assert.match(workflow, /npm@11\.17\.0/);
 		assert.doesNotMatch(workflow, /node-version:\s*"24"/);
 		assert.doesNotMatch(workflow, /node-version:\s*"25"/);
+		assert.doesNotMatch(workflow, /node-version:\s*"26"/);
 	}
-	assert.match(envrc, /NODE_VERSIONS=.*v25\.9\.0/);
-	assert.equal(nvmrc.trim(), "25.9.0");
-	assert.match(mise, /node = "25\.9\.0"/);
+	assert.match(envrc, /NODE_VERSIONS=.*v26\.8\.2/);
+	assert.equal(nvmrc.trim(), "26.8.2");
+	assert.match(mise, /node = "26\.8\.2"/);
 	for (const docs of [cicdDocs, architectureDocs]) {
-		assert.match(docs, /25\.9\.0/);
-		assert.doesNotMatch(docs, /25\.4\.0/);
+		assert.match(docs, /26\.8\.2/);
+		assert.doesNotMatch(docs, /25\.9\.0/);
 	}
 });
 
