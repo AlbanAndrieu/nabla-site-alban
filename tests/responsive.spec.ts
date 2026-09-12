@@ -30,12 +30,13 @@ async function expectContainedInViewport(
 }
 
 test.describe("Responsive Design Tests", () => {
-	test("Nabla UI stays contained across mobile, tablet, and desktop", async ({
+	test("Nabla UI stays contained across mobile, tablet, landscape, and desktop", async ({
 		page,
 	}) => {
 		const viewports = [
 			{ width: 320, height: 700, name: "small mobile" },
 			{ width: 375, height: 812, name: "mobile" },
+			{ width: 667, height: 375, name: "mobile landscape" },
 			{ width: 768, height: 1024, name: "tablet" },
 			{ width: 1440, height: 900, name: "desktop" },
 		];
@@ -86,7 +87,7 @@ test.describe("Responsive Design Tests", () => {
 		}
 	});
 
-	test("route header reflows between tablet and mobile", async ({ page }) => {
+	test("route header reflows between tablet and narrow mobile", async ({ page }) => {
 		await page.setViewportSize({ width: 768, height: 1024 });
 		await page.goto("/architecture", { waitUntil: "domcontentloaded" });
 		await expectNoHorizontalOverflow(page);
@@ -102,6 +103,19 @@ test.describe("Responsive Design Tests", () => {
 		await expectNoHorizontalOverflow(page);
 		await expect(localeLabel).toBeVisible();
 		await expect(localeSelect).toBeVisible();
+
+		await page.setViewportSize({ width: 320, height: 700 });
+		await expectNoHorizontalOverflow(page);
+		await expectContainedInViewport(page, "#route-header-locale", 320);
+
+		const labelBox = await localeLabel.boundingBox();
+		const selectBox = await localeSelect.boundingBox();
+		expect(labelBox).not.toBeNull();
+		expect(selectBox).not.toBeNull();
+		if (labelBox && selectBox) {
+			expect(selectBox.y).toBeGreaterThanOrEqual(labelBox.y + labelBox.height - 1);
+			expect(selectBox.width).toBeGreaterThan(250);
+		}
 	});
 
 	test("architecture switches to the compact hierarchy on mobile", async ({
