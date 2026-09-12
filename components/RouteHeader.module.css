@@ -9,6 +9,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: clamp(var(--ui-space-sm), 2vw, var(--ui-space-lg));
+	min-width: 0;
 	min-height: 3.75rem;
 	padding-block: 0.65rem;
 }
@@ -35,6 +36,7 @@
 
 .home,
 .parent {
+	min-width: 0;
 	min-height: 2.75rem;
 	color: inherit;
 	font-weight: var(--ui-font-weight-action);
@@ -119,6 +121,7 @@
 
 	.locale > span {
 		display: inline;
+		overflow-wrap: anywhere;
 	}
 
 	.select {
@@ -139,7 +142,13 @@
 		flex-basis: 100%;
 	}
 
+	.locale {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
 	.select {
-		width: min(10rem, 58%);
+		width: 100%;
+		min-width: 0;
 	}
 }
