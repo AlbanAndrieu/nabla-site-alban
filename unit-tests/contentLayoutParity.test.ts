@@ -20,7 +20,10 @@ test("shared content layout and surface stay aligned with Bababou primitives", a
 	]) {
 		assert.match(layout, new RegExp(token));
 	}
-	assert.match(layout, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+	assert.match(
+		layout,
+		/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/,
+	);
 	assert.match(layout, /@media \(max-width:\s*900px\)/);
 	assert.match(layout, /@media \(max-width:\s*575\.98px\)/);
 	assert.match(layout, /overflow-wrap:\s*anywhere/);
