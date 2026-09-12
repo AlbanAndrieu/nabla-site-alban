@@ -70,6 +70,10 @@ Phase 2 exact-SHA proof is green; dependency cleanup is complete.
   Vercel succeeded; Playwright #876 / run `34672460989` passed 144/144 in
   2.6 min; OWASP ZAP Preview #43 / run `34672461010` succeeded.
 
+The Phase 3 close-out changes only roadmap text and the descriptive unit-test name;
+the validated dependency graph, CSS sources and production build inputs remain
+unchanged from the Phase 2 proof SHA above.
+
 ## Phase 3 — close the migration
 
 - [x] Remove temporary phase-specific naming once the complete absence contract is
