@@ -7,6 +7,9 @@ import { setRequestLocale } from "next-intl/server";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
+import Container from "@/components/ui/Container";
+import layout from "@/components/ui/ContentLayout.module.css";
+import surface from "@/components/ui/Surface.module.css";
 import { type AppLocale, routing } from "@/i18n/routing";
 import {
 	getPolicyPage,
@@ -31,12 +34,30 @@ const COPY: Record<AppLocale, IndexCopy> = {
 		title: "Policies and legal information",
 		lead: "The six documents below are the current native policy pages for albanandrieu.com. Legacy .html URLs permanently redirect to these canonical routes.",
 		labels: {
-			legal: { title: "Legal notices", description: "Publisher, hosting and general legal information." },
-			privacy_policy: { title: "Privacy Policy", description: "Personal-data processing, GDPR rights, retention and recipients." },
-			cookie_policy: { title: "Cookie Policy", description: "Browser storage, analytics, optional providers and preference controls." },
-			service_terms: { title: "Terms of Service", description: "Rules governing use of the website and its public services." },
-			accessibility_statement: { title: "Accessibility Statement", description: "Accessibility target, known limitations and contact options." },
-			impressum: { title: "Impressum", description: "German publisher information and the applicable § 5 DDG framing." },
+			legal: {
+				title: "Legal notices",
+				description: "Publisher, hosting and general legal information.",
+			},
+			privacy_policy: {
+				title: "Privacy Policy",
+				description: "Personal-data processing, GDPR rights, retention and recipients.",
+			},
+			cookie_policy: {
+				title: "Cookie Policy",
+				description: "Browser storage, analytics, optional providers and preference controls.",
+			},
+			service_terms: {
+				title: "Terms of Service",
+				description: "Rules governing use of the website and its public services.",
+			},
+			accessibility_statement: {
+				title: "Accessibility Statement",
+				description: "Accessibility target, known limitations and contact options.",
+			},
+			impressum: {
+				title: "Impressum",
+				description: "German publisher information and the applicable § 5 DDG framing.",
+			},
 		},
 	},
 	fr: {
@@ -46,12 +67,30 @@ const COPY: Record<AppLocale, IndexCopy> = {
 		title: "Politiques et informations légales",
 		lead: "Les six documents ci-dessous sont les pages de politique natives actuelles d’albanandrieu.com. Les anciennes URL .html redirigent définitivement vers ces routes canoniques.",
 		labels: {
-			legal: { title: "Mentions légales", description: "Éditeur, hébergement et informations légales générales." },
-			privacy_policy: { title: "Politique de confidentialité", description: "Traitements de données, droits RGPD, conservation et destinataires." },
-			cookie_policy: { title: "Politique relative aux cookies", description: "Stockage navigateur, analytics, fournisseurs optionnels et préférences." },
-			service_terms: { title: "Conditions de service", description: "Règles applicables à l’utilisation du site et de ses services publics." },
-			accessibility_statement: { title: "Déclaration d’accessibilité", description: "Objectif d’accessibilité, limites connues et moyens de contact." },
-			impressum: { title: "Impressum", description: "Informations éditeur pour l’Allemagne et cadre applicable du § 5 DDG." },
+			legal: {
+				title: "Mentions légales",
+				description: "Éditeur, hébergement et informations légales générales.",
+			},
+			privacy_policy: {
+				title: "Politique de confidentialité",
+				description: "Traitements de données, droits RGPD, conservation et destinataires.",
+			},
+			cookie_policy: {
+				title: "Politique relative aux cookies",
+				description: "Stockage navigateur, analytics, fournisseurs optionnels et préférences.",
+			},
+			service_terms: {
+				title: "Conditions de service",
+				description: "Règles applicables à l’utilisation du site et de ses services publics.",
+			},
+			accessibility_statement: {
+				title: "Déclaration d’accessibilité",
+				description: "Objectif d’accessibilité, limites connues et moyens de contact.",
+			},
+			impressum: {
+				title: "Impressum",
+				description: "Informations éditeur pour l’Allemagne et cadre applicable du § 5 DDG.",
+			},
 		},
 	},
 };
@@ -111,27 +150,29 @@ export default async function PolicyIndexPage({ params }: PageProps<"/[locale]/p
 		<>
 			<TopAnchor />
 			<SkipToMainContent />
-			<main id="main-content" className={`site-content-page container py-5 ${styles.main}`} lang={locale}>
-				<header className={styles.header}>
-					<AnchoredHeading id="policy-index-title" className={styles.title}>
-						{copy.title}
-					</AnchoredHeading>
-					<p className={styles.lead}>{copy.lead}</p>
-				</header>
-				<div className={styles.grid} aria-label={copy.title}>
-					{POLICY_PAGE_SLUGS.map((policy) => {
-						const item = copy.labels[policy];
-						return (
-							<article className={styles.card} key={policy}>
-								<h2 className={styles.cardTitle}>
-									<Link href={localizedPolicyPath(policy, locale)}>{item.title}</Link>
-								</h2>
-								<p>{item.description}</p>
-								<code className={styles.slug}>{getPolicyPage(policy).canonicalPath}</code>
-							</article>
-						);
-					})}
-				</div>
+			<main id="main-content" className={`site-content-page ${layout.main}`} lang={locale}>
+				<Container>
+					<header className={layout.centeredHeader}>
+						<AnchoredHeading id="policy-index-title" className={layout.title}>
+							{copy.title}
+						</AnchoredHeading>
+						<p className={layout.lead}>{copy.lead}</p>
+					</header>
+					<div className={layout.twoColumnGrid} aria-label={copy.title}>
+						{POLICY_PAGE_SLUGS.map((policy) => {
+							const item = copy.labels[policy];
+							return (
+								<article className={surface.card} key={policy}>
+									<h2 className={styles.cardTitle}>
+										<Link href={localizedPolicyPath(policy, locale)}>{item.title}</Link>
+									</h2>
+									<p className={surface.text}>{item.description}</p>
+									<code className={styles.slug}>{getPolicyPage(policy).canonicalPath}</code>
+								</article>
+							);
+						})}
+					</div>
+				</Container>
 			</main>
 		</>
 	);
