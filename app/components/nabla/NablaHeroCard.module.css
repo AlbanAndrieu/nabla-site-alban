@@ -3,7 +3,7 @@
 	align-items: stretch;
 	justify-content: center;
 	min-width: 0;
-	margin-bottom: clamp(2rem, 5vw, 3rem);
+	margin-bottom: 3rem;
 	padding-inline: min(1vw, 0.25rem);
 }
 
