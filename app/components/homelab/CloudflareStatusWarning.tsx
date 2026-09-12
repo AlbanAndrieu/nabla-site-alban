@@ -8,6 +8,7 @@ import {
 	cloudflareUnconfirmedReason,
 	parseCloudflareControlPlaneStatus,
 } from "@/lib/cloudflareStatus";
+import styles from "./CloudflareStatusWarning.module.css";
 
 const EMPTY_STATUS: CloudflareControlPlaneStatus = {
 	present: false,
@@ -76,7 +77,7 @@ export default function CloudflareStatusWarning() {
 	const backendDetail = status.warning ?? status.message;
 	return (
 		<div
-			className="alert alert-warning py-2"
+			className={`${styles.warning} py-2 px-3`}
 			role="status"
 			data-cloudflare-status-unconfirmed
 			data-cloudflare-error-kind={status.errorKind ?? "unknown"}
