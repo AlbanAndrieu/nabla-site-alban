@@ -3,8 +3,8 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { chmod, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const baselineScript = fileURLToPath(
 	new URL("../scripts/verify-production-baseline.sh", import.meta.url),
@@ -21,8 +21,13 @@ type FixtureOptions = {
 	deletePath?: boolean;
 };
 
-async function createFixture({ path, deletePath = false }: FixtureOptions): Promise<Fixture> {
-	const directory = await mkdtemp(join(tmpdir(), "alban-maintenance-baseline-"));
+async function createFixture({
+	path,
+	deletePath = false,
+}: FixtureOptions): Promise<Fixture> {
+	const directory = await mkdtemp(
+		join(tmpdir(), "alban-maintenance-baseline-"),
+	);
 	execFileSync("git", ["init"], { cwd: directory, stdio: "ignore" });
 	execFileSync("git", ["config", "user.name", "CI"], {
 		cwd: directory,
@@ -156,7 +161,10 @@ test("production baseline inherits across a bounded maintenance-only commit", as
 
 	assert.equal(result.status, 0, result.stderr);
 	assert.match(result.stdout, /accepted maintenance-only baseline hop/);
-	assert.match(result.stdout, /production-only statuses are absent on maintenance-only commit/);
+	assert.match(
+		result.stdout,
+		/production-only statuses are absent on maintenance-only commit/,
+	);
 	assert.match(
 		result.stdout,
 		new RegExp(`production baseline healthy at ${fixture.parentSha}`),
@@ -177,7 +185,10 @@ test("production baseline refuses to inherit across a deploy-relevant maintenanc
 });
 
 test("production baseline counts deleted runtime files as deploy-relevant", async (t) => {
-	const fixture = await createFixture({ path: "components/Runtime.tsx", deletePath: true });
+	const fixture = await createFixture({
+		path: "components/Runtime.tsx",
+		deletePath: true,
+	});
 	t.after(async () => rm(fixture.directory, { recursive: true, force: true }));
 	const bin = await installCurlMock(fixture);
 
