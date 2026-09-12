@@ -10,6 +10,9 @@
 	--ui-border: var(--border-color, #dee2e6);
 	--ui-link: var(--link-color, #007bff);
 	--ui-link-hover: var(--link-hover, #0056b3);
+	--ui-info-surface: var(--alert-info-bg, #d1ecf1);
+	--ui-info-border: var(--alert-info-border, #bee5eb);
+	--ui-info-text: var(--alert-info-text, #0c5460);
 	--ui-success-surface: var(--alert-success-bg, #d4edda);
 	--ui-success-border: var(--alert-success-border, #c3e6cb);
 	--ui-success-text: var(--alert-success-text, #155724);
