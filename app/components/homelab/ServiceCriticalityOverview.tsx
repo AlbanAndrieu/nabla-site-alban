@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 import {
 	analyzeServiceCriticality,
@@ -9,7 +9,7 @@ import {
 	SERVICE_CRITICALITY_TIERS,
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
-import type { ServiceTopology } from "@/lib/serviceTopology";
+import type { ServiceLifecyclePhase, ServiceTopology } from "@/lib/serviceTopology";
 
 type MessageKey =
 	| "criticality.tiers.foundation"
@@ -34,11 +34,25 @@ type Props = {
 	compact?: boolean;
 };
 
+function lifecycleLabel(phase: ServiceLifecyclePhase, french: boolean): string {
+	const labels: Record<ServiceLifecyclePhase, [string, string]> = {
+		"bootstrap-runtime": ["Bootstrap runtime", "Bootstrap runtime"],
+		foundation: ["Foundation", "Fondations"],
+		"network-edge": ["Network & edge", "Réseau & edge"],
+		"primary-data": ["Primary data", "Données primaires"],
+		"secondary-data": ["Secondary data", "Données secondaires"],
+		"platform-services": ["Platform services", "Services de plateforme"],
+		applications: ["Applications", "Applications"],
+	};
+	return labels[phase][french ? 1 : 0];
+}
+
 export default function ServiceCriticalityOverview({
 	topology,
 	compact = false,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
+	const french = useLocale() === "fr";
 	const analysis = useMemo(() => analyzeServiceCriticality(topology), [topology]);
 	const nodesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node])),
@@ -72,6 +86,11 @@ export default function ServiceCriticalityOverview({
 					{t("criticality.title")}
 				</h2>
 				<p className="mb-1">{t("criticality.lead")}</p>
+				<small className="text-body-secondary" data-lifecycle-ordering-note>
+					{french
+						? "Ordre lifecycle canonique de Nabla Compose : les dépendances requises restent prioritaires, puis la phase et la priorité numérique déterminent l’ordre opérationnel."
+						: "Canonical Nabla Compose lifecycle order: required dependencies remain authoritative, then lifecycle phase and numeric priority determine operational order."}
+				</small>
 			</div>
 
 			<div className="row g-3" data-criticality-hierarchy>
@@ -110,6 +129,9 @@ export default function ServiceCriticalityOverview({
 												key={node.id}
 												data-criticality-node={node.id}
 												data-criticality-tier={tier}
+												data-lifecycle-phase={criticality?.lifecyclePhase}
+												data-lifecycle-priority={criticality?.lifecyclePriority}
+												data-lifecycle-source={criticality?.lifecycleSource}
 												data-blast-radius={criticality?.transitiveDependents ?? 0}
 											>
 												<div className="d-flex justify-content-between gap-2 align-items-start">
@@ -123,8 +145,17 @@ export default function ServiceCriticalityOverview({
 														})}
 													</span>
 												</div>
-												<small className="d-block text-body-secondary">
-													{node.kind}
+												<small className="d-flex flex-wrap gap-1 align-items-center text-body-secondary">
+													<span>{node.kind}</span>
+													{criticality ? (
+														<span
+															className="badge text-bg-light border"
+															data-lifecycle-badge
+														>
+															P{criticality.lifecyclePriority} · {lifecycleLabel(criticality.lifecyclePhase, french)}
+															{criticality.lifecycleSource === "compatibility" ? " · compat" : ""}
+														</span>
+													) : null}
 												</small>
 												{required.length > 0 ? (
 													<small className="d-block mt-1">
