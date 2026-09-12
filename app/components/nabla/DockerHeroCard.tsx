@@ -1,4 +1,5 @@
 import React from "react";
+import Card, { CardBody } from "@/components/ui/Card";
 
 type Props = {
 	title: string;
@@ -15,10 +16,7 @@ export default function DockerHeroCard({
 }: Props) {
 	return (
 		<div className="d-flex justify-content-center align-items-center mb-5">
-			<div
-				className="card shadow border-0"
-				style={{ maxWidth: 400, minWidth: 320 }}
-			>
+			<Card borderless elevated style={{ maxWidth: 400, minWidth: 320 }}>
 				<div className="text-center pt-4 pb-2">
 					<span style={{ fontSize: 48, color: "#2496ed" }}>
 						<i className="fab fa-docker" aria-hidden="true"></i>
@@ -30,7 +28,7 @@ export default function DockerHeroCard({
 						open source
 					</span>
 				</div>
-				<div className="card-body text-center">
+				<CardBody className="text-center">
 					<h3 className="h5">{title}</h3>
 					<p className="card-text text-muted mb-3">{description}</p>
 					<a
@@ -42,8 +40,8 @@ export default function DockerHeroCard({
 						<i className="fab fa-docker me-2"></i>
 						{linkLabel}
 					</a>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	);
 }
