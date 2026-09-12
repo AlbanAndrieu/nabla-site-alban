@@ -6,6 +6,7 @@ export type ActionVariant =
 	| "secondary"
 	| "outline"
 	| "outlineSecondary"
+	| "outlineInfo"
 	| "inverted";
 export type ActionSize = "default" | "compact";
 
