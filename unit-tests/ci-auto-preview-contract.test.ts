@@ -46,7 +46,10 @@ test("Preview security gate waits for both Playwright and OWASP ZAP exact-SHA st
 	assert.match(workflow, /OWASP ZAP Preview/);
 	assert.match(workflow, /zap_bootstrap/);
 	assert.match(workflow, /ZAP_BOOTSTRAP/);
-	assert.match(workflow, /repository_dispatch uses the default-branch workflow/);
+	assert.match(
+		workflow,
+		/repository_dispatch uses the default-branch workflow/,
+	);
 	assert.match(workflow, /stale master ZAP result/);
 	assert.match(workflow, /Publish deferred ZAP workflow-bootstrap status/);
 	assert.match(workflow, /createCommitStatus/);
