@@ -20,8 +20,8 @@
 
 .sectionHeading {
 	max-width: 900px;
-	margin: 0 auto var(--ui-space-lg);
-	text-align: center;
+	margin: 0 0 var(--ui-space-lg);
+	text-align: left;
 }
 
 .sectionHeading p {
@@ -30,7 +30,35 @@
 }
 
 .sectionHeading h2 {
-	margin-bottom: var(--ui-space-sm);
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+	margin: 0 0 1rem;
+	color: var(--ui-link);
+	font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+	font-weight: 300;
+	line-height: 1.08;
+	letter-spacing: -0.025em;
+}
+
+.sectionHeading h2::before {
+	content: "◈";
+	display: inline-grid;
+	flex: 0 0 1.15em;
+	width: 1.15em;
+	height: 1.15em;
+	place-items: center;
+	color: currentColor;
+	font-size: 0.78em;
+}
+
+.sectionHeading h2::after {
+	content: "#";
+	flex: 0 0 auto;
+	color: var(--ui-link);
+	font-size: 0.72em;
+	font-weight: 400;
+	opacity: 0.35;
 }
 
 @media (min-width: 576px) {
@@ -66,5 +94,10 @@
 @media (max-width: 760px) {
 	.explorerSection {
 		width: min(100% - 1rem, 1200px);
+	}
+
+	.sectionHeading h2 {
+		align-items: flex-start;
+		font-size: clamp(2rem, 9vw, 2.75rem);
 	}
 }

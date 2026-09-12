@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import CloudflareStatusWarning from "@/app/components/homelab/CloudflareStatusWarning";
-import AnchoredHeading from "@/components/AnchoredHeading";
+import SectionHeading from "@/components/SectionHeading";
 import HomeLabNetworkFlow from "./HomeLabNetworkFlow";
 import styles from "./HomeLabSection.module.css";
 
@@ -10,13 +10,9 @@ export default async function HomeLabSection() {
 	return (
 		<section className="py-4 page-truenas-secondary" aria-labelledby="homelab">
 			<div className="container">
-				<AnchoredHeading as="h2" id="homelab" className="h4 mb-3">
-					<i
-						className="fas fa-layer-group text-primary me-2"
-						aria-hidden="true"
-					></i>
+				<SectionHeading id="homelab" iconClass="fa-layer-group">
 					{t("title")}
-				</AnchoredHeading>
+				</SectionHeading>
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<CloudflareStatusWarning />
 				<p>{t("purpose")}</p>

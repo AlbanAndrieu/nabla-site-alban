@@ -3,46 +3,12 @@
 	margin-inline: auto;
 }
 
-.heading {
-	display: block;
-	margin-bottom: 0.75rem;
-	text-align: center;
-}
-
-.heading > a {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.9rem;
-	max-width: 100%;
-}
-
-.heading > a > span:last-child {
-	margin-left: 0.2rem;
-	font-size: 0.72em;
-	line-height: 1;
-}
-
-.headingGlyph {
-	display: inline-grid;
-	flex: 0 0 3.4rem;
-	width: 3.4rem;
-	height: 3.4rem;
-	place-items: center;
-	border: 1px solid color-mix(in srgb, var(--ui-link) 55%, var(--ui-border));
-	border-radius: 1rem;
-	background: color-mix(in srgb, var(--ui-link) 14%, var(--ui-surface-card));
-	box-shadow: var(--ui-shadow-sm);
-	color: var(--ui-link);
-	font-size: 1.45rem;
-}
-
 .introCard {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
 	max-width: 58rem;
-	margin: 1.25rem auto 0;
+	margin: 1.25rem 0 0;
 	padding: 1rem 1.2rem;
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius-card);
@@ -201,15 +167,6 @@
 }
 
 @media (max-width: 760px) {
-	.heading {
-		text-align: left;
-	}
-
-	.heading > a {
-		align-items: flex-start;
-		justify-content: flex-start;
-	}
-
 	.introCard {
 		align-items: flex-start;
 		flex-wrap: wrap;

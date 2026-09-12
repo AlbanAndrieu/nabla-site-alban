@@ -4,7 +4,7 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import HomelabOperationalEvidence from "@/app/components/homelab/HomelabOperationalEvidence";
 import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
-import AnchoredHeading from "@/components/AnchoredHeading";
+import SectionHeading from "@/components/SectionHeading";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
@@ -107,15 +107,15 @@ export default async function ArchitecturePage({
 					aria-labelledby="homelab-network-ingress-paths"
 				>
 					<div className="container py-5">
-						<div
-							className="text-center mx-auto mb-4"
-							style={{ maxWidth: "900px" }}
-						>
-							<AnchoredHeading id="homelab-network-ingress-paths">
+						<div className="mx-auto mb-4" style={{ maxWidth: "900px" }}>
+							<SectionHeading
+								id="homelab-network-ingress-paths"
+								iconClass="fa-network-wired"
+							>
 								{french
 									? "Réseau homelab et chemins d’ingress"
 									: "Homelab network and ingress paths"}
-							</AnchoredHeading>
+							</SectionHeading>
 							<p>
 								{french
 									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Les chemins ingress direct HAProxy/Traefik et Cloudflare Tunnel montrent désormais tous deux leur transit par le WAN avant pfSense, puis le tunnel rejoint TrueNAS/cloudflared via le switch LAN. OpenWebUI illustre une origine tunnel directe sur :31028 qui ne traverse jamais Traefik. Le filtre DNS sépare la résolution de noms du routage HTTP : les clients LAN utilisent pfSense/Unbound 172.17.0.1:53 ; les noms publics sont résolus récursivement avec Quad9/Cloudflare comme fallbacks publics uniquement, tandis que le Domain Override int.albandrieu.com délègue vers Pi-hole 172.17.0.24:53, alimenté par pihole-dns-sync à partir des labels Traefik éligibles. Le graphe documente aussi l’incident où une politique Unbound limitée au WAN faisait expirer le forwarder Pi-hole ; la configuration validée est Outgoing Network Interfaces = All avec Forwarding Mode désactivé. Garage conserve trois surfaces : s3.int.albandrieu.com via HAProxy → TLS ré-chiffré → Traefik → :3900, garage.albandrieu.com via Tunnel → cloudflared → :3909 et garage-admin.albandrieu.com via Tunnel → cloudflared → :3903."
@@ -132,15 +132,15 @@ export default async function ArchitecturePage({
 					aria-labelledby="declared-observed-health"
 				>
 					<div className="container py-5">
-						<div
-							className="text-center mx-auto mb-4"
-							style={{ maxWidth: "860px" }}
-						>
-							<AnchoredHeading id="declared-observed-health">
+						<div className="mx-auto mb-4" style={{ maxWidth: "860px" }}>
+							<SectionHeading
+								id="declared-observed-health"
+								iconClass="fa-heart-pulse"
+							>
 								{french
 									? "Configuration déclarée, runtime observé et santé"
 									: "Declared configuration, observed runtime, and health"}
-							</AnchoredHeading>
+							</SectionHeading>
 							<p>
 								{french
 									? "L’architecture sépare volontairement ce qui devrait exister, ce qui tourne réellement et ce qui est effectivement utilisable. Cette séparation permet de détecter les dérives sans faire de l’interface Web ou de l’API TrueNAS une source de vérité de configuration."

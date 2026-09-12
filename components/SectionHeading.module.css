@@ -1,0 +1,41 @@
+.heading {
+	margin: 0 0 1rem;
+	font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+	font-weight: 300;
+	line-height: 1.08;
+	letter-spacing: -0.025em;
+}
+
+.heading > a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.8rem;
+	max-width: 100%;
+	color: var(--ui-link);
+}
+
+.icon {
+	display: inline-grid;
+	flex: 0 0 1.15em;
+	width: 1.15em;
+	height: 1.15em;
+	place-items: center;
+	color: currentColor;
+	font-size: 0.78em;
+}
+
+.text {
+	min-width: 0;
+	color: inherit;
+}
+
+@media (max-width: 760px) {
+	.heading {
+		font-size: clamp(2rem, 9vw, 2.75rem);
+	}
+
+	.heading > a {
+		align-items: flex-start;
+		gap: 0.65rem;
+	}
+}
