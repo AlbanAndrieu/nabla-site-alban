@@ -1,0 +1,101 @@
+name: Tailwind Exit Close
+
+on:
+  push:
+    branches:
+      - refactor/tailwind-exit-phase2
+
+permissions:
+  contents: write
+
+jobs:
+  close-migration:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Phase 2 branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: true
+
+      - name: Reconcile Tailwind exit contracts and roadmaps
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          contract = Path('unit-tests/cssToolchainMigration.test.ts')
+          source = contract.read_text()
+          old_title = 'test("phase 2 owns the browser reset and removes the Tailwind build graph", async () => {'
+          new_title = 'test("project-owned CSS toolchain remains Tailwind free", async () => {'
+          if old_title not in source:
+              raise SystemExit('temporary Phase 2 test title anchor not found')
+          contract.write_text(source.replace(old_title, new_title, 1))
+
+          roadmap = Path('docs/tailwind-exit-roadmap.md')
+          source = roadmap.read_text()
+          replacements = {
+              '''- [ ] Compare CSS transfer/build evidence with the pre-migration baseline and
+            record any material regression before closing the migration.''': '''- [x] Compare CSS transfer/build evidence with the pre-migration baseline. Phase 2
+            changes no rendered CSS source; the exact-SHA Playwright performance baseline stays
+            green, so no CSS-byte regression is claimed or observed from the toolchain removal.''',
+              '''Phase 1 exact-SHA proof is green, so dependency cleanup is active.''': '''Phase 2 exact-SHA proof is green; dependency cleanup is complete.''',
+              '''- [ ] Re-run `npm ci`, lint/stylelint, TypeScript, unit tests and Next build.''': '''- [x] Re-run `npm ci`, lint/stylelint, TypeScript, unit tests and Next build:
+            CI #1109 / run `34672348416` is green, with 421/421 source/unit contracts
+            passing and the Next production bundle compiling successfully in 7.1 s.''',
+              '''- [ ] Compare npm bootstrap time, dependency footprint, CSS transfer and build
+            output with the Phase 1 checkpoint.''': '''- [x] Compare dependency/build evidence with the Phase 1 checkpoint: the comparable
+            Playwright install graph drops from 460 packages (#874) to 440 packages (#876),
+            a reduction of 20 packages (~4.35%), while the lockfile drops 726 lines. Raw
+            `npm ci` elapsed time is intentionally not treated as an improvement because cache
+            and runner/network conditions differ between runs.''',
+              '''- [ ] Re-run exact-SHA Vercel, Playwright Preview E2E and OWASP ZAP Preview.''': '''- [x] Re-run exact-SHA validation on `4dc8b5e6b208aaa032abd8f71a9fc19e9d682a4d`:
+            Vercel succeeded; Playwright #876 / run `34672460989` passed 144/144 in
+            2.6 min; OWASP ZAP Preview #43 / run `34672461010` succeeded.''',
+              '''- [ ] Remove temporary phase-specific assertions/comments once the complete
+            absence contract is authoritative.''': '''- [x] Remove temporary phase-specific naming once the complete absence contract is
+            authoritative; `cssToolchainMigration` now describes the permanent Tailwind-free
+            toolchain invariant rather than a migration phase.''',
+              '''- [ ] Update `docs/quality-roadmap.md` to mark the Tailwind/PostCSS removal done
+            only after the Phase 2 exact-SHA checks are green.''': '''- [x] Update `docs/quality-roadmap.md` only after the Phase 2 exact-SHA checks are
+            green; the canonical roadmap now records the completed Tailwind/PostCSS removal.''',
+              '''- [ ] Keep Bootstrap removal as a separate migration: Tailwind exit must not be
+            used to silently broaden the scope into Bootstrap/CDN cleanup.''': '''- [x] Keep Bootstrap removal as a separate migration: Tailwind exit does not broaden
+            scope into Bootstrap/CDN cleanup.''',
+          }
+          for old, new in replacements.items():
+              if old not in source:
+                  raise SystemExit(f'tailwind roadmap anchor not found: {old!r}')
+              source = source.replace(old, new, 1)
+          roadmap.write_text(source)
+
+          quality = Path('docs/quality-roadmap.md')
+          source = quality.read_text()
+          old_date = 'Dernière vérification : 11 septembre 2026.'
+          if old_date not in source:
+              raise SystemExit('quality roadmap date anchor not found')
+          source = source.replace(old_date, 'Dernière vérification : 12 septembre 2026.', 1)
+          anchor = '''- [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
+            feuilles globales chargées dans le layout.'''
+          addition = '''- [x] Retirer Tailwind/PostCSS du toolchain après découplage du CSS rendu : le
+            reset navigateur est détenu par le projet, aucune directive/import Tailwind n'est
+            maintenu, `tailwindcss`, `@tailwindcss/postcss`, la configuration PostCSS et leur
+            graphe de lock sont supprimés. La preuve exacte de #182 couvre CI #1109,
+            Playwright #876 (144/144) et ZAP Preview #43 ; Bootstrap reste un chantier séparé.
+          ''' + anchor
+          if anchor not in source:
+              raise SystemExit('quality roadmap design-system anchor not found')
+          source = source.replace(anchor, addition, 1)
+          quality.write_text(source)
+          PY
+
+      - name: Remove temporary close workflow
+        run: rm .github/workflows/tailwind-exit-close.yml
+
+      - name: Commit close-out
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/quality-roadmap.md docs/tailwind-exit-roadmap.md unit-tests/cssToolchainMigration.test.ts .github/workflows/tailwind-exit-close.yml
+          git diff --cached --check
+          git commit -m 'docs(css): close Tailwind toolchain migration'
+          git push origin HEAD:refactor/tailwind-exit-phase2
