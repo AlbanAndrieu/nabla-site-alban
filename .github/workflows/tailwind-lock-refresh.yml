@@ -1,0 +1,53 @@
+name: Tailwind Lock Refresh
+
+on:
+  push:
+    branches:
+      - refactor/tailwind-exit-phase2
+
+permissions:
+  contents: read
+
+jobs:
+  refresh-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Phase 2 branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version-file: .nvmrc
+          check-latest: false
+
+      - name: Pin npm
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}"
+          npm install --global npm@11.17.0 --no-audit --no-fund
+
+      - name: Regenerate package lock only
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Verify Tailwind packages are pruned
+        run: |
+          node <<'NODE'
+          const lock = require('./package-lock.json');
+          const packages = Object.keys(lock.packages ?? {});
+          const stale = packages.filter(
+            (name) => name === 'node_modules/tailwindcss' || name.startsWith('node_modules/@tailwindcss/'),
+          );
+          if (stale.length > 0) {
+            console.error('Tailwind packages still present:', stale);
+            process.exit(1);
+          }
+          NODE
+
+      - name: Upload regenerated lockfile
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: tailwind-phase2-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 3
