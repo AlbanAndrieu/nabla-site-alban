@@ -2,6 +2,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { formatEuro } from "./formatters";
 import { FAST_POOL_PRODUCT } from "./hardwarePlan";
 
+const failureTone = { color: "var(--ui-danger-text)" } as const;
+
 export default async function FastPoolPlan() {
 	const [locale, t] = await Promise.all([
 		getLocale(),
@@ -41,7 +43,7 @@ export default async function FastPoolPlan() {
 									{t("system")}
 								</div>
 								<div className="mb-1">{t("systemDevice")}</div>
-								<code>boot-pool</code>
+								<code style={failureTone}>boot-pool</code>
 								<div className="small text-muted mt-2">{t("systemRole")}</div>
 							</div>
 						</div>
@@ -53,9 +55,7 @@ export default async function FastPoolPlan() {
 									{t("fast")}
 								</div>
 								<div className="mb-1">{t("fastDevice")}</div>
-								<code style={{ color: "var(--ui-danger-text)" }}>
-									{t("fastRole")}
-								</code>
+								<code style={failureTone}>{t("fastRole")}</code>
 								<div className="small text-muted mt-2">{t("fastUsage")}</div>
 							</div>
 						</div>
@@ -67,7 +67,7 @@ export default async function FastPoolPlan() {
 									{t("data")}
 								</div>
 								<div className="mb-1">{t("dataDevice")}</div>
-								<code>{t("dataRole")}</code>
+								<code style={failureTone}>{t("dataRole")}</code>
 								<div className="small text-muted mt-2">{t("dataUsage")}</div>
 							</div>
 						</div>

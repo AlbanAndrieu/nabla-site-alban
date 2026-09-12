@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import AnchoredHeading from "@/components/AnchoredHeading";
+import SectionHeading from "@/components/SectionHeading";
 import ActionLink from "@/components/ui/ActionLink";
 import HomelabOperationsDisclosure from "./HomelabOperationsDisclosure";
 import HomelabServicesBlock from "./HomelabServicesBlock";
@@ -21,48 +21,43 @@ export default async function HomelabServicesSection({
 		>
 			<div className="container">
 				<div className={styles.sectionHeader}>
-					<div className="text-center">
-						<AnchoredHeading id={headingId} className={styles.heading}>
-							<span className={styles.headingGlyph} aria-hidden="true">
-								<i className="fas fa-cubes-stacked" />
-							</span>
-							<span>{t("title")}</span>
-						</AnchoredHeading>
-						<div className={styles.introCard}>
-							<span className={styles.introIcon} aria-hidden="true">
-								<i className="fas fa-heart-pulse" />
-							</span>
-							<p className={styles.introText}>{t("lead")}</p>
-							<div className={styles.architectureLink}>
-								<ActionLink
-									href="architecture#declared-observed-architecture"
-									variant="secondary"
-								>
-									<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
-									Architecture
-								</ActionLink>
-							</div>
+					<SectionHeading id={headingId} iconClass="fa-server">
+						{t("title")}
+					</SectionHeading>
+					<div className={styles.introCard}>
+						<span className={styles.introIcon} aria-hidden="true">
+							<i className="fas fa-heart-pulse" />
+						</span>
+						<p className={styles.introText}>{t("lead")}</p>
+						<div className={styles.architectureLink}>
+							<ActionLink
+								href="architecture#declared-observed-architecture"
+								variant="secondary"
+							>
+								<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
+								Architecture
+							</ActionLink>
 						</div>
-						<p className="small text-secondary homelab-services-foss-note mt-3 mb-0">
-							{t("iconsBefore")}{" "}
-							<a
-								href="https://selfh.st/icons/"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								selfh.st/icons
-							</a>
-							. {t("iconsAfter")}{" "}
-							<a
-								href="https://selfh.st/apps/"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								selfh.st/apps
-							</a>
-							.
-						</p>
 					</div>
+					<p className="small text-secondary homelab-services-foss-note mt-3 mb-0">
+						{t("iconsBefore")}{" "}
+						<a
+							href="https://selfh.st/icons/"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							selfh.st/icons
+						</a>
+						. {t("iconsAfter")}{" "}
+						<a
+							href="https://selfh.st/apps/"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							selfh.st/apps
+						</a>
+						.
+					</p>
 				</div>
 
 				<div className={styles.serviceFirst} data-service-first-homelab-view>

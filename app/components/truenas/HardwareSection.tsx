@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import AnchoredHeading from "@/components/AnchoredHeading";
+import SectionHeading from "@/components/SectionHeading";
 
 const PILLAR_ICONS = [
 	"fa-database",
@@ -22,20 +22,9 @@ export default async function HardwareSection() {
 			<div className="container">
 				<div className="row mb-4">
 					<div className="col-12">
-						<AnchoredHeading
-							id="hardware"
-							className="hardware-heading-with-icon display-4"
-						>
-							<span
-								className="hardware-heading-with-icon__glyph"
-								aria-hidden="true"
-							>
-								<i className="fas fa-server"></i>
-							</span>
-							<span className="hardware-heading-with-icon__text">
-								{t("title")}
-							</span>
-						</AnchoredHeading>
+						<SectionHeading id="hardware" iconClass="fa-server">
+							{t("title")}
+						</SectionHeading>
 						<div className="hardware-platform-band mt-4">
 							<div className="row justify-content-center">
 								<div className="col-lg-8">
