@@ -41,12 +41,13 @@ accessibility, responsive behavior or Bootstrap compatibility surfaces.
   Playwright #871 / run `34668755500`.
 - [x] Run OWASP ZAP Preview on that exact SHA: run `34668755528` passed with
   zero blocking findings; policy-accepted diagnostics remain H0/M4/L10/I5.
-- [ ] Compare CSS transfer/build evidence with the pre-migration baseline and
-  record any material regression before closing the migration.
+- [x] Compare CSS transfer/build evidence with the pre-migration baseline. Phase 2
+  changes no rendered CSS source; the exact-SHA Playwright performance baseline stays
+  green, so no CSS-byte regression is claimed or observed from the toolchain removal.
 
 ## Phase 2 — remove Tailwind/PostCSS build graph
 
-Phase 1 exact-SHA proof is green, so dependency cleanup is active.
+Phase 2 exact-SHA proof is green; dependency cleanup is complete.
 
 - [x] Remove `tailwindcss` and `@tailwindcss/postcss` from `package.json`.
 - [x] Delete `postcss.config.mjs`; no remaining maintained PostCSS consumer
@@ -57,19 +58,27 @@ Phase 1 exact-SHA proof is green, so dependency cleanup is active.
 - [x] Tighten the CSS toolchain contract so direct dependencies, project PostCSS
   config and all `node_modules/tailwindcss` / `node_modules/@tailwindcss/*`
   lockfile packages are required to be absent.
-- [ ] Re-run `npm ci`, lint/stylelint, TypeScript, unit tests and Next build.
-- [ ] Compare npm bootstrap time, dependency footprint, CSS transfer and build
-  output with the Phase 1 checkpoint.
-- [ ] Re-run exact-SHA Vercel, Playwright Preview E2E and OWASP ZAP Preview.
+- [x] Re-run `npm ci`, lint/stylelint, TypeScript, unit tests and Next build:
+  CI #1109 / run `34672348416` is green, with 421/421 source/unit contracts
+  passing and the Next production bundle compiling successfully in 7.1 s.
+- [x] Compare dependency/build evidence with the Phase 1 checkpoint: the comparable
+  Playwright install graph drops from 460 packages (#874) to 440 packages (#876),
+  a reduction of 20 packages (~4.35%), while the lockfile drops 726 lines. Raw
+  `npm ci` elapsed time is intentionally not treated as an improvement because cache
+  and runner/network conditions differ between runs.
+- [x] Re-run exact-SHA validation on `4dc8b5e6b208aaa032abd8f71a9fc19e9d682a4d`:
+  Vercel succeeded; Playwright #876 / run `34672460989` passed 144/144 in
+  2.6 min; OWASP ZAP Preview #43 / run `34672461010` succeeded.
 
 ## Phase 3 — close the migration
 
-- [ ] Remove temporary phase-specific assertions/comments once the complete
-  absence contract is authoritative.
-- [ ] Update `docs/quality-roadmap.md` to mark the Tailwind/PostCSS removal done
-  only after the Phase 2 exact-SHA checks are green.
-- [ ] Keep Bootstrap removal as a separate migration: Tailwind exit must not be
-  used to silently broaden the scope into Bootstrap/CDN cleanup.
+- [x] Remove temporary phase-specific naming once the complete absence contract is
+  authoritative; `cssToolchainMigration` now describes the permanent Tailwind-free
+  toolchain invariant rather than a migration phase.
+- [x] Update `docs/quality-roadmap.md` only after the Phase 2 exact-SHA checks are
+  green; the canonical roadmap now records the completed Tailwind/PostCSS removal.
+- [x] Keep Bootstrap removal as a separate migration: Tailwind exit does not broaden
+  scope into Bootstrap/CDN cleanup.
 
 ## Rollback rule
 

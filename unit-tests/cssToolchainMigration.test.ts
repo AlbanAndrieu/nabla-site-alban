@@ -19,7 +19,7 @@ async function cssFiles(directory: URL): Promise<URL[]> {
 	return files.flat();
 }
 
-test("phase 2 owns the browser reset and removes the Tailwind build graph", async () => {
+test("project-owned CSS toolchain remains Tailwind free", async () => {
 	const [globals, reset, packageRaw, lockRaw] = await Promise.all([
 		readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 		readFile(new URL("../app/reset.css", import.meta.url), "utf8"),

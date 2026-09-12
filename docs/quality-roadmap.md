@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 11 septembre 2026.
+Dernière vérification : 12 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -114,6 +114,11 @@ branche finale et le déploiement Vercel sont validés.
   composants abstraits inutilisés.
 - [x] Migrer le Footer, `RouteHeader`, `LocaleSwitcher` et `ContactHero` vers les
   tokens/primitives partagés avant les composants spécifiques aux pages.
+- [x] Retirer Tailwind/PostCSS du toolchain après découplage du CSS rendu : le
+  reset navigateur est détenu par le projet, aucune directive/import Tailwind n'est
+  maintenu, `tailwindcss`, `@tailwindcss/postcss`, la configuration PostCSS et leur
+  graphe de lock sont supprimés. La preuve exacte de #182 couvre CI #1109,
+  Playwright #876 (144/144) et ZAP Preview #43 ; Bootstrap reste un chantier séparé.
 - [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
   feuilles globales chargées dans le layout.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
