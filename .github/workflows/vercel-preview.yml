@@ -31,8 +31,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Resolve requested PR checkpoint
-        id: preview
+      - name: Publish deploy-relevant checkpoint only
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
@@ -54,24 +53,38 @@ jobs:
               return;
             }
 
-            const { data: qualityRuns } = await github.rest.actions.listWorkflowRunsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              head_sha: pr.head.sha,
-              event: 'pull_request',
-              per_page: 100,
-            });
-            const quality = qualityRuns.workflow_runs.find(
-              (run) =>
-                run.name === 'CI (Quality and Security)' &&
-                run.head_sha === pr.head.sha,
+            const sha = pr.head.sha;
+            const qualityRuns = await github.paginate(
+              github.rest.actions.listWorkflowRunsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: sha,
+                event: 'pull_request',
+                per_page: 100,
+              },
             );
-            if (!quality || quality.status !== 'completed' || quality.conclusion !== 'success') {
+            const qualityRun = qualityRuns
+              .filter(
+                (run) =>
+                  run.name === 'CI (Quality and Security)' &&
+                  run.head_sha === sha,
+              )
+              .sort((left, right) => right.run_number - left.run_number)[0];
+
+            if (
+              !qualityRun ||
+              qualityRun.status !== 'completed' ||
+              qualityRun.conclusion !== 'success'
+            ) {
               core.setFailed(
-                `PR #${prNumber} head ${pr.head.sha} does not have a successful completed Quality run.`,
+                `PR #${prNumber} head ${sha} has no successful completed Quality run.`,
               );
               return;
             }
+            core.info(
+              `Quality run #${qualityRun.run_number} validated exact PR head ${sha}.`,
+            );
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
@@ -88,12 +101,12 @@ jobs:
             ]);
             const safeOnly = (filename) => {
               if (forceCheckpoint.has(filename)) return false;
-
               return (
                 filename.startsWith('docs/') ||
                 filename.endsWith('.md') ||
                 filename.startsWith('unit-tests/') ||
                 filename.startsWith('.github/') ||
+                filename.startsWith('.zap/') ||
                 filename.startsWith('.vscode/') ||
                 filename.startsWith('.idea/') ||
                 filename.startsWith('.agents/') ||
@@ -106,33 +119,55 @@ jobs:
               .map((file) => file.filename)
               .filter((filename) => !safeOnly(filename));
 
-            core.setOutput('sha', pr.head.sha);
-            core.setOutput('branch', `vercel-preview-pr-${prNumber}`);
-            core.setOutput('deploy_relevant', deployRelevant.length > 0 ? 'true' : 'false');
-
             if (deployRelevant.length === 0) {
               core.info(`PR #${prNumber} only changes tests/docs/maintenance; no Vercel Preview needed.`);
               return;
             }
 
             core.info(`Deploy-relevant files: ${deployRelevant.join(', ')}`);
+            const branch = `vercel-preview-pr-${prNumber}`;
+            const ref = `heads/${branch}`;
 
-      - name: Checkout exact PR revision
-        if: steps.preview.outputs.deploy_relevant == 'true'
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          ref: ${{ steps.preview.outputs.sha }}
-          fetch-depth: 0
-
-      - name: Push dedicated Preview checkpoint
-        if: steps.preview.outputs.deploy_relevant == 'true'
-        env:
-          CHECKPOINT_BRANCH: ${{ steps.preview.outputs.branch }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          git push --force origin "HEAD:refs/heads/${CHECKPOINT_BRANCH}"
-          echo "Published ${CHECKPOINT_BRANCH} at $(git rev-parse HEAD)."
+            try {
+              const current = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+              });
+              if (current.data.object.sha === sha) {
+                core.info(`${branch} already points to ${sha}; no new Vercel build needed.`);
+                return;
+              }
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+                sha,
+                force: true,
+              });
+              core.info(`Moved ${branch} to ${sha}`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/${ref}`,
+                sha: pr.base.sha,
+              });
+              // Creating a branch alone does not reliably emit the push event used by
+              // Vercel Git Integration. Move the fresh checkpoint from the PR base to
+              // the already quality-validated head to force the first deployment event.
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref,
+                sha,
+                force: true,
+              });
+              core.info(
+                `Created ${branch} from ${pr.base.sha} and moved it to validated head ${sha}`,
+              );
+            }
 
   cleanup:
     name: Remove closed PR Preview checkpoint
