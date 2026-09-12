@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import ActionLink from "@/components/ui/ActionLink";
 import SectionHeading from "@/components/SectionHeading";
+import ActionLink from "@/components/ui/ActionLink";
 import HomelabOperationsDisclosure from "./HomelabOperationsDisclosure";
 import HomelabServicesBlock from "./HomelabServicesBlock";
 import styles from "./HomelabServicesSection.module.css";

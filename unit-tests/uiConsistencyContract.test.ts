@@ -27,10 +27,22 @@ test("major TrueNAS and architecture sections share the anchored blue heading co
 
 	assert.match(sectionHeading, /AnchoredHeading/);
 	assert.match(sectionHeadingCss, /color: var\(--ui-link\)/);
-	assert.match(sectionHeadingCss, /font-size: clamp\(2\.25rem, 4\.5vw, 3\.5rem\)/);
-	assert.match(hardware, /<SectionHeading id="hardware" iconClass="fa-server">/);
-	assert.match(homelab, /<SectionHeading id="homelab" iconClass="fa-layer-group">/);
-	assert.match(services, /<SectionHeading id=\{headingId\} iconClass="fa-server">/);
+	assert.match(
+		sectionHeadingCss,
+		/font-size: clamp\(2\.25rem, 4\.5vw, 3\.5rem\)/,
+	);
+	assert.match(
+		hardware,
+		/<SectionHeading id="hardware" iconClass="fa-server">/,
+	);
+	assert.match(
+		homelab,
+		/<SectionHeading id="homelab" iconClass="fa-layer-group">/,
+	);
+	assert.match(
+		services,
+		/<SectionHeading id=\{headingId\} iconClass="fa-server">/,
+	);
 	assert.doesNotMatch(services, /fa-cubes-stacked/);
 	assert.match(architecture, /id="homelab-network-ingress-paths"/);
 	assert.match(architecture, /iconClass="fa-network-wired"/);
@@ -45,7 +57,10 @@ test("storage roles reuse the semantic runtime failure red", async () => {
 	const fastPool = await source("app/components/truenas/FastPoolPlan.tsx");
 	const uses = fastPool.match(/style=\{failureTone\}/g) ?? [];
 
-	assert.match(fastPool, /const failureTone = \{ color: "var\(--ui-danger-text\)" \}/);
+	assert.match(
+		fastPool,
+		/const failureTone = \{ color: "var\(--ui-danger-text\)" \}/,
+	);
 	assert.equal(uses.length, 3);
 	assert.match(fastPool, />boot-pool<\/code>/);
 	assert.match(fastPool, /\{t\("fastRole"\)\}<\/code>/);
