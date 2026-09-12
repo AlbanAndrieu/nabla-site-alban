@@ -7,6 +7,20 @@ export type ServiceDeploymentEnvironment = {
 	cloudflareTunnel: boolean;
 };
 
+export type ServiceLifecyclePhase =
+	| "bootstrap-runtime"
+	| "foundation"
+	| "network-edge"
+	| "primary-data"
+	| "secondary-data"
+	| "platform-services"
+	| "applications";
+
+export type ServiceLifecycle = {
+	phase: ServiceLifecyclePhase;
+	priority: number;
+};
+
 export type ServiceTopologyNode = {
 	id: string;
 	name: string;
@@ -14,6 +28,7 @@ export type ServiceTopologyNode = {
 	category: string;
 	presentationRole?: "service" | "core" | "support";
 	criticality?: "critical" | "high" | "medium" | "low";
+	lifecycle?: ServiceLifecycle;
 	sourcePath?: string;
 	url?: string;
 	internalUrl?: string;
@@ -63,6 +78,15 @@ const PRIMARY_TIMEOUT_MS = 2500;
 const DEPLOYMENT_ENVIRONMENT_NAMES = new Set<
 	ServiceDeploymentEnvironment["name"]
 >(["production", "staging", "dev"]);
+const LIFECYCLE_PHASES = new Set<ServiceLifecyclePhase>([
+	"bootstrap-runtime",
+	"foundation",
+	"network-edge",
+	"primary-data",
+	"secondary-data",
+	"platform-services",
+	"applications",
+]);
 
 const RELATION_TYPES = new Set<ServiceRelationType>([
 	"dependsOn",
@@ -80,6 +104,19 @@ const RELATION_TYPES = new Set<ServiceRelationType>([
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function validLifecycle(value: unknown): boolean {
+	if (value === undefined) return true;
+	return (
+		isRecord(value) &&
+		typeof value.phase === "string" &&
+		LIFECYCLE_PHASES.has(value.phase as ServiceLifecyclePhase) &&
+		typeof value.priority === "number" &&
+		Number.isInteger(value.priority) &&
+		value.priority >= 0 &&
+		value.priority <= 1000
+	);
 }
 
 export function parseServiceTopology(value: unknown): ServiceTopology | null {
@@ -110,6 +147,7 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 				typeof node.name === "string" &&
 				typeof node.kind === "string" &&
 				typeof node.category === "string" &&
+				validLifecycle(node.lifecycle) &&
 				(node.icon === undefined || typeof node.icon === "string") &&
 				(node.internalUrl === undefined ||
 					typeof node.internalUrl === "string") &&
