@@ -1,4 +1,6 @@
 import Image from "next/image";
+import ActionLink from "@/components/ui/ActionLink";
+import Badge from "@/components/ui/Badge";
 import Card, { CardBody } from "@/components/ui/Card";
 
 type Props = {
@@ -43,23 +45,23 @@ export default function AnsibleHeroCard({
 						</span>
 					)}
 					<div className="w-100">
-						<span className="badge bg-success mt-2" style={{ fontSize: 16 }}>
+						<Badge className="mt-2" variant="success">
 							open source
-						</span>
+						</Badge>
 					</div>
 				</div>
 				<CardBody className="text-center">
 					<h3 className="h5">{title}</h3>
 					<p className="card-text text-muted mb-3">{description}</p>
-					<a
+					<ActionLink
 						href={linkUrl}
-						className="btn btn-outline-primary"
 						target="_blank"
 						rel="noopener noreferrer"
+						variant="outline"
 					>
 						<i className="fab fa-github me-2"></i>
 						{linkLabel}
-					</a>
+					</ActionLink>
 				</CardBody>
 			</Card>
 		</div>
