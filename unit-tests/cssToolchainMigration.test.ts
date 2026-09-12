@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdir, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function cssFiles(directory: URL): Promise<URL[]> {
@@ -19,15 +19,21 @@ async function cssFiles(directory: URL): Promise<URL[]> {
 	return files.flat();
 }
 
-test("phase 1 owns the browser reset and detaches rendered CSS from Tailwind", async () => {
-	const [globals, reset, postcss, packageRaw] = await Promise.all([
+test("phase 2 owns the browser reset and removes the Tailwind build graph", async () => {
+	const [globals, reset, packageRaw, lockRaw] = await Promise.all([
 		readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 		readFile(new URL("../app/reset.css", import.meta.url), "utf8"),
-		readFile(new URL("../postcss.config.mjs", import.meta.url), "utf8"),
 		readFile(new URL("../package.json", import.meta.url), "utf8"),
+		readFile(new URL("../package-lock.json", import.meta.url), "utf8"),
 	]);
 	const pkg = JSON.parse(packageRaw) as {
 		devDependencies?: Record<string, string>;
+	};
+	const lock = JSON.parse(lockRaw) as {
+		packages?: Record<
+			string,
+			{ devDependencies?: Record<string, string> } | undefined
+		>;
 	};
 
 	assert.match(globals, /^@import "\.\/reset\.css";$/m);
@@ -48,10 +54,23 @@ test("phase 1 owns the browser reset and detaches rendered CSS from Tailwind", a
 		/\[hidden\]:where\(:not\(\[hidden="until-found"\]\)\)[\s\S]*display:\s*none !important/,
 	);
 
-	// Phase 2 deliberately owns dependency/lock cleanup after exact-SHA visual proof.
-	assert.match(postcss, /"@tailwindcss\/postcss"/);
-	assert.ok(pkg.devDependencies?.tailwindcss);
-	assert.ok(pkg.devDependencies?.["@tailwindcss/postcss"]);
+	assert.equal(pkg.devDependencies?.tailwindcss, undefined);
+	assert.equal(pkg.devDependencies?.["@tailwindcss/postcss"], undefined);
+	await assert.rejects(
+		access(new URL("../postcss.config.mjs", import.meta.url)),
+		(error: unknown) =>
+			error instanceof Error && "code" in error && error.code === "ENOENT",
+	);
+
+	const lockRoot = lock.packages?.[""];
+	assert.equal(lockRoot?.devDependencies?.tailwindcss, undefined);
+	assert.equal(lockRoot?.devDependencies?.["@tailwindcss/postcss"], undefined);
+	const tailwindPackages = Object.keys(lock.packages ?? {}).filter(
+		(name) =>
+			name === "node_modules/tailwindcss" ||
+			name.startsWith("node_modules/@tailwindcss/"),
+	);
+	assert.deepEqual(tailwindPackages, []);
 });
 
 test("maintained CSS no longer imports Tailwind or uses Tailwind directives", async () => {
