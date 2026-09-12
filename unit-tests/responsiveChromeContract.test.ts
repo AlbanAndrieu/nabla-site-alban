@@ -11,13 +11,14 @@ const paths = {
 };
 
 test("shared responsive chrome keeps the Bababou-safe layout contracts", async () => {
-	const [container, routeHeader, footer, contactHero, globals] = await Promise.all([
-		readFile(paths.container, "utf8"),
-		readFile(paths.routeHeader, "utf8"),
-		readFile(paths.footer, "utf8"),
-		readFile(paths.contactHero, "utf8"),
-		readFile(paths.globals, "utf8"),
-	]);
+	const [container, routeHeader, footer, contactHero, globals] =
+		await Promise.all([
+			readFile(paths.container, "utf8"),
+			readFile(paths.routeHeader, "utf8"),
+			readFile(paths.footer, "utf8"),
+			readFile(paths.contactHero, "utf8"),
+			readFile(paths.globals, "utf8"),
+		]);
 
 	assert.match(container, /padding-left:\s*max\(/);
 	assert.match(container, /padding-right:\s*max\(/);
@@ -44,5 +45,8 @@ test("shared responsive chrome keeps the Bababou-safe layout contracts", async (
 		/grid-template-columns:\s*repeat\(auto-fit, minmax\(min\(100%, 12rem\), 1fr\)\)/,
 	);
 	assert.match(globals, /height:\s*clamp\(18rem, 45vw, 28\.125rem\)/);
-	assert.match(globals, /\.contact-github-badges iframe[\s\S]*max-width:\s*100%/);
+	assert.match(
+		globals,
+		/\.contact-github-badges iframe[\s\S]*max-width:\s*100%/,
+	);
 });
