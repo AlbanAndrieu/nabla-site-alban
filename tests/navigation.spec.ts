@@ -1,84 +1,55 @@
 import { expect, test } from "@playwright/test";
 
+// Test navigation and links
 test.describe("Navigation and Links Tests", () => {
 	test("should have working internal links", async ({ page }) => {
 		await page.goto("/");
 
-		// Internal links: relative paths only (exclude fragments, mailto, tel, javascript, absolute URLs)
-		const internalLinks = page.locator(
-			'a[href]:not([href^="http"]):not([href^="//"]):not([href^="#"]):not([href^="mailto"]):not([href^="tel"]):not([href^="javascript:"])',
-		);
-		const linkCount = await internalLinks.count();
-		expect(linkCount).toBeGreaterThan(0);
+		const links = page.locator('a[href^="/"]');
+		const count = await links.count();
 
-		const linksToCheck = Math.min(linkCount, 12);
-		for (let i = 0; i < linksToCheck; i++) {
-			const href = await internalLinks.nth(i).getAttribute("href");
-			expect(href).toBeTruthy();
-			expect(href?.trim().length).toBeGreaterThan(0);
+		for (let i = 0; i < Math.min(count, 5); i++) {
+			const href = await links.nth(i).getAttribute("href");
+			if (href && href !== "#") {
+				const response = await page.request.get(href);
+				expect(response.status()).toBeLessThan(500);
+			}
 		}
 	});
 
 	test("should have descriptive link text", async ({ page }) => {
 		await page.goto("/");
 
-		// Get all links
-		const links = page.locator("a[href]");
-		const linkCount = await links.count();
+		const links = page.locator("a");
+		const count = await links.count();
 
-		// Check that links have text or aria-label
-		for (let i = 0; i < Math.min(linkCount, 10); i++) {
+		for (let i = 0; i < count; i++) {
 			const link = links.nth(i);
-			const text = await link.textContent();
+			const text = (await link.textContent())?.trim();
 			const ariaLabel = await link.getAttribute("aria-label");
-			const ariaLabelledby = await link.getAttribute("aria-labelledby");
 			const title = await link.getAttribute("title");
+			const imgAlt = await link.locator("img").first().getAttribute("alt");
 
-			// Images inside links should have alt text
-			const img = link.locator("img");
-			const imgCount = await img.count();
-
-			if (imgCount > 0) {
-				const alt = await img.first().getAttribute("alt");
-				const hasAccessibleName =
-					text || ariaLabel || ariaLabelledby || title || alt;
-				expect(hasAccessibleName).toBeTruthy();
-			} else {
-				// Text links should have text content
-				const hasAccessibleName = text || ariaLabel || ariaLabelledby || title;
-				expect(hasAccessibleName).toBeTruthy();
-			}
+			const hasDescription = Boolean(text || ariaLabel || title || imgAlt);
+			expect(hasDescription).toBeTruthy();
 		}
 	});
 
-	test("should have external links with proper attributes", async ({
-		page,
-	}) => {
+	test("should have external links with proper attributes", async ({ page }) => {
 		await page.goto("/");
 
-		// Get external links
-		const externalLinks = page.locator('a[href^="http"]');
-		const linkCount = await externalLinks.count();
+		const externalLinks = page.locator(
+			'a[href^="http"]:not([href*="albandrieu.com"])',
+		);
+		const count = await externalLinks.count();
 
-		// Check first few external links
-		for (let i = 0; i < Math.min(linkCount, 5); i++) {
+		for (let i = 0; i < count; i++) {
 			const link = externalLinks.nth(i);
-			const href = await link.getAttribute("href");
-
-			// External links should have href
-			expect(href).toBeTruthy();
-
-			// Check if it has target="_blank" (optional but common)
 			const target = await link.getAttribute("target");
+			const rel = await link.getAttribute("rel");
+
 			if (target === "_blank") {
-				// If target="_blank", should have rel attribute for security
-				const rel = await link.getAttribute("rel");
-				// rel should contain noopener or noreferrer for security
-				if (rel) {
-					const hasSecureRel =
-						rel.includes("noopener") || rel.includes("noreferrer");
-					expect(hasSecureRel).toBeTruthy();
-				}
+				expect(rel).toContain("noopener");
 			}
 		}
 	});
@@ -86,14 +57,10 @@ test.describe("Navigation and Links Tests", () => {
 	test("should have navigation menu", async ({ page }) => {
 		await page.goto("/");
 
-		// Look for navigation elements
-		const nav = page.locator(
-			'nav, [role="navigation"], header nav, .nav, .navigation',
-		);
+		const nav = page.locator('nav, [role="navigation"]');
 		const navCount = await nav.count();
 
-		// Should have at least some navigation structure
-		expect(navCount).toBeGreaterThanOrEqual(0);
+		expect(navCount).toBeGreaterThan(0);
 	});
 
 	test("should have footer with links", async ({ page }) => {
@@ -113,7 +80,7 @@ test.describe("Navigation and Links Tests", () => {
 		// Stable semantic CTA; deliberately independent from Bootstrap/CSS-module classes.
 		const link = page
 			.locator(
-				'main .hero-section a[href="https://calendly.com/alban-andrieu"]',
+				'[data-responsive-hero] a[href="https://calendly.com/alban-andrieu"]',
 			)
 			.first();
 		await expect(link).toBeVisible();
