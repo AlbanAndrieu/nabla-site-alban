@@ -77,11 +77,7 @@ export default async function PricingPage({ params }: Props) {
 											<li key={item}>{item}</li>
 										))}
 									</ul>
-									<ActionLink
-										href={tier.href}
-										size="compact"
-										variant="outline"
-									>
+									<ActionLink href={tier.href} size="compact" variant="outline">
 										{tier.cta}
 									</ActionLink>
 								</div>

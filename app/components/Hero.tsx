@@ -32,10 +32,7 @@ export default function Hero() {
 					>
 						<i className="fa fa-calendar-plus"></i> {t("home.hero.cta.book")}
 					</ActionLink>
-					<ActionLink
-						href={`${localePrefix}/startup.html`}
-						variant="inverted"
-					>
+					<ActionLink href={`${localePrefix}/startup.html`} variant="inverted">
 						<i className="fas fa-rocket" aria-hidden="true"></i>{" "}
 						{t("home.hero.cta.start")}
 					</ActionLink>
@@ -56,10 +53,7 @@ export default function Hero() {
 						<i className="fab fa-linkedin"></i> {t("home.hero.cta.linkedin")}
 					</ActionLink>
 				</div>
-				<div
-					className="hero-value-list"
-					aria-label={t("home.hero.services")}
-				>
+				<div className="hero-value-list" aria-label={t("home.hero.services")}>
 					<ul>
 						<li>{t("home.hero.value1")}</li>
 						<li>{t("home.hero.value2")}</li>
@@ -68,10 +62,7 @@ export default function Hero() {
 					</ul>
 				</div>
 				<div className="cta-buttons">
-					<ActionLink
-						href={`${localePrefix}/expertise`}
-						variant="secondary"
-					>
+					<ActionLink href={`${localePrefix}/expertise`} variant="secondary">
 						<i className="fas fa-layer-group" aria-hidden="true"></i>{" "}
 						{t("home.hero.services")}
 					</ActionLink>
