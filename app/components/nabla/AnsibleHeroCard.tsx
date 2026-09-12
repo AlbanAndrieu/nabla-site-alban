@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Card, { CardBody } from "@/components/ui/Card";
 
 type Props = {
 	title: string;
@@ -19,10 +20,7 @@ export default function AnsibleHeroCard({
 }: Props) {
 	return (
 		<div className="d-flex justify-content-center align-items-center mb-5">
-			<div
-				className="card shadow border-0"
-				style={{ maxWidth: 400, minWidth: 320 }}
-			>
+			<Card borderless elevated style={{ maxWidth: 400, minWidth: 320 }}>
 				<div className="text-center pt-4 pb-2">
 					{imageSrc ? (
 						<Image
@@ -50,7 +48,7 @@ export default function AnsibleHeroCard({
 						</span>
 					</div>
 				</div>
-				<div className="card-body text-center">
+				<CardBody className="text-center">
 					<h3 className="h5">{title}</h3>
 					<p className="card-text text-muted mb-3">{description}</p>
 					<a
@@ -62,8 +60,8 @@ export default function AnsibleHeroCard({
 						<i className="fab fa-github me-2"></i>
 						{linkLabel}
 					</a>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	);
 }
