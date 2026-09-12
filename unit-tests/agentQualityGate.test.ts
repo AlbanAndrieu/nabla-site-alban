@@ -252,8 +252,8 @@ test("local agent toolchain matches CI bootstrap pins", async () => {
 	]);
 
 	assert.equal(pythonVersion.trim(), "3.13");
-	assert.equal(nvmrc.trim(), "25.9.0");
-	assert.ok(mise.includes('node = "25.9.0"'));
+	assert.equal(nvmrc.trim(), "26.8.2");
+	assert.ok(mise.includes('node = "26.8.2"'));
 	assert.ok(mise.includes("default='3.13'"));
 	assert.ok(mise.includes('pre-commit = "4.6.2"'));
 	for (const workflow of [ci, setup]) {
