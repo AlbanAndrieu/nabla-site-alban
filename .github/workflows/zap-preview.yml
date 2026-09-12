@@ -198,7 +198,7 @@ jobs:
           allow_issue_writing: false
           fail_action: true
           artifact_name: zap-preview-report
-          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+          cmd_options: "-I -T 5"
 
       - name: Summarize ZAP Preview diagnostics
         id: summary

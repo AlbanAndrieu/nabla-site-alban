@@ -6,7 +6,7 @@ async function source(path: string) {
 	return readFile(new URL("../" + path, import.meta.url), "utf8");
 }
 
-test("PR CI separates the current diff base from the production branch HEAD", async () => {
+test("PR CI separates the current diff base from the verified production baseline", async () => {
 	const ci = await source(".github/workflows/ci.yml");
 
 	assert.doesNotMatch(
@@ -32,7 +32,6 @@ test("PR CI separates the current diff base from the production branch HEAD", as
 		/github\.rest\.repos\.getBranch\(\{[\s\S]*?branch: productionRef,[\s\S]*?\}\);/,
 	);
 	assert.match(ci, /core\.setOutput\('production-sha', productionSha\);/);
-	assert.match(ci, /ref: productionSha,/);
 
 	const resolvedBaseUsages =
 		ci.match(/steps\.production-baseline\.outputs\.base-sha/g) ?? [];
@@ -51,7 +50,12 @@ test("PR CI separates the current diff base from the production branch HEAD", as
 
 	assert.match(
 		ci,
-		/PRODUCTION_SHA: \$\{\{ steps\.production-baseline\.outputs\.production-sha \}\}/,
+		/BASE_SHA: \$\{\{ steps\.production-baseline\.outputs\.production-sha \}\}/,
+	);
+	assert.match(ci, /id: verified-production-baseline/);
+	assert.match(
+		ci,
+		/PRODUCTION_SHA: \$\{\{ steps\.verified-production-baseline\.outputs\.baseline_sha \}\}/,
 	);
 	assert.match(
 		ci,

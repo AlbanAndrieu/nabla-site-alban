@@ -83,6 +83,7 @@ const baselineSecurityHeaders = [
 
 const nextConfig = {
 	reactStrictMode: true,
+	poweredByHeader: false,
 	experimental: {
 		/** Required because the root layout lives below the dynamic `[locale]` segment. */
 		globalNotFound: true,

@@ -6,6 +6,8 @@
  * validate them on the exact Preview SHA before altering browser defaults.
  */
 
+@import "./accessibility.css";
+
 *,
 ::after,
 ::before,

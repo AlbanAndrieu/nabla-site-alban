@@ -93,7 +93,7 @@ jobs:
           allow_issue_writing: false
           fail_action: true
           artifact_name: zap-production-report
-          cmd_options: "-I -T 5 -c .zap/rules.tsv"
+          cmd_options: "-I -T 5"
 
       - name: Clean ZAP production workspace
         if: always()
