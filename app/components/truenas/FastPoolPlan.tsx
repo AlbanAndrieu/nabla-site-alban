@@ -53,7 +53,7 @@ export default async function FastPoolPlan() {
 									{t("fast")}
 								</div>
 								<div className="mb-1">{t("fastDevice")}</div>
-								<code>{t("fastRole")}</code>
+								<code style={{ color: "var(--ui-danger-text)" }}>{t("fastRole")}</code>
 								<div className="small text-muted mt-2">{t("fastUsage")}</div>
 							</div>
 						</div>
