@@ -159,11 +159,11 @@ release_only_hop() {
 	parent_lock_root_version="$(git show "${parent}:package-lock.json" | jq -er '.packages[""].version | select(type == "string" and length > 0)')"
 	child_lock_root_version="$(git show "${child}:package-lock.json" | jq -er '.packages[""].version | select(type == "string" and length > 0)')"
 
-	if [[ "${parent_package_version}" != "${parent_lock_version}" || "${parent_package_version}" != "${parent_lock_root_version}" ]]; then
+	if ! [[ "${parent_package_version}" == "${parent_lock_version}" && "${parent_package_version}" == "${parent_lock_root_version}" ]]; then
 		printf '❌ PROD_BASE_RELEASE_VERSION: parent %s has inconsistent package/lock versions\n' "${parent}" >&2
 		return 1
 	fi
-	if [[ "${child_package_version}" != "${child_lock_version}" || "${child_package_version}" != "${child_lock_root_version}" ]]; then
+	if ! [[ "${child_package_version}" == "${child_lock_version}" && "${child_package_version}" == "${child_lock_root_version}" ]]; then
 		printf '❌ PROD_BASE_RELEASE_VERSION: release %s has inconsistent package/lock versions\n' "${child}" >&2
 		return 1
 	fi
