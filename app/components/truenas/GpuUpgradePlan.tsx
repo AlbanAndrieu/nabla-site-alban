@@ -1,6 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatEuro } from "./formatters";
-import styles from "./GpuUpgradePlan.module.css";
 import { GPU_OPTIONS } from "./hardwarePlan";
 
 export default async function GpuUpgradePlan() {
@@ -12,7 +11,7 @@ export default async function GpuUpgradePlan() {
 	const fit = t.raw("fit") as string[];
 
 	return (
-		<div className="mt-4" data-truenas-ai-palette>
+		<div className="mt-4">
 			<h5 className="h6 mb-2">
 				<i className="fas fa-microchip me-2" aria-hidden="true" />
 				{t("title")}
@@ -22,20 +21,15 @@ export default async function GpuUpgradePlan() {
 			<div className="row g-3">
 				{GPU_OPTIONS.map((gpu, index) => (
 					<div className="col-lg-4" key={gpu.name}>
-						<div className={styles.card} data-recommended={gpu.recommended}>
+						<div
+							className={`card h-100 ${gpu.recommended ? "border-primary" : "border-secondary"}`}
+						>
 							<div className="card-body d-flex flex-column">
 								<div className="d-flex align-items-start justify-content-between gap-2">
 									<h6 className="card-title">{gpu.name}</h6>
 									{gpu.recommended ? (
-										<span className={`badge ${styles.recommendedBadge}`}>
-											{t("recommended")}
-										</span>
-									) : (
-										<span
-											className={styles.alternativeMarker}
-											aria-hidden="true"
-										/>
-									)}
+										<span className="badge text-bg-primary">{t("recommended")}</span>
+									) : null}
 								</div>
 								<dl className="small mb-3">
 									<div className="d-flex justify-content-between gap-3">
@@ -83,7 +77,7 @@ export default async function GpuUpgradePlan() {
 					</div>
 				))}
 			</div>
-			<div className={`mt-3 mb-0 p-3 ${styles.ramNote}`} role="note">
+			<div className="alert alert-info mt-3 mb-0" role="note">
 				<strong>{t("ramTitle")}:</strong> {t("ram")}
 			</div>
 		</div>
