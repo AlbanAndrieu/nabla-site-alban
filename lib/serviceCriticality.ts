@@ -155,8 +155,7 @@ function isBlockingRequired(relation: ServiceTopologyRelation): boolean {
 
 function isImpactRequired(relation: ServiceTopologyRelation): boolean {
 	return (
-		relation.strength === "required" &&
-		IMPACT_RELATION_TYPES.has(relation.type)
+		relation.strength === "required" && IMPACT_RELATION_TYPES.has(relation.type)
 	);
 }
 
@@ -185,10 +184,7 @@ function compatibilityLifecycle(node: ServiceTopologyNode): ServiceLifecycle {
 	if (SECONDARY_DATA_IDS.has(id) || semanticSharedData(node)) {
 		return { phase: "secondary-data", priority: 30 };
 	}
-	if (
-		PLATFORM_CATEGORIES.has(node.category) ||
-		PLATFORM_KINDS.has(node.kind)
-	) {
+	if (PLATFORM_CATEGORIES.has(node.category) || PLATFORM_KINDS.has(node.kind)) {
 		return { phase: "platform-services", priority: 40 };
 	}
 	return { phase: "applications", priority: 50 };
@@ -238,7 +234,8 @@ function tierFor(
 			return "shared-platform";
 		case "applications":
 			if (node.presentationRole === "support") return "support";
-			if (directDependencies > 0 || transitiveDependents > 0) return "application";
+			if (directDependencies > 0 || transitiveDependents > 0)
+				return "application";
 			return "support";
 	}
 }
@@ -252,14 +249,16 @@ export function analyzeServiceCriticality(
 
 	for (const relation of topology.relations) {
 		if (isBlockingRequired(relation)) {
-			const dependencies = requiredDependencies.get(relation.source) ?? new Set();
+			const dependencies =
+				requiredDependencies.get(relation.source) ?? new Set();
 			dependencies.add(relation.target);
 			requiredDependencies.set(relation.source, dependencies);
 		} else if (
 			relation.strength === "optional" &&
 			BLOCKING_RELATION_TYPES.has(relation.type)
 		) {
-			const dependencies = optionalDependencies.get(relation.source) ?? new Set();
+			const dependencies =
+				optionalDependencies.get(relation.source) ?? new Set();
 			dependencies.add(relation.target);
 			optionalDependencies.set(relation.source, dependencies);
 		}
@@ -273,8 +272,12 @@ export function analyzeServiceCriticality(
 
 	return new Map(
 		topology.nodes.map((node) => {
-			const directDependencyIds = [...(requiredDependencies.get(node.id) ?? [])].sort();
-			const directDependentIds = [...(impactDependents.get(node.id) ?? [])].sort();
+			const directDependencyIds = [
+				...(requiredDependencies.get(node.id) ?? []),
+			].sort();
+			const directDependentIds = [
+				...(impactDependents.get(node.id) ?? []),
+			].sort();
 			const transitiveDependentIds = [
 				...collectReachable(node.id, impactDependents),
 			].sort();
@@ -314,9 +317,9 @@ function longestRequiredDependencyPath(
 ): string[] {
 	if (seen.has(startId) || !analysis.has(startId)) return [];
 	const nextSeen = new Set(seen).add(startId);
-	const dependencies = (analysis.get(startId)?.requiredDependencies ?? []).filter(
-		(id) => !nextSeen.has(id),
-	);
+	const dependencies = (
+		analysis.get(startId)?.requiredDependencies ?? []
+	).filter((id) => !nextSeen.has(id));
 	if (dependencies.length === 0) return [startId];
 
 	const candidates = dependencies
@@ -326,7 +329,8 @@ function longestRequiredDependencyPath(
 		.filter((path) => path.length > 0)
 		.sort(
 			(left, right) =>
-				right.length - left.length || left.join("\0").localeCompare(right.join("\0")),
+				right.length - left.length ||
+				left.join("\0").localeCompare(right.join("\0")),
 		);
 	return [startId, ...(candidates[0] ?? [])];
 }
@@ -385,7 +389,8 @@ export function compareServiceCriticality(
 
 	const leftRequiresRight = requiresTransitively(leftId, rightId, analysis);
 	const rightRequiresLeft = requiresTransitively(rightId, leftId, analysis);
-	if (leftRequiresRight !== rightRequiresLeft) return leftRequiresRight ? 1 : -1;
+	if (leftRequiresRight !== rightRequiresLeft)
+		return leftRequiresRight ? 1 : -1;
 
 	return (
 		left.lifecyclePriority - right.lifecyclePriority ||
