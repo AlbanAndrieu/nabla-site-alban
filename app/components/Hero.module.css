@@ -15,6 +15,7 @@
 }
 
 .content {
+	min-width: 0;
 	width: min(100%, 72rem);
 	margin-inline: auto;
 	text-align: center;
@@ -27,6 +28,7 @@
 	font-weight: 700;
 	line-height: 1.05;
 	letter-spacing: -0.035em;
+	overflow-wrap: anywhere;
 	text-wrap: balance;
 }
 
@@ -36,6 +38,7 @@
 	font-size: clamp(1.05rem, 2.2vw, 1.5rem);
 	line-height: 1.5;
 	opacity: 0.96;
+	overflow-wrap: anywhere;
 	text-wrap: balance;
 }
 
@@ -73,10 +76,12 @@
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 0.75rem;
+	min-width: 0;
 	width: 100%;
 }
 
 .serviceBlock {
+	min-width: 0;
 	margin-top: clamp(2rem, 5vw, 3.5rem);
 }
 
@@ -108,7 +113,8 @@
 
 @media (max-width: 36rem) {
 	.hero {
-		padding-inline: max(1rem, env(safe-area-inset-left));
+		padding-inline-start: max(1rem, env(safe-area-inset-left));
+		padding-inline-end: max(1rem, env(safe-area-inset-right));
 	}
 
 	.ctaGroup {
@@ -129,5 +135,16 @@
 	.valueList li {
 		padding-inline-start: 1.25rem;
 		font-size: 0.95rem;
+	}
+}
+
+@media (orientation: landscape) and (max-height: 36rem) {
+	.hero {
+		min-height: auto;
+		padding-block: 2.5rem;
+	}
+
+	.serviceBlock {
+		margin-top: 2rem;
 	}
 }
