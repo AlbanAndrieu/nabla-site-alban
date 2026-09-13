@@ -18,10 +18,10 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 - Les URLs SEO canoniques sont sans extension ; `next.config.mjs` conserve des
   redirections permanentes depuis les anciennes URLs `.html` pendant la
   migration SEO.
-- Chaque URL publique possède une route App Router dédiée. `/workstation`
-  charge encore temporairement un fragment HTML de `public/` via
-  `app/components/PublicHtmlFragment.tsx`; `/ai` et `/security` sont
-  désormais entièrement natifs.
+- Chaque URL publique possède une route App Router dédiée. `/workstation`,
+  `/ai` et `/security` sont désormais rendues par des composants React natifs et
+  des catalogues `next-intl`; aucune de ces routes n'injecte de fragment HTML
+  `public/`.
 - La route localisée `app/[locale]/cv/[...path]/page.tsx` conserve
   `loadCvHtmlFragment` comme pont de compatibilité explicitement allowlisté vers
   les CV HTML historiques autonomes de `public/cv/`; ces documents restent la
@@ -29,6 +29,9 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 - `app/global-not-found.tsx` gère les URL inconnues hors du root layout
   dynamique `[locale]`, reste exclu de l'indexation et conserve l'exception
   explicite `public/404.html` via le loader de fragment statique.
+- Workstation reste volontairement non indexable et conserve pour l'instant ses
+  URLs canoniques historiques `.html`; la décision SEO d'indexer ou non CTID,
+  FreeNAS et Workstation reste un chantier séparé.
 
 ## Données et APIs
 
@@ -112,8 +115,9 @@ au commit déployé.
 
 ## Dette de migration connue
 
-- `/workstation` reste le dernier consommateur App Router direct de
-  `PublicHtmlFragment`. Les CV localisés utilisent leur loader allowlisté dédié,
-  tandis que le 404 conserve son exception statique documentée.
+- Le composant transitionnel `app/components/PublicHtmlFragment.tsx` n'a plus de
+  consommateur App Router et est retiré. `lib/htmlFromPublic.ts` reste nécessaire
+  pour l'exception statique 404 et d'autres helpers de compatibilité historiques;
+  les CV localisés utilisent leur loader allowlisté dédié.
 - Plusieurs grandes feuilles CSS et assets historiques sont encore sous
   `public/` et doivent être audités avant suppression.

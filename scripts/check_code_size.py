@@ -118,7 +118,17 @@ def main() -> int:
             continue
 
         inspected += 1
-        line_count = _line_count(path)
+        try:
+            line_count = _line_count(path)
+        except UnicodeDecodeError as exc:
+            failures += 1
+            print(
+                f"ERROR {path}: source file is not valid UTF-8 "
+                f"({exc.reason} at byte {exc.start}).",
+                file=sys.stderr,
+            )
+            continue
+
         baseline_lines = _baseline_line_count(path, args.baseline_ref)
 
         if line_count > args.fail:

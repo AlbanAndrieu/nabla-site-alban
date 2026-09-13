@@ -51,6 +51,25 @@ test("code-size gate fails a new source file above the hard limit", async () => 
 	}
 });
 
+test("code-size gate reports invalid UTF-8 source without traceback", async () => {
+	const directory = await mkdtemp(join(tmpdir(), "site-code-size-"));
+	const source = join(directory, "invalid-utf8.ts");
+	try {
+		await writeFile(source, Buffer.from([0x63, 0x6f, 0x6e, 0x73, 0x74, 0x20, 0xbb, 0x0a]));
+		const result = runCodeSize(["--warn", "3", "--fail", "5", source]);
+
+		assert.equal(result.status, 1);
+		assert.match(
+			result.stderr,
+			/ERROR .*invalid-utf8\.ts: source file is not valid UTF-8/,
+		);
+		assert.doesNotMatch(result.stderr, /Traceback/);
+		assert.match(result.stdout, /1 file\(s\), 0 warning\(s\), 1 error\(s\)/);
+	} finally {
+		await rm(directory, { recursive: true, force: true });
+	}
+});
+
 test("code-size gate grandfathers an already oversized baseline file", () => {
 	const result = runCodeSize([
 		"--warn",
