@@ -72,11 +72,12 @@ const policyHtmlRedirects = policyNames.flatMap((name) => [
 ]);
 
 /**
- * Only unresolved top-level HTML URLs reach this fallback. Public files, known
- * redirects/rewrites and dynamic routes are resolved first, so historical nested
- * CV documents stay untouched while stale links get the global custom 404.
+ * Resolve stale top-level HTML links after real public/filesystem matches but
+ * before dynamic App Router routes. Without this phase, `[locale]` consumes an
+ * unknown `*.html` segment and Next renders its generic 404 instead of the
+ * project's global custom not-found document.
  */
-const unknownTopLevelHtmlFallback = [
+const unknownTopLevelHtmlAfterFiles = [
 	{ source: "/:slug.html", destination: "/404" },
 ];
 
@@ -121,8 +122,8 @@ const nextConfig = {
 	async rewrites() {
 		return {
 			beforeFiles: [...htmlPageBeforeFiles],
-			afterFiles: [],
-			fallback: [...unknownTopLevelHtmlFallback],
+			afterFiles: [...unknownTopLevelHtmlAfterFiles],
+			fallback: [],
 		};
 	},
 };
