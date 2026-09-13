@@ -1,0 +1,211 @@
+{
+	"workstation": {
+		"meta": {
+			"title": "Workstation Docker Compose | Nabla - Alban Andrieu",
+			"description": "Docker Compose stacks on the workstation: self-hosted services, migration path from TrueNAS Scale, links to nabla-compose and ansible-workstation."
+		},
+		"hero": {
+			"title": "Docker Compose Services",
+			"subtitle": "Self-hosted applications and services running on my workstation and supporting migrations from TrueNAS Scale.",
+			"nasLead": "For the NAS-side catalog, see",
+			"nasLink": "TrueNAS Scale services",
+			"repositories": {
+				"nablaCompose": {
+					"description": "Docker Compose files for workstation and related deployments.",
+					"action": "Open nabla-compose"
+				},
+				"ansibleWorkstation": {
+					"description": "Ansible role and playbooks to provision this Ubuntu workstation, including packages and optional desktop tooling.",
+					"action": "Open ansible-workstation"
+				}
+			}
+		},
+		"sections": {
+			"edge": {
+				"title": "Edge & control",
+				"services": {
+					"traefik": {
+						"description": "Reverse proxy and TLS entrypoint",
+						"action": "Open HTTP"
+					},
+					"portainer": {
+						"description": "Container management UI",
+						"action": "Open Portainer"
+					},
+					"dockge": {
+						"description": "Compose stack manager",
+						"action": "Open Dockge"
+					},
+					"watchtower": {
+						"description": "Automatic image updates (no published UI on this host)",
+						"action": "Background service"
+					}
+				}
+			},
+			"observability": {
+				"title": "Observability",
+				"services": {
+					"grafana": {
+						"description": "Dashboards and alerting",
+						"action": "Open Grafana"
+					},
+					"prometheus": {
+						"description": "Metrics and time series",
+						"action": "Open Prometheus"
+					},
+					"loki": {
+						"description": "Log aggregation API",
+						"action": "Open Loki"
+					},
+					"graylog": {
+						"description": "Centralized log management and search",
+						"action": "Open Graylog"
+					},
+					"jaeger": {
+						"description": "Distributed tracing UI",
+						"action": "Open Jaeger"
+					},
+					"githubExporter": {
+						"description": "Prometheus metrics for GitHub",
+						"action": "Metrics"
+					},
+					"pyroscope": {
+						"description": "Continuous profiling UI",
+						"action": "Open Pyroscope"
+					},
+					"cadvisor": {
+						"description": "Container resource metrics",
+						"action": "Open cAdvisor"
+					}
+				}
+			},
+			"nabla": {
+				"title": "Nabla / Plumber application",
+				"services": {
+					"backend": {
+						"description": "Application backend",
+						"action": "Open API"
+					},
+					"frontend": {
+						"description": "Web UI",
+						"action": "Open UI"
+					},
+					"jupyter": {
+						"description": "Data science notebook",
+						"action": "Open Jupyter"
+					}
+				}
+			},
+			"utilities": {
+				"title": "Productivity & utilities",
+				"services": {
+					"vaultwarden": {
+						"description": "Password manager (bound to loopback)",
+						"action": "Open Vaultwarden"
+					},
+					"uptimeKuma": {
+						"description": "Uptime monitoring",
+						"action": "Open Kuma"
+					},
+					"porttracker": {
+						"description": "Port inventory UI",
+						"action": "Open PortTracker"
+					},
+					"stirlingPdf": {
+						"description": "PDF toolkit",
+						"action": "Open Stirling"
+					},
+					"convertx": {
+						"description": "File conversion",
+						"action": "Open ConvertX"
+					},
+					"languageTool": {
+						"description": "Grammar and style API",
+						"action": "Open LanguageTool"
+					},
+					"litellm": {
+						"description": "LLM proxy / gateway",
+						"action": "Open LiteLLM"
+					},
+					"mcpInspector": {
+						"description": "Model Context Protocol debugger",
+						"action": "Open inspector"
+					},
+					"temporal": {
+						"description": "Workflow engine (UI / gRPC ports on this host)",
+						"action": "Open :8005"
+					}
+				}
+			},
+			"data": {
+				"title": "Data stores & clients",
+				"services": {
+					"postgresql": {
+						"description": "Primary database (client connection)",
+						"action": "Connection"
+					},
+					"pgbouncer": {
+						"description": "Connection pooler",
+						"action": "Connection"
+					},
+					"postgresqlStandby": {
+						"description": "Replica instance",
+						"action": "Connection"
+					},
+					"neo4j": {
+						"description": "Graph browser (default port; use Traefik if not bound)",
+						"action": "Open Browser"
+					}
+				}
+			},
+			"network": {
+				"title": "Network visibility",
+				"services": {
+					"ntopng": {
+						"description": "Traffic analysis (host network — default UI port)",
+						"action": "Open ntopng"
+					},
+					"netalertx": {
+						"description": "Network presence monitoring (host network)",
+						"action": "Open NetAlertX"
+					},
+					"scrutiny": {
+						"description": "SMART collector (no host UI in this deployment)",
+						"action": "Collector only"
+					}
+				}
+			},
+			"sentry": {
+				"title": "Sentry self-hosted",
+				"services": {
+					"web": {
+						"description": "Error tracking UI — host port from the Sentry compose, commonly :9000 when Graylog is not using it.",
+						"action": "Open Sentry"
+					}
+				},
+				"note": "Workers, Snuba, ClickHouse, Kafka and other Sentry containers usually stay on the Docker network; use the web UI or Traefik routes for day-to-day access. Graylog is also listed on :9000, so remap one stack or use Traefik if both publish that port."
+			}
+		},
+		"related": {
+			"title": "Related",
+			"truenas": {
+				"description": "Homelab apps and hardware on the NAS.",
+				"action": "Open TrueNAS page"
+			},
+			"nabla": {
+				"description": "Project context on this site.",
+				"action": "Open Nabla"
+			}
+		},
+		"hardware": {
+			"title": "Hardware",
+			"workstationTitle": "Workstation",
+			"intro": "After seven years of good service, my workstation is getting old. The goal is to recover from hard-drive failures and keep using the RTX 2060 GPU for local LLM workloads.",
+			"bom": {
+				"title": "Bill of materials",
+				"reused": "Reused",
+				"newPurchases": "New purchases"
+			}
+		}
+	}
+}

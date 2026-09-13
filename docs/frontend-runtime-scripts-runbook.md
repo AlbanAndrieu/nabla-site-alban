@@ -102,13 +102,15 @@ or private but healthy from the user's LAN.
 
 ## Next.js HTML content migration
 
-`/workstation` is the remaining App Router route that renders trusted
-`public/` content through `app/components/PublicHtmlFragment.tsx` and
-`lib/htmlFromPublic.ts`. `/ai` and `/security` are fully native and no
-longer cross that component boundary. Localized detailed CV routes use the
-separate allowlisted `loadCvHtmlFragment` bridge so the standalone historical
-documents under `public/cv/` remain their source of truth. The custom 404 keeps
-its explicitly documented static-fragment exception.
+`/workstation`, `/ai` and `/security` are fully native App Router pages. The
+former `app/components/PublicHtmlFragment.tsx` transition component is retired;
+Workstation keeps technical service names, URLs and ports in typed TypeScript
+data while human-facing copy is owned by `messages/workstation/{en,fr}.json`.
+
+`lib/htmlFromPublic.ts` remains for compatibility helpers and for the explicitly
+documented static 404 exception. Localized detailed CV routes use the separate
+allowlisted `loadCvHtmlFragment` bridge so the standalone historical documents
+under `public/cv/` remain their source of truth.
 
 For each migrated page:
 
@@ -118,8 +120,9 @@ For each migrated page:
 4. keep internal URLs, canonical metadata, hreflang and sitemap policy aligned;
 5. remove the obsolete public HTML/script dependency when no consumer remains.
 
-SEO-indexable canonical URLs are extensionless. Historical `.html` URLs may
-remain only as permanent migration redirects, not as canonical internal links.
+SEO-indexable canonical URLs are extensionless. Non-indexable historical routes,
+including Workstation for now, keep their explicit routing policy until their
+indexability is decided separately.
 
 ## Troubleshooting
 

@@ -1,0 +1,211 @@
+{
+	"workstation": {
+		"meta": {
+			"title": "Workstation Docker Compose | Nabla - Alban Andrieu",
+			"description": "Stacks Docker Compose de la workstation : services auto-hébergés, trajectoire de migration depuis TrueNAS Scale et liens vers nabla-compose et ansible-workstation."
+		},
+		"hero": {
+			"title": "Services Docker Compose",
+			"subtitle": "Applications et services auto-hébergés sur ma workstation, utilisés aussi pour accompagner les migrations depuis TrueNAS Scale.",
+			"nasLead": "Pour le catalogue côté NAS, voir",
+			"nasLink": "les services TrueNAS Scale",
+			"repositories": {
+				"nablaCompose": {
+					"description": "Fichiers Docker Compose pour la workstation et les déploiements associés.",
+					"action": "Ouvrir nabla-compose"
+				},
+				"ansibleWorkstation": {
+					"description": "Rôle et playbooks Ansible pour provisionner cette workstation Ubuntu, avec les paquets et l'outillage desktop optionnel.",
+					"action": "Ouvrir ansible-workstation"
+				}
+			}
+		},
+		"sections": {
+			"edge": {
+				"title": "Edge & contrôle",
+				"services": {
+					"traefik": {
+						"description": "Reverse proxy et point d'entrée TLS",
+						"action": "Ouvrir HTTP"
+					},
+					"portainer": {
+						"description": "Interface de gestion des conteneurs",
+						"action": "Ouvrir Portainer"
+					},
+					"dockge": {
+						"description": "Gestionnaire de stacks Compose",
+						"action": "Ouvrir Dockge"
+					},
+					"watchtower": {
+						"description": "Mises à jour automatiques des images, sans interface publiée sur cet hôte",
+						"action": "Service en arrière-plan"
+					}
+				}
+			},
+			"observability": {
+				"title": "Observabilité",
+				"services": {
+					"grafana": {
+						"description": "Tableaux de bord et alertes",
+						"action": "Ouvrir Grafana"
+					},
+					"prometheus": {
+						"description": "Métriques et séries temporelles",
+						"action": "Ouvrir Prometheus"
+					},
+					"loki": {
+						"description": "API d'agrégation des logs",
+						"action": "Ouvrir Loki"
+					},
+					"graylog": {
+						"description": "Gestion centralisée et recherche dans les logs",
+						"action": "Ouvrir Graylog"
+					},
+					"jaeger": {
+						"description": "Interface de traçage distribué",
+						"action": "Ouvrir Jaeger"
+					},
+					"githubExporter": {
+						"description": "Métriques Prometheus pour GitHub",
+						"action": "Métriques"
+					},
+					"pyroscope": {
+						"description": "Interface de profiling continu",
+						"action": "Ouvrir Pyroscope"
+					},
+					"cadvisor": {
+						"description": "Métriques de ressources des conteneurs",
+						"action": "Ouvrir cAdvisor"
+					}
+				}
+			},
+			"nabla": {
+				"title": "Application Nabla / Plumber",
+				"services": {
+					"backend": {
+						"description": "Backend de l'application",
+						"action": "Ouvrir l'API"
+					},
+					"frontend": {
+						"description": "Interface web",
+						"action": "Ouvrir l'interface"
+					},
+					"jupyter": {
+						"description": "Notebook de data science",
+						"action": "Ouvrir Jupyter"
+					}
+				}
+			},
+			"utilities": {
+				"title": "Productivité & utilitaires",
+				"services": {
+					"vaultwarden": {
+						"description": "Gestionnaire de mots de passe, lié à la boucle locale",
+						"action": "Ouvrir Vaultwarden"
+					},
+					"uptimeKuma": {
+						"description": "Supervision de disponibilité",
+						"action": "Ouvrir Kuma"
+					},
+					"porttracker": {
+						"description": "Interface d'inventaire des ports",
+						"action": "Ouvrir PortTracker"
+					},
+					"stirlingPdf": {
+						"description": "Boîte à outils PDF",
+						"action": "Ouvrir Stirling"
+					},
+					"convertx": {
+						"description": "Conversion de fichiers",
+						"action": "Ouvrir ConvertX"
+					},
+					"languageTool": {
+						"description": "API de grammaire et de style",
+						"action": "Ouvrir LanguageTool"
+					},
+					"litellm": {
+						"description": "Proxy / passerelle LLM",
+						"action": "Ouvrir LiteLLM"
+					},
+					"mcpInspector": {
+						"description": "Débogueur Model Context Protocol",
+						"action": "Ouvrir l'inspecteur"
+					},
+					"temporal": {
+						"description": "Moteur de workflows, avec ports UI / gRPC sur cet hôte",
+						"action": "Ouvrir :8005"
+					}
+				}
+			},
+			"data": {
+				"title": "Stockage de données & clients",
+				"services": {
+					"postgresql": {
+						"description": "Base de données principale, connexion cliente",
+						"action": "Connexion"
+					},
+					"pgbouncer": {
+						"description": "Pooler de connexions",
+						"action": "Connexion"
+					},
+					"postgresqlStandby": {
+						"description": "Instance répliquée",
+						"action": "Connexion"
+					},
+					"neo4j": {
+						"description": "Navigateur de graphe, port par défaut ; utiliser Traefik s'il n'est pas publié",
+						"action": "Ouvrir le navigateur"
+					}
+				}
+			},
+			"network": {
+				"title": "Visibilité réseau",
+				"services": {
+					"ntopng": {
+						"description": "Analyse du trafic, réseau hôte et port UI par défaut",
+						"action": "Ouvrir ntopng"
+					},
+					"netalertx": {
+						"description": "Supervision de présence réseau sur le réseau hôte",
+						"action": "Ouvrir NetAlertX"
+					},
+					"scrutiny": {
+						"description": "Collecteur SMART, sans interface hôte dans ce déploiement",
+						"action": "Collecteur uniquement"
+					}
+				}
+			},
+			"sentry": {
+				"title": "Sentry auto-hébergé",
+				"services": {
+					"web": {
+						"description": "Interface de suivi des erreurs — port hôte défini par le Compose Sentry, souvent :9000 lorsque Graylog ne l'utilise pas.",
+						"action": "Ouvrir Sentry"
+					}
+				},
+				"note": "Workers, Snuba, ClickHouse, Kafka et les autres conteneurs Sentry restent généralement sur le réseau Docker ; utiliser l'interface web ou les routes Traefik au quotidien. Graylog est également indiqué sur :9000 : remapper l'une des stacks ou utiliser Traefik si les deux publient ce port."
+			}
+		},
+		"related": {
+			"title": "Pages liées",
+			"truenas": {
+				"description": "Applications du homelab et matériel côté NAS.",
+				"action": "Ouvrir la page TrueNAS"
+			},
+			"nabla": {
+				"description": "Contexte du projet sur ce site.",
+				"action": "Ouvrir Nabla"
+			}
+		},
+		"hardware": {
+			"title": "Matériel",
+			"workstationTitle": "Workstation",
+			"intro": "Après sept années de bons services, ma workstation vieillit. L'objectif est de fiabiliser le stockage après les pannes de disques et de continuer à utiliser le GPU RTX 2060 pour les workloads LLM locaux.",
+			"bom": {
+				"title": "Nomenclature",
+				"reused": "Réutilisé",
+				"newPurchases": "Nouveaux achats"
+			}
+		}
+	}
+}

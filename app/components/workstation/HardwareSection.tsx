@@ -1,4 +1,8 @@
-export default function HardwareSection() {
+import { getTranslations } from "next-intl/server";
+
+export default async function HardwareSection() {
+	const t = await getTranslations("workstation.hardware");
+
 	return (
 		<section
 			className="category-section nabla-platforms-section hardware-section"
@@ -15,16 +19,18 @@ export default function HardwareSection() {
 								className="hardware-heading-with-icon__glyph"
 								aria-hidden="true"
 							>
-								<i className="fas fa-server"></i>
+								<i className="fas fa-server" />
 							</span>
-							<span className="hardware-heading-with-icon__text">Hardware</span>
+							<span className="hardware-heading-with-icon__text">
+								{t("title")}
+							</span>
 						</h2>
 						<h3 className="h4 mb-2" id="nabla-workstation-heading">
 							<i
 								className="fas fa-database me-2 text-primary"
 								aria-hidden="true"
-							></i>
-							Workstation
+							/>
+							{t("workstationTitle")}
 						</h3>
 						<div className="hardware-platform-band">
 							<div className="row justify-content-center">
@@ -36,12 +42,10 @@ export default function HardwareSection() {
 													className="hardware-bom-intro__icon"
 													aria-hidden="true"
 												>
-													<i className="fas fa-screwdriver-wrench"></i>
+													<i className="fas fa-screwdriver-wrench" />
 												</span>
 												<span className="hardware-bom-intro__text">
-													After seven years of good service, my workstation is
-													getting old. The goal is to fix hard drive failure and
-													use the GPU RTX 2060 for LLM.
+													{t("intro")}
 												</span>
 											</p>
 										</div>
