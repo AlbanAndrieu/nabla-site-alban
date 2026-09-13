@@ -30,6 +30,11 @@ const AI_LOADERS = {
 	fr: () => import("@/messages/ai/fr.json"),
 } as const;
 
+const WORKSTATION_LOADERS = {
+	en: () => import("@/messages/workstation/en.json"),
+	fr: () => import("@/messages/workstation/fr.json"),
+} as const;
+
 const LEGACY_FEATURE_NAMESPACES = new Set(["truenasPage", "securityPage"]);
 
 function withoutMigratedLegacyNamespaces<T extends Record<string, unknown>>(
@@ -67,6 +72,7 @@ export async function loadMessages(locale: AppLocale) {
 		{ default: operations },
 		{ default: security },
 		{ default: ai },
+		{ default: workstation },
 	] = await Promise.all([
 		BASE_LOADERS[locale](),
 		TRUENAS_LOADERS[locale](),
@@ -74,6 +80,7 @@ export async function loadMessages(locale: AppLocale) {
 		OPERATIONS_LOADERS[locale](),
 		SECURITY_LOADERS[locale](),
 		AI_LOADERS[locale](),
+		WORKSTATION_LOADERS[locale](),
 	]);
 
 	const legacyBase = withoutMigratedLegacyNamespaces(base);
@@ -84,6 +91,7 @@ export async function loadMessages(locale: AppLocale) {
 		operations,
 		security,
 		ai,
+		workstation,
 	]);
 
 	return {
@@ -93,5 +101,6 @@ export async function loadMessages(locale: AppLocale) {
 		...operations,
 		...security,
 		...ai,
+		...workstation,
 	};
 }
