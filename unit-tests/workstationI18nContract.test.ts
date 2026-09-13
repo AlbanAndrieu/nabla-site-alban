@@ -40,7 +40,9 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 
 	for (const component of components) {
 		assert.match(component, /getTranslations/);
-		assert.doesNotMatch(component, /locale === [#']fr[#']/);
+		assert.match(component, /components\/ui\/Container/);
+		assert.doesNotMatch(component, /className=["']container["']/);
+		assert.doesNotMatch(component, /locale === ["']fr["']/);
 		assert.doesNotMatch(component, /const COPY\b/);
 	}
 

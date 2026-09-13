@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Container from "@/components/ui/Container";
 
 export default async function HardwareSection() {
 	const t = await getTranslations("workstation.hardware");
@@ -8,7 +9,7 @@ export default async function HardwareSection() {
 			className="category-section nabla-platforms-section hardware-section"
 			aria-labelledby="hardware-heading"
 		>
-			<div className="container">
+			<Container>
 				<div className="row mb-4">
 					<div className="col-12">
 						<h2
@@ -55,7 +56,7 @@ export default async function HardwareSection() {
 						</div>
 					</div>
 				</div>
-			</div>
+			</Container>
 		</section>
 	);
 }
