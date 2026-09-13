@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Container from "@/components/ui/Container";
 import { WORKSTATION_SECTIONS } from "./workstationServices";
 
 type Props = Readonly<{
@@ -41,7 +42,7 @@ export default async function WorkstationServiceSections({
 						className={sectionClassName}
 						aria-labelledby={section.id}
 					>
-						<div className="container">
+						<Container>
 							<h2 id={section.id} className="workstation-section-title h3 mb-4">
 								<span
 									className="workstation-section-title__icon"
@@ -103,7 +104,7 @@ export default async function WorkstationServiceSections({
 							{copy.note ? (
 								<p className="text-secondary small mt-3 mb-0">{copy.note}</p>
 							) : null}
-						</div>
+						</Container>
 					</section>
 				);
 			})}
@@ -111,7 +112,7 @@ export default async function WorkstationServiceSections({
 				className="workstation-section workstation-section--alt py-5 border-top border-secondary"
 				aria-labelledby="workstation-related-heading"
 			>
-				<div className="container">
+				<Container>
 					<h2
 						id="workstation-related-heading"
 						className="workstation-section-title h3 mb-4"
@@ -158,7 +159,7 @@ export default async function WorkstationServiceSections({
 							</div>
 						</div>
 					</div>
-				</div>
+				</Container>
 			</section>
 		</>
 	);
