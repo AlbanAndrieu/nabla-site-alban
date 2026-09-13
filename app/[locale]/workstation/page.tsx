@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function WorkstationPage({ params }: Props) {
-	const { locale } = await params»
+	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	const appLocale = locale as AppLocale;
