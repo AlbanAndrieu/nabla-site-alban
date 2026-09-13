@@ -82,7 +82,8 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.match(workflow, /rules_file_name: "\.zap\/rules\.tsv"/);
 	assert.match(workflow, /allow_issue_writing: false/);
 	assert.match(workflow, /fail_action: true/);
-	assert.match(workflow, /cmd_options: "-I -T 5 -c \.zap\/rules\.tsv"/);
+	assert.match(workflow, /cmd_options: "-I -T 5"/);
+	assert.doesNotMatch(workflow, /cmd_options:.*-c \.zap\/rules\.tsv/);
 	assert.match(workflow, /continue-on-error: true/);
 	assert.match(workflow, /artifact_name: zap-preview-report/);
 	assert.match(workflow, /Summarize ZAP Preview diagnostics/);

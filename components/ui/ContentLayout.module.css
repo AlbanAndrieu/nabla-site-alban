@@ -1,0 +1,91 @@
+.main {
+	padding-block: clamp(var(--ui-space-lg), 4vw, 3rem);
+}
+
+.header {
+	margin-bottom: clamp(var(--ui-space-lg), 3vw, var(--ui-space-xl));
+}
+
+.centeredHeader {
+	max-width: 48rem;
+	margin-inline: auto;
+	margin-bottom: clamp(var(--ui-space-lg), 3vw, var(--ui-space-xl));
+	text-align: center;
+}
+
+.title {
+	margin: 0 0 var(--ui-space-xs);
+	color: var(--ui-text-primary);
+	font-size: clamp(1.75rem, 2.5vw + 1rem, 2.5rem);
+	line-height: 1.15;
+	text-wrap: balance;
+}
+
+.lead {
+	margin: 0;
+	color: var(--ui-text-secondary);
+	font-size: clamp(1rem, 0.4vw + 0.95rem, 1.125rem);
+	line-height: 1.65;
+	text-wrap: pretty;
+}
+
+.section {
+	min-width: 0;
+	padding-block: var(--ui-space-sm);
+}
+
+.section + .section {
+	margin-top: clamp(var(--ui-space-md), 2vw, var(--ui-space-lg));
+}
+
+.sectionTitle {
+	margin: 0 0 var(--ui-space-md);
+	color: var(--ui-text-primary);
+	font-size: clamp(1.2rem, 0.8vw + 1rem, 1.4rem);
+	line-height: 1.3;
+	text-wrap: balance;
+}
+
+.twoColumnGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: clamp(var(--ui-space-md), 2.5vw, var(--ui-space-xl));
+}
+
+.twoColumnGrid > * {
+	min-width: 0;
+}
+
+.breakable {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.visuallyHidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (max-width: 900px) {
+	.twoColumnGrid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 575.98px) {
+	.main {
+		padding-block: var(--ui-space-lg);
+	}
+
+	.header,
+	.centeredHeader {
+		margin-bottom: var(--ui-space-lg);
+	}
+}
