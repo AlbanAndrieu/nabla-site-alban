@@ -55,7 +55,10 @@ test("code-size gate reports invalid UTF-8 source without traceback", async () =
 	const directory = await mkdtemp(join(tmpdir(), "site-code-size-"));
 	const source = join(directory, "invalid-utf8.ts");
 	try {
-		await writeFile(source, Buffer.from([0x63, 0x6f, 0x6e, 0x73, 0x74, 0x20, 0xbb, 0x0a]));
+		await writeFile(
+			source,
+			Buffer.from([0x63, 0x6f, 0x6e, 0x73, 0x74, 0x20, 0xbb, 0x0a]),
+		);
 		const result = runCodeSize(["--warn", "3", "--fail", "5", source]);
 
 		assert.equal(result.status, 1);
