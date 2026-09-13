@@ -71,6 +71,16 @@ const policyHtmlRedirects = policyNames.flatMap((name) => [
 	},
 ]);
 
+/**
+ * Resolve stale top-level HTML links after real public/filesystem matches but
+ * before dynamic App Router routes. Without this phase, `[locale]` consumes an
+ * unknown `*.html` segment and Next renders its generic 404 instead of the
+ * project's global custom not-found document.
+ */
+const unknownTopLevelHtmlAfterFiles = [
+	{ source: "/:slug.html", destination: "/404" },
+];
+
 const baselineSecurityHeaders = [
 	{ key: "X-Content-Type-Options", value: "nosniff" },
 	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -112,7 +122,8 @@ const nextConfig = {
 	async rewrites() {
 		return {
 			beforeFiles: [...htmlPageBeforeFiles],
-			afterFiles: [],
+			afterFiles: [...unknownTopLevelHtmlAfterFiles],
+			fallback: [],
 		};
 	},
 };
