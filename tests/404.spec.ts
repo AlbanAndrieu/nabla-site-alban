@@ -57,6 +57,38 @@ test.describe("404 Error Page Tests", () => {
 		await expect(page.locator("body")).toBeVisible();
 	});
 
+	test("unknown top-level HTML should render the same custom 404 as /404", async ({
+		page,
+	}) => {
+		for (const pathname of ["/404", "/people-contactedsss.html"]) {
+			const response = await page.goto(pathname);
+
+			expect(response?.status(), pathname).toBe(404);
+			await expect(
+				page.locator('html[data-nabla-app="next-global-not-found"]'),
+			).toHaveCount(1);
+			await expect(page.locator("body.page-dark")).toBeVisible();
+			await expect(page.locator("h1")).toHaveText("404");
+			await expect(page.locator(".cloak__wrapper")).toHaveCount(1);
+			await expect(page.locator(".info h2")).toHaveText("We can't find that page");
+			await expect(page.locator('.info a[href="/"]')).toBeVisible();
+
+			const bodyStyle = await page.locator("body").evaluate((body) => {
+				const style = window.getComputedStyle(body);
+				return {
+					display: style.display,
+					backgroundColor: style.backgroundColor,
+					color: style.color,
+				};
+			});
+			expect(bodyStyle).toEqual({
+				display: "flex",
+				backgroundColor: "rgb(115, 115, 115)",
+				color: "rgb(250, 250, 250)",
+			});
+		}
+	});
+
 	test("should be accessible on mobile", async ({ page, viewport }) => {
 		await page.goto(missingPath);
 

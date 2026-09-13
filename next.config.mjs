@@ -71,6 +71,15 @@ const policyHtmlRedirects = policyNames.flatMap((name) => [
 	},
 ]);
 
+/**
+ * Only unresolved top-level HTML URLs reach this fallback. Public files, known
+ * redirects/rewrites and dynamic routes are resolved first, so historical nested
+ * CV documents stay untouched while stale links get the global custom 404.
+ */
+const unknownTopLevelHtmlFallback = [
+	{ source: "/:slug.html", destination: "/404" },
+];
+
 const baselineSecurityHeaders = [
 	{ key: "X-Content-Type-Options", value: "nosniff" },
 	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -113,6 +122,7 @@ const nextConfig = {
 		return {
 			beforeFiles: [...htmlPageBeforeFiles],
 			afterFiles: [],
+			fallback: [...unknownTopLevelHtmlFallback],
 		};
 	},
 };
