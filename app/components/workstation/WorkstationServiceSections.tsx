@@ -42,10 +42,7 @@ export default async function WorkstationServiceSections({
 						aria-labelledby={section.id}
 					>
 						<div className="container">
-							<h2
-								id={section.id}
-								className="workstation-section-title h3 mb-4"
-							>
+							<h2 id={section.id} className="workstation-section-title h3 mb-4">
 								<span
 									className="workstation-section-title__icon"
 									aria-hidden="true"
@@ -73,9 +70,7 @@ export default async function WorkstationServiceSections({
 													<h3 className="h5 card-title">
 														<b>{service.name}</b>
 													</h3>
-													<p className="card-text">
-														{serviceCopy.description}
-													</p>
+													<p className="card-text">{serviceCopy.description}</p>
 													<div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
 														{service.disabled ? (
 															<button

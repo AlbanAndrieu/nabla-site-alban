@@ -10,9 +10,10 @@ const WORKSTATION_COMPONENTS = [
 ] as const;
 
 function leafKeys(value: unknown, prefix = ""): string[] {
-	if (!value || typeof value !== "object" || Array.isArray(value)) return [prefix];
-	return Object.entries(value as Record<string, unknown>).flatMap(([key, child]) =>
-		leafKeys(child, prefix ? `${prefix}.${key}` : key),
+	if (!value || typeof value !== "object" || Array.isArray(value))
+		return [prefix];
+	return Object.entries(value as Record<string, unknown>).flatMap(
+		([key, child]) => leafKeys(child, prefix ? `${prefix}.${key}` : key),
 	);
 }
 

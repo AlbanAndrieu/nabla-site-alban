@@ -23,7 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	if (!hasLocale(routing.locales, locale)) return {};
 
 	const appLocale = locale as AppLocale;
-	const t = await getTranslations({ locale: appLocale, namespace: "workstation.meta" });
+	const t = await getTranslations({
+		locale: appLocale,
+		namespace: "workstation.meta",
+	});
 	const canonical = workstationCanonical(appLocale);
 	const canonicalUrl = new URL(canonical, "https://albanandrieu.com").href;
 
@@ -41,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function WorkstationPage({ params }: Props) {
-	const { locale } = await params;
+	const { locale } = await params»
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	const appLocale = locale as AppLocale;
