@@ -96,6 +96,8 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    outputs:
+      current-base-sha: ${{ steps.production-baseline.outputs.base-sha }}
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -475,10 +477,18 @@ jobs:
         if: steps.preview.outputs.deploy_relevant == 'true'
         env:
           CHECKPOINT_BRANCH: ${{ steps.preview.outputs.branch }}
+          PR_BASE_SHA: ${{ needs.quality.outputs.current-base-sha }}
         shell: bash
         run: |
           set -euo pipefail
-          git push --force origin "HEAD:refs/heads/${CHECKPOINT_BRANCH}"
+          checkpoint_ref="refs/heads/${CHECKPOINT_BRANCH}"
+          if ! git ls-remote --exit-code --heads origin "${checkpoint_ref}" >/dev/null 2>&1; then
+            # Creating a new ref directly at the final SHA does not reliably emit
+            # the Git update Vercel listens for. Seed the branch at the PR base,
+            # then move it to the already quality-validated exact PR SHA.
+            git push origin "${PR_BASE_SHA}:${checkpoint_ref}"
+          fi
+          git push --force origin "HEAD:${checkpoint_ref}"
           echo "Published ${CHECKPOINT_BRANCH} at $(git rev-parse HEAD)."
 
       - name: Wait for Vercel, Playwright and ZAP Preview statuses
@@ -489,6 +499,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           ZAP_BOOTSTRAP: ${{ steps.preview.outputs.zap_bootstrap }}
         with:
+          retries: 3
           script: |
             const sha = process.env.STATUS_SHA;
             const prNumber = Number(process.env.PR_NUMBER);

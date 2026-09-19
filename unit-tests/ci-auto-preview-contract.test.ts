@@ -19,10 +19,14 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 	assert.match(workflow, /pull-requests: read/);
 	assert.match(workflow, /statuses: write/);
 	assert.match(workflow, /ref: \$\{\{ steps\.preview\.outputs\.sha \}\}/);
+	assert.match(workflow, /PR_BASE_SHA/);
+	assert.match(workflow, /git ls-remote --exit-code --heads origin/);
 	assert.match(
 		workflow,
-		/git push --force origin "HEAD:refs\/heads\/\$\{CHECKPOINT_BRANCH\}"/,
+		/git push origin "\$\{PR_BASE_SHA\}:\$\{checkpoint_ref\}"/,
 	);
+	assert.match(workflow, /git push --force origin "HEAD:\$\{checkpoint_ref\}"/);
+	assert.match(workflow, /does not reliably emit/);
 	assert.match(workflow, /vercel-preview-pr-/);
 	assert.match(workflow, /zapBootstrap/);
 });
@@ -66,6 +70,10 @@ test("Preview security gate waits for both Playwright and OWASP ZAP exact-SHA st
 	assert.match(workflow, /2 \* 60 \* 1000/);
 	assert.match(workflow, /status\?\.state \?\? 'absent'/);
 	assert.match(workflow, /Vercel status was not registered within 2 minutes/);
+	assert.match(
+		workflow,
+		/Wait for Vercel, Playwright and ZAP Preview statuses[\s\S]*?retries: 3/,
+	);
 	assert.doesNotMatch(workflow, /status\?\.state \?\? 'pending'/);
 	assert.match(workflow, /Timed out waiting for/);
 });
