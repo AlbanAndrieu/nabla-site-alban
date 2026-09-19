@@ -96,6 +96,8 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    outputs:
+      current-base-sha: ${{ steps.production-baseline.outputs.base-sha }}
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -475,7 +477,7 @@ jobs:
         if: steps.preview.outputs.deploy_relevant == 'true'
         env:
           CHECKPOINT_BRANCH: ${{ steps.preview.outputs.branch }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BASE_SHA: ${{ needs.quality.outputs.current-base-sha }}
         shell: bash
         run: |
           set -euo pipefail
