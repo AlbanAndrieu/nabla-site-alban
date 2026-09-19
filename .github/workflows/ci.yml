@@ -499,6 +499,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           ZAP_BOOTSTRAP: ${{ steps.preview.outputs.zap_bootstrap }}
         with:
+          retries: 3
           script: |
             const sha = process.env.STATUS_SHA;
             const prNumber = Number(process.env.PR_NUMBER);
