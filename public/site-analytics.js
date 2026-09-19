@@ -183,6 +183,7 @@
 	}
 
 	function loadDefer(src) {
+		if (document.querySelector('script[src*="' + src + '"]')) return;
 		var s = document.createElement("script");
 		s.src = src;
 		s.defer = true;
