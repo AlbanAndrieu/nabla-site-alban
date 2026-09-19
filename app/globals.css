@@ -260,13 +260,13 @@ html body .form-control::placeholder {
 	color: #fff;
 }
 
-.page-truenas a:not(.btn) {
+.page-truenas a:not(.btn):not([data-ui-action]) {
 	color: var(--truenas-link);
 	text-decoration-color: rgb(125 211 252 / 70%);
 }
 
-.page-truenas a:not(.btn):hover,
-.page-truenas a:not(.btn):focus-visible {
+.page-truenas a:not(.btn):not([data-ui-action]):hover,
+.page-truenas a:not(.btn):not([data-ui-action]):focus-visible {
 	color: var(--truenas-link-hover);
 	text-decoration-color: currentColor;
 }

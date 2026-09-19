@@ -1,4 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import ActionLink from "@/components/ui/ActionLink";
+import Button from "@/components/ui/Button";
+import Card, { CardBody } from "@/components/ui/Card";
 import Container from "@/components/ui/Container";
 import { WORKSTATION_SECTIONS } from "./workstationServices";
 
@@ -60,43 +63,51 @@ export default async function WorkstationServiceSections({
 											`Missing workstation copy for ${section.key}.${service.key}`,
 										);
 									}
-									const actionClassName = `btn btn-sm btn-outline-${
-										service.actionTone ?? "primary"
-									}`;
+									const actionVariant =
+										service.actionTone === "secondary"
+											? "outlineSecondary"
+											: "outline";
 
 									return (
 										<div key={service.key} className="col-md-4 p-3">
-											<div className="card workstation-service-card box-shadow h-100">
-												<div className="card-body">
-													<h3 className="h5 card-title">
+											<Card
+												elevated
+												className="workstation-service-card h-100"
+											>
+												<CardBody>
+													<h3 className="h5">
 														<b>{service.name}</b>
 													</h3>
-													<p className="card-text">{serviceCopy.description}</p>
+													<p>{serviceCopy.description}</p>
 													<div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
 														{service.disabled ? (
-															<button
-																type="button"
-																className={actionClassName}
+															<Button
+																variant={actionVariant}
+																size="compact"
 																disabled
 															>
 																{serviceCopy.action}
-															</button>
+															</Button>
 														) : (
-															<a
+															<ActionLink
 																href={service.href}
-																className={actionClassName}
+																variant={actionVariant}
+																size="compact"
+																data-ui-action=""
 															>
 																<i
 																	className={service.iconClassName}
 																	aria-hidden="true"
 																/>{" "}
 																{serviceCopy.action}
-															</a>
+															</ActionLink>
 														)}
-														<small className="text-muted">{service.port}</small>
+														<small className="text-muted">
+															{service.port}
+														</small>
 													</div>
-												</div>
-											</div>
+												</CardBody>
+											</Card>
 										</div>
 									);
 								})}
@@ -127,36 +138,42 @@ export default async function WorkstationServiceSections({
 					</h2>
 					<div className="row g-4">
 						<div className="col-md-6">
-							<div className="card workstation-service-card box-shadow h-100 border-secondary">
-								<div className="card-body">
-									<h3 className="h6 card-title">TrueNAS Scale</h3>
-									<p className="card-text text-muted small mb-0">
+							<Card elevated className="workstation-service-card h-100">
+								<CardBody>
+									<h3 className="h6">TrueNAS Scale</h3>
+									<p className="text-muted small mb-0">
 										{t("related.truenas.description")}
 									</p>
-									<a
+									<ActionLink
 										href={truenasHref}
-										className="btn btn-sm btn-outline-primary mt-3"
+										variant="outline"
+										size="compact"
+										className="mt-3"
+										data-ui-action=""
 									>
 										{t("related.truenas.action")}
-									</a>
-								</div>
-							</div>
+									</ActionLink>
+								</CardBody>
+							</Card>
 						</div>
 						<div className="col-md-6">
-							<div className="card workstation-service-card box-shadow h-100 border-secondary">
-								<div className="card-body">
-									<h3 className="h6 card-title">Nabla</h3>
-									<p className="card-text text-muted small mb-0">
+							<Card elevated className="workstation-service-card h-100">
+								<CardBody>
+									<h3 className="h6">Nabla</h3>
+									<p className="text-muted small mb-0">
 										{t("related.nabla.description")}
 									</p>
-									<a
+									<ActionLink
 										href={nablaHref}
-										className="btn btn-sm btn-outline-primary mt-3"
+										variant="outline"
+										size="compact"
+										className="mt-3"
+										data-ui-action=""
 									>
 										{t("related.nabla.action")}
-									</a>
-								</div>
-							</div>
+									</ActionLink>
+								</CardBody>
+							</Card>
 						</div>
 					</div>
 				</Container>
