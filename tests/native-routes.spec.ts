@@ -1,11 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { RESOURCE_SECTIONS } from "../app/[locale]/security/securityResources";
 
-const pages = ["/workstation.html"];
+const workstationPages = [
+	{
+		pathname: "/workstation.html",
+		locale: "en",
+		heading: "Docker Compose Services",
+	},
+	{
+		pathname: "/fr/workstation.html",
+		locale: "fr",
+		heading: "Services Docker Compose",
+	},
+] as const;
 
-test.describe("transitional public HTML fragments", () => {
-	for (const pathname of pages) {
-		test(`${pathname} keeps one accessible document structure`, async ({
+const canonicalProductNames = ["Traefik", "Prometheus", "Dockge"] as const;
+
+test.describe("native workstation route", () => {
+	for (const { pathname, locale, heading } of workstationPages) {
+		test(`${pathname} renders localized native content without mobile overflow`, async ({
 			page,
 		}) => {
 			const hydrationErrors: string[] = [];
@@ -14,15 +27,25 @@ test.describe("transitional public HTML fragments", () => {
 					hydrationErrors.push(message.text());
 				}
 			});
+			await page.setViewportSize({ width: 320, height: 568 });
 
 			const response = await page.goto(pathname);
 
 			expect(response?.ok()).toBeTruthy();
-			await expect(page.locator("h1")).toHaveCount(1);
+			await expect(page.locator("html")).toHaveAttribute("lang", locale);
+			await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
 			await expect(page.locator("main#main-content")).toHaveCount(1);
 			await expect(
 				page.locator('a.skip-to-main[href="#main-content"]'),
 			).toHaveCount(1);
+			for (const productName of canonicalProductNames) {
+				await expect(page.getByText(productName, { exact: true }).first()).toBeVisible();
+			}
+			const width = await page.evaluate(() => ({
+				scroll: document.documentElement.scrollWidth,
+				client: document.documentElement.clientWidth,
+			}));
+			expect(width.scroll).toBeLessThanOrEqual(width.client);
 			expect(hydrationErrors).toEqual([]);
 		});
 	}

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 
 type Props = Readonly<{
@@ -14,7 +15,7 @@ export default async function WorkstationHero({ truenasHref }: Props) {
 				className="py-5 bg-light page-truenas-apps"
 				aria-labelledby="workstation-compose-heading"
 			>
-				<div className="container">
+				<Container>
 					<div className="row mb-4">
 						<div className="col-12 text-center">
 							<h1 id="workstation-compose-heading" className="display-4 mb-3">
@@ -76,7 +77,7 @@ export default async function WorkstationHero({ truenasHref }: Props) {
 							</div>
 						</div>
 					</div>
-				</div>
+				</Container>
 			</section>
 		</header>
 	);

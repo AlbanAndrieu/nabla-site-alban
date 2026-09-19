@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { WORKSTATION_BOM } from "./workstationServices";
 
@@ -7,7 +8,7 @@ export default async function BillOfMaterialsSection() {
 
 	return (
 		<section className="category-section nabla-platforms-section bill-of-materials-section">
-			<div className="container">
+			<Container>
 				<div className="row mb-4">
 					<div className="col-12">
 						<h3 className="h5 mt-4 hardware-bom-heading">
@@ -56,7 +57,7 @@ export default async function BillOfMaterialsSection() {
 						</ul>
 					</div>
 				</div>
-			</div>
+			</Container>
 		</section>
 	);
 }
