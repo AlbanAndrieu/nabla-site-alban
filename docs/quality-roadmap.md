@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 12 septembre 2026.
+Dernière vérification : 19 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -69,7 +69,7 @@ branche finale et le déploiement Vercel sont validés.
   natives avant le catalogue outils/workflows, et les contrats
   `aiI18nContract`/`aiSecurePlatform` verrouillent l'architecture Secure AI et
   la parité EN/FR.
-- [ ] Migrer les derniers fragments nécessaires de `/workstation`.
+- [x] Migrer les derniers fragments nécessaires de `/workstation`. #186 a retiré le\n  dernier fragment App Router legacy et garde le contenu Workstation en React/Next\n  natif avec données techniques typées et copie EN/FR versionnée.
 - [x] Conserver `cv-{small,medium,large,full}-{en,fr,de,no}.html` comme documents
   historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
   exclus de la migration React/Next.js native ; voir `public/cv/README.md` et le
