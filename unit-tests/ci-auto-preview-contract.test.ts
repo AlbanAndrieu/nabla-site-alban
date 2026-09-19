@@ -25,10 +25,7 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 		workflow,
 		/git push origin "\$\{PR_BASE_SHA\}:\$\{checkpoint_ref\}"/,
 	);
-	assert.match(
-		workflow,
-		/git push --force origin "HEAD:\$\{checkpoint_ref\}"/,
-	);
+	assert.match(workflow, /git push --force origin "HEAD:\$\{checkpoint_ref\}"/);
 	assert.match(workflow, /does not reliably emit/);
 	assert.match(workflow, /vercel-preview-pr-/);
 	assert.match(workflow, /zapBootstrap/);
