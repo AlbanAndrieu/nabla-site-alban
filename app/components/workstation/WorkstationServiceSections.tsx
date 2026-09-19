@@ -70,10 +70,7 @@ export default async function WorkstationServiceSections({
 
 									return (
 										<div key={service.key} className="col-md-4 p-3">
-											<Card
-												elevated
-												className="workstation-service-card h-100"
-											>
+											<Card elevated className="workstation-service-card h-100">
 												<CardBody>
 													<h3 className="h5">
 														<b>{service.name}</b>
@@ -102,9 +99,7 @@ export default async function WorkstationServiceSections({
 																{serviceCopy.action}
 															</ActionLink>
 														)}
-														<small className="text-muted">
-															{service.port}
-														</small>
+														<small className="text-muted">{service.port}</small>
 													</div>
 												</CardBody>
 											</Card>
