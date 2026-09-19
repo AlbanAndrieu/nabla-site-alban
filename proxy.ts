@@ -19,7 +19,9 @@ const knownTopLevelHtmlPaths = new Set([
 ]);
 
 function isUnknownTopLevelHtml(pathname: string): boolean {
-	return /^\/[^/]+\.html$/.test(pathname) && !knownTopLevelHtmlPaths.has(pathname);
+	return (
+		/^\/[^/]+\.html$/.test(pathname) && !knownTopLevelHtmlPaths.has(pathname)
+	);
 }
 
 /**
@@ -60,8 +62,5 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-	matcher: [
-		"/:slug.html",
-		"/((?!api|_next|_vercel|.*\\..*).*)",
-	],
+	matcher: ["/:slug.html", "/((?!api|_next|_vercel|.*\\..*).*)"],
 };
