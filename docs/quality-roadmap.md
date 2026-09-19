@@ -69,7 +69,9 @@ branche finale et le déploiement Vercel sont validés.
   natives avant le catalogue outils/workflows, et les contrats
   `aiI18nContract`/`aiSecurePlatform` verrouillent l'architecture Secure AI et
   la parité EN/FR.
-- [x] Migrer les derniers fragments nécessaires de `/workstation`. #186 a retiré le\n  dernier fragment App Router legacy et garde le contenu Workstation en React/Next\n  natif avec données techniques typées et copie EN/FR versionnée.
+- [x] Migrer les derniers fragments nécessaires de `/workstation`. #186 a retiré le
+  dernier fragment App Router legacy et garde le contenu Workstation en React/Next
+  natif avec données techniques typées et copie EN/FR versionnée.
 - [x] Conserver `cv-{small,medium,large,full}-{en,fr,de,no}.html` comme documents
   historiques simples et autonomes sous `public/cv/`. Ils sont explicitement
   exclus de la migration React/Next.js native ; voir `public/cv/README.md` et le
@@ -80,11 +82,10 @@ branche finale et le déploiement Vercel sont validés.
   explicitement allowlistées. Leur autonomie sous `public/cv/` reste inchangée
   et un contrat verrouille ce lien de compatibilité sans imposer une migration
   React de ces documents.
-- [ ] Réduire puis supprimer `PublicHtmlFragment` lorsqu'il n'a plus de
-  consommateur justifié, hors exceptions statiques explicitement documentées.
-  L'audit du 8 septembre 2026 confirme que `/ai` et `/security` sont natifs ;
-  `/workstation` reste le dernier consommateur App Router direct, tandis que le
-  404 utilise séparément son exception statique documentée.
+- [x] Supprimer `PublicHtmlFragment` une fois ses consommateurs App Router
+  migrés. #186 a retiré le composant après la migration native de `/workstation` ;
+  le 404 conserve séparément son loader statique documenté et les CV historiques
+  restent servis par leur chemin de compatibilité explicitement allowlisté.
 
 ## P0 — Design system et cohérence UI/UX
 
@@ -100,18 +101,21 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Définir les tokens sémantiques Next.js `surface`, `surface-muted`,
   `text-primary`, `text-secondary`, `border`, `link`, `success`, `warning` et
   `danger` en les adossant au contrat `theme.css` existant.
-- [ ] Valider systématiquement le contraste WCAG AA de ces tokens sur les pages
-  prioritaires en thème clair, sombre et préférence système.
-- [ ] Ajouter une vérification visuelle automatisée light/dark sur les pages
+- [x] Valider systématiquement le contraste WCAG AA de ces tokens sur les pages
+  prioritaires en thème clair, sombre et préférence système. #189 verrouille un
+  ratio d'au moins 4,5:1 pour les couples sémantiques couverts.
+- [x] Ajouter une vérification visuelle automatisée light/dark sur les pages
   prioritaires (`/`, `/truenas`, `/architecture`, `/ai`, `/contact`, `/cv`) afin
   d'empêcher les régressions de contraste lors des migrations Bootstrap/CSS.
+  #189 couvre les préférences explicites `light`/`dark` et `auto` avec système
+  clair/sombre sans recourir à des snapshots pixel-perfect fragiles.
 - [ ] Normaliser les tokens globaux pour couleurs, surfaces, espacements, rayons,
   typographie, ombres et états success/warning/danger.
 - [x] Introduire les primitives `Container` et `ExternalLink` ainsi que la
   primitive d'action partagée utilisée par le Footer et les CTA migrés.
-- [ ] Introduire les primitives restantes `Button`, `Card`, `Section`, `Badge` et
-  `PageHeader` seulement lorsqu'un consommateur réel permet d'éviter des
-  composants abstraits inutilisés.
+- [ ] Introduire les primitives restantes `Section` et `PageHeader` seulement
+  lorsqu'un consommateur réel permet d'éviter des composants abstraits inutilisés.
+  `Button`, `Card` et `Badge` ont désormais des consommateurs réels.
 - [x] Migrer le Footer, `RouteHeader`, `LocaleSwitcher` et `ContactHero` vers les
   tokens/primitives partagés avant les composants spécifiques aux pages.
 - [x] Retirer Tailwind/PostCSS du toolchain après découplage du CSS rendu : le
@@ -120,7 +124,10 @@ branche finale et le déploiement Vercel sont validés.
   graphe de lock sont supprimés. La preuve exacte de #182 couvre CI #1109,
   Playwright #876 (144/144) et ZAP Preview #43 ; Bootstrap reste un chantier séparé.
 - [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
-  feuilles globales chargées dans le layout.
+  feuilles globales chargées dans le layout. La phase Workstation suivant #187
+  migre les cartes/actions React natives vers `Card`, `CardBody`, `ActionLink` et
+  `Button` ; la grille et les utilitaires Bootstrap restants sont volontairement
+  différés pour conserver des lots visuels bornés.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
   couvrent.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après
