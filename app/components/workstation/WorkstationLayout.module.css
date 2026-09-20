@@ -1,0 +1,234 @@
+.pageMain {
+	margin-bottom: var(--ui-space-2xl);
+}
+
+.heroSection {
+	padding-block: clamp(var(--ui-space-xl), 5vw, 3rem);
+	background: var(--ui-surface-muted);
+}
+
+.section {
+	padding-block: clamp(var(--ui-space-xl), 5vw, 3rem);
+}
+
+.relatedSection {
+	border-top: 1px solid var(--ui-border);
+}
+
+.heroTitle {
+	margin: 0 0 var(--ui-space-md);
+	font-size: var(--ui-font-size-display);
+	font-weight: var(--ui-font-weight-light);
+	line-height: var(--ui-line-height-heading);
+	text-wrap: balance;
+}
+
+.heroLead {
+	margin: 0;
+	font-size: var(--ui-font-size-lg);
+	font-weight: var(--ui-font-weight-light);
+	line-height: 1.5;
+	text-wrap: pretty;
+}
+
+.heroSupporting {
+	margin: var(--ui-space-md) 0 0;
+	line-height: 1.5;
+}
+
+.cardTitle,
+.relatedTitle,
+.sectionTitle {
+	line-height: var(--ui-line-height-heading);
+}
+
+.cardTitle {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: var(--ui-font-size-lg);
+}
+
+.headingIcon {
+	margin-inline-end: var(--ui-space-xs);
+	color: var(--truenas-accent-blue, var(--ui-link));
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: var(--ui-space-xs);
+	margin: 0 0 var(--ui-space-lg);
+	font-size: var(--ui-font-size-section-title);
+	text-wrap: balance;
+}
+
+.sectionTitleIcon {
+	flex: 0 0 auto;
+	color: var(--truenas-accent-cyan, var(--ui-link));
+}
+
+.servicePort,
+.note,
+.relatedCopy {
+	font-size: var(--ui-font-size-sm);
+}
+
+.relatedTitle {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: var(--ui-font-size-md);
+}
+
+.relatedCopy {
+	margin: 0;
+	line-height: 1.5;
+}
+
+.heroSection .heroLead,
+.heroSection .heroSupporting,
+.section .servicePort,
+.section .note,
+.section .relatedCopy {
+	color: var(--truenas-text-secondary, var(--ui-text-secondary));
+}
+
+.hardwareContent,
+.bomContent {
+	margin-bottom: var(--ui-space-lg);
+}
+
+.hardwareTitle {
+	margin: 0 0 var(--ui-space-md);
+	font-size: var(--ui-font-size-display);
+	font-weight: var(--ui-font-weight-light);
+	line-height: var(--ui-line-height-heading);
+	text-wrap: balance;
+}
+
+.hardwareSubtitle {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: var(--ui-font-size-section-title);
+	line-height: var(--ui-line-height-heading);
+}
+
+.hardwareBand {
+	width: 100%;
+	max-width: 50rem;
+	margin-inline: auto;
+}
+
+.hardwareIntroCard {
+	width: 100%;
+}
+
+.hardwareIntro {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--ui-space-sm);
+	margin: 0;
+}
+
+.bomTitle,
+.bomSubtitle {
+	display: flex;
+	align-items: center;
+	gap: var(--ui-space-xs);
+	line-height: var(--ui-line-height-heading);
+}
+
+.bomTitle {
+	margin: var(--ui-space-lg) 0 0;
+	font-size: var(--ui-font-size-lg);
+}
+
+.bomSubtitle {
+	margin: var(--ui-space-md) 0 var(--ui-space-xs);
+	color: var(--truenas-text-muted, var(--ui-text-muted));
+	font-size: var(--ui-font-size-md);
+}
+
+.bomList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--truenas-card-border, var(--ui-border));
+}
+
+.bomListSpaced {
+	margin-bottom: var(--ui-space-md);
+}
+
+.bomItem {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--ui-space-sm);
+	padding: var(--ui-space-sm) 0;
+	border-bottom: 1px solid var(--truenas-card-border, var(--ui-border));
+	background: transparent;
+	color: inherit;
+}
+
+.heroIntro {
+	margin-bottom: clamp(var(--ui-space-lg), 3vw, var(--ui-space-xl));
+	text-align: center;
+}
+
+.heroGrid,
+.relatedGrid,
+.serviceGrid {
+	display: grid;
+	min-width: 0;
+	gap: clamp(var(--ui-space-md), 2vw, var(--ui-space-lg));
+}
+
+.heroGrid,
+.relatedGrid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.serviceGrid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.heroBody {
+	display: flex;
+	min-width: 0;
+	height: 100%;
+	flex-direction: column;
+}
+
+.grow {
+	flex: 1;
+}
+
+.startAction {
+	align-self: flex-start;
+}
+
+.actionRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--ui-space-sm);
+}
+
+.note,
+.relatedAction {
+	margin-top: var(--ui-space-md);
+}
+
+.note {
+	margin-bottom: 0;
+}
+
+@media (max-width: 991.98px) {
+	.heroGrid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.relatedGrid,
+	.serviceGrid {
+		grid-template-columns: 1fr;
+	}
+}

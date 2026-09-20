@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 19 septembre 2026.
+Dernière vérification : 20 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -124,10 +124,19 @@ branche finale et le déploiement Vercel sont validés.
   graphe de lock sont supprimés. La preuve exacte de #182 couvre CI #1109,
   Playwright #876 (144/144) et ZAP Preview #43 ; Bootstrap reste un chantier séparé.
 - [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
-  feuilles globales chargées dans le layout. La phase Workstation suivant #187
-  migre les cartes/actions React natives vers `Card`, `CardBody`, `ActionLink` et
-  `Button` ; la grille et les utilitaires Bootstrap restants sont volontairement
-  différés pour conserver des lots visuels bornés.
+  feuilles globales chargées dans le layout. #190 a migré les cartes/actions
+  Workstation React natives vers `Card`, `CardBody`, `ActionLink` et `Button`.
+  #191 poursuit ce lot en déplaçant les grilles Hero/services/related, les
+  utilitaires de layout, les surfaces/espacements de section et la typographie de
+  ces deux composants vers `WorkstationLayout.module.css` et une petite échelle
+  typographique sémantique partagée. Le contrat responsive couvre 320/768/1440.
+  Le même lot migre ensuite les wrappers structurels de `HardwareSection` et
+  `BillOfMaterialsSection` vers les primitives partagées et le CSS Module, tout
+  en conservant les classes métier `hardware-*` communes à TrueNAS. #191 retire
+  aussi le dernier utilitaire Bootstrap de layout de la route Workstation
+  (`main.mb-5`) au profit du même CSS Module et d'un token d'espacement partagé.
+  Le chargement Bootstrap global reste volontairement différé tant que d'autres
+  routes Next/legacy en dépendent encore.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
   couvrent.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après

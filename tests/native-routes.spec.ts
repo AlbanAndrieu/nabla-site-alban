@@ -14,11 +14,17 @@ const workstationPages = [
 	},
 ] as const;
 
+const workstationViewports = [
+	{ width: 320, height: 568 },
+	{ width: 768, height: 1024 },
+	{ width: 1440, height: 900 },
+] as const;
+
 const canonicalProductNames = ["Traefik", "Prometheus", "Dockge"] as const;
 
 test.describe("native workstation route", () => {
 	for (const { pathname, locale, heading } of workstationPages) {
-		test(`${pathname} renders localized native content without mobile overflow`, async ({
+		test(`${pathname} keeps native content responsive across priority viewports`, async ({
 			page,
 		}) => {
 			const hydrationErrors: string[] = [];
@@ -27,25 +33,32 @@ test.describe("native workstation route", () => {
 					hydrationErrors.push(message.text());
 				}
 			});
-			await page.setViewportSize({ width: 320, height: 568 });
 
-			const response = await page.goto(pathname);
+			for (const viewport of workstationViewports) {
+				await page.setViewportSize(viewport);
+				const response = await page.goto(pathname);
 
-			expect(response?.ok()).toBeTruthy();
-			await expect(page.locator("html")).toHaveAttribute("lang", locale);
-			await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
-			await expect(page.locator("main#main-content")).toHaveCount(1);
-			await expect(
-				page.locator('a.skip-to-main[href="#main-content"]'),
-			).toHaveCount(1);
-			for (const productName of canonicalProductNames) {
-				await expect(page.getByText(productName, { exact: true }).first()).toBeVisible();
+				expect(response?.ok()).toBeTruthy();
+				await expect(page.locator("html")).toHaveAttribute("lang", locale);
+				await expect(
+					page.getByRole("heading", { level: 1, name: heading }),
+				).toBeVisible();
+				await expect(page.locator("main#main-content")).toHaveCount(1);
+				await expect(
+					page.locator('a.skip-to-main[href="#main-content"]'),
+				).toHaveCount(1);
+				for (const productName of canonicalProductNames) {
+					await expect(
+						page.getByText(productName, { exact: true }).first(),
+					).toBeVisible();
+				}
+				const width = await page.evaluate(() => ({
+					scroll: document.documentElement.scrollWidth,
+					client: document.documentElement.clientWidth,
+				}));
+				expect(width.scroll).toBeLessThanOrEqual(width.client);
 			}
-			const width = await page.evaluate(() => ({
-				scroll: document.documentElement.scrollWidth,
-				client: document.documentElement.clientWidth,
-			}));
-			expect(width.scroll).toBeLessThanOrEqual(width.client);
+
 			expect(hydrationErrors).toEqual([]);
 		});
 	}

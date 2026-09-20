@@ -25,6 +25,8 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 		globalNotFound,
 		globals,
 		actionStyles,
+		designTokens,
+		layoutStyles,
 		enRaw,
 		frRaw,
 		...components
@@ -35,6 +37,8 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 		readFile("app/global-not-found.tsx", "utf8"),
 		readFile("app/globals.css", "utf8"),
 		readFile("components/ui/Action.module.css", "utf8"),
+		readFile("app/design-tokens.css", "utf8"),
+		readFile("app/components/workstation/WorkstationLayout.module.css", "utf8"),
 		readFile("messages/workstation/en.json", "utf8"),
 		readFile("messages/workstation/fr.json", "utf8"),
 		...WORKSTATION_COMPONENTS.map((path) => readFile(path, "utf8")),
@@ -48,6 +52,12 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 	assert.doesNotMatch(page, /metadataFromPublicHtml/);
 	assert.match(page, /NON_INDEXABLE_ROBOTS/);
 	assert.match(page, /workstation\.html/);
+	assert.match(page, /WorkstationLayout\.module\.css/);
+	assert.match(page, /className=\{styles\.pageMain\}/);
+	assert.doesNotMatch(
+		page,
+		/className=(?:["'][^"']*\b(?:mb-5|py-5|container|row|col-[\w-]+)\b[^"']*["']|\{`[^`]*\b(?:mb-5|py-5|container|row|col-[\w-]+)\b[^`]*`\})/,
+	);
 
 	for (const component of components) {
 		assert.match(component, /getTranslations/);
@@ -57,16 +67,66 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 		assert.doesNotMatch(component, /const COPY\b/);
 	}
 
-	const [hero, serviceSections] = components;
+	const [hero, serviceSections, hardware, billOfMaterials] = components;
+	for (const source of [hardware, billOfMaterials]) {
+		assert.match(source, /WorkstationLayout\.module\.css/);
+		assert.doesNotMatch(
+			source,
+			/\b(?:row|col-(?:12|lg-8)|justify-content-center|card-body|card-text|list-group|list-group-flush|list-group-item|mb-0|mb-2|mb-3|mb-4|mt-3|mt-4|me-2|text-primary|text-muted|display-4)\b/,
+		);
+		assert.doesNotMatch(
+			source,
+			/className=(?:["'][^"']*\b(?:h4|h5|h6)\b[^"']*["']|\{`[^`]*\b(?:h4|h5|h6)\b[^`]*`\})/,
+		);
+	}
+	assert.match(hardware, /components\/ui\/Card/);
+	assert.match(hardware, /components\/ui\/Container/);
+	assert.match(billOfMaterials, /components\/ui\/ExternalLink/);
+	assert.match(layoutStyles, /\.hardwareBand/);
+	assert.match(layoutStyles, /\.bomList/);
+	assert.match(layoutStyles, /\.bomItem/);
+	assert.match(layoutStyles, /\.pageMain/);
+	assert.match(layoutStyles, /var\(--ui-space-2xl\)/);
+	assert.match(designTokens, /--ui-space-2xl:/);
+
 	for (const source of [hero, serviceSections]) {
 		assert.match(source, /components\/ui\/Card/);
+		assert.match(source, /WorkstationLayout\.module\.css/);
 		assert.doesNotMatch(source, /\bcard-(?:body|title|text)\b/);
 		assert.doesNotMatch(source, /\bbtn(?:-[\w-]+)?\b/);
 		assert.match(source, /data-ui-action/);
+		assert.doesNotMatch(
+			source,
+			/\b(?:row|col-(?:12|lg-6|md-4|md-6)|p-3|g-4|d-flex|flex-column|flex-grow-1|justify-content-between|align-items-center|gap-2|align-self-start|h-100|py-5|bg-light|border-top|border-secondary)\b/,
+		);
+		assert.doesNotMatch(
+			source,
+			/\b(?:display-4|text-secondary|text-muted|text-primary|mb-0|mb-3|mb-4|mt-3|me-2)\b/,
+		);
+		assert.doesNotMatch(
+			source,
+			/className=(?:["'][^"']*\b(?:lead|h3|h5|h6)\b[^"']*["']|\{`[^`]*\b(?:lead|h3|h5|h6)\b[^`]*`\})/,
+		);
 	}
 	assert.match(hero, /actionClassName/);
+	assert.match(hero, /styles\.heroSection/);
+	assert.match(hero, /styles\.heroGrid/);
 	assert.match(serviceSections, /components\/ui\/ActionLink/);
 	assert.match(serviceSections, /components\/ui\/Button/);
+	assert.match(serviceSections, /styles\.section/);
+	assert.match(serviceSections, /styles\.relatedSection/);
+	assert.match(serviceSections, /styles\.serviceGrid/);
+	assert.match(serviceSections, /styles\.relatedGrid/);
+	assert.match(serviceSections, /styles\.actionRow/);
+	assert.match(layoutStyles, /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+	assert.match(layoutStyles, /@media \(max-width: 991\.98px\)/);
+	assert.match(layoutStyles, /@media \(max-width: 767\.98px\)/);
+	assert.match(designTokens, /--ui-font-size-display:/);
+	assert.match(designTokens, /--ui-font-size-section-title:/);
+	assert.match(designTokens, /--ui-font-size-lg:/);
+	assert.match(designTokens, /--ui-font-size-sm:/);
+	assert.match(layoutStyles, /var\(--ui-font-size-display\)/);
+	assert.match(layoutStyles, /var\(--ui-font-size-section-title\)/);
 	assert.match(
 		globals,
 		/\.page-truenas a:not\(\.btn\):not\(\[data-ui-action\]\)/,
