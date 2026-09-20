@@ -1,0 +1,57 @@
+name: PR CI policy
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ci-policy:
+    name: CI policy guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Reject CI skip directives in PR commits
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const commits = await github.paginate(github.rest.pulls.listCommits, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+
+            const skipDirective =
+              /\[(?:skip ci|ci skip|no ci|skip actions|actions skip)\]|(?:^|\n)skip-checks\s*:\s*true(?:\n|$)/i;
+            const violations = commits
+              .filter((commit) => skipDirective.test(commit.commit.message ?? ''))
+              .map((commit) => ({
+                sha: commit.sha.slice(0, 12),
+                subject: (commit.commit.message ?? '').split('\n', 1)[0],
+              }));
+
+            if (violations.length > 0) {
+              core.setFailed(
+                [
+                  'CI skip directives are forbidden on pull-request commits.',
+                  'Quality/Security must run on the exact PR HEAD before merge.',
+                  ...violations.map(
+                    ({ sha, subject }) => `- ${sha}: ${subject}`,
+                  ),
+                ].join('\n'),
+              );
+              return;
+            }
+
+            core.notice(
+              `PR #${context.payload.pull_request.number} contains no CI skip directive.`,
+            );
