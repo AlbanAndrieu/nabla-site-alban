@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const workflowPath = new URL("../.github/workflows/ci-policy.yml", import.meta.url);
+const workflowPath = new URL(
+	"../.github/workflows/ci-policy.yml",
+	import.meta.url,
+);
 const canonicalCiPath = new URL("../.github/workflows/ci.yml", import.meta.url);
 
 test("PR CI policy guard is metadata-only and cannot execute PR code", async () => {
