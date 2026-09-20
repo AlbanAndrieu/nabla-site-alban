@@ -184,3 +184,40 @@ test("catalog v2 loader can switch to a validated upstream contract by configura
 		}
 	}
 });
+
+test("legacy aliases and workstation deployments resolve without duplicating logical entities", () => {
+	const { catalog } = getStaticHomelabServicesCatalog();
+
+	const openWebUi = catalog.services.find(
+		(service) => service.name === "Open WebUI",
+	);
+	assert.ok(openWebUi);
+	assert.equal(openWebUi.id, "openwebui");
+
+	const portracker = catalog.services.find(
+		(service) => service.name === "Portracker",
+	);
+	assert.ok(portracker);
+	assert.equal(portracker.id, "portracker");
+
+	const languageTool = catalog.services.find(
+		(service) => service.name === "LanguageTool",
+	);
+	assert.ok(languageTool);
+	assert.equal(languageTool.id, "languagetool");
+
+	const prometheusDev = catalog.services.find(
+		(service) => service.id === "prometheus-albandrieu",
+	);
+	assert.ok(prometheusDev);
+	assert.equal(prometheusDev.canonicalEntityId, "prometheus");
+	assert.equal(prometheusDev.environment, "dev");
+	assert.equal(prometheusDev.kind, "observability");
+
+	const litellmDev = catalog.services.find(
+		(service) => service.id === "litellm-albandrieu",
+	);
+	assert.ok(litellmDev);
+	assert.equal(litellmDev.canonicalEntityId, "litellm");
+	assert.equal(litellmDev.environment, "dev");
+});
