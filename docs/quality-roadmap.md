@@ -230,6 +230,12 @@ les autres chantiers.
   `CONTRIBUTING.md`).
 - [x] Ajouter `npm run build` à la CI avant merge.
 - [x] Exécuter une quality gate agent-first identique localement et en CI avant le build : fraîcheur de branche, garde anti-troncature, bits exécutables, pre-commit déterministe, lint, types Next/TypeScript et tests unitaires ; le pre-push utilise `--publish` et le setup Copilot installe les dépendances requises.
+- [x] Verrouiller aussi par contrat unitaire le bit exécutable des cinq scripts
+  critiques du chemin Quality/Preview. Le run CI #1212 de #192 a correctement
+  échoué avant Semgrep/npm parce que `ci-scope.sh` et
+  `verify-production-baseline.sh` avaient été réécrits en mode `100644` ;
+  ils sont restaurés en `100755` et le contrat empêche désormais une mutation
+  Git/API ultérieure de perdre silencieusement ce mode.
 - [x] Rejouer le workflow Quality/Security sur `master` après merge.
 - [x] Réparer les régressions SEO post-merge qui empêchaient le build Vercel.
 - [x] Consolider la politique metadata sociale et conserver une façade de
