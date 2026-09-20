@@ -5,10 +5,11 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("maintenance paths stay aligned across local scope, Preview and production baseline", async () => {
-	const [scope, workflow, baseline] = await Promise.all([
+test("maintenance paths stay aligned across local scope, both Preview paths and production baseline", async () => {
+	const [scope, workflow, onDemandWorkflow, baseline] = await Promise.all([
 		read("scripts/ci-scope.sh"),
 		read(".github/workflows/ci.yml"),
+		read(".github/workflows/vercel-preview.yml"),
 		read("scripts/verify-production-baseline.sh"),
 	]);
 
@@ -29,8 +30,16 @@ test("maintenance paths stay aligned across local scope, Preview and production 
 			`${path} missing from Preview scope`,
 		);
 		assert.ok(
+			onDemandWorkflow.includes(`filename === '${path}'`),
+			`${path} missing from on-demand Preview scope`,
+		);
+		assert.ok(
 			baseline.includes(path),
 			`${path} missing from production-baseline scope`,
 		);
 	}
+
+	assert.match(onDemandWorkflow, /publish-vercel-preview-checkpoint\.sh/);
+	assert.doesNotMatch(onDemandWorkflow, /github\.rest\.git\.(?:createRef|updateRef)/);
+	assert.doesNotMatch(onDemandWorkflow, /forceCheckpoint/);
 });

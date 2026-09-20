@@ -93,7 +93,7 @@ Audit des 10 dernières PR mergées de `nabla-site-bababou` au 20 septembre 2026
 
 | PR Bababou | Apport partagé | État côté Alban |
 | --- | --- | --- |
-| #199 | Publisher Vercel exact-SHA réutilisable localement, `force-with-lease`, scopes maintenance cohérents | Porté/adapté dans #192 |
+| #199 | Publisher Vercel exact-SHA réutilisable localement, `force-with-lease`, scopes maintenance cohérents | Porté/adapté dans #192 ; même helper pour Preview auto et on-demand |
 | #198 | 404 legacy GET/HEAD, no-cache et noindex | Top-level aligné dans #191 ; chemins localisés/nichés restent à traiter selon le proxy Alban |
 | #197 | Images raster légères, dimensions intrinsèques, lazy/async, réduction CLS | Principe retenu ; audit ciblé des images Alban restant dans P2 performance |
 | #195 | Fallback 404 pour `*.html` inconnus sans capturer les vrais fichiers legacy | Équivalent Alban livré via #188/#191 avec `proxy.ts`, implémentation volontairement différente |
@@ -684,7 +684,9 @@ Autres contrôles :
   est utilisable depuis un checkout local de confiance pendant une panne/quota
   Actions, valide la relation base→HEAD, refuse les noms hors
   `vercel-preview-pr-<n>`, utilise `--force-with-lease` et reste strictement
-  distinct de la preuve Quality/Security obligatoire avant merge.
+  distinct de la preuve Quality/Security obligatoire avant merge. Les chemins
+  Preview automatique et on-demand consomment désormais ce même publisher et la
+  même classification maintenance afin d'éviter deux autorités de mutation.
 - [x] Ajouter un test d’intégration Preview reliant les Route Handlers
   `/api/homelab-services` et `/api/homelab-topology` à la page
   `/architecture`, avec vérification du chemin stable
