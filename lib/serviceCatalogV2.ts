@@ -32,8 +32,8 @@ export type ServiceCatalogV2Entity = {
 		backstage: { entityRef: string };
 		cyclonedx: { bomRef: string };
 	};
-	integrations?: {
-		cartography?: {
+	integrations: {
+		cartography: {
 			joinProperty: "nabla_ref";
 			joinValue: string;
 		};
@@ -106,11 +106,10 @@ export function parseServiceCatalogV2(value: unknown): ServiceCatalogV2 | null {
 				typeof entity.standards.backstage.entityRef === "string" &&
 				isRecord(entity.standards.cyclonedx) &&
 				typeof entity.standards.cyclonedx.bomRef === "string" &&
-				(entity.integrations === undefined ||
-					(isRecord(entity.integrations) &&
-						isRecord(entity.integrations.cartography) &&
-						entity.integrations.cartography.joinProperty === "nabla_ref" &&
-						typeof entity.integrations.cartography.joinValue === "string")),
+				isRecord(entity.integrations) &&
+				isRecord(entity.integrations.cartography) &&
+				entity.integrations.cartography.joinProperty === "nabla_ref" &&
+				typeof entity.integrations.cartography.joinValue === "string",
 		)
 	) {
 		return null;
