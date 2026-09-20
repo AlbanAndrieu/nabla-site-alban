@@ -1,3 +1,4 @@
+import catalogV2Compatibility from "../config/homelab-catalog-v2-compatibility.json";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -220,4 +221,22 @@ test("legacy aliases and workstation deployments resolve without duplicating log
 	assert.ok(litellmDev);
 	assert.equal(litellmDev.canonicalEntityId, "litellm");
 	assert.equal(litellmDev.environment, "dev");
+});
+
+test("legacy-only compatibility debt is explicit and cannot grow silently", () => {
+	const v2 = getStaticServiceCatalogV2().catalog;
+	const v2Ids = new Set(v2.entities.map((entity) => entity.id));
+	const { catalog } = getStaticHomelabServicesCatalog();
+	const legacyOnly = catalog.services
+		.filter(
+			(service) =>
+				!service.canonicalEntityId &&
+				!v2Ids.has(homelabServiceId(service)),
+		)
+		.map((service) => homelabServiceId(service))
+		.sort();
+
+	assert.deepEqual(legacyOnly, [...catalogV2Compatibility.legacyOnly].sort());
+	assert.equal(catalog.services.length, 72);
+	assert.equal(catalog.services.length - legacyOnly.length, 39);
 });
