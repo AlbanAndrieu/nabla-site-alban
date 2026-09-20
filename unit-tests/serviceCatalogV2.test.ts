@@ -26,6 +26,16 @@ test("bundled Nabla catalog v2 has stable unique identities", () => {
 	const refs = new Set(catalog.entities.map((entity) => entity.ref));
 	assert.equal(ids.size, catalog.entities.length);
 	assert.equal(refs.size, catalog.entities.length);
+	for (const entity of catalog.entities) {
+		assert.equal(
+			entity.integrations?.cartography?.joinProperty,
+			"nabla_ref",
+		);
+		assert.equal(
+			entity.integrations?.cartography?.joinValue,
+			entity.ref,
+		);
+	}
 	assert.ok(parseServiceCatalogV2(catalog));
 });
 
