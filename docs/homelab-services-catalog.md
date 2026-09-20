@@ -89,9 +89,16 @@ FastAPI v1 remains the runtime primary path for now:
 - `/api/homelab-services`;
 - `/api/homelab-topology`.
 
-The next step is a versioned v2 endpoint carrying the exact upstream
-`catalogRevision`. Site Alban should only prefer that endpoint after contract
-tests prove revision parity and fallback behaviour.
+Site Alban now exposes `GET /api/homelab-catalog-v2`. It serves the bundled
+last-known-good v2 catalog by default and only attempts a remote v2 source when
+`HOMELAB_CATALOG_V2_API_URL` is explicitly configured. The next upstream step
+is therefore to expose a FastAPI v2 endpoint carrying the exact upstream
+`catalogRevision`, validate it, and then enable that configuration.
+
+Compatibility coverage is tracked separately in
+[`homelab-catalog-v2-coverage.md`](./homelab-catalog-v2-coverage.md): 39 of 72
+historical cards are canonicalized and the remaining 33 are an explicit
+legacy-only baseline rather than hidden drift.
 
 Do not create a FastAPI -> Site -> FastAPI dependency loop. The bundled v2 file
 must remain usable without the runtime observer.
