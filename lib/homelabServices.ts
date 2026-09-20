@@ -1,3 +1,4 @@
+import catalogV2Compatibility from "../config/homelab-catalog-v2-compatibility.json";
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 import { getStaticServiceCatalogV2 } from "./serviceCatalogV2";
@@ -15,6 +16,7 @@ export type HomelabService = {
 	category?: string;
 	presentationRole?: "service" | "core" | "support";
 	criticality?: "critical" | "high" | "medium" | "low";
+	canonicalEntityId?: string;
 	description?: string;
 	healthNote?: string;
 	icon?: string;
@@ -168,6 +170,18 @@ const LOCAL_V2_BY_NAME = new Map(
 	LOCAL_V2.entities.map((entity) => [slugifyServiceName(entity.name), entity]),
 );
 
+const V2_ID_ALIASES = new Map<string, string>(
+	Object.entries(catalogV2Compatibility.aliases),
+);
+const V2_DEPLOYMENTS = new Map<
+	string,
+	{ entityId: string; environment: HomelabEnvironment }
+>(
+	Object.entries(catalogV2Compatibility.deployments) as Array<
+		[string, { entityId: string; environment: HomelabEnvironment }]
+	>,
+);
+
 function applyV2CanonicalMetadata(
 	catalog: HomelabServicesCatalog,
 ): HomelabServicesCatalog {
@@ -191,8 +205,12 @@ function applyV2CanonicalMetadata(
 			if (!revisionsCompatible) return service;
 
 			const serviceId = homelabServiceId(service);
+			const deployment = V2_DEPLOYMENTS.get(serviceId);
+			const canonicalId =
+				deployment?.entityId ?? V2_ID_ALIASES.get(serviceId) ?? serviceId;
 			const entity =
-				LOCAL_V2_BY_ID.get(serviceId) ?? LOCAL_V2_BY_NAME.get(serviceId);
+				LOCAL_V2_BY_ID.get(canonicalId) ??
+				LOCAL_V2_BY_NAME.get(serviceId);
 			if (!entity) return service;
 
 			const preferredEndpoint = entity.endpoints?.find((endpoint) =>
@@ -200,8 +218,10 @@ function applyV2CanonicalMetadata(
 			);
 			return {
 				...service,
-				id: entity.id,
-				name: entity.name,
+				id: deployment ? serviceId : entity.id,
+				...(deployment ? { canonicalEntityId: entity.id } : {}),
+				name: deployment ? service.name : entity.name,
+				environment: deployment?.environment ?? service.environment,
 				kind: entity.subtype,
 				category: entity.domain,
 				description: entity.description ?? service.description,
