@@ -1,5 +1,6 @@
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
+import { getStaticServiceCatalogV2 } from "./serviceCatalogV2";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -159,6 +160,48 @@ function requireLocalFallback(): HomelabServicesCatalog {
 }
 
 const LOCAL_FALLBACK = requireLocalFallback();
+const LOCAL_V2 = getStaticServiceCatalogV2().catalog;
+const LOCAL_V2_BY_ID = new Map(
+	LOCAL_V2.entities.map((entity) => [entity.id, entity]),
+);
+const LOCAL_V2_BY_NAME = new Map(
+	LOCAL_V2.entities.map((entity) => [slugifyServiceName(entity.name), entity]),
+);
+
+function applyV2CanonicalMetadata(
+	catalog: HomelabServicesCatalog,
+): HomelabServicesCatalog {
+	return {
+		...catalog,
+		catalogRevision: LOCAL_V2.metadata.catalogRevision,
+		topologyVersion: LOCAL_V2.metadata.topologyVersion,
+		services: catalog.services.map((service) => {
+			const serviceId = homelabServiceId(service);
+			const entity =
+				LOCAL_V2_BY_ID.get(serviceId) ?? LOCAL_V2_BY_NAME.get(serviceId);
+			if (!entity) return service;
+
+			const preferredEndpoint = entity.endpoints?.find((endpoint) =>
+				["primary", "production"].includes(endpoint.type),
+			);
+			return {
+				...service,
+				id: entity.id,
+				name: entity.name,
+				kind: entity.subtype,
+				category: entity.domain,
+				description: entity.description ?? service.description,
+				presentationRole:
+					entity.presentation?.presentationRole ?? service.presentationRole,
+				criticality:
+					entity.presentation?.criticality ?? service.criticality,
+				icon: entity.presentation?.icon ?? service.icon,
+				endpointUrl: service.endpointUrl ?? preferredEndpoint?.url,
+			};
+		}),
+	};
+}
+
 const LOCAL_PRESENTATION_BY_ID = new Map(
 	LOCAL_FALLBACK.services.map((service) => [
 		homelabServiceId(service),
@@ -173,9 +216,10 @@ const LOCAL_PRESENTATION_BY_ID = new Map(
 function applyLocalPresentationOverrides(
 	catalog: HomelabServicesCatalog,
 ): HomelabServicesCatalog {
+	const canonical = applyV2CanonicalMetadata(catalog);
 	return {
-		...catalog,
-		services: catalog.services.map((service) => {
+		...canonical,
+		services: canonical.services.map((service) => {
 			const serviceId = homelabServiceId(service);
 			const local = LOCAL_PRESENTATION_BY_ID.get(serviceId);
 			const endpointUrl =
