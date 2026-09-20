@@ -3,7 +3,9 @@ import test from "node:test";
 
 import {
 	getStaticServiceCatalogV2,
+	loadServiceCatalogV2,
 	parseServiceCatalogV2,
+	SERVICE_CATALOG_V2_API_ENV,
 	serviceCatalogV2ToTopologyPayload,
 } from "../lib/serviceCatalogV2";
 import {
@@ -117,6 +119,68 @@ test("remote catalog revisions remain authoritative over the bundled v2 snapshot
 			delete process.env.HOMELAB_SERVICES_API_URL;
 		} else {
 			process.env.HOMELAB_SERVICES_API_URL = originalUrl;
+		}
+	}
+});
+
+test("catalog v2 loader stays local until the upstream URL is explicitly configured", async () => {
+	const originalFetch = globalThis.fetch;
+	const originalUrl = process.env[SERVICE_CATALOG_V2_API_ENV];
+	delete process.env[SERVICE_CATALOG_V2_API_ENV];
+	let fetchCalled = false;
+	globalThis.fetch = (async () => {
+		fetchCalled = true;
+		throw new Error("v2 loader must remain local without explicit opt-in");
+	}) as typeof fetch;
+
+	try {
+		const result = await loadServiceCatalogV2();
+		assert.equal(fetchCalled, false);
+		assert.equal(result.source, "local-v2");
+		assert.equal(result.primaryUrl, null);
+	} finally {
+		globalThis.fetch = originalFetch;
+		if (originalUrl === undefined) {
+			delete process.env[SERVICE_CATALOG_V2_API_ENV];
+		} else {
+			process.env[SERVICE_CATALOG_V2_API_ENV] = originalUrl;
+		}
+	}
+});
+
+test("catalog v2 loader can switch to a validated upstream contract by configuration", async () => {
+	const originalFetch = globalThis.fetch;
+	const originalUrl = process.env[SERVICE_CATALOG_V2_API_ENV];
+	process.env[SERVICE_CATALOG_V2_API_ENV] =
+		"https://catalog.example.test/api/homelab-catalog/v2";
+	const local = getStaticServiceCatalogV2().catalog;
+	const remote = {
+		...local,
+		metadata: {
+			...local.metadata,
+			catalogRevision:
+				"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		},
+	};
+	globalThis.fetch = (async () => Response.json(remote)) as typeof fetch;
+
+	try {
+		const result = await loadServiceCatalogV2();
+		assert.equal(result.source, "fastapi-v2");
+		assert.equal(
+			result.catalog.metadata.catalogRevision,
+			remote.metadata.catalogRevision,
+		);
+		assert.equal(
+			result.primaryUrl,
+			"https://catalog.example.test/api/homelab-catalog/v2",
+		);
+	} finally {
+		globalThis.fetch = originalFetch;
+		if (originalUrl === undefined) {
+			delete process.env[SERVICE_CATALOG_V2_API_ENV];
+		} else {
+			process.env[SERVICE_CATALOG_V2_API_ENV] = originalUrl;
 		}
 	}
 });
