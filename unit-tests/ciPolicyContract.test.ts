@@ -3,9 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const workflowPath = new URL("../.github/workflows/ci-policy.yml", import.meta.url);
+const canonicalCiPath = new URL("../.github/workflows/ci.yml", import.meta.url);
 
 test("PR CI policy guard is metadata-only and cannot execute PR code", async () => {
-	const workflow = await readFile(workflowPath, "utf8");
+	const [workflow, canonicalCi] = await Promise.all([
+		readFile(workflowPath, "utf8"),
+		readFile(canonicalCiPath, "utf8"),
+	]);
 
 	assert.match(workflow, /pull_request_target:/);
 	assert.match(workflow, /contents: read/);
@@ -16,4 +20,13 @@ test("PR CI policy guard is metadata-only and cannot execute PR code", async () 
 	assert.doesNotMatch(workflow, /actions\/checkout@/);
 	assert.doesNotMatch(workflow, /\bsecrets\./);
 	assert.doesNotMatch(workflow, /^\s*run:/m);
+
+	const policyScopeMatches = canonicalCi.match(
+		/"\.github\/workflows\/ci-policy\.yml"/g,
+	);
+	assert.equal(
+		policyScopeMatches?.length,
+		2,
+		"canonical CI must include ci-policy.yml for PR and master push scopes",
+	);
 });
