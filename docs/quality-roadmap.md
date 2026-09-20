@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 19 septembre 2026.
+Dernière vérification : 20 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -31,6 +31,56 @@ branche finale et le déploiement Vercel sont validés.
 - [x] Les diagnostics homelab distinguent désormais l'échec courant des preuves
   `last_good`/stale et conservent l'âge, le cache et la provenance des observations.
 
+## Contrat de parité `nabla-site-alban` / `nabla-site-bababou`
+
+Dernier audit croisé : 20 septembre 2026, PR Bababou #188 à #198. La règle
+commune est **même plateforme et mêmes comportements transverses, contenu métier
+distinct**. Une divergence technique doit être intentionnelle, documentée et
+justifiée par un consommateur réel ; l'objectif n'est pas de copier une
+implémentation plus faible uniquement pour rendre les fichiers identiques.
+
+Doivent converger entre les deux sites :
+
+- versions Node/npm/Next/React/next-intl et politique de compatibilité Vercel ;
+- primitives UI réellement consommées, design tokens et conventions responsive ;
+- reduced-motion, reflow, focus, touch targets et contrats d'accessibilité ;
+- comportements des widgets legacy partagés, notamment thème et retour en haut ;
+- sémantique des 404 protégées, exactitude GET/HEAD, noindex et cache négatif ;
+- architecture local-first des quality gates, scopes CI, exact-SHA Preview,
+  Playwright et DAST/ZAP ;
+- politiques de dépendances, assets vendus et réduction des coûts CI.
+
+Peuvent diverger explicitement : contenu et langues, catalogue homelab/TrueNAS,
+Stripe/OpenTelemetry/React Flow côté Alban, ainsi que les documents
+juridiques/familiaux et contraintes de confidentialité propres à Bababou.
+
+État de convergence après l'audit #188–#198 :
+
+- [x] Le workflow Node 24 de compatibilité production est identique entre les
+  deux dépôts et limité aux entrées runtime/build pertinentes (#189).
+- [x] Preview et Production ZAP ont une seule autorité de chargement
+  `.zap/rules.tsv` et interdisent le double `-c` (#188).
+- [x] Reduced-motion et l'API partagée `ActionLink` sont convergents ; Bababou
+  #191 a repris ces contrats depuis Alban sans créer de primitives sans consommateur.
+- [x] #191 Alban répare la régression `scrollToTopOfPage` du widget statique,
+  découverte en comparaison avec Bababou #192, et ajoute une preuve runtime sur
+  un footer statique.
+- [x] Les 404 HTML top-level interceptées par Alban héritent désormais d'un
+  contrat HTTP 404 + `X-Robots-Tag: noindex, nofollow` +
+  `Cache-Control: no-store, max-age=0`, aligné sur Bababou #198 sans remplacer
+  le routage SEO/legacy spécifique à Alban.
+- [ ] Étendre le même contrat GET/HEAD aux chemins HTML legacy localisés/nichés
+  seulement après preuve que cela ne court-circuite ni les redirects SEO,
+  ni les pages `HTML_ROUTE_SLUGS`, ni les CV historiques.
+- [ ] Réutiliser les enseignements image/CLS de Bababou #197 sur les surfaces
+  Alban encore réellement servies : dimensions intrinsèques, lazy loading et
+  `next/image` pour le natif, sans générer de variantes plus lourdes que la source.
+- [ ] Maintenir une matrice responsive commune minimale
+  320/375/768/1024/1440 px pour les composants partagés ; ajouter 1920 px
+  uniquement lorsque le layout concerné apporte une valeur de couverture.
+- [ ] À chaque lot transverse, auditer d'abord les PR récentes du dépôt frère et
+  backporter uniquement les écarts de plateforme/comportement réellement utiles.
+
 ## P0 — Cohérence produit et contenu
 
 - [x] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
@@ -50,8 +100,6 @@ branche finale et le déploiement Vercel sont validés.
   `public/locales/fr/contact.html` et `public/locales/fr/index.html` ne
   présentent plus Jus Mundi comme poste actuel et le contrat
   `professionalCopyConsistency` verrouille cette cohérence.
-- [ ] Maintenir les pages utilisées aussi dans `nabla-site-bababou` à parité
-  uniquement lorsqu'elles doivent volontairement être identiques.
 
 ## P0 — Achever la migration Next.js native
 
@@ -124,10 +172,19 @@ branche finale et le déploiement Vercel sont validés.
   graphe de lock sont supprimés. La preuve exacte de #182 couvre CI #1109,
   Playwright #876 (144/144) et ZAP Preview #43 ; Bootstrap reste un chantier séparé.
 - [ ] Réduire progressivement le mélange Bootstrap + CSS historique et les
-  feuilles globales chargées dans le layout. La phase Workstation suivant #187
-  migre les cartes/actions React natives vers `Card`, `CardBody`, `ActionLink` et
-  `Button` ; la grille et les utilitaires Bootstrap restants sont volontairement
-  différés pour conserver des lots visuels bornés.
+  feuilles globales chargées dans le layout. #190 a migré les cartes/actions
+  Workstation React natives vers `Card`, `CardBody`, `ActionLink` et `Button`.
+  #191 poursuit ce lot en déplaçant les grilles Hero/services/related, les
+  utilitaires de layout, les surfaces/espacements de section et la typographie de
+  ces deux composants vers `WorkstationLayout.module.css` et une petite échelle
+  typographique sémantique partagée. Le contrat responsive couvre 320/768/1440.
+  Le même lot migre ensuite les wrappers structurels de `HardwareSection` et
+  `BillOfMaterialsSection` vers les primitives partagées et le CSS Module, tout
+  en conservant les classes métier `hardware-*` communes à TrueNAS. #191 retire
+  aussi le dernier utilitaire Bootstrap de layout de la route Workstation
+  (`main.mb-5`) au profit du même CSS Module et d'un token d'espacement partagé.
+  Le chargement Bootstrap global reste volontairement différé tant que d'autres
+  routes Next/legacy en dépendent encore.
 - [ ] Supprimer les styles inline de layout lorsque les primitives partagées les
   couvrent.
 - [ ] Vérifier mobile, tablette et desktop pour les principales pages après
@@ -464,7 +521,9 @@ Autres contrôles :
   canonique est scannée après les déploiements `master` et quotidiennement.
   Les règles anti-clickjacking, `nosniff`, directory browsing et HSTS sont
   bloquantes ; CSP reste en WARN jusqu'au chantier de durcissement dédié.
-  Les scans Preview et production passent explicitement `-c .zap/rules.tsv`.
+  Preview et production chargent `.zap/rules.tsv` une seule fois via
+  `rules_file_name`; `cmd_options` conserve uniquement `-I -T 5` afin
+  d'éviter le double chargement de politique détecté puis corrigé avec Bababou #188.
   Le DAST production utilise le Vercel Automation Bypass et un preflight 200
   qui rejette `429` / Security Checkpoint afin qu'un scan de page de challenge
   ne puisse jamais produire un faux vert. Les rapports ZAP conteneurisés sont
@@ -602,7 +661,7 @@ Autres contrôles :
   `public/**` était déjà couvert pour les événements push et pull_request.
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
-- [x] Aligner le développement et les workflows GitHub sur Node 25, conserver une plage `>=24.11.0 <26` compatible avec le runtime Vercel Node 24, et garder OpenCommit uniquement comme helper local/on-demand.
+- [x] Aligner le développement, mise, direnv et les workflows GitHub sur Node 26.8.2, conserver une plage `>=24.11.0 <27` compatible avec le runtime Vercel Node 24.11.0, et garder OpenCommit uniquement comme helper local/on-demand. Le workflow Node 24 est désormais identique à celui de `nabla-site-bababou`.
 - [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.13 et
   `pre-commit==4.6.2` : `.python-version`, mise, Copilot Setup Steps et
   Quality/Security utilisent désormais les mêmes versions au lieu de laisser

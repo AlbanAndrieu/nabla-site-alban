@@ -10,6 +10,7 @@ import { canonicalPagePath, NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 import BillOfMaterialsSection from "../../components/workstation/BillOfMaterialsSection";
 import HardwareSection from "../../components/workstation/HardwareSection";
 import WorkstationHero from "../../components/workstation/WorkstationHero";
+import styles from "../../components/workstation/WorkstationLayout.module.css";
 import WorkstationServiceSections from "../../components/workstation/WorkstationServiceSections";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -57,7 +58,7 @@ export default async function WorkstationPage({ params }: Props) {
 			<TopAnchor />
 			<SkipToMainContent />
 			<WorkstationHero truenasHref={truenasHref} />
-			<main id="main-content" role="main" className="mb-5">
+			<main id="main-content" role="main" className={styles.pageMain}>
 				<WorkstationServiceSections
 					truenasHref={truenasHref}
 					nablaHref={nablaHref}
