@@ -60,10 +60,20 @@ second hand-maintained inventory.
 - [x] Legacy service-card presentation data is preserved temporarily, but matched
   entries receive canonical v2 ID/name/kind/category/criticality and the upstream
   `catalogRevision`.
+- [x] Add Site Alban `GET /api/homelab-catalog-v2` with local-v2 LKG by
+  default and opt-in upstream switching through `HOMELAB_CATALOG_V2_API_URL`;
+  no nonexistent FastAPI v2 endpoint is called by default.
 - [ ] Expose catalog v2 from `fastapi-sample` through a versioned endpoint and
-  require the same `catalogRevision` as the upstream `nabla-compose` artifact.
+  require the same `catalogRevision` as the upstream `nabla-compose` artifact,
+  then configure the Site Alban upstream URL.
 - [ ] Add a deterministic cross-repository synchronization/drift check so the
   bundled Site Alban v2 artifact cannot silently lag the canonical generator.
+- [x] Split reviewed legacy aliases from development deployment instances and
+  baseline compatibility coverage: 39/72 historical cards canonicalized, 33/72
+  explicitly legacy-only. New unclassified drift is rejected by unit contract.
+- [ ] Reconcile the remaining 33 legacy-only entries: add canonical `x-nabla`,
+  classify as deployment/environment, map a proven alias, or remove stale UI
+  inventory.
 - [ ] Move endpoint/environment/navigation representation natively onto the v2
   contract; keep only genuinely site-owned browser presentation overrides.
 - [ ] Retire `public/service-topology.json` and the hand-maintained portions of
