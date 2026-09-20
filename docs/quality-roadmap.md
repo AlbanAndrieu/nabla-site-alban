@@ -75,9 +75,10 @@ juridiques/familiaux et contraintes de confidentialité propres à Bababou.
 - [ ] Réutiliser les enseignements image/CLS de Bababou #197 sur les surfaces
   Alban encore réellement servies : dimensions intrinsèques, lazy loading et
   `next/image` pour le natif, sans générer de variantes plus lourdes que la source.
-- [ ] Maintenir une matrice responsive commune minimale
-  320/375/768/1024/1440 px pour les composants partagés ; ajouter 1920 px
-  uniquement lorsque le layout concerné apporte une valeur de couverture.
+- [x] Maintenir une matrice responsive commune minimale
+  320/375/768/1024/1440 px pour les composants partagés ; la couverture
+  Workstation exerce désormais les cinq largeurs prioritaires. Ajouter 1920 px
+  uniquement lorsqu'un layout concerné apporte une valeur de couverture.
 - [ ] À chaque lot transverse, auditer d'abord les PR récentes du dépôt frère et
   backporter uniquement les écarts de plateforme/comportement réellement utiles.
 
@@ -177,7 +178,7 @@ juridiques/familiaux et contraintes de confidentialité propres à Bababou.
   #191 poursuit ce lot en déplaçant les grilles Hero/services/related, les
   utilitaires de layout, les surfaces/espacements de section et la typographie de
   ces deux composants vers `WorkstationLayout.module.css` et une petite échelle
-  typographique sémantique partagée. Le contrat responsive couvre 320/768/1440.
+  typographique sémantique partagée. Le contrat responsive couvre désormais 320/375/768/1024/1440.
   Le même lot migre ensuite les wrappers structurels de `HardwareSection` et
   `BillOfMaterialsSection` vers les primitives partagées et le CSS Module, tout
   en conservant les classes métier `hardware-*` communes à TrueNAS. #191 retire
@@ -210,6 +211,12 @@ les autres chantiers.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
 - [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
   afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
+- [x] Interdire les directives GitHub de contournement CI dans les commits de PR
+  avec un guard `pull_request_target` metadata-only : permissions lecture seule,
+  aucun checkout, aucun secret et aucun code de la PR exécuté. Ce guard ferme le
+  trou observé après #191, où `[skip ci]` a empêché Quality/Security de fournir
+  une preuve sur le HEAD fusionné. Le futur ruleset reste nécessaire pour rendre
+  ce statut effectivement obligatoire avant merge.
 - [ ] Valider opérationnellement le workflow post-merge de #173 après son merge,
   car GitHub exige qu'un workflow `workflow_run` existe sur la branche par défaut
   avant de pouvoir être déclenché. Sur un échec ou timeout de
