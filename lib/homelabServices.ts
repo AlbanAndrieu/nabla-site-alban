@@ -171,11 +171,25 @@ const LOCAL_V2_BY_NAME = new Map(
 function applyV2CanonicalMetadata(
 	catalog: HomelabServicesCatalog,
 ): HomelabServicesCatalog {
+	const upstreamRevision =
+		typeof catalog.catalogRevision === "string"
+			? catalog.catalogRevision
+			: undefined;
+	const revisionsCompatible =
+		upstreamRevision === undefined ||
+		upstreamRevision === LOCAL_V2.metadata.catalogRevision;
+	const topologyVersion =
+		typeof catalog.topologyVersion === "number"
+			? catalog.topologyVersion
+			: LOCAL_V2.metadata.topologyVersion;
+
 	return {
 		...catalog,
-		catalogRevision: LOCAL_V2.metadata.catalogRevision,
-		topologyVersion: LOCAL_V2.metadata.topologyVersion,
+		catalogRevision: upstreamRevision ?? LOCAL_V2.metadata.catalogRevision,
+		topologyVersion,
 		services: catalog.services.map((service) => {
+			if (!revisionsCompatible) return service;
+
 			const serviceId = homelabServiceId(service);
 			const entity =
 				LOCAL_V2_BY_ID.get(serviceId) ?? LOCAL_V2_BY_NAME.get(serviceId);
