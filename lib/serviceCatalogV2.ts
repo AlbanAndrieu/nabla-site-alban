@@ -65,6 +65,11 @@ export type ServiceCatalogV2 = {
 	relations: ServiceCatalogV2Relation[];
 };
 
+export type ServiceCatalogV2Source = "fastapi-v2" | "local-v2";
+
+export const SERVICE_CATALOG_V2_API_ENV = "HOMELAB_CATALOG_V2_API_URL";
+const PRIMARY_TIMEOUT_MS = 2500;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -214,4 +219,42 @@ export function serviceCatalogV2ToTopologyPayload(
 		nodes,
 		relations,
 	};
+}
+
+export async function loadServiceCatalogV2(): Promise<{
+	catalog: ServiceCatalogV2;
+	source: ServiceCatalogV2Source;
+	primaryUrl: string | null;
+}> {
+	const primaryUrl = process.env[SERVICE_CATALOG_V2_API_ENV]?.trim() || null;
+	if (!primaryUrl) {
+		return { catalog: LOCAL_V2, source: "local-v2", primaryUrl: null };
+	}
+
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
+	try {
+		const response = await fetch(primaryUrl, {
+			headers: {
+				Accept: "application/json",
+				"User-Agent": "nabla-site-service-catalog-v2/1.0",
+			},
+			signal: controller.signal,
+			cache: "no-store",
+		});
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const catalog = parseServiceCatalogV2(await response.json());
+		if (!catalog || catalog.entities.length === 0) {
+			throw new Error("Invalid service catalog v2 payload");
+		}
+		return { catalog, source: "fastapi-v2", primaryUrl };
+	} catch (error) {
+		const reason = error instanceof Error ? error.message : String(error);
+		console.warn(
+			`[service-catalog-v2] upstream unavailable (${primaryUrl}): ${reason}; using local v2 fallback`,
+		);
+		return { catalog: LOCAL_V2, source: "local-v2", primaryUrl };
+	} finally {
+		clearTimeout(timeout);
+	}
 }
