@@ -70,3 +70,43 @@ test("legacy service cards receive canonical v2 identity and classification", ()
 	assert.equal(truenas.kind, "storage-platform");
 	assert.equal(truenas.category, "infrastructure");
 });
+
+test("remote catalog revisions remain authoritative over the bundled v2 snapshot", async () => {
+	const originalFetch = globalThis.fetch;
+	const originalUrl = process.env.HOMELAB_SERVICES_API_URL;
+	process.env.HOMELAB_SERVICES_API_URL =
+		"https://catalog.example.test/services";
+	globalThis.fetch = (async () =>
+		Response.json({
+			version: 1,
+			catalogRevision: "sha256:remote-newer-revision",
+			topologyVersion: 2,
+			services: [
+				{
+					id: "truenas",
+					name: "TrueNAS from remote",
+					kind: "remote-kind",
+					category: "remote-category",
+				},
+			],
+		})) as typeof fetch;
+
+	try {
+		const { loadHomelabServicesCatalog } = await import("../lib/homelabServices");
+		const result = await loadHomelabServicesCatalog();
+		assert.equal(
+			result.catalog.catalogRevision,
+			"sha256:remote-newer-revision",
+		);
+		assert.equal(result.catalog.topologyVersion, 2);
+		assert.equal(result.catalog.services[0]?.name, "TrueNAS from remote");
+		assert.equal(result.catalog.services[0]?.kind, "remote-kind");
+	} finally {
+		globalThis.fetch = originalFetch;
+		if (originalUrl === undefined) {
+			delete process.env.HOMELAB_SERVICES_API_URL;
+		} else {
+			process.env.HOMELAB_SERVICES_API_URL = originalUrl;
+		}
+	}
+});
