@@ -23,5 +23,40 @@
       "entityId": "litellm",
       "environment": "dev"
     }
-  }
+  },
+  "legacyOnly": [
+    "affine",
+    "anythingllm",
+    "anythingllm-albandrieu",
+    "convertx",
+    "ddns-updater",
+    "domain-watchdog",
+    "freshrss",
+    "home",
+    "it-tools",
+    "karakeep",
+    "lidarr",
+    "localai",
+    "localai-gpu",
+    "netalertx",
+    "netbootxyz",
+    "ollama-gpu",
+    "open-speedtest",
+    "openarchiver",
+    "openclaw",
+    "paperless-ai",
+    "paperless-ngx",
+    "pgadmin",
+    "portainer",
+    "prowlarr",
+    "radarr",
+    "reactive-resume",
+    "reactive-resume-albandrieu",
+    "sabnzbd",
+    "sonarr",
+    "speedtest-tracker",
+    "stirling-pdf",
+    "stirling-pdf-albandrieu",
+    "transmission"
+  ]
 }
