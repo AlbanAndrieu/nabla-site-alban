@@ -125,6 +125,12 @@ An API-only agent must not silently treat remote API writes as a way to bypass l
 
 Never bypass repository hooks with `git push --no-verify`. Never weaken or disable formatter, lint, security, YAML, workflow, generated-file, or validation rules merely to make a push or CI build pass.
 
+Agents must not put GitHub-recognized CI bypass directives in pull-request commit
+messages. In particular, do not use bracketed CI/action skip markers or a
+`skip-checks: true` trailer to save runner time. Documentation-only and
+maintenance PRs must rely on the repository's path/scope classification instead
+of suppressing the workflow itself.
+
 ### Post-merge remediation is recovery only
 
 `.github/workflows/post-merge-quality-remediation.yml` is a recovery safety net for a failed or timed-out `CI (Quality and Security)` run after a push has already reached `master`. GitHub only activates this `workflow_run` trigger once the workflow file exists on the default branch. It may create a non-default automated remediation PR when deterministic formatter/pre-commit fixes converge, or a diagnostic issue when they do not or when GitHub refuses PR publication/validation.
