@@ -39,6 +39,12 @@
       "runtime": {
         "provider": "truenas-app",
         "appId": "twofactor-auth"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:2fauth"
+        }
       }
     },
     {
@@ -67,7 +73,13 @@
         "phase": "foundation",
         "priority": 10
       },
-      "description": "Native TrueNAS App for network DNS filtering. It remains runtime-owned by TrueNAS until migration to repository-owned Compose."
+      "description": "Native TrueNAS App for network DNS filtering. It remains runtime-owned by TrueNAS until migration to repository-owned Compose.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:adguard-home"
+        }
+      }
     },
     {
       "id": "aistor",
@@ -100,7 +112,13 @@
         "host": "172.17.0.24",
         "port": 9002
       },
-      "description": "MinIO AIStor-compatible object storage service."
+      "description": "MinIO AIStor-compatible object storage service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:aistor"
+        }
+      }
     },
     {
       "id": "akvorado-console",
@@ -140,6 +158,12 @@
       "monitoring": {
         "type": "http",
         "url": "http://172.17.0.24:31056/"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:akvorado-console"
+        }
       }
     },
     {
@@ -183,6 +207,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:akvorado-inlet"
+        }
       }
     },
     {
@@ -219,6 +249,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:akvorado-orchestrator"
+        }
       }
     },
     {
@@ -262,6 +298,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:akvorado-outlet"
+        }
       }
     },
     {
@@ -295,6 +337,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:alloy"
+        }
       }
     },
     {
@@ -327,7 +375,13 @@
         "phase": "platform-services",
         "priority": 40
       },
-      "description": "Declarative monitor reconciler for the existing Uptime Kuma instance."
+      "description": "Declarative monitor reconciler for the existing Uptime Kuma instance.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:autokuma"
+        }
+      }
     },
     {
       "id": "autoxpose",
@@ -362,7 +416,13 @@
         "type": "http",
         "target": "http://172.17.0.24:4949/api/settings/status"
       },
-      "description": "Reconciles Docker service exposure and DNS/proxy provider state."
+      "description": "Reconciles Docker service exposure and DNS/proxy provider state.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:autoxpose"
+        }
+      }
     },
     {
       "id": "bichon",
@@ -395,6 +455,12 @@
         "conditions": [
           "[CONNECTED] == true"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:bichon"
+        }
       }
     },
     {
@@ -432,7 +498,13 @@
           "intranet"
         ]
       },
-      "description": "Scheduled/manual security asset and relationship ingestion into Neo4j for attack-path and blast-radius analysis."
+      "description": "Scheduled/manual security asset and relationship ingestion into Neo4j for attack-path and blast-radius analysis.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:cartography"
+        }
+      }
     },
     {
       "id": "clamav",
@@ -472,7 +544,13 @@
           "detect"
         ]
       },
-      "description": "Internal ClamAV/clamd service. The .int URL is the private DNS identity; functional health remains a TCP/3310 probe."
+      "description": "Internal ClamAV/clamd service. The .int URL is the private DNS identity; functional health remains a TCP/3310 probe.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:clamav"
+        }
+      }
     },
     {
       "id": "clickhouse",
@@ -505,6 +583,12 @@
       "lifecycle": {
         "phase": "secondary-data",
         "priority": 30
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:clickhouse"
+        }
       }
     },
     {
@@ -529,7 +613,13 @@
         "presentationRole": "support",
         "criticality": "high"
       },
-      "description": "TrueNAS-hosted cloudflared connector for outbound-established Cloudflare Tunnel ingress that bypasses Traefik."
+      "description": "TrueNAS-hosted cloudflared connector for outbound-established Cloudflare Tunnel ingress that bypasses Traefik.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:cloudflared"
+        }
+      }
     },
     {
       "id": "code-server",
@@ -561,7 +651,13 @@
         "type": "http",
         "target": "http://172.17.0.24:8443/healthz"
       },
-      "description": "Browser-based development environment for homelab repositories."
+      "description": "Browser-based development environment for homelab repositories.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:code-server"
+        }
+      }
     },
     {
       "id": "crowdsec",
@@ -593,6 +689,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "crowdsec"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:crowdsec"
+        }
       }
     },
     {
@@ -643,7 +745,13 @@
           "[STATUS] == 200"
         ]
       },
-      "description": "Lightweight threat-intelligence workbench for extracting IoCs and checking reputation across OSINT, CTI, and EDR engines."
+      "description": "Lightweight threat-intelligence workbench for extracting IoCs and checking reputation across OSINT, CTI, and EDR engines.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:cyberbro"
+        }
+      }
     },
     {
       "id": "defectdojo",
@@ -692,7 +800,13 @@
         "host": "172.17.0.24",
         "port": 31085
       },
-      "description": "Central normalized security-finding aggregation, deduplication, triage and remediation workflow."
+      "description": "Central normalized security-finding aggregation, deduplication, triage and remediation workflow.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:defectdojo"
+        }
+      }
     },
     {
       "id": "defectdojo-api",
@@ -729,6 +843,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:defectdojo-api"
+        }
       }
     },
     {
@@ -759,6 +879,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:defectdojo-celerybeat"
+        }
       }
     },
     {
@@ -789,6 +915,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:defectdojo-initializer"
+        }
       }
     },
     {
@@ -819,6 +951,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:defectdojo-worker"
+        }
       }
     },
     {
@@ -867,7 +1005,13 @@
         "host": "172.17.0.24",
         "port": 31084
       },
-      "description": "CycloneDX SBOM component inventory and software supply-chain vulnerability analysis platform."
+      "description": "CycloneDX SBOM component inventory and software supply-chain vulnerability analysis platform.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:dependency-track"
+        }
+      }
     },
     {
       "id": "dependency-track-api",
@@ -903,6 +1047,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:dependency-track-api"
+        }
       }
     },
     {
@@ -927,7 +1077,13 @@
         "presentationRole": "core",
         "criticality": "critical"
       },
-      "description": "Docker engine hosting the TrueNAS Compose workloads."
+      "description": "Docker engine hosting the TrueNAS Compose workloads.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:docker"
+        }
+      }
     },
     {
       "id": "docker-socket-proxy",
@@ -967,7 +1123,13 @@
         "phase": "bootstrap-runtime",
         "priority": 0
       },
-      "description": "Restricted read-only Docker Engine API boundary for repository automation."
+      "description": "Restricted read-only Docker Engine API boundary for repository automation.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:docker-socket-proxy"
+        }
+      }
     },
     {
       "id": "dockhand",
@@ -1000,7 +1162,13 @@
         "host": "172.17.0.24",
         "port": 3050
       },
-      "description": "Docker container management UI."
+      "description": "Docker container management UI.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:dockhand"
+        }
+      }
     },
     {
       "id": "docling",
@@ -1054,7 +1222,13 @@
         "phase": "applications",
         "priority": 40
       },
-      "description": "CPU-backed document conversion API used by OpenRAG knowledge ingestion."
+      "description": "CPU-backed document conversion API used by OpenRAG knowledge ingestion.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:docling"
+        }
+      }
     },
     {
       "id": "doco-cd",
@@ -1087,7 +1261,13 @@
         "host": "172.17.0.24",
         "port": 9120
       },
-      "description": "Git-driven Compose deployment automation for the TrueNAS Docker runtime."
+      "description": "Git-driven Compose deployment automation for the TrueNAS Docker runtime.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:doco-cd"
+        }
+      }
     },
     {
       "id": "dozzle",
@@ -1123,7 +1303,13 @@
         "host": "172.17.0.24",
         "port": 8888
       },
-      "description": "Live Docker log viewer and MCP-enabled operations UI."
+      "description": "Live Docker log viewer and MCP-enabled operations UI.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:dozzle"
+        }
+      }
     },
     {
       "id": "drawio",
@@ -1156,7 +1342,13 @@
         "host": "172.17.0.24",
         "port": 9080
       },
-      "description": "Self-hosted diagrams.net editor."
+      "description": "Self-hosted diagrams.net editor.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:drawio"
+        }
+      }
     },
     {
       "id": "elasticsearch",
@@ -1185,6 +1377,12 @@
         "networks": [
           "traefik_network"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:elasticsearch"
+        }
       }
     },
     {
@@ -1210,7 +1408,13 @@
         "criticality": "critical",
         "icon": "🗄️"
       },
-      "description": "Critical Kubernetes control-plane state store managed by Talos on control-plane nodes."
+      "description": "Critical Kubernetes control-plane state store managed by Talos on control-plane nodes.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:etcd"
+        }
+      }
     },
     {
       "id": "fastapi-sample",
@@ -1264,7 +1468,13 @@
           "[STATUS] == 200"
         ]
       },
-      "description": "FastAPI Sample service with FastAPI Cloud production and TrueNAS staging environments."
+      "description": "FastAPI Sample service with FastAPI Cloud production and TrueNAS staging environments.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:fastapi-sample"
+        }
+      }
     },
     {
       "id": "garage",
@@ -1300,7 +1510,13 @@
           "traefik_network"
         ]
       },
-      "description": "S3-compatible object storage exposed directly through pfSense HAProxy, TLS re-encryption and Traefik on TrueNAS."
+      "description": "S3-compatible object storage exposed directly through pfSense HAProxy, TLS re-encryption and Traefik on TrueNAS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:garage"
+        }
+      }
     },
     {
       "id": "garage-admin",
@@ -1334,7 +1550,13 @@
         "presentationRole": "support",
         "criticality": "high"
       },
-      "description": "Garage Admin API exposed through Cloudflare Tunnel to the LAN-bound :3903 origin without Traefik."
+      "description": "Garage Admin API exposed through Cloudflare Tunnel to the LAN-bound :3903 origin without Traefik.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:garage-admin"
+        }
+      }
     },
     {
       "id": "garage-webui",
@@ -1370,7 +1592,13 @@
           "traefik_network"
         ]
       },
-      "description": "Garage web administration UI exposed by Cloudflare Tunnel directly to the LAN-bound :3909 origin without Traefik."
+      "description": "Garage web administration UI exposed by Cloudflare Tunnel directly to the LAN-bound :3909 origin without Traefik.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:garage-webui"
+        }
+      }
     },
     {
       "id": "gatus",
@@ -1403,7 +1631,13 @@
           "intranet"
         ]
       },
-      "description": "Declarative status monitoring generated from Nabla Compose services."
+      "description": "Declarative status monitoring generated from Nabla Compose services.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:gatus"
+        }
+      }
     },
     {
       "id": "grafana",
@@ -1436,6 +1670,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:grafana"
+        }
       }
     },
     {
@@ -1470,6 +1710,12 @@
       "lifecycle": {
         "phase": "platform-services",
         "priority": 40
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:graylog"
+        }
       }
     },
     {
@@ -1496,6 +1742,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "haproxy-exporter"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:haproxy-exporter"
+        }
       }
     },
     {
@@ -1526,7 +1778,13 @@
         "presentationRole": "support",
         "criticality": "low"
       },
-      "description": "Application dashboard retained from the legacy homelab inventory and classified canonically for topology consumers."
+      "description": "Application dashboard retained from the legacy homelab inventory and classified canonically for topology consumers.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:heimdall"
+        }
+      }
     },
     {
       "id": "hello-nginx",
@@ -1562,7 +1820,13 @@
         "host": "172.17.0.24",
         "port": 8099
       },
-      "description": "Small internal Nginx service used for ingress and routing experiments."
+      "description": "Small internal Nginx service used for ingress and routing experiments.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:hello-nginx"
+        }
+      }
     },
     {
       "id": "homarr",
@@ -1599,7 +1863,13 @@
           "intranet"
         ]
       },
-      "description": "Homelab application dashboard generated from the Nabla service inventory."
+      "description": "Homelab application dashboard generated from the Nabla service inventory.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:homarr"
+        }
+      }
     },
     {
       "id": "homarr-sync",
@@ -1626,7 +1896,13 @@
           "intranet"
         ]
       },
-      "description": "Non-destructively reconciles generated Nabla applications through the Homarr API."
+      "description": "Non-destructively reconciles generated Nabla applications through the Homarr API.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:homarr-sync"
+        }
+      }
     },
     {
       "id": "homeassistant",
@@ -1658,7 +1934,13 @@
           "traefik"
         ]
       },
-      "description": "Home automation control plane exposed through the dedicated IoT network."
+      "description": "Home automation control plane exposed through the dedicated IoT network.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:homeassistant"
+        }
+      }
     },
     {
       "id": "influxdb",
@@ -1689,7 +1971,13 @@
         "phase": "primary-data",
         "priority": 20
       },
-      "description": "Shared InfluxDB 2.x time-series database for Scrutiny and future homelab consumers."
+      "description": "Shared InfluxDB 2.x time-series database for Scrutiny and future homelab consumers.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:influxdb"
+        }
+      }
     },
     {
       "id": "joplin",
@@ -1742,7 +2030,13 @@
         "phase": "applications",
         "priority": 60
       },
-      "description": "Private Joplin synchronization server backed by the shared PostgreSQL service."
+      "description": "Private Joplin synchronization server backed by the shared PostgreSQL service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:joplin"
+        }
+      }
     },
     {
       "id": "kafka",
@@ -1777,6 +2071,12 @@
       "lifecycle": {
         "phase": "primary-data",
         "priority": 20
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:kafka"
+        }
       }
     },
     {
@@ -1811,6 +2111,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:kafka-exporter"
+        }
       }
     },
     {
@@ -1846,7 +2152,13 @@
         "type": "http",
         "target": "http://172.17.0.24:30239/health/ready"
       },
-      "description": "Central OIDC/SAML identity provider backed by the shared PostgreSQL service."
+      "description": "Central OIDC/SAML identity provider backed by the shared PostgreSQL service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:keycloak"
+        }
+      }
     },
     {
       "id": "kibana",
@@ -1875,6 +2187,12 @@
         "networks": [
           "traefik_network"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:kibana"
+        }
       }
     },
     {
@@ -1900,7 +2218,13 @@
         "criticality": "critical",
         "icon": "☸️"
       },
-      "description": "Target Kubernetes cluster bootstrapped on Talos Linux VMs hosted by TrueNAS."
+      "description": "Target Kubernetes cluster bootstrapped on Talos Linux VMs hosted by TrueNAS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:kubernetes"
+        }
+      }
     },
     {
       "id": "langflow",
@@ -1930,6 +2254,12 @@
           "intranet",
           "traefik_network"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:langflow"
+        }
       }
     },
     {
@@ -1953,7 +2283,13 @@
       "presentation": {
         "icon": "📈"
       },
-      "description": "Logical Langfuse v4 observability platform composed of web and worker workloads."
+      "description": "Logical Langfuse v4 observability platform composed of web and worker workloads.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:langfuse"
+        }
+      }
     },
     {
       "id": "langfuse-web",
@@ -1982,6 +2318,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:langfuse-web"
+        }
       }
     },
     {
@@ -2011,6 +2353,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:langfuse-worker"
+        }
       }
     },
     {
@@ -2043,7 +2391,13 @@
         "type": "http",
         "target": "http://172.17.0.24:8010/v2/check?language=en-US&text=healthcheck"
       },
-      "description": "Self-hosted grammar and style checking API."
+      "description": "Self-hosted grammar and style checking API.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:languagetool"
+        }
+      }
     },
     {
       "id": "litellm",
@@ -2069,6 +2423,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "litellm"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:litellm"
+        }
       }
     },
     {
@@ -2102,6 +2462,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:loki"
+        }
       }
     },
     {
@@ -2144,7 +2510,13 @@
         "host": "172.17.0.24",
         "port": 8013
       },
-      "description": "Model Context Protocol bridge exposing Cyberbro observable-analysis tools to MCP-capable clients such as LiteLLM."
+      "description": "Model Context Protocol bridge exposing Cyberbro observable-analysis tools to MCP-capable clients such as LiteLLM.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:mcp-cyberbro"
+        }
+      }
     },
     {
       "id": "mimir",
@@ -2177,6 +2549,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:mimir"
+        }
       }
     },
     {
@@ -2206,6 +2584,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:minio"
+        }
       }
     },
     {
@@ -2239,6 +2623,12 @@
       "lifecycle": {
         "phase": "primary-data",
         "priority": 20
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:mongo"
+        }
       }
     },
     {
@@ -2265,6 +2655,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "n8n"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:n8n"
+        }
       }
     },
     {
@@ -2313,7 +2709,13 @@
         "host": "172.17.0.24",
         "port": 31086
       },
-      "description": "Analytical graph store for Cartography attack-path, privilege-chain and blast-radius queries; not an authoritative CMDB."
+      "description": "Analytical graph store for Cartography attack-path, privilege-chain and blast-radius queries; not an authoritative CMDB.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:neo4j-security"
+        }
+      }
     },
     {
       "id": "netbox",
@@ -2360,7 +2762,13 @@
         "host": "172.17.0.24",
         "port": 31082
       },
-      "description": "Network and infrastructure source of truth for IPAM, prefixes, VLANs, devices, VMs and interfaces; x-nabla remains authoritative for application/service identity."
+      "description": "Network and infrastructure source of truth for IPAM, prefixes, VLANs, devices, VMs and interfaces; x-nabla remains authoritative for application/service identity.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:netbox"
+        }
+      }
     },
     {
       "id": "netbox-housekeeping",
@@ -2390,6 +2798,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:netbox-housekeeping"
+        }
       }
     },
     {
@@ -2420,6 +2834,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:netbox-worker"
+        }
       }
     },
     {
@@ -2456,7 +2876,13 @@
         "host": "172.17.0.24",
         "port": 8081
       },
-      "description": "Repository manager for development artifacts and package proxies."
+      "description": "Repository manager for development artifacts and package proxies.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:nexus"
+        }
+      }
     },
     {
       "id": "nginx-proxy-manager",
@@ -2489,7 +2915,13 @@
         "host": "172.17.0.24",
         "port": 30021
       },
-      "description": "Legacy reverse-proxy administration service retained during NPMplus migration."
+      "description": "Legacy reverse-proxy administration service retained during NPMplus migration.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:nginx-proxy-manager"
+        }
+      }
     },
     {
       "id": "npmplus",
@@ -2522,7 +2954,13 @@
         "host": "172.17.0.24",
         "port": 30360
       },
-      "description": "Hardened Nginx Proxy Manager fork tracked as the repository migration target."
+      "description": "Hardened Nginx Proxy Manager fork tracked as the repository migration target.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:npmplus"
+        }
+      }
     },
     {
       "id": "ntopng",
@@ -2548,6 +2986,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "ntopng"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:ntopng"
+        }
       }
     },
     {
@@ -2574,6 +3018,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "obsidian"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:obsidian"
+        }
       }
     },
     {
@@ -2600,6 +3050,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "ollama"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:ollama"
+        }
       }
     },
     {
@@ -2638,7 +3094,13 @@
         "host": "172.17.0.24",
         "port": 8097
       },
-      "description": "1Password Connect API for machine-readable secret access."
+      "description": "1Password Connect API for machine-readable secret access.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:op-connect-api"
+        }
+      }
     },
     {
       "id": "op-connect-sync",
@@ -2671,7 +3133,13 @@
         "provider": "truenas-app",
         "containerService": "op-connect-sync"
       },
-      "description": "Synchronizes 1Password vault state for the Connect API."
+      "description": "Synchronizes 1Password vault state for the Connect API.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:op-connect-sync"
+        }
+      }
     },
     {
       "id": "open-terminal",
@@ -2694,7 +3162,13 @@
       "presentation": {
         "icon": "⌨️"
       },
-      "description": "Optional agent terminal API consumed by Open WebUI tools."
+      "description": "Optional agent terminal API consumed by Open WebUI tools.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:open-terminal"
+        }
+      }
     },
     {
       "id": "openclaw-sandbox",
@@ -2722,7 +3196,13 @@
         "provider": "truenas-app",
         "containerService": "openclaw-sandbox"
       },
-      "description": "Isolated sandbox for OpenClaw skills and local calendar tooling."
+      "description": "Isolated sandbox for OpenClaw skills and local calendar tooling.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openclaw-sandbox"
+        }
+      }
     },
     {
       "id": "openhands",
@@ -2758,7 +3238,13 @@
         "host": "172.17.0.24",
         "port": 3010
       },
-      "description": "Self-hosted coding-agent environment with Docker-backed sandboxes."
+      "description": "Self-hosted coding-agent environment with Docker-backed sandboxes.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openhands"
+        }
+      }
     },
     {
       "id": "openrag-backend",
@@ -2788,6 +3274,12 @@
           "intranet",
           "traefik_network"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openrag-backend"
+        }
       }
     },
     {
@@ -2818,6 +3310,12 @@
           "intranet",
           "traefik_network"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openrag-frontend"
+        }
       }
     },
     {
@@ -2851,6 +3349,12 @@
       "lifecycle": {
         "phase": "secondary-data",
         "priority": 30
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:opensearch"
+        }
       }
     },
     {
@@ -2884,6 +3388,12 @@
       "lifecycle": {
         "phase": "secondary-data",
         "priority": 30
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:opensearch-dashboards"
+        }
       }
     },
     {
@@ -2910,6 +3420,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "opensearch-exporter"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:opensearch-exporter"
+        }
       }
     },
     {
@@ -2943,6 +3459,12 @@
       "lifecycle": {
         "phase": "secondary-data",
         "priority": 30
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:opensearch-security"
+        }
       }
     },
     {
@@ -2972,6 +3494,12 @@
         "networks": [
           "nabla-security"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:opensearch-security-exporter"
+        }
       }
     },
     {
@@ -3006,7 +3534,13 @@
         "provider": "truenas-app",
         "containerService": "scorecard"
       },
-      "description": "One-shot repository and upstream dependency security-posture scanner. Results are evidence, not a service criticality score."
+      "description": "One-shot repository and upstream dependency security-posture scanner. Results are evidence, not a service criticality score.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openssf-scorecard"
+        }
+      }
     },
     {
       "id": "openwebui",
@@ -3033,6 +3567,12 @@
         "provider": "truenas-app",
         "appId": "openwebui",
         "containerService": "open-webui"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openwebui"
+        }
       }
     },
     {
@@ -3059,6 +3599,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "pipelines"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:openwebui-pipelines"
+        }
       }
     },
     {
@@ -3097,7 +3643,13 @@
           "[STATUS] == 200"
         ]
       },
-      "description": "External pfSense firewall running the lightweight CrowdSec remediation component."
+      "description": "External pfSense firewall running the lightweight CrowdSec remediation component.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:pfsense"
+        }
+      }
     },
     {
       "id": "pfsense-exporter",
@@ -3130,6 +3682,12 @@
         "conditions": [
           "[CONNECTED] == true"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:pfsense-exporter"
+        }
       }
     },
     {
@@ -3161,7 +3719,13 @@
         "host": "82.66.4.247",
         "port": 443
       },
-      "description": "pfSense HAProxy terminates public TLS and re-encrypts direct *.int.albandrieu.com ingress to Traefik on TrueNAS."
+      "description": "pfSense HAProxy terminates public TLS and re-encrypts direct *.int.albandrieu.com ingress to Traefik on TrueNAS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:pfsense-haproxy"
+        }
+      }
     },
     {
       "id": "pfsense-unbound",
@@ -3191,7 +3755,13 @@
         "host": "172.17.0.1",
         "port": 53
       },
-      "description": "Primary LAN recursive resolver at 172.17.0.1:53; delegates int.albandrieu.com to Pi-hole with Forwarding Mode disabled and outgoing interfaces set to All."
+      "description": "Primary LAN recursive resolver at 172.17.0.1:53; delegates int.albandrieu.com to Pi-hole with Forwarding Mode disabled and outgoing interfaces set to All.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:pfsense-unbound"
+        }
+      }
     },
     {
       "id": "pihole",
@@ -3230,7 +3800,13 @@
         "phase": "foundation",
         "priority": 10
       },
-      "description": "LAN DNS filtering and private *.int.albandrieu.com record consumer."
+      "description": "LAN DNS filtering and private *.int.albandrieu.com record consumer.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:pihole"
+        }
+      }
     },
     {
       "id": "pihole-dns-sync",
@@ -3261,7 +3837,13 @@
           "intranet"
         ]
       },
-      "description": "Synchronizes repository-managed Docker/Traefik service names into Pi-hole private DNS."
+      "description": "Synchronizes repository-managed Docker/Traefik service names into Pi-hole private DNS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:pihole-dns-sync"
+        }
+      }
     },
     {
       "id": "pihole-exporter",
@@ -3297,7 +3879,13 @@
         "host": "172.17.0.24",
         "port": 9617
       },
-      "description": "Prometheus-compatible metrics exporter for Pi-hole."
+      "description": "Prometheus-compatible metrics exporter for Pi-hole.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:pihole-exporter"
+        }
+      }
     },
     {
       "id": "plumber",
@@ -3345,7 +3933,13 @@
         "host": "172.17.0.24",
         "port": 31070
       },
-      "description": "Repository-managed Plumber frontend replacing the legacy root plumber-platform submodule deployment model."
+      "description": "Repository-managed Plumber frontend replacing the legacy root plumber-platform submodule deployment model.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:plumber"
+        }
+      }
     },
     {
       "id": "plumber-api",
@@ -3381,6 +3975,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:plumber-api"
+        }
       }
     },
     {
@@ -3411,6 +4011,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:plumber-worker"
+        }
       }
     },
     {
@@ -3444,7 +4050,13 @@
         "host": "172.17.0.24",
         "port": 4999
       },
-      "description": "Host and Docker port inventory used to detect exposure and allocation drift."
+      "description": "Host and Docker port inventory used to detect exposure and allocation drift.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:portracker"
+        }
+      }
     },
     {
       "id": "postgres-exporter",
@@ -3480,7 +4092,13 @@
         "host": "172.17.0.24",
         "port": 9187
       },
-      "description": "Prometheus exporter for the shared PostgreSQL service."
+      "description": "Prometheus exporter for the shared PostgreSQL service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:postgres-exporter"
+        }
+      }
     },
     {
       "id": "postgresql",
@@ -3511,7 +4129,13 @@
         "phase": "primary-data",
         "priority": 20
       },
-      "description": "Shared native TrueNAS PostgreSQL App used by repository-managed consumers. Keep it as a runtime-owned native service until migration to repository-owned Compose."
+      "description": "Shared native TrueNAS PostgreSQL App used by repository-managed consumers. Keep it as a runtime-owned native service until migration to repository-owned Compose.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:postgresql"
+        }
+      }
     },
     {
       "id": "prometheus",
@@ -3547,6 +4171,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:prometheus"
+        }
       }
     },
     {
@@ -3577,6 +4207,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:prometheus-alertmanager"
+        }
       }
     },
     {
@@ -3610,7 +4246,13 @@
         "target": "http://172.17.0.24:4040/",
         "url": "http://172.17.0.24:4040/metrics"
       },
-      "description": "Continuous profiling backend with persistent Pyroscope v2 metastore state."
+      "description": "Continuous profiling backend with persistent Pyroscope v2 metastore state.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:pyroscope"
+        }
+      }
     },
     {
       "id": "redis",
@@ -3643,6 +4285,12 @@
       "lifecycle": {
         "phase": "primary-data",
         "priority": 20
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:redis"
+        }
       }
     },
     {
@@ -3691,7 +4339,13 @@
         "host": "172.17.0.24",
         "port": 60072
       },
-      "description": "Agentless network discovery and continuously updated topology documentation backed by the shared PostgreSQL service."
+      "description": "Agentless network discovery and continuously updated topology documentation backed by the shared PostgreSQL service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:scanopy"
+        }
+      }
     },
     {
       "id": "scanopy-daemon",
@@ -3725,7 +4379,13 @@
         "provider": "truenas-app",
         "containerService": "scanopy-daemon"
       },
-      "description": "Privileged agentless scanner used by Scanopy to discover hosts, ports, containers, and network topology."
+      "description": "Privileged agentless scanner used by Scanopy to discover hosts, ports, containers, and network topology.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:scanopy-daemon"
+        }
+      }
     },
     {
       "id": "scrutiny",
@@ -3769,7 +4429,13 @@
           "[STATUS] == 200"
         ]
       },
-      "description": "SMART disk health monitoring web/API backed by the shared InfluxDB service."
+      "description": "SMART disk health monitoring web/API backed by the shared InfluxDB service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:scrutiny"
+        }
+      }
     },
     {
       "id": "scrutiny-collector",
@@ -3795,6 +4461,12 @@
         "networks": [
           "intranet"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:scrutiny-collector"
+        }
       }
     },
     {
@@ -3818,7 +4490,13 @@
       "presentation": {
         "icon": "🌐"
       },
-      "description": "Optional metasearch backend consumed by Open WebUI web-search tooling."
+      "description": "Optional metasearch backend consumed by Open WebUI web-search tooling.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:searxng"
+        }
+      }
     },
     {
       "id": "sentry",
@@ -3860,7 +4538,13 @@
         "type": "http",
         "target": "http://172.17.0.24:9005/_health/"
       },
-      "description": "Self-hosted Sentry 26.8 errors-only application service."
+      "description": "Self-hosted Sentry 26.8 errors-only application service.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry"
+        }
+      }
     },
     {
       "id": "sentry-clickhouse",
@@ -3899,6 +4583,12 @@
       "lifecycle": {
         "phase": "secondary-data",
         "priority": 30
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:sentry-clickhouse"
+        }
       }
     },
     {
@@ -3934,6 +4624,12 @@
       "monitoring": {
         "type": "http",
         "target": "http://172.17.0.24:9005/_health/"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry-edge"
+        }
       }
     },
     {
@@ -3965,6 +4661,12 @@
           "intranet",
           "sentry"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry-relay"
+        }
       }
     },
     {
@@ -3997,7 +4699,13 @@
           "sentry"
         ]
       },
-      "description": "Sentry query API backed by the dedicated temporary Sentry ClickHouse."
+      "description": "Sentry query API backed by the dedicated temporary Sentry ClickHouse.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry-snuba-api"
+        }
+      }
     },
     {
       "id": "sentry-taskbroker",
@@ -4028,6 +4736,12 @@
           "intranet",
           "sentry"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry-taskbroker"
+        }
       }
     },
     {
@@ -4059,6 +4773,12 @@
           "intranet",
           "sentry"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sentry-taskworker"
+        }
       }
     },
     {
@@ -4085,6 +4805,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "sonarqube"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sonarqube"
+        }
       }
     },
     {
@@ -4121,7 +4847,13 @@
         "host": "172.17.0.24",
         "port": 3128
       },
-      "description": "Internal forward proxy for controlled HTTP(S) egress experiments."
+      "description": "Internal forward proxy for controlled HTTP(S) egress experiments.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:squid"
+        }
+      }
     },
     {
       "id": "suricata",
@@ -4156,6 +4888,12 @@
       "lifecycle": {
         "phase": "platform-services",
         "priority": 40
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:suricata"
+        }
       }
     },
     {
@@ -4179,7 +4917,13 @@
       "presentation": {
         "icon": "🗄️"
       },
-      "description": "External Sybase ASE database monitored through FreeTDS."
+      "description": "External Sybase ASE database monitored through FreeTDS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:sybase"
+        }
+      }
     },
     {
       "id": "sybase-exporter",
@@ -4205,6 +4949,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "sybase-exporter"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:sybase-exporter"
+        }
       }
     },
     {
@@ -4230,7 +4980,13 @@
         "criticality": "critical",
         "icon": "🔷"
       },
-      "description": "Immutable Talos Linux platform for the Kubernetes control-plane and worker VMs on TrueNAS."
+      "description": "Immutable Talos Linux platform for the Kubernetes control-plane and worker VMs on TrueNAS.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:talos"
+        }
+      }
     },
     {
       "id": "tempo",
@@ -4263,6 +5019,12 @@
         "conditions": [
           "[STATUS] == 200"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:tempo"
+        }
       }
     },
     {
@@ -4299,7 +5061,13 @@
         "phase": "foundation",
         "priority": 10
       },
-      "description": "Docker reverse proxy on TrueNAS for direct *.int.albandrieu.com services."
+      "description": "Docker reverse proxy on TrueNAS for direct *.int.albandrieu.com services.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:traefik"
+        }
+      }
     },
     {
       "id": "truenas",
@@ -4329,7 +5097,13 @@
         "presentationRole": "core",
         "criticality": "critical"
       },
-      "description": "TrueNAS SCALE storage and application host."
+      "description": "TrueNAS SCALE storage and application host.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:truenas"
+        }
+      }
     },
     {
       "id": "uptime-kuma",
@@ -4363,7 +5137,13 @@
         "phase": "platform-services",
         "priority": 40
       },
-      "description": "Intended native TrueNAS Uptime Kuma target on host port 31050, reconciled by AutoKuma until the service is migrated to repository-owned Compose. Confirm the native App still exists before enabling AutoKuma."
+      "description": "Intended native TrueNAS Uptime Kuma target on host port 31050, reconciled by AutoKuma until the service is migrated to repository-owned Compose. Confirm the native App still exists before enabling AutoKuma.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:uptime-kuma"
+        }
+      }
     },
     {
       "id": "vaultwarden",
@@ -4412,7 +5192,13 @@
         "priority": 10,
         "blocksLaterWaves": false
       },
-      "description": "Self-hosted Bitwarden-compatible password and secret vault."
+      "description": "Self-hosted Bitwarden-compatible password and secret vault.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:vaultwarden"
+        }
+      }
     },
     {
       "id": "vaultwarden-rest-api",
@@ -4449,7 +5235,13 @@
           "secrets-backend"
         ]
       },
-      "description": "Legacy Doco-CD compatibility adapter for Vaultwarden secret retrieval."
+      "description": "Legacy Doco-CD compatibility adapter for Vaultwarden secret retrieval.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:vaultwarden-rest-api"
+        }
+      }
     },
     {
       "id": "wazuh",
@@ -4472,7 +5264,13 @@
       "presentation": {
         "icon": "🛡️"
       },
-      "description": "Logical Wazuh security platform composed of manager, indexer, dashboard and forwarding workloads."
+      "description": "Logical Wazuh security platform composed of manager, indexer, dashboard and forwarding workloads.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:wazuh"
+        }
+      }
     },
     {
       "id": "wazuh-dashboard",
@@ -4498,6 +5296,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "wazuh.dashboard"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:wazuh-dashboard"
+        }
       }
     },
     {
@@ -4528,6 +5332,12 @@
           "default",
           "nabla-security"
         ]
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:wazuh-forwarder"
+        }
       }
     },
     {
@@ -4554,6 +5364,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "wazuh.indexer"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:resource:wazuh-indexer"
+        }
       }
     },
     {
@@ -4585,6 +5401,12 @@
       "runtime": {
         "provider": "truenas-app",
         "containerService": "wazuh.manager"
+      },
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:wazuh-manager"
+        }
       }
     },
     {
@@ -4616,7 +5438,13 @@
           "intranet"
         ]
       },
-      "description": "Lab WordPress deployment backed by PostgreSQL through PG4WP."
+      "description": "Lab WordPress deployment backed by PostgreSQL through PG4WP.",
+      "integrations": {
+        "cartography": {
+          "joinProperty": "nabla_ref",
+          "joinValue": "nabla:component:wordpress"
+        }
+      }
     }
   ],
   "relations": [
