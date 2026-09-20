@@ -104,6 +104,13 @@
 	color: var(--ui-inverted-text-hover);
 }
 
+.action:disabled,
+.action:disabled:hover {
+	cursor: not-allowed;
+	opacity: 0.65;
+	transform: none;
+}
+
 @media (max-width: 575.98px) {
 	.action {
 		width: min(100%, 22rem);

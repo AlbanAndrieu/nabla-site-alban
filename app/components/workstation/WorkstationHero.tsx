@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { actionClassName } from "@/components/ui/ActionLink";
+import Card, { CardBody } from "@/components/ui/Card";
 import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 
@@ -31,50 +33,60 @@ export default async function WorkstationHero({ truenasHref }: Props) {
 					</div>
 					<div className="row">
 						<div className="col-lg-6 p-3">
-							<div className="card box-shadow h-100">
-								<div className="card-body d-flex flex-column">
-									<h2 className="h5 card-title">
+							<Card elevated className="h-100">
+								<CardBody className="d-flex flex-column">
+									<h2 className="h5">
 										<i
 											className="fab fa-github me-2 text-primary"
 											aria-hidden="true"
 										/>
 										nabla-compose
 									</h2>
-									<p className="card-text flex-grow-1">
+									<p className="flex-grow-1">
 										{t("repositories.nablaCompose.description")}
 									</p>
 									<ExternalLink
 										href="https://github.com/AlbanAndrieu/nabla-compose"
-										className="btn btn-sm btn-outline-primary align-self-start"
+										className={actionClassName(
+											"outline",
+											"compact",
+											"align-self-start",
+										)}
+										data-ui-action=""
 									>
 										<i className="fab fa-github" aria-hidden="true" />{" "}
 										{t("repositories.nablaCompose.action")}
 									</ExternalLink>
-								</div>
-							</div>
+								</CardBody>
+							</Card>
 						</div>
 						<div className="col-lg-6 p-3">
-							<div className="card box-shadow h-100">
-								<div className="card-body d-flex flex-column">
-									<h2 className="h5 card-title">
+							<Card elevated className="h-100">
+								<CardBody className="d-flex flex-column">
+									<h2 className="h5">
 										<i
 											className="fab fa-github me-2 text-primary"
 											aria-hidden="true"
 										/>
 										ansible-workstation
 									</h2>
-									<p className="card-text flex-grow-1">
+									<p className="flex-grow-1">
 										{t("repositories.ansibleWorkstation.description")}
 									</p>
 									<ExternalLink
 										href="https://github.com/AlbanAndrieu/ansible-workstation"
-										className="btn btn-sm btn-outline-primary align-self-start"
+										className={actionClassName(
+											"outline",
+											"compact",
+											"align-self-start",
+										)}
+										data-ui-action=""
 									>
 										<i className="fab fa-github" aria-hidden="true" />{" "}
 										{t("repositories.ansibleWorkstation.action")}
 									</ExternalLink>
-								</div>
-							</div>
+								</CardBody>
+							</Card>
 						</div>
 					</div>
 				</Container>

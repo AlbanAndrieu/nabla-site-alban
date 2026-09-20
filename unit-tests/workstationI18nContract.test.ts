@@ -18,16 +18,27 @@ function leafKeys(value: unknown, prefix = ""): string[] {
 }
 
 test("workstation is native Next.js with a locale-parity feature catalog", async () => {
-	const [loader, page, data, globalNotFound, enRaw, frRaw, ...components] =
-		await Promise.all([
-			readFile("i18n/messages.ts", "utf8"),
-			readFile("app/[locale]/workstation/page.tsx", "utf8"),
-			readFile("app/components/workstation/workstationServices.ts", "utf8"),
-			readFile("app/global-not-found.tsx", "utf8"),
-			readFile("messages/workstation/en.json", "utf8"),
-			readFile("messages/workstation/fr.json", "utf8"),
-			...WORKSTATION_COMPONENTS.map((path) => readFile(path, "utf8")),
-		]);
+	const [
+		loader,
+		page,
+		data,
+		globalNotFound,
+		globals,
+		actionStyles,
+		enRaw,
+		frRaw,
+		...components
+	] = await Promise.all([
+		readFile("i18n/messages.ts", "utf8"),
+		readFile("app/[locale]/workstation/page.tsx", "utf8"),
+		readFile("app/components/workstation/workstationServices.ts", "utf8"),
+		readFile("app/global-not-found.tsx", "utf8"),
+		readFile("app/globals.css", "utf8"),
+		readFile("components/ui/Action.module.css", "utf8"),
+		readFile("messages/workstation/en.json", "utf8"),
+		readFile("messages/workstation/fr.json", "utf8"),
+		...WORKSTATION_COMPONENTS.map((path) => readFile(path, "utf8")),
+	]);
 
 	assert.match(loader, /WORKSTATION_LOADERS/);
 	assert.match(loader, /\.\.\.workstation/);
@@ -45,6 +56,22 @@ test("workstation is native Next.js with a locale-parity feature catalog", async
 		assert.doesNotMatch(component, /locale === ["']fr["']/);
 		assert.doesNotMatch(component, /const COPY\b/);
 	}
+
+	const [hero, serviceSections] = components;
+	for (const source of [hero, serviceSections]) {
+		assert.match(source, /components\/ui\/Card/);
+		assert.doesNotMatch(source, /\bcard-(?:body|title|text)\b/);
+		assert.doesNotMatch(source, /\bbtn(?:-[\w-]+)?\b/);
+		assert.match(source, /data-ui-action/);
+	}
+	assert.match(hero, /actionClassName/);
+	assert.match(serviceSections, /components\/ui\/ActionLink/);
+	assert.match(serviceSections, /components\/ui\/Button/);
+	assert.match(
+		globals,
+		/\.page-truenas a:not\(\.btn\):not\(\[data-ui-action\]\)/,
+	);
+	assert.match(actionStyles, /\.action:disabled/);
 
 	for (const productName of [
 		"Traefik",
