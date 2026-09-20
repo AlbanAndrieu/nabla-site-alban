@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "aliases": {
+    "open-webui": "openwebui",
+    "porttracker": "portracker",
+    "language-tool": "languagetool",
+    "hello": "hello-nginx"
+  },
+  "deployments": {
+    "prometheus-albandrieu": {
+      "entityId": "prometheus",
+      "environment": "dev"
+    },
+    "porttracker-albandrieu": {
+      "entityId": "portracker",
+      "environment": "dev"
+    },
+    "scrutiny-collector-albandrieu": {
+      "entityId": "scrutiny-collector",
+      "environment": "dev"
+    },
+    "litellm-albandrieu": {
+      "entityId": "litellm",
+      "environment": "dev"
+    }
+  }
+}
