@@ -494,6 +494,12 @@
 	var DEFAULT_REVEAL_SELECTORS =
 		".service-card, .skill-category, .tool-item, .contact-card, .social-card, .js-animate-on-scroll, [data-animate-on-scroll]";
 
+	function scrollToTopOfPage() {
+		window.scrollTo(0, 0);
+		if (document.body) document.body.scrollTop = 0;
+		if (document.documentElement) document.documentElement.scrollTop = 0;
+	}
+
 	function initSmoothScroll() {
 		/* Delegation: catches footer / late links; one listener vs every anchor */
 		document.addEventListener(

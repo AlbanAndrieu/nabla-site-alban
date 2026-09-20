@@ -42,7 +42,10 @@ export default function proxy(request: NextRequest) {
 	if (isUnknownTopLevelHtml(request.nextUrl.pathname)) {
 		const notFoundUrl = request.nextUrl.clone();
 		notFoundUrl.pathname = "/404";
-		return NextResponse.rewrite(notFoundUrl, { status: 404 });
+		const response = NextResponse.rewrite(notFoundUrl, { status: 404 });
+		response.headers.set("Cache-Control", "no-store, max-age=0");
+		response.headers.set("X-Robots-Tag", "noindex, nofollow");
+		return response;
 	}
 
 	/*

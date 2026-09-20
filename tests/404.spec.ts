@@ -89,6 +89,16 @@ test.describe("404 Error Page Tests", () => {
 		}
 	});
 
+	test("unknown top-level HTML HEAD is non-indexable and non-cacheable", async ({
+		request,
+	}) => {
+		const response = await request.head("/people-contactedsss.html");
+
+		expect(response.status()).toBe(404);
+		expect(response.headers()["x-robots-tag"]).toContain("noindex");
+		expect(response.headers()["cache-control"]).toContain("no-store");
+	});
+
 	test("should be accessible on mobile", async ({ page, viewport }) => {
 		await page.goto(missingPath);
 

@@ -47,6 +47,49 @@ test.describe("Site widgets integration", () => {
 		await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 	});
 
+	test("static footer back-to-top uses the shared scroll handler", async ({
+		page,
+	}) => {
+		const pageErrors: string[] = [];
+		page.on("pageerror", (error) => pageErrors.push(error.message));
+
+		await page.goto("/checkout.html");
+		const footerBackToTop = page.locator('footer a[href="#top"]');
+		await expect(footerBackToTop).toBeVisible();
+
+		await page.evaluate(() => {
+			document.body.style.minHeight = "300vh";
+			window.scrollTo(0, document.body.scrollHeight);
+		});
+		await expect
+			.poll(() =>
+				page.evaluate(() =>
+					Math.max(
+						window.scrollY,
+						document.body.scrollTop,
+						document.documentElement.scrollTop,
+					),
+				),
+			)
+			.toBeGreaterThan(0);
+
+		await footerBackToTop.click();
+		await expect
+			.poll(() =>
+				page.evaluate(() =>
+					Math.max(
+						window.scrollY,
+						document.body.scrollTop,
+						document.documentElement.scrollTop,
+					),
+				),
+			)
+			.toBe(0);
+		expect(
+			pageErrors.filter((message) => /scrollToTopOfPage/.test(message)),
+		).toEqual([]);
+	});
+
 	test("should keep the global 404 in minimal chrome mode", async ({ page }) => {
 		await page.goto("/404.html");
 
