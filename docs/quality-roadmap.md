@@ -521,7 +521,9 @@ Autres contrôles :
   canonique est scannée après les déploiements `master` et quotidiennement.
   Les règles anti-clickjacking, `nosniff`, directory browsing et HSTS sont
   bloquantes ; CSP reste en WARN jusqu'au chantier de durcissement dédié.
-  Les scans Preview et production passent explicitement `-c .zap/rules.tsv`.
+  Preview et production chargent `.zap/rules.tsv` une seule fois via
+  `rules_file_name`; `cmd_options` conserve uniquement `-I -T 5` afin
+  d'éviter le double chargement de politique détecté puis corrigé avec Bababou #188.
   Le DAST production utilise le Vercel Automation Bypass et un preflight 200
   qui rejette `429` / Security Checkpoint afin qu'un scan de page de challenge
   ne puisse jamais produire un faux vert. Les rapports ZAP conteneurisés sont

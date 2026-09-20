@@ -14,12 +14,17 @@ test("static back-to-top links keep a defined shared scroll handler", async () =
 	]);
 
 	assert.match(widgets, /function scrollToTopOfPage\(\)/);
-	assert.match(widgets, /window\.scrollTo\(0, 0\)/);
-	assert.match(widgets, /document\.body\.scrollTop = 0/);
-	assert.match(widgets, /document\.documentElement\.scrollTop = 0/);
+	assert.match(widgets, /prefers-reduced-motion: reduce/);
+	assert.match(widgets, /window\.scrollTo\(options\)/);
+	assert.match(widgets, /document\.body\?\.scrollTo\(options\)/);
+	assert.match(widgets, /document\.documentElement\?\.scrollTo\(options\)/);
 	assert.match(
 		widgets,
 		/\/\^top\$\/i\.test\(frag\)[\s\S]*scrollToTopOfPage\(\)/,
+	);
+	assert.match(
+		widgets,
+		/BACK_TO_TOP_BTN_ID[\s\S]*link\.addEventListener\("click"[\s\S]*scrollToTopOfPage\(\)/,
 	);
 
 	for (const page of [rootPage, localizedPage, nestedPage]) {

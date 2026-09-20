@@ -495,9 +495,13 @@
 		".service-card, .skill-category, .tool-item, .contact-card, .social-card, .js-animate-on-scroll, [data-animate-on-scroll]";
 
 	function scrollToTopOfPage() {
-		window.scrollTo(0, 0);
-		if (document.body) document.body.scrollTop = 0;
-		if (document.documentElement) document.documentElement.scrollTop = 0;
+		var behavior = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+			? "auto"
+			: "smooth";
+		var options = { top: 0, left: 0, behavior: behavior };
+		window.scrollTo(options);
+		document.body?.scrollTo(options);
+		document.documentElement?.scrollTo(options);
 	}
 
 	function initSmoothScroll() {
@@ -840,10 +844,7 @@
 
 		link.addEventListener("click", (e) => {
 			e.preventDefault();
-			window.scrollTo({ top: 0, behavior: "smooth" });
-			document.body.scrollTo({ top: 0, behavior: "smooth" });
-			// Also target documentElement for cross-browser compatibility
-			document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+			scrollToTopOfPage();
 		});
 		document.body.appendChild(link);
 	}
