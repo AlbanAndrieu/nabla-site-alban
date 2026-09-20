@@ -209,9 +209,12 @@ export function parseServiceTopology(value: unknown): ServiceTopology | null {
 	return value as ServiceTopology;
 }
 
-const parsedLocalFallback = parseServiceTopology(localTopology);
+const localCatalogV2 = getStaticServiceCatalogV2().catalog;
+const parsedLocalFallback = parseServiceTopology(
+	serviceCatalogV2ToTopologyPayload(localCatalogV2),
+);
 if (!parsedLocalFallback) {
-	throw new Error("Invalid local service-topology.json fallback");
+	throw new Error("Invalid v2-derived service topology fallback");
 }
 const LOCAL_FALLBACK: ServiceTopology = parsedLocalFallback;
 
