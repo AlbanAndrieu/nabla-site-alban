@@ -428,6 +428,7 @@ jobs:
               filename === 'eslint.config.js' ||
               filename === 'stylelint.config.cjs' ||
               filename === 'scripts/agent-quality-gate.sh' ||
+              filename === 'scripts/check_code_size.py' ||
               filename === 'scripts/ci-scope.sh' ||
               filename === 'scripts/verify-production-baseline.sh' ||
               filename === 'scripts/publish-vercel-preview-checkpoint.sh' ||
