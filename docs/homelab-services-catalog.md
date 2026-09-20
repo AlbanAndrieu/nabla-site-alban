@@ -1,92 +1,106 @@
 # Homelab services catalog migration
 
-The canonical homelab inventory is owned by `nabla-compose` service-local
-`x-nabla` metadata. `fastapi-sample` distributes and reconciles that declaration
-with runtime/health evidence; Site Alban is a consumer and keeps a bundled
-fallback for resilience.
+The homelab catalog is migrating through a **coordinated direct cutover**. Site
+Alban is a presentation consumer; it must not become a second inventory authority
+and it must not keep a long-lived v1/v2 compatibility layer.
 
-## Canonical source and generated contracts
+## Target authority
 
-`nabla-compose` already generates:
+The future canonical model is owned by `nabla-compose`:
 
-- `catalog/services.json`;
-- `catalog/service-topology.json`.
+1. service-local Backstage `catalog-info.yaml` descriptors own catalog identity,
+   ownership, system membership and standard relations;
+2. Docker Compose owns runtime service/image/ports/networks/healthcheck facts;
+3. minimal `x-nabla` owns only Nabla-specific operational/security semantics
+   that do not have a suitable standard representation;
+4. generated CycloneDX/provider views share the same stable identities and
+   `catalogRevision`;
+5. FastAPI Sample reconciles declared state with runtime/health/provider evidence;
+6. Site Alban renders that reconciled contract.
 
-The generator and its deterministic check are:
+Cartography/Neo4j may enrich observed graph/security analysis but never becomes
+the lifecycle or catalog source of truth.
 
-```bash
-python scripts/generate-service-topology.py
-python scripts/generate-service-topology.py --check
-```
+## Migration policy
 
-They are also covered by the `nabla-service-catalog` skill, pre-commit and the
-agent quality gate. Generated catalog files must not become independent sources
-of truth.
+This service is non-critical, so a short catalog/Architecture interruption is an
+acceptable trade-off for a simpler migration.
 
-The next compatibility step is tracked in `docs/homelab-roadmap.md`: extend the
-same generator to emit `catalog/homelab-services.json`, detect catalog-worthy
-Compose services missing `x-nabla`, and propagate a `catalogRevision` so
-cross-repository consumers can detect drift.
+The cutover rules are therefore:
 
-## Transition architecture
+- no parallel v1/v2 reader;
+- no dual write;
+- no old-schema runtime fallback;
+- no permanent compatibility translation layer;
+- no independent hand-maintained service inventory in this repository.
 
-The website currently keeps `public/homelab-services.json` as an independent
-fallback while trying FastAPI first.
+`public/homelab-services.json` must be replaced during the migration rather than
+kept indefinitely for v1 compatibility. If a bundled last-known-good artifact is
+still useful after cutover, it must be generated from the **new schema**, carry
+the same `catalogRevision`, and remain cache/resilience data only.
 
-Primary source:
+Rollback is performed by reverting the coordinated repository/deployment commits,
+not by maintaining two wire contracts.
 
-- `https://fastapi-sample.fastapicloud.dev/api/homelab-services`;
-- override with the server-side `HOMELAB_SERVICES_API_URL` environment variable
-  when needed.
-
-Fallback source:
-
-- repository file `public/homelab-services.json`.
-
-The primary request has a short timeout and the returned payload is validated
-before use. HTTP errors, timeouts, invalid JSON, an empty service list, or
-malformed entries cause an immediate fallback to the repository catalog.
-
-The fallback is temporary resilience data. Do not add a new service by editing
-it alone. Add or change the canonical `x-nabla` declaration in `nabla-compose`,
-regenerate the catalog contracts and then synchronize the consumer artifact.
-
-## Website integration
-
-- `lib/homelabServices.ts` owns source selection, timeout, validation and
-  fallback;
-- the App Router TrueNAS grid uses that loader directly on the server;
-- `GET /api/homelab-services` exposes the selected catalog to browser consumers
-  without requiring cross-origin CORS access to FastAPI;
-- response header `X-Homelab-Services-Source` is `fastapi` or `local-fallback`,
-  making the active source observable.
-
-`/homelab-services.json` intentionally remains a real static file during the
-migration. It must not create a FastAPI → website → FastAPI dependency loop.
-
-## Target architecture
+## Cutover sequence
 
 ```text
-nabla-compose apps/**/compose.yml + x-nabla
-                  │
-                  ▼
-       generate-service-topology.py
-          │          │           │
-          ▼          ▼           ▼
- services.json  topology.json  homelab-services.json
-          │          │           │
-          └──────────┴─────┬─────┘
-                           ▼
-                    fastapi-sample
-                  runtime reconciliation
-                           │
-                    versioned API contract
-                           │
-                           ▼
-                    nabla-site-alban
-                  + generated LKG fallback
+nabla-compose
+Backstage + Compose + minimal x-nabla
+              |
+              v
+       canonical generator
+              |
+       +------+------+
+       |             |
+       v             v
+   CycloneDX    declared/provider
+                   projections
+                      |
+                      v
+                fastapi-sample
+             reconciled read model
+                      |
+                      v
+               nabla-site-alban
 ```
 
-Before deleting the local fallback, prove the generated compatibility artifact,
-cross-repository drift check and a last-known-good resilience path in CI and
-Preview/production.
+The coordinated migration should:
+
+1. freeze a known-good pre-cutover commit/tag in all participating repositories;
+2. validate the new `nabla-compose` catalog for stable IDs, relation closure,
+   exposure/access-policy coverage and one `catalogRevision`;
+3. update FastAPI's loader/reconciliation/API contract directly to the new model;
+4. update Site Alban's types/loaders/Architecture and TrueNAS presentation directly
+   to that contract;
+5. remove v1-only parsers, fixtures and compatibility overlays in the same
+   migration window;
+6. deploy FastAPI then Site Alban and validate the end-to-end read model;
+7. rollback the coordinated deployment if acceptance fails rather than reopening
+   a dual-schema compatibility path.
+
+## Site Alban acceptance contract
+
+Before production cutover, prove:
+
+- stable canonical entity/service IDs drive React/graph keys;
+- every relation endpoint resolves;
+- declared and observed state remain visually distinct;
+- relation type, strength and evidence are preserved where present;
+- exposure/access intent is rendered from canonical declarations, not inferred
+  from hostnames or labels;
+- missing runtime/security evidence produces unknown/unavailable presentation,
+  not a false DOWN state;
+- any LKG artifact uses the new schema and matching `catalogRevision`;
+- EN/FR Architecture and TrueNAS pages build and render successfully;
+- local quality gate and production build pass on the final cutover tree.
+
+## Source design
+
+The authoritative migration design lives in `nabla-compose`:
+
+- `docs/service-catalog-security-graph.md`;
+- `docs/service-catalog-v2-normalization.md`.
+
+Site Alban should follow those contracts rather than inventing a consumer-specific
+catalog schema.
