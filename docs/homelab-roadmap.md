@@ -1,6 +1,6 @@
 # Homelab integration roadmap
 
-Last reconciled: 12 September 2026.
+Last reconciled: 20 September 2026.
 
 This document is the focused backlog for the TrueNAS / FastAPI / `nabla-compose`
 integration. `docs/quality-roadmap.md` remains the cross-project quality roadmap;
@@ -42,47 +42,50 @@ Official references:
 
 ## P0 — Canonical homelab catalog generation
 
-Canonical ownership is `nabla-compose` service-local `x-nabla` metadata. FastAPI
-is an observer/distributor and Site Alban is a consumer; neither should become a
+Canonical ownership remains `nabla-compose` service-local `x-nabla` metadata.
+FastAPI is an observer/distributor and Site Alban is a consumer; neither becomes a
 second hand-maintained inventory.
 
-- [ ] Extend `nabla-compose/scripts/generate-service-topology.py` so one generator
-  also emits `catalog/homelab-services.json` as a deterministic compatibility
-  projection alongside `catalog/services.json` and
-  `catalog/service-topology.json`.
-- [ ] Define the projection schema explicitly: stable service ID, name, public and
-  internal URLs, external/tunnel intent, environment, monitoring target,
-  presentation metadata and runtime binding where safe. Never copy credentials.
-- [ ] Extend `--check`, pre-commit and `scripts/agent-quality-gate.sh` so a stale
-  `catalog/homelab-services.json` fails before build.
-- [ ] Detect missing components, not only broken relations. A tracked Compose
-  service intended for the Nabla inventory must either carry service-local
-  `x-nabla` metadata or an explicit documented ignore reason. Missing IDs,
-  duplicate IDs and unresolved relation targets must fail generation.
-- [ ] Add generator tests for add / rename / remove / reconnect operations and
-  verify all three generated catalog contracts change together.
-- [ ] Add a cross-repository drift check: Site Alban's bundled fallback must match
-  the canonical generated projection revision. Prefer a generated artifact or
-  repository-dispatch workflow over manual copy/paste.
-- [ ] Trigger Site/FastAPI contract validation when `nabla-compose` merges a
-  catalog-affecting change. The trigger must not deploy if only generated
-  consumer validation is needed.
-- [ ] Once the generated projection is stable, stop hand-editing
-  `public/homelab-services.json`; either generate it from the canonical artifact
-  or replace it with a last-known-good bundled artifact carrying
+- [x] `nabla-compose` now emits `catalog/service-catalog-v2.json` as the
+  deterministic interoperable declared-state projection while preserving the
+  existing v1 contracts during migration.
+- [x] The same upstream generator emits a Backstage-compatible software-catalog
+  projection and a CycloneDX 1.7 service BOM. Those are derived views, not new
+  sources of truth.
+- [x] Site Alban bundles `public/service-catalog-v2.json` as its current
+  last-known-good v2 artifact and validates stable entity/relation references.
+- [x] The local React Flow/topology fallback is adapted from catalog v2 into the
+  existing `ServiceTopology` view model, so the rendering surface can migrate
+  without a big-bang component rewrite.
+- [x] Legacy service-card presentation data is preserved temporarily, but matched
+  entries receive canonical v2 ID/name/kind/category/criticality and the upstream
   `catalogRevision`.
+- [ ] Expose catalog v2 from `fastapi-sample` through a versioned endpoint and
+  require the same `catalogRevision` as the upstream `nabla-compose` artifact.
+- [ ] Add a deterministic cross-repository synchronization/drift check so the
+  bundled Site Alban v2 artifact cannot silently lag the canonical generator.
+- [ ] Move endpoint/environment/navigation representation natively onto the v2
+  contract; keep only genuinely site-owned browser presentation overrides.
+- [ ] Retire `public/service-topology.json` and the hand-maintained portions of
+  `public/homelab-services.json` only after FastAPI v2 distribution, fallback
+  resilience and Preview/production rendering have been accepted.
+- [ ] Consume Cartography/Neo4j observed-security enrichment separately from the
+  declared v2 catalog; observed/inferred edges must never rewrite `x-nabla`.
 
-Existing automation already available in `nabla-compose`:
+Upstream generation/validation:
 
 ```bash
 python scripts/generate-service-topology.py
+python scripts/generate-service-catalog-v2.py
 python scripts/generate-service-topology.py --check
-bash scripts/quality-gate.sh
+python scripts/generate-service-catalog-v2.py --check
+bash scripts/agent-quality-gate.sh
 ```
 
-The existing `nabla-service-catalog` skill, pre-commit hook and agent quality gate
-already invoke/check the topology generator. The missing work is extending this
-same path to the compatibility catalog and explicit missing-component policy.
+Site migration contract tests live in
+`unit-tests/serviceCatalogV2.test.ts`. The current FastAPI v1 APIs remain the
+runtime primary sources until the versioned v2 endpoint exists; the bundled v2
+artifact supplies the canonical local declared-state fallback.
 
 ## P0 — FastAPI health contract convergence
 
