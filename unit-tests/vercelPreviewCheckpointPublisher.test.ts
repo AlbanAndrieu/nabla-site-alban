@@ -3,8 +3,8 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const checkpointScript = fileURLToPath(
 	new URL("../scripts/publish-vercel-preview-checkpoint.sh", import.meta.url),
@@ -72,12 +72,9 @@ test("publishes an exact-SHA checkpoint and replays idempotently", async (t) => 
 	);
 	assert.match(first, /Published vercel-preview-pr-192/);
 	assert.equal(
-		git(
-			work,
-			"ls-remote",
-			"origin",
-			"refs/heads/vercel-preview-pr-192",
-		).split("\t")[0],
+		git(work, "ls-remote", "origin", "refs/heads/vercel-preview-pr-192").split(
+			"\t",
+		)[0],
 		fixture.headSha,
 	);
 
@@ -107,7 +104,12 @@ test("rejects unsafe branch names and stale base/head relationships", async (t) 
 
 	const stale = spawnSync(
 		"bash",
-		[checkpointScript, "vercel-preview-pr-192", fixture.headSha, fixture.baseSha],
+		[
+			checkpointScript,
+			"vercel-preview-pr-192",
+			fixture.headSha,
+			fixture.baseSha,
+		],
 		{ cwd: work, encoding: "utf8" },
 	);
 	assert.equal(stale.status, 1);

@@ -24,10 +24,7 @@ test("PR CI policy guard is metadata-only and cannot execute PR code", async () 
 	assert.doesNotMatch(workflow, /\bsecrets\./);
 	assert.doesNotMatch(workflow, /^\s*run:/m);
 	assert.doesNotMatch(workflow, /:\s*write\b/);
-	assert.match(
-		workflow,
-		/uses:\s*actions\/github-script@[0-9a-f]{40}\s+# v8/,
-	);
+	assert.match(workflow, /uses:\s*actions\/github-script@[0-9a-f]{40}\s+# v8/);
 
 	const policyScopeMatches = canonicalCi.match(
 		/"\.github\/workflows\/ci-policy\.yml"/g,

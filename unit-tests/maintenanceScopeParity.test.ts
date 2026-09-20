@@ -40,6 +40,9 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 	}
 
 	assert.match(onDemandWorkflow, /publish-vercel-preview-checkpoint\.sh/);
-	assert.doesNotMatch(onDemandWorkflow, /github\.rest\.git\.(?:createRef|updateRef)/);
+	assert.doesNotMatch(
+		onDemandWorkflow,
+		/github\.rest\.git\.(?:createRef|updateRef)/,
+	);
 	assert.doesNotMatch(onDemandWorkflow, /forceCheckpoint/);
 });
