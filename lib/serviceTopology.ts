@@ -1,4 +1,4 @@
-import localTopology from "../public/service-topology.json";
+import {\n\tgetStaticServiceCatalogV2,\n\tserviceCatalogV2ToTopologyPayload,\n} from "./serviceCatalogV2";
 
 export type ServiceDeploymentEnvironment = {
 	name: "production" | "staging" | "dev";
