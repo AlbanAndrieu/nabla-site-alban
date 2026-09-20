@@ -82,6 +82,32 @@ juridiques/familiaux et contraintes de confidentialité propres à Bababou.
 - [ ] À chaque lot transverse, auditer d'abord les PR récentes du dépôt frère et
   backporter uniquement les écarts de plateforme/comportement réellement utiles.
 
+## Convergence `nabla-site-alban` / `nabla-site-bababou`
+
+Principe directeur : les deux sites doivent partager le même socle technique,
+les mêmes primitives UI, politiques accessibilité/sécurité, versions de runtime,
+quality gates et comportements de déploiement. Les contenus, données, langues
+réellement publiées et intégrations métier restent propres à chaque site.
+
+Audit des 10 dernières PR mergées de `nabla-site-bababou` au 20 septembre 2026 :
+
+| PR Bababou | Apport partagé | État côté Alban |
+| --- | --- | --- |
+| #199 | Publisher Vercel exact-SHA réutilisable localement, `force-with-lease`, scopes maintenance cohérents | Porté/adapté dans #192 |
+| #198 | 404 legacy GET/HEAD, no-cache et noindex | Top-level aligné dans #191 ; chemins localisés/nichés restent à traiter selon le proxy Alban |
+| #197 | Images raster légères, dimensions intrinsèques, lazy/async, réduction CLS | Principe retenu ; audit ciblé des images Alban restant dans P2 performance |
+| #195 | Fallback 404 pour `*.html` inconnus sans capturer les vrais fichiers legacy | Équivalent Alban livré via #188/#191 avec `proxy.ts`, implémentation volontairement différente |
+| #194 | Migration d'un hub legacy vers App Router/i18n/catalogue SEO | Contenu Bababou spécifique ; pattern déjà appliqué aux migrations natives Alban |
+| #193 | Migration native multi-locale + contrat de contraste legacy | Contenu Bababou spécifique ; tokens/contrastes/native routes déjà couverts côté Alban |
+| #192 | Back-to-top robuste sur pages statiques | Aligné dans #191 via le widget partagé et reduced-motion |
+| #191 | Reflow 200 %, reduced-motion, primitives partagées | Aligné : `app/accessibility.css`, responsive contracts et primitives communes |
+| #190 | Responsive mobile/tablette/desktop + safe-area/touch targets | Aligné ; #192 complète la matrice Workstation 320/375/768/1024/1440 |
+| #189 | Node 24 limité aux vrais inputs runtime | Déjà aligné et verrouillé par le workflow/contrat Node 24 Alban |
+
+Règle de portage : une amélioration du socle est portée ou explicitement
+documentée comme non applicable ; une migration de contenu n'est jamais copiée
+pour obtenir artificiellement la parité.
+
 ## P0 — Cohérence produit et contenu
 
 - [x] Aligner les informations professionnelles entre l'accueil, `/contact`, `/cv`
@@ -653,6 +679,12 @@ Autres contrôles :
   succès du workflow `CI (Quality and Security)` via `workflow_run`, puis
   laisser le webhook de déploiement enchaîner ZAP Preview et Playwright. Le
   `workflow_dispatch` reste disponible pour une relance manuelle contrôlée.
+- [x] Extraire la publication du checkpoint Vercel exact-SHA dans
+  `scripts/publish-vercel-preview-checkpoint.sh`, comme Bababou #199 : le helper
+  est utilisable depuis un checkout local de confiance pendant une panne/quota
+  Actions, valide la relation base→HEAD, refuse les noms hors
+  `vercel-preview-pr-<n>`, utilise `--force-with-lease` et reste strictement
+  distinct de la preuve Quality/Security obligatoire avant merge.
 - [x] Ajouter un test d’intégration Preview reliant les Route Handlers
   `/api/homelab-services` et `/api/homelab-topology` à la page
   `/architecture`, avec vérification du chemin stable
@@ -738,6 +770,9 @@ Autres contrôles :
 - [x] Documenter l'architecture Next.js/Vercel, l'i18n, la migration SEO et le
   catalogue homelab.
 - [x] Consolider `docs/todo.md` dans cette feuille de route unique.
+- [x] Consolider la parité de plateforme avec les 10 dernières PR Bababou dans
+  cette roadmap canonique ; toute divergence future doit être classée
+  `shared-platform`, `site-specific` ou `deferred-with-reason`.
 - [ ] Supprimer ou archiver les runbooks qui ne décrivent plus aucun runtime
   actif.
 - [ ] Garder les PR de refactoring petites et thématiques afin d'éviter les

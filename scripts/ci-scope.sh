@@ -44,6 +44,7 @@ is_maintenance_only_path() {
             scripts/quality-gate.sh | \
             scripts/check_code_size.py | \
             scripts/ci-scope.sh | \
+            scripts/publish-vercel-preview-checkpoint.sh | \
             unit-tests/agent*.test.ts | \
             unit-tests/ciScope.test.ts | \
             unit-tests/copilotCacheAuthority.test.ts | \

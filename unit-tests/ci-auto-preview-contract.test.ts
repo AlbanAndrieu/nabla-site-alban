@@ -3,9 +3,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const ciUrl = new URL("../.github/workflows/ci.yml", import.meta.url);
+const checkpointUrl = new URL(
+	"../scripts/publish-vercel-preview-checkpoint.sh",
+	import.meta.url,
+);
 
 test("Quality automatically publishes exact PR Preview checkpoints after success", async () => {
-	const workflow = await readFile(ciUrl, "utf8");
+	const [workflow, checkpointScript] = await Promise.all([
+		readFile(ciUrl, "utf8"),
+		readFile(checkpointUrl, "utf8"),
+	]);
 
 	assert.match(workflow, /preview-security:/);
 	assert.match(workflow, /needs: quality/);
@@ -20,13 +27,16 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 	assert.match(workflow, /statuses: write/);
 	assert.match(workflow, /ref: \$\{\{ steps\.preview\.outputs\.sha \}\}/);
 	assert.match(workflow, /PR_BASE_SHA/);
-	assert.match(workflow, /git ls-remote --exit-code --heads origin/);
+	assert.match(workflow, /publish-vercel-preview-checkpoint\.sh/);
 	assert.match(
 		workflow,
-		/git push origin "\$\{PR_BASE_SHA\}:\$\{checkpoint_ref\}"/,
+		/filename === \'scripts\\/publish-vercel-preview-checkpoint\\.sh\'/,
 	);
-	assert.match(workflow, /git push --force origin "HEAD:\$\{checkpoint_ref\}"/);
-	assert.match(workflow, /does not reliably emit/);
+	assert.match(checkpointScript, /\^vercel-preview-pr-\[0-9\]\+\$/);
+	assert.match(checkpointScript, /git merge-base --is-ancestor/);
+	assert.match(checkpointScript, /git ls-remote --exit-code --heads/);
+	assert.match(checkpointScript, /--force-with-lease=/);
+	assert.match(checkpointScript, /does not reliably emit/);
 	assert.match(workflow, /vercel-preview-pr-/);
 	assert.match(workflow, /zapBootstrap/);
 });

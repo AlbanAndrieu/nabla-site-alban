@@ -211,7 +211,7 @@ maintenance_only_hop() {
 
     for file in "${maintenance_files[@]}"; do
         case "${file}" in
-            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/ci-scope.sh | scripts/verify-production-baseline.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
+            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/ci-scope.sh | scripts/verify-production-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
                 ;;
             *)
                 printf '❌ PROD_BASE_MAINTENANCE_SCOPE: %s changes deploy-relevant file %s\n' "${child}" "${file}" >&2
