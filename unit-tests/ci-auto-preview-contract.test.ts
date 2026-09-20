@@ -29,7 +29,9 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 	assert.match(workflow, /PR_BASE_SHA/);
 	assert.match(workflow, /publish-vercel-preview-checkpoint\.sh/);
 	assert.ok(
-		workflow.includes("filename === 'scripts/publish-vercel-preview-checkpoint.sh'"),
+		workflow.includes(
+			"filename === 'scripts/publish-vercel-preview-checkpoint.sh'",
+		),
 	);
 	assert.match(checkpointScript, /\^vercel-preview-pr-\[0-9\]\+\$/);
 	assert.match(checkpointScript, /git merge-base --is-ancestor/);
