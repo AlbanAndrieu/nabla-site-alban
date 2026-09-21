@@ -43,7 +43,7 @@ test("agent quality gate wraps the canonical publication gate", async () => {
 	}
 	assert.match(
 		gate,
-		/scripts\/verify-production-baseline\.sh \| \\\\n\s+app\/components\/homelab\/HomelabOperationalEvidence\.tsx/,
+		/scripts\/verify-production-baseline\.sh \| \\[\s\S]*?app\/components\/homelab\/HomelabOperationalEvidence\.tsx/,
 	);
 	assert.match(
 		gate,
