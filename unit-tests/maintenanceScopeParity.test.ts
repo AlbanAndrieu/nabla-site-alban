@@ -95,7 +95,10 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		"scripts/lib/agent-quality-support.sh",
 		"scripts/agent-publish.sh",
 	]) {
-		assert.ok(scope.includes(path), `${path} missing from CI maintenance scope`);
+		assert.ok(
+			scope.includes(path),
+			`${path} missing from CI maintenance scope`,
+		);
 		assert.ok(
 			workflow.includes(`filename === '${path}'`),
 			`${path} missing from automatic Preview safe scope`,

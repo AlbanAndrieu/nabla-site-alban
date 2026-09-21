@@ -17,10 +17,7 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 	assert.match(workflow, /preview-security:/);
 	assert.match(workflow, /needs: quality/);
 	assert.match(workflow, /needs\.quality\.result == 'success'/);
-	assert.match(
-		workflow,
-		/needs\.quality\.outputs\.preview_required == 'true'/,
-	);
+	assert.match(workflow, /needs\.quality\.outputs\.preview_required == 'true'/);
 	assert.match(
 		workflow,
 		/preview_required:\s*\$\{\{ steps\.ci-scope\.outputs\.preview_required \}\}/,
@@ -58,9 +55,7 @@ test("automatic Preview policy skips repository-security maintenance without hid
 	assert.match(workflow, /filename\.startsWith\('\.github\/'\)/);
 	assert.match(workflow, /filename\.startsWith\('\.zap\/'\)/);
 	assert.ok(
-		workflow.includes(
-			"filename === 'scripts/lib/agent-quality-support.sh'",
-		),
+		workflow.includes("filename === 'scripts/lib/agent-quality-support.sh'"),
 	);
 	assert.ok(workflow.includes("filename === 'scripts/agent-publish.sh'"));
 	assert.ok(

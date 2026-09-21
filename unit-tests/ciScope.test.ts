@@ -88,10 +88,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 
 		await mkdir(path.join(cwd, "scripts/lib"), { recursive: true });
 		await writeFile(
-			path.join(
-				cwd,
-				"scripts/lib/production-baseline-classification.sh",
-			),
+			path.join(cwd, "scripts/lib/production-baseline-classification.sh"),
 			"# policy-only classifier\n",
 		);
 		const classifierHead = await commitAll(cwd, "classifier policy");
