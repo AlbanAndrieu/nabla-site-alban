@@ -124,6 +124,22 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 	assert.equal(accepted.status, 0, accepted.stderr);
 	assert.match(accepted.stdout, /accepted maintenance-only baseline hop/);
 
+	await mkdir(join(cwd, "scripts/lib"), { recursive: true });
+	await writeFile(
+		join(cwd, "scripts/lib/production-baseline-classification.sh"),
+		"# classification maintenance\n",
+	);
+	git(cwd, "add", ".");
+	git(cwd, "commit", "--quiet", "-m", "refactor: baseline classifier");
+	const classifierMaintenance = git(cwd, "rev-parse", "HEAD");
+	const classifierAccepted = classify(
+		cwd,
+		"maintenance_only_hop",
+		maintenance,
+		classifierMaintenance,
+	);
+	assert.equal(classifierAccepted.status, 0, classifierAccepted.stderr);
+
 	await mkdir(join(cwd, "app"), { recursive: true });
 	await writeFile(join(cwd, "app/runtime.ts"), "export const runtime = true;\n");
 	git(cwd, "add", ".");
@@ -133,7 +149,7 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 	const rejected = classify(
 		cwd,
 		"maintenance_only_hop",
-		maintenance,
+		classifierMaintenance,
 		runtime,
 	);
 	assert.equal(rejected.status, 1);

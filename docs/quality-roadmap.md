@@ -294,7 +294,9 @@ les autres chantiers.
   verrouille la release SemVer monotone, les chemins maintenance autorisés et le
   refus d'un changement runtime. La librairie reste volontairement hors fast-path
   maintenance CI : modifier la logique d'héritage de preuve production conserve
-  le scope sécurité complet.
+  le scope sécurité complet. En revanche, le classifieur de baseline accepte son
+  propre chemin comme maintenance après merge, afin qu'un commit non déployé de
+  cette seule politique puisse hériter de la dernière preuve production saine.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
