@@ -58,20 +58,23 @@ test("Playwright ignores production deployment dispatches", async () => {
 	);
 });
 
-test("on-demand Vercel Preview requires exact Quality success and triggers a first ref update", async () => {
-	const workflow = await readFile(
-		".github/workflows/vercel-preview.yml",
-		"utf8",
-	);
+test("on-demand Vercel Preview requires exact Quality success and the shared exact-SHA publisher", async () => {
+	const [workflow, publisher] = await Promise.all([
+		readFile(".github/workflows/vercel-preview.yml", "utf8"),
+		readFile("scripts/publish-vercel-preview-checkpoint.sh", "utf8"),
+	]);
 
 	assert.match(workflow, /actions:\s*read/);
 	assert.match(workflow, /listWorkflowRunsForRepo/);
 	assert.match(workflow, /head_sha:\s*sha/);
 	assert.match(workflow, /CI \(Quality and Security\)/);
 	assert.match(workflow, /qualityRun\.conclusion !== 'success'/);
-	assert.match(workflow, /sha:\s*pr\.base\.sha/);
+	assert.ok(workflow.includes("core.setOutput('base_sha', pr.base.sha)"));
+	assert.match(workflow, /publish-vercel-preview-checkpoint\.sh/);
+	assert.match(publisher, /git merge-base --is-ancestor/);
 	assert.match(
-		workflow,
-		/createRef[\s\S]*sha:\s*pr\.base\.sha[\s\S]*updateRef[\s\S]*sha,/,
+		publisher,
+		/git push "\$\{REMOTE\}" "\$\{base_sha\}:\$\{checkpoint_ref\}"/,
 	);
+	assert.match(publisher, /--force-with-lease=/);
 });

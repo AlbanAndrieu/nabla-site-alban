@@ -31,7 +31,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Publish deploy-relevant checkpoint only
+      - name: Resolve deploy-relevant checkpoint
+        id: preview
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
@@ -46,6 +47,10 @@ jobs:
 
             if (pr.state !== 'open') {
               core.setFailed(`PR #${prNumber} is not open.`);
+              return;
+            }
+            if (pr.draft) {
+              core.setFailed(`PR #${prNumber} is draft; validate it before Preview publication.`);
               return;
             }
             if (pr.head.repo.full_name !== context.repo.owner + '/' + context.repo.repo) {
@@ -93,81 +98,80 @@ jobs:
               per_page: 100,
             });
 
-            const forceCheckpoint = new Set([
-              '.github/workflows/ci.yml',
-              '.github/workflows/playwright.yml',
-              '.github/workflows/vercel-preview.yml',
-              '.github/workflows/zap-preview.yml',
-            ]);
-            const safeOnly = (filename) => {
-              if (forceCheckpoint.has(filename)) return false;
-              return (
-                filename.startsWith('docs/') ||
-                filename.endsWith('.md') ||
-                filename.startsWith('unit-tests/') ||
-                filename.startsWith('.github/') ||
-                filename.startsWith('.zap/') ||
-                filename.startsWith('.vscode/') ||
-                filename.startsWith('.idea/') ||
-                filename.startsWith('.agents/') ||
-                filename.startsWith('.cursor/') ||
-                filename.startsWith('.claude/')
-              );
-            };
+            const safeOnly = (filename) =>
+              filename.startsWith('docs/') ||
+              filename.endsWith('.md') ||
+              filename.startsWith('unit-tests/') ||
+              filename.startsWith('.github/') ||
+              filename.startsWith('.zap/') ||
+              filename.startsWith('.vscode/') ||
+              filename.startsWith('.idea/') ||
+              filename.startsWith('.agents/') ||
+              filename.startsWith('.cursor/') ||
+              filename.startsWith('.claude/') ||
+              filename === '.assetsignore' ||
+              filename === '.pre-commit-config.yaml' ||
+              filename === '.pre-commit-pre-push.yaml' ||
+              filename === '.python-version' ||
+              filename === 'mise.toml' ||
+              filename === 'eslint.config.js' ||
+              filename === 'stylelint.config.cjs' ||
+              filename === 'scripts/agent-quality-gate.sh' ||
+              filename === 'scripts/check_code_size.py' ||
+              filename === 'scripts/ci-scope.sh' ||
+              filename === 'scripts/verify-production-baseline.sh' ||
+              filename === 'scripts/publish-vercel-preview-checkpoint.sh' ||
+              filename === 'scripts/quality-gate.sh' ||
+              filename === 'scripts/eslint-github-formatter.mjs';
 
             const deployRelevant = files
               .map((file) => file.filename)
               .filter((filename) => !safeOnly(filename));
 
+            core.setOutput('sha', sha);
+            core.setOutput('base_sha', pr.base.sha);
+            core.setOutput('branch', `vercel-preview-pr-${prNumber}`);
+            core.setOutput(
+              'deploy_relevant',
+              deployRelevant.length > 0 ? 'true' : 'false',
+            );
+
             if (deployRelevant.length === 0) {
-              core.info(`PR #${prNumber} only changes tests/docs/maintenance; no Vercel Preview needed.`);
+              core.info(
+                `PR #${prNumber} only changes tests/docs/maintenance; no Vercel Preview needed.`,
+              );
               return;
             }
 
             core.info(`Deploy-relevant files: ${deployRelevant.join(', ')}`);
-            const branch = `vercel-preview-pr-${prNumber}`;
-            const ref = `heads/${branch}`;
 
-            try {
-              const current = await github.rest.git.getRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref,
-              });
-              if (current.data.object.sha === sha) {
-                core.info(`${branch} already points to ${sha}; no new Vercel build needed.`);
-                return;
-              }
-              await github.rest.git.updateRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref,
-                sha,
-                force: true,
-              });
-              core.info(`Moved ${branch} to ${sha}`);
-            } catch (error) {
-              if (error.status !== 404) throw error;
-              await github.rest.git.createRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `refs/${ref}`,
-                sha: pr.base.sha,
-              });
-              // Creating a branch alone does not reliably emit the push event used by
-              // Vercel Git Integration. Move the fresh checkpoint from the PR base to
-              // the already quality-validated head to force the first deployment event.
-              await github.rest.git.updateRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref,
-                sha,
-                force: true,
-              });
-              core.info(
-                `Created ${branch} from ${pr.base.sha} and moved it to validated head ${sha}`,
-              );
-            }
+      - name: Report maintenance-only Preview skip
+        if: steps.preview.outputs.deploy_relevant != 'true'
+        shell: bash
+        run: |
+          {
+            echo "## On-demand Preview"
+            echo
+            echo "No deploy-relevant files: no Vercel checkpoint is published."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout exact PR revision
+        if: steps.preview.outputs.deploy_relevant == 'true'
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.preview.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Publish exact-SHA Vercel Preview checkpoint
+        if: steps.preview.outputs.deploy_relevant == 'true'
+        env:
+          CHECKPOINT_BRANCH: ${{ steps.preview.outputs.branch }}
+          PR_BASE_SHA: ${{ steps.preview.outputs.base_sha }}
+          PR_HEAD_SHA: ${{ steps.preview.outputs.sha }}
+        shell: bash
+        run: >-
+          bash scripts/publish-vercel-preview-checkpoint.sh
+          "${CHECKPOINT_BRANCH}" "${PR_BASE_SHA}" "${PR_HEAD_SHA}"
 
   cleanup:
     name: Remove closed PR Preview checkpoint
