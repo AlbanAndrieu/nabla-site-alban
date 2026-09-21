@@ -269,6 +269,10 @@ les autres chantiers.
   `ruff-format`, et un contrat empêche le retour du hook `ruff` redondant. Il reste
   à observer un cycle local réel `quality:agent:fix` → commit → pre-push démontrant
   que la publication gate stricte ne s'exécute qu'une fois et laisse l'arbre propre.
+  Le publisher refuse désormais aussi explicitement une toolchain absente ou
+  cassée avec `QG_PUBLISH_TOOL_MISSING` / `QG_PUBLISH_TOOL_INVALID`, avant
+  toute réutilisation de preuve, afin qu'un bootstrap local incomplet ne se
+  traduise plus par un arrêt shell opaque.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
