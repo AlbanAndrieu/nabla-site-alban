@@ -6,12 +6,20 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("maintenance paths stay aligned across local scope, both Preview paths and production baseline", async () => {
-	const [scope, workflow, onDemandWorkflow, baseline] = await Promise.all([
+	const [
+		scope,
+		workflow,
+		onDemandWorkflow,
+		baseline,
+		baselineClassification,
+	] = await Promise.all([
 		read("scripts/ci-scope.sh"),
 		read(".github/workflows/ci.yml"),
 		read(".github/workflows/vercel-preview.yml"),
 		read("scripts/verify-production-baseline.sh"),
+		read("scripts/lib/production-baseline-classification.sh"),
 	]);
+	const productionBaselinePolicy = `${baseline}\n${baselineClassification}`;
 
 	const sharedMaintenancePrefixes = [
 		["docs/*", "filename.startsWith('docs/')"],
@@ -32,7 +40,7 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 			`${jsPredicate} missing from on-demand Preview scope`,
 		);
 		assert.ok(
-			baseline.includes(shellPattern),
+			productionBaselinePolicy.includes(shellPattern),
 			`${shellPattern} missing from production-baseline scope`,
 		);
 	}
@@ -58,7 +66,7 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 			`${path} missing from on-demand Preview scope`,
 		);
 		assert.ok(
-			baseline.includes(path),
+			productionBaselinePolicy.includes(path),
 			`${path} missing from production-baseline scope`,
 		);
 	}
@@ -69,4 +77,23 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		/github\.rest\.git\.(?:createRef|updateRef)/,
 	);
 	assert.doesNotMatch(onDemandWorkflow, /forceCheckpoint/);
+
+	const classifierPath =
+		"scripts/lib/production-baseline-classification.sh";
+	assert.ok(
+		baselineClassification.includes(classifierPath),
+		"classifier must accept its own policy-only maintenance hop",
+	);
+	assert.ok(
+		!scope.includes(classifierPath),
+		"classifier changes must stay on full CI security scope",
+	);
+	assert.ok(
+		!workflow.includes(`filename === '${classifierPath}'`),
+		"classifier changes must not skip automatic Preview security scope",
+	);
+	assert.ok(
+		!onDemandWorkflow.includes(`filename === '${classifierPath}'`),
+		"classifier changes must not skip on-demand Preview security scope",
+	);
 });
