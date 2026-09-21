@@ -272,7 +272,10 @@ les autres chantiers.
   Le publisher refuse désormais aussi explicitement une toolchain absente ou
   cassée avec `QG_PUBLISH_TOOL_MISSING` / `QG_PUBLISH_TOOL_INVALID`, avant
   toute réutilisation de preuve, afin qu'un bootstrap local incomplet ne se
-  traduise plus par un arrêt shell opaque.
+  traduise plus par un arrêt shell opaque. Le contrat comportemental reproduit
+  désormais les deux cas : outil présent mais invalide et `pre-commit`
+  réellement absent d'un `PATH` local restreint ; une preuve déjà cachée ne peut
+  donc pas masquer une toolchain devenue incomplète.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
