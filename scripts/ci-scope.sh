@@ -37,7 +37,6 @@ is_maintenance_only_path() {
         docs/* | \
             unit-tests/* | \
             *.md | \
-            .github/copilot-instructions.md | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             scripts/agent-quality-gate.sh | \
@@ -48,11 +47,7 @@ is_maintenance_only_path() {
             scripts/ci-scope.sh | \
             scripts/verify-production-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \
-            scripts/eslint-github-formatter.mjs | \
-            unit-tests/agent*.test.ts | \
-            unit-tests/ciScope.test.ts | \
-            unit-tests/copilotCacheAuthority.test.ts | \
-            unit-tests/codeSize*.test.ts)
+            scripts/eslint-github-formatter.mjs)
             return 0
             ;;
         *)
