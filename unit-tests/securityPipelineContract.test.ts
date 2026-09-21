@@ -45,7 +45,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(baseline, /Production DAST/);
 	assert.match(
 		baseline,
-		/source scripts\/lib\/production-baseline-classification\.sh/,
+		/source "\$\{SCRIPT_DIR\}\/lib\/production-baseline-classification\.sh"/,
 	);
 	assert.match(baseline, /maintenance_only_hop/);
 	assert.match(baselineClassification, /--diff-filter=ACMRD/);

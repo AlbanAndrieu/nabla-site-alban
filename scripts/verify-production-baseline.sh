@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
@@ -59,7 +60,7 @@ latest_status() {
 }
 
 # shellcheck source=scripts/lib/production-baseline-classification.sh
-source scripts/lib/production-baseline-classification.sh
+source "${SCRIPT_DIR}/lib/production-baseline-classification.sh"
 
 candidate="${BASE_SHA}"
 release_hops=0
