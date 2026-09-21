@@ -13,6 +13,27 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		read("scripts/verify-production-baseline.sh"),
 	]);
 
+	const sharedMaintenancePrefixes = [
+		["docs/*", "filename.startsWith('docs/')"],
+		["unit-tests/*", "filename.startsWith('unit-tests/')"],
+	] as const;
+
+	for (const [shellPattern, jsPredicate] of sharedMaintenancePrefixes) {
+		assert.ok(scope.includes(shellPattern), `${shellPattern} missing from CI scope`);
+		assert.ok(
+			workflow.includes(jsPredicate),
+			`${jsPredicate} missing from Preview scope`,
+		);
+		assert.ok(
+			onDemandWorkflow.includes(jsPredicate),
+			`${jsPredicate} missing from on-demand Preview scope`,
+		);
+		assert.ok(
+			baseline.includes(shellPattern),
+			`${shellPattern} missing from production-baseline scope`,
+		);
+	}
+
 	const sharedMaintenancePaths = [
 		"scripts/agent-quality-gate.sh",
 		"scripts/quality-gate.sh",

@@ -744,6 +744,13 @@ Autres contrôles :
   `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
   `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
   et un test de contrat empêche la réintroduction du pull coûteux.
+- [x] Aligner le scope CI des changements non-runtime avec Preview et la
+  baseline production : `docs/*`, `*.md` et `unit-tests/*` restent soumis à
+  pre-commit, lint/typecheck et tests unitaires, mais ne déclenchent plus
+  Semgrep applicatif ni `next build`. #1227 a montré le drift précédent en
+  classant une PR docs/tests comme `application=true`; les workflows
+  `.github/**` restent volontairement hors de cette exemption afin de conserver
+  leur analyse Semgrep.
 - [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque

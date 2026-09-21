@@ -34,7 +34,9 @@ fi
 
 is_maintenance_only_path() {
     case "$1" in
-        AGENTS.md | \
+        docs/* | \
+            unit-tests/* | \
+            *.md | \
             .github/copilot-instructions.md | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \

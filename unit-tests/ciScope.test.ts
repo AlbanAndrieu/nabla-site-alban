@@ -49,6 +49,24 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(maintenance.stdout, /sast=false/);
 		assert.match(maintenance.stdout, /build=false/);
 
+		await mkdir(path.join(cwd, "docs"), { recursive: true });
+		await mkdir(path.join(cwd, "unit-tests"), { recursive: true });
+		await writeFile(path.join(cwd, "docs/quality.md"), "docs only\n");
+		await writeFile(
+			path.join(cwd, "unit-tests/quality.test.ts"),
+			"export const maintenanceOnly = true;\n",
+		);
+		const docsAndTestsHead = await commitAll(cwd, "docs and unit tests");
+		const docsAndTests = await execFileAsync(
+			"bash",
+			[SCRIPT, maintenanceHead, docsAndTestsHead],
+			{ cwd },
+		);
+		assert.match(docsAndTests.stdout, /maintenance_only=true/);
+		assert.match(docsAndTests.stdout, /application=false/);
+		assert.match(docsAndTests.stdout, /sast=false/);
+		assert.match(docsAndTests.stdout, /build=false/);
+
 		await mkdir(path.join(cwd, "app"), { recursive: true });
 		await writeFile(
 			path.join(cwd, "app/page.tsx"),
@@ -57,7 +75,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		const applicationHead = await commitAll(cwd, "application");
 		const application = await execFileAsync(
 			"bash",
-			[SCRIPT, maintenanceHead, applicationHead],
+			[SCRIPT, docsAndTestsHead, applicationHead],
 			{ cwd },
 		);
 		assert.match(application.stdout, /maintenance_only=false/);
