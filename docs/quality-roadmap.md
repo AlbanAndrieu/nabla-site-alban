@@ -287,10 +287,14 @@ les autres chantiers.
   warning, hard fail, grandfathering et dépassement de la marge legacy.
   Le follow-up post-#192 extrait le contrat des bits exécutables de
   `agentQualityGate.test.ts`, qui repasse de 311 à 288 lignes et ne génère plus
-  son warning code-size. `verify-production-baseline.sh` reste le dernier warning
-  de ce lot (335 lignes) ; son découpage est différé vers un refactor dédié avec
-  tests de classification release/maintenance afin de ne pas modifier le chemin
-  de santé production dans le hotfix CI.
+  son warning code-size. Il extrait ensuite sans changement de politique les
+  helpers release/maintenance de `verify-production-baseline.sh` vers
+  `scripts/lib/production-baseline-classification.sh`, ce qui ramène
+  l'orchestrateur sous le seuil de warning. Un contrat comportemental dédié
+  verrouille la release SemVer monotone, les chemins maintenance autorisés et le
+  refus d'un changement runtime. La librairie reste volontairement hors fast-path
+  maintenance CI : modifier la logique d'héritage de preuve production conserve
+  le scope sécurité complet.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
