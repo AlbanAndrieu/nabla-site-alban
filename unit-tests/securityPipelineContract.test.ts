@@ -144,10 +144,7 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(checkpoint, /CI \(Quality and Security\)/);
 	assert.match(checkpoint, /qualityRun\.conclusion !== 'success'/);
 	assert.match(checkpoint, /publish-vercel-preview-checkpoint\.sh/);
-	assert.doesNotMatch(
-		checkpoint,
-		/github\.rest\.git\.(?:createRef|updateRef)/,
-	);
+	assert.doesNotMatch(checkpoint, /github\.rest\.git\.(?:createRef|updateRef)/);
 
 	const securityWorkflows = [
 		ciWorkflowPinContract(await read(".github/workflows/ci.yml")),
