@@ -6,19 +6,14 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("maintenance paths stay aligned across local scope, both Preview paths and production baseline", async () => {
-	const [
-		scope,
-		workflow,
-		onDemandWorkflow,
-		baseline,
-		baselineClassification,
-	] = await Promise.all([
-		read("scripts/ci-scope.sh"),
-		read(".github/workflows/ci.yml"),
-		read(".github/workflows/vercel-preview.yml"),
-		read("scripts/verify-production-baseline.sh"),
-		read("scripts/lib/production-baseline-classification.sh"),
-	]);
+	const [scope, workflow, onDemandWorkflow, baseline, baselineClassification] =
+		await Promise.all([
+			read("scripts/ci-scope.sh"),
+			read(".github/workflows/ci.yml"),
+			read(".github/workflows/vercel-preview.yml"),
+			read("scripts/verify-production-baseline.sh"),
+			read("scripts/lib/production-baseline-classification.sh"),
+		]);
 	const productionBaselinePolicy = `${baseline}\n${baselineClassification}`;
 
 	const sharedMaintenancePrefixes = [
@@ -78,8 +73,7 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 	);
 	assert.doesNotMatch(onDemandWorkflow, /forceCheckpoint/);
 
-	const classifierPath =
-		"scripts/lib/production-baseline-classification.sh";
+	const classifierPath = "scripts/lib/production-baseline-classification.sh";
 	assert.ok(
 		baselineClassification.includes(classifierPath),
 		"classifier must accept its own policy-only maintenance hop",
