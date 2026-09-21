@@ -19,7 +19,10 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 	] as const;
 
 	for (const [shellPattern, jsPredicate] of sharedMaintenancePrefixes) {
-		assert.ok(scope.includes(shellPattern), `${shellPattern} missing from CI scope`);
+		assert.ok(
+			scope.includes(shellPattern),
+			`${shellPattern} missing from CI scope`,
+		);
 		assert.ok(
 			workflow.includes(jsPredicate),
 			`${jsPredicate} missing from Preview scope`,
