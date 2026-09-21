@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 20 septembre 2026.
+Dernière vérification : 21 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -750,7 +750,11 @@ Autres contrôles :
   Semgrep applicatif ni `next build`. #1227 a montré le drift précédent en
   classant une PR docs/tests comme `application=true`; les workflows
   `.github/**` restent volontairement hors de cette exemption afin de conserver
-  leur analyse Semgrep.
+  leur analyse Semgrep. Un test comportemental verrouille cette frontière :
+  un workflow reste `maintenance_only=false / sast=true / build=true`, même si
+  `verify-production-baseline.sh` peut hériter d'une baseline saine à travers
+  ce commit non-déployable. Cette asymétrie est intentionnelle : sécurité du code
+  CI d'un côté, continuité de preuve production de l'autre.
 - [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque

@@ -67,6 +67,22 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(docsAndTests.stdout, /sast=false/);
 		assert.match(docsAndTests.stdout, /build=false/);
 
+		await mkdir(path.join(cwd, ".github/workflows"), { recursive: true });
+		await writeFile(
+			path.join(cwd, ".github/workflows/ci.yml"),
+			"name: Security-sensitive workflow\n",
+		);
+		const workflowHead = await commitAll(cwd, "workflow change");
+		const workflow = await execFileAsync(
+			"bash",
+			[SCRIPT, docsAndTestsHead, workflowHead],
+			{ cwd },
+		);
+		assert.match(workflow.stdout, /maintenance_only=false/);
+		assert.match(workflow.stdout, /application=true/);
+		assert.match(workflow.stdout, /sast=true/);
+		assert.match(workflow.stdout, /build=true/);
+
 		await mkdir(path.join(cwd, "app"), { recursive: true });
 		await writeFile(
 			path.join(cwd, "app/page.tsx"),
@@ -75,7 +91,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		const applicationHead = await commitAll(cwd, "application");
 		const application = await execFileAsync(
 			"bash",
-			[SCRIPT, docsAndTestsHead, applicationHead],
+			[SCRIPT, workflowHead, applicationHead],
 			{ cwd },
 		);
 		assert.match(application.stdout, /maintenance_only=false/);
