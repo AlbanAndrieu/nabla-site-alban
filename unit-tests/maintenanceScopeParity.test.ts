@@ -83,11 +83,26 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		"classifier changes must stay on full CI security scope",
 	);
 	assert.ok(
-		!workflow.includes(`filename === '${classifierPath}'`),
-		"classifier changes must not skip automatic Preview security scope",
+		workflow.includes(`filename === '${classifierPath}'`),
+		"classifier changes must keep full CI security scope but skip automatic Preview deployment",
 	);
 	assert.ok(
-		!onDemandWorkflow.includes(`filename === '${classifierPath}'`),
-		"classifier changes must not skip on-demand Preview security scope",
+		onDemandWorkflow.includes(`filename === '${classifierPath}'`),
+		"classifier changes must skip on-demand Preview deployment",
 	);
+
+	for (const path of [
+		"scripts/lib/agent-quality-support.sh",
+		"scripts/agent-publish.sh",
+	]) {
+		assert.ok(scope.includes(path), `${path} missing from CI maintenance scope`);
+		assert.ok(
+			workflow.includes(`filename === '${path}'`),
+			`${path} missing from automatic Preview safe scope`,
+		);
+		assert.ok(
+			onDemandWorkflow.includes(`filename === '${path}'`),
+			`${path} missing from on-demand Preview safe scope`,
+		);
+	}
 });

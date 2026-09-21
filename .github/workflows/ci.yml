@@ -100,6 +100,7 @@ jobs:
     timeout-minutes: 25
     outputs:
       current-base-sha: ${{ steps.production-baseline.outputs.base-sha }}
+      preview_required: ${{ steps.ci-scope.outputs.preview_required }}
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -358,7 +359,8 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      needs.quality.result == 'success'
+      needs.quality.result == 'success' &&
+      needs.quality.outputs.preview_required == 'true'
     timeout-minutes: 35
     runs-on: ubuntu-latest
     permissions:
@@ -428,8 +430,11 @@ jobs:
               filename === 'eslint.config.js' ||
               filename === 'stylelint.config.cjs' ||
               filename === 'scripts/agent-quality-gate.sh' ||
+              filename === 'scripts/lib/agent-quality-support.sh' ||
+              filename === 'scripts/agent-publish.sh' ||
               filename === 'scripts/check_code_size.py' ||
               filename === 'scripts/ci-scope.sh' ||
+              filename === 'scripts/lib/production-baseline-classification.sh' ||
               filename === 'scripts/verify-production-baseline.sh' ||
               filename === 'scripts/publish-vercel-preview-checkpoint.sh' ||
               filename === 'scripts/quality-gate.sh' ||

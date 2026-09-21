@@ -794,10 +794,16 @@ Autres contrôles :
   `Playwright Preview E2E`. Le repository ne possède actuellement aucun
   ruleset ; les contrôles production Post-deploy Smoke/DAST sont vérifiés par
   Quality sur le SHA `master` de base.
-- [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
-  changements docs-only et les commits intermédiaires d'une même PR. Le correctif
-  `deploymentEnabled["**"] = false` est préparé pour empêcher les branches
-  `fix/*`/`feat/*` de contourner involontairement le checkpoint on-demand.
+- [x] Réduire encore les déploiements Preview inutiles : Vercel garde
+  `deploymentEnabled["**"] = false` et n'accepte que `master` ou les checkpoints
+  `vercel-preview-*`. Le scope Quality expose désormais séparément
+  `preview_required` : les changements docs/tests/tooling et politiques CI
+  non déployables peuvent rester pleinement contrôlés par Quality/SAST tout en
+  évitant complètement l'allocation du runner `preview-security`. Les
+  workflows automatique et on-demand partagent aussi les exceptions du tooling
+  local (`agent-publish`, `agent-quality-support`) et du classifier de baseline.
+  La concurrency PR annule toujours les runs intermédiaires obsolètes, et le
+  checkpoint exact-SHA revalide encore le HEAD avant publication.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
   profils mobiles seulement lorsque cela apporte une couverture complémentaire.
 - [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un
