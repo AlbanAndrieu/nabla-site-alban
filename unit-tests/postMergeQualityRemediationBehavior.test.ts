@@ -12,7 +12,8 @@ type HarnessOptions = {
 };
 
 const WORKFLOW = ".github/workflows/post-merge-quality-remediation.yml";
-const AsyncFunction = Object.getPrototypeOf(async () => undefined).constructor as new (
+const AsyncFunction = Object.getPrototypeOf(async () => undefined)
+	.constructor as new (
 	...args: string[]
 ) => (...args: unknown[]) => Promise<unknown>;
 
@@ -26,9 +27,7 @@ async function remediationScript() {
 	assert.notEqual(stepIndex, -1);
 	assert.notEqual(scriptIndex, -1);
 
-	const lines = workflow
-		.slice(scriptIndex + scriptMarker.length)
-		.split("\n");
+	const lines = workflow.slice(scriptIndex + scriptMarker.length).split("\n");
 	const scriptLines: string[] = [];
 	for (const line of lines) {
 		if (line.startsWith("            ")) {
@@ -130,7 +129,9 @@ async function runRemediation(
 	const harness = makeHarness(options);
 	const script = await remediationScript();
 	const run = new AsyncFunction("github", "core", "context", "process", script);
-	await run(harness.github, harness.core, harness.context, { env: environment });
+	await run(harness.github, harness.core, harness.context, {
+		env: environment,
+	});
 	return harness;
 }
 
@@ -141,10 +142,7 @@ test("successful remediation PR dispatches canonical CI without opening an issue
 	assert.equal(harness.calls.pulls.length, 1);
 	assert.equal(harness.calls.dispatches.length, 1);
 	assert.equal(harness.calls.dispatches[0].workflow_id, "ci.yml");
-	assert.equal(
-		harness.calls.dispatches[0].ref,
-		environment.REMEDIATION_BRANCH,
-	);
+	assert.equal(harness.calls.dispatches[0].ref, environment.REMEDIATION_BRANCH);
 	assert.equal(harness.calls.issues.length, 0);
 });
 
@@ -170,7 +168,10 @@ test("PR publication failure falls back to a diagnostic issue", async () => {
 	assert.equal(harness.calls.pulls.length, 1);
 	assert.equal(harness.calls.dispatches.length, 0);
 	assert.equal(harness.calls.issues.length, 1);
-	assert.match(String(harness.calls.issues[0].body), /unable to open remediation PR/);
+	assert.match(
+		String(harness.calls.issues[0].body),
+		/unable to open remediation PR/,
+	);
 	assert.match(String(harness.calls.issues[0].body), /Automation fallback/);
 });
 
@@ -186,7 +187,10 @@ test("CI dispatch failure after PR creation falls back to a diagnostic issue", a
 		String(harness.calls.issues[0].body),
 		/canonical CI dispatch failed/,
 	);
-	assert.match(String(harness.calls.issues[0].body), /remediation PR #42 exists/);
+	assert.match(
+		String(harness.calls.issues[0].body),
+		/remediation PR #42 exists/,
+	);
 });
 
 test("existing remediation PR is reused without a duplicate PR or issue", async () => {
