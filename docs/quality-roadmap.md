@@ -254,11 +254,16 @@ les autres chantiers.
   en production : après le merge de #192, `CI (Quality and Security) #1226` a
   échoué sur un contrat unitaire sémantique obsolète, la remédiation #16 a confirmé
   qu'aucun auto-fix déterministe ne progressait et a ouvert l'issue dédupliquée
-  #193. Il reste à prouver le chemin **auto-fix convergent → PR
-  `automation/quality-remediation-*` → dispatch explicite de `ci.yml`**, ainsi
-  que le fallback lorsque GitHub refuse la création de PR ou le dispatch avec
-  `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
-  la quality gate pré-publication.
+  #193. La logique privilégiée est désormais aussi exécutée localement depuis le
+  `github-script` exact du workflow, sans API distante : le contrat couvre
+  **PR créée → dispatch `ci.yml`**, l'échec de publication de branche, le refus
+  de création de PR, le refus de dispatch après création, la réutilisation d'une
+  PR de remédiation existante et la déduplication de l'issue diagnostique. Il
+  reste à observer ces chemins avec les permissions `GITHUB_TOKEN` réelles sur
+  GitHub, en particulier **auto-fix convergent → PR
+  `automation/quality-remediation-*` → dispatch explicite de `ci.yml`**. Ce
+  mécanisme reste un filet de récupération et ne remplace jamais la quality gate
+  pré-publication.
 - [ ] Terminer la validation du chemin local-first sur un workspace agent réel.
   La moitié CI est désormais prouvée à plusieurs reprises dans #177 : un défaut
   formatter/pre-commit s'arrête avant Semgrep, `setup-node`, `npm ci` et le build,
