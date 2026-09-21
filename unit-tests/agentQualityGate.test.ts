@@ -41,6 +41,14 @@ test("agent quality gate wraps the canonical publication gate", async () => {
 			`missing reviewed retirement: ${retired}`,
 		);
 	}
+	assert.match(
+		gate,
+		/scripts\/verify-production-baseline\.sh \| \\\\n\s+app\/components\/homelab\/HomelabOperationalEvidence\.tsx/,
+	);
+	assert.match(
+		gate,
+		/production-baseline split is locked by dedicated release\//,
+	);
 	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
