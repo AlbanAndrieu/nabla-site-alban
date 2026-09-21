@@ -6,9 +6,10 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("quality gate checks production health before build and runs diff-scoped SAST", async () => {
-	const [ci, baseline] = await Promise.all([
+	const [ci, baseline, baselineClassification] = await Promise.all([
 		read(".github/workflows/ci.yml"),
 		read("scripts/verify-production-baseline.sh"),
+		read("scripts/lib/production-baseline-classification.sh"),
 	]);
 
 	const checkout = ci.indexOf("- name: Checkout");
@@ -42,9 +43,13 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	);
 	assert.match(baseline, /Production Post-deploy Smoke/);
 	assert.match(baseline, /Production DAST/);
+	assert.match(
+		baseline,
+		/source scripts\/lib\/production-baseline-classification\.sh/,
+	);
 	assert.match(baseline, /maintenance_only_hop/);
-	assert.match(baseline, /--diff-filter=ACMRD/);
-	assert.match(baseline, /semantic-release metadata hop/);
+	assert.match(baselineClassification, /--diff-filter=ACMRD/);
+	assert.match(baselineClassification, /semantic-release metadata hop/);
 	assert.doesNotMatch(
 		ci,
 		/Bootstrap production DAST before first DAST-enabled merge/,
