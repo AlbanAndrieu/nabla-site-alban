@@ -141,7 +141,10 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 	assert.equal(classifierAccepted.status, 0, classifierAccepted.stderr);
 
 	await mkdir(join(cwd, "app"), { recursive: true });
-	await writeFile(join(cwd, "app/runtime.ts"), "export const runtime = true;\n");
+	await writeFile(
+		join(cwd, "app/runtime.ts"),
+		"export const runtime = true;\n",
+	);
 	git(cwd, "add", ".");
 	git(cwd, "commit", "--quiet", "-m", "feat: runtime");
 	const runtime = git(cwd, "rev-parse", "HEAD");
