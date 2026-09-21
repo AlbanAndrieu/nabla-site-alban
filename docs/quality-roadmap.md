@@ -249,14 +249,14 @@ les autres chantiers.
   trou observé après #191, où `[skip ci]` a empêché Quality/Security de fournir
   une preuve sur le HEAD fusionné. Le futur ruleset reste nécessaire pour rendre
   ce statut effectivement obligatoire avant merge.
-- [ ] Valider opérationnellement le workflow post-merge de #173 après son merge,
-  car GitHub exige qu'un workflow `workflow_run` existe sur la branche par défaut
-  avant de pouvoir être déclenché. Sur un échec ou timeout de
-  `CI (Quality and Security)` après push sur `master`, une correction déterministe
-  convergente doit ouvrir une PR `automation/quality-remediation-*` puis déclencher
-  explicitement `ci.yml`; si aucune correction sûre ne converge, une issue
-  diagnostique dédupliquée doit être ouverte. La validation doit aussi confirmer
-  le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
+- [ ] Valider opérationnellement le workflow post-merge de #173 après son merge.
+  Le chemin **échec non auto-corrigeable → issue diagnostique** est désormais prouvé
+  en production : après le merge de #192, `CI (Quality and Security) #1226` a
+  échoué sur un contrat unitaire sémantique obsolète, la remédiation #16 a confirmé
+  qu'aucun auto-fix déterministe ne progressait et a ouvert l'issue dédupliquée
+  #193. Il reste à prouver le chemin **auto-fix convergent → PR
+  `automation/quality-remediation-*` → dispatch explicite de `ci.yml`**, ainsi
+  que le fallback lorsque GitHub refuse la création de PR ou le dispatch avec
   `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
   la quality gate pré-publication.
 - [ ] Terminer la validation du chemin local-first sur un workspace agent réel.
@@ -281,6 +281,12 @@ les autres chantiers.
   les fichiers legacy déjà au-dessus de 600 ne peuvent croître que de +2 %. Le
   rapport compact reste visible sur les runs verts et les contrats couvrent
   warning, hard fail, grandfathering et dépassement de la marge legacy.
+  Le follow-up post-#192 extrait le contrat des bits exécutables de
+  `agentQualityGate.test.ts`, qui repasse de 311 à 288 lignes et ne génère plus
+  son warning code-size. `verify-production-baseline.sh` reste le dernier warning
+  de ce lot (335 lignes) ; son découpage est différé vers un refactor dédié avec
+  tests de classification release/maintenance afin de ne pas modifier le chemin
+  de santé production dans le hotfix CI.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
