@@ -22,6 +22,10 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 		workflow,
 		/preview_required:\s*\$\{\{ steps\.ci-scope\.outputs\.preview_required \}\}/,
 	);
+	assert.match(
+		workflow,
+		/zap_bootstrap:\s*\$\{\{ steps\.ci-scope\.outputs\.zap_bootstrap \}\}/,
+	);
 	assert.match(workflow, /github\.event\.pull_request\.draft == false/);
 	assert.match(
 		workflow,
@@ -53,6 +57,8 @@ test("automatic Preview delegates deploy classification to the canonical CI scop
 	assert.doesNotMatch(workflow, /const safeOnly/);
 	assert.doesNotMatch(workflow, /deployRelevant/);
 	assert.doesNotMatch(workflow, /Report maintenance-only Preview skip/);
+	assert.doesNotMatch(workflow, /github\.rest\.pulls\.listFiles/);
+	assert.match(workflow, /needs\.quality\.outputs\.zap_bootstrap/);
 	assert.match(workflow, /Canonical Quality scope requires automatic Preview/);
 	assert.doesNotMatch(workflow, /forceCheckpoint/);
 });
@@ -64,6 +70,14 @@ test("Preview security gate waits for both Playwright and OWASP ZAP exact-SHA st
 	assert.match(workflow, /OWASP ZAP Preview/);
 	assert.match(workflow, /zap_bootstrap/);
 	assert.match(workflow, /ZAP_BOOTSTRAP/);
+	assert.match(
+		workflow,
+		/ZAP_BOOTSTRAP:\s*\$\{\{ needs\.quality\.outputs\.zap_bootstrap \}\}/,
+	);
+	assert.match(
+		workflow,
+		/if: needs\.quality\.outputs\.zap_bootstrap == 'true'/,
+	);
 	assert.match(
 		workflow,
 		/repository_dispatch uses the default-branch workflow/,

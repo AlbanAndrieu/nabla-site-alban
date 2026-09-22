@@ -807,11 +807,14 @@ Autres contrôles :
   évitant complètement l'allocation du runner `preview-security`. Le Preview
   automatique ne possède plus une seconde copie de `safeOnly` :
   `scripts/ci-scope.sh` est son autorité unique et le job consomme directement
-  `needs.quality.outputs.preview_required`. Le chemin on-demand conserve
-  provisoirement son classifier API séparé, car il s'exécute sous un token avec
-  permission d'écriture et ne doit pas exécuter du code de PR uniquement pour
-  décider si un Preview est nécessaire ; un contrat de parité garde ses exceptions
-  alignées avec le classifier canonique. La concurrency PR annule toujours les
+  `needs.quality.outputs.preview_required`. Le même classifier calcule aussi
+  `zap_bootstrap`, ce qui supprime le dernier `pulls.listFiles` du Preview
+  automatique : le job ne relit plus le diff via l'API après Quality. Le chemin
+  on-demand conserve provisoirement son classifier API séparé, car il s'exécute
+  sous un token avec permission d'écriture et ne doit pas exécuter du code de PR
+  uniquement pour décider si un Preview est nécessaire ; un contrat de parité
+  garde ses exceptions alignées avec le classifier canonique. La concurrency PR
+  annule toujours les
   runs intermédiaires obsolètes, et le checkpoint exact-SHA revalide encore le HEAD
   avant publication.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les

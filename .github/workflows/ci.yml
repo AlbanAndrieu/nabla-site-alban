@@ -101,6 +101,7 @@ jobs:
     outputs:
       current-base-sha: ${{ steps.production-baseline.outputs.base-sha }}
       preview_required: ${{ steps.ci-scope.outputs.preview_required }}
+      zap_bootstrap: ${{ steps.ci-scope.outputs.zap_bootstrap }}
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -404,19 +405,8 @@ jobs:
               return;
             }
 
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              per_page: 100,
-            });
-            const zapBootstrap = files.some(
-              (file) => file.filename === '.github/workflows/zap-preview.yml',
-            );
-
             core.setOutput('sha', headSha);
             core.setOutput('branch', `vercel-preview-pr-${prNumber}`);
-            core.setOutput('zap_bootstrap', zapBootstrap ? 'true' : 'false');
             core.info(
               `Canonical Quality scope requires automatic Preview for PR #${prNumber}.`,
             );
@@ -441,7 +431,7 @@ jobs:
         env:
           STATUS_SHA: ${{ steps.preview.outputs.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          ZAP_BOOTSTRAP: ${{ steps.preview.outputs.zap_bootstrap }}
+          ZAP_BOOTSTRAP: ${{ needs.quality.outputs.zap_bootstrap }}
         with:
           retries: 3
           script: |
@@ -543,7 +533,7 @@ jobs:
             );
 
       - name: Publish deferred ZAP workflow-bootstrap status
-        if: steps.preview.outputs.zap_bootstrap == 'true'
+        if: needs.quality.outputs.zap_bootstrap == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           STATUS_SHA: ${{ steps.preview.outputs.sha }}

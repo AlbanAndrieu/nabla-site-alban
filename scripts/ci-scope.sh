@@ -101,6 +101,7 @@ mapfile -t CHANGED_FILES < <(
 
 maintenance_only=true
 preview_required=false
+zap_bootstrap=false
 if (("${#CHANGED_FILES[@]}" == 0)); then
     # No diff is unusual in CI. Prefer the safe/full path rather than skipping work.
     maintenance_only=false
@@ -112,6 +113,9 @@ else
         fi
         if ! is_preview_safe_path "${file}"; then
             preview_required=true
+        fi
+        if [[ "${file}" == ".github/workflows/zap-preview.yml" ]]; then
+            zap_bootstrap=true
         fi
     done
 fi
@@ -132,6 +136,7 @@ emit() {
     printf 'sast=%s\n' "${sast}"
     printf 'build=%s\n' "${build}"
     printf 'preview_required=%s\n' "${preview_required}"
+    printf 'zap_bootstrap=%s\n' "${zap_bootstrap}"
     printf 'changed_count=%d\n' "${#CHANGED_FILES[@]}"
 }
 

@@ -85,6 +85,24 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(workflow.stdout, /sast=true/);
 		assert.match(workflow.stdout, /build=true/);
 		assert.match(workflow.stdout, /preview_required=false/);
+		assert.match(workflow.stdout, /zap_bootstrap=false/);
+
+		await writeFile(
+			path.join(cwd, ".github/workflows/zap-preview.yml"),
+			"name: ZAP Preview\n",
+		);
+		const zapWorkflowHead = await commitAll(cwd, "zap workflow bootstrap");
+		const zapWorkflow = await execFileAsync(
+			"bash",
+			[SCRIPT, workflowHead, zapWorkflowHead],
+			{ cwd },
+		);
+		assert.match(zapWorkflow.stdout, /maintenance_only=false/);
+		assert.match(zapWorkflow.stdout, /application=true/);
+		assert.match(zapWorkflow.stdout, /sast=true/);
+		assert.match(zapWorkflow.stdout, /build=true/);
+		assert.match(zapWorkflow.stdout, /preview_required=false/);
+		assert.match(zapWorkflow.stdout, /zap_bootstrap=true/);
 
 		await mkdir(path.join(cwd, "scripts/lib"), { recursive: true });
 		await writeFile(
@@ -94,7 +112,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		const classifierHead = await commitAll(cwd, "classifier policy");
 		const classifier = await execFileAsync(
 			"bash",
-			[SCRIPT, workflowHead, classifierHead],
+			[SCRIPT, zapWorkflowHead, classifierHead],
 			{ cwd },
 		);
 		assert.match(classifier.stdout, /maintenance_only=false/);
@@ -102,6 +120,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(classifier.stdout, /sast=true/);
 		assert.match(classifier.stdout, /build=true/);
 		assert.match(classifier.stdout, /preview_required=false/);
+		assert.match(classifier.stdout, /zap_bootstrap=false/);
 
 		await mkdir(path.join(cwd, "app"), { recursive: true });
 		await writeFile(
@@ -118,6 +137,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(application.stdout, /sast=true/);
 		assert.match(application.stdout, /build=true/);
 		assert.match(application.stdout, /preview_required=true/);
+		assert.match(application.stdout, /zap_bootstrap=false/);
 	} finally {
 		await rm(cwd, { recursive: true, force: true });
 	}
