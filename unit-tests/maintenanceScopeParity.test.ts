@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("maintenance paths stay aligned across local scope, both Preview paths and production baseline", async () => {
+test("maintenance paths stay aligned across local scope, on-demand Preview and production baseline", async () => {
 	const [scope, workflow, onDemandWorkflow, baseline, baselineClassification] =
 		await Promise.all([
 			read("scripts/ci-scope.sh"),
@@ -25,10 +25,6 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		assert.ok(
 			scope.includes(shellPattern),
 			`${shellPattern} missing from CI scope`,
-		);
-		assert.ok(
-			workflow.includes(jsPredicate),
-			`${jsPredicate} missing from Preview scope`,
 		);
 		assert.ok(
 			onDemandWorkflow.includes(jsPredicate),
@@ -53,10 +49,6 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 	for (const path of sharedMaintenancePaths) {
 		assert.ok(scope.includes(path), `${path} missing from CI scope`);
 		assert.ok(
-			workflow.includes(`filename === '${path}'`),
-			`${path} missing from Preview scope`,
-		);
-		assert.ok(
 			onDemandWorkflow.includes(`filename === '${path}'`),
 			`${path} missing from on-demand Preview scope`,
 		);
@@ -65,6 +57,14 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 			`${path} missing from production-baseline scope`,
 		);
 	}
+
+	assert.match(workflow, /needs\.quality\.outputs\.preview_required == 'true'/);
+	assert.match(
+		workflow,
+		/preview_required:\s*\$\{\{ steps\.ci-scope\.outputs\.preview_required \}\}/,
+	);
+	assert.doesNotMatch(workflow, /const safeOnly/);
+	assert.doesNotMatch(workflow, /deployRelevant/);
 
 	assert.match(onDemandWorkflow, /publish-vercel-preview-checkpoint\.sh/);
 	assert.doesNotMatch(
@@ -90,10 +90,6 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		"classifier changes must stay on full CI security scope",
 	);
 	assert.ok(
-		workflow.includes(`filename === '${classifierPath}'`),
-		"classifier changes must keep full CI security scope but skip automatic Preview deployment",
-	);
-	assert.ok(
 		onDemandWorkflow.includes(`filename === '${classifierPath}'`),
 		"classifier changes must skip on-demand Preview deployment",
 	);
@@ -105,10 +101,6 @@ test("maintenance paths stay aligned across local scope, both Preview paths and 
 		assert.ok(
 			scope.includes(path),
 			`${path} missing from CI maintenance scope`,
-		);
-		assert.ok(
-			workflow.includes(`filename === '${path}'`),
-			`${path} missing from automatic Preview safe scope`,
 		);
 		assert.ok(
 			onDemandWorkflow.includes(`filename === '${path}'`),

@@ -804,11 +804,16 @@ Autres contrôles :
   `vercel-preview-*`. Le scope Quality expose désormais séparément
   `preview_required` : les changements docs/tests/tooling et politiques CI
   non déployables peuvent rester pleinement contrôlés par Quality/SAST tout en
-  évitant complètement l'allocation du runner `preview-security`. Les
-  workflows automatique et on-demand partagent aussi les exceptions du tooling
-  local (`agent-publish`, `agent-quality-support`) et du classifier de baseline.
-  La concurrency PR annule toujours les runs intermédiaires obsolètes, et le
-  checkpoint exact-SHA revalide encore le HEAD avant publication.
+  évitant complètement l'allocation du runner `preview-security`. Le Preview
+  automatique ne possède plus une seconde copie de `safeOnly` :
+  `scripts/ci-scope.sh` est son autorité unique et le job consomme directement
+  `needs.quality.outputs.preview_required`. Le chemin on-demand conserve
+  provisoirement son classifier API séparé, car il s'exécute sous un token avec
+  permission d'écriture et ne doit pas exécuter du code de PR uniquement pour
+  décider si un Preview est nécessaire ; un contrat de parité garde ses exceptions
+  alignées avec le classifier canonique. La concurrency PR annule toujours les
+  runs intermédiaires obsolètes, et le checkpoint exact-SHA revalide encore le HEAD
+  avant publication.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
   profils mobiles seulement lorsque cela apporte une couverture complémentaire.
 - [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un
