@@ -43,7 +43,7 @@ test("Quality automatically publishes exact PR Preview checkpoints after success
 	assert.match(checkpointScript, /--force-with-lease=/);
 	assert.match(checkpointScript, /does not reliably emit/);
 	assert.match(workflow, /vercel-preview-pr-/);
-	assert.match(workflow, /zapBootstrap/);
+	assert.match(workflow, /needs\.quality\.outputs\.zap_bootstrap/);
 });
 
 test("automatic Preview delegates deploy classification to the canonical CI scope", async () => {
