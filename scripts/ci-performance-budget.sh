@@ -88,7 +88,7 @@ if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
         echo
         echo "#### Copy-ready baseline record"
         echo
-        printf '`%s`\n' "${baseline_record}"
+        printf '%s%s%s\n' "\`" "${baseline_record}" "\`"
     } >>"${GITHUB_STEP_SUMMARY}"
 fi
 
