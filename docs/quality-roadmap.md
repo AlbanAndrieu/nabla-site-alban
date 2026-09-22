@@ -766,13 +766,16 @@ Autres contrôles :
   baseline production : `docs/*`, `*.md` et `unit-tests/*` restent soumis à
   pre-commit, lint/typecheck et tests unitaires, mais ne déclenchent plus
   Semgrep applicatif ni `next build`. #1227 a montré le drift précédent en
-  classant une PR docs/tests comme `application=true`; les workflows
-  `.github/**` restent volontairement hors de cette exemption afin de conserver
-  leur analyse Semgrep. Un test comportemental verrouille cette frontière :
-  un workflow reste `maintenance_only=false / sast=true / build=true`, même si
-  `verify-production-baseline.sh` peut hériter d'une baseline saine à travers
-  ce commit non-déployable. Cette asymétrie est intentionnelle : sécurité du code
-  CI d'un côté, continuité de preuve production de l'autre.
+  classant une PR docs/tests comme `application=true`. Les workflows
+  `.github/**` et les politiques de baseline restent volontairement hors du
+  fast-path maintenance afin de conserver `sast=true`, mais leur caractère
+  non-déployable est maintenant séparé de cette exigence sécurité :
+  `application=false / build=false / preview_required=false`. Un changement
+  applicatif ou autre entrée réellement déployable conserve
+  `application=true / sast=true / build=true / preview_required=true`. Cette
+  asymétrie évite un build Next sans valeur pour un changement de workflow tout
+  en maintenant Semgrep et permet toujours à `verify-production-baseline.sh`
+  d'hériter d'une baseline saine à travers ces commits non déployés.
 - [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque

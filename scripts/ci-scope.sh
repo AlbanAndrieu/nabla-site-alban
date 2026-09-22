@@ -121,13 +121,17 @@ else
 fi
 
 if [[ "${maintenance_only}" == true ]]; then
-    application=false
     sast=false
-    build=false
 else
-    application=true
     sast=true
+fi
+
+if [[ "${preview_required}" == true ]]; then
+    application=true
     build=true
+else
+    application=false
+    build=false
 fi
 
 emit() {
@@ -147,8 +151,10 @@ fi
 
 if [[ "${maintenance_only}" == true ]]; then
     echo "ℹ️ CI scope: agent/quality maintenance only; application SAST/build may be skipped."
+elif [[ "${preview_required}" == true ]]; then
+    echo "ℹ️ CI scope: deploy-relevant application change; SAST/build remain mandatory."
 else
-    echo "ℹ️ CI scope: application-capable change; full SAST/build remain mandatory."
+    echo "ℹ️ CI scope: security-sensitive non-deployable change; SAST remains mandatory and application build may be skipped."
 fi
 if [[ "${preview_required}" == true ]]; then
     echo "ℹ️ Preview scope: deploy-relevant change; Preview security gates are required."

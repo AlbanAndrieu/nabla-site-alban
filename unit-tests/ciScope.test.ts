@@ -81,9 +81,9 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 			{ cwd },
 		);
 		assert.match(workflow.stdout, /maintenance_only=false/);
-		assert.match(workflow.stdout, /application=true/);
+		assert.match(workflow.stdout, /application=false/);
 		assert.match(workflow.stdout, /sast=true/);
-		assert.match(workflow.stdout, /build=true/);
+		assert.match(workflow.stdout, /build=false/);
 		assert.match(workflow.stdout, /preview_required=false/);
 		assert.match(workflow.stdout, /zap_bootstrap=false/);
 
@@ -98,9 +98,9 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 			{ cwd },
 		);
 		assert.match(zapWorkflow.stdout, /maintenance_only=false/);
-		assert.match(zapWorkflow.stdout, /application=true/);
+		assert.match(zapWorkflow.stdout, /application=false/);
 		assert.match(zapWorkflow.stdout, /sast=true/);
-		assert.match(zapWorkflow.stdout, /build=true/);
+		assert.match(zapWorkflow.stdout, /build=false/);
 		assert.match(zapWorkflow.stdout, /preview_required=false/);
 		assert.match(zapWorkflow.stdout, /zap_bootstrap=true/);
 
@@ -116,9 +116,9 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 			{ cwd },
 		);
 		assert.match(classifier.stdout, /maintenance_only=false/);
-		assert.match(classifier.stdout, /application=true/);
+		assert.match(classifier.stdout, /application=false/);
 		assert.match(classifier.stdout, /sast=true/);
-		assert.match(classifier.stdout, /build=true/);
+		assert.match(classifier.stdout, /build=false/);
 		assert.match(classifier.stdout, /preview_required=false/);
 		assert.match(classifier.stdout, /zap_bootstrap=false/);
 
