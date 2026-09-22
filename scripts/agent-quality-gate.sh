@@ -279,11 +279,37 @@ else
         bash scripts/quality-gate.sh
 fi
 
-run_compact "ESLint" npm run lint
-run_compact "Stylelint" npm run lint:css
-run_compact "Next.js route type generation" npx next typegen
-run_compact "TypeScript" npm run typecheck
-run_compact "unit and contract tests" npm run test:unit
+scope_output="$(bash scripts/ci-scope.sh "${BASE_REF}" HEAD)"
+printf '%s\n' "${scope_output}"
+build="$(awk -F= '$1 == "build" { print $2; exit }' <<<"${scope_output}")"
+
+run_maintenance_project_checks() {
+    npm run lint
+    npm run lint:css
+    npm run typecheck
+    npm run test:unit
+}
+
+run_full_prebuild_checks() {
+    npm run lint
+    npm run lint:css
+    npx next typegen
+    npm run typecheck
+    npm run test:unit
+}
+
+case "${build}" in
+    true)
+        run_compact "full pre-build lint, route types, TypeScript and unit gate" run_full_prebuild_checks
+        ;;
+    false)
+        run_compact "maintenance lint, CSS, TypeScript and unit gate" run_maintenance_project_checks
+        ;;
+    *)
+        printf '❌ QG_SCOPE_INVALID: ci-scope returned build=%s\n' "${build:-missing}" >&2
+        exit 1
+        ;;
+esac
 
 if [[ "${PUBLISH}" == true ]]; then
     STATUS="$(git status --short)"

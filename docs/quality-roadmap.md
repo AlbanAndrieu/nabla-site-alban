@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 21 septembre 2026.
+Dernière vérification : 22 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -280,7 +280,11 @@ les autres chantiers.
   traduise plus par un arrêt shell opaque. Le contrat comportemental reproduit
   désormais les deux cas : outil présent mais invalide et `pre-commit`
   réellement absent d'un `PATH` local restreint ; une preuve déjà cachée ne peut
-  donc pas masquer une toolchain devenue incomplète.
+  donc pas masquer une toolchain devenue incomplète. La publication locale refuse
+  aussi de matérialiser sa preuve si un build déployable modifie le working tree
+  (`QG_PUBLISH_DIRTY_AFTER_BUILD`) ; un contrat isolé vérifie l'échec sans preuve,
+  la récupération après restauration de l'arbre puis la réutilisation exacte de
+  la preuve sans rejouer gate ni build.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
@@ -766,13 +770,16 @@ Autres contrôles :
   baseline production : `docs/*`, `*.md` et `unit-tests/*` restent soumis à
   pre-commit, lint/typecheck et tests unitaires, mais ne déclenchent plus
   Semgrep applicatif ni `next build`. #1227 a montré le drift précédent en
-  classant une PR docs/tests comme `application=true`; les workflows
-  `.github/**` restent volontairement hors de cette exemption afin de conserver
-  leur analyse Semgrep. Un test comportemental verrouille cette frontière :
-  un workflow reste `maintenance_only=false / sast=true / build=true`, même si
-  `verify-production-baseline.sh` peut hériter d'une baseline saine à travers
-  ce commit non-déployable. Cette asymétrie est intentionnelle : sécurité du code
-  CI d'un côté, continuité de preuve production de l'autre.
+  classant une PR docs/tests comme `application=true`. Les workflows
+  `.github/**` et les politiques de baseline restent volontairement hors du
+  fast-path maintenance afin de conserver `sast=true`, mais leur caractère
+  non-déployable est maintenant séparé de cette exigence sécurité :
+  `application=false / build=false / preview_required=false`. Un changement
+  applicatif ou autre entrée réellement déployable conserve
+  `application=true / sast=true / build=true / preview_required=true`. Cette
+  asymétrie évite un build Next sans valeur pour un changement de workflow tout
+  en maintenant Semgrep et permet toujours à `verify-production-baseline.sh`
+  d'hériter d'une baseline saine à travers ces commits non déployés.
 - [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque
@@ -783,17 +790,29 @@ Autres contrôles :
   sont désormais verrouillées sur des SHA Git immuables au lieu de tags
   mutables.
 - [ ] Mesurer après merge le gain du pipeline local-first sur plusieurs runs : la
-  CI doit arrêter les défauts formatter/pre-commit avant le bootstrap npm, ne pas
-  rejouer le canonical gate plus tard dans le même job, limiter les logs à 40
-  lignes utiles et ne conserver l'artifact Semgrep brut que lors des échecs.
-  Comparer notamment à la baseline Quality `master` d'environ 96 s observée avant
-  ce changement, sans transformer cette durée en seuil bloquant/flakey.
+  CI arrête désormais les défauts formatter/pre-commit avant le bootstrap npm,
+  ne rejoue pas le canonical gate plus tard dans le même job, limite les logs
+  d'échec à 40 lignes utiles et ne conserve l'artifact Semgrep brut que lors des
+  échecs. La première série historique confirme surtout le gain du fail-fast :
+  plusieurs échecs déterministes de #194 se sont arrêtés en ~31–39 s, alors que
+  les runs verts récents restent variables (#1252 ≈117 s, #1253 ≈112 s,
+  #1256 ≈123 s) par rapport à l'ancienne baseline `master` d'environ 96 s.
+  Le skip du build seul ne suffit donc pas à prouver un gain de wall-clock.
+  #195 ajoute des enregistrements `CI_PERF_BASELINE` exact-checkout et des
+  budgets **warning-only** pour `npm ci`, `node_modules`, la gate agent et le
+  build Next ; aucune régression de performance ne devient bloquante. Fermer ce
+  point après au moins trois runs post-merge instrumentés comparables, en tenant
+  compte des cache hits et de la variance des hosted runners.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
   7 septembre 2026 a été refusé (HTTP 403) lors de la création du tag technique ;
   le workflow échoue désormais fermé côté mutation et exige le GitHub App dédié
   (`RELEASE_APP_CLIENT_ID` + `RELEASE_APP_PRIVATE_KEY`) avant de publier.
+  Le run post-#194 `Semantic Release #325` du 22 septembre est un succès de
+  **skip contrôlé** : `Report skipped semantic release` passe, mais checkout,
+  token App, bootstrap, version et publication restent tous skippés ; aucun tag
+  ni release `v0.0.1` n'existe encore. Ce succès ne ferme donc pas ce point.
 - [ ] Configurer un ruleset GitHub pour rendre réellement obligatoires avant
   merge les statuts de PR `CI (Quality and Security)`, `Vercel` et
   `Playwright Preview E2E`. Le repository ne possède actuellement aucun
@@ -804,11 +823,19 @@ Autres contrôles :
   `vercel-preview-*`. Le scope Quality expose désormais séparément
   `preview_required` : les changements docs/tests/tooling et politiques CI
   non déployables peuvent rester pleinement contrôlés par Quality/SAST tout en
-  évitant complètement l'allocation du runner `preview-security`. Les
-  workflows automatique et on-demand partagent aussi les exceptions du tooling
-  local (`agent-publish`, `agent-quality-support`) et du classifier de baseline.
-  La concurrency PR annule toujours les runs intermédiaires obsolètes, et le
-  checkpoint exact-SHA revalide encore le HEAD avant publication.
+  évitant complètement l'allocation du runner `preview-security`. Le Preview
+  automatique ne possède plus une seconde copie de `safeOnly` :
+  `scripts/ci-scope.sh` est son autorité unique et le job consomme directement
+  `needs.quality.outputs.preview_required`. Le même classifier calcule aussi
+  `zap_bootstrap`, ce qui supprime le dernier `pulls.listFiles` du Preview
+  automatique : le job ne relit plus le diff via l'API après Quality. Le chemin
+  on-demand conserve provisoirement son classifier API séparé, car il s'exécute
+  sous un token avec permission d'écriture et ne doit pas exécuter du code de PR
+  uniquement pour décider si un Preview est nécessaire ; un contrat de parité
+  garde ses exceptions alignées avec le classifier canonique. La concurrency PR
+  annule toujours les
+  runs intermédiaires obsolètes, et le checkpoint exact-SHA revalide encore le HEAD
+  avant publication.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
   profils mobiles seulement lorsque cela apporte une couverture complémentaire.
 - [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un

@@ -90,6 +90,30 @@ fi
 
 QUALITY_BASE_REF="${BASE_SHA}" bash scripts/agent-quality-gate.sh --publish
 
+scope_output="$(bash scripts/ci-scope.sh "${BASE_SHA}" HEAD)"
+printf '%s\n' "${scope_output}"
+build="$(awk -F= '$1 == "build" { print $2; exit }' <<<"${scope_output}")"
+case "${build}" in
+    true)
+        npm run build
+        echo "✅ deploy-relevant Next build passed."
+        ;;
+    false)
+        echo "✅ Next build intentionally skipped for non-deployable publication scope."
+        ;;
+    *)
+        printf '❌ QG_PUBLISH_SCOPE_INVALID: ci-scope returned build=%s\n' "${build:-missing}" >&2
+        exit 1
+        ;;
+esac
+
+STATUS="$(git status --short)"
+if [[ -n "${STATUS}" ]]; then
+    echo "❌ QG_PUBLISH_DIRTY_AFTER_BUILD: tracked files changed during publication validation." >&2
+    printf '%s\n' "${STATUS}" >&2
+    exit 1
+fi
+
 mkdir -p "$(dirname "${PROOF_FILE}")"
 PROOF_TMP="$(mktemp "${PROOF_FILE}.XXXXXX")"
 trap 'rm -f "${PROOF_TMP}"' EXIT

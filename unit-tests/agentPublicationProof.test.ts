@@ -44,7 +44,16 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			path.join(cwd, "scripts/agent-quality-gate.sh"),
 			`#!/usr/bin/env bash\nset -euo pipefail\nprintf '1\\n' >> "\${QUALITY_TEST_COUNTER}"\n`,
 		);
-		await git(cwd, "add", "scripts/agent-quality-gate.sh");
+		await makeExecutable(
+			path.join(cwd, "scripts/ci-scope.sh"),
+			`#!/usr/bin/env bash\nset -euo pipefail\nif git diff --name-only "\$1" "\$2" | grep -q '^app/'; then printf '%s\\n' 'build=true'; else printf '%s\\n' 'build=false'; fi\n`,
+		);
+		await git(
+			cwd,
+			"add",
+			"scripts/agent-quality-gate.sh",
+			"scripts/ci-scope.sh",
+		);
 		await git(cwd, "commit", "-m", "head");
 
 		const counter = path.join(cwd, ".git", "gate-count.txt");
@@ -52,7 +61,6 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		await mkdir(bin);
 		for (const [name, version] of [
 			["node", "v26.8.2"],
-			["npm", "11.17.0"],
 			["python3", "Python 3.13.15"],
 			["pre-commit", "pre-commit 4.6.2"],
 		] as const) {
@@ -61,15 +69,23 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 				`#!/usr/bin/env bash\nprintf '%s\\n' '${version}'\n`,
 			);
 		}
+		const buildCounter = path.join(cwd, ".git", "build-count.txt");
+		await makeExecutable(
+			path.join(bin, "npm"),
+			`#!/usr/bin/env bash\nset -euo pipefail\nif [[ "\${1:-}" == "--version" ]]; then printf '%s\\n' '11.17.0'; exit 0; fi\nif [[ "\${1:-}" == "run" && "\${2:-}" == "build" ]]; then printf '1\\n' >> "\${QUALITY_TEST_BUILD_COUNTER}"; exit 0; fi\nexit 2\n`,
+		);
 		const env = {
 			...process.env,
 			PATH: `${bin}:${process.env.PATH ?? ""}`,
 			QUALITY_BASE_REF: "",
 			QUALITY_TEST_COUNTER: counter,
+			QUALITY_TEST_BUILD_COUNTER: buildCounter,
 		};
 
 		const first = await execFileAsync("bash", [SCRIPT], { cwd, env });
+		assert.match(first.stdout, /Next build intentionally skipped/);
 		assert.match(first.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
+		await assert.rejects(readFile(buildCounter, "utf8"));
 		const second = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(second.stdout, /QG_PUBLISH_PROOF_REUSED/);
 		assert.equal(
@@ -145,6 +161,25 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		assert.equal(
 			(await readFile(counter, "utf8")).trim().split("\n").length,
 			2,
+		);
+
+		await mkdir(path.join(cwd, "app"), { recursive: true });
+		await writeFile(
+			path.join(cwd, "app/page.tsx"),
+			"export default function Page() {}\n",
+		);
+		await git(cwd, "add", "app/page.tsx");
+		await git(cwd, "commit", "-m", "deployable-head");
+		const fourth = await execFileAsync("bash", [SCRIPT], { cwd, env });
+		assert.match(fourth.stdout, /deploy-relevant Next build passed/);
+		assert.match(fourth.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
+		assert.equal(
+			(await readFile(counter, "utf8")).trim().split("\n").length,
+			3,
+		);
+		assert.equal(
+			(await readFile(buildCounter, "utf8")).trim().split("\n").length,
+			1,
 		);
 	} finally {
 		await rm(cwd, { recursive: true, force: true });

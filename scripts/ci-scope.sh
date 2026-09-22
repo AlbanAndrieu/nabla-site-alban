@@ -44,6 +44,7 @@ is_maintenance_only_path() {
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
             scripts/check_code_size.py | \
+            scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
             scripts/verify-production-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \
@@ -79,6 +80,7 @@ is_preview_safe_path() {
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/check_code_size.py | \
+            scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
             scripts/lib/production-baseline-classification.sh | \
             scripts/verify-production-baseline.sh | \
@@ -101,6 +103,7 @@ mapfile -t CHANGED_FILES < <(
 
 maintenance_only=true
 preview_required=false
+zap_bootstrap=false
 if (("${#CHANGED_FILES[@]}" == 0)); then
     # No diff is unusual in CI. Prefer the safe/full path rather than skipping work.
     maintenance_only=false
@@ -113,17 +116,24 @@ else
         if ! is_preview_safe_path "${file}"; then
             preview_required=true
         fi
+        if [[ "${file}" == ".github/workflows/zap-preview.yml" ]]; then
+            zap_bootstrap=true
+        fi
     done
 fi
 
 if [[ "${maintenance_only}" == true ]]; then
-    application=false
     sast=false
-    build=false
 else
-    application=true
     sast=true
+fi
+
+if [[ "${preview_required}" == true ]]; then
+    application=true
     build=true
+else
+    application=false
+    build=false
 fi
 
 emit() {
@@ -132,6 +142,7 @@ emit() {
     printf 'sast=%s\n' "${sast}"
     printf 'build=%s\n' "${build}"
     printf 'preview_required=%s\n' "${preview_required}"
+    printf 'zap_bootstrap=%s\n' "${zap_bootstrap}"
     printf 'changed_count=%d\n' "${#CHANGED_FILES[@]}"
 }
 
@@ -142,8 +153,10 @@ fi
 
 if [[ "${maintenance_only}" == true ]]; then
     echo "ℹ️ CI scope: agent/quality maintenance only; application SAST/build may be skipped."
+elif [[ "${preview_required}" == true ]]; then
+    echo "ℹ️ CI scope: deploy-relevant application change; SAST/build remain mandatory."
 else
-    echo "ℹ️ CI scope: application-capable change; full SAST/build remain mandatory."
+    echo "ℹ️ CI scope: security-sensitive non-deployable change; SAST remains mandatory and application build may be skipped."
 fi
 if [[ "${preview_required}" == true ]]; then
     echo "ℹ️ Preview scope: deploy-relevant change; Preview security gates are required."

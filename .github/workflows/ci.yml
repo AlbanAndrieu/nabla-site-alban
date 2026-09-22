@@ -101,6 +101,7 @@ jobs:
     outputs:
       current-base-sha: ${{ steps.production-baseline.outputs.base-sha }}
       preview_required: ${{ steps.ci-scope.outputs.preview_required }}
+      zap_bootstrap: ${{ steps.ci-scope.outputs.zap_bootstrap }}
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -300,7 +301,18 @@ jobs:
           npm install --global npm@11.17.0 --no-audit --no-fund
 
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        id: install
+        shell: bash
+        run: |
+          set -euo pipefail
+          start_ms="$(date +%s%3N)"
+          npm ci --no-audit --no-fund
+          end_ms="$(date +%s%3N)"
+          elapsed_ms=$((end_ms - start_ms))
+          npm_ci_seconds="$(awk -v ms="${elapsed_ms}" 'BEGIN { printf "%.3f", ms / 1000 }')"
+          node_modules_mb="$(du -sm node_modules | awk '{print $1}')"
+          echo "npm_ci_seconds=${npm_ci_seconds}" >>"${GITHUB_OUTPUT}"
+          echo "node_modules_mb=${node_modules_mb}" >>"${GITHUB_OUTPUT}"
 
       - name: Restore Next.js build cache
         id: next-cache
@@ -328,15 +340,58 @@ jobs:
           QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
           QUALITY_LOG_TAIL: "40"
           QUALITY_CANONICAL_GATE_VERIFIED: "1"
-        run: bash scripts/agent-quality-gate.sh
+        shell: bash
+        run: |
+          set +e
+          start_ms="$(date +%s%3N)"
+          bash scripts/agent-quality-gate.sh
+          rc=$?
+          end_ms="$(date +%s%3N)"
+          set -e
+          elapsed_ms=$((end_ms - start_ms))
+          agent_gate_seconds="$(awk -v ms="${elapsed_ms}" 'BEGIN { printf "%.3f", ms / 1000 }')"
+          echo "agent_gate_seconds=${agent_gate_seconds}" >>"${GITHUB_OUTPUT}"
+          exit "${rc}"
 
       - name: Enforce agent-first quality gate
         if: steps.agent-quality-gate.outcome != 'success'
         run: exit 1
 
       - name: Build Next.js production bundle
+        id: next-build
         if: steps.ci-scope.outputs.build == 'true'
-        run: npm run build
+        shell: bash
+        run: |
+          set +e
+          start_ms="$(date +%s%3N)"
+          npm run build
+          rc=$?
+          end_ms="$(date +%s%3N)"
+          set -e
+          elapsed_ms=$((end_ms - start_ms))
+          next_build_seconds="$(awk -v ms="${elapsed_ms}" 'BEGIN { printf "%.3f", ms / 1000 }')"
+          next_mb=""
+          if [[ -d .next ]]; then
+            next_mb="$(du -sm .next | awk '{print $1}')"
+          fi
+          echo "next_build_seconds=${next_build_seconds}" >>"${GITHUB_OUTPUT}"
+          echo "next_mb=${next_mb}" >>"${GITHUB_OUTPUT}"
+          exit "${rc}"
+
+      - name: Check CI performance warning budgets
+        if: always()
+        shell: bash
+        env:
+          NPM_CI_SECONDS: ${{ steps.install.outputs.npm_ci_seconds }}
+          NODE_MODULES_MB: ${{ steps.install.outputs.node_modules_mb }}
+          AGENT_GATE_SECONDS: ${{ steps.agent-quality-gate.outputs.agent_gate_seconds }}
+          NEXT_BUILD_SECONDS: ${{ steps.next-build.outputs.next_build_seconds }}
+          NEXT_MB: ${{ steps.next-build.outputs.next_mb }}
+          NPM_CACHE_HIT: ${{ steps.npm-cache.outputs.cache-hit }}
+          NEXT_CACHE_HIT: ${{ steps.next-cache.outputs.cache-hit }}
+          SAST_REQUIRED: ${{ steps.ci-scope.outputs.sast }}
+          BUILD_REQUIRED: ${{ steps.ci-scope.outputs.build }}
+        run: bash scripts/ci-performance-budget.sh
 
       - name: Save Next.js build cache
         if: steps.ci-scope.outputs.build == 'true' && steps.next-cache.outputs.cache-hit != 'true'
@@ -404,86 +459,19 @@ jobs:
               return;
             }
 
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              per_page: 100,
-            });
-
-            const safeOnly = (filename) =>
-              filename.startsWith('docs/') ||
-              filename.endsWith('.md') ||
-              filename.startsWith('unit-tests/') ||
-              filename.startsWith('.github/') ||
-              filename.startsWith('.zap/') ||
-              filename.startsWith('.vscode/') ||
-              filename.startsWith('.idea/') ||
-              filename.startsWith('.agents/') ||
-              filename.startsWith('.cursor/') ||
-              filename.startsWith('.claude/') ||
-              filename === '.assetsignore' ||
-              filename === '.pre-commit-config.yaml' ||
-              filename === '.pre-commit-pre-push.yaml' ||
-              filename === '.python-version' ||
-              filename === 'mise.toml' ||
-              filename === 'eslint.config.js' ||
-              filename === 'stylelint.config.cjs' ||
-              filename === 'scripts/agent-quality-gate.sh' ||
-              filename === 'scripts/lib/agent-quality-support.sh' ||
-              filename === 'scripts/agent-publish.sh' ||
-              filename === 'scripts/check_code_size.py' ||
-              filename === 'scripts/ci-scope.sh' ||
-              filename === 'scripts/lib/production-baseline-classification.sh' ||
-              filename === 'scripts/verify-production-baseline.sh' ||
-              filename === 'scripts/publish-vercel-preview-checkpoint.sh' ||
-              filename === 'scripts/quality-gate.sh' ||
-              filename === 'scripts/eslint-github-formatter.mjs';
-
-            const deployRelevant = files
-              .map((file) => file.filename)
-              .filter((filename) => !safeOnly(filename));
-
-            const zapBootstrap = files.some(
-              (file) => file.filename === '.github/workflows/zap-preview.yml',
-            );
-
             core.setOutput('sha', headSha);
             core.setOutput('branch', `vercel-preview-pr-${prNumber}`);
-            core.setOutput(
-              'deploy_relevant',
-              deployRelevant.length > 0 ? 'true' : 'false',
+            core.info(
+              `Canonical Quality scope requires automatic Preview for PR #${prNumber}.`,
             );
-            core.setOutput('zap_bootstrap', zapBootstrap ? 'true' : 'false');
-
-            if (deployRelevant.length === 0) {
-              core.info(
-                `PR #${prNumber} only changes tests/docs/maintenance; Preview security gates are not required.`,
-              );
-              return;
-            }
-
-            core.info(`Automatic Preview files: ${deployRelevant.join(', ')}`);
-
-      - name: Report maintenance-only Preview skip
-        if: steps.preview.outputs.deploy_relevant != 'true'
-        shell: bash
-        run: |
-          {
-            echo "## Preview security gates"
-            echo
-            echo "No deploy-relevant files: Vercel Preview, Playwright and ZAP are intentionally skipped."
-          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Checkout exact PR revision for Preview
-        if: steps.preview.outputs.deploy_relevant == 'true'
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ steps.preview.outputs.sha }}
           fetch-depth: 0
 
       - name: Push automatic Vercel Preview checkpoint
-        if: steps.preview.outputs.deploy_relevant == 'true'
         env:
           CHECKPOINT_BRANCH: ${{ steps.preview.outputs.branch }}
           PR_BASE_SHA: ${{ needs.quality.outputs.current-base-sha }}
@@ -493,12 +481,11 @@ jobs:
           "${CHECKPOINT_BRANCH}" "${PR_BASE_SHA}" HEAD
 
       - name: Wait for Vercel, Playwright and ZAP Preview statuses
-        if: steps.preview.outputs.deploy_relevant == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           STATUS_SHA: ${{ steps.preview.outputs.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          ZAP_BOOTSTRAP: ${{ steps.preview.outputs.zap_bootstrap }}
+          ZAP_BOOTSTRAP: ${{ needs.quality.outputs.zap_bootstrap }}
         with:
           retries: 3
           script: |
@@ -600,7 +587,7 @@ jobs:
             );
 
       - name: Publish deferred ZAP workflow-bootstrap status
-        if: steps.preview.outputs.deploy_relevant == 'true' && steps.preview.outputs.zap_bootstrap == 'true'
+        if: needs.quality.outputs.zap_bootstrap == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           STATUS_SHA: ${{ steps.preview.outputs.sha }}
