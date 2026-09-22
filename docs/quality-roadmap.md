@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 21 septembre 2026.
+Dernière vérification : 22 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -786,17 +786,29 @@ Autres contrôles :
   sont désormais verrouillées sur des SHA Git immuables au lieu de tags
   mutables.
 - [ ] Mesurer après merge le gain du pipeline local-first sur plusieurs runs : la
-  CI doit arrêter les défauts formatter/pre-commit avant le bootstrap npm, ne pas
-  rejouer le canonical gate plus tard dans le même job, limiter les logs à 40
-  lignes utiles et ne conserver l'artifact Semgrep brut que lors des échecs.
-  Comparer notamment à la baseline Quality `master` d'environ 96 s observée avant
-  ce changement, sans transformer cette durée en seuil bloquant/flakey.
+  CI arrête désormais les défauts formatter/pre-commit avant le bootstrap npm,
+  ne rejoue pas le canonical gate plus tard dans le même job, limite les logs
+  d'échec à 40 lignes utiles et ne conserve l'artifact Semgrep brut que lors des
+  échecs. La première série historique confirme surtout le gain du fail-fast :
+  plusieurs échecs déterministes de #194 se sont arrêtés en ~31–39 s, alors que
+  les runs verts récents restent variables (#1252 ≈117 s, #1253 ≈112 s,
+  #1256 ≈123 s) par rapport à l'ancienne baseline `master` d'environ 96 s.
+  Le skip du build seul ne suffit donc pas à prouver un gain de wall-clock.
+  #195 ajoute des enregistrements `CI_PERF_BASELINE` exact-checkout et des
+  budgets **warning-only** pour `npm ci`, `node_modules`, la gate agent et le
+  build Next ; aucune régression de performance ne devient bloquante. Fermer ce
+  point après au moins trois runs post-merge instrumentés comparables, en tenant
+  compte des cache hits et de la variance des hosted runners.
 - [ ] Finaliser le bootstrap Semantic Release `v0.0.1` et vérifier après merge la
   création du tag, du changelog synchronisé et de la GitHub Release sans exiger
   une mutation manuelle de `master`. Le `GITHUB_TOKEN` du run validé du
   7 septembre 2026 a été refusé (HTTP 403) lors de la création du tag technique ;
   le workflow échoue désormais fermé côté mutation et exige le GitHub App dédié
   (`RELEASE_APP_CLIENT_ID` + `RELEASE_APP_PRIVATE_KEY`) avant de publier.
+  Le run post-#194 `Semantic Release #325` du 22 septembre est un succès de
+  **skip contrôlé** : `Report skipped semantic release` passe, mais checkout,
+  token App, bootstrap, version et publication restent tous skippés ; aucun tag
+  ni release `v0.0.1` n'existe encore. Ce succès ne ferme donc pas ce point.
 - [ ] Configurer un ruleset GitHub pour rendre réellement obligatoires avant
   merge les statuts de PR `CI (Quality and Security)`, `Vercel` et
   `Playwright Preview E2E`. Le repository ne possède actuellement aucun

@@ -44,6 +44,7 @@ is_maintenance_only_path() {
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
             scripts/check_code_size.py | \
+            scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
             scripts/verify-production-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \
@@ -79,6 +80,7 @@ is_preview_safe_path() {
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/check_code_size.py | \
+            scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
             scripts/lib/production-baseline-classification.sh | \
             scripts/verify-production-baseline.sh | \

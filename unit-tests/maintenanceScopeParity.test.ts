@@ -43,6 +43,7 @@ test("maintenance paths stay aligned across local scope, on-demand Preview and p
 		"scripts/verify-production-baseline.sh",
 		"scripts/publish-vercel-preview-checkpoint.sh",
 		"scripts/check_code_size.py",
+		"scripts/ci-performance-budget.sh",
 		"scripts/eslint-github-formatter.mjs",
 	];
 
