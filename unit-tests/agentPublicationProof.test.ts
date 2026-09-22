@@ -48,7 +48,12 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			path.join(cwd, "scripts/ci-scope.sh"),
 			`#!/usr/bin/env bash\nset -euo pipefail\nif git diff --name-only "\$1" "\$2" | grep -q '^app/'; then printf '%s\\n' 'build=true'; else printf '%s\\n' 'build=false'; fi\n`,
 		);
-		await git(cwd, "add", "scripts/agent-quality-gate.sh", "scripts/ci-scope.sh");
+		await git(
+			cwd,
+			"add",
+			"scripts/agent-quality-gate.sh",
+			"scripts/ci-scope.sh",
+		);
 		await git(cwd, "commit", "-m", "head");
 
 		const counter = path.join(cwd, ".git", "gate-count.txt");

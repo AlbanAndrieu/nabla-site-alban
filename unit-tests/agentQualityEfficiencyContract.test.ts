@@ -18,7 +18,10 @@ test("agent quality keeps TypeScript and unit coverage while scoping route type 
 	);
 	assert.match(gate, /run_full_prebuild_checks/);
 	assert.match(gate, /npx next typegen/);
-	assert.match(gate, /full pre-build lint, route types, TypeScript and unit gate/);
+	assert.match(
+		gate,
+		/full pre-build lint, route types, TypeScript and unit gate/,
+	);
 });
 
 test("publication proof builds deploy-relevant changes only after strict agent validation", async () => {
