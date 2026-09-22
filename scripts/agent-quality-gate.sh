@@ -164,10 +164,13 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             package-lock.json | public/assets/fontawesome-free-7.1.0-web/* | public/assets/fontawesome/*)
                 continue
                 ;;
-            # Reviewed P1 module splits: these facades intentionally shrink below
-            # the destructive-diff threshold while behavior moves to cohesive
-            # modules. Once merged, their new <200-line baselines make this inert.
-            app/components/homelab/HomelabOperationalEvidence.tsx | \
+            # Reviewed module splits: these files intentionally shrink below the
+            # destructive-diff threshold while behavior moves to cohesive modules.
+            # The production-baseline split is locked by dedicated release/
+            # maintenance classification tests. Once merged, the new <200-line
+            # baselines make these exceptions inert.
+            scripts/verify-production-baseline.sh | \
+                app/components/homelab/HomelabOperationalEvidence.tsx | \
                 lib/homelabHealth.ts | lib/homelabObservability.ts)
                 continue
                 ;;

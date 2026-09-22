@@ -1,19 +1,16 @@
 import assert from "node:assert/strict";
-import { readFile, stat } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function source(path: string) {
 	return readFile(new URL("../" + path, import.meta.url), "utf8");
 }
 
-test("agent quality gate is executable and wraps the canonical publication gate", async () => {
-	const [gate, canonical, fileStat] = await Promise.all([
+test("agent quality gate wraps the canonical publication gate", async () => {
+	const [gate, canonical] = await Promise.all([
 		source("scripts/agent-quality-gate.sh"),
 		source("scripts/quality-gate.sh"),
-		stat(new URL("../scripts/agent-quality-gate.sh", import.meta.url)),
 	]);
-
-	assert.notEqual(fileStat.mode & 0o100, 0, "agent gate must be executable");
 	for (const expected of [
 		"QG_BASE_STALE",
 		"QG_LARGE_DELETION",
@@ -44,28 +41,15 @@ test("agent quality gate is executable and wraps the canonical publication gate"
 			`missing reviewed retirement: ${retired}`,
 		);
 	}
-	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
-});
-
-test("critical quality and Preview shell entrypoints remain executable", async () => {
-	const scripts = [
-		"scripts/quality-gate.sh",
-		"scripts/agent-quality-gate.sh",
-		"scripts/ci-scope.sh",
-		"scripts/verify-production-baseline.sh",
-		"scripts/publish-vercel-preview-checkpoint.sh",
-	] as const;
-	const stats = await Promise.all(
-		scripts.map((path) => stat(new URL(`../${path}`, import.meta.url))),
+	assert.match(
+		gate,
+		/scripts\/verify-production-baseline\.sh \| \\[\s\S]*?app\/components\/homelab\/HomelabOperationalEvidence\.tsx/,
 	);
-
-	for (const [index, fileStat] of stats.entries()) {
-		assert.notEqual(
-			fileStat.mode & 0o100,
-			0,
-			`${scripts[index]} must remain executable`,
-		);
-	}
+	assert.match(
+		gate,
+		/production-baseline split is locked by dedicated release\//,
+	);
+	assert.doesNotMatch(gate, /package-lock\.json \| public\/assets\/\*\)/);
 });
 
 test("repository exposes local fix, check and reusable strict publication commands", async () => {

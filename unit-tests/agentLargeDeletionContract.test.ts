@@ -12,10 +12,10 @@ test("reviewed homelab splits keep the destructive-diff exceptions path-scoped",
 		source(".github/workflows/ci.yml"),
 	]);
 
-	assert.match(gate, /Reviewed P1 module splits/);
+	assert.match(gate, /Reviewed module splits/);
 	assert.match(
 		gate,
-		/lib\/homelabHealth\.ts \| lib\/homelabObservability\.ts\)/,
+		/scripts\/verify-production-baseline\.sh \| \\[\s\S]*?lib\/homelabHealth\.ts \| lib\/homelabObservability\.ts\)/,
 	);
 	assert.match(gate, /lib\/homelabHealthBase\.ts \|/);
 	assert.match(gate, /QUALITY_ALLOW_LARGE_DELETION:-0/);

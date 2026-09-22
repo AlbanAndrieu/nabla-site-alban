@@ -77,6 +77,53 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			1,
 		);
 
+		await rm(path.join(bin, "pre-commit"));
+		const missingToolEnv = {
+			...env,
+			PATH: `${bin}:/usr/bin:/bin`,
+		};
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT], { cwd, env: missingToolEnv }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_TOOL_MISSING",
+						),
+				),
+		);
+		assert.equal(
+			(await readFile(counter, "utf8")).trim().split("\n").length,
+			1,
+		);
+		await makeExecutable(
+			path.join(bin, "pre-commit"),
+			"#!/usr/bin/env bash\nprintf '%s\\n' 'pre-commit 4.6.2'\n",
+		);
+
+		await makeExecutable(
+			path.join(bin, "node"),
+			"#!/usr/bin/env bash\nexit 42\n",
+		);
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT], { cwd, env }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_TOOL_INVALID",
+						),
+				),
+		);
+		await makeExecutable(
+			path.join(bin, "node"),
+			"#!/usr/bin/env bash\nprintf '%s\\n' 'v26.8.2'\n",
+		);
+
 		await writeFile(path.join(cwd, "README.md"), "dirty\n");
 		await assert.rejects(
 			execFileAsync("bash", [SCRIPT], { cwd, env }),

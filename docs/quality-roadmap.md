@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 20 septembre 2026.
+Dernière vérification : 21 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -249,16 +249,21 @@ les autres chantiers.
   trou observé après #191, où `[skip ci]` a empêché Quality/Security de fournir
   une preuve sur le HEAD fusionné. Le futur ruleset reste nécessaire pour rendre
   ce statut effectivement obligatoire avant merge.
-- [ ] Valider opérationnellement le workflow post-merge de #173 après son merge,
-  car GitHub exige qu'un workflow `workflow_run` existe sur la branche par défaut
-  avant de pouvoir être déclenché. Sur un échec ou timeout de
-  `CI (Quality and Security)` après push sur `master`, une correction déterministe
-  convergente doit ouvrir une PR `automation/quality-remediation-*` puis déclencher
-  explicitement `ci.yml`; si aucune correction sûre ne converge, une issue
-  diagnostique dédupliquée doit être ouverte. La validation doit aussi confirmer
-  le fallback issue lorsque GitHub refuse la création de PR ou le dispatch CI avec
-  `GITHUB_TOKEN`. Ce mécanisme reste un filet de récupération et ne remplace jamais
-  la quality gate pré-publication.
+- [ ] Valider opérationnellement le workflow post-merge de #173 après son merge.
+  Le chemin **échec non auto-corrigeable → issue diagnostique** est désormais prouvé
+  en production : après le merge de #192, `CI (Quality and Security) #1226` a
+  échoué sur un contrat unitaire sémantique obsolète, la remédiation #16 a confirmé
+  qu'aucun auto-fix déterministe ne progressait et a ouvert l'issue dédupliquée
+  #193. La logique privilégiée est désormais aussi exécutée localement depuis le
+  `github-script` exact du workflow, sans API distante : le contrat couvre
+  **PR créée → dispatch `ci.yml`**, l'échec de publication de branche, le refus
+  de création de PR, le refus de dispatch après création, la réutilisation d'une
+  PR de remédiation existante et la déduplication de l'issue diagnostique. Il
+  reste à observer ces chemins avec les permissions `GITHUB_TOKEN` réelles sur
+  GitHub, en particulier **auto-fix convergent → PR
+  `automation/quality-remediation-*` → dispatch explicite de `ci.yml`**. Ce
+  mécanisme reste un filet de récupération et ne remplace jamais la quality gate
+  pré-publication.
 - [ ] Terminer la validation du chemin local-first sur un workspace agent réel.
   La moitié CI est désormais prouvée à plusieurs reprises dans #177 : un défaut
   formatter/pre-commit s'arrête avant Semgrep, `setup-node`, `npm ci` et le build,
@@ -269,6 +274,13 @@ les autres chantiers.
   `ruff-format`, et un contrat empêche le retour du hook `ruff` redondant. Il reste
   à observer un cycle local réel `quality:agent:fix` → commit → pre-push démontrant
   que la publication gate stricte ne s'exécute qu'une fois et laisse l'arbre propre.
+  Le publisher refuse désormais aussi explicitement une toolchain absente ou
+  cassée avec `QG_PUBLISH_TOOL_MISSING` / `QG_PUBLISH_TOOL_INVALID`, avant
+  toute réutilisation de preuve, afin qu'un bootstrap local incomplet ne se
+  traduise plus par un arrêt shell opaque. Le contrat comportemental reproduit
+  désormais les deux cas : outil présent mais invalide et `pre-commit`
+  réellement absent d'un `PATH` local restreint ; une preuve déjà cachée ne peut
+  donc pas masquer une toolchain devenue incomplète.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
@@ -281,6 +293,18 @@ les autres chantiers.
   les fichiers legacy déjà au-dessus de 600 ne peuvent croître que de +2 %. Le
   rapport compact reste visible sur les runs verts et les contrats couvrent
   warning, hard fail, grandfathering et dépassement de la marge legacy.
+  Le follow-up post-#192 extrait le contrat des bits exécutables de
+  `agentQualityGate.test.ts`, qui repasse de 311 à 288 lignes et ne génère plus
+  son warning code-size. Il extrait ensuite sans changement de politique les
+  helpers release/maintenance de `verify-production-baseline.sh` vers
+  `scripts/lib/production-baseline-classification.sh`, ce qui ramène
+  l'orchestrateur sous le seuil de warning. Un contrat comportemental dédié
+  verrouille la release SemVer monotone, les chemins maintenance autorisés et le
+  refus d'un changement runtime. La librairie reste volontairement hors fast-path
+  maintenance CI : modifier la logique d'héritage de preuve production conserve
+  le scope sécurité complet. En revanche, le classifieur de baseline accepte son
+  propre chemin comme maintenance après merge, afin qu'un commit non déployé de
+  cette seule politique puisse hériter de la dernière preuve production saine.
 - [x] Durcir le fallback Docker secondaire : image NGINX non-root, smoke runtime
   sur `/` et le `404.html` protégé, Trivy v0.74 HIGH/CRITICAL bloquant sur
   l'image locale exacte, SARIF conservé et envoyé via CodeQL v4 avant toute
@@ -738,6 +762,17 @@ Autres contrôles :
   `SNYK_TOKEN` est absent, Quality/Security ne prépare plus l'action conteneur
   `snyk/actions/node`; le scan reste conditionnel via `npx --yes snyk test`
   et un test de contrat empêche la réintroduction du pull coûteux.
+- [x] Aligner le scope CI des changements non-runtime avec Preview et la
+  baseline production : `docs/*`, `*.md` et `unit-tests/*` restent soumis à
+  pre-commit, lint/typecheck et tests unitaires, mais ne déclenchent plus
+  Semgrep applicatif ni `next build`. #1227 a montré le drift précédent en
+  classant une PR docs/tests comme `application=true`; les workflows
+  `.github/**` restent volontairement hors de cette exemption afin de conserver
+  leur analyse Semgrep. Un test comportemental verrouille cette frontière :
+  un workflow reste `maintenance_only=false / sast=true / build=true`, même si
+  `verify-production-baseline.sh` peut hériter d'une baseline saine à travers
+  ce commit non-déployable. Cette asymétrie est intentionnelle : sécurité du code
+  CI d'un côté, continuité de preuve production de l'autre.
 - [x] Réduire le coût des itérations de PR : réutiliser `.next/cache` par PR
   avec fallback sur un cache compatible `package-lock`, et ne pas répéter
   Trivy OS/library sur une PR qui ne modifie que `public/**`. Le scan Trivy reste forcé lorsque
@@ -764,10 +799,16 @@ Autres contrôles :
   `Playwright Preview E2E`. Le repository ne possède actuellement aucun
   ruleset ; les contrôles production Post-deploy Smoke/DAST sont vérifiés par
   Quality sur le SHA `master` de base.
-- [ ] Réduire encore les déploiements Preview inutiles, notamment pour les
-  changements docs-only et les commits intermédiaires d'une même PR. Le correctif
-  `deploymentEnabled["**"] = false` est préparé pour empêcher les branches
-  `fix/*`/`feat/*` de contourner involontairement le checkpoint on-demand.
+- [x] Réduire encore les déploiements Preview inutiles : Vercel garde
+  `deploymentEnabled["**"] = false` et n'accepte que `master` ou les checkpoints
+  `vercel-preview-*`. Le scope Quality expose désormais séparément
+  `preview_required` : les changements docs/tests/tooling et politiques CI
+  non déployables peuvent rester pleinement contrôlés par Quality/SAST tout en
+  évitant complètement l'allocation du runner `preview-security`. Les
+  workflows automatique et on-demand partagent aussi les exceptions du tooling
+  local (`agent-publish`, `agent-quality-support`) et du classifier de baseline.
+  La concurrency PR annule toujours les runs intermédiaires obsolètes, et le
+  checkpoint exact-SHA revalide encore le HEAD avant publication.
 - [ ] Valider la suite Playwright complète sur Chromium, Firefox, WebKit et les
   profils mobiles seulement lorsque cela apporte une couverture complémentaire.
 - [ ] Rétablir une vérification automatisable des logs runtime Vercel lorsqu'un
