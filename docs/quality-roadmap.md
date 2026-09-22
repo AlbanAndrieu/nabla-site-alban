@@ -280,7 +280,11 @@ les autres chantiers.
   traduise plus par un arrêt shell opaque. Le contrat comportemental reproduit
   désormais les deux cas : outil présent mais invalide et `pre-commit`
   réellement absent d'un `PATH` local restreint ; une preuve déjà cachée ne peut
-  donc pas masquer une toolchain devenue incomplète.
+  donc pas masquer une toolchain devenue incomplète. La publication locale refuse
+  aussi de matérialiser sa preuve si un build déployable modifie le working tree
+  (`QG_PUBLISH_DIRTY_AFTER_BUILD`) ; un contrat isolé vérifie l'échec sans preuve,
+  la récupération après restauration de l'arbre puis la réutilisation exacte de
+  la preuve sans rejouer gate ni build.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
