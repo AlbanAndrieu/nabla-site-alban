@@ -92,7 +92,7 @@ require_tool gh
 
 if [[ -z "${REPOSITORY}" ]]; then
     remote_url="$(git -C "${ROOT}" remote get-url origin 2>/dev/null || true)"
-    REPOSITORY="$(sed -E 's#^(https://github.com/|git@github.com:)([^/]+/[^/]+?)(\.git)?$#\2#' <<<"${remote_url}")"
+    REPOSITORY="$(sed -E -e 's#^(https://github.com/|git@github.com:)##' -e 's#\.git$##' <<<"${remote_url}")"
 fi
 
 if [[ ! "${REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
