@@ -81,65 +81,77 @@ function testEnv(mockDir: string) {
 	};
 }
 
-test("master ruleset pins unconditional checks without making conditional Preview checks globally required", async () => {
-	const config = JSON.parse(await readFile(CONFIG, "utf8"));
-	const statusRule = config.rules.find(
-		(rule: { type: string }) => rule.type === "required_status_checks",
-	);
-	const contexts = statusRule.parameters.required_status_checks.map(
-		(check: { context: string }) => check.context,
-	);
-	assert.deepEqual(contexts.sort(), ["CI policy guard", "quality"]);
-	assert.equal(contexts.includes("Vercel"), false);
-	assert.equal(contexts.includes("Playwright Preview E2E"), false);
-	assert.deepEqual(config.conditions.ref_name.include, ["~DEFAULT_BRANCH"]);
-	assert.deepEqual(config.bypass_actors, [
-		{ actor_id: 7859836, actor_type: "User", bypass_mode: "pull_request" },
-	]);
-});
+test(
+	"master ruleset pins unconditional checks without making conditional Preview checks globally required",
+	async () => {
+		const config = JSON.parse(await readFile(CONFIG, "utf8"));
+		const statusRule = config.rules.find(
+			(rule: { type: string }) => rule.type === "required_status_checks",
+		);
+		const contexts = statusRule.parameters.required_status_checks.map(
+			(check: { context: string }) => check.context,
+		);
+		assert.deepEqual(contexts.sort(), ["CI policy guard", "quality"]);
+		assert.equal(contexts.includes("Vercel"), false);
+		assert.equal(contexts.includes("Playwright Preview E2E"), false);
+		assert.deepEqual(config.conditions.ref_name.include, ["~DEFAULT_BRANCH"]);
+		assert.deepEqual(config.bypass_actors, [
+			{ actor_id: 7859836, actor_type: "User", bypass_mode: "pull_request" },
+		]);
+	},
+);
 
-test("ruleset audit passes only when GitHub matches the repository-owned config", async () => {
-	for (const [mode, shouldPass] of [
-		["exact", true],
-		["drift", false],
-	] as const) {
-		const mock = await mockGh(mode);
-		try {
-			if (shouldPass) {
-				const result = await execFileAsync("bash", [SCRIPT, "--check"], {
+test(
+	"ruleset audit passes only when GitHub matches the repository-owned config",
+	async () => {
+		for (const [mode, shouldPass] of [
+			["exact", true],
+			["drift", false],
+		] as const) {
+			const mock = await mockGh(mode);
+			try {
+				if (shouldPass) {
+					const result = await execFileAsync("bash", [SCRIPT, "--check"], {
+						env: testEnv(mock.cwd),
+					});
+					assert.match(result.stdout, /RULESET_OK/);
+				} else {
+					await assert.rejects(
+						execFileAsync("bash", [SCRIPT, "--check"], {
+							env: testEnv(mock.cwd),
+						}),
+						(error: { stderr?: string }) =>
+							Boolean(error.stderr?.includes("RULESET_DRIFT")),
+					);
+				}
+			} finally {
+				await rm(mock.cwd, { recursive: true, force: true });
+			}
+		}
+	},
+);
+
+test(
+	"ruleset apply creates missing state and updates drift before verifying exact state",
+	async () => {
+		for (const [mode, expectedMethod, expectedMessage] of [
+			["missing", "POST", "RULESET_CREATE"],
+			["drift", "PUT", "RULESET_UPDATE"],
+		] as const) {
+			const mock = await mockGh(mode);
+			try {
+				const result = await execFileAsync("bash", [SCRIPT, "--apply"], {
 					env: testEnv(mock.cwd),
 				});
+				assert.match(result.stdout, new RegExp(expectedMessage));
 				assert.match(result.stdout, /RULESET_OK/);
-			} else {
-				await assert.rejects(
-					execFileAsync("bash", [SCRIPT, "--check"], {
-						env: testEnv(mock.cwd),
-					}),
-					(error: { stderr?: string }) =>
-						Boolean(error.stderr?.includes("RULESET_DRIFT")),
+				assert.match(
+					await readFile(mock.logPath, "utf8"),
+					new RegExp(expectedMethod),
 				);
+			} finally {
+				await rm(mock.cwd, { recursive: true, force: true });
 			}
-		} finally {
-			await rm(mock.cwd, { recursive: true, force: true });
 		}
-	}
-});
-
-test("ruleset apply creates missing state and updates drift before verifying exact state", async () => {
-	for (const [mode, expectedMethod, expectedMessage] of [
-		["missing", "POST", "RULESET_CREATE"],
-		["drift", "PUT", "RULESET_UPDATE"],
-	] as const) {
-		const mock = await mockGh(mode);
-		try {
-			const result = await execFileAsync("bash", [SCRIPT, "--apply"], {
-				env: testEnv(mock.cwd),
-			});
-			assert.match(result.stdout, new RegExp(expectedMessage));
-			assert.match(result.stdout, /RULESET_OK/);
-			assert.match(await readFile(mock.logPath, "utf8"), new RegExp(expectedMethod));
-		} finally {
-			await rm(mock.cwd, { recursive: true, force: true });
-		}
-	}
-});
+	},
+);
