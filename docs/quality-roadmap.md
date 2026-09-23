@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 22 septembre 2026.
+Dernière vérification : 23 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -241,8 +241,20 @@ les autres chantiers.
 - [x] Consolider la politique metadata sociale et conserver une façade de
   compatibilité pour les anciens imports.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
-- [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
-  afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
+- [ ] Activer le ruleset GitHub de protection de `master` afin qu'une PR rouge
+  ou un ancien run vert ne puisse plus casser la branche par défaut. Le dépôt
+  versionne désormais l'intention dans
+  `.github/rulesets/master-quality.json`, documentée dans
+  `docs/github-master-ruleset.md`, ainsi qu'un audit/apply local
+  `scripts/manage-master-ruleset.sh`. Le contrat exige les checks
+  inconditionnels `quality` et `CI policy guard`, bloque suppression et
+  force-push, et limite le bypass propriétaire au flux **pull request** afin de
+  conserver une sortie de continuité lorsque le quota GitHub Actions est épuisé
+  sans réautoriser de push direct sur `master`. Les checks Preview
+  Vercel/Playwright/ZAP restent volontairement hors du ruleset global depuis
+  #195, car `preview_required=false` est un état légitime pour les changements
+  non déployables. Le point reste ouvert jusqu'à application distante du ruleset
+  et validation `RULESET_OK` sur le dépôt live.
 - [x] Interdire les directives GitHub de contournement CI dans les commits de PR
   avec un guard `pull_request_target` metadata-only : permissions lecture seule,
   aucun checkout, aucun secret et aucun code de la PR exécuté. Ce guard ferme le
@@ -813,10 +825,14 @@ Autres contrôles :
   **skip contrôlé** : `Report skipped semantic release` passe, mais checkout,
   token App, bootstrap, version et publication restent tous skippés ; aucun tag
   ni release `v0.0.1` n'existe encore. Ce succès ne ferme donc pas ce point.
-- [ ] Configurer un ruleset GitHub pour rendre réellement obligatoires avant
-  merge les statuts de PR `CI (Quality and Security)`, `Vercel` et
-  `Playwright Preview E2E`. Le repository ne possède actuellement aucun
-  ruleset ; les contrôles production Post-deploy Smoke/DAST sont vérifiés par
+- [ ] Configurer puis auditer le ruleset GitHub de `master`. Le dépôt ne
+  possède encore aucun ruleset installé au 23 septembre 2026 ; la configuration
+  as-code et l'outil local check/apply sont maintenant préparés. Les checks
+  globaux à rendre obligatoires sont `quality` et `CI policy guard`.
+  `Vercel`, `Playwright Preview E2E` et ZAP restent conditionnels à
+  `preview_required` et ne doivent donc pas être requis globalement, au risque
+  de bloquer les PR docs/tooling pour lesquelles #195 évite volontairement le
+  Preview. Les contrôles production Post-deploy Smoke/DAST restent vérifiés par
   Quality sur le SHA `master` de base.
 - [x] Réduire encore les déploiements Preview inutiles : Vercel garde
   `deploymentEnabled["**"] = false` et n'accepte que `master` ou les checkpoints

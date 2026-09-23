@@ -82,6 +82,7 @@ is_preview_safe_path() {
             scripts/check_code_size.py | \
             scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
+            scripts/manage-master-ruleset.sh | \
             scripts/lib/production-baseline-classification.sh | \
             scripts/verify-production-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \

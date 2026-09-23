@@ -122,6 +122,23 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(classifier.stdout, /preview_required=false/);
 		assert.match(classifier.stdout, /zap_bootstrap=false/);
 
+		await writeFile(
+			path.join(cwd, "scripts/manage-master-ruleset.sh"),
+			"#!/usr/bin/env bash\necho ruleset\n",
+		);
+		const rulesetToolHead = await commitAll(cwd, "ruleset tool");
+		const rulesetTool = await execFileAsync(
+			"bash",
+			[SCRIPT, classifierHead, rulesetToolHead],
+			{ cwd },
+		);
+		assert.match(rulesetTool.stdout, /maintenance_only=false/);
+		assert.match(rulesetTool.stdout, /application=false/);
+		assert.match(rulesetTool.stdout, /sast=true/);
+		assert.match(rulesetTool.stdout, /build=false/);
+		assert.match(rulesetTool.stdout, /preview_required=false/);
+		assert.match(rulesetTool.stdout, /zap_bootstrap=false/);
+
 		await mkdir(path.join(cwd, "app"), { recursive: true });
 		await writeFile(
 			path.join(cwd, "app/page.tsx"),
@@ -130,7 +147,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		const applicationHead = await commitAll(cwd, "application");
 		const application = await execFileAsync(
 			"bash",
-			[SCRIPT, classifierHead, applicationHead],
+			[SCRIPT, rulesetToolHead, applicationHead],
 			{ cwd },
 		);
 		assert.match(application.stdout, /maintenance_only=false/);
