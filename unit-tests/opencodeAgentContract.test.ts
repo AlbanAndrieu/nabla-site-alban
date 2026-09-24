@@ -16,10 +16,7 @@ test("OpenCode build agent stays model-agnostic and deterministic", async () => 
 	assert.equal("model" in build, false);
 	assert.equal(build.temperature, 0.1);
 	assert.ok(build.steps >= 32);
-	assert.equal(
-		build.prompt,
-		"{file:./.opencode/prompts/repository-build.txt}",
-	);
+	assert.equal(build.prompt, "{file:./.opencode/prompts/repository-build.txt}");
 	assert.equal(config.permission?.skill?.["*"], "allow");
 });
 
@@ -50,9 +47,18 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 
 test("repository OpenCode skills expose focused maintenance workflows", async () => {
 	const expected = new Map([
-		["nabla-maintenance", ["docs/quality-roadmap.md", "nabla-quality", "nabla-pr"]],
-		["nabla-quality", ["quality:agent:fix", "quality:agent:publish", "--status"]],
-		["nabla-pr", ["current GitHub pull request", "exact HEAD SHA", "Do not merge"]],
+		[
+			"nabla-maintenance",
+			["docs/quality-roadmap.md", "nabla-quality", "nabla-pr"],
+		],
+		[
+			"nabla-quality",
+			["quality:agent:fix", "quality:agent:publish", "--status"],
+		],
+		[
+			"nabla-pr",
+			["current GitHub pull request", "exact HEAD SHA", "Do not merge"],
+		],
 	]);
 
 	for (const [name, markers] of expected) {
