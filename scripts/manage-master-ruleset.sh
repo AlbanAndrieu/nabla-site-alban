@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
-CONFIG="${ROOT}/.github/rulesets/master-quality.json"
+CONFIG="${RULESET_CONFIG:-${ROOT}/.github/rulesets/master-quality.json}"
 API_VERSION="2026-03-10"
 MODE="check"
 REPOSITORY="${GITHUB_REPOSITORY:-}"

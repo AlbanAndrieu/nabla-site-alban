@@ -249,7 +249,9 @@ les autres chantiers.
   `scripts/manage-master-ruleset.sh`. Le mode local `--validate` vérifie
   désormais sans API GitHub l'ensemble exact des règles, les paramètres PR,
   les checks obligatoires, leur source GitHub Actions, le mode strict et le
-  bypass. Le contrat exige les checks
+  bypass. Le contrat négatif injecte également quatre dérives locales
+  (`strict=true`, required check manquant, bypass élargi et règle inattendue) et
+  exige leur rejet avant publication. Le contrat exige les checks
   inconditionnels `quality` et `CI policy guard`, bloque suppression et
   force-push, et limite le bypass propriétaire au flux **pull request** afin de
   conserver une sortie de continuité lorsque le quota GitHub Actions est épuisé

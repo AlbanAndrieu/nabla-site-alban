@@ -105,6 +105,40 @@ test("ruleset config validates locally without GitHub API access", async () => {
 	assert.match(result.stdout, /RULESET_CONFIG_OK/);
 });
 
+test("ruleset local validation rejects unsafe policy drift", async () => {
+	const invalidCases = [
+		[
+			'(.rules[] | select(.type == "required_status_checks") | .parameters.strict_required_status_checks_policy) = true',
+			"strict mode",
+		],
+		[
+			'(.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks) = [{"context":"quality","integration_id":15368}]',
+			"missing required check",
+		],
+		['.bypass_actors[0].bypass_mode = "always"', "expanded bypass"],
+		['.rules += [{"type":"creation"}]', "unexpected rule"],
+	] as const;
+
+	for (const [filter, label] of invalidCases) {
+		const cwd = await mkdtemp(path.join(os.tmpdir(), "nabla-ruleset-invalid-"));
+		try {
+			const { stdout } = await execFileAsync("jq", [filter, CONFIG]);
+			const configPath = path.join(cwd, "ruleset.json");
+			await writeFile(configPath, stdout);
+			await assert.rejects(
+				execFileAsync("bash", [SCRIPT, "--validate"], {
+					env: { ...process.env, RULESET_CONFIG: configPath },
+				}),
+				(error: { stderr?: string }) =>
+					Boolean(error.stderr?.includes("RULESET_CONFIG_INVALID")),
+				label,
+			);
+		} finally {
+			await rm(cwd, { recursive: true, force: true });
+		}
+	}
+});
+
 test("ruleset audit passes only when GitHub matches the repository-owned config", async () => {
 	for (const [mode, shouldPass] of [
 		["exact", true],
