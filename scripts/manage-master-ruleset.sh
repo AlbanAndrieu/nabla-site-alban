@@ -10,7 +10,7 @@ REPOSITORY="${GITHUB_REPOSITORY:-}"
 
 usage() {
     cat <<'EOF'
-Usage: bash scripts/manage-master-ruleset.sh [--check|--apply|--print] [--repo OWNER/REPO]
+Usage: bash scripts/manage-master-ruleset.sh [--validate|--check|--apply|--print] [--repo OWNER/REPO]
 
 Audits or applies the repository-owned default-branch ruleset. Applying requires
 GitHub repository Administration:write permission. --check is read-only.
@@ -19,6 +19,9 @@ EOF
 
 while (($# > 0)); do
     case "$1" in
+        --validate)
+            MODE="validate"
+            ;;
         --check)
             MODE="check"
             ;;
@@ -66,12 +69,21 @@ validate_config() {
         and .enforcement == "active"
         and (.conditions.ref_name.include == ["~DEFAULT_BRANCH"])
         and (.conditions.ref_name.exclude == [])
-        and ([.rules[].type] | index("pull_request") != null)
-        and ([.rules[].type] | index("required_status_checks") != null)
-        and ([.rules[].type] | index("deletion") != null)
-        and ([.rules[].type] | index("non_fast_forward") != null)
-        and ([.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context] | sort == ["CI policy guard", "quality"])
-        and ([.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].integration_id] | unique == [15368])
+        and ([.rules[].type] | sort == ["deletion", "non_fast_forward", "pull_request", "required_status_checks"])
+        and ([.rules[] | select(.type == "pull_request") | .parameters] == [{
+            "allowed_merge_methods":["merge","squash","rebase"],
+            "dismiss_stale_reviews_on_push":false,
+            "require_code_owner_review":false,
+            "require_last_push_approval":false,
+            "required_approving_review_count":0,
+            "required_review_thread_resolution":false
+        }])
+        and ([.rules[] | select(.type == "required_status_checks") | .parameters.do_not_enforce_on_create] == [false])
+        and ([.rules[] | select(.type == "required_status_checks") | .parameters.strict_required_status_checks_policy] == [false])
+        and ([.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[]] | sort_by(.context) == [
+            {"context":"CI policy guard","integration_id":15368},
+            {"context":"quality","integration_id":15368}
+        ])
         and ([.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context] | index("Vercel") == null)
         and ([.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context] | index("Playwright Preview E2E") == null)
         and (.bypass_actors == [{"actor_id":7859836,"actor_type":"User","bypass_mode":"pull_request"}])
@@ -82,6 +94,11 @@ validate_config() {
 }
 
 validate_config
+
+if [[ "${MODE}" == "validate" ]]; then
+    printf 'RULESET_CONFIG_OK: %s\n' "${CONFIG}"
+    exit 0
+fi
 
 if [[ "${MODE}" == "print" ]]; then
     jq -S . "${CONFIG}"

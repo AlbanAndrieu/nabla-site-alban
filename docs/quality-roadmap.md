@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 23 septembre 2026.
+Dernière vérification : 24 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -246,7 +246,10 @@ les autres chantiers.
   versionne désormais l'intention dans
   `.github/rulesets/master-quality.json`, documentée dans
   `docs/github-master-ruleset.md`, ainsi qu'un audit/apply local
-  `scripts/manage-master-ruleset.sh`. Le contrat exige les checks
+  `scripts/manage-master-ruleset.sh`. Le mode local `--validate` vérifie
+  désormais sans API GitHub l'ensemble exact des règles, les paramètres PR,
+  les checks obligatoires, leur source GitHub Actions, le mode strict et le
+  bypass. Le contrat exige les checks
   inconditionnels `quality` et `CI policy guard`, bloque suppression et
   force-push, et limite le bypass propriétaire au flux **pull request** afin de
   conserver une sortie de continuité lorsque le quota GitHub Actions est épuisé
@@ -827,7 +830,7 @@ Autres contrôles :
   ni release `v0.0.1` n'existe encore. Ce succès ne ferme donc pas ce point.
 - [ ] Configurer puis auditer le ruleset GitHub de `master`. Le dépôt ne
   possède encore aucun ruleset installé au 23 septembre 2026 ; la configuration
-  as-code et l'outil local check/apply sont maintenant préparés. Les checks
+  as-code et l'outil local validate/check/apply sont maintenant préparés. Les checks
   globaux à rendre obligatoires sont `quality` et `CI policy guard`.
   `Vercel`, `Playwright Preview E2E` et ZAP restent conditionnels à
   `preview_required` et ne doivent donc pas être requis globalement, au risque

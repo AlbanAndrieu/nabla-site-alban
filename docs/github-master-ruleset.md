@@ -1,60 +1,85 @@
-# GitHub master ruleset
+# Ruleset GitHub de `master`
 
-The repository keeps the intended default-branch protection as code in
+Le dépôt conserve la politique de protection prévue pour la branche par défaut sous forme de code dans
 `.github/rulesets/master-quality.json`.
 
-## Policy
+## Politique
 
-The ruleset targets `~DEFAULT_BRANCH` and is intended to stay active. It:
+Le ruleset cible `~DEFAULT_BRANCH` et doit rester actif. Il :
 
-- requires changes to reach `master` through a pull request;
-- requires the unconditional GitHub Actions checks `quality` and `CI policy guard`;
-- blocks branch deletion and non-fast-forward updates;
-- keeps `strict_required_status_checks_policy=false` to avoid an extra update/rebuild
-  cycle solely because `master` moved;
-- grants the repository owner a `pull_request`-only bypass. This is the emergency
-  path when hosted Actions are unavailable or quota-constrained; it never permits
-  a direct push to `master`.
+- impose le passage par une pull request avant toute modification de `master` ;
+- impose les checks GitHub Actions inconditionnels `quality` et `CI policy guard` ;
+- bloque la suppression de la branche et les mises à jour non fast-forward ;
+- conserve `strict_required_status_checks_policy=false` afin d'éviter un nouveau
+  cycle update/rebuild uniquement parce que `master` a avancé ;
+- accorde au propriétaire du dépôt un bypass limité à `pull_request`. Ce chemin
+  d'urgence sert lorsque les Actions hébergées sont indisponibles ou sans crédit ;
+  il n'autorise jamais un push direct sur `master`.
 
-`Vercel`, `Playwright Preview E2E` and Preview ZAP are deliberately not global
-required checks. Since #195, `scripts/ci-scope.sh` can set `preview_required=false`
-for non-deployable changes and those Preview jobs/statuses may legitimately be
-absent or skipped. A repository ruleset required status check is not conditional
-on the changed-file scope, so making those statuses globally required would block
-maintenance/tooling PRs by design.
+`Vercel`, `Playwright Preview E2E` et ZAP Preview ne sont volontairement pas
+des checks globaux obligatoires. Depuis #195, `scripts/ci-scope.sh` peut produire
+`preview_required=false` pour les changements non déployables ; ces jobs/statuts
+peuvent donc légitimement être absents ou skippés. Un required status check de
+ruleset n'est pas conditionnel au diff : les rendre obligatoires globalement
+bloquerait les PR de maintenance/tooling.
 
-## Local audit
+Le mode `strict=false` est un compromis explicite coût/risque : le dernier HEAD
+de la PR doit avoir ses checks obligatoires verts, mais GitHub n'impose pas de
+rejouer ces checks après chaque mouvement ultérieur de `master`. La quality gate
+résout déjà le HEAD courant de la branche de base au démarrage du run. Si les PR
+concurrentes deviennent fréquentes, passer ce paramètre à `true` devient le
+durcissement suivant à évaluer. GitHub documente explicitement ce compromis :
+le mode strict requiert une branche à jour mais peut provoquer davantage de builds,
+le mode loose réduit ces builds au prix d'un risque d'incompatibilité avec une base
+ayant avancé.
 
-The script is read-only unless `--apply` is passed:
+## Validation locale
+
+Le script reste en lecture seule tant que `--apply` n'est pas utilisé :
 
 ```bash
+bash scripts/manage-master-ruleset.sh --validate
 bash scripts/manage-master-ruleset.sh --print
 bash scripts/manage-master-ruleset.sh --check --repo AlbanAndrieu/nabla-site-alban
 ```
 
-`--check` fails closed when the ruleset is missing, duplicated or drifts from the
-repository-owned JSON.
+`--validate` ne contacte pas GitHub et vérifie localement les invariants
+sensibles du JSON : cible, enforcement, ensemble exact des règles, paramètres PR,
+checks obligatoires, source GitHub Actions, mode strict et bypass.
 
-## Apply
+`--check` échoue fermé si le ruleset distant est absent, dupliqué ou dérive du
+JSON versionné.
 
-Applying requires `gh`, `jq` and a GitHub credential with repository
-`Administration: write` permission:
+## Application
+
+L'application nécessite `gh`, `jq` et un credential GitHub disposant de
+`Administration: write` sur le dépôt :
 
 ```bash
 bash scripts/manage-master-ruleset.sh --apply --repo AlbanAndrieu/nabla-site-alban
 ```
 
-The command creates the ruleset when absent, updates it when present, then reads
-it back and requires an exact normalized match.
+La commande crée le ruleset s'il est absent, le met à jour s'il existe, puis le
+relit et exige une correspondance normalisée exacte.
 
-When GitHub Actions credits are unavailable, the owner bypass should only be used
-from the PR merge UI after recording a successful local publication proof (for a
-fully bootstrapped checkout, `npm run quality:agent:publish`). The bypass is a
-continuity mechanism, not a replacement for the local quality gate.
+## Bypass de continuité
 
-## Activation state
+Lorsque les crédits GitHub Actions sont indisponibles, le bypass propriétaire ne
+doit être utilisé que depuis l'interface de merge de la PR après une preuve locale
+de publication réussie, idéalement :
 
-As of 23 September 2026, the GitHub repository exposes no installed ruleset. The
-configuration and audit/apply tooling are versioned first; this roadmap item stays
-open until the remote ruleset has been applied and `--check` reports
-`RULESET_OK` against the live repository.
+```bash
+npm run quality:agent:publish
+```
+
+Il faut conserver dans la PR le SHA exact validé et la commande de validation
+utilisée. Le bypass est un mécanisme de continuité et non un remplacement de la
+quality gate locale. Le mode `pull_request` est volontaire : il n'accorde pas de
+bypass pour un push direct vers `master`.
+
+## État d'activation
+
+Au 24 septembre 2026, le dépôt GitHub n'expose encore aucun ruleset installé. La
+configuration et les outils de validation/application sont versionnés d'abord ;
+l'item de roadmap reste ouvert jusqu'à application du ruleset distant et jusqu'à
+ce que `--check` retourne `RULESET_OK` contre le dépôt live.

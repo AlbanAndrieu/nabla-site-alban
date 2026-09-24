@@ -98,6 +98,13 @@ test("master ruleset pins unconditional checks without making conditional Previe
 	]);
 });
 
+test("ruleset config validates locally without GitHub API access", async () => {
+	const result = await execFileAsync("bash", [SCRIPT, "--validate"], {
+		env: { ...process.env, GITHUB_REPOSITORY: "" },
+	});
+	assert.match(result.stdout, /RULESET_CONFIG_OK/);
+});
+
 test("ruleset audit passes only when GitHub matches the repository-owned config", async () => {
 	for (const [mode, shouldPass] of [
 		["exact", true],
