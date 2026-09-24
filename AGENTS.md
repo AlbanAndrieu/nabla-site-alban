@@ -20,6 +20,20 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 4. After an editing batch, run the self-converging local fix phase before committing or publishing.
 5. For CI failures, inspect the failing job/step and affected files before unrelated code.
 
+### Small-model / OpenCode execution discipline
+
+When the active coding model is less capable, reduce ambiguity instead of reducing quality:
+
+- follow this file and loaded repository skills literally; do not invent substitute commands when a repository script exists;
+- for roadmap/PR/quality work, load `nabla-maintenance` first, then `nabla-quality` and `nabla-pr` only when their scope applies;
+- make one cohesive editing batch at a time and finish its validation before starting another;
+- after every failed command, read the actual exit status/error and fix that failure before continuing;
+- treat unchecked roadmap items as open until their stated evidence exists; never infer completion from nearby green checks;
+- never claim a local or hosted check passed unless it ran for the exact current HEAD;
+- prefer deterministic repository commands over free-form reasoning for formatting, lint, tests, build, scope classification and publication proof.
+
+The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
+
 ## Tool and context efficiency
 
 Optimize the amount of context needed to reach a correct result, **not** the repository's capabilities. `/AGENTS.md` is the canonical repository guidance. Agent-specific instruction files must remain thin adapters to it; do not recursively enumerate every AI-vendor directory or preload every skill.

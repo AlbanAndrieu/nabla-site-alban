@@ -307,6 +307,15 @@ les autres chantiers.
   `QG_PUBLISH_PROOF_OK` avec les SHA HEAD/base et le snapshot de toolchain que
   lorsque la preuve exacte est encore valide. Le contrat comportemental couvre
   les trois états missing/ok/stale.
+  La configuration OpenCode du dépôt est désormais également adaptée aux modèles
+  plus légers : le modèle reste hérité de la workstation, tandis qu'un prompt
+  `build` déterministe, trois skills `nabla-*` et des permissions explicites
+  forcent la réutilisation des scripts local-first. Un contrat dédié verrouille
+  l'absence de modèle imposé, le routage vers les skills, l'autorisation des
+  commandes quality et l'interdiction des pushes vers `master`/force-push.
+  `opencode.json` et `.opencode/**` sont classés non déployables afin de ne pas
+  allouer de Preview Vercel pour une simple évolution de l'agent. Le point reste
+  ouvert jusqu'au cycle réel sur la workstation.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a

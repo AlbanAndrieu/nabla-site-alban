@@ -1,5 +1,42 @@
 {
 	"$schema": "https://opencode.ai/config.json",
+	"permission": {
+		"skill": {
+			"*": "allow"
+		},
+		"bash": {
+			"*": "ask",
+			"git status*": "allow",
+			"git diff*": "allow",
+			"git log*": "allow",
+			"git show*": "allow",
+			"git rev-parse*": "allow",
+			"git branch*": "allow",
+			"git fetch*": "allow",
+			"rg *": "allow",
+			"npm run quality:agent:fix*": "allow",
+			"npm run quality:agent:publish*": "allow",
+			"npm run lint*": "allow",
+			"npm run lint:css*": "allow",
+			"npm run typecheck*": "allow",
+			"npm run test:unit*": "allow",
+			"npm run build*": "allow",
+			"git commit *": "allow",
+			"git push *": "ask",
+			"git push *master*": "deny",
+			"git push *--force*": "deny",
+			"git push *-f*": "deny",
+			"git switch master*": "deny",
+			"git checkout master*": "deny"
+		}
+	},
+	"agent": {
+		"build": {
+			"temperature": 0.1,
+			"steps": 48,
+			"prompt": "{file:./.opencode/prompts/repository-build.txt}"
+		}
+	},
 	"mcp": {
 		"next-devtools": {
 			"type": "local",

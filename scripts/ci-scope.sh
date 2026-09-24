@@ -67,6 +67,8 @@ is_preview_safe_path() {
             .vscode/* | \
             .idea/* | \
             .agents/* | \
+            .opencode/* | \
+            opencode.json | \
             .cursor/* | \
             .claude/* | \
             .assetsignore | \
