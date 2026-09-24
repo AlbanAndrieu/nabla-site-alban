@@ -4,6 +4,23 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
+MODE="publish"
+case "${1:-}" in
+    "")
+        ;;
+    --status)
+        MODE="status"
+        ;;
+    *)
+        printf '❌ QG_PUBLISH_ARGUMENT_INVALID: %s\n' "${1}" >&2
+        exit 2
+        ;;
+esac
+if (($# > 1)); then
+    printf '❌ QG_PUBLISH_ARGUMENT_INVALID: unexpected extra arguments\n' >&2
+    exit 2
+fi
+
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
         printf '%s\n' "${QUALITY_BASE_REF}"
@@ -36,7 +53,7 @@ tool_version_or_fail() {
     printf '%s\n' "${value}"
 }
 
-toolchain_fingerprint() {
+toolchain_snapshot() {
     local node_version
     local npm_version
     local python_version
@@ -47,18 +64,16 @@ toolchain_fingerprint() {
     python_version="$(tool_version_or_fail python3 python3 --version)" || return 1
     precommit_version="$(tool_version_or_fail pre-commit pre-commit --version)" || return 1
 
-    {
-        printf 'node=%s\n' "${node_version}"
-        printf 'npm=%s\n' "${npm_version}"
-        printf 'python=%s\n' "${python_version}"
-        printf 'pre-commit=%s\n' "${precommit_version}"
-        if [[ -f node_modules/.package-lock.json ]]; then
-            printf 'node-modules-lock='
-            sha256sum node_modules/.package-lock.json | awk '{print $1}'
-        else
-            printf 'node-modules-lock=missing\n'
-        fi
-    } | sha256sum | awk '{print $1}'
+    printf 'node=%s\n' "${node_version}"
+    printf 'npm=%s\n' "${npm_version}"
+    printf 'python=%s\n' "${python_version}"
+    printf 'pre-commit=%s\n' "${precommit_version}"
+    if [[ -f node_modules/.package-lock.json ]]; then
+        printf 'node-modules-lock='
+        sha256sum node_modules/.package-lock.json | awk '{print $1}'
+    else
+        printf 'node-modules-lock=missing\n'
+    fi
 }
 
 BASE_REF="$(resolve_base_ref)"
@@ -76,12 +91,30 @@ fi
 
 HEAD_SHA="$(git rev-parse HEAD)"
 BASE_SHA="$(git rev-parse "${BASE_REF}^{commit}")"
-if ! TOOLCHAIN_SHA="$(toolchain_fingerprint)"; then
+if ! TOOLCHAIN_SNAPSHOT="$(toolchain_snapshot)"; then
     exit 1
 fi
+TOOLCHAIN_SHA="$(printf '%s\n' "${TOOLCHAIN_SNAPSHOT}" | sha256sum | awk '{print $1}')"
 PROOF_VERSION="v1"
 PROOF_KEY="${PROOF_VERSION}|${HEAD_SHA}|${BASE_SHA}|${TOOLCHAIN_SHA}"
 PROOF_FILE="$(git rev-parse --git-path agent-publication-proof)"
+
+if [[ "${MODE}" == "status" ]]; then
+    if [[ ! -f "${PROOF_FILE}" ]]; then
+        printf '❌ QG_PUBLISH_PROOF_MISSING: no strict publication proof exists for the current checkout.\n' >&2
+        exit 1
+    fi
+    if [[ "$(cat "${PROOF_FILE}")" != "${PROOF_KEY}" ]]; then
+        printf '❌ QG_PUBLISH_PROOF_STALE: HEAD/base/toolchain differs from the last strict publication proof.\n' >&2
+        exit 1
+    fi
+    printf '✅ QG_PUBLISH_PROOF_OK\n'
+    printf 'head=%s\n' "${HEAD_SHA}"
+    printf 'base=%s\n' "${BASE_SHA}"
+    printf 'toolchain_sha=%s\n' "${TOOLCHAIN_SHA}"
+    printf '%s\n' "${TOOLCHAIN_SNAPSHOT}"
+    exit 0
+fi
 
 if [[ -f "${PROOF_FILE}" ]] && [[ "$(cat "${PROOF_FILE}")" == "${PROOF_KEY}" ]]; then
     echo "✅ QG_PUBLISH_PROOF_REUSED: HEAD/base/toolchain unchanged; strict publication gate already passed."

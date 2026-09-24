@@ -301,7 +301,12 @@ les autres chantiers.
   aussi de matérialiser sa preuve si un build déployable modifie le working tree
   (`QG_PUBLISH_DIRTY_AFTER_BUILD`) ; un contrat isolé vérifie l'échec sans preuve,
   la récupération après restauration de l'arbre puis la réutilisation exacte de
-  la preuve sans rejouer gate ni build.
+  la preuve sans rejouer gate ni build. Le publisher expose désormais aussi
+  `--status` : ce mode ne relance ni lint, ni tests, ni build ; il échoue fermé
+  avec `QG_PUBLISH_PROOF_MISSING` ou `QG_PUBLISH_PROOF_STALE` et n'affiche
+  `QG_PUBLISH_PROOF_OK` avec les SHA HEAD/base et le snapshot de toolchain que
+  lorsque la preuve exacte est encore valide. Le contrat comportemental couvre
+  les trois états missing/ok/stale.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
