@@ -230,6 +230,7 @@ les autres chantiers.
   `CONTRIBUTING.md`).
 - [x] Ajouter `npm run build` à la CI avant merge.
 - [x] Exécuter une quality gate agent-first identique localement et en CI avant le build : fraîcheur de branche, garde anti-troncature, bits exécutables, pre-commit déterministe, lint, types Next/TypeScript et tests unitaires ; le pre-push utilise `--publish` et le setup Copilot installe les dépendances requises.
+- [x] Rendre le chemin local-first explicite pour OpenCode et les modèles plus petits : `AGENTS.md` contient désormais un protocole déterministe, `opencode.json` sélectionne le profil `nabla-maintainer` sans imposer de modèle, les commandes `qg-fix` / `qg-publish` / `roadmap-next` délèguent aux scripts canoniques, et le skill `quality-local-first` est chargé à la demande depuis `.agents/skills`. Le contrat unitaire interdit de remplacer ces autorités par une logique OpenCode parallèle et le scope CI traite `opencode.json` comme maintenance non déployable.
 - [x] Verrouiller aussi par contrat unitaire le bit exécutable des cinq scripts
   critiques du chemin Quality/Preview. Le run CI #1212 de #192 a correctement
   échoué avant Semgrep/npm parce que `ci-scope.sh` et
