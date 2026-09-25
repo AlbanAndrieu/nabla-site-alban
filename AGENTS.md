@@ -14,6 +14,15 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 
 ## Workflow
 
+On a workstation checkout, refresh remote refs once and run the deterministic workspace preflight before broader reasoning:
+
+```bash
+git fetch --prune origin
+bash scripts/agent-doctor.sh
+```
+
+`AGENT_DOCTOR_OK` proves the checkout is on a named non-default branch based on the current local `origin/<default>`, the pinned Node/Python/pre-commit toolchain is active, npm satisfies the repository range, required Git hooks are executable, and `node_modules` has been bootstrapped. Any `AGENT_DOCTOR_*` failure is a local prerequisite to repair before implementation; do not compensate for it by weakening gates. The output also records the OpenCode version when available so schema migrations can be based on the actual workstation binary.
+
 1. Inspect only files relevant to the request.
 2. Reuse existing patterns and make the smallest safe patch.
 3. Validate narrowly first, then broaden checks.
