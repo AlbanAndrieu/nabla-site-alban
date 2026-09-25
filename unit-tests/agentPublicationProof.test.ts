@@ -55,6 +55,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			"scripts/ci-scope.sh",
 		);
 		await git(cwd, "commit", "-m", "head");
+		await git(cwd, "switch", "-c", "test/agent-publication");
 
 		const counter = path.join(cwd, ".git", "gate-count.txt");
 		const bin = path.join(cwd, ".git", "fake-bin");
