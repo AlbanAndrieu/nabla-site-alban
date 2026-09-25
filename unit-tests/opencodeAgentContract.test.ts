@@ -85,7 +85,7 @@ test(
 		assert.match(commands["ci-diagnose"].template, /nabla-ci-debug/);
 		assert.match(commands["qg-fix"].template, /nabla-quality/);
 		assert.match(commands["review-batch"].template, /nabla-review/);
-			assert.match(commands["qg-proof"].template, /--status/);
+		assert.match(commands["qg-proof"].template, /--status/);
 	},
 );
 
