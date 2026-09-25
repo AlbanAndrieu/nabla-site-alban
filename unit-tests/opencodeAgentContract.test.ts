@@ -101,6 +101,7 @@ test("repository OpenCode skills expose focused maintenance workflows", async ()
 				"QG_PRECOMMIT_FAILED",
 				"QG_FIX_DID_NOT_CONVERGE",
 				"QG_PUBLISH_PROOF_STALE",
+				"QG_PUBLISH_PROTECTED_BRANCH",
 			],
 		],
 		[
