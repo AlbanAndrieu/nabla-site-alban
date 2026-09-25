@@ -24,6 +24,7 @@ test("OpenCode allows local quality work but protects master publication", async
 	const config = JSON.parse(await read("opencode.json"));
 	const bash = config.permission?.bash;
 
+	assert.equal(bash["*"], "ask");
 	assert.equal(bash["npm run quality:agent:fix*"], "allow");
 	assert.equal(bash["npm run quality:agent:publish*"], "allow");
 	assert.equal(bash["git push *"], "ask");
@@ -43,6 +44,7 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 	assert.match(prompt, /quality:agent:fix/);
 	assert.match(prompt, /quality:agent:publish/);
 	assert.match(prompt, /never push or edit `master`/);
+	assert.match(prompt, /hosted CI is unavailable or quota-constrained/);
 });
 
 test("repository OpenCode skills expose focused maintenance workflows", async () => {
@@ -53,7 +55,14 @@ test("repository OpenCode skills expose focused maintenance workflows", async ()
 		],
 		[
 			"nabla-quality",
-			["quality:agent:fix", "quality:agent:publish", "--status"],
+			[
+				"quality:agent:fix",
+				"quality:agent:publish",
+				"--status",
+				"QG_PRECOMMIT_FAILED",
+				"QG_FIX_DID_NOT_CONVERGE",
+				"QG_PUBLISH_PROOF_STALE",
+			],
 		],
 		[
 			"nabla-pr",
