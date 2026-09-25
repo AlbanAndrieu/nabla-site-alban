@@ -13,7 +13,7 @@ test("agent Python toolchain stays pinned across bootstraps", async () => {
 		read(".github/workflows/copilot-setup-steps.yml"),
 	]);
 
-	assert.equal(pythonVersion.trim(), "3.13");
+	assert.equal(pythonVersion.trim(), "3.12.10");
 	assert.match(mise, /default='3\.13'/);
 	assert.match(mise, /pre-commit = "4\.6\.2"/);
 

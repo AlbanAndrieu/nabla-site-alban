@@ -104,6 +104,10 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	assert.match(envrc, /NODE_VERSIONS=.*v26\.8\.2/);
 	assert.equal(nvmrc.trim(), "26.8.2");
 	assert.match(mise, /idiomatic_version_file_enable_tools = \["node"\]/);
+	assert.match(
+		mise,
+		/idiomatic_version_file_disable_files = \["node:\\.nvmrc"\]/,
+	);
 	assert.doesNotMatch(mise, /^node\s*=\s*"26\.8\.2"$/m);
 	for (const docs of [cicdDocs, architectureDocs]) {
 		assert.match(docs, /26\.8\.2/);

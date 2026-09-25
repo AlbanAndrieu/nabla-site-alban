@@ -1,4 +1,4 @@
-min_version = "2024.9.5"
+min_version = "2026.9.13"
 
 [tools]
 python = "{{ get_env(name='PYTHON_VERSION', default='3.12.10') }}"
@@ -7,6 +7,7 @@ pre-commit = "4.6.2"
 [settings]
 lockfile = true
 idiomatic_version_file_enable_tools = ["node"]
+idiomatic_version_file_disable_files = ["node:.nvmrc"]
 
 [env]
 _.file = [".env.secrets", ".env.local"]
