@@ -56,36 +56,36 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 test(
 	"OpenCode commands decompose planning, diagnosis, fixing, review and proof without pinning a model",
 	async () => {
-	const config = JSON.parse(await read("opencode.json"));
-	const commands = config.command;
+		const config = JSON.parse(await read("opencode.json"));
+		const commands = config.command;
 
-	for (const name of [
-		"roadmap-plan",
-		"roadmap-next",
-		"ci-diagnose",
-		"qg-fix",
-		"review-batch",
-		"qg-proof",
-	]) {
-		assert.ok(commands?.[name], `missing OpenCode command: ${name}`);
-		assert.equal("model" in commands[name], false, `${name} must inherit the workstation model`);
-		assert.ok(commands[name].template.length > 40);
-	}
+		for (const name of [
+			"roadmap-plan",
+			"roadmap-next",
+			"ci-diagnose",
+			"qg-fix",
+			"review-batch",
+			"qg-proof",
+		]) {
+			assert.ok(commands?.[name], `missing OpenCode command: ${name}`);
+			assert.equal("model" in commands[name], false, `${name} must inherit the workstation model`);
+			assert.ok(commands[name].template.length > 40);
+		}
 
-	assert.equal(commands["roadmap-plan"].agent, "plan");
-	assert.equal(commands["roadmap-plan"].subtask, true);
-	assert.equal(commands["ci-diagnose"].agent, "plan");
-	assert.equal(commands["ci-diagnose"].subtask, true);
-	assert.equal(commands["review-batch"].agent, "plan");
-	assert.equal(commands["review-batch"].subtask, true);
-	assert.equal(commands["roadmap-next"].agent, "build");
-	assert.equal(commands["qg-fix"].agent, "build");
-	assert.equal(commands["qg-proof"].agent, "build");
+		assert.equal(commands["roadmap-plan"].agent, "plan");
+		assert.equal(commands["roadmap-plan"].subtask, true);
+		assert.equal(commands["ci-diagnose"].agent, "plan");
+		assert.equal(commands["ci-diagnose"].subtask, true);
+		assert.equal(commands["review-batch"].agent, "plan");
+		assert.equal(commands["review-batch"].subtask, true);
+		assert.equal(commands["roadmap-next"].agent, "build");
+		assert.equal(commands["qg-fix"].agent, "build");
+		assert.equal(commands["qg-proof"].agent, "build");
 
-	assert.match(commands["ci-diagnose"].template, /nabla-ci-debug/);
-	assert.match(commands["qg-fix"].template, /nabla-quality/);
-	assert.match(commands["review-batch"].template, /nabla-review/);
-		assert.match(commands["qg-proof"].template, /--status/);
+		assert.match(commands["ci-diagnose"].template, /nabla-ci-debug/);
+		assert.match(commands["qg-fix"].template, /nabla-quality/);
+		assert.match(commands["review-batch"].template, /nabla-review/);
+			assert.match(commands["qg-proof"].template, /--status/);
 	},
 );
 
