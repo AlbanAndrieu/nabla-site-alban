@@ -31,6 +31,7 @@ When the active coding model is less capable, reduce ambiguity instead of reduci
 - treat unchecked roadmap items as open until their stated evidence exists; never infer completion from nearby green checks;
 - never claim a local or hosted check passed unless it ran for the exact current HEAD;
 - prefer deterministic repository commands over free-form reasoning for formatting, lint, tests, build, scope classification and publication proof.
+- treat `QG_*` messages as a machine-readable decision API: follow the named remediation exactly, stop on non-convergence/publication failures, and never replace a missing/stale proof with an assumption.
 
 The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
 
