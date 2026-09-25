@@ -1,8 +1,10 @@
 ---
 name: nabla-quality
-description: Run the repository's local-first quality workflow. Use before committing/pushing, when QG_* errors appear, or when GitHub Actions quota is limited and the exact local publication proof is important.
+description: >-
+  Run the repository's local-first quality workflow. Use before
+  committing/pushing, when QG_* errors appear, or when GitHub Actions quota is
+  limited and the exact local publication proof is important.
 ---
-
 # Nabla local-first quality
 
 Use the repository scripts; do not recreate their checks manually.

@@ -1,8 +1,10 @@
 ---
 name: nabla-pr
-description: Safely maintain the current GitHub pull request for nabla-site-alban. Use before pushing a branch, updating PR metadata, interpreting checks, or preparing a PR for user-controlled merge.
+description: >-
+  Safely maintain the current GitHub pull request for nabla-site-alban. Use
+  before pushing a branch, updating PR metadata, interpreting checks, or
+  preparing a PR for user-controlled merge.
 ---
-
 # Nabla PR workflow
 
 1. Confirm the branch is non-default. Never mutate, switch to for editing, push to, force-update, or merge `master`.

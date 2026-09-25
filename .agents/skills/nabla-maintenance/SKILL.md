@@ -1,8 +1,10 @@
 ---
 name: nabla-maintenance
-description: Continue the current nabla-site-alban roadmap or PR safely. Use for requests to continue planned improvements, reconcile roadmap work, fix CI/quality failures, or advance the current PR while minimizing GitHub Actions usage.
+description: >-
+  Continue the current nabla-site-alban roadmap or PR safely. Use for requests
+  to continue planned improvements, reconcile roadmap work, fix CI/quality
+  failures, or advance the current PR while minimizing GitHub Actions usage.
 ---
-
 # Nabla maintenance workflow
 
 1. Read the relevant section of `docs/quality-roadmap.md`; do not scan unrelated generated/vendor files.
