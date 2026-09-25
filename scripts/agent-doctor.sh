@@ -69,6 +69,12 @@ done
 
 [[ -d node_modules && -f node_modules/.package-lock.json ]] || fail "AGENT_DOCTOR_DEPS_MISSING" "run 'npm ci --no-audit --no-fund' before the strict local gate"
 
+if command -v opencode >/dev/null 2>&1; then
+    OPENCODE_VERSION="$(opencode --version 2>&1 | head -n1)"
+else
+    OPENCODE_VERSION="unavailable"
+fi
+
 STATUS="$(git status --short)"
 if [[ -n "${STATUS}" ]]; then
     printf 'working_tree=dirty\n'
@@ -83,4 +89,5 @@ printf 'node=%s\n' "${ACTUAL_NODE}"
 printf 'npm=%s\n' "${ACTUAL_NPM}"
 printf 'python=%s\n' "${ACTUAL_PYTHON}"
 printf 'pre-commit=%s\n' "${ACTUAL_PRECOMMIT}"
+printf 'opencode=%s\n' "${OPENCODE_VERSION}"
 printf '✅ AGENT_DOCTOR_OK\n'
