@@ -14,6 +14,7 @@
 			"git branch*": "allow",
 			"git fetch*": "allow",
 			"rg *": "allow",
+			"bash scripts/agent-doctor.sh*": "allow",
 			"npm run quality:agent:fix*": "allow",
 			"npm run quality:agent:publish*": "allow",
 			"npm run lint*": "allow",
@@ -38,6 +39,12 @@
 		}
 	},
 	"command": {
+		"agent-doctor": {
+			"template": "Read AGENTS.md. Run git fetch --prune origin, then bash scripts/agent-doctor.sh. Report the exact AGENT_DOCTOR_* outcome and remediate only the stated local prerequisite. Do not edit application code, push, rerun hosted CI, or merge.",
+			"description": "Check branch, base, toolchain, hooks and local dependencies",
+			"agent": "plan",
+			"subtask": true
+		},
 		"roadmap-plan": {
 			"template": "Read AGENTS.md. Load nabla-maintenance. Inspect only the current branch/status/diff and the relevant roadmap section. Return a compact task card with goal, in-scope paths, done evidence, validation, and stop conditions. Do not edit, commit, push, rerun hosted CI, or merge.",
 			"description": "Plan one on-theme roadmap batch without editing",
