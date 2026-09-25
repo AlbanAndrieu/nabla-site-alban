@@ -39,6 +39,7 @@ is_maintenance_only_path() {
             *.md | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
+            opencode.json | \
             scripts/agent-quality-gate.sh | \
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
@@ -67,11 +68,13 @@ is_preview_safe_path() {
             .vscode/* | \
             .idea/* | \
             .agents/* | \
+            .opencode/* | \
             .cursor/* | \
             .claude/* | \
             .assetsignore | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
+            opencode.json | \
             .python-version | \
             mise.toml | \
             eslint.config.js | \
