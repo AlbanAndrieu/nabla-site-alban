@@ -35,6 +35,24 @@ When the active coding model is less capable, reduce ambiguity instead of reduci
 
 The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
 
+
+#### Deterministic small-model state machine
+
+Keep exactly one active phase. Do not skip directly from editing to publication.
+
+1. **OBSERVE** — capture `git branch --show-current`, `git status --short`, `git diff --stat`, the exact HEAD, and the smallest relevant roadmap/test context.
+2. **ROUTE** — load one primary skill for the task: `nabla-maintenance` for roadmap/current-PR work, `nabla-quality` for local gates/publication, `nabla-ci-debug` for hosted failures, `nabla-pr` for PR/push operations, or `nabla-review` for a read-only pre-publication review. Load framework/domain skills such as `next-dev-loop`, `agent-browser`, or Stripe skills only when that domain is actually touched.
+3. **CHANGE** — implement one cohesive batch with explicit done evidence. Do not opportunistically fix unrelated roadmap items.
+4. **FIX** — run `npm run quality:agent:fix` until deterministic mutations converge; inspect only the changed paths.
+5. **REVIEW** — for non-trivial code/config changes, run one focused `nabla-review` pass. If it finds a blocking issue, return to CHANGE; do not publish.
+6. **PROVE** — commit the complete batch, run/reuse `npm run quality:agent:publish`, then audit it with `npm run quality:agent:publish -- --status`.
+7. **PUBLISH** — only after a clean proof, push once to the non-default branch, then inspect hosted results for the exact published HEAD without manually rerunning them.
+
+For planning, maintain a compact task card with **goal**, **in-scope paths**, **done evidence**, **validation**, and **stop conditions**. Keep it concise and do not expand it into narrative unless the user asks.
+
+Stop and report instead of guessing when the current branch is `master`, publication proof is missing/stale after an unexpected change, the fix phase does not converge, the base is stale, an unexpected file enters the diff, or the requested work no longer fits the PR theme.
+The publication wrapper enforces this independently of the model: `scripts/agent-publish.sh` fails closed with `QG_PUBLISH_PROTECTED_BRANCH` on the repository default branch and `QG_PUBLISH_DETACHED_HEAD` on a detached checkout.
+
 ## Tool and context efficiency
 
 Optimize the amount of context needed to reach a correct result, **not** the repository's capabilities. `/AGENTS.md` is the canonical repository guidance. Agent-specific instruction files must remain thin adapters to it; do not recursively enumerate every AI-vendor directory or preload every skill.

@@ -37,6 +37,41 @@
 			"prompt": "{file:./.opencode/prompts/repository-build.txt}"
 		}
 	},
+	"command": {
+		"roadmap-plan": {
+			"template": "Read AGENTS.md. Load nabla-maintenance. Inspect only the current branch/status/diff and the relevant roadmap section. Return a compact task card with goal, in-scope paths, done evidence, validation, and stop conditions. Do not edit, commit, push, rerun hosted CI, or merge.",
+			"description": "Plan one on-theme roadmap batch without editing",
+			"agent": "plan",
+			"subtask": true
+		},
+		"roadmap-next": {
+			"template": "Read AGENTS.md and load nabla-maintenance. Follow OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH. Implement exactly one finishable batch that fits the current PR theme. Use repository scripts instead of ad-hoc equivalents. If the user request authorizes updating the PR, follow nabla-pr; otherwise stop after local evidence. Never mutate master or merge.",
+			"description": "Implement one finishable roadmap batch locally first",
+			"agent": "build"
+		},
+		"ci-diagnose": {
+			"template": "Read AGENTS.md and load nabla-ci-debug. Diagnose the current red check using exact HEAD → workflow/check → job → step → targeted log evidence. Stop when root cause is proven. Do not edit files, rerun hosted CI, push, or merge. Return the root cause and the smallest repair path.",
+			"description": "Diagnose a failing hosted check without editing",
+			"agent": "plan",
+			"subtask": true
+		},
+		"qg-fix": {
+			"template": "Read AGENTS.md and load nabla-quality. Run npm run quality:agent:fix, let deterministic hooks converge, then inspect git status --short, git diff --stat, and only the affected diff. Fix only remaining semantic failures. Do not push or merge.",
+			"description": "Converge deterministic local quality fixes",
+			"agent": "build"
+		},
+		"review-batch": {
+			"template": "Read AGENTS.md and load nabla-review. Review only the current intended diff and directly affected contracts. Report blocking findings first with concrete paths and reasons. Do not edit, commit, push, rerun hosted CI, or merge.",
+			"description": "Run a focused read-only review of the current batch",
+			"agent": "plan",
+			"subtask": true
+		},
+		"qg-proof": {
+			"template": "Read AGENTS.md and load nabla-quality. Confirm the branch is not master and the working tree is clean. Run or reuse npm run quality:agent:publish, then run npm run quality:agent:publish -- --status. Report the exact QG_* result, HEAD, base, and toolchain proof. Never push on failure and never use --no-verify.",
+			"description": "Create or audit the strict local publication proof",
+			"agent": "build"
+		}
+	},
 	"mcp": {
 		"next-devtools": {
 			"type": "local",

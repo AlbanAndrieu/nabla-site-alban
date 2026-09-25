@@ -57,6 +57,7 @@ test("publication proof is written only after a clean deployable build", async (
 			"scripts/ci-scope.sh",
 		);
 		await git(cwd, "commit", "-m", "deployable head");
+		await git(cwd, "switch", "-c", "test/agent-publication");
 
 		const bin = path.join(cwd, ".git", "fake-bin");
 		await mkdir(bin);

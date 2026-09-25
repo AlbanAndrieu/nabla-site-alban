@@ -53,7 +53,7 @@ test.describe("Site widgets integration", () => {
 		const pageErrors: string[] = [];
 		page.on("pageerror", (error) => pageErrors.push(error.message));
 
-		await page.goto("/checkout.html");
+		await page.goto("/jm/4-years-review-aandrieu.html");
 		const footerBackToTop = page.locator('footer a[href="#top"]');
 		await expect(footerBackToTop).toBeVisible();
 

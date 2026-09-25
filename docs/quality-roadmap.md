@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 24 septembre 2026.
+Dernière vérification : 25 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -309,13 +309,21 @@ les autres chantiers.
   les trois états missing/ok/stale.
   La configuration OpenCode du dépôt est désormais également adaptée aux modèles
   plus légers : le modèle reste hérité de la workstation, tandis qu'un prompt
-  `build` déterministe, trois skills `nabla-*` et des permissions explicites
-  forcent la réutilisation des scripts local-first. Un contrat dédié verrouille
-  l'absence de modèle imposé, le routage vers les skills, l'autorisation des
-  commandes quality et l'interdiction des pushes vers `master`/force-push.
-  `opencode.json` et `.opencode/**` sont classés non déployables afin de ne pas
-  allouer de Preview Vercel pour une simple évolution de l'agent. Le point reste
-  ouvert jusqu'au cycle réel sur la workstation.
+  `build` déterministe, cinq skills `nabla-*` et des permissions explicites
+  forcent la réutilisation des scripts local-first. `AGENTS.md` impose une
+  machine d'état `OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH`.
+  Les nouveaux skills `nabla-ci-debug` et `nabla-review` séparent le diagnostic
+  progressif et la revue read-only de l'implémentation. Les commandes OpenCode
+  `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`, `/qg-fix`,
+  `/review-batch` et `/qg-proof` encapsulent ces chemins sans imposer de
+  modèle ; les commandes d'analyse utilisent l'agent `plan` en sous-tâche pour
+  ne pas polluer le contexte principal du modèle plus petit. Un contrat dédié
+  verrouille l'absence de modèle imposé, le routage vers les skills, les phases,
+  l'autorisation des commandes quality et l'interdiction des pushes vers
+  `master`/force-push. `opencode.json` et `.opencode/**` restent classés
+  non déployables afin de ne pas allouer de Preview Vercel pour une simple
+  évolution de l'agent. Le point reste ouvert jusqu'au cycle réel sur la
+  workstation.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
