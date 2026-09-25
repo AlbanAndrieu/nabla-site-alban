@@ -44,6 +44,8 @@ When the active coding model is less capable, reduce ambiguity instead of reduci
 
 The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
 
+The repository configuration currently keeps the OpenCode V1 field names already used by the workstation (`permission`, `command`, `subtask`). Current OpenCode V2 documentation uses `permissions`, `commands` and `subagent`; do not migrate these fields speculatively. Use the `opencode=...` line from `scripts/agent-doctor.sh` to confirm the installed workstation version first, then migrate the config and its contract in one explicit batch.
+
 
 #### Deterministic small-model state machine
 
