@@ -29,6 +29,48 @@ async function makeExecutable(pathname: string, content: string) {
 	await chmod(pathname, 0o755);
 }
 
+test("publication proof refuses protected and detached branches before running tools", async () => {
+	const cwd = await mkdtemp(path.join(os.tmpdir(), "nabla-publish-branch-"));
+	try {
+		await git(cwd, "init");
+		await git(cwd, "config", "user.email", "publish-branch@example.invalid");
+		await git(cwd, "config", "user.name", "Publish Branch Guard Test");
+		await writeFile(path.join(cwd, "README.md"), "base\n");
+		await git(cwd, "add", "README.md");
+		await git(cwd, "commit", "-m", "base");
+		await git(cwd, "branch", "-M", "master");
+
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_PROTECTED_BRANCH",
+						),
+				),
+		);
+
+		await git(cwd, "checkout", "--detach");
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_DETACHED_HEAD",
+						),
+				),
+		);
+	} finally {
+		await rm(cwd, { recursive: true, force: true });
+	}
+});
+
 test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates on changes", async () => {
 	const cwd = await mkdtemp(path.join(os.tmpdir(), "nabla-publish-proof-"));
 	try {
