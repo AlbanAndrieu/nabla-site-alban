@@ -80,6 +80,30 @@ The source design is maintained in `nabla-compose`
 `docs/service-catalog-security-graph.md` and
 `docs/service-catalog-v2-normalization.md`.
 
+
+### Préparation Site Alban au contrat v2
+
+- [x] Ajouter `lib/homelabCatalogV2.ts` comme contrat TypeScript du read-model
+  Backstage généré par `nabla-compose`.
+- [x] Valider `schemaVersion=2`, `model=backstage`, le
+  `catalogRevision` SHA-256, les entités Backstage supportées et l'unicité des
+  `entityRef`.
+- [x] Ajouter `CatalogV2ServiceView` afin que la future UI des services dérive
+  identité, type, lifecycle, tags NIST et criticités depuis les champs standard,
+  sans reconstruire ces informations à partir du vieux schéma.
+- [x] Ajouter les tests unitaires de parsing, unicité et projection Cartography /
+  Neo4j représentative.
+- [ ] Ne pas connecter encore ce parser aux endpoints de production : FastAPI
+  doit d'abord publier le read-model v2 avec la même `catalogRevision`.
+- [ ] Lors du cutover, remplacer directement `lib/homelabServices.ts` et
+  `lib/serviceTopology.ts` par le contrat v2 et supprimer les parseurs v1 dans
+  la même fenêtre de migration.
+- [ ] Regénérer l'éventuel LKG local depuis le nouveau schéma uniquement ; ne pas
+  conserver `public/homelab-services.json` comme fallback v1.
+- [ ] Adapter les vues Architecture/TrueNAS pour séparer clairement état déclaré,
+  état observé et findings sécurité Cartography.
+
+
 ## P0 — FastAPI health contract convergence
 
 - [x] Consume probe-first health without making aggregate reconciliation block the
