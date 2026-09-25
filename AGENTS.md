@@ -51,6 +51,7 @@ Keep exactly one active phase. Do not skip directly from editing to publication.
 For planning, maintain a compact task card with **goal**, **in-scope paths**, **done evidence**, **validation**, and **stop conditions**. Keep it concise and do not expand it into narrative unless the user asks.
 
 Stop and report instead of guessing when the current branch is `master`, publication proof is missing/stale after an unexpected change, the fix phase does not converge, the base is stale, an unexpected file enters the diff, or the requested work no longer fits the PR theme.
+The publication wrapper enforces this independently of the model: `scripts/agent-publish.sh` fails closed with `QG_PUBLISH_PROTECTED_BRANCH` on the repository default branch and `QG_PUBLISH_DETACHED_HEAD` on a detached checkout.
 
 ## Tool and context efficiency
 
