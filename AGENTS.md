@@ -20,6 +20,24 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 4. After an editing batch, run the self-converging local fix phase before committing or publishing.
 5. For CI failures, inspect the failing job/step and affected files before unrelated code.
 
+## Small-model / OpenCode execution protocol
+
+This repository must remain operable by smaller coding models, including GPT-4.1 mini. Reduce ambiguity before increasing context: the repository scripts and contracts are the authority, not improvised agent reasoning.
+
+1. Start with `git status --short`, `git branch --show-current`, and `git diff --stat`. Confirm the current branch is not `master` before editing or publishing.
+2. Read only the files directly required by the task. Do not preload the roadmap, all instructions, all skills, or broad generated/vendor trees.
+3. Classify the task before choosing tools. OpenCode discovers project skills under `.agents/skills/*/SKILL.md`; load **one matching skill first** with the native skill tool, and load another only when the task genuinely crosses domains.
+4. For quality-gate, formatter, lint, CI-cost, publication, or pre-push work, load `quality-local-first` and follow its decision tree rather than inventing a new sequence.
+5. For Next.js runtime work, prefer `next-dev-loop`; for browser/UI verification use `agent-browser`; load Stripe skills only for Stripe work.
+6. Keep one coherent editing batch. Do not opportunistically refactor unrelated files while fixing a gate or roadmap item.
+7. Treat machine-readable `QG_*` outcomes literally:
+   - `QG_AUTOFIX_REQUIRED` → run `npm run quality:agent:fix`, review the resulting short diff, commit it, then retry publication;
+   - `QG_PRECOMMIT_FAILED` / `QG_FIX_DID_NOT_CONVERGE` → inspect only the failing hook and affected files;
+   - any `QG_PUBLISH_*` failure → do not push; repair the stated invariant first.
+8. Before remote publication, require a clean tree and a successful or reusable `npm run quality:agent:publish` proof. Never spend GitHub Actions credits to discover a deterministic failure that the local scripts can detect.
+
+OpenCode's project config intentionally does **not** hard-code a model. The workstation-selected model remains authoritative; the custom `nabla-maintainer` agent and slash commands provide the deterministic workflow needed by less capable models.
+
 ## Tool and context efficiency
 
 Optimize the amount of context needed to reach a correct result, **not** the repository's capabilities. `/AGENTS.md` is the canonical repository guidance. Agent-specific instruction files must remain thin adapters to it; do not recursively enumerate every AI-vendor directory or preload every skill.
