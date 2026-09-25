@@ -21,6 +21,25 @@ if (($# > 1)); then
     exit 2
 fi
 
+resolve_protected_branch() {
+    if git symbolic-ref --quiet refs/remotes/origin/HEAD >/dev/null 2>&1; then
+        git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's#^origin/##'
+    else
+        printf '%s\n' "master"
+    fi
+}
+
+CURRENT_BRANCH="$(git branch --show-current)"
+if [[ -z "${CURRENT_BRANCH}" ]]; then
+    printf '❌ QG_PUBLISH_DETACHED_HEAD: publication requires a named non-default branch\n' >&2
+    exit 1
+fi
+PROTECTED_BRANCH="$(resolve_protected_branch)"
+if [[ "${CURRENT_BRANCH}" == "${PROTECTED_BRANCH}" ]]; then
+    printf '❌ QG_PUBLISH_PROTECTED_BRANCH: refusing publication validation on %s\n' "${CURRENT_BRANCH}" >&2
+    exit 1
+fi
+
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
         printf '%s\n' "${QUALITY_BASE_REF}"
