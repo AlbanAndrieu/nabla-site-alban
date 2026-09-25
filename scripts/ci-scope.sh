@@ -40,6 +40,7 @@ is_maintenance_only_path() {
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             scripts/agent-quality-gate.sh | \
+            scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
@@ -79,6 +80,7 @@ is_preview_safe_path() {
             eslint.config.js | \
             stylelint.config.cjs | \
             scripts/agent-quality-gate.sh | \
+            scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/check_code_size.py | \
