@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import {
 	catalogV2ServiceViews,
 	parseHomelabCatalogV2,
@@ -56,22 +58,23 @@ function fixture() {
 describe("homelab catalog v2", () => {
 	it("parses the Backstage-derived canonical read model", () => {
 		const parsed = parseHomelabCatalogV2(fixture());
-		expect(parsed?.catalogRevision).toBe(revision);
-		expect(parsed?.entities).toHaveLength(2);
+		assert.equal(parsed?.catalogRevision, revision);
+		assert.equal(parsed?.entities.length, 2);
 	});
 
 	it("rejects duplicate canonical entity refs", () => {
 		const payload = fixture();
 		payload.entities[1].entityRef = payload.entities[0].entityRef;
-		expect(parseHomelabCatalogV2(payload)).toBeNull();
+		assert.equal(parseHomelabCatalogV2(payload), null);
 	});
 
 	it("projects service cards from standards metadata instead of v1 fields", () => {
 		const parsed = parseHomelabCatalogV2(fixture());
-		expect(parsed).not.toBeNull();
-		const views = catalogV2ServiceViews(parsed!);
+		assert.ok(parsed);
+		const views = catalogV2ServiceViews(parsed);
 		const cartography = views.find((item) => item.id === "cartography");
-		expect(cartography).toMatchObject({
+		assert.ok(cartography);
+		assert.partialDeepStrictEqual(cartography, {
 			entityRef: "component:default/cartography",
 			name: "Cartography",
 			entityKind: "Component",

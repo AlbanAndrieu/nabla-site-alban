@@ -135,4 +135,3 @@ This parser is deliberately **not wired to production yet**. FastAPI must first
 publish the same v2 read-model and `catalogRevision`; then the existing v1
 loaders are replaced in one coordinated cutover rather than retained as a dual
 reader.
-
