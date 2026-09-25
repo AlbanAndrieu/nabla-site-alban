@@ -768,7 +768,7 @@ Autres contrôles :
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
 - [x] Aligner le développement, mise, direnv et les workflows GitHub sur Node 26.8.2, conserver une plage `>=24.11.0 <27` compatible avec le runtime Vercel Node 24.11.0, et garder OpenCommit uniquement comme helper local/on-demand. Le workflow Node 24 est désormais identique à celui de `nabla-site-bababou`.
-- [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.13 et
+- [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.12.10 et
   `pre-commit==4.6.2` : `.python-version`, mise, Copilot Setup Steps et
   Quality/Security utilisent désormais les mêmes versions au lieu de laisser
   `pre-commit = "latest"` dériver.

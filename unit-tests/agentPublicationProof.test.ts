@@ -61,7 +61,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		await mkdir(bin);
 		for (const [name, version] of [
 			["node", "v26.8.2"],
-			["python3", "Python 3.13.15"],
+			["python3", "Python 3.12.10"],
 			["pre-commit", "pre-commit 4.6.2"],
 		] as const) {
 			await makeExecutable(
