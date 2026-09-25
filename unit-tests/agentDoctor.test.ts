@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import {
-	chmod,
-	mkdir,
-	mkdtemp,
-	rm,
-	writeFile,
-} from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -43,7 +37,14 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		await writeFile(path.join(cwd, ".python-version"), "3.12.10\n");
 		await writeFile(path.join(cwd, "mise.toml"), 'pre-commit = "4.6.2"\n');
 		await writeFile(path.join(cwd, "README.md"), "base\n");
-		await git(cwd, "add", ".nvmrc", ".python-version", "mise.toml", "README.md");
+		await git(
+			cwd,
+			"add",
+			".nvmrc",
+			".python-version",
+			"mise.toml",
+			"README.md",
+		);
 		await git(cwd, "commit", "-m", "base");
 		await git(cwd, "branch", "-M", "master");
 		await git(cwd, "update-ref", "refs/remotes/origin/master", "HEAD");
