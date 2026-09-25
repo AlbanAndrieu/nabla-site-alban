@@ -25,6 +25,7 @@ test("OpenCode allows local quality work but protects master publication", async
 	const bash = config.permission?.bash;
 
 	assert.equal(bash["*"], "ask");
+	assert.equal(bash["bash scripts/agent-doctor.sh*"], "allow");
 	assert.equal(bash["npm run quality:agent:fix*"], "allow");
 	assert.equal(bash["npm run quality:agent:publish*"], "allow");
 	assert.equal(bash["git push *"], "ask");
@@ -51,6 +52,7 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 	assert.match(prompt, /quality:agent:publish/);
 	assert.match(prompt, /never push or edit `master`/);
 	assert.match(prompt, /hosted CI is unavailable or quota-constrained/);
+	assert.match(prompt, /\/agent-doctor/);
 	assert.match(prompt, /\/roadmap-plan/);
 	assert.match(prompt, /\/ci-diagnose/);
 	assert.match(prompt, /\/review-batch/);
@@ -61,6 +63,7 @@ test("OpenCode commands decompose work without pinning a model", async () => {
 	const commands = config.command;
 
 	for (const name of [
+		"agent-doctor",
 		"roadmap-plan",
 		"roadmap-next",
 		"ci-diagnose",
@@ -77,6 +80,8 @@ test("OpenCode commands decompose work without pinning a model", async () => {
 		assert.ok(commands[name].template.length > 40);
 	}
 
+	assert.equal(commands["agent-doctor"].agent, "plan");
+	assert.equal(commands["agent-doctor"].subtask, true);
 	assert.equal(commands["roadmap-plan"].agent, "plan");
 	assert.equal(commands["roadmap-plan"].subtask, true);
 	assert.equal(commands["ci-diagnose"].agent, "plan");
@@ -87,6 +92,8 @@ test("OpenCode commands decompose work without pinning a model", async () => {
 	assert.equal(commands["qg-fix"].agent, "build");
 	assert.equal(commands["qg-proof"].agent, "build");
 
+	assert.match(commands["agent-doctor"].template, /agent-doctor\.sh/);
+	assert.match(commands["agent-doctor"].template, /AGENT_DOCTOR_\*/);
 	assert.match(commands["ci-diagnose"].template, /nabla-ci-debug/);
 	assert.match(commands["qg-fix"].template, /nabla-quality/);
 	assert.match(commands["review-batch"].template, /nabla-review/);

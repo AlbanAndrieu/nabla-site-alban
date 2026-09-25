@@ -37,6 +37,10 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 			path.join(cwd, "scripts/agent-quality-gate.sh"),
 			"#!/usr/bin/env bash\necho maintenance\n",
 		);
+		await writeFile(
+			path.join(cwd, "scripts/agent-doctor.sh"),
+			"#!/usr/bin/env bash\necho doctor\n",
+		);
 		const maintenanceHead = await commitAll(cwd, "maintenance");
 		const maintenance = await execFileAsync(
 			"bash",

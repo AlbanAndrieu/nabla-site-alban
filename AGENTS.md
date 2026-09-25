@@ -14,6 +14,15 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 
 ## Workflow
 
+On a workstation checkout, refresh remote refs once and run the deterministic workspace preflight before broader reasoning:
+
+```bash
+git fetch --prune origin
+bash scripts/agent-doctor.sh
+```
+
+`AGENT_DOCTOR_OK` proves the checkout is on a named non-default branch based on the current local `origin/<default>`, the pinned Node/Python/pre-commit toolchain is active, npm satisfies the repository range, required Git hooks are executable, and `node_modules` has been bootstrapped. Any `AGENT_DOCTOR_*` failure is a local prerequisite to repair before implementation; do not compensate for it by weakening gates. The output also records the OpenCode version when available so schema migrations can be based on the actual workstation binary.
+
 1. Inspect only files relevant to the request.
 2. Reuse existing patterns and make the smallest safe patch.
 3. Validate narrowly first, then broaden checks.
@@ -34,6 +43,8 @@ When the active coding model is less capable, reduce ambiguity instead of reduci
 - treat `QG_*` messages as a machine-readable decision API: follow the named remediation exactly, stop on non-convergence/publication failures, and never replace a missing/stale proof with an assumption.
 
 The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
+
+The repository configuration currently keeps the OpenCode V1 field names already used by the workstation (`permission`, `command`, `subtask`). Current OpenCode V2 documentation uses `permissions`, `commands` and `subagent`; do not migrate these fields speculatively. Use the `opencode=...` line from `scripts/agent-doctor.sh` to confirm the installed workstation version first, then migrate the config and its contract in one explicit batch.
 
 
 #### Deterministic small-model state machine
