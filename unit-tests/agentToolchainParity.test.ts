@@ -14,7 +14,7 @@ test("agent Python toolchain stays pinned across bootstraps", async () => {
 	]);
 
 	assert.equal(pythonVersion.trim(), "3.12.10");
-	assert.match(mise, /default='3\.13'/);
+	assert.match(mise, /default='3\.12\.10'/);
 	assert.match(mise, /pre-commit = "4\.6\.2"/);
 
 	for (const workflow of [quality, copilot]) {
