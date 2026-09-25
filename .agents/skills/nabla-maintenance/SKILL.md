@@ -9,7 +9,7 @@ description: >-
 
 1. On a workstation checkout, run `git fetch --prune origin` then `bash scripts/agent-doctor.sh`; repair any `AGENT_DOCTOR_*` prerequisite before implementation.
 2. Read the relevant section of `docs/quality-roadmap.md`; do not scan unrelated generated/vendor files.
-4. Confirm the current branch is not `master` and identify the current PR/HEAD when available.
+3. Confirm the current branch is not `master` and identify the current PR/HEAD when available.
 4. Create a compact task card: goal, in-scope paths, done evidence, validation, and stop conditions.
 5. Choose one finishable item that matches the current PR theme. Do not broaden a ruleset/quality PR into UI or product work.
 6. Inspect the smallest relevant files and existing contracts before editing.
