@@ -53,7 +53,9 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 	assert.match(prompt, /\/review-batch/);
 });
 
-test("OpenCode commands decompose planning, diagnosis, fixing, review and proof without pinning a model", async () => {
+test(
+	"OpenCode commands decompose planning, diagnosis, fixing, review and proof without pinning a model",
+	async () => {
 	const config = JSON.parse(await read("opencode.json"));
 	const commands = config.command;
 
@@ -83,8 +85,9 @@ test("OpenCode commands decompose planning, diagnosis, fixing, review and proof 
 	assert.match(commands["ci-diagnose"].template, /nabla-ci-debug/);
 	assert.match(commands["qg-fix"].template, /nabla-quality/);
 	assert.match(commands["review-batch"].template, /nabla-review/);
-	assert.match(commands["qg-proof"].template, /--status/);
-});
+		assert.match(commands["qg-proof"].template, /--status/);
+	},
+);
 
 test("repository OpenCode skills expose focused maintenance workflows", async () => {
 	const expected = new Map([
