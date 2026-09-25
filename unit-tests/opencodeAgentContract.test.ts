@@ -38,7 +38,10 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 	const prompt = await read(".opencode/prompts/repository-build.txt");
 
 	assert.match(prompt, /AGENTS\.md/);
-	assert.match(prompt, /OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH/);
+	assert.match(
+		prompt,
+		/OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH/,
+	);
 	assert.match(prompt, /nabla-maintenance/);
 	assert.match(prompt, /nabla-ci-debug/);
 	assert.match(prompt, /nabla-quality/);
@@ -66,7 +69,11 @@ test("OpenCode commands decompose work without pinning a model", async () => {
 		"qg-proof",
 	]) {
 		assert.ok(commands?.[name], `missing OpenCode command: ${name}`);
-		assert.equal("model" in commands[name], false, `${name} must inherit the workstation model`);
+		assert.equal(
+			"model" in commands[name],
+			false,
+			`${name} must inherit the workstation model`,
+		);
 		assert.ok(commands[name].template.length > 40);
 	}
 
@@ -110,11 +117,20 @@ test("repository OpenCode skills expose focused maintenance workflows", async ()
 		],
 		[
 			"nabla-ci-debug",
-			["Progressive evidence", "QG_AUTOFIX_REQUIRED", "Playwright", "Quota-constrained mode"],
+			[
+				"Progressive evidence",
+				"QG_AUTOFIX_REQUIRED",
+				"Playwright",
+				"Quota-constrained mode",
+			],
 		],
 		[
 			"nabla-review",
-			["focused read-only review", "blocking findings", "Do not commit, push, merge"],
+			[
+				"focused read-only review",
+				"blocking findings",
+				"Do not commit, push, merge",
+			],
 		],
 	]);
 
