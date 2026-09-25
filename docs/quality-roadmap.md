@@ -313,17 +313,26 @@ les autres chantiers.
   forcent la réutilisation des scripts local-first. `AGENTS.md` impose une
   machine d'état `OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH`.
   Les nouveaux skills `nabla-ci-debug` et `nabla-review` séparent le diagnostic
-  progressif et la revue read-only de l'implémentation. Les commandes OpenCode
-  `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`, `/qg-fix`,
-  `/review-batch` et `/qg-proof` encapsulent ces chemins sans imposer de
-  modèle ; les commandes d'analyse utilisent l'agent `plan` en sous-tâche pour
-  ne pas polluer le contexte principal du modèle plus petit. Un contrat dédié
+  progressif et la revue read-only de l'implémentation. Le preflight
+  `scripts/agent-doctor.sh` vérifie localement branche/base, Node/npm,
+  Python/pre-commit, hooks Git et dépendances, puis expose des résultats
+  `AGENT_DOCTOR_*` ainsi que la version OpenCode observée. Les commandes OpenCode
+  `/agent-doctor`, `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`,
+  `/qg-fix`, `/review-batch` et `/qg-proof` encapsulent ces chemins sans
+  imposer de modèle ; les commandes d'analyse utilisent l'agent `plan` en
+  sous-tâche pour ne pas polluer le contexte principal du modèle plus petit.
+  Un contrat dédié
   verrouille l'absence de modèle imposé, le routage vers les skills, les phases,
   l'autorisation des commandes quality et l'interdiction des pushes vers
   `master`/force-push. `opencode.json` et `.opencode/**` restent classés
   non déployables afin de ne pas allouer de Preview Vercel pour une simple
   évolution de l'agent. Le point reste ouvert jusqu'au cycle réel sur la
-  workstation.
+  workstation. La configuration garde volontairement les clés OpenCode V1
+  `permission` / `command` / `subtask` tant que la version réelle du binaire
+  workstation n'est pas capturée par `agent-doctor`; la documentation OpenCode
+  V2 actuelle emploie `permissions` / `commands` / `subagent`, et cette
+  migration doit être faite en un lot dédié après preuve de compatibilité plutôt
+  qu'introduite spéculativement dans cette PR.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
