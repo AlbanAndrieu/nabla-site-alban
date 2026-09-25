@@ -1,9 +1,34 @@
 {
 	"$schema": "https://opencode.ai/config.json",
+	"default_agent": "nabla-maintainer",
+	"skills": [
+		"./.agents/skills"
+	],
+	"commands": {
+		"qg-fix": {
+			"description": "Converge deterministic local quality fixes without publishing",
+			"agent": "nabla-maintainer",
+			"template": "Follow AGENTS.md. Load the quality-local-first skill. Run `npm run quality:agent:fix`. If it changes files, inspect `git status --short`, `git diff --stat`, and only the affected diff. Fix only non-auto-fixable failures. Do not push or merge."
+		},
+		"qg-publish": {
+			"description": "Run or reuse the strict local publication proof",
+			"agent": "nabla-maintainer",
+			"template": "Follow AGENTS.md. Load the quality-local-first skill. Confirm the branch is not master and the tree is clean, then run `npm run quality:agent:publish`. Report the exact QG_* outcome. Never push on failure and never use --no-verify."
+		},
+		"roadmap-next": {
+			"description": "Implement one finishable on-theme roadmap item locally first",
+			"agent": "nabla-maintainer",
+			"template": "Follow AGENTS.md. Read only the current relevant section of docs/quality-roadmap.md plus the current diff. Select one finishable item that belongs in the current PR theme, implement the smallest safe batch, then run the local fix workflow. Do not broaden scope, merge, or mutate master."
+		}
+	},
 	"mcp": {
 		"next-devtools": {
 			"type": "local",
-			"command": ["npx", "-y", "next-devtools-mcp@latest"],
+			"command": [
+				"npx",
+				"-y",
+				"next-devtools-mcp@latest"
+			],
 			"enabled": true,
 			"environment": {}
 		}
