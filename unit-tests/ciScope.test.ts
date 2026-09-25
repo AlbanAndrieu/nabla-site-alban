@@ -69,6 +69,22 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(docsAndTests.stdout, /build=false/);
 		assert.match(docsAndTests.stdout, /preview_required=false/);
 
+		await writeFile(
+			path.join(cwd, "opencode.json"),
+			'{"$schema":"https://opencode.ai/config.json"}\n',
+		);
+		const openCodeHead = await commitAll(cwd, "OpenCode agent config");
+		const openCode = await execFileAsync(
+			"bash",
+			[SCRIPT, docsAndTestsHead, openCodeHead],
+			{ cwd },
+		);
+		assert.match(openCode.stdout, /maintenance_only=true/);
+		assert.match(openCode.stdout, /application=false/);
+		assert.match(openCode.stdout, /sast=false/);
+		assert.match(openCode.stdout, /build=false/);
+		assert.match(openCode.stdout, /preview_required=false/);
+
 		await mkdir(path.join(cwd, ".github/workflows"), { recursive: true });
 		await writeFile(
 			path.join(cwd, ".github/workflows/ci.yml"),
