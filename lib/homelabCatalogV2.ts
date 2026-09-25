@@ -52,7 +52,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function strings(value: unknown): value is string[] {
-	return Array.isArray(value) && value.every((item) => typeof item === "string");
+	return (
+		Array.isArray(value) && value.every((item) => typeof item === "string")
+	);
 }
 
 function stringRecord(value: unknown): value is Record<string, string> {
@@ -82,10 +84,7 @@ function validEntity(value: unknown): value is CatalogV2Entity {
 	) {
 		return false;
 	}
-	if (
-		value.metadata.tags !== undefined &&
-		!strings(value.metadata.tags)
-	) {
+	if (value.metadata.tags !== undefined && !strings(value.metadata.tags)) {
 		return false;
 	}
 	if (
@@ -135,7 +134,9 @@ export function catalogV2ServiceViews(
 ): CatalogV2ServiceView[] {
 	return catalog.entities
 		.filter(
-			(entity): entity is CatalogV2Entity & {
+			(
+				entity,
+			): entity is CatalogV2Entity & {
 				kind: "Component" | "Resource" | "API";
 			} => ["Component", "Resource", "API"].includes(entity.kind),
 		)

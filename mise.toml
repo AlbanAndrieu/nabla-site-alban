@@ -6,7 +6,8 @@ pre-commit = "4.6.2"
 
 [settings]
 lockfile = true
-idiomatic_version_file_enable_tools = ["node", "npm"]
+idiomatic_version_file_enable_tools = ["node"]
+idiomatic_version_file_disable_files = ["node:.nvmrc"]
 
 [env]
 _.file = [".env.secrets", ".env.local"]
