@@ -4,21 +4,22 @@ const paths = ["/contact", "/fr/contact", "/policy"] as const;
 
 test.describe("Accessible responsive reflow", () => {
 	test("reflows at 200% text and honors reduced motion on small mobile", async ({
+		context,
 		page,
 	}) => {
 		await page.setViewportSize({ width: 320, height: 568 });
 		await page.emulateMedia({ reducedMotion: "reduce" });
+		const cdp = await context.newCDPSession(page);
 
-		for (const path of paths) {
-			await page.goto(path, { waitUntil: "domcontentloaded" });
-			await expect(page.locator("body")).toBeVisible();
+		try {
+			await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 2 });
 
-			const metrics = await page.evaluate(() => {
-				document.documentElement.style.setProperty(
-					"font-size",
-					"200%",
-					"important",
-				);
+			for (const path of paths) {
+				await page.goto(path, { waitUntil: "domcontentloaded" });
+				await expect(page.locator("body")).toBeVisible();
+				await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 2 });
+
+				const metrics = await page.evaluate(() => {
 				const maxCssTimeMs = (value: string): number =>
 					Math.max(
 						0,
@@ -63,9 +64,14 @@ test.describe("Accessible responsive reflow", () => {
 			expect(metrics.transitionDurationMs).toBeLessThanOrEqual(0.02);
 			expect(metrics.animationDurationMs).toBeLessThanOrEqual(0.02);
 
-			const mainBox = await page.locator("main").first().boundingBox();
-			expect(mainBox?.width ?? 0).toBeLessThanOrEqual(metrics.clientWidth + 1);
-			await expect(page.locator("#route-header-locale")).toBeVisible();
+				const mainBox = await page.locator("main").first().boundingBox();
+				expect(mainBox?.width ?? 0).toBeLessThanOrEqual(
+					metrics.clientWidth + 1,
+				);
+				await expect(page.locator("#route-header-locale")).toBeVisible();
+			}
+		} finally {
+			await cdp.send("Emulation.setEmulatedOSTextScale", {});
 		}
 	});
 });
