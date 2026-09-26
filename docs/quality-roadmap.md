@@ -584,36 +584,22 @@ les autres chantiers.
 
 ### Shared `SkipToMainContent`
 
-Déjà migrés :
+- [x] Centraliser le skip-link des routes App Router localisées dans
+  `app/[locale]/layout.tsx`, **avant** `RouteHeader`. #197 a montré via
+  Playwright que le modèle précédent rendait la navigation partagée avant les
+  skip-links page-level, ce qui inversait l'ordre clavier attendu. Le layout est
+  désormais l'unique autorité : les pages, `PaymentShell` et Jus Mundi ne
+  rendent plus leur propre skip-link.
+- [x] Conserver `SkipToMainContent` comme composant partagé traduit et imposer
+  `main-content` comme cible sémantique des routes actives. Le contrat unitaire
+  vérifie que le skip-link précède `RouteHeader` et empêche la réintroduction
+  de copies page-level.
+- [x] Laisser les documents HTML historiques de `public/**` inchangés tant
+  qu'ils ne sont pas migrés vers App Router.
 
-- [x] accueil
-- [x] AI
-- [x] FreeNAS
-- [x] TrueNAS
-- [x] Workstation
-- [x] Email
-- [x] Expertise
-- [x] CISO
-- [x] Contact — #197 ajoute le `SkipToMainContent` partagé découvert manquant par le parcours clavier Preview.
-- [x] Pricing
-- [x] Nabla
-- [x] Architecture
-- [x] Jus Mundi
-- [x] Security
-- [x] Checkout TJM
-- [x] CV catch-all
-- [x] Startup / Startup Thanks
-- [x] Link
-- [x] Test
-- [x] Login — shell serveur + interactions isolées dans un Client Component
-- [x] `components/payments/PaymentShell.tsx`
-
-Migration Next active terminée : les documents HTML historiques de `public/**`
-restent volontairement inchangés.
-
-Critères d'acceptation : un composant partagé, aucun markup de skip-link dupliqué
-dans les routes Next actives, chaque page expose `<main id="main-content">`, et
-des tests de non-régression.
+Critères d'acceptation : un seul skip-link global par document Next localisé,
+rendu avant la navigation partagée, aucune duplication dans les pages et une
+cible `main-content` stable.
 
 Autres contrôles :
 
@@ -623,14 +609,12 @@ Autres contrôles :
   `/fr/contact` et `/policy` : le clavier doit atteindre le skip-link, le
   sélecteur de langue puis une action du contenu principal ; chaque cible doit
   correspondre à `:focus-visible`, présenter un outline/box-shadow perceptible
-  et rester dans le viewport. Le premier Preview du HEAD `6d724da...` a
-  correctement révélé deux hypothèses invalides du contrat : Contact n'utilisait
-  pas encore le skip-link partagé et le test imposait au sélecteur de langue un
-  budget arbitraire de dix tabulations. Le follow-up ajoute le composant partagé
-  à Contact et vérifie désormais l'atteignabilité du sélecteur dans le parcours
-  clavier sans imposer sa position exacte. Un contrat unitaire verrouille le
-  skip-link Contact, les styles focus communs et le parcours Playwright. Fermer
-  ce point uniquement après passage de ce nouveau spec sur le Preview exact-SHA.
+  et rester dans le viewport. Les Previews `6d724da...` puis `9727a15...`
+  ont révélé que le défaut restant était architectural : `RouteHeader` était
+  rendu par le layout **avant** les skip-links page-level. Le follow-up
+  centralise donc le skip-link dans le layout avant `RouteHeader`, supprime les
+  copies locales et adapte les contrats. Fermer ce point uniquement après
+  passage de ce nouveau modèle sur le Preview exact-SHA.
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
