@@ -26,7 +26,7 @@ test("all six policy routes are native, typed and statically generated for confi
 	assert.match(page, /POLICY_PAGE_SLUGS/);
 	assert.match(page, /NativePolicyContent/);
 	assert.match(page, /"x-default"/);
-	assert.match(page, /SkipToMainContent/);
+	assert.doesNotMatch(page, /SkipToMainContent/);
 	assert.match(page, /TopAnchor/);
 });
 

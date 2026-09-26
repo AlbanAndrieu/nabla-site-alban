@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
@@ -64,7 +63,6 @@ export default async function CvPathPage({ params }: Props) {
 		return (
 			<div className="page-cv" suppressHydrationWarning>
 				<TopAnchor />
-				<SkipToMainContent />
 				{/* eslint-disable-next-line react/no-danger */}
 				<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
 				<nav

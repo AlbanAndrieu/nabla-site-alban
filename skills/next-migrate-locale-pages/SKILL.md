@@ -72,10 +72,11 @@ Do not duplicate global navigation, footer or back-navigation UI in page-specifi
 Reuse existing primitives such as:
 
 - `TopAnchor`
-- `SkipToMainContent`
 - `AnchoredHeading`
 
-Do not reimplement their markup page by page.
+`SkipToMainContent` is owned by `app/[locale]/layout.tsx` and rendered before
+`RouteHeader`. Migrated pages must expose the `main-content` target but must
+not import, render or reimplement the skip-link themselves.
 
 ### Large-page component boundaries
 
