@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import ActionLink, { actionClassName } from "@/components/ui/ActionLink";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { routing } from "@/i18n/routing";
@@ -81,10 +82,12 @@ export default async function ContactPage({
 	setRequestLocale(locale);
 	const t = await getTranslations("contactPage");
 	return (
-		<main
-			id="main-content"
-			className="site-content-page page-contact page-dark"
-		>
+		<>
+			<SkipToMainContent />
+			<main
+				id="main-content"
+				className="site-content-page page-contact page-dark"
+			>
 			<span id="top" />
 			<ContactHero
 				contactCta={t("hero.contactCta")}
@@ -286,6 +289,7 @@ export default async function ContactPage({
 					</ExternalLink>
 				</article>
 			</section>
-		</main>
+			</main>
+		</>
 	);
 }
