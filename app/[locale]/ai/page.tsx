@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -49,7 +48,6 @@ export default async function AiBestPracticesPage({
 		<div className="site-content-page page-ai page-dark page-nabla-best-practices">
 			<link rel="stylesheet" href="/nabla.css" />
 			<TopAnchor />
-			<SkipToMainContent />
 			<script
 				type="application/ld+json"
 				dangerouslySetInnerHTML={{
