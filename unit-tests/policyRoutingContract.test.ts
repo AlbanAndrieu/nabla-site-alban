@@ -10,14 +10,17 @@ async function source(path: string) {
 }
 
 test("all six policy routes are native, typed and statically generated for configured locales", async () => {
-	assert.deepEqual([...POLICY_PAGE_SLUGS].sort(), [
-		"accessibility_statement",
-		"cookie_policy",
-		"impressum",
-		"legal",
-		"privacy_policy",
-		"service_terms",
-	].sort());
+	assert.deepEqual(
+		[...POLICY_PAGE_SLUGS].sort(),
+		[
+			"accessibility_statement",
+			"cookie_policy",
+			"impressum",
+			"legal",
+			"privacy_policy",
+			"service_terms",
+		].sort(),
+	);
 	assert.deepEqual([...routing.locales], ["en", "fr"]);
 
 	const page = await source("app/[locale]/policy/[policy]/page.tsx");
