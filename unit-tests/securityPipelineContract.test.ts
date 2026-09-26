@@ -95,18 +95,12 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		ci,
 		/git diff --quiet "\$PRODUCTION_SHA" "\$HEAD_SHA" -- scripts\/post-deploy-smoke\.mjs/,
 	);
-	assert.match(
-		ci,
-		/Candidate smoke checkout does not match the exact PR HEAD/,
-	);
+	assert.match(ci, /Candidate smoke checkout does not match the exact PR HEAD/);
 	assert.match(
 		ci,
 		/Candidate smoke is missing the reviewed homelab degraded-state contract/,
 	);
-	assert.match(
-		ci,
-		/DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/,
-	);
+	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/);
 	assert.doesNotMatch(
 		ci,
 		/continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/,
