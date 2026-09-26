@@ -22,9 +22,16 @@ export default function AiPageGuide() {
 			<p className={styles.sectionLead}>{t("guide.lead")}</p>
 			<nav className="resource-grid" aria-label={t("guide.aria")}>
 				{SECTIONS.map((section, index) => (
-					<a key={section.id} href={`#${section.id}`} className={`resource-card text-decoration-none ${styles.guideLink}`}>
+					<a
+						key={section.id}
+						href={`#${section.id}`}
+						className={`resource-card text-decoration-none ${styles.guideLink}`}
+					>
 						<h3>
-							<i className={`fas ${section.icon} resource-card-icon`} aria-hidden="true" />{" "}
+							<i
+								className={`fas ${section.icon} resource-card-icon`}
+								aria-hidden="true"
+							/>{" "}
 							{index + 1}. {t(`guide.sections.${section.key}`)}
 						</h3>
 					</a>
