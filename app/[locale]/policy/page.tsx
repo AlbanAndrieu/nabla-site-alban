@@ -5,7 +5,6 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
 import AnchoredHeading from "@/components/AnchoredHeading";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import Container from "@/components/ui/Container";
 import layout from "@/components/ui/ContentLayout.module.css";
@@ -167,7 +166,6 @@ export default async function PolicyIndexPage({
 	return (
 		<>
 			<TopAnchor />
-			<SkipToMainContent />
 			<main
 				id="main-content"
 				className={`site-content-page ${layout.main}`}
