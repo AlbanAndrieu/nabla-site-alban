@@ -4,10 +4,10 @@ import styles from "./AiNativePage.module.css";
 const SECTIONS = [
 	{ id: "secure-ai-platform", icon: "fa-shield-halved", key: "secure" },
 	{ id: "ai-homelab-architecture", icon: "fa-network-wired", key: "architecture" },
+	{ id: "ai-observability", icon: "fa-chart-line", key: "observability" },
 	{ id: "workflow-automation", icon: "fa-diagram-project", key: "automation" },
 	{ id: "global-ai-tools", icon: "fa-toolbox", key: "tools" },
 	{ id: "ai-resource-catalog", icon: "fa-microchip", key: "catalog" },
-	{ id: "ai-observability", icon: "fa-chart-line", key: "observability" },
 	{ id: "document-pipeline", icon: "fa-file-lines", key: "knowledge" },
 	{ id: "general-best-practices", icon: "fa-list-check", key: "practices" },
 ] as const;
