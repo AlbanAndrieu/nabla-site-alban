@@ -3,7 +3,11 @@ import styles from "./AiNativePage.module.css";
 
 const SECTIONS = [
 	{ id: "secure-ai-platform", icon: "fa-shield-halved", key: "secure" },
-	{ id: "ai-homelab-architecture", icon: "fa-network-wired", key: "architecture" },
+	{
+		id: "ai-homelab-architecture",
+		icon: "fa-network-wired",
+		key: "architecture",
+	},
 	{ id: "ai-observability", icon: "fa-chart-line", key: "observability" },
 	{ id: "workflow-automation", icon: "fa-diagram-project", key: "automation" },
 	{ id: "global-ai-tools", icon: "fa-toolbox", key: "tools" },
@@ -15,7 +19,10 @@ const SECTIONS = [
 export default function AiPageGuide() {
 	const t = useTranslations("ai");
 	return (
-		<section className="category-section" aria-labelledby="ai-page-guide-heading">
+		<section
+			className="category-section"
+			aria-labelledby="ai-page-guide-heading"
+		>
 			<h2 id="ai-page-guide-heading" className="category-title">
 				<i className="fas fa-route" aria-hidden="true" /> {t("guide.title")}
 			</h2>

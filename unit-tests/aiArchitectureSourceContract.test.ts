@@ -24,12 +24,19 @@ test("AI architecture reuses the shared architecture catalog", async () => {
 
 	const layers = new Map<number, string[]>();
 	for (const entity of AI_ENTITIES) {
-		assert.equal(typeof entity.layer, "number", `${entity.id} must define a layer`);
+		assert.equal(
+			typeof entity.layer,
+			"number",
+			`${entity.id} must define a layer`,
+		);
 		const layer = entity.layer as number;
 		layers.set(layer, [...(layers.get(layer) ?? []), entity.id]);
 	}
 
-	assert.deepEqual([...layers.keys()].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5]);
+	assert.deepEqual(
+		[...layers.keys()].sort((a, b) => a - b),
+		[0, 1, 2, 3, 4, 5],
+	);
 	for (const layer of layers.values()) assert.ok(layer.length > 0);
 
 	const hasRelation = (sourceId: string, targetId: string) =>
@@ -51,7 +58,10 @@ test("AI architecture reuses the shared architecture catalog", async () => {
 	let previousIndex = -1;
 	for (const marker of sectionOrder) {
 		const index = sections.indexOf(marker);
-		assert.ok(index > previousIndex, `${marker} must preserve the secure AI narrative order`);
+		assert.ok(
+			index > previousIndex,
+			`${marker} must preserve the secure AI narrative order`,
+		);
 		previousIndex = index;
 	}
 
@@ -66,7 +76,10 @@ test("AI architecture reuses the shared architecture catalog", async () => {
 	previousIndex = -1;
 	for (const marker of guideOrder) {
 		const index = guide.indexOf(marker);
-		assert.ok(index > previousIndex, `${marker} must match rendered section order`);
+		assert.ok(
+			index > previousIndex,
+			`${marker} must match rendered section order`,
+		);
 		previousIndex = index;
 	}
 });
