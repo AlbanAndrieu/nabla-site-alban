@@ -600,19 +600,27 @@ Autres contrôles :
 
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
 - [ ] Étendre la vérification du focus visible et de la navigation clavier.
+  #197 ajoute un parcours Playwright ciblé sur `/`, `/contact`,
+  `/fr/contact` et `/policy` : le clavier doit atteindre le skip-link, le
+  sélecteur de langue puis une action du contenu principal ; chaque cible doit
+  correspondre à `:focus-visible`, présenter un outline/box-shadow perceptible
+  et rester dans le viewport. Un contrat unitaire vérifie aussi les styles
+  focus des surfaces communes. Fermer ce point uniquement après passage de ce
+  nouveau spec sur le Preview exact-SHA.
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
-- [ ] Valider sur le Preview Chromium exact le reflow avec une préférence de
-  texte à 200 % sans contourner la CSP. #196 remplace la simulation par style
+- [x] Valider sur le Preview Chromium exact le reflow avec une préférence de
+  texte à 200 % sans contourner la CSP. #197 remplace la simulation par style
   inline par `Emulation.setEmulatedOSTextScale` et fait dériver la taille racine
   de `env(preferred-text-scale, 1)`, disponible dans la branche Chromium 145
   utilisée par Playwright 1.58. Le fallback `1` conserve le rendu des moteurs qui
   n'exposent pas encore cette variable. Ne pas cumuler ce mécanisme avec
   `<meta name="text-scale" content="scale">` tant que la toolchain navigateur
   actuelle ne le supporte pas : les deux mécanismes appliqueraient sinon
-  l'échelle deux fois. Fermer ce point uniquement après passage du test
-  `accessibility-responsive.spec.ts` sur l'exact SHA Preview.
+  l'échelle deux fois. Preuve : HEAD
+  `b6327c5cb492d5ae136f08c634f0369182c3e50a`, Quality/Security #1290,
+  Node 24 #54, Vercel, ZAP Preview et Playwright Preview E2E tous verts.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
