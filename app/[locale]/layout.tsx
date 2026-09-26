@@ -90,6 +90,7 @@ export default async function LocaleLayout({
 			<head>
 				<ThemeBootstrap />
 				<meta name="color-scheme" content="light dark" />
+				<meta name="text-scale" content="scale" />
 				<link rel="stylesheet" href="/landing-sections.css" />
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />
