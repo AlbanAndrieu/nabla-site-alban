@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 25 septembre 2026.
+Dernière vérification : 26 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -368,6 +368,24 @@ les autres chantiers.
   publique et prouve via `/api/deployment` le SHA Vercel
   `7e0a0e880cbc4acb1d83505352b6d09b017c4569`. Il valide également canonical,
   hreflang EN/FR/`x-default`, sitemap et robots sur les routes couvertes.
+  Le follow-up #197 distingue désormais disponibilité du site et disponibilité
+  de l'observateur FastAPI homelab : après les trois retries normaux, un HTTP 503
+  de `/api/homelab-status` n'est accepté que si le proxy expose exactement son
+  contrat de dégradation (`source=unavailable`, `Cache-Control: no-store`,
+  upstream HTTPS identifié et payload
+  `FastAPI homelab status unavailable`). Le run Quality/Security #1291 a motivé
+  ce durcissement : production, sitemap et robots étaient sains, tandis que
+  FastAPI avait dépassé le timeout à trois reprises. Un 200 continue d'exiger le
+  snapshot FastAPI structuré et tout autre 503/mode dégradé mal formé reste
+  bloquant. Pour éviter un deadlock lors de cette évolution de politique, la CI
+  exécute toujours d'abord le smoke issu du SHA de production. Le smoke candidat
+  du HEAD de PR n'est autorisé en second passage que si l'ancien smoke échoue
+  exactement sur ce 503 homelab, après preuve de toutes les pages, du SHA de
+  déploiement, du sitemap et de robots.txt, et seulement si le script smoke a
+  réellement changé dans la PR. Toute autre erreur de la baseline reste
+  immédiatement bloquante. Une fois cette politique présente sur `master`, le
+  premier smoke sait lui-même valider le mode dégradé et ce chemin de transition
+  reste dormant.
 
 ## P1 — Architecture et homelab runtime
 
@@ -566,43 +584,51 @@ les autres chantiers.
 
 ### Shared `SkipToMainContent`
 
-Déjà migrés :
+- [x] Centraliser le skip-link des routes App Router localisées dans
+  `app/[locale]/layout.tsx`, **avant** `RouteHeader`. #197 a montré via
+  Playwright que le modèle précédent rendait la navigation partagée avant les
+  skip-links page-level, ce qui inversait l'ordre clavier attendu. Le layout est
+  désormais l'unique autorité : les pages, `PaymentShell` et Jus Mundi ne
+  rendent plus leur propre skip-link.
+- [x] Conserver `SkipToMainContent` comme composant partagé traduit et imposer
+  `main-content` comme cible sémantique des routes actives. Le contrat unitaire
+  vérifie que le skip-link précède `RouteHeader` et empêche la réintroduction
+  de copies page-level.
+- [x] Laisser les documents HTML historiques de `public/**` inchangés tant
+  qu'ils ne sont pas migrés vers App Router.
 
-- [x] accueil
-- [x] AI
-- [x] FreeNAS
-- [x] TrueNAS
-- [x] Workstation
-- [x] Email
-- [x] Expertise
-- [x] CISO
-- [x] Pricing
-- [x] Nabla
-- [x] Architecture
-- [x] Jus Mundi
-- [x] Security
-- [x] Checkout TJM
-- [x] CV catch-all
-- [x] Startup / Startup Thanks
-- [x] Link
-- [x] Test
-- [x] Login — shell serveur + interactions isolées dans un Client Component
-- [x] `components/payments/PaymentShell.tsx`
-
-Migration Next active terminée : les documents HTML historiques de `public/**`
-restent volontairement inchangés.
-
-Critères d'acceptation : un composant partagé, aucun markup de skip-link dupliqué
-dans les routes Next actives, chaque page expose `<main id="main-content">`, et
-des tests de non-régression.
+Critères d'acceptation : un seul skip-link global par document Next localisé,
+rendu avant la navigation partagée, aucune duplication dans les pages et une
+cible `main-content` stable.
 
 Autres contrôles :
 
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
 - [ ] Étendre la vérification du focus visible et de la navigation clavier.
+  #197 ajoute un parcours Playwright ciblé sur `/`, `/contact`,
+  `/fr/contact` et `/policy` : le clavier doit atteindre le skip-link, le
+  sélecteur de langue puis une action du contenu principal ; chaque cible doit
+  correspondre à `:focus-visible`, présenter un outline/box-shadow perceptible
+  et rester dans le viewport. Les Previews `6d724da...` puis `9727a15...`
+  ont révélé que le défaut restant était architectural : `RouteHeader` était
+  rendu par le layout **avant** les skip-links page-level. Le follow-up
+  centralise donc le skip-link dans le layout avant `RouteHeader`, supprime les
+  copies locales et adapte les contrats. Fermer ce point uniquement après
+  passage de ce nouveau modèle sur le Preview exact-SHA.
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
+- [x] Valider sur le Preview Chromium exact le reflow avec une préférence de
+  texte à 200 % sans contourner la CSP. #197 remplace la simulation par style
+  inline par `Emulation.setEmulatedOSTextScale` et fait dériver la taille racine
+  de `env(preferred-text-scale, 1)`, disponible dans la branche Chromium 145
+  utilisée par Playwright 1.58. Le fallback `1` conserve le rendu des moteurs qui
+  n'exposent pas encore cette variable. Ne pas cumuler ce mécanisme avec
+  `<meta name="text-scale" content="scale">` tant que la toolchain navigateur
+  actuelle ne le supporte pas : les deux mécanismes appliqueraient sinon
+  l'échelle deux fois. Preuve : HEAD
+  `b6327c5cb492d5ae136f08c634f0369182c3e50a`, Quality/Security #1290,
+  Node 24 #54, Vercel, ZAP Preview et Playwright Preview E2E tous verts.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 

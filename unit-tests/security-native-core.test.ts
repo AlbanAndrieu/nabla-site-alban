@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const pageSource = await readFile("app/[locale]/security/page.tsx", "utf8");
+const layoutSource = await readFile("app/[locale]/layout.tsx", "utf8");
 const sectionSource = await readFile(
 	"app/[locale]/security/SecurityCoreSections.tsx",
 	"utf8",
@@ -12,12 +13,13 @@ const resourceSource = await readFile(
 	"utf8",
 );
 
-test("security owns its semantic main and shared skip link", () => {
-	assert.match(pageSource, /<SkipToMainContent\s*\/>/);
+test("security main relies on layout-owned skip navigation", () => {
+	assert.match(layoutSource, /<SkipToMainContent\s*\/>/);
 	assert.match(
 		pageSource,
 		/<main id="main-content" className="security-resources">/,
 	);
+	assert.doesNotMatch(pageSource, /SkipToMainContent/);
 	assert.doesNotMatch(pageSource, /className="skip-to-main"/);
 });
 

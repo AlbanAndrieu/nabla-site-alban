@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { canonicalPagePath, NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -56,7 +55,6 @@ export default async function WorkstationPage({ params }: Props) {
 	return (
 		<div className="site-content-page page-dark page-truenas page-workstation">
 			<TopAnchor />
-			<SkipToMainContent />
 			<WorkstationHero truenasHref={truenasHref} />
 			<main id="main-content" role="main" className={styles.pageMain}>
 				<WorkstationServiceSections

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
@@ -34,7 +33,6 @@ export default async function PricingPage({ params }: Props) {
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<SkipToMainContent />
 			<main id="main-content" className="container py-4 pb-5 pricing-page">
 				<header className="mb-4">
 					<h1 className="h2 mb-2">{t("title")}</h1>

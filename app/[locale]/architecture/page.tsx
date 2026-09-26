@@ -6,7 +6,6 @@ import HomelabOperationalEvidence from "@/app/components/homelab/HomelabOperatio
 import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
 import SectionHeading from "@/components/SectionHeading";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
@@ -49,7 +48,6 @@ export default async function ArchitecturePage({
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<SkipToMainContent />
 			<main id="main-content">
 				<section
 					id="architecture-overview"

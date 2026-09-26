@@ -167,6 +167,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PRODUCTION_SHA: ${{ steps.verified-production-baseline.outputs.baseline_sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           BASE_URL: "https://www.albanandrieu.com"
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
@@ -176,10 +177,61 @@ jobs:
             echo "::error::VERCEL_AUTOMATION_BYPASS_SECRET is required for the pre-merge production smoke."
             exit 1
           fi
-          smoke_script="${RUNNER_TEMP}/post-deploy-smoke.mjs"
-          git show "${PRODUCTION_SHA}:scripts/post-deploy-smoke.mjs" > "$smoke_script"
-          DEPLOYED_SHA="$PRODUCTION_SHA" node "$smoke_script" "$BASE_URL"
 
+          baseline_smoke="${RUNNER_TEMP}/post-deploy-smoke.baseline.mjs"
+          baseline_log="${RUNNER_TEMP}/post-deploy-smoke.baseline.log"
+          candidate_smoke="${GITHUB_WORKSPACE}/scripts/post-deploy-smoke.mjs"
+          git show "${PRODUCTION_SHA}:scripts/post-deploy-smoke.mjs" > "$baseline_smoke"
+
+          set +e
+          DEPLOYED_SHA="$PRODUCTION_SHA" node "$baseline_smoke" "$BASE_URL" 2>&1 | tee "$baseline_log"
+          baseline_status="${PIPESTATUS[0]}"
+          set -e
+          if [[ "$baseline_status" -eq 0 ]]; then
+            exit 0
+          fi
+
+          expected_failure="Production post-deploy smoke failed: Error: /api/homelab-status returned HTTP 503"
+          if ! grep -Fq "$expected_failure" "$baseline_log"; then
+            echo "::error::Canonical production smoke failed outside the reviewed homelab degraded transition."
+            exit "$baseline_status"
+          fi
+
+          required_evidence=(
+            "PASS /api/deployment ${PRODUCTION_SHA}"
+            "PASS page /"
+            "PASS page /fr"
+            "PASS page /truenas"
+            "PASS page /fr/truenas"
+            "PASS page /architecture"
+            "PASS page /fr/architecture"
+            "PASS page /contact"
+            "PASS page /fr/contact"
+            "PASS sitemap.xml"
+            "PASS robots.txt"
+          )
+          for evidence in "${required_evidence[@]}"; do
+            if ! grep -Fq "$evidence" "$baseline_log"; then
+              echo "::error::Canonical production smoke did not prove required evidence before the homelab 503: $evidence"
+              exit "$baseline_status"
+            fi
+          done
+
+          if [[ "$(git rev-parse HEAD)" != "$HEAD_SHA" ]]; then
+            echo "::error::Candidate smoke checkout does not match the exact PR HEAD."
+            exit 1
+          fi
+          if git diff --quiet "$PRODUCTION_SHA" "$HEAD_SHA" -- scripts/post-deploy-smoke.mjs; then
+            echo "::error::Canonical smoke failed on homelab 503 but this PR does not update the smoke policy."
+            exit "$baseline_status"
+          fi
+          if ! grep -Fq 'WARN /api/homelab-status degraded: FastAPI upstream unavailable (' "$candidate_smoke"; then
+            echo "::error::Candidate smoke is missing the reviewed homelab degraded-state contract."
+            exit 1
+          fi
+
+          echo "::warning::Canonical smoke hit the reviewed homelab 503 transition; validating the candidate smoke against the same production SHA."
+          DEPLOYED_SHA="$PRODUCTION_SHA" node "$candidate_smoke" "$BASE_URL"
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
