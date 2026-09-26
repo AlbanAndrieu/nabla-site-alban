@@ -594,6 +594,7 @@ Déjà migrés :
 - [x] Email
 - [x] Expertise
 - [x] CISO
+- [x] Contact — #197 ajoute le `SkipToMainContent` partagé découvert manquant par le parcours clavier Preview.
 - [x] Pricing
 - [x] Nabla
 - [x] Architecture
@@ -622,9 +623,14 @@ Autres contrôles :
   `/fr/contact` et `/policy` : le clavier doit atteindre le skip-link, le
   sélecteur de langue puis une action du contenu principal ; chaque cible doit
   correspondre à `:focus-visible`, présenter un outline/box-shadow perceptible
-  et rester dans le viewport. Un contrat unitaire vérifie aussi les styles
-  focus des surfaces communes. Fermer ce point uniquement après passage de ce
-  nouveau spec sur le Preview exact-SHA.
+  et rester dans le viewport. Le premier Preview du HEAD `6d724da...` a
+  correctement révélé deux hypothèses invalides du contrat : Contact n'utilisait
+  pas encore le skip-link partagé et le test imposait au sélecteur de langue un
+  budget arbitraire de dix tabulations. Le follow-up ajoute le composant partagé
+  à Contact et vérifie désormais l'atteignabilité du sélecteur dans le parcours
+  clavier sans imposer sa position exacte. Un contrat unitaire verrouille le
+  skip-link Contact, les styles focus communs et le parcours Playwright. Fermer
+  ce point uniquement après passage de ce nouveau spec sur le Preview exact-SHA.
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
