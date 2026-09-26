@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -21,7 +20,6 @@ export default async function TestPage({
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<SkipToMainContent />
 			<main id="main-content" role="main" className="mb-5">
 				<section className="services-section" aria-labelledby="people-heading">
 					<div className="container">
