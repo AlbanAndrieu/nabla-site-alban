@@ -192,7 +192,9 @@ export default async function ContactPage({
 								className="contact-method"
 								href={href}
 								target={href.startsWith("http") ? "_blank" : undefined}
-								rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+								rel={
+									href.startsWith("http") ? "noopener noreferrer" : undefined
+								}
 								key={key}
 							>
 								<div className="contact-icon">
