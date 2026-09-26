@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 25 septembre 2026.
+Dernière vérification : 26 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -603,6 +603,16 @@ Autres contrôles :
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
+- [ ] Valider sur le Preview Chromium exact le reflow avec une préférence de
+  texte à 200 % sans contourner la CSP. #196 remplace la simulation par style
+  inline par `Emulation.setEmulatedOSTextScale` et fait dériver la taille racine
+  de `env(preferred-text-scale, 1)`, disponible dans la branche Chromium 145
+  utilisée par Playwright 1.58. Le fallback `1` conserve le rendu des moteurs qui
+  n'exposent pas encore cette variable. Ne pas cumuler ce mécanisme avec
+  `<meta name="text-scale" content="scale">` tant que la toolchain navigateur
+  actuelle ne le supporte pas : les deux mécanismes appliqueraient sinon
+  l'échelle deux fois. Fermer ce point uniquement après passage du test
+  `accessibility-responsive.spec.ts` sur l'exact SHA Preview.
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
