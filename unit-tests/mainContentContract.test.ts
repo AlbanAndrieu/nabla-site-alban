@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import { relative } from "node:path";
-import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const repoRoot = new URL("../", import.meta.url);
 const localizedAppRoot = new URL("../app/[locale]/", import.meta.url);
