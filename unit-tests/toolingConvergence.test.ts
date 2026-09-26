@@ -54,6 +54,13 @@ test("retired deployment tooling stays absent while OpenCommit remains available
 test("Node and Next toolchain stay aligned with the reviewed targets", async () => {
 	const packageJson = JSON.parse(await read("package.json")) as {
 		engines?: { node?: string };
+		devEngines?: {
+			runtime?: {
+				name?: string;
+				version?: string;
+				onFail?: string;
+			};
+		};
 		dependencies?: Record<string, string>;
 		devDependencies?: Record<string, string>;
 	};
@@ -79,6 +86,11 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		read("docs/architecture.md"),
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <27");
+	assert.deepEqual(packageJson.devEngines?.runtime, {
+		name: "node",
+		version: "26.8.2",
+		onFail: "warn",
+	});
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
 	assert.equal(packageJson.devDependencies?.["eslint-config-next"], undefined);
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
@@ -91,7 +103,12 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 	}
 	assert.match(envrc, /NODE_VERSIONS=.*v26\.8\.2/);
 	assert.equal(nvmrc.trim(), "26.8.2");
-	assert.match(mise, /node = "26\.8\.2"/);
+	assert.match(mise, /idiomatic_version_file_enable_tools = \["node"\]/);
+	assert.match(
+		mise,
+		/idiomatic_version_file_disable_files = \["node:\.nvmrc"\]/,
+	);
+	assert.doesNotMatch(mise, /^node\s*=\s*"26\.8\.2"$/m);
 	for (const docs of [cicdDocs, architectureDocs]) {
 		assert.match(docs, /26\.8\.2/);
 		assert.doesNotMatch(docs, /25\.9\.0/);

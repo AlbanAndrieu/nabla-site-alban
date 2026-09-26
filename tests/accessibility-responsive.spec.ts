@@ -11,12 +11,14 @@ test.describe("Accessible responsive reflow", () => {
 
 		for (const path of paths) {
 			await page.goto(path, { waitUntil: "domcontentloaded" });
-			await page.addStyleTag({
-				content: "html { font-size: 200% !important; }",
-			});
 			await expect(page.locator("body")).toBeVisible();
 
 			const metrics = await page.evaluate(() => {
+				document.documentElement.style.setProperty(
+					"font-size",
+					"200%",
+					"important",
+				);
 				const maxCssTimeMs = (value: string): number =>
 					Math.max(
 						0,

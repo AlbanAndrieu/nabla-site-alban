@@ -40,6 +40,7 @@ is_maintenance_only_path() {
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             scripts/agent-quality-gate.sh | \
+            scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
@@ -67,6 +68,8 @@ is_preview_safe_path() {
             .vscode/* | \
             .idea/* | \
             .agents/* | \
+            .opencode/* | \
+            opencode.json | \
             .cursor/* | \
             .claude/* | \
             .assetsignore | \
@@ -77,11 +80,13 @@ is_preview_safe_path() {
             eslint.config.js | \
             stylelint.config.cjs | \
             scripts/agent-quality-gate.sh | \
+            scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/check_code_size.py | \
             scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
+            scripts/manage-master-ruleset.sh | \
             scripts/lib/production-baseline-classification.sh | \
             scripts/verify-production-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \

@@ -1,6 +1,6 @@
 # Feuille de route produit, qualité et refactoring
 
-Dernière vérification : 22 septembre 2026.
+Dernière vérification : 25 septembre 2026.
 
 Ce document est la source de vérité unique pour les améliorations du site. Un lot
 n'est considéré comme terminé que lorsque les contrôles pertinents, la CI sur la
@@ -241,8 +241,25 @@ les autres chantiers.
 - [x] Consolider la politique metadata sociale et conserver une façade de
   compatibilité pour les anciens imports.
 - [x] Aligner canonical, sitemap et Open Graph sur le host de production final.
-- [ ] Ajouter un ruleset GitHub rendant Quality/Security obligatoire avant merge
-  afin qu'une PR rouge ou un ancien run vert ne puisse plus casser `master`.
+- [ ] Activer le ruleset GitHub de protection de `master` afin qu'une PR rouge
+  ou un ancien run vert ne puisse plus casser la branche par défaut. Le dépôt
+  versionne désormais l'intention dans
+  `.github/rulesets/master-quality.json`, documentée dans
+  `docs/github-master-ruleset.md`, ainsi qu'un audit/apply local
+  `scripts/manage-master-ruleset.sh`. Le mode local `--validate` vérifie
+  désormais sans API GitHub l'ensemble exact des règles, les paramètres PR,
+  les checks obligatoires, leur source GitHub Actions, le mode strict et le
+  bypass. Le contrat négatif injecte également quatre dérives locales
+  (`strict=true`, required check manquant, bypass élargi et règle inattendue) et
+  exige leur rejet avant publication. Le contrat exige les checks
+  inconditionnels `quality` et `CI policy guard`, bloque suppression et
+  force-push, et limite le bypass propriétaire au flux **pull request** afin de
+  conserver une sortie de continuité lorsque le quota GitHub Actions est épuisé
+  sans réautoriser de push direct sur `master`. Les checks Preview
+  Vercel/Playwright/ZAP restent volontairement hors du ruleset global depuis
+  #195, car `preview_required=false` est un état légitime pour les changements
+  non déployables. Le point reste ouvert jusqu'à application distante du ruleset
+  et validation `RULESET_OK` sur le dépôt live.
 - [x] Interdire les directives GitHub de contournement CI dans les commits de PR
   avec un guard `pull_request_target` metadata-only : permissions lecture seule,
   aucun checkout, aucun secret et aucun code de la PR exécuté. Ce guard ferme le
@@ -284,7 +301,38 @@ les autres chantiers.
   aussi de matérialiser sa preuve si un build déployable modifie le working tree
   (`QG_PUBLISH_DIRTY_AFTER_BUILD`) ; un contrat isolé vérifie l'échec sans preuve,
   la récupération après restauration de l'arbre puis la réutilisation exacte de
-  la preuve sans rejouer gate ni build.
+  la preuve sans rejouer gate ni build. Le publisher expose désormais aussi
+  `--status` : ce mode ne relance ni lint, ni tests, ni build ; il échoue fermé
+  avec `QG_PUBLISH_PROOF_MISSING` ou `QG_PUBLISH_PROOF_STALE` et n'affiche
+  `QG_PUBLISH_PROOF_OK` avec les SHA HEAD/base et le snapshot de toolchain que
+  lorsque la preuve exacte est encore valide. Le contrat comportemental couvre
+  les trois états missing/ok/stale.
+  La configuration OpenCode du dépôt est désormais également adaptée aux modèles
+  plus légers : le modèle reste hérité de la workstation, tandis qu'un prompt
+  `build` déterministe, cinq skills `nabla-*` et des permissions explicites
+  forcent la réutilisation des scripts local-first. `AGENTS.md` impose une
+  machine d'état `OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH`.
+  Les nouveaux skills `nabla-ci-debug` et `nabla-review` séparent le diagnostic
+  progressif et la revue read-only de l'implémentation. Le preflight
+  `scripts/agent-doctor.sh` vérifie localement branche/base, Node/npm,
+  Python/pre-commit, hooks Git et dépendances, puis expose des résultats
+  `AGENT_DOCTOR_*` ainsi que la version OpenCode observée. Les commandes OpenCode
+  `/agent-doctor`, `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`,
+  `/qg-fix`, `/review-batch` et `/qg-proof` encapsulent ces chemins sans
+  imposer de modèle ; les commandes d'analyse utilisent l'agent `plan` en
+  sous-tâche pour ne pas polluer le contexte principal du modèle plus petit.
+  Un contrat dédié
+  verrouille l'absence de modèle imposé, le routage vers les skills, les phases,
+  l'autorisation des commandes quality et l'interdiction des pushes vers
+  `master`/force-push. `opencode.json` et `.opencode/**` restent classés
+  non déployables afin de ne pas allouer de Preview Vercel pour une simple
+  évolution de l'agent. Le point reste ouvert jusqu'au cycle réel sur la
+  workstation. La configuration garde volontairement les clés OpenCode V1
+  `permission` / `command` / `subtask` tant que la version réelle du binaire
+  workstation n'est pas capturée par `agent-doctor`; la documentation OpenCode
+  V2 actuelle emploie `permissions` / `commands` / `subagent`, et cette
+  migration doit être faite en un lot dédié après preuve de compatibilité plutôt
+  qu'introduite spéculativement dans cette PR.
 - [x] Supprimer la double autorité Stylelint après vérification de parité des
   règles : npm / `package-lock.json` + Stylelint 17 couvre désormais
   `app/**/*.css`, `components/**/*.css` et `public/*.css`. L'élargissement a
@@ -737,7 +785,7 @@ Autres contrôles :
 - [x] Exécuter lint, type-check, unit tests et `npm run build` dans Quality/Security.
 - [x] Exécuter Quality/Security sur `master` après merge.
 - [x] Aligner le développement, mise, direnv et les workflows GitHub sur Node 26.8.2, conserver une plage `>=24.11.0 <27` compatible avec le runtime Vercel Node 24.11.0, et garder OpenCommit uniquement comme helper local/on-demand. Le workflow Node 24 est désormais identique à celui de `nabla-site-bababou`.
-- [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.13 et
+- [x] Aligner le bootstrap de quality gate local/agent/CI sur Python 3.12.10 et
   `pre-commit==4.6.2` : `.python-version`, mise, Copilot Setup Steps et
   Quality/Security utilisent désormais les mêmes versions au lieu de laisser
   `pre-commit = "latest"` dériver.
@@ -813,10 +861,14 @@ Autres contrôles :
   **skip contrôlé** : `Report skipped semantic release` passe, mais checkout,
   token App, bootstrap, version et publication restent tous skippés ; aucun tag
   ni release `v0.0.1` n'existe encore. Ce succès ne ferme donc pas ce point.
-- [ ] Configurer un ruleset GitHub pour rendre réellement obligatoires avant
-  merge les statuts de PR `CI (Quality and Security)`, `Vercel` et
-  `Playwright Preview E2E`. Le repository ne possède actuellement aucun
-  ruleset ; les contrôles production Post-deploy Smoke/DAST sont vérifiés par
+- [ ] Configurer puis auditer le ruleset GitHub de `master`. Le dépôt ne
+  possède encore aucun ruleset installé au 23 septembre 2026 ; la configuration
+  as-code et l'outil local validate/check/apply sont maintenant préparés. Les checks
+  globaux à rendre obligatoires sont `quality` et `CI policy guard`.
+  `Vercel`, `Playwright Preview E2E` et ZAP restent conditionnels à
+  `preview_required` et ne doivent donc pas être requis globalement, au risque
+  de bloquer les PR docs/tooling pour lesquelles #195 évite volontairement le
+  Preview. Les contrôles production Post-deploy Smoke/DAST restent vérifiés par
   Quality sur le SHA `master` de base.
 - [x] Réduire encore les déploiements Preview inutiles : Vercel garde
   `deploymentEnabled["**"] = false` et n'accepte que `master` ou les checkpoints

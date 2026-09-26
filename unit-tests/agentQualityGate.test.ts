@@ -256,14 +256,14 @@ test("local agent toolchain matches CI bootstrap pins", async () => {
 		source(".github/workflows/copilot-setup-steps.yml"),
 	]);
 
-	assert.equal(pythonVersion.trim(), "3.13");
+	assert.equal(pythonVersion.trim(), "3.12.10");
 	assert.equal(nvmrc.trim(), "26.8.2");
-	assert.ok(mise.includes('node = "26.8.2"'));
-	assert.ok(mise.includes("default='3.13'"));
+	assert.ok(mise.includes('idiomatic_version_file_enable_tools = ["node"]'));
+	assert.ok(mise.includes("default='3.12.10'"));
 	assert.ok(mise.includes('pre-commit = "4.6.2"'));
 	for (const workflow of [ci, setup]) {
 		assert.ok(workflow.includes('python-version-file: ".python-version"'));
-		assert.ok(!workflow.includes('python-version: "3.13"'));
+		assert.ok(!workflow.includes('python-version: "3.12.10"'));
 		assert.ok(workflow.includes("pre-commit==4.6.2"));
 		assert.ok(
 			workflow.includes(

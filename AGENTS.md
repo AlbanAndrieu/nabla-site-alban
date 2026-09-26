@@ -14,11 +14,55 @@ This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push
 
 ## Workflow
 
+On a workstation checkout, refresh remote refs once and run the deterministic workspace preflight before broader reasoning:
+
+```bash
+git fetch --prune origin
+bash scripts/agent-doctor.sh
+```
+
+`AGENT_DOCTOR_OK` proves the checkout is on a named non-default branch based on the current local `origin/<default>`, the pinned Node/Python/pre-commit toolchain is active, npm satisfies the repository range, required Git hooks are executable, and `node_modules` has been bootstrapped. Any `AGENT_DOCTOR_*` failure is a local prerequisite to repair before implementation; do not compensate for it by weakening gates. The output also records the OpenCode version when available so schema migrations can be based on the actual workstation binary.
+
 1. Inspect only files relevant to the request.
 2. Reuse existing patterns and make the smallest safe patch.
 3. Validate narrowly first, then broaden checks.
 4. After an editing batch, run the self-converging local fix phase before committing or publishing.
 5. For CI failures, inspect the failing job/step and affected files before unrelated code.
+
+### Small-model / OpenCode execution discipline
+
+When the active coding model is less capable, reduce ambiguity instead of reducing quality:
+
+- follow this file and loaded repository skills literally; do not invent substitute commands when a repository script exists;
+- for roadmap/PR/quality work, load `nabla-maintenance` first, then `nabla-quality` and `nabla-pr` only when their scope applies;
+- make one cohesive editing batch at a time and finish its validation before starting another;
+- after every failed command, read the actual exit status/error and fix that failure before continuing;
+- treat unchecked roadmap items as open until their stated evidence exists; never infer completion from nearby green checks;
+- never claim a local or hosted check passed unless it ran for the exact current HEAD;
+- prefer deterministic repository commands over free-form reasoning for formatting, lint, tests, build, scope classification and publication proof.
+- treat `QG_*` messages as a machine-readable decision API: follow the named remediation exactly, stop on non-convergence/publication failures, and never replace a missing/stale proof with an assumption.
+
+The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
+
+The repository configuration currently keeps the OpenCode V1 field names already used by the workstation (`permission`, `command`, `subtask`). Current OpenCode V2 documentation uses `permissions`, `commands` and `subagent`; do not migrate these fields speculatively. Use the `opencode=...` line from `scripts/agent-doctor.sh` to confirm the installed workstation version first, then migrate the config and its contract in one explicit batch.
+
+
+#### Deterministic small-model state machine
+
+Keep exactly one active phase. Do not skip directly from editing to publication.
+
+1. **OBSERVE** — capture `git branch --show-current`, `git status --short`, `git diff --stat`, the exact HEAD, and the smallest relevant roadmap/test context.
+2. **ROUTE** — load one primary skill for the task: `nabla-maintenance` for roadmap/current-PR work, `nabla-quality` for local gates/publication, `nabla-ci-debug` for hosted failures, `nabla-pr` for PR/push operations, or `nabla-review` for a read-only pre-publication review. Load framework/domain skills such as `next-dev-loop`, `agent-browser`, or Stripe skills only when that domain is actually touched.
+3. **CHANGE** — implement one cohesive batch with explicit done evidence. Do not opportunistically fix unrelated roadmap items.
+4. **FIX** — run `npm run quality:agent:fix` until deterministic mutations converge; inspect only the changed paths.
+5. **REVIEW** — for non-trivial code/config changes, run one focused `nabla-review` pass. If it finds a blocking issue, return to CHANGE; do not publish.
+6. **PROVE** — commit the complete batch, run/reuse `npm run quality:agent:publish`, then audit it with `npm run quality:agent:publish -- --status`.
+7. **PUBLISH** — only after a clean proof, push once to the non-default branch, then inspect hosted results for the exact published HEAD without manually rerunning them.
+
+For planning, maintain a compact task card with **goal**, **in-scope paths**, **done evidence**, **validation**, and **stop conditions**. Keep it concise and do not expand it into narrative unless the user asks.
+
+Stop and report instead of guessing when the current branch is `master`, publication proof is missing/stale after an unexpected change, the fix phase does not converge, the base is stale, an unexpected file enters the diff, or the requested work no longer fits the PR theme.
+The publication wrapper enforces this independently of the model: `scripts/agent-publish.sh` fails closed with `QG_PUBLISH_PROTECTED_BRANCH` on the repository default branch and `QG_PUBLISH_DETACHED_HEAD` on a detached checkout.
 
 ## Tool and context efficiency
 
@@ -101,7 +145,7 @@ git push
 
 `quality:agent:fix` is intentionally self-converging: it reruns mutating pre-commit hooks until stable, then applies npm-backed ESLint/Stylelint fixes when relevant and revalidates pre-commit. A pass that merely rewrites files is not a successful final state; the command must reach a clean deterministic fix pass before the result is committed.
 
-The versioned pre-push hook is the canonical strict local publication guard and invokes `scripts/agent-publish.sh`. That wrapper keys a reusable proof by the exact committed `HEAD`, resolved comparison-base SHA and local toolchain fingerprint. Running `npm run quality:agent:publish` before `git push` is therefore safe when useful: if the same proof is still valid, pre-push reuses it instead of rerunning the expensive gate. Any dirty tree, new commit, base-branch movement or toolchain change invalidates the proof and forces the full strict gate again.
+The versioned pre-push hook is the canonical strict local publication guard and invokes `scripts/agent-publish.sh`. That wrapper keys a reusable proof by the exact committed `HEAD`, resolved comparison-base SHA and local toolchain fingerprint. Running `npm run quality:agent:publish` before `git push` is therefore safe when useful: if the same proof is still valid, pre-push reuses it instead of rerunning the expensive gate. Any dirty tree, new commit, base-branch movement or toolchain change invalidates the proof and forces the full strict gate again. Use `npm run quality:agent:publish -- --status` to audit an existing proof without rerunning lint/tests/build; it fails closed when the proof is missing or stale and prints the exact HEAD, base and toolchain snapshot only when the cached proof still matches.
 
 `scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. In CI it runs early, before npm dependency bootstrap, so formatting/pre-commit regressions fail cheaply. The later application gate may reuse that proof in the same CI job but publication mode can never bypass the canonical gate.
 
@@ -114,7 +158,7 @@ Before every `git push`, GitHub API file update, or other remote repository muta
 1. Confirm the target is a dedicated non-default branch and is **not** `master`.
 2. Run `npm run quality:agent:fix` from a local checkout after the editing batch and let it converge without manually investigating intermediate formatter passes.
 3. Review `git status --short` and `git diff --stat`, then inspect only the affected diff necessary to confirm the deterministic fixes are safe; commit the complete intended batch.
-4. Run or reuse `npm run quality:agent:publish`; when repository hooks are installed, the versioned pre-push hook calls the same proof-aware wrapper automatically.
+4. Run or reuse `npm run quality:agent:publish`; when repository hooks are installed, the versioned pre-push hook calls the same proof-aware wrapper automatically. For a local-only merge justification or quota outage, capture `npm run quality:agent:publish -- --status` after the successful pass so the PR records the exact HEAD/base/toolchain evidence without rerunning the gate.
 5. When hooks are unavailable, or for an API-only mutation path with an executable checkout, explicitly run `npm run quality:agent:publish` until it succeeds before publishing.
 6. Fix every non-auto-fixable formatter, linter, YAML, workflow, configuration, unit/contract, type, executable-bit, destructive-diff, or security-check failure caused by the change.
 7. Verify `git status --short` is empty after the strict publication gate, then publish through a pull request.

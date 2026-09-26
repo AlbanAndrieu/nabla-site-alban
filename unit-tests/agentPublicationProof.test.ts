@@ -29,6 +29,48 @@ async function makeExecutable(pathname: string, content: string) {
 	await chmod(pathname, 0o755);
 }
 
+test("publication proof refuses protected and detached branches before running tools", async () => {
+	const cwd = await mkdtemp(path.join(os.tmpdir(), "nabla-publish-branch-"));
+	try {
+		await git(cwd, "init");
+		await git(cwd, "config", "user.email", "publish-branch@example.invalid");
+		await git(cwd, "config", "user.name", "Publish Branch Guard Test");
+		await writeFile(path.join(cwd, "README.md"), "base\n");
+		await git(cwd, "add", "README.md");
+		await git(cwd, "commit", "-m", "base");
+		await git(cwd, "branch", "-M", "master");
+
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_PROTECTED_BRANCH",
+						),
+				),
+		);
+
+		await git(cwd, "checkout", "--detach");
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_DETACHED_HEAD",
+						),
+				),
+		);
+	} finally {
+		await rm(cwd, { recursive: true, force: true });
+	}
+});
+
 test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates on changes", async () => {
 	const cwd = await mkdtemp(path.join(os.tmpdir(), "nabla-publish-proof-"));
 	try {
@@ -55,13 +97,14 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			"scripts/ci-scope.sh",
 		);
 		await git(cwd, "commit", "-m", "head");
+		await git(cwd, "switch", "-c", "test/agent-publication");
 
 		const counter = path.join(cwd, ".git", "gate-count.txt");
 		const bin = path.join(cwd, ".git", "fake-bin");
 		await mkdir(bin);
 		for (const [name, version] of [
 			["node", "v26.8.2"],
-			["python3", "Python 3.13.15"],
+			["python3", "Python 3.12.10"],
 			["pre-commit", "pre-commit 4.6.2"],
 		] as const) {
 			await makeExecutable(
@@ -82,10 +125,42 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			QUALITY_TEST_BUILD_COUNTER: buildCounter,
 		};
 
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd, env }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_PROOF_MISSING",
+						),
+				),
+		);
+
 		const first = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(first.stdout, /Next build intentionally skipped/);
 		assert.match(first.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
 		await assert.rejects(readFile(buildCounter, "utf8"));
+		const status = await execFileAsync("bash", [SCRIPT, "--status"], {
+			cwd,
+			env,
+		});
+		assert.match(status.stdout, /QG_PUBLISH_PROOF_OK/);
+		assert.match(
+			status.stdout,
+			new RegExp(`head=${await git(cwd, "rev-parse", "HEAD")}`),
+		);
+		assert.match(
+			status.stdout,
+			new RegExp(`base=${await git(cwd, "rev-parse", "HEAD~1")}`),
+		);
+		assert.match(status.stdout, /toolchain_sha=[0-9a-f]{64}/);
+		assert.match(status.stdout, /node=v26\.8\.2/);
+		assert.match(status.stdout, /npm=11\.17\.0/);
+		assert.match(status.stdout, /python=Python 3\.12\.10/);
+		assert.match(status.stdout, /pre-commit=pre-commit 4\.6\.2/);
+
 		const second = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(second.stdout, /QG_PUBLISH_PROOF_REUSED/);
 		assert.equal(
@@ -156,6 +231,18 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 
 		await git(cwd, "add", "README.md");
 		await git(cwd, "commit", "-m", "new-head");
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--status"], { cwd, env }),
+			(error: unknown) =>
+				Boolean(
+					error &&
+						typeof error === "object" &&
+						"stderr" in error &&
+						String((error as { stderr: unknown }).stderr).includes(
+							"QG_PUBLISH_PROOF_STALE",
+						),
+				),
+		);
 		const third = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(third.stdout, /QG_PUBLISH_PROOF_WRITTEN/);
 		assert.equal(

@@ -104,3 +104,34 @@ The authoritative migration design lives in `nabla-compose`:
 
 Site Alban should follow those contracts rather than inventing a consumer-specific
 catalog schema.
+
+## Site v2 implementation status
+
+The active PR now contains an isolated v2 consumer contract in
+`lib/homelabCatalogV2.ts`.
+
+It accepts only the canonical generated shape:
+
+```json
+{
+  "schemaVersion": 2,
+  "model": "backstage",
+  "catalogRevision": "sha256:...",
+  "entities": []
+}
+```
+
+The corresponding `CatalogV2ServiceView` derives service presentation from
+Backstage entity metadata:
+
+- canonical identity from `entityRef` and `metadata.name`;
+- display name/description from Backstage metadata;
+- technical type and lifecycle from `spec`;
+- category and NIST CSF functions from tags;
+- operational/business criticality from qualified labels;
+- source provenance from `sourcePath`.
+
+This parser is deliberately **not wired to production yet**. FastAPI must first
+publish the same v2 read-model and `catalogRevision`; then the existing v1
+loaders are replaced in one coordinated cutover rather than retained as a dual
+reader.

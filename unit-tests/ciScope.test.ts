@@ -37,6 +37,10 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 			path.join(cwd, "scripts/agent-quality-gate.sh"),
 			"#!/usr/bin/env bash\necho maintenance\n",
 		);
+		await writeFile(
+			path.join(cwd, "scripts/agent-doctor.sh"),
+			"#!/usr/bin/env bash\necho doctor\n",
+		);
 		const maintenanceHead = await commitAll(cwd, "maintenance");
 		const maintenance = await execFileAsync(
 			"bash",
@@ -122,6 +126,45 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		assert.match(classifier.stdout, /preview_required=false/);
 		assert.match(classifier.stdout, /zap_bootstrap=false/);
 
+		await writeFile(
+			path.join(cwd, "scripts/manage-master-ruleset.sh"),
+			"#!/usr/bin/env bash\necho ruleset\n",
+		);
+		const rulesetToolHead = await commitAll(cwd, "ruleset tool");
+		const rulesetTool = await execFileAsync(
+			"bash",
+			[SCRIPT, classifierHead, rulesetToolHead],
+			{ cwd },
+		);
+		assert.match(rulesetTool.stdout, /maintenance_only=false/);
+		assert.match(rulesetTool.stdout, /application=false/);
+		assert.match(rulesetTool.stdout, /sast=true/);
+		assert.match(rulesetTool.stdout, /build=false/);
+		assert.match(rulesetTool.stdout, /preview_required=false/);
+		assert.match(rulesetTool.stdout, /zap_bootstrap=false/);
+
+		await mkdir(path.join(cwd, ".opencode/prompts"), { recursive: true });
+		await writeFile(
+			path.join(cwd, ".opencode/prompts/repository-build.txt"),
+			"small model instructions\n",
+		);
+		await writeFile(
+			path.join(cwd, "opencode.json"),
+			'{"$schema":"https://opencode.ai/config.json"}\n',
+		);
+		const opencodeHead = await commitAll(cwd, "opencode policy");
+		const opencode = await execFileAsync(
+			"bash",
+			[SCRIPT, rulesetToolHead, opencodeHead],
+			{ cwd },
+		);
+		assert.match(opencode.stdout, /maintenance_only=false/);
+		assert.match(opencode.stdout, /application=false/);
+		assert.match(opencode.stdout, /sast=true/);
+		assert.match(opencode.stdout, /build=false/);
+		assert.match(opencode.stdout, /preview_required=false/);
+		assert.match(opencode.stdout, /zap_bootstrap=false/);
+
 		await mkdir(path.join(cwd, "app"), { recursive: true });
 		await writeFile(
 			path.join(cwd, "app/page.tsx"),
@@ -130,7 +173,7 @@ test("CI scope classifier only skips application work for narrow agent/quality m
 		const applicationHead = await commitAll(cwd, "application");
 		const application = await execFileAsync(
 			"bash",
-			[SCRIPT, classifierHead, applicationHead],
+			[SCRIPT, opencodeHead, applicationHead],
 			{ cwd },
 		);
 		assert.match(application.stdout, /maintenance_only=false/);
