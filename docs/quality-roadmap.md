@@ -641,11 +641,19 @@ Autres contrôles :
 
 - [ ] Organiser la page autour d'une architecture Secure AI : identité/RBAC,
   LiteLLM gateway, inference locale/distante, PII/secrets, MCP, RAG,
-  observabilité, FinOps et gouvernance.
-- [ ] Réutiliser les données/topologies déjà présentes plutôt que créer un second
-  catalogue statique spécifique à la page AI.
-- [ ] Conserver les catalogues d'outils comme contenu secondaire et non comme
-  structure principale.
+  observabilité, FinOps et gouvernance. Le socle existe déjà via
+  `AiSecurePlatformOverview` et `AiHomelabArchitecture`; poursuivre avec les
+  contrôles PII/secrets, FinOps et gouvernance normative avant de fermer ce point.
+- [x] Réutiliser les données/topologies déjà présentes plutôt que créer un second
+  catalogue statique spécifique à la page AI. La page AI dérive désormais ses
+  six couches depuis `AI_ENTITIES` de
+  `app/[locale]/architecture/architectureData.ts` ; les noms Open WebUI,
+  LiteLLM, Ollama, outils, workflows et observabilité ne sont plus recopiés dans
+  `AiHomelabArchitecture`. Un contrat verrouille aussi le chemin
+  `Open WebUI → LiteLLM → Ollama`.
+- [x] Conserver les catalogues d'outils comme contenu secondaire et non comme
+  structure principale. L'ordre rendu et le guide placent maintenant Secure AI,
+  architecture et observabilité avant workflow, outils et catalogue de ressources.
 - [ ] Relier explicitement les choix de plateforme à ISO 27001, ISO 42001 et aux
   contraintes GDPR lorsque pertinent.
 
