@@ -6,14 +6,16 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("priority keyboard surfaces expose visible focus contracts", async () => {
-	const [theme, routeHeader, policy, action, contact, e2e] = await Promise.all([
-		read("public/theme.css"),
-		read("components/RouteHeader.module.css"),
-		read("app/[locale]/policy/page.module.css"),
-		read("components/ui/Action.module.css"),
-		read("app/[locale]/contact/page.tsx"),
-		read("tests/accessibility-keyboard.spec.ts"),
-	]);
+	const [theme, routeHeader, policy, action, layout, contact, e2e] =
+		await Promise.all([
+			read("public/theme.css"),
+			read("components/RouteHeader.module.css"),
+			read("app/[locale]/policy/page.module.css"),
+			read("components/ui/Action.module.css"),
+			read("app/[locale]/layout.tsx"),
+			read("app/[locale]/contact/page.tsx"),
+			read("tests/accessibility-keyboard.spec.ts"),
+		]);
 
 	assert.match(
 		theme,
@@ -32,7 +34,10 @@ test("priority keyboard surfaces expose visible focus contracts", async () => {
 		/\.action:focus-visible\s*{[^}]*outline:\s*3px solid var\(--ui-focus-ring\)/s,
 	);
 
-	assert.match(contact, /<SkipToMainContent \/>/);
+	const skipIndex = layout.indexOf("<SkipToMainContent />");
+	const headerIndex = layout.indexOf("<RouteHeader />");
+	assert.ok(skipIndex >= 0 && skipIndex < headerIndex);
+	assert.doesNotMatch(contact, /SkipToMainContent/);
 	assert.match(contact, /<main\s+id="main-content"/);
 
 	for (const route of ["/", "/contact", "/fr/contact", "/policy"]) {
