@@ -58,7 +58,7 @@ test.describe("Keyboard focus visibility", () => {
 
 			const localeSelect = page.locator("#route-header-locale");
 			await expect(localeSelect).toBeVisible();
-			await tabUntilFocused(page, localeSelect, 10);
+			await tabUntilFocused(page, localeSelect, 40);
 			await expect(localeSelect).toBeFocused();
 			await expectVisibleFocus(localeSelect);
 

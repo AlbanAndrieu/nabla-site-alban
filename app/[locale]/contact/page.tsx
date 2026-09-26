@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ContactHero from "@/components/ContactHero";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import ActionLink, { actionClassName } from "@/components/ui/ActionLink";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { routing } from "@/i18n/routing";
@@ -81,211 +82,214 @@ export default async function ContactPage({
 	setRequestLocale(locale);
 	const t = await getTranslations("contactPage");
 	return (
-		<main
-			id="main-content"
-			className="site-content-page page-contact page-dark"
-		>
-			<span id="top" />
-			<ContactHero
-				contactCta={t("hero.contactCta")}
-				contactHref="#contact-details"
-				cvCta={t("hero.cvCta")}
-				cvHref={canonicalPagePath("cv", locale)}
-				experience={t("hero.experience")}
-				intro={t("intro")}
-				profileAlt={t("hero.profileAlt")}
-				role={t("role")}
-			/>
-			<section className="contact-section container" id="contact-details">
-				<h2 className="section-title">{t("information.title")}</h2>
-				<p className="section-subtitle">{t("information.subtitle")}</p>
-				<div className="contact-methods">
-					<a
-						className="contact-method"
-						href={canonicalPagePath("contact", locale)}
-					>
-						<Image
-							src="/assets/nabla/signature/qr_albanandrieu_contact_logo.png"
-							width={120}
-							height={120}
-							alt={t("allInfoAlt")}
-						/>
-						<div className="contact-info">
-							<h3>{t("allInfo")}</h3>
-						</div>
-					</a>
-					<a
-						className="contact-method"
-						href="mailto:job@albandrieu.com?Subject=DevSecOps%20Inquiry"
-					>
-						<div className="contact-icon">
-							<i className="fas fa-envelope" />
-						</div>
-						<div className="contact-info">
-							<h3>{t("methods.email.title")}</h3>
-							<p>{t("methods.email.value")}</p>
-						</div>
-					</a>
-					<div className="contact-method">
-						<div className="contact-icon">
-							<i className="fas fa-phone" />
-						</div>
-						<div className="contact-info">
-							<h3>{t("methods.phone.title")}</h3>
-							<p>{t("methods.phone.value")}</p>
-						</div>
-					</div>
-					<ExternalLink
-						className="contact-method"
-						href="https://calendly.com/alban-andrieu"
-					>
-						<div className="contact-icon">
-							<i className="fas fa-calendar-plus" />
-						</div>
-						<div className="contact-info">
-							<h3>{t("methods.calendar.title")}</h3>
-							<p>{t("methods.calendar.value")}</p>
-						</div>
-					</ExternalLink>
-				</div>
-			</section>
-			<section className="proof-section container">
-				<h2 className="section-title">{t("cv.title")}</h2>
-				<p>{t("cv.description")}</p>
-				<div className="cv-page-links">
-					<ActionLink href={`/${locale}/cv`}>{t("cv.cta")}</ActionLink>
-					{["full", "medium", "small"].map((size) => (
-						<ActionLink
-							href={`/cv/cv-${size}-${locale}.html`}
-							target="_blank"
-							key={size}
-							rel="noopener"
-							variant="outline"
-						>
-							{t(`cv.${size}`)}
-						</ActionLink>
-					))}
-				</div>
-				<ExternalLink
-					className="cv-page-qr"
-					href="https://www.linkedin.com/in/nabla/"
-				>
-					<Image
-						src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
-						width={954}
-						height={996}
-						alt={t("linkedinQrAlt")}
-						style={{ width: 120, height: "auto" }}
-					/>
-					<strong>LinkedIn</strong>
-				</ExternalLink>
-			</section>
-			<section className="contact-section container">
-				<h2 className="section-title">{t("social.title")}</h2>
-				<p className="section-subtitle">{t("social.subtitle")}</p>
-				<div className="contact-methods">
-					{socials.map(([key, name, href, icon]) => (
+		<>
+			<SkipToMainContent />
+			<main
+				id="main-content"
+				className="site-content-page page-contact page-dark"
+			>
+				<span id="top" />
+				<ContactHero
+					contactCta={t("hero.contactCta")}
+					contactHref="#contact-details"
+					cvCta={t("hero.cvCta")}
+					cvHref={canonicalPagePath("cv", locale)}
+					experience={t("hero.experience")}
+					intro={t("intro")}
+					profileAlt={t("hero.profileAlt")}
+					role={t("role")}
+				/>
+				<section className="contact-section container" id="contact-details">
+					<h2 className="section-title">{t("information.title")}</h2>
+					<p className="section-subtitle">{t("information.subtitle")}</p>
+					<div className="contact-methods">
 						<a
 							className="contact-method"
-							href={href}
-							target={href.startsWith("http") ? "_blank" : undefined}
-							rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-							key={key}
+							href={canonicalPagePath("contact", locale)}
 						>
-							<div className="contact-icon">
-								<i className={icon} />
-							</div>
+							<Image
+								src="/assets/nabla/signature/qr_albanandrieu_contact_logo.png"
+								width={120}
+								height={120}
+								alt={t("allInfoAlt")}
+							/>
 							<div className="contact-info">
-								<h3>{name}</h3>
-								<p>{t(`social.channels.${key}`)}</p>
+								<h3>{t("allInfo")}</h3>
 							</div>
 						</a>
-					))}
-				</div>
-			</section>
-			<section className="contact-section container">
-				<article
-					className="location-section"
-					id="location"
-					itemScope
-					itemType="https://schema.org/PostalAddress"
-				>
-					<h2 className="section-title">{t("location.title")}</h2>
-					<p className="location-address">
-						<i className="fas fa-map-marker-alt" aria-hidden="true" />{" "}
-						<span itemProp="streetAddress">{t("location.district")}</span> ·{" "}
-						<span itemProp="postalCode">92800</span>{" "}
-						<span itemProp="addressLocality">Puteaux</span> ·{" "}
-						<span itemProp="addressRegion">Île-de-France</span>,{" "}
-						<span itemProp="addressCountry">France</span>
-					</p>
-					<p>{t("location.description")}</p>
-					<div className="map-container">
-						<iframe
-							title={t("location.mapTitle")}
-							src="https://www.openstreetmap.org/export/embed.html?bbox=2.135%2C48.845%2C2.285%2C48.93&layer=mapnik&marker=48.8919%2C2.238"
-							loading="lazy"
-						/>
+						<a
+							className="contact-method"
+							href="mailto:job@albandrieu.com?Subject=DevSecOps%20Inquiry"
+						>
+							<div className="contact-icon">
+								<i className="fas fa-envelope" />
+							</div>
+							<div className="contact-info">
+								<h3>{t("methods.email.title")}</h3>
+								<p>{t("methods.email.value")}</p>
+							</div>
+						</a>
+						<div className="contact-method">
+							<div className="contact-icon">
+								<i className="fas fa-phone" />
+							</div>
+							<div className="contact-info">
+								<h3>{t("methods.phone.title")}</h3>
+								<p>{t("methods.phone.value")}</p>
+							</div>
+						</div>
+						<ExternalLink
+							className="contact-method"
+							href="https://calendly.com/alban-andrieu"
+						>
+							<div className="contact-icon">
+								<i className="fas fa-calendar-plus" />
+							</div>
+							<div className="contact-info">
+								<h3>{t("methods.calendar.title")}</h3>
+								<p>{t("methods.calendar.value")}</p>
+							</div>
+						</ExternalLink>
 					</div>
-					<p className="contact-map-caption">
-						{t("location.caption")}{" "}
-						<ExternalLink href="https://www.openstreetmap.org/copyright">
-							OpenStreetMap
-						</ExternalLink>{" "}
-						{t("location.contributors")}
-					</p>
-				</article>
-				<article className="contact-open-source">
-					<h2 className="section-title">{t("opensource.title")}</h2>
-					<p className="section-subtitle">{t("opensource.description")}</p>
+				</section>
+				<section className="proof-section container">
+					<h2 className="section-title">{t("cv.title")}</h2>
+					<p>{t("cv.description")}</p>
 					<div className="cv-page-links">
-						<ExternalLink
-							className={actionClassName("primary")}
-							href="https://github.com/AlbanAndrieu/nabla-site-alban"
-						>
-							<i className="fab fa-github" /> {t("opensource.site")}
-						</ExternalLink>
-						<ExternalLink
-							className={actionClassName("outline")}
-							href="https://github.com/AlbanAndrieu"
-						>
-							<i className="fab fa-github" /> {t("opensource.all")}
-						</ExternalLink>
-					</div>
-					<div className="contact-github-badges">
-						<iframe
-							src="https://ghbtns.com/github-btn.html?user=AlbanAndrieu&repo=nabla-site-alban&type=watch&count=true"
-							title={t("opensource.stars")}
-							width="110"
-							height="20"
-						/>
-						<iframe
-							src="https://ghbtns.com/github-btn.html?user=AlbanAndrieu&repo=nabla-site-alban&type=fork&count=true"
-							title={t("opensource.forks")}
-							width="95"
-							height="20"
-						/>
-						<iframe
-							src="https://github.com/sponsors/AlbanAndrieu/button"
-							title={t("opensource.sponsor")}
-							width="114"
-							height="32"
-						/>
+						<ActionLink href={`/${locale}/cv`}>{t("cv.cta")}</ActionLink>
+						{["full", "medium", "small"].map((size) => (
+							<ActionLink
+								href={`/cv/cv-${size}-${locale}.html`}
+								target="_blank"
+								key={size}
+								rel="noopener"
+								variant="outline"
+							>
+								{t(`cv.${size}`)}
+							</ActionLink>
+						))}
 					</div>
 					<ExternalLink
-						className="contact-stack-badge"
-						href="https://stackexchange.com/users/4652074/albanandrieu"
+						className="cv-page-qr"
+						href="https://www.linkedin.com/in/nabla/"
 					>
 						<Image
-							src="https://stackexchange.com/users/flair/4652074.png"
-							width={208}
-							height={58}
-							alt={t("opensource.stackAlt")}
-							unoptimized
+							src="/assets/nabla/signature/qr-code-linkedin-nabla.jpg"
+							width={954}
+							height={996}
+							alt={t("linkedinQrAlt")}
+							style={{ width: 120, height: "auto" }}
 						/>
+						<strong>LinkedIn</strong>
 					</ExternalLink>
-				</article>
-			</section>
-		</main>
+				</section>
+				<section className="contact-section container">
+					<h2 className="section-title">{t("social.title")}</h2>
+					<p className="section-subtitle">{t("social.subtitle")}</p>
+					<div className="contact-methods">
+						{socials.map(([key, name, href, icon]) => (
+							<a
+								className="contact-method"
+								href={href}
+								target={href.startsWith("http") ? "_blank" : undefined}
+								rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+								key={key}
+							>
+								<div className="contact-icon">
+									<i className={icon} />
+								</div>
+								<div className="contact-info">
+									<h3>{name}</h3>
+									<p>{t(`social.channels.${key}`)}</p>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+				<section className="contact-section container">
+					<article
+						className="location-section"
+						id="location"
+						itemScope
+						itemType="https://schema.org/PostalAddress"
+					>
+						<h2 className="section-title">{t("location.title")}</h2>
+						<p className="location-address">
+							<i className="fas fa-map-marker-alt" aria-hidden="true" />{" "}
+							<span itemProp="streetAddress">{t("location.district")}</span> ·{" "}
+							<span itemProp="postalCode">92800</span>{" "}
+							<span itemProp="addressLocality">Puteaux</span> ·{" "}
+							<span itemProp="addressRegion">Île-de-France</span>,{" "}
+							<span itemProp="addressCountry">France</span>
+						</p>
+						<p>{t("location.description")}</p>
+						<div className="map-container">
+							<iframe
+								title={t("location.mapTitle")}
+								src="https://www.openstreetmap.org/export/embed.html?bbox=2.135%2C48.845%2C2.285%2C48.93&layer=mapnik&marker=48.8919%2C2.238"
+								loading="lazy"
+							/>
+						</div>
+						<p className="contact-map-caption">
+							{t("location.caption")}{" "}
+							<ExternalLink href="https://www.openstreetmap.org/copyright">
+								OpenStreetMap
+							</ExternalLink>{" "}
+							{t("location.contributors")}
+						</p>
+					</article>
+					<article className="contact-open-source">
+						<h2 className="section-title">{t("opensource.title")}</h2>
+						<p className="section-subtitle">{t("opensource.description")}</p>
+						<div className="cv-page-links">
+							<ExternalLink
+								className={actionClassName("primary")}
+								href="https://github.com/AlbanAndrieu/nabla-site-alban"
+							>
+								<i className="fab fa-github" /> {t("opensource.site")}
+							</ExternalLink>
+							<ExternalLink
+								className={actionClassName("outline")}
+								href="https://github.com/AlbanAndrieu"
+							>
+								<i className="fab fa-github" /> {t("opensource.all")}
+							</ExternalLink>
+						</div>
+						<div className="contact-github-badges">
+							<iframe
+								src="https://ghbtns.com/github-btn.html?user=AlbanAndrieu&repo=nabla-site-alban&type=watch&count=true"
+								title={t("opensource.stars")}
+								width="110"
+								height="20"
+							/>
+							<iframe
+								src="https://ghbtns.com/github-btn.html?user=AlbanAndrieu&repo=nabla-site-alban&type=fork&count=true"
+								title={t("opensource.forks")}
+								width="95"
+								height="20"
+							/>
+							<iframe
+								src="https://github.com/sponsors/AlbanAndrieu/button"
+								title={t("opensource.sponsor")}
+								width="114"
+								height="32"
+							/>
+						</div>
+						<ExternalLink
+							className="contact-stack-badge"
+							href="https://stackexchange.com/users/4652074/albanandrieu"
+						>
+							<Image
+								src="https://stackexchange.com/users/flair/4652074.png"
+								width={208}
+								height={58}
+								alt={t("opensource.stackAlt")}
+								unoptimized
+							/>
+						</ExternalLink>
+					</article>
+				</section>
+			</main>
+		</>
 	);
 }
