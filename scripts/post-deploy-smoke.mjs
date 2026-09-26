@@ -152,7 +152,12 @@ function metaContent(html, name) {
 	return null;
 }
 
-async function fetchResponse(baseUrl, pathname, accept) {
+async function fetchResponse(
+	baseUrl,
+	pathname,
+	accept,
+	allowedFinalStatuses = new Set(),
+) {
 	const target = new URL(pathname, baseUrl);
 	assertCondition(
 		target.origin === CANONICAL_ORIGIN,
@@ -206,7 +211,16 @@ async function fetchResponse(baseUrl, pathname, accept) {
 						? " with redirect to " + new URL(location, target).origin
 						: ""),
 			);
-			if (!RETRYABLE_STATUSES.has(response.status)) break;
+			if (!RETRYABLE_STATUSES.has(response.status)) {
+				if (allowedFinalStatuses.has(response.status)) return response;
+				break;
+			}
+			if (
+				attempt === FETCH_ATTEMPTS &&
+				allowedFinalStatuses.has(response.status)
+			) {
+				return response;
+			}
 		} catch (error) {
 			lastError = error instanceof Error ? error : new Error(String(error));
 		}
@@ -383,15 +397,61 @@ async function checkRobots(baseUrl) {
 	console.log("PASS robots.txt");
 }
 
-async function checkHomelabStatus(baseUrl) {
+export async function checkHomelabStatus(baseUrl) {
 	const response = await fetchResponse(
 		baseUrl,
 		"/api/homelab-status",
 		"application/json",
+		new Set([503]),
 	);
 	assertContentType(response, "/api/homelab-status", ["application/json"]);
+
+	const source = response.headers.get("x-homelab-status-source");
+	if (response.status === 503) {
+		assertCondition(
+			source === "unavailable",
+			"/api/homelab-status 503 must expose source=unavailable",
+		);
+		assertCondition(
+			(response.headers.get("cache-control") ?? "")
+				.toLowerCase()
+				.includes("no-store"),
+			"/api/homelab-status 503 must be non-cacheable",
+		);
+		const primary = response.headers.get("x-homelab-status-primary");
+		assertCondition(
+			Boolean(primary),
+			"/api/homelab-status 503 is missing the primary upstream URL",
+		);
+		let primaryUrl;
+		try {
+			primaryUrl = new URL(primary);
+		} catch {
+			throw new Error(
+				"/api/homelab-status 503 exposes an invalid primary upstream URL",
+			);
+		}
+		assertCondition(
+			primaryUrl.protocol === "https:",
+			"/api/homelab-status production upstream must use HTTPS",
+		);
+		const payload = await response.json();
+		assertCondition(
+			payload &&
+				typeof payload === "object" &&
+				payload.error === "FastAPI homelab status unavailable",
+			"/api/homelab-status 503 returned an unexpected degraded payload",
+		);
+		console.warn(
+			"WARN /api/homelab-status degraded: FastAPI upstream unavailable (" +
+				primary +
+				")",
+		);
+		return;
+	}
+
 	assertCondition(
-		response.headers.get("x-homelab-status-source") === "fastapi",
+		source === "fastapi",
 		"/api/homelab-status is not backed by the FastAPI source",
 	);
 
