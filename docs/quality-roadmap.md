@@ -368,6 +368,16 @@ les autres chantiers.
   publique et prouve via `/api/deployment` le SHA Vercel
   `7e0a0e880cbc4acb1d83505352b6d09b017c4569`. Il valide également canonical,
   hreflang EN/FR/`x-default`, sitemap et robots sur les routes couvertes.
+  Le follow-up #197 distingue désormais disponibilité du site et disponibilité
+  de l'observateur FastAPI homelab : après les trois retries normaux, un HTTP 503
+  de `/api/homelab-status` n'est accepté que si le proxy expose exactement son
+  contrat de dégradation (`source=unavailable`, `Cache-Control: no-store`,
+  upstream HTTPS identifié et payload
+  `FastAPI homelab status unavailable`). Le run Quality/Security #1291 a motivé
+  ce durcissement : production, sitemap et robots étaient sains, tandis que
+  FastAPI avait dépassé le timeout à trois reprises. Un 200 continue d'exiger le
+  snapshot FastAPI structuré et tout autre 503/mode dégradé mal formé reste
+  bloquant.
 
 ## P1 — Architecture et homelab runtime
 

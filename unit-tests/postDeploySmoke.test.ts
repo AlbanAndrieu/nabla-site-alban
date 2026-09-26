@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+	checkHomelabStatus,
 	decodeHtmlAttributeValue,
 	runProductionSmoke,
 } from "../scripts/post-deploy-smoke.mjs";
@@ -309,6 +310,64 @@ test("production smoke validates pages, homelab API and social cards", async () 
 	assert.ok(requests.includes("/api/homelab-status"));
 	assert.ok(requests.includes("/api/social-card?title=Smoke&locale=en"));
 	assert.ok(requests.includes("/api/social-card?title=Smoke&locale=fr"));
+});
+
+test("homelab smoke accepts only the explicit degraded 503 contract after retries", async () => {
+	const originalFetch = globalThis.fetch;
+	let attempts = 0;
+
+	globalThis.fetch = (async () => {
+		attempts += 1;
+		return new Response(
+			JSON.stringify({ error: "FastAPI homelab status unavailable" }),
+			{
+				status: 503,
+				headers: {
+					"cache-control": "no-store",
+					"content-type": "application/json",
+					"x-homelab-status-primary":
+						"https://fastapi-sample.fastapicloud.dev/api/homelab/status",
+					"x-homelab-status-source": "unavailable",
+				},
+			},
+		);
+	}) as typeof fetch;
+
+	try {
+		await checkHomelabStatus(ORIGIN);
+	} finally {
+		globalThis.fetch = originalFetch;
+	}
+
+	assert.equal(attempts, 3);
+});
+
+test("homelab smoke rejects malformed degraded 503 responses", async () => {
+	const originalFetch = globalThis.fetch;
+
+	globalThis.fetch = (async () =>
+		new Response(
+			JSON.stringify({ error: "FastAPI homelab status unavailable" }),
+			{
+				status: 503,
+				headers: {
+					"cache-control": "no-store",
+					"content-type": "application/json",
+					"x-homelab-status-primary":
+						"https://fastapi-sample.fastapicloud.dev/api/homelab/status",
+					"x-homelab-status-source": "fastapi",
+				},
+			},
+		)) as typeof fetch;
+
+	try {
+		await assert.rejects(
+			checkHomelabStatus(ORIGIN),
+			/503 must expose source=unavailable/,
+		);
+	} finally {
+		globalThis.fetch = originalFetch;
+	}
 });
 
 test("production smoke rejects non-canonical targets", async () => {
