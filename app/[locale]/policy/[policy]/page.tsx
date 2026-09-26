@@ -35,14 +35,18 @@ function localizedPolicyPath(policy: PolicyPageSlug, locale: AppLocale) {
 
 function localizedPolicyAlternates(policy: PolicyPageSlug) {
 	return Object.fromEntries(
-		routing.locales.map((locale) => [locale, localizedPolicyPath(policy, locale)]),
+		routing.locales.map((locale) => [
+			locale,
+			localizedPolicyPath(policy, locale),
+		]),
 	);
 }
 
 function getNativePolicyCopy(policy: PolicyPageSlug, locale: AppLocale) {
 	if (policy === "privacy_policy") return getPrivacyPolicyCopy(locale);
 	if (policy === "service_terms") return getServiceTermsCopy(locale);
-	if (policy === "legal" || policy === "impressum") return getLegalPolicyCopy(policy, locale);
+	if (policy === "legal" || policy === "impressum")
+		return getLegalPolicyCopy(policy, locale);
 	return getPublicPolicyCopy(policy, locale);
 }
 
@@ -50,8 +54,10 @@ function NativePolicyContent({
 	policy,
 	locale,
 }: Readonly<{ policy: PolicyPageSlug; locale: AppLocale }>) {
-	if (policy === "privacy_policy") return <PrivacyPolicyContent locale={locale} />;
-	if (policy === "service_terms") return <ServiceTermsContent locale={locale} />;
+	if (policy === "privacy_policy")
+		return <PrivacyPolicyContent locale={locale} />;
+	if (policy === "service_terms")
+		return <ServiceTermsContent locale={locale} />;
 	if (policy === "legal" || policy === "impressum") {
 		return <LegalPolicyContent locale={locale} policy={policy} />;
 	}
@@ -62,7 +68,8 @@ export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/policy/[policy]">): Promise<Metadata> {
 	const { locale, policy } = await params;
-	if (!hasLocale(routing.locales, locale) || !isPolicyPageSlug(policy)) return {};
+	if (!hasLocale(routing.locales, locale) || !isPolicyPageSlug(policy))
+		return {};
 
 	const page = getPolicyPage(policy);
 	const copy = getNativePolicyCopy(policy, locale);
@@ -97,13 +104,18 @@ export default async function PolicyPage({
 	params,
 }: PageProps<"/[locale]/policy/[policy]">) {
 	const { locale, policy } = await params;
-	if (!hasLocale(routing.locales, locale) || !isPolicyPageSlug(policy)) notFound();
+	if (!hasLocale(routing.locales, locale) || !isPolicyPageSlug(policy))
+		notFound();
 	setRequestLocale(locale);
 
 	return (
 		<>
 			<TopAnchor />
-			<main id="main-content" className="site-content-page policy-legal container py-4" lang={locale}>
+			<main
+				id="main-content"
+				className="site-content-page policy-legal container py-4"
+				lang={locale}
+			>
 				<NativePolicyContent policy={policy} locale={locale} />
 			</main>
 		</>
