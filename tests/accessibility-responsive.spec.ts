@@ -12,80 +12,65 @@ test.describe("Accessible responsive reflow", () => {
 			browserName !== "chromium",
 			"OS text-scale emulation currently uses Chromium CDP",
 		);
-
 		await page.setViewportSize({ width: 320, height: 568 });
 		await page.emulateMedia({ reducedMotion: "reduce" });
 		const cdp = await context.newCDPSession(page);
+		await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 2 });
 
-		try {
-			await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 2 });
+		for (const path of paths) {
+			await page.goto(path, { waitUntil: "domcontentloaded" });
+			await expect(page.locator("body")).toBeVisible();
 
-			for (const path of paths) {
-				await page.goto(path, { waitUntil: "domcontentloaded" });
-				await expect(page.locator("body")).toBeVisible();
-
-				const metrics = await page.evaluate(() => {
-					const maxCssTimeMs = (value: string): number =>
-						Math.max(
-							0,
-							...value.split(",").map((part) => {
-								const trimmed = part.trim();
-								if (trimmed.endsWith("ms")) {
-									return Number.parseFloat(trimmed);
-								}
-								if (trimmed.endsWith("s")) {
-									return Number.parseFloat(trimmed) * 1000;
-								}
-								return 0;
-							}),
-						);
-					const motionTarget = document.querySelector(
-						'a[href="#contact-details"], footer a.social-link',
+			const metrics = await page.evaluate(() => {
+				const maxCssTimeMs = (value: string): number =>
+					Math.max(
+						0,
+						...value.split(",").map((part) => {
+							const trimmed = part.trim();
+							if (trimmed.endsWith("ms")) return Number.parseFloat(trimmed);
+							if (trimmed.endsWith("s")) return Number.parseFloat(trimmed) * 1000;
+							return 0;
+						}),
 					);
-					const motionStyles = motionTarget
-						? window.getComputedStyle(motionTarget)
-						: null;
-
-					return {
-						clientWidth: document.documentElement.clientWidth,
-						hasHorizontalScroll:
-							document.documentElement.scrollWidth >
-							document.documentElement.clientWidth,
-						rootFontSize: Number.parseFloat(
-							window.getComputedStyle(document.documentElement).fontSize,
-						),
-						scrollBehavior: window.getComputedStyle(document.documentElement)
-							.scrollBehavior,
-						transitionDurationMs: motionStyles
-							? maxCssTimeMs(motionStyles.transitionDuration)
-							: 0,
-						animationDurationMs: motionStyles
-							? maxCssTimeMs(motionStyles.animationDuration)
-							: 0,
-					};
-				});
-
-				expect(
-					metrics.rootFontSize,
-					`${path} should honor 200% text sizing`,
-				).toBeGreaterThanOrEqual(32);
-				expect(
-					metrics.hasHorizontalScroll,
-					`${path} should reflow without horizontal scrolling at 200% text`,
-				).toBe(false);
-				expect(metrics.scrollBehavior).toBe("auto");
-				expect(metrics.transitionDurationMs).toBeLessThanOrEqual(0.02);
-				expect(metrics.animationDurationMs).toBeLessThanOrEqual(0.02);
-
-				const mainBox = await page.locator("main").first().boundingBox();
-				expect(mainBox?.width ?? 0).toBeLessThanOrEqual(
-					metrics.clientWidth + 1,
+				const motionTarget = document.querySelector(
+					'a[href="#contact-details"], footer a.social-link',
 				);
-				await expect(page.locator("#route-header-locale")).toBeVisible();
-			}
-		} finally {
-			await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 1 });
-			await cdp.detach();
+				const motionStyles = motionTarget
+					? window.getComputedStyle(motionTarget)
+					: null;
+				return {
+					clientWidth: document.documentElement.clientWidth,
+					hasHorizontalScroll:
+						document.documentElement.scrollWidth >
+						document.documentElement.clientWidth,
+					rootFontSize: Number.parseFloat(
+						window.getComputedStyle(document.documentElement).fontSize,
+					),
+					scrollBehavior: window.getComputedStyle(document.documentElement)
+						.scrollBehavior,
+					transitionDurationMs: motionStyles
+						? maxCssTimeMs(motionStyles.transitionDuration)
+						: 0,
+					animationDurationMs: motionStyles
+						? maxCssTimeMs(motionStyles.animationDuration)
+						: 0,
+				};
+			});
+
+			expect(metrics.rootFontSize, `${path} should honor 200% text sizing`).toBeGreaterThanOrEqual(32);
+			expect(
+				metrics.hasHorizontalScroll,
+				`${path} should reflow without horizontal scrolling at 200% text`,
+			).toBe(false);
+			expect(metrics.scrollBehavior).toBe("auto");
+			expect(metrics.transitionDurationMs).toBeLessThanOrEqual(0.02);
+			expect(metrics.animationDurationMs).toBeLessThanOrEqual(0.02);
+
+			const mainBox = await page.locator("main").first().boundingBox();
+			expect(mainBox?.width ?? 0).toBeLessThanOrEqual(metrics.clientWidth + 1);
+			await expect(page.locator("#route-header-locale")).toBeVisible();
 		}
+
+		await cdp.detach();
 	});
 });
