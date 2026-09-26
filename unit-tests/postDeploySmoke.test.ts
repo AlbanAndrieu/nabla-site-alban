@@ -75,9 +75,7 @@ function pageHtml({
 	locale,
 }: (typeof ROUTE_METADATA)[string]) {
 	const socialCard =
-		ORIGIN +
-		"/api/social-card?title=Smoke&amp;locale=" +
-		locale;
+		ORIGIN + "/api/social-card?title=Smoke&amp;locale=" + locale;
 	return `<!doctype html>
 <html>
 <head>
@@ -125,7 +123,10 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.match(workflow, /git\.ref == 'master'/);
 	assert.match(workflow, /environment == 'production'/);
 	assert.match(workflow, /BASE_URL: "https:\/\/www\.albanandrieu\.com"/);
-	assert.match(workflow, /DEPLOYED_SHA must be a full lowercase 40-character Git SHA/);
+	assert.match(
+		workflow,
+		/DEPLOYED_SHA must be a full lowercase 40-character Git SHA/,
+	);
 	assert.match(workflow, /persist-credentials: false/);
 	assert.match(workflow, /node scripts\/post-deploy-smoke\.mjs/);
 	assert.match(workflow, /Production Post-deploy Smoke/);
