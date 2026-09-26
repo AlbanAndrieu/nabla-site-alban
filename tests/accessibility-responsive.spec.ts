@@ -4,21 +4,24 @@ const paths = ["/contact", "/fr/contact", "/policy"] as const;
 
 test.describe("Accessible responsive reflow", () => {
 	test("reflows at 200% text and honors reduced motion on small mobile", async ({
+		browserName,
+		context,
 		page,
 	}) => {
+		test.skip(
+			browserName !== "chromium",
+			"OS text-scale emulation currently uses Chromium CDP",
+		);
 		await page.setViewportSize({ width: 320, height: 568 });
 		await page.emulateMedia({ reducedMotion: "reduce" });
+		const cdp = await context.newCDPSession(page);
+		await cdp.send("Emulation.setEmulatedOSTextScale", { scale: 2 });
 
 		for (const path of paths) {
 			await page.goto(path, { waitUntil: "domcontentloaded" });
 			await expect(page.locator("body")).toBeVisible();
 
 			const metrics = await page.evaluate(() => {
-				document.documentElement.style.setProperty(
-					"font-size",
-					"200%",
-					"important",
-				);
 				const maxCssTimeMs = (value: string): number =>
 					Math.max(
 						0,
@@ -67,5 +70,7 @@ test.describe("Accessible responsive reflow", () => {
 			expect(mainBox?.width ?? 0).toBeLessThanOrEqual(metrics.clientWidth + 1);
 			await expect(page.locator("#route-header-locale")).toBeVisible();
 		}
+
+		await cdp.detach();
 	});
 });
