@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Script from "next/script";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
 
@@ -22,7 +21,6 @@ export default async function CheckoutTjmPage({
 	return (
 		<div className="site-content-page">
 			<TopAnchor />
-			<SkipToMainContent />
 			<main id="main-content" className="checkout-page">
 				<section className="checkout-card">
 					<div className="checkout-stripe-buy text-md-center">
