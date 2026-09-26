@@ -40,14 +40,17 @@ test("every localized App Router page exposes exactly one main-content target", 
 			fileURLToPath(page),
 		).replaceAll("\\", "/");
 		const delegatedOwner = delegatedMainTargets.get(relativePage);
-		const target = delegatedOwner ? new URL(`../${delegatedOwner}`, import.meta.url) : page;
+		const target = delegatedOwner
+			? new URL(`../${delegatedOwner}`, import.meta.url)
+			: page;
 		const source = await readFile(target, "utf8");
 		const targets = source.match(/id="main-content"/g) ?? [];
+		const ownerLabel = delegatedOwner ? ` via ${delegatedOwner}` : "";
 
 		assert.equal(
 			targets.length,
 			1,
-			`${relativePage} must expose exactly one main-content target${delegatedOwner ? ` via ${delegatedOwner}` : ""}`,
+			`${relativePage} must expose exactly one main-content target${ownerLabel}`,
 		);
 	}
 });
