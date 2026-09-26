@@ -6,15 +6,14 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("priority keyboard surfaces expose visible focus contracts", async () => {
-	const [theme, routeHeader, policy, action, contact, e2e] =
-		await Promise.all([
-			read("public/theme.css"),
-			read("components/RouteHeader.module.css"),
-			read("app/[locale]/policy/page.module.css"),
-			read("components/ui/Action.module.css"),
-			read("app/[locale]/contact/page.tsx"),
-			read("tests/accessibility-keyboard.spec.ts"),
-		]);
+	const [theme, routeHeader, policy, action, contact, e2e] = await Promise.all([
+		read("public/theme.css"),
+		read("components/RouteHeader.module.css"),
+		read("app/[locale]/policy/page.module.css"),
+		read("components/ui/Action.module.css"),
+		read("app/[locale]/contact/page.tsx"),
+		read("tests/accessibility-keyboard.spec.ts"),
+	]);
 
 	assert.match(
 		theme,
