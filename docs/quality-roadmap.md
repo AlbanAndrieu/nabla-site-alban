@@ -377,7 +377,15 @@ les autres chantiers.
   ce durcissement : production, sitemap et robots étaient sains, tandis que
   FastAPI avait dépassé le timeout à trois reprises. Un 200 continue d'exiger le
   snapshot FastAPI structuré et tout autre 503/mode dégradé mal formé reste
-  bloquant.
+  bloquant. Pour éviter un deadlock lors de cette évolution de politique, la CI
+  exécute toujours d'abord le smoke issu du SHA de production. Le smoke candidat
+  du HEAD de PR n'est autorisé en second passage que si l'ancien smoke échoue
+  exactement sur ce 503 homelab, après preuve de toutes les pages, du SHA de
+  déploiement, du sitemap et de robots.txt, et seulement si le script smoke a
+  réellement changé dans la PR. Toute autre erreur de la baseline reste
+  immédiatement bloquante. Une fois cette politique présente sur `master`, le
+  premier smoke sait lui-même valider le mode dégradé et ce chemin de transition
+  reste dormant.
 
 ## P1 — Architecture et homelab runtime
 
