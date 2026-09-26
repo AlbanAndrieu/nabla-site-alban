@@ -26,8 +26,7 @@ async function expectVisibleFocus(target: Locator): Promise<void> {
 		const styles = window.getComputedStyle(element);
 		const rect = element.getBoundingClientRect();
 		const outlineWidth = Number.parseFloat(styles.outlineWidth) || 0;
-		const hasBoxShadow =
-			styles.boxShadow !== "none" && styles.boxShadow !== "rgba(0, 0, 0, 0) 0px 0px 0px 0px";
+		const hasBoxShadow = styles.boxShadow !== "none";
 
 		return {
 			focusVisible: element.matches(":focus-visible"),
