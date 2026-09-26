@@ -82,7 +82,35 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		ci,
 		/git show "\$\{PRODUCTION_SHA\}:scripts\/post-deploy-smoke\.mjs"/,
 	);
-	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$smoke_script"/);
+	assert.match(ci, /baseline_status="\$\{PIPESTATUS\[0\]\}"/);
+	assert.match(
+		ci,
+		/Production post-deploy smoke failed: Error: \/api\/homelab-status returned HTTP 503/,
+	);
+	assert.ok(ci.includes("PASS /api/deployment ${PRODUCTION_SHA}"));
+	assert.ok(ci.includes("PASS page /fr/contact"));
+	assert.ok(ci.includes("PASS sitemap.xml"));
+	assert.ok(ci.includes("PASS robots.txt"));
+	assert.match(
+		ci,
+		/git diff --quiet "\$PRODUCTION_SHA" "\$HEAD_SHA" -- scripts\/post-deploy-smoke\.mjs/,
+	);
+	assert.match(
+		ci,
+		/Candidate smoke checkout does not match the exact PR HEAD/,
+	);
+	assert.match(
+		ci,
+		/Candidate smoke is missing the reviewed homelab degraded-state contract/,
+	);
+	assert.match(
+		ci,
+		/DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/,
+	);
+	assert.doesNotMatch(
+		ci,
+		/continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/,
+	);
 	assert.match(ci, /path: \.next\/cache/);
 	assert.match(ci, /steps\.next-cache\.outputs\.cache-hit != 'true'/);
 });
