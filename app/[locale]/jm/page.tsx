@@ -35,10 +35,7 @@ export default async function JusmundiPage({
 }) {
 	const { locale } = await params;
 	setRequestLocale(locale);
-	const [jm, site] = await Promise.all([
-		getTranslations("jm"),
-		getTranslations("site"),
-	]);
+	const jm = await getTranslations("jm");
 	const kpis = [
 		["kpiTasksCompleted", "kpiLabels.tasksCompleted"],
 		["kpiPlatformUptime", "kpiLabels.platformUptime"],
