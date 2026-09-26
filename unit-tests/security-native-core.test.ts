@@ -13,7 +13,7 @@ const resourceSource = await readFile(
 	"utf8",
 );
 
-test("security owns its semantic main while the locale layout owns skip navigation", () => {
+test("security main relies on layout-owned skip navigation", () => {
 	assert.match(layoutSource, /<SkipToMainContent\s*\/>/);
 	assert.match(
 		pageSource,
