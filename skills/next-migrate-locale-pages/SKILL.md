@@ -75,8 +75,10 @@ Reuse existing primitives such as:
 - `AnchoredHeading`
 
 `SkipToMainContent` is owned by `app/[locale]/layout.tsx` and rendered before
-`RouteHeader`. Migrated pages must expose the `main-content` target but must
-not import, render or reimplement the skip-link themselves.
+`RouteHeader`. Migrated pages must expose exactly one `main-content` target
+but must not import, render or reimplement the skip-link themselves. When a page
+delegates its semantic main to a child component, that delegation must be
+explicitly covered by the repository main-content contract.
 
 ### Large-page component boundaries
 
