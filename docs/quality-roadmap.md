@@ -604,17 +604,24 @@ cible `main-content` stable.
 Autres contrôles :
 
 - [ ] Exécuter un audit axe complet des pages prioritaires en anglais et français.
-- [ ] Étendre la vérification du focus visible et de la navigation clavier.
-  #197 ajoute un parcours Playwright ciblé sur `/`, `/contact`,
-  `/fr/contact` et `/policy` : le clavier doit atteindre le skip-link, le
-  sélecteur de langue puis une action du contenu principal ; chaque cible doit
-  correspondre à `:focus-visible`, présenter un outline/box-shadow perceptible
-  et rester dans le viewport. Les Previews `6d724da...` puis `9727a15...`
-  ont révélé que le défaut restant était architectural : `RouteHeader` était
-  rendu par le layout **avant** les skip-links page-level. Le follow-up
-  centralise donc le skip-link dans le layout avant `RouteHeader`, supprime les
-  copies locales et adapte les contrats. Fermer ce point uniquement après
-  passage de ce nouveau modèle sur le Preview exact-SHA.
+  `axe-core` / `@axe-core/playwright` ne sont actuellement ni dépendances
+  directes ni transitives du dépôt. Ne pas introduire une dépendance non
+  verrouillée uniquement depuis un runner hébergé : ajouter axe lorsque le
+  `package-lock.json` peut être régénéré et la suite exécutée localement.
+- [x] Garantir que le skip-link global possède exactement une cible
+  `main-content` sur chaque route App Router localisée. L'audit statique des
+  30 `page.tsx` a découvert que `jm/[review]` rendait un `<main>` sans ID ;
+  #197 corrige cette route et ajoute un contrat récursif. Les 29 autres pages
+  possèdent directement leur cible ; `/login` la délègue explicitement à
+  `LoginClient`, également couvert par le contrat.
+- [x] Étendre la vérification du focus visible et de la navigation clavier.
+  #197 couvre `/`, `/contact`, `/fr/contact` et `/policy` : skip-link,
+  sélecteur de langue puis action du contenu principal doivent être atteignables
+  via `Tab`, correspondre à `:focus-visible`, présenter un ring perceptible et
+  rester dans le viewport. Les Previews intermédiaires ont révélé puis permis de
+  corriger l'ordre DOM du skip-link. Preuve finale : HEAD
+  `67f6517abb9d81af455829e1d0eb95ad57cc02cb`, Quality/Security #1300,
+  Node 24 #64, Vercel, ZAP Preview et Playwright Preview E2E tous verts.
 - [x] Vérifier `prefers-reduced-motion` pour React Flow : les arêtes animées
   deviennent statiques lorsque l'utilisateur demande une réduction des
   animations, sans perdre leur couleur, motif ni sémantique.
