@@ -53,9 +53,6 @@ export default async function JusmundiPage({
 			<link rel="stylesheet" href="/jm/jusmundi.css" precedence="page" />
 			<div className="jusmundi-page jusmundi-landing-page page-dark">
 				<span id="top" />
-				<a href="#main-content" className="skip-link">
-					{site("skipToMainContent")}
-				</a>
 				<main id="main-content" className="container py-4 pb-5">
 					<section
 						className="hero-section jusmundi-hero-compact"
