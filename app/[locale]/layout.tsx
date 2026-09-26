@@ -11,6 +11,7 @@ import {
 } from "next-intl/server";
 import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
+import SkipToMainContent from "@/components/SkipToMainContent";
 import ThemeBootstrap from "@/components/ThemeBootstrap";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata, SITE_ORIGIN } from "@/lib/socialMetadata";
@@ -114,6 +115,7 @@ export default async function LocaleLayout({
 				/>
 			</head>
 			<body>
+				<SkipToMainContent />
 				<NextIntlClientProvider locale={locale} messages={messages}>
 					<RouteHeader />
 					{children}

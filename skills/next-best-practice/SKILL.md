@@ -13,27 +13,29 @@ Garantir :
 
 ## Pattern recommandé pour le haut de page
 
-Dans chaque page Next.js/Next-Intl :
+Le skip-link global appartient désormais à `app/[locale]/layout.tsx`. Il doit être
+rendu **avant** `RouteHeader` afin d'être le premier contrôle utile du parcours
+clavier. Une page localisée ne doit ni importer ni rendre `SkipToMainContent`.
+
+Chaque page reste responsable de son ancre `#top` lorsqu'elle en a besoin et,
+surtout, de la cible sémantique :
 
 ```tsx
 import TopAnchor from "@/components/TopAnchor";
-import { getTranslations } from "next-intl/server";
 
-export default async function Page() {
-  const site = await getTranslations("site");
+export default function Page() {
   return (
     <>
       <TopAnchor />
-      <a href="#main-content" className="skip-to-main">
-        {site("skipToMainContent")}
-      </a>
-      {/* ... suite de la page ... */}
+      <main id="main-content">{/* ... */}</main>
     </>
   );
 }
 ```
 
-**Plus de `<div id="top" />` ni de "Skip to main content" codé en dur.**
+**Ne pas réintroduire de skip-link page-level, de `<div id="top" />` ou de
+"Skip to main content" codé en dur.** Le layout locale est l'unique autorité du
+skip-link pour les routes App Router localisées.
 
 ---
 
@@ -76,14 +78,16 @@ Conserver les IDs existants lorsqu'ils sont déjà publics afin de ne pas casser
 ## Procédure de migration / création
 
 1. Dans tous les fichiers de page (ex : `app/[locale]/.../page.tsx`) :
-   - remplacer tout en-tête de type `<div id="top" /> ... Skip to main content ...` par le pattern partagé ;
-   - utiliser `AnchoredHeading` pour les titres de sections partageables ;
-   - ajouter les imports absents si besoin, et rendre la fonction `async` lorsque Next-Intl serveur l'exige.
+   - supprimer tout skip-link local ou import `SkipToMainContent` : le layout locale le rend déjà ;
+   - conserver une cible unique `<main id="main-content">...`;
+   - remplacer les anciens `<div id="top" />` par `TopAnchor` lorsque l'ancre est requise ;
+   - utiliser `AnchoredHeading` pour les titres de sections partageables.
 2. Vérifier :
-   - le texte du skip-link est traduit ;
+   - le layout rend exactement un skip-link avant `RouteHeader` ;
+   - le texte du skip-link est traduit par le composant partagé ;
    - `TopAnchor` et la navigation sont fonctionnels partout ;
    - chaque permalink de section pointe vers un ID unique et stable ;
-   - le focus clavier sur le titre-permalink est visible.
+   - le focus clavier sur le skip-link et les contrôles importants est visible.
 
 ## Avantages
 

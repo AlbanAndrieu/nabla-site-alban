@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata } from "@/lib/siteMetadata";
@@ -38,7 +37,6 @@ export default async function LinkPage({
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<SkipToMainContent />
 			<nav
 				className="page-nav container py-3"
 				aria-label={t("breadcrumbLabel")}

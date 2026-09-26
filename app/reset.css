@@ -19,6 +19,10 @@
 	border: 0 solid;
 }
 
+html {
+	font-size: calc(100% * env(preferred-text-scale, 1));
+}
+
 html,
 :host {
 	line-height: 1.5;

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
@@ -36,7 +35,6 @@ export default async function StartupThanksPage({
 	return (
 		<div className="site-content-page page-dark">
 			<TopAnchor />
-			<SkipToMainContent />
 			<nav className="page-nav container py-3" aria-label="Breadcrumb">
 				<a href={homePath} className="text-decoration-none">
 					<i className="fas fa-home" aria-hidden="true"></i>{" "}

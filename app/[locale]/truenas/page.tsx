@@ -4,7 +4,6 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
-import SkipToMainContent from "@/components/SkipToMainContent";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -41,7 +40,6 @@ export default async function TruenasPage({ params }: Props) {
 	return (
 		<div className="site-content-page page-dark page-truenas">
 			<TopAnchor />
-			<SkipToMainContent />
 			<main id="main-content">
 				<HeroSection />
 				<HomeLabSection />

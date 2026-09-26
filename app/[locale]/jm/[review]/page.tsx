@@ -59,7 +59,7 @@ export default async function ReviewPage({ params }: Props) {
 	return (
 		<>
 			<link rel="stylesheet" href="/jm/jusmundi.css" precedence="page" />
-			<main className="container py-4 pb-5">
+			<main id="main-content" className="container py-4 pb-5">
 				<section
 					className="hero-section jusmundi-hero-compact"
 					aria-labelledby="hero-heading"
