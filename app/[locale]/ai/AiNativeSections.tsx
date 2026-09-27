@@ -12,10 +12,10 @@ export default function AiNativeSections() {
 		<>
 			<AiSecurePlatformOverview />
 			<AiHomelabArchitecture />
+			<AiObservability />
 			<AiWorkflowAutomation />
 			<AiGlobalTools />
 			<AiResourceCatalog />
-			<AiObservability />
 			<AiDocumentPipeline />
 			<AiEngineeringPractices />
 		</>

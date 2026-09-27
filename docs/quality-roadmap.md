@@ -639,15 +639,28 @@ Autres contrôles :
 
 ## P1 — Page AI : passer du catalogue à la preuve d'expertise
 
-- [ ] Organiser la page autour d'une architecture Secure AI : identité/RBAC,
+- [x] Organiser la page autour d'une architecture Secure AI : identité/RBAC,
   LiteLLM gateway, inference locale/distante, PII/secrets, MCP, RAG,
-  observabilité, FinOps et gouvernance.
-- [ ] Réutiliser les données/topologies déjà présentes plutôt que créer un second
-  catalogue statique spécifique à la page AI.
-- [ ] Conserver les catalogues d'outils comme contenu secondaire et non comme
-  structure principale.
-- [ ] Relier explicitement les choix de plateforme à ISO 27001, ISO 42001 et aux
-  contraintes GDPR lorsque pertinent.
+  observabilité, FinOps et gouvernance. #198 complète le socle
+  `AiSecurePlatformOverview` / `AiHomelabArchitecture` avec trois contrôles
+  opérationnels explicites : protection PII/secrets, FinOps IA et gouvernance.
+  Chaque contrôle expose objectif, preuves attendues et référentiels associés,
+  sans dupliquer l'inventaire technique détenu par `AI_ENTITIES`.
+- [x] Réutiliser les données/topologies déjà présentes plutôt que créer un second
+  catalogue statique spécifique à la page AI. La page AI dérive désormais ses
+  six couches depuis `AI_ENTITIES` de
+  `app/[locale]/architecture/architectureData.ts` ; les noms Open WebUI,
+  LiteLLM, Ollama, outils, workflows et observabilité ne sont plus recopiés dans
+  `AiHomelabArchitecture`. Un contrat verrouille aussi le chemin
+  `Open WebUI → LiteLLM → Ollama`.
+- [x] Conserver les catalogues d'outils comme contenu secondaire et non comme
+  structure principale. L'ordre rendu et le guide placent maintenant Secure AI,
+  architecture et observabilité avant workflow, outils et catalogue de ressources.
+- [x] Relier explicitement les choix de plateforme à ISO 27001, ISO 42001 et aux
+  contraintes GDPR lorsque pertinent. #198 associe les contrôles protection des
+  données et gouvernance à ISO 27001, ISO 42001 et GDPR ; le contrôle FinOps est
+  relié à ISO 42001. Les contrats EN/FR verrouillent ces mappings et les preuves
+  opérationnelles attendues.
 
 ## P1 — Sécurité applicative
 
