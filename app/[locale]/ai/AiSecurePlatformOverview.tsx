@@ -9,7 +9,13 @@ const PILLARS = [
 	{ id: "governance", icon: "fas fa-scale-balanced" },
 ] as const;
 
-const OUTCOMES = ["privacy", "policy", "measurement", "providers", "audit"] as const;
+const OUTCOMES = [
+	"privacy",
+	"policy",
+	"measurement",
+	"providers",
+	"audit",
+] as const;
 
 const GOVERNANCE_CONTROLS = [
 	{
