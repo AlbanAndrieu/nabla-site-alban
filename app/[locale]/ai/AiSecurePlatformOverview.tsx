@@ -11,6 +11,21 @@ const PILLARS = [
 
 const OUTCOMES = ["privacy", "policy", "measurement", "providers", "audit"] as const;
 
+const GOVERNANCE_CONTROLS = [
+	{
+		id: "dataProtection",
+		frameworks: ["ISO 27001", "ISO 42001", "GDPR"],
+	},
+	{
+		id: "finops",
+		frameworks: ["ISO 42001"],
+	},
+	{
+		id: "governance",
+		frameworks: ["ISO 27001", "ISO 42001", "GDPR"],
+	},
+] as const;
+
 export default function AiSecurePlatformOverview() {
 	const t = useTranslations("ai");
 	return (
@@ -36,6 +51,28 @@ export default function AiSecurePlatformOverview() {
 							{t(`securePlatform.pillars.${pillar.id}.title`)}
 						</h3>
 						<p>{t(`securePlatform.pillars.${pillar.id}.description`)}</p>
+					</article>
+				))}
+			</div>
+			<h3>{t("securePlatform.controlsTitle")}</h3>
+			<p>{t("securePlatform.controlsLead")}</p>
+			<div className="resource-grid">
+				{GOVERNANCE_CONTROLS.map((control) => (
+					<article
+						className="resource-card"
+						key={control.id}
+						data-ai-control={control.id}
+					>
+						<h3>{t(`securePlatform.controls.${control.id}.title`)}</h3>
+						<p>{t(`securePlatform.controls.${control.id}.description`)}</p>
+						<p>
+							<strong>{t("securePlatform.evidenceLabel")}:</strong>{" "}
+							{t(`securePlatform.controls.${control.id}.evidence`)}
+						</p>
+						<p>
+							<strong>{t("securePlatform.frameworksLabel")}:</strong>{" "}
+							{control.frameworks.join(" · ")}
+						</p>
 					</article>
 				))}
 			</div>
