@@ -30,6 +30,27 @@
 					"description": "Relier les contrôles techniques aux enjeux RGPD, ISO 27001 et ISO 42001 : responsabilité, contrôle d’accès, preuves, résidence des données, risque fournisseur et politique d’usage des modèles."
 				}
 			},
+			"controlsTitle": "Contrôles opérationnels de gouvernance",
+			"controlsLead": "Chaque contrôle précise les preuves attendues afin que les choix d’architecture puissent être vérifiés en exploitation, en audit et lors des retours d’incident.",
+			"evidenceLabel": "Preuves attendues",
+			"frameworksLabel": "Référentiels",
+			"controls": {
+				"dataProtection": {
+					"title": "PII, secrets et protection des données",
+					"description": "Classifier les entrées sensibles, exclure les secrets des prompts, privilégier le traitement local pour les données protégées et rendre explicite toute bascule vers un modèle distant.",
+					"evidence": "classification des données, politique de gestion des secrets, règles de routage, rétention et décisions fournisseur/localisation des données"
+				},
+				"finops": {
+					"title": "FinOps IA et maîtrise de la consommation",
+					"description": "Mesurer l’usage des modèles de manière centralisée, définir budgets et règles de fallback, puis examiner conjointement coût, latence et qualité avant tout changement de fournisseur ou de modèle.",
+					"evidence": "mesures LiteLLM, tableaux de coûts/tokens, seuils budgétaires, politique de fallback fournisseur et revues périodiques des coûts"
+				},
+				"governance": {
+					"title": "Gouvernance IA et responsabilités",
+					"description": "Définir responsables, usages autorisés, frontières d’approbation humaine et preuves de changement pour modèles, prompts, pipelines de retrieval et capacités agents.",
+					"evidence": "propriétaires de contrôles, politique d’usage, décisions de risque, résultats d’évaluation, historique des changements et preuves d’architecture auditables"
+				}
+			},
 			"outcomesTitle": "Objectifs d’architecture",
 			"outcomes": {
 				"privacy": "confidentialité local-first avec fallback distant contrôlé",
