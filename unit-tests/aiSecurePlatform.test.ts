@@ -27,6 +27,8 @@ test("AI page leads native content with secure platform engineering", async () =
 
 	assert.match(overview, /useTranslations\("ai"\)/);
 	assert.match(overview, /securePlatform\.pillars/);
+	assert.match(overview, /GOVERNANCE_CONTROLS/);
+	assert.match(overview, /data-ai-control/);
 	const english = JSON.parse(englishRaw) as {
 		ai: {
 			securePlatform: {
@@ -39,7 +41,13 @@ test("AI page leads native content with secure platform engineering", async () =
 	assert.match(copy, /MCP & agent trust boundaries/);
 	assert.match(copy, /RAG provenance & lifecycle/);
 	assert.match(copy, /Observability, evaluation & FinOps/);
+	assert.match(copy, /PII, secrets & data protection/);
+	assert.match(copy, /AI FinOps & consumption control/);
+	assert.match(copy, /AI governance & accountability/);
 	assert.match(copy, /ISO 27001 and ISO 42001/);
+	assert.match(overview, /ISO 27001/);
+	assert.match(overview, /ISO 42001/);
+	assert.match(overview, /GDPR/);
 });
 
 test("secure AI architecture is localized for French readers through next-intl", async () => {
@@ -54,6 +62,8 @@ test("secure AI architecture is localized for French readers through next-intl",
 	assert.doesNotMatch(overview, /locale === ["']fr["']/);
 	assert.match(copy, /Ingénierie d’une plateforme IA sécurisée/);
 	assert.match(copy, /Frontières de confiance MCP et agents/);
-	assert.match(copy, /Gouvernance dès la conception/);
+	assert.match(copy, /PII, secrets et protection des données/);
+	assert.match(copy, /FinOps IA et maîtrise de la consommation/);
+	assert.match(copy, /Gouvernance IA et responsabilités/);
 	assert.match(copy, /RGPD, ISO 27001 et ISO 42001/);
 });

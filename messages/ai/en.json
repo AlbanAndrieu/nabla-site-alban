@@ -30,6 +30,27 @@
 					"description": "Map technical controls to GDPR, ISO 27001 and ISO 42001 concerns: accountability, access control, evidence, data residency, supplier risk and model-use policy."
 				}
 			},
+			"controlsTitle": "Operational governance controls",
+			"controlsLead": "Each control names the expected evidence so architecture claims can be checked in operations, audits and incident reviews.",
+			"evidenceLabel": "Expected evidence",
+			"frameworksLabel": "Frameworks",
+			"controls": {
+				"dataProtection": {
+					"title": "PII, secrets & data protection",
+					"description": "Classify sensitive inputs, keep credentials out of prompts, prefer local processing for protected data, and make remote-model fallback an explicit policy decision.",
+					"evidence": "data classification, secret-management policy, routing rules, retention settings and supplier/data-location decisions"
+				},
+				"finops": {
+					"title": "AI FinOps & consumption control",
+					"description": "Meter model usage centrally, set budgets and fallback policy, and review cost, latency and quality together before changing providers or models.",
+					"evidence": "LiteLLM usage records, token/cost dashboards, budget thresholds, provider fallback policy and periodic cost reviews"
+				},
+				"governance": {
+					"title": "AI governance & accountability",
+					"description": "Define accountable owners, approved use cases, human-approval boundaries and change evidence for models, prompts, retrieval pipelines and agent capabilities.",
+					"evidence": "control owners, approved-use policy, risk decisions, evaluation records, change history and audit-ready architecture evidence"
+				}
+			},
 			"outcomesTitle": "What this architecture optimizes for",
 			"outcomes": {
 				"privacy": "local-first privacy with controlled remote fallback",
