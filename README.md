@@ -85,7 +85,8 @@ pour les scripts côté navigateur.
 
 ## Déploiement
 
-`vercel.json` configure le déploiement Next.js sur Vercel. La configuration Wrangler historique a été retirée : Vercel est l’unique cible de déploiement du site.
+`vercel.json` configure le déploiement Next.js sur Vercel. La configuration
+Wrangler historique a été retirée : Vercel est l’unique cible de déploiement du site.
 
 Avant un déploiement :
 
@@ -105,15 +106,10 @@ Le processus LibreTranslate est décrit dans
 
 ## CI
 
-Les workflows GitHub Actions couvrent notamment :
-
-- les tests Playwright ;
-- le build Docker ;
-- MegaLinter ;
-- la génération des PDF du CV ;
-- les contrôles de configuration pour les assistants de développement.
-
-Les secrets CI sont documentés dans `docs/GITHUB_ACTIONS_SETUP.md`. OpenCommit reste un outil local/on-demand et n’implique pas de workflow GitHub dédié.
+La gate qualité/sécurité, les Preview exact-SHA, la publication et les secrets
+des workflows sont documentés dans
+[.github/github-actions-best-practices.md](.github/github-actions-best-practices.md).
+OpenCommit reste un outil local/on-demand et n’implique pas de workflow GitHub dédié.
 
 ## Documentation du CV
 

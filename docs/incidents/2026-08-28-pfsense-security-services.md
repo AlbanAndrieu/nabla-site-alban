@@ -1,5 +1,7 @@
 # pfSense security services incident — 28 August 2026
 
+Status: mitigated; remaining ASN/log-retention follow-up is tracked in `docs/homelab-roadmap.md`.
+
 ## Scope
 
 This note records the pfSense stability and security-service findings observed while recovering CrowdSec, pfBlockerNG and Snort after the LAN/link incident. It separates confirmed root causes from mitigations and deferred follow-up.

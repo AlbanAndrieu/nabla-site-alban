@@ -62,4 +62,5 @@ Relevant application values include Stripe configuration and other variables doc
 4. Reproduce with `npm ci && npm run build` using the repository Node/npm contract.
 5. For browser regressions, inspect the exact Preview Playwright run and its artifacts.
 
-Keep this document aligned with `vercel.json`, `.github/workflows/vercel-preview.yml`, `.nvmrc`, and `docs/GITHUB_ACTIONS_SETUP.md`.
+Keep this document aligned with `vercel.json`, `.github/workflows/vercel-preview.yml`,
+`.nvmrc` and `.github/github-actions-best-practices.md`.

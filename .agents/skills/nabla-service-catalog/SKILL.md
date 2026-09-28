@@ -1,8 +1,9 @@
 ---
 name: nabla-service-catalog
-description: Keep Site Alban synchronized with the canonical nabla-compose homelab service inventory and generated topology contracts.
+description: >-
+  Keep Site Alban synchronized with the canonical nabla-compose homelab service
+  inventory and generated topology contracts.
 ---
-
 # Nabla service catalog consumer synchronization
 
 Use this skill whenever a homelab service is added, renamed, removed, moved,
@@ -93,8 +94,8 @@ Before reporting a service/catalog task complete, account for every requested or
 discovered item. If anything remains unfinished because of time, an upstream PR,
 missing credentials, unavailable infrastructure or deferred refactoring:
 
-1. add an unchecked item to `docs/homelab-roadmap.md`;
-2. also add it to `docs/quality-roadmap.md` when it is cross-cutting;
+1. add one detailed unchecked item to `docs/homelab-roadmap.md`;
+2. when the topic is cross-cutting, add only a compact parent/reference in `docs/quality-roadmap.md` instead of duplicating the checklist;
 3. identify the dependency/blocker in the roadmap item;
 4. never leave the only record in chat, a scratchpad or a transient PR comment;
 5. do not mark an upstream/unmerged capability as implemented.

@@ -16,6 +16,11 @@
 - Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
 - Never enable `dangerously-allow-all-scripts`.
 - The local Vercel CLI, Wrangler deployment config, unused browser observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired. OpenCommit is intentionally retained as opt-in local tooling; its transitive dependency tree is not part of the deployed runtime.
+- Renovate is the single owner of dependency update branches and rebases. Routine npm version updates are grouped by cadence; GitHub vulnerability alerts feed Renovate security PRs with an additional `security` label. `osvVulnerabilityAlerts` stays disabled so the same advisory is not rediscovered through a second Renovate source.
+- Dependabot vulnerability alerts remain useful as GitHub security signals, but **Dependabot Security Updates must be disabled in repository settings** before Renovate vulnerability PRs are activated. The repository intentionally has no `.github/dependabot.yml`, so Dependabot version updates are not configured either.
+- Renovate uses `rebaseWhen=conflicted`: conflict-driven Renovate branch regeneration is the canonical dependency rebase mechanism. Do not add a custom dependency rebase workflow, do not use Dependabot dependency PRs in parallel, and do not push manual commits to `renovate/*` branches.
+- The GitLab mirror keeps only Renovate configuration validation; its Dependabot and scheduled Renovate updater jobs are disabled so it cannot create a second family of dependency branches.
+- npm runtime updates are grouped weekly, devDependencies monthly, and GitHub Actions/pre-commit maintenance monthly. `next` and `eslint-config-next` are kept in one weekly Next.js stack; npm releases must age 7 days before routine upgrades, and disruptive major/replacement updates require Dependency Dashboard approval.
 
 ## Validation
 

@@ -7,6 +7,7 @@ const reviewedInstallScriptVersions = {
 	"@swc/core": ["1.15.46"],
 	esbuild: ["0.28.1"],
 	fsevents: ["2.3.2", "2.3.3"],
+	"unrs-resolver": ["1.12.2"],
 } as const;
 
 function packageNameFromLockPath(path: string) {
@@ -38,6 +39,7 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 		"@swc/core": false,
 		esbuild: false,
 		fsevents: false,
+		"unrs-resolver": false,
 	});
 	assert.match(npmrc, /^strict-allow-scripts=true$/m);
 	assert.doesNotMatch(npmrc, /dangerously-allow-all-scripts\s*=\s*true/);

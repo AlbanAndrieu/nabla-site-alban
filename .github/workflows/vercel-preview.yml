@@ -114,6 +114,7 @@ jobs:
               filename === '.pre-commit-pre-push.yaml' ||
               filename === '.python-version' ||
               filename === 'mise.toml' ||
+              filename === 'renovate.json' ||
               filename === 'eslint.config.js' ||
               filename === 'stylelint.config.cjs' ||
               filename === 'scripts/agent-quality-gate.sh' ||

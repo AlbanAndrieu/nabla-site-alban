@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import nextVitals from "eslint-config-next/core-web-vitals";
 export default [
 	{
 		ignores: [
@@ -24,6 +25,7 @@ export default [
 		],
 	},
 	js.configs.recommended,
+	...nextVitals,
 	{
 		files: ["scripts/**/*.{cjs,mjs}", "*.config.{cjs,js,mjs}", "server.cjs"],
 		languageOptions: {
