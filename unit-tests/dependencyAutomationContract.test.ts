@@ -49,7 +49,11 @@ function rule(config: RenovateConfig, description: string) {
 test("routine dependency updates have one conservative Renovate owner", async () => {
 	const config = await loadConfig();
 
-	assert.deepEqual(config.enabledManagers, ["npm", "github-actions", "pre-commit"]);
+	assert.deepEqual(config.enabledManagers, [
+		"npm",
+		"github-actions",
+		"pre-commit",
+	]);
 	assert.equal(config.timezone, "Europe/Paris");
 	assert.equal(config.dependencyDashboard, true);
 	assert.equal(config.automerge, false);
@@ -102,7 +106,10 @@ test("npm updates are aged and grouped by operational risk", async () => {
 
 test("automation tooling shares one monthly Renovate group", async () => {
 	const config = await loadConfig();
-	const automation = rule(config, "Group automation tooling maintenance monthly");
+	const automation = rule(
+		config,
+		"Group automation tooling maintenance monthly",
+	);
 
 	assert.deepEqual(automation.matchManagers, ["github-actions", "pre-commit"]);
 	assert.equal(automation.groupName, "automation toolchain");
