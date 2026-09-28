@@ -1,8 +1,9 @@
 ---
 name: nabla-service-catalog
-description: Keep Site Alban synchronized with the canonical nabla-compose homelab service inventory and generated topology contracts.
+description: >-
+  Keep Site Alban synchronized with the canonical nabla-compose homelab service
+  inventory and generated topology contracts.
 ---
-
 # Nabla service catalog consumer synchronization
 
 Use this skill whenever a homelab service is added, renamed, removed, moved,
