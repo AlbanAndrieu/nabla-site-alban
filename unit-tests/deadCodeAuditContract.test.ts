@@ -51,11 +51,8 @@ test("dead-code audit stays explicit and on-demand", async () => {
 	);
 	assert.equal(pkg.dependencies?.["@stripe/react-stripe-js"], undefined);
 	assert.equal(pkg.dependencies?.["@stripe/stripe-js"], undefined);
-	for (const name of [
-		"eslint-config-next",
-		"postcss-selector-parser",
-		"typescript-eslint",
-	]) {
+	assert.equal(pkg.devDependencies?.["eslint-config-next"], "16.3.4");
+	for (const name of ["postcss-selector-parser", "typescript-eslint"]) {
 		assert.equal(pkg.devDependencies?.[name], undefined);
 	}
 	assert.match(knip, /"ignoreFiles": \["public\/\*\*"\]/);

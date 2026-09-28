@@ -74,6 +74,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		mise,
 		cicdDocs,
 		architectureDocs,
+		eslintConfig,
 	] = await Promise.all([
 		read(".github/workflows/copilot-setup-steps.yml"),
 		read(".github/workflows/ci.yml"),
@@ -84,6 +85,7 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		read("mise.toml"),
 		read(".github/copilot-instructions-cicd.md"),
 		read("docs/architecture.md"),
+		read("eslint.config.js"),
 	]);
 	assert.equal(packageJson.engines?.node, ">=24.11.0 <27");
 	assert.deepEqual(packageJson.devEngines?.runtime, {
@@ -92,7 +94,13 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		onFail: "warn",
 	});
 	assert.equal(packageJson.dependencies?.next, "16.3.4");
-	assert.equal(packageJson.devDependencies?.["eslint-config-next"], undefined);
+	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.3.4");
+	assert.equal(
+		packageJson.devDependencies?.["eslint-config-next"],
+		packageJson.dependencies?.next,
+	);
+	assert.match(eslintConfig, /eslint-config-next\/core-web-vitals/);
+	assert.match(eslintConfig, /\.\.\.nextVitals/);
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^25.9.5");
 	for (const workflow of [setup, ci, release, playwright]) {
 		assert.match(workflow, /node-version-file:\s*"\.nvmrc"/);
@@ -141,11 +149,7 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 	for (const name of ["@stripe/react-stripe-js", "@stripe/stripe-js"]) {
 		assert.equal(packageJson.dependencies?.[name], undefined);
 	}
-	for (const name of [
-		"eslint-config-next",
-		"postcss-selector-parser",
-		"typescript-eslint",
-	]) {
+	for (const name of ["postcss-selector-parser", "typescript-eslint"]) {
 		assert.equal(packageJson.devDependencies?.[name], undefined);
 	}
 	assert.ok(packageJson.devDependencies?.["lodash-es"]);

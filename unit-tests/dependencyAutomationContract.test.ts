@@ -30,7 +30,6 @@ type RenovateConfig = {
 	commitHourlyLimit?: number;
 	"pre-commit"?: { enabled?: boolean };
 	osvVulnerabilityAlerts?: boolean;
-	vulnerabilityAlerts?: { enabled?: boolean };
 	packageRules?: RenovateRule[];
 };
 
@@ -58,7 +57,6 @@ test("routine dependency updates have one conservative Renovate owner", async ()
 	assert.equal(config.dependencyDashboard, true);
 	assert.equal(config.automerge, false);
 	assert.equal(config.rebaseWhen, "conflicted");
-	assert.equal(config.rebaseLabel, "rebase");
 	assert.equal(config.prConcurrentLimit, 2);
 	assert.equal(config.branchConcurrentLimit, 2);
 	assert.equal(config.prHourlyLimit, 1);
@@ -68,7 +66,11 @@ test("routine dependency updates have one conservative Renovate owner", async ()
 	assert.ok(config.extends?.includes(":combinePatchMinorReleases"));
 	assert.ok(config.extends?.includes(":maintainLockFilesDisabled"));
 	assert.equal(config.osvVulnerabilityAlerts, false);
-	assert.equal(config.vulnerabilityAlerts?.enabled, false);
+	assert.ok(
+		config.extends?.includes(
+			":enableVulnerabilityAlertsWithAdditionalLabel(security)",
+		),
+	);
 
 	await assert.rejects(
 		access(".github/dependabot.yml", constants.F_OK),
@@ -92,6 +94,7 @@ test("npm updates are aged and grouped by operational risk", async () => {
 
 	const runtime = rule(config, "Group non-major runtime npm updates weekly");
 	assert.deepEqual(runtime.matchDepTypes, ["dependencies"]);
+	assert.deepEqual(runtime.matchPackageNames, ["!next"]);
 	assert.equal(runtime.groupName, "runtime dependencies");
 	assert.deepEqual(runtime.schedule, ["* 0-3 * * 1"]);
 
@@ -101,7 +104,23 @@ test("npm updates are aged and grouped by operational risk", async () => {
 	);
 	assert.deepEqual(development.matchDepTypes, ["devDependencies"]);
 	assert.equal(development.groupName, "development dependencies");
+	assert.deepEqual(development.matchPackageNames, ["!eslint-config-next"]);
 	assert.deepEqual(development.schedule, ["* 0-3 1 * *"]);
+
+	const nextStack = rule(
+		config,
+		"Keep Next.js and eslint-config-next aligned weekly",
+	);
+	assert.deepEqual(nextStack.matchPackageNames, ["next", "eslint-config-next"]);
+	assert.deepEqual(nextStack.matchUpdateTypes, [
+		"major",
+		"minor",
+		"patch",
+		"pin",
+		"digest",
+	]);
+	assert.equal(nextStack.groupName, "Next.js stack");
+	assert.deepEqual(nextStack.schedule, ["* 0-3 * * 1"]);
 });
 
 test("automation tooling shares one monthly Renovate group", async () => {
