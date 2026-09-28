@@ -37,6 +37,7 @@ test("maintenance paths stay aligned across local scope, on-demand Preview and p
 	}
 
 	const sharedMaintenancePaths = [
+		"renovate.json",
 		"scripts/agent-quality-gate.sh",
 		"scripts/quality-gate.sh",
 		"scripts/ci-scope.sh",

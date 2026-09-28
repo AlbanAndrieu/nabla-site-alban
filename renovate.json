@@ -1,0 +1,106 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":automergeDisabled",
+    ":combinePatchMinorReleases",
+    ":enablePreCommit",
+    ":maintainLockFilesDisabled"
+  ],
+  "timezone": "Europe/Paris",
+  "enabledManagers": [
+    "npm",
+    "github-actions",
+    "pre-commit"
+  ],
+  "dependencyDashboard": true,
+  "automerge": false,
+  "rebaseWhen": "conflicted",
+  "rebaseLabel": "rebase",
+  "prConcurrentLimit": 2,
+  "branchConcurrentLimit": 2,
+  "prHourlyLimit": 1,
+  "osvVulnerabilityAlerts": false,
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "description": "Wait seven days before routine npm upgrades",
+      "matchManagers": [
+        "npm"
+      ],
+      "internalChecksFilter": "strict",
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Require Dependency Dashboard approval for disruptive updates",
+      "matchUpdateTypes": [
+        "major",
+        "replacement"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Group non-major runtime npm updates weekly",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "groupName": "runtime dependencies",
+      "groupSlug": "runtime-dependencies",
+      "schedule": [
+        "* 0-3 * * 1"
+      ]
+    },
+    {
+      "description": "Group non-major development dependencies monthly",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "groupName": "development dependencies",
+      "groupSlug": "development-dependencies",
+      "schedule": [
+        "* 0-3 1 * *"
+      ]
+    },
+    {
+      "description": "Group automation tooling maintenance monthly",
+      "matchManagers": [
+        "github-actions",
+        "pre-commit"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "groupName": "automation toolchain",
+      "groupSlug": "automation-toolchain",
+      "schedule": [
+        "* 0-3 1 * *"
+      ]
+    }
+  ],
+  "commitHourlyLimit": 1,
+  "pre-commit": {
+    "enabled": true
+  }
+}

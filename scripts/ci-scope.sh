@@ -39,6 +39,7 @@ is_maintenance_only_path() {
             *.md | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
+            renovate.json | \
             scripts/agent-quality-gate.sh | \
             scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
@@ -75,6 +76,7 @@ is_preview_safe_path() {
             .assetsignore | \
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
+            renovate.json | \
             .python-version | \
             mise.toml | \
             eslint.config.js | \

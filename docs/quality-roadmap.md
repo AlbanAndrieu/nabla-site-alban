@@ -754,6 +754,20 @@ Autres contrôles :
   Turbopack prouve qu'ils sont consommés à la compilation.
 - [x] Aligner npm sur `>=11.17.0 <12`, activer `strict-allow-scripts` et
   maintenir une denylist explicite des scripts d'installation déjà examinés.
+- [x] Aligner l'automatisation des dépendances sur `nabla-site-bababou#207` :
+  Renovate possède les version updates ordinaires avec runtime npm groupé
+  chaque semaine, `devDependencies` et tooling Actions/pre-commit groupés
+  chaque mois, attente npm de 7 jours, deux PR maximum, un commit et une
+  nouvelle PR bot par heure, majors/replacements via Dependency Dashboard et
+  rebase uniquement en cas de conflit. Ne pas ajouter de
+  `.github/dependabot.yml` afin de conserver Dependabot sur les
+  alertes/security updates sans doubler les PR de version.
+- [ ] Vérifier/installer Mend Renovate App sur le dépôt et observer le premier
+  Dependency Dashboard ; tant que l'app n'a pas exécuté `renovate.json`, la
+  politique reste versionnée mais non prouvée en runtime.
+- [ ] Après rétablissement des runners GitHub, valider le premier lot Renovate
+  groupé avec le gate complet avant d'envisager un automerge limité aux
+  patch/minor de `devDependencies`.
 - [x] Reprendre et adapter le nettoyage public validé par
   `nabla-site-bababou#170` : conserver les trois bundles Font Awesome JS,
   les trois CSS et leurs deux webfonts, plus les deux SVG réellement consommés

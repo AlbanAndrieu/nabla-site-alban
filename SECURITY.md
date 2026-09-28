@@ -16,6 +16,9 @@
 - Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
 - Never enable `dangerously-allow-all-scripts`.
 - The local Vercel CLI, Wrangler deployment config, unused browser observability SDK roots, npm D3 and the local Next DevTools MCP dependency are retired. OpenCommit is intentionally retained as opt-in local tooling; its transitive dependency tree is not part of the deployed runtime.
+- Routine version updates are owned by Renovate: npm runtime updates are grouped weekly, devDependencies monthly, and GitHub Actions/pre-commit maintenance monthly. npm releases must age 7 days before routine Renovate upgrades; branch/PR churn is capped to one bot commit and one new PR per hour, with at most two concurrent Renovate branches/PRs.
+- Dependabot remains the vulnerability signal/security-fix path. The repository intentionally has no `.github/dependabot.yml`, so Dependabot version updates are not enabled alongside Renovate.
+- Renovate vulnerability-alert and OSV PR generation stay disabled while Dependabot security updates own CVE remediation, preventing duplicate security PRs. Major/replacement upgrades require Dependency Dashboard approval and Renovate rebases only when a branch is actually conflicted.
 
 ## Validation
 
