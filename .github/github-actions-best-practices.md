@@ -1,8 +1,7 @@
 # GitHub Actions — règles du dépôt
 
-Ce document ne duplique pas la documentation GitHub générale. Il fixe uniquement
-les invariants propres à `nabla-site-alban`. Pour la syntaxe Actions, utiliser
-la documentation officielle GitHub.
+Ce document fixe uniquement les invariants propres à `nabla-site-alban`. Pour la
+syntaxe Actions, utiliser la documentation officielle GitHub.
 
 ## Autorités
 
@@ -14,7 +13,33 @@ la documentation officielle GitHub.
 - `scripts/verify-production-baseline.sh` vérifie la preuve production héritée
   avant de dépenser le budget build d'une PR.
 - `renovate.json` est l'autorité des mises à jour de dépendances. Renovate est
-  le seul bot autorisé à créer/rebaser des branches de dependency updates.
+  le seul bot autorisé à créer ou rebaser des branches de dependency updates.
+
+## Workflows maintenus
+
+- `ci.yml` : qualité, sécurité, lint, types, tests et build conditionnel ;
+- `vercel-preview.yml` + `playwright.yml` : Preview exact-SHA et validation navigateur ;
+- `release.yml` : semantic-release après validation de `master` ;
+- `mega-linter.yml`, `docker-build.yml`, `build-pdf.yml` : contrôles spécialisés ;
+- `copilot-setup-steps.yml` : bootstrap des agents.
+
+OpenCommit reste un outil local/on-demand : aucun workflow OpenCommit n'est requis.
+
+## Runtime et secrets
+
+GitHub Actions lit `.nvmrc` pour Node.js 26.8.2 et utilise npm 11.17.x.
+L'installation canonique est `npm ci` avec `strict-allow-scripts=true`.
+
+Secrets/variables utiles selon les workflows :
+
+- `SNYK_TOKEN` : scan Snyk optionnel ;
+- `DOCKER_USERNAME` / `DOCKER_PASSWORD` : miroir Docker Hub optionnel ;
+- `RELEASE_APP_PRIVATE_KEY` + `RELEASE_APP_CLIENT_ID` : identité GitHub App
+  utilisée par semantic-release ;
+- `PAT` : fallback MegaLinter lorsqu'il est explicitement configuré.
+
+Ne pas créer un secret pour un workflow absent. Les secrets Vercel/Stripe restent
+documentés dans leurs runbooks respectifs.
 
 ## Sécurité
 
@@ -38,7 +63,7 @@ La concurrency doit annuler les runs de PR obsolètes. Les caches sont des
 optimisations : une panne du backend cache ne doit pas masquer ni provoquer un
 échec de qualité.
 
-## Dépendances et GitHub Actions
+## Dépendances et rebase
 
 Ne pas ajouter `.github/dependabot.yml` pour les version updates. Renovate
 groupe les GitHub Actions et pre-commit dans le lot mensuel
@@ -85,7 +110,7 @@ Si CI retourne `QG_AUTOFIX_REQUIRED`, appliquer le **patch exact** produit par
 la gate puis rejouer localement. Ne pas relancer un hosted run pour diagnostiquer
 un défaut que la gate a déjà identifié.
 
-Pour un problème de scope, exécuter :
+Pour un problème de scope :
 
 ```bash
 bash scripts/ci-scope.sh <base-sha> HEAD

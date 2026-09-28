@@ -4,9 +4,7 @@ La documentation est organisée par **usage**, pas par chronologie de PR. Git re
 la source de l'historique d'implémentation ; les documents maintenus doivent aider
 à exploiter, diagnostiquer ou planifier le système actuel.
 
-## Sources de vérité
-
-### Architecture et exploitation
+## Architecture et exploitation
 
 - [Architecture et exploitation](architecture.md)
 - [Catalogue des services homelab](homelab-services-catalog.md)
@@ -14,28 +12,27 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 - [Réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
 
-### Roadmaps actives
+## Roadmaps actives
 
 - [Roadmap produit et qualité](quality-roadmap.md) — backlog transverse canonique.
 - [Roadmap homelab](homelab-roadmap.md) — backlog TrueNAS/FastAPI/Talos/DNS.
 
-Une migration terminée ne conserve pas une roadmap séparée. Les anciennes
-roadmaps Tailwind/PostCSS et Next 16.3 preview ont été retirées après consolidation
-de leurs invariants utiles.
+Les roadmaps conservent les travaux ouverts, les invariants et un historique
+compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 
-### Runbooks
+## Runbooks
 
-- [GitHub Actions](GITHUB_ACTIONS_SETUP.md)
+- [GitHub Actions](../.github/github-actions-best-practices.md)
 - [Ruleset GitHub de master](github-master-ruleset.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)
 - [Scripts frontend / analytics / Speed Insights](frontend-runtime-scripts-runbook.md)
 - [Internationalisation](i18n-weblate-libretranslate.md)
 
-### Diagnostics, incidents et références
+## Diagnostics, incidents et références
 
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
-- [Migration des URL SEO](seo-url-migration.md)
+- [Migration et invariants des URL SEO](seo-url-migration.md)
 
 ## Politique de réduction documentaire
 
@@ -54,7 +51,7 @@ Compacter ou supprimer :
 - checklists entièrement terminées sans valeur opératoire résiduelle ;
 - guides de migration devenus faux après stabilisation de la version ;
 - copies du même backlog dans plusieurs roadmaps ;
-- documentation d'un outil/runtime supprimé sans chemin de diagnostic actuel.
+- documentation générique d'un outil déjà couverte par sa source officielle.
 
 ## Règles de maintenance
 
