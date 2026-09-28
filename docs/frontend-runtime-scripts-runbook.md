@@ -37,6 +37,23 @@ The Next.js application shell uses `vercel` by default. Set
 `NEXT_PUBLIC_ANALYTICS_MODE` explicitly only when the extra vendor cost and
 privacy/performance impact are intentional.
 
+### Vercel Speed Insights
+
+Speed Insights is loaded by `public/site-analytics.js` through
+`/_vercel/speed-insights/script.js`. Do not add
+`@vercel/speed-insights/next` in parallel unless this loader is removed first,
+or telemetry would be duplicated.
+
+Operational validation:
+
+1. enable Speed Insights in the Vercel project;
+2. deploy the application;
+3. confirm a successful request to `/_vercel/speed-insights/script.js`;
+4. confirm measurements appear after real traffic.
+
+A missing Vercel endpoint in local development must not block page rendering.
+`tests/site-analytics.spec.ts` is the repository contract for this wiring.
+
 ## Shared UI attributes
 
 `site-widgets.js` supports the legacy attributes below:

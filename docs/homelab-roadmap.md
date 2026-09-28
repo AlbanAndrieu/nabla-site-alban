@@ -1,263 +1,132 @@
-# Homelab integration roadmap
+# Feuille de route homelab
 
-Last reconciled: 12 September 2026.
+Dernière réconciliation : 28 septembre 2026.
 
-This document is the focused backlog for the TrueNAS / FastAPI / `nabla-compose`
-integration. `docs/quality-roadmap.md` remains the cross-project quality roadmap;
-items discovered during homelab work must not remain only in chat or PR comments.
+Ce document contient uniquement le backlog actif propre à TrueNAS, FastAPI,
+`nabla-compose`, Talos/Kubernetes, DNS et diagnostics homelab. Les décisions
+transverses de qualité/CI restent dans `docs/quality-roadmap.md` et ne sont pas
+dupliquées ici.
 
-## P0 — TrueNAS 26 WebSocket API migration
+## P0 — Migration TrueNAS 26 vers WebSocket JSON-RPC
 
-- [ ] Treat the TrueNAS 26 API transition as an **upgrade blocker**. TrueNAS 26
-  removes the legacy REST API; no homelab integration may depend on a REST-only
-  TrueNAS endpoint before the next appliance upgrade.
-- [ ] Inventory every TrueNAS integration across `fastapi-sample`,
-  `nabla-compose`, site scripts, CSI/storage automation, MCP tooling and runbooks.
-  Classify each call as JSON-RPC 2.0 over WebSocket, REST, CLI/SSH or indirect.
-- [ ] Migrate every remaining REST call to the versioned TrueNAS JSON-RPC 2.0
-  WebSocket API documented at <https://api.truenas.com/>. Prefer one reusable
-  authenticated client with explicit method allowlists, deadlines, reconnect
-  behaviour and sanitized errors.
-- [ ] Preserve the current health distinction between HTTPS listener reachability
-  and authenticated TrueNAS API health (`system.version`, `app.query`, etc.).
-- [x] Add contract tests that fail if a new TrueNAS `/api/v2*` REST endpoint is
-  introduced in maintained runtime code. `unit-tests/truenasApiTransportContract.test.ts`
-  now scans TrueNAS-owned runtime code under `app/` and `lib/` while leaving the
-  legitimate pfSense v2 API contract untouched, and separately locks preservation
-  of the observed TrueNAS WebSocket URI/path/TLS evidence.
-- [ ] Validate WebSocket authentication/RBAC with the read-only observer account,
-  then run a pre-upgrade smoke covering DNS → TCP/TLS → WebSocket → auth →
-  `system.version` + `app.query`.
-- [x] Update the architecture UI to expose the observed TrueNAS API transport
-  (`websocket-jsonrpc`) so a future REST regression is visible. The architecture
-  page already owns `HomelabOperationalEvidence`; it now renders
-  `HomelabOperationalTrueNasTransport` directly from that existing health snapshot,
-  including observed WebSocket URI/path/TLS evidence, and the source contract
-  explicitly forbids the transport surface from creating another `fetch()` owner.
+- [ ] Traiter la transition TrueNAS 26 comme un **upgrade blocker** : aucun
+  composant maintenu ne doit dépendre d'un endpoint REST TrueNAS legacy lors du
+  prochain upgrade.
+- [ ] Inventorier les intégrations TrueNAS de `fastapi-sample`,
+  `nabla-compose`, Site Alban, CSI/storage, MCP et runbooks ; classer chaque
+  appel WebSocket JSON-RPC, CLI/SSH, indirect ou REST restant.
+- [ ] Migrer les derniers appels REST vers un client WebSocket JSON-RPC versionné,
+  avec allowlist de méthodes, deadlines, reconnexion et erreurs nettoyées.
+- [ ] Conserver deux preuves distinctes : reachability HTTPS du listener et santé
+  API authentifiée (`system.version`, `app.query`, etc.).
+- [ ] Valider auth/RBAC du compte observer puis exécuter un smoke pré-upgrade
+  DNS → TCP/TLS → WebSocket → auth → `system.version` + `app.query`.
 
-Official references:
+Références : <https://api.truenas.com/> et notes de version TrueNAS 26.
 
-- <https://api.truenas.com/>
-- <https://www.truenas.com/docs/scale/26/gettingstarted/versionnotes/>
+## P0 — Cutover direct du catalogue/security graph v2
 
-## P0 — Direct canonical catalog/security-graph cutover
+Le site reste un consommateur non critique : une courte interruption contrôlée
+est préférable à une compatibilité v1/v2 durable.
 
-The future catalog migration follows the one-shot design owned by
-`nabla-compose`: native Backstage descriptors for catalog identity and standard
-relations, Compose for runtime definition, minimal `x-nabla` only for Nabla-
-specific operational/security semantics, and deterministic CycloneDX/provider
-projections.
+- [ ] Attendre que FastAPI publie le read-model v2 avec le même
+  `catalogRevision`, puis connecter directement le parser v2 déjà présent.
+- [ ] Remplacer `lib/homelabServices.ts` et `lib/serviceTopology.ts` dans la
+  même fenêtre, supprimer les parseurs/tests v1 et ne pas créer de double reader
+  ou feature flag de transition.
+- [ ] Utiliser les IDs/refs canoniques pour tout état UI et vérifier la fermeture
+  de toutes les relations avant déploiement.
+- [ ] Préserver exposition/access intent, type/force/preuve des relations,
+  provenance runtime et findings sécurité ; ne pas les reconstruire depuis les
+  labels ou URLs côté UI.
+- [ ] Si un LKG local reste utile, le régénérer uniquement au schéma v2 avec le
+  même `catalogRevision`; supprimer le fallback v1
+  `public/homelab-services.json`.
+- [ ] Préparer un rollback commit/tag et coordonner l'ordre de déploiement
+  `nabla-compose` → FastAPI → Site Alban pour rendre l'interruption bornée et
+  observable.
 
-This website is a non-critical consumer. A short Architecture/TrueNAS catalog
-interruption is acceptable if it avoids a long-lived compatibility layer.
-
-- [ ] Migrate Site Alban directly to the new canonical contract in the coordinated
-  `nabla-compose` / `fastapi-sample` cutover window. Do **not** implement a
-  parallel v1/v2 reader or a feature flag that keeps both schemas alive.
-- [ ] Remove the plan to create another compatibility
-  `catalog/homelab-services.json` projection solely for Site Alban. Consume the
-  canonical new-schema API/artifact instead.
-- [ ] Key all service/topology UI state by stable canonical service/entity ID, not
-  by display name, and require every relation endpoint to resolve before deploy.
-- [ ] Preserve declared exposure/access intent, relation type/strength/evidence and
-  runtime observation provenance in the new contract; do not reconstruct them from
-  labels, URLs or UI-side heuristics.
-- [ ] Replace `public/homelab-services.json` during the cutover rather than
-  maintaining it as an old-schema fallback. If an offline/last-known-good artifact
-  remains useful, regenerate it in the **new schema** and keep it cache-only,
-  carrying the same `catalogRevision`.
-- [ ] Remove obsolete v1 parsers/types/tests in the same migration once the new
-  contract tests pass. Avoid adapters whose only purpose is to preserve the old
-  shape.
-- [ ] Before switching production, pin a rollback commit/tag and validate stable
-  IDs, relation closure, exposure-policy coverage, `catalogRevision`, EN/FR
-  rendering, Architecture/TrueNAS pages and production build.
-- [ ] Coordinate deployment order with FastAPI so a temporary catalog outage is
-  bounded and observable. Prefer repository/deployment rollback to supporting two
-  schemas at runtime.
-
-The source design is maintained in `nabla-compose`
-`docs/service-catalog-security-graph.md` and
+Les designs canoniques restent dans `nabla-compose`
+`docs/service-catalog-security-graph.md` et
 `docs/service-catalog-v2-normalization.md`.
 
+## P1 — Talos/Kubernetes et runtime
 
-### Préparation Site Alban au contrat v2
+- [ ] Consommer la progression Kubernetes dans l'ordre DNS/CNI → smoke FastAPI
+  `test.albandrieu.com` → CSI TrueNAS → secrets d'infrastructure. Le site doit
+  distinguer santé applicative, réseau/DNS, persistance et présence de
+  configuration sans exposer de secret.
+- [ ] Vérifier en production les bindings par `appId` : un service non prêt doit
+  rester dégradé même si Cloudflare Tunnel est sain.
 
-- [x] Ajouter `lib/homelabCatalogV2.ts` comme contrat TypeScript du read-model
-  Backstage généré par `nabla-compose`.
-- [x] Valider `schemaVersion=2`, `model=backstage`, le
-  `catalogRevision` SHA-256, les entités Backstage supportées et l'unicité des
-  `entityRef`.
-- [x] Ajouter `CatalogV2ServiceView` afin que la future UI des services dérive
-  identité, type, lifecycle, tags NIST et criticités depuis les champs standard,
-  sans reconstruire ces informations à partir du vieux schéma.
-- [x] Ajouter les tests unitaires de parsing, unicité et projection Cartography /
-  Neo4j représentative.
-- [ ] Ne pas connecter encore ce parser aux endpoints de production : FastAPI
-  doit d'abord publier le read-model v2 avec la même `catalogRevision`.
-- [ ] Lors du cutover, remplacer directement `lib/homelabServices.ts` et
-  `lib/serviceTopology.ts` par le contrat v2 et supprimer les parseurs v1 dans
-  la même fenêtre de migration.
-- [ ] Regénérer l'éventuel LKG local depuis le nouveau schéma uniquement ; ne pas
-  conserver `public/homelab-services.json` comme fallback v1.
-- [ ] Adapter les vues Architecture/TrueNAS pour séparer clairement état déclaré,
-  état observé et findings sécurité Cartography.
+## P1 — Santé, diagnostic et métriques
 
+- [ ] Consommer le diagnostic opérateur à six dépendances seulement si FastAPI
+  l'expose comme contrat API stable
+  (`configured/reachable/authenticated/application_result/stale/error_*/evidence_complete`);
+  ne jamais scraper une CLI.
+- [ ] Garder Pyroscope comme signal optionnel : l'absence de profiling ne modifie
+  pas la santé fonctionnelle.
+- [ ] Exposer progressivement disponibilité, trafic, erreurs, latence et
+  saturation uniquement avec des requêtes API prédéfinies et de cardinalité
+  bornée ; le navigateur ne fournit jamais de PromQL.
+- [ ] Pour TrueNAS/ZFS, Talos, Kubernetes, CNI/CSI et etcd, afficher les signaux
+  spécifiques (pression, capacité, Ready, alarmes, leader/quota) plutôt qu'un
+  simple probe HTTP.
+- [ ] Séparer explicitement **disponibilité du contrôle** et **posture/policy**
+  pour les composants sécurité ; un volume d'alertes ou blocages n'est pas une
+  panne.
+- [ ] Ajouter une vue temporelle courte (1 h/24 h) seulement lorsque les métriques
+  instantanées sont stables et interprétables.
 
-## P0 — FastAPI health contract convergence
+## P1 — Résilience DNS
 
-- [x] Consume probe-first health without making aggregate reconciliation block the
-  first useful TrueNAS/service evidence.
-- [x] Keep stale health-board data from overwriting fresher aggregate/probe data.
-- [x] Treat `runtime_missing` plus fresh positive origin evidence as inventory
-  drift rather than proof that the application is down.
-- [x] FastAPI 1.13.15 treats Cloudflare timeout/connection/empty/stale inventory as
-  **unconfirmed** evidence rather than global degradation. Site Alban now adds an
-  explicit ⚠️ warning when Cloudflare cannot be confirmed while leaving service
-  health unchanged.
-- [x] Consume the remaining per-row rolling probe metadata from FastAPI 1.13.15:
-  `probe_source`, observation age, stale threshold, estimated interval,
-  `next_probe_in_seconds`, refresh error and last-known state/reachability.
-  Retained stale rows preserve the upstream `reachable: null` meaning instead of
-  being silently discarded by the older boolean-only parser.
-- [x] Consume the stable rolling-evidence semantics delivered with
-  `fastapi-sample#236` and separate **evidence coverage** from **healthy
-  coverage**. Healthy coverage is derived from retained `origin`/`memory` rows
-  that are currently non-stale and healthy; it is not derived from
-  `probe_summary.states`, which describes only the current sampled wave.
-- [ ] If FastAPI exposes the six-dependency operator diagnostic as a stable API
-  contract, consume its normalized `configured / reachable / authenticated /
-  application_result / stale / error_stage / error_kind / evidence_complete`
-  fields. `fastapi-sample#236` currently provides this report as an operator CLI
-  assembled from existing health-board data, so Site Alban must not scrape CLI
-  output or invent a second wire contract.
-- [x] Finish adaptive UI polling separately from provider probe cadence. Site
-  Alban coalesces concurrent health-board reads and keeps a deliberately short
-  server cache (fresh 5 s, refreshing 2 s, pending/stale 1 s, failures 0 s).
-  `/api/homelab-health` defers the richer aggregate request until the cached board
-  proves insufficient; a contract test proves that a fresh board starts zero
-  aggregate/probe fallback requests. `ArchitectureTopologyView` is now the single
-  browser owner through `useArchitectureHealthPolling`: refreshing evidence polls
-  every 2 s, fresh evidence every 5 s, and stale/pending/unavailable evidence every
-  30 s. `HierarchicalArchitectureExplorer` receives the shared health snapshot and
-  source as props and cannot create a second health fetch; its distinct runtime
-  drift observation remains isolated at 30 s. Source contracts lock these owners
-  so the faster browser cadence cannot silently become additional provider fan-out.
+- [ ] Garder pfSense/Unbound capable de résoudre indépendamment de TrueNAS Apps,
+  afin qu'un arrêt TrueNAS/Docker n'entraîne pas une panne DNS générale.
+- [ ] Définir le rôle exact de Pi-hole et AdGuard Home dans la chaîne de
+  résolution/filtrage et l'ordre annoncé par DHCP.
+- [ ] Si des DNS applicatifs sont annoncés directement aux clients, fournir une
+  redondance sur deux domaines de panne ; deux conteneurs sur le même TrueNAS ne
+  sont pas une redondance.
+- [ ] Documenter DHCP DNS, zones locales, DNSSEC, conditional forwarding,
+  failover et ownership des enregistrements internes.
+- [ ] Automatiser les tests de panne TrueNAS, Docker, Pi-hole, AdGuard, Unbound et
+  WAN, puis exposer disponibilité **et conformité de politique** dans la santé.
 
-## P0 — Post-merge Quality remediation
+## P2 — Follow-up incident pfSense
 
-- [ ] Operationally validate the merged
-  `.github/workflows/post-merge-quality-remediation.yml`: after an actual failed
-  or timed out `CI (Quality and Security)` push on `master`, a converged
-  deterministic formatter/pre-commit repair must open a non-default remediation
-  PR and dispatch canonical CI on it; a non-auto-fixable failure must instead open
-  one deduplicated diagnostic issue with the failed jobs and source run. Also
-  validate the fallback issue path when GitHub refuses PR creation or CI dispatch
-  with `GITHUB_TOKEN`. Keep this as a recovery safety net, never as permission for
-  agents to skip their pre-publish gate.
-- [ ] Finish validating the local-first pipeline on a real agent workspace. The CI
-  half is now proven repeatedly in #177: formatter-only changes emit
-  `QG_AUTOFIX_REQUIRED` with the exact patch and stop before Semgrep/npm/build,
-  then a clean retry proceeds through the full gate. Copilot cold bootstrap also
-  succeeds with npm 11.17 pinned before Node-backed pre-commit hook installation.
-  Ruff now has a single lint authority, `ruff-check --fix --unsafe-fixes`, before
-  `ruff-format`, so fixable Python diagnostics no longer stop before their own
-  auto-fix hook; a contract prevents the old duplicate `ruff` hook from returning.
-  The remaining operational proof is one real local `quality:agent:fix` → commit →
-  strict pre-push publication cycle showing that the canonical publication gate
-  executes once and leaves a clean tree.
-- [x] Remove the duplicate Stylelint authority after proving rule parity. npm /
-  `package-lock.json` + Stylelint 17 is now the single CSS lint authority across
-  maintained `app/**/*.css`, `components/**/*.css` and `public/*.css`. The parity
-  expansion exposed and fixed the CSS Modules `:global()` false positives plus
-  two genuine duplicate selectors before the old pre-commit Stylelint 14
-  environment and `stylelint-config-standard-scss@3.0.0` were removed. Contract
-  tests prevent reintroducing that second toolchain.
+Le diagnostic détaillé et les preuves historiques sont conservés dans
+`docs/incidents/2026-08-28-pfsense-security-services.md`.
 
-## P1 — Refactoring / code-size debt
+- [ ] Terminer la suppression de l'enrichissement ASN pfBlockerNG : identifier
+  le chemin qui appelle encore `iptoasn`, empêcher les téléchargements IPinfo
+  répétés sans token/`asn.mmdb`, puis vérifier l'absence de nouvelle boucle.
+  Ne pas augmenter le `memory_limit` PHP pour masquer le défaut.
+- [ ] Revalider rotation/rétention des logs pfBlockerNG et traiter les gros
+  historiques (`dns_reply.log`, `unified.log`, `error.log`, `extras.log`)
+  sans relever les limites configurées.
+- [ ] Avant une nouvelle vague de changements réseau/sécurité, conserver un
+  export pfSense daté hors du firewall pour rollback.
 
-Refactor cohesive responsibilities instead of raising size thresholds.
+## Fondations déjà livrées
 
-- [x] Refactor `lib/homelabHealth.ts` into contract types, parsing/validation and
-  transport loaders. The public module is now a thin compatibility facade over
-  dedicated types, validation, rolling-probe parsing, pfSense parsing, aggregate
-  parsing and HTTP transport modules; the temporary 933-line
-  `lib/homelabHealthBase.ts` has been removed. The destructive-diff guard keeps a
-  path-scoped reviewed exception for this split rather than enabling the global
-  large-deletion bypass, and CI #957 validated canonical formatting, Semgrep,
-  code-size reporting, ESLint, Stylelint, Next type generation, TypeScript,
-  unit/contract tests and the production build.
-- [x] Refactor `lib/homelabObservability.ts` into deep-diagnostic parsing,
-  platform-metric parsing and fallback orchestration. The former monolith is now a
-  thin composition facade over dedicated types/shared parsing, deep-diagnostic,
-  platform-metric, control-plane/edge and fallback modules. The facade lost 534
-  lines while every extracted module remains below the 300-line warning threshold.
-  A contract test prevents the cohesive parsers from drifting back into the facade;
-  the destructive-diff exception remains path-scoped, and CI #961 plus Copilot
-  Setup #110 validate the final formatter-clean split, SAST, TypeScript,
-  unit/contracts and production build.
-- [x] Refactor `app/components/homelab/HomelabOperationalEvidence.tsx` into
-  control-plane, deep-diagnostic, exposure, freshness and metrics sections. #178
-  keeps one polling owner in the facade (one `/api/homelab-observability` fetch,
-  one timer and one `AbortController`) while child sections remain presentation
-  owners only; source contracts prevent polling ownership from drifting downward.
-- [x] Refactor `lib/homelabOperationalEvidence.ts` without changing its public
-  evidence contract. #179 keeps the public compatibility/composition surface and
-  extracts generic parsing, pfSense DNS/security/ingress parsing, trusted-source
-  TCP exposure parsing, stale-service/dependency-cycle parsing and troubleshooting
-  focus into cohesive modules. The split remains below the destructive-diff guard
-  naturally, requires no global or new path-scoped bypass, and a source contract
-  prevents heavy parser responsibilities from drifting back into the facade.
-- [x] Split `unit-tests/homelabObservability.test.ts` by cohesive scenario while
-  keeping the aggregate fixture centralized. Compatibility fallback, route
-  contract and UI ownership checks now live separately; the main test file is at
-  the 300-line boundary without a destructive-diff bypass, and CI #1035 validated
-  the split.
-- [x] Split `unit-tests/serviceTopology.test.ts` by catalog/topology versus
-  Architecture UI contracts while keeping shared fallback loading/relation helpers
-  centralized. The main topology test settles below the 300-line warning threshold
-  after canonical formatting; CI #1041 validated the formatter-clean split.
-- [x] Extract cohesive mechanics from `scripts/agent-quality-gate.sh` without
-  creating a second formatter/linter authority. Base resolution, compact logging,
-  workspace diff/fingerprint collection and changed-file classification now live in
-  sourced `scripts/lib/agent-quality-support.sh`; the wrapper retains auto-fix,
-  destructive-diff, executable-bit, canonical quality, lint/type/test and publish
-  policy. `ci-scope.sh`, Copilot setup and source contracts follow the helper, and
-  the wrapper is below the 300-line warning threshold.
-- [x] Reduce `HierarchicalArchitectureExplorer.tsx` only through a substantive
-  functional boundary rather than line-count churn. #179 moves health ownership
-  entirely to `ArchitectureTopologyView` through `useArchitectureHealthPolling`,
-  passes the health snapshot/source into the explorer, and extracts the explorer's
-  distinct `/api/homelab-status` ownership to `useArchitectureRuntimeStatus`.
-  `unit-tests/architecturePollingOwnership.test.ts` plus the reconciled
-  Architecture source contracts prevent either concern from drifting back into the
-  React Flow surface. The explorer drops from the 1253-line baseline to 1196 lines
-  while preserving its rendering semantics; CI #1056 and Copilot Setup #189
-  validate the formatter-clean functional extraction.
+- Le parser v2, les IDs Backstage et les contrôles de `catalogRevision` sont
+  préparés mais volontairement non connectés au runtime.
+- Les régressions vers TrueNAS REST sont gardées par contrat et le transport
+  WebSocket observé est visible dans l'UI.
+- Le health board consomme fraîcheur, provenance et rolling probes sans confondre
+  `runtime_missing` avec une panne prouvée.
+- Cloudflare indisponible ou stale reste une preuve non confirmée, jamais une
+  dégradation globale automatique.
+- Le navigateur possède un seul owner de polling santé et n'augmente pas le fan-out
+  des probes provider.
+- Les gros parseurs/observability facades ont été découpés en modules cohésifs ;
+  le garde code-size empêche de recréer la dette.
 
-- [x] Add a non-regression code-size report to the Site agent quality gate. The
-  diff-scoped `scripts/check_code_size.py` now warns above 300 lines, fails new or
-  newly oversized maintained source/test files above 600 lines, and grandfathers
-  files already above 600 only within a +2% baseline growth margin. Generated,
-  public and dependency trees are excluded. The agent gate runs it before npm
-  lint/tests and exposes only `WARNING` lines plus the compact summary on success;
-  the validated #177 run reported 8 inspected files, 1 warning and 0 errors.
-  Contract tests cover soft warnings, hard failures, legacy grandfathering,
-  growth beyond +2% and report integration, avoiding a repository-wide big-bang
-  refactor while making new size debt visible.
+## Règle de clôture
 
-## Completion rule
-
-Before an agent reports a homelab task complete:
-
-1. run the closest deterministic quality gate and inspect the final CI;
-2. if a formatter/linter hook modifies files, commit the fixes and rerun the gate
-   until the final pass is clean; a successful auto-fix pass is not itself a
-   successful quality gate;
-3. list every requested or discovered item that remains incomplete;
-4. add each deferred item as an unchecked roadmap entry here (and in
-   `docs/quality-roadmap.md` when it is cross-cutting);
-5. never leave the only record of unfinished work in chat, a transient scratchpad
-   or a TODO comment;
-6. record any dependency on an unmerged upstream PR as pending rather than
-   claiming it is implemented.
+Une tâche homelab est terminée uniquement avec la preuve la plus proche du
+runtime concerné. Si elle reste bloquée, conserver **un seul item détaillé ici** ;
+la roadmap qualité ne reçoit qu'un pointeur transverse si nécessaire. Ne jamais
+laisser l'unique trace d'un risque ou d'un follow-up dans un chat ou un commentaire
+de PR.

@@ -1,5 +1,7 @@
 # Baseline de performance frontend
 
+> Référence historique : ces mesures servent à comparer une régression, pas à décrire le SLO courant. Les garde-fous automatisés actuels vivent dans `tests/performance-baseline.spec.ts` et la roadmap ne recopie pas les anciens runs.
+
 Mesure locale du 30 juillet 2026 avec Next.js 16.3 preview en mode
 développement, Chromium et un cache local chaud. Ces valeurs servent à détecter
 les régressions entre deux changements ; elles ne remplacent pas un audit
