@@ -7,6 +7,7 @@ type RenovateRule = {
 	description?: string;
 	matchManagers?: string[];
 	matchDepTypes?: string[];
+	matchPackageNames?: string[];
 	matchUpdateTypes?: string[];
 	groupName?: string;
 	groupSlug?: string;
@@ -23,7 +24,6 @@ type RenovateConfig = {
 	dependencyDashboard?: boolean;
 	automerge?: boolean;
 	rebaseWhen?: string;
-	rebaseLabel?: string;
 	prConcurrentLimit?: number;
 	branchConcurrentLimit?: number;
 	prHourlyLimit?: number;
@@ -76,6 +76,13 @@ test("routine dependency updates have one conservative Renovate owner", async ()
 		access(".github/dependabot.yml", constants.F_OK),
 		(error: NodeJS.ErrnoException) => error.code === "ENOENT",
 	);
+
+	const gitlab = await readFile(".gitlab-ci.yml", "utf8");
+	assert.doesNotMatch(gitlab, /dependabot-gitlab/);
+	assert.doesNotMatch(gitlab, /^renovate:/m);
+	assert.doesNotMatch(gitlab, /^run_renovate:/m);
+	assert.doesNotMatch(gitlab, /RENOVATE_PLATFORM|RENOVATE_EXTRA_FLAGS/);
+	assert.match(gitlab, /renovate-config-validator\.gitlab-ci\.yml/);
 });
 
 test("npm updates are aged and grouped by operational risk", async () => {
