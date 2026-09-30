@@ -209,6 +209,47 @@ test("existing remediation PR is reused without a duplicate PR or issue", async 
 	assert.equal(harness.calls.issues.length, 0);
 });
 
+test("existing remediation PR dispatch failure falls back to a diagnostic issue", async () => {
+	const harness = await runRemediation(
+		baseEnvironment({
+			EXISTING_PR_FOUND: "true",
+			EXISTING_PR_BRANCH: "automation/quality-remediation-123-1",
+			EXISTING_PR_NUMBER: "41",
+			EXISTING_PR_URL: "https://example.invalid/pr/41",
+			PUBLISH_OUTCOME: "skipped",
+		}),
+		{ dispatchError: "dispatch denied" },
+	);
+
+	assert.equal(harness.calls.pulls.length, 0);
+	assert.equal(harness.calls.dispatches.length, 1);
+	assert.equal(harness.calls.issues.length, 1);
+	assert.match(
+		String(harness.calls.issues[0].body),
+		/canonical CI dispatch failed/,
+	);
+});
+
+test("prepare failure produces a diagnostic issue instead of attempting a PR", async () => {
+	const harness = await runRemediation(
+		baseEnvironment({
+			PREPARE_RESULT: "failure",
+			REMEDIATION_ACTION: "",
+			REMEDIATION_BRANCH: "",
+			REMEDIATION_REASON: "",
+			PUBLISH_OUTCOME: "skipped",
+		}),
+	);
+
+	assert.equal(harness.calls.pulls.length, 0);
+	assert.equal(harness.calls.dispatches.length, 0);
+	assert.equal(harness.calls.issues.length, 1);
+	assert.match(
+		String(harness.calls.issues[0].body),
+		/preparation did not reach the decision step/,
+	);
+});
+
 test("existing diagnostic issue deduplicates fallback creation", async () => {
 	const failedSha = baseEnvironment().FAILED_SHA;
 	const harness = await runRemediation(

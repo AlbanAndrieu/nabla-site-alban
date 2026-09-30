@@ -38,10 +38,10 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   `scripts/manage-master-ruleset.sh --apply`, puis fermer uniquement lorsque
   `--check` retourne `RULESET_OK`. Contrat et rollback :
   `docs/github-master-ruleset.md`.
-- [ ] **Valider le recovery post-merge** avec les permissions GitHub réelles :
-  échec auto-corrigeable → PR de remédiation + dispatch CI ; échec non
-  auto-corrigeable → issue diagnostique dédupliquée. Ce filet ne remplace jamais
-  la gate pré-publication.
+- [ ] **Valider les permissions live du recovery post-merge** : les contrats locaux
+  couvrent trigger master, séparation read/write, patch déterministe, déduplication
+  et fallbacks PR/issue/dispatch. Il reste à prouver sur le dépôt réel :
+  auto-fixable → PR + dispatch CI ; non auto-fixable → issue dédupliquée.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
