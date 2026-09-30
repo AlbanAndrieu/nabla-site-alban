@@ -71,11 +71,14 @@ test("documentation index keeps roadmap, runbook, incident and contract ownershi
 test("documentation index relative links resolve", async () => {
 	const indexPath = path.join(DOCS, "README.md");
 	const index = await readFile(indexPath, "utf8");
-	const targets = [...index.matchAll(/\[[^\]]+\]\((?![a-z]+:|#)([^)]+)\)/gi)].map(
-		(match) => match[1],
-	);
+	const targets = [
+		...index.matchAll(/\[[^\]]+\]\((?![a-z]+:|#)([^)]+)\)/gi),
+	].map((match) => match[1]);
 
-	assert.ok(targets.length > 0, "documentation index should contain local links");
+	assert.ok(
+		targets.length > 0,
+		"documentation index should contain local links",
+	);
 	for (const target of targets) {
 		const relativeTarget = target.split("#", 1)[0];
 		if (!relativeTarget) continue;
