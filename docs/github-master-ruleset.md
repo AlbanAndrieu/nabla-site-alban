@@ -1,85 +1,87 @@
 # Ruleset GitHub de `master`
 
-Le dépôt conserve la politique de protection prévue pour la branche par défaut sous forme de code dans
-`.github/rulesets/master-quality.json`.
+La politique cible est versionnée dans
+`.github/rulesets/master-quality.json` et pilotée par
+`scripts/manage-master-ruleset.sh`.
 
-## Politique
+## Contrat
 
-Le ruleset cible `~DEFAULT_BRANCH` et doit rester actif. Il :
+Le ruleset `master-quality-and-pr-safety` cible `~DEFAULT_BRANCH` et doit :
 
-- impose le passage par une pull request avant toute modification de `master` ;
-- impose les checks GitHub Actions inconditionnels `quality` et `CI policy guard` ;
-- bloque la suppression de la branche et les mises à jour non fast-forward ;
-- conserve `strict_required_status_checks_policy=false` afin d'éviter un nouveau
-  cycle update/rebuild uniquement parce que `master` a avancé ;
-- accorde au propriétaire du dépôt un bypass limité à `pull_request`. Ce chemin
-  d'urgence sert lorsque les Actions hébergées sont indisponibles ou sans crédit ;
-  il n'autorise jamais un push direct sur `master`.
+- imposer une pull request avant modification de `master` ;
+- exiger uniquement les checks globaux `quality` et `CI policy guard` ;
+- bloquer suppression et mises à jour non fast-forward ;
+- conserver `strict_required_status_checks_policy=false` pour éviter de rejouer
+  les builds uniquement parce que `master` a avancé ;
+- autoriser au propriétaire un bypass limité au mode `pull_request`, jamais un
+  push direct sur `master`.
 
-`Vercel`, `Playwright Preview E2E` et ZAP Preview ne sont volontairement pas
-des checks globaux obligatoires. Depuis #195, `scripts/ci-scope.sh` peut produire
-`preview_required=false` pour les changements non déployables ; ces jobs/statuts
-peuvent donc légitimement être absents ou skippés. Un required status check de
-ruleset n'est pas conditionnel au diff : les rendre obligatoires globalement
-bloquerait les PR de maintenance/tooling.
+Les checks Preview (`Vercel`, `Playwright Preview E2E`, ZAP Preview) restent
+conditionnels au diff et ne doivent pas devenir des required checks globaux.
 
-Le mode `strict=false` est un compromis explicite coût/risque : le dernier HEAD
-de la PR doit avoir ses checks obligatoires verts, mais GitHub n'impose pas de
-rejouer ces checks après chaque mouvement ultérieur de `master`. La quality gate
-résout déjà le HEAD courant de la branche de base au démarrage du run. Si les PR
-concurrentes deviennent fréquentes, passer ce paramètre à `true` devient le
-durcissement suivant à évaluer. GitHub documente explicitement ce compromis :
-le mode strict requiert une branche à jour mais peut provoquer davantage de builds,
-le mode loose réduit ces builds au prix d'un risque d'incompatibilité avec une base
-ayant avancé.
+## Validation local-first
 
-## Validation locale
-
-Le script reste en lecture seule tant que `--apply` n'est pas utilisé :
+Aucun runner GitHub n'est nécessaire pour valider la configuration versionnée :
 
 ```bash
 bash scripts/manage-master-ruleset.sh --validate
 bash scripts/manage-master-ruleset.sh --print
-bash scripts/manage-master-ruleset.sh --check --repo AlbanAndrieu/nabla-site-alban
 ```
 
-`--validate` ne contacte pas GitHub et vérifie localement les invariants
-sensibles du JSON : cible, enforcement, ensemble exact des règles, paramètres PR,
-checks obligatoires, source GitHub Actions, mode strict et bypass.
+`--validate` vérifie localement avec `jq` la cible, l'enforcement, l'ensemble
+exact des règles, les paramètres PR, les deux checks obligatoires, `strict=false`
+et le bypass propriétaire.
 
-`--check` échoue fermé si le ruleset distant est absent, dupliqué ou dérive du
-JSON versionné.
+L'audit du dépôt live est read-only et utilise le credential `gh` local :
+
+```bash
+bash scripts/manage-master-ruleset.sh --check \
+  --repo AlbanAndrieu/nabla-site-alban
+```
+
+Résultats attendus :
+
+- `RULESET_OK` : état distant identique au JSON versionné ;
+- `RULESET_MISSING` : aucun ruleset portant ce nom ;
+- `RULESET_DUPLICATE` : plusieurs rulesets concurrents ;
+- `RULESET_DRIFT` : état distant différent.
+
+Le script échoue fermé dans les trois derniers cas.
 
 ## Application
 
-L'application nécessite `gh`, `jq` et un credential GitHub disposant de
+L'application utilise la workstation et ne consomme pas de crédit GitHub Actions.
+Elle exige `gh`, `jq` et un credential GitHub avec
 `Administration: write` sur le dépôt :
 
 ```bash
-bash scripts/manage-master-ruleset.sh --apply --repo AlbanAndrieu/nabla-site-alban
+bash scripts/manage-master-ruleset.sh --apply \
+  --repo AlbanAndrieu/nabla-site-alban
 ```
 
-La commande crée le ruleset s'il est absent, le met à jour s'il existe, puis le
-relit et exige une correspondance normalisée exacte.
+Le script crée le ruleset s'il manque, met à jour un ruleset divergent, puis le
+relit et exige `RULESET_OK`.
 
-## Bypass de continuité
+Après application, exécuter à nouveau `--check` et conserver le résultat avec le
+SHA de la branche/PR qui porte la configuration.
 
-Lorsque les crédits GitHub Actions sont indisponibles, le bypass propriétaire ne
-doit être utilisé que depuis l'interface de merge de la PR après une preuve locale
-de publication réussie, idéalement :
+## Continuité sans crédits Actions
+
+Le bypass propriétaire sert uniquement depuis l'interface de merge d'une PR
+lorsque les runners hébergés sont indisponibles. Il doit être accompagné d'une
+preuve locale exacte-SHA, idéalement :
 
 ```bash
 npm run quality:agent:publish
+npm run quality:agent:publish -- --status
 ```
 
-Il faut conserver dans la PR le SHA exact validé et la commande de validation
-utilisée. Le bypass est un mécanisme de continuité et non un remplacement de la
-quality gate locale. Le mode `pull_request` est volontaire : il n'accorde pas de
-bypass pour un push direct vers `master`.
+Ce bypass ne remplace pas la quality gate et n'autorise jamais un push direct sur
+`master`.
 
-## État d'activation
+## État live
 
-Au 24 septembre 2026, le dépôt GitHub n'expose encore aucun ruleset installé. La
-configuration et les outils de validation/application sont versionnés d'abord ;
-l'item de roadmap reste ouvert jusqu'à application du ruleset distant et jusqu'à
-ce que `--check` retourne `RULESET_OK` contre le dépôt live.
+Audit GitHub du **30 septembre 2026** : aucun ruleset n'est installé sur le dépôt.
+Le prochain geste P0 est donc uniquement l'application depuis une workstation
+autorisée, puis la preuve `RULESET_OK`. Le backlog correspondant reste dans
+`docs/quality-roadmap.md`.

@@ -33,11 +33,11 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P0 — Protection de merge, publication et dépendances
 
-- [ ] **Activer et auditer le ruleset `master`** décrit dans
-  `docs/github-master-ruleset.md`. Les checks globaux sont `quality` et
-  `CI policy guard`; les checks Preview restent conditionnels à
-  `preview_required`. Fermer uniquement lorsque `--check` retourne
-  `RULESET_OK` contre le dépôt live.
+- [ ] **Activer le ruleset `master` depuis une workstation autorisée** :
+  l'audit live du 30 septembre confirme qu'aucun ruleset n'est installé. Exécuter
+  `scripts/manage-master-ruleset.sh --apply`, puis fermer uniquement lorsque
+  `--check` retourne `RULESET_OK`. Contrat et rollback :
+  `docs/github-master-ruleset.md`.
 - [ ] **Valider le recovery post-merge** avec les permissions GitHub réelles :
   échec auto-corrigeable → PR de remédiation + dispatch CI ; échec non
   auto-corrigeable → issue diagnostique dédupliquée. Ce filet ne remplace jamais
