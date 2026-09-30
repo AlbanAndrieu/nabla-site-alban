@@ -45,13 +45,13 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
-- [ ] **Finaliser l'ownership Renovate** : garder GitHub vulnerability alerts
-  activées mais désactiver *Dependabot Security Updates* ; vérifier/installer
-  Mend Renovate App, observer le premier Dependency Dashboard et une PR
-  `security`, puis vérifier qu'un conflit est résolu uniquement par
-  `rebaseWhen=conflicted`.
-- [ ] **Finaliser Semantic Release** : fournir l'identité GitHub App requise,
-  créer réellement le tag/release `v0.0.1`, puis vérifier changelog et rollback.
+- [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
+  Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
+  confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un
+  rebase conflictuel géré uniquement par `rebaseWhen=conflicted`.
+- [ ] **Finaliser Semantic Release** : aucune GitHub Release n'est publiée au
+  30 septembre. Fournir l'identité GitHub App, publier réellement `v0.0.1`,
+  puis vérifier changelog et rollback.
 
 ## P1 — UI/UX et design system
 
