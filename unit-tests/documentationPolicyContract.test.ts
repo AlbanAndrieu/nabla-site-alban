@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdir, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -66,4 +66,27 @@ test("documentation index keeps roadmap, runbook, incident and contract ownershi
 	assert.match(index, /Un runbook décrit l'état courant et le diagnostic/);
 	assert.match(index, /document de contrat décrit les invariants/);
 	assert.match(index, /incidents vont sous `docs\/incidents\/`/);
+});
+
+test("documentation index relative links resolve", async () => {
+	const indexPath = path.join(DOCS, "README.md");
+	const index = await readFile(indexPath, "utf8");
+	const targets = [...index.matchAll(/\[[^\]]+\]\((?![a-z]+:|#)([^)]+)\)/gi)].map(
+		(match) => match[1],
+	);
+
+	assert.ok(targets.length > 0, "documentation index should contain local links");
+	for (const target of targets) {
+		const relativeTarget = target.split("#", 1)[0];
+		if (!relativeTarget) continue;
+		const absolute = path.resolve(
+			path.dirname(indexPath),
+			decodeURIComponent(relativeTarget),
+		);
+		try {
+			await access(absolute);
+		} catch {
+			assert.fail(`broken documentation index link: ${target}`);
+		}
+	}
 });
