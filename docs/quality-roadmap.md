@@ -29,7 +29,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
-| Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert maintenu uniquement dans les roadmaps |
+| Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
 
 ## P0 — Protection de merge, publication et dépendances
 
