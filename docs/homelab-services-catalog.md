@@ -1,137 +1,91 @@
-# Homelab services catalog migration
+# Homelab catalog v2 consumer contract
 
-The homelab catalog is migrating through a **coordinated direct cutover**. Site
-Alban is a presentation consumer; it must not become a second inventory authority
-and it must not keep a long-lived v1/v2 compatibility layer.
+Status: **consumer parser implemented, production cutover pending**.
 
-## Target authority
+Site Alban is a presentation consumer. It must not become a second inventory
+authority and must not maintain a long-lived v1/v2 compatibility layer.
 
-The future canonical model is owned by `nabla-compose`:
+## Authority chain
 
-1. service-local Backstage `catalog-info.yaml` descriptors own catalog identity,
-   ownership, system membership and standard relations;
-2. Docker Compose owns runtime service/image/ports/networks/healthcheck facts;
-3. minimal `x-nabla` owns only Nabla-specific operational/security semantics
-   that do not have a suitable standard representation;
-4. generated CycloneDX/provider views share the same stable identities and
-   `catalogRevision`;
-5. FastAPI Sample reconciles declared state with runtime/health/provider evidence;
-6. Site Alban renders that reconciled contract.
+The canonical model is owned upstream:
 
-Cartography/Neo4j may enrich observed graph/security analysis but never becomes
-the lifecycle or catalog source of truth.
+1. Backstage `catalog-info.yaml` owns catalog identity, ownership, system
+   membership and standard relations;
+2. Docker Compose owns runtime image/ports/networks/healthcheck facts;
+3. minimal `x-nabla` owns only Nabla-specific operational/security semantics;
+4. generated views share stable identities and one `catalogRevision`;
+5. FastAPI reconciles declared state with runtime/health/provider evidence;
+6. Site Alban renders that reconciled read model.
 
-## Migration policy
+Cartography/Neo4j may enrich graph/security analysis but is not a lifecycle or
+catalog source of truth.
 
-This service is non-critical, so a short catalog/Architecture interruption is an
-acceptable trade-off for a simpler migration.
+## Site v2 schema
 
-The cutover rules are therefore:
-
-- no parallel v1/v2 reader;
-- no dual write;
-- no old-schema runtime fallback;
-- no permanent compatibility translation layer;
-- no independent hand-maintained service inventory in this repository.
-
-`public/homelab-services.json` must be replaced during the migration rather than
-kept indefinitely for v1 compatibility. If a bundled last-known-good artifact is
-still useful after cutover, it must be generated from the **new schema**, carry
-the same `catalogRevision`, and remain cache/resilience data only.
-
-Rollback is performed by reverting the coordinated repository/deployment commits,
-not by maintaining two wire contracts.
-
-## Cutover sequence
-
-```text
-nabla-compose
-Backstage + Compose + minimal x-nabla
-              |
-              v
-       canonical generator
-              |
-       +------+------+
-       |             |
-       v             v
-   CycloneDX    declared/provider
-                   projections
-                      |
-                      v
-                fastapi-sample
-             reconciled read model
-                      |
-                      v
-               nabla-site-alban
-```
-
-The coordinated migration should:
-
-1. freeze a known-good pre-cutover commit/tag in all participating repositories;
-2. validate the new `nabla-compose` catalog for stable IDs, relation closure,
-   exposure/access-policy coverage and one `catalogRevision`;
-3. update FastAPI's loader/reconciliation/API contract directly to the new model;
-4. update Site Alban's types/loaders/Architecture and TrueNAS presentation directly
-   to that contract;
-5. remove v1-only parsers, fixtures and compatibility overlays in the same
-   migration window;
-6. deploy FastAPI then Site Alban and validate the end-to-end read model;
-7. rollback the coordinated deployment if acceptance fails rather than reopening
-   a dual-schema compatibility path.
-
-## Site Alban acceptance contract
-
-Before production cutover, prove:
-
-- stable canonical entity/service IDs drive React/graph keys;
-- every relation endpoint resolves;
-- declared and observed state remain visually distinct;
-- relation type, strength and evidence are preserved where present;
-- exposure/access intent is rendered from canonical declarations, not inferred
-  from hostnames or labels;
-- missing runtime/security evidence produces unknown/unavailable presentation,
-  not a false DOWN state;
-- any LKG artifact uses the new schema and matching `catalogRevision`;
-- EN/FR Architecture and TrueNAS pages build and render successfully;
-- local quality gate and production build pass on the final cutover tree.
-
-## Source design
-
-The authoritative migration design lives in `nabla-compose`:
-
-- `docs/service-catalog-security-graph.md`;
-- `docs/service-catalog-v2-normalization.md`.
-
-Site Alban should follow those contracts rather than inventing a consumer-specific
-catalog schema.
-
-## Site v2 implementation status
-
-The active PR now contains an isolated v2 consumer contract in
-`lib/homelabCatalogV2.ts`.
-
-It accepts only the canonical generated shape:
+`lib/homelabCatalogV2.ts` already validates the isolated v2 shape:
 
 ```json
 {
   "schemaVersion": 2,
   "model": "backstage",
-  "catalogRevision": "sha256:...",
+  "catalogRevision": "sha256:<64 lowercase hex>",
   "entities": []
 }
 ```
 
-The corresponding `CatalogV2ServiceView` derives service presentation from
-Backstage entity metadata:
+The parser requires unique `entityRef` values and accepts Backstage
+`API`, `Component`, `Domain`, `Group`, `Resource` and `System`
+entities.
 
-- canonical identity from `entityRef` and `metadata.name`;
-- display name/description from Backstage metadata;
-- technical type and lifecycle from `spec`;
+For service presentation, `CatalogV2ServiceView` derives:
+
+- identity from `entityRef` and `metadata.name`;
+- display name/description from metadata;
+- technical type/lifecycle from `spec`;
 - category and NIST CSF functions from tags;
 - operational/business criticality from qualified labels;
-- source provenance from `sourcePath`.
+- provenance from `sourcePath`.
 
-This parser is deliberately **not wired to production yet**. FastAPI must first
-publish the same v2 read-model and `catalogRevision`; then the existing v1
-loaders are replaced in one coordinated cutover rather than retained as a dual
-reader.
+The parser is intentionally **not wired to production loaders yet**. Current
+production catalog/topology readers remain v1 until FastAPI publishes the
+coordinated v2 read model.
+
+## Direct-cutover policy
+
+The site is non-critical, so a short controlled catalog/Architecture interruption
+is preferable to permanent compatibility complexity.
+
+During cutover:
+
+- no parallel v1/v2 reader;
+- no dual write;
+- no old-schema runtime fallback;
+- no permanent translation layer;
+- no independently maintained service inventory in this repository.
+
+If a last-known-good artifact remains useful after cutover, it must be generated
+from v2, carry the matching `catalogRevision`, and act only as cache/resilience
+data. Rollback is performed by reverting the coordinated deployment commits, not
+by reopening a second wire contract.
+
+## Acceptance contract
+
+Before production cutover, prove that:
+
+- stable canonical IDs drive React/graph keys;
+- every relation endpoint resolves;
+- declared and observed state remain distinct;
+- relation type, strength and evidence survive reconciliation;
+- exposure/access intent comes from canonical declarations, not hostname guesses;
+- missing runtime/security evidence renders unknown/unavailable, not false DOWN;
+- any LKG artifact uses v2 and the matching `catalogRevision`;
+- EN/FR Architecture and TrueNAS surfaces build/render correctly;
+- the local quality gate and production build pass on the final cutover tree.
+
+The authoritative upstream design remains in `nabla-compose`:
+
+- `docs/service-catalog-security-graph.md`;
+- `docs/service-catalog-v2-normalization.md`.
+
+The remaining cutover sequence and rollback work is tracked only in
+`docs/homelab-roadmap.md`.

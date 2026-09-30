@@ -60,6 +60,11 @@ Les designs canoniques restent dans `nabla-compose`
 
 ## P1 — Santé, diagnostic et métriques
 
+Le contrat de santé dépendances (`local_state`, `effective_state`,
+`blocked_by`, `degraded_by`, `unconfirmed_dependencies`) est déjà consommé
+par un resolver partagé et protégé par tests. Ne pas recréer cette logique par
+vue.
+
 - [ ] Consommer le diagnostic opérateur à six dépendances seulement si FastAPI
   l'expose comme contrat API stable
   (`configured/reachable/authenticated/application_result/stale/error_*/evidence_complete`);
@@ -117,6 +122,9 @@ Le diagnostic historique est conservé dans
 
 - Parser catalogue v2, IDs Backstage et contrôles `catalogRevision` préparés
   mais volontairement non connectés au runtime.
+- Santé dépendances livrée côté site : resolver partagé, états
+  bloqué/dégradé/non confirmé, preuves de relation et protection contre les faux
+  rouges `runtime_missing`.
 - Régressions TrueNAS REST gardées par contrat ; WebSocket, fraîcheur, provenance
   et rolling probes visibles sans transformer `runtime_missing` en panne prouvée.
 - Cloudflare stale/indisponible reste une preuve non confirmée ; le navigateur
