@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 29 septembre 2026.
+Dernière réconciliation : 30 septembre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -29,7 +29,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
-| Documentation | Index central, deux roadmaps actives, incidents dédiés et migrations terminées compactées dans des contrats/runbooks durables |
+| Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert maintenu uniquement dans les roadmaps |
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -110,16 +110,6 @@ métriques bornées et séparation disponibilité/posture sécurité.
   la couverture supplémentaire justifie le coût.
 - [ ] Rétablir une lecture automatisable des logs runtime Vercel lorsqu'un
   connecteur/endpoint adapté est disponible.
-
-## P2 — Documentation et maintenance
-
-- [ ] Continuer à fusionner ou retirer un document seulement lorsqu'il ne décrit
-  plus un runtime/protocole actif ou lorsqu'une autre source canonique conserve
-  ses informations opératoires.
-- [ ] Garder les PR de refactoring petites et thématiques ; l'historique détaillé
-  reste dans Git.
-- [ ] À chaque chantier transverse, comparer `nabla-site-bababou` et ne reprendre
-  que les écarts de plateforme réellement utiles.
 
 Les preuves détaillées des livraisons terminées restent dans Git/GitHub et, si
 elles ont encore une valeur opérationnelle, dans les documents indexés par

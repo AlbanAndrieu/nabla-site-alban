@@ -9,7 +9,7 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 - [Architecture et exploitation](architecture.md)
 - [Catalogue des services homelab](homelab-services-catalog.md)
 - [Santé des dépendances homelab](homelab-dependency-health-ui.md)
-- [Réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
+- [Runbook réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
 
 ## Roadmaps actives
@@ -62,5 +62,7 @@ Compacter ou supprimer :
   reproduire le diagnostic sans relire le chat d'origine.
 - Les travaux homelab détaillés vont uniquement dans `homelab-roadmap.md`; la
   roadmap qualité référence le chantier au lieu de recopier sa checklist.
+- Un runbook décrit l'état courant et le diagnostic ; toute action encore ouverte
+  appartient à une roadmap, pas à une seconde checklist dans le runbook.
 - Avant publication, utiliser la quality gate du dépôt plutôt qu'une liste de
   commandes documentaire susceptible de dériver.
