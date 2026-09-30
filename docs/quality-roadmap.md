@@ -74,9 +74,11 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
 - [ ] Ajouter un audit axe EN/FR reproductible lorsque `axe-core` peut être
   verrouillé localement dans le lockfile.
-- [ ] Revalider en production canonical, `hreflang`, robots, sitemap et Open Graph
-  sur le host final `www`, puis traiter les anciennes URL `.html` encore indexées
-  sans toucher aux CV historiques.
+- [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
+  robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
+  vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
+  tant que les moteurs exposent encore ces anciennes URLs et au minimum jusqu'au
+  23 août 2027, sans toucher aux CV historiques.
 - [ ] Décider l'indexabilité de CTID, FreeNAS et Workstation, ainsi que le périmètre
   de langues éditoriales au-delà de EN/FR.
 
