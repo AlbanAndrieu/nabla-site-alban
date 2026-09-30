@@ -52,8 +52,6 @@ include:
       auto-release-enabled: true
       info-on: all
 
-
-
   - project: "renovate-bot/renovate-runner"
     file: "/templates/renovate-config-validator.gitlab-ci.yml"
 
@@ -175,7 +173,6 @@ variables:
   SECRET_DETECTION_HISTORIC_SCAN: false
   IGNORE_NORMALISATION_GIT_HEAD_MOVE: "true"
   MEGALINTER_IMAGE_TAG: "v9.2.0"
-
 
 secret_detection:
   stage: secret-detection

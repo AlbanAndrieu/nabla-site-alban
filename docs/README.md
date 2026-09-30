@@ -7,9 +7,9 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 ## Architecture et exploitation
 
 - [Architecture et exploitation](architecture.md)
-- [Catalogue des services homelab](homelab-services-catalog.md)
-- [Santé des dépendances homelab](homelab-dependency-health-ui.md)
-- [Réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
+- [Contrat catalogue homelab v2](homelab-services-catalog.md)
+- [Contrat de santé des dépendances homelab](homelab-dependency-health-ui.md)
+- [Runbook réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
 
 ## Roadmaps actives
@@ -32,7 +32,7 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
-- [Migration et invariants des URL SEO](seo-url-migration.md)
+- [Contrat de routage et redirects SEO](seo-url-migration.md)
 
 ## Politique de réduction documentaire
 
@@ -62,5 +62,9 @@ Compacter ou supprimer :
   reproduire le diagnostic sans relire le chat d'origine.
 - Les travaux homelab détaillés vont uniquement dans `homelab-roadmap.md`; la
   roadmap qualité référence le chantier au lieu de recopier sa checklist.
+- Un runbook décrit l'état courant et le diagnostic ; toute action encore ouverte
+  appartient à une roadmap, pas à une seconde checklist dans le runbook.
+- Un document de contrat décrit les invariants déjà implémentés ou la frontière
+  d'intégration ; son plan de livraison restant appartient à la roadmap.
 - Avant publication, utiliser la quality gate du dépôt plutôt qu'une liste de
   commandes documentaire susceptible de dériver.

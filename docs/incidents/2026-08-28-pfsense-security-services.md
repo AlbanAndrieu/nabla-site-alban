@@ -1,17 +1,47 @@
 # pfSense security services incident — 28 August 2026
 
-Status: mitigated; remaining ASN/log-retention follow-up is tracked in `docs/homelab-roadmap.md`.
+Status: mitigated; remaining network/security follow-up is tracked in
+`docs/homelab-roadmap.md`.
 
 ## Scope
 
-This note records the pfSense stability and security-service findings observed while recovering CrowdSec, pfBlockerNG and Snort after the LAN/link incident. It separates confirmed root causes from mitigations and deferred follow-up.
+This note records the pfSense stability and security-service findings observed
+while recovering CrowdSec, pfBlockerNG and Snort after the LAN/link incident. It
+keeps only evidence that remains useful for diagnosing a recurrence.
+
+## LAN/link-layer context
+
+Repeated `e6000sw0port2` DOWN/UP events were observed before recovery, with
+individual outages lasting from a few seconds to roughly 24 seconds. A grouped
+port cycle occurred during a broader pfSense interface reinitialization, but later
+isolated port flaps remained the stronger signal for an intermittent physical/L2
+fault.
+
+The important diagnostic ordering is:
+
+- a fresh `link state changed to DOWN` event is below DNS, HAProxy, DHCP,
+  dpinger and application health and therefore points first to cable/port/peer,
+  PHY negotiation or driver/hardware state;
+- `dpinger: WANGW 82.66.4.254: sendto error: 13` is a correlated symptom, not
+  evidence that dpinger itself is the root cause;
+- an earlier Unbound `SO_SNDBUF ... No buffer space available` warning was not
+  corroborated by later mbuf inspection: `netstat -m` showed zero denied or
+  delayed mbuf allocations, so persistent mbuf starvation was not retained as
+  the primary explanation;
+- when DHCP exposed only the TrueNAS-hosted resolver and TrueNAS/Docker was down,
+  clients could retain Wi-Fi/IP routing while DNS failed. This led to the
+  requirement that pfSense/Unbound remain an independent LAN resolver.
+
+The current topology, commands and addressing belong in
+`docs/truenas-fastapi-cloud-network.md`.
 
 ## Network baseline after recovery
 
 The base pfSense dataplane was healthy before continuing security-service work:
 
 - no new `e6000sw0port2` link-down events were observed during the validation window;
-- WANGW monitoring had been moved to `1.1.1.1` to separate Internet reachability from the Free next-hop gateway;
+- WANGW monitoring had been moved to `1.1.1.1` to separate Internet reachability
+  from the Free next-hop gateway;
 - `netstat -m` reported zero denied/delayed mbuf allocations;
 - `net.inet.ip.intr_queue_drops=0`;
 - VLAN interfaces had no RX/TX errors or collisions;
@@ -22,7 +52,10 @@ CrowdSec, pfBlockerNG and Snort were then re-enabled sequentially.
 
 ## CrowdSec pressure
 
-CrowdSec was initially the largest persistent CPU consumer. Metrics showed that pfSense was parsing a very noisy `/var/log/filter.log` stream and the `firewallservices/pf-scan-multi_ports` scenario repeatedly emitted backpressure warnings with millions of failed event-send attempts.
+CrowdSec was initially the largest persistent CPU consumer. Metrics showed that
+pfSense was parsing a very noisy `/var/log/filter.log` stream and the
+`firewallservices/pf-scan-multi_ports` scenario repeatedly emitted backpressure
+warnings with millions of failed event-send attempts.
 
 The pfSense CrowdSec firewall bouncer itself was healthy and inexpensive:
 
@@ -32,13 +65,14 @@ The pfSense CrowdSec firewall bouncer itself was healthy and inexpensive:
 
 ### Mitigation applied
 
-The CrowdSec **Log Processor** was disabled on pfSense while keeping the remediation/bouncer path active. This reduced the local parsing/scenario load while retaining application of community decisions to PF.
+The CrowdSec **Log Processor** was disabled on pfSense while keeping the
+remediation/bouncer path active. This reduced local parsing/scenario load while
+retaining application of community decisions to PF.
 
-This is a temporary architecture state. Local log-based detections on pfSense are reduced until the Security Engine runs elsewhere.
+This is a temporary architecture state. Local log-based detections on pfSense are
+reduced until the Security Engine runs elsewhere.
 
 ### Target architecture
-
-The intended target is:
 
 ```text
 pfSense logs + Suricata events
@@ -54,7 +88,8 @@ pfSense remediation / firewall bouncer
 PF block tables
 ```
 
-The corresponding deployment work is tracked in `AlbanAndrieu/nabla-compose` PR #59.
+The corresponding deployment work is tracked in
+`AlbanAndrieu/nabla-compose` PR #59.
 
 ## pfBlockerNG ASN failure loop
 
@@ -67,9 +102,9 @@ Allowed memory size of 134217728 bytes exhausted
 file_get_contents()
 ```
 
-The configured PHP limit was confirmed as `128M`.
-
-Subsequent diagnostics confirmed that the failure was not a generic PF-table exhaustion problem. The pfBlockerNG IP tables remained loaded and PF itself was healthy. The fault was specifically in ASN enrichment/reporting.
+The configured PHP limit was `128M`. PF tables remained loaded and PF itself
+was healthy, so the failure was isolated to ASN enrichment/reporting rather than
+generic PF-table exhaustion.
 
 ### Confirmed root cause
 
@@ -80,41 +115,36 @@ pfblockerng.php asn
 pfblockerng.sh iptoasn <IP>
 ```
 
-and `extras.log` accumulated repeated entries such as:
+while `extras.log` repeatedly attempted:
 
 ```text
 Downloading [ IPinfo databases ]
 ```
 
-The associated error was explicit and repeated:
+with:
 
 ```text
 ASN Token not defined. Terminating Download.
 Database ASN [ asn.mmdb ] not found. Register for IPinfo Token.
 ```
 
-Current pfBlockerNG code attempts to download the IPinfo ASN database on first ASN lookup when `/usr/local/share/GeoIP/asn.mmdb` is absent. Because no IPinfo ASN token is configured, the database is never created. Each subsequent `iptoasn` lookup can therefore trigger another failed download attempt.
-
-This created a retry loop which contributed CPU load, log growth and the observed PHP OOM.
+Without an IPinfo ASN token, `asn.mmdb` was never created. Subsequent
+`iptoasn` lookups could therefore trigger another failed download, contributing
+CPU load, log growth and the observed PHP OOM.
 
 ### Mitigation applied
 
-**ASN Reporting was disabled.** This does not disable pfBlockerNG enforcement:
+**ASN Reporting was disabled.** Enforcement remained active through PF aliases,
+GeoIP policy, DNSBL and existing `pfB_*` tables.
 
-- IP feeds still populate native PF aliases/tables;
-- GeoIP country/continent policy still operates independently;
-- DNSBL still filters through Unbound;
-- existing `pfB_*` firewall tables remain active.
-
-ASN reporting is enrichment for reports/alerts (mapping an IP to an Autonomous System/organisation), not the primary enforcement path.
-
-However this mitigation is **not yet a complete fix**. `iptoasn` calls were still observed after disabling ASN Reporting, which means another report/log-enrichment path can still request ASN conversion. Do not raise PHP `memory_limit` merely to hide this loop.
-
-The low-priority follow-up is to remove/disable the remaining ASN enrichment path cleanly, or fix the upstream/package configuration so an absent ASN token/database cannot cause repeated downloads.
+This mitigation is incomplete: `iptoasn` calls were still observed afterwards,
+so another enrichment path can still request ASN conversion. Do not increase PHP
+`memory_limit` to hide the loop. The remaining cleanup is tracked in the homelab
+roadmap.
 
 ## pfBlockerNG log volume
 
-pfBlockerNG logs were found to be unusually large, including approximately:
+Large historical logs included approximately:
 
 ```text
 dns_reply.log   ~580 MB
@@ -124,16 +154,15 @@ error.log        ~37 MB
 extras.log       ~16 MB
 ```
 
-The configured log limits were already set to about 10,000 lines, so they must **not** be increased. The large files are historical/current artifacts and also make broad `grep /var/log/pfblockerng/*` diagnostics expensive.
-
-Use targeted log inspection instead, for example:
+Configured limits were already around 10,000 lines and must not be increased.
+Prefer targeted inspection:
 
 ```sh
 tail -100 /var/log/pfblockerng/error.log
 tail -100 /var/log/pfblockerng/extras.log
 ```
 
-Follow up later on rotation/retention behaviour and truncate/archive oversized historical logs only with an explicit rollback/retention decision.
+Rotation/retention cleanup remains open in the homelab roadmap.
 
 ## PF tables observed
 
@@ -144,52 +173,33 @@ crowdsec_blacklists  ~22.9k entries
 snort2c              3 entries
 ```
 
-pfBlockerNG tables included:
+pfBlockerNG tables included `pfB_Antarctica_v4/v6`, `pfB_Asia_v4/v6`,
+`pfB_BlockListDE_v4` and `pfB_PRI1_v4` through `pfB_PRI3_v4`. Their
+presence confirmed that disabling ASN Reporting did not remove IP-blocking
+policy.
 
-```text
-pfB_Antarctica_v4
-pfB_Antarctica_v6
-pfB_Asia_v4
-pfB_Asia_v6
-pfB_BlockListDE_v4
-pfB_PRI1_v4
-pfB_PRI2_v4
-pfB_PRI3_v4
-```
+## AutoConfigBackup and configuration audit
 
-The existence of these tables confirms that disabling ASN Reporting does not remove the underlying IP-blocking policy.
+AutoConfigBackup had reported curl error `(28)` while WAN/LAN was unstable.
+After network recovery, DNS, TCP/443, TLS and the Netgate certificate succeeded,
+and the GUI reported `Hosted backup count: 100`. The earlier errors are treated
+as transient network symptoms rather than an active ACB failure.
 
-## AutoConfigBackup
+A local/exported pfSense configuration backup was also taken before continuing
+security-service changes.
 
-AutoConfigBackup previously reported curl error `(28)` while the WAN/LAN path was unstable. After network recovery:
-
-- `acb.netgate.com` resolved successfully;
-- TCP/443 and TLS negotiation succeeded;
-- the Netgate certificate validated;
-- the GUI reported `Hosted backup count: 100`.
-
-The historical `(28)` errors are therefore treated as transient network-timeout symptoms, not an active ACB failure.
-
-A local/exported pfSense configuration backup was also taken before continuing firewall/security-service changes.
-
-## `write_config()` warning
-
-pfSense logged:
+pfSense also logged:
 
 ```text
 WARNING: write_config() was called without description
 ```
 
-AutoConfigBackup subsequently recorded `/pkg_edit.php made unknown change` at approximately the same time as the CrowdSec package setting change. This is treated as package/UI audit metadata quality rather than evidence of `config.xml` corruption.
+AutoConfigBackup recorded `/pkg_edit.php made unknown change` around the same
+CrowdSec package change. This is treated as package/UI audit-metadata quality, not
+evidence of `config.xml` corruption.
 
-## Remaining security hardening
+## Remaining ownership
 
-The higher-priority security work remains to replace the broad WAN rule:
-
-```text
-Easy Rule: Passed from Firewall Log View
-```
-
-with explicit least-privilege WAN policy. In particular, the pfSense webConfigurator must not be reachable from the public Internet; only explicitly published services such as the HAProxy TrueNAS frontend should remain exposed.
-
-The ASN cleanup is intentionally lower priority than this WAN-rule hardening because ASN enrichment is optional and enforcement remains active without it.
+No open checklist is maintained in this incident record. Current network,
+least-privilege WAN, DNS resilience, ASN cleanup, log retention and rollback work
+is owned by `docs/homelab-roadmap.md`.
