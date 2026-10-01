@@ -139,6 +139,20 @@ test("ruleset local validation rejects unsafe policy drift", async () => {
 	}
 });
 
+test("ruleset audit fails closed when the live ruleset is absent", async () => {
+	const mock = await mockGh("missing");
+	try {
+		await assert.rejects(
+			execFileAsync("bash", [SCRIPT, "--check"], {
+				env: testEnv(mock.cwd),
+			}),
+			(error: { stderr?: string }) =>
+				Boolean(error.stderr?.includes("RULESET_MISSING")),
+		);
+	} finally {
+		await rm(mock.cwd, { recursive: true, force: true });
+	}
+});
 test("ruleset audit passes only when GitHub matches the repository-owned config", async () => {
 	for (const [mode, shouldPass] of [
 		["exact", true],

@@ -17,7 +17,7 @@ const resourcesPath = new URL(
 const messagesLoaderPath = new URL("../i18n/messages.ts", import.meta.url);
 
 const EXPECTED_LINK_COUNTS = {
-	owasp: 8,
+	owasp: 9,
 	personal: 3,
 	network: 5,
 	hardening: 9,
@@ -55,6 +55,7 @@ test("security uses its dedicated next-intl catalog", async () => {
 	assert.match(sections, /nativeSections\.\$\{definition\.key\}/);
 	assert.doesNotMatch(resources, /\/ai\.html#/);
 	assert.match(resources, /page: "truenas"/);
+	assert.match(resources, /page: "security\/dsomm"/);
 	assert.match(resources, /hash: "homelab"/);
 	assert.match(resources, /zero-trust-kubernetes/);
 	assert.match(loader, /SECURITY_LOADERS/);

@@ -36,6 +36,10 @@ export const SITE_PAGES = {
 		category: "editorialShowcase",
 		seo: { priority: 0.85, changeFrequency: "monthly" },
 	},
+	"security/dsomm": {
+		category: "editorialShowcase",
+		seo: { priority: 0.76, changeFrequency: "monthly" },
+	},
 	ai: {
 		category: "editorialShowcase",
 		seo: { priority: 0.8, changeFrequency: "monthly" },

@@ -1,4 +1,9 @@
-export type ResourceLinkIcon = "external" | "github" | "brain" | "terminal";
+export type ResourceLinkIcon =
+	| "external"
+	| "github"
+	| "brain"
+	| "terminal"
+	| "chart";
 
 export type ResourceLink =
 	| {
@@ -6,8 +11,8 @@ export type ResourceLink =
 			icon?: ResourceLinkIcon;
 	  }
 	| {
-			page: "ai" | "truenas";
-			hash: string;
+			page: "ai" | "truenas" | "security/dsomm";
+			hash?: string;
 			icon: ResourceLinkIcon;
 	  };
 
@@ -43,6 +48,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 		id: "owasp-resources",
 		iconClass: "fa-solid fa-shield-halved",
 		links: [
+			{ page: "security/dsomm", icon: "chart" },
 			{ href: "https://owasp.org/www-project-top-ten/" },
 			{ href: "https://owasp.org/www-project-web-security-testing-guide/" },
 			{

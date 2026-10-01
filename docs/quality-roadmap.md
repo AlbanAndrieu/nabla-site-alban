@@ -29,29 +29,29 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
-| Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert maintenu uniquement dans les roadmaps |
+| Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
 
 ## P0 — Protection de merge, publication et dépendances
 
-- [ ] **Activer et auditer le ruleset `master`** décrit dans
-  `docs/github-master-ruleset.md`. Les checks globaux sont `quality` et
-  `CI policy guard`; les checks Preview restent conditionnels à
-  `preview_required`. Fermer uniquement lorsque `--check` retourne
-  `RULESET_OK` contre le dépôt live.
-- [ ] **Valider le recovery post-merge** avec les permissions GitHub réelles :
-  échec auto-corrigeable → PR de remédiation + dispatch CI ; échec non
-  auto-corrigeable → issue diagnostique dédupliquée. Ce filet ne remplace jamais
-  la gate pré-publication.
+- [ ] **Activer le ruleset `master` depuis une workstation autorisée** :
+  l'audit live du 30 septembre confirme qu'aucun ruleset n'est installé. Exécuter
+  `scripts/manage-master-ruleset.sh --apply`, puis fermer uniquement lorsque
+  `--check` retourne `RULESET_OK`. Contrat et rollback :
+  `docs/github-master-ruleset.md`.
+- [ ] **Valider les permissions live du recovery post-merge** : les contrats locaux
+  couvrent trigger master, séparation read/write, patch déterministe, déduplication
+  et fallbacks PR/issue/dispatch. Il reste à prouver sur le dépôt réel :
+  auto-fixable → PR + dispatch CI ; non auto-fixable → issue dédupliquée.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
-- [ ] **Finaliser l'ownership Renovate** : garder GitHub vulnerability alerts
-  activées mais désactiver *Dependabot Security Updates* ; vérifier/installer
-  Mend Renovate App, observer le premier Dependency Dashboard et une PR
-  `security`, puis vérifier qu'un conflit est résolu uniquement par
-  `rebaseWhen=conflicted`.
-- [ ] **Finaliser Semantic Release** : fournir l'identité GitHub App requise,
-  créer réellement le tag/release `v0.0.1`, puis vérifier changelog et rollback.
+- [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
+  Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
+  confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un
+  rebase conflictuel géré uniquement par `rebaseWhen=conflicted`.
+- [ ] **Finaliser Semantic Release** : aucune GitHub Release n'est publiée au
+  30 septembre. Fournir l'identité GitHub App, publier réellement `v0.0.1`,
+  puis vérifier changelog et rollback.
 
 ## P1 — UI/UX et design system
 
@@ -74,13 +74,20 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
 - [ ] Ajouter un audit axe EN/FR reproductible lorsque `axe-core` peut être
   verrouillé localement dans le lockfile.
-- [ ] Revalider en production canonical, `hreflang`, robots, sitemap et Open Graph
-  sur le host final `www`, puis traiter les anciennes URL `.html` encore indexées
-  sans toucher aux CV historiques.
+- [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
+  robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
+  vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
+  tant que les moteurs exposent encore ces anciennes URLs et au minimum jusqu'au
+  23 août 2027, sans toucher aux CV historiques.
 - [ ] Décider l'indexabilité de CTID, FreeNAS et Workstation, ainsi que le périmètre
   de langues éditoriales au-delà de EN/FR.
 
 ## P1 — Sécurité applicative
+
+Le premier jalon DSOMM est livré comme snapshot OWASP statique sous
+`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le futur
+service DSOMM de `nabla-compose` remplacera uniquement la provenance des données
+en conservant le contrat consommateur typé du site.
 
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.

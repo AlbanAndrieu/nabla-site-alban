@@ -66,5 +66,7 @@ Compacter ou supprimer :
   appartient à une roadmap, pas à une seconde checklist dans le runbook.
 - Un document de contrat décrit les invariants déjà implémentés ou la frontière
   d'intégration ; son plan de livraison restant appartient à la roadmap.
+- Le contrat local `unit-tests/documentationPolicyContract.test.ts` interdit les
+  checklists ouvertes hors des roadmaps et protège les frontières runbook/incident/contrat.
 - Avant publication, utiliser la quality gate du dépôt plutôt qu'une liste de
   commandes documentaire susceptible de dériver.

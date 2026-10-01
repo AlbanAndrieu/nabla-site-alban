@@ -19,6 +19,7 @@
 				"title": "OWASP — Open Worldwide Application Security Project",
 				"description": "Practical standards, testing guidance and reference material for building and assessing secure web, API and mobile applications.",
 				"links": [
+					"OWASP DevSecOps Maturity Model (DSOMM)",
 					"OWASP Top 10",
 					"OWASP Web Security Testing Guide (WSTG)",
 					"OWASP Application Security Verification Standard (ASVS)",
@@ -246,6 +247,64 @@
 		"posture": {
 			"title": "Build security into delivery",
 			"description": "Combine preventive controls, continuous verification, observable production systems and clear incident response ownership."
+		}
+	},
+	"dsommPage": {
+		"meta": {
+			"title": "OWASP DSOMM — DevSecOps maturity model | Alban Andrieu",
+			"description": "Static explorer for the OWASP DevSecOps Maturity Model: levels, dimensions, risks, measures, assessment evidence and framework mappings."
+		},
+		"eyebrow": "OWASP · DevSecOps Maturity",
+		"title": "OWASP DevSecOps Maturity Model",
+		"lead": "A versioned snapshot of the official DSOMM model to explore DevSecOps capabilities, risks, measures, assessment criteria and compliance mappings.",
+		"backToSecurity": "Back to security resources",
+		"snapshotBadge": "Static OWASP snapshot",
+		"languageNote": "Activity content stays in English to preserve the upstream snapshot faithfully.",
+		"summary": {
+			"activities": "Activities",
+			"dimensions": "Dimensions",
+			"maturityLevels": "Maturity levels",
+			"upstreamVersion": "Upstream version",
+			"levelDistribution": "Activities by maturity level"
+		},
+		"explorer": {
+			"title": "Explore DSOMM activities",
+			"lead": "Filter the model by dimension, level, framework or tag. Details are rendered locally from the versioned snapshot.",
+			"searchLabel": "Search",
+			"searchPlaceholder": "Name, subdimension, risk, measure, tag…",
+			"dimensionLabel": "Dimension",
+			"allDimensions": "All dimensions",
+			"levelLabel": "Level",
+			"allLevels": "All levels",
+			"frameworkLabel": "Framework",
+			"allFrameworks": "All frameworks",
+			"tagLabel": "Tag",
+			"allTags": "All tags",
+			"results": "{count} activities out of {total}",
+			"noResults": "No activity matches these filters.",
+			"showMore": "Show more",
+			"details": "View details",
+			"description": "Description",
+			"risk": "Risk",
+			"measure": "Measure",
+			"assessment": "Expected assessment evidence",
+			"mappings": "Mappings",
+			"tags": "Tags",
+			"usefulness": "Usefulness",
+			"difficulty": "Difficulty",
+			"knowledge": "knowledge",
+			"time": "time",
+			"resources": "resources"
+		},
+		"source": {
+			"title": "Snapshot provenance",
+			"lead": "This page uses no database, iframe or runtime fetch. The model is embedded in the build and can later be replaced by the planned nabla-compose DSOMM service without changing the UI contract.",
+			"version": "Version",
+			"released": "Upstream release",
+			"snapshot": "Local snapshot",
+			"source": "OWASP DSOMM source",
+			"license": "Upstream license",
+			"project": "Official DSOMM application"
 		}
 	}
 }
