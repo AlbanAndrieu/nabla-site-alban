@@ -5,19 +5,14 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
 import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
-import { routing, type AppLocale } from "@/i18n/routing";
-import {
-	DSOMM_SNAPSHOT,
-	dsommSnapshotStats,
-} from "@/lib/dsommSnapshot";
+import { type AppLocale, routing } from "@/i18n/routing";
+import { DSOMM_SNAPSHOT, dsommSnapshotStats } from "@/lib/dsommSnapshot";
 import {
 	canonicalPageAlternates,
 	canonicalPagePath,
 } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
-import DsommExplorer, {
-	type DsommExplorerCopy,
-} from "./DsommExplorer";
+import DsommExplorer, { type DsommExplorerCopy } from "./DsommExplorer";
 import styles from "./page.module.css";
 
 export async function generateMetadata({
@@ -76,7 +71,10 @@ export default async function DsommPage({
 			</header>
 
 			<main id="main-content">
-				<section className={styles.summarySection} aria-labelledby="dsomm-summary-heading">
+				<section
+					className={styles.summarySection}
+					aria-labelledby="dsomm-summary-heading"
+				>
 					<Container>
 						<h2 id="dsomm-summary-heading" className={styles.visuallyHidden}>
 							{t("summary.levelDistribution")}
@@ -123,7 +121,10 @@ export default async function DsommPage({
 					/>
 				</Container>
 
-				<section className={styles.sourceSection} aria-labelledby="dsomm-source-heading">
+				<section
+					className={styles.sourceSection}
+					aria-labelledby="dsomm-source-heading"
+				>
 					<Container>
 						<h2 id="dsomm-source-heading">{t("source.title")}</h2>
 						<p>{t("source.lead")}</p>

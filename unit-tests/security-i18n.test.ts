@@ -55,7 +55,7 @@ test("security uses its dedicated next-intl catalog", async () => {
 	assert.match(sections, /nativeSections\.\$\{definition\.key\}/);
 	assert.doesNotMatch(resources, /\/ai\.html#/);
 	assert.match(resources, /page: "truenas"/);
-	assert.match(resources, /page: "security\\/dsomm"/);
+	assert.match(resources, /page: "security\/dsomm"/);
 	assert.match(resources, /hash: "homelab"/);
 	assert.match(resources, /zero-trust-kubernetes/);
 	assert.match(loader, /SECURITY_LOADERS/);

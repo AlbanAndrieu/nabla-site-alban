@@ -1,7 +1,11 @@
 .hero {
 	padding-block: clamp(3.25rem, 8vw, 6rem);
 	background:
-		radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--ui-link) 24%, transparent), transparent 38%),
+		radial-gradient(
+			circle at 80% 20%,
+			color-mix(in srgb, var(--ui-link) 24%, transparent),
+			transparent 38%
+		),
 		var(--ui-surface-card);
 	color: var(--ui-text-primary);
 	border-bottom: 1px solid var(--ui-border);

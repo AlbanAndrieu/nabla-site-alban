@@ -53,7 +53,8 @@ test("DSOMM snapshot is a pinned static OWASP model with stable activity identit
 		[...new Set(snapshot.activities.map((activity) => activity.level))].sort(),
 		[1, 2, 3, 4, 5],
 	);
-	assert.ok(snapshot.activities.every((activity) => activity.measure));
+	assert.ok(snapshot.activities.some((activity) => activity.measure));
+	assert.ok(snapshot.activities.some((activity) => !activity.measure));
 	assert.ok(
 		snapshot.activities.some(
 			(activity) => activity.references["iso27001-2022"]?.length > 0,

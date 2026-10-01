@@ -61,11 +61,7 @@ function frameworkLabel(key: string) {
 	return FRAMEWORK_LABELS[key] ?? key;
 }
 
-export default function DsommExplorer({
-	activities,
-	dimensions,
-	copy,
-}: Props) {
+export default function DsommExplorer({ activities, dimensions, copy }: Props) {
 	const [query, setQuery] = useState("");
 	const [dimension, setDimension] = useState("");
 	const [level, setLevel] = useState("");
@@ -101,7 +97,8 @@ export default function DsommExplorer({
 		return activities.filter((activity) => {
 			if (dimension && activity.dimension !== dimension) return false;
 			if (level && String(activity.level) !== level) return false;
-			if (framework && !(activity.references[framework]?.length > 0)) return false;
+			if (framework && !(activity.references[framework]?.length > 0))
+				return false;
 			if (tag && !activity.tags.includes(tag)) return false;
 			if (!normalizedQuery) return true;
 
@@ -130,7 +127,10 @@ export default function DsommExplorer({
 	}
 
 	return (
-		<section className={styles.section} aria-labelledby="dsomm-explorer-heading">
+		<section
+			className={styles.section}
+			aria-labelledby="dsomm-explorer-heading"
+		>
 			<header className={styles.heading}>
 				<h2 id="dsomm-explorer-heading">{copy.title}</h2>
 				<p>{copy.lead}</p>
@@ -280,9 +280,11 @@ export default function DsommExplorer({
 									<section>
 										<h4>{copy.difficulty}</h4>
 										<p>
-											{copy.knowledge}: {activity.difficultyOfImplementation.knowledge}/5 ·{" "}
-											{copy.time}: {activity.difficultyOfImplementation.time}/5 ·{" "}
-											{copy.resources}: {activity.difficultyOfImplementation.resources}/5
+											{copy.knowledge}:{" "}
+											{activity.difficultyOfImplementation.knowledge}/5 ·{" "}
+											{copy.time}: {activity.difficultyOfImplementation.time}/5
+											· {copy.resources}:{" "}
+											{activity.difficultyOfImplementation.resources}/5
 											{activity.usefulness !== null
 												? ` · ${copy.usefulness}: ${activity.usefulness}/5`
 												: ""}
@@ -300,7 +302,11 @@ export default function DsommExplorer({
 																{values.map((value) => (
 																	<li key={value}>
 																		{value.startsWith("http") ? (
-																			<a href={value} target="_blank" rel="noreferrer">
+																			<a
+																				href={value}
+																				target="_blank"
+																				rel="noreferrer"
+																			>
 																				{value}
 																			</a>
 																		) : (

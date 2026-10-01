@@ -59,7 +59,10 @@ function ResourceSection({
 					const label = copy.links[index];
 					const content = (
 						<>
-							<i className={resourceLinkIconClass(link.icon)} aria-hidden="true" />{" "}
+							<i
+								className={resourceLinkIconClass(link.icon)}
+								aria-hidden="true"
+							/>{" "}
 							{label}
 						</>
 					);
@@ -126,9 +129,7 @@ export default async function SecurityCoreSections({
 				<ResourceSection
 					definition={definition}
 					copy={
-						t.raw(
-							`nativeSections.${definition.key}`,
-						) as ResourceSectionCopy
+						t.raw(`nativeSections.${definition.key}`) as ResourceSectionCopy
 					}
 					locale={locale}
 					key={definition.id}
