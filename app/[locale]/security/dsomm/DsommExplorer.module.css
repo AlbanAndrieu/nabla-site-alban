@@ -1,0 +1,230 @@
+.section {
+	padding-block: clamp(2.5rem, 6vw, 4rem);
+	color: var(--ui-text-primary);
+}
+
+.heading {
+	max-width: 72ch;
+	margin-bottom: var(--ui-space-lg);
+}
+
+.heading h2 {
+	margin-bottom: var(--ui-space-sm);
+}
+
+.heading p,
+.resultCount,
+.subdimension {
+	color: var(--ui-text-muted);
+}
+
+.filters {
+	display: grid;
+	grid-template-columns: minmax(14rem, 2fr) repeat(4, minmax(9rem, 1fr));
+	gap: var(--ui-space-md);
+	align-items: end;
+}
+
+.filters label {
+	display: grid;
+	gap: var(--ui-space-xs);
+	min-width: 0;
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.filters input,
+.filters select {
+	width: 100%;
+	min-height: var(--ui-control-min-height);
+	padding: 0.65rem 0.75rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+}
+
+.filters input:focus-visible,
+.filters select:focus-visible,
+.showMore:focus-visible,
+.details summary:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 2px;
+}
+
+.resultCount {
+	margin-block: var(--ui-space-lg);
+	font-weight: 600;
+}
+
+.activityGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--ui-space-lg);
+}
+
+.activityCard {
+	min-width: 0;
+	padding: var(--ui-space-lg);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+	box-shadow: var(--ui-shadow-sm);
+}
+
+.activityHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--ui-space-md);
+}
+
+.activityHeader h3 {
+	margin: var(--ui-space-xs) 0;
+	font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+
+.dimension {
+	margin: 0;
+	color: var(--ui-link);
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.subdimension {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+.levelBadge {
+	flex: 0 0 auto;
+	padding: 0.3rem 0.55rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ui-space-xs);
+	margin-top: var(--ui-space-md);
+}
+
+.chips span {
+	padding: 0.2rem 0.45rem;
+	border-radius: 999px;
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-muted);
+	font-size: 0.76rem;
+}
+
+.details {
+	margin-top: var(--ui-space-lg);
+	border-top: 1px solid var(--ui-border);
+	padding-top: var(--ui-space-md);
+}
+
+.details summary {
+	min-height: var(--ui-control-min-height);
+	cursor: pointer;
+	color: var(--ui-link);
+	font-weight: 700;
+}
+
+.detailBody {
+	display: grid;
+	gap: var(--ui-space-lg);
+	padding-top: var(--ui-space-md);
+}
+
+.detailBody section {
+	min-width: 0;
+}
+
+.detailBody h4 {
+	margin: 0 0 var(--ui-space-xs);
+	font-size: 0.95rem;
+}
+
+.detailBody p {
+	margin: 0;
+	line-height: 1.65;
+}
+
+.preLine {
+	white-space: pre-line;
+}
+
+.mappingList {
+	display: grid;
+	gap: var(--ui-space-md);
+}
+
+.mappingList ul {
+	margin: var(--ui-space-xs) 0 0;
+	padding-left: 1.25rem;
+}
+
+.mappingList a {
+	overflow-wrap: anywhere;
+	color: var(--ui-link);
+}
+
+.showMore {
+	display: block;
+	min-height: var(--ui-control-min-height);
+	margin: var(--ui-space-xl) auto 0;
+	padding-inline: var(--ui-space-lg);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	font-weight: 700;
+}
+
+.empty {
+	padding: var(--ui-space-xl);
+	border: 1px dashed var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	color: var(--ui-text-muted);
+	text-align: center;
+}
+
+@media (max-width: 1050px) {
+	.filters {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.searchField {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (max-width: 760px) {
+	.activityGrid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 520px) {
+	.filters {
+		grid-template-columns: 1fr;
+	}
+
+	.searchField {
+		grid-column: auto;
+	}
+
+	.activityCard {
+		padding: var(--ui-space-md);
+	}
+
+	.activityHeader {
+		align-items: flex-start;
+	}
+}

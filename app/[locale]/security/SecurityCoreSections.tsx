@@ -25,6 +25,8 @@ function resourceLinkIconClass(icon: ResourceLinkIcon = "external") {
 			return "fa-solid fa-brain";
 		case "terminal":
 			return "fa-solid fa-terminal";
+		case "chart":
+			return "fa-solid fa-chart-line";
 		default:
 			return "fa-solid fa-arrow-up-right-from-square";
 	}
@@ -62,12 +64,17 @@ function ResourceSection({
 						</>
 					);
 
+					const internalHref =
+						"page" in link
+							? `${canonicalPagePath(link.page, locale)}${link.hash ? `#${link.hash}` : ""}`
+							: null;
+
 					return (
-						<li key={"href" in link ? link.href : `${link.page}#${link.hash}`}>
+						<li key={"href" in link ? link.href : internalHref}>
 							{"href" in link ? (
 								<ExternalLink href={link.href}>{content}</ExternalLink>
 							) : (
-								<a href={`${canonicalPagePath(link.page, locale)}#${link.hash}`}>
+								<a href={internalHref ?? canonicalPagePath(link.page, locale)}>
 									{content}
 								</a>
 							)}

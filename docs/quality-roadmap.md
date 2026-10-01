@@ -84,6 +84,11 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Sécurité applicative
 
+Le premier jalon DSOMM est livré comme snapshot OWASP statique sous
+`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le futur
+service DSOMM de `nabla-compose` remplacera uniquement la provenance des données
+en conservant le contrat consommateur typé du site.
+
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.
 - [ ] Ajouter des webhooks Stripe signés uniquement lorsqu'un paiement déclenche

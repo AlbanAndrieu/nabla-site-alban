@@ -19,6 +19,7 @@
 				"title": "OWASP — Open Worldwide Application Security Project",
 				"description": "Standards, guides de test et références pratiques pour concevoir et évaluer la sécurité des applications web, API et mobiles.",
 				"links": [
+					"OWASP DevSecOps Maturity Model (DSOMM)",
 					"OWASP Top 10",
 					"Guide de test de sécurité web OWASP (WSTG)",
 					"OWASP Application Security Verification Standard (ASVS)",
@@ -149,13 +150,17 @@
 				"badge": "Tests d’intrusion",
 				"title": "Pentest-Tools.com",
 				"description": "Plateforme en ligne de tests d’intrusion et d’analyse des vulnérabilités.",
-				"links": ["Pentest-Tools.com App — tests de sécurité réseau et web"]
+				"links": [
+					"Pentest-Tools.com App — tests de sécurité réseau et web"
+				]
 			},
 			"siem": {
 				"badge": "SIEM / Détection de logiciels malveillants",
 				"title": "SIEM / Détection de logiciels malveillants",
 				"description": "Ressources de supervision de sécurité et de détection des logiciels malveillants.",
-				"links": ["Wazuh — collecte des journaux de détection ClamAV"]
+				"links": [
+					"Wazuh — collecte des journaux de détection ClamAV"
+				]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -192,7 +197,9 @@
 				"badge": "Sécurité des applications et infrastructures",
 				"title": "Sécurité des applications et infrastructures",
 				"description": "Bonnes pratiques pour sécuriser les applications et les plateformes d’infrastructure.",
-				"links": ["TrueNAS — sécurisation des applications"]
+				"links": [
+					"TrueNAS — sécurisation des applications"
+				]
 			},
 			"cloud": {
 				"badge": "Sécurité cloud",
@@ -246,6 +253,64 @@
 		"posture": {
 			"title": "Intégrer la sécurité à la livraison",
 			"description": "Associer contrôles préventifs, vérification continue, production observable et responsabilités claires pour la réponse aux incidents."
+		}
+	},
+	"dsommPage": {
+		"meta": {
+			"title": "OWASP DSOMM — modèle de maturité DevSecOps | Alban Andrieu",
+			"description": "Explorer statique du modèle OWASP DevSecOps Maturity Model : niveaux, dimensions, risques, mesures, preuves d’évaluation et mappings."
+		},
+		"eyebrow": "OWASP · DevSecOps Maturity",
+		"title": "OWASP DevSecOps Maturity Model",
+		"lead": "Un snapshot versionné du modèle DSOMM officiel pour explorer les capacités DevSecOps, leurs risques, mesures, critères d’évaluation et mappings de conformité.",
+		"backToSecurity": "Retour aux ressources sécurité",
+		"snapshotBadge": "Snapshot OWASP statique",
+		"languageNote": "Le contenu des activités reste en anglais afin de préserver fidèlement le snapshot upstream.",
+		"summary": {
+			"activities": "Activités",
+			"dimensions": "Dimensions",
+			"maturityLevels": "Niveaux de maturité",
+			"upstreamVersion": "Version upstream",
+			"levelDistribution": "Répartition des activités par niveau"
+		},
+		"explorer": {
+			"title": "Explorer les activités DSOMM",
+			"lead": "Filtrer le modèle par dimension, niveau, référentiel ou tag. Les détails sont rendus localement depuis le snapshot versionné.",
+			"searchLabel": "Rechercher",
+			"searchPlaceholder": "Nom, sous-dimension, risque, mesure, tag…",
+			"dimensionLabel": "Dimension",
+			"allDimensions": "Toutes les dimensions",
+			"levelLabel": "Niveau",
+			"allLevels": "Tous les niveaux",
+			"frameworkLabel": "Référentiel",
+			"allFrameworks": "Tous les référentiels",
+			"tagLabel": "Tag",
+			"allTags": "Tous les tags",
+			"results": "{count} activités sur {total}",
+			"noResults": "Aucune activité ne correspond à ces filtres.",
+			"showMore": "Afficher plus",
+			"details": "Voir le détail",
+			"description": "Description",
+			"risk": "Risque",
+			"measure": "Mesure",
+			"assessment": "Preuves d’évaluation attendues",
+			"mappings": "Mappings",
+			"tags": "Tags",
+			"usefulness": "Utilité",
+			"difficulty": "Difficulté",
+			"knowledge": "connaissance",
+			"time": "temps",
+			"resources": "ressources"
+		},
+		"source": {
+			"title": "Provenance du snapshot",
+			"lead": "Cette page n’utilise ni base de données, ni iframe, ni fetch runtime. Le modèle est embarqué dans le build et pourra ensuite être remplacé par le service DSOMM prévu dans nabla-compose sans changer le contrat UI.",
+			"version": "Version",
+			"released": "Publication upstream",
+			"snapshot": "Snapshot local",
+			"source": "Source OWASP DSOMM",
+			"license": "Licence upstream",
+			"project": "Application officielle DSOMM"
 		}
 	}
 }

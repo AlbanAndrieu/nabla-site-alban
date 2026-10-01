@@ -16,6 +16,7 @@ const expectedSitemapUrls = [
 	`${canonicalOrigin}/expertise`,
 	`${canonicalOrigin}/contact`,
 	`${canonicalOrigin}/security`,
+	`${canonicalOrigin}/security/dsomm`,
 	`${canonicalOrigin}/ai`,
 	`${canonicalOrigin}/architecture`,
 	`${canonicalOrigin}/ciso`,
