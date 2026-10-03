@@ -165,7 +165,6 @@ export default function EndpointAction({
 		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
 
-
 	useEffect(() => {
 		if (!supplementWithPrivateProbe || !url) return;
 
@@ -286,8 +285,7 @@ export default function EndpointAction({
 		? t("applicationError", { error: applicationError })
 		: "";
 	const healthColor = homelabHealthTextColor(health);
-	const showCloudflare =
-		tunnelSecure && hasCloudflareEvidence(initialHealth);
+	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
 		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
