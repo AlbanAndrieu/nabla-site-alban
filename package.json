@@ -58,7 +58,7 @@
 		"quality:agent": "bash scripts/agent-quality-gate.sh",
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
 		"quality:agent:publish": "bash scripts/agent-publish.sh",
-		"test:a11y": "playwright test tests/accessibility-axe.spec.ts --project=chromium"
+		"test:a11y": "PLAYWRIGHT_A11Y=1 playwright test tests/accessibility-axe.spec.ts --project=chromium --reporter=line"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",
