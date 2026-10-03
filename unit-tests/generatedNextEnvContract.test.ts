@@ -18,6 +18,7 @@ test("Next wrapper restores generated next-env.d.ts after runtime commands", asy
 	assert.doesNotMatch(script, /git checkout -- next-env\.d\.ts/);
 	assert.match(script, /npx next/);
 	assert.equal(pkg.scripts.dev, "bash scripts/run-next-clean.sh dev");
+
 	assert.equal(
 		pkg.scripts["dev:test"],
 		"bash scripts/run-next-clean.sh dev --hostname 127.0.0.1",
