@@ -43,3 +43,16 @@ Treat the machine-readable outcomes as a decision API:
 - any other `QG_PUBLISH_*` failure → block publication and repair the stated invariant.
 
 For semantic/type/test/security failures, inspect the failing command and affected files only. Do not manually rerun hosted GitHub Actions to diagnose a deterministic local failure.
+
+
+## Test-output policy
+
+When adding or extending local tests, keep terminal output bounded and actionable without hiding failures:
+
+- print a short failure summary, occurrence count, and the first actionable file/location;
+- keep full framework diagnostics, traces, screenshots, reports, or equivalent evidence in test artifacts/log files;
+- deduplicate repeated React/browser/framework diagnostics when the same root cause is emitted for several routes or workers;
+- bound repeated rule examples (for example Axe nodes) and report the omitted count;
+- preserve the original non-zero exit status and never filter, downgrade, or ignore a real test, accessibility, security, type, lint, or runtime failure merely to reduce verbosity.
+
+Prefer reporter/harness-level compaction over changing application behavior or weakening assertions. A compact terminal is an observability interface; artifacts remain the forensic interface.
