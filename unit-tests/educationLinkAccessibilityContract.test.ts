@@ -8,6 +8,6 @@ test("education detail links remain distinguishable without relying on color", a
 		"utf8",
 	);
 
-	assert.match(css, /\.education-details a\s*\{[\s\S]*text-decoration:\s*underline;/);
+	assert.match(\n\t\tcss,\n\t\t/\\.education-details a\\s*\\{[\\s\\S]*text-decoration:\\s*underline;/,\n\t);
 	assert.match(css, /text-underline-offset:/);
 });
