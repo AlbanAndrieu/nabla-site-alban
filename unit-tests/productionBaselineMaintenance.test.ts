@@ -210,3 +210,87 @@ test("production baseline enforces the maintenance-only hop budget", async (t) =
 	assert.match(result.stderr, /PROD_BASE_MAINTENANCE_HOPS/);
 	assert.match(result.stderr, /maintenance-only hop budget 0/);
 });
+
+
+test("production baseline accepts missing DAST when Vercel and smoke are successful", async (t) => {
+	const fixture = await createFixture({ path: ".github/workflows/ci.yml" });
+	t.after(async () => rm(fixture.directory, { recursive: true, force: true }));
+
+	const bin = join(fixture.directory, "bin-dast-missing");
+	await mkdir(bin, { recursive: true });
+	const curl = join(bin, "curl");
+	const statuses = [
+		{
+			context: "Vercel",
+			state: "success",
+			description: "Deployment has completed",
+			created_at: "2026-10-03T19:00:00Z",
+		},
+		{
+			context: "Production Post-deploy Smoke",
+			state: "success",
+			description: "Production smoke passed",
+			created_at: "2026-10-03T19:01:00Z",
+		},
+	];
+	await writeFile(
+		curl,
+		`#!/usr/bin/env bash
+set -euo pipefail
+cat <<'JSON'
+${JSON.stringify({ statuses })}
+JSON
+`,
+	);
+	await chmod(curl, 0o755);
+
+	const result = runBaseline(fixture, bin);
+
+	assert.equal(result.status, 0, result.stderr);
+	assert.match(result.stderr, /PROD_BASE_DAST_MISSING/);
+});
+
+test("production baseline still fails closed on an explicit DAST failure", async (t) => {
+	const fixture = await createFixture({ path: ".github/workflows/ci.yml" });
+	t.after(async () => rm(fixture.directory, { recursive: true, force: true }));
+
+	const bin = join(fixture.directory, "bin-dast-failed");
+	await mkdir(bin, { recursive: true });
+	const curl = join(bin, "curl");
+	const statuses = [
+		{
+			context: "Vercel",
+			state: "success",
+			description: "Deployment has completed",
+			created_at: "2026-10-03T19:00:00Z",
+		},
+		{
+			context: "Production Post-deploy Smoke",
+			state: "success",
+			description: "Production smoke passed",
+			created_at: "2026-10-03T19:01:00Z",
+		},
+		{
+			context: "Production DAST",
+			state: "failure",
+			description: "Production ZAP failed",
+			created_at: "2026-10-03T19:02:00Z",
+		},
+	];
+	await writeFile(
+		curl,
+		`#!/usr/bin/env bash
+set -euo pipefail
+cat <<'JSON'
+${JSON.stringify({ statuses })}
+JSON
+`,
+	);
+	await chmod(curl, 0o755);
+
+	const result = runBaseline(fixture, bin);
+
+	assert.equal(result.status, 1);
+	assert.match(result.stderr, /PROD_BASE_UNHEALTHY/);
+	assert.match(result.stderr, /Production DAST=failure/);
+});
