@@ -36,9 +36,9 @@
 		"check": "npm run lint && npm run lint:css && npm run typecheck && npm run test:unit && npm run build",
 		"audit": "npm audit --audit-level=moderate",
 		"audit:dead-code": "npx --yes --ignore-scripts knip@6.35.0 --config knip.jsonc --reporter compact --no-progress",
-		"dev": "next dev",
-		"dev:test": "next dev --hostname 127.0.0.1",
-		"build": "next build",
+		"dev": "bash scripts/run-next-clean.sh dev",
+		"dev:test": "bash scripts/run-next-clean.sh dev --hostname 127.0.0.1",
+		"build": "bash scripts/run-next-clean.sh build",
 		"start": "next start",
 		"start:test": "next start --hostname 127.0.0.1",
 		"start:python": "npx http-server public -p 8001",
@@ -57,7 +57,8 @@
 		"opencommit": "node scripts/run-opencommit.mjs",
 		"quality:agent": "bash scripts/agent-quality-gate.sh",
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
-		"quality:agent:publish": "bash scripts/agent-publish.sh"
+		"quality:agent:publish": "bash scripts/agent-publish.sh",
+		"test:a11y": "bash scripts/run-a11y-local.sh"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",
@@ -73,23 +74,24 @@
 		"stripe": "^20.4.1"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "4.13.0",
 		"@commitlint/config-conventional": "^20.3.1",
 		"@commitlint/types": "^20.5.0",
-		"@eslint/js": "^9.39.1",
+		"@eslint/js": "9.39.5",
 		"@playwright/test": "^1.58.0",
 		"@types/node": "^25.9.5",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"conventional-changelog-conventionalcommits": "^9.3.1",
-		"eslint": "^10.8.0",
+		"eslint": "9.39.5",
+		"eslint-config-next": "16.3.4",
 		"eslint-formatter-gitlab": "^7.2.0",
 		"lodash-es": "^4.18.1",
 		"opencommit": "^3.2.14",
 		"playwright": "^1.58.0",
 		"stylelint": "^17.14.1",
 		"tsx": "^4.21.0",
-		"typescript": "^5.9.3",
-		"eslint-config-next": "16.3.4"
+		"typescript": "^5.9.3"
 	},
 	"allowScripts": {
 		"@parcel/watcher": false,

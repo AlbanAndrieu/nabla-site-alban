@@ -11,6 +11,7 @@ const localTestUrl = `http://127.0.0.1:${testPort}`;
 const externalBaseUrl = process.env.BASE_URL?.trim();
 const vercelBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
 const protectedVercelPreview = process.env.VERCEL_PREVIEW_PROTECTED === "true";
+const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER !== "false";
 
 if (externalBaseUrl && protectedVercelPreview && !vercelBypassSecret) {
 	throw new Error(
@@ -82,7 +83,7 @@ export default defineConfig({
 		: {
 				command: `${process.env.CI ? "npm run start:test" : "npm run dev:test"} -- --port ${testPort}`,
 				url: `${localTestUrl}/fr`,
-				reuseExistingServer: !process.env.CI,
+				reuseExistingServer: !process.env.CI && reuseExistingServer,
 				timeout: 120 * 1000,
 			},
 });

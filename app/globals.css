@@ -145,6 +145,18 @@
 	}
 }
 
+/* Inline prose links must remain identifiable without relying on color alone. */
+.content-inline-link {
+	text-decoration: underline;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.16em;
+}
+
+.content-inline-link:hover,
+.content-inline-link:focus-visible {
+	text-decoration-thickness: 0.12em;
+}
+
 /* Bootstrap contrast bridge. Bootstrap is linked after the theme stylesheet,
  * so keep these selectors intentionally more specific than Bootstrap utilities. */
 html body .text-muted {

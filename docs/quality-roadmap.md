@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 30 septembre 2026.
+Dernière réconciliation : 3 octobre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -22,7 +22,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Domaine | État à préserver |
 | --- | --- |
 | Runtime | Next.js App Router + `next-intl` pour EN/FR ; CV HTML et 404 statique restent des exceptions explicitement conservées |
-| Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés |
+| Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
 | Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
 | Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés |
@@ -45,6 +45,9 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
+- [ ] **Rendre l'auto-fix convergent plus diagnostique** : détecter un fingerprint
+  de workspace déjà vu avant la limite de passes et afficher le ou les hooks/fichiers
+  qui oscillent, afin d'éviter 12 itérations identiques et de réduire le coût local/CI.
 - [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
   Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
   confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un
@@ -72,8 +75,12 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   `HTML_ROUTE_SLUGS`, ni CV historiques.
 - [ ] Appliquer aux images Alban actives les règles CLS : dimensions intrinsèques,
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
-- [ ] Ajouter un audit axe EN/FR reproductible lorsque `axe-core` peut être
-  verrouillé localement dans le lockfile.
+- [ ] Clore l'audit axe EN/FR des routes prioritaires : le contrat WCAG A/AA,
+  la dépendance verrouillée et les corrections de contraste/affordance sont livrés ;
+  fermer après Preview exact-SHA vert et preuve locale de publication.
+- [ ] Généraliser l'affordance accessible des liens inline des contenus secondaires
+  (soulignement/focus indépendant de la couleur) via une primitive ou un token
+  partagé, puis étendre axe EN/FR aux routes prioritaires restantes.
 - [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
   robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
   vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
@@ -113,8 +120,11 @@ métriques bornées et séparation disponibilité/posture sécurité.
   complète avant d'envisager un automerge ciblé de patch/minor à faible risque.
 - [ ] Mesurer le gain local-first sur au moins trois runs comparables en séparant
   cache hit/miss, `npm ci`, gate et build.
-- [ ] Étendre Playwright à Firefox/WebKit et aux profils mobiles seulement lorsque
-  la couverture supplémentaire justifie le coût.
+- [ ] Ajouter un mode local de parité Preview (`BASE_URL=<preview> npm run test:a11y`
+  ou équivalent) afin de reproduire les audits exact-SHA sans attendre la CI.
+- [ ] Ajouter une régression visuelle ciblée EN/FR (Home, Security, Architecture)
+  sur quelques viewports/thèmes stables avant d'étendre Playwright à Firefox/WebKit
+  ou à davantage de profils mobiles ; conserver un coût CI borné.
 - [ ] Rétablir une lecture automatisable des logs runtime Vercel lorsqu'un
   connecteur/endpoint adapté est disponible.
 

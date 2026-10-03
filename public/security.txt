@@ -3,4 +3,4 @@ Expires: 2026-10-12T00:00:00Z
 Canonical: https://albanandrieu.com/security.txt
 Preferred-Languages: en,fr
 Acknowledgments: https://github.com/AlbanAndrieu/nabla-site-alban#readme
-Policy: https://albanandrieu.com/policy/privacy.html
+Policy: https://www.albanandrieu.com/fr/policy/privacy_policy

@@ -334,7 +334,8 @@ body.site-content-page.page-contact .contact-info-item a:hover {
 	--security-primary: #dc3545;
 	--security-secondary: #6c757d;
 	--security-success: #28a745;
-	--security-info: #17a2b8;
+	/* Accessible teal: >= 4.5:1 against white for text and reciprocal badges. */
+	--security-info: #117a8b;
 	--security-warning: #ffc107;
 	--security-danger: #dc3545;
 }

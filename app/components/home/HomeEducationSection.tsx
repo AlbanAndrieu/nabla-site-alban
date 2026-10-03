@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
@@ -40,7 +41,10 @@ export default async function HomeEducationSection({ locale }: Props) {
 					{t.rich("education.iso.details", {
 						strong: (chunks) => <strong>{chunks}</strong>,
 						link: (chunks) => (
-							<a href={`${prefix}/security#security-standards-compliance`}>
+							<a
+								className="content-inline-link"
+								href={`${prefix}/security#security-standards-compliance`}
+							>
 								{chunks}
 							</a>
 						),
@@ -69,7 +73,7 @@ function EducationCard({
 	featured?: boolean;
 	title: string;
 	org: string;
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return (
 		<div
