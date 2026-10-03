@@ -8,6 +8,23 @@ const localizedRoutePairs = [
 	["/security", "/fr/security"],
 ] as const;
 
+function formatViolations(
+	violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"],
+): string {
+	return violations
+		.map((violation) => {
+			const targets = violation.nodes
+				.slice(0, 3)
+				.map((node) => node.target.join(" "))
+				.join(", ");
+			const overflow =
+				violation.nodes.length > 3 ? ` (+${violation.nodes.length - 3} more)` : "";
+
+			return `${violation.id} [${violation.impact ?? "unknown"}] ${violation.help} :: ${targets}${overflow}`;
+		})
+		.join("\n");
+}
+
 test.describe("axe accessibility audit EN/FR", () => {
 	for (const [englishRoute, frenchRoute] of localizedRoutePairs) {
 		for (const route of [englishRoute, frenchRoute]) {
@@ -25,15 +42,7 @@ test.describe("axe accessibility audit EN/FR", () => {
 					])
 					.analyze();
 
-				expect(
-					results.violations,
-					results.violations
-						.map(
-							(violation) =>
-								`${violation.id} [${violation.impact ?? "unknown"}]: ${violation.help}`,
-						)
-						.join("\n"),
-				).toEqual([]);
+				expect(results.violations, formatViolations(results.violations)).toEqual([]);
 			});
 		}
 	}
