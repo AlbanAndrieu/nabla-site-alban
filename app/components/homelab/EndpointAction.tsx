@@ -375,7 +375,7 @@ export default function EndpointAction({
 							style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
 							title={applicationErrorTitle}
 							role="img"
-						aria-label={applicationErrorTitle}
+							aria-label={applicationErrorTitle}
 						/>{" "}
 						<span>{t("applicationErrorShort")}</span>
 					</>
