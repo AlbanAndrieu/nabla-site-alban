@@ -57,7 +57,8 @@
 		"opencommit": "node scripts/run-opencommit.mjs",
 		"quality:agent": "bash scripts/agent-quality-gate.sh",
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
-		"quality:agent:publish": "bash scripts/agent-publish.sh"
+		"quality:agent:publish": "bash scripts/agent-publish.sh",
+		"test:a11y": "playwright test tests/accessibility-axe.spec.ts --project=chromium"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",
@@ -89,7 +90,8 @@
 		"stylelint": "^17.14.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"eslint-config-next": "16.3.4"
+		"eslint-config-next": "16.3.4",
+		"@axe-core/playwright": "4.13.0"
 	},
 	"allowScripts": {
 		"@parcel/watcher": false,
