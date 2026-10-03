@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 30 septembre 2026.
+Dernière réconciliation : 3 octobre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -72,10 +72,12 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   `HTML_ROUTE_SLUGS`, ni CV historiques.
 - [ ] Appliquer aux images Alban actives les règles CLS : dimensions intrinsèques,
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
-- [ ] Finaliser l'audit axe EN/FR reproductible : le contrat Playwright couvre
-  les routes prioritaires EN/FR avec WCAG A/AA ; verrouiller `@axe-core/playwright`
-  via npm sur la workstation, exécuter l'audit, corriger les violations réelles puis
-  fermer uniquement avec une preuve exact-SHA.
+- [ ] Clore l'audit axe EN/FR des routes prioritaires : le contrat WCAG A/AA,
+  la dépendance verrouillée et les corrections de contraste/affordance sont livrés ;
+  fermer après Preview exact-SHA vert et preuve locale de publication.
+- [ ] Généraliser l'affordance accessible des liens inline des contenus secondaires
+  (soulignement/focus indépendant de la couleur) via une primitive ou un token
+  partagé, puis étendre axe EN/FR aux routes prioritaires restantes.
 - [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
   robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
   vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
@@ -115,8 +117,11 @@ métriques bornées et séparation disponibilité/posture sécurité.
   complète avant d'envisager un automerge ciblé de patch/minor à faible risque.
 - [ ] Mesurer le gain local-first sur au moins trois runs comparables en séparant
   cache hit/miss, `npm ci`, gate et build.
-- [ ] Étendre Playwright à Firefox/WebKit et aux profils mobiles seulement lorsque
-  la couverture supplémentaire justifie le coût.
+- [ ] Ajouter un mode local de parité Preview (`BASE_URL=<preview> npm run test:a11y`
+  ou équivalent) afin de reproduire les audits exact-SHA sans attendre la CI.
+- [ ] Ajouter une régression visuelle ciblée EN/FR (Home, Security, Architecture)
+  sur quelques viewports/thèmes stables avant d'étendre Playwright à Firefox/WebKit
+  ou à davantage de profils mobiles ; conserver un coût CI borné.
 - [ ] Rétablir une lecture automatisable des logs runtime Vercel lorsqu'un
   connecteur/endpoint adapté est disponible.
 
