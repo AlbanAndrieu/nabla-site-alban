@@ -7,6 +7,7 @@ import {
 	cloudflareIndicatorColor,
 	hasCloudflareEvidence,
 	homelabHealthColor,
+	homelabHealthTextColor,
 	isHttpsEndpoint,
 	tlsIndicatorColor,
 } from "@/lib/homelabHealthPresentation";
@@ -291,7 +292,7 @@ export default function EndpointAction({
 	const applicationErrorTitle = applicationError
 		? t("applicationError", { error: applicationError })
 		: "";
-	const healthColor = homelabHealthColor(health);
+	const healthColor = homelabHealthTextColor(health);
 	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
@@ -324,6 +325,7 @@ export default function EndpointAction({
 					<i
 						className="fas fa-lock"
 						style={{ color: tlsIndicatorColor(undefined), marginLeft: 5 }}
+						role="img"
 						aria-label={t("httpsUnknown")}
 					/>
 				)}
@@ -353,6 +355,7 @@ export default function EndpointAction({
 						className="fas fa-lock"
 						style={{ color: tlsIndicatorColor(tlsTrusted), marginLeft: 5 }}
 						title={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
+						role="img"
 						aria-label={tlsTrusted === false ? t("httpsInvalid") : tlsTrusted === true ? t("httpsTrusted") : t("httpsUnknown")}
 					/>
 				)}
@@ -361,6 +364,7 @@ export default function EndpointAction({
 						className="fas fa-cloud"
 						style={{ color: cloudflareIndicatorColor(initialHealth), marginLeft: 6 }}
 						title={tunnelTitle}
+						role="img"
 						aria-label={tunnelTitle}
 					/>
 				)}
@@ -370,7 +374,8 @@ export default function EndpointAction({
 							className="fas fa-skull-crossbones"
 							style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
 							title={applicationErrorTitle}
-							aria-label={applicationErrorTitle}
+							role="img"
+						aria-label={applicationErrorTitle}
 						/>{" "}
 						<span>{t("applicationErrorShort")}</span>
 					</>
