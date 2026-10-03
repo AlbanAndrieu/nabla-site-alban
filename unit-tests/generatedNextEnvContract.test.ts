@@ -51,5 +51,7 @@ test("local accessibility harness isolates Next runtime artifacts", async () => 
 	assert.ok(script.includes("rm -rf .next test-results"));
 	assert.ok(script.includes('PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-3103}"'));
 	assert.ok(script.includes("PLAYWRIGHT_REUSE_SERVER=false"));
-	assert.ok(playwright.includes('process.env.PLAYWRIGHT_REUSE_SERVER !== "false"'));
+	assert.ok(
+		playwright.includes('process.env.PLAYWRIGHT_REUSE_SERVER !== "false"'),
+	);
 });
