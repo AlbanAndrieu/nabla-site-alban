@@ -52,9 +52,9 @@
 	--secondary-color: #1e40af;
 	--accent-color: #f59e0b;
 
-	/* Fixed FABs: light mode — colored blue surface, dark glyph; hover deepens + light icon */
-	--site-fab-bg: #60a5fa;
-	--site-fab-fg: #0f172a;
+	/* Fixed FABs: opaque WCAG AA pair for text and icons. */
+	--site-fab-bg: #0b5ed7;
+	--site-fab-fg: #ffffff;
 	--site-fab-hover-bg: #2563eb;
 	--site-fab-hover-fg: #ffffff;
 	--site-fab-border: 1px solid rgba(37, 99, 235, 0.35);
@@ -162,8 +162,8 @@ html[data-theme="light"] {
 	--toggle-track-bg: #e9ecef;
 	--toggle-segment-muted: #495057;
 
-	--site-fab-bg: #156bd4;
-	--site-fab-fg: #0f172a;
+	--site-fab-bg: #0b5ed7;
+	--site-fab-fg: #ffffff;
 	--site-fab-hover-bg: #2563eb;
 	--site-fab-hover-fg: #ffffff;
 	--site-fab-border: 1px solid rgba(37, 99, 235, 0.35);
