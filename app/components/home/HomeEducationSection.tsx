@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 import AnchoredHeading from "@/components/AnchoredHeading";
 
 type Props = {
@@ -72,7 +73,7 @@ function EducationCard({
 	featured?: boolean;
 	title: string;
 	org: string;
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return (
 		<div
