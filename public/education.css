@@ -56,13 +56,3 @@
 	font-size: 0.95rem;
 }
 
-.education-details a {
-	text-decoration: underline;
-	text-decoration-thickness: 0.08em;
-	text-underline-offset: 0.16em;
-}
-
-.education-details a:hover,
-.education-details a:focus-visible {
-	text-decoration-thickness: 0.12em;
-}
