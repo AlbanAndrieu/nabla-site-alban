@@ -11,4 +11,5 @@ test("education detail links remain distinguishable without relying on color", a
 	assert.ok(css.includes(".education-details a {"));
 	assert.ok(css.includes("text-decoration: underline;"));
 	assert.ok(css.includes("text-underline-offset:"));
+
 });
