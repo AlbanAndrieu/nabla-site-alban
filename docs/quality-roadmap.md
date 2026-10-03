@@ -23,7 +23,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | --- | --- |
 | Runtime | Next.js App Router + `next-intl` pour EN/FR ; CV HTML et 404 statique restent des exceptions explicitement conservées |
 | Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
-| Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA |
+| Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA ; Axe EN/FR dispose d’un harness local isolé et reproductible |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
 | Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés |
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
@@ -70,17 +70,13 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Accessibilité, SEO et i18n
 
+- [ ] Étendre progressivement l’audit Axe EN/FR aux routes prioritaires restantes ; Architecture est le prochain lot borné après Home, Contact, Policy et Security.
+
 - [ ] Étendre le contrat 404 GET/HEAD aux chemins HTML legacy localisés/nichés
   seulement après preuve qu'il ne capture ni redirects SEO, ni
   `HTML_ROUTE_SLUGS`, ni CV historiques.
 - [ ] Appliquer aux images Alban actives les règles CLS : dimensions intrinsèques,
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
-- [ ] Clore l'audit axe EN/FR des routes prioritaires : le contrat WCAG A/AA,
-  la dépendance verrouillée et les corrections de contraste/affordance sont livrés ;
-  fermer après Preview exact-SHA vert et preuve locale de publication.
-- [ ] Généraliser l'affordance accessible des liens inline des contenus secondaires
-  (soulignement/focus indépendant de la couleur) via une primitive ou un token
-  partagé, puis étendre axe EN/FR aux routes prioritaires restantes.
 - [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
   robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
   vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
