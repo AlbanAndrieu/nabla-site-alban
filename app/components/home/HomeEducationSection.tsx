@@ -40,7 +40,10 @@ export default async function HomeEducationSection({ locale }: Props) {
 					{t.rich("education.iso.details", {
 						strong: (chunks) => <strong>{chunks}</strong>,
 						link: (chunks) => (
-							<a\n\t\t\t\t\t\t\t\tclassName="content-inline-link"\n\t\t\t\t\t\t\t\thref={`${prefix}/security#security-standards-compliance`}\n\t\t\t\t\t\t\t>
+							<a
+								className="content-inline-link"
+								href={`${prefix}/security#security-standards-compliance`}
+							>
 								{chunks}
 							</a>
 						),
