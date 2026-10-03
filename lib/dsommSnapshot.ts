@@ -97,6 +97,21 @@ function requireStringArray(value: unknown, label: string): string[] {
 	return value as string[];
 }
 
+function requireIsoDate(value: unknown, label: string): string {
+	const date = requireString(value, label);
+	if (!DATE_PATTERN.test(date)) {
+		invalid(`${label} must use YYYY-MM-DD`);
+	}
+	const parsed = new Date(`${date}T00:00:00Z`);
+	if (
+		Number.isNaN(parsed.getTime()) ||
+		parsed.toISOString().slice(0, 10) !== date
+	) {
+		invalid(`${label} must be a real calendar date`);
+	}
+	return date;
+}
+
 function requireScore(value: unknown, label: string): number {
 	if (
 		typeof value !== "number" ||
@@ -134,13 +149,12 @@ export function validateDsommSnapshot(value: unknown): DsommSnapshot {
 	if (!VERSION_PATTERN.test(version)) {
 		invalid("source.version must be semantic x.y.z");
 	}
-	for (const key of ["released", "snapshotDate"] as const) {
-		const date = requireString(source[key], `source.${key}`);
-		if (!DATE_PATTERN.test(date)) {
-			invalid(`source.${key} must use YYYY-MM-DD`);
-		}
-	}
-	if (String(source.snapshotDate) < String(source.released)) {
+	const released = requireIsoDate(source.released, "source.released");
+	const snapshotDate = requireIsoDate(
+		source.snapshotDate,
+		"source.snapshotDate",
+	);
+	if (snapshotDate < released) {
 		invalid("source.snapshotDate must not predate source.released");
 	}
 	for (const [key, expected] of Object.entries(DSOMM_SOURCE)) {

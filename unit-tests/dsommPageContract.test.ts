@@ -82,6 +82,13 @@ test("DSOMM validator fails closed on malformed provenance", () => {
 		/canonical OWASP DSOMM provenance/,
 	);
 
+	const impossibleRelease = cloneSnapshot();
+	impossibleRelease.source.released = "2026-02-31";
+	assert.throws(
+		() => validateDsommSnapshot(impossibleRelease),
+		/real calendar date/,
+	);
+
 	const unpinnedSource = cloneSnapshot();
 	unpinnedSource.source.upstreamUrl =
 		"https://github.com/devsecopsmaturitymodel/DevSecOps-MaturityModel-data/blob/main/generated/model.yaml";
