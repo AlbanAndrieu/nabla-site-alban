@@ -175,9 +175,9 @@ export default async function ArchitecturePage({
 							].map(([title, copy]) => (
 								<div className="col-12 col-md-6 col-xl-3" key={title}>
 									<div
-									className="card h-100 bg-dark border-secondary p-3 text-light"
-									style={{ color: "#f8fafc" }}
-								>
+										className="card h-100 bg-dark border-secondary p-3 text-light"
+										style={{ color: "#f8fafc" }}
+									>
 										<h3 className="h5">{title}</h3>
 										<p className="mb-0" style={{ color: "inherit" }}>
 											{copy}
