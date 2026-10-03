@@ -48,7 +48,11 @@ test("local accessibility harness isolates Next runtime artifacts", async () => 
 	assert.doesNotMatch(script, /^#!\/usr\/bin\/env bash/m);
 	assert.match(script, /^# shellcheck shell=bash/m);
 	assert.ok(script.includes('git diff --quiet -- "${NEXT_ENV}"'));
-	assert.ok(script.includes("rm -rf .next test-results"));
+	assert.ok(script.includes('rm -rf .next "${A11Y_ARTIFACT_DIR}"'));
+	assert.ok(script.includes('mkdir -p "${A11Y_ARTIFACT_DIR}"'));
+	assert.ok(
+		script.includes('cp "${A11Y_LOG}" "${A11Y_ARTIFACT_DIR}/a11y-playwright.log"'),
+	);
 	assert.ok(script.includes('PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-3103}"'));
 	assert.ok(script.includes("PLAYWRIGHT_REUSE_SERVER=false"));
 	assert.ok(

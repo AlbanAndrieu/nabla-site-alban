@@ -442,6 +442,7 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 									? "TLS invalid"
 									: "TLS not verified"
 						}
+						role="img"
 						aria-label="TLS status"
 					/>
 				) : null}
@@ -450,6 +451,7 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 						className="fas fa-cloud"
 						style={{ color: item.cloudflareColor, marginLeft: 6 }}
 						title={`Cloudflare${item.cloudflareStatus ? `: ${item.cloudflareStatus}` : " observed"}`}
+						role="img"
 						aria-label="Cloudflare evidence"
 					/>
 				) : null}
@@ -458,6 +460,7 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 						className="fas fa-skull-crossbones"
 						style={{ color: homelabHealthColor("fail"), marginLeft: 6 }}
 						title={item.applicationError}
+						role="img"
 						aria-label={item.applicationError}
 					/>
 				) : null}

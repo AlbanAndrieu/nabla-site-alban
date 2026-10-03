@@ -11,8 +11,22 @@ const HEALTH_COLORS: Record<HomelabPresentationState, string> = {
 	unknown: "#94a3b8",
 };
 
+const HEALTH_TEXT_COLORS: Record<HomelabPresentationState, string> = {
+	pending: "#075985",
+	ok: "#166534",
+	warn: "#92400e",
+	fail: "#b91c1c",
+	unknown: "#475569",
+};
+
 export function homelabHealthColor(state: HomelabPresentationState): string {
 	return HEALTH_COLORS[state];
+}
+
+export function homelabHealthTextColor(
+	state: HomelabPresentationState,
+): string {
+	return HEALTH_TEXT_COLORS[state];
 }
 
 export function isHttpsEndpoint(url?: string): boolean {
