@@ -13,14 +13,17 @@ function formatViolations(
 ): string {
 	return violations
 		.map((violation) => {
-			const targets = violation.nodes
-				.slice(0, 3)
-				.map((node) => node.target.join(" "))
-				.join(", ");
+			const nodes = violation.nodes.slice(0, 4).map((node) => {
+				const message = [...node.any, ...node.all, ...node.none]
+					.map((check) => check.message)
+					.filter(Boolean)
+					.join("; ");
+				return `${node.target.join(" ")} => ${message}`;
+			});
 			const overflow =
-				violation.nodes.length > 3 ? ` (+${violation.nodes.length - 3} more)` : "";
+				violation.nodes.length > 4 ? ` (+${violation.nodes.length - 4} more)` : "";
 
-			return `${violation.id} [${violation.impact ?? "unknown"}] ${violation.help} :: ${targets}${overflow}`;
+			return `${violation.id} [${violation.impact ?? "unknown"}] ${violation.help} :: ${nodes.join(" | ")}${overflow}`;
 		})
 		.join("\n");
 }
