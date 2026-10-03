@@ -42,7 +42,9 @@ test.describe("axe accessibility audit EN/FR", () => {
 					])
 					.analyze();
 
-				expect(results.violations, formatViolations(results.violations)).toEqual([]);
+				if (results.violations.length > 0) {
+					throw new Error(formatViolations(results.violations));
+				}
 			});
 		}
 	}
