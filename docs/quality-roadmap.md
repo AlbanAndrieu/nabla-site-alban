@@ -45,6 +45,9 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
+- [ ] **Rendre l'auto-fix convergent plus diagnostique** : détecter un fingerprint
+  de workspace déjà vu avant la limite de passes et afficher le ou les hooks/fichiers
+  qui oscillent, afin d'éviter 12 itérations identiques et de réduire le coût local/CI.
 - [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
   Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
   confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un
