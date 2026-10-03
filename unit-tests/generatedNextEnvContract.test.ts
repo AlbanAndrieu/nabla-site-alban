@@ -12,8 +12,10 @@ test("Next wrapper restores generated next-env.d.ts after runtime commands", asy
 	]);
 	const pkg = JSON.parse(pkgRaw) as { scripts: Record<string, string> };
 
-	assert.match(script, /snapshot_next_env/);\n\tassert.match(script, /trap restore_next_env EXIT INT TERM/);
-	assert.match(script, /cp "\\$\\{NEXT_ENV\\}" "\\$\\{NEXT_ENV_SNAPSHOT\\}"/);\n\tassert.doesNotMatch(script, /git checkout -- next-env\\.d\\.ts/);
+	assert.match(script, /snapshot_next_env/);
+	assert.match(script, /trap restore_next_env EXIT INT TERM/);
+	assert.ok(script.includes('cp "${NEXT_ENV}" "${NEXT_ENV_SNAPSHOT}"'));
+	assert.doesNotMatch(script, /git checkout -- next-env\.d\.ts/);
 	assert.match(script, /npx next/);
 	assert.equal(pkg.scripts.dev, "bash scripts/run-next-clean.sh dev");
 	assert.equal(
