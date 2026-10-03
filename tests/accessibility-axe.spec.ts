@@ -32,6 +32,7 @@ test.describe("axe accessibility audit EN/FR", () => {
 	for (const [englishRoute, frenchRoute] of localizedRoutePairs) {
 		for (const route of [englishRoute, frenchRoute]) {
 			test(`${route} has no WCAG A/AA axe violations`, async ({ page }) => {
+				await page.emulateMedia({ reducedMotion: "reduce" });
 				await page.goto(route, { waitUntil: "networkidle" });
 				await expect(page.locator("main#main-content")).toHaveCount(1);
 
