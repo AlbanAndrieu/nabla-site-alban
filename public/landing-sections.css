@@ -484,6 +484,13 @@ body {
 .contact-hero-ctas {
 	margin-bottom: 2rem;
 	justify-content: center;
+	/* Keep Home CTA text at WCAG AA contrast in both light and dark themes. */
+	--ui-primary-bg: #0b5ed7;
+	--ui-primary-bg-hover: #094db1;
+	--ui-primary-text: #fff;
+	--ui-secondary-bg: #5c636a;
+	--ui-secondary-bg-hover: #4d5358;
+	--ui-secondary-text: #fff;
 }
 
 .contact-logo-wrap {
