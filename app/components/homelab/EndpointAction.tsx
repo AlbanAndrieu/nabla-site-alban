@@ -154,6 +154,7 @@ export default function EndpointAction({
 	truenasDown = false,
 }: Props) {
 	const t = useTranslations("homelab.endpoint");
+	const [hydrated, setHydrated] = useState(false);
 	const configured = enabled && Boolean(url);
 	const https = isHttpsEndpoint(url);
 	const authoritativeSnapshot = hasAuthoritativeEvidence(initialHealth);
@@ -164,6 +165,10 @@ export default function EndpointAction({
 	const [privateDetail, setPrivateDetail] = useState<ProbeDetail>(
 		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
+
+	useEffect(() => {
+		setHydrated(true);
+	}, []);
 
 	useEffect(() => {
 		if (!supplementWithPrivateProbe || !url) return;
@@ -258,7 +263,7 @@ export default function EndpointAction({
 				: supplementWithPrivateProbe && privateProbeIsAuthoritative
 					? privateHealth
 					: (snapshotState ?? (external ? "unknown" : privateHealth === "fail" ? "unknown" : privateHealth));
-	const tlsTrusted = initialHealth?.tls_trusted;
+	const tlsTrusted = hydrated ? initialHealth?.tls_trusted : undefined;
 	const browserDetail = translateProbeDetail(privateDetail);
 	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
 	const detail = !configured
@@ -288,12 +293,13 @@ export default function EndpointAction({
 				: tunnelState === "degraded"
 					? t("tunnelDegraded", { status: initialHealth?.tunnel_status ?? "unknown" })
 					: t("tunnelUnknown");
-	const applicationError = initialHealth?.application_error;
+	const applicationError = hydrated ? initialHealth?.application_error : undefined;
 	const applicationErrorTitle = applicationError
 		? t("applicationError", { error: applicationError })
 		: "";
 	const healthColor = homelabHealthTextColor(health);
-	const showCloudflare = tunnelSecure && hasCloudflareEvidence(initialHealth);
+	const showCloudflare =
+		hydrated && tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
 		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
