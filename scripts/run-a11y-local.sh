@@ -16,7 +16,7 @@ fi
 NEXT_ENV_SNAPSHOT="$(mktemp)"
 cp "${NEXT_ENV}" "${NEXT_ENV_SNAPSHOT}"
 
-# shellcheck disable=SC2064 -- trap must retain these concrete temp paths.
+# shellcheck disable=SC2064
 trap 'cp "${NEXT_ENV_SNAPSHOT}" "${NEXT_ENV}" 2>/dev/null || true; rm -f "${NEXT_ENV_SNAPSHOT}" "${A11Y_LOG}"' EXIT INT TERM
 
 rm -rf .next "${A11Y_ARTIFACT_DIR}"
