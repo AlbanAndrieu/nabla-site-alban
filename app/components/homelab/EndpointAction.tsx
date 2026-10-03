@@ -154,7 +154,6 @@ export default function EndpointAction({
 	truenasDown = false,
 }: Props) {
 	const t = useTranslations("homelab.endpoint");
-	const [hydrated, setHydrated] = useState(false);
 	const configured = enabled && Boolean(url);
 	const https = isHttpsEndpoint(url);
 	const authoritativeSnapshot = hasAuthoritativeEvidence(initialHealth);
@@ -166,9 +165,6 @@ export default function EndpointAction({
 		configured ? { kind: "checking" } : { kind: "notConfigured" },
 	);
 
-	useEffect(() => {
-		setHydrated(true);
-	}, []);
 
 	useEffect(() => {
 		if (!supplementWithPrivateProbe || !url) return;
@@ -177,15 +173,9 @@ export default function EndpointAction({
 		try {
 			parsed = new URL(url);
 		} catch {
-			setPrivateHealth("fail");
-			setPrivateDetail({ kind: "invalidUrl" });
 			return;
 		}
-		if (!["http:", "https:"].includes(parsed.protocol)) {
-			setPrivateHealth("unknown");
-			setPrivateDetail({ kind: "protocol", protocol: parsed.protocol });
-			return;
-		}
+		if (!["http:", "https:"].includes(parsed.protocol)) return;
 
 		let disposed = false;
 		const controller = new AbortController();
@@ -196,8 +186,6 @@ export default function EndpointAction({
 				setPrivateDetail({ kind: "timeout" });
 			}
 		}, 10_000);
-		setPrivateHealth("pending");
-		setPrivateDetail({ kind: "checking" });
 		void probePrivateEndpoint(url, controller.signal).then((result) => {
 			if (!disposed) {
 				window.clearTimeout(timeout);
@@ -263,7 +251,7 @@ export default function EndpointAction({
 				: supplementWithPrivateProbe && privateProbeIsAuthoritative
 					? privateHealth
 					: (snapshotState ?? (external ? "unknown" : privateHealth === "fail" ? "unknown" : privateHealth));
-	const tlsTrusted = hydrated ? initialHealth?.tls_trusted : undefined;
+	const tlsTrusted = initialHealth?.tls_trusted;
 	const browserDetail = translateProbeDetail(privateDetail);
 	const apiDetail = initialHealth ? fastApiHealthDetail(initialHealth) : "";
 	const detail = !configured
@@ -293,13 +281,13 @@ export default function EndpointAction({
 				: tunnelState === "degraded"
 					? t("tunnelDegraded", { status: initialHealth?.tunnel_status ?? "unknown" })
 					: t("tunnelUnknown");
-	const applicationError = hydrated ? initialHealth?.application_error : undefined;
+	const applicationError = initialHealth?.application_error;
 	const applicationErrorTitle = applicationError
 		? t("applicationError", { error: applicationError })
 		: "";
 	const healthColor = homelabHealthTextColor(health);
 	const showCloudflare =
-		hydrated && tunnelSecure && hasCloudflareEvidence(initialHealth);
+		tunnelSecure && hasCloudflareEvidence(initialHealth);
 	const ageSeconds = snapshotAgeSeconds(snapshotCheckedAt);
 	const evidence = [
 		typeof initialHealth?.http_status === "number" && initialHealth.http_status > 0
