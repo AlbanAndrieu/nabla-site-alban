@@ -6,7 +6,7 @@ cd "${ROOT}"
 
 NEXT_ENV="next-env.d.ts"
 A11Y_ARTIFACT_DIR="test-results"
-A11Y_LOG="${A11Y_ARTIFACT_DIR}/a11y-playwright.log"
+A11Y_LOG="$(mktemp)"
 
 if ! git diff --quiet -- "${NEXT_ENV}" || ! git diff --cached --quiet -- "${NEXT_ENV}"; then
     echo "❌ A11Y_HARNESS_DIRTY_NEXT_ENV: restore next-env.d.ts before running accessibility tests." >&2
@@ -16,11 +16,8 @@ fi
 NEXT_ENV_SNAPSHOT="$(mktemp)"
 cp "${NEXT_ENV}" "${NEXT_ENV_SNAPSHOT}"
 
-cleanup() {
-    cp "${NEXT_ENV_SNAPSHOT}" "${NEXT_ENV}" 2>/dev/null || true
-    rm -f "${NEXT_ENV_SNAPSHOT}"
-}
-trap cleanup EXIT INT TERM
+# shellcheck disable=SC2064 -- trap must retain these concrete temp paths.
+trap 'cp "${NEXT_ENV_SNAPSHOT}" "${NEXT_ENV}" 2>/dev/null || true; rm -f "${NEXT_ENV_SNAPSHOT}" "${A11Y_LOG}"' EXIT INT TERM
 
 rm -rf .next "${A11Y_ARTIFACT_DIR}"
 mkdir -p "${A11Y_ARTIFACT_DIR}"
@@ -34,9 +31,12 @@ npx playwright test tests/accessibility-axe.spec.ts --project=chromium --reporte
 status=$?
 set -e
 
+cp "${A11Y_LOG}" "${A11Y_ARTIFACT_DIR}/a11y-playwright.log"
+
 if (( status == 0 )); then
     summary="$(grep -E '^[[:space:]]*[0-9]+ passed' "${A11Y_LOG}" | tail -1 || true)"
     printf '✅ Axe EN/FR: %s\n' "${summary:-all accessibility tests passed}"
+    printf '📎 Full Playwright log: %s/a11y-playwright.log\n' "${A11Y_ARTIFACT_DIR}"
     exit 0
 fi
 
@@ -59,7 +59,7 @@ if (( http_502_count > 0 )); then
     printf '⚠️ FastAPI fallback noise: %d HTTP 502 occurrence%s (details in artifact)\n' "${http_502_count}" "$([[ "${http_502_count}" == 1 ]] && printf '' || printf 's')"
 fi
 
-printf '📎 Full Playwright log: %s\n' "${A11Y_LOG}"
+printf '📎 Full Playwright log: %s/a11y-playwright.log\n' "${A11Y_ARTIFACT_DIR}"
 printf '📎 Failure screenshots/context: %s/\n' "${A11Y_ARTIFACT_DIR}"
 
 exit "${status}"
