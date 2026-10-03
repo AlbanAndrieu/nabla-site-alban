@@ -72,8 +72,10 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   `HTML_ROUTE_SLUGS`, ni CV historiques.
 - [ ] Appliquer aux images Alban actives les règles CLS : dimensions intrinsèques,
   lazy loading et `next/image` lorsque cela réduit réellement le coût.
-- [ ] Ajouter un audit axe EN/FR reproductible lorsque `axe-core` peut être
-  verrouillé localement dans le lockfile.
+- [ ] Finaliser l'audit axe EN/FR reproductible : le contrat Playwright couvre
+  les routes prioritaires EN/FR avec WCAG A/AA ; verrouiller `@axe-core/playwright`
+  via npm sur la workstation, exécuter l'audit, corriger les violations réelles puis
+  fermer uniquement avec une preuve exact-SHA.
 - [ ] Finaliser l'audit SEO production sur `www` : canonical, `hreflang`,
   robots, sitemap et Open Graph. Les redirects `/contact.html` et `/ai.html`
   vers leurs URLs sans extension sont confirmés ; conserver les redirects legacy
