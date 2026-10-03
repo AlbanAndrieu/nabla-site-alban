@@ -46,6 +46,7 @@ test("local accessibility harness isolates Next runtime artifacts", async () => 
 
 	assert.equal(pkg.scripts["test:a11y"], "bash scripts/run-a11y-local.sh");
 	assert.doesNotMatch(script, /^#!\/usr\/bin\/env bash/m);
+	assert.match(script, /^# shellcheck shell=bash/m);
 	assert.ok(script.includes('git diff --quiet -- "${NEXT_ENV}"'));
 	assert.ok(script.includes("rm -rf .next test-results"));
 	assert.ok(script.includes('PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-3103}"'));
