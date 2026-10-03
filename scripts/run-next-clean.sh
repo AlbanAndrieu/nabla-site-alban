@@ -4,13 +4,24 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
-restore_next_env() {
-    if git ls-files --error-unmatch next-env.d.ts >/dev/null 2>&1; then
-        git checkout -- next-env.d.ts
+NEXT_ENV="next-env.d.ts"
+NEXT_ENV_SNAPSHOT=""
+
+snapshot_next_env() {
+    if git ls-files --error-unmatch "${NEXT_ENV}" >/dev/null 2>&1 && [[ -f "${NEXT_ENV}" ]]; then
+        NEXT_ENV_SNAPSHOT="$(mktemp)"
+        cp "${NEXT_ENV}" "${NEXT_ENV_SNAPSHOT}"
     fi
 }
 
-trap restore_next_env EXIT
+restore_next_env() {
+    if [[ -n "${NEXT_ENV_SNAPSHOT}" && -f "${NEXT_ENV_SNAPSHOT}" ]]; then
+        cp "${NEXT_ENV_SNAPSHOT}" "${NEXT_ENV}"
+        rm -f "${NEXT_ENV_SNAPSHOT}"
+    fi
+}
 
-exec_args=("$@")
-npx next "${exec_args[@]}"
+snapshot_next_env
+trap restore_next_env EXIT INT TERM
+
+npx next "$@"
