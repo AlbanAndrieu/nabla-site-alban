@@ -16,9 +16,13 @@ import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
+type ArchitecturePageProps = {
+	params: Promise<{ locale: string }>;
+};
+
 export async function generateMetadata({
 	params,
-}: PageProps<"/[locale]/architecture">): Promise<Metadata> {
+}: ArchitecturePageProps): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
@@ -36,7 +40,7 @@ export async function generateMetadata({
 
 export default async function ArchitecturePage({
 	params,
-}: PageProps<"/[locale]/architecture">) {
+}: ArchitecturePageProps) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
