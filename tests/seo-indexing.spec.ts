@@ -44,6 +44,7 @@ const migratedSeoSlugs = [
 
 const localizedSeoSlugs = [
 	...migratedSeoSlugs,
+	"security/dsomm",
 	"architecture",
 	"cv",
 	"jm",

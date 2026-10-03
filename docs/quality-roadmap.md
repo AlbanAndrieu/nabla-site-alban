@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 3 octobre 2026.
+Dernière réconciliation : 4 octobre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -25,11 +25,12 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
 | Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
-| Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés |
+| Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `security.txt` utilise le host `www` et les routes natives `privacy_policy` |
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
+| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné, sans DB/iframe/fetch runtime ; schéma, provenance et identités validés fail-closed |
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -92,9 +93,10 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 ## P1 — Sécurité applicative
 
 Le premier jalon DSOMM est livré comme snapshot OWASP statique sous
-`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le futur
-service DSOMM de `nabla-compose` remplacera uniquement la provenance des données
-en conservant le contrat consommateur typé du site.
+`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le snapshot
+est validé fail-closed (provenance commit-pinnée, IDs upstream, dimensions,
+niveaux, difficulté et mappings) ; l'explorer expose filtres réinitialisables et
+couverture par dimension. Le futur provider appartient à la roadmap homelab.
 
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.

@@ -98,17 +98,35 @@ export default async function DsommPage({
 							</article>
 						</div>
 
-						<div className={styles.levels}>
-							<h3>{t("summary.levelDistribution")}</h3>
-							{stats.levels.map(({ level, count }) => (
-								<div className={styles.levelRow} key={level}>
-									<span>Level {level}</span>
-									<progress max={stats.activityCount} value={count}>
-										{count}
-									</progress>
-									<strong>{count}</strong>
-								</div>
-							))}
+						<div className={styles.coverageGrid}>
+							<section className={styles.levels}>
+								<h3>{t("summary.levelDistribution")}</h3>
+								{stats.levels.map(({ level, count }) => (
+									<div className={styles.levelRow} key={level}>
+										<span>Level {level}</span>
+										<progress max={stats.activityCount} value={count}>
+											{count}
+										</progress>
+										<strong>{count}</strong>
+									</div>
+								))}
+							</section>
+
+							<section className={styles.dimensions}>
+								<h3>{t("summary.dimensionCoverage")}</h3>
+								{stats.dimensions.map(({ dimension, activityCount }) => (
+									<div className={styles.dimensionRow} key={dimension}>
+										<span>{dimension}</span>
+										<progress
+											max={stats.maxDimensionActivityCount}
+											value={activityCount}
+										>
+											{activityCount}
+										</progress>
+										<strong>{activityCount}</strong>
+									</div>
+								))}
+							</section>
 						</div>
 					</Container>
 				</section>

@@ -31,6 +31,7 @@ export type DsommExplorerCopy = {
 	results: string;
 	noResults: string;
 	showMore: string;
+	clearFilters: string;
 	details: string;
 	description: string;
 	risk: string;
@@ -118,12 +119,24 @@ export default function DsommExplorer({ activities, dimensions, copy }: Props) {
 	}, [activities, dimension, framework, level, query, tag]);
 
 	const visible = filtered.slice(0, limit);
+	const hasActiveFilters = Boolean(
+		query.trim() || dimension || level || framework || tag,
+	);
 	const resultLabel = copy.results
 		.replace("{count}", String(filtered.length))
 		.replace("{total}", String(activities.length));
 
 	function resetLimit() {
 		setLimit(INITIAL_ACTIVITY_LIMIT);
+	}
+
+	function clearFilters() {
+		setQuery("");
+		setDimension("");
+		setLevel("");
+		setFramework("");
+		setTag("");
+		resetLimit();
 	}
 
 	return (
@@ -219,9 +232,21 @@ export default function DsommExplorer({ activities, dimensions, copy }: Props) {
 				</label>
 			</div>
 
-			<p className={styles.resultCount} aria-live="polite">
-				{resultLabel}
-			</p>
+			<div className={styles.resultBar}>
+				<p className={styles.resultCount} aria-live="polite">
+					{resultLabel}
+				</p>
+				{hasActiveFilters && (
+					<button
+						type="button"
+						className={styles.clearFilters}
+						onClick={clearFilters}
+					>
+						<i className="fa-solid fa-filter-circle-xmark" aria-hidden="true" />{" "}
+						{copy.clearFilters}
+					</button>
+				)}
+			</div>
 
 			{visible.length === 0 ? (
 				<p className={styles.empty}>{copy.noResults}</p>

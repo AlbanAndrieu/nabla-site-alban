@@ -107,12 +107,20 @@
 	color: var(--ui-text-muted);
 }
 
-.levels {
-	max-width: 54rem;
+.coverageGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--ui-space-xl);
 	margin-top: var(--ui-space-xl);
 }
 
-.levels h3 {
+.levels,
+.dimensions {
+	min-width: 0;
+}
+
+.levels h3,
+.dimensions h3 {
 	margin-bottom: var(--ui-space-md);
 }
 
@@ -124,10 +132,23 @@
 	margin-block: var(--ui-space-sm);
 }
 
-.levelRow progress {
+.levelRow progress,
+.dimensionRow progress {
 	width: 100%;
 	height: 0.8rem;
 	accent-color: var(--ui-link);
+}
+
+.dimensionRow {
+	display: grid;
+	grid-template-columns: minmax(8rem, 1.35fr) minmax(0, 1fr) 3rem;
+	align-items: center;
+	gap: var(--ui-space-md);
+	margin-block: var(--ui-space-sm);
+}
+
+.dimensionRow span {
+	color: var(--ui-text-muted);
 }
 
 .sourceSection {
@@ -192,6 +213,10 @@
 }
 
 @media (max-width: 800px) {
+	.coverageGrid {
+		grid-template-columns: 1fr;
+	}
+
 	.summaryGrid,
 	.sourceGrid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -207,5 +232,20 @@
 	.levelRow {
 		grid-template-columns: 4.5rem minmax(0, 1fr) 2.25rem;
 		gap: var(--ui-space-sm);
+	}
+
+	.dimensionRow {
+		grid-template-columns: minmax(0, 1fr) 2.25rem;
+		gap: var(--ui-space-xs) var(--ui-space-sm);
+	}
+
+	.dimensionRow progress {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+
+	.dimensionRow strong {
+		grid-column: 2;
+		grid-row: 1;
 	}
 }
