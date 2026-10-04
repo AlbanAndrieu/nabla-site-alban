@@ -6,7 +6,10 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
+import {
+	homelabHealthColor,
+	homelabHealthTextColor,
+} from "@/lib/homelabHealthPresentation";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import {
 	blockedDependencyLabels,
@@ -354,7 +357,7 @@ export default function HomelabServiceGrid({
 							initialHealth?.runtime_stale === true ||
 							initialHealth?.runtime_reachable === false,
 					);
-					const internalColor = homelabHealthColor(internalState);
+					const internalColor = homelabHealthTextColor(internalState);
 					const runtimeState = runtimePresentationState(
 						initialHealth,
 						dependsOnTrueNas,
@@ -413,6 +416,7 @@ export default function HomelabServiceGrid({
 													className={RUNTIME_ICON_CLASS[runtimeState]}
 													style={{ color: runtimeColor, marginLeft: 8 }}
 													title={runtimeTitle}
+													role="img"
 													aria-label={runtimeTitle}
 													data-truenas-runtime-state={runtimeState}
 												/>
@@ -512,6 +516,7 @@ export default function HomelabServiceGrid({
 														className="fas fa-lock"
 														style={{ color: internalColor, marginRight: 5 }}
 														title={t("truenas.internalTlsTitle")}
+														role="img"
 														aria-label={t("truenas.internalTlsAria")}
 													/>
 												)}

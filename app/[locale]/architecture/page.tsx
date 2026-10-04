@@ -16,9 +16,13 @@ import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
+type ArchitecturePageProps = {
+	params: Promise<{ locale: string }>;
+};
+
 export async function generateMetadata({
 	params,
-}: PageProps<"/[locale]/architecture">): Promise<Metadata> {
+}: ArchitecturePageProps): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
@@ -36,7 +40,7 @@ export async function generateMetadata({
 
 export default async function ArchitecturePage({
 	params,
-}: PageProps<"/[locale]/architecture">) {
+}: ArchitecturePageProps) {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
@@ -174,9 +178,14 @@ export default async function ArchitecturePage({
 								],
 							].map(([title, copy]) => (
 								<div className="col-12 col-md-6 col-xl-3" key={title}>
-									<div className="card h-100 bg-dark border-secondary p-3">
+									<div
+										className="card h-100 bg-dark border-secondary p-3 text-light"
+										style={{ color: "#f8fafc" }}
+									>
 										<h3 className="h5">{title}</h3>
-										<p className="mb-0">{copy}</p>
+										<p className="mb-0" style={{ color: "inherit" }}>
+											{copy}
+										</p>
 									</div>
 								</div>
 							))}

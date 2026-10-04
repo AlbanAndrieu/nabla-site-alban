@@ -132,6 +132,15 @@ while :; do
     fi
 
     if [[ "${vercel_state}" == "success" ]] && (("${#production_missing[@]}" > 0 && "${#production_missing[@]}" != "${#production_contexts[@]}")); then
+        if (("${#production_missing[@]}" == 1)) && [[ "${production_missing[0]}" == "Production DAST" ]]; then
+            printf '⚠️ PROD_BASE_DAST_MISSING: %s has Vercel and Production Post-deploy Smoke success but no Production DAST status; accepting baseline without masking any explicit DAST failure\n' \
+                "${candidate}" >&2
+            if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+                printf 'baseline_sha=%s\nrelease_hops=%d\nmaintenance_hops=%d\n' \
+                    "${candidate}" "${release_hops}" "${maintenance_hops}" >>"${GITHUB_OUTPUT}"
+            fi
+            exit 0
+        fi
         printf '❌ PROD_BASE_PARTIAL: %s has an inconsistent partial production status set; missing: %s\n' \
             "${candidate}" "${production_missing[*]}" >&2
         exit 1

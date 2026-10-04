@@ -162,7 +162,7 @@ test("Cloudflare indicator requires tunnel intent and observed API evidence", as
 	const presentation = await source("lib/homelabHealthPresentation.ts");
 	assert.match(
 		page,
-		/showCloudflare = tunnelSecure && hasCloudflareEvidence\(initialHealth\)/,
+		/showCloudflare =\s*hydrated && tunnelSecure && hasCloudflareEvidence\(initialHealth\)/,
 	);
 	assert.match(page, /\{showCloudflare && \(/);
 	assert.match(page, /cloudflareIndicatorColor\(initialHealth\)/);
