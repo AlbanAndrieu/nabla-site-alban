@@ -46,15 +46,37 @@
 
 .filters input:focus-visible,
 .filters select:focus-visible,
+.clearFilters:focus-visible,
 .showMore:focus-visible,
 .details summary:focus-visible {
 	outline: 3px solid var(--ui-focus-ring);
 	outline-offset: 2px;
 }
 
-.resultCount {
+.resultBar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--ui-space-md);
 	margin-block: var(--ui-space-lg);
+}
+
+.resultCount {
+	margin: 0;
 	font-weight: 600;
+}
+
+.clearFilters {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--ui-space-xs);
+	min-height: var(--ui-control-min-height);
+	padding-inline: var(--ui-space-md);
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-sm);
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	font-weight: 700;
 }
 
 .activityGrid {
@@ -212,6 +234,15 @@
 }
 
 @media (max-width: 520px) {
+	.resultBar {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.clearFilters {
+		justify-content: center;
+	}
+
 	.filters {
 		grid-template-columns: 1fr;
 	}

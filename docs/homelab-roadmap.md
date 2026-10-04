@@ -1,6 +1,6 @@
 # Feuille de route homelab
 
-Dernière réconciliation : 30 septembre 2026.
+Dernière réconciliation : 1 octobre 2026.
 
 Ce document est l'unique backlog actif propre à TrueNAS, FastAPI,
 `nabla-compose`, Talos/Kubernetes, DNS et diagnostics homelab. Les runbooks
@@ -57,6 +57,15 @@ Les designs canoniques restent dans `nabla-compose`
   configuration sans exposer de secret.
 - [ ] Vérifier en production les bindings par `appId` : un service non prêt doit
   rester dégradé même si Cloudflare Tunnel est sain.
+
+## P1 — Provider DSOMM
+
+- [ ] Déployer l'application DSOMM dans `nabla-compose` avec une version upstream
+  explicitement pinée, puis exposer un contrat read-only versionné équivalent au
+  snapshot Site Alban. Migrer `/security/dsomm` vers ce provider uniquement
+  après preuve de parité (version, provenance, UUID et champs consommés), en
+  conservant le snapshot statique comme LKG de résilience et sans créer une
+  seconde source de modèle.
 
 ## P1 — Santé, diagnostic et métriques
 

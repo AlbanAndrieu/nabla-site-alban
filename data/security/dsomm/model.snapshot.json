@@ -7,10 +7,10 @@
 		"version": "5.0.2",
 		"released": "2026-09-17",
 		"snapshotDate": "2026-10-01",
-		"upstreamUrl": "https://github.com/devsecopsmaturitymodel/DevSecOps-MaturityModel-data/blob/main/generated/model.yaml",
+		"upstreamUrl": "https://github.com/devsecopsmaturitymodel/DevSecOps-MaturityModel-data/blob/a2c1b7e6c7cc22de0d478027d76fd8d02c41fd7a/generated/model.yaml",
 		"projectUrl": "https://dsomm.owasp.org/",
 		"license": "GPL-3.0",
-		"licenseUrl": "https://github.com/devsecopsmaturitymodel/DevSecOps-MaturityModel-data/blob/main/LICENSE"
+		"licenseUrl": "https://github.com/devsecopsmaturitymodel/DevSecOps-MaturityModel-data/blob/a2c1b7e6c7cc22de0d478027d76fd8d02c41fd7a/LICENSE"
 	},
 	"dimensions": [
 		"Agentic AI",

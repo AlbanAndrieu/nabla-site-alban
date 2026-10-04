@@ -265,7 +265,8 @@
 			"dimensions": "Dimensions",
 			"maturityLevels": "Niveaux de maturité",
 			"upstreamVersion": "Version upstream",
-			"levelDistribution": "Répartition des activités par niveau"
+			"levelDistribution": "Répartition des activités par niveau",
+			"dimensionCoverage": "Activités par dimension"
 		},
 		"explorer": {
 			"title": "Explorer les activités DSOMM",
@@ -294,7 +295,8 @@
 			"difficulty": "Difficulté",
 			"knowledge": "connaissance",
 			"time": "temps",
-			"resources": "ressources"
+			"resources": "ressources",
+			"clearFilters": "Réinitialiser les filtres"
 		},
 		"source": {
 			"title": "Provenance du snapshot",
