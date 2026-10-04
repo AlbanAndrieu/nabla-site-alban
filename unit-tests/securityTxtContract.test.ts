@@ -19,19 +19,13 @@ test("security.txt keeps one canonical host and one canonical policy route", asy
 		wellKnown,
 		/^Canonical: https:\/\/www\.albanandrieu\.com\/security\.txt$/m,
 	);
-	assert.match(
-		wellKnown,
-		/^Expires: 2027-10-03T00:00:00Z$/m,
-	);
+	assert.match(wellKnown, /^Expires: 2027-10-03T00:00:00Z$/m);
 	assert.match(
 		wellKnown,
 		/^Policy: https:\/\/www\.albanandrieu\.com\/policy\/privacy_policy$/m,
 	);
 	assert.doesNotMatch(wellKnown, /privacy\.html/);
-	assert.doesNotMatch(
-		wellKnown,
-		/^Canonical: https:\/\/albanandrieu\.com\//m,
-	);
+	assert.doesNotMatch(wellKnown, /^Canonical: https:\/\/albanandrieu\.com\//m);
 	assert.doesNotMatch(wellKnown, /^Policy: https:\/\/albanandrieu\.com\//m);
 	assert.doesNotMatch(wellKnown, /^Policy: .*\/fr\/policy\/privacy_policy$/m);
 	assert.equal((wellKnown.match(/^Canonical:/gm) ?? []).length, 1);

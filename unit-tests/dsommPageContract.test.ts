@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import {
-	DSOMM_SNAPSHOT,
-	validateDsommSnapshot,
-} from "../lib/dsommSnapshot";
+import { DSOMM_SNAPSHOT, validateDsommSnapshot } from "../lib/dsommSnapshot";
 
 const snapshotPath = new URL(
 	"../data/security/dsomm/model.snapshot.json",
@@ -29,7 +26,9 @@ function cloneSnapshot() {
 }
 
 test("DSOMM snapshot is a pinned static OWASP model with stable activity identities", async () => {
-	const snapshot = JSON.parse(await readFile(snapshotPath, "utf8")) as typeof DSOMM_SNAPSHOT;
+	const snapshot = JSON.parse(
+		await readFile(snapshotPath, "utf8"),
+	) as typeof DSOMM_SNAPSHOT;
 
 	assert.equal(snapshot.source.version, "5.0.2");
 	assert.equal(snapshot.source.released, "2026-09-17");
@@ -124,7 +123,10 @@ test("DSOMM validator rejects incomplete normalized data", () => {
 test("DSOMM validator rejects broken model identities and scores", () => {
 	const duplicate = cloneSnapshot();
 	duplicate.activities[1].uuid = duplicate.activities[0].uuid;
-	assert.throws(() => validateDsommSnapshot(duplicate), /duplicate activity UUID/);
+	assert.throws(
+		() => validateDsommSnapshot(duplicate),
+		/duplicate activity UUID/,
+	);
 
 	const unknownDimension = cloneSnapshot();
 	unknownDimension.activities[0].dimension = "Unknown dimension";
@@ -135,7 +137,10 @@ test("DSOMM validator rejects broken model identities and scores", () => {
 
 	const invalidLevel = cloneSnapshot();
 	invalidLevel.activities[0].level = 6;
-	assert.throws(() => validateDsommSnapshot(invalidLevel), /integer from 1 to 5/);
+	assert.throws(
+		() => validateDsommSnapshot(invalidLevel),
+		/integer from 1 to 5/,
+	);
 });
 
 test("DSOMM page renders the local snapshot without database, iframe or runtime fetch", async () => {

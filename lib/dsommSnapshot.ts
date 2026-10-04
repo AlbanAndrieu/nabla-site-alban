@@ -70,10 +70,7 @@ function invalid(message: string): never {
 	throw new Error(`Invalid DSOMM snapshot: ${message}`);
 }
 
-function requireRecord(
-	value: unknown,
-	label: string,
-): Record<string, unknown> {
+function requireRecord(value: unknown, label: string): Record<string, unknown> {
 	if (typeof value !== "object" || value === null || Array.isArray(value)) {
 		invalid(`${label} must be an object`);
 	}
@@ -141,7 +138,10 @@ export function validateDsommSnapshot(value: unknown): DsommSnapshot {
 	] as const) {
 		requireString(source[key], `source.${key}`);
 	}
-	const sourceCommit = requireString(source.sourceCommit, "source.sourceCommit");
+	const sourceCommit = requireString(
+		source.sourceCommit,
+		"source.sourceCommit",
+	);
 	if (!SHA_PATTERN.test(sourceCommit)) {
 		invalid("source.sourceCommit must be a full Git SHA");
 	}
@@ -162,10 +162,8 @@ export function validateDsommSnapshot(value: unknown): DsommSnapshot {
 			invalid(`source.${key} must match canonical OWASP DSOMM provenance`);
 		}
 	}
-	const expectedUpstreamUrl =
-		`https://github.com/${DSOMM_SOURCE.repository}/blob/${sourceCommit}/${DSOMM_SOURCE.sourcePath}`;
-	const expectedLicenseUrl =
-		`https://github.com/${DSOMM_SOURCE.repository}/blob/${sourceCommit}/LICENSE`;
+	const expectedUpstreamUrl = `https://github.com/${DSOMM_SOURCE.repository}/blob/${sourceCommit}/${DSOMM_SOURCE.sourcePath}`;
+	const expectedLicenseUrl = `https://github.com/${DSOMM_SOURCE.repository}/blob/${sourceCommit}/LICENSE`;
 	if (source.upstreamUrl !== expectedUpstreamUrl) {
 		invalid("source.upstreamUrl must be pinned to source.sourceCommit");
 	}
