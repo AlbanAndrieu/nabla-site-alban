@@ -82,10 +82,10 @@ test("Docker fallback runtime stays non-root and keeps the protected static 404"
 		/FROM nginxinc\/nginx-unprivileged:1\.30\.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7364b4a14f9bad4763ae8f5317c437b896afa3df4b84/,
 	);
 	assert.match(dockerfile, /EXPOSE 8080/);
-	assert.match(dockerfile, /USER root/);
+	assert.match(dockerfile, /USER 0/);
 	assert.match(dockerfile, /apk add --no-cache 'pcre2>=10\\.49-r0'/);
 	assert.match(dockerfile, /USER 101/);
-	assert.ok(dockerfile.indexOf("USER root") < dockerfile.indexOf("USER 101"));
+	assert.ok(dockerfile.indexOf("USER 0") < dockerfile.indexOf("USER 101"));
 	assert.match(dockerfile, /COPY public\/ \/usr\/share\/nginx\/html\//);
 	assert.doesNotMatch(dockerfile, /version="0\.0\.6"/);
 	assert.equal(dockerignore, "**\n!public/\n!public/**\n");

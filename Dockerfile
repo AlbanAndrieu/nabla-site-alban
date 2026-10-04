@@ -4,7 +4,7 @@ FROM nginxinc/nginx-unprivileged:1.30.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7
 
 # The pinned upstream image predates Alpine's pcre2 10.49 security rebuild.
 # Upgrade only the affected runtime package, then drop back to the unprivileged UID.
-USER root
+USER 0
 RUN apk add --no-cache 'pcre2>=10.49-r0'
 
 LABEL org.opencontainers.image.title="nabla-site-alban" \
