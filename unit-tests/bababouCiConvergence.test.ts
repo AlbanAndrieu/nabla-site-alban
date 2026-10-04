@@ -137,7 +137,7 @@ test("semantic release authenticates before freshness and avoids npm ci", async 
 	);
 });
 
-test("theme and Docker hardening from Bababou 159-160 are already converged", async () => {
+test("theme and Docker hardening stay at or above the Bababou 159-160 baseline", async () => {
 	const [layout, bootstrap, theme, dockerfile, dockerWorkflow, dockerignore] =
 		await Promise.all([
 			read("app/[locale]/layout.tsx"),
@@ -151,7 +151,7 @@ test("theme and Docker hardening from Bababou 159-160 are already converged", as
 	assert.match(bootstrap, /site-theme-preference/);
 	assert.match(theme, /--link-color:\s*#0b5ed7/);
 	assert.match(theme, /--toggle-segment-muted:\s*#495057/);
-	assert.match(dockerfile, /nginxinc\/nginx-unprivileged:1\.30\.4-alpine-slim/);
+	assert.match(dockerfile, /nginxinc\/nginx-unprivileged:1\.30\.5-alpine-slim/);
 	assert.match(dockerfile, /USER 101/);
 	assert.match(
 		dockerWorkflow,

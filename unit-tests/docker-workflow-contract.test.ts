@@ -83,7 +83,7 @@ test("Docker fallback runtime stays non-root and keeps the protected static 404"
 	);
 	assert.match(dockerfile, /EXPOSE 8080/);
 	assert.match(dockerfile, /USER 0/);
-	assert.match(dockerfile, /apk add --no-cache 'pcre2>=10\\.49-r0'/);
+	assert.match(dockerfile, /apk add --no-cache 'pcre2>=10\.49-r0'/);
 	assert.match(dockerfile, /USER 101/);
 	assert.ok(dockerfile.indexOf("USER 0") < dockerfile.indexOf("USER 101"));
 	assert.match(dockerfile, /COPY public\/ \/usr\/share\/nginx\/html\//);
