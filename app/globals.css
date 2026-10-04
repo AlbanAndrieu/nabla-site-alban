@@ -248,12 +248,13 @@ html body .form-control::placeholder {
 }
 
 .page-truenas :is(p, li, dd, dt, .card-text, .list-group-item) {
-	color: var(--truenas-text-primary);
+	color: var(--truenas-text-primary) !important;
 }
 
 .page-truenas :is(.card, .list-group-item) {
-	border-color: var(--truenas-card-border);
-	background-color: var(--truenas-card-bg);
+	border-color: var(--truenas-card-border) !important;
+	background-color: var(--truenas-card-bg) !important;
+	color: var(--truenas-text-primary);
 }
 
 .page-truenas .table {
