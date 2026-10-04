@@ -8,7 +8,7 @@ const wellKnownPath = new URL(
 	import.meta.url,
 );
 
-test("security.txt follows the RFC 9116 location and canonical policy routes", async () => {
+test("security.txt keeps one canonical host and one canonical policy route", async () => {
 	const [legacy, wellKnown] = await Promise.all([
 		readFile(legacyPath, "utf8"),
 		readFile(wellKnownPath, "utf8"),
@@ -17,7 +17,7 @@ test("security.txt follows the RFC 9116 location and canonical policy routes", a
 	assert.equal(legacy, wellKnown);
 	assert.match(
 		wellKnown,
-		/^Canonical: https:\/\/www\.albanandrieu\.com\/\.well-known\/security\.txt$/m,
+		/^Canonical: https:\/\/www\.albanandrieu\.com\/security\.txt$/m,
 	);
 	assert.match(
 		wellKnown,
@@ -27,11 +27,14 @@ test("security.txt follows the RFC 9116 location and canonical policy routes", a
 		wellKnown,
 		/^Policy: https:\/\/www\.albanandrieu\.com\/policy\/privacy_policy$/m,
 	);
-	assert.match(
-		wellKnown,
-		/^Policy: https:\/\/www\.albanandrieu\.com\/fr\/policy\/privacy_policy$/m,
-	);
 	assert.doesNotMatch(wellKnown, /privacy\.html/);
+	assert.doesNotMatch(
+		wellKnown,
+		/^Canonical: https:\/\/albanandrieu\.com\//m,
+	);
 	assert.doesNotMatch(wellKnown, /^Policy: https:\/\/albanandrieu\.com\//m);
+	assert.doesNotMatch(wellKnown, /^Policy: .*\/fr\/policy\/privacy_policy$/m);
+	assert.equal((wellKnown.match(/^Canonical:/gm) ?? []).length, 1);
+	assert.equal((wellKnown.match(/^Policy:/gm) ?? []).length, 1);
 	assert.equal((wellKnown.match(/^Expires:/gm) ?? []).length, 1);
 });
