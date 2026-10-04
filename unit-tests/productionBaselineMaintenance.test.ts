@@ -211,7 +211,6 @@ test("production baseline enforces the maintenance-only hop budget", async (t) =
 	assert.match(result.stderr, /maintenance-only hop budget 0/);
 });
 
-
 test("production baseline accepts missing DAST when Vercel and smoke are successful", async (t) => {
 	const fixture = await createFixture({ path: ".github/workflows/ci.yml" });
 	t.after(async () => rm(fixture.directory, { recursive: true, force: true }));
