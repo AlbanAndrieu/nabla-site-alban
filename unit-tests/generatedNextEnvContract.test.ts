@@ -26,14 +26,16 @@ test("Next wrapper restores generated next-env.d.ts after runtime commands", asy
 	assert.equal(pkg.scripts.build, "bash scripts/run-next-clean.sh build");
 });
 
-test("security.txt references the canonical localized privacy policy", async () => {
+test("security.txt references one canonical privacy policy", async () => {
 	const security = await source("public/security.txt");
 
 	assert.match(
 		security,
-		/^Policy: https:\/\/www\.albanandrieu\.com\/fr\/policy\/privacy_policy$/m,
+		/^Policy: https:\/\/www\.albanandrieu\.com\/policy\/privacy_policy$/m,
 	);
 	assert.doesNotMatch(security, /\/policy\/privacy\.html/);
+	assert.doesNotMatch(security, /^Policy: .*\/fr\/policy\/privacy_policy$/m);
+	assert.equal((security.match(/^Policy:/gm) ?? []).length, 1);
 });
 
 test("local accessibility harness isolates Next runtime artifacts", async () => {
@@ -51,7 +53,9 @@ test("local accessibility harness isolates Next runtime artifacts", async () => 
 	assert.ok(script.includes('rm -rf .next "${A11Y_ARTIFACT_DIR}"'));
 	assert.ok(script.includes('mkdir -p "${A11Y_ARTIFACT_DIR}"'));
 	assert.ok(
-		script.includes('cp "${A11Y_LOG}" "${A11Y_ARTIFACT_DIR}/a11y-playwright.log"'),
+		script.includes(
+			'cp "${A11Y_LOG}" "${A11Y_ARTIFACT_DIR}/a11y-playwright.log"',
+		),
 	);
 	assert.ok(script.includes('PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-3103}"'));
 	assert.ok(script.includes("PLAYWRIGHT_REUSE_SERVER=false"));

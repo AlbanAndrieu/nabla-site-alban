@@ -5,7 +5,10 @@ import type {
 	HomelabHealthEntry,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
+import {
+	homelabHealthColor,
+	homelabHealthTextColor,
+} from "@/lib/homelabHealthPresentation";
 import {
 	type HomelabServiceSignalId,
 	homelabServiceSignals,
@@ -56,7 +59,8 @@ export default function ServiceSignalStrip({ entry }: Readonly<Props>) {
 		>
 			{signals.map((signal) => {
 				const label = LABELS[signal.id][french ? 1 : 0];
-				const color = homelabHealthColor(signal.state);
+				const borderColor = homelabHealthColor(signal.state);
+				const textColor = homelabHealthTextColor(signal.state);
 				return (
 					<span
 						key={signal.id}
@@ -66,7 +70,7 @@ export default function ServiceSignalStrip({ entry }: Readonly<Props>) {
 						data-service-signal-state={signal.state}
 						title={`${label}: ${signal.detail}`}
 						aria-label={`${label}: ${signal.detail}`}
-						style={{ color, borderColor: color }}
+						style={{ color: textColor, borderColor }}
 					>
 						<i className={SIGNAL_ICON[signal.id]} aria-hidden="true" />
 						<span>{label}</span>

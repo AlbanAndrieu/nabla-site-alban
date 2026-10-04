@@ -50,7 +50,7 @@ export default async function ArchitecturePage({
 	const prefix = french ? "/fr" : "";
 
 	return (
-		<div className="site-content-page page-dark">
+		<div className="site-content-page page-dark architecture-page">
 			<TopAnchor />
 			<main id="main-content">
 				<section
