@@ -176,3 +176,14 @@
 		width: 100%;
 	}
 }
+
+
+.architectureLink :global([data-ui-action]) {
+	background: #1e293b;
+	color: #f8fafc;
+}
+
+.architectureLink :global([data-ui-action]:hover) {
+	background: #334155;
+	color: #ffffff;
+}
