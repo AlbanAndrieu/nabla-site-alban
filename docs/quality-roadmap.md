@@ -25,7 +25,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
 | Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA ; Axe EN/FR dispose d’un harness local isolé et reproductible |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
-| Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `/.well-known/security.txt` est canonique, `/security.txt` reste le fallback legacy et les policies utilisent les routes natives `privacy_policy` |
+| Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `/security.txt` est canonique, `/.well-known/security.txt` publie la même copie RFC 9116 et la policy unique utilise la route native `/policy/privacy_policy` |
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |

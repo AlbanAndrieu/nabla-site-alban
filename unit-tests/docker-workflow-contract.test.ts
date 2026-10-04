@@ -79,7 +79,7 @@ test("Docker fallback runtime stays non-root and keeps the protected static 404"
 
 	assert.match(
 		dockerfile,
-		/FROM nginxinc\/nginx-unprivileged:1\.30\.4-alpine-slim/,
+		/FROM nginxinc\/nginx-unprivileged:1\.30\.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7364b4a14f9bad4763ae8f5317c437b896afa3df4b84/,
 	);
 	assert.match(dockerfile, /EXPOSE 8080/);
 	assert.match(dockerfile, /USER 101/);

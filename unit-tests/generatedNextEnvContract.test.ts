@@ -26,14 +26,16 @@ test("Next wrapper restores generated next-env.d.ts after runtime commands", asy
 	assert.equal(pkg.scripts.build, "bash scripts/run-next-clean.sh build");
 });
 
-test("security.txt references the canonical localized privacy policy", async () => {
+test("security.txt references one canonical privacy policy", async () => {
 	const security = await source("public/security.txt");
 
 	assert.match(
 		security,
-		/^Policy: https:\/\/www\.albanandrieu\.com\/fr\/policy\/privacy_policy$/m,
+		/^Policy: https:\/\/www\.albanandrieu\.com\/policy\/privacy_policy$/m,
 	);
 	assert.doesNotMatch(security, /\/policy\/privacy\.html/);
+	assert.doesNotMatch(security, /^Policy: .*\/fr\/policy\/privacy_policy$/m);
+	assert.equal((security.match(/^Policy:/gm) ?? []).length, 1);
 });
 
 test("local accessibility harness isolates Next runtime artifacts", async () => {
