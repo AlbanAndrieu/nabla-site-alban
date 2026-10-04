@@ -66,6 +66,10 @@ body.site-content-page.policy-legal #main-content ul {
 	}
 }
 
+body.site-content-page.architecture-page #main-content code {
+	color: #9d174d;
+}
+
 /* All unused and incomplete CSS blocks removed below this line.
    See repo commit for legacy page code if needed.
 */
