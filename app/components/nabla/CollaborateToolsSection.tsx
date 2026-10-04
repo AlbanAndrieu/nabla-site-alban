@@ -79,8 +79,12 @@ export default function CollaborateToolsSection({
 									)}
 									{tool.badge && (
 										<span
-											className="badge ms-2 bg-info text-dark"
-											style={{ fontSize: 12 }}
+											className="badge ms-2"
+											style={{
+												fontSize: 12,
+												backgroundColor: "#0f766e",
+												color: "#ffffff",
+											}}
 										>
 											{tool.badge}
 										</span>
