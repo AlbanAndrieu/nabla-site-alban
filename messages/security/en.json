@@ -150,17 +150,13 @@
 				"badge": "Penetration Testing",
 				"title": "Pentest-Tools.com",
 				"description": "Online penetration testing and vulnerability scanning platform.",
-				"links": [
-					"Pentest-Tools.com App — network and web security testing"
-				]
+				"links": ["Pentest-Tools.com App — network and web security testing"]
 			},
 			"siem": {
 				"badge": "SIEM / Malware Detection",
 				"title": "SIEM / Malware Detection",
 				"description": "Security monitoring and malware detection resources.",
-				"links": [
-					"Wazuh — ClamAV malware detection logs"
-				]
+				"links": ["Wazuh — ClamAV malware detection logs"]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -197,9 +193,7 @@
 				"badge": "App & Infrastructure Security",
 				"title": "App & Infrastructure Security",
 				"description": "Best practices for securing applications and infrastructure platforms.",
-				"links": [
-					"TrueNAS — securing applications"
-				]
+				"links": ["TrueNAS — securing applications"]
 			},
 			"cloud": {
 				"badge": "Cloud Security",
@@ -266,6 +260,9 @@
 		"backToSecurity": "Back to security resources",
 		"snapshotBadge": "Static OWASP snapshot",
 		"languageNote": "The interface is available in English and French. Official activity content stays in English to preserve the upstream snapshot faithfully.",
+		"languageSwitcherLabel": "DSOMM interface language",
+		"englishLabel": "English",
+		"frenchLabel": "Français",
 		"summary": {
 			"activities": "Activities",
 			"dimensions": "Dimensions",
@@ -313,9 +310,6 @@
 			"source": "OWASP DSOMM source",
 			"license": "Upstream license",
 			"project": "Official DSOMM application"
-		},
-		"languageSwitcherLabel": "DSOMM interface language",
-		"englishLabel": "English",
-		"frenchLabel": "Français"
+		}
 	}
 }
