@@ -346,3 +346,11 @@ html body .page-truenas code {
 .page-truenas .hardware-pill__icon {
 	color: var(--truenas-accent-cyan);
 }
+
+
+/* Keep inline CV prose links distinguishable without relying on color alone. */
+.page-cv .cv-page-section p > a:not([data-ui-action]) {
+	text-decoration-line: underline;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.16em;
+}
