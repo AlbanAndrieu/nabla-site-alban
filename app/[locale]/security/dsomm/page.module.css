@@ -188,6 +188,10 @@
 	font-weight: 700;
 }
 
+.sourceGrid code {
+	color: var(--ui-text-primary);
+}
+
 .sourceLinks {
 	display: flex;
 	flex-wrap: wrap;
