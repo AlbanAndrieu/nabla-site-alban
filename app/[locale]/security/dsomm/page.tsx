@@ -58,6 +58,23 @@ export default async function DsommPage({
 						<i className="fa-solid fa-arrow-left" aria-hidden="true" />{" "}
 						{t("backToSecurity")}
 					</a>
+					<nav
+						className={styles.languageSwitch}
+						aria-label={t("languageSwitcherLabel")}
+					>
+						<a
+							href={canonicalPagePath("security/dsomm", "en")}
+							aria-current={locale === "en" ? "page" : undefined}
+						>
+							{t("englishLabel")}
+						</a>
+						<a
+							href={canonicalPagePath("security/dsomm", "fr")}
+							aria-current={locale === "fr" ? "page" : undefined}
+						>
+							{t("frenchLabel")}
+						</a>
+					</nav>
 					<p className={styles.eyebrow}>{t("eyebrow")}</p>
 					<h1>{t("title")}</h1>
 					<p className={styles.lead}>{t("lead")}</p>

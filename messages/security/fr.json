@@ -150,13 +150,17 @@
 				"badge": "Tests d’intrusion",
 				"title": "Pentest-Tools.com",
 				"description": "Plateforme en ligne de tests d’intrusion et d’analyse des vulnérabilités.",
-				"links": ["Pentest-Tools.com App — tests de sécurité réseau et web"]
+				"links": [
+					"Pentest-Tools.com App — tests de sécurité réseau et web"
+				]
 			},
 			"siem": {
 				"badge": "SIEM / Détection de logiciels malveillants",
 				"title": "SIEM / Détection de logiciels malveillants",
 				"description": "Ressources de supervision de sécurité et de détection des logiciels malveillants.",
-				"links": ["Wazuh — collecte des journaux de détection ClamAV"]
+				"links": [
+					"Wazuh — collecte des journaux de détection ClamAV"
+				]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -193,7 +197,9 @@
 				"badge": "Sécurité des applications et infrastructures",
 				"title": "Sécurité des applications et infrastructures",
 				"description": "Bonnes pratiques pour sécuriser les applications et les plateformes d’infrastructure.",
-				"links": ["TrueNAS — sécurisation des applications"]
+				"links": [
+					"TrueNAS — sécurisation des applications"
+				]
 			},
 			"cloud": {
 				"badge": "Sécurité cloud",
@@ -259,7 +265,7 @@
 		"lead": "Un snapshot versionné du modèle DSOMM officiel pour explorer les capacités DevSecOps, leurs risques, mesures, critères d’évaluation et mappings de conformité.",
 		"backToSecurity": "Retour aux ressources sécurité",
 		"snapshotBadge": "Snapshot OWASP statique",
-		"languageNote": "Le contenu des activités reste en anglais afin de préserver fidèlement le snapshot upstream.",
+		"languageNote": "L’interface est disponible en français et en anglais. Le contenu officiel des activités reste en anglais afin de préserver fidèlement le snapshot upstream.",
 		"summary": {
 			"activities": "Activités",
 			"dimensions": "Dimensions",
@@ -307,6 +313,9 @@
 			"source": "Source OWASP DSOMM",
 			"license": "Licence upstream",
 			"project": "Application officielle DSOMM"
-		}
+		},
+		"languageSwitcherLabel": "Langue de l’interface DSOMM",
+		"englishLabel": "English",
+		"frenchLabel": "Français"
 	}
 }
