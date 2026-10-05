@@ -1039,7 +1039,7 @@
 			]
 		},
 		{
-			"activityUuid": "d6bc0b7f-fd98-49fe-b66c-7c79fe88ea1",
+			"activityUuid": "d6bc0b7f-fd98-49fe-b66c-7c5fa70452c6",
 			"activityName": "Human review of AI generated code",
 			"dimension": "Agentic AI",
 			"level": 3,
