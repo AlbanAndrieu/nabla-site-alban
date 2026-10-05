@@ -225,6 +225,31 @@ html body .form-control::placeholder {
 	--truenas-accent-red: #f87171;
 	--truenas-accent-red-strong: #dc2626;
 	--truenas-accent-cyan: #67e8f9;
+
+	/* Map the dark TrueNAS surface onto shared semantic tokens so native
+	 * components do not inherit light-mode surfaces with dark-page text. */
+	--ui-surface: #0f172a;
+	--ui-surface-muted: #1e293b;
+	--ui-surface-card: var(--truenas-card-bg);
+	--ui-text-primary: var(--truenas-text-primary);
+	--ui-text-secondary: var(--truenas-text-secondary);
+	--ui-text-muted: var(--truenas-text-muted);
+	--ui-border: var(--truenas-card-border);
+	--ui-link: var(--truenas-link);
+	--ui-link-hover: var(--truenas-link-hover);
+	--ui-secondary-bg: #334155;
+	--ui-secondary-bg-hover: #475569;
+	--ui-secondary-text: #ffffff;
+	--ui-success-surface: #143b2b;
+	--ui-success-border: #22c55e;
+	--ui-success-text: #86efac;
+	--ui-warning-surface: #422006;
+	--ui-warning-border: #f59e0b;
+	--ui-warning-text: #fde68a;
+	--ui-danger-surface: #450a0a;
+	--ui-danger-border: #ef4444;
+	--ui-danger-text: #fca5a5;
+
 	--truenas-blue-surface: color-mix(
 		in srgb,
 		var(--truenas-accent-blue) 12%,
@@ -282,6 +307,34 @@ html body .form-control::placeholder {
 .page-truenas a:not(.btn):not([data-ui-action]):focus-visible {
 	color: var(--truenas-link-hover);
 	text-decoration-color: currentColor;
+}
+
+/* Inline links must remain distinguishable from nearby light text without
+ * depending on color alone. */
+.page-truenas :is(p, li, dd) a:not(.btn):not([data-ui-action]) {
+	text-decoration: underline;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.16em;
+}
+
+/* Bootstrap's code color is intended for light surfaces. */
+html body .page-truenas code {
+	color: var(--truenas-text-primary);
+}
+
+/* Health signal helpers expose light-surface inline colors. On the dark
+ * TrueNAS service cards, promote them to accessible foreground colors. */
+.page-truenas [data-service-signal-state="ok"] {
+	color: #86efac !important;
+}
+.page-truenas [data-service-signal-state="warn"] {
+	color: #fde68a !important;
+}
+.page-truenas [data-service-signal-state="fail"] {
+	color: #fca5a5 !important;
+}
+.page-truenas [data-service-signal-state="unknown"] {
+	color: #cbd5e1 !important;
 }
 
 .page-truenas .border-secondary {
