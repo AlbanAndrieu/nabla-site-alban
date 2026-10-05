@@ -30,7 +30,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
-| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné, sans DB/iframe/fetch runtime ; schéma, provenance et identités validés fail-closed |
+| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable, preuves/progression par UUID, miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -88,11 +88,23 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Sécurité applicative
 
-Le premier jalon DSOMM est livré comme snapshot OWASP statique sous
-`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le snapshot
-est validé fail-closed (provenance commit-pinnée, IDs upstream, dimensions,
-niveaux, difficulté et mappings) ; l'explorer expose filtres réinitialisables et
-couverture par dimension. Le futur provider appartient à la roadmap homelab.
+Le snapshot OWASP statique sous `/security/dsomm` reste la source locale LKG :
+aucun iframe, aucune base et aucun fetch runtime. Le repository publie désormais
+`nabla-dsomm-assessment.json` et son schéma v1 : claims par UUID, applicabilité,
+progression, confiance et preuves avec miroir HTTP exact sous
+`/.well-known/nabla/`. Les activités absentes restent `not-assessed` et les
+`not-applicable` sont exclues du score. Le futur agrégateur/provider appartient à
+la roadmap homelab.
+
+- [ ] Rebaser snapshot et assessment sur la version DSOMM upstream courante,
+  actuellement 5.1.0, en conservant une migration explicite par UUID et la preuve
+  du commit source cible.
+- [ ] Augmenter la couverture de l'assessment avec les preuves à plus fort levier :
+  threat model propre à `nabla-site-alban`, SBOM/provenance/signature de la
+  supply chain et inventaire machine-readable des agents AI. Les gaps
+  d'enforcement GitHub/Renovate restent propriétaires des items P0 existants.
+- [ ] Afficher une circular heatmap de maturité uniquement depuis l'assessment
+  validé, avec couverture et N/A visibles séparément du score.
 
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.

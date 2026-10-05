@@ -11,6 +11,7 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 - [Contrat de santé des dépendances homelab](homelab-dependency-health-ui.md)
 - [Runbook réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
+- [Contrat d’évaluation DSOMM portable](dsomm-assessment-contract.md)
 
 ## Roadmaps actives
 

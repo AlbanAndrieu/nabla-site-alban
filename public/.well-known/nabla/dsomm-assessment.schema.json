@@ -1,0 +1,420 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://www.albanandrieu.com/.well-known/nabla/dsomm-assessment.schema.json",
+	"title": "Nabla DSOMM repository assessment",
+	"type": "object",
+	"additionalProperties": false,
+	"required": [
+		"$schema",
+		"schemaVersion",
+		"contract",
+		"subject",
+		"assessment",
+		"model",
+		"progressDefinition",
+		"aggregation",
+		"evidence",
+		"claims"
+	],
+	"properties": {
+		"$schema": {
+			"const": "./nabla-dsomm-assessment.schema.json"
+		},
+		"schemaVersion": {
+			"const": 1
+		},
+		"contract": {
+			"const": "nabla.dsomm.repository-assessment/v1"
+		},
+		"subject": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"kind",
+				"repository",
+				"defaultBranch",
+				"url"
+			],
+			"properties": {
+				"kind": {
+					"const": "repository"
+				},
+				"repository": {
+					"type": "string",
+					"pattern": "^[^/]+/[^/]+$"
+				},
+				"defaultBranch": {
+					"type": "string",
+					"minLength": 1
+				},
+				"url": {
+					"type": "string",
+					"format": "uri"
+				}
+			}
+		},
+		"assessment": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"id",
+				"assessedAt",
+				"basisRevision",
+				"method",
+				"reviewStatus",
+				"scope"
+			],
+			"properties": {
+				"id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"assessedAt": {
+					"type": "string",
+					"format": "date"
+				},
+				"basisRevision": {
+					"type": "string",
+					"pattern": "^[0-9a-f]{40}$"
+				},
+				"method": {
+					"const": "evidence-based-self-assessment"
+				},
+				"reviewStatus": {
+					"enum": [
+						"self-assessed",
+						"reviewed",
+						"independently-reviewed"
+					]
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+		"model": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"project",
+				"version",
+				"sourceCommit",
+				"activityIdentity"
+			],
+			"properties": {
+				"project": {
+					"const": "OWASP DevSecOps Maturity Model (DSOMM)"
+				},
+				"version": {
+					"type": "string",
+					"pattern": "^\\d+\\.\\d+\\.\\d+$"
+				},
+				"sourceCommit": {
+					"type": "string",
+					"pattern": "^[0-9a-f]{40}$"
+				},
+				"activityIdentity": {
+					"const": "uuid"
+				}
+			}
+		},
+		"progressDefinition": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"not-implemented",
+				"started",
+				"partly-implemented",
+				"fully-implemented"
+			],
+			"properties": {
+				"not-implemented": {
+					"const": 0
+				},
+				"started": {
+					"const": 0.2
+				},
+				"partly-implemented": {
+					"const": 0.5
+				},
+				"fully-implemented": {
+					"const": 1
+				}
+			}
+		},
+		"aggregation": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"identity",
+				"excludeApplicability",
+				"missingClaim",
+				"modelCompatibility",
+				"recommendedPortfolioStrategy",
+				"notes"
+			],
+			"properties": {
+				"identity": {
+					"const": "activityUuid"
+				},
+				"excludeApplicability": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"const": "not-applicable"
+						}
+					],
+					"minItems": 1,
+					"maxItems": 1
+				},
+				"missingClaim": {
+					"const": "not-assessed"
+				},
+				"modelCompatibility": {
+					"const": "exact-source-commit"
+				},
+				"recommendedPortfolioStrategy": {
+					"const": "mean-of-applicable-repository-scores"
+				},
+				"notes": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+		"evidence": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"type",
+					"visibility",
+					"title",
+					"description"
+				],
+				"properties": {
+					"id": {
+						"type": "string",
+						"pattern": "^[a-z0-9][a-z0-9-]*$"
+					},
+					"type": {
+						"enum": [
+							"repository",
+							"workflow",
+							"test",
+							"documentation",
+							"policy",
+							"notion"
+						]
+					},
+					"visibility": {
+						"enum": [
+							"public",
+							"restricted"
+						]
+					},
+					"title": {
+						"type": "string",
+						"minLength": 1
+					},
+					"description": {
+						"type": "string",
+						"minLength": 1
+					},
+					"path": {
+						"type": "string",
+						"minLength": 1
+					},
+					"url": {
+						"type": "string",
+						"format": "uri"
+					}
+				},
+				"oneOf": [
+					{
+						"required": [
+							"path"
+						],
+						"not": {
+							"required": [
+								"url"
+							]
+						}
+					},
+					{
+						"required": [
+							"url"
+						],
+						"not": {
+							"required": [
+								"path"
+							]
+						}
+					}
+				]
+			}
+		},
+		"claims": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"activityUuid",
+					"activityName",
+					"dimension",
+					"level",
+					"applicability",
+					"progress",
+					"score",
+					"scope",
+					"confidence",
+					"rationale",
+					"evidenceRefs"
+				],
+				"properties": {
+					"activityUuid": {
+						"type": "string",
+						"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?:-(?:medium|advanced))?$"
+					},
+					"activityName": {
+						"type": "string",
+						"minLength": 1
+					},
+					"dimension": {
+						"type": "string",
+						"minLength": 1
+					},
+					"level": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 5
+					},
+					"applicability": {
+						"enum": [
+							"applicable",
+							"not-applicable"
+						]
+					},
+					"progress": {
+						"anyOf": [
+							{
+								"enum": [
+									"not-implemented",
+									"started",
+									"partly-implemented",
+									"fully-implemented"
+								]
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"score": {
+						"anyOf": [
+							{
+								"enum": [
+									0,
+									0.2,
+									0.5,
+									1
+								]
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"scope": {
+						"enum": [
+							"repository",
+							"development-process",
+							"runtime",
+							"governance"
+						]
+					},
+					"confidence": {
+						"enum": [
+							"low",
+							"medium",
+							"high"
+						]
+					},
+					"rationale": {
+						"type": "string",
+						"minLength": 1
+					},
+					"evidenceRefs": {
+						"type": "array",
+						"minItems": 1,
+						"uniqueItems": true,
+						"items": {
+							"type": "string",
+							"minLength": 1
+						}
+					}
+				},
+				"allOf": [
+					{
+						"if": {
+							"properties": {
+								"applicability": {
+									"const": "not-applicable"
+								}
+							},
+							"required": [
+								"applicability"
+							]
+						},
+						"then": {
+							"properties": {
+								"progress": {
+									"type": "null"
+								},
+								"score": {
+									"type": "null"
+								}
+							}
+						}
+					},
+					{
+						"if": {
+							"properties": {
+								"applicability": {
+									"const": "applicable"
+								}
+							},
+							"required": [
+								"applicability"
+							]
+						},
+						"then": {
+							"properties": {
+								"progress": {
+									"enum": [
+										"not-implemented",
+										"started",
+										"partly-implemented",
+										"fully-implemented"
+									]
+								},
+								"score": {
+									"enum": [
+										0,
+										0.2,
+										0.5,
+										1
+									]
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	}
+}
