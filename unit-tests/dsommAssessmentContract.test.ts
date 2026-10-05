@@ -9,7 +9,10 @@ import {
 } from "../lib/dsommAssessment";
 import { DSOMM_SNAPSHOT } from "../lib/dsommSnapshot";
 
-const canonicalPath = new URL("../nabla-dsomm-assessment.json", import.meta.url);
+const canonicalPath = new URL(
+	"../nabla-dsomm-assessment.json",
+	import.meta.url,
+);
 const publicPath = new URL(
 	"../public/.well-known/nabla/dsomm-assessment.json",
 	import.meta.url,

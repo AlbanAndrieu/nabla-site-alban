@@ -29,12 +29,7 @@
 		"subject": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": [
-				"kind",
-				"repository",
-				"defaultBranch",
-				"url"
-			],
+			"required": ["kind", "repository", "defaultBranch", "url"],
 			"properties": {
 				"kind": {
 					"const": "repository"
@@ -81,11 +76,7 @@
 					"const": "evidence-based-self-assessment"
 				},
 				"reviewStatus": {
-					"enum": [
-						"self-assessed",
-						"reviewed",
-						"independently-reviewed"
-					]
+					"enum": ["self-assessed", "reviewed", "independently-reviewed"]
 				},
 				"scope": {
 					"type": "string",
@@ -96,12 +87,7 @@
 		"model": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": [
-				"project",
-				"version",
-				"sourceCommit",
-				"activityIdentity"
-			],
+			"required": ["project", "version", "sourceCommit", "activityIdentity"],
 			"properties": {
 				"project": {
 					"const": "OWASP DevSecOps Maturity Model (DSOMM)"
@@ -188,13 +174,7 @@
 			"items": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": [
-					"id",
-					"type",
-					"visibility",
-					"title",
-					"description"
-				],
+				"required": ["id", "type", "visibility", "title", "description"],
 				"properties": {
 					"id": {
 						"type": "string",
@@ -211,10 +191,7 @@
 						]
 					},
 					"visibility": {
-						"enum": [
-							"public",
-							"restricted"
-						]
+						"enum": ["public", "restricted"]
 					},
 					"title": {
 						"type": "string",
@@ -235,23 +212,15 @@
 				},
 				"oneOf": [
 					{
-						"required": [
-							"path"
-						],
+						"required": ["path"],
 						"not": {
-							"required": [
-								"url"
-							]
+							"required": ["url"]
 						}
 					},
 					{
-						"required": [
-							"url"
-						],
+						"required": ["url"],
 						"not": {
-							"required": [
-								"path"
-							]
+							"required": ["path"]
 						}
 					}
 				]
@@ -294,10 +263,7 @@
 						"maximum": 5
 					},
 					"applicability": {
-						"enum": [
-							"applicable",
-							"not-applicable"
-						]
+						"enum": ["applicable", "not-applicable"]
 					},
 					"progress": {
 						"anyOf": [
@@ -317,12 +283,7 @@
 					"score": {
 						"anyOf": [
 							{
-								"enum": [
-									0,
-									0.2,
-									0.5,
-									1
-								]
+								"enum": [0, 0.2, 0.5, 1]
 							},
 							{
 								"type": "null"
@@ -338,11 +299,7 @@
 						]
 					},
 					"confidence": {
-						"enum": [
-							"low",
-							"medium",
-							"high"
-						]
+						"enum": ["low", "medium", "high"]
 					},
 					"rationale": {
 						"type": "string",
@@ -366,9 +323,7 @@
 									"const": "not-applicable"
 								}
 							},
-							"required": [
-								"applicability"
-							]
+							"required": ["applicability"]
 						},
 						"then": {
 							"properties": {
@@ -388,9 +343,7 @@
 									"const": "applicable"
 								}
 							},
-							"required": [
-								"applicability"
-							]
+							"required": ["applicability"]
 						},
 						"then": {
 							"properties": {
@@ -403,12 +356,7 @@
 									]
 								},
 								"score": {
-									"enum": [
-										0,
-										0.2,
-										0.5,
-										1
-									]
+									"enum": [0, 0.2, 0.5, 1]
 								}
 							}
 						}

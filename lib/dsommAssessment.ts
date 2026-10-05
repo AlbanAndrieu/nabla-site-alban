@@ -1,8 +1,5 @@
+import { DSOMM_SNAPSHOT, type DsommSnapshot } from "@/lib/dsommSnapshot";
 import assessment from "@/nabla-dsomm-assessment.json";
-import {
-	DSOMM_SNAPSHOT,
-	type DsommSnapshot,
-} from "@/lib/dsommSnapshot";
 
 export const DSOMM_ASSESSMENT_CONTRACT =
 	"nabla.dsomm.repository-assessment/v1" as const;
@@ -250,7 +247,14 @@ export function validateDsommRepositoryAssessment(
 		evidenceIds.add(id);
 		oneOf(
 			item.type,
-			["repository", "workflow", "test", "documentation", "policy", "notion"] as const,
+			[
+				"repository",
+				"workflow",
+				"test",
+				"documentation",
+				"policy",
+				"notion",
+			] as const,
 			`evidence[${index}].type`,
 		);
 		oneOf(
@@ -321,13 +325,17 @@ export function validateDsommRepositoryAssessment(
 		}
 		for (const ref of item.evidenceRefs) {
 			if (typeof ref !== "string" || !evidenceIds.has(ref)) {
-				invalid(`claim ${activityUuid} references unknown evidence ${String(ref)}`);
+				invalid(
+					`claim ${activityUuid} references unknown evidence ${String(ref)}`,
+				);
 			}
 		}
 
 		if (applicability === "not-applicable") {
 			if (item.progress !== null || item.score !== null) {
-				invalid(`not-applicable claim ${activityUuid} must have null progress and score`);
+				invalid(
+					`not-applicable claim ${activityUuid} must have null progress and score`,
+				);
 			}
 			continue;
 		}
@@ -338,9 +346,7 @@ export function validateDsommRepositoryAssessment(
 			`claims[${index}].progress`,
 		);
 		if (item.score !== PROGRESS_SCORES[progress]) {
-			invalid(
-				`claim ${activityUuid} score must match progress ${progress}`,
-			);
+			invalid(`claim ${activityUuid} score must match progress ${progress}`);
 		}
 	}
 
