@@ -347,7 +347,6 @@ html body .page-truenas code {
 	color: var(--truenas-accent-cyan);
 }
 
-
 /* Keep inline CV prose links distinguishable without relying on color alone. */
 .page-cv .cv-page-section p > a:not([data-ui-action]) {
 	text-decoration-line: underline;
