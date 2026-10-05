@@ -71,7 +71,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Accessibilité, SEO et i18n
 
-- [ ] Étendre progressivement l’audit Axe EN/FR aux routes prioritaires restantes ; Home, Contact, Policy, Security et Architecture sont livrés. Le lot courant couvre TrueNAS, Nabla, AI et Expertise.
+- [ ] Étendre progressivement l’audit Axe EN/FR aux routes prioritaires restantes ; Home, Contact, Policy, Security et Architecture sont livrés. Le lot courant couvre TrueNAS, Nabla, AI, Expertise, CISO et DSOMM.
 
 - [ ] Étendre le contrat 404 GET/HEAD aux chemins HTML legacy localisés/nichés
   seulement après preuve qu'il ne capture ni redirects SEO, ni
