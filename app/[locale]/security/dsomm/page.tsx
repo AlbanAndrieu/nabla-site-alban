@@ -7,14 +7,14 @@ import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { DSOMM_SNAPSHOT, dsommSnapshotStats } from "@/lib/dsommSnapshot";
-import DsommAssessmentHeatmap, {
-	type DsommAssessmentHeatmapCopy,
-} from "./DsommAssessmentHeatmap";
 import {
 	canonicalPageAlternates,
 	canonicalPagePath,
 } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
+import DsommAssessmentHeatmap, {
+	type DsommAssessmentHeatmapCopy,
+} from "./DsommAssessmentHeatmap";
 import DsommExplorer, { type DsommExplorerCopy } from "./DsommExplorer";
 import styles from "./page.module.css";
 
@@ -47,9 +47,7 @@ export default async function DsommPage({
 
 	const t = await getTranslations({ locale, namespace: "dsommPage" });
 	const stats = dsommSnapshotStats();
-	const assessmentCopy = t.raw(
-		"assessment",
-	) as DsommAssessmentHeatmapCopy;
+	const assessmentCopy = t.raw("assessment") as DsommAssessmentHeatmapCopy;
 	const explorerCopy = t.raw("explorer") as DsommExplorerCopy;
 
 	return (

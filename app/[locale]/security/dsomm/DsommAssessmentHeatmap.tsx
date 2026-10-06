@@ -73,8 +73,7 @@ type Props = Readonly<{
 export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
 	const data = buildDsommHeatmapData();
 	const step =
-		(360 - GROUP_GAP_DEGREES * data.dimensions.length) /
-		data.modelActivities;
+		(360 - GROUP_GAP_DEGREES * data.dimensions.length) / data.modelActivities;
 	let angle = -90;
 
 	const segments = data.dimensions.flatMap(({ dimension }) => {
@@ -127,17 +126,17 @@ export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
 						</div>
 					</div>
 					<ul className={styles.legend} aria-label={copy.legendTitle}>
-						{(
-							Object.keys(STATUS_CLASS) as DsommHeatmapStatus[]
-						).map((status) => (
-							<li key={status}>
-								<span
-									className={`${styles.swatch} ${STATUS_CLASS[status]}`}
-									aria-hidden="true"
-								/>
-								{copy.status[status]}
-							</li>
-						))}
+						{(Object.keys(STATUS_CLASS) as DsommHeatmapStatus[]).map(
+							(status) => (
+								<li key={status}>
+									<span
+										className={`${styles.swatch} ${STATUS_CLASS[status]}`}
+										aria-hidden="true"
+									/>
+									{copy.status[status]}
+								</li>
+							),
+						)}
 					</ul>
 				</div>
 

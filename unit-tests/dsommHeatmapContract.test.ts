@@ -14,14 +14,8 @@ test("circular heatmap has exactly one status per official DSOMM activity", () =
 		new Set(data.activities.map((activity) => activity.uuid)).size,
 		data.modelActivities,
 	);
-	assert.equal(
-		data.assessed + data.notAssessed,
-		data.modelActivities,
-	);
-	assert.equal(
-		data.applicable + data.notApplicable,
-		data.assessed,
-	);
+	assert.equal(data.assessed + data.notAssessed, data.modelActivities);
+	assert.equal(data.applicable + data.notApplicable, data.assessed);
 	assert.equal(data.notApplicable, 3);
 	assert.equal(data.assessed, DSOMM_REPOSITORY_ASSESSMENT.claims.length);
 });
@@ -43,10 +37,7 @@ test("circular heatmap separates assessment coverage from scored maturity", () =
 		data.modelActivities,
 	);
 	assert.equal(
-		data.dimensions.reduce(
-			(sum, dimension) => sum + dimension.notAssessed,
-			0,
-		),
+		data.dimensions.reduce((sum, dimension) => sum + dimension.notAssessed, 0),
 		data.notAssessed,
 	);
 });

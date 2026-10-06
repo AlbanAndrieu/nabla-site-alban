@@ -3,10 +3,7 @@ import {
 	type DsommRepositoryAssessment,
 	validateDsommRepositoryAssessment,
 } from "@/lib/dsommAssessment";
-import {
-	DSOMM_SNAPSHOT,
-	type DsommSnapshot,
-} from "@/lib/dsommSnapshot";
+import { DSOMM_SNAPSHOT, type DsommSnapshot } from "@/lib/dsommSnapshot";
 
 export type DsommHeatmapStatus =
 	| "not-assessed"
@@ -96,7 +93,7 @@ export function buildDsommHeatmapData(
 					? "not-assessed"
 					: claim.applicability === "not-applicable"
 						? "not-applicable"
-						: claim.progress ?? "not-assessed";
+						: (claim.progress ?? "not-assessed");
 				return {
 					uuid: activity.uuid,
 					dimension,
