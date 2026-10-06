@@ -399,7 +399,8 @@ export function dsommAssessmentStats(
 			averageProgress:
 				scores.length === 0
 					? null
-					: scores.reduce<number>((sum, score) => sum + score, 0) / scores.length,
+					: scores.reduce<number>((sum, score) => sum + score, 0) /
+						scores.length,
 		};
 	});
 	return {
