@@ -47,6 +47,29 @@ npm start           # serveur Next.js de production
 Les rapports Playwright sont écrits dans `playwright-report/` et les résultats
 CI dans `test-results/`.
 
+## Commandes local-first avec Just
+
+Le `justfile` complète le `Makefile` historique **sans le remplacer**.
+Just 1.58.0 est épinglé dans `mise.toml`. Les recettes délèguent aux
+commandes existantes npm et mise : une seule quality gate reste canonique.
+
+```bash
+mise install
+just --list
+just dev
+just quality-fix
+just quality
+just publish
+just secrets
+just secrets-history
+```
+
+Betterleaks v1.9.0 remplace le hook Gitleaks historique. Le hook vérifie les
+fichiers textuels modifiés, même sur un checkout CI propre. `just secrets`
+analyse les fichiers locaux ; `just secrets-history` analyse l'historique Git
+complet, potentiellement plus coûteux. Les scans échouent en cas de fuite,
+masquent les secrets et n'activent pas la validation des identifiants en ligne.
+
 ## Architecture
 
 ```text

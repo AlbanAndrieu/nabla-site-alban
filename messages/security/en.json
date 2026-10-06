@@ -167,7 +167,7 @@
 					"FastAPI security without slowness",
 					"MegaLinter — multi-language linter",
 					"Trivy — vulnerability and misconfiguration scanner",
-					"Gitleaks — detect secrets in repositories and files",
+					"Betterleaks — detect secrets in repositories and files",
 					"pre-commit — Git hooks for preventive checks",
 					"Bandit — security linter for Python",
 					"pre-commit-terraform — Terraform and Terragrunt hooks",
