@@ -12,6 +12,9 @@ import {
 	canonicalPagePath,
 } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
+import DsommAssessmentHeatmap, {
+	type DsommAssessmentHeatmapCopy,
+} from "./DsommAssessmentHeatmap";
 import DsommExplorer, { type DsommExplorerCopy } from "./DsommExplorer";
 import styles from "./page.module.css";
 
@@ -44,6 +47,7 @@ export default async function DsommPage({
 
 	const t = await getTranslations({ locale, namespace: "dsommPage" });
 	const stats = dsommSnapshotStats();
+	const assessmentCopy = t.raw("assessment") as DsommAssessmentHeatmapCopy;
 	const explorerCopy = t.raw("explorer") as DsommExplorerCopy;
 
 	return (
@@ -58,6 +62,23 @@ export default async function DsommPage({
 						<i className="fa-solid fa-arrow-left" aria-hidden="true" />{" "}
 						{t("backToSecurity")}
 					</a>
+					<nav
+						className={styles.languageSwitch}
+						aria-label={t("languageSwitcherLabel")}
+					>
+						<a
+							href={canonicalPagePath("security/dsomm", "en")}
+							aria-current={locale === "en" ? "page" : undefined}
+						>
+							{t("englishLabel")}
+						</a>
+						<a
+							href={canonicalPagePath("security/dsomm", "fr")}
+							aria-current={locale === "fr" ? "page" : undefined}
+						>
+							{t("frenchLabel")}
+						</a>
+					</nav>
 					<p className={styles.eyebrow}>{t("eyebrow")}</p>
 					<h1>{t("title")}</h1>
 					<p className={styles.lead}>{t("lead")}</p>
@@ -132,6 +153,10 @@ export default async function DsommPage({
 				</section>
 
 				<Container>
+					<DsommAssessmentHeatmap
+						copy={assessmentCopy}
+						locale={locale as AppLocale}
+					/>
 					<DsommExplorer
 						activities={DSOMM_SNAPSHOT.activities}
 						dimensions={DSOMM_SNAPSHOT.dimensions}

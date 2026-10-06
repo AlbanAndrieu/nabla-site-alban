@@ -259,7 +259,10 @@
 		"lead": "Un snapshot versionné du modèle DSOMM officiel pour explorer les capacités DevSecOps, leurs risques, mesures, critères d’évaluation et mappings de conformité.",
 		"backToSecurity": "Retour aux ressources sécurité",
 		"snapshotBadge": "Snapshot OWASP statique",
-		"languageNote": "Le contenu des activités reste en anglais afin de préserver fidèlement le snapshot upstream.",
+		"languageNote": "L’interface est disponible en français et en anglais. Le contenu officiel des activités reste en anglais afin de préserver fidèlement le snapshot upstream.",
+		"languageSwitcherLabel": "Langue de l’interface DSOMM",
+		"englishLabel": "English",
+		"frenchLabel": "Français",
 		"summary": {
 			"activities": "Activités",
 			"dimensions": "Dimensions",
@@ -267,6 +270,29 @@
 			"upstreamVersion": "Version upstream",
 			"levelDistribution": "Répartition des activités par niveau",
 			"dimensionCoverage": "Activités par dimension"
+		},
+		"assessment": {
+			"title": "Évaluation du dépôt · heatmap circulaire",
+			"lead": "Un segment par activité officielle DSOMM. Le graphique reflète l'auto-évaluation fondée sur les preuves de ce dépôt, pas la maturité de l'ensemble des dépôts Nabla.",
+			"coverage": "Couverture évaluée",
+			"assessed": "Évaluées",
+			"modelActivities": "Activités du modèle",
+			"notAssessed": "Non évaluées",
+			"notApplicable": "N/A",
+			"meanAssessed": "Moyenne des claims applicables",
+			"noScore": "—",
+			"caveat": "La moyenne ne porte que sur les claims applicables évalués. Les absents ne valent pas zéro ; les N/A sont exclus. Ce n'est pas un verdict de maturité du portfolio et aucun état global DSOMM n'est déduit.",
+			"dimension": "Dimension",
+			"legendTitle": "États d'évaluation des activités",
+			"dataLink": "Consulter l'évaluation versionnée du dépôt (JSON)",
+			"status": {
+				"not-assessed": "Non évaluée",
+				"not-applicable": "Non applicable",
+				"not-implemented": "Non implémentée · 0 %",
+				"started": "Démarrée · 20 %",
+				"partly-implemented": "Partiellement implémentée · 50 %",
+				"fully-implemented": "Complètement implémentée · 100 %"
+			}
 		},
 		"explorer": {
 			"title": "Explorer les activités DSOMM",

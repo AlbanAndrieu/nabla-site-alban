@@ -7,6 +7,14 @@ const localizedRoutePairs = [
 	["/policy", "/fr/policy"],
 	["/security", "/fr/security"],
 	["/architecture", "/fr/architecture"],
+	["/truenas", "/fr/truenas"],
+	["/nabla", "/fr/nabla"],
+	["/ai", "/fr/ai"],
+	["/expertise", "/fr/expertise"],
+	["/ciso", "/fr/ciso"],
+	["/security/dsomm", "/fr/security/dsomm"],
+	["/cv", "/fr/cv"],
+	["/jm", "/fr/jm"],
 ] as const;
 
 function formatViolations(

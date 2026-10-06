@@ -1,0 +1,1027 @@
+{
+	"$schema": "./nabla-dsomm-assessment.schema.json",
+	"schemaVersion": 1,
+	"contract": "nabla.dsomm.repository-assessment/v1",
+	"subject": {
+		"kind": "repository",
+		"repository": "AlbanAndrieu/nabla-site-alban",
+		"defaultBranch": "master",
+		"url": "https://github.com/AlbanAndrieu/nabla-site-alban"
+	},
+	"assessment": {
+		"id": "nabla-site-alban",
+		"assessedAt": "2026-10-05",
+		"basisRevision": "83d0ab91482a47b8bad5fa62479b75444ecadc82",
+		"method": "evidence-based-self-assessment",
+		"reviewStatus": "self-assessed",
+		"scope": "Repository implementation, delivery/runtime controls, governance evidence and AI-assisted SDLC. Missing claims are intentionally not assessed."
+	},
+	"model": {
+		"project": "OWASP DevSecOps Maturity Model (DSOMM)",
+		"version": "5.0.2",
+		"sourceCommit": "a2c1b7e6c7cc22de0d478027d76fd8d02c41fd7a",
+		"activityIdentity": "uuid"
+	},
+	"progressDefinition": {
+		"not-implemented": 0,
+		"started": 0.2,
+		"partly-implemented": 0.5,
+		"fully-implemented": 1
+	},
+	"aggregation": {
+		"identity": "activityUuid",
+		"excludeApplicability": ["not-applicable"],
+		"missingClaim": "not-assessed",
+		"modelCompatibility": "exact-source-commit",
+		"recommendedPortfolioStrategy": "mean-of-applicable-repository-scores",
+		"notes": "Consumers must preserve repository/evidence provenance and assessment coverage. Missing claims are not zero. Assessments from different DSOMM source commits must be normalized to an explicit target model before portfolio aggregation."
+	},
+	"evidence": [
+		{
+			"id": "agent-policy",
+			"type": "policy",
+			"visibility": "public",
+			"title": "Repository agent policy and deterministic publication state machine",
+			"path": "AGENTS.md",
+			"description": "Versioned rules for coding agents, local-first quality, exact-SHA proof, review and protected publication."
+		},
+		{
+			"id": "agent-quality-gate",
+			"type": "test",
+			"visibility": "public",
+			"title": "Agent local-first quality gate",
+			"path": "scripts/agent-quality-gate.sh",
+			"description": "Deterministic local quality, remediation and publication contract used before agent changes are published."
+		},
+		{
+			"id": "ci-quality-security",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Quality and security CI",
+			"path": ".github/workflows/ci.yml",
+			"description": "Semgrep, quality, unit, type, build and preview-security orchestration on pull requests."
+		},
+		{
+			"id": "ci-zap-preview",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "OWASP ZAP preview DAST",
+			"path": ".github/workflows/zap-preview.yml",
+			"description": "Blocking preview DAST workflow for deployed pull-request candidates."
+		},
+		{
+			"id": "ci-production-dast",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Production DAST",
+			"path": ".github/workflows/production-dast.yml",
+			"description": "Independent production OWASP ZAP validation."
+		},
+		{
+			"id": "ci-production-smoke",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Production smoke validation",
+			"path": ".github/workflows/production-smoke.yml",
+			"description": "Post-deployment HTTP and SEO smoke coverage for the production site."
+		},
+		{
+			"id": "ci-docker",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Container build and smoke workflow",
+			"path": ".github/workflows/docker-build.yml",
+			"description": "Builds the fallback container and validates it with a smoke test."
+		},
+		{
+			"id": "ci-vercel-preview",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Vercel Preview security checkpoint",
+			"path": ".github/workflows/vercel-preview.yml",
+			"description": "Coordinates exact-preview validation and publishes the preview security checkpoint."
+		},
+		{
+			"id": "security-policy",
+			"type": "policy",
+			"visibility": "public",
+			"title": "Repository security policy",
+			"path": "SECURITY.md",
+			"description": "Documents supply-chain controls, scanning layers, deployment boundaries and least-privilege expectations."
+		},
+		{
+			"id": "precommit-security",
+			"type": "test",
+			"visibility": "public",
+			"title": "Pre-commit preventive controls",
+			"path": ".pre-commit-config.yaml",
+			"description": "Preventive integrity, private-key, lint and security hooks used before publication."
+		},
+		{
+			"id": "renovate-policy",
+			"type": "policy",
+			"visibility": "public",
+			"title": "Renovate dependency policy",
+			"path": "renovate.json",
+			"description": "Versioned dependency update and vulnerability-remediation policy; live activation remains separately tracked."
+		},
+		{
+			"id": "master-ruleset-contract",
+			"type": "documentation",
+			"visibility": "public",
+			"title": "GitHub master ruleset contract",
+			"path": "docs/github-master-ruleset.md",
+			"description": "Versioned target branch protection contract and explicit record that the live ruleset was still missing at the last audit."
+		},
+		{
+			"id": "quality-roadmap",
+			"type": "documentation",
+			"visibility": "public",
+			"title": "Quality and security roadmap",
+			"path": "docs/quality-roadmap.md",
+			"description": "Canonical open work and delivered quality/security invariants."
+		},
+		{
+			"id": "security-baseline-tests",
+			"type": "test",
+			"visibility": "public",
+			"title": "Application security baseline tests",
+			"path": "tests/security-baseline.spec.ts",
+			"description": "Browser-level security assertions for the deployed application."
+		},
+		{
+			"id": "dsomm-contract-tests",
+			"type": "test",
+			"visibility": "public",
+			"title": "DSOMM model contract tests",
+			"path": "unit-tests/dsommPageContract.test.ts",
+			"description": "Fail-closed tests for the pinned DSOMM model, provenance and local explorer contract."
+		},
+		{
+			"id": "otel-instrumentation",
+			"type": "repository",
+			"visibility": "public",
+			"title": "Vercel OpenTelemetry instrumentation",
+			"path": "instrumentation.ts",
+			"description": "Registers nabla-site-alban as an OpenTelemetry service in the Vercel runtime."
+		},
+		{
+			"id": "github-green-baseline",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Exact-SHA green quality and security baseline",
+			"url": "https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/37358912087",
+			"description": "CI (Quality and Security) run for basis revision 83d0ab91482a47b8bad5fa62479b75444ecadc82."
+		},
+		{
+			"id": "github-zap-green-baseline",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Exact-SHA OWASP ZAP Preview evidence",
+			"url": "https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/37359427558",
+			"description": "Successful OWASP ZAP Preview status observed for the assessment basis revision."
+		},
+		{
+			"id": "github-playwright-green-baseline",
+			"type": "workflow",
+			"visibility": "public",
+			"title": "Exact-SHA Playwright Preview evidence",
+			"url": "https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/37359288301",
+			"description": "Successful Playwright Preview E2E status observed for the assessment basis revision."
+		},
+		{
+			"id": "notion-devsecops-roadmap",
+			"type": "notion",
+			"visibility": "restricted",
+			"title": "Nabla — Système opérationnel DevSecOps sur 90 jours",
+			"url": "https://app.notion.com/p/3dcf375a7e5e81cbaac0e4635b0dde90",
+			"description": "Governance, criticality, control architecture, risk-based gates, resilience and evidence-first operating model."
+		},
+		{
+			"id": "notion-security-champions",
+			"type": "notion",
+			"visibility": "restricted",
+			"title": "Security Champions & Security Belts",
+			"url": "https://app.notion.com/p/3def375a7e5e81d690b6d4e1e9891da1",
+			"description": "Security Champion role, progressive training, coaching, review and threat-model participation model."
+		},
+		{
+			"id": "notion-agentic-ai-security",
+			"type": "notion",
+			"visibility": "restricted",
+			"title": "Agentic AI & MCP - Security Framework",
+			"url": "https://app.notion.com/p/ccaf375a7e5e8321a9ad8187a7b98dcb",
+			"description": "Threat model and controls for agentic AI: least privilege, allowlisting, human approval, auditability, fail-closed behavior and sandboxing."
+		}
+	],
+	"claims": [
+		{
+			"activityUuid": "f6f7737f-25a9-4317-8de2-09bf59f29b5b",
+			"activityName": "Defined build process",
+			"dimension": "Build and Deployment",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The repository defines deterministic build commands and enforces production builds in CI.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"agent-quality-gate",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "a340f46b-6360-4cb8-847b-a0d3483d09d3",
+			"activityName": "Building and testing of artifacts in virtualized environments",
+			"dimension": "Build and Deployment",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Pull-request validation builds and tests artifacts on hosted runners and the fallback image in Docker.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"ci-docker",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "f3c4971e-9f4d-4e59-8ed0-f0bdb6262477",
+			"activityName": "Pinning of artifacts",
+			"dimension": "Build and Deployment",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Security-critical GitHub Actions and the Semgrep image are pinned immutably, while not every runtime dependency is content-addressed.",
+			"evidenceRefs": ["security-policy", "ci-quality-security"]
+		},
+		{
+			"activityUuid": "2858ac12-0179-40d9-9acf-1b839c030473",
+			"activityName": "SBOM of components",
+			"dimension": "Build and Deployment",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "not-implemented",
+			"score": 0,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "No generated CycloneDX/SPDX SBOM is currently published as a repository or release artifact.",
+			"evidenceRefs": ["security-policy", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "67e1a9aa-9fbf-4ec5-a2de-400f01960c51",
+			"activityName": "Automated deployment process",
+			"dimension": "Build and Deployment",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "Production and preview deployment use Vercel Git Integration with automated preview validation.",
+			"evidenceRefs": [
+				"security-policy",
+				"ci-vercel-preview",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "74938a3f-1269-49b9-9d0f-c43a79a1985a",
+			"activityName": "Defined deployment process",
+			"dimension": "Build and Deployment",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "The production/preview boundary and deployment validation are explicitly documented and tested.",
+			"evidenceRefs": [
+				"security-policy",
+				"ci-vercel-preview",
+				"ci-production-smoke"
+			]
+		},
+		{
+			"activityUuid": "df428c9d-efa0-4226-9f47-a15bb53f822b",
+			"activityName": "Environment depending configuration parameters (secrets)",
+			"dimension": "Build and Deployment",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "Runtime secrets are provided through deployment/CI secret stores and the repository forbids committed secrets.",
+			"evidenceRefs": ["security-policy", "ci-quality-security"]
+		},
+		{
+			"activityUuid": "0de465a6-55a7-4343-af79-948bb5ff10ba",
+			"activityName": "Evaluation of the trust of used components",
+			"dimension": "Build and Deployment",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Dependency changes are reviewed and vulnerability scanning is present, but a formal trust/admission policy such as Scorecard or repository firewall is not yet enforced.",
+			"evidenceRefs": ["security-policy", "renovate-policy"]
+		},
+		{
+			"activityUuid": "99415139-6b50-441b-89e1-0aa59accd43d",
+			"activityName": "A patch policy is defined",
+			"dimension": "Build and Deployment",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "governance",
+			"confidence": "high",
+			"rationale": "Dependency ownership, cadence, vulnerability handling and rebase policy are versioned.",
+			"evidenceRefs": ["security-policy", "renovate-policy"]
+		},
+		{
+			"activityUuid": "8ae0b92c-10e0-4602-ba22-7524d6aed488",
+			"activityName": "Automated PRs for patches",
+			"dimension": "Build and Deployment",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Renovate configuration exists, but the roadmap records that live Renovate activation has not yet been proven.",
+			"evidenceRefs": ["renovate-policy", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "47419324-e263-415b-815d-e7161b6b905e",
+			"activityName": "Conduction of simple threat modeling on technical level",
+			"dimension": "Culture and Organization",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "Threat-model practices are documented, but a repository-specific nabla-site-alban threat model is not yet versioned.",
+			"evidenceRefs": [
+				"notion-devsecops-roadmap",
+				"notion-agentic-ai-security",
+				"quality-roadmap"
+			]
+		},
+		{
+			"activityUuid": "1b9281b9-48e2-4c01-9ac6-9db9931c4885",
+			"activityName": "Information security targets are communicated",
+			"dimension": "Culture and Organization",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "governance",
+			"confidence": "high",
+			"rationale": "Security targets and quality/security invariants are documented in the repository and the broader DevSecOps operating model.",
+			"evidenceRefs": [
+				"security-policy",
+				"quality-roadmap",
+				"notion-devsecops-roadmap"
+			]
+		},
+		{
+			"activityUuid": "dd5ed7c1-bdbf-400f-b75f-6d3953a1a04e",
+			"activityName": "Creation of threat modeling processes and standards",
+			"dimension": "Culture and Organization",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "A reusable threat-model approach is documented in Notion, but this repository does not yet carry its own threat model or a mandatory trigger.",
+			"evidenceRefs": ["notion-agentic-ai-security", "notion-devsecops-roadmap"]
+		},
+		{
+			"activityUuid": "7121b0c7-6ace-4d6b-95d0-94535dbccb57",
+			"activityName": "Security code review",
+			"dimension": "Culture and Organization",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Security scanning and review expectations are systematic, but live branch protection does not yet guarantee independent security review for every merge.",
+			"evidenceRefs": [
+				"agent-policy",
+				"ci-quality-security",
+				"master-ruleset-contract"
+			]
+		},
+		{
+			"activityUuid": "f7b215dc-73a4-4c61-9e49-b3a3af1c9ac3",
+			"activityName": "Security Coaching",
+			"dimension": "Culture and Organization",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "A Security Champions and coaching model is documented, but operating cadence and participation are not evidenced by this repository.",
+			"evidenceRefs": ["notion-security-champions"]
+		},
+		{
+			"activityUuid": "72737130-472c-4984-80f8-9ab2f1c2ed5d",
+			"activityName": "Determining the protection requirement",
+			"dimension": "Culture and Organization",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "The broader Nabla model defines criticality tiers and risk-based controls; repository-specific classification remains incomplete.",
+			"evidenceRefs": ["notion-devsecops-roadmap", "security-policy"]
+		},
+		{
+			"activityUuid": "3f63bdbc-c75f-4780-a941-e6ad42e894e1",
+			"activityName": "Approval by reviewing any new version",
+			"dimension": "Culture and Organization",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "PR review and exact-SHA evidence are the intended flow, but the live master ruleset that makes review mandatory is still absent.",
+			"evidenceRefs": [
+				"agent-policy",
+				"master-ruleset-contract",
+				"quality-roadmap"
+			]
+		},
+		{
+			"activityUuid": "b4193d32-3948-47e2-a326-3748c48019a1",
+			"activityName": "Definition of a change management process",
+			"dimension": "Culture and Organization",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The repository defines a deterministic change state machine, CI gates and rollback-oriented rules, while formal live branch enforcement remains incomplete.",
+			"evidenceRefs": ["agent-policy", "master-ruleset-contract"]
+		},
+		{
+			"activityUuid": "29318d60-18ce-4526-80ea-f5928e49f639",
+			"activityName": "Secure headers",
+			"dimension": "Implementation",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "Security headers are configured and covered by application security baseline tests.",
+			"evidenceRefs": [
+				"security-baseline-tests",
+				"github-playwright-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "066084c6-1135-4635-9cc5-9e75c7c5459f",
+			"activityName": "Version control",
+			"dimension": "Implementation",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Source, configuration, policy, tests and assessment data are maintained in Git.",
+			"evidenceRefs": ["agent-policy"]
+		},
+		{
+			"activityUuid": "e7598ac4-b082-4e56-b7df-e2c6b426a5e2",
+			"activityName": "Require a PR before merging",
+			"dimension": "Implementation",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The repository policy and target ruleset require PR-based delivery, but the last live audit found the GitHub ruleset missing.",
+			"evidenceRefs": ["agent-policy", "master-ruleset-contract"]
+		},
+		{
+			"activityUuid": "c7d99b18-c3e1-4d22-b2e3-9aa9146c0b17",
+			"activityName": "Block force pushes",
+			"dimension": "Implementation",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "not-implemented",
+			"score": 0,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The versioned target ruleset blocks non-fast-forward updates, but the live repository audit records that the ruleset is not installed.",
+			"evidenceRefs": ["master-ruleset-contract", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "50ba2bfb-2ae3-4576-8813-a8f00d8a3220",
+			"activityName": "Block pushes containing secrets",
+			"dimension": "Implementation",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Local preventive secret checks and hosted secret scanning exist; server-side push protection enforcement is not proven by the repository contract.",
+			"evidenceRefs": [
+				"precommit-security",
+				"security-policy",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "e9a6d403-a467-445e-b98a-74f0c29da0b1",
+			"activityName": "Simple application metrics",
+			"dimension": "Information Gathering",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "The application registers OpenTelemetry in Vercel, but the repository does not yet expose a complete operational metric SLO contract.",
+			"evidenceRefs": ["otel-instrumentation", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "fe875e17-ae4a-45f8-a359-244aa4fcbc04",
+			"activityName": "Centralized application logging",
+			"dimension": "Information Gathering",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "runtime",
+			"confidence": "medium",
+			"rationale": "Vercel provides centralized runtime observability and OTel instrumentation is registered, while automated log retrieval remains an open roadmap item.",
+			"evidenceRefs": ["otel-instrumentation", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "ccfdd0a8-991e-4269-ad77-c0a54ca655cb",
+			"activityName": "Logging of security events",
+			"dimension": "Information Gathering",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "runtime",
+			"confidence": "medium",
+			"rationale": "GitHub security scanners and deployment security workflows produce centralized security events, but a unified runtime security-event stream is not evidenced.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"ci-zap-preview",
+				"security-policy"
+			]
+		},
+		{
+			"activityUuid": "8a442d8e-0eb1-4793-a513-571aef982edd",
+			"activityName": "Alerting",
+			"dimension": "Information Gathering",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "runtime",
+			"confidence": "medium",
+			"rationale": "CI and deployment failures surface alerts/statuses, but an explicit production alerting/SLO policy for this site is not yet versioned.",
+			"evidenceRefs": [
+				"ci-production-smoke",
+				"ci-production-dast",
+				"quality-roadmap"
+			]
+		},
+		{
+			"activityUuid": "eb2c7f9d-d0bd-4253-a2ba-cff2ace4a075",
+			"activityName": "Security unit tests for important components",
+			"dimension": "Test and Verification",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Security and policy contracts are exercised by the repository unit-test suite.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"dsomm-contract-tests",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "f57d55f2-dc05-4b34-9d1f-f8ce5bfb0715",
+			"activityName": "Security integration tests for important components",
+			"dimension": "Test and Verification",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Preview security and integration browser tests run against deployed candidates.",
+			"evidenceRefs": ["ci-vercel-preview", "github-playwright-green-baseline"]
+		},
+		{
+			"activityUuid": "73aaae0b-5d68-4953-9fa4-fd25bf665f2a",
+			"activityName": "Smoke Test",
+			"dimension": "Test and Verification",
+			"level": 4,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "Fallback containers and production deployments have explicit smoke validation.",
+			"evidenceRefs": [
+				"ci-docker",
+				"ci-production-smoke",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "44f2c8a9-4aaa-4c72-942d-63f78b89f385",
+			"activityName": "Treatment of defects with high or critical severity",
+			"dimension": "Test and Verification",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Security findings block relevant gates and vulnerability remediation policy exists, but an explicit repository SLA/exception workflow is not fully evidenced.",
+			"evidenceRefs": [
+				"security-policy",
+				"ci-quality-security",
+				"renovate-policy"
+			]
+		},
+		{
+			"activityUuid": "07796811-37f9-467c-9ff2-48f346e77ff3",
+			"activityName": "Simple Scan",
+			"dimension": "Test and Verification",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "OWASP ZAP scans Preview and production surfaces.",
+			"evidenceRefs": [
+				"ci-zap-preview",
+				"ci-production-dast",
+				"github-zap-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "6e180abc-7c98-4265-b4e9-852cb91b067b",
+			"activityName": "Local development security checks performed",
+			"dimension": "Test and Verification",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The local-first quality gate and preventive hooks are explicit repository contracts.",
+			"evidenceRefs": [
+				"agent-quality-gate",
+				"precommit-security",
+				"agent-policy"
+			]
+		},
+		{
+			"activityUuid": "07fe8c4f-ae33-4409-b1b2-cf64cfccea86",
+			"activityName": "Software Composition Analysis (client side)",
+			"dimension": "Test and Verification",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "npm audit/Snyk and dependency vulnerability handling exist, but the dedicated SCA evidence chain and SBOM are incomplete.",
+			"evidenceRefs": ["security-policy", "renovate-policy"]
+		},
+		{
+			"activityUuid": "e237176b-bec5-447d-a926-e37d6dd60e4b",
+			"activityName": "Static analysis for important client side components",
+			"dimension": "Test and Verification",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Semgrep and CodeQL cover the JavaScript/TypeScript application and current exact-SHA checks are green.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"security-policy",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "6c05c837-8c99-46e2-828b-7c903e27dba4",
+			"activityName": "Static analysis for important server side components",
+			"dimension": "Test and Verification",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Server-side Next.js code is included in Semgrep/CodeQL and quality gates.",
+			"evidenceRefs": [
+				"ci-quality-security",
+				"security-policy",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "297be001-8d94-41ee-ab29-207020d423c0",
+			"activityName": "Usage of multiple analyzers",
+			"dimension": "Test and Verification",
+			"level": 4,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Semgrep, CodeQL, GitGuardian, ZAP, browser security tests and optional Snyk provide independent analyzers.",
+			"evidenceRefs": [
+				"security-policy",
+				"ci-quality-security",
+				"ci-zap-preview",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "c6e3c812-56e2-41b0-ae01-b7afc41a004c",
+			"activityName": "Test for stored secrets in code",
+			"dimension": "Test and Verification",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Private-key/secret preventive checks and hosted secret scanning are active in the validation chain.",
+			"evidenceRefs": [
+				"precommit-security",
+				"security-policy",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "51ebc877-c4fd-4b50-9305-320152242ddf",
+			"activityName": "Static load of security rules",
+			"dimension": "Agentic AI",
+			"level": 1,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Repository agent rules are versioned and loaded as persistent project guidance.",
+			"evidenceRefs": ["agent-policy"]
+		},
+		{
+			"activityUuid": "a511a9a9-1b75-4dfd-8a4f-e516e8096150",
+			"activityName": "AI usage policy",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "Repository-specific agent rules and a broader AI security framework exist, but a single formal AI-use policy/inventory is not yet published in this repository.",
+			"evidenceRefs": ["agent-policy", "notion-agentic-ai-security"]
+		},
+		{
+			"activityUuid": "c1f02ad7-e97e-4c87-b827-7542793ddb0a",
+			"activityName": "Inventory of AI agents",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "governance",
+			"confidence": "medium",
+			"rationale": "The repository distinguishes agent/tool classes and workflows, but it does not yet publish a normalized machine-readable inventory of approved coding agents and MCP integrations.",
+			"evidenceRefs": ["agent-policy", "notion-agentic-ai-security"]
+		},
+		{
+			"activityUuid": "ac152a8d-2628-4db1-a7d6-6d75031bb40e",
+			"activityName": "Language and framework specific security rules",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "The repository provides Next.js/frontend/security guidance and deterministic framework-specific quality tools for agents.",
+			"evidenceRefs": ["agent-policy", "agent-quality-gate"]
+		},
+		{
+			"activityUuid": "923a2a23-d63b-421c-926a-191d1dd5f570",
+			"activityName": "Spec-driven development",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Agent work follows explicit task cards, roadmaps and deterministic phases, but not every change starts from a formal specification artifact.",
+			"evidenceRefs": ["agent-policy", "quality-roadmap"]
+		},
+		{
+			"activityUuid": "1caad69c-316c-422a-a56b-04ad6f6cc306",
+			"activityName": "Threat modeling rule",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "started",
+			"score": 0.2,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "AI threat-model principles exist in the governing framework, but repository agent instructions do not yet mandate a threat-model trigger for security-significant changes.",
+			"evidenceRefs": ["notion-agentic-ai-security", "agent-policy"]
+		},
+		{
+			"activityUuid": "4a618049-19da-4e20-b933-81f203ecd4d2",
+			"activityName": "Permission management for AI agents",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Agent instructions constrain tools, branch mutation and publication, but external enforcement of every agent permission is not demonstrated by this repository.",
+			"evidenceRefs": ["agent-policy", "master-ruleset-contract"]
+		},
+		{
+			"activityUuid": "1bd1308d-ae3b-499a-ae81-818993571f52",
+			"activityName": "Human review of AI generated plans",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "The workflow expects review before publication/merge, while mandatory server-side human approval is not yet proven.",
+			"evidenceRefs": ["agent-policy", "master-ruleset-contract"]
+		},
+		{
+			"activityUuid": "09307f26-bf34-49c2-828e-649130876978",
+			"activityName": "Human review of AI generated specifications",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Specifications and roadmaps are reviewable in Git/Notion, but mandatory independent approval is not technically enforced.",
+			"evidenceRefs": ["agent-policy", "notion-devsecops-roadmap"]
+		},
+		{
+			"activityUuid": "63e82b31-4167-480d-a22b-baf8ef79af61",
+			"activityName": "Self-verification of AI generated changes",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Agents are required to run deterministic fix/review/prove phases and exact-SHA validation before publication.",
+			"evidenceRefs": ["agent-policy", "agent-quality-gate"]
+		},
+		{
+			"activityUuid": "10362082-f48f-4218-be08-4ab78e589df0",
+			"activityName": "Static and dynamic analysis of AI generated code",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "fully-implemented",
+			"score": 1,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Published agent changes enter the same Semgrep/CodeQL and Preview/ZAP/Playwright security gates as human changes.",
+			"evidenceRefs": [
+				"agent-policy",
+				"ci-quality-security",
+				"ci-zap-preview",
+				"github-green-baseline"
+			]
+		},
+		{
+			"activityUuid": "df2db3f4-bae6-448e-844e-9562a4eabc39",
+			"activityName": "Validation of AI-suggested dependencies",
+			"dimension": "Agentic AI",
+			"level": 2,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Dependency changes are governed by Renovate/security policy and CI, but dedicated AI-origin dependency provenance is not separately recorded.",
+			"evidenceRefs": ["security-policy", "renovate-policy", "agent-policy"]
+		},
+		{
+			"activityUuid": "d6bc0b7f-fd98-49fe-b66c-7c5fa70452c6",
+			"activityName": "Human review of AI generated code",
+			"dimension": "Agentic AI",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "medium",
+			"rationale": "Human merge remains the intended control point, but branch protection does not yet prove mandatory independent review for every AI-generated change.",
+			"evidenceRefs": ["agent-policy", "master-ruleset-contract"]
+		},
+		{
+			"activityUuid": "c548df0b-0964-4fad-9f98-28fcd7442011",
+			"activityName": "No verification bypass for AI generated code",
+			"dimension": "Agentic AI",
+			"level": 3,
+			"applicability": "applicable",
+			"progress": "partly-implemented",
+			"score": 0.5,
+			"scope": "development-process",
+			"confidence": "high",
+			"rationale": "Repository policy forbids weakening quality gates and exact-SHA proof, but the missing live ruleset means server-side bypass resistance is incomplete.",
+			"evidenceRefs": [
+				"agent-policy",
+				"master-ruleset-contract",
+				"quality-roadmap"
+			]
+		},
+		{
+			"activityUuid": "51a63793-c2c5-4438-bfd6-b7dee604a76d",
+			"activityName": "Hallucination detection for AI responses",
+			"dimension": "Agentic AI",
+			"level": 4,
+			"applicability": "not-applicable",
+			"progress": null,
+			"score": null,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "The public site does not expose an AI assistant or model-response surface; AI is used in the development process instead.",
+			"evidenceRefs": ["agent-policy"]
+		},
+		{
+			"activityUuid": "24990a5e-b0e6-4e2c-b06b-4e9f0d6f7b21",
+			"activityName": "Secure output handling in AI applications",
+			"dimension": "Agentic AI",
+			"level": 4,
+			"applicability": "not-applicable",
+			"progress": null,
+			"score": null,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "The public site has no runtime model output to validate or render.",
+			"evidenceRefs": ["agent-policy"]
+		},
+		{
+			"activityUuid": "106622af-8969-4d9b-81ad-86d8e2bfd631",
+			"activityName": "Protection of agent memory against poisoning",
+			"dimension": "Agentic AI",
+			"level": 5,
+			"applicability": "not-applicable",
+			"progress": null,
+			"score": null,
+			"scope": "runtime",
+			"confidence": "high",
+			"rationale": "The public site has no persistent runtime AI-agent memory; coding-agent workspace controls are assessed separately.",
+			"evidenceRefs": ["agent-policy"]
+		}
+	]
+}

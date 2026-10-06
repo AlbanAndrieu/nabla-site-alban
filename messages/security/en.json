@@ -259,7 +259,10 @@
 		"lead": "A versioned snapshot of the official DSOMM model to explore DevSecOps capabilities, risks, measures, assessment criteria and compliance mappings.",
 		"backToSecurity": "Back to security resources",
 		"snapshotBadge": "Static OWASP snapshot",
-		"languageNote": "Activity content stays in English to preserve the upstream snapshot faithfully.",
+		"languageNote": "The interface is available in English and French. Official activity content stays in English to preserve the upstream snapshot faithfully.",
+		"languageSwitcherLabel": "DSOMM interface language",
+		"englishLabel": "English",
+		"frenchLabel": "Français",
 		"summary": {
 			"activities": "Activities",
 			"dimensions": "Dimensions",
@@ -267,6 +270,29 @@
 			"upstreamVersion": "Upstream version",
 			"levelDistribution": "Activities by maturity level",
 			"dimensionCoverage": "Activities by dimension"
+		},
+		"assessment": {
+			"title": "Repository assessment · circular heatmap",
+			"lead": "One segment per official DSOMM activity. The chart reflects this repository's evidence-based self-assessment, not the maturity of all Nabla repositories.",
+			"coverage": "Assessment coverage",
+			"assessed": "Assessed",
+			"modelActivities": "Model activities",
+			"notAssessed": "Not assessed",
+			"notApplicable": "N/A",
+			"meanAssessed": "Mean of applicable claims",
+			"noScore": "—",
+			"caveat": "The mean is calculated only from applicable claims that were assessed. Missing claims are not zero; N/A claims are excluded. This is not a portfolio maturity verdict and no global DSOMM state is inferred.",
+			"dimension": "Dimension",
+			"legendTitle": "Activity assessment states",
+			"dataLink": "Read the versioned repository assessment (JSON)",
+			"status": {
+				"not-assessed": "Not assessed",
+				"not-applicable": "Not applicable",
+				"not-implemented": "Not implemented · 0%",
+				"started": "Started · 20%",
+				"partly-implemented": "Partly implemented · 50%",
+				"fully-implemented": "Fully implemented · 100%"
+			}
 		},
 		"explorer": {
 			"title": "Explore DSOMM activities",

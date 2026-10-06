@@ -33,6 +33,7 @@ export default async function HomelabServicesSection({
 							<ActionLink
 								href="architecture#declared-observed-architecture"
 								variant="secondary"
+								data-ui-action=""
 							>
 								<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
 								Architecture

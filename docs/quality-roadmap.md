@@ -30,7 +30,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
-| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné, sans DB/iframe/fetch runtime ; schéma, provenance et identités validés fail-closed |
+| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable, preuves/progression par UUID, miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -71,7 +71,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Accessibilité, SEO et i18n
 
-- [ ] Étendre progressivement l’audit Axe EN/FR aux routes prioritaires restantes ; Architecture est le prochain lot borné après Home, Contact, Policy et Security.
+- [ ] Étendre progressivement l’audit Axe EN/FR aux routes prioritaires restantes. Le socle livré couvre désormais 13 paires EN/FR, soit 26 audits : Home, Contact, Policy, Security, Architecture, TrueNAS, Nabla, AI, Expertise, CISO, DSOMM, CV et JM. Conserver ce périmètre comme non-régression et n’ajouter une route qu’avec un consommateur réel et un coût CI borné.
 
 - [ ] Étendre le contrat 404 GET/HEAD aux chemins HTML legacy localisés/nichés
   seulement après preuve qu'il ne capture ni redirects SEO, ni
@@ -88,11 +88,27 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Sécurité applicative
 
-Le premier jalon DSOMM est livré comme snapshot OWASP statique sous
-`/security/dsomm` : aucun iframe, aucune base et aucun fetch runtime. Le snapshot
-est validé fail-closed (provenance commit-pinnée, IDs upstream, dimensions,
-niveaux, difficulté et mappings) ; l'explorer expose filtres réinitialisables et
-couverture par dimension. Le futur provider appartient à la roadmap homelab.
+La heatmap circulaire du site rend désormais une cellule par activité du modèle
+piné et dissocie explicitement couverture, N/A et progression des claims
+applicables. Elle est calculée au build depuis l'assessment validé, sans fetch
+runtime ni assimilation des absences à des zéros.
+
+Le snapshot OWASP statique sous `/security/dsomm` reste la source locale LKG :
+aucun iframe, aucune base et aucun fetch runtime. Le repository publie désormais
+`nabla-dsomm-assessment.json` et son schéma v1 : claims par UUID, applicabilité,
+progression, confiance et preuves avec miroir HTTP exact sous
+`/.well-known/nabla/`. Les activités absentes restent `not-assessed` et les
+`not-applicable` sont exclues du score. Le futur agrégateur/provider appartient à
+la roadmap homelab.
+
+- [ ] Rebaser snapshot et assessment sur la version DSOMM upstream courante,
+  actuellement 5.1.0, en conservant une migration explicite par UUID et la preuve
+  du commit source cible.
+- [ ] Augmenter la couverture de l'assessment avec les preuves à plus fort levier :
+  threat model propre à `nabla-site-alban`, SBOM/provenance/signature de la
+  supply chain et inventaire machine-readable des agents AI. Les gaps
+  d'enforcement GitHub/Renovate restent propriétaires des items P0 existants.
+
 
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.

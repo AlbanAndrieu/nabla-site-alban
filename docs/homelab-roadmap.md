@@ -58,14 +58,19 @@ Les designs canoniques restent dans `nabla-compose`
 - [ ] Vérifier en production les bindings par `appId` : un service non prêt doit
   rester dégradé même si Cloudflare Tunnel est sain.
 
-## P1 — Provider DSOMM
+## P1 — Provider et agrégateur DSOMM
 
 - [ ] Déployer l'application DSOMM dans `nabla-compose` avec une version upstream
-  explicitement pinée, puis exposer un contrat read-only versionné équivalent au
-  snapshot Site Alban. Migrer `/security/dsomm` vers ce provider uniquement
-  après preuve de parité (version, provenance, UUID et champs consommés), en
-  conservant le snapshot statique comme LKG de résilience et sans créer une
-  seconde source de modèle.
+  explicitement pinée, puis implémenter l'agrégateur
+  `nabla.dsomm.repository-assessment/v1`. Découvrir
+  `nabla-dsomm-assessment.json` dans chaque repository (ou son miroir
+  `/.well-known/nabla/dsomm-assessment.json`), valider schéma + provenance,
+  agréger par `activityUuid`, préserver les preuves et le détail par repository,
+  exclure `not-applicable` et conserver une absence comme `not-assessed`.
+  Refuser la fusion directe de `sourceCommit` DSOMM différents : normaliser
+  d'abord vers un modèle cible explicite. Exposer ensuite un contrat read-only
+  portfolio versionné ; migrer `/security/dsomm` vers ce provider uniquement
+  après preuve de parité et conserver le snapshot/assessment statiques comme LKG.
 
 ## P1 — Santé, diagnostic et métriques
 
