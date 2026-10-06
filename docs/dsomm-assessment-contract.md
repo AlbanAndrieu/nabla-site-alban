@@ -67,6 +67,16 @@ cible. `nabla-compose` peut ingérer plusieurs versions pour diagnostic, mais ne
 doit agréger leurs scores qu’après normalisation explicite des UUID vers un même
 modèle cible.
 
+## Visualisation sur le site
+
+La circular heatmap de `/security/dsomm` et `/fr/security/dsomm` est rendue au
+build depuis `DSOMM_REPOSITORY_ASSESSMENT` validé et le snapshot source. Ses
+251 secteurs représentent les activités du modèle : statut évalué, N/A ou
+`not-assessed`. Le tableau adjacent conserve les effectifs, la couverture
+par dimension et la moyenne des seuls claims applicables. La moyenne n'est pas
+un verdict de maturité portefeuille, et aucune preuve restreinte n'est rendue
+par la heatmap.
+
 ## Preuves restreintes
 
 Les références Notion sont des preuves de gouvernance utiles, mais leur

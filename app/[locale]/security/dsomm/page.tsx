@@ -7,6 +7,9 @@ import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { DSOMM_SNAPSHOT, dsommSnapshotStats } from "@/lib/dsommSnapshot";
+import DsommAssessmentHeatmap, {
+	type DsommAssessmentHeatmapCopy,
+} from "./DsommAssessmentHeatmap";
 import {
 	canonicalPageAlternates,
 	canonicalPagePath,
@@ -44,6 +47,9 @@ export default async function DsommPage({
 
 	const t = await getTranslations({ locale, namespace: "dsommPage" });
 	const stats = dsommSnapshotStats();
+	const assessmentCopy = t.raw(
+		"assessment",
+	) as DsommAssessmentHeatmapCopy;
 	const explorerCopy = t.raw("explorer") as DsommExplorerCopy;
 
 	return (
@@ -149,6 +155,10 @@ export default async function DsommPage({
 				</section>
 
 				<Container>
+					<DsommAssessmentHeatmap
+						copy={assessmentCopy}
+						locale={locale as AppLocale}
+					/>
 					<DsommExplorer
 						activities={DSOMM_SNAPSHOT.activities}
 						dimensions={DSOMM_SNAPSHOT.dimensions}

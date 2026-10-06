@@ -151,6 +151,7 @@ test("DSOMM page renders the local snapshot without database, iframe or runtime 
 	]);
 
 	assert.match(page, /DSOMM_SNAPSHOT/);
+	assert.match(page, /DsommAssessmentHeatmap/);
 	assert.match(page, /canonicalPagePath\("security\/dsomm"/);
 	assert.match(page, /canonicalPageAlternates\("security\/dsomm"\)/);
 	assert.match(page, /summary\.dimensionCoverage/);

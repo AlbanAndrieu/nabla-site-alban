@@ -88,6 +88,11 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 
 ## P1 — Sécurité applicative
 
+La heatmap circulaire du site rend désormais une cellule par activité du modèle
+piné et dissocie explicitement couverture, N/A et progression des claims
+applicables. Elle est calculée au build depuis l'assessment validé, sans fetch
+runtime ni assimilation des absences à des zéros.
+
 Le snapshot OWASP statique sous `/security/dsomm` reste la source locale LKG :
 aucun iframe, aucune base et aucun fetch runtime. Le repository publie désormais
 `nabla-dsomm-assessment.json` et son schéma v1 : claims par UUID, applicabilité,
@@ -103,8 +108,7 @@ la roadmap homelab.
   threat model propre à `nabla-site-alban`, SBOM/provenance/signature de la
   supply chain et inventaire machine-readable des agents AI. Les gaps
   d'enforcement GitHub/Renovate restent propriétaires des items P0 existants.
-- [ ] Afficher une circular heatmap de maturité uniquement depuis l'assessment
-  validé, avec couverture et N/A visibles séparément du score.
+
 
 - [ ] Définir un rate limiting adapté à `create-checkout-session` et vérifier
   la validation `Origin` des POST navigateur.

@@ -150,13 +150,17 @@
 				"badge": "Tests d’intrusion",
 				"title": "Pentest-Tools.com",
 				"description": "Plateforme en ligne de tests d’intrusion et d’analyse des vulnérabilités.",
-				"links": ["Pentest-Tools.com App — tests de sécurité réseau et web"]
+				"links": [
+					"Pentest-Tools.com App — tests de sécurité réseau et web"
+				]
 			},
 			"siem": {
 				"badge": "SIEM / Détection de logiciels malveillants",
 				"title": "SIEM / Détection de logiciels malveillants",
 				"description": "Ressources de supervision de sécurité et de détection des logiciels malveillants.",
-				"links": ["Wazuh — collecte des journaux de détection ClamAV"]
+				"links": [
+					"Wazuh — collecte des journaux de détection ClamAV"
+				]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -193,7 +197,9 @@
 				"badge": "Sécurité des applications et infrastructures",
 				"title": "Sécurité des applications et infrastructures",
 				"description": "Bonnes pratiques pour sécuriser les applications et les plateformes d’infrastructure.",
-				"links": ["TrueNAS — sécurisation des applications"]
+				"links": [
+					"TrueNAS — sécurisation des applications"
+				]
 			},
 			"cloud": {
 				"badge": "Sécurité cloud",
@@ -270,6 +276,29 @@
 			"upstreamVersion": "Version upstream",
 			"levelDistribution": "Répartition des activités par niveau",
 			"dimensionCoverage": "Activités par dimension"
+		},
+		"assessment": {
+			"title": "Évaluation du dépôt · heatmap circulaire",
+			"lead": "Un segment par activité officielle DSOMM. Le graphique reflète l'auto-évaluation fondée sur les preuves de ce dépôt, pas la maturité de l'ensemble des dépôts Nabla.",
+			"coverage": "Couverture évaluée",
+			"assessed": "Évaluées",
+			"modelActivities": "Activités du modèle",
+			"notAssessed": "Non évaluées",
+			"notApplicable": "N/A",
+			"meanAssessed": "Moyenne des claims applicables",
+			"noScore": "—",
+			"caveat": "La moyenne ne porte que sur les claims applicables évalués. Les absents ne valent pas zéro ; les N/A sont exclus. Ce n'est pas un verdict de maturité du portfolio et aucun état global DSOMM n'est déduit.",
+			"dimension": "Dimension",
+			"legendTitle": "États d'évaluation des activités",
+			"dataLink": "Consulter l'évaluation versionnée du dépôt (JSON)",
+			"status": {
+				"not-assessed": "Non évaluée",
+				"not-applicable": "Non applicable",
+				"not-implemented": "Non implémentée · 0 %",
+				"started": "Démarrée · 20 %",
+				"partly-implemented": "Partiellement implémentée · 50 %",
+				"fully-implemented": "Complètement implémentée · 100 %"
+			}
 		},
 		"explorer": {
 			"title": "Explorer les activités DSOMM",
