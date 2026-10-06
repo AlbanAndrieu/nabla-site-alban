@@ -14,10 +14,7 @@ test("Betterleaks is the pinned canonical pre-commit secrets detector", async ()
 		read(".betterleaks.toml"),
 		read(".mega-linter.yml"),
 	]);
-	assert.match(
-		hooks,
-		/repo: https:\/\/github\.com\/betterleaks\/betterleaks/,
-	);
+	assert.match(hooks, /repo: https:\/\/github\.com\/betterleaks\/betterleaks/);
 	assert.match(hooks, /rev: v1\.9\.0/);
 	assert.match(hooks, /id: betterleaks/);
 	assert.match(
@@ -32,10 +29,7 @@ test("Betterleaks is the pinned canonical pre-commit secrets detector", async ()
 	assert.match(config, /betterleaksMinVersion = "v1\.9\.0"/);
 	assert.match(config, /useDefault = true/);
 	assert.match(megaLinter, /- REPOSITORY_GITLEAKS/);
-	assert.match(
-		megaLinter,
-		/REPOSITORY_SECRETLINT_DISABLE_ERRORS: false/,
-	);
+	assert.match(megaLinter, /REPOSITORY_SECRETLINT_DISABLE_ERRORS: false/);
 });
 
 test("Just keeps the original Makefile and delegates to existing quality gates", async () => {
@@ -46,14 +40,8 @@ test("Just keeps the original Makefile and delegates to existing quality gates",
 	]);
 	assert.match(mise, /just = "1\.58\.0"/);
 	assert.match(just, /quality:\n\s+npm run quality:agent\n/);
-	assert.match(
-		just,
-		/quality-fix:\n\s+npm run quality:agent:fix\n/,
-	);
-	assert.match(
-		just,
-		/publish:\n\s+npm run quality:agent:publish\n/,
-	);
+	assert.match(just, /quality-fix:\n\s+npm run quality:agent:fix\n/);
+	assert.match(just, /publish:\n\s+npm run quality:agent:publish\n/);
 	assert.match(
 		just,
 		/secrets:\n\s+betterleaks dir \. --config \.betterleaks\.toml --redact\n/,
