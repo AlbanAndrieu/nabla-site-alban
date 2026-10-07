@@ -85,15 +85,16 @@ export default function ArchitectureImpactInspector({
 	const [showImpact, setShowImpact] = useState(false);
 
 	useEffect(() => {
-		setSelectedId(initialHashService());
 		let active = true;
 		void fetchHomelabHealthOnce().then((nextHealth) => {
 			if (active) setHealth(nextHealth);
 		});
 		const onHashChange = () => setSelectedId(initialHashService());
+		const initialFrame = window.requestAnimationFrame(onHashChange);
 		window.addEventListener("hashchange", onHashChange);
 		return () => {
 			active = false;
+			window.cancelAnimationFrame(initialFrame);
 			window.removeEventListener("hashchange", onHashChange);
 		};
 	}, []);

@@ -74,24 +74,29 @@ export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
 	const data = buildDsommHeatmapData();
 	const step =
 		(360 - GROUP_GAP_DEGREES * data.dimensions.length) / data.modelActivities;
-	let angle = -90;
-
-	const segments = data.dimensions.flatMap(({ dimension }) => {
-		const paths = data.activities
-			.filter((activity) => activity.dimension === dimension)
-			.map((activity) => {
-				const start = angle + SEGMENT_GAP_DEGREES / 2;
-				const end = angle + step - SEGMENT_GAP_DEGREES / 2;
-				angle += step;
-				return {
-					uuid: activity.uuid,
-					status: activity.status,
-					path: wedge(start, end),
-				};
-			});
-		angle += GROUP_GAP_DEGREES;
-		return paths;
-	});
+	const segments = data.dimensions.flatMap(
+		({ dimension }, dimensionIndex, dimensions) => {
+			const priorActivityCount = dimensions
+				.slice(0, dimensionIndex)
+				.reduce((count, item) => count + item.modelActivities, 0);
+			const groupStart =
+				-90 +
+				priorActivityCount * step +
+				dimensionIndex * GROUP_GAP_DEGREES;
+			return data.activities
+				.filter((activity) => activity.dimension === dimension)
+				.map((activity, activityIndex) => {
+					const angle = groupStart + activityIndex * step;
+					const start = angle + SEGMENT_GAP_DEGREES / 2;
+					const end = angle + step - SEGMENT_GAP_DEGREES / 2;
+					return {
+						uuid: activity.uuid,
+						status: activity.status,
+						path: wedge(start, end),
+					};
+				});
+		},
+	);
 
 	return (
 		<section

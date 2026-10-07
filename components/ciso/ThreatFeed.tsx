@@ -168,13 +168,17 @@ export default function ThreatFeed({
 
 	useEffect(() => {
 		const controller = new AbortController();
-		void loadFeeds(controller.signal);
+		const initialLoad = window.setTimeout(
+			() => void loadFeeds(controller.signal),
+			0,
+		);
 		const refresh = window.setInterval(
 			() => void loadFeeds(controller.signal),
 			600_000,
 		);
 		return () => {
 			controller.abort();
+			window.clearTimeout(initialLoad);
 			window.clearInterval(refresh);
 		};
 	}, [loadFeeds]);
