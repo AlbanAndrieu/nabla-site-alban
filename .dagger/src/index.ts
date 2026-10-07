@@ -67,10 +67,11 @@ export class NablaSiteAlbanCi {
 
 	private async runNode26(source: Directory): Promise<void> {
 		const environment = this.environment(source, NODE_DEVELOPMENT);
+		const typedEnvironment = environment.withExec(["npx", "next", "typegen"]);
 		await Promise.all([
 			environment.withExec(["npm", "run", "lint"]).stdout(),
 			environment.withExec(["npm", "run", "lint:css"]).stdout(),
-			environment.withExec(["npm", "run", "typecheck"]).stdout(),
+			typedEnvironment.withExec(["npm", "run", "typecheck"]).stdout(),
 			environment.withExec(["npm", "run", "test:unit"]).stdout(),
 			this.buildEnvironment(source, NODE_DEVELOPMENT)
 				.withExec(["npx", "next", "build"])
