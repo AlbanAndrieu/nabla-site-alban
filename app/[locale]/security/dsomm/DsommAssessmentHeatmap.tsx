@@ -80,9 +80,7 @@ export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
 				.slice(0, dimensionIndex)
 				.reduce((count, item) => count + item.modelActivities, 0);
 			const groupStart =
-				-90 +
-				priorActivityCount * step +
-				dimensionIndex * GROUP_GAP_DEGREES;
+				-90 + priorActivityCount * step + dimensionIndex * GROUP_GAP_DEGREES;
 			return data.activities
 				.filter((activity) => activity.dimension === dimension)
 				.map((activity, activityIndex) => {
