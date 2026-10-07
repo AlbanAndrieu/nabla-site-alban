@@ -77,6 +77,14 @@ par dimension et la moyenne des seuls claims applicables. La moyenne n'est pas
 un verdict de maturité portefeuille, et aucune preuve restreinte n'est rendue
 par la heatmap.
 
+La route française applique en outre un catalogue de traduction versionné
+`data/security/dsomm/model.fr.json` couvrant les 251 activités. Ce catalogue
+est joint au snapshot par UUID et par `sourceCommit` ; il ne modifie ni le
+modèle canonique anglais, ni les claims d'assessment. Toute évolution upstream
+qui ajoute ou retire une activité exige donc une mise à jour explicite de la
+traduction avant que la validation puisse passer. Le changement de langue reste
+piloté uniquement par le sélecteur global du header.
+
 ## Preuves restreintes
 
 Les références Notion sont des preuves de gouvernance utiles, mais leur

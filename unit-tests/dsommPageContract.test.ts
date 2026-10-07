@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { DSOMM_SNAPSHOT, validateDsommSnapshot } from "../lib/dsommSnapshot";
+import { localizeDsommSnapshot } from "../lib/dsommTranslation";
 
 const snapshotPath = new URL(
 	"../data/security/dsomm/model.snapshot.json",
@@ -155,9 +156,10 @@ test("DSOMM page renders the local snapshot without database, iframe or runtime 
 	assert.match(page, /canonicalPagePath\("security\/dsomm"/);
 	assert.match(page, /canonicalPageAlternates\("security\/dsomm"\)/);
 	assert.match(page, /summary\.dimensionCoverage/);
-	assert.match(page, /languageSwitcherLabel/);
-	assert.match(page, /canonicalPagePath\("security\/dsomm", "en"\)/);
-	assert.match(page, /canonicalPagePath\("security\/dsomm", "fr"\)/);
+	assert.doesNotMatch(page, /languageSwitcherLabel/);
+	assert.doesNotMatch(page, /canonicalPagePath\("security\/dsomm", "en"\)/);
+	assert.doesNotMatch(page, /canonicalPagePath\("security\/dsomm", "fr"\)/);
+	assert.match(page, /localizeDsommSnapshot/);
 	assert.doesNotMatch(page, /fetch\(/);
 	assert.doesNotMatch(page, /<iframe/i);
 	assert.doesNotMatch(explorer, /fetch\(/);
@@ -183,4 +185,33 @@ test("DSOMM explorer exposes bounded filters and an explicit reset", async () =>
 	assert.match(explorer, /activity\.difficultyOfImplementation/);
 	assert.match(explorer, /hasActiveFilters/);
 	assert.match(explorer, /clearFilters/);
+});
+
+
+test("French DSOMM translation covers every upstream activity without changing identities", () => {
+	const localized = localizeDsommSnapshot("fr");
+	assert.equal(localized.activities.length, DSOMM_SNAPSHOT.activities.length);
+	assert.deepEqual(
+		localized.activities.map((activity) => activity.uuid),
+		DSOMM_SNAPSHOT.activities.map((activity) => activity.uuid),
+	);
+	const changedNames = localized.activities.filter(
+		(activity, index) =>
+			activity.name !== DSOMM_SNAPSHOT.activities[index].name,
+	).length;
+	assert.ok(changedNames >= 240);
+	assert.equal(
+		localized.activities.find(
+			(activity) =>
+				activity.uuid === "dc62d384-0b9c-47d9-b7a5-9d82e53642ba",
+		)?.name,
+		"Prévention de base contre les fuites de données",
+	);
+	assert.equal(
+		localized.activities.find(
+			(activity) =>
+				activity.uuid === "2244983e-5279-4a6c-b594-155a5d26ebc2",
+		)?.name,
+		"Appliquer une autorisation côté serveur à chaque requête",
+	);
 });

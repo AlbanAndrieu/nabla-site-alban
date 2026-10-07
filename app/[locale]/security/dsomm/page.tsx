@@ -7,6 +7,7 @@ import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { DSOMM_SNAPSHOT, dsommSnapshotStats } from "@/lib/dsommSnapshot";
+import { localizeDsommSnapshot } from "@/lib/dsommTranslation";
 import {
 	canonicalPageAlternates,
 	canonicalPagePath,
@@ -47,6 +48,7 @@ export default async function DsommPage({
 
 	const t = await getTranslations({ locale, namespace: "dsommPage" });
 	const stats = dsommSnapshotStats();
+	const localizedSnapshot = localizeDsommSnapshot(locale as AppLocale);
 	const assessmentCopy = t.raw("assessment") as DsommAssessmentHeatmapCopy;
 	const explorerCopy = t.raw("explorer") as DsommExplorerCopy;
 
@@ -62,23 +64,6 @@ export default async function DsommPage({
 						<i className="fa-solid fa-arrow-left" aria-hidden="true" />{" "}
 						{t("backToSecurity")}
 					</a>
-					<nav
-						className={styles.languageSwitch}
-						aria-label={t("languageSwitcherLabel")}
-					>
-						<a
-							href={canonicalPagePath("security/dsomm", "en")}
-							aria-current={locale === "en" ? "page" : undefined}
-						>
-							{t("englishLabel")}
-						</a>
-						<a
-							href={canonicalPagePath("security/dsomm", "fr")}
-							aria-current={locale === "fr" ? "page" : undefined}
-						>
-							{t("frenchLabel")}
-						</a>
-					</nav>
 					<p className={styles.eyebrow}>{t("eyebrow")}</p>
 					<h1>{t("title")}</h1>
 					<p className={styles.lead}>{t("lead")}</p>
@@ -87,7 +72,6 @@ export default async function DsommPage({
 						<span>v{DSOMM_SNAPSHOT.source.version}</span>
 						<span>{DSOMM_SNAPSHOT.source.released}</span>
 					</div>
-					<p className={styles.languageNote}>{t("languageNote")}</p>
 				</Container>
 			</header>
 
@@ -137,7 +121,7 @@ export default async function DsommPage({
 								<h3>{t("summary.dimensionCoverage")}</h3>
 								{stats.dimensions.map(({ dimension, activityCount }) => (
 									<div className={styles.dimensionRow} key={dimension}>
-										<span>{dimension}</span>
+										<span>{localizedSnapshot.dimensionLabels[dimension]}</span>
 										<progress
 											max={stats.maxDimensionActivityCount}
 											value={activityCount}
@@ -155,11 +139,12 @@ export default async function DsommPage({
 				<Container>
 					<DsommAssessmentHeatmap
 						copy={assessmentCopy}
+						dimensionLabels={localizedSnapshot.dimensionLabels}
 						locale={locale as AppLocale}
 					/>
 					<DsommExplorer
-						activities={DSOMM_SNAPSHOT.activities}
-						dimensions={DSOMM_SNAPSHOT.dimensions}
+						activities={localizedSnapshot.activities}
+						dimensions={localizedSnapshot.dimensions}
 						copy={explorerCopy}
 					/>
 				</Container>

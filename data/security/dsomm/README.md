@@ -45,3 +45,21 @@ The future DSOMM application in `nabla-compose` may replace the primary data
 provider only after it can expose an equivalent versioned read-only contract.
 The static snapshot should remain the last-known-good fallback during that
 cutover; there must be no second independently maintained DSOMM model.
+
+
+## Traduction française
+
+`model.snapshot.json` reste la source canonique upstream, inchangée et en anglais.
+La route `/fr/security/dsomm` applique au build le catalogue
+`model.fr.json`, indexé par UUID d'activité et lié au même `sourceCommit` et
+à la même version DSOMM.
+
+Le validateur `lib/dsommTranslation.ts` échoue fermé si une dimension,
+sous-dimension ou activité du snapshot n'a pas de traduction, si un UUID
+inconnu apparaît, ou si la provenance du catalogue diffère du snapshot. Les
+identifiants, niveaux, tags, mappings, références et difficultés restent ceux
+du modèle upstream ; seuls les textes d'affichage sont localisés.
+
+Lors d'une mise à jour du snapshot, la traduction française doit donc être
+rebasée dans le même changement. Il n'existe aucun fetch de traduction au
+runtime et le sélecteur de langue reste celui du header global du site.

@@ -30,7 +30,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
-| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable, preuves/progression par UUID, miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
+| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable ; traduction FR build-time complète 251/251 liée par UUID/sourceCommit ; miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
 ## P0 — Protection de merge, publication et dépendances
 

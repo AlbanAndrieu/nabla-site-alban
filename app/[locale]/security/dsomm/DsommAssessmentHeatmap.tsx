@@ -67,10 +67,15 @@ function percent(value: number, locale: "en" | "fr"): string {
 
 type Props = Readonly<{
 	copy: DsommAssessmentHeatmapCopy;
+	dimensionLabels: Readonly<Record<string, string>>;
 	locale: "en" | "fr";
 }>;
 
-export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
+export default function DsommAssessmentHeatmap({
+	copy,
+	dimensionLabels,
+	locale,
+}: Props) {
 	const data = buildDsommHeatmapData();
 	const step =
 		(360 - GROUP_GAP_DEGREES * data.dimensions.length) / data.modelActivities;
@@ -176,7 +181,7 @@ export default function DsommAssessmentHeatmap({ copy, locale }: Props) {
 							<tbody>
 								{data.dimensions.map((dimension) => (
 									<tr key={dimension.dimension}>
-										<th scope="row">{dimension.dimension}</th>
+										<th scope="row">{dimensionLabels[dimension.dimension]}</th>
 										<td>
 											{dimension.assessed}/{dimension.modelActivities}
 										</td>
