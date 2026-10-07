@@ -1,7 +1,7 @@
 import {
+	argument,
 	Container,
 	Directory,
-	argument,
 	dag,
 	func,
 	object,
@@ -53,10 +53,7 @@ export class NablaSiteAlbanCi {
 			.withExec(["npm", "ci", "--no-audit", "--no-fund"]);
 	}
 
-	private buildEnvironment(
-		source: Directory,
-		nodeVersion: string,
-	): Container {
+	private buildEnvironment(source: Directory, nodeVersion: string): Container {
 		return this.environment(source, nodeVersion).withMountedCache(
 			"/src/.next/cache",
 			dag.cacheVolume(`nabla-site-alban-next-${nodeVersion}`),

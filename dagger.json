@@ -1,6 +1,6 @@
 {
-  "name": "nabla-site-alban-ci",
-  "sdk": "typescript",
-  "source": ".dagger",
-  "engineVersion": "v0.21.10"
+	"name": "nabla-site-alban-ci",
+	"sdk": "typescript",
+	"source": ".dagger",
+	"engineVersion": "v0.21.10"
 }
