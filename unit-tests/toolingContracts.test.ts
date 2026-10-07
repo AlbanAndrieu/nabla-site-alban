@@ -70,6 +70,11 @@ test("Dagger PoC is pinned, measurable and explicitly non-blocking", async () =>
 		/f9ee083767dd12cdac583f9db3fedbebbbb3064f69152998be1f121d1a6cc103/,
 	);
 	assert.match(workflow, /dagger call check --source=\./);
+	assert.match(
+		workflow,
+		/ref: \${{ github\.event\.pull_request\.head\.sha \|\| github\.sha }}/,
+	);
+	assert.match(workflow, /test "\$\(git rev-parse HEAD\)" = "\$\{source_sha\}"/);
 	assert.match(workflow, /git archive --format=tar\.gz/);
 	assert.match(
 		workflow,
