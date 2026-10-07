@@ -162,6 +162,18 @@ L'objectif n'est pas seulement de réduire la durée CPU : moins de fichiers lus
 moins de logs et moins de reruns réduisent aussi les tokens et le temps de
 raisonnement des agents.
 
+## Interprétation du check GitHub non bloquant
+
+Le job GitHub du PoC utilise volontairement `continue-on-error` autour de
+l'appel Dagger. Sa conclusion GitHub peut donc rester verte alors que la
+commande Dagger a retourné une erreur. **Un job vert ne constitue pas une
+preuve de parité Dagger.** La preuve expérimentale est le couple
+`steps.dagger.outcome=success` et `exit_code=0` reporté dans le Job Summary.
+
+Ce compromis conserve le PoC non bloquant sans confondre disponibilité de
+l'expérience et conformité du pipeline. Si Dagger devient une gate canonique,
+`continue-on-error` devra être supprimé.
+
 ## Critères de décision après trois PR
 
 Conserver puis étendre Dagger seulement si les trois conditions suivantes sont

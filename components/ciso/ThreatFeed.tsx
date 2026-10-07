@@ -155,7 +155,6 @@ export default function ThreatFeed({
 	const usedLabels = { ...defaultLabels, ...labels };
 
 	const loadFeeds = useCallback(async (signal?: AbortSignal) => {
-		setStatus("loading");
 		try {
 			const feedUrls = await loadFeedUrls(signal);
 			const nextItems = await fetchFeedsWithLimit(feedUrls, signal);
@@ -194,7 +193,10 @@ export default function ThreatFeed({
 				<Button
 					size="compact"
 					variant="outline"
-					onClick={() => void loadFeeds()}
+					onClick={() => {
+						setStatus("loading");
+						void loadFeeds();
+					}}
 				>
 					{usedLabels.retry}
 				</Button>
