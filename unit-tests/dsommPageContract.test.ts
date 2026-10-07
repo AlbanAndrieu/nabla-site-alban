@@ -187,7 +187,6 @@ test("DSOMM explorer exposes bounded filters and an explicit reset", async () =>
 	assert.match(explorer, /clearFilters/);
 });
 
-
 test("French DSOMM translation covers every upstream activity without changing identities", () => {
 	const localized = localizeDsommSnapshot("fr");
 	assert.equal(localized.activities.length, DSOMM_SNAPSHOT.activities.length);
@@ -202,15 +201,13 @@ test("French DSOMM translation covers every upstream activity without changing i
 	assert.ok(changedNames >= 240);
 	assert.equal(
 		localized.activities.find(
-			(activity) =>
-				activity.uuid === "dc62d384-0b9c-47d9-b7a5-9d82e53642ba",
+			(activity) => activity.uuid === "dc62d384-0b9c-47d9-b7a5-9d82e53642ba",
 		)?.name,
 		"Prévention de base contre les fuites de données",
 	);
 	assert.equal(
 		localized.activities.find(
-			(activity) =>
-				activity.uuid === "2244983e-5279-4a6c-b594-155a5d26ebc2",
+			(activity) => activity.uuid === "2244983e-5279-4a6c-b594-155a5d26ebc2",
 		)?.name,
 		"Appliquer une autorisation côté serveur à chaque requête",
 	);

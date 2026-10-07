@@ -1,5 +1,9 @@
 import translation from "@/data/security/dsomm/model.fr.json";
-import { DSOMM_SNAPSHOT, type DsommActivity, type DsommSnapshot } from "@/lib/dsommSnapshot";
+import {
+	DSOMM_SNAPSHOT,
+	type DsommActivity,
+	type DsommSnapshot,
+} from "@/lib/dsommSnapshot";
 
 export type DsommActivityTranslation = Pick<
 	DsommActivity,
@@ -33,22 +37,38 @@ export function validateDsommFrenchCatalog(
 		fail("sourceVersion must match the pinned upstream snapshot");
 	}
 	for (const dimension of snapshot.dimensions) {
-		if (!value.dimensions[dimension]) fail(`missing dimension translation: ${dimension}`);
+		if (!value.dimensions[dimension])
+			fail(`missing dimension translation: ${dimension}`);
 	}
-	for (const subdimension of new Set(snapshot.activities.map((activity) => activity.subdimension))) {
-		if (!value.subdimensions[subdimension]) fail(`missing subdimension translation: ${subdimension}`);
+	for (const subdimension of new Set(
+		snapshot.activities.map((activity) => activity.subdimension),
+	)) {
+		if (!value.subdimensions[subdimension])
+			fail(`missing subdimension translation: ${subdimension}`);
 	}
-	const upstreamIds = new Set(snapshot.activities.map((activity) => activity.uuid));
+	const upstreamIds = new Set(
+		snapshot.activities.map((activity) => activity.uuid),
+	);
 	const translatedIds = Object.keys(value.activities);
 	if (translatedIds.length !== upstreamIds.size) {
-		fail(`expected ${upstreamIds.size} activity translations, got ${translatedIds.length}`);
+		fail(
+			`expected ${upstreamIds.size} activity translations, got ${translatedIds.length}`,
+		);
 	}
 	for (const activity of snapshot.activities) {
 		const localized = value.activities[activity.uuid];
 		if (!localized) fail(`missing activity translation: ${activity.uuid}`);
-		for (const field of ["name", "description", "risk", "measure", "assessment"] as const) {
-			if (typeof localized[field] !== "string") fail(`${activity.uuid}.${field} must be a string`);
-			if (activity[field] && !localized[field]) fail(`${activity.uuid}.${field} must not be empty`);
+		for (const field of [
+			"name",
+			"description",
+			"risk",
+			"measure",
+			"assessment",
+		] as const) {
+			if (typeof localized[field] !== "string")
+				fail(`${activity.uuid}.${field} must be a string`);
+			if (activity[field] && !localized[field])
+				fail(`${activity.uuid}.${field} must not be empty`);
 		}
 	}
 	for (const uuid of translatedIds) {
@@ -64,13 +84,20 @@ export function localizeDsommSnapshot(
 	if (locale === "en") {
 		return {
 			...snapshot,
-			dimensionLabels: Object.fromEntries(snapshot.dimensions.map((dimension) => [dimension, dimension])),
+			dimensionLabels: Object.fromEntries(
+				snapshot.dimensions.map((dimension) => [dimension, dimension]),
+			),
 		};
 	}
-	const catalog = validateDsommFrenchCatalog(translation as DsommFrenchCatalog, snapshot);
+	const catalog = validateDsommFrenchCatalog(
+		translation as DsommFrenchCatalog,
+		snapshot,
+	);
 	return {
 		...snapshot,
-		dimensions: snapshot.dimensions.map((dimension) => catalog.dimensions[dimension]),
+		dimensions: snapshot.dimensions.map(
+			(dimension) => catalog.dimensions[dimension],
+		),
 		dimensionLabels: catalog.dimensions,
 		activities: snapshot.activities.map((activity) => ({
 			...activity,
