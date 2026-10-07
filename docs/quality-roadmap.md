@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 4 octobre 2026.
+Dernière réconciliation : 7 octobre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -132,15 +132,31 @@ métriques bornées et séparation disponibilité/posture sécurité.
   graphe d'import applicatif.
 - [ ] Après le premier cycle Renovate réel, valider le lot groupé avec la gate
   complète avant d'envisager un automerge ciblé de patch/minor à faible risque.
-- [ ] Mesurer le gain local-first sur au moins trois runs comparables en séparant
-  cache hit/miss, `npm ci`, gate et build. Le PoC Dagger 0.21.10 est
-  non bloquant : comparer `dagger call check` à la gate actuelle avant toute
-  suppression de YAML/scripts, avec un objectif indicatif de 25–35 % de
-  réduction du code d'orchestration build/test.
-- [ ] Benchmarker la boucle de hooks réelle avec Hyperfine : pre-commit reste la
-  référence ; comparer d'abord prek (configuration compatible), puis hk 2.x
-  avec parité de règles. N'envisager Lefthook qu'après mesure et sans perdre
-  Betterleaks, les fixers déterministes ni l'isolation des outils.
+- [ ] **Décider l'adoption Dagger après trois PR comparables** : mesurer cache
+  froid/chaud, `npm ci`, lint/type/tests/build et divergences exact-SHA. Le PoC
+  0.21.10 reste non bloquant. Objectifs à confirmer par le diff final :
+  **25–35 %** de réduction du code d'orchestration build/test, **8–12 %** sur
+  la sélection CI/tooling globale et jusqu'à **35–45 %** du noyau build/test si
+  les scripts shell deviennent de simples adaptateurs. Ne pas migrer Vercel,
+  OIDC, statuts GitHub, Preview, ZAP ou release dans Dagger.
+- [ ] **Industrialiser la validation distante exact-HEAD sans clone** : le PoC
+  publie désormais un `git archive` à rétention 1 jour. La méthode
+  connector → artifact → extraction → test ciblé est prouvée sans DNS local ;
+  la fermer après merge et réutilisation sur une tâche ultérieure. Elle ne doit
+  jamais être présentée comme équivalente à `quality:agent:publish`, car
+  l'archive ne contient ni `.git` ni les dépendances installées.
+- [ ] **Benchmarker les hooks sur le dépôt réel avec Hyperfine** : conserver
+  pre-commit comme référence, comparer d'abord prek sur la même configuration,
+  puis hk avec parité de règles et exécution parallèle sûre. Évaluer ensuite le
+  mode agent de hk (JSON/JSONL, `--safe`, MCP) avant toute migration. Lefthook
+  reste un candidat de simplicité si les mesures hk/prek ne compensent pas le
+  coût de migration.
+- [ ] **Mesurer trois PoC d'efficacité agentique avant ajout permanent** :
+  ast-grep pour recherche/codemod structurels, Context7 pour documentation
+  versionnée avant génération de code, et Oxlint en pré-lint incrémental avant
+  ESLint. Mesurer temps jusqu'au premier diagnostic, volume de contexte lu,
+  taille du patch et nombre de reruns. N'évaluer Serena MCP ou Repomix compressé
+  que si la recherche GitHub/rg/ast-grep ne donne pas déjà un contexte ciblé.
 - [ ] Ajouter un mode local de parité Preview (`BASE_URL=<preview> npm run test:a11y`
   ou équivalent) afin de reproduire les audits exact-SHA sans attendre la CI.
 - [ ] Ajouter une régression visuelle ciblée EN/FR (Home, Security, Architecture)

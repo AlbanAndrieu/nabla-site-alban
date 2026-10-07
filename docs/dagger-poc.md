@@ -39,6 +39,27 @@ just bench-dev-loop
 Dagger Node 26 avec `npm run check`. Il ne remplace pas les mesures CI
 existantes.
 
+## Snapshot exact-HEAD pour agents sans DNS
+
+Le workflow PoC publie un artifact éphémère
+`source-snapshot-<PR_HEAD_SHA>` (rétention 1 jour). Le checkout et
+`git archive` sont explicitement liés à
+`github.event.pull_request.head.sha` afin d'éviter le merge commit synthétique
+de `GITHUB_SHA`.
+
+Ce transport a été testé depuis un runtime où `github.com`,
+`codeload.github.com` et `raw.githubusercontent.com` ne résolvent pas :
+l'artifact a été téléchargé via le connecteur GitHub, son nom/digest contrôlé,
+puis le tarball exact-HEAD a été extrait. Sur la copie matérialisée (1 175
+fichiers), les trois contrats de `unit-tests/toolingContracts.test.ts` ont
+passé avec le type stripping natif de Node, sans clone ni téléchargement npm.
+
+La frontière est volontairement stricte : `git archive` ne transporte pas
+`.git` et n'apporte pas `node_modules`. Il permet donc des tests ciblés
+sans dépendances et une inspection exacte de source, mais **pas** une preuve
+`quality:agent:publish`, un merge-base ou une validation changed-files
+complète. Le skill `nabla-maintenance` documente le fallback opérationnel.
+
 ## Estimation de réduction de code
 
 Baseline mesurée au démarrage du PoC :
@@ -108,12 +129,11 @@ l'isolation et la compatibilité des hooks.
 | hk | parallélisme, file locks, builtins, check/fix/pre-commit partagés | nouvelle configuration Pkl | benchmark après parité de règles |
 | Lefthook | groupes parallèles, filtres fichiers, configuration simple | dépend davantage des outils système/mise | candidat si hk/prek n'apportent pas assez |
 
-Le benchmark publié par hk le 28 septembre 2026 mesurait, sur sa machine de
-référence, le scénario « commit » à 1,15 s pour hk, 1,83 s pour Lefthook,
-2,21 s pour prek et 3,00 s pour pre-commit. Pour « check every file », les
-médianes étaient 3,24 s, 5,12 s, 5,81 s et 7,34 s. Ces chiffres ne doivent pas
-être transposés directement au dépôt : la prochaine étape est un benchmark
-Hyperfine sur la configuration Nabla réelle.
+Le benchmark hk mesuré le 6 octobre 2026 sur huit CPU donne, pour le scénario
+« commit », des médianes de 1,36 s pour hk, 1,81 s pour Lefthook, 2,15 s pour
+prek et 2,95 s pour pre-commit. Pour « check every file », les médianes sont
+3,18 s, 4,98 s, 5,84 s et 7,24 s. Ces chiffres externes servent uniquement
+d'hypothèse : la décision Nabla dépend du benchmark Hyperfine du dépôt réel.
 
 ## Outils pour accélérer le code et les agents IA
 
@@ -193,12 +213,11 @@ d'exploitation compense une performance inférieure à hk/prek.
 
 ### Hooks rapides
 
-Le benchmark hk publié le 28 septembre 2026 compare hk 2.4.0, Lefthook
-2.1.14, prek 0.5.3 et pre-commit 4.6.2 sur huit CPU. Sur leur scénario
-« commit », les médianes annoncées sont 1,15 s / 1,83 s / 2,21 s / 3,00 s.
-Sur « check every file », hk annonce 3,24 s contre 7,34 s pour pre-commit.
-Ces chiffres ne sont **pas** une estimation Nabla : ils justifient uniquement
-le benchmark local ajouté ici.
+Le benchmark hk du 6 octobre 2026 compare hk 2.5.0, Lefthook 2.1.14,
+prek 0.5.3 et pre-commit 4.6.2 sur huit CPU. Sur le scénario « commit », les
+médianes sont 1,36 s / 1,81 s / 2,15 s / 2,95 s ; sur « check every file »,
+3,18 s / 4,98 s / 5,84 s / 7,24 s. Ces chiffres ne sont **pas** une estimation
+Nabla : ils justifient uniquement le benchmark local ajouté ici.
 Source : https://hk.jdx.dev/benchmarks
 
 hk est particulièrement intéressant lorsque plusieurs checks/fixers travaillent
@@ -253,3 +272,27 @@ pas accéléré par un hook ; il est évité lorsque le patch est déjà invalid
 
 L'objectif d'optimisation IA est : **moins de contexte lu + patch plus petit +
 preuve ciblée plus tôt**, avant d'utiliser les gates coûteuses.
+
+
+## Recherche agentique : ordre d'expérimentation
+
+La priorité est de réduire le contexte et le nombre de reruns, pas d'empiler
+des outils. Les expériences suivantes restent mesurées et réversibles :
+
+1. **ast-grep** : recherche et réécriture structurelles avant lecture de gros
+   fichiers ou codemod manuel.
+2. **Context7** : documentation de bibliothèque versionnée ; privilégier un
+   skill/CLI ciblé pour Next.js, Dagger ou une API en mouvement avant génération
+   de code.
+3. **hk agent** : sortie structurée JSON/JSONL, portée changed/staged, mode
+   `--safe` et MCP pour donner aux agents des diagnostics bornés. À évaluer
+   seulement après parité des hooks.
+4. **Oxlint** : exécution avant ESLint avec migration incrémentale et règles
+   chevauchantes désactivées côté ESLint si la parité est démontrée.
+5. **Serena MCP / Repomix** : utiles respectivement pour navigation symbolique
+   et compression de contexte, mais seulement lorsqu'ils réduisent
+   objectivement le volume lu par rapport à GitHub search, rg et ast-grep.
+
+Chaque PoC doit mesurer au minimum : temps jusqu'au premier diagnostic,
+fichiers/octets de contexte lus, taille du patch, reruns nécessaires et
+diagnostics manqués par rapport à la gate canonique.
