@@ -33,6 +33,7 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
+- [PoC Dagger et boucle de développement](dagger-poc.md)
 - [Contrat de routage et redirects SEO](seo-url-migration.md)
 
 ## Politique de réduction documentaire

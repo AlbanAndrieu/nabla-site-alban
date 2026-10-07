@@ -133,7 +133,14 @@ métriques bornées et séparation disponibilité/posture sécurité.
 - [ ] Après le premier cycle Renovate réel, valider le lot groupé avec la gate
   complète avant d'envisager un automerge ciblé de patch/minor à faible risque.
 - [ ] Mesurer le gain local-first sur au moins trois runs comparables en séparant
-  cache hit/miss, `npm ci`, gate et build.
+  cache hit/miss, `npm ci`, gate et build. Le PoC Dagger 0.21.10 est
+  non bloquant : comparer `dagger call check` à la gate actuelle avant toute
+  suppression de YAML/scripts, avec un objectif indicatif de 25–35 % de
+  réduction du code d'orchestration build/test.
+- [ ] Benchmarker la boucle de hooks réelle avec Hyperfine : pre-commit reste la
+  référence ; comparer d'abord prek (configuration compatible), puis hk 2.x
+  avec parité de règles. N'envisager Lefthook qu'après mesure et sans perdre
+  Betterleaks, les fixers déterministes ni l'isolation des outils.
 - [ ] Ajouter un mode local de parité Preview (`BASE_URL=<preview> npm run test:a11y`
   ou équivalent) afin de reproduire les audits exact-SHA sans attendre la CI.
 - [ ] Ajouter une régression visuelle ciblée EN/FR (Home, Security, Architecture)

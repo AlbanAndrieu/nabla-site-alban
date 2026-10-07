@@ -1,0 +1,99 @@
+name: Dagger PoC
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "i18n/**"
+      - "lib/**"
+      - "messages/**"
+      - "public/**/*.css"
+      - "scripts/**"
+      - "tests/**"
+      - "unit-tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".nvmrc"
+      - ".nvmrc-production"
+      - "dagger.json"
+      - ".dagger/**"
+      - "justfile"
+      - "mise.toml"
+      - ".github/workflows/dagger-poc.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dagger-poc:
+    name: Dagger parity PoC (non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Install pinned Dagger CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/dagger.tar.gz"
+          bin_dir="${RUNNER_TEMP}/dagger-bin"
+          mkdir -p "${bin_dir}"
+          curl --fail-with-body --location --silent --show-error \
+            --output "${archive}" \
+            https://github.com/dagger/dagger/releases/download/v0.21.10/dagger_v0.21.10_linux_amd64.tar.gz
+          echo "f9ee083767dd12cdac583f9db3fedbebbbb3064f69152998be1f121d1a6cc103  ${archive}" \
+            | sha256sum --check --strict
+          tar -xzf "${archive}" -C "${bin_dir}" dagger
+          echo "${bin_dir}" >> "${GITHUB_PATH}"
+
+      - name: Run Dagger Node 26 + Node 24 parity PoC
+        id: dagger
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          started="$(date +%s)"
+          dagger call check --source=.
+          rc=$?
+          finished="$(date +%s)"
+          set -e
+          echo "exit_code=${rc}" >> "${GITHUB_OUTPUT}"
+          echo "elapsed_seconds=$((finished - started))" >> "${GITHUB_OUTPUT}"
+          exit "${rc}"
+
+      - name: Summarize non-blocking PoC
+        if: always()
+        env:
+          DAGGER_OUTCOME: ${{ steps.dagger.outcome }}
+          DAGGER_EXIT_CODE: ${{ steps.dagger.outputs.exit_code }}
+          DAGGER_ELAPSED_SECONDS: ${{ steps.dagger.outputs.elapsed_seconds }}
+        shell: bash
+        run: |
+          {
+            echo "## Dagger PoC"
+            echo
+            echo "- Policy: **non-blocking**"
+            echo "- Outcome: **${DAGGER_OUTCOME:-unknown}**"
+            echo "- Exit code: `${DAGGER_EXIT_CODE:-n/a}`"
+            echo "- Elapsed: `${DAGGER_ELAPSED_SECONDS:-n/a}s`"
+            echo "- Engine/CLI: `v0.21.10`"
+            echo "- Scope: Node 26 lint/style/type/unit/build + Node 24 build"
+            echo
+            echo "The canonical quality, build, Preview, Playwright and ZAP gates remain authoritative."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [[ "${DAGGER_OUTCOME:-}" != "success" ]]; then
+            echo "::warning::Dagger PoC failed, but this experiment is intentionally non-blocking."
+          fi

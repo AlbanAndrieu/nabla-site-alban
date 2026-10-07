@@ -44,5 +44,18 @@ secrets:
 secrets-history:
     betterleaks git . --config .betterleaks.toml --redact
 
+# Experimental and non-blocking until the roadmap parity criteria are met.
+dagger-check:
+    dagger call check --source=.
+
+dagger-check-node26:
+    dagger call check-node26 --source=.
+
+# Warm-cache comparison: Dagger Node 26 parity vs the current npm check.
+bench-dev-loop:
+    hyperfine --warmup 1 --min-runs 3 \
+        'dagger call check-node26 --source=.' \
+        'npm run check'
+
 legacy-help:
     make help
