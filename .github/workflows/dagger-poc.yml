@@ -86,9 +86,9 @@ jobs:
             echo
             echo "- Policy: **non-blocking**"
             echo "- Outcome: **${DAGGER_OUTCOME:-unknown}**"
-            echo "- Exit code: `${DAGGER_EXIT_CODE:-n/a}`"
-            echo "- Elapsed: `${DAGGER_ELAPSED_SECONDS:-n/a}s`"
-            echo "- Engine/CLI: `v0.21.10`"
+            echo "- Exit code: ${DAGGER_EXIT_CODE:-n/a}"
+            echo "- Elapsed: ${DAGGER_ELAPSED_SECONDS:-n/a}s"
+            echo "- Engine/CLI: v0.21.10"
             echo "- Scope: Node 26 lint/style/type/unit/build + Node 24 build"
             echo
             echo "The canonical quality, build, Preview, Playwright and ZAP gates remain authoritative."

@@ -18,7 +18,11 @@ migration vers 1.0 sera évaluée séparément après stabilisation.
 - Node 26.8.2 : ESLint, Stylelint, TypeScript, tests unitaires et build Next.js ;
 - Node 24.11.0 : build de compatibilité Vercel.
 
-Le cache npm et le cache Next.js sont des volumes Dagger persistants. Le
+Le cache npm et le cache Next.js sont des volumes Dagger persistants. Le build
+Next.js appelle directement `npx next build` dans le conteneur éphémère : le
+wrapper local qui restaure `next-env.d.ts` n'est pas nécessaire et cela permet
+de garder `.git` hors du contexte Dagger. Git reste installé dans le conteneur
+pour les tests qui manipulent leurs propres dépôts temporaires. Le
 contexte source exclut `.git`, `node_modules`, les sorties de tests/build et
 tous les fichiers `.env*` afin de ne pas copier les secrets locaux dans le
 pipeline.

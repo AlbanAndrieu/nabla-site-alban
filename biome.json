@@ -24,6 +24,14 @@
 	},
 	"overrides": [
 		{
+			"includes": [".dagger/**/*.ts"],
+			"javascript": {
+				"parser": {
+					"unsafeParameterDecoratorsEnabled": true
+				}
+			}
+		},
+		{
 			"includes": ["**/*.tsx"],
 			"linter": {
 				"rules": {

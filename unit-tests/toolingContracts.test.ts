@@ -70,6 +70,14 @@ test("Dagger PoC is pinned, measurable and explicitly non-blocking", async () =>
 		/f9ee083767dd12cdac583f9db3fedbebbbb3064f69152998be1f121d1a6cc103/,
 	);
 	assert.match(workflow, /dagger call check --source=\./);
+	assert.match(
+		await read("biome.json"),
+		/\.dagger\/\*\*\/\*\.ts[\s\S]*unsafeParameterDecoratorsEnabled": true/,
+	);
+	assert.match(
+		await read(".dagger/src/index.ts"),
+		/@argument\(\{ defaultPath: "\/", ignore: SOURCE_IGNORE \}\)/,
+	);
 	assert.match(just, /dagger-check:\n\s+dagger call check --source=\./);
 	assert.match(just, /bench-dev-loop:/);
 });

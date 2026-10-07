@@ -35,6 +35,11 @@ export class NablaSiteAlbanCi {
 		return dag
 			.container()
 			.from(`node:${nodeVersion}-bookworm-slim`)
+			.withExec([
+				"sh",
+				"-c",
+				"apt-get update && apt-get install --yes --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*",
+			])
 			.withMountedCache(
 				"/root/.npm",
 				dag.cacheVolume(`nabla-site-alban-npm-${nodeVersion}`),
@@ -68,14 +73,14 @@ export class NablaSiteAlbanCi {
 			environment.withExec(["npm", "run", "typecheck"]).stdout(),
 			environment.withExec(["npm", "run", "test:unit"]).stdout(),
 			this.buildEnvironment(source, NODE_DEVELOPMENT)
-				.withExec(["npm", "run", "build"])
+				.withExec(["npx", "next", "build"])
 				.stdout(),
 		]);
 	}
 
 	private async runNode24(source: Directory): Promise<void> {
 		await this.buildEnvironment(source, NODE_VERCEL)
-			.withExec(["npm", "run", "build"])
+			.withExec(["npx", "next", "build"])
 			.stdout();
 	}
 
