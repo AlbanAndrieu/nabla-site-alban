@@ -48,6 +48,17 @@ export class NablaSiteAlbanCi {
 			.withWorkdir("/src")
 			.withEnvVariable("CI", "true")
 			.withExec([
+				"sh",
+				"-c",
+				[
+					"git init --quiet --initial-branch=dagger-source",
+					"git config user.email dagger@example.invalid",
+					"git config user.name 'Dagger Source Snapshot'",
+					"git add --all",
+					"GIT_AUTHOR_DATE='2000-01-01T00:00:00Z' GIT_COMMITTER_DATE='2000-01-01T00:00:00Z' git commit --quiet --no-gpg-sign -m 'Dagger source snapshot'",
+				].join(" && "),
+			])
+			.withExec([
 				"npm",
 				"install",
 				"--global",
