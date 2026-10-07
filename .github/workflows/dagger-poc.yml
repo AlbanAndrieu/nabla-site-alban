@@ -43,6 +43,25 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Package exact HEAD source snapshot
+        id: source-snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot="${RUNNER_TEMP}/nabla-site-alban-${GITHUB_SHA}.tar.gz"
+          git archive --format=tar.gz --output="${snapshot}" "${GITHUB_SHA}"
+          sha256sum "${snapshot}"
+          echo "path=${snapshot}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload exact HEAD source snapshot
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: source-snapshot-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ steps.source-snapshot.outputs.path }}
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
       - name: Install pinned Dagger CLI
         shell: bash
         run: |
