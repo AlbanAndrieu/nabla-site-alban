@@ -108,7 +108,7 @@ export default async function DsommPage({
 								<h3>{t("summary.levelDistribution")}</h3>
 								{stats.levels.map(({ level, count }) => (
 									<div className={styles.levelRow} key={level}>
-										<span>Level {level}</span>
+										<span>{t("summary.levelLabel")} {level}</span>
 										<progress max={stats.activityCount} value={count}>
 											{count}
 										</progress>

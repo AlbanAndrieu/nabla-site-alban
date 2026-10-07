@@ -263,6 +263,7 @@
 			"activities": "Activités",
 			"dimensions": "Dimensions",
 			"maturityLevels": "Niveaux de maturité",
+			"levelLabel": "Niveau",
 			"upstreamVersion": "Version upstream",
 			"levelDistribution": "Répartition des activités par niveau",
 			"dimensionCoverage": "Activités par dimension"

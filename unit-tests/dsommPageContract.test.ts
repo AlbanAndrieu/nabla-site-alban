@@ -156,6 +156,7 @@ test("DSOMM page renders the local snapshot without database, iframe or runtime 
 	assert.match(page, /canonicalPagePath\("security\/dsomm"/);
 	assert.match(page, /canonicalPageAlternates\("security\/dsomm"\)/);
 	assert.match(page, /summary\.dimensionCoverage/);
+	assert.match(page, /summary\.levelLabel/);
 	assert.doesNotMatch(page, /languageSwitcherLabel/);
 	assert.doesNotMatch(page, /canonicalPagePath\("security\/dsomm", "en"\)/);
 	assert.doesNotMatch(page, /canonicalPagePath\("security\/dsomm", "fr"\)/);
