@@ -66,6 +66,24 @@ Ces pourcentages sont des objectifs à confirmer sur trois PR comparables. Ils
 n'incluent pas Vercel, ZAP, Playwright distant, release, GitHub policy ni les
 workflows post-merge, qui gardent une vraie responsabilité d'orchestration.
 
+## Benchmark local des hook runners
+
+Le PoC ajoute désormais, **sans changer le hook Git canonique** :
+
+- `prek 0.5.4`, exécuté sur la même `.pre-commit-config.yaml` que
+  pre-commit pour permettre un A/B à configuration identique ;
+- `hk 2.5.0` avec un hook custom `fast-check` qui lance ESLint, Stylelint
+  et TypeScript en parallèle. Aucun `pre-commit` hk n'est déclaré et
+  `hk install` n'est pas appelé par le projet ;
+- `just bench-hook-runners` refuse de démarrer si l'arbre Git n'est pas
+  propre, puis compare pre-commit et prek avec Hyperfine ;
+- `just bench-fast-check` compare le fast-check hk aux mêmes trois contrôles
+  npm exécutés séquentiellement.
+
+Ces benchmarks sont des **mesures locales**, pas des gates CI. Leur but est de
+mesurer le temps d'échec précoce et le coût d'orchestration avant de décider
+d'une migration.
+
 ## Hooks : ce qui peut réellement accélérer
 
 Un gestionnaire de hooks ne réduit pas directement le temps de compilation
@@ -157,3 +175,69 @@ observées :
 Pour les hooks, benchmarker ensuite pre-commit, prek et hk sur les mêmes fichiers
 et le même cache. Lefthook devient prioritaire seulement si sa simplicité
 d'exploitation compense une performance inférieure à hk/prek.
+
+
+## Recherche outils / agents — octobre 2026
+
+### Hooks rapides
+
+Le benchmark hk publié le 28 septembre 2026 compare hk 2.4.0, Lefthook
+2.1.14, prek 0.5.3 et pre-commit 4.6.2 sur huit CPU. Sur leur scénario
+« commit », les médianes annoncées sont 1,15 s / 1,83 s / 2,21 s / 3,00 s.
+Sur « check every file », hk annonce 3,24 s contre 7,34 s pour pre-commit.
+Ces chiffres ne sont **pas** une estimation Nabla : ils justifient uniquement
+le benchmark local ajouté ici.
+Source : https://hk.jdx.dev/benchmarks
+
+hk est particulièrement intéressant lorsque plusieurs checks/fixers travaillent
+sur des fichiers qui se recouvrent : il parallélise les étapes et coordonne les
+lectures/écritures avec des verrous par fichier. Lefthook sait également
+paralléliser des groupes, mais les fixers concurrents exigent davantage de
+discipline de configuration.
+Sources : https://hk.jdx.dev/why-hk.html et
+https://lefthook.dev/configuration/jobs/
+
+prek est le candidat de migration le moins risqué : il réutilise la
+configuration pre-commit existante et fournit un binaire Rust autonome.
+Source : https://github.com/j178/prek
+
+### Réduction du temps de développement, pas seulement du build
+
+Les hooks doivent rester devant les opérations coûteuses :
+
+```text
+changed files
+  -> formatter / secrets / lint ciblé
+  -> typecheck / unit
+  -> Dagger build
+  -> Preview
+  -> Playwright / ZAP
+```
+
+Le gain principal est donc le **temps avant feedback**. Le build Next.js n'est
+pas accéléré par un hook ; il est évité lorsque le patch est déjà invalide.
+
+### Outillage IA à évaluer
+
+1. **ast-grep** pour recherche et réécriture AST déterministes. Il est
+   particulièrement adapté aux agents pour éviter les recherches textuelles
+   larges et produire des codemods contrôlables.
+   https://ast-grep.github.io/
+2. **Context7** pour injecter la documentation de bibliothèque courante et
+   versionnée dans l'agent, afin de réduire les API obsolètes/hallucinées.
+   https://context7.com/docs/overview
+3. **Oxlint** en mode incrémental avant ESLint. Son outil de migration peut
+   convertir un flat config ESLint et conserver ESLint pour les règles non
+   supportées ; aucun remplacement ne doit être fait avant comparaison de
+   diagnostics sur ce repository.
+   https://oxc.rs/docs/guide/usage/linter/migrate-from-eslint.html
+4. **Skills spécialisés et courts** : préférer un skill par workflow stable
+   (quality, review, PR, Dagger) à des instructions générales volumineuses.
+   Réévaluer régulièrement AGENTS.md et les skills pour retirer les règles
+   devenues évidentes ou dupliquées.
+5. **Dagger** comme environnement d'exécution reproductible de l'agent :
+   l'agent peut produire un petit patch, lancer un check ciblé, puis seulement
+   promouvoir vers `dagger call check`.
+
+L'objectif d'optimisation IA est : **moins de contexte lu + patch plus petit +
+preuve ciblée plus tôt**, avant d'utiliser les gates coûteuses.

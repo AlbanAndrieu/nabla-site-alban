@@ -1,0 +1,20 @@
+amends "package://github.com/jdx/hk/releases/download/v2.5.0/hk@2.5.0#/Config.pkl"
+
+// Benchmark-only configuration.
+// No top-level steps and no "pre-commit" hook are declared, so hk does not
+// replace the repository's canonical pre-commit installation.
+hooks {
+  ["fast-check"] {
+    steps {
+      ["eslint"] {
+        check = "npm run lint"
+      }
+      ["stylelint"] {
+        check = "npm run lint:css"
+      }
+      ["typescript"] {
+        check = "npm run typecheck"
+      }
+    }
+  }
+}
