@@ -38,7 +38,7 @@ export class NablaSiteAlbanCi {
 			.withExec([
 				"sh",
 				"-c",
-				"apt-get update && apt-get install --yes --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*",
+				"apt-get update && apt-get install --yes --no-install-recommends bash ca-certificates curl git jq python3 && rm -rf /var/lib/apt/lists/*",
 			])
 			.withMountedCache(
 				"/root/.npm",
