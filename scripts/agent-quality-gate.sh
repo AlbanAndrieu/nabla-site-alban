@@ -284,18 +284,18 @@ printf '%s\n' "${scope_output}"
 build="$(awk -F= '$1 == "build" { print $2; exit }' <<<"${scope_output}")"
 
 run_maintenance_project_checks() {
-    npm run lint
-    npm run lint:css
-    npm run typecheck
-    npm run test:unit
+    npm run lint &&
+        npm run lint:css &&
+        npm run typecheck &&
+        npm run test:unit
 }
 
 run_full_prebuild_checks() {
-    npm run lint
-    npm run lint:css
-    npx next typegen
-    npm run typecheck
-    npm run test:unit
+    npm run lint &&
+        npm run lint:css &&
+        npx next typegen &&
+        npm run typecheck &&
+        npm run test:unit
 }
 
 case "${build}" in

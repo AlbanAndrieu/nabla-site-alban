@@ -32,7 +32,7 @@ ci:
   -   schemas
   submodules: true
 default_install_hook_types:
--   pre-commit # gitleak
+-   pre-commit # Betterleaks
     # make sure you include `prepare-commit-msg` in `default_install_hook_types`
     # prepare-commit-msg made by oco
     # - prepare-commit-msg
@@ -446,13 +446,15 @@ repos:
             public/assets/fontawesome-free-7.1.0-web/.*|
           )$
 
--   repo: https://github.com/zricethezav/gitleaks
-    rev: v8.30.1
+-   repo: https://github.com/betterleaks/betterleaks
+    rev: v1.9.0
     hooks:
-    -   id: gitleaks-docker
-        name: "🔒 🐳 security · Detect hardcoded secrets"
-        entry: zricethezav/gitleaks protect --verbose --redact --staged --config
-          .gitleaks.toml
+    -   id: betterleaks
+        name: "🔒 security · Detect hardcoded secrets with Betterleaks"
+        # Scans passed files in both local commits and clean CI --files runs.
+        entry: betterleaks dir --redact --config .betterleaks.toml
+        types: [text]
+        pass_filenames: true
 
     ### Ansible ###
     # Disable because too slow

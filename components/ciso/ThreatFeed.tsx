@@ -155,7 +155,6 @@ export default function ThreatFeed({
 	const usedLabels = { ...defaultLabels, ...labels };
 
 	const loadFeeds = useCallback(async (signal?: AbortSignal) => {
-		setStatus("loading");
 		try {
 			const feedUrls = await loadFeedUrls(signal);
 			const nextItems = await fetchFeedsWithLimit(feedUrls, signal);
@@ -169,13 +168,17 @@ export default function ThreatFeed({
 
 	useEffect(() => {
 		const controller = new AbortController();
-		void loadFeeds(controller.signal);
+		const initialLoad = window.setTimeout(
+			() => void loadFeeds(controller.signal),
+			0,
+		);
 		const refresh = window.setInterval(
 			() => void loadFeeds(controller.signal),
 			600_000,
 		);
 		return () => {
 			controller.abort();
+			window.clearTimeout(initialLoad);
 			window.clearInterval(refresh);
 		};
 	}, [loadFeeds]);
@@ -194,7 +197,10 @@ export default function ThreatFeed({
 				<Button
 					size="compact"
 					variant="outline"
-					onClick={() => void loadFeeds()}
+					onClick={() => {
+						setStatus("loading");
+						void loadFeeds();
+					}}
 				>
 					{usedLabels.retry}
 				</Button>

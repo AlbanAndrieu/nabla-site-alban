@@ -55,28 +55,29 @@ export default async function CvPathPage({ params }: Props) {
 		: routing.defaultLocale;
 	setRequestLocale(normalizedLocale);
 
+	let html: string;
 	try {
-		const { html } = await loadCvHtmlFragment(path, normalizedLocale);
-		const documentLocale = cvDocumentLocale(path, normalizedLocale);
-		const cvIndexHref = normalizedLocale === "fr" ? "/fr/cv" : "/cv";
-
-		return (
-			<div className="page-cv" suppressHydrationWarning>
-				<TopAnchor />
-				{/* eslint-disable-next-line react/no-danger */}
-				<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
-				<nav
-					className={styles.backAction}
-					aria-label={BACK_TO_INDEX_LABEL[documentLocale]}
-				>
-					<ActionLink href={cvIndexHref} variant="primary">
-						<span aria-hidden="true">←</span>
-						{BACK_TO_INDEX_LABEL[documentLocale]}
-					</ActionLink>
-				</nav>
-			</div>
-		);
+		({ html } = await loadCvHtmlFragment(path, normalizedLocale));
 	} catch {
 		notFound();
 	}
+
+	const documentLocale = cvDocumentLocale(path, normalizedLocale);
+	const cvIndexHref = normalizedLocale === "fr" ? "/fr/cv" : "/cv";
+
+	return (
+		<div className="page-cv" suppressHydrationWarning>
+			<TopAnchor />
+			<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
+			<nav
+				className={styles.backAction}
+				aria-label={BACK_TO_INDEX_LABEL[documentLocale]}
+			>
+				<ActionLink href={cvIndexHref} variant="primary">
+					<span aria-hidden="true">←</span>
+					{BACK_TO_INDEX_LABEL[documentLocale]}
+				</ActionLink>
+			</nav>
+		</div>
+	);
 }

@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 4 octobre 2026.
+Dernière réconciliation : 7 octobre 2026.
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -23,14 +23,14 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | --- | --- |
 | Runtime | Next.js App Router + `next-intl` pour EN/FR ; CV HTML et 404 statique restent des exceptions explicitement conservées |
 | Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
-| Qualité | Gate local-first, auto-fix déterministe, SAST, lint/types/tests, build conditionnel et preuve exact-SHA ; Axe EN/FR dispose d’un harness local isolé et reproductible |
+| Qualité | Gate local-first, auto-fix déterministe, SAST, Betterleaks v1.9.0, lint/types/tests, build conditionnel et preuve exact-SHA ; Just 1.58.0 complète le Makefile conservé ; Axe EN/FR reste reproductible |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
 | Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `/security.txt` est canonique, `/.well-known/security.txt` publie la même copie RFC 9116 et la policy unique utilise la route native `/policy/privacy_policy` |
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
 | Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
-| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable, preuves/progression par UUID, miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
+| DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable ; traduction FR build-time complète 251/251 liée par UUID/sourceCommit ; miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -132,8 +132,31 @@ métriques bornées et séparation disponibilité/posture sécurité.
   graphe d'import applicatif.
 - [ ] Après le premier cycle Renovate réel, valider le lot groupé avec la gate
   complète avant d'envisager un automerge ciblé de patch/minor à faible risque.
-- [ ] Mesurer le gain local-first sur au moins trois runs comparables en séparant
-  cache hit/miss, `npm ci`, gate et build.
+- [ ] **Décider l'adoption Dagger après trois PR comparables** : mesurer cache
+  froid/chaud, `npm ci`, lint/type/tests/build et divergences exact-SHA. Le PoC
+  0.21.10 reste non bloquant. Objectifs à confirmer par le diff final :
+  **25–35 %** de réduction du code d'orchestration build/test, **8–12 %** sur
+  la sélection CI/tooling globale et jusqu'à **35–45 %** du noyau build/test si
+  les scripts shell deviennent de simples adaptateurs. Ne pas migrer Vercel,
+  OIDC, statuts GitHub, Preview, ZAP ou release dans Dagger.
+- [ ] **Industrialiser la validation distante exact-HEAD sans clone** : le PoC
+  publie désormais un `git archive` à rétention 1 jour. La méthode
+  connector → artifact → extraction → test ciblé est prouvée sans DNS local ;
+  la fermer après merge et réutilisation sur une tâche ultérieure. Elle ne doit
+  jamais être présentée comme équivalente à `quality:agent:publish`, car
+  l'archive ne contient ni `.git` ni les dépendances installées.
+- [ ] **Benchmarker les hooks sur le dépôt réel avec Hyperfine** : conserver
+  pre-commit comme référence, comparer d'abord prek sur la même configuration,
+  puis hk avec parité de règles et exécution parallèle sûre. Évaluer ensuite le
+  mode agent de hk (JSON/JSONL, `--safe`, MCP) avant toute migration. Lefthook
+  reste un candidat de simplicité si les mesures hk/prek ne compensent pas le
+  coût de migration.
+- [ ] **Mesurer trois PoC d'efficacité agentique avant ajout permanent** :
+  ast-grep pour recherche/codemod structurels, Context7 pour documentation
+  versionnée avant génération de code, et Oxlint en pré-lint incrémental avant
+  ESLint. Mesurer temps jusqu'au premier diagnostic, volume de contexte lu,
+  taille du patch et nombre de reruns. N'évaluer Serena MCP ou Repomix compressé
+  que si la recherche GitHub/rg/ast-grep ne donne pas déjà un contexte ciblé.
 - [ ] Ajouter un mode local de parité Preview (`BASE_URL=<preview> npm run test:a11y`
   ou équivalent) afin de reproduire les audits exact-SHA sans attendre la CI.
 - [ ] Ajouter une régression visuelle ciblée EN/FR (Home, Security, Architecture)

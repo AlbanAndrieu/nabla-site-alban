@@ -240,7 +240,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 			},
 			{ href: "https://github.com/oxsecurity/megalinter", icon: "github" },
 			{ href: "https://github.com/aquasecurity/trivy", icon: "github" },
-			{ href: "https://github.com/zricethezav/gitleaks", icon: "github" },
+			{ href: "https://github.com/betterleaks/betterleaks", icon: "github" },
 			{ href: "https://pre-commit.com/" },
 			{ href: "https://github.com/PyCQA/bandit", icon: "github" },
 			{

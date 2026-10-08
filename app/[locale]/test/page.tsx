@@ -59,7 +59,7 @@ export default async function TestPage({
 			</main>
 			<section className="contact-section" id="contact">
 				<div className="contact-container">
-					<h2 className="section-title">Let's Work Together</h2>
+					<h2 className="section-title">Let&apos;s Work Together</h2>
 					<p className="section-subtitle">
 						Ready to transform your DevOps practices? Get in touch to discuss
 						your project.

@@ -14,7 +14,7 @@ test("agent quality keeps TypeScript and unit coverage while scoping route type 
 	assert.match(gate, /maintenance lint, CSS, TypeScript and unit gate/);
 	assert.match(
 		gate,
-		/npm run lint\n\s+npm run lint:css\n\s+npm run typecheck\n\s+npm run test:unit/,
+		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
 	);
 	assert.match(gate, /run_full_prebuild_checks/);
 	assert.match(gate, /npx next typegen/);

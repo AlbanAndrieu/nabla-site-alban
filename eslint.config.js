@@ -24,7 +24,12 @@ export default [
 			"vendor/**",
 		],
 	},
-	js.configs.recommended,
+	{
+		...js.configs.recommended,
+		// Core JavaScript rules such as no-undef/no-unused-vars do not understand
+		// TypeScript type space. Next's TypeScript-aware config remains active below.
+		files: ["**/*.{js,cjs,mjs}"],
+	},
 	...nextVitals,
 	{
 		files: ["scripts/**/*.{cjs,mjs}", "*.config.{cjs,js,mjs}", "server.cjs"],

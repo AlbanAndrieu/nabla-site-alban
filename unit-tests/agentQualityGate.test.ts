@@ -86,6 +86,19 @@ test("repository exposes local fix, check and reusable strict publication comman
 	assert.match(publish, /git rev-parse --git-path agent-publication-proof/);
 });
 
+test("project checks fail closed when an early command fails", async () => {
+	const gate = await source("scripts/agent-quality-gate.sh");
+
+	assert.match(
+		gate,
+		/run_maintenance_project_checks\(\) \{[\s\S]*?npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+	);
+	assert.match(
+		gate,
+		/run_full_prebuild_checks\(\) \{[\s\S]*?npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+	);
+});
+
 test("local fix phase converges formatter and npm lint fixes before publication", async () => {
 	const gate = await source("scripts/agent-quality-gate.sh");
 

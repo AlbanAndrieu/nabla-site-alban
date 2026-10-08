@@ -22,6 +22,22 @@
 - The GitLab mirror keeps only Renovate configuration validation; its Dependabot and scheduled Renovate updater jobs are disabled so it cannot create a second family of dependency branches.
 - npm runtime updates are grouped weekly, devDependencies monthly, and GitHub Actions/pre-commit maintenance monthly. `next` and `eslint-config-next` are kept in one weekly Next.js stack; npm releases must age 7 days before routine upgrades, and disruptive major/replacement updates require Dependency Dashboard approval.
 
+## Détection de secrets : Betterleaks
+
+- Le hook pre-commit est épinglé à Betterleaks **v1.9.0**. Il examine
+  directement les fichiers textuels transmis par pre-commit et fonctionne
+  également dans le checkout Git propre du `pre-commit run --files` CI.
+  Une analyse des seuls fichiers `--staged` ne couvrirait pas ce cas.
+- `.betterleaks.toml` conserve les exceptions revues et étend les règles
+  intégrées. Toute nouvelle exception doit être limitée et justifiée.
+- `just secrets` examine le répertoire ; `just secrets-history` examine
+  l'historique Git complet. Les sorties sont masquées (`--redact`) et les
+  scans échouent si une fuite est découverte.
+- Aucune validation distante de credentials n'est activée ; GitGuardian
+  demeure un contrôle GitHub indépendant.
+- MegaLinter garde SecretLint, mais désactive Gitleaks pour éviter un doublon
+  avec Betterleaks.
+
 ## Validation
 
 - `CI (Quality and Security)` verifies that the current production base has green Vercel, production smoke and production DAST evidence, then replays the canonical production smoke from the base commit before spending the PR build budget.

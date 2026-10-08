@@ -22,37 +22,10 @@
 }
 
 .backLink:focus-visible,
-.languageSwitch a:focus-visible,
 .sourceLinks a:focus-visible {
 	outline: 3px solid var(--ui-focus-ring);
 	outline-offset: 3px;
 	border-radius: var(--ui-radius-sm);
-}
-
-.languageSwitch {
-	display: inline-flex;
-	flex-wrap: wrap;
-	gap: var(--ui-space-xs);
-	margin-bottom: var(--ui-space-lg);
-	padding: 0.25rem;
-	border: 1px solid var(--ui-border);
-	border-radius: 999px;
-	background: var(--ui-surface-muted);
-}
-
-.languageSwitch a {
-	min-height: var(--ui-control-min-height);
-	padding: 0.55rem 0.85rem;
-	border-radius: 999px;
-	color: var(--ui-text-muted);
-	font-weight: 700;
-	text-decoration: none;
-}
-
-.languageSwitch a[aria-current="page"] {
-	background: var(--ui-surface-card);
-	color: var(--ui-text-primary);
-	box-shadow: var(--ui-shadow-sm);
 }
 
 .eyebrow {
@@ -93,13 +66,6 @@
 	background: var(--ui-surface-muted);
 	font-size: 0.9rem;
 	font-weight: 600;
-}
-
-.languageNote {
-	max-width: 70ch;
-	margin: var(--ui-space-md) 0 0;
-	color: var(--ui-text-muted);
-	font-size: 0.95rem;
 }
 
 .summarySection {

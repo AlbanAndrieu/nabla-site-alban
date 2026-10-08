@@ -1,13 +1,10 @@
-# This is the default gitleaks configuration file.
-# Rules and allowlists are defined within this file.
-# Rules instruct gitleaks on what should be considered a secret.
-# Allowlists instruct gitleaks on what is allowed, i.e. not a secret.
-title = "gitleaks config"
-minVersion = "v8.25.0"
+# Betterleaks v1.9.0 policy. Keep reviewed legacy allowlists until v2 migration.
+# Extend the upstream rules rather than maintaining a replacement rule set.
+title = "nabla-site-alban secrets policy"
+betterleaksMinVersion = "v1.9.0"
 
 [extend]
-# useDefault will extend the base configuration with the default gitleaks config:
-# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+# Extend built-in Betterleaks detection rules.
 useDefault = true
 
 [allowlist]
@@ -17,7 +14,7 @@ regexes = [
     '''078-05-1120''',
     '''(9[0-9]{2}|666)-\d{2}-\d{4}''',
     '''#nosec''',
-    '''allow:gitleaks''',
+    '''betterleaks:allow''',
     '''password-reset-XXX''',
     '''sk-1234567890''',
     '''tg3zLMS/bebJFl0LxctiCw''',
@@ -25,7 +22,7 @@ regexes = [
   '''data-key=^[A-Za-z0-9]+/[A-Za-z0-9+/=]{10,70}$''',
     ]
 paths = [
-    '''gitleaks.toml''',
+    '''betterleaks.toml''',
     '''(.*?)(jpg|gif|doc|docx|zip|xls|pdf|bin|svg|socket|vsidx|v2|suo|wsuo|.dll|pdb|exe)$''',
     '''(go.mod|go.sum|go.work|go.work.sum)$''',
     '''gradle.lockfile''',
