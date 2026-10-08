@@ -93,8 +93,8 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		version: "26.8.2",
 		onFail: "warn",
 	});
-	assert.equal(packageJson.dependencies?.next, "16.3.4");
-	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.3.4");
+	assert.equal(packageJson.dependencies?.next, "16.4.0");
+	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.4.0");
 	assert.equal(
 		packageJson.devDependencies?.["eslint-config-next"],
 		packageJson.dependencies?.next,
