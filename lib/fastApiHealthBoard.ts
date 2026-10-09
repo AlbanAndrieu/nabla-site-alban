@@ -141,9 +141,11 @@ async function loadFastApiHealthBoardUncached(
 		return { board, primaryUrl, error: null };
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(
-			`[health-board] FastAPI aggregate unavailable (${primaryUrl}): ${reason}`,
-		);
+		if (process.env.HOMELAB_HEALTH_VERBOSE === "1") {
+			console.warn(
+				`[health-board] FastAPI aggregate unavailable (${primaryUrl}): ${reason}`,
+			);
+		}
 		return { board: null, primaryUrl, error: reason };
 	} finally {
 		clearTimeout(timeout);
