@@ -86,7 +86,7 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
                         target.chmod(0o755 if member.mode & 0o111 else 0o644)
                     elif member.issym():
                         resolved = posixpath.normpath(
-                            posixpath.join(posixpath.dirname(name), member.linkname)
+                            posixpath.join(posixpath.dirname(name), member.linkname),
                         )
                         if resolved == ".." or resolved.startswith("../") or resolved.startswith("/"):
                             raise ValueError("symlink escapes the snapshot")
@@ -102,7 +102,7 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
             os.replace(stage, destination)
             print(
                 f"SNAPSHOT_OK head={head} digest={digest} "
-                f"entries={len(members)} mode=source-only"
+                f"entries={len(members)} mode=source-only",
             )
             print("SNAPSHOT_NOT_PUBLISHABLE: missing .git; use targeted tests only")
             return len(members)
