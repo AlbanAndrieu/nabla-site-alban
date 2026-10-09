@@ -259,7 +259,7 @@ jobs:
         continue-on-error: true
         env:
           QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "40"
+          QUALITY_LOG_TAIL: "20"
         run: bash scripts/quality-gate.sh
 
       - name: Save pre-commit environments
@@ -396,7 +396,7 @@ jobs:
         continue-on-error: true
         env:
           QUALITY_BASE_REF: ${{ steps.production-baseline.outputs.base-sha || github.event.before || 'origin/master' }}
-          QUALITY_LOG_TAIL: "40"
+          QUALITY_LOG_TAIL: "20"
           QUALITY_CANONICAL_GATE_VERIFIED: "1"
         shell: bash
         run: |
