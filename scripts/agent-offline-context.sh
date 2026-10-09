@@ -10,7 +10,9 @@ fi
 
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo 'QG_OFFLINE_SOURCE_ONLY: no .git; run targeted archive tests, never publish from this tree' >&2
-    if [[ "${mode}" == preflight ]]; then exit 1; fi
+    if [[ "${mode}" == preflight ]]; then
+        exit 1
+    fi
     exit 0
 fi
 
@@ -53,7 +55,7 @@ if [[ ! "${max_paths}" =~ ^(0|[1-9][0-9]*)$ ]]; then
     exit 2
 fi
 if ((max_paths > 0 && ${#paths[@]} > max_paths)); then
-    printf 'QG_OFFLINE_PATH_LIMIT: changed=%s limit=%s; refusing incomplete inventory\\n' "${#paths[@]}" "${max_paths}" >&2
+    printf 'QG_OFFLINE_PATH_LIMIT: changed=%s limit=%s; refusing incomplete inventory\n' "${#paths[@]}" "${max_paths}" >&2
     exit 1
 fi
 
@@ -63,7 +65,9 @@ printf 'paths:'
 for ((i = 0; i < ${#paths[@]} && i < 12; i++)); do
     printf ' %q' "${paths[i]}"
 done
-if ((${#paths[@]} > 12)); then printf ' (+%d more)' "$((${#paths[@]} - 12))"; fi
+if ((${#paths[@]} > 12)); then
+    printf ' (+%d more)' "$((${#paths[@]} - 12))"
+fi
 printf '\n'
 
 if [[ "${mode}" != preflight ]]; then
