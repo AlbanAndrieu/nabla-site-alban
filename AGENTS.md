@@ -4,7 +4,7 @@ Canonical compact policy. Load only the task-specific skill under `.agents/skill
 
 ## Network-free agent loop
 
-Start with `just context` (bounded local Git summary) then `just preflight` (cached refs). Never repeatedly retry blocked GitHub/DNS/codeload/npm endpoints. If available, obtain the exact-HEAD Dagger `source-snapshot-<SHA>` using the connected GitHub service. Verify workflow HEAD plus artifact SHA-256 with `just snapshot-check ZIP SHA DIGEST OUTPUT`. Such a source-only archive lacks `.git` and `node_modules`: **never** treat it as an exact publication proof. Targeted tests are still useful.
+Start with `just context` (bounded local Git summary) then `just preflight` (cached refs). Never repeatedly retry blocked GitHub/DNS/codeload/npm endpoints. If available, obtain the exact-HEAD Dagger `source-snapshot-<SHA>` using the connected GitHub service. Verify workflow HEAD plus artifact SHA-256 with `just snapshot-check ZIP SHA DIGEST OUTPUT`. Such a source-only archive lacks `.git` and `node_modules`: **never** treat it as an exact publication proof. Targeted tests are still useful: `just source-check` runs an offline smoke, not a publish gate.
 
 When network works, fetch once, then run `bash scripts/agent-doctor.sh` and `mise run hooks` on a real checkout. Offline preflight is not remote freshness, dependency validation, or permission to publish.
 

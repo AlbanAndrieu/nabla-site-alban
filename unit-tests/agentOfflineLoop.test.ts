@@ -166,3 +166,32 @@ test("offline context counts more than 200 paths while printing a bounded summar
 		await rm(cwd, { recursive: true, force: true });
 	}
 });
+
+test("offline inventory fails closed when git diff fails", async () => {
+	const cwd = await fixture();
+	try {
+		const bin = path.join(cwd, "bin");
+		await mkdir(bin);
+		const wrapper = path.join(bin, "git");
+		await writeFile(
+			wrapper,
+			`#!/usr/bin/env bash
+if [[ "$1" == "diff" ]]; then exit 42; fi
+exec /usr/bin/git "$@"
+`,
+		);
+		await chmod(wrapper, 0o755);
+		await assert.rejects(
+			execute("bash", [contextScript, "preflight"], {
+				cwd,
+				env: { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}` },
+			}),
+			(error: unknown) =>
+				String((error as { stderr: string }).stderr).includes(
+					"QG_OFFLINE_GIT_DIFF_FAILED",
+				),
+		);
+	} finally {
+		await rm(cwd, { recursive: true, force: true });
+	}
+});

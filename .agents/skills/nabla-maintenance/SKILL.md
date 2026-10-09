@@ -38,12 +38,9 @@ DNS prevents `git clone`, `curl github.com`, codeload or raw GitHub access.
 4. Use `just snapshot-check ZIP HEAD_SHA ARTIFACT_SHA256 DESTINATION` to verify the artifact digest, reject unsafe paths and extract without `.git`. Require exactly one inner tarball named
    `nabla-site-alban-<HEAD_SHA>.tar.gz`. Extract it to a fresh directory;
    never silently accept a merge-commit SHA or a differently named snapshot.
-5. Run the cheapest real targeted checks that do not need unavailable
-   dependencies. For dependency-free TypeScript contract tests, Node 22 can run
-   suitable files with
-   `node --experimental-strip-types --test <test-file.ts>`. Use this only when
-   the selected test imports Node built-ins/repository files and does not need
-   package dependencies.
+5. Run `just source-check` inside the verified archive for dependency-free
+   Bash/Node contracts. Run other targeted tests only when their imports are
+   resolvable; mark unavailable checks `NOT_RUN`, never `PASS`.
 6. Treat the snapshot as source-tree evidence, not as a Git checkout. A
    `git archive` has no `.git`, so merge-base, changed-file, branch,
    pre-push and exact publication-proof checks cannot be proven from it.

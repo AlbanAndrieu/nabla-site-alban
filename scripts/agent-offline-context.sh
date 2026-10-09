@@ -37,18 +37,19 @@ paths_file="$(mktemp)"
 trap 'rm -f "${paths_file}"' EXIT
 # A failed git diff must never produce a partial or deceptively empty inventory.
 if ! (
-    set -e
+    # errexit is suppressed in conditions: guard each Git command explicitly.
     if [[ "${base_sha}" != unavailable ]]; then
-        git diff --name-only -z --diff-filter=ACMR "${base}...HEAD"
+        git diff --name-only -z --diff-filter=ACMR "${base}...HEAD" || exit 1
     fi
-    git diff --name-only -z --diff-filter=ACMR
-    git diff --cached --name-only -z --diff-filter=ACMR
-    git ls-files -z --others --exclude-standard
+    git diff --name-only -z --diff-filter=ACMR || exit 1
+    git diff --cached --name-only -z --diff-filter=ACMR || exit 1
+    git ls-files -z --others --exclude-standard || exit 1
 ) >"${paths_file}"; then
     echo 'QG_OFFLINE_GIT_DIFF_FAILED: inventory incomplete; refusing optimistic context' >&2
     exit 1
 fi
-mapfile -d '' -t paths < <(LC_ALL=C sort -zu "${paths_file}")
+LC_ALL=C sort -zu -o "${paths_file}" "${paths_file}"
+mapfile -d '' -t paths <"${paths_file}"
 max_paths="${AGENT_OFFLINE_MAX_PATHS:-0}"
 if [[ ! "${max_paths}" =~ ^(0|[1-9][0-9]*)$ ]]; then
     echo 'QG_OFFLINE_MAX_PATHS_INVALID: expected non-negative integer' >&2

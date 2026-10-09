@@ -15,6 +15,13 @@ preflight:
 snapshot-check archive head digest destination:
     python3 scripts/agent-source-snapshot.py "{{archive}}" "{{head}}" "{{digest}}" "{{destination}}"
 
+# Dependency-free targeted verification; never a substitute for the publication gate.
+source-check:
+    bash -n scripts/agent-offline-context.sh scripts/agent-quality-gate.sh scripts/test-agent-quality-oscillation.sh
+    bash scripts/test-agent-quality-oscillation.sh
+    node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts unit-tests/agentSourceSnapshot.test.ts
+    @echo "QG_SOURCE_CHECK_OK: targeted offline smoke only; publication gate NOT_RUN"
+
 dev:
     npm run dev
 

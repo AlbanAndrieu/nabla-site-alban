@@ -49,9 +49,8 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Boucle offline-first / agent à faible contexte** : tester le fallback artefact Dagger exact-SHA dans un environnement sans DNS GitHub et sans registry npm, valider les tests sans dépendances, distinguer `NOT_RUN` de `PASS`, et conserver une preuve de publication uniquement lorsque le checkout Git, la base et la toolchain ont été réellement contrôlés. Le skill `nabla-ci-debug` décrit désormais le protocole de diagnostic minimal et la politique de réduction des tokens (inspirés de `fastapi-sample` #329/#330, `nabla-compose` #240/#247 et `nabla-site-bababou` #209/#210).
 - [ ] **Valider le fail-fast sur oscillation d'auto-fix** : le contrat sans réseau `bash scripts/test-agent-quality-oscillation.sh` couvre A→B→A, la convergence et le code retour d’échec ; le harnais a été exécuté sur la fonction correspondante en environnement isolé. Restent la preuve complète avec le script versionné dans le checkout exact-HEAD et la quality gate ShellCheck/pre-commit.
 - [x] **Introduire une détection de fingerprint répété** pour éviter de lancer les 12 passes quand le workspace revient dans un état déjà vu.
-- [ ] **Rendre l'auto-fix convergent plus diagnostique** : détecter un fingerprint
-  de workspace déjà vu avant la limite de passes et afficher le ou les hooks/fichiers
-  qui oscillent, afin d'éviter 12 itérations identiques et de réduire le coût local/CI.
+- [ ] **Identifier les hooks et fichiers oscillants** dans le diagnostic
+  `QG_FIX_OSCILLATION` (détection des fingerprints répétés déjà livrée).
 - [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
   Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
   confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un
