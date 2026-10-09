@@ -111,3 +111,49 @@ test("a failed fresh origin probe remains a genuine public failure", () => {
 		true,
 	);
 });
+
+for (const [label, evidence] of [
+	["deadline", { direct_probe_source: "deadline" }],
+	["refresh error", { direct_probe_refresh_error: "probe failed" }],
+	["stale probe", { probe_stale: true }],
+	["stale observation", { observation_stale: true }],
+	["timeout", { timed_out: true }],
+] as const) {
+	test(`public endpoint does not report confirmed downtime with ${label}`, () => {
+		const reasons = homelabHealthReasons(
+			entry({ direct_state: "fail", ...evidence }),
+		);
+		assert.equal(
+			reasons.some((reason) => reason.kind === "public_endpoint_down"),
+			false,
+		);
+	});
+}
+
+for (const [label, evidence] of [
+	["deadline", { internal_probe_source: "deadline" }],
+	["refresh error", { internal_probe_refresh_error: "probe failed" }],
+	["stale probe", { probe_stale: true }],
+	["stale observation", { observation_stale: true }],
+	["timeout", { timed_out: true }],
+] as const) {
+	test(`internal endpoint does not report confirmed downtime with ${label}`, () => {
+		const reasons = homelabHealthReasons(
+			entry({ internal_state: "fail", ...evidence }),
+		);
+		assert.equal(
+			reasons.some((reason) => reason.kind === "internal_endpoint_down"),
+			false,
+		);
+	});
+}
+
+test("a fresh failed internal probe remains a confirmed internal failure", () => {
+	const reasons = homelabHealthReasons(
+		entry({ internal_state: "fail", internal_probe_source: "origin" }),
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "internal_endpoint_down"),
+		true,
+	);
+});

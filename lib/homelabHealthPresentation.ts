@@ -129,7 +129,9 @@ export function homelabHealthReasons(
 		entry.direct_state === "fail" &&
 		entry.direct_probe_source !== "deadline" &&
 		entry.direct_probe_refresh_error == null &&
-		entry.probe_stale !== true
+		entry.probe_stale !== true &&
+		entry.observation_stale !== true &&
+		entry.timed_out !== true
 	) {
 		reasons.push({
 			kind: "public_endpoint_down",
@@ -139,7 +141,14 @@ export function homelabHealthReasons(
 		});
 	}
 
-	if (entry.internal_state === "fail") {
+	if (
+		entry.internal_state === "fail" &&
+		entry.internal_probe_source !== "deadline" &&
+		entry.internal_probe_refresh_error == null &&
+		entry.probe_stale !== true &&
+		entry.observation_stale !== true &&
+		entry.timed_out !== true
+	) {
 		reasons.push({ kind: "internal_endpoint_down" });
 	}
 
