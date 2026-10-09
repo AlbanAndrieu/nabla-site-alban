@@ -39,7 +39,7 @@ if (($# > 0)); then
     exit 2
 fi
 
-LOG_TAIL="${QUALITY_LOG_TAIL:-40}"
+LOG_TAIL="${QUALITY_LOG_TAIL:-20}"
 FIX_PASSES="${QUALITY_FIX_PASSES:-12}"
 if [[ ! "${FIX_PASSES}" =~ ^[1-9][0-9]*$ ]]; then
     echo "❌ QUALITY_FIX_PASSES must be a positive integer" >&2
@@ -93,7 +93,11 @@ precommit_fix_until_stable() {
         fi
 
         echo "❌ QG_PRECOMMIT_FAILED: auto-fix made no further progress." >&2
-        tail -n "${LOG_TAIL}" "${log}" >&2 || true
+        if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+            cat "${log}" >&2
+        else
+            tail -n "${LOG_TAIL}" "${log}" >&2 || true
+        fi
         rm -f "${log}"
         return "${rc}"
     done
