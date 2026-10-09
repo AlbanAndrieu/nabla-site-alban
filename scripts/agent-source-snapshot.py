@@ -27,7 +27,7 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
         raise ValueError("expected the SHA-256 digest provided by GitHub artifacts")
     if destination.exists() or destination.is_symlink():
         raise ValueError(
-            "destination already exists; do not overlay a different revision"
+            "destination already exists; do not overlay a different revision",
         )
     if archive.stat().st_size > MAX_ARCHIVE_BYTES:
         raise ValueError("artifact exceeds size limit")
@@ -72,7 +72,7 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
                     seen_paths.add(name)
                     if path.parts[0] in {".git", "node_modules"}:
                         raise ValueError(
-                            "archive must not contain Git metadata or dependencies"
+                            "archive must not contain Git metadata or dependencies",
                         )
                     target = stage.joinpath(*path.parts)
                     if member.isdir():
