@@ -54,6 +54,7 @@ precommit_fix_until_stable() {
     local after
     local log
     local rc
+    declare -A seen_fingerprints=()
 
     for ((pass = 1; pass <= FIX_PASSES; pass++)); do
         mapfile -t fix_files < <(collect_changed_files)
@@ -63,6 +64,14 @@ precommit_fix_until_stable() {
         fi
 
         before="$(workspace_fingerprint)"
+        if [[ -n "${seen_fingerprints[${before}]:-}" ]]; then
+            printf '❌ QG_FIX_OSCILLATION: workspace fingerprint repeated (passes %s and %s).\\n' \\
+                "${seen_fingerprints[${before}]}" "${pass}" >&2
+            printf '   Inspect changed paths and the mutating pre-commit hooks.\\n' >&2
+            git status --short >&2
+            return 1
+        fi
+        seen_fingerprints["${before}"]="${pass}"
         log="$(mktemp)"
         set +e
         pre-commit run --hook-stage pre-commit --files "${fix_files[@]}" >"${log}" 2>&1
