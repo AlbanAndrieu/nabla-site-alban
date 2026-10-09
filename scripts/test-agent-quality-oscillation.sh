@@ -41,8 +41,7 @@ esac
 HOOK
     chmod +x "${tmp}/bin/pre-commit"
     export PATH="${tmp}/bin:${PATH}"
-    FIX_PASSES=12
-    LOG_TAIL=10
+    export FIX_PASSES=12 LOG_TAIL=10
     collect_changed_files() { printf 'dummy.txt\n'; }
     workspace_fingerprint() { cat "${QG_TEST_STATE_FILE}"; }
     git() {
@@ -52,6 +51,11 @@ HOOK
             command git "$@"
         fi
     }
+    # These are intentionally invoked by the dynamically loaded function.
+    # Verify the shims directly, so ShellCheck can analyze their reachability.
+    [[ "$(collect_changed_files)" == "dummy.txt" ]]
+    [[ "$(workspace_fingerprint)" == A ]]
+    [[ "$(git status --short)" == " M dummy.txt" ]]
     eval "${FUNCTION}"
     local rc=0
     precommit_fix_until_stable >"${tmp}/out" 2>&1 || rc=$?
