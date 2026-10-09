@@ -46,6 +46,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
+- [ ] **Boucle offline-first / agent à faible contexte** : tester le fallback artefact Dagger exact-SHA dans un environnement sans DNS GitHub et sans registry npm, valider les tests sans dépendances, distinguer `NOT_RUN` de `PASS`, et conserver une preuve de publication uniquement lorsque le checkout Git, la base et la toolchain ont été réellement contrôlés. Le skill `nabla-ci-debug` décrit désormais le protocole de diagnostic minimal et la politique de réduction des tokens (inspirés de `fastapi-sample` #329/#330, `nabla-compose` #240/#247 et `nabla-site-bababou` #209/#210).
 - [ ] **Rendre l'auto-fix convergent plus diagnostique** : détecter un fingerprint
   de workspace déjà vu avant la limite de passes et afficher le ou les hooks/fichiers
   qui oscillent, afin d'éviter 12 itérations identiques et de réduire le coût local/CI.
