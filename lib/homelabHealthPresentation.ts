@@ -70,7 +70,8 @@ export type HomelabHealthReasonKind =
 	| "tunnel_unobserved"
 	| "runtime_stale"
 	| "tunnel_stale"
-	| "stale_evidence";
+	| "stale_evidence"
+	| "probe_unconfirmed";
 
 export type HomelabHealthReason = {
 	kind: HomelabHealthReasonKind;
@@ -125,14 +126,22 @@ export function homelabHealthReasons(
 		});
 	}
 
-	if (
+	const evidenceUnconfirmed =
+		entry.probe_stale === true ||
+		entry.observation_stale === true ||
+		entry.timed_out === true;
+	const publicProbeUnconfirmed =
 		entry.direct_state === "fail" &&
-		entry.direct_probe_source !== "deadline" &&
-		entry.direct_probe_refresh_error == null &&
-		entry.probe_stale !== true &&
-		entry.observation_stale !== true &&
-		entry.timed_out !== true
-	) {
+		(evidenceUnconfirmed ||
+			entry.direct_probe_source === "deadline" ||
+			entry.direct_probe_refresh_error != null);
+	const internalProbeUnconfirmed =
+		entry.internal_state === "fail" &&
+		(evidenceUnconfirmed ||
+			entry.internal_probe_source === "deadline" ||
+			entry.internal_probe_refresh_error != null);
+
+	if (entry.direct_state === "fail" && !publicProbeUnconfirmed) {
 		reasons.push({
 			kind: "public_endpoint_down",
 			detail:
@@ -141,15 +150,12 @@ export function homelabHealthReasons(
 		});
 	}
 
-	if (
-		entry.internal_state === "fail" &&
-		entry.internal_probe_source !== "deadline" &&
-		entry.internal_probe_refresh_error == null &&
-		entry.probe_stale !== true &&
-		entry.observation_stale !== true &&
-		entry.timed_out !== true
-	) {
+	if (entry.internal_state === "fail" && !internalProbeUnconfirmed) {
 		reasons.push({ kind: "internal_endpoint_down" });
+	}
+
+	if (publicProbeUnconfirmed || internalProbeUnconfirmed) {
+		reasons.push({ kind: "probe_unconfirmed" });
 	}
 
 	if (options.tunnelExpected === true) {

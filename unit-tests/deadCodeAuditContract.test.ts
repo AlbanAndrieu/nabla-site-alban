@@ -51,7 +51,10 @@ test("dead-code audit stays explicit and on-demand", async () => {
 	);
 	assert.equal(pkg.dependencies?.["@stripe/react-stripe-js"], undefined);
 	assert.equal(pkg.dependencies?.["@stripe/stripe-js"], undefined);
-	assert.ok(pkg.dependencies?.next, "Next.js must remain an explicit dependency");
+	assert.ok(
+		pkg.dependencies?.next,
+		"Next.js must remain an explicit dependency",
+	);
 	assert.equal(
 		pkg.devDependencies?.["eslint-config-next"],
 		pkg.dependencies.next,

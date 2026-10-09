@@ -157,3 +157,23 @@ test("a fresh failed internal probe remains a confirmed internal failure", () =>
 		true,
 	);
 });
+
+test("inconclusive public and internal probes share one explicit explanation", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "deadline",
+			internal_state: "fail",
+			internal_probe_refresh_error: "unavailable",
+		}),
+	);
+	assert.deepEqual(reasons, [{ kind: "probe_unconfirmed" }]);
+});
+
+test("a fresh HTTP failure remains explicit without an inconclusive-probe reason", () => {
+	const reasons = homelabHealthReasons(
+		entry({ direct_state: "fail", direct_probe_source: "origin", http_status: 503 }),
+	);
+	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), true);
+	assert.equal(reasons.some((reason) => reason.kind === "probe_unconfirmed"), false);
+});
