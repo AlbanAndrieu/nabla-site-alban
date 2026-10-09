@@ -81,3 +81,19 @@ test("down Cloudflare tunnel is explicit when the service expects a tunnel", () 
 
 	assert.deepEqual(reasons, [{ kind: "tunnel_down", detail: "down" }]);
 });
+
+test("deadline-only public probe is not misrepresented as confirmed origin downtime", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		direct_probe_source: "deadline",
+		probe_stale: true,
+		direct_probe_refresh_error: "probe budget exceeded",
+	}));
+	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), false);
+});
+
+test("a failed fresh origin probe remains a genuine public failure", () => {
+	const reasons = homelabHealthReasons(entry({direct_state: "fail", direct_probe_source: "origin", http_status: 503}));
+	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), true);
+});
