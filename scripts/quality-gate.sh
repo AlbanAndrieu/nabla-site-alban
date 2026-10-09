@@ -22,7 +22,7 @@ if ! command -v pre-commit >/dev/null 2>&1; then
     exit 1
 fi
 
-LOG_TAIL="${QUALITY_LOG_TAIL:-40}"
+LOG_TAIL="${QUALITY_LOG_TAIL:-20}"
 
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
@@ -94,11 +94,20 @@ if (("${#CHANGED_FILES[@]}" > 0)); then
             echo "   No CI-log analysis is required for this condition." >&2
             git status --short >&2
             echo "--- exact formatter patch ---" >&2
-            git diff --no-ext-diff -- "${CHANGED_FILES[@]}" >&2 || true
+            if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+                git diff --no-ext-diff -- "${CHANGED_FILES[@]}" >&2 || true
+            else
+                git diff --no-ext-diff -- "${CHANGED_FILES[@]}" | head -n "${LOG_TAIL}" >&2 || true
+                echo "   Set QUALITY_VERBOSE=1 for the full formatter patch." >&2
+            fi
             echo "--- end formatter patch ---" >&2
         else
             echo "❌ QG_PRECOMMIT_FAILED: pre-commit found a non-auto-fixed validation error." >&2
-            tail -n "${LOG_TAIL}" "${log}" >&2 || true
+            if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+                cat "${log}" >&2
+            else
+                tail -n "${LOG_TAIL}" "${log}" >&2 || true
+            fi
         fi
         rm -f "${log}"
         exit "${rc}"
