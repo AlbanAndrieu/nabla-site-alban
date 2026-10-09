@@ -26,7 +26,9 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
     if not re.fullmatch(r"[0-9a-f]{64}", digest):
         raise ValueError("expected the SHA-256 digest provided by GitHub artifacts")
     if destination.exists() or destination.is_symlink():
-        raise ValueError("destination already exists; do not overlay a different revision")
+        raise ValueError(
+            "destination already exists; do not overlay a different revision"
+        )
     if archive.stat().st_size > MAX_ARCHIVE_BYTES:
         raise ValueError("artifact exceeds size limit")
     with archive.open("rb") as artifact:
@@ -69,7 +71,9 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
                         raise ValueError("duplicate snapshot path")
                     seen_paths.add(name)
                     if path.parts[0] in {".git", "node_modules"}:
-                        raise ValueError("archive must not contain Git metadata or dependencies")
+                        raise ValueError(
+                            "archive must not contain Git metadata or dependencies"
+                        )
                     target = stage.joinpath(*path.parts)
                     if member.isdir():
                         target.mkdir(parents=True, exist_ok=True)
