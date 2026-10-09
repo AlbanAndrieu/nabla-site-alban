@@ -88,7 +88,7 @@ def unpack(archive: Path, head: str, digest: str, destination: Path) -> int:
                         resolved = posixpath.normpath(
                             posixpath.join(posixpath.dirname(name), member.linkname),
                         )
-                        if resolved == ".." or resolved.startswith("../") or resolved.startswith("/"):
+                        if resolved == ".." or resolved.startswith(("../", "/")):
                             raise ValueError("symlink escapes the snapshot")
                         links.append((target, member.linkname))
                     else:
