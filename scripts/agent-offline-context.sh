@@ -31,14 +31,31 @@ if git rev-parse --verify "${base}^{commit}" >/dev/null 2>&1; then
 fi
 
 # Path names only, capped to save model context; no secrets or file contents.
-mapfile -t paths < <({
+paths_file="$(mktemp)"
+trap 'rm -f "${paths_file}"' EXIT
+# A failed git diff must never produce a partial or deceptively empty inventory.
+if ! (
+    set -e
     if [[ "${base_sha}" != unavailable ]]; then
-        git diff --name-only --diff-filter=ACMR "${base}...HEAD"
+        git diff --name-only -z --diff-filter=ACMR "${base}...HEAD"
     fi
-    git diff --name-only --diff-filter=ACMR
-    git diff --cached --name-only --diff-filter=ACMR
-    git ls-files --others --exclude-standard
-} | LC_ALL=C sort -u)
+    git diff --name-only -z --diff-filter=ACMR
+    git diff --cached --name-only -z --diff-filter=ACMR
+    git ls-files -z --others --exclude-standard
+) >"${paths_file}"; then
+    echo 'QG_OFFLINE_GIT_DIFF_FAILED: inventory incomplete; refusing optimistic context' >&2
+    exit 1
+fi
+mapfile -d '' -t paths < <(LC_ALL=C sort -zu "${paths_file}")
+max_paths="${AGENT_OFFLINE_MAX_PATHS:-0}"
+if [[ ! "${max_paths}" =~ ^(0|[1-9][0-9]*)$ ]]; then
+    echo 'QG_OFFLINE_MAX_PATHS_INVALID: expected non-negative integer' >&2
+    exit 2
+fi
+if ((max_paths > 0 && ${#paths[@]} > max_paths)); then
+    printf 'QG_OFFLINE_PATH_LIMIT: changed=%s limit=%s; refusing incomplete inventory\\n' "${#paths[@]}" "${max_paths}" >&2
+    exit 1
+fi
 
 printf 'AGENT_CONTEXT branch=%s head=%s base=%s base_sha=%s changed=%s\n' \
     "${branch:-DETACHED}" "${head}" "${base}" "${base_sha}" "${#paths[@]}"

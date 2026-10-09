@@ -137,3 +137,27 @@ test("repository agent entrypoint is compact without losing protected-branch pol
 		assert.ok(policy.includes(essential), `missing canonical invariant: ${essential}`);
 	}
 });
+
+test("offline context counts more than 200 paths while printing a bounded summary", async () => {
+	const cwd = await fixture();
+	try {
+		for (let i = 0; i < 205; i++) {
+			await writeFile(path.join(cwd, `extra-${i}.txt`), "new\\n");
+		}
+		const { stdout } = await execute("bash", [contextScript, "context"], { cwd });
+		assert.match(stdout, /changed=206/);
+		assert.match(stdout, /\\(\\+194 more\\)/);
+		await assert.rejects(
+			execute("bash", [contextScript, "preflight"], {
+				cwd,
+				env: { ...process.env, AGENT_OFFLINE_MAX_PATHS: "200" },
+			}),
+			(error: unknown) =>
+				String((error as { stderr: string }).stderr).includes(
+					"QG_OFFLINE_PATH_LIMIT",
+				),
+		);
+	} finally {
+		await rm(cwd, { recursive: true, force: true });
+	}
+});
