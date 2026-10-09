@@ -125,7 +125,7 @@ export function homelabHealthReasons(
 		});
 	}
 
-	if (entry.direct_state === "fail") {
+	if (entry.direct_state === "fail" && entry.direct_probe_source !== "deadline" && entry.direct_probe_refresh_error == null && entry.probe_stale !== true) {
 		reasons.push({
 			kind: "public_endpoint_down",
 			detail:
