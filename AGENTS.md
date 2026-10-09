@@ -1,154 +1,32 @@
 # Repository agent rules
 
-Keep context small. Prefer targeted search/ranges and changed files; never scan generated/vendor output unless required (`node_modules/`, `.next/`, coverage/reports, caches, lockfiles).
+Canonical compact policy. Load only the task-specific skill under `.agents/skills/nabla-*/SKILL.md`. Do not preload whole skill trees, lockfiles, unrelated docs or broad CI logs.
 
-## Repository bootstrap
+## Network-free agent loop
 
-Git hook configuration is versioned, but Git does not install repository hooks automatically after clone. On a new checkout, run:
+Start with `just context` (bounded local Git summary) then `just preflight` (cached refs). Never repeatedly retry blocked GitHub/DNS/codeload/npm endpoints. If available, obtain the exact-HEAD Dagger `source-snapshot-<SHA>` using the connected GitHub service. Verify workflow HEAD plus artifact SHA-256 with `just snapshot-check ZIP SHA DIGEST OUTPUT`. Such a source-only archive lacks `.git` and `node_modules`: **never** treat it as an exact publication proof. Targeted tests are still useful.
 
-```bash
-mise run hooks
-```
+When network works, fetch once, then run `bash scripts/agent-doctor.sh` and `mise run hooks` on a real checkout. Offline preflight is not remote freshness, dependency validation, or permission to publish.
 
-This installs the configured `pre-commit`, `commit-msg`, and canonical `pre-push` quality-gate hooks. CI remains the authoritative enforcement layer because local hooks can be absent or explicitly bypassed. Agent bootstrap workflows must install these hooks too so ordinary agent pushes receive the same local publication guard.
+## OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH
 
-## Workflow
+1. OBSERVE exact HEAD/branch/base and status/stat using `just context`.
+2. ROUTE one skill: `nabla-maintenance`, `nabla-ci-debug`, `nabla-quality`, `nabla-review`, `nabla-pr`. Load framework/browser skills only when needed.
+3. CHANGE one on-theme cohesive batch, preserving security, API and E2E contracts.
+4. FIX with `npm run quality:agent:fix` on a complete Git checkout; inspect changed paths only.
+5. REVIEW with a focused `nabla-review` before non-trivial publication.
+6. PROVE on a committed clean tree with `npm run quality:agent:publish`, then `-- --status` (exact HEAD/base/toolchain proof).
+7. PUBLISH once to the confirmed non-default branch and inspect the exact-HEAD CI. In an API-only environment without a runnable checkout, explicitly disclose missing proof and validate narrowly before any reviewed write.
 
-On a workstation checkout, refresh remote refs once and run the deterministic workspace preflight before broader reasoning:
+Never write, push, delete or merge `master`, never omit branch on API mutations, force-push, use `--no-verify`, skip CI via commit messages, weaken tests/SAST/secrets/quality gates, or merge a PR without an explicit user instruction. Stop on stale base, unknown HEAD, oscillator, dirty proof or scope creep.
 
-```bash
-git fetch --prune origin
-bash scripts/agent-doctor.sh
-```
+## Context and evidence budget
 
-`AGENT_DOCTOR_OK` proves the checkout is on a named non-default branch based on the current local `origin/<default>`, the pinned Node/Python/pre-commit toolchain is active, npm satisfies the repository range, required Git hooks are executable, and `node_modules` has been bootstrapped. Any `AGENT_DOCTOR_*` failure is a local prerequisite to repair before implementation; do not compensate for it by weakening gates. The output also records the OpenCode version when available so schema migrations can be based on the actual workstation binary.
+Inspect exact HEAD → workflow → failed job → failed step → only matching log lines; expand to artifacts when needed. Never loop on statuses. `QG_AUTOFIX_REQUIRED` means local formatter fix, not broad CI log reading; `QG_FIX_OSCILLATION` and `QG_PUBLISH_*` block publication. Report changed paths, tests, HEAD and remaining blockers, not verbose successful test output.
 
-1. Inspect only files relevant to the request.
-2. Reuse existing patterns and make the smallest safe patch.
-3. Validate narrowly first, then broaden checks.
-4. After an editing batch, run the self-converging local fix phase before committing or publishing.
-5. For CI failures, inspect the failing job/step and affected files before unrelated code.
+Roadmaps: `docs/quality-roadmap.md` and `docs/homelab-roadmap.md`. Roadmap=open; runbook=operations; incident=history; contract=invariant; Git=chronology. `docs/agent-frontend-standards.md` is on-demand. Do not mutate OpenCode V1/V2 schema without checking installed version.
 
-### Small-model / OpenCode execution discipline
-
-When the active coding model is less capable, reduce ambiguity instead of reducing quality:
-
-- follow this file and loaded repository skills literally; do not invent substitute commands when a repository script exists;
-- for roadmap/PR/quality work, load `nabla-maintenance` first, then `nabla-quality` and `nabla-pr` only when their scope applies;
-- make one cohesive editing batch at a time and finish its validation before starting another;
-- after every failed command, read the actual exit status/error and fix that failure before continuing;
-- treat unchecked roadmap items as open until their stated evidence exists; never infer completion from nearby green checks;
-- never claim a local or hosted check passed unless it ran for the exact current HEAD;
-- prefer deterministic repository commands over free-form reasoning for formatting, lint, tests, build, scope classification and publication proof.
-- treat `QG_*` messages as a machine-readable decision API: follow the named remediation exactly, stop on non-convergence/publication failures, and never replace a missing/stale proof with an assumption.
-
-The project `opencode.json` deliberately does not pin a model. OpenCode therefore inherits the workstation's configured model while the repository controls procedure, permissions and validation. The built-in `build` agent uses the concise prompt in `.opencode/prompts/repository-build.txt`; repository-specific workflows live in `.agents/skills/nabla-*/SKILL.md` and are loaded on demand to keep context small.
-
-The repository configuration currently keeps the OpenCode V1 field names already used by the workstation (`permission`, `command`, `subtask`). Current OpenCode V2 documentation uses `permissions`, `commands` and `subagent`; do not migrate these fields speculatively. Use the `opencode=...` line from `scripts/agent-doctor.sh` to confirm the installed workstation version first, then migrate the config and its contract in one explicit batch.
-
-
-#### Deterministic small-model state machine
-
-Keep exactly one active phase. Do not skip directly from editing to publication.
-
-1. **OBSERVE** — capture `git branch --show-current`, `git status --short`, `git diff --stat`, the exact HEAD, and the smallest relevant roadmap/test context.
-2. **ROUTE** — load one primary skill for the task: `nabla-maintenance` for roadmap/current-PR work, `nabla-quality` for local gates/publication, `nabla-ci-debug` for hosted failures, `nabla-pr` for PR/push operations, or `nabla-review` for a read-only pre-publication review. Load framework/domain skills such as `next-dev-loop`, `agent-browser`, or Stripe skills only when that domain is actually touched.
-3. **CHANGE** — implement one cohesive batch with explicit done evidence. Do not opportunistically fix unrelated roadmap items.
-4. **FIX** — run `npm run quality:agent:fix` until deterministic mutations converge; inspect only the changed paths.
-5. **REVIEW** — for non-trivial code/config changes, run one focused `nabla-review` pass. If it finds a blocking issue, return to CHANGE; do not publish.
-6. **PROVE** — commit the complete batch, run/reuse `npm run quality:agent:publish`, then audit it with `npm run quality:agent:publish -- --status`.
-7. **PUBLISH** — only after a clean proof, push once to the non-default branch, then inspect hosted results for the exact published HEAD without manually rerunning them.
-
-For planning, maintain a compact task card with **goal**, **in-scope paths**, **done evidence**, **validation**, and **stop conditions**. Keep it concise and do not expand it into narrative unless the user asks.
-
-Stop and report instead of guessing when the current branch is `master`, publication proof is missing/stale after an unexpected change, the fix phase does not converge, the base is stale, an unexpected file enters the diff, or the requested work no longer fits the PR theme.
-The publication wrapper enforces this independently of the model: `scripts/agent-publish.sh` fails closed with `QG_PUBLISH_PROTECTED_BRANCH` on the repository default branch and `QG_PUBLISH_DETACHED_HEAD` on a detached checkout.
-
-## Tool and context efficiency
-
-Optimize the amount of context needed to reach a correct result, **not** the repository's capabilities. `/AGENTS.md` is the canonical repository guidance. Agent-specific instruction files must remain thin adapters to it; do not recursively enumerate every AI-vendor directory or preload every skill.
-
-### Tool classes for this repository
-
-- **First-class:** local Git/search (`git status`, `git diff`, `git ls-files`, `rg`); Node/npm and the commands in `package.json`; `scripts/quality-gate.sh`; GitHub repository/PR, Actions, CodeQL, commit-status, artifact and release diagnostics; Vercel deployment/Preview/build diagnostics and Vercel OpenTelemetry; Playwright; Next.js and the `next-devtools` MCP for Next runtime diagnostics; Semantic Release; conditional Snyk scanning when configured. Docker/Buildx, DockerHub/GHCR and Trivy are first-class for Docker-scoped changes. Use these whenever the task requires them; context efficiency must not restrict their functional use.
-- **On-demand:** matching entries under `skills/` or `.agents/skills` (including agent-browser, Next.js optimization/i18n and Stripe skills); Stripe integrations; the FastAPI Cloud homelab health/data backend; Cloudflare diagnostics; Datadog/static-analysis configuration; PDF generation; LibreTranslate; OpenCommit; and the legacy MegaLinter workflow. Discover or load them only when the task materially involves them.
-- **Out-of-scope by default:** legacy GitLab CI (`.gitlab-ci.yml`) and unrelated account/service connectors such as Gmail, Calendar, Contacts, Slack, LinkedIn, Supabase or Sentry when the current task has no explicit dependency on them. Do not uninstall or disconnect global integrations merely to save context; leave them installed and simply do not discover/load/invoke them.
-
-The classification is repository-specific and may change when the code or deployment architecture changes. Evidence in current code/workflows takes precedence over assumptions or classifications copied from other repositories.
-
-### Discovery and result reuse
-
-- For MCPs, connectors and plugins, discover only the few functions needed for the current operation instead of loading an entire tool schema. Reuse already-discovered functions for the remainder of the task.
-- Reuse prior tool responses/resources when they still describe the same revision/state. Do not repeat equivalent API calls solely to refresh context.
-- Prefer specialized operations (file/range, PR diff, workflow jobs, job steps, deployment logs) over broad generic REST/API responses.
-- Retrieve only the necessary files, ranges, diffs, status fields or logs. Expand progressively only when the targeted evidence is insufficient.
-- A context-saving rule is never a reason to avoid a tool that is necessary for a correct diagnosis, security review, test investigation or deployment validation.
-
-### Repository context
-
-Prefer `git status --short`, `git diff --stat`, targeted `git diff -- <paths>`, `git ls-files`, `rg`, changed-file lists and explicit file/range reads over recursive repository scans. Start with the short status/stat; only read a full diff when the changed paths or a failing check require it. Do not load large lockfiles, generated files, reports, artifacts or whole instruction/skill trees when a manifest, diff, summary or targeted fragment answers the question.
-
-`docs/agent-frontend-standards.md` contains detailed frontend/accessibility/i18n/SEO/print conventions and is intentionally **on-demand**. Load it when a task touches those concerns rather than carrying it in every agent session.
-
-### CI, logs, artifacts and observability
-
-Inspect failures progressively:
-
-1. workflow/check/deployment status;
-2. failing job;
-3. failing step;
-4. targeted logs around the error;
-5. full logs, report, artifact, trace, screenshot or video only when the targeted evidence does not explain the failure or when the richer artifact materially improves the diagnosis.
-
-`QG_AUTOFIX_REQUIRED` is not a debugging condition. Do not spend tokens reading broad CI logs for it: run `npm run quality:agent:fix` locally, review the short status/diff, commit the deterministic changes, and retry publication. Only diagnose logs when the fix phase reports `QG_PRECOMMIT_FAILED`, `QG_FIX_DID_NOT_CONVERGE`, or a semantic lint/type/test/security failure.
-
-Keep existing test and E2E coverage. For Playwright failures, use the uploaded report, traces, screenshots and other artifacts whenever they are useful; difficult failures justify retrieving the complete artifact set. Apply the same progressive approach to Vercel, FastAPI Cloud, GitHub security results and other observability platforms.
-
-### Polling
-
-Do not loop on workflow status, deployment status, checks, jobs or observability. Read once, continue other useful work, then revalidate when the result can materially change the next action. A requested final CI/deployment verification is still mandatory; avoiding polling must never become skipping the final verification.
-
-### No quality trade-off
-
-Never reduce or bypass security controls, privacy requirements, quality gates, test coverage, hooks, release rules, CI/CD checks or deployment validation to reduce token/context/tool usage. The governing principle is: **reduce the context required to obtain information, not the agent's capabilities or the evidence required for confidence.**
-
-## Protected default-branch policy
-
-Agents must **never** commit, push, create, update, delete, or otherwise mutate files directly on `master`, and must never move, force-update, or write the `master` ref directly.
-
-This prohibition applies equally to Git CLI pushes, GitHub Contents/API writes, ref updates, merge commits authored by an agent, generated-file updates, documentation-only changes, trivial fixes, and emergency fixes. There is no “small change” exception.
-
-Before every remote mutation, an agent must verify that the destination is a non-default working branch. If a repository API or tool defaults to the repository default branch when a `branch`/`ref` argument is omitted, omitting that argument for a write is prohibited.
-
-All agent-authored repository changes must follow this path:
-
-1. create or reuse a dedicated non-default branch;
-2. apply all remote mutations only to that branch;
-3. validate the branch and inspect CI/deployment results;
-4. open or update a pull request targeting `master`;
-5. leave the merge to the user/maintainer unless the user explicitly asks the agent to merge that pull request.
-
-Never force-update `master`. If an accidental direct mutation occurs, stop further writes, report it explicitly, and repair it through the safest reviewed path rather than hiding or rewriting history without user approval.
-
-## Validation
-
-For a focused change, run the closest relevant formatter/linter or test first.
-
-After an editing batch, use the repository-specific local-first workflow:
-
-```bash
-npm run quality:agent:fix
-# Inspect git status --short / git diff --stat and the affected diff only.
-# Commit deterministic fixes together with the intended change.
-git push
-```
-
-`quality:agent:fix` is intentionally self-converging: it reruns mutating pre-commit hooks until stable, then applies npm-backed ESLint/Stylelint fixes when relevant and revalidates pre-commit. A pass that merely rewrites files is not a successful final state; the command must reach a clean deterministic fix pass before the result is committed.
-
-The versioned pre-push hook is the canonical strict local publication guard and invokes `scripts/agent-publish.sh`. That wrapper keys a reusable proof by the exact committed `HEAD`, resolved comparison-base SHA and local toolchain fingerprint. Running `npm run quality:agent:publish` before `git push` is therefore safe when useful: if the same proof is still valid, pre-push reuses it instead of rerunning the expensive gate. Any dirty tree, new commit, base-branch movement or toolchain change invalidates the proof and forces the full strict gate again. Use `npm run quality:agent:publish -- --status` to audit an existing proof without rerunning lint/tests/build; it fails closed when the proof is missing or stale and prints the exact HEAD, base and toolchain snapshot only when the cached proof still matches.
-
-`scripts/quality-gate.sh` remains the canonical changed-file formatter/linter/security gate. In CI it runs early, before npm dependency bootstrap, so formatting/pre-commit regressions fail cheaply. The later application gate may reuse that proof in the same CI job but publication mode can never bypass the canonical gate.
-
+---
 ## Mandatory agent publish policy
 
 Agents must never publish changes immediately after editing files.

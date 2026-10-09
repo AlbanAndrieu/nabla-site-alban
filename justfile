@@ -4,6 +4,17 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 default:
     @just --list
 
+# Network-free, bounded diagnostics. Neither is a publication proof.
+context:
+    bash scripts/agent-offline-context.sh context
+
+preflight:
+    bash scripts/agent-offline-context.sh preflight
+
+# SHA/digest come from the exact-head Dagger GitHub artifact.
+snapshot-check archive head digest destination:
+    python3 scripts/agent-source-snapshot.py "{{archive}}" "{{head}}" "{{digest}}" "{{destination}}"
+
 dev:
     npm run dev
 

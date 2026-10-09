@@ -15,6 +15,9 @@
 			"git fetch*": "allow",
 			"rg *": "allow",
 			"bash scripts/agent-doctor.sh*": "allow",
+			"just context*": "allow",
+			"just preflight*": "allow",
+			"bash scripts/agent-offline-context.sh*": "allow",
 			"npm run quality:agent:fix*": "allow",
 			"npm run quality:agent:publish*": "allow",
 			"npm run lint*": "allow",
@@ -40,7 +43,7 @@
 	},
 	"command": {
 		"agent-doctor": {
-			"template": "Read AGENTS.md. Run git fetch --prune origin, then bash scripts/agent-doctor.sh. Report the exact AGENT_DOCTOR_* outcome and remediate only the stated local prerequisite. Do not edit application code, push, rerun hosted CI, or merge.",
+			"template": "Read AGENTS.md. Run just context and just preflight offline; when network works fetch once, then run bash scripts/agent-doctor.sh. Report AGENT_DOCTOR_* outcome and repair only the stated prerequisite. Do not edit application code, push, rerun hosted CI, or merge.",
 			"description": "Check branch, base, toolchain, hooks and local dependencies",
 			"agent": "plan",
 			"subtask": true
