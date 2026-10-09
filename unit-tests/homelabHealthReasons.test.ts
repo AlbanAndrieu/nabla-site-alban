@@ -172,8 +172,18 @@ test("inconclusive public and internal probes share one explicit explanation", (
 
 test("a fresh HTTP failure remains explicit without an inconclusive-probe reason", () => {
 	const reasons = homelabHealthReasons(
-		entry({ direct_state: "fail", direct_probe_source: "origin", http_status: 503 }),
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "origin",
+			http_status: 503,
+		}),
 	);
-	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), true);
-	assert.equal(reasons.some((reason) => reason.kind === "probe_unconfirmed"), false);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "public_endpoint_down"),
+		true,
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "probe_unconfirmed"),
+		false,
+	);
 });
