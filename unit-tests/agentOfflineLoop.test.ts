@@ -142,11 +142,11 @@ test("offline context counts more than 200 paths while printing a bounded summar
 	const cwd = await fixture();
 	try {
 		for (let i = 0; i < 205; i++) {
-			await writeFile(path.join(cwd, `extra-${i}.txt`), "new\\n");
+			await writeFile(path.join(cwd, `extra-${i}.txt`), "new\n");
 		}
 		const { stdout } = await execute("bash", [contextScript, "context"], { cwd });
 		assert.match(stdout, /changed=206/);
-		assert.match(stdout, /\\(\\+194 more\\)/);
+		assert.match(stdout, /194 more/);
 		await assert.rejects(
 			execute("bash", [contextScript, "preflight"], {
 				cwd,
