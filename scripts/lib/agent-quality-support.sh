@@ -16,7 +16,7 @@ Modes:
 
 Environment:
     QUALITY_BASE_REF                    override comparison base
-    QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
+    QUALITY_LOG_TAIL                    failure log lines to print (default: 20; QUALITY_LOG_TAIL=120 for diagnostics)
     QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
     QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
     QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
@@ -53,7 +53,13 @@ run_compact() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
+    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+        cat "${log}" >&2
+    else
+        # One compact excerpt, never downgrade the failing exit status.
+        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
+        printf '   Full command output was captured locally; set QUALITY_VERBOSE=1 for complete console output.\\n' >&2
+    fi
     rm -f "${log}"
     return "${rc}"
 }
@@ -73,7 +79,13 @@ run_compact_report() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
+    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+        cat "${log}" >&2
+    else
+        # One compact excerpt, never downgrade the failing exit status.
+        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
+        printf '   Full command output was captured locally; set QUALITY_VERBOSE=1 for complete console output.\\n' >&2
+    fi
     rm -f "${log}"
     return "${rc}"
 }
