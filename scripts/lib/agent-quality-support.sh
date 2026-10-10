@@ -57,7 +57,7 @@ preserve_or_remove_failure_log() {
         return
     fi
     local destination
-    if ! mkdir -p -- "${QUALITY_LOG_DIR}"; then
+    if ! { mkdir -p -- "${QUALITY_LOG_DIR}" && chmod 700 -- "${QUALITY_LOG_DIR}"; }; then
         printf 'QG_LOG_PERSIST_FAILED: cannot create log directory; original exit code preserved\n' >&2
         rm -f "${log}"
         return
