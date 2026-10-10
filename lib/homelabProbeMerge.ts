@@ -78,7 +78,7 @@ function copyAllowed(
 
 function normalizedName(value: unknown): string | null {
 	return typeof value === "string" && value.trim()
-		? value.trim().toLowerCase().replace(/[\\s_-]+/g, "")
+		? value.trim().toLowerCase().replace(/[\s_-]+/g, "")
 		: null;
 }
 
