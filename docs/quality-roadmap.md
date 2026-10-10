@@ -109,10 +109,15 @@ la roadmap homelab.
 - [ ] Rebaser snapshot et assessment sur la version DSOMM upstream courante,
   actuellement 5.1.0, en conservant une migration explicite par UUID et la preuve
   du commit source cible.
-- [ ] Augmenter la couverture de l'assessment avec les preuves à plus fort levier :
-  rattacher le [modèle de menaces](security-threat-model.md) à des tests et preuves
-  de remédiation TM-01 à TM-08 ; SBOM/provenance/signature de la supply chain
-  et inventaire machine-readable des agents AI. Les gaps
+- [x] Formaliser un [premier modèle de menaces STRIDE](security-threat-model.md)
+  pour les frontières Next.js/Vercel/Stripe/FastAPI/GitHub et lier l'activité
+  DSOMM niveau 1 `47419324-e263-415b-815d-e7161b6b905e` ; cette documentation
+  **ne valide pas à elle seule** un claim DSOMM pleinement implémenté.
+- [ ] Étendre les preuves DSOMM : faire revoir le modèle et rattacher TM-01 à
+  TM-08 à des tests négatifs et à leurs remédiations ; compléter
+  SBOM/provenance/signature supply chain et inventaire machine-readable des
+  agents AI. Priorité immédiate : TM-01 rate limiting distribué et TM-02
+  politique Origin/Fetch Metadata sans bloquer les usages légitimes. Les gaps
   d'enforcement GitHub/Renovate restent propriétaires des items P0 existants.
 
 
