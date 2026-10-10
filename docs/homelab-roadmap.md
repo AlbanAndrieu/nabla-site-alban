@@ -14,6 +14,17 @@ Procédure et critères détaillés : [runbook d'audit](cloudflare-security-audi
 - [ ] Maintenir SAST, BetterLeaks, Playwright et ZAP indépendants ; valider localement la quality gate sur le HEAD exact avant de consommer la CI.
 - [ ] Avant merge : contrôles CI requis sur HEAD exact et findings critiques traités ; ne jamais présenter le seul succès PR CI policy comme une validation exhaustive.
 
+## Exécution et acceptation — audit Cloudflare (P1)
+
+1. **Préparation sans exécution implicite** : vérifier la révision upstream officielle et sa licence ; enregistrer le commit exact, le checksum et la provenance avant tout vendoring ou lancement. Ne pas prétendre que le skill est installé tant que ces preuves manquent.
+2. **Périmètre initial** : examiner uniquement les fichiers modifiés de la PR active, les configurations Cloudflare pertinentes et les contrôles de sécurité existants ; exclure les secrets et les jetons des rapports. Les appels à Cloudflare exigent une autorisation explicite et des permissions minimales en lecture.
+3. **Couverture traçable** : conserver pour chaque contrôle un identifiant stable, la cible, la révision, la commande réellement exécutée, la date, le résultat (`pass`, `fail`, `not-run`, `not-applicable`), les preuves expurgées et les limites. `not-run` ne vaut jamais `pass`.
+4. **Scénarios à couvrir** : Access (403 attendu vs origine indisponible), authentification GitHub/FIDO2, Service Tokens, DNS, Tunnel/Traefik, surface publique, cookies/sessions, secrets et probes authentifiés. Associer les constats STRIDE et DSOMM uniquement sur la base d'identifiants officiels vérifiés ; ne pas inventer d'UUID.
+5. **Quality gate et publication** : exécuter d'abord les contrôles locaux ciblés, puis la gate de publication lorsque l'environnement le permet. Ne jamais désactiver SAST, BetterLeaks, Playwright, ZAP ni les gardes de publication ; reporter explicitement tout contrôle non exécuté. La CI GitHub reste une preuve distincte, non substituable à un test local.
+6. **Critère de clôture** : rapport versionné, ledger de couverture, provenance upstream, constats et remédiations priorisés P0–P4, vérification des faux positifs, preuves locales et état de la CI au HEAD exact. Garder la PR ouverte jusqu'à revue, sans merge automatique.
+
+**Ordre de déploiement** : prototype en lecture seule sur Site Alban → validation de la parité avec l'audit partiel `nabla-compose` → transposition dans `fastapi-sample` → audit élargi sur preuves de runtime autorisées. La simple présence de cette tâche dans la roadmap ne prouve ni installation ni exécution.
+
 ## P1 — Cloudflare Access, identité et exposition interne (10/10/2026)
 
 - [x] Préserver les preuves de deuxième vérification Access de `fastapi-sample` dans les snapshots : éligibilité, tentative et résultat d'accès à l'origine.
