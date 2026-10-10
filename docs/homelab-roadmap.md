@@ -2,6 +2,18 @@
 
 - [ ] **P1 — Cloudflare security-audit-skill (Site Alban + FastAPI)** : intégrer le skill officiel `cloudflare/security-audit-skill` dans `nabla-site-alban` et `fastapi-sample` en épinglant l'upstream et la licence, sur le modèle de `nabla-compose/.agents/skills/security-audit`. Réaliser d'abord un audit incrémental local-first des PR actives, puis une revue élargie (Access 403 / Service Tokens, GitHub + YubiKey/FIDO2, DNS/Traefik/Tunnel, secrets et sondes authentifiées). Produire un rapport reproductible avec ledger de couverture, findings, preuves et limites ; rapprocher les scénarios STRIDE et les UUID DSOMM officiels. Réutiliser l'audit partiel de `nabla-compose` comme antériorité, sans le présenter comme un audit complet ni supprimer les tests SAST/DAST existants. Ne pas merger automatiquement.
 
+## P1 — Protocole d'audit Cloudflare (local-first)
+
+Procédure et critères détaillés : [runbook d'audit](cloudflare-security-audit-runbook.md).
+
+- [ ] Vérifier licence, version et commit SHA upstream avant importation ; inventorier dépendances et permissions du skill et conserver un manifeste de provenance.
+- [ ] Exécuter le skill sur le diff de la PR au HEAD exact, enregistrer commandes, environnement, portée, contrôles exécutés et non exécutés ; étendre ensuite aux routes publiques.
+- [ ] Vérifier distinctement refus HTTP 403 anonyme attendu, requête authentifiée Service Token et disponibilité LAN de l'origine. Un 403 ne démontre ni une panne ni la configuration correcte d'Access.
+- [ ] Comparer routes déclarées et règles Traefik, DNS, Tunnel et politiques Cloudflare effectivement consultées : une URL déclarée ne prouve pas sa publication.
+- [ ] Produire un registre de findings avec sévérité, CWE/STRIDE, activityUuid DSOMM vérifié, propriétaire, preuve expurgée et remédiation.
+- [ ] Maintenir SAST, BetterLeaks, Playwright et ZAP indépendants ; valider localement la quality gate sur le HEAD exact avant de consommer la CI.
+- [ ] Avant merge : contrôles CI requis sur HEAD exact et findings critiques traités ; ne jamais présenter le seul succès PR CI policy comme une validation exhaustive.
+
 ## P1 — Cloudflare Access, identité et exposition interne (10/10/2026)
 
 - [x] Préserver les preuves de deuxième vérification Access de `fastapi-sample` dans les snapshots : éligibilité, tentative et résultat d'accès à l'origine.
@@ -13,7 +25,7 @@
 - [ ] Relier les preuves Access / FIDO2 (GitHub comme IdP) et les risques de session détournée au modèle STRIDE / DSOMM existant.
 
 
-Dernière réconciliation : 1 octobre 2026.
+Dernière réconciliation du protocole : 10 octobre 2026 (validation runtime encore requise).
 
 Ce document est l'unique backlog actif propre à TrueNAS, FastAPI,
 `nabla-compose`, Talos/Kubernetes, DNS et diagnostics homelab. Les runbooks
