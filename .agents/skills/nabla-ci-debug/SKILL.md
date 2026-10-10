@@ -52,3 +52,44 @@ When Actions quota is constrained:
 ## Completion
 
 Report the exact HEAD, root cause, files changed, local checks actually run, hosted checks observed for that HEAD, and any unresolved risk.
+
+
+## Environnement isolé : GitHub et registres inaccessibles
+
+Un échec de `git clone`, de DNS ou d'accès au registre n'est **pas** une
+régression applicative. Ne pas multiplier les appels réseau identiques.
+
+1. Vérifier une fois l'existence d'un checkout Git local et l'exactitude de
+   `git rev-parse HEAD`. Ne jamais utiliser un checkout correspondant à un
+   SHA différent comme preuve de publication.
+2. Si le checkout est absent, appliquer le protocole
+   `nabla-maintenance > Remote exact-HEAD snapshot fallback` : artefact
+   Dagger de la CI existante, SHA identique et extraction isolée. Ne pas
+   demander de relance GitHub Actions uniquement pour obtenir l'artefact.
+3. En dernier recours, utiliser les fichiers ciblés du connecteur GitHub
+   **sur le ref SHA**, sans `git clone`, `curl github.com` ni appels
+   répétés à codeload/raw. Une reconstruction partielle n'est jamais une
+   preuve d'un checkout complet.
+4. Exécuter les tests sans dépendances externes réellement disponibles.
+   Sans `node_modules` vérifié, marquer lint/typecheck/build et scans
+   nécessitant des binaires téléchargés `NOT_RUN`, jamais `PASS`.
+5. Pour les défauts de dépendances, ne jamais inventer un
+   `integrity` npm ou réécrire le lockfile à la main ; exiger un
+   lockfile régénéré puis `npm ci` avant publication.
+
+## Budget de contexte de l'agent
+
+- Conserver une fiche courte : `HEAD | check rouge | première erreur |
+  fichiers | correction | preuve | risque restant`.
+- Récupérer un **seul** workflow, job et segment de log correspondant à
+  la première erreur utile ; élargir seulement lorsque cela ne suffit pas.
+- Après une correction de formatter `QG_AUTOFIX_REQUIRED`, consommer
+  directement le patch déterministe fourni par la gate, sans réanalyser
+  le log complet ni inventer des changements sémantiques.
+- Une validation réussie n'est réutilisable que si HEAD, base, toolchain
+  et empreinte du workspace sont identiques ; sinon, l'invalider.
+- Préférer un lot cohérent et une unique publication à plusieurs petits
+  commits déclenchant de nouvelles CI. Jamais de relance manuelle.
+
+La compaction des logs et du contexte **ne supprime aucun test** et ne
+transforme jamais un échec en succès.

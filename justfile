@@ -4,6 +4,30 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 default:
     @just --list
 
+# Network-free, bounded diagnostics. Neither is a publication proof.
+context:
+    bash scripts/agent-offline-context.sh context
+
+preflight:
+    bash scripts/agent-offline-context.sh preflight
+
+# SHA/digest come from the exact-head Dagger GitHub artifact.
+snapshot-check archive head digest destination:
+    python3 scripts/agent-source-snapshot.py "{{archive}}" "{{head}}" "{{digest}}" "{{destination}}"
+
+# Dependency-free targeted verification; never a substitute for the publication gate.
+source-check:
+    bash -n scripts/agent-offline-context.sh scripts/agent-quality-gate.sh scripts/test-agent-quality-oscillation.sh
+    bash scripts/test-agent-quality-oscillation.sh
+    node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts unit-tests/agentSourceSnapshot.test.ts
+    @echo "QG_SOURCE_CHECK_OK: targeted offline smoke only; publication gate NOT_RUN"
+
+npm-offline-check:
+    bash scripts/agent-npm-offline.sh check
+
+npm-offline-install:
+    bash scripts/agent-npm-offline.sh install
+
 dev:
     npm run dev
 

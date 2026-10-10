@@ -162,6 +162,7 @@
 				"runtimeStale": "TrueNAS runtime evidence is stale and is not used as healthy proof.",
 				"tunnelStale": "Cloudflare evidence is stale and is not used as healthy proof.",
 				"staleEvidence": "The latest service health evidence is stale.",
+				"probeUnconfirmed": "The probe is incomplete, timed out or stale; endpoint downtime is not confirmed.",
 				"genericFailure": "no fresh evidence confirms that the service is available",
 				"genericDegraded": "the service is only partially healthy or has a configuration mismatch",
 				"runtimeInventoryMismatch": "The origin responds, but the declared TrueNAS runtime binding is not found in the app inventory: inventory drift, so the service is degraded rather than unavailable."

@@ -16,7 +16,8 @@ Modes:
 
 Environment:
     QUALITY_BASE_REF                    override comparison base
-    QUALITY_LOG_TAIL                    failure log lines to print (default: 40)
+    QUALITY_LOG_TAIL                    failure log lines to print (default: 20; QUALITY_LOG_TAIL=120 for diagnostics)
+    QUALITY_LOG_DIR                     optionally retain failed-command logs (may contain secrets; keep private)
     QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
     QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
     QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
@@ -39,6 +40,38 @@ resolve_base_ref() {
     fi
 }
 
+report_compact_failure() {
+    local log="$1"
+    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+        cat "${log}" >&2
+    else
+        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
+        printf '   Output truncated; use QUALITY_VERBOSE=1 to print full command output.\n' >&2
+    fi
+}
+
+preserve_or_remove_failure_log() {
+    local log="$1"
+    if [[ -z "${QUALITY_LOG_DIR:-}" ]]; then
+        rm -f "${log}"
+        return
+    fi
+    local destination
+    if ! { mkdir -p -- "${QUALITY_LOG_DIR}" && chmod 700 -- "${QUALITY_LOG_DIR}"; }; then
+        printf 'QG_LOG_PERSIST_FAILED: cannot create log directory; original exit code preserved\n' >&2
+        rm -f "${log}"
+        return
+    fi
+    destination="${QUALITY_LOG_DIR}/quality-$(basename "${log}")"
+    if mv -- "${log}" "${destination}"; then
+        chmod 600 -- "${destination}" || true
+        printf 'QG_FULL_LOG=%s\n' "${destination}" >&2
+    else
+        printf 'QG_LOG_PERSIST_FAILED: cannot preserve log; original exit code preserved\n' >&2
+        rm -f "${log}"
+    fi
+}
+
 run_compact() {
     local label="$1"
     shift
@@ -53,8 +86,8 @@ run_compact() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
-    rm -f "${log}"
+    report_compact_failure "${log}"
+    preserve_or_remove_failure_log "${log}"
     return "${rc}"
 }
 
@@ -73,8 +106,8 @@ run_compact_report() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    tail -n "${LOG_TAIL}" "${log}" >&2 || true
-    rm -f "${log}"
+    report_compact_failure "${log}"
+    preserve_or_remove_failure_log "${log}"
     return "${rc}"
 }
 

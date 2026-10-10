@@ -69,3 +69,17 @@ test("Node 24 CI follows production runtime inputs instead of generic maintenanc
 	assert.doesNotMatch(workflow, /- "scripts\/\*\*"/);
 	assert.doesNotMatch(workflow, /- "\.nvmrc"/);
 });
+
+test("Node 24 CI keeps logs compact and retains evidence without hiding failures", async () => {
+	const workflow = await read(".github/workflows/node24-compat.yml");
+
+	assert.match(workflow, /QUALITY_LOG_TAIL: "20"/);
+	assert.match(workflow, /npm run test:unit >"\$\{log\}" 2>&1/);
+	assert.match(workflow, /grep -E.*head -n 20/);
+	assert.match(workflow, /QUALITY_VERBOSE:-0/);
+	assert.match(workflow, /exit "\$\{rc\}"/);
+	assert.match(workflow, /Upload failed Node 24 unit-test evidence/);
+	assert.match(workflow, /if: failure\(\)/);
+	assert.match(workflow, /retention-days: 1/);
+	assert.match(workflow, /actions\/upload-artifact@[0-9a-f]{40}/);
+});

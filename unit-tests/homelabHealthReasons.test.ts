@@ -81,3 +81,152 @@ test("down Cloudflare tunnel is explicit when the service expects a tunnel", () 
 
 	assert.deepEqual(reasons, [{ kind: "tunnel_down", detail: "down" }]);
 });
+
+test("deadline-only public probe is not misrepresented as confirmed origin downtime", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			state: "warn",
+			direct_state: "fail",
+			direct_probe_source: "deadline",
+			probe_stale: true,
+			direct_probe_refresh_error: "probe budget exceeded",
+		}),
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "public_endpoint_down"),
+		false,
+	);
+});
+
+test("a failed fresh origin probe remains a genuine public failure", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "origin",
+			http_status: 503,
+		}),
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "public_endpoint_down"),
+		true,
+	);
+});
+
+for (const [label, evidence] of [
+	["deadline", { direct_probe_source: "deadline" }],
+	["refresh error", { direct_probe_refresh_error: "probe failed" }],
+	["stale probe", { probe_stale: true }],
+	["stale observation", { observation_stale: true }],
+	["timeout", { timed_out: true }],
+] as const) {
+	test(`public endpoint does not report confirmed downtime with ${label}`, () => {
+		const reasons = homelabHealthReasons(
+			entry({ direct_state: "fail", ...evidence }),
+		);
+		assert.equal(
+			reasons.some((reason) => reason.kind === "public_endpoint_down"),
+			false,
+		);
+	});
+}
+
+for (const [label, evidence] of [
+	["deadline", { internal_probe_source: "deadline" }],
+	["refresh error", { internal_probe_refresh_error: "probe failed" }],
+	["stale probe", { probe_stale: true }],
+	["stale observation", { observation_stale: true }],
+	["timeout", { timed_out: true }],
+] as const) {
+	test(`internal endpoint does not report confirmed downtime with ${label}`, () => {
+		const reasons = homelabHealthReasons(
+			entry({ internal_state: "fail", ...evidence }),
+		);
+		assert.equal(
+			reasons.some((reason) => reason.kind === "internal_endpoint_down"),
+			false,
+		);
+	});
+}
+
+test("a fresh failed internal probe remains a confirmed internal failure", () => {
+	const reasons = homelabHealthReasons(
+		entry({ internal_state: "fail", internal_probe_source: "origin" }),
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "internal_endpoint_down"),
+		true,
+	);
+});
+
+test("inconclusive public and internal probes share one explicit explanation", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "deadline",
+			internal_state: "fail",
+			internal_probe_refresh_error: "unavailable",
+		}),
+	);
+	assert.deepEqual(reasons, [{ kind: "probe_unconfirmed" }]);
+});
+
+test("a fresh HTTP failure remains explicit without an inconclusive-probe reason", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "origin",
+			http_status: 503,
+		}),
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "public_endpoint_down"),
+		true,
+	);
+	assert.equal(
+		reasons.some((reason) => reason.kind === "probe_unconfirmed"),
+		false,
+	);
+});
+
+test("a fresh HTTP 503 and an independent internal timeout retain separate evidence", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "origin",
+			http_status: 503,
+			internal_state: "fail",
+			internal_probe_source: "deadline",
+		}),
+	);
+	assert.deepEqual(reasons, [
+		{ kind: "public_endpoint_down", detail: "HTTP 503" },
+		{ kind: "probe_unconfirmed" },
+	]);
+});
+
+test("unconfirmed endpoint probes never hide a confirmed stopped runtime", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			runtime_state: "stopped",
+			direct_state: "fail",
+			direct_probe_source: "deadline",
+			internal_state: "fail",
+			internal_probe_refresh_error: "deadline exceeded",
+		}),
+	);
+	assert.deepEqual(reasons, [
+		{ kind: "runtime_down", detail: "stopped" },
+		{ kind: "probe_unconfirmed" },
+	]);
+});
+
+test("nullable direct and internal probe states do not invent outage reasons", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: null,
+			internal_state: null,
+			probe_stale: true,
+		}),
+	);
+	assert.deepEqual(reasons, []);
+});

@@ -32,6 +32,9 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
 | DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable ; traduction FR build-time complète 251/251 liée par UUID/sourceCommit ; miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
+- [ ] **Installation npm sans DNS (local-first)** : `just npm-offline-check` indique seulement la disponibilité des outils/cache (aucun contrôle d’intégrité des dépendances) ; `just npm-offline-install` utilise `npm ci --offline --ignore-scripts --no-audit --no-fund` sur un arbre sans `node_modules` et échoue si le cache est incomplet. Rejouer les scripts requis et la gate stricte uniquement depuis un checkout Git complet, avec dépendances installées et provenance vérifiée. Ne jamais convertir une preuve source-only en PASS publication.
+- [ ] **Valider le compactage des diagnostics CI/runtime** : sorties par défaut limitées à 20 lignes dans les gates et la CI (`QUALITY_LOG_TAIL`), détails activables par `QUALITY_VERBOSE=1`, warnings Health Board activables par `HOMELAB_HEALTH_VERBOSE=1`. Vérifier les tests et le HEAD exact ; conserver les preuves d'échec complètes accessibles hors console avant de clore le sujet.
+
 ## P0 — Protection de merge, publication et dépendances
 
 - [ ] **Activer le ruleset `master` depuis une workstation autorisée** :
@@ -46,9 +49,11 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 - [ ] **Prouver un cycle workstation complet** :
   `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
   arbre propre et preuve exacte encore valide avec `--status`.
-- [ ] **Rendre l'auto-fix convergent plus diagnostique** : détecter un fingerprint
-  de workspace déjà vu avant la limite de passes et afficher le ou les hooks/fichiers
-  qui oscillent, afin d'éviter 12 itérations identiques et de réduire le coût local/CI.
+- [ ] **Boucle offline-first / agent à faible contexte** : tester le fallback artefact Dagger exact-SHA dans un environnement sans DNS GitHub et sans registry npm, valider les tests sans dépendances, distinguer `NOT_RUN` de `PASS`, et conserver une preuve de publication uniquement lorsque le checkout Git, la base et la toolchain ont été réellement contrôlés. Le skill `nabla-ci-debug` décrit désormais le protocole de diagnostic minimal et la politique de réduction des tokens (inspirés de `fastapi-sample` #329/#330, `nabla-compose` #240/#247 et `nabla-site-bababou` #209/#210).
+- [ ] **Valider le fail-fast sur oscillation d'auto-fix** : le contrat sans réseau `bash scripts/test-agent-quality-oscillation.sh` couvre A→B→A, la convergence et le code retour d’échec ; le harnais a été exécuté sur la fonction correspondante en environnement isolé. Restent la preuve complète avec le script versionné dans le checkout exact-HEAD et la quality gate ShellCheck/pre-commit.
+- [x] **Introduire une détection de fingerprint répété** pour éviter de lancer les 12 passes quand le workspace revient dans un état déjà vu.
+- [ ] **Identifier les hooks et fichiers oscillants** dans le diagnostic
+  `QG_FIX_OSCILLATION` (détection des fingerprints répétés déjà livrée).
 - [ ] **Activer Renovate côté dépôt** : au 30 septembre, aucun Dependency
   Dashboard ni PR Renovate n'est visible. Désactiver *Dependabot Security Updates*,
   confirmer Mend Renovate App, puis observer Dashboard, PR `security` et un

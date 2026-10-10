@@ -118,7 +118,7 @@ test("local fix phase converges formatter and npm lint fixes before publication"
 test("canonical quality gate distinguishes auto-fix mutations from semantic failures", async () => {
 	const canonical = await source("scripts/quality-gate.sh");
 
-	assert.match(canonical, /QUALITY_LOG_TAIL:-40/);
+	assert.match(canonical, /QUALITY_LOG_TAIL:-20/);
 	assert.match(canonical, /QG_AUTOFIX_REQUIRED/);
 	assert.match(canonical, /QG_PRECOMMIT_FAILED/);
 	assert.match(canonical, /No CI-log analysis is required for this condition/);
@@ -183,7 +183,7 @@ test("CI rejects formatting before expensive work and scopes application SAST/bu
 	assert.match(ci, /steps\.ci-scope\.outputs\.sast == 'true'/);
 	assert.match(ci, /steps\.ci-scope\.outputs\.build == 'true'/);
 	assert.match(ci, /QUALITY_CANONICAL_GATE_VERIFIED: "1"/);
-	assert.match(ci, /QUALITY_LOG_TAIL: "40"/);
+	assert.match(ci, /QUALITY_LOG_TAIL: "20"/);
 	assert.match(
 		ci,
 		/- name: Restore pre-commit environments[\s\S]*?continue-on-error: true[\s\S]*?uses: actions\/cache\/restore@[0-9a-f]{40}\s+# v5/,

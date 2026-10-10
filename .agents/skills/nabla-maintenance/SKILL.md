@@ -7,7 +7,7 @@ description: >-
 ---
 # Nabla maintenance workflow
 
-1. On a workstation checkout, run `git fetch --prune origin` then `bash scripts/agent-doctor.sh`; repair any `AGENT_DOCTOR_*` prerequisite before implementation.
+1. Begin with `just context` and `just preflight` (cached Git, no network). Only fetch once if reachable; run `bash scripts/agent-doctor.sh` on a complete checkout before publishing. A source-only archive cannot certify the strict gate.
 2. Read the relevant section of `docs/quality-roadmap.md`; do not scan unrelated generated/vendor files.
 3. Confirm the current branch is not `master` and identify the current PR/HEAD when available.
 4. Create a compact task card: goal, in-scope paths, done evidence, validation, and stop conditions.
@@ -35,15 +35,12 @@ DNS prevents `git clone`, `curl github.com`, codeload or raw GitHub access.
 3. Download the workflow artifact through the GitHub connector. Verify the
    connector-reported artifact digest when available, then unzip it in an
    isolated directory.
-4. Require exactly one inner tarball named
+4. Use `just snapshot-check ZIP HEAD_SHA ARTIFACT_SHA256 DESTINATION` to verify the artifact digest, reject unsafe paths and extract without `.git`. Require exactly one inner tarball named
    `nabla-site-alban-<HEAD_SHA>.tar.gz`. Extract it to a fresh directory;
    never silently accept a merge-commit SHA or a differently named snapshot.
-5. Run the cheapest real targeted checks that do not need unavailable
-   dependencies. For dependency-free TypeScript contract tests, Node 22 can run
-   suitable files with
-   `node --experimental-strip-types --test <test-file.ts>`. Use this only when
-   the selected test imports Node built-ins/repository files and does not need
-   package dependencies.
+5. Run `just source-check` inside the verified archive for dependency-free
+   Bash/Node contracts. Run other targeted tests only when their imports are
+   resolvable; mark unavailable checks `NOT_RUN`, never `PASS`.
 6. Treat the snapshot as source-tree evidence, not as a Git checkout. A
    `git archive` has no `.git`, so merge-base, changed-file, branch,
    pre-push and exact publication-proof checks cannot be proven from it.
