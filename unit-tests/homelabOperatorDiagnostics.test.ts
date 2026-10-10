@@ -290,3 +290,19 @@ test("Language Tool probe aliases enrich canonical LanguageTool without overridi
 	assert.equal(merged.services[0]?.anonymous_http_status, 200);
 	assert.equal(merged.services[0]?.probe_source, "origin");
 });
+
+test("ambiguous normalized aliases do not attach another service's probe evidence", () => {
+	const canonical = {
+		...aggregate,
+		services: [{ ...aggregate.services[0], id: "languagetool", name: "LanguageTool" }],
+	} as HomelabHealthSnapshot;
+	const probes = {
+		...aggregate,
+		services: [
+			{ ...aggregate.services[0], id: undefined, name: "Language Tool", anonymous_http_status: 403 },
+			{ ...aggregate.services[0], id: undefined, name: "language-tool", anonymous_http_status: 200 },
+		],
+	} as HomelabHealthSnapshot;
+	const merged = mergeHomelabProbeDiagnostics(canonical, probes);
+	assert.equal(merged.services[0]?.anonymous_http_status, undefined);
+});
