@@ -202,7 +202,10 @@ test("offline npm helper refuses implicit DNS and requires a lockfile", async ()
 		"utf8",
 	);
 	const just = await readFile(path.join(project, "justfile"), "utf8");
-	assert.match(script, /npm ci --offline --ignore-scripts --no-audit --no-fund/);
+	assert.match(
+		script,
+		/npm ci --offline --ignore-scripts --no-audit --no-fund/,
+	);
 	assert.match(script, /QG_NPM_OFFLINE_CACHE_MISS/);
 	assert.match(script, /QG_NPM_OFFLINE_INSTALL_REFUSED/);
 	assert.doesNotMatch(script, /npm (install|ci)(?! --offline)/);
