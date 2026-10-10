@@ -34,7 +34,8 @@ type HealthReasonMessageKey =
 	| "health.reasons.runtimeStale"
 	| "health.reasons.tunnelStale"
 	| "health.reasons.staleEvidence"
-	| "health.reasons.probeUnconfirmed";
+	| "health.reasons.probeUnconfirmed"
+	| "health.reasons.accessProtectedUnverified";
 
 function reasonKey(reason: HomelabHealthReason): HealthReasonMessageKey {
 	switch (reason.kind) {
@@ -60,6 +61,8 @@ function reasonKey(reason: HomelabHealthReason): HealthReasonMessageKey {
 			return "health.reasons.tunnelStale";
 		case "stale_evidence":
 			return "health.reasons.staleEvidence";
+		case "access_protected_unverified":
+			return "health.reasons.accessProtectedUnverified";
 		case "probe_unconfirmed":
 			return "health.reasons.probeUnconfirmed";
 	}
