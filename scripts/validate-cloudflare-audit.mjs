@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Offline Cloudflare security-audit evidence validation.
  * No network access, credentials or external packages required.
