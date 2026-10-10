@@ -88,7 +88,34 @@ jobs:
 
       - name: Verify minimum Node 24 compatibility
         shell: bash
-        run: npm run test:unit
+        env:
+          QUALITY_LOG_TAIL: "20"
+        run: |
+          set -euo pipefail
+          log="${RUNNER_TEMP}/node24-unit-tests.log"
+          if npm run test:unit >"${log}" 2>&1; then
+            grep -E '^ℹ (tests|pass|fail|duration_ms) ' "${log}" || true
+            echo "NODE24_UNIT_OK"
+          else
+            rc=$?
+            echo "::error::Node 24 unit tests failed; compact failure excerpts follow."
+            grep -E '^✖ |AssertionError|^npm error' "${log}" | head -n 20 || true
+            if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+              cat "${log}"
+            else
+              tail -n "${QUALITY_LOG_TAIL:-20}" "${log}"
+            fi
+            exit "${rc}"
+          fi
+
+      - name: Upload failed Node 24 unit-test evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: node24-unit-failure-${{ github.sha }}
+          path: ${{ runner.temp }}/node24-unit-tests.log
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Save npm downloads
         if: steps.npm-cache.outputs.cache-hit != 'true'
