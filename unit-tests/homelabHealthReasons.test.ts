@@ -253,3 +253,29 @@ test("genuine HTTP 503 is still a public outage", () => {
 	}));
 	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), true);
 });
+
+test("Cloudflare edge evidence alone avoids a false HTTP 403 outage", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		http_status: 403,
+		cloudflare_access_signal: true,
+		cloudflare_service_token_access_passed: false,
+	}));
+	assert.deepEqual(reasons, [{ kind: "access_protected_unverified" }]);
+});
+
+test("unverified Access does not conceal an independent internal failure", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		http_status: 403,
+		cloudflare_access_signal: true,
+		internal_state: "fail",
+		internal_probe_source: "origin",
+	}));
+	assert.deepEqual(reasons.map((reason) => reason.kind), [
+		"access_protected_unverified",
+		"internal_endpoint_down",
+	]);
+});
