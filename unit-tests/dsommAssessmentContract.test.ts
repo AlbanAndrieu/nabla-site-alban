@@ -122,3 +122,24 @@ test("DSOMM stats expose assessment coverage separately from average progress", 
 	assert.ok(stats.averageProgress !== null);
 	assert.ok(stats.averageProgress! >= 0 && stats.averageProgress! <= 1);
 });
+
+test("DSOMM threat modeling claim cites the repository STRIDE evidence without overstating maturity", async () => {
+	const claim = DSOMM_REPOSITORY_ASSESSMENT.claims.find(
+		(item) => item.activityUuid === "47419324-e263-415b-815d-e7161b6b905e",
+	);
+	assert.ok(claim);
+	assert.equal(claim.progress, "started");
+	assert.equal(claim.score, 0.2);
+	assert.ok(claim.evidenceRefs.includes("site-stride-threat-model"));
+	const evidence = DSOMM_REPOSITORY_ASSESSMENT.evidence.find(
+		(item) => item.id === "site-stride-threat-model",
+	);
+	assert.equal(evidence?.path, "docs/security-threat-model.md");
+	const model = await readFile(
+		new URL("../docs/security-threat-model.md", import.meta.url),
+		"utf8",
+	);
+	for (let index = 1; index <= 8; index += 1) {
+		assert.ok(model.includes(`### TM-0${index}`));
+	}
+});

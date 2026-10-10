@@ -212,6 +212,14 @@
 			"title": "Agentic AI & MCP - Security Framework",
 			"url": "https://app.notion.com/p/ccaf375a7e5e8321a9ad8187a7b98dcb",
 			"description": "Threat model and controls for agentic AI: least privilege, allowlisting, human approval, auditability, fail-closed behavior and sandboxing."
+		},
+		{
+			"id": "site-stride-threat-model",
+			"type": "documentation",
+			"visibility": "public",
+			"title": "Repository-specific STRIDE threat model",
+			"path": "docs/security-threat-model.md",
+			"description": "Eight application-specific scenarios TM-01 through TM-08, trust boundaries, assumptions, mitigations and validation criteria; design review pending."
 		}
 	],
 	"claims": [
@@ -371,11 +379,12 @@
 			"score": 0.2,
 			"scope": "governance",
 			"confidence": "medium",
-			"rationale": "Threat-model practices are documented, but a repository-specific nabla-site-alban threat model is not yet versioned.",
+			"rationale": "A repository-specific STRIDE model documents eight threat scenarios and mitigations. This is initial design evidence only: independent review, runtime validation and repeatable mitigations are not yet complete.",
 			"evidenceRefs": [
 				"notion-devsecops-roadmap",
 				"notion-agentic-ai-security",
-				"quality-roadmap"
+				"quality-roadmap",
+				"site-stride-threat-model"
 			]
 		},
 		{
