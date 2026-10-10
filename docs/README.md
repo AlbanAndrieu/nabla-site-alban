@@ -12,6 +12,7 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 - [Runbook réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
 - [Contrat d’évaluation DSOMM portable](dsomm-assessment-contract.md)
+- [Modèle de menaces du site](security-threat-model.md)
 
 ## Roadmaps actives
 
