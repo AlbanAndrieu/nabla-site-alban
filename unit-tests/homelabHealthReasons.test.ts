@@ -219,3 +219,14 @@ test("unconfirmed endpoint probes never hide a confirmed stopped runtime", () =>
 		{ kind: "probe_unconfirmed" },
 	]);
 });
+
+test("nullable direct and internal probe states do not invent outage reasons", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: null,
+			internal_state: null,
+			probe_stale: true,
+		}),
+	);
+	assert.deepEqual(reasons, []);
+});
