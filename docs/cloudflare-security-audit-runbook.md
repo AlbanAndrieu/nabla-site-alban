@@ -40,7 +40,24 @@ Un enregistrement par preuve, avec :
 
 Une CI politique verte ne signifie pas que la CI applicative a été exécutée. Ne déclarer « complet » que si l'audit et les quality gates requises ont des résultats rattachés au même HEAD, les vulnérabilités bloquantes sont corrigées et les limites d'accès au runtime sont explicitement documentées. Ne pas merger automatiquement.
 
-## 6. Constat pour la PR #219
+## 6. Validation automatisée hors ligne
+
+Le validateur `scripts/validate-cloudflare-audit.mjs` vérifie la structure des preuves, les SHA complets, la version upstream, les états et les preuves obligatoires. Il n'effectue **pas** lui-même d'audit Cloudflare et ne garantit pas que les preuves correspondent à la réalité.
+
+Sur un checkout local de la PR :
+
+```bash
+node --test unit-tests/cloudflareAuditEvidence.test.mjs
+node scripts/validate-cloudflare-audit.mjs path/to/redacted-evidence.json "$(git rev-parse HEAD)"
+git diff --check
+npm run quality:gate
+```
+
+Ne pas ajouter aux commits des valeurs de jetons ni des exports de configuration non expurgés. Les états `not-run` et `not-applicable` exigent une raison. Le registre doit contenir au moins un contrôle, et chaque succès/échec doit être rattaché à une preuve non secrète.
+
+**Limite connue :** un test des règles de validation n'est pas une attestation de l'audit Cloudflare. Les tests de sécurité indépendants restent obligatoires selon les politiques du dépôt.
+
+## 7. Constat pour la PR #219
 
 - HEAD initial examiné : `5ceac52798bc6da989f8afbef7e342081314177e`.
 - Workflow « PR CI policy » du 10/10/2026 : **success**, run [38076572143](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/38076572143).
