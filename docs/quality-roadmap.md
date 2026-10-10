@@ -110,8 +110,9 @@ la roadmap homelab.
   actuellement 5.1.0, en conservant une migration explicite par UUID et la preuve
   du commit source cible.
 - [ ] Augmenter la couverture de l'assessment avec les preuves à plus fort levier :
-  threat model propre à `nabla-site-alban`, SBOM/provenance/signature de la
-  supply chain et inventaire machine-readable des agents AI. Les gaps
+  rattacher le [modèle de menaces](security-threat-model.md) à des tests et preuves
+  de remédiation TM-01 à TM-08 ; SBOM/provenance/signature de la supply chain
+  et inventaire machine-readable des agents AI. Les gaps
   d'enforcement GitHub/Renovate restent propriétaires des items P0 existants.
 
 
