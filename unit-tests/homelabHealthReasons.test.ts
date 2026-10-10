@@ -187,3 +187,35 @@ test("a fresh HTTP failure remains explicit without an inconclusive-probe reason
 		false,
 	);
 });
+
+test("a fresh HTTP 503 and an independent internal timeout retain separate evidence", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			direct_state: "fail",
+			direct_probe_source: "origin",
+			http_status: 503,
+			internal_state: "fail",
+			internal_probe_source: "deadline",
+		}),
+	);
+	assert.deepEqual(reasons, [
+		{ kind: "public_endpoint_down", detail: "HTTP 503" },
+		{ kind: "probe_unconfirmed" },
+	]);
+});
+
+test("unconfirmed endpoint probes never hide a confirmed stopped runtime", () => {
+	const reasons = homelabHealthReasons(
+		entry({
+			runtime_state: "stopped",
+			direct_state: "fail",
+			direct_probe_source: "deadline",
+			internal_state: "fail",
+			internal_probe_refresh_error: "deadline exceeded",
+		}),
+	);
+	assert.deepEqual(reasons, [
+		{ kind: "runtime_down", detail: "stopped" },
+		{ kind: "probe_unconfirmed" },
+	]);
+});
