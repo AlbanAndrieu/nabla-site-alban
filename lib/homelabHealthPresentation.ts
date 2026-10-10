@@ -130,16 +130,23 @@ export function homelabHealthReasons(
 		entry.probe_stale === true ||
 		entry.observation_stale === true ||
 		entry.timed_out === true;
-	const publicProbeUnconfirmed =
-		entry.direct_state === "fail" &&
-		(evidenceUnconfirmed ||
-			entry.direct_probe_source === "deadline" ||
-			entry.direct_probe_refresh_error != null);
-	const internalProbeUnconfirmed =
-		entry.internal_state === "fail" &&
-		(evidenceUnconfirmed ||
-			entry.internal_probe_source === "deadline" ||
-			entry.internal_probe_refresh_error != null);
+	const probeUnconfirmed = (
+		state: HomelabHealthState | undefined,
+		source: string | undefined,
+		refreshError: string | null | undefined,
+	): boolean =>
+		state === "fail" &&
+		(evidenceUnconfirmed || source === "deadline" || refreshError != null);
+	const publicProbeUnconfirmed = probeUnconfirmed(
+		entry.direct_state,
+		entry.direct_probe_source,
+		entry.direct_probe_refresh_error,
+	);
+	const internalProbeUnconfirmed = probeUnconfirmed(
+		entry.internal_state,
+		entry.internal_probe_source,
+		entry.internal_probe_refresh_error,
+	);
 
 	if (entry.direct_state === "fail" && !publicProbeUnconfirmed) {
 		reasons.push({
