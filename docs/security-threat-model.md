@@ -54,6 +54,103 @@ Les contrôles existants sont des **éléments de conception** et ne valent pas 
 
 **TM-06 / TM-07 / TM-08 :** compléter l'inventaire des ressources chargées, maintenir les scans et refuser l'introduction d'une sonde SSRF arbitraire.
 
+
+## Référentiel et relation exacte avec DSOMM
+
+**STRIDE n'est pas une exigence DSOMM ni un scanner.** Il s'agit d'une taxonomie Microsoft : **S**poofing (usurpation), **T**ampering (altération), **R**epudiation (répudiation), **I**nformation disclosure (divulgation), **D**enial of service (déni de service), **E**levation of privilege (élévation de privilèges).
+
+Dans OWASP DSOMM, l'activité **« Conduction of simple threat modeling on technical level »**, de niveau 1, recommande explicitement des checklists simples telles que STRIDE et des menaces/mesures documentées :
+- référence stable : https://dsomm.owasp.org/activity-description?uuid=47419324-e263-415b-815d-e7161b6b905e
+- `activityUuid` : `47419324-e263-415b-815d-e7161b6b905e`
+- modèle local du site : snapshot DSOMM **5.0.2** piné ; version publique DSOMM **5.1.0** au 10 octobre 2026. Vérifier par UUID la présence et le libellé dans chaque snapshot avant toute migration.
+- preuve candidate : le présent document et les tests futurs. **Aucun claim « fully-implemented » ne doit être déduit de la simple rédaction par IA** ; revue humaine et vérification des flux/mesures requises.
+
+Les autres activités de modélisation métier, d'abuse stories et de threat modeling avancé ont leurs propres objectifs et doivent être évaluées séparément.
+
+## Fiches de scénarios — attaque, préconditions, preuve et contrôle
+
+Les huit identifiants `TM-xx` représentent des **scénarios à vérifier** et non huit vulnérabilités prouvées. La classification STRIDE décrit le type d'atteinte, pas une probabilité mesurée.
+
+### TM-01 — Saturation ou abus de Checkout (D)
+
+- **Actif :** disponibilité de `POST /api/create-checkout-session`, quota et coûts associés à Stripe.
+- **Adversaire / préconditions :** client Internet capable d'émettre de nombreuses requêtes ; intégration Stripe active.
+- **Chemin :** requêtes répétées → création de sessions côté Stripe → consommation de ressources ou saturation.
+- **Impact :** dégradation du parcours de paiement, coût opérationnel, bruit de diagnostic.
+- **Code constaté :** la route appelle `stripe.checkout.sessions.create` après lecture du corps ; aucune limitation explicite n'est visible dans ce handler. Cela **ne prouve pas** l'absence d'une protection Vercel/WAF externe.
+- **Mesures :** limitation distribuée résistante aux instances éphémères, identifiant client fiable, seuils adaptés au trafic, `429` et `Retry-After` ; métriques sans PII.
+- **Validation :** tests unitaires du seuil et de l'échec du stockage partagé ; essai contrôlé sur Preview après vérification des protections edge.
+- **État :** risque plausible, protection déployée non vérifiée.
+
+### TM-02 — Requête cross-site non attendue (S / T)
+
+- **Actif :** intégrité du déclenchement de Checkout.
+- **Adversaire / préconditions :** site tiers amenant un navigateur à soumettre le formulaire ; aucune authentification préalable n'est présumée.
+- **Chemin :** formulaire/POST déclenché depuis une autre origine → création d'une session sans intention de la personne qui visite.
+- **Impact :** création abusive de sessions et consommation du quota ; **pas** de paiement effectué à lui seul.
+- **Code constaté :** le handler ne valide pas explicitement `Origin` ni `Sec-Fetch-Site`. **CSRF au sens de détournement d'une session authentifiée n'est pas établi**, puisqu'aucune session utilisateur n'est documentée ici.
+- **Mesures :** politique Origin + Fetch Metadata pour les navigateurs, compatible avec les POST HTML/JSON légitimes ; ne pas considérer ces en-têtes comme une authentification universelle.
+- **Validation :** POST même origine accepté ; origine étrangère rejetée ; Origin absent et clients machine traités selon un contrat écrit.
+- **État :** garde de route à évaluer et documenter.
+
+### TM-03 — Mauvaise URL de retour (T)
+
+- **Actif :** destination Stripe `success_url` et `cancel_url`.
+- **Adversaire / préconditions :** influence sur la configuration de déploiement ou découverte d'une normalisation ambiguë de `DOMAIN`/`VERCEL_URL`.
+- **Chemin :** origine de confiance mal définie → URL de retour inattendue.
+- **Code constaté :** les URL proviennent de variables serveur, pas de `Host`; le parseur `originFromDomainEnv` accepte cependant des URL avec chemin, qu'il ignore pour ne garder que l'origine, alors que le texte d'erreur indique « no path ».
+- **Mesures :** valider strictement `DOMAIN` comme origine pure ; encadrer le host Vercel autorisé ; conserver les tests de refus des credentials/schémas.
+- **Validation :** cas chemin, query, fragment, userinfo, protocoles non HTTP, hostname trompeur.
+- **État :** divergence de contrat de validation identifiée dans la lecture statique ; impact exploitable non démontré.
+
+### TM-04 — Exposition de détails internes (I)
+
+- **Actif :** informations d'infrastructure, accès privés et erreurs provider.
+- **Adversaire / préconditions :** accès public aux réponses des API homelab.
+- **Chemin :** champ interne ou erreur non nettoyée propagé dans une réponse JSON.
+- **Impact :** renseignement utile à une attaque ultérieure ; risque de divulgation de token selon les champs réels.
+- **Mesures :** schéma de sortie en allowlist, séparation URL publique/privée, sanitation systématique des exceptions.
+- **Validation :** fixtures contenant token, IP privée ou header Authorization et assertions négatives sur la réponse publique.
+- **État :** menace à tester ; aucune fuite actuelle démontrée.
+
+### TM-05 — Présentation trompeuse d'une preuve périmée (T / R)
+
+- **Actif :** intégrité et traçabilité de la santé présentée sur le site.
+- **Adversaire / préconditions :** indisponibilité partielle, latence ou snapshot périmé du provider ; attaque intentionnelle non requise.
+- **Chemin :** observation obsolète → badge « OK » ou « panne » non justifié.
+- **Impact :** mauvaise décision d'exploitation ou masquage d'incident.
+- **Mesures :** fraîcheur, source, horodatage, état local/effectif et incertitude conservés indépendamment.
+- **Validation :** tests stale, timeout, HTTP 503 confirmé, preuve absente ; la PR #215 a déjà renforcé cette distinction.
+- **État :** risque opérationnel avec mitigations déjà présentes, non qualifié comme attaque active.
+
+### TM-06 — Script tiers ou HTML non fiable (T / I)
+
+- **Actif :** intégrité de la page et confidentialité des données du navigateur.
+- **Adversaire / préconditions :** dépendance tierce compromise ou contenu HTML qui échappe aux garde-fous du loader.
+- **Chemin :** script exécuté dans l'origine du site → altération DOM / collecte indue.
+- **Mesures :** CSP resserrée, contrôle des ressources tierces, loader CV à chemins explicitement autorisés et réduction des scripts legacy.
+- **Validation :** audit des sources, tests de chemins CV, rapport CSP et tests navigateur.
+- **État :** exposition théorique, pas de XSS prouvée.
+
+### TM-07 — Compromission de dépendance ou de pipeline (S / T / E)
+
+- **Actif :** code publié, secrets CI et provenance du build.
+- **Adversaire / préconditions :** dépendance npm, action CI ou compte de publication compromis.
+- **Chemin :** code non fiable dans build/test → artefact ou secrets altérés.
+- **Mesures :** pinning, lockfile, permissions minimales, SAST, BetterLeaks, SBOM, provenance, scans Playwright/ZAP et publication liée à un commit exact.
+- **Validation :** preuves au HEAD de dependency review, scans, génération de SBOM et contrôle de provenance ; ne pas convertir NOT_RUN en PASS.
+- **État :** menace générique reconnue ; pas de compromission constatée.
+
+### TM-08 — Sonde arbitraire introduite dans les API (E / I / D)
+
+- **Actif :** réseau privé et droits d'egress du runtime.
+- **Adversaire / préconditions :** une future route accepte une URL client et la récupère côté serveur.
+- **Chemin :** SSRF vers hôte interne, métadonnées ou endpoint sensible.
+- **Code constaté :** l'architecture actuelle exclut une route générique de sondage arbitraire.
+- **Mesures :** destinations fixes configurées côté serveur ; interdiction des URL libres, résolution DNS et redirects contrôlés le cas échéant.
+- **Validation :** test de contrat empêchant l'introduction d'une sonde libre ; SSRF uniquement testé sur un environnement autorisé.
+- **État :** menace **préventive** ; la fonctionnalité dangereuse n'est pas documentée comme présente.
+
 ## Limites et mise à jour
 
 Cette analyse n'inclut pas de scan authentifié, de pentest, de vérification des variables Vercel ou des règles réseau effectives. Elle doit être révisée lors d'une nouvelle route API, d'une évolution des limites de confiance, de la migration catalogue v2 ou d'un changement Stripe. Les tâches ouvertes restent exclusivement dans `docs/quality-roadmap.md` et `docs/homelab-roadmap.md`.
