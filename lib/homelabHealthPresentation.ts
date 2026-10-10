@@ -149,12 +149,20 @@ export function homelabHealthReasons(
 		entry.internal_probe_refresh_error,
 	);
 
-	if (entry.public_probe_verification === "access_protected_origin_unverified" ||
-		(entry.cloudflare_access_signal === true && entry.cloudflare_service_token_access_passed !== true && entry.http_status === 403)) {
-		reasons.push({kind: "access_protected_unverified", detail: "Cloudflare Access bloque la requête anonyme ; disponibilité applicative non confirmée."});
+	const accessProtectedUnverified =
+		entry.public_probe_verification === "access_protected_origin_unverified" ||
+		(entry.cloudflare_access_signal === true &&
+			entry.cloudflare_service_token_access_passed !== true &&
+			entry.http_status === 403);
+	if (accessProtectedUnverified) {
+		reasons.push({ kind: "access_protected_unverified" });
 	}
 
-	if (entry.direct_state === "fail" && !publicProbeUnconfirmed && entry.public_probe_verification !== "access_protected_origin_unverified") {
+	if (
+		entry.direct_state === "fail" &&
+		!publicProbeUnconfirmed &&
+		!accessProtectedUnverified
+	) {
 		reasons.push({
 			kind: "public_endpoint_down",
 			detail:
