@@ -165,7 +165,8 @@
 				"probeUnconfirmed": "The probe is incomplete, timed out or stale; endpoint downtime is not confirmed.",
 				"genericFailure": "no fresh evidence confirms that the service is available",
 				"genericDegraded": "the service is only partially healthy or has a configuration mismatch",
-				"runtimeInventoryMismatch": "The origin responds, but the declared TrueNAS runtime binding is not found in the app inventory: inventory drift, so the service is degraded rather than unavailable."
+				"runtimeInventoryMismatch": "The origin responds, but the declared TrueNAS runtime binding is not found in the app inventory: inventory drift, so the service is degraded rather than unavailable.",
+				"accessProtectedUnverified": "Cloudflare Access blocks anonymous traffic; application availability behind Access remains unverified."
 			}
 		},
 		"presentation": {
