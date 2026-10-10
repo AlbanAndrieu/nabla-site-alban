@@ -131,7 +131,7 @@ export function homelabHealthReasons(
 		entry.observation_stale === true ||
 		entry.timed_out === true;
 	const probeUnconfirmed = (
-		state: HomelabHealthState | undefined,
+		state: HomelabHealthState | null | undefined,
 		source: string | undefined,
 		refreshError: string | null | undefined,
 	): boolean =>
