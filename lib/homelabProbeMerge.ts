@@ -27,6 +27,9 @@ const ROLLING_DIAGNOSTIC_KEYS = [
 
 const SERVICE_DIAGNOSTIC_KEYS = [
 	"anonymous_http_status",
+	"cloudflare_access_secondary_probe_eligible",
+	"cloudflare_access_secondary_probe_attempted",
+	"public_probe_verification",
 	"public_probe_auth_mode",
 	"http_probe_auth_mode",
 	"http_evidence_status",
