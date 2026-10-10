@@ -88,12 +88,20 @@ function indexRows(rows: unknown): {
 } {
 	const byId = new Map<string, UnknownRecord>();
 	const byName = new Map<string, UnknownRecord>();
+	const ambiguousNames = new Set<string>();
 	if (!Array.isArray(rows)) return { byId, byName };
 	for (const row of rows) {
 		if (!isRecord(row)) continue;
 		if (typeof row.id === "string" && row.id.trim()) byId.set(row.id, row);
 		const name = normalizedName(row.name);
-		if (name) byName.set(name, row);
+		if (name) {
+			if (byName.has(name)) {
+				byName.delete(name);
+				ambiguousNames.add(name);
+			} else if (!ambiguousNames.has(name)) {
+				byName.set(name, row);
+			}
+		}
 	}
 	return { byId, byName };
 }
