@@ -1,5 +1,7 @@
 # Feuille de route homelab
 
+- [ ] **P1 — Cloudflare security-audit-skill (Site Alban + FastAPI)** : intégrer le skill officiel `cloudflare/security-audit-skill` dans `nabla-site-alban` et `fastapi-sample` en épinglant l'upstream et la licence, sur le modèle de `nabla-compose/.agents/skills/security-audit`. Réaliser d'abord un audit incrémental local-first des PR actives, puis une revue élargie (Access 403 / Service Tokens, GitHub + YubiKey/FIDO2, DNS/Traefik/Tunnel, secrets et sondes authentifiées). Produire un rapport reproductible avec ledger de couverture, findings, preuves et limites ; rapprocher les scénarios STRIDE et les UUID DSOMM officiels. Réutiliser l'audit partiel de `nabla-compose` comme antériorité, sans le présenter comme un audit complet ni supprimer les tests SAST/DAST existants. Ne pas merger automatiquement.
+
 ## P1 — Cloudflare Access, identité et exposition interne (10/10/2026)
 
 - [x] Préserver les preuves de deuxième vérification Access de `fastapi-sample` dans les snapshots : éligibilité, tentative et résultat d'accès à l'origine.
