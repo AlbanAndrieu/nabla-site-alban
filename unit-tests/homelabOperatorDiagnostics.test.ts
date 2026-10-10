@@ -262,3 +262,47 @@ test("homelab UI keeps reconciled health and exposes progressive operator metric
 	assert.match(serviceDiagnostics, /last_known_http_status/);
 	assert.match(reasons, /ServiceOperatorDiagnostics/);
 });
+
+test("Language Tool probe aliases enrich canonical LanguageTool without overriding aggregate state", () => {
+	const canonical = {
+		...aggregate,
+		services: [{
+			...aggregate.services[0],
+			id: "languagetool",
+			name: "LanguageTool",
+			state: "unknown",
+			http_status: 0,
+		}],
+	} as HomelabHealthSnapshot;
+	const probes = {
+		...aggregate,
+		services: [{
+			...aggregate.services[0],
+			id: undefined,
+			name: "Language Tool",
+			state: "ok",
+			anonymous_http_status: 200,
+			probe_source: "origin",
+		}],
+	} as HomelabHealthSnapshot;
+	const merged = mergeHomelabProbeDiagnostics(canonical, probes);
+	assert.equal(merged.services[0]?.state, "unknown");
+	assert.equal(merged.services[0]?.anonymous_http_status, 200);
+	assert.equal(merged.services[0]?.probe_source, "origin");
+});
+
+test("ambiguous normalized aliases do not attach another service's probe evidence", () => {
+	const canonical = {
+		...aggregate,
+		services: [{ ...aggregate.services[0], id: "languagetool", name: "LanguageTool" }],
+	} as HomelabHealthSnapshot;
+	const probes = {
+		...aggregate,
+		services: [
+			{ ...aggregate.services[0], id: undefined, name: "Language Tool", anonymous_http_status: 403 },
+			{ ...aggregate.services[0], id: undefined, name: "language-tool", anonymous_http_status: 200 },
+		],
+	} as HomelabHealthSnapshot;
+	const merged = mergeHomelabProbeDiagnostics(canonical, probes);
+	assert.equal(merged.services[0]?.anonymous_http_status, undefined);
+});

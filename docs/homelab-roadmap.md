@@ -1,5 +1,16 @@
 # Feuille de route homelab
 
+## P1 — Cloudflare Access, identité et exposition interne (10/10/2026)
+
+- [x] Préserver les preuves de deuxième vérification Access de `fastapi-sample` dans les snapshots : éligibilité, tentative et résultat d'accès à l'origine.
+- [x] Afficher ces preuves dans les détails des services, même sans télémétrie de sonde périodique ; préserver la distinction entre refus anonyme et panne réelle.
+- [x] Corriger la classification de la preuve Access HTTP 403 : un blocage anonyme connu ne constitue pas une panne de l'origine ; un échec LAN indépendant demeure visible. Tests de régression enregistrés, exécution locale encore requise.
+- [ ] Vérifier en environnement TrueNAS les cas IT Tools, Heimdall, AdGuard Home et Karakeep ; exposer la configuration et les tests Access sans jamais rendre les jetons visibles.
+- [ ] Réconcilier l'état « Inconnu » et les identités canoniques avec `nabla-compose` (LanguageTool unique, `external: false`) et distinguer « non surveillé » de « indisponible ».
+- [ ] Afficher les dérives DNS, Cloudflare Tunnel et Traefik issues d'un inventaire vérifié, avec propriétaire et dernier contrôle ; ne jamais interpréter une URL déclarée comme une publication prouvée.
+- [ ] Relier les preuves Access / FIDO2 (GitHub comme IdP) et les risques de session détournée au modèle STRIDE / DSOMM existant.
+
+
 Dernière réconciliation : 1 octobre 2026.
 
 Ce document est l'unique backlog actif propre à TrueNAS, FastAPI,

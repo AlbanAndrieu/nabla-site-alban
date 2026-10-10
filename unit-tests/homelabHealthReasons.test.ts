@@ -230,3 +230,52 @@ test("nullable direct and internal probe states do not invent outage reasons", (
 	);
 	assert.deepEqual(reasons, []);
 });
+
+test("expected Cloudflare Access 403 is not classified as confirmed origin downtime", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		http_status: 403,
+		cloudflare_access_secondary_probe_attempted: true,
+		cloudflare_access_signal: true,
+		cloudflare_service_token_access_passed: false,
+		public_probe_verification: "access_protected_origin_unverified",
+	}));
+	assert.equal(reasons.some((reason) => reason.kind === "access_protected_unverified"), true);
+	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), false);
+});
+
+test("genuine HTTP 503 is still a public outage", () => {
+	const reasons = homelabHealthReasons(entry({
+		direct_state: "fail",
+		http_status: 503,
+		public_probe_verification: "authenticated_origin_observed",
+	}));
+	assert.equal(reasons.some((reason) => reason.kind === "public_endpoint_down"), true);
+});
+
+test("Cloudflare edge evidence alone avoids a false HTTP 403 outage", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		http_status: 403,
+		cloudflare_access_signal: true,
+		cloudflare_service_token_access_passed: false,
+	}));
+	assert.deepEqual(reasons, [{ kind: "access_protected_unverified" }]);
+});
+
+test("unverified Access does not conceal an independent internal failure", () => {
+	const reasons = homelabHealthReasons(entry({
+		state: "warn",
+		direct_state: "fail",
+		http_status: 403,
+		cloudflare_access_signal: true,
+		internal_state: "fail",
+		internal_probe_source: "origin",
+	}));
+	assert.deepEqual(reasons.map((reason) => reason.kind), [
+		"access_protected_unverified",
+		"internal_endpoint_down",
+	]);
+});

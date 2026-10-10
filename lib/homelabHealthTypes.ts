@@ -68,6 +68,15 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		latency_ms?: number;
 		error?: string;
 		application_error?: string | null;
+		cloudflare_access_secondary_probe_eligible?: boolean;
+		cloudflare_access_secondary_probe_attempted?: boolean;
+		public_probe_verification?: "access_protected_origin_unverified" | "authenticated_origin_observed" | "authenticated_origin_unverified";
+		cloudflare_access_signal?: boolean;
+		cloudflare_default_deny?: boolean;
+		cloudflare_service_auth_attempted?: boolean;
+		cloudflare_service_token_access_passed?: boolean;
+		anonymous_http_status?: number;
+		public_probe_auth_mode?: string;
 		tunnel_status?: string | null;
 		tunnel_name?: string | null;
 		cloudflare_status_confirmed?: boolean;

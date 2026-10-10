@@ -27,6 +27,9 @@ const ROLLING_DIAGNOSTIC_KEYS = [
 
 const SERVICE_DIAGNOSTIC_KEYS = [
 	"anonymous_http_status",
+	"cloudflare_access_secondary_probe_eligible",
+	"cloudflare_access_secondary_probe_attempted",
+	"public_probe_verification",
 	"public_probe_auth_mode",
 	"http_probe_auth_mode",
 	"http_evidence_status",
@@ -75,7 +78,7 @@ function copyAllowed(
 
 function normalizedName(value: unknown): string | null {
 	return typeof value === "string" && value.trim()
-		? value.trim().toLowerCase()
+		? value.trim().toLowerCase().replace(/[\s_-]+/g, "")
 		: null;
 }
 
@@ -85,12 +88,20 @@ function indexRows(rows: unknown): {
 } {
 	const byId = new Map<string, UnknownRecord>();
 	const byName = new Map<string, UnknownRecord>();
+	const ambiguousNames = new Set<string>();
 	if (!Array.isArray(rows)) return { byId, byName };
 	for (const row of rows) {
 		if (!isRecord(row)) continue;
 		if (typeof row.id === "string" && row.id.trim()) byId.set(row.id, row);
 		const name = normalizedName(row.name);
-		if (name) byName.set(name, row);
+		if (name) {
+			if (byName.has(name)) {
+				byName.delete(name);
+				ambiguousNames.add(name);
+			} else if (!ambiguousNames.has(name)) {
+				byName.set(name, row);
+			}
+		}
 	}
 	return { byId, byName };
 }
