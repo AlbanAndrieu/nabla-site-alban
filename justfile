@@ -22,6 +22,12 @@ source-check:
     node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts unit-tests/agentSourceSnapshot.test.ts
     @echo "QG_SOURCE_CHECK_OK: targeted offline smoke only; publication gate NOT_RUN"
 
+npm-offline-check:
+    bash scripts/agent-npm-offline.sh check
+
+npm-offline-install:
+    bash scripts/agent-npm-offline.sh install
+
 dev:
     npm run dev
 

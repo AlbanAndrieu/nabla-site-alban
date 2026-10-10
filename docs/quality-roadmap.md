@@ -32,6 +32,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
 | DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable ; traduction FR build-time complète 251/251 liée par UUID/sourceCommit ; miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
+- [ ] **Installation npm sans DNS (local-first)** : `just npm-offline-check` indique seulement la disponibilité des outils/cache (aucun contrôle d’intégrité des dépendances) ; `just npm-offline-install` utilise `npm ci --offline --ignore-scripts --no-audit --no-fund` sur un arbre sans `node_modules` et échoue si le cache est incomplet. Rejouer les scripts requis et la gate stricte uniquement depuis un checkout Git complet, avec dépendances installées et provenance vérifiée. Ne jamais convertir une preuve source-only en PASS publication.
 - [ ] **Valider le compactage des diagnostics CI/runtime** : sorties par défaut limitées à 20 lignes dans les gates et la CI (`QUALITY_LOG_TAIL`), détails activables par `QUALITY_VERBOSE=1`, warnings Health Board activables par `HOMELAB_HEALTH_VERBOSE=1`. Vérifier les tests et le HEAD exact ; conserver les preuves d'échec complètes accessibles hors console avant de clore le sujet.
 
 ## P0 — Protection de merge, publication et dépendances

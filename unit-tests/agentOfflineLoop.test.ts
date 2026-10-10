@@ -195,3 +195,23 @@ exec /usr/bin/git "$@"
 		await rm(cwd, { recursive: true, force: true });
 	}
 });
+
+test("offline npm helper refuses implicit DNS and requires a lockfile", async () => {
+	const script = await readFile(
+		path.join(project, "scripts/agent-npm-offline.sh"),
+		"utf8",
+	);
+	const just = await readFile(path.join(project, "justfile"), "utf8");
+	assert.match(script, /npm ci --offline --ignore-scripts --no-audit --no-fund/);
+	assert.match(script, /QG_NPM_OFFLINE_CACHE_MISS/);
+	assert.match(script, /QG_NPM_OFFLINE_INSTALL_REFUSED/);
+	assert.doesNotMatch(script, /npm (install|ci)(?! --offline)/);
+	assert.match(just, /^npm-offline-check:/m);
+	assert.match(just, /^npm-offline-install:/m);
+	const result = await execute(
+		"bash",
+		[path.join(project, "scripts/agent-npm-offline.sh"), "check"],
+		{ cwd: project },
+	);
+	assert.match(result.stdout, /QG_NPM_OFFLINE_CHECK/);
+});
