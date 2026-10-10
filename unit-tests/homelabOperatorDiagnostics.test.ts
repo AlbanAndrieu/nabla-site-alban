@@ -266,24 +266,28 @@ test("homelab UI keeps reconciled health and exposes progressive operator metric
 test("Language Tool probe aliases enrich canonical LanguageTool without overriding aggregate state", () => {
 	const canonical = {
 		...aggregate,
-		services: [{
-			...aggregate.services[0],
-			id: "languagetool",
-			name: "LanguageTool",
-			state: "unknown",
-			http_status: 0,
-		}],
+		services: [
+			{
+				...aggregate.services[0],
+				id: "languagetool",
+				name: "LanguageTool",
+				state: "unknown",
+				http_status: 0,
+			},
+		],
 	} as HomelabHealthSnapshot;
 	const probes = {
 		...aggregate,
-		services: [{
-			...aggregate.services[0],
-			id: undefined,
-			name: "Language Tool",
-			state: "ok",
-			anonymous_http_status: 200,
-			probe_source: "origin",
-		}],
+		services: [
+			{
+				...aggregate.services[0],
+				id: undefined,
+				name: "Language Tool",
+				state: "ok",
+				anonymous_http_status: 200,
+				probe_source: "origin",
+			},
+		],
 	} as HomelabHealthSnapshot;
 	const merged = mergeHomelabProbeDiagnostics(canonical, probes);
 	assert.equal(merged.services[0]?.state, "unknown");
@@ -294,13 +298,25 @@ test("Language Tool probe aliases enrich canonical LanguageTool without overridi
 test("ambiguous normalized aliases do not attach another service's probe evidence", () => {
 	const canonical = {
 		...aggregate,
-		services: [{ ...aggregate.services[0], id: "languagetool", name: "LanguageTool" }],
+		services: [
+			{ ...aggregate.services[0], id: "languagetool", name: "LanguageTool" },
+		],
 	} as HomelabHealthSnapshot;
 	const probes = {
 		...aggregate,
 		services: [
-			{ ...aggregate.services[0], id: undefined, name: "Language Tool", anonymous_http_status: 403 },
-			{ ...aggregate.services[0], id: undefined, name: "language-tool", anonymous_http_status: 200 },
+			{
+				...aggregate.services[0],
+				id: undefined,
+				name: "Language Tool",
+				anonymous_http_status: 403,
+			},
+			{
+				...aggregate.services[0],
+				id: undefined,
+				name: "language-tool",
+				anonymous_http_status: 200,
+			},
 		],
 	} as HomelabHealthSnapshot;
 	const merged = mergeHomelabProbeDiagnostics(canonical, probes);

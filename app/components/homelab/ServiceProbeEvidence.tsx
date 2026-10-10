@@ -90,26 +90,47 @@ export default function ServiceProbeEvidence({ entry }: Readonly<Props>) {
 			data-probe-source={entry.probe_source ?? "unknown"}
 			data-probe-stale={entry.probe_stale === true ? "true" : "false"}
 		>
-			{hasRollingEvidence ? <span>
-				<i className={sourceIcon(entry)} aria-hidden="true" />{" "}
-				{sourceLabel(entry.probe_source, french)}
-				{details.length > 0 ? ` · ${details.join(" · ")}` : ""}
-			</span> : null}
+			{hasRollingEvidence ? (
+				<span>
+					<i className={sourceIcon(entry)} aria-hidden="true" />{" "}
+					{sourceLabel(entry.probe_source, french)}
+					{details.length > 0 ? ` · ${details.join(" · ")}` : ""}
+				</span>
+			) : null}
 			{hasAccessEvidence ? (
-				<span className="d-block" data-cloudflare-access-evidence data-access-probe-attempted={String(entry.cloudflare_access_secondary_probe_attempted === true)}>
+				<span
+					className="d-block"
+					data-cloudflare-access-evidence
+					data-access-probe-attempted={String(
+						entry.cloudflare_access_secondary_probe_attempted === true,
+					)}
+				>
 					<i className="fas fa-shield-halved" aria-hidden="true" />{" "}
 					{french ? "Cloudflare Access" : "Cloudflare Access"}:{" "}
 					{entry.cloudflare_access_secondary_probe_attempted === true
-						? french ? "second contrôle exécuté" : "secondary check executed"
+						? french
+							? "second contrôle exécuté"
+							: "secondary check executed"
 						: entry.cloudflare_access_secondary_probe_eligible === true
-							? french ? "second contrôle non exécuté" : "secondary check not executed"
-							: french ? "second contrôle non requis ou non confirmé" : "secondary check not required or unconfirmed"}
+							? french
+								? "second contrôle non exécuté"
+								: "secondary check not executed"
+							: french
+								? "second contrôle non requis ou non confirmé"
+								: "secondary check not required or unconfirmed"}
 					{entry.public_probe_verification === "authenticated_origin_observed"
-						? french ? " · origine authentifiée observée" : " · authenticated origin observed"
-						: entry.public_probe_verification === "access_protected_origin_unverified"
-							? french ? " · origine non vérifiée" : " · origin unverified"
+						? french
+							? " · origine authentifiée observée"
+							: " · authenticated origin observed"
+						: entry.public_probe_verification ===
+								"access_protected_origin_unverified"
+							? french
+								? " · origine non vérifiée"
+								: " · origin unverified"
 							: ""}
-					{typeof entry.anonymous_http_status === "number" ? ` · HTTP ${entry.anonymous_http_status} (${french ? "anonyme" : "anonymous"})` : ""}
+					{typeof entry.anonymous_http_status === "number"
+						? ` · HTTP ${entry.anonymous_http_status} (${french ? "anonyme" : "anonymous"})`
+						: ""}
 				</span>
 			) : null}
 			{entry.probe_stale === true ? (

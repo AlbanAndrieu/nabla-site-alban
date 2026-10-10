@@ -70,7 +70,10 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		application_error?: string | null;
 		cloudflare_access_secondary_probe_eligible?: boolean;
 		cloudflare_access_secondary_probe_attempted?: boolean;
-		public_probe_verification?: "access_protected_origin_unverified" | "authenticated_origin_observed" | "authenticated_origin_unverified";
+		public_probe_verification?:
+			| "access_protected_origin_unverified"
+			| "authenticated_origin_observed"
+			| "authenticated_origin_unverified";
 		cloudflare_access_signal?: boolean;
 		cloudflare_default_deny?: boolean;
 		cloudflare_service_auth_attempted?: boolean;
