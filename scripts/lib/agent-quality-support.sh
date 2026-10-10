@@ -39,6 +39,16 @@ resolve_base_ref() {
     fi
 }
 
+report_compact_failure() {
+    local log="$1"
+    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+        cat "${log}" >&2
+    else
+        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
+        printf '   Output truncated; use QUALITY_VERBOSE=1 to print full command output.\n' >&2
+    fi
+}
+
 run_compact() {
     local label="$1"
     shift
@@ -53,13 +63,7 @@ run_compact() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
-        cat "${log}" >&2
-    else
-        # One compact excerpt, never downgrade the failing exit status.
-        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
-        printf '   Full command output was captured locally; set QUALITY_VERBOSE=1 for complete console output.\\n' >&2
-    fi
+    report_compact_failure "${log}"
     rm -f "${log}"
     return "${rc}"
 }
@@ -79,13 +83,7 @@ run_compact_report() {
         rc=$?
     fi
     printf '❌ %s\n' "${label}" >&2
-    if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
-        cat "${log}" >&2
-    else
-        # One compact excerpt, never downgrade the failing exit status.
-        tail -n "${LOG_TAIL:-20}" "${log}" >&2 || true
-        printf '   Full command output was captured locally; set QUALITY_VERBOSE=1 for complete console output.\\n' >&2
-    fi
+    report_compact_failure "${log}"
     rm -f "${log}"
     return "${rc}"
 }
