@@ -17,6 +17,7 @@ Modes:
 Environment:
     QUALITY_BASE_REF                    override comparison base
     QUALITY_LOG_TAIL                    failure log lines to print (default: 20; QUALITY_LOG_TAIL=120 for diagnostics)
+    QUALITY_LOG_DIR                     optionally retain failed-command logs (may contain secrets; keep private)
     QUALITY_FIX_PASSES                  maximum local pre-commit fix passes (default: 12)
     QUALITY_CANONICAL_GATE_VERIFIED=1   CI-only: canonical gate already passed in this job
     QUALITY_ALLOW_LARGE_DELETION=1      acknowledge an intentional large truncation
@@ -49,6 +50,28 @@ report_compact_failure() {
     fi
 }
 
+preserve_or_remove_failure_log() {
+    local log="$1"
+    if [[ -z "${QUALITY_LOG_DIR:-}" ]]; then
+        rm -f "${log}"
+        return
+    fi
+    local destination
+    if ! mkdir -m 700 -p -- "${QUALITY_LOG_DIR}"; then
+        printf 'QG_LOG_PERSIST_FAILED: cannot create log directory; original exit code preserved\\n' >&2
+        rm -f "${log}"
+        return
+    fi
+    destination="${QUALITY_LOG_DIR}/quality-$(basename "${log}")"
+    if mv -- "${log}" "${destination}"; then
+        chmod 600 -- "${destination}" || true
+        printf 'QG_FULL_LOG=%s\\n' "${destination}" >&2
+    else
+        printf 'QG_LOG_PERSIST_FAILED: cannot preserve log; original exit code preserved\\n' >&2
+        rm -f "${log}"
+    fi
+}
+
 run_compact() {
     local label="$1"
     shift
@@ -64,7 +87,7 @@ run_compact() {
     fi
     printf '❌ %s\n' "${label}" >&2
     report_compact_failure "${log}"
-    rm -f "${log}"
+    preserve_or_remove_failure_log "${log}"
     return "${rc}"
 }
 
@@ -84,7 +107,7 @@ run_compact_report() {
     fi
     printf '❌ %s\n' "${label}" >&2
     report_compact_failure "${log}"
-    rm -f "${log}"
+    preserve_or_remove_failure_log "${log}"
     return "${rc}"
 }
 
