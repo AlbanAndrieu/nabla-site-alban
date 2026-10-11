@@ -62,17 +62,11 @@ export function validateAudit(document, expectedHead) {
 			) {
 				errors.push(`${at}.status invalid`);
 			}
-			if (
-				typeof control.scope !== "string" ||
-				!control.scope.trim()
-			) {
+			if (typeof control.scope !== "string" || !control.scope.trim()) {
 				errors.push(`${at}.scope required`);
 			}
 			if (control.status === "pass" || control.status === "fail") {
-				if (
-					typeof control.evidence !== "string" ||
-					!control.evidence.trim()
-				) {
+				if (typeof control.evidence !== "string" || !control.evidence.trim()) {
 					errors.push(`${at}.evidence required for executed controls`);
 				}
 			}
