@@ -79,3 +79,22 @@ test("accepts a documented failed control without upgrading it to pass", () => {
 	};
 	assert.deepEqual(validateAudit(evidence, HEAD), []);
 });
+
+test("rejects invalid evidence timestamp", () => {
+	const evidence = valid();
+	evidence.auditedAt = "2026-99-99T00:00:00Z";
+	assert.match(validateAudit(evidence).join(" "), /auditedAt/);
+});
+
+test("rejects a missing reason for an unexecuted check", () => {
+	const evidence = valid();
+	delete evidence.controls[0].reason;
+	assert.match(validateAudit(evidence).join(" "), /reason required/);
+});
+
+test("accepts a syntactically valid DSOMM UUID without attesting its provenance", () => {
+	const evidence = valid();
+	evidence.controls[0].activityUuid =
+		"123e4567-e89b-42d3-a456-426614174000";
+	assert.deepEqual(validateAudit(evidence, HEAD), []);
+});
