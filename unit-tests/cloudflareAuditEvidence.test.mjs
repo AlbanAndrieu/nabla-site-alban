@@ -25,7 +25,10 @@ test("accepts explicit not-run controls without claiming success", () => {
 test("rejects missing upstream provenance and SHA mismatch", () => {
 	const evidence = valid();
 	evidence.upstreamSha = "latest";
-	assert.match(validateAudit(evidence, "c".repeat(40)).join(" "), /upstreamSha/);
+	assert.match(
+		validateAudit(evidence, "c".repeat(40)).join(" "),
+		/upstreamSha/,
+	);
 	assert.match(
 		validateAudit(evidence, "c".repeat(40)).join(" "),
 		/headSha differs/,
