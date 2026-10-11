@@ -84,7 +84,9 @@ export function validateAudit(document, expectedHead) {
 			}
 			if (
 				control.activityUuid !== undefined &&
-				!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(control.activityUuid)
+				!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+					control.activityUuid,
+				)
 			) {
 				errors.push(`${at}.activityUuid invalid`);
 			}
