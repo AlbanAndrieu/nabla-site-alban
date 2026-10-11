@@ -2,6 +2,16 @@
 
 > Statut au 10 octobre 2026 : **plan de vérification, pas résultat d'audit**. Ne pas attribuer de succès à un contrôle qui n'a pas été exécuté.
 
+## Clarification du périmètre — apport Site Bababou (11/10/2026)
+
+Le projet [Cloudflare security-audit-skill](https://github.com/cloudflare/security-audit-skill) est un **skill générique d'audit de sécurité du code**, avec six phases, un registre de couverture et des constats vérifiés indépendamment. **Ce n'est pas un scanner de compte Cloudflare** : Access, DNS, WAF, tunnels, FIDO2 et Service Tokens nécessitent des contrôles opérationnels distincts, en lecture seule, avec autorisation et preuves propres.
+
+Documentation de référence : [Site Bababou, PR #230](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/230), fichier `docs/security-audit-skill.md`. Sa révision upstream documentée est `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` (licence MIT, à vérifier avant importation). Épingler **le commit entier** et conserver `LICENSE` ; un blob Git ne prouve ni un téléchargement sûr ni une installation.
+
+Pour un audit effectivement réalisé, respecter les six phases upstream : reconnaissance, couverture, validation contradictoire, constats structurés, vérification indépendante et rapports dérivés. Produire `architecture.md`, `coverage-ledger.json`, `findings.json`, `REPORT.md`, `FINDINGS-DETAIL.md` et `NEEDS-VALIDATION.md`, puis lancer les validateurs upstream `validate-coverage-ledger.cjs` et `validate-findings.cjs` sur les sorties. Les données sensibles doivent rester hors dépôt et hors artefacts publics. Préserver `confirmed`, `needs_validation` et `rejected` et documenter `NOT_RUN` lorsqu'aucun audit n'a eu lieu.
+
+Le validateur local `scripts/validate-cloudflare-audit.mjs` contrôle **uniquement une enveloppe de traçabilité propre au Site Alban** ; il ne remplace ni les deux validateurs upstream, ni Semgrep/BetterLeaks, ni Playwright/ZAP, ni l'audit du compte Cloudflare. Aucun succès d'un contrôle de schéma ne doit être représenté comme absence de vulnérabilité.
+
 ## 1. Provenance et trust boundary
 
 Source : https://github.com/cloudflare/security-audit-skill
