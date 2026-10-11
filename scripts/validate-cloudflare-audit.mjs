@@ -47,30 +47,45 @@ export function validateAudit(document, expectedHead) {
 				errors.push(`${at} must be an object`);
 				continue;
 			}
-			if (typeof control.id !== "string" || !/^[a-z0-9][a-z0-9._-]*$/.test(control.id)) {
+			if (
+				typeof control.id !== "string" ||
+				!/^[a-z0-9][a-z0-9._-]*$/.test(control.id)
+			) {
 				errors.push(`${at}.id invalid`);
 			} else if (ids.has(control.id)) {
 				errors.push(`${at}.id duplicated`);
 			} else {
 				ids.add(control.id);
 			}
-			if (!["pass", "fail", "not-run", "not-applicable"].includes(control.status)) {
+			if (
+				!["pass", "fail", "not-run", "not-applicable"].includes(control.status)
+			) {
 				errors.push(`${at}.status invalid`);
 			}
-			if (typeof control.scope !== "string" || !control.scope.trim()) {
+			if (
+				typeof control.scope !== "string" ||
+				!control.scope.trim()
+			) {
 				errors.push(`${at}.scope required`);
 			}
 			if (control.status === "pass" || control.status === "fail") {
-				if (typeof control.evidence !== "string" || !control.evidence.trim()) {
+				if (
+					typeof control.evidence !== "string" ||
+					!control.evidence.trim()
+				) {
 					errors.push(`${at}.evidence required for executed controls`);
 				}
 			}
-			if (control.status === "not-run" &&
-				(typeof control.reason !== "string" || !control.reason.trim())) {
+			if (
+				control.status === "not-run" &&
+				(typeof control.reason !== "string" || !control.reason.trim())
+			) {
 				errors.push(`${at}.reason required when not-run`);
 			}
-			if (control.status === "not-applicable" &&
-				(typeof control.reason !== "string" || !control.reason.trim())) {
+			if (
+				control.status === "not-applicable" &&
+				(typeof control.reason !== "string" || !control.reason.trim())
+			) {
 				errors.push(`${at}.reason required when not-applicable`);
 			}
 			if (
@@ -84,20 +99,29 @@ export function validateAudit(document, expectedHead) {
 	return errors;
 }
 
-const invoked = process.argv[1] && resolve(process.argv[1]) === resolve(new URL(import.meta.url).pathname);
+const invoked =
+	process.argv[1] &&
+	resolve(process.argv[1]) === resolve(new URL(import.meta.url).pathname);
 if (invoked) {
 	const file = process.argv[2];
 	if (!file) {
-		console.error("Usage: node scripts/validate-cloudflare-audit.mjs <evidence.json> [expected-head-sha]");
+		console.error(
+			"Usage: node scripts/validate-cloudflare-audit.mjs <evidence.json> [expected-head-sha]",
+		);
 		process.exitCode = 2;
 	} else {
 		try {
-			const errors = validateAudit(JSON.parse(readFileSync(file, "utf8")), process.argv[3]);
+			const errors = validateAudit(
+				JSON.parse(readFileSync(file, "utf8")),
+				process.argv[3],
+			);
 			if (errors.length) {
 				for (const error of errors) console.error(`FAIL: ${error}`);
 				process.exitCode = 1;
 			} else {
-				console.log("OK: evidence schema and SHA provenance valid (not a security audit attestation)");
+				console.log(
+					"OK: evidence schema and SHA provenance valid (not a security audit attestation)",
+				);
 			}
 		} catch (error) {
 			console.error(`FAIL: unable to validate evidence: ${error.message}`);
