@@ -9,7 +9,14 @@ const valid = () => ({
 	upstreamSha: UPSTREAM,
 	upstreamLicense: "MIT",
 	auditedAt: "2026-10-10T21:00:00Z",
-	controls: [{ id: "access-anonymous", scope: "site", status: "not-run", reason: "No operator credentials" }],
+	controls: [
+		{
+			id: "access-anonymous",
+			scope: "site",
+			status: "not-run",
+			reason: "No operator credentials",
+		},
+	],
 });
 
 test("accepts explicit not-run controls without claiming success", () => {
@@ -23,14 +30,18 @@ test("rejects missing upstream provenance and SHA mismatch", () => {
 });
 test("requires evidence for pass and fail", () => {
 	for (const status of ["pass", "fail"]) {
-	  const evidence = valid();
-	  evidence.controls[0] = { id: status, scope: "site", status };
-	  assert.match(validateAudit(evidence).join(" "), /evidence required/);
+		const evidence = valid();
+		evidence.controls[0] = { id: status, scope: "site", status };
+		assert.match(validateAudit(evidence).join(" "), /evidence required/);
 	}
 });
 test("rejects duplicate control identifiers and unsubstantiated exclusion", () => {
 	const evidence = valid();
-	evidence.controls.push({ id: "access-anonymous", scope: "site", status: "not-applicable" });
+	evidence.controls.push({
+		id: "access-anonymous",
+		scope: "site",
+		status: "not-applicable",
+	});
 	const errors = validateAudit(evidence).join(" ");
 	assert.match(errors, /duplicated/);
 	assert.match(errors, /reason required/);
