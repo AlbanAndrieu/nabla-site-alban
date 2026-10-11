@@ -65,13 +65,18 @@ export function validateAudit(document, expectedHead) {
 					errors.push(`${at}.evidence required for executed controls`);
 				}
 			}
-			if (control.status === "not-run" && !control.reason?.trim()) {
+			if (control.status === "not-run" &&
+				(typeof control.reason !== "string" || !control.reason.trim())) {
 				errors.push(`${at}.reason required when not-run`);
 			}
-			if (control.status === "not-applicable" && !control.reason?.trim()) {
+			if (control.status === "not-applicable" &&
+				(typeof control.reason !== "string" || !control.reason.trim())) {
 				errors.push(`${at}.reason required when not-applicable`);
 			}
-			if (control.activityUuid !== undefined && !/^[0-9a-f-]{36}$/i.test(control.activityUuid)) {
+			if (
+				control.activityUuid !== undefined &&
+				!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(control.activityUuid)
+			) {
 				errors.push(`${at}.activityUuid invalid`);
 			}
 		}
