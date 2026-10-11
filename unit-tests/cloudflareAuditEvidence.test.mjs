@@ -94,7 +94,6 @@ test("rejects a missing reason for an unexecuted check", () => {
 
 test("accepts a syntactically valid DSOMM UUID without attesting its provenance", () => {
 	const evidence = valid();
-	evidence.controls[0].activityUuid =
-		"123e4567-e89b-42d3-a456-426614174000";
+	evidence.controls[0].activityUuid = "123e4567-e89b-42d3-a456-426614174000";
 	assert.deepEqual(validateAudit(evidence, HEAD), []);
 });
