@@ -26,7 +26,10 @@ test("rejects missing upstream provenance and SHA mismatch", () => {
 	const evidence = valid();
 	evidence.upstreamSha = "latest";
 	assert.match(validateAudit(evidence, "c".repeat(40)).join(" "), /upstreamSha/);
-	assert.match(validateAudit(evidence, "c".repeat(40)).join(" "), /headSha differs/);
+	assert.match(
+		validateAudit(evidence, "c".repeat(40)).join(" "),
+		/headSha differs/,
+	);
 });
 test("requires evidence for pass and fail", () => {
 	for (const status of ["pass", "fail"]) {
