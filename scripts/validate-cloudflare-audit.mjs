@@ -16,7 +16,7 @@ export function validateAudit(document, expectedHead) {
 	  errors.push("headSha must be a full 40-character Git SHA");
 	}
 	if (expectedHead && sha !== expectedHead) {
-	\terrors.push("headSha differs from the requested HEAD");
+			errors.push("headSha differs from the requested HEAD");
 	}
 	if (typeof document.upstreamSha !== "string" || !/^[a-f0-9]{40}$/i.test(document.upstreamSha)) {
 	  errors.push("upstreamSha must pin a full commit SHA");
@@ -41,7 +41,7 @@ export function validateAudit(document, expectedHead) {
 	    else if (ids.has(control.id)) errors.push(`${at}.id duplicated`);
 	    else ids.add(control.id);
 	    if (!["pass", "fail", "not-run", "not-applicable"].includes(control.status)) {
-	\t\terrors.push(`${at}.status invalid`);
+	\t		errors.push(`${at}.status invalid`);
 	\t}
 	    if (typeof control.scope !== "string" || !control.scope.trim()) errors.push(`${at}.scope required`);
 	    if (control.status === "pass" || control.status === "fail") {
