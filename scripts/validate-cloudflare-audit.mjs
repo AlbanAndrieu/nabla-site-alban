@@ -16,15 +16,25 @@ export function validateAudit(document, expectedHead) {
 		errors.push("headSha must be a full 40-character Git SHA");
 	}
 	if (expectedHead && sha !== expectedHead) {
-			errors.push("headSha differs from the requested HEAD");
+		errors.push("headSha differs from the requested HEAD");
 	}
-	if (typeof document.upstreamSha !== "string" || !/^[a-f0-9]{40}$/i.test(document.upstreamSha)) {
+	if (
+		typeof document.upstreamSha !== "string" ||
+		!/^[a-f0-9]{40}$/i.test(document.upstreamSha)
+	) {
 		errors.push("upstreamSha must pin a full commit SHA");
 	}
-	if (typeof document.upstreamLicense !== "string" || !document.upstreamLicense.trim()) {
+	if (
+		typeof document.upstreamLicense !== "string" ||
+		!document.upstreamLicense.trim()
+	) {
 		errors.push("upstreamLicense is required");
 	}
-	if (typeof document.auditedAt !== "string" || !/^\d{4}-\d{2}-\d{2}T/.test(document.auditedAt) || !Number.isFinite(Date.parse(document.auditedAt))) {
+	if (
+		typeof document.auditedAt !== "string" ||
+		!/^\d{4}-\d{2}-\d{2}T/.test(document.auditedAt) ||
+		!Number.isFinite(Date.parse(document.auditedAt))
+	) {
 		errors.push("auditedAt must be an ISO timestamp");
 	}
 	if (!Array.isArray(document.controls) || document.controls.length === 0) {
@@ -37,19 +47,33 @@ export function validateAudit(document, expectedHead) {
 				errors.push(`${at} must be an object`);
 				continue;
 			}
-			if (typeof control.id !== "string" || !/^[a-z0-9][a-z0-9._-]*$/.test(control.id)) errors.push(`${at}.id invalid`);
-			else if (ids.has(control.id)) errors.push(`${at}.id duplicated`);
-			else ids.add(control.id);
+			if (typeof control.id !== "string" || !/^[a-z0-9][a-z0-9._-]*$/.test(control.id)) {
+				errors.push(`${at}.id invalid`);
+			} else if (ids.has(control.id)) {
+				errors.push(`${at}.id duplicated`);
+			} else {
+				ids.add(control.id);
+			}
 			if (!["pass", "fail", "not-run", "not-applicable"].includes(control.status)) {
 				errors.push(`${at}.status invalid`);
-		}
-			if (typeof control.scope !== "string" || !control.scope.trim()) errors.push(`${at}.scope required`);
-			if (control.status === "pass" || control.status === "fail") {
-				if (typeof control.evidence !== "string" || !control.evidence.trim()) errors.push(`${at}.evidence required for executed controls`);
 			}
-			if (control.status === "not-run" && (typeof control.reason !== "string" || !control.reason.trim())) errors.push(`${at}.reason required when not-run`);
-			if (control.status === "not-applicable" && (typeof control.reason !== "string" || !control.reason.trim())) errors.push(`${at}.reason required when not-applicable`);
-			if (control.activityUuid !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(control.activityUuid)) errors.push(`${at}.activityUuid invalid`);
+			if (typeof control.scope !== "string" || !control.scope.trim()) {
+				errors.push(`${at}.scope required`);
+			}
+			if (control.status === "pass" || control.status === "fail") {
+				if (typeof control.evidence !== "string" || !control.evidence.trim()) {
+					errors.push(`${at}.evidence required for executed controls`);
+				}
+			}
+			if (control.status === "not-run" && !control.reason?.trim()) {
+				errors.push(`${at}.reason required when not-run`);
+			}
+			if (control.status === "not-applicable" && !control.reason?.trim()) {
+				errors.push(`${at}.reason required when not-applicable`);
+			}
+			if (control.activityUuid !== undefined && !/^[0-9a-f-]{36}$/i.test(control.activityUuid)) {
+				errors.push(`${at}.activityUuid invalid`);
+			}
 		}
 	}
 	return errors;
