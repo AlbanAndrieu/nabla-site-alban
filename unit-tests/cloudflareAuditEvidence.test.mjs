@@ -56,3 +56,26 @@ test("rejects malformed evidence payload", () => {
 	assert.match(validateAudit([]).join(" "), /JSON object/);
 	assert.match(validateAudit({}).join(" "), /controls/);
 });
+
+test("rejects an unknown status rather than treating it as successful", () => {
+	const evidence = valid();
+	evidence.controls[0].status = "success";
+	assert.match(validateAudit(evidence).join(" "), /status invalid/);
+});
+
+test("rejects malformed DSOMM activity UUIDs", () => {
+	const evidence = valid();
+	evidence.controls[0].activityUuid = "00000000-0000-0000-0000-000000000000";
+	assert.match(validateAudit(evidence).join(" "), /activityUuid invalid/);
+});
+
+test("accepts a documented failed control without upgrading it to pass", () => {
+	const evidence = valid();
+	evidence.controls[0] = {
+		id: "access-anonymous",
+		scope: "site",
+		status: "fail",
+		evidence: "redacted/report.json",
+	};
+	assert.deepEqual(validateAudit(evidence, HEAD), []);
+});
