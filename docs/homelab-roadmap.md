@@ -1,5 +1,33 @@
 # Feuille de route homelab
 
+- [ ] **P1 — Nuclei public DAST + DefectDojo** : exécuter le scan à débit limité de `albanandrieu.com` dans la PR, lire le résumé par sévérité, stabiliser le téléchargement/versionnement des templates et valider les exceptions par IDs ; importer les JSONL via API DefectDojo depuis un runner ayant accès à l'homelab et des secrets restreints. Aucun import n'est attesté tant que l'API n'a pas confirmé sa réception. Voir [procédure Nuclei](nuclei-security-scan.md).
+
+- [ ] **P1 — Transfert contrôlé Bababou #230** : distinguer audit générique de code en six phases et audit opérationnel du compte Cloudflare ; réutiliser les validateurs upstream du ledger/findings, l'upstream épinglé et la procédure de sandbox sans données sensibles. Ne pas confondre le validateur local de métadonnées avec une attestation de sécurité. Détails : [runbook](cloudflare-security-audit-runbook.md).
+- [ ] **P1 — Cloudflare security-audit-skill (Site Alban + FastAPI)** : intégrer le skill officiel `cloudflare/security-audit-skill` dans `nabla-site-alban` et `fastapi-sample` en épinglant l'upstream et la licence, sur le modèle de `nabla-compose/.agents/skills/security-audit`. Réaliser d'abord un audit incrémental local-first des PR actives, puis une revue élargie (Access 403 / Service Tokens, GitHub + YubiKey/FIDO2, DNS/Traefik/Tunnel, secrets et sondes authentifiées). Produire un rapport reproductible avec ledger de couverture, findings, preuves et limites ; rapprocher les scénarios STRIDE et les UUID DSOMM officiels. Réutiliser l'audit partiel de `nabla-compose` comme antériorité, sans le présenter comme un audit complet ni supprimer les tests SAST/DAST existants. Ne pas merger automatiquement.
+
+## P1 — Protocole d'audit Cloudflare (local-first)
+
+Procédure et critères détaillés : [runbook d'audit](cloudflare-security-audit-runbook.md).
+
+- [ ] Vérifier licence, version et commit SHA upstream avant importation ; inventorier dépendances et permissions du skill et conserver un manifeste de provenance.
+- [ ] Exécuter le skill sur le diff de la PR au HEAD exact, enregistrer commandes, environnement, portée, contrôles exécutés et non exécutés ; étendre ensuite aux routes publiques.
+- [ ] Vérifier distinctement refus HTTP 403 anonyme attendu, requête authentifiée Service Token et disponibilité LAN de l'origine. Un 403 ne démontre ni une panne ni la configuration correcte d'Access.
+- [ ] Comparer routes déclarées et règles Traefik, DNS, Tunnel et politiques Cloudflare effectivement consultées : une URL déclarée ne prouve pas sa publication.
+- [ ] Produire un registre de findings avec sévérité, CWE/STRIDE, activityUuid DSOMM vérifié, propriétaire, preuve expurgée et remédiation.
+- [ ] Maintenir SAST, BetterLeaks, Playwright et ZAP indépendants ; valider localement la quality gate sur le HEAD exact avant de consommer la CI.
+- [ ] Avant merge : contrôles CI requis sur HEAD exact et findings critiques traités ; ne jamais présenter le seul succès PR CI policy comme une validation exhaustive.
+
+## Exécution et acceptation — audit Cloudflare (P1)
+
+1. **Préparation sans exécution implicite** : vérifier la révision upstream officielle et sa licence ; enregistrer le commit exact, le checksum et la provenance avant tout vendoring ou lancement. Ne pas prétendre que le skill est installé tant que ces preuves manquent.
+2. **Périmètre initial** : examiner uniquement les fichiers modifiés de la PR active, les configurations Cloudflare pertinentes et les contrôles de sécurité existants ; exclure les secrets et les jetons des rapports. Les appels à Cloudflare exigent une autorisation explicite et des permissions minimales en lecture.
+3. **Couverture traçable** : conserver pour chaque contrôle un identifiant stable, la cible, la révision, la commande réellement exécutée, la date, le résultat (`pass`, `fail`, `not-run`, `not-applicable`), les preuves expurgées et les limites. `not-run` ne vaut jamais `pass`.
+4. **Scénarios à couvrir** : Access (403 attendu vs origine indisponible), authentification GitHub/FIDO2, Service Tokens, DNS, Tunnel/Traefik, surface publique, cookies/sessions, secrets et probes authentifiés. Associer les constats STRIDE et DSOMM uniquement sur la base d'identifiants officiels vérifiés ; ne pas inventer d'UUID.
+5. **Quality gate et publication** : exécuter d'abord les contrôles locaux ciblés, puis la gate de publication lorsque l'environnement le permet. Ne jamais désactiver SAST, BetterLeaks, Playwright, ZAP ni les gardes de publication ; reporter explicitement tout contrôle non exécuté. La CI GitHub reste une preuve distincte, non substituable à un test local.
+6. **Critère de clôture** : rapport versionné, ledger de couverture, provenance upstream, constats et remédiations priorisés P0–P4, vérification des faux positifs, preuves locales et état de la CI au HEAD exact. Garder la PR ouverte jusqu'à revue, sans merge automatique.
+
+**Ordre de déploiement** : prototype en lecture seule sur Site Alban → validation de la parité avec l'audit partiel `nabla-compose` → transposition dans `fastapi-sample` → audit élargi sur preuves de runtime autorisées. La simple présence de cette tâche dans la roadmap ne prouve ni installation ni exécution.
+
 ## P1 — Cloudflare Access, identité et exposition interne (10/10/2026)
 
 - [x] Préserver les preuves de deuxième vérification Access de `fastapi-sample` dans les snapshots : éligibilité, tentative et résultat d'accès à l'origine.
@@ -11,7 +39,7 @@
 - [ ] Relier les preuves Access / FIDO2 (GitHub comme IdP) et les risques de session détournée au modèle STRIDE / DSOMM existant.
 
 
-Dernière réconciliation : 1 octobre 2026.
+Dernière réconciliation du protocole : 10 octobre 2026 (validation runtime encore requise).
 
 Ce document est l'unique backlog actif propre à TrueNAS, FastAPI,
 `nabla-compose`, Talos/Kubernetes, DNS et diagnostics homelab. Les runbooks

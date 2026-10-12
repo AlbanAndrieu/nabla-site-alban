@@ -1,0 +1,217 @@
+name: Nuclei public DAST (Site Alban)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "19 4 * * 1"
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/nuclei-public.yml"
+      - ".nuclei/**"
+      - "scripts/nuclei-*.mjs"
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "next.config.mjs"
+      - "vercel.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nuclei-public-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-dast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Install pinned Nuclei with checksum verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/nuclei.zip"
+          curl --fail --location --silent --show-error --max-time 90 \
+            "https://github.com/projectdiscovery/nuclei/releases/download/v3.11.1/nuclei_3.11.1_linux_amd64.zip" \
+            --output "$archive"
+          printf '%s  %s\n' \
+            'ea63d4ae232808cd7c6bc00d0142428e231fab59dae01042246097d195835ab6' "$archive" \
+            | sha256sum --check --status
+          unzip -p "$archive" nuclei > "${RUNNER_TEMP}/nuclei"
+          chmod 700 "${RUNNER_TEMP}/nuclei"
+          "${RUNNER_TEMP}/nuclei" -version
+          # Template update is separate from the binary release and is mandatory.
+          "${RUNNER_TEMP}/nuclei" -ut
+          test -d "${HOME}/nuclei-templates" || {
+            echo "::error::Nuclei templates missing after bootstrap."
+            exit 1
+          }
+
+      - name: Scan public website (bounded HTTP templates)
+        id: nuclei
+        shell: bash
+        env:
+          NUCLEI_DISABLE_UPDATE_CHECK: "true"
+          NUCLEI_NO_COLOR: "true"
+        run: |
+          set -euo pipefail
+          mkdir -p nuclei-results
+          # No credentials, fuzzing, OAST, headless browser or network discovery.
+          # Cap concurrency and rate to reduce load on production and Cloudflare.
+          excludes=()
+          while IFS= read -r id; do
+            [[ "$id" =~ ^#.*$ || -z "$id" ]] && continue
+            if [[ ! "$id" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+              echo "::error::Invalid Nuclei exclusion template ID"
+              exit 2
+            fi
+            excludes+=("$id")
+          done < .nuclei/ignore-templates.txt
+          exclusion_args=()
+          if (( ${#excludes[@]} )); then
+            joined="$(IFS=,; echo "${excludes[*]}")"
+            exclusion_args=(-eid "$joined")
+          fi
+          "${RUNNER_TEMP}/nuclei" \
+            -u https://albanandrieu.com \
+            -pt http -ni \
+            -etags dos,fuzz,bruteforce,intrusive \
+            -rl 2 -c 1 -timeout 5 -retries 0 \
+            -duc -jsonl -o nuclei-results/nuclei.jsonl \
+            "${exclusion_args[@]}"
+          test -f nuclei-results/nuclei.jsonl || : > nuclei-results/nuclei.jsonl
+          node scripts/nuclei-to-sarif.mjs nuclei-results/nuclei.jsonl nuclei-results/nuclei.sarif
+
+      - name: Summarize Nuclei findings and reviewed exclusions
+        if: always()
+        shell: bash
+        env:
+          SCAN_OUTCOME: ${{ steps.nuclei.outcome }}
+        run: |
+          if [[ "$SCAN_OUTCOME" != "success" ]]; then
+            echo "## Nuclei public DAST — NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
+            echo "Scanner failed before completion; empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
+          else
+            node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload scan report (restricted artifact lifetime)
+        if: always() && hashFiles('nuclei-results/nuclei.jsonl') != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: nuclei-public-${{ github.run_id }}
+          path: |
+            nuclei-results/nuclei.jsonl
+            nuclei-results/nuclei.sarif
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Optional DefectDojo reimport (trusted production branch only)
+        if: steps.nuclei.outcome == 'success' && github.ref == 'refs/heads/master'
+        continue-on-error: true
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
+          DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${DEFECTDOJO_URL:-}" || -z "${DEFECTDOJO_API_TOKEN:-}" ]]; then
+            echo "::notice::DefectDojo not configured; report retained as artifact."
+            exit 0
+          fi
+          if [[ ! "$DEFECTDOJO_URL" =~ ^https://[^/?#]+/?$ ]]; then
+            echo "::warning::DefectDojo upload skipped: HTTPS endpoint required."
+            exit 1
+          fi
+          if [[ -z "${CF_ACCESS_CLIENT_ID:-}" || -z "${CF_ACCESS_CLIENT_SECRET:-}" ]]; then
+            echo "::warning::Cloudflare Access credentials missing; refusing DefectDojo API call."
+            exit 1
+          fi
+          if [[ -z "${DEFECTDOJO_PRODUCT_NAME:-}" ]]; then
+            echo "::warning::DefectDojo product name not mapped to the canonical service catalog; skip import."
+            exit 0
+          fi
+          if [[ ! -s nuclei-results/nuclei.jsonl ]]; then
+            echo "::notice::No Nuclei findings to reimport; skipping empty upload."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 30 \
+            -o "${RUNNER_TEMP}/defectdojo-response.json" \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+            -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
+            -F 'scan_type=Nuclei Scan' \
+            -F 'product_type_name=Web Applications' \
+            -F "product_name=${DEFECTDOJO_PRODUCT_NAME}" \
+            -F 'engagement_name=Public DAST' \
+            -F 'test_title=Nuclei public albanandrieu.com' \
+            -F 'auto_create_context=true' \
+            -F 'active=true' \
+            -F 'verified=false' \
+            -F 'minimum_severity=Info' \
+            -F 'file=@nuclei-results/nuclei.jsonl;type=application/json' \
+            "${DEFECTDOJO_URL%/}/api/v2/reimport-scan/" \
+            || { echo "::warning::DefectDojo not reachable or import rejected."; exit 1; }
+          echo "DefectDojo reimport API accepted the report; check server-side processing."
+
+      - name: Retrieve DefectDojo findings for this product (trusted runner)
+        if: github.ref == 'refs/heads/master'
+        continue-on-error: true
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
+          DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${DEFECTDOJO_URL:-}" || -z "${DEFECTDOJO_API_TOKEN:-}" || -z "${DEFECTDOJO_PRODUCT_NAME:-}" ]]; then
+            echo "::notice::DefectDojo readback NOT_CONFIGURED (no private token or product mapping)."
+            exit 0
+          fi
+          if [[ ! "${DEFECTDOJO_URL}" =~ ^https://[^/?#]+/?$ ]]; then
+            echo "::error::DefectDojo must use a fixed HTTPS origin (no path, query or fragment)."
+            exit 1
+          fi
+          if [[ -z "${CF_ACCESS_CLIENT_ID:-}" || -z "${CF_ACCESS_CLIENT_SECRET:-}" ]]; then
+            echo "::warning::Cloudflare Access credentials missing; refusing DefectDojo API call."
+            exit 1
+          fi
+
+          products="${RUNNER_TEMP}/dojo-products.json"
+          findings="${RUNNER_TEMP}/dojo-findings.json"
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+            -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
+            -H 'Accept: application/json' \
+            --get --data-urlencode "name=${DEFECTDOJO_PRODUCT_NAME}" \
+            "${DEFECTDOJO_URL%/}/api/v2/products/" > "$products"
+          product_id="$(jq -r --arg name "$DEFECTDOJO_PRODUCT_NAME" '[.results[]? | select(.name == $name) | .id] | if length == 1 then .[0] else empty end' "$products")"
+          if [[ ! "$product_id" =~ ^[0-9]+$ ]]; then
+            echo "::warning::DefectDojo product mapping missing/ambiguous; no findings queried."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+            -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
+            -H 'Accept: application/json' \
+            --get --data-urlencode "product=${product_id}" \
+            --data-urlencode "limit=100" \
+            "${DEFECTDOJO_URL%/}/api/v2/findings/" > "$findings"
+          # Do not publish finding details, endpoints, secrets, or full API JSON.
+          jq -r '. as $r | "DefectDojo readback: product mapped, fetched \($r.results | length) findings on first page; total \($r.count // "unknown"). Readback is not an audit attestation."' "$findings"
+          rm -f "$products" "$findings"

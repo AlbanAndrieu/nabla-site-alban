@@ -1,0 +1,51 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: nabla-site-alban
+  title: Site Alban
+  description: Public bilingual professional website and DSOMM assessment evidence for Nabla.
+  labels:
+    albandrieu.com/operational-state: active
+    albandrieu.com/operational-criticality: medium
+    albandrieu.com/business-criticality: medium
+    albandrieu.com/bia-scope: direct
+  tags:
+    - website
+    - security
+    - dsomm
+    - devsecops
+  annotations:
+    albandrieu.com/bia-mtpd: P2D
+    albandrieu.com/bia-mbco: restore-public-site-and-dsomm-assessment-within-1-day
+    albandrieu.com/bia-impact-operational: medium
+    albandrieu.com/bia-impact-customer: low
+    albandrieu.com/bia-impact-financial: low
+    albandrieu.com/bia-impact-legal-regulatory: low
+    albandrieu.com/bia-impact-reputation: medium
+    albandrieu.com/bia-impact-confidentiality: low
+    albandrieu.com/bia-impact-integrity: medium
+    albandrieu.com/bia-impact-privacy: low
+    albandrieu.com/bia-rto: P1D
+    albandrieu.com/bia-rpo: P1D
+    albandrieu.com/bia-status: provisional
+    albandrieu.com/bia-reviewed-at: "2026-10-12"
+    backstage.io/source-location: url:https://github.com/AlbanAndrieu/nabla-site-alban/
+    github.com/project-slug: AlbanAndrieu/nabla-site-alban
+    backstage.io/techdocs-ref: url:https://github.com/AlbanAndrieu/nabla-site-alban/tree/master/
+  links:
+    - url: https://www.albanandrieu.com
+      title: Site web de production
+    - url: https://github.com/AlbanAndrieu/nabla-site-alban
+      title: Dépôt source
+    - url: https://www.albanandrieu.com/fr/security/dsomm
+      title: Analyse DSOMM
+    - url: https://github.com/AlbanAndrieu/nabla-site-alban/blob/master/docs/dsomm-assessment-contract.md
+      title: Contrat des analyses DSOMM
+    - url: https://github.com/AlbanAndrieu/nabla-site-alban/blob/master/nabla-dsomm-assessment.json
+      title: Évaluation DSOMM source
+spec:
+  type: website
+  lifecycle: production
+  owner: group:default/nabla-platform
+  system: system:default/nabla-homelab
