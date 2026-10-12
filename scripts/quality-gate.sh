@@ -94,7 +94,7 @@ if (("${#CHANGED_FILES[@]}" > 0)); then
             echo "   No CI-log analysis is required for this condition." >&2
             git status --short >&2
             echo "--- exact formatter patch ---" >&2
-            if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
+            if [[ "${QUALITY_VERBOSE:-0}" == "1" || "${CI:-false}" == "true" ]]; then
                 git diff --no-ext-diff -- "${CHANGED_FILES[@]}" >&2 || true
             else
                 git diff --no-ext-diff -- "${CHANGED_FILES[@]}" | head -n "${LOG_TAIL}" >&2 || true
