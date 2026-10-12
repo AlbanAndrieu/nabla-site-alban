@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0"><head><title>Nabla public security intelligence (10 feeds)</title></head><body>
+  <outline text="CISA Alerts" title="CISA Alerts" type="rss" xmlUrl="https://www.cisa.gov/cybersecurity-advisories/all.xml" />
+  <outline text="CERT-FR" title="CERT-FR" type="rss" xmlUrl="https://www.cert.ssi.gouv.fr/feed/" />
+  <outline text="CERT/CC" title="CERT/CC" type="rss" xmlUrl="https://www.kb.cert.org/vulfeed/" />
+  <outline text="Kubernetes" title="Kubernetes" type="rss" xmlUrl="https://kubernetes.io/feed.xml" />
+  <outline text="CNCF" title="CNCF" type="rss" xmlUrl="https://www.cncf.io/feed/" />
+  <outline text="OpenSSF" title="OpenSSF" type="rss" xmlUrl="https://openssf.org/feed/" />
+  <outline text="Snyk" title="Snyk" type="rss" xmlUrl="https://snyk.io/blog/feed/" />
+  <outline text="GitHub Security" title="GitHub Security" type="rss" xmlUrl="https://github.blog/tag/security/feed/" />
+  <outline text="Unit 42" title="Unit 42" type="rss" xmlUrl="https://unit42.paloaltonetworks.com/feed/" />
+  <outline text="Google Project Zero" title="Google Project Zero" type="rss" xmlUrl="https://projectzero.google/feed.xml" />
+</body></opml>

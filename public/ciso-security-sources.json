@@ -1,0 +1,56 @@
+{
+	"schemaVersion": 1,
+	"purpose": "public-security-intelligence-only",
+	"sources": [
+		{
+			"title": "CISA Alerts",
+			"url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+			"scope": "global"
+		},
+		{
+			"title": "CERT-FR",
+			"url": "https://www.cert.ssi.gouv.fr/feed/",
+			"scope": "global"
+		},
+		{
+			"title": "CERT/CC",
+			"url": "https://www.kb.cert.org/vulfeed/",
+			"scope": "global"
+		},
+		{
+			"title": "Kubernetes",
+			"url": "https://kubernetes.io/feed.xml",
+			"scope": "homelab"
+		},
+		{
+			"title": "CNCF",
+			"url": "https://www.cncf.io/feed/",
+			"scope": "homelab"
+		},
+		{
+			"title": "OpenSSF",
+			"url": "https://openssf.org/feed/",
+			"scope": "homelab"
+		},
+		{
+			"title": "Snyk",
+			"url": "https://snyk.io/blog/feed/",
+			"scope": "homelab"
+		},
+		{
+			"title": "GitHub Security",
+			"url": "https://github.blog/tag/security/feed/",
+			"scope": "homelab"
+		},
+		{
+			"title": "Unit 42",
+			"url": "https://unit42.paloaltonetworks.com/feed/",
+			"scope": "global"
+		},
+		{
+			"title": "Google Project Zero",
+			"url": "https://projectzero.google/feed.xml",
+			"scope": "global"
+		}
+	]
+}
