@@ -2,7 +2,23 @@
 	"mcpServers": {
 		"next-devtools": {
 			"command": "npx",
-			"args": ["-y", "next-devtools-mcp@latest"]
+			"args": [
+				"-y",
+				"next-devtools-mcp@latest"
+			]
+		},
+		"defectdojo": {
+			"type": "stdio",
+			"command": "uvx",
+			"args": [
+				"--from",
+				"git+https://github.com/dcianciulli/defectdojo-mcp-server@4d34d17f346dccab92e97e3d50e77b568689f283",
+				"defectdojo-mcp-server"
+			],
+			"env": {
+				"DEFECTDOJO_URL": "${DEFECTDOJO_URL}",
+				"DEFECTDOJO_API_KEY": "${DEFECTDOJO_API_KEY}"
+			}
 		}
 	}
 }
