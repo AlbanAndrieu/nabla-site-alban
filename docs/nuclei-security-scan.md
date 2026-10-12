@@ -29,3 +29,17 @@ Les filtres Nuclei `-etags` (tags exclus) sont réservés aux familles de tests 
 ## État initial
 
 Au 12 octobre 2026 : workflow et import préparés, **scan Nuclei non exécuté depuis ce conteneur** (binaire Nuclei absent et DNS public indisponible) ; résultat DefectDojo **non confirmé**. Attendre une preuve d'exécution du workflow sur le HEAD exact avant de publier un inventaire d'erreurs ou warnings.
+
+## SARIF et consultation des findings DefectDojo
+
+La PR génère aussi `nuclei-results/nuclei.sarif` avec `scripts/nuclei-to-sarif.mjs`, inclus avec le JSONL dans l'artefact GitHub. Le SARIF est une **vue expurgée** (règle, gravité, libellé) ; il ne constitue pas une nouvelle analyse et ne doit pas contenir cookies, corps de réponse ni URL avec paramètres sensibles. Un import SARIF dans GitHub Code Scanning est distinct et exige les permissions et décisions de visibilité appropriées : sa présence dans l'artefact **ne signifie pas** que GitHub Code Scanning l'a ingéré.
+
+Depuis une session/API DefectDojo disposant des droits de lecture, les findings se consultent via `GET /api/v2/findings/?product=<ID_PRODUIT>` (et les filtres `test`, `active`, `severity`). L'ID produit doit être résolu depuis `GET /api/v2/products/?name=<NOM_PRODUIT>` ou depuis l'interface, jamais inventé. Paginer les résultats ; protéger les jetons et ne pas publier les URL de reproduction sensibles.
+
+### Réconciliation avec nabla-compose
+
+Le catalogue principal `nabla-compose/catalog/services.json` déclare **le service DefectDojo lui-même** sous `id: defectdojo`, `name: DefectDojo`. Il ne déclare pas `nabla-site-alban` ou `albanandrieu.com` comme service applicatif. Le nom initial de produit DefectDojo `albanandrieu.com` provenait donc de la **cible DAST** et non du catalogue. L'import utilise désormais `vars.DEFECTDOJO_PRODUCT_NAME` : en son absence, aucun produit n'est créé arbitrairement. Il faut une association explicite et revue entre le produit DefectDojo, le dépôt `nabla-site-alban`, le domaine `albanandrieu.com` et une éventuelle future entrée canonique du catalogue.
+
+### Cloudflare security-audit-skill vs Nuclei
+
+Le skill Cloudflare épinglé `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` organise un **audit de code raisonné** (reconnaissance, ledger de couverture, investigation, vérification contradictoire, registre de findings). Il n'invoque pas Nuclei par défaut et n'impose pas de scan automatisé de l'URL de production. Il pourrait déceler des défauts équivalents quand le code montre leur cause, mais il ne peut pas reproduire automatiquement toutes les anomalies HTTP, TLS, configuration CDN ou comportements runtime observables par Nuclei. Inversement, Nuclei ne couvre pas toutes les vulnérabilités logiques du code. Les résultats doivent être comparés sur des identifiants/CWE et preuves confirmées, **pas présumés identiques**.
