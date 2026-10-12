@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import ThreatFeed from "@/components/ciso/ThreatFeed";
+import CtidIntelligence from "@/components/ciso/CtidIntelligence";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import { NON_INDEXABLE_ROBOTS } from "@/lib/sitePageCatalog";
@@ -14,8 +14,8 @@ export default async function CTIDPage({
 }) {
 	const { locale } = await params;
 	setRequestLocale(locale);
+	const fr = locale === "fr";
 	const t = await getTranslations("ctid");
-	// On retire tout le <nav> local
 	return (
 		<div className="site-content-page page-ciso page-dark">
 			<TopAnchor />
@@ -38,6 +38,11 @@ export default async function CTIDPage({
 						</div>
 						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">{t("description")}</p>
+						<p className="hero-description">
+							<a href={fr ? "/fr/ciso" : "/ciso"}>{fr ? "Retour au tableau de bord CISO" : "Back to the CISO dashboard"}</a>
+							{" · "}
+							<a href="/security-feed.xml">{fr ? "S'abonner au RSS sécurité" : "Subscribe to security RSS"}</a>
+						</p>
 					</div>
 				</section>
 				<section
@@ -49,15 +54,7 @@ export default async function CTIDPage({
 						{t("threatFeedTitle")}
 					</h2>
 					<p>{t("threatFeedIntro")}</p>
-					<ThreatFeed
-						locale={locale as "en" | "fr"}
-						labels={{
-							loading: t("threatFeed.loading"),
-							error: t("threatFeed.error"),
-							retry: t("threatFeed.retry"),
-							opensInNewTab: t("threatFeed.opensInNewTab"),
-						}}
-					/>
+					<CtidIntelligence locale={locale === "fr" ? "fr" : "en"} />
 				</section>
 			</main>
 			<SiteWidgetsScript />
