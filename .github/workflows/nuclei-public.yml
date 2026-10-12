@@ -119,6 +119,8 @@ jobs:
         continue-on-error: true
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
           DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
         shell: bash
@@ -128,8 +130,12 @@ jobs:
             echo "::notice::DefectDojo not configured; report retained as artifact."
             exit 0
           fi
-          if [[ ! "$DEFECTDOJO_URL" =~ ^https:// ]]; then
+          if [[ ! "$DEFECTDOJO_URL" =~ ^https://[^/?#]+/?$ ]]; then
             echo "::warning::DefectDojo upload skipped: HTTPS endpoint required."
+            exit 1
+          fi
+          if [[ -z "${CF_ACCESS_CLIENT_ID:-}" || -z "${CF_ACCESS_CLIENT_SECRET:-}" ]]; then
+            echo "::warning::Cloudflare Access credentials missing; refusing DefectDojo API call."
             exit 1
           fi
           if [[ -z "${DEFECTDOJO_PRODUCT_NAME:-}" ]]; then
@@ -142,6 +148,8 @@ jobs:
           fi
           curl --fail --silent --show-error --max-time 30 \
             -o "${RUNNER_TEMP}/defectdojo-response.json" \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
             -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
             -F 'scan_type=Nuclei Scan' \
             -F 'product_type_name=Web Applications' \
@@ -162,6 +170,8 @@ jobs:
         continue-on-error: true
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
           DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
         shell: bash
@@ -175,9 +185,16 @@ jobs:
             echo "::error::DefectDojo must use a fixed HTTPS origin (no path, query or fragment)."
             exit 1
           fi
+          if [[ -z "${CF_ACCESS_CLIENT_ID:-}" || -z "${CF_ACCESS_CLIENT_SECRET:-}" ]]; then
+            echo "::warning::Cloudflare Access credentials missing; refusing DefectDojo API call."
+            exit 1
+          fi
+
           products="${RUNNER_TEMP}/dojo-products.json"
           findings="${RUNNER_TEMP}/dojo-findings.json"
           curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
             -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
             -H 'Accept: application/json' \
             --get --data-urlencode "name=${DEFECTDOJO_PRODUCT_NAME}" \
@@ -188,6 +205,8 @@ jobs:
             exit 1
           fi
           curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
             -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
             -H 'Accept: application/json' \
             --get --data-urlencode "product=${product_id}" \
