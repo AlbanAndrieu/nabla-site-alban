@@ -2,6 +2,7 @@ import { rankArticles } from "@/lib/cisoThreatFeed";
 import { fetchFreshRssPublicArticles } from "@/lib/server/freshRssPublic";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function xml(value: string): string {
 	return value.replace(

@@ -73,3 +73,8 @@ La liste allowlistée des sources est dans `public/ciso-security-sources.json`, 
 **Séparation public/privé :** les findings DefectDojo futurs devront être traités dans un service serveur authentifié, avec accès read-only et filtrage d'information. Exporter publiquement uniquement un digest validé explicitement, sans versions, détails d'attaque, noms de projet, IP, identifiants ni informations personnelles.
 
 DORA (règlement (UE) 2022/2554) : art. 10 détection, art. 13 apprentissage et amélioration continue, art. 45 partage volontaire de renseignements. Il ne s'agit pas d'une obligation générale de publication de veille sur une page Internet. Référence : https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+
+
+### Filtre source côté serveur — garde de confidentialité
+
+Le serveur récupère aussi `subscription/list` et vérifie, avant toute publication, que `entry.origin.streamId` correspond à un abonnement dont l'URL figure **strictement** dans la liste de dix sources approuvées `public/ciso-security-sources.json`. Tout abonnement non mappé est rejeté (fail closed), y compris en présence d'un compte mal configuré ; l'identifiant du compte et les adresses privées ne sortent pas via l'API publique. Test de contrat `unit-tests/freshRssPublic.test.ts` avec un abonnement privé simulé. Un changement de source doit être approuvé et versionné, puis confirmé dans FreshRSS. Les caches CDN peuvent conserver un digest public jusqu'à expiration TTL, même après désactivation du flag : purger les caches en cas d'incident.
