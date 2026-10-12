@@ -7,7 +7,9 @@ import styles from "./CtidIntelligence.module.css";
 
 type Language = "en" | "fr";
 
-async function fetchNews(signal: AbortSignal): Promise<{ items: FeedItem[]; mode: string }> {
+async function fetchNews(
+	signal: AbortSignal,
+): Promise<{ items: FeedItem[]; mode: string }> {
 	try {
 		const response = await fetch("/api/ciso/threat-feed", { signal });
 		if (!response.ok) throw new Error("FreshRSS unavailable");
@@ -16,30 +18,54 @@ async function fetchNews(signal: AbortSignal): Promise<{ items: FeedItem[]; mode
 		return { items: data.items, mode: "FreshRSS" };
 	} catch {
 		if (signal.aborted) throw new Error("Aborted");
-		const configResponse = await fetch("/ciso-security-sources.json", { signal });
+		const configResponse = await fetch("/ciso-security-sources.json", {
+			signal,
+		});
 		if (!configResponse.ok) throw new Error("RSS fallback list unavailable");
-		const config = (await configResponse.json()) as { sources?: Array<{ url?: string }> };
-		const sources = (config.sources ?? []).filter((entry) => {
-			try { return new URL(entry.url ?? "").protocol === "https:"; } catch { return false; }
-		}).slice(0, 10);
-		const results = await Promise.allSettled(sources.map(async (entry) => {
-			const endpoint = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(entry.url ?? "");
-			const res = await fetch(endpoint, { signal });
-			if (!res.ok) throw new Error("Source unavailable");
-			const data = (await res.json()) as {
-				feed?: { title?: string };
-				items?: Array<{ title?: string; link?: string; pubDate?: string; description?: string }>;
-			};
-			return (data.items ?? []).slice(0, 5).flatMap((item) => {
-				const normalized = normalizeArticle({
-					title: item.title, link: item.link, pubDate: item.pubDate,
-					source: data.feed?.title ?? "RSS", summary: item.description,
+		const config = (await configResponse.json()) as {
+			sources?: Array<{ url?: string }>;
+		};
+		const sources = (config.sources ?? [])
+			.filter((entry) => {
+				try {
+					return new URL(entry.url ?? "").protocol === "https:";
+				} catch {
+					return false;
+				}
+			})
+			.slice(0, 10);
+		const results = await Promise.allSettled(
+			sources.map(async (entry) => {
+				const endpoint =
+					"https://api.rss2json.com/v1/api.json?rss_url=" +
+					encodeURIComponent(entry.url ?? "");
+				const res = await fetch(endpoint, { signal });
+				if (!res.ok) throw new Error("Source unavailable");
+				const data = (await res.json()) as {
+					feed?: { title?: string };
+					items?: Array<{
+						title?: string;
+						link?: string;
+						pubDate?: string;
+						description?: string;
+					}>;
+				};
+				return (data.items ?? []).slice(0, 5).flatMap((item) => {
+					const normalized = normalizeArticle({
+						title: item.title,
+						link: item.link,
+						pubDate: item.pubDate,
+						source: data.feed?.title ?? "RSS",
+						summary: item.description,
+					});
+					return normalized ? [normalized] : [];
 				});
-				return normalized ? [normalized] : [];
-			});
-		}));
+			}),
+		);
 		return {
-			items: results.flatMap((result) => result.status === "fulfilled" ? result.value : []),
+			items: results.flatMap((result) =>
+				result.status === "fulfilled" ? result.value : [],
+			),
 			mode: "RSS public · fallback",
 		};
 	}
@@ -52,7 +78,8 @@ const titleLabels = {
 		other: "Autres vulnérabilités et actualités",
 		analysis: "Résumé",
 		details: "Plus de détails",
-		evidence: "Criticité indicative, basée sur le titre et le résumé. Aucun impact sur le homelab n'est confirmé sans inventaire, version affectée et validation technique.",
+		evidence:
+			"Criticité indicative, basée sur le titre et le résumé. Aucun impact sur le homelab n'est confirmé sans inventaire, version affectée et validation technique.",
 		service: "Voir le service dans TrueNAS",
 		empty: "Aucun signal vérifiable dans les sources disponibles.",
 		load: "Chargement des flux de veille…",
@@ -67,7 +94,8 @@ const titleLabels = {
 		other: "Other vulnerabilities and security news",
 		analysis: "Summary",
 		details: "More details",
-		evidence: "Editorial severity derived from title and summary only. No homelab impact is confirmed without version evidence and technical verification.",
+		evidence:
+			"Editorial severity derived from title and summary only. No homelab impact is confirmed without version evidence and technical verification.",
 		service: "View service on TrueNAS page",
 		empty: "No usable articles from available sources.",
 		load: "Loading security feeds…",
@@ -79,37 +107,90 @@ const titleLabels = {
 } as const;
 
 const signalLabels = {
-	fr: { critical: "Signal critique", high: "Signal élevé", medium: "Signal modéré", informational: "Information" },
-	en: { critical: "Critical signal", high: "High signal", medium: "Medium signal", informational: "Information" },
+	fr: {
+		critical: "Signal critique",
+		high: "Signal élevé",
+		medium: "Signal modéré",
+		informational: "Information",
+	},
+	en: {
+		critical: "Critical signal",
+		high: "High signal",
+		medium: "Medium signal",
+		informational: "Information",
+	},
 } as const;
 
-function CtidCard({ item, locale, featured }: { item: CtidItem; locale: Language; featured: boolean }) {
+function CtidCard({
+	item,
+	locale,
+	featured,
+}: {
+	item: CtidItem;
+	locale: Language;
+	featured: boolean;
+}) {
 	const t = titleLabels[locale];
 	return (
 		<article className={styles.card}>
 			<div className={styles.meta}>
-				<span className={styles.severity} data-level={item.severity}>{signalLabels[locale][item.severity]}</span>
+				<span className={styles.severity} data-level={item.severity}>
+					{signalLabels[locale][item.severity]}
+				</span>
 				<span>{item.source}</span>
-				{item.pubDate && <time dateTime={item.pubDate}>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(item.pubDate))}</time>}
+				{item.pubDate && (
+					<time dateTime={item.pubDate}>
+						{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+							new Date(item.pubDate),
+						)}
+					</time>
+				)}
 			</div>
-			<h3><a href={item.link} target="_blank" rel="noopener noreferrer">{item.title} ↗</a></h3>
-			{featured && <p className={styles.summary}>{item.summary || (locale === "fr" ? "Consulter la source originale pour le contexte." : "See the original source for context.")}</p>}
+			<h3>
+				<a href={item.link} target="_blank" rel="noopener noreferrer">
+					{item.title} ↗
+				</a>
+			</h3>
+			{featured && (
+				<p className={styles.summary}>
+					{item.summary ||
+						(locale === "fr"
+							? "Consulter la source originale pour le contexte."
+							: "See the original source for context.")}
+				</p>
+			)}
 			{!featured && (
 				<details className={styles.disclosure}>
 					<summary>{t.analysis}</summary>
-					<p>{item.summary || (locale === "fr" ? "Résumé indisponible : lire la source." : "No excerpt available: see original.")}</p>
+					<p>
+						{item.summary ||
+							(locale === "fr"
+								? "Résumé indisponible : lire la source."
+								: "No excerpt available: see original.")}
+					</p>
 				</details>
 			)}
 			<details className={styles.disclosure}>
 				<summary>{t.details}</summary>
 				<p>{t.evidence}</p>
 				<dl className={styles.facts}>
-					<dt>{t.source}</dt><dd>{item.source}</dd>
-					{item.pubDate && <><dt>{t.date}</dt><dd>{item.pubDate.slice(0, 10)}</dd></>}
-					<dt>{t.tech}</dt><dd>{item.technologies.join(", ") || "—"}</dd>
+					<dt>{t.source}</dt>
+					<dd>{item.source}</dd>
+					{item.pubDate && (
+						<>
+							<dt>{t.date}</dt>
+							<dd>{item.pubDate.slice(0, 10)}</dd>
+						</>
+					)}
+					<dt>{t.tech}</dt>
+					<dd>{item.technologies.join(", ") || "—"}</dd>
 				</dl>
 				{item.serviceIds.map((id) => (
-					<a key={id} className={styles.serviceLink} href={`${locale === "fr" ? "/fr" : ""}/truenas#homelab-service-${id}`}>
+					<a
+						key={id}
+						className={styles.serviceLink}
+						href={`${locale === "fr" ? "/fr" : ""}/truenas#homelab-service-${id}`}
+					>
 						{t.service} : {id} ↗
 					</a>
 				))}
@@ -121,7 +202,9 @@ function CtidCard({ item, locale, featured }: { item: CtidItem; locale: Language
 export default function CtidIntelligence({ locale }: { locale: Language }) {
 	const [items, setItems] = useState<FeedItem[]>([]);
 	const [mode, setMode] = useState("");
-	const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+	const [status, setStatus] = useState<"loading" | "ready" | "error">(
+		"loading",
+	);
 	const t = titleLabels[locale];
 	const reload = useCallback(async (signal: AbortSignal) => {
 		try {
@@ -137,29 +220,68 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 	useEffect(() => {
 		const controller = new AbortController();
 		const initial = window.setTimeout(() => void reload(controller.signal), 0);
-		return () => { controller.abort(); window.clearTimeout(initial); };
+		return () => {
+			controller.abort();
+			window.clearTimeout(initial);
+		};
 	}, [reload]);
 	const digest = useMemo(() => selectCtidDigest(items), [items]);
 	if (status === "loading") return <p role="status">{t.load}</p>;
-	if (status === "error") return <div role="alert"><p>{t.empty}</p><button type="button" onClick={() => {
-		const controller = new AbortController();
-		setStatus("loading");
-		void reload(controller.signal);
-	}}>{t.retry}</button></div>;
+	if (status === "error")
+		return (
+			<div role="alert">
+				<p>{t.empty}</p>
+				<button
+					type="button"
+					onClick={() => {
+						const controller = new AbortController();
+						setStatus("loading");
+						void reload(controller.signal);
+					}}
+				>
+					{t.retry}
+				</button>
+			</div>
+		);
 	return (
 		<div className={styles.digest}>
-			<p className={styles.notice}>{t.evidence} · {mode}</p>
+			<p className={styles.notice}>
+				{t.evidence} · {mode}
+			</p>
 			<section aria-labelledby="ctid-homelab-heading">
-				<h3 id="ctid-homelab-heading">{t.homelab} ({digest.homelab.length})</h3>
-				<div className={styles.grid}>{digest.homelab.map((item) => <CtidCard key={item.link} item={item} locale={locale} featured />)}</div>
+				<h3 id="ctid-homelab-heading">
+					{t.homelab} ({digest.homelab.length})
+				</h3>
+				<div className={styles.grid}>
+					{digest.homelab.map((item) => (
+						<CtidCard key={item.link} item={item} locale={locale} featured />
+					))}
+				</div>
 			</section>
 			<section aria-labelledby="ctid-global-heading">
-				<h3 id="ctid-global-heading">{t.global} ({digest.global.length})</h3>
-				<div className={styles.grid}>{digest.global.map((item) => <CtidCard key={item.link} item={item} locale={locale} featured />)}</div>
+				<h3 id="ctid-global-heading">
+					{t.global} ({digest.global.length})
+				</h3>
+				<div className={styles.grid}>
+					{digest.global.map((item) => (
+						<CtidCard key={item.link} item={item} locale={locale} featured />
+					))}
+				</div>
 			</section>
 			<section aria-labelledby="ctid-other-heading">
-				<h3 id="ctid-other-heading">{t.other} ({digest.other.length})</h3>
-				<div className={styles.grid}>{digest.other.map((item) => <CtidCard key={item.link} item={item} locale={locale} featured={false} />)}</div>
+				<h3 id="ctid-other-heading">
+					{t.other} ({digest.other.length})
+				</h3>
+				<div className={styles.grid}>
+					{digest.other.map((item) => (
+						<CtidCard
+							key={item.link}
+							item={item}
+							locale={locale}
+							featured={false}
+						/>
+					))}
+				</div>
 			</section>
 		</div>
 	);

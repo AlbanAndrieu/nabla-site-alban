@@ -60,10 +60,18 @@
 	padding: 0.16rem 0.5rem;
 }
 
-.severity[data-level="critical"] { color: #fca5a5; }
-.severity[data-level="high"] { color: #fcd34d; }
-.severity[data-level="medium"] { color: #93c5fd; }
-.severity[data-level="informational"] { color: var(--text-secondary, #cbd5e1); }
+.severity[data-level="critical"] {
+	color: #fca5a5;
+}
+.severity[data-level="high"] {
+	color: #fcd34d;
+}
+.severity[data-level="medium"] {
+	color: #93c5fd;
+}
+.severity[data-level="informational"] {
+	color: var(--text-secondary, #cbd5e1);
+}
 
 .summary {
 	line-height: 1.6;
@@ -110,6 +118,10 @@
 }
 
 @media (max-width: 600px) {
-	.grid { grid-template-columns: 1fr; }
-	.card { padding: 1rem; }
+	.grid {
+		grid-template-columns: 1fr;
+	}
+	.card {
+		padding: 1rem;
+	}
 }

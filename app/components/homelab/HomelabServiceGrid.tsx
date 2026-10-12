@@ -393,7 +393,9 @@ export default function HomelabServiceGrid({
 							className="col-md-4 p-3"
 							key={`${serviceId}:${endpointUrl}`}
 							id={
-								services.findIndex((item) => homelabServiceId(item) === serviceId) === serviceIndex
+								services.findIndex(
+									(item) => homelabServiceId(item) === serviceId,
+								) === serviceIndex
 									? `homelab-service-${serviceId}`
 									: undefined
 							}

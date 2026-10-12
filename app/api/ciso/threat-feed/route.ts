@@ -16,7 +16,8 @@ export async function GET() {
 			{ items, mode: "freshrss" },
 			{
 				headers: {
-					"Cache-Control": "public, max-age=0, s-maxage=600, stale-while-revalidate=300",
+					"Cache-Control":
+						"public, max-age=0, s-maxage=600, stale-while-revalidate=300",
 					"X-Content-Type-Options": "nosniff",
 				},
 			},

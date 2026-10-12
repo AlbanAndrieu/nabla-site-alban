@@ -39,9 +39,15 @@ export default async function CTIDPage({
 						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">{t("description")}</p>
 						<p className="hero-description">
-							<a href={fr ? "/fr/ciso" : "/ciso"}>{fr ? "Retour au tableau de bord CISO" : "Back to the CISO dashboard"}</a>
+							<a href={fr ? "/fr/ciso" : "/ciso"}>
+								{fr
+									? "Retour au tableau de bord CISO"
+									: "Back to the CISO dashboard"}
+							</a>
 							{" · "}
-							<a href="/security-feed.xml">{fr ? "S'abonner au RSS sécurité" : "Subscribe to security RSS"}</a>
+							<a href="/security-feed.xml">
+								{fr ? "S'abonner au RSS sécurité" : "Subscribe to security RSS"}
+							</a>
 						</p>
 					</div>
 				</section>

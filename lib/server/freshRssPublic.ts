@@ -14,7 +14,9 @@ type GReaderEntry = {
 };
 
 /** Only a purpose-built public security account may ever be used here. */
-export async function fetchFreshRssPublicArticles(): Promise<FeedItem[] | null> {
+export async function fetchFreshRssPublicArticles(): Promise<
+	FeedItem[] | null
+> {
 	const auth = process.env.FRESHRSS_GREADER_AUTH;
 	if (!auth || process.env.FRESHRSS_PUBLICATION_ENABLED !== "true") return null;
 
@@ -37,23 +39,31 @@ export async function fetchFreshRssPublicArticles(): Promise<FeedItem[] | null> 
 			signal: AbortSignal.timeout(8500),
 		},
 	);
-	if (!response.ok || Number(response.headers.get("content-length") || "0") > CONTENT_LIMIT) {
+	if (
+		!response.ok ||
+		Number(response.headers.get("content-length") || "0") > CONTENT_LIMIT
+	) {
 		throw new Error("Public security feed upstream unavailable");
 	}
 	const raw = await response.text();
-	if (raw.length > CONTENT_LIMIT) throw new Error("Public security feed exceeds size budget");
+	if (raw.length > CONTENT_LIMIT)
+		throw new Error("Public security feed exceeds size budget");
 	const data = JSON.parse(raw) as { items?: GReaderEntry[] };
-	if (!Array.isArray(data.items)) throw new Error("Invalid public security feed response");
+	if (!Array.isArray(data.items))
+		throw new Error("Invalid public security feed response");
 	return data.items.slice(0, 100).flatMap((entry) => {
-		const published = typeof entry.published === "number"
-			? new Date(entry.published * 1000)
-			: null;
+		const published =
+			typeof entry.published === "number"
+				? new Date(entry.published * 1000)
+				: null;
 		const article = normalizeArticle({
 			title: entry.title,
 			link: entry.canonical?.[0]?.href ?? entry.alternate?.[0]?.href,
 			source: entry.origin?.title,
-			pubDate: published && Number.isFinite(published.getTime())
-				? published.toISOString() : undefined,
+			pubDate:
+				published && Number.isFinite(published.getTime())
+					? published.toISOString()
+					: undefined,
 			summary: entry.summary?.content ?? entry.content?.content,
 		});
 		return article ? [article] : [];
