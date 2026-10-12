@@ -1,0 +1,115 @@
+.digest {
+	display: grid;
+	gap: 2rem;
+	text-align: left;
+}
+
+.digest section h3 {
+	font-size: 1.25rem;
+	margin: 0 0 1rem;
+}
+
+.notice {
+	color: var(--text-secondary, #cbd5e1);
+	font-size: 0.875rem;
+	line-height: 1.6;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+	gap: 1rem;
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-width: 0;
+	padding: 1.15rem;
+	border: 1px solid var(--border-color, #64748b);
+	border-radius: 0.9rem;
+	background: var(--bg-secondary, #1e293b);
+	color: var(--text-primary, #f8fafc);
+}
+
+.card h3 {
+	font-size: 1.05rem;
+	line-height: 1.5;
+	overflow-wrap: anywhere;
+}
+
+.card a {
+	color: var(--link-color, #93c5fd);
+	text-underline-offset: 0.15em;
+}
+
+.meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	align-items: center;
+	font-size: 0.79rem;
+	color: var(--text-secondary, #cbd5e1);
+}
+
+.severity {
+	font-weight: 700;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	padding: 0.16rem 0.5rem;
+}
+
+.severity[data-level="critical"] { color: #fca5a5; }
+.severity[data-level="high"] { color: #fcd34d; }
+.severity[data-level="medium"] { color: #93c5fd; }
+.severity[data-level="informational"] { color: var(--text-secondary, #cbd5e1); }
+
+.summary {
+	line-height: 1.6;
+	color: var(--text-secondary, #cbd5e1);
+	overflow-wrap: anywhere;
+}
+
+.disclosure {
+	border-top: 1px solid var(--border-color, #64748b);
+	padding-top: 0.7rem;
+}
+
+.disclosure summary {
+	cursor: pointer;
+	font-weight: 650;
+}
+
+.disclosure summary:focus-visible,
+.card a:focus-visible {
+	outline: 3px solid var(--accent-color, #f59e0b);
+	outline-offset: 3px;
+}
+
+.disclosure p {
+	margin: 0.6rem 0;
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+}
+
+.facts {
+	display: grid;
+	grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+	gap: 0.4rem 0.7rem;
+	margin-top: 0.75rem;
+}
+
+.facts dd {
+	overflow-wrap: anywhere;
+}
+
+.serviceLink {
+	display: block;
+	margin: 0.65rem 0;
+}
+
+@media (max-width: 600px) {
+	.grid { grid-template-columns: 1fr; }
+	.card { padding: 1rem; }
+}
