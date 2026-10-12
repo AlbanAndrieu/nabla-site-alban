@@ -808,31 +808,6 @@ body.site-content-page.page-ciso .feed-item p {
 	font-weight: 700;
 }
 
-.page-ciso .ciso-feed-list {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 0 1.5rem;
-	margin-top: 1rem;
-}
-
-.page-ciso .ciso-feed-item {
-	padding: 1rem 0;
-	background: transparent;
-	border-bottom: 1px solid var(--border-color);
-}
-
-.page-ciso .ciso-feed-meta {
-	margin: 0 0 0.4rem;
-	color: var(--text-secondary);
-	font-size: 0.8rem;
-}
-
-.page-ciso .ciso-feed-item h3 {
-	margin: 0;
-	font-size: 1rem;
-	line-height: 1.5;
-}
-
 .page-ciso .ciso-feed-item a,
 .page-ciso .resource-link {
 	color: var(--link-color);
@@ -1015,6 +990,8 @@ body.site-content-page.page-ctid .feed-item a:hover {
 }
 
 .page-ciso .ciso-feed-list {
+	display: grid;
+	margin-top: 1rem;
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
 	gap: 1rem;
 }
@@ -1040,6 +1017,8 @@ body.site-content-page.page-ctid .feed-item a:hover {
 }
 
 .page-ciso .ciso-feed-meta {
+	color: var(--text-secondary);
+	font-size: 0.8rem;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.25rem 0.8rem;
@@ -1050,6 +1029,7 @@ body.site-content-page.page-ctid .feed-item a:hover {
 }
 
 .page-ciso .ciso-feed-item h3 {
+	margin: 0;
 	font-size: 1.05rem;
 	line-height: 1.45;
 	overflow-wrap: anywhere;
