@@ -15,8 +15,13 @@ test("CISO RSS configuration contains valid feed URLs", async () => {
 	assert.ok(config.feeds.length > 0, "The feeds array must not be empty");
 	assert.ok(config.feeds.every((feed) => typeof feed === "string"));
 	assert.ok(
-		config.feeds.every((feed) => /^https?:\/\//.test(feed)),
-		"Every feed must use an HTTP(S) URL",
+		config.feeds.every((feed) => /^https:\/\//.test(feed)),
+		"Every feed must use an HTTPS URL",
+	);
+	assert.equal(
+		new Set(config.feeds).size,
+		config.feeds.length,
+		"Feed URLs must be unique",
 	);
 	assert.ok(
 		config.feeds.every((feed) => !feed.includes("&amp;")),

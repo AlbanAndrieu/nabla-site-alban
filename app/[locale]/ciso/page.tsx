@@ -117,6 +117,39 @@ export default async function CisoPage({ params }: Props) {
 							))}
 						</div>
 					</section>
+					<section
+						className="ciso-card ciso-card--wide"
+						aria-labelledby="dora-requirements"
+					>
+						<h2 id="dora-requirements">
+							<i className="fa-solid fa-scale-balanced" aria-hidden="true" />{" "}
+							DORA —{" "}
+							{locale === "fr"
+								? "Résilience opérationnelle numérique"
+								: "Digital operational resilience"}
+						</h2>
+						<p>
+							{locale === "fr"
+								? "Le règlement (UE) 2022/2554 s’applique depuis le 17 janvier 2025 aux entités financières concernées. Article 10 : détection des activités anormales ; article 13 : apprentissage à partir des incidents et renseignements de cybermenace ; article 45 : cadre du partage volontaire de renseignements."
+								: "Regulation (EU) 2022/2554 applies since 17 January 2025 to financial entities in scope. Article 10 addresses detection, Article 13 learning from incidents and cyber-threat intelligence, and Article 45 voluntary cyber-threat information sharing."}
+						</p>
+						<p>
+							{locale === "fr"
+								? "Une veille publique ne démontre pas à elle seule la conformité DORA et ne doit pas exposer les findings techniques internes."
+								: "A public digest does not establish DORA compliance and must not disclose internal technical findings."}
+						</p>
+						<a
+							className="resource-link"
+							href="https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{locale === "fr"
+								? "Consulter DORA sur EUR-Lex"
+								: "Read DORA on EUR-Lex"}{" "}
+							↗
+						</a>
+					</section>
 
 					<section
 						className="ciso-card ciso-card--wide"
@@ -127,6 +160,24 @@ export default async function CisoPage({ params }: Props) {
 							{t("threats")}
 						</h2>
 						<p>{t("threatsIntro")}</p>
+						<p>
+							<a
+								className="resource-link"
+								href={locale === "fr" ? "/fr/ctid" : "/ctid"}
+							>
+								{locale === "fr"
+									? "Dix signaux prioritaires, homelab et global — CTID"
+									: "Top ten homelab and global signals — CTID"}
+							</a>
+							{" · "}
+							<a className="resource-link" href="/security-feed.xml">
+								{locale === "fr" ? "Flux RSS sécurité" : "Security RSS"}
+							</a>
+							{" · "}
+							<a className="resource-link" href="/feed.xml">
+								{locale === "fr" ? "Flux RSS du site" : "Site RSS"}
+							</a>
+						</p>
 						<ThreatFeed locale={locale} />
 					</section>
 				</div>

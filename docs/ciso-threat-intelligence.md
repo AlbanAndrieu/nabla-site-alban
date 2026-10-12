@@ -1,0 +1,92 @@
+# Veille RSS CISO — intégration FreshRSS et pertinence Nabla
+
+## Périmètre
+
+La PR #220 ajoute des cartes RSS accessibles, la recherche, le filtrage par technologie, le tri, les aperçus et la provenance des flux sur `/fr/ciso` et `/ciso`. **Une mention textuelle d'une technologie ou d'un CVE ne prouve ni une exposition ni une vulnérabilité** ; le rapprochement n'est pas un scanner et ne connaît pas les versions.
+
+Les tags dans `lib/cisoThreatFeed.ts` sont un sous-ensemble **public et volontairement limité** des technologies du catalogue `nabla-compose/catalog/services.json` ; aucune IP, version ou adresse interne n'est exportée. Certains services du catalogue sont `planned` : aucune déclaration de déploiement réel n'est déduite de leur présence.
+
+## Source principale : API GReader FreshRSS
+
+Le service **FreshRSS** est déclaré dans `nabla-compose/catalog/homelab-services.json`, mais aucun export OPML ni paramétrage API dédié n'a été retrouvé dans la branche `master` examinée. Les abonnements réellement configurés et les droits API ne sont donc pas encore vérifiés.
+
+1. Créer dans FreshRSS un compte séparé avec **uniquement des abonnements publics de veille cyber publiables sur Internet**. Ne jamais utiliser un compte personnel : la réponse JSON est publique et cacheable.
+2. Activer l'API FreshRSS et attribuer un mot de passe API au compte de veille. Via `POST /api/greader.php/accounts/ClientLogin` avec `Email` et `Passwd`, récupérer la valeur `Auth`.
+3. Fournir **seulement côté serveur Vercel** le secret `FRESHRSS_GREADER_AUTH` (valeur `Auth`, sans `GoogleLogin auth=`). Ne jamais employer `NEXT_PUBLIC_` ni mettre le secret dans Git.
+4. Si Cloudflare Access protège FreshRSS, définir `FRESHRSS_CF_ACCESS_CLIENT_ID` et `FRESHRSS_CF_ACCESS_CLIENT_SECRET` côté serveur avec une politique de service token **limitée au chemin GReader**. Garder l'origine privée ; ne pas désactiver Access pour résoudre un 403.
+5. Tester `GET /api/ciso/threat-feed` sur la preview : `mode=freshrss` et uniquement des articles publiables. Inspecter l'absence de secret dans JSON, JS client et logs ; révoquer le secret en cas de fuite.
+
+La route ne contacte qu'une origine préconfigurée : `https://freshrss.albandrieu.com`. Requêtes GET seules, sans redirection, timeout, limite de réponse, aucune URL contrôlée par le visiteur. L'API retourne 503 sans configuration ou 502 lors d'un échec (sans révéler l'erreur amont).
+
+**Mode de secours provisoire :** jusqu'à 16 flux prioritaires depuis `public/ciso-rss-feeds.json`, chargés dans le navigateur via le service public tiers `rss2json`. Cela crée une dépendance externe et une couverture partielle ; il faudra retirer ce secours après validation de FreshRSS. Ce fichier JSON ne correspond pas nécessairement à l'OPML réellement importé.
+
+Pour synchroniser les sources : `GET /api/greader.php/reader/api/0/subscription/list?output=json`, ou export OPML via **Gestion des abonnements → Import / export**. Ne pas exposer les abonnements privés. Référence : https://freshrss.github.io/FreshRSS/en/developers/06_GoogleReader_API.html
+
+## MCP FreshRSS — évaluation, non déployé
+
+- https://github.com/ChrisLAS/freshrss-mcp : GReader, outils de lecture et écriture, serveur HTTP MCP.
+- https://github.com/Knuckles-Team/freshrss-agent : API GReader et MCP avec surfaces plus larges.
+
+**Choix :** l'API GReader suffit pour le site web. Un MCP peut être utile à Hermes/OpenClaw *en réseau privé* après revue de code, analyse SCA, pinning, authentification stricte, mode lecture seule et permissions minimales. Ne pas publier un serveur MCP ou exposer ses outils de modification sur Internet.
+
+## Catalogue de technologies et évolution
+
+1. Corréler les **services déclarés** de `nabla-compose/catalog/services.json` avec l'état TrueNAS/Talos réellement observé (`planned`, `running`, `stopped`), sans publier la topologie.
+2. Produire un SBOM CycloneDX/SPDX avec **Syft** et/ou **Trivy** à partir d'images et manifestes connus ; compléter avec packages et labels OCI en lecture seule. Éviter un scan de fingerprinting réseau non maîtrisé.
+3. Associer purl/CPE, version, criticité et exposition dans un inventaire **privé**. Corréler CISA KEV, OSV et NVD avec SCA et les findings DefectDojo avant toute qualification de risque. Le RSS seul ne doit jamais déclencher un statut « vulnérable ».
+4. Générer ensuite un export déterministe de **tags validés et publiables** vers la page CISO, avec contrôle de divulgation automatique (pas d'hôte, d'IP, de secrets ou de version).
+5. Ajouter des tests de non-régression pour classement, dédoublonnage, faux positifs, filtrage, fraîcheur et indisponibilité de FreshRSS.
+
+## Vérifications
+
+Commandes à exécuter dans une copie locale du dépôt : `npm run test:unit`, `npm run lint`, `npm run lint:css`, `npm run typecheck`, `npx playwright test tests/ciso.spec.ts`.
+
+Vérifier que la prévisualisation en mode sans secrets affiche clairement le **mode secours**, et que le filtre « pertinent pour la stack » ne conclut pas à une exposition.
+
+
+## CTID priorisé, DORA et publication RSS — lot du 12 octobre 2026
+
+Les pages CISO et CTID sont déjà servies par **Next.js App Router** ; la page CTID utilise désormais un composant séparé. Les **dix premiers articles**, au plus, sont divisés en **deux groupes** : signaux de la stack (jusqu'à cinq) et actualités globales (jusqu'à cinq). La sélection remplit les places restantes si une catégorie est insuffisamment alimentée, sans créer de données. Les articles suivants disposent d'un résumé dépliable ; toutes les cartes présentent des détails dépliables. Les liens profonds de services validés renvoient à `/truenas#homelab-service-{id}`.
+
+**Important :** « Critique / élevé / modéré / information » est une **sévérité éditoriale fondée sur les termes du titre ou de l'extrait**, ni score CVSS, ni risque avéré sur le homelab. La preuve scanner et la version affectée doivent encore être corrélées dans DefectDojo.
+
+### Les dix sources retenues
+
+La liste allowlistée des sources est dans `public/ciso-security-sources.json`, exportable en `public/security-sources.opml`, avec : CISA, CERT-FR, CERT/CC, Kubernetes, CNCF, OpenSSF, Snyk, GitHub Security, Unit42 et Google Project Zero. Vérifier la disponibilité réelle des URL et leur fréquence de mise à jour après import.
+
+- **Ancien flux** `/feed.xml` inchangé (actualités du site).
+- **Nouveau flux** `/security-feed.xml` : jusqu'aux 10 articles les mieux classés des abonnements publics du compte dédié ; RSS2 XML, publication dynamique et cache de 10 minutes. Retourne **503** en l'absence de source validée (ne génère aucun article fictif).
+- La liste de secours du CTID essaie ces dix sources via rss2json côté navigateur si l'API privée FreshRSS n'est pas opérationnelle. Elle ne remplace ni la confidentialité ni la fiabilité de FreshRSS.
+
+### Configuration d'activation FreshRSS
+
+1. Dans l'interface FreshRSS existante, créer un utilisateur **`securitypublic` distinct** ; aucune source privée ni favoris personnels. Dans *Gestion des abonnements*, importer uniquement `public/security-sources.opml`, contrôler les dix URL et la fraîcheur effective, puis exporter un OPML pour prouver la parité.
+2. Dans *Authentification / API*, activer Google Reader API, créer un **mot de passe API dédié**, puis effectuer un `POST /api/greader.php/accounts/ClientLogin` avec `Email` et `Passwd` pour récupérer la valeur `Auth`. Ne jamais écrire cette valeur dans le dépôt, les logs ou le navigateur.
+3. Provisionner **dans l'environnement serveur Vercel** `FRESHRSS_GREADER_AUTH=<Auth du seul compte securitypublic>` et `FRESHRSS_PUBLICATION_ENABLED=true`. La variable de publication est un coupe-circuit **désactivé par défaut**. Sans les deux, l'API et le RSS renvoient 503. Si l'origine est derrière Cloudflare Access, utiliser les variables serveur `FRESHRSS_CF_ACCESS_CLIENT_ID` et `FRESHRSS_CF_ACCESS_CLIENT_SECRET`, avec politique de service-token limitée au chemin API autorisé.
+4. Tester en preview : `GET /api/ciso/threat-feed` retourne `mode=freshrss` avec des articles **publics seulement**. `GET /security-feed.xml` renvoie au plus 10 items RSS2, HTTPS externes, titre/source, sans cookie, secret, PII ni IP de la stack. Contrôler le comportement d'arrêt par `FRESHRSS_PUBLICATION_ENABLED=false` et les 503 en mode non configuré.
+5. Mettre en place monitoring du statut HTTP, ancienneté et défaillances, sauvegarde chiffrée des abonnements (OPML), politique de rotation du jeton et rollback. Ne jamais publier des comptes privés ou un serveur MCP ouvert.
+
+**FreshRSS comme outil de publication :** le service permet de collecter RSS/Atom, filtrer, catégoriser, rechercher, importer/exporter OPML, partager certaines sélections d'articles au format RSS/HTML/OPML et utiliser l'API Google Reader. Pour de **vrais billets personnels originaux** avec relecture éditoriale, privilégier un flux Next.js/CMS signé plutôt que publier automatiquement des findings.
+
+**Déploiement et qualité :** cet ajout prépare le code et la roadmap mais **n'active pas l'instance TrueNAS**, n'exécute aucun scan SBOM et ne crée aucun compte ni secret Vercel. Voir `AlbanAndrieu/nabla-compose#254` pour l'ordre d'exécution FreshRSS → SBOM CycloneDX (Syft/Trivy) → SCA → import DefectDojo. Un SBOM est une nomenclature, **pas** un fichier de résultats vulnérabilités : les parsers d'import compatibles avec DefectDojo doivent être testés.
+
+**Séparation public/privé :** les findings DefectDojo futurs devront être traités dans un service serveur authentifié, avec accès read-only et filtrage d'information. Exporter publiquement uniquement un digest validé explicitement, sans versions, détails d'attaque, noms de projet, IP, identifiants ni informations personnelles.
+
+DORA (règlement (UE) 2022/2554) : art. 10 détection, art. 13 apprentissage et amélioration continue, art. 45 partage volontaire de renseignements. Il ne s'agit pas d'une obligation générale de publication de veille sur une page Internet. Référence : https://eur-lex.europa.eu/eli/reg/2022/2554/oj
+
+
+### Filtre source côté serveur — garde de confidentialité
+
+Le serveur récupère aussi `subscription/list` et vérifie, avant toute publication, que `entry.origin.streamId` correspond à un abonnement dont l'URL figure **strictement** dans la liste de dix sources approuvées `public/ciso-security-sources.json`. Tout abonnement non mappé est rejeté (fail closed), y compris en présence d'un compte mal configuré ; l'identifiant du compte et les adresses privées ne sortent pas via l'API publique. Test de contrat `unit-tests/freshRssPublic.test.ts` avec un abonnement privé simulé. Un changement de source doit être approuvé et versionné, puis confirmé dans FreshRSS. Les caches CDN peuvent conserver un digest public jusqu'à expiration TTL, même après désactivation du flag : purger les caches en cas d'incident.
+
+
+## Provisionnement reproductible — intégration nabla-compose
+
+- Préflight CLI TrueNAS **sans mutation** : `bash scripts/truenas/freshrss-ops.sh --check`.
+- Création opt-in des deux identités `securitypublic` (site RSS) et `securityagent` (MCP) puis import OPML : `sudo -E FRESHRSS_APPROVE_APPLY=YES bash scripts/truenas/freshrss-ops.sh --apply`. Il faut préalablement créer les quatre fichiers de mots de passe `root:root 0600` décrits dans `nabla-compose/docs/freshrss-security-runbook.md`.
+- Les comptes existants ne sont **jamais écrasés**, les mots de passe ne sont pas renouvelés implicitement, la collecte réelle et le chargement Vercel sont validés séparément.
+- **Sécurité CLI** : la CLI native `create-user.php` passe les mots de passe en arguments de processus durant la création. Réserver cette étape à l'hôte TrueNAS administré, sans debug/trace ; pour zéro exposition `argv`, créer les comptes/mots de passe via l'interface FreshRSS et utiliser seulement les scripts de vérification et d'import.
+- Le MCP déclaré dans `nabla-compose/.mcp.json` est **local stdio**, non accessible en réseau et limité à `list_security_feeds` et `recent_security_articles`, avec compte séparé et même liste allowlistée.
+- DefectDojo reçoit les scans via l'API **privée** depuis les jobs internes ; aucun accès public, port ouvert sur Internet ou service token Cloudflare n'est nécessaire pour cette voie.
+
+Ne pas activer `FRESHRSS_PUBLICATION_ENABLED` tant que l'identité, les dix sources, la confidentialité et les réponses RSS ne sont pas acceptées sur l'instance réelle.
