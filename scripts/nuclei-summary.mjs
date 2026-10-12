@@ -23,7 +23,14 @@ function readReport(path) {
 }
 
 export function summarizeFindings(findings) {
-	const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0, unknown: 0 };
+	const counts = {
+		critical: 0,
+		high: 0,
+		medium: 0,
+		low: 0,
+		info: 0,
+		unknown: 0,
+	};
 	for (const finding of findings) {
 		const severity = String(finding.info?.severity ?? "unknown").toLowerCase();
 		if (Object.hasOwn(counts, severity)) counts[severity] += 1;
