@@ -1,0 +1,2 @@
+# Nuclei template IDs to exclude after human review (one template ID per line).
+# Do not add blanket exclusions. Document each exception in docs/nuclei-security-scan.md.
