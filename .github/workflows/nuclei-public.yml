@@ -2,8 +2,10 @@ name: Nuclei public DAST (Site Alban)
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: "19 4 * * 1"
+  push:
+    branches: [master]
     paths:
       - ".github/workflows/nuclei-public.yml"
       - ".nuclei/**"
@@ -18,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: nuclei-public-${{ github.event.pull_request.number || github.ref }}
+  group: nuclei-public-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,7 +32,7 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Install pinned Nuclei with checksum verification
         shell: bash
@@ -112,8 +114,8 @@ jobs:
           retention-days: 3
           if-no-files-found: error
 
-      - name: Optional DefectDojo reimport (reachable runner and configured credentials only)
-        if: steps.nuclei.outcome == 'success' && github.event_name != 'pull_request'
+      - name: Optional DefectDojo reimport (trusted production branch only)
+        if: steps.nuclei.outcome == 'success' && github.ref == 'refs/heads/master'
         continue-on-error: true
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
@@ -154,3 +156,43 @@ jobs:
             "${DEFECTDOJO_URL%/}/api/v2/reimport-scan/" \
             || { echo "::warning::DefectDojo not reachable or import rejected."; exit 1; }
           echo "DefectDojo reimport API accepted the report; check server-side processing."
+
+      - name: Retrieve DefectDojo findings for this product (trusted runner)
+        if: github.ref == 'refs/heads/master'
+        continue-on-error: true
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
+          DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${DEFECTDOJO_URL:-}" || -z "${DEFECTDOJO_API_TOKEN:-}" || -z "${DEFECTDOJO_PRODUCT_NAME:-}" ]]; then
+            echo "::notice::DefectDojo readback NOT_CONFIGURED (no private token or product mapping)."
+            exit 0
+          fi
+          if [[ ! "${DEFECTDOJO_URL}" =~ ^https://[^/?#]+/?$ ]]; then
+            echo "::error::DefectDojo must use a fixed HTTPS origin (no path, query or fragment)."
+            exit 1
+          fi
+          products="${RUNNER_TEMP}/dojo-products.json"
+          findings="${RUNNER_TEMP}/dojo-findings.json"
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
+            -H 'Accept: application/json' \
+            --get --data-urlencode "name=${DEFECTDOJO_PRODUCT_NAME}" \
+            "${DEFECTDOJO_URL%/}/api/v2/products/" > "$products"
+          product_id="$(jq -r --arg name "$DEFECTDOJO_PRODUCT_NAME" '[.results[]? | select(.name == $name) | .id] | if length == 1 then .[0] else empty end' "$products")"
+          if [[ ! "$product_id" =~ ^[0-9]+$ ]]; then
+            echo "::warning::DefectDojo product mapping missing/ambiguous; no findings queried."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
+            -H 'Accept: application/json' \
+            --get --data-urlencode "product=${product_id}" \
+            --data-urlencode "limit=100" \
+            "${DEFECTDOJO_URL%/}/api/v2/findings/" > "$findings"
+          # Do not publish finding details, endpoints, secrets, or full API JSON.
+          jq -r '. as $r | "DefectDojo readback: product mapped, fetched \($r.results | length) findings on first page; total \($r.count // "unknown"). Readback is not an audit attestation."' "$findings"
+          rm -f "$products" "$findings"
