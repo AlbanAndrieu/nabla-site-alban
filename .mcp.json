@@ -10,7 +10,7 @@
 			"args": [
 				"--from",
 				"git+https://github.com/dcianciulli/defectdojo-mcp-server@4d34d17f346dccab92e97e3d50e77b568689f283",
-				"defectdojo-mcp-server",
+				"defectdojo-mcp-server"
 			],
 			"env": {
 				"DEFECTDOJO_URL": "${DEFECTDOJO_URL}",
