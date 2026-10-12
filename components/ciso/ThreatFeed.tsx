@@ -306,7 +306,12 @@ export default function ThreatFeed({
 						<span className="visually-hidden">{strings.order}</span>
 						<select
 							value={order}
-							onChange={(event) => setOrder(event.target.value)}
+							onChange={(event) => {
+							const nextOrder = event.target.value;
+							if (nextOrder === "newest" || nextOrder === "relevance") {
+								setOrder(nextOrder);
+							}
+						}}
 						>
 							<option value="relevance">{strings.relevance}</option>
 							<option value="newest">{strings.latest}</option>
