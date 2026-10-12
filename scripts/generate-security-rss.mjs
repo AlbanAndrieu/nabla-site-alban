@@ -5,18 +5,28 @@ const source = new URL("../data/security/security-feeds.opml", import.meta.url);
 const destination = new URL("../public/ciso-rss-feeds.json", import.meta.url);
 
 function decodeXmlEntities(value) {
-	return value.replace(/&(#x[0-9a-f]+|#\d+|amp|quot|apos|lt|gt);/gi, (match, entity) => {
-		const named = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
-		if (Object.hasOwn(named, entity)) return named[entity];
-		if (entity.startsWith("#")) {
-			const radix = entity[1]?.toLowerCase() === "x" ? 16 : 10;
-			const numeric = Number.parseInt(entity.slice(radix === 16 ? 2 : 1), radix);
-			if (numeric > 0 && numeric <= 0x10ffff && !(numeric >= 0xd800 && numeric <= 0xdfff)) {
-				return String.fromCodePoint(numeric);
+	return value.replace(
+		/&(#x[0-9a-f]+|#\d+|amp|quot|apos|lt|gt);/gi,
+		(match, entity) => {
+			const named = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
+			if (Object.hasOwn(named, entity)) return named[entity];
+			if (entity.startsWith("#")) {
+				const radix = entity[1]?.toLowerCase() === "x" ? 16 : 10;
+				const numeric = Number.parseInt(
+					entity.slice(radix === 16 ? 2 : 1),
+					radix,
+				);
+				if (
+					numeric > 0 &&
+					numeric <= 0x10ffff &&
+					!(numeric >= 0xd800 && numeric <= 0xdfff)
+				) {
+					return String.fromCodePoint(numeric);
+				}
 			}
-		}
-		throw new Error(`Invalid XML entity: ${match}`);
-	});
+			throw new Error(`Invalid XML entity: ${match}`);
+		},
+	);
 }
 
 export function opmlToFeedUrls(xml) {
@@ -48,7 +58,9 @@ if (invoked) {
 	const output = generateFeedsJson(readFileSync(source, "utf8"));
 	if (process.argv.includes("--check")) {
 		if (readFileSync(destination, "utf8") !== output) {
-			console.error("RSS JSON differs from the authoritative OPML; run node scripts/generate-security-rss.mjs");
+			console.error(
+				"RSS JSON differs from the authoritative OPML; run node scripts/generate-security-rss.mjs",
+			);
 			process.exitCode = 1;
 		} else {
 			console.log("RSS JSON matches authoritative OPML");
