@@ -1,5 +1,5 @@
-import approvedSources from "../../public/ciso-security-sources.json";
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
+import approvedSources from "../../public/ciso-security-sources.json";
 
 const FRESHRSS_ORIGIN = "https://freshrss.albandrieu.com";
 const CONTENT_LIMIT = 1_500_000;
@@ -31,19 +31,26 @@ export async function fetchFreshRssPublicArticles(): Promise<
 		headers["CF-Access-Client-Id"] = id;
 		headers["CF-Access-Client-Secret"] = secret;
 	}
-	const request = (resource: string) => fetch(
-		`${FRESHRSS_ORIGIN}/api/greader.php/reader/api/0/${resource}?output=json`,
-		{
-			headers,
-			redirect: "error",
-			cache: "no-store",
-			signal: AbortSignal.timeout(8500),
-		},
-	);
+	const request = (resource: string) =>
+		fetch(
+			`${FRESHRSS_ORIGIN}/api/greader.php/reader/api/0/${resource}?output=json`,
+			{
+				headers,
+				redirect: "error",
+				cache: "no-store",
+				signal: AbortSignal.timeout(8500),
+			},
+		);
 	const [response, subscriptionResponse] = await Promise.all([
-		fetch(`${FRESHRSS_ORIGIN}/api/greader.php/reader/api/0/stream/contents/reading-list?output=json&n=100`, {
-			headers, redirect: "error", cache: "no-store", signal: AbortSignal.timeout(8500),
-		}),
+		fetch(
+			`${FRESHRSS_ORIGIN}/api/greader.php/reader/api/0/stream/contents/reading-list?output=json&n=100`,
+			{
+				headers,
+				redirect: "error",
+				cache: "no-store",
+				signal: AbortSignal.timeout(8500),
+			},
+		),
 		request("subscription/list"),
 	]);
 	if (
@@ -68,21 +75,29 @@ export async function fetchFreshRssPublicArticles(): Promise<
 	if (!Array.isArray(subscriptions.subscriptions)) {
 		throw new Error("Public feed subscriptions malformed");
 	}
-	const allowed = new Set(approvedSources.sources.map((source) => new URL(source.url).href));
+	const allowed = new Set(
+		approvedSources.sources.map((source) => new URL(source.url).href),
+	);
 	const approvedStreamIds = new Set(
 		subscriptions.subscriptions.flatMap((subscription) => {
-		try {
-			return subscription.id && subscription.url &&
-				allowed.has(new URL(subscription.url).href)
-				? [subscription.id] : [];
-		} catch {
-			return [];
-		}
+			try {
+				return subscription.id &&
+					subscription.url &&
+					allowed.has(new URL(subscription.url).href)
+					? [subscription.id]
+					: [];
+			} catch {
+				return [];
+			}
 		}),
 	);
 	return data.items.slice(0, 100).flatMap((entry) => {
 		// Fail closed: an account with extra private feeds cannot publish them.
-		if (!entry.origin?.streamId || !approvedStreamIds.has(entry.origin.streamId)) return [];
+		if (
+			!entry.origin?.streamId ||
+			!approvedStreamIds.has(entry.origin.streamId)
+		)
+			return [];
 		const published =
 			typeof entry.published === "number"
 				? new Date(entry.published * 1000)

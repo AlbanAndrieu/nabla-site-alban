@@ -10,7 +10,8 @@ test("FreshRSS publication defaults to closed without explicit opt-in", async ()
 		process.env.FRESHRSS_GREADER_AUTH = "dummy-fixture-value";
 		assert.equal(await fetchFreshRssPublicArticles(), null);
 	} finally {
-		if (beforeEnabled === undefined) delete process.env.FRESHRSS_PUBLICATION_ENABLED;
+		if (beforeEnabled === undefined)
+			delete process.env.FRESHRSS_PUBLICATION_ENABLED;
 		else process.env.FRESHRSS_PUBLICATION_ENABLED = beforeEnabled;
 		if (beforeAuth === undefined) delete process.env.FRESHRSS_GREADER_AUTH;
 		else process.env.FRESHRSS_GREADER_AUTH = beforeAuth;
@@ -30,23 +31,41 @@ test("FreshRSS refuses articles outside the ten approved subscription IDs", asyn
 				return Response.json({
 					subscriptions: [
 						{ id: "feed/approved", url: "https://kubernetes.io/feed.xml" },
-						{ id: "feed/unapproved", url: "https://private.example.com/feed.xml" },
+						{
+							id: "feed/unapproved",
+							url: "https://private.example.com/feed.xml",
+						},
 					],
 				});
 			}
 			return Response.json({
 				items: [
-					{ title: "Kubernetes security bulletin", canonical: [{ href: "https://example.org/public" }], origin: { title: "Kubernetes", streamId: "feed/approved" } },
-					{ title: "Private homelab finding", canonical: [{ href: "https://example.org/private" }], origin: { title: "Private", streamId: "feed/unapproved" } },
-					{ title: "Missing origin: deny", canonical: [{ href: "https://example.org/missing" }] },
+					{
+						title: "Kubernetes security bulletin",
+						canonical: [{ href: "https://example.org/public" }],
+						origin: { title: "Kubernetes", streamId: "feed/approved" },
+					},
+					{
+						title: "Private homelab finding",
+						canonical: [{ href: "https://example.org/private" }],
+						origin: { title: "Private", streamId: "feed/unapproved" },
+					},
+					{
+						title: "Missing origin: deny",
+						canonical: [{ href: "https://example.org/missing" }],
+					},
 				],
 			});
 		};
 		const articles = await fetchFreshRssPublicArticles();
-		assert.deepEqual(articles?.map((article) => article.title), ["Kubernetes security bulletin"]);
+		assert.deepEqual(
+			articles?.map((article) => article.title),
+			["Kubernetes security bulletin"],
+		);
 	} finally {
 		globalThis.fetch = previousFetch;
-		if (previousEnabled === undefined) delete process.env.FRESHRSS_PUBLICATION_ENABLED;
+		if (previousEnabled === undefined)
+			delete process.env.FRESHRSS_PUBLICATION_ENABLED;
 		else process.env.FRESHRSS_PUBLICATION_ENABLED = previousEnabled;
 		if (previousAuth === undefined) delete process.env.FRESHRSS_GREADER_AUTH;
 		else process.env.FRESHRSS_GREADER_AUTH = previousAuth;
