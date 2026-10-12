@@ -307,11 +307,11 @@ export default function ThreatFeed({
 						<select
 							value={order}
 							onChange={(event) => {
-							const nextOrder = event.target.value;
-							if (nextOrder === "newest" || nextOrder === "relevance") {
-								setOrder(nextOrder);
-							}
-						}}
+								const nextOrder = event.target.value;
+								if (nextOrder === "newest" || nextOrder === "relevance") {
+									setOrder(nextOrder);
+								}
+							}}
 						>
 							<option value="relevance">{strings.relevance}</option>
 							<option value="newest">{strings.latest}</option>
