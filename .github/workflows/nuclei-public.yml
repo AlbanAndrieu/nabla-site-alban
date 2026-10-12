@@ -86,6 +86,7 @@ jobs:
             -duc -jsonl -o nuclei-results/nuclei.jsonl \
             "${exclusion_args[@]}"
           test -f nuclei-results/nuclei.jsonl || : > nuclei-results/nuclei.jsonl
+          node scripts/nuclei-to-sarif.mjs nuclei-results/nuclei.jsonl nuclei-results/nuclei.sarif
 
       - name: Summarize Nuclei findings and reviewed exclusions
         if: always()
@@ -105,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: nuclei-public-${{ github.run_id }}
-          path: nuclei-results/nuclei.jsonl
+          path: |\n            nuclei-results/nuclei.jsonl\n            nuclei-results/nuclei.sarif
           retention-days: 3
           if-no-files-found: error
 
@@ -115,6 +116,7 @@ jobs:
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
           DEFECTDOJO_API_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
+          DEFECTDOJO_PRODUCT_NAME: ${{ vars.DEFECTDOJO_PRODUCT_NAME }}
         shell: bash
         run: |
           set -euo pipefail
@@ -126,6 +128,10 @@ jobs:
             echo "::warning::DefectDojo upload skipped: HTTPS endpoint required."
             exit 1
           fi
+          if [[ -z "${DEFECTDOJO_PRODUCT_NAME:-}" ]]; then
+            echo "::warning::DefectDojo product name not mapped to the canonical service catalog; skip import."
+            exit 0
+          fi
           if [[ ! -s nuclei-results/nuclei.jsonl ]]; then
             echo "::notice::No Nuclei findings to reimport; skipping empty upload."
             exit 0
@@ -135,7 +141,7 @@ jobs:
             -H "Authorization: Token ${DEFECTDOJO_API_TOKEN}" \
             -F 'scan_type=Nuclei Scan' \
             -F 'product_type_name=Web Applications' \
-            -F 'product_name=albanandrieu.com' \
+            -F "product_name=${DEFECTDOJO_PRODUCT_NAME}" \
             -F 'engagement_name=Public DAST' \
             -F 'test_title=Nuclei public albanandrieu.com' \
             -F 'auto_create_context=true' \
