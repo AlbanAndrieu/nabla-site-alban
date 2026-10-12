@@ -44,11 +44,15 @@ if (file) {
 	console.log("## Nuclei public DAST — albanandrieu.com");
 	console.log("");
 	if (findings === null) {
-		console.log("**NOT RUN** — no report was produced; this is not zero vulnerabilities.");
+		console.log(
+			"**NOT RUN** — no report was produced; this is not zero vulnerabilities.",
+		);
 		process.exitCode = 1;
 	} else {
 		const counts = summarizeFindings(findings);
-		console.log(`Found ${findings.length} matched templates (not independently verified vulnerabilities).`);
+		console.log(
+			`Found ${findings.length} matched templates (not independently verified vulnerabilities).`,
+		);
 		console.log("");
 		console.log("| Severity | Findings |");
 		console.log("| --- | ---: |");
@@ -58,11 +62,21 @@ if (file) {
 		console.log("");
 		console.log("### Findings (template IDs only)");
 		for (const finding of findings.slice(0, 25)) {
-			const id = String(finding["template-id"] ?? "unknown").replace(/[^a-zA-Z0-9_.-]/g, "");
-			const severity = String(finding.info?.severity ?? "unknown").replace(/[^a-zA-Z]/g, "");
+			const id = String(finding["template-id"] ?? "unknown").replace(
+				/[^a-zA-Z0-9_.-]/g,
+				"",
+			);
+			const severity = String(finding.info?.severity ?? "unknown").replace(
+				/[^a-zA-Z]/g,
+				"",
+			);
 			console.log(`- \`${id}\` — ${severity}`);
 		}
-		if (findings.length > 25) console.log(`- … ${findings.length - 25} additional findings in the private artifact`);
+		if (findings.length > 25) {
+			console.log(
+				`- … ${findings.length - 25} additional findings in the private artifact`,
+			);
+		}
 	}
 	if (ignoreFile) {
 		const exclusions = readFileSync(ignoreFile, "utf8")
@@ -73,5 +87,7 @@ if (file) {
 		for (const id of exclusions) console.log(`- \`${id}\``);
 	}
 	console.log("");
-	console.log("An absent report is NOT_RUN; a report with no matches is not proof of security.");
+	console.log(
+		"An absent report is NOT_RUN; a report with no matches is not proof of security.",
+	);
 }
