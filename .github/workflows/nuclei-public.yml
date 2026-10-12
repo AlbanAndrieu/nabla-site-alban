@@ -46,6 +46,12 @@ jobs:
           unzip -p "$archive" nuclei > "${RUNNER_TEMP}/nuclei"
           chmod 700 "${RUNNER_TEMP}/nuclei"
           "${RUNNER_TEMP}/nuclei" -version
+          # Template update is separate from the binary release and is mandatory.
+          "${RUNNER_TEMP}/nuclei" -ut
+          test -d "${HOME}/nuclei-templates" || {
+            echo "::error::Nuclei templates missing after bootstrap."
+            exit 1
+          }
 
       - name: Scan public website (bounded HTTP templates)
         id: nuclei
@@ -84,8 +90,15 @@ jobs:
       - name: Summarize Nuclei findings and reviewed exclusions
         if: always()
         shell: bash
+        env:
+          SCAN_OUTCOME: ${{ steps.nuclei.outcome }}
         run: |
-          node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$SCAN_OUTCOME" != "success" ]]; then
+            echo "## Nuclei public DAST — NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
+            echo "Scanner failed before completion; empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
+          else
+            node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload scan report (restricted artifact lifetime)
         if: always() && hashFiles('nuclei-results/nuclei.jsonl') != ''
