@@ -5,8 +5,16 @@ if (!input || !output) {
 	console.error("Usage: node scripts/nuclei-to-sarif.mjs <nuclei.jsonl> <nuclei.sarif>");
 	process.exitCode = 2;
 } else {
-	const levels = { critical: "error", high: "error", medium: "warning", low: "note", info: "note" };
-	const rows = readFileSync(input, "utf8").split(/\r?\n/).filter(Boolean);
+	const levels = {
+		critical: "error",
+		high: "error",
+		medium: "warning",
+		low: "note",
+		info: "note",
+	};
+	const rows = readFileSync(input, "utf8")
+		.split(/\r?\n/)
+		.filter(Boolean);
 	const findings = rows.map((line) => JSON.parse(line));
 	const rules = new Map();
 	const results = [];
@@ -32,10 +40,12 @@ if (!input || !output) {
 	const report = {
 		version: "2.1.0",
 		$schema: "https://json.schemastore.org/sarif-2.1.0.json",
-		runs: [{
-			tool: { driver: { name: "Nuclei", rules: [...rules.values()] } },
-			results,
-		}],
+		runs: [
+			{
+				tool: { driver: { name: "Nuclei", rules: [...rules.values()] } },
+				results,
+			},
+		],
 	};
 	writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
 }
