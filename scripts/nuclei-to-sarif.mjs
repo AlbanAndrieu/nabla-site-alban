@@ -2,7 +2,9 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const [input, output] = process.argv.slice(2);
 if (!input || !output) {
-	console.error("Usage: node scripts/nuclei-to-sarif.mjs <nuclei.jsonl> <nuclei.sarif>");
+	console.error(
+		"Usage: node scripts/nuclei-to-sarif.mjs <nuclei.jsonl> <nuclei.sarif>",
+	);
 	process.exitCode = 2;
 } else {
 	const levels = {
@@ -12,9 +14,7 @@ if (!input || !output) {
 		low: "note",
 		info: "note",
 	};
-	const rows = readFileSync(input, "utf8")
-		.split(/\r?\n/)
-		.filter(Boolean);
+	const rows = readFileSync(input, "utf8").split(/\r?\n/).filter(Boolean);
 	const findings = rows.map((line) => JSON.parse(line));
 	const rules = new Map();
 	const results = [];
