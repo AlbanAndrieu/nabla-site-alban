@@ -42,3 +42,34 @@ Pour synchroniser les sources : `GET /api/greader.php/reader/api/0/subscription/
 Commandes à exécuter dans une copie locale du dépôt : `npm run test:unit`, `npm run lint`, `npm run lint:css`, `npm run typecheck`, `npx playwright test tests/ciso.spec.ts`.
 
 Vérifier que la prévisualisation en mode sans secrets affiche clairement le **mode secours**, et que le filtre « pertinent pour la stack » ne conclut pas à une exposition.
+
+
+## CTID priorisé, DORA et publication RSS — lot du 12 octobre 2026
+
+Les pages CISO et CTID sont déjà servies par **Next.js App Router** ; la page CTID utilise désormais un composant séparé. Les **dix premiers articles**, au plus, sont divisés en **deux groupes** : signaux de la stack (jusqu'à cinq) et actualités globales (jusqu'à cinq). La sélection remplit les places restantes si une catégorie est insuffisamment alimentée, sans créer de données. Les articles suivants disposent d'un résumé dépliable ; toutes les cartes présentent des détails dépliables. Les liens profonds de services validés renvoient à `/truenas#homelab-service-{id}`.
+
+**Important :** « Critique / élevé / modéré / information » est une **sévérité éditoriale fondée sur les termes du titre ou de l'extrait**, ni score CVSS, ni risque avéré sur le homelab. La preuve scanner et la version affectée doivent encore être corrélées dans DefectDojo.
+
+### Les dix sources retenues
+
+La liste allowlistée des sources est dans `public/ciso-security-sources.json`, exportable en `public/security-sources.opml`, avec : CISA, CERT-FR, CERT/CC, Kubernetes, CNCF, OpenSSF, Snyk, GitHub Security, Unit42 et Google Project Zero. Vérifier la disponibilité réelle des URL et leur fréquence de mise à jour après import.
+
+- **Ancien flux** `/feed.xml` inchangé (actualités du site).
+- **Nouveau flux** `/security-feed.xml` : jusqu'aux 10 articles les mieux classés des abonnements publics du compte dédié ; RSS2 XML, publication dynamique et cache de 10 minutes. Retourne **503** en l'absence de source validée (ne génère aucun article fictif).
+- La liste de secours du CTID essaie ces dix sources via rss2json côté navigateur si l'API privée FreshRSS n'est pas opérationnelle. Elle ne remplace ni la confidentialité ni la fiabilité de FreshRSS.
+
+### Configuration d'activation FreshRSS
+
+1. Dans l'interface FreshRSS existante, créer un utilisateur **`security-public` distinct** ; aucune source privée ni favoris personnels. Dans *Gestion des abonnements*, importer uniquement `public/security-sources.opml`, contrôler les dix URL et la fraîcheur effective, puis exporter un OPML pour prouver la parité.
+2. Dans *Authentification / API*, activer Google Reader API, créer un **mot de passe API dédié**, puis effectuer un `POST /api/greader.php/accounts/ClientLogin` avec `Email` et `Passwd` pour récupérer la valeur `Auth`. Ne jamais écrire cette valeur dans le dépôt, les logs ou le navigateur.
+3. Provisionner **dans l'environnement serveur Vercel** `FRESHRSS_GREADER_AUTH=<Auth du seul compte security-public>` et `FRESHRSS_PUBLICATION_ENABLED=true`. La variable de publication est un coupe-circuit **désactivé par défaut**. Sans les deux, l'API et le RSS renvoient 503. Si l'origine est derrière Cloudflare Access, utiliser les variables serveur `FRESHRSS_CF_ACCESS_CLIENT_ID` et `FRESHRSS_CF_ACCESS_CLIENT_SECRET`, avec politique de service-token limitée au chemin API autorisé.
+4. Tester en preview : `GET /api/ciso/threat-feed` retourne `mode=freshrss` avec des articles **publics seulement**. `GET /security-feed.xml` renvoie au plus 10 items RSS2, HTTPS externes, titre/source, sans cookie, secret, PII ni IP de la stack. Contrôler le comportement d'arrêt par `FRESHRSS_PUBLICATION_ENABLED=false` et les 503 en mode non configuré.
+5. Mettre en place monitoring du statut HTTP, ancienneté et défaillances, sauvegarde chiffrée des abonnements (OPML), politique de rotation du jeton et rollback. Ne jamais publier des comptes privés ou un serveur MCP ouvert.
+
+**FreshRSS comme outil de publication :** le service permet de collecter RSS/Atom, filtrer, catégoriser, rechercher, importer/exporter OPML, partager certaines sélections d'articles au format RSS/HTML/OPML et utiliser l'API Google Reader. Pour de **vrais billets personnels originaux** avec relecture éditoriale, privilégier un flux Next.js/CMS signé plutôt que publier automatiquement des findings.
+
+**Déploiement et qualité :** cet ajout prépare le code et la roadmap mais **n'active pas l'instance TrueNAS**, n'exécute aucun scan SBOM et ne crée aucun compte ni secret Vercel. Voir `AlbanAndrieu/nabla-compose#254` pour l'ordre d'exécution FreshRSS → SBOM CycloneDX (Syft/Trivy) → SCA → import DefectDojo. Un SBOM est une nomenclature, **pas** un fichier de résultats vulnérabilités : les parsers d'import compatibles avec DefectDojo doivent être testés.
+
+**Séparation public/privé :** les findings DefectDojo futurs devront être traités dans un service serveur authentifié, avec accès read-only et filtrage d'information. Exporter publiquement uniquement un digest validé explicitement, sans versions, détails d'attaque, noms de projet, IP, identifiants ni informations personnelles.
+
+DORA (règlement (UE) 2022/2554) : art. 10 détection, art. 13 apprentissage et amélioration continue, art. 45 partage volontaire de renseignements. Il ne s'agit pas d'une obligation générale de publication de veille sur une page Internet. Référence : https://eur-lex.europa.eu/eli/reg/2022/2554/oj
