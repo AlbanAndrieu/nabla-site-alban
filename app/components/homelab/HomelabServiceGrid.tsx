@@ -322,7 +322,7 @@ export default function HomelabServiceGrid({
 			)}
 
 			<div className="row service-grid">
-				{services.map((svc) => {
+				{services.map((svc, serviceIndex) => {
 					const serviceId = homelabServiceId(svc);
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
@@ -389,7 +389,15 @@ export default function HomelabServiceGrid({
 										: undefined;
 
 					return (
-						<div className="col-md-4 p-3" key={`${serviceId}:${endpointUrl}`}>
+						<div
+							className="col-md-4 p-3"
+							key={`${serviceId}:${endpointUrl}`}
+							id={
+								services.findIndex((item) => homelabServiceId(item) === serviceId) === serviceIndex
+									? `homelab-service-${serviceId}`
+									: undefined
+							}
+						>
 							<div
 								className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
 								data-effective-health={presentationState}
