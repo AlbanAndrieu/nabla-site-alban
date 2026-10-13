@@ -10,6 +10,7 @@ import {
 
 const FEEDS_CONFIG_URL = "/ciso-rss-feeds.json";
 const FEED_CONCURRENCY = 4;
+// Keep browser-side rss2json requests bounded until FreshRSS is ready.
 const MAX_FALLBACK_FEEDS = 16;
 const MAX_VISIBLE_ITEMS = 60;
 
@@ -165,8 +166,8 @@ export default function ThreatFeed({
 				const response = await fetch("/api/ciso/threat-feed", { signal });
 				if (!response.ok) throw new Error("FreshRSS unavailable");
 				const payload = (await response.json()) as { items?: FeedItem[] };
-				if (!Array.isArray(payload.items))
-					throw new Error("Invalid FreshRSS response");
+				if (!Array.isArray(payload.items) || payload.items.length === 0)
+					throw new Error("FreshRSS response empty or invalid");
 				nextItems = payload.items;
 				nextMode = "freshrss";
 			} catch {

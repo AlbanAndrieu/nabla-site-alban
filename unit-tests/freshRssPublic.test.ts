@@ -18,7 +18,7 @@ test("FreshRSS publication defaults to closed without explicit opt-in", async ()
 	}
 });
 
-test("FreshRSS refuses articles outside the ten approved subscription IDs", async () => {
+test("FreshRSS refuses articles outside the canonical OPML-approved subscription IDs", async () => {
 	const previousEnabled = process.env.FRESHRSS_PUBLICATION_ENABLED;
 	const previousAuth = process.env.FRESHRSS_GREADER_AUTH;
 	const previousFetch = globalThis.fetch;
@@ -31,6 +31,7 @@ test("FreshRSS refuses articles outside the ten approved subscription IDs", asyn
 				return Response.json({
 					subscriptions: [
 						{ id: "feed/approved", url: "https://kubernetes.io/feed.xml" },
+						{ id: "feed/additional", url: "https://www.bleepingcomputer.com/feed/" },
 						{
 							id: "feed/unapproved",
 							url: "https://private.example.com/feed.xml",
@@ -44,6 +45,11 @@ test("FreshRSS refuses articles outside the ten approved subscription IDs", asyn
 						title: "Kubernetes security bulletin",
 						canonical: [{ href: "https://example.org/public" }],
 						origin: { title: "Kubernetes", streamId: "feed/approved" },
+					},
+					{
+						title: "Additional public feed",
+						canonical: [{ href: "https://example.org/additional" }],
+						origin: { title: "BleepingComputer", streamId: "feed/additional" },
 					},
 					{
 						title: "Private homelab finding",
@@ -60,7 +66,7 @@ test("FreshRSS refuses articles outside the ten approved subscription IDs", asyn
 		const articles = await fetchFreshRssPublicArticles();
 		assert.deepEqual(
 			articles?.map((article) => article.title),
-			["Kubernetes security bulletin"],
+			["Kubernetes security bulletin", "Additional public feed"],
 		);
 	} finally {
 		globalThis.fetch = previousFetch;

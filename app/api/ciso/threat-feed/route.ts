@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
 	try {
 		const items = await fetchFreshRssPublicArticles();
-		if (!items) {
+		if (!items || items.length === 0) {
 			return NextResponse.json(
-				{ items: [], mode: "unconfigured" },
+				{ items: [], mode: items ? "warming-up" : "unconfigured" },
 				{ status: 503, headers: { "Cache-Control": "no-store" } },
 			);
 		}

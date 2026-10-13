@@ -1,5 +1,5 @@
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
-import approvedSources from "../../public/ciso-security-sources.json";
+import approvedSources from "../../public/ciso-rss-feeds.json";
 
 const FRESHRSS_ORIGIN = "https://freshrss.albandrieu.com";
 const CONTENT_LIMIT = 1_500_000;
@@ -76,7 +76,7 @@ export async function fetchFreshRssPublicArticles(): Promise<
 		throw new Error("Public feed subscriptions malformed");
 	}
 	const allowed = new Set(
-		approvedSources.sources.map((source) => new URL(source.url).href),
+		approvedSources.feeds.map((url) => new URL(url).href),
 	);
 	const approvedStreamIds = new Set(
 		subscriptions.subscriptions.flatMap((subscription) => {

@@ -1,0 +1,35 @@
+name: Security RSS OPML contract
+
+on:
+  pull_request:
+    paths:
+      - "data/security/security-feeds.opml"
+      - "public/ciso-rss-feeds.json"
+      - "scripts/generate-security-rss.mjs"
+      - "unit-tests/securityRssOpml.test.mjs"
+      - ".github/workflows/security-rss-opml.yml"
+      - ".pre-commit-config.yaml"
+  push:
+    branches: [master]
+    paths:
+      - "data/security/security-feeds.opml"
+      - "public/ciso-rss-feeds.json"
+      - "scripts/generate-security-rss.mjs"
+      - "unit-tests/securityRssOpml.test.mjs"
+      - ".github/workflows/security-rss-opml.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-generated-json:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Check authoritative OPML vs generated JSON
+        run: node scripts/generate-security-rss.mjs --check
+      - name: Run offline OPML contract tests
+        run: node --test unit-tests/securityRssOpml.test.mjs

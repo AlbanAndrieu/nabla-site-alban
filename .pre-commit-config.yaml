@@ -571,3 +571,15 @@ repos:
   #         - --filesonly
   #         - --flavor
   #         - "python"
+
+# Maintain the RSS JSON whenever the canonical OPML is staged.
+# pre-commit marks modified generated outputs as a failed hook: stage them and retry.
+-   repo: local
+    hooks:
+    -   id: generate-security-rss
+        name: "📰 RSS · Regenerate public JSON from authoritative OPML"
+        entry: node scripts/generate-security-rss.mjs
+        language: system
+        files: ^data/security/security-feeds\.opml$
+        pass_filenames: false
+        stages: [pre-commit]
