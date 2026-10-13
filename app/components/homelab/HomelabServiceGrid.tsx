@@ -84,6 +84,14 @@ function serviceIconPath(iconSrc?: string): string {
 	return `/${iconSrc}`;
 }
 
+function endpointUrlHostIsPrivateS3(value?: string): boolean {
+	try {
+		return new URL(value ?? "").hostname === "s3.int.albandrieu.com";
+	} catch {
+		return false;
+	}
+}
+
 function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
 }
@@ -240,6 +248,7 @@ export default function HomelabServiceGrid({
 	healthHttpStatus = null,
 }: Props) {
 	const t = useTranslations("homelab");
+	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
 	const serviceHealth = healthIndex(snapshot);
 	const truenasPublic = snapshot?.truenas?.public;
@@ -327,6 +336,11 @@ export default function HomelabServiceGrid({
 					const hasInternal =
 						typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 					const isExternal = svc.external === true;
+					const isPrivateEndpoint = !isExternal;
+					const privateExposureDebt =
+						serviceId === "garage" &&
+						endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
+						isExternal;
 					const endpointUrl = homelabServiceEndpointUrl(svc);
 					const endpointEnabled = svc.endpointEnabled !== false;
 					const initialHealth = reconciledHealth(
@@ -498,6 +512,20 @@ export default function HomelabServiceGrid({
 											gap: 8,
 										}}
 									>
+										{(isPrivateEndpoint || privateExposureDebt) && (
+											<span
+												className="badge bg-info text-dark"
+												title={
+													privateExposureDebt
+														? "Accès interne souhaité ; exception DNS publique encore déclarée"
+														: "Accès Internet non souhaité ; disponibilité LAN vérifiée séparément"
+												}
+											>
+												<i className="fas fa-lock me-1" aria-hidden="true" />
+												Interne
+												{privateExposureDebt ? " · exposition à corriger" : ""}
+											</span>
+										)}
 										<EndpointAction
 											url={endpointUrl}
 											enabled={endpointEnabled}
