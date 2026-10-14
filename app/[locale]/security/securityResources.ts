@@ -3,7 +3,8 @@ export type ResourceLinkIcon =
 	| "github"
 	| "brain"
 	| "terminal"
-	| "chart";
+	| "chart"
+	| "book";
 
 export type ResourceLink =
 	| {
@@ -11,7 +12,7 @@ export type ResourceLink =
 			icon?: ResourceLinkIcon;
 	  }
 	| {
-			page: "ai" | "truenas" | "security/dsomm";
+			page: "ai" | "truenas" | "security/dsomm" | "security/lexique";
 			hash?: string;
 			icon: ResourceLinkIcon;
 	  };
@@ -176,6 +177,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 		id: "security-standards-compliance",
 		iconClass: "fa-solid fa-file-certificate",
 		links: [
+			{ page: "security/lexique", icon: "book" },
 			{ href: "https://www.nist.gov/cyberframework" },
 			{ href: "https://www.iso.org/isoiec-27001-information-security.html" },
 			{ href: "https://www.iso.org/standard/42001" },

@@ -40,6 +40,10 @@ export const SITE_PAGES = {
 		category: "editorialShowcase",
 		seo: { priority: 0.76, changeFrequency: "monthly" },
 	},
+	"security/lexique": {
+		category: "editorialShowcase",
+		seo: { priority: 0.74, changeFrequency: "monthly" },
+	},
 	ai: {
 		category: "editorialShowcase",
 		seo: { priority: 0.8, changeFrequency: "monthly" },
