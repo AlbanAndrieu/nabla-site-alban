@@ -1,39 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type {
-	HomelabHealthSnapshot,
-} from "@/lib/homelabHealth";
-import {
-	homelabHealthColor,
-	homelabHealthTextColor,
-} from "@/lib/homelabHealthPresentation";
-import {
-	blockedDependencyLabels,
-	hasFreshRuntimeInventoryConflict,
-	resolveEffectiveServiceState,
-} from "@/lib/homelabHealthResolver";
-import {
-	type HomelabService,
-	type HomelabServicesCatalog,
-	homelabServiceEndpointUrl,
-	homelabServiceId,
-} from "@/lib/homelabServices";
-import {
-	EFFECTIVE_HEALTH_LABEL_KEY,
-	EFFECTIVE_HEALTH_ICON_CLASS,
-	INTERNAL_HEALTH_CLASS,
-	RUNTIME_ICON_CLASS,
-	serviceIconPath,
-	endpointUrlHostIsPrivateS3,
-	healthIndex,
-	serviceHealthEvidence,
-	reconciledHealth,
-	internalPresentationState,
-	runtimePresentationState,
-} from "./homelabGridPresentation";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
+import {
+	EFFECTIVE_HEALTH_ICON_CLASS,
+	EFFECTIVE_HEALTH_LABEL_KEY,
+	endpointUrlHostIsPrivateS3,
+	healthIndex,
+	INTERNAL_HEALTH_CLASS,
+	internalPresentationState,
+	RUNTIME_ICON_CLASS,
+	reconciledHealth,
+	runtimePresentationState,
+	serviceHealthEvidence,
+	serviceIconPath,
+} from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
@@ -43,9 +26,10 @@ type Props = {
 	healthHttpStatus?: number | null;
 };
 
-type HealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byUrl: Map<strvailable = false,
+export default function HomelabServiceGrid({
+	catalog,
+	snapshot,
+	healthUnavailable = false,
 	healthHttpStatus = null,
 }: Props) {
 	const t = useTranslations("homelab");
