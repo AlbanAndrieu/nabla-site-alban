@@ -1,11 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type {
-	HomelabHealthEntry,
-	HomelabHealthSnapshot,
-	HomelabHealthState,
-} from "@/lib/homelabHealth";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import {
 	homelabHealthColor,
 	homelabHealthTextColor,
