@@ -17,6 +17,8 @@ import {
 	homelabServiceEndpointUrl,
 	homelabServiceId,
 } from "@/lib/homelabServices";
+import EndpointAction from "./EndpointAction";
+import styles from "./HomelabServicesBlock.module.css";
 import {
 	EFFECTIVE_HEALTH_ICON_CLASS,
 	EFFECTIVE_HEALTH_LABEL_KEY,
@@ -30,8 +32,6 @@ import {
 	serviceHealthEvidence,
 	serviceIconPath,
 } from "./homelabGridPresentation";
-import EndpointAction from "./EndpointAction";
-import styles from "./HomelabServicesBlock.module.css";
 import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
