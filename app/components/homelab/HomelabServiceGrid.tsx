@@ -1,9 +1,26 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
-import EndpointAction from "./EndpointAction";
-import styles from "./HomelabServicesBlock.module.css";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+	HomelabHealthState,
+} from "@/lib/homelabHealth";
+import {
+	homelabHealthColor,
+	homelabHealthTextColor,
+} from "@/lib/homelabHealthPresentation";
+import {
+	blockedDependencyLabels,
+	hasFreshRuntimeInventoryConflict,
+	resolveEffectiveServiceState,
+} from "@/lib/homelabHealthResolver";
+import {
+	type HomelabService,
+	type HomelabServicesCatalog,
+	homelabServiceEndpointUrl,
+	homelabServiceId,
+} from "@/lib/homelabServices";
 import {
 	EFFECTIVE_HEALTH_ICON_CLASS,
 	EFFECTIVE_HEALTH_LABEL_KEY,
@@ -17,6 +34,8 @@ import {
 	serviceHealthEvidence,
 	serviceIconPath,
 } from "./homelabGridPresentation";
+import EndpointAction from "./EndpointAction";
+import styles from "./HomelabServicesBlock.module.css";
 import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
