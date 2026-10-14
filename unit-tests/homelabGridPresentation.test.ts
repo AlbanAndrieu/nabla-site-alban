@@ -47,9 +47,24 @@ test("internal health prefers observed LAN evidence over external state", () => 
 
 test("unavailable TrueNAS runtime is not presented as healthy", () => {
 	const running = { runtime_state: "RUNNING" };
-	assert.equal(runtimePresentationState(running, true, "garage", false, false), "ok");
-	assert.equal(runtimePresentationState(running, true, "garage", true, false), "missing");
-	assert.equal(runtimePresentationState(running, true, "garage", false, true), "missing");
-	assert.equal(runtimePresentationState(running, false, "garage", false, false), null);
-	assert.equal(runtimePresentationState(running, true, "truenas", false, false), null);
+	assert.equal(
+		runtimePresentationState(running, true, "garage", false, false),
+		"ok",
+	);
+	assert.equal(
+		runtimePresentationState(running, true, "garage", true, false),
+		"missing",
+	);
+	assert.equal(
+		runtimePresentationState(running, true, "garage", false, true),
+		"missing",
+	);
+	assert.equal(
+		runtimePresentationState(running, false, "garage", false, false),
+		null,
+	);
+	assert.equal(
+		runtimePresentationState(running, true, "truenas", false, false),
+		null,
+	);
 });
