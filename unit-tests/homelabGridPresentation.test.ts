@@ -7,9 +7,18 @@ import {
 } from "../app/components/homelab/homelabGridPresentation";
 
 test("only the exact internal S3 hostname matches the exposure marker", () => {
-	assert.equal(endpointUrlHostIsPrivateS3("https://s3.int.albandrieu.com/"), true);
-	assert.equal(endpointUrlHostIsPrivateS3("https://s3.int.albandrieu.com.evil.test/"), false);
-	assert.equal(endpointUrlHostIsPrivateS3("https://garage-admin.albandrieu.com/"), false);
+	assert.equal(
+		endpointUrlHostIsPrivateS3("https://s3.int.albandrieu.com/"),
+		true,
+	);
+	assert.equal(
+		endpointUrlHostIsPrivateS3("https://s3.int.albandrieu.com.evil.test/"),
+		false,
+	);
+	assert.equal(
+		endpointUrlHostIsPrivateS3("https://garage-admin.albandrieu.com/"),
+		false,
+	);
 	assert.equal(endpointUrlHostIsPrivateS3("invalid"), false);
 });
 
@@ -20,8 +29,20 @@ test("internal health prefers observed LAN evidence over external state", () => 
 		runtime_state: "STOPPED",
 	};
 	assert.equal(internalPresentationState(entry, false), "ok");
-	assert.equal(internalPresentationState({ runtime_state: "RUNNING", state: "fail" }, false), "ok");
-	assert.equal(internalPresentationState({ runtime_state: "RUNNING", state: "fail" }, true), "fail");
+	assert.equal(
+		internalPresentationState(
+			{ runtime_state: "RUNNING", state: "fail" },
+			false,
+		),
+		"ok",
+	);
+	assert.equal(
+		internalPresentationState(
+			{ runtime_state: "RUNNING", state: "fail" },
+			true,
+		),
+		"fail",
+	);
 });
 
 test("unavailable TrueNAS runtime is not presented as healthy", () => {
