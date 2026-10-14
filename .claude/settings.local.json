@@ -1,4 +1,3 @@
 {
-	"enabledMcpjsonServers": ["next-devtools"],
-	"enableAllProjectMcpServers": true
+	"enabledMcpjsonServers": ["next-devtools"]
 }
