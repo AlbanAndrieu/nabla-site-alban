@@ -1,4 +1,8 @@
-import type { HomelabHealthEntry, HomelabHealthSnapshot, HomelabHealthState } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+	HomelabHealthState,
+} from "@/lib/homelabHealth";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
@@ -65,7 +69,9 @@ function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
 }
 
-export function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
+export function healthIndex(
+	snapshot: HomelabHealthSnapshot | null,
+): HealthIndex {
 	const byId = new Map<string, HomelabHealthEntry>();
 	const byUrl = new Map<string, HomelabHealthEntry>();
 	const byName = new Map<string, HomelabHealthEntry>();
