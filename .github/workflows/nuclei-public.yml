@@ -74,6 +74,8 @@ jobs:
           "${RUNNER_TEMP}/nuclei" \
             -u https://albanandrieu.com \
             -pt http -ni \
+            -tags cve,misconfig,exposure \
+            -severity medium,high,critical \
             -etags dos,fuzz,bruteforce,intrusive \
             -rl 2 -c 1 -timeout 5 -retries 0 \
             -duc -jsonl -o nuclei-results/nuclei.jsonl \
