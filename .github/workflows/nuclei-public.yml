@@ -4,17 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "19 4 * * 1"
-  push:
-    branches: [master]
-    paths:
-      - ".github/workflows/nuclei-public.yml"
-      - ".nuclei/**"
-      - "scripts/nuclei-*.mjs"
-      - "app/**"
-      - "components/**"
-      - "lib/**"
-      - "next.config.mjs"
-      - "vercel.json"
 
 permissions:
   contents: read
@@ -65,6 +54,8 @@ jobs:
           set -euo pipefail
           mkdir -p nuclei-results
           # No credentials, fuzzing, OAST, headless browser or network discovery.
+          # Cost/load budget: narrow the weekly profile to actionable medium+ findings.
+          # Full-template scans must be an explicitly approved separate workflow.
           # Cap concurrency and rate to reduce load on production and Cloudflare.
           excludes=()
           while IFS= read -r id; do
