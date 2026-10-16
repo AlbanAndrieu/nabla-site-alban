@@ -90,8 +90,8 @@ jobs:
           SCAN_OUTCOME: ${{ steps.nuclei.outcome }}
         run: |
           if [[ "$SCAN_OUTCOME" != "success" ]]; then
-            echo "## Nuclei public DAST — NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
-            echo "Scanner failed before completion; empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
+            echo "## Nuclei public DAST — INCOMPLETE / NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
+            echo "Scan did not complete successfully (failed, canceled or not started); partial or empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
           else
             node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -159,7 +159,7 @@ jobs:
           echo "DefectDojo reimport API accepted the report; check server-side processing."
 
       - name: Retrieve DefectDojo findings for this product (trusted runner)
-        if: github.ref == 'refs/heads/master'
+        if: steps.nuclei.outcome == 'success' && github.ref == 'refs/heads/master'
         continue-on-error: true
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
