@@ -18,6 +18,7 @@ const expectedSeoSlugs = [
 	"contact",
 	"security",
 	"security/dsomm",
+	"security/lexique",
 	"ai",
 	"architecture",
 	"ciso",

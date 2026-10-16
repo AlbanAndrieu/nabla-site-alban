@@ -113,6 +113,7 @@
 				"title": "Normes de sécurité et conformité",
 				"description": "Normes industrielles, cadres de conformité et références réglementaires pour la gouvernance de la sécurité.",
 				"links": [
+					"Lexique des acronymes sécurité (BIA, RTO, CVSS, DORA…)",
 					"Cadre de cybersécurité du NIST",
 					"ISO/IEC 27001 — management de la sécurité de l’information",
 					"ISO/IEC 42001 — système de management de l’intelligence artificielle",
@@ -330,6 +331,446 @@
 			"source": "Source OWASP DSOMM",
 			"license": "Licence upstream",
 			"project": "Application officielle DSOMM"
+		}
+	},
+	"securityGlossaryPage": {
+		"meta": {
+			"title": "Lexique des acronymes sécurité | Alban Andrieu",
+			"description": "Lexique des principaux acronymes de sécurité, continuité d’activité, gestion des vulnérabilités, protection des données et réglementation : BIA, RTO, RPO, SAST, DAST, CVSS, EPSS, KEV, DORA…"
+		},
+		"backToSecurity": "Retour aux ressources sécurité",
+		"eyebrow": "Sécurité · Référentiel",
+		"title": "Lexique des acronymes",
+		"lead": "Référentiel des principaux acronymes liés à la sécurité des systèmes d’information, à la continuité d’activité, à la gestion des vulnérabilités, à la protection des données et à la réglementation, avec la question clé à laquelle chacun répond.",
+		"toc": {
+			"label": "Sommaire du lexique",
+			"overview": "Vue d’ensemble"
+		},
+		"overview": {
+			"title": "Vue d’ensemble",
+			"caption": "Acronymes, signification et question clé",
+			"acronym": "Acronyme",
+			"meaning": "Signification",
+			"question": "Question clé",
+			"scrollLabel": "Tableau des acronymes, défilable horizontalement"
+		},
+		"keyQuestion": "Question clé :",
+		"sourcesLabel": "Sources :",
+		"disclaimer": "Définitions générales à vocation pédagogique : vérifiez toujours le texte du référentiel, de la norme ou de la réglementation applicable à votre contexte.",
+		"categories": {
+			"continuity": {
+				"title": "Continuité d’activité et reprise",
+				"intro": "Privilégier les acronymes anglais MTPD, RTO, RPO et MBCO, plus stables d’un référentiel à l’autre. Les équivalents français (DMTP, DMIA, DIMA, OMCA) varient selon les éditions : vérifiez leur alignement avec la version de référence retenue avant de les employer.",
+				"terms": {
+					"bia": {
+						"acronym": "BIA",
+						"expansion": "Business Impact Analysis",
+						"question": "Quels sont les impacts d’une interruption ?",
+						"definition": [
+							"Analyse d’impact métier. Méthode permettant d’identifier les processus, activités et ressources critiques d’une organisation, ainsi que les conséquences d’une interruption et les délais acceptables de reprise."
+						]
+					},
+					"dima": {
+						"acronym": "DIMA",
+						"expansion": "Durée d’Interruption Maximale Admissible",
+						"question": "Au-delà de quelle durée l’interruption d’un processus devient-elle inacceptable ?",
+						"definition": [
+							"Durée totale au-delà de laquelle l’interruption d’un processus métier provoque des conséquences jugées inacceptables : financières, réglementaires, opérationnelles, contractuelles ou réputationnelles.",
+							"Issue de la BIA, la DIMA exprime une tolérance métier. Elle ne doit pas être recopiée automatiquement comme RTO : l’objectif de reprise doit être validé au regard des besoins métier et des capacités techniques."
+						]
+					},
+					"mtpd": {
+						"acronym": "MTPD",
+						"expansion": "Maximum Tolerable Period of Disruption",
+						"question": "Quelle est la durée maximale absolue pendant laquelle une activité critique peut rester interrompue ?",
+						"definition": [
+							"Durée maximale tolérable d’interruption. Durée absolue la plus longue pendant laquelle une organisation peut accepter qu’un processus, une activité ou un service critique reste indisponible avant que les conséquences deviennent inacceptables, graves ou irréversibles.",
+							"Le MTPD est déterminé dans le cadre de la BIA à partir des impacts métier, financiers, réglementaires, contractuels, opérationnels et réputationnels. Il fixe une limite de tolérance métier, et non une cible technique de reprise."
+						],
+						"note": "Le RTO doit être inférieur au MTPD afin de laisser une marge pour la reprise, la vérification et le retour à un niveau de service acceptable. Les acronymes français parfois associés à cette notion (DMTP, DMIA ou DIMA selon les éditions) ne sont pas interchangeables sans validation du référentiel retenu."
+					},
+					"mbco": {
+						"acronym": "MBCO",
+						"expansion": "Minimum Business Continuity Objective",
+						"question": "Quel niveau minimal d’activité doit être maintenu ou rétabli pendant une perturbation ?",
+						"definition": [
+							"Objectif minimal de continuité d’activité. Niveau minimal acceptable de produits, services ou activités qu’une organisation doit être capable de maintenir ou de rétablir pendant une perturbation.",
+							"Le MBCO exprime une capacité métier minimale, par exemple un volume de transactions, un nombre de dossiers traités ou un périmètre de service prioritaire. Il complète les objectifs temporels :"
+						],
+						"points": [
+							"le MTPD fixe la limite au-delà de laquelle l’interruption devient inacceptable ;",
+							"le RTO indique le délai cible de reprise ;",
+							"le RPO limite la perte de données acceptable ;",
+							"le MBCO précise le niveau d’activité minimal à atteindre pendant ou après la reprise."
+						]
+					},
+					"bcp": {
+						"acronym": "BCP",
+						"expansion": "Business Continuity Plan",
+						"question": "Comment maintenir les activités critiques pendant une crise ?",
+						"definition": [
+							"Plan de continuité d’activité (PCA). Document qui définit les mesures, responsabilités et procédures permettant de maintenir ou de rétablir rapidement les activités critiques pendant une interruption ou une crise."
+						]
+					},
+					"drp": {
+						"acronym": "DRP",
+						"expansion": "Disaster Recovery Plan",
+						"question": "Comment restaurer les systèmes après un sinistre ?",
+						"definition": [
+							"Plan de reprise après sinistre. Document décrivant les procédures et moyens nécessaires pour restaurer les systèmes, applications et données après un incident majeur. En informatique, il est souvent rapproché de l’ITDRP."
+						]
+					},
+					"itdrp": {
+						"acronym": "ITDRP",
+						"expansion": "Information Technology Disaster Recovery Plan",
+						"question": "Comment restaurer les systèmes informatiques ?",
+						"definition": [
+							"Plan de reprise informatique après sinistre. Il décrit les procédures, responsabilités, moyens techniques et priorités nécessaires pour restaurer les systèmes d’information à la suite d’un incident majeur."
+						]
+					},
+					"rto": {
+						"acronym": "RTO",
+						"expansion": "Recovery Time Objective",
+						"question": "Dans quel délai faut-il reprendre ?",
+						"definition": [
+							"Objectif de délai de reprise. Durée maximale acceptable pendant laquelle un système, une application ou un processus peut rester indisponible après une interruption."
+						]
+					},
+					"rpo": {
+						"acronym": "RPO",
+						"expansion": "Recovery Point Objective",
+						"question": "Quelle perte de données maximale est acceptable ?",
+						"definition": [
+							"Objectif de point de reprise. Quantité maximale de données qu’il est acceptable de perdre, exprimée en durée. Par exemple, un RPO de 4 heures signifie que la perte de données ne doit pas dépasser les 4 dernières heures."
+						]
+					},
+					"spof": {
+						"acronym": "SPOF",
+						"expansion": "Single Point of Failure",
+						"question": "Quel élément unique pourrait interrompre le service ?",
+						"definition": [
+							"Point unique de défaillance. Élément dont la panne peut entraîner à elle seule l’interruption d’un système, d’un service ou d’une activité. Identifier les SPOF permet de mettre en place de la redondance et de réduire les risques d’indisponibilité."
+						]
+					}
+				}
+			},
+			"assets": {
+				"title": "Gestion des actifs et services IT",
+				"terms": {
+					"cmdb": {
+						"acronym": "CMDB",
+						"expansion": "Configuration Management Database",
+						"question": "Où sont recensés les composants du système d’information et leurs relations ?",
+						"definition": [
+							"Base de données de gestion des configurations. Référentiel centralisant les composants du système d’information, appelés éléments de configuration ou Configuration Items (CI), ainsi que leurs caractéristiques et leurs relations. Elle facilite la gestion des actifs, l’analyse d’impact et le traitement des incidents et des changements."
+						]
+					}
+				}
+			},
+			"architecture": {
+				"title": "Architecture et intégration",
+				"terms": {
+					"ipaas": {
+						"acronym": "iPaaS",
+						"expansion": "Integration Platform as a Service",
+						"question": "Comment connecter et orchestrer des applications, données et services ?",
+						"definition": [
+							"Plateforme d’intégration en tant que service. Plateforme cloud qui permet de connecter des applications, des données, des API et des services, puis de concevoir, exécuter, superviser et gouverner leurs flux d’intégration.",
+							"Elle fournit généralement des connecteurs, des mécanismes de transformation et d’orchestration, ainsi que des fonctions de suivi et de gestion des erreurs."
+						]
+					},
+					"adr-architecture": {
+						"acronym": "ADR",
+						"expansion": "Architecture Decision Record",
+						"question": "Comment documenter une décision d’architecture et ses conséquences ?",
+						"definition": [
+							"Journal d’une décision d’architecture. Document court et versionné qui consigne une décision structurante prise sur un système : son contexte, les options envisagées, la décision retenue, son statut et ses conséquences.",
+							"Un ADR conserve le raisonnement à l’origine d’un choix, évite de rouvrir régulièrement la même discussion et facilite la revue, l’évolution ou le remplacement de la décision. Il contient habituellement :"
+						],
+						"points": [
+							"le contexte et le problème à résoudre ;",
+							"les contraintes et critères de décision ;",
+							"les options étudiées et leurs compromis ;",
+							"la décision retenue ;",
+							"les conséquences, risques et actions associées ;",
+							"un statut : proposé, accepté, rejeté, remplacé ou obsolète."
+						],
+						"note": "Un ADR peut formaliser les exigences et arbitrages de sécurité : modèle de menace, authentification et autorisation, chiffrement, journalisation, gestion des secrets, exposition réseau, dépendances, conformité, résilience et risques résiduels. Il ne remplace pas une analyse de risques, mais en conserve les conclusions. À distinguer de l’ADR « Application Detection and Response »."
+					}
+				}
+			},
+			"performance": {
+				"title": "Pilotage de la performance et niveaux de service",
+				"outro": "La BIA identifie les activités critiques et leurs besoins de reprise. Les KPO traduisent les résultats prioritaires attendus, les KPI en mesurent l’atteinte, les SLO fixent les cibles internes de service et les SLA formalisent les engagements applicables.",
+				"terms": {
+					"kpo": {
+						"acronym": "KPO",
+						"expansion": "Key Performance Objective",
+						"question": "Quel résultat prioritaire cherche-t-on à atteindre ?",
+						"definition": [
+							"Objectif clé de performance. Résultat prioritaire qu’une organisation, une équipe ou un dispositif cherche à atteindre. Le KPO définit la cible et l’intention ; les KPI permettent d’en mesurer l’avancement ou l’atteinte."
+						]
+					},
+					"kpi": {
+						"acronym": "KPI",
+						"expansion": "Key Performance Indicator",
+						"question": "Quelle mesure permet de suivre la performance par rapport à un objectif ?",
+						"definition": [
+							"Indicateur clé de performance. Mesure quantifiable utilisée pour suivre la performance d’une activité, d’un processus ou d’un service par rapport à un objectif défini. Un KPI doit préciser sa méthode de calcul, sa source, sa fréquence de mesure, sa cible et son responsable."
+						]
+					},
+					"slo": {
+						"acronym": "SLO",
+						"expansion": "Service Level Objective",
+						"question": "Quelle cible interne de fiabilité ou de performance le service doit-il atteindre ?",
+						"definition": [
+							"Objectif de niveau de service. Cible interne, mesurable et définie sur une période donnée pour un indicateur de niveau de service, par exemple 99,9 % de disponibilité sur 30 jours. Le SLO guide le pilotage de la fiabilité et doit généralement être plus exigeant que le SLA associé."
+						]
+					},
+					"sla": {
+						"acronym": "SLA",
+						"expansion": "Service Level Agreement",
+						"question": "Quel niveau de service est formellement convenu avec les utilisateurs ou partenaires ?",
+						"definition": [
+							"Accord de niveau de service. Engagement formalisé entre un fournisseur de service et ses utilisateurs ou partenaires. Il définit notamment le niveau de service attendu, la période de mesure, les responsabilités, les exclusions et les conséquences éventuelles en cas de non-respect."
+						]
+					}
+				}
+			},
+			"control": {
+				"title": "Sécurité et contrôle",
+				"terms": {
+					"dica": {
+						"acronym": "DICA",
+						"expansion": "Disponibilité, Intégrité, Confidentialité, Authentification",
+						"question": "Quels critères fondamentaux permettent de protéger les systèmes et les données ?",
+						"definition": [
+							"Critères fondamentaux de la sécurité des systèmes d’information. Le modèle DIC définit trois propriétés essentielles ; sa variante DICA y ajoute l’authentification. Selon les référentiels, on rencontre aussi DICP ou DICAN, qui ajoutent la preuve, la traçabilité ou la non-répudiation."
+						],
+						"points": [
+							"Disponibilité : les systèmes et les données sont accessibles au moment voulu par les personnes autorisées.",
+							"Intégrité : les données ne sont pas modifiées ou altérées de manière accidentelle ou malveillante.",
+							"Confidentialité : seules les personnes autorisées peuvent accéder aux données.",
+							"Authentification : l’identité des utilisateurs, services ou systèmes est vérifiée ; la preuve et la traçabilité permettent en complément d’attribuer et de retracer les actions."
+						]
+					},
+					"scim": {
+						"acronym": "SCIM",
+						"expansion": "System for Cross-domain Identity Management",
+						"question": "Comment automatiser le cycle de vie des identités entre un fournisseur d’identité et des applications ?",
+						"definition": [
+							"Protocole standard ouvert de gestion des identités. Fondé sur HTTP, REST et JSON, SCIM automatise l’échange d’informations d’identité et le cycle de vie des comptes entre un fournisseur d’identité (IdP) et un fournisseur de service, notamment une application SaaS. Il permet de :"
+						],
+						"points": [
+							"provisionner automatiquement un compte lors de l’arrivée d’une personne ;",
+							"mettre à jour ses attributs, groupes et droits lorsque sa situation évolue ;",
+							"désactiver ou supprimer rapidement ses accès lors de son départ ;",
+							"synchroniser les utilisateurs et les groupes entre les systèmes."
+						],
+						"note": "SCIM réduit les comptes orphelins, les opérations manuelles et le délai de révocation des accès. Il complète les protocoles d’authentification et de fédération comme SAML ou OpenID Connect, sans les remplacer."
+					},
+					"dlp": {
+						"acronym": "DLP",
+						"expansion": "Data Loss Prevention",
+						"question": "Comment prévenir la fuite ou la perte de données ?",
+						"definition": [
+							"Prévention de la perte ou de la fuite de données. Ensemble de règles, contrôles et outils visant à détecter et empêcher l’utilisation, l’exfiltration ou le partage non autorisé de données sensibles."
+						]
+					},
+					"worm": {
+						"acronym": "WORM",
+						"expansion": "Write Once, Read Many",
+						"question": "Comment garantir l’immutabilité des données ?",
+						"definition": [
+							"Stockage immuable. Configuration permettant d’écrire des données une seule fois afin de les rendre impossibles à modifier ou à supprimer pendant une période de rétention définie. Elle protège notamment les sauvegardes, journaux et éléments soumis à des exigences de conservation."
+						]
+					},
+					"adr-detection": {
+						"acronym": "ADR",
+						"expansion": "Application Detection and Response",
+						"question": "Comment détecter et traiter les incidents applicatifs ?",
+						"definition": [
+							"Détection et réponse aux incidents applicatifs. Approche et outils permettant d’identifier les comportements anormaux ou les incidents affectant les applications, puis de les analyser et d’y répondre."
+						],
+						"note": "À distinguer de l’ADR « Architecture Decision Record »."
+					},
+					"ioc": {
+						"acronym": "IoC",
+						"expansion": "Indicator of Compromise",
+						"question": "Quels indices permettent de détecter une compromission potentielle ou avérée ?",
+						"definition": [
+							"Indicateur de compromission. Trace observable pouvant signaler une compromission potentielle ou avérée d’un système, d’un compte ou d’un réseau : empreinte de fichier malveillant, adresse IP ou domaine associé à une activité malveillante, fichier suspect ou entrée de journal caractéristique.",
+							"Les IoC servent à détecter, rechercher et analyser des activités malveillantes. Ils doivent être interprétés dans leur contexte : un indicateur isolé ne constitue pas toujours une preuve de compromission."
+						]
+					},
+					"sod": {
+						"acronym": "SoD",
+						"expansion": "Separation (ou Segregation) of Duties",
+						"question": "Comment répartir les responsabilités sensibles ?",
+						"definition": [
+							"Séparation des tâches. Principe de contrôle interne consistant à répartir les responsabilités entre plusieurs personnes afin qu’aucune ne puisse réaliser seule toutes les étapes d’une opération sensible, par exemple initier, approuver et exécuter une transaction."
+						]
+					}
+				}
+			},
+			"vulnerabilities": {
+				"title": "Gestion des vulnérabilités",
+				"outro": "La SCA analyse les composants tiers, le SAST examine le code sans l’exécuter, le DAST teste l’application depuis l’extérieur et l’IAST observe son comportement interne pendant les tests. Leur combinaison améliore la couverture du risque applicatif tout au long du cycle de développement.",
+				"terms": {
+					"appsec": {
+						"acronym": "AppSec",
+						"expansion": "Application Security",
+						"question": "Comment intégrer la sécurité dans l’ensemble du cycle de vie des applications ?",
+						"definition": [
+							"Sécurité applicative. Approche globale visant à intégrer la sécurité dans tout le cycle de vie d’une application (conception, développement, tests, déploiement et exploitation) plutôt qu’à la traiter comme un contrôle isolé en fin de projet. Elle regroupe des pratiques complémentaires :"
+						],
+						"points": [
+							"SCA : inventaire des composants et dépendances tierces et recherche de leurs vulnérabilités connues ;",
+							"SAST : analyse du code ou des artefacts sans exécuter l’application ;",
+							"DAST : test depuis l’extérieur d’une application en fonctionnement ;",
+							"IAST : observation du comportement interne de l’application pendant son exécution et les tests ;",
+							"revue de code, modélisation des menaces et tests d’intrusion : analyse humaine et contextuelle complémentaire."
+						],
+						"note": "Aucune technique ne couvre seule tous les risques : c’est leur combinaison qui couvre les dépendances, le code source, l’application déployée et son comportement à l’exécution."
+					},
+					"sca": {
+						"acronym": "SCA",
+						"expansion": "Software Composition Analysis",
+						"question": "Quelles vulnérabilités affectent les composants et dépendances tierces ?",
+						"definition": [
+							"Analyse de la composition logicielle. Méthode permettant d’inventorier les bibliothèques, packages et composants tiers d’une application, puis d’identifier leurs vulnérabilités connues, versions obsolètes et éventuels risques de licence. La SCA peut alimenter un SBOM et s’intégrer aux pipelines CI/CD ou à l’analyse du runtime."
+						]
+					},
+					"sast": {
+						"acronym": "SAST",
+						"expansion": "Static Application Security Testing",
+						"question": "Quelles failles peut-on détecter dans le code sans l’exécuter ?",
+						"definition": [
+							"Test statique de sécurité applicative. Analyse du code source, du bytecode ou des artefacts sans exécuter l’application. Le SAST détecte en amont des défauts tels que les injections, les flux de données non sécurisés ou certaines erreurs de validation, généralement pendant le développement ou dans la CI/CD."
+						]
+					},
+					"dast": {
+						"acronym": "DAST",
+						"expansion": "Dynamic Application Security Testing",
+						"question": "Quelles failles apparaissent lorsque l’application fonctionne ?",
+						"definition": [
+							"Test dynamique de sécurité applicative. Analyse d’une application en fonctionnement par l’envoi de requêtes et la simulation d’attaques depuis l’extérieur, sans accès au code source. Le DAST révèle des vulnérabilités liées au comportement réel, à la configuration ou aux interactions entre composants."
+						]
+					},
+					"iast": {
+						"acronym": "IAST",
+						"expansion": "Interactive Application Security Testing",
+						"question": "Quelles vulnérabilités apparaissent pendant l’exécution et les tests de l’application ?",
+						"definition": [
+							"Test interactif de sécurité applicative. Méthode qui analyse une application web pendant son exécution afin d’identifier des vulnérabilités à partir de son comportement interne et des interactions générées par des tests manuels ou automatisés.",
+							"L’IAST combine une instrumentation intégrée à l’application avec l’observation des requêtes, des flux de données et du code effectivement exécuté. Il fournit des résultats contextualisés : emplacement de la vulnérabilité, chemin d’exécution concerné et données impliquées."
+						]
+					},
+					"ssrf": {
+						"acronym": "SSRF",
+						"expansion": "Server-Side Request Forgery",
+						"question": "Comment empêcher un serveur d’émettre des requêtes réseau non autorisées ?",
+						"definition": [
+							"Falsification de requête côté serveur. Vulnérabilité web qui permet à une personne malveillante de tromper un serveur vulnérable afin qu’il émette des requêtes réseau non autorisées vers des systèmes internes ou externes.",
+							"Elle peut permettre d’atteindre des services internes normalement inaccessibles depuis Internet ou de contourner certains contrôles réseau."
+						]
+					},
+					"cve": {
+						"acronym": "CVE",
+						"expansion": "Common Vulnerabilities and Exposures",
+						"question": "Quel identifiant unique désigne une vulnérabilité publiquement référencée ?",
+						"definition": [
+							"Identifiant public de vulnérabilité. Référence unique (par exemple CVE-2021-44228) attribuée à une faille de sécurité connue, permettant de la citer et de la suivre de façon standardisée entre outils et organisations."
+						]
+					},
+					"cvss": {
+						"acronym": "CVSS",
+						"expansion": "Common Vulnerability Scoring System",
+						"question": "Quelle est la sévérité technique théorique d’une vulnérabilité (0 à 10) ?",
+						"definition": [
+							"Score de sévérité technique. Note de 0 à 10 calculée par l’éditeur ou le NVD à partir de critères techniques : facilité d’exploitation, impact potentiel, complexité, vecteur d’attaque. Il évalue la gravité théorique d’une vulnérabilité, indépendamment de son exploitation réelle."
+						]
+					},
+					"epss": {
+						"acronym": "EPSS",
+						"expansion": "Exploit Prediction Scoring System",
+						"question": "Quelle est la probabilité qu’une vulnérabilité soit exploitée dans les 30 prochains jours ?",
+						"definition": [
+							"Score de probabilité d’exploitation. Estimation statistique publiée par le FIRST, exprimée de 0 à 100 %, de la probabilité qu’une vulnérabilité soit exploitée dans les 30 jours suivants. Complémentaire au CVSS : une CVE peut avoir un CVSS élevé mais un EPSS faible si elle n’est pas exploitée en pratique."
+						]
+					},
+					"kev": {
+						"acronym": "KEV",
+						"expansion": "Known Exploited Vulnerabilities",
+						"question": "Quelles vulnérabilités ont une exploitation active confirmée sur le terrain ?",
+						"definition": [
+							"Catalogue des vulnérabilités à exploitation confirmée. Liste maintenue par la CISA (agence américaine) des CVE dont l’exploitation active a été constatée, à traiter en priorité. Chaque entrée porte un délai de remédiation (due date) imposé aux agences fédérales américaines ; non contraignant ailleurs, il reste la référence externe la plus proche d’un standard reconnu par les auditeurs et les assureurs cyber."
+						]
+					}
+				}
+			},
+			"privacy": {
+				"title": "Protection des données et RGPD",
+				"terms": {
+					"dpa": {
+						"acronym": "DPA",
+						"expansion": "Data Processing Agreement",
+						"question": "Comment encadrer contractuellement un traitement de données personnelles réalisé par un sous-traitant ?",
+						"definition": [
+							"Accord relatif au traitement des données. Contrat ou ensemble de clauses qui encadre le traitement de données personnelles réalisé par un sous-traitant pour le compte d’un responsable de traitement. Dans le cadre du RGPD, il précise notamment :"
+						],
+						"points": [
+							"l’objet, la durée, la nature et les finalités du traitement ;",
+							"les catégories de données personnelles et de personnes concernées ;",
+							"les instructions documentées du responsable de traitement ;",
+							"les obligations de confidentialité et les mesures de sécurité ;",
+							"les conditions de recours à des sous-traitants ultérieurs ;",
+							"l’assistance en matière de droits des personnes, d’incidents et d’analyses d’impact ;",
+							"la restitution ou la suppression des données en fin de prestation ;",
+							"les droits d’audit et les éléments démontrant la conformité."
+						],
+						"note": "Le DPA formalise principalement les obligations de l’article 28 du RGPD entre responsable de traitement et sous-traitant. Il ne doit pas être confondu avec la DPIA."
+					},
+					"dpia": {
+						"acronym": "DPIA",
+						"expansion": "Data Protection Impact Assessment",
+						"question": "Comment évaluer et réduire les risques élevés d’un traitement pour les droits et libertés des personnes ?",
+						"definition": [
+							"Analyse d’impact relative à la protection des données (AIPD). Démarche structurée permettant d’identifier, d’évaluer et de réduire les risques qu’un traitement de données personnelles présente pour les droits et libertés des personnes concernées. Elle décrit généralement :"
+						],
+						"points": [
+							"le traitement envisagé, ses finalités et sa base juridique ;",
+							"sa nécessité et sa proportionnalité ;",
+							"les risques pour les personnes concernées ;",
+							"les mesures techniques et organisationnelles prévues pour réduire ces risques ;",
+							"les risques résiduels et la décision d’acceptation ou de traitement complémentaire."
+						],
+						"note": "Prévue par l’article 35 du RGPD, la DPIA est requise lorsqu’un traitement est susceptible d’engendrer un risque élevé. Si un risque élevé subsiste malgré les mesures prévues, l’autorité de contrôle doit être consultée avant la mise en œuvre. À distinguer du DPA, qui est un accord contractuel."
+					}
+				}
+			},
+			"regulation": {
+				"title": "Réglementation — secteur financier et assurance",
+				"terms": {
+					"dora": {
+						"acronym": "DORA",
+						"expansion": "Digital Operational Resilience Act",
+						"question": "Quel cadre européen régit la résilience numérique ?",
+						"definition": [
+							"Règlement européen sur la résilience opérationnelle numérique. Il encadre la gestion des risques liés aux technologies de l’information et de la communication dans le secteur financier, y compris les entreprises d’assurance concernées."
+						]
+					},
+					"pra": {
+						"acronym": "PRA",
+						"expansion": "Prudential Regulation Authority",
+						"question": "Quelle autorité supervise le secteur financier britannique ?",
+						"definition": [
+							"Autorité de régulation prudentielle du Royaume-Uni, rattachée à la Banque d’Angleterre. Elle assure la supervision prudentielle des banques, assureurs et autres institutions financières concernées."
+						],
+						"note": "À ne pas confondre avec le PRA français, Plan de Reprise d’Activité, équivalent du DRP."
+					}
+				}
+			}
 		}
 	}
 }

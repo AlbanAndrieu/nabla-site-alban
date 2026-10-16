@@ -17,6 +17,7 @@ const expectedSitemapUrls = [
 	`${canonicalOrigin}/contact`,
 	`${canonicalOrigin}/security`,
 	`${canonicalOrigin}/security/dsomm`,
+	`${canonicalOrigin}/security/lexique`,
 	`${canonicalOrigin}/ai`,
 	`${canonicalOrigin}/architecture`,
 	`${canonicalOrigin}/ciso`,
@@ -45,6 +46,7 @@ const migratedSeoSlugs = [
 const localizedSeoSlugs = [
 	...migratedSeoSlugs,
 	"security/dsomm",
+	"security/lexique",
 	"architecture",
 	"cv",
 	"jm",

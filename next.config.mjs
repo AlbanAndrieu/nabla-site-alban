@@ -84,6 +84,8 @@ const baselineSecurityHeaders = [
 const nextConfig = {
 	reactStrictMode: true,
 	poweredByHeader: false,
+	/** AGENTS.md is curated by hand: stop `next dev` from injecting its generic agent-rules block. */
+	agentRules: false,
 	experimental: {
 		/** Required because the root layout lives below the dynamic `[locale]` segment. */
 		globalNotFound: true,

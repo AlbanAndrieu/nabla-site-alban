@@ -295,7 +295,7 @@ test-pytest-poetry:
     - python3 -m pipenv install --dev --site-packages --ignore-pipfile
     - export DB_URL=${DB_URL}
     - export POSTGRES_DRIVER="postgresql"
-    - export POSTGRES_HOST="pg-gra.service.gra.dev.consul"
+    - export POSTGRES_HOST="postgres.service.gra.dev.consul"
     - export POSTGRES_PORT="5432"
     - export POSTGRES_DB="fastapi_sample_gitlab"
     - export POSTGRES_USER=${POSTGRES_USER}
@@ -327,7 +327,7 @@ test-pytest:
     - if [ -n "${DEFAULT_POETRY_OPT_GROUPS}" ]; then ${POETRY_HOME}/bin/poetry install --no-root --with ${DEFAULT_POETRY_OPT_GROUPS}; else ${POETRY_HOME}/bin/poetry install --no-root; fi
     - export DB_URL=${DB_URL}
     - export POSTGRES_DRIVER="postgresql"
-    - export POSTGRES_HOST="pg-gra.service.gra.dev.consul"
+    - export POSTGRES_HOST="postgres.service.gra.dev.consul"
     - export POSTGRES_PORT="5432"
     - export POSTGRES_DB="fastapi_sample_gitlab"
     - export POSTGRES_USER=${POSTGRES_USER}

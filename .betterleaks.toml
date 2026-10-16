@@ -1,4 +1,5 @@
-# Betterleaks v1.9.0 policy. Keep reviewed legacy allowlists until v2 migration.
+# Betterleaks v1.9.0 policy. The reviewed legacy global allowlist is kept
+# as-is in the [[allowlists]] format (default condition OR = legacy behavior).
 # Extend the upstream rules rather than maintaining a replacement rule set.
 title = "nabla-site-alban secrets policy"
 betterleaksMinVersion = "v1.9.0"
@@ -7,7 +8,7 @@ betterleaksMinVersion = "v1.9.0"
 # Extend built-in Betterleaks detection rules.
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "global allow lists"
 regexes = [
     '''219-09-9999''',
@@ -42,3 +43,41 @@ paths = [
     '''environment.yml''',
     '''.terraform''',
 ]
+
+# Public client-side keys, shipped to every browser by design: an exception
+# requires the expected rule AND file AND public key format, so a real secret
+# added to the same file is still reported.
+[[allowlists]]
+description = "PostHog project key (phc_) is a public ingestion-only key"
+targetRules = ["posthog-project-api-key"]
+condition = "AND"
+paths = ['''^public/site-analytics\.js$''']
+regexes = ['''^phc_[A-Za-z0-9]{20,}$''']
+
+[[allowlists]]
+description = "Datadog RUM clientToken (pub...) is a public browser token"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^public/site-analytics\.js$''']
+regexes = ['''^pub[0-9a-f]{32}$''']
+
+[[allowlists]]
+description = "Stripe publishable key (pk_) used by the public Buy Button"
+targetRules = ["generic-api-key", "stripe-access-token"]
+condition = "AND"
+paths = [
+    '''^public/checkout-tjm\.html$''',
+    '''^app/\[locale\]/checkout-tjm/page\.tsx$''',
+]
+regexes = ['''^pk_(live|test)_[A-Za-z0-9]{20,}$''']
+
+[[allowlists]]
+description = "Commented DAST example credential, not a real password"
+targetRules = ["generic-password"]
+condition = "AND"
+paths = ['''^\.gitlab-ci\.yml$''']
+regexes = ['''^["“]?P@ssw0rd["”]?$''']
+
+[[allowlists]]
+description = "Local Next.js build output (git-ignored, never committed)"
+paths = ['''(^|/)\.next/''']

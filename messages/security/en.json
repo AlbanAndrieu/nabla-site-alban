@@ -113,6 +113,7 @@
 				"title": "Security Standards & Compliance",
 				"description": "Industry standards, compliance frameworks and regulatory guidance for security governance.",
 				"links": [
+					"Security acronym glossary (BIA, RTO, CVSS, DORA…)",
 					"NIST Cybersecurity Framework",
 					"ISO/IEC 27001 — Information Security Management",
 					"ISO/IEC 42001 — Artificial Intelligence Management System",
@@ -330,6 +331,446 @@
 			"source": "OWASP DSOMM source",
 			"license": "Upstream license",
 			"project": "Official DSOMM application"
+		}
+	},
+	"securityGlossaryPage": {
+		"meta": {
+			"title": "Security acronym glossary | Alban Andrieu",
+			"description": "Glossary of key security, business continuity, vulnerability management, data protection and regulatory acronyms: BIA, RTO, RPO, SAST, DAST, CVSS, EPSS, KEV, DORA and more."
+		},
+		"backToSecurity": "Back to security resources",
+		"eyebrow": "Security · Reference",
+		"title": "Acronym glossary",
+		"lead": "A reference of the main acronyms used in information security, business continuity, vulnerability management, data protection and regulation, each with the key question it answers.",
+		"toc": {
+			"label": "Glossary contents",
+			"overview": "Overview"
+		},
+		"overview": {
+			"title": "Overview",
+			"caption": "Acronyms, meaning and key question",
+			"acronym": "Acronym",
+			"meaning": "Meaning",
+			"question": "Key question",
+			"scrollLabel": "Acronym table, horizontally scrollable"
+		},
+		"keyQuestion": "Key question:",
+		"sourcesLabel": "Sources:",
+		"disclaimer": "General, educational definitions: always check the text of the framework, standard or regulation that applies to your context.",
+		"categories": {
+			"continuity": {
+				"title": "Business continuity and recovery",
+				"intro": "Prefer the English acronyms MTPD, RTO, RPO and MBCO, which are more stable across frameworks. French equivalents (DMTP, DMIA, DIMA, OMCA) vary between editions: check them against the reference edition you follow before using them.",
+				"terms": {
+					"bia": {
+						"acronym": "BIA",
+						"expansion": "Business Impact Analysis",
+						"question": "What are the impacts of a disruption?",
+						"definition": [
+							"A method to identify an organisation’s critical processes, activities and resources, the consequences of their disruption and the acceptable recovery delays."
+						]
+					},
+					"dima": {
+						"acronym": "DIMA",
+						"expansion": "Durée d’Interruption Maximale Admissible (maximum admissible interruption duration)",
+						"question": "Beyond what duration does a process disruption become unacceptable?",
+						"definition": [
+							"French term for the total duration beyond which the disruption of a business process causes unacceptable consequences: financial, regulatory, operational, contractual or reputational.",
+							"Derived from the BIA, the DIMA expresses a business tolerance. It must not be copied as-is into the RTO: the recovery objective has to be validated against business needs and technical capabilities."
+						]
+					},
+					"mtpd": {
+						"acronym": "MTPD",
+						"expansion": "Maximum Tolerable Period of Disruption",
+						"question": "What is the absolute maximum time a critical activity can remain disrupted?",
+						"definition": [
+							"The longest period an organisation can accept a critical process, activity or service being unavailable before the consequences become unacceptable, severe or irreversible.",
+							"The MTPD is set during the BIA from business, financial, regulatory, contractual, operational and reputational impacts. It is a business tolerance limit, not a technical recovery target."
+						],
+						"note": "The RTO must be shorter than the MTPD to leave room for recovery, verification and the return to an acceptable service level. French acronyms sometimes mapped to this notion (DMTP, DMIA or DIMA depending on the edition) are not interchangeable without checking the reference framework."
+					},
+					"mbco": {
+						"acronym": "MBCO",
+						"expansion": "Minimum Business Continuity Objective",
+						"question": "What minimum level of activity must be maintained or restored during a disruption?",
+						"definition": [
+							"The minimum acceptable level of products, services or activities an organisation must be able to maintain or restore during a disruption.",
+							"The MBCO expresses a minimum business capacity, such as a transaction volume, a number of cases processed or a priority service scope. It complements the time-based objectives:"
+						],
+						"points": [
+							"the MTPD sets the limit beyond which disruption becomes unacceptable;",
+							"the RTO gives the target recovery time;",
+							"the RPO caps acceptable data loss;",
+							"the MBCO defines the minimum activity level to reach during or after recovery."
+						]
+					},
+					"bcp": {
+						"acronym": "BCP",
+						"expansion": "Business Continuity Plan",
+						"question": "How do we keep critical activities running during a crisis?",
+						"definition": [
+							"A document defining the measures, responsibilities and procedures used to maintain or quickly restore critical activities during a disruption or crisis."
+						]
+					},
+					"drp": {
+						"acronym": "DRP",
+						"expansion": "Disaster Recovery Plan",
+						"question": "How do we restore systems after a disaster?",
+						"definition": [
+							"A document describing the procedures and resources needed to restore systems, applications and data after a major incident. In IT it is often treated together with the ITDRP."
+						]
+					},
+					"itdrp": {
+						"acronym": "ITDRP",
+						"expansion": "Information Technology Disaster Recovery Plan",
+						"question": "How do we restore IT systems?",
+						"definition": [
+							"Describes the procedures, responsibilities, technical resources and priorities needed to restore information systems after a major incident."
+						]
+					},
+					"rto": {
+						"acronym": "RTO",
+						"expansion": "Recovery Time Objective",
+						"question": "How quickly must we recover?",
+						"definition": [
+							"The maximum acceptable time a system, application or process may remain unavailable after a disruption."
+						]
+					},
+					"rpo": {
+						"acronym": "RPO",
+						"expansion": "Recovery Point Objective",
+						"question": "How much data loss is acceptable?",
+						"definition": [
+							"The maximum amount of data it is acceptable to lose, expressed as a duration. For example, a 4-hour RPO means no more than the last 4 hours of data may be lost."
+						]
+					},
+					"spof": {
+						"acronym": "SPOF",
+						"expansion": "Single Point of Failure",
+						"question": "Which single component could take the service down?",
+						"definition": [
+							"A component whose failure alone can interrupt a system, service or activity. Identifying SPOFs makes it possible to add redundancy and reduce availability risks."
+						]
+					}
+				}
+			},
+			"assets": {
+				"title": "IT asset and service management",
+				"terms": {
+					"cmdb": {
+						"acronym": "CMDB",
+						"expansion": "Configuration Management Database",
+						"question": "Where are information system components and their relationships recorded?",
+						"definition": [
+							"A repository centralising information system components, called Configuration Items (CIs), with their attributes and relationships. It supports asset management, impact analysis and incident and change handling."
+						]
+					}
+				}
+			},
+			"architecture": {
+				"title": "Architecture and integration",
+				"terms": {
+					"ipaas": {
+						"acronym": "iPaaS",
+						"expansion": "Integration Platform as a Service",
+						"question": "How do we connect and orchestrate applications, data and services?",
+						"definition": [
+							"A cloud platform used to connect applications, data, APIs and services, then design, run, monitor and govern their integration flows.",
+							"It usually provides connectors, transformation and orchestration mechanisms, plus monitoring and error-handling features."
+						]
+					},
+					"adr-architecture": {
+						"acronym": "ADR",
+						"expansion": "Architecture Decision Record",
+						"question": "How do we document an architecture decision and its consequences?",
+						"definition": [
+							"A short, versioned document recording a significant decision about a system: its context, the options considered, the chosen decision, its status and its consequences.",
+							"An ADR preserves the reasoning behind a choice, avoids reopening the same debate and eases review, evolution or replacement of the decision. It usually contains:"
+						],
+						"points": [
+							"the context and the problem to solve;",
+							"constraints and decision criteria;",
+							"the options studied and their trade-offs;",
+							"the chosen decision;",
+							"consequences, risks and follow-up actions;",
+							"a status: proposed, accepted, rejected, superseded or deprecated."
+						],
+						"note": "An ADR can capture security requirements and trade-offs: threat model, authentication and authorisation, encryption, logging, secrets management, network exposure, dependencies, compliance, resilience and residual risks. It does not replace a risk analysis but keeps its conclusions. Not to be confused with ADR “Application Detection and Response”."
+					}
+				}
+			},
+			"performance": {
+				"title": "Performance management and service levels",
+				"outro": "The BIA identifies critical activities and their recovery needs. KPOs express the priority outcomes, KPIs measure their achievement, SLOs set internal service targets and SLAs formalise the applicable commitments.",
+				"terms": {
+					"kpo": {
+						"acronym": "KPO",
+						"expansion": "Key Performance Objective",
+						"question": "Which priority outcome are we trying to achieve?",
+						"definition": [
+							"A priority outcome an organisation, team or system aims to achieve. The KPO sets the target and intent; KPIs measure progress towards it."
+						]
+					},
+					"kpi": {
+						"acronym": "KPI",
+						"expansion": "Key Performance Indicator",
+						"question": "Which measure tracks performance against an objective?",
+						"definition": [
+							"A quantifiable measure used to track the performance of an activity, process or service against a defined objective. A KPI should state its calculation method, source, measurement frequency, target and owner."
+						]
+					},
+					"slo": {
+						"acronym": "SLO",
+						"expansion": "Service Level Objective",
+						"question": "Which internal reliability or performance target must the service meet?",
+						"definition": [
+							"An internal, measurable target over a given period for a service level indicator, for example 99.9% availability over 30 days. The SLO drives reliability management and is usually stricter than the related SLA."
+						]
+					},
+					"sla": {
+						"acronym": "SLA",
+						"expansion": "Service Level Agreement",
+						"question": "Which service level is formally agreed with users or partners?",
+						"definition": [
+							"A formal commitment between a service provider and its users or partners. It defines the expected service level, the measurement period, responsibilities, exclusions and any consequences of non-compliance."
+						]
+					}
+				}
+			},
+			"control": {
+				"title": "Security and control",
+				"terms": {
+					"dica": {
+						"acronym": "DICA",
+						"expansion": "Disponibilité, Intégrité, Confidentialité, Authentification (availability, integrity, confidentiality, authentication)",
+						"question": "Which core criteria protect systems and data?",
+						"definition": [
+							"The French counterpart of the CIA triad. The DIC model defines three core properties; the DICA variant adds authentication. Some frameworks use DICP or DICAN, which add proof, traceability or non-repudiation."
+						],
+						"points": [
+							"Availability: systems and data are accessible when needed by authorised people.",
+							"Integrity: data is not modified or altered accidentally or maliciously.",
+							"Confidentiality: only authorised people can access the data.",
+							"Authentication: the identity of users, services or systems is verified; proof and traceability then make it possible to attribute and trace actions."
+						]
+					},
+					"scim": {
+						"acronym": "SCIM",
+						"expansion": "System for Cross-domain Identity Management",
+						"question": "How do we automate the identity lifecycle between an identity provider and applications?",
+						"definition": [
+							"An open standard for identity management. Built on HTTP, REST and JSON, SCIM automates the exchange of identity data and account lifecycle between an identity provider (IdP) and a service provider such as a SaaS application. It is used to:"
+						],
+						"points": [
+							"provision an account automatically when someone joins;",
+							"update attributes, groups and permissions when their situation changes;",
+							"quickly disable or delete access when they leave;",
+							"synchronise users and groups across systems."
+						],
+						"note": "SCIM reduces orphaned accounts, manual operations and access revocation delays. It complements authentication and federation protocols such as SAML or OpenID Connect without replacing them."
+					},
+					"dlp": {
+						"acronym": "DLP",
+						"expansion": "Data Loss Prevention",
+						"question": "How do we prevent data leakage or loss?",
+						"definition": [
+							"A set of rules, controls and tools that detect and prevent unauthorised use, exfiltration or sharing of sensitive data."
+						]
+					},
+					"worm": {
+						"acronym": "WORM",
+						"expansion": "Write Once, Read Many",
+						"question": "How do we guarantee data immutability?",
+						"definition": [
+							"Immutable storage: data is written once and cannot be modified or deleted during a defined retention period. It protects backups, logs and records subject to retention requirements."
+						]
+					},
+					"adr-detection": {
+						"acronym": "ADR",
+						"expansion": "Application Detection and Response",
+						"question": "How do we detect and handle application incidents?",
+						"definition": [
+							"An approach and tooling used to identify abnormal behaviour or incidents affecting applications, then analyse and respond to them."
+						],
+						"note": "Not to be confused with ADR “Architecture Decision Record”."
+					},
+					"ioc": {
+						"acronym": "IoC",
+						"expansion": "Indicator of Compromise",
+						"question": "Which clues reveal a potential or confirmed compromise?",
+						"definition": [
+							"An observable artefact that may signal a potential or confirmed compromise of a system, account or network: a malicious file hash, an IP address or domain linked to malicious activity, a suspicious file or a characteristic log entry.",
+							"IoCs are used to detect, hunt and analyse malicious activity. They must be read in context: a single indicator is not always proof of compromise."
+						]
+					},
+					"sod": {
+						"acronym": "SoD",
+						"expansion": "Separation (or Segregation) of Duties",
+						"question": "How do we split sensitive responsibilities?",
+						"definition": [
+							"An internal control principle that splits responsibilities across several people so that nobody can perform every step of a sensitive operation alone, for example initiating, approving and executing a transaction."
+						]
+					}
+				}
+			},
+			"vulnerabilities": {
+				"title": "Vulnerability management",
+				"outro": "SCA analyses third-party components, SAST examines code without running it, DAST tests the running application from the outside and IAST observes its internal behaviour during tests. Combined, they improve application risk coverage across the development lifecycle.",
+				"terms": {
+					"appsec": {
+						"acronym": "AppSec",
+						"expansion": "Application Security",
+						"question": "How do we build security into the whole application lifecycle?",
+						"definition": [
+							"A holistic approach that embeds security throughout an application’s lifecycle (design, development, testing, deployment and operations) rather than treating it as a one-off check at the end. It combines complementary practices:"
+						],
+						"points": [
+							"SCA: inventories third-party components and dependencies and looks up their known vulnerabilities;",
+							"SAST: analyses code or artefacts without running the application;",
+							"DAST: tests a running application from the outside;",
+							"IAST: observes the application’s internal behaviour during execution and tests;",
+							"code review, threat modelling and penetration testing: complementary human, contextual analysis."
+						],
+						"note": "No single technique covers every risk: combining them covers dependencies, source code, the deployed application and its runtime behaviour."
+					},
+					"sca": {
+						"acronym": "SCA",
+						"expansion": "Software Composition Analysis",
+						"question": "Which vulnerabilities affect third-party components and dependencies?",
+						"definition": [
+							"A method to inventory the libraries, packages and third-party components of an application, then identify their known vulnerabilities, outdated versions and potential licence risks. SCA can feed an SBOM and plug into CI/CD pipelines or runtime analysis."
+						]
+					},
+					"sast": {
+						"acronym": "SAST",
+						"expansion": "Static Application Security Testing",
+						"question": "Which flaws can be found in code without running it?",
+						"definition": [
+							"Analysis of source code, bytecode or artefacts without running the application. SAST detects issues such as injections, insecure data flows or validation errors early, usually during development or in CI/CD."
+						]
+					},
+					"dast": {
+						"acronym": "DAST",
+						"expansion": "Dynamic Application Security Testing",
+						"question": "Which flaws appear when the application is running?",
+						"definition": [
+							"Analysis of a running application by sending requests and simulating attacks from the outside, without access to the source code. DAST reveals vulnerabilities tied to real behaviour, configuration or interactions between components."
+						]
+					},
+					"iast": {
+						"acronym": "IAST",
+						"expansion": "Interactive Application Security Testing",
+						"question": "Which vulnerabilities appear while the application runs and is tested?",
+						"definition": [
+							"A method that analyses a web application while it runs to identify vulnerabilities from its internal behaviour and from the interactions generated by manual or automated tests.",
+							"IAST combines in-application instrumentation with observation of requests, data flows and the code actually executed. It provides contextual results: the vulnerability location, the execution path involved and the data concerned."
+						]
+					},
+					"ssrf": {
+						"acronym": "SSRF",
+						"expansion": "Server-Side Request Forgery",
+						"question": "How do we stop a server from issuing unauthorised network requests?",
+						"definition": [
+							"A web vulnerability that lets an attacker trick a vulnerable server into sending unauthorised network requests to internal or external systems.",
+							"It can expose internal services that are normally unreachable from the Internet or bypass some network controls."
+						]
+					},
+					"cve": {
+						"acronym": "CVE",
+						"expansion": "Common Vulnerabilities and Exposures",
+						"question": "Which unique identifier designates a publicly listed vulnerability?",
+						"definition": [
+							"A unique reference (for example CVE-2021-44228) assigned to a known security flaw so it can be cited and tracked consistently across tools and organisations."
+						]
+					},
+					"cvss": {
+						"acronym": "CVSS",
+						"expansion": "Common Vulnerability Scoring System",
+						"question": "What is the theoretical technical severity of a vulnerability (0 to 10)?",
+						"definition": [
+							"A 0–10 score computed by the vendor or the NVD from technical criteria: exploitability, potential impact, complexity and attack vector. It rates the theoretical severity of a vulnerability, regardless of whether it is actually exploited."
+						]
+					},
+					"epss": {
+						"acronym": "EPSS",
+						"expansion": "Exploit Prediction Scoring System",
+						"question": "How likely is a vulnerability to be exploited in the next 30 days?",
+						"definition": [
+							"A statistical estimate published by FIRST, from 0 to 100%, of the probability that a vulnerability will be exploited in the next 30 days. It complements CVSS: a CVE can have a high CVSS but a low EPSS if it is not exploited in practice."
+						]
+					},
+					"kev": {
+						"acronym": "KEV",
+						"expansion": "Known Exploited Vulnerabilities",
+						"question": "Which vulnerabilities are confirmed to be actively exploited in the wild?",
+						"definition": [
+							"A catalogue maintained by CISA (US agency) of CVEs with confirmed active exploitation, to be handled as top priority. Each entry carries a remediation due date binding on US federal agencies; while not binding elsewhere, it is the closest external reference to a recognised standard for auditors and cyber insurers."
+						]
+					}
+				}
+			},
+			"privacy": {
+				"title": "Data protection and GDPR",
+				"terms": {
+					"dpa": {
+						"acronym": "DPA",
+						"expansion": "Data Processing Agreement",
+						"question": "How do we contractually frame personal data processing carried out by a processor?",
+						"definition": [
+							"A contract or set of clauses governing the processing of personal data by a processor on behalf of a controller. Under the GDPR it specifies in particular:"
+						],
+						"points": [
+							"the subject matter, duration, nature and purposes of the processing;",
+							"the categories of personal data and data subjects;",
+							"the controller’s documented instructions;",
+							"confidentiality obligations and security measures;",
+							"the conditions for engaging sub-processors;",
+							"assistance with data subject rights, incidents and impact assessments;",
+							"return or deletion of data at the end of the service;",
+							"audit rights and evidence of compliance."
+						],
+						"note": "The DPA mainly formalises the GDPR Article 28 obligations between controller and processor. It must not be confused with the DPIA."
+					},
+					"dpia": {
+						"acronym": "DPIA",
+						"expansion": "Data Protection Impact Assessment",
+						"question": "How do we assess and reduce the high risks a processing poses to people’s rights and freedoms?",
+						"definition": [
+							"A structured process to identify, assess and reduce the risks that personal data processing poses to the rights and freedoms of data subjects. It usually describes:"
+						],
+						"points": [
+							"the planned processing, its purposes and legal basis;",
+							"its necessity and proportionality;",
+							"the risks to data subjects;",
+							"the technical and organisational measures planned to reduce those risks;",
+							"residual risks and the decision to accept them or take further action."
+						],
+						"note": "Required by GDPR Article 35 when processing is likely to result in a high risk. If a high risk remains despite the planned measures, the supervisory authority must be consulted before processing starts. Not to be confused with the DPA, which is a contractual agreement."
+					}
+				}
+			},
+			"regulation": {
+				"title": "Regulation — financial and insurance sector",
+				"terms": {
+					"dora": {
+						"acronym": "DORA",
+						"expansion": "Digital Operational Resilience Act",
+						"question": "Which European framework governs digital operational resilience?",
+						"definition": [
+							"EU regulation on digital operational resilience. It governs information and communication technology risk management in the financial sector, including the insurance undertakings in scope."
+						]
+					},
+					"pra": {
+						"acronym": "PRA",
+						"expansion": "Prudential Regulation Authority",
+						"question": "Which authority supervises the UK financial sector?",
+						"definition": [
+							"The UK prudential regulator, part of the Bank of England. It carries out the prudential supervision of banks, insurers and other financial institutions in scope."
+						],
+						"note": "Not to be confused with the French PRA, Plan de Reprise d’Activité, the equivalent of a DRP."
+					}
+				}
+			}
 		}
 	}
 }
