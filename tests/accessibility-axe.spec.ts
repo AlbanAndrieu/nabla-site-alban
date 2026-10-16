@@ -13,6 +13,7 @@ const localizedRoutePairs = [
 	["/expertise", "/fr/expertise"],
 	["/ciso", "/fr/ciso"],
 	["/security/dsomm", "/fr/security/dsomm"],
+	["/security/lexique", "/fr/security/lexique"],
 	["/cv", "/fr/cv"],
 	["/jm", "/fr/jm"],
 ] as const;

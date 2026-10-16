@@ -27,6 +27,8 @@ function resourceLinkIconClass(icon: ResourceLinkIcon = "external") {
 			return "fa-solid fa-terminal";
 		case "chart":
 			return "fa-solid fa-chart-line";
+		case "book":
+			return "fa-solid fa-book";
 		default:
 			return "fa-solid fa-arrow-up-right-from-square";
 	}

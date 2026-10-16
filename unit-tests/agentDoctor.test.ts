@@ -75,6 +75,8 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		);
 
 		const hooks = path.join(cwd, ".git", "hooks");
+		// `git init` only creates hooks/ when the init template provides it.
+		await mkdir(hooks, { recursive: true });
 		for (const hook of ["pre-commit", "commit-msg", "pre-push"]) {
 			await writeExecutable(
 				path.join(hooks, hook),

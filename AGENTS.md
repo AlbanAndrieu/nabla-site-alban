@@ -45,10 +45,11 @@ paths, tests, HEAD and remaining blockers, not verbose successful test output.
 
 Roadmaps: `docs/quality-roadmap.md` and `docs/homelab-roadmap.md`. Roadmap=open;
 runbook=operations; incident=history; contract=invariant; Git=chronology.
-`docs/agent-frontend-standards.md` is on-demand. Do not mutate OpenCode V1/V2 schema without
-checking installed version.
+Load `docs/agent-frontend-standards.md` before frontend, a11y, i18n, SEO, print or perf edits.
+Do not mutate OpenCode V1/V2 schema without checking installed version.
 
 ---
+
 ## Mandatory agent publish policy
 
 Agents must never publish changes immediately after editing files.
@@ -102,6 +103,8 @@ Agents must never rely on this post-merge workflow as justification for publishi
 
 Next.js 16 / React 19 / TypeScript / next-intl. Node/npm constraints and commands are authoritative
 in `package.json`.
+
+Commands, single-test invocations and architecture: `docs/agent-developer-guide.md` (on-demand).
 
 ## Legacy static 404 rendering exception
 

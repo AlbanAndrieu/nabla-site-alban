@@ -524,17 +524,16 @@ repos:
   #         - "@commitlint/config-conventional"
   #         - conventional-changelog-conventionalcommits
 
-  # - repo: https://github.com/commitizen-tools/commitizen
-  #   rev: v4.11.2
-  #   hooks:
-  #     - id: commitizen
-  #       name: "🌳 git · Validate commit message"
-  #       # stages: [commit-msg]
-  #       stages: [pre-push]
-  #       additional_dependencies: [cz-conventional-gitmoji]
-  #     - id: commitizen-branch
-  #       # stages: [pre-push]
-  #       stages: [post-commit]
+-   repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.17.0
+    hooks:
+    -   id: commitizen
+        name: "🌳 git · Validate commit message"
+        stages: [commit-msg]
+        additional_dependencies: [cz-conventional-gitmoji]
+    -   id: commitizen-branch
+        name: "🌳 git · Validate commit messages before push"
+        stages: [pre-push]
 
   # - repo: https://github.com/jorisroovers/gitlint
   #   rev: v0.19.1

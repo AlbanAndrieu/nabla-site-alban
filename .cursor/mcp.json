@@ -38,9 +38,9 @@
 				"-disable-write"
 			],
 			"env": {
-				"GRAFANA_URL": "http://grafana.service.gra.prod.consul",
-				"GRAFANA_USERNAME": "admin",
-				"GRAFANA_PASSWORD": "admin",
+				"GRAFANA_URL": "http://grafana.albandrieu.com",
+				"GRAFANA_USERNAME": "${env:GRAFANA_USERNAME}",
+				"GRAFANA_PASSWORD": "${env:GRAFANA_PASSWORD}",
 				"GRAFANA_ORG_ID": "1"
 			}
 		},
