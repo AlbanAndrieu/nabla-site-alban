@@ -837,22 +837,22 @@
 			"external": true
 		},
 		{
-			"name": "Garage S3",
+			"name": "Garage S3 API",
 			"icons": ["fas fa-database"],
-			"description": "Garage S3-compatible object-storage API exposed through the direct HAProxy/TLS re-encryption/Traefik path.",
+			"description": "S3-compatible object-storage API on :3900, internal LAN/VPN access intended; no public exposure authorized.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3900,
 			"internalSecure": false,
 			"tunnelUrl": "https://s3.int.albandrieu.com",
 			"tunnelSecure": false,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"external": true,
+			"external": false,
 			"id": "garage"
 		},
 		{
-			"name": "Garage",
+			"name": "Garage Web UI",
 			"icons": ["fas fa-terminal"],
-			"description": "Garage WebUI exposed through Cloudflare Tunnel directly to the LAN-bound :3909 origin without Traefik.",
+			"description": "Dedicated Garage browser Web UI on :3909; public Cloudflare routing is pending verification and access should eventually become private.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3909,
 			"internalSecure": false,
@@ -864,16 +864,16 @@
 		},
 		{
 			"id": "garage-admin",
-			"name": "Garage Admin",
+			"name": "Garage Admin API",
 			"icons": ["fas fa-lock"],
-			"description": "Garage Admin API exposed through Cloudflare Tunnel directly to the LAN-bound :3903 origin without Traefik.",
+			"description": "Garage Admin API :3903 — accès LAN/VPN seulement, ne pas confondre avec la Web UI :3909.",
 			"internalHost": "172.17.0.24",
 			"internalPort": 3903,
 			"internalSecure": false,
 			"tunnelUrl": "https://garage-admin.albandrieu.com",
-			"tunnelSecure": true,
+			"tunnelSecure": false,
 			"iconSrc": "assets/selfh-icons/garage.png",
-			"external": true
+			"external": false
 		}
 	]
 }
