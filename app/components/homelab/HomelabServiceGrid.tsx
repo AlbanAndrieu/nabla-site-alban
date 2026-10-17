@@ -317,7 +317,7 @@ export default function HomelabServiceGrid({
 									>
 										{(isPrivateEndpoint || privateExposureDebt) && (
 											<span
-												className="badge bg-info text-dark"
+												className="badge bg-info text-black"
 												title={
 													privateExposureDebt
 														? "Accès interne souhaité ; exception DNS publique encore déclarée"
