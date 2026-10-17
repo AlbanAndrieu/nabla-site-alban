@@ -91,6 +91,8 @@ export default async function LocaleLayout({
 			<head>
 				<ThemeBootstrap />
 				<meta name="color-scheme" content="light dark" />
+				{/* Opt in to the OS/browser preferred text scale (CSS Fonts 5). */}
+				<meta name="text-scale" content="scale" />
 				<link rel="stylesheet" href="/landing-sections.css" />
 				<link rel="stylesheet" href="/wireframe.css" />
 				<link rel="stylesheet" href="/theme.css" />

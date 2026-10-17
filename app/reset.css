@@ -19,8 +19,13 @@
 	border: 0 solid;
 }
 
+/*
+ * The text-scale meta in the root layout already scales the initial font size
+ * with the user's preferred text scale. Multiplying by
+ * env(preferred-text-scale) here would apply that scale twice.
+ */
 html {
-	font-size: calc(100% * env(preferred-text-scale, 1));
+	font-size: 100%;
 }
 
 html,
