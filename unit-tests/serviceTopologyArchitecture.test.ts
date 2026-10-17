@@ -70,7 +70,7 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(data, /iconSrc: serviceIconSrc\(service\)/);
 	assert.match(css, /background: #020617/);
 	assert.match(css, /\.nodeIconFrame/);
-	assert.match(packageJson, /"@xyflow\/react": "12\.11\.3"/);
+	assert.match(packageJson, /"@xyflow\/react": "12\.12\.0"/);
 	for (const product of [
 		"Open WebUI",
 		"LiteLLM",
