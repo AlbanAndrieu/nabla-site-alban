@@ -40,6 +40,8 @@ is_maintenance_only_path() {
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             renovate.json | \
+            scripts/lib/quality-log-excerpt.awk | \
+            scripts/agent-output-metrics.sh | \
             scripts/agent-quality-gate.sh | \
             scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
