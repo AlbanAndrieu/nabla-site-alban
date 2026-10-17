@@ -157,7 +157,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           QUALITY_BASELINE_RELEASE_HOPS: "3"
           QUALITY_BASELINE_MAINTENANCE_HOPS: "5"
-        run: bash scripts/verify-production-baseline.sh
+        run: bash scripts/verify-master-baseline.sh
 
       - name: Classify CI change scope
         id: ci-scope

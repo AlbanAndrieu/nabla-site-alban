@@ -10,7 +10,7 @@ syntaxe Actions, utiliser la documentation officielle GitHub.
   SAST et Preview ; ne pas recréer ce classifieur dans un autre workflow.
 - `scripts/agent-quality-gate.sh` et `scripts/agent-publish.sh` sont les
   autorités local-first avant publication.
-- `scripts/verify-production-baseline.sh` vérifie la preuve production héritée
+- `scripts/verify-master-baseline.sh` vérifie la preuve production héritée
   avant de dépenser le budget build d'une PR.
 - `renovate.json` est l'autorité des mises à jour de dépendances. Renovate est
   le seul bot autorisé à créer ou rebaser des branches de dependency updates.

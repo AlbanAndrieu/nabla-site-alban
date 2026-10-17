@@ -182,7 +182,7 @@ if [[ "${QUALITY_ALLOW_LARGE_DELETION:-0}" != "1" && "${BASE_REF}" != "HEAD" ]];
             # The production-baseline split is locked by dedicated release/
             # maintenance classification tests. Once merged, the new <200-line
             # baselines make these exceptions inert.
-            scripts/verify-production-baseline.sh | \
+            scripts/verify-master-baseline.sh | \
                 app/components/homelab/HomelabOperationalEvidence.tsx | \
                 lib/homelabHealth.ts | lib/homelabObservability.ts)
                 continue

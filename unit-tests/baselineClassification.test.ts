@@ -7,10 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const classificationScript = fileURLToPath(
-	new URL(
-		"../scripts/lib/production-baseline-classification.sh",
-		import.meta.url,
-	),
+	new URL("../scripts/lib/baseline-classification.sh", import.meta.url),
 );
 
 function git(cwd: string, ...args: string[]) {
@@ -19,6 +16,37 @@ function git(cwd: string, ...args: string[]) {
 		encoding: "utf8",
 		stdio: ["ignore", "pipe", "pipe"],
 	}).trim();
+}
+
+// macOS file systems treat NFD and NFC names as the same file, so Unicode
+// renames are staged directly in the index to stay byte-exact on every OS.
+function renameInIndex(cwd: string, oldName: string, newName: string) {
+	const [mode, blob] = git(cwd, "ls-files", "--stage", "--", oldName).split(
+		/\s+/,
+	);
+	git(cwd, "rm", "--cached", "--quiet", "--", oldName);
+	git(
+		cwd,
+		"update-index",
+		"--add",
+		"--cacheinfo",
+		`${mode},${blob},${newName}`,
+	);
+}
+
+function writeIndexBlob(cwd: string, pathname: string, content: string) {
+	const blob = execFileSync("git", ["hash-object", "-w", "--stdin"], {
+		cwd,
+		encoding: "utf8",
+		input: content,
+	}).trim();
+	git(
+		cwd,
+		"update-index",
+		"--add",
+		"--cacheinfo",
+		`100644,${blob},${pathname}`,
+	);
 }
 
 async function writeJson(pathname: string, value: unknown) {
@@ -33,6 +61,7 @@ async function createRepository() {
 	git(cwd, "init", "--quiet");
 	git(cwd, "config", "user.email", "baseline-classifier@example.invalid");
 	git(cwd, "config", "user.name", "Baseline Classifier Test");
+	git(cwd, "config", "core.precomposeunicode", "false");
 
 	await writeJson(join(cwd, "package.json"), {
 		name: "fixture",
@@ -126,7 +155,7 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 
 	await mkdir(join(cwd, "scripts/lib"), { recursive: true });
 	await writeFile(
-		join(cwd, "scripts/lib/production-baseline-classification.sh"),
+		join(cwd, "scripts/lib/baseline-classification.sh"),
 		"# classification maintenance\n",
 	);
 	git(cwd, "add", ".");
@@ -159,12 +188,10 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 	assert.match(rejected.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
 });
 
-
 test("maintenance classification permits only the byte-identical macOS Unicode PDF rename", async (t) => {
 	const cwd = await createRepository();
 	t.after(async () => rm(cwd, { recursive: true, force: true }));
-	const oldName =
-		"public/cv/kleta/Dossier de compe\\u0301tences - Se\\u0301curite\\u0301.pdf";
+	const oldName = "public/cv/kleta/Dossier de compétences - Sécurité.pdf";
 	const newName = oldName.normalize("NFC");
 	assert.notEqual(oldName, newName);
 	await mkdir(dirname(join(cwd, oldName)), { recursive: true });
@@ -173,16 +200,20 @@ test("maintenance classification permits only the byte-identical macOS Unicode P
 	git(cwd, "commit", "--quiet", "-m", "add old name");
 	const parent = git(cwd, "rev-parse", "HEAD");
 
-	git(cwd, "mv", oldName, newName);
+	renameInIndex(cwd, oldName, newName);
 	git(cwd, "commit", "--quiet", "-m", "normalize filename");
 	const renameCommit = git(cwd, "rev-parse", "HEAD");
 	const accepted = classify(cwd, "maintenance_only_hop", parent, renameCommit);
 	assert.equal(accepted.status, 0, accepted.stderr);
 
-	await writeFile(join(cwd, newName), "changed pdf bytes");
-	git(cwd, "add", ".");
+	writeIndexBlob(cwd, newName, "changed pdf bytes");
 	git(cwd, "commit", "--quiet", "-m", "change pdf");
-	const modified = classify(cwd, "maintenance_only_hop", renameCommit, git(cwd, "rev-parse", "HEAD"));
+	const modified = classify(
+		cwd,
+		"maintenance_only_hop",
+		renameCommit,
+		git(cwd, "rev-parse", "HEAD"),
+	);
 	assert.equal(modified.status, 1);
 	assert.match(modified.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
 });
@@ -190,20 +221,28 @@ test("maintenance classification permits only the byte-identical macOS Unicode P
 test("a byte-identical PDF rename never hides deployable changes in the same commit", async (t) => {
 	const cwd = await createRepository();
 	t.after(async () => rm(cwd, { recursive: true, force: true }));
-	const oldName = "public/cv/kleta/cv-e\\u0301.pdf";
+	const oldName = "public/cv/kleta/cv-é.pdf";
 	const newName = oldName.normalize("NFC");
 	await mkdir(dirname(join(cwd, oldName)), { recursive: true });
 	await writeFile(join(cwd, oldName), "original");
 	git(cwd, "add", ".");
 	git(cwd, "commit", "--quiet", "-m", "fixture PDF");
 	const parent = git(cwd, "rev-parse", "HEAD");
-	git(cwd, "mv", oldName, newName);
+	renameInIndex(cwd, oldName, newName);
 	await mkdir(join(cwd, "app"), { recursive: true });
-	await writeFile(join(cwd, "app/page.tsx"), "export default function Page() { return null; }");
-	git(cwd, "add", ".");
+	await writeFile(
+		join(cwd, "app/page.tsx"),
+		"export default function Page() { return null; }",
+	);
+	git(cwd, "add", "app/page.tsx");
 	git(cwd, "commit", "--quiet", "-m", "filename normalization and new page");
-	const rejected = classify(cwd, "maintenance_only_hop", parent, git(cwd, "rev-parse", "HEAD"));
+	const rejected = classify(
+		cwd,
+		"maintenance_only_hop",
+		parent,
+		git(cwd, "rev-parse", "HEAD"),
+	);
 	assert.equal(rejected.status, 1);
 	assert.match(rejected.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
-	assert.match(rejected.stderr, /app\\/page.tsx/);
+	assert.match(rejected.stderr, /app\/page\.tsx/);
 });

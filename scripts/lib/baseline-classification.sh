@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# Classification helpers for scripts/verify-production-baseline.sh.
+# Classification helpers for scripts/verify-master-baseline.sh.
 # This file is sourced; it intentionally has no shebang and is not executable.
 
 stable_semver_gt() {
@@ -142,45 +142,7 @@ kleta_pdf_filename_only_rename() {
     local parent="$1" child="$2" expected_path="$3"
     local status old_path new_path extra
     [[ "${expected_path}" == public/cv/kleta/*.pdf ]] || return 1
-    IFS=
-    local parent="$1"
-    local child="$2"
-    local parent_count
-    local file
-
-    parent_count="$(git rev-list --parents -n 1 "${child}" | awk '{print NF - 1}')"
-    if [[ "${parent_count}" != "1" ]]; then
-        printf '❌ PROD_BASE_MAINTENANCE_GRAPH: maintenance candidate %s has %s parents; baseline inheritance requires a linear single-parent commit\n' \
-            "${child}" "${parent_count}" >&2
-        return 1
-    fi
-
-    mapfile -t maintenance_files < <(git diff --name-only --diff-filter=ACMRD "${parent}" "${child}" | awk 'NF' | sort -u)
-    if (("${#maintenance_files[@]}" == 0)); then
-        return 1
-    fi
-
-    for file in "${maintenance_files[@]}"; do
-        case "${file}" in
-            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | renovate.json | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/check_code_size.py | scripts/ci-performance-budget.sh | scripts/ci-scope.sh | scripts/lib/production-baseline-classification.sh | scripts/verify-production-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
-                ;;
-            public/cv/kleta/*.pdf)
-                if ! kleta_pdf_filename_only_rename "${parent}" "${child}" "${file}"; then
-                    printf '❌ PROD_BASE_MAINTENANCE_SCOPE: %s modifies CV content or adds/removes a PDF: %s\n' "${child}" "${file}" >&2
-                    return 1
-                fi
-                ;;
-            *)
-                printf '❌ PROD_BASE_MAINTENANCE_SCOPE: %s changes deploy-relevant file %s\n' "${child}" "${file}" >&2
-                return 1
-                ;;
-        esac
-    done
-
-    printf 'ℹ️  accepted maintenance-only baseline hop %s -> %s\n' "${parent}" "${child}"
-    return 0
-}
-\t' read -r status old_path new_path extra < <(
+    IFS=$'\t' read -r status old_path new_path extra < <(
         git -c core.quotePath=false diff --name-status --find-renames=100% \
             "${parent}" "${child}" -- public/cv/kleta/
     )
@@ -203,14 +165,20 @@ maintenance_only_hop() {
         return 1
     fi
 
-    mapfile -t maintenance_files < <(git diff --name-only --diff-filter=ACMRD "${parent}" "${child}" | awk 'NF' | sort -u)
+    mapfile -t maintenance_files < <(git -c core.quotePath=false diff --name-only --diff-filter=ACMRD "${parent}" "${child}" | awk 'NF' | sort -u)
     if (("${#maintenance_files[@]}" == 0)); then
         return 1
     fi
 
     for file in "${maintenance_files[@]}"; do
         case "${file}" in
-            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | renovate.json | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/check_code_size.py | scripts/ci-performance-budget.sh | scripts/ci-scope.sh | scripts/lib/production-baseline-classification.sh | scripts/verify-production-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
+            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | renovate.json | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/check_code_size.py | scripts/ci-performance-budget.sh | scripts/ci-scope.sh | scripts/lib/baseline-classification.sh | scripts/verify-master-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
+                ;;
+            public/cv/kleta/*.pdf)
+                if ! kleta_pdf_filename_only_rename "${parent}" "${child}" "${file}"; then
+                    printf '❌ PROD_BASE_MAINTENANCE_SCOPE: %s modifies CV content or adds/removes a PDF: %s\n' "${child}" "${file}" >&2
+                    return 1
+                fi
                 ;;
             *)
                 printf '❌ PROD_BASE_MAINTENANCE_SCOPE: %s changes deploy-relevant file %s\n' "${child}" "${file}" >&2
