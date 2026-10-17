@@ -33,6 +33,13 @@ check_large_deletions() {
                 lib/homelabHealth.ts | lib/homelabObservability.ts)
                 continue
                 ;;
+            # Reviewed R1-R3 component splits (PR #230): rendering stays here while
+            # graph builders, state hooks and presentation move to sibling modules.
+            app/\[locale\]/architecture/HierarchicalArchitectureExplorer.tsx | \
+                app/components/truenas/HierarchicalHomeLabNetworkFlow.tsx | \
+                app/components/homelab/HomelabServicesBlock.tsx)
+                continue
+                ;;
             *.md | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.scss | *.html | *.json | *.yml | *.yaml | *.toml | *.py | *.sh | Dockerfile* | Makefile) ;;
             *)
                 continue
