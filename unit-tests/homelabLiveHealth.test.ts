@@ -6,6 +6,17 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The block delegates health polling to useHomelabHealth.ts and service
+// filtering/grouping to homelabServiceHierarchy.ts.
+async function blockSource() {
+	const [block, health, hierarchy] = await Promise.all([
+		source("app/components/homelab/HomelabServicesBlock.tsx"),
+		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabServiceHierarchy.ts"),
+	]);
+	return `${block}\n${health}\n${hierarchy}`;
+}
+
 // The grid delegates pure health/presentation helpers to homelabGridPresentation.ts.
 async function gridSource() {
 	const [grid, presentation] = await Promise.all([
@@ -58,7 +69,7 @@ test("TrueNAS card uses only the dedicated public port-7000 probe for link color
 
 test("TrueNAS runtime/API failures are explicit even when the public UI remains reachable", async () => {
 	const page = await gridSource();
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const health = await source("lib/homelabHealth.ts");
 	const healthValidation = await source("lib/homelabHealthValidation.ts");
 	assert.match(page, /healthUnavailable \|\|/);
@@ -209,7 +220,7 @@ test("pending endpoint state is explicit and motion-safe", async () => {
 });
 
 test("homelab health refreshes every thirty seconds, preserves context and exposes failed refreshes", async () => {
-	const page = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const page = await blockSource();
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
@@ -230,7 +241,7 @@ test("internal badge uses semantic tokens instead of the low-contrast legacy bg-
 	const css = await source(
 		"app/components/homelab/HomelabServicesBlock.module.css",
 	);
-	// wireframe.css repaints .bg-info as #8e8e8e: 4.47:1 with dark text (axe color-contrast).
+	// Bootstrap's forced .bg-info cyan fails with light text (axe color-contrast).
 	assert.match(page, /className=\{`badge \$\{styles\.internalBadge\}`\}/);
 	assert.doesNotMatch(page, /bg-info/);
 	assert.match(

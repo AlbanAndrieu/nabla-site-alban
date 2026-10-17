@@ -7,10 +7,12 @@ async function source(path: string) {
 }
 
 test("agent quality gate wraps the canonical publication gate", async () => {
-	const [gate, canonical] = await Promise.all([
+	const [gateEntry, guards, canonical] = await Promise.all([
 		source("scripts/agent-quality-gate.sh"),
+		source("scripts/lib/agent-quality-guards.sh"),
 		source("scripts/quality-gate.sh"),
 	]);
+	const gate = `${gateEntry}\n${guards}`;
 	for (const expected of [
 		"QG_BASE_STALE",
 		"QG_LARGE_DELETION",

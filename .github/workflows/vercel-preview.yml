@@ -119,6 +119,7 @@ jobs:
               filename === 'stylelint.config.cjs' ||
               filename === 'scripts/agent-quality-gate.sh' ||
               filename === 'scripts/lib/agent-quality-support.sh' ||
+              filename === 'scripts/lib/agent-quality-guards.sh' ||
               filename === 'scripts/agent-publish.sh' ||
               filename === 'scripts/check_code_size.py' ||
               filename === 'scripts/ci-performance-budget.sh' ||

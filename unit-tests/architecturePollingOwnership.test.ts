@@ -2,13 +2,35 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 test("architecture health polling has a single owner and adaptive schedule", async () => {
 	const [view, explorer, healthPolling, runtimePolling] = await Promise.all([
 		readFile("app/[locale]/architecture/ArchitectureTopologyView.tsx", "utf8"),
-		readFile(
-			"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-			"utf8",
-		),
+		explorerSource(),
 		readFile(
 			"app/[locale]/architecture/useArchitectureHealthPolling.ts",
 			"utf8",

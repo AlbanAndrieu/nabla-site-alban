@@ -15,6 +15,31 @@ import {
 	unconfirmedDependencyLabels,
 } from "../lib/homelabHealthResolver";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 const DEPENDENCY_ENTRY: HomelabHealthEntry = {
 	id: "langfuse-web",
 	name: "Langfuse web",
@@ -306,7 +331,7 @@ test("service grid shows effective dependency degradation without replacing runt
 
 test("architecture graph uses explicit consumer-side dependency evidence on required edges", async () => {
 	const [explorer, evidence] = await Promise.all([
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
 	]);
 

@@ -185,14 +185,15 @@ sup {
 	top: -0.5em;
 }
 
+/* Contrast: legacy #8e8e8e links were 3.28:1 on white. */
 a {
-	color: #8e8e8e;
+	color: var(--ui-link, #0b5ed7);
 	text-decoration: none;
 	background-color: transparent;
 	-webkit-text-decoration-skip: objects;
 }
 a:hover {
-	color: #686868;
+	color: var(--ui-link-hover, #0056b3);
 	text-decoration: underline;
 }
 
@@ -2589,11 +2590,14 @@ fieldset:disabled a.btn {
 		0 0 0 0.2rem rgba(85, 85, 85, 0.5);
 }
 
+/* Contrast: the legacy #cdcdcd outline was 1.59:1 on white. Bootstrap 5
+ * normally repaints it through `--bs-btn-*` (bridged in app/globals.css);
+ * this token fallback covers pages rendered without the Bootstrap CDN. */
 .btn-outline-primary {
-	color: #cdcdcd;
+	color: var(--ui-link, #0b5ed7);
 	background-color: transparent;
 	background-image: none;
-	border-color: #cdcdcd;
+	border-color: var(--ui-link, #0b5ed7);
 }
 .btn-outline-primary:hover {
 	color: #212529;
@@ -2624,11 +2628,12 @@ fieldset:disabled a.btn {
 		0 0 0 0.2rem rgba(205, 205, 205, 0.5);
 }
 
+/* Contrast: legacy #b0b0b0 was 2.17:1 on white; see .btn-outline-primary. */
 .btn-outline-secondary {
-	color: #b0b0b0;
+	color: var(--ui-text-secondary, #475569);
 	background-color: transparent;
 	background-image: none;
-	border-color: #b0b0b0;
+	border-color: var(--ui-text-secondary, #475569);
 }
 .btn-outline-secondary:hover {
 	color: #212529;
@@ -5716,15 +5721,18 @@ button.bg-success:focus {
 	background-color: #1e7e34;
 }
 
+/* Contrast: align with Bootstrap 5's `.bg-info` (#0dcaf0, applied with
+ * !important by the CDN in every theme) instead of the legacy #8e8e8e, which
+ * gave 3.28:1 with white text and 4.46:1 with #1e293b. */
 .bg-info {
-	background-color: #8e8e8e;
+	background-color: #0dcaf0;
 }
 
 a.bg-info:hover,
 a.bg-info:focus,
 button.bg-info:hover,
 button.bg-info:focus {
-	background-color: #757575;
+	background-color: #3dd5f3;
 }
 
 .bg-warning {
@@ -8507,14 +8515,15 @@ body {
 	color: #fff;
 }
 
+/* Dark text on the fixed light-cyan info surface: 7.88:1 in both themes. */
 .bg-info {
-	color: #fff;
+	color: #212529;
 }
 .bg-info input::placeholder {
-	color: rgba(255, 255, 255, 0.8);
+	color: rgba(33, 37, 41, 0.8);
 }
 .bg-info .input-group-text {
-	color: #fff;
+	color: #212529;
 }
 
 .bg-warning {

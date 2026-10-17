@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import nextVitals from "eslint-config-next/core-web-vitals";
-export default [
+
+const eslintConfig = [
 	{
 		ignores: [
 			"node_modules/**",
@@ -47,3 +48,5 @@ export default [
 		},
 	},
 ];
+
+export default eslintConfig;
