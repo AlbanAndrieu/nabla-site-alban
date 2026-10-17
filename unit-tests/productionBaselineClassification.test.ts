@@ -158,3 +158,52 @@ test("maintenance classification accepts reviewed paths and rejects runtime path
 	assert.equal(rejected.status, 1);
 	assert.match(rejected.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
 });
+
+
+test("maintenance classification permits only the byte-identical macOS Unicode PDF rename", async (t) => {
+	const cwd = await createRepository();
+	t.after(async () => rm(cwd, { recursive: true, force: true }));
+	const oldName =
+		"public/cv/kleta/Dossier de compe\\u0301tences - Se\\u0301curite\\u0301.pdf";
+	const newName = oldName.normalize("NFC");
+	assert.notEqual(oldName, newName);
+	await mkdir(dirname(join(cwd, oldName)), { recursive: true });
+	await writeFile(join(cwd, oldName), "identical pdf bytes");
+	git(cwd, "add", ".");
+	git(cwd, "commit", "--quiet", "-m", "add old name");
+	const parent = git(cwd, "rev-parse", "HEAD");
+
+	git(cwd, "mv", oldName, newName);
+	git(cwd, "commit", "--quiet", "-m", "normalize filename");
+	const renameCommit = git(cwd, "rev-parse", "HEAD");
+	const accepted = classify(cwd, "maintenance_only_hop", parent, renameCommit);
+	assert.equal(accepted.status, 0, accepted.stderr);
+
+	await writeFile(join(cwd, newName), "changed pdf bytes");
+	git(cwd, "add", ".");
+	git(cwd, "commit", "--quiet", "-m", "change pdf");
+	const modified = classify(cwd, "maintenance_only_hop", renameCommit, git(cwd, "rev-parse", "HEAD"));
+	assert.equal(modified.status, 1);
+	assert.match(modified.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
+});
+
+test("a byte-identical PDF rename never hides deployable changes in the same commit", async (t) => {
+	const cwd = await createRepository();
+	t.after(async () => rm(cwd, { recursive: true, force: true }));
+	const oldName = "public/cv/kleta/cv-e\\u0301.pdf";
+	const newName = oldName.normalize("NFC");
+	await mkdir(dirname(join(cwd, oldName)), { recursive: true });
+	await writeFile(join(cwd, oldName), "original");
+	git(cwd, "add", ".");
+	git(cwd, "commit", "--quiet", "-m", "fixture PDF");
+	const parent = git(cwd, "rev-parse", "HEAD");
+	git(cwd, "mv", oldName, newName);
+	await mkdir(join(cwd, "app"), { recursive: true });
+	await writeFile(join(cwd, "app/page.tsx"), "export default function Page() { return null; }");
+	git(cwd, "add", ".");
+	git(cwd, "commit", "--quiet", "-m", "filename normalization and new page");
+	const rejected = classify(cwd, "maintenance_only_hop", parent, git(cwd, "rev-parse", "HEAD"));
+	assert.equal(rejected.status, 1);
+	assert.match(rejected.stderr, /PROD_BASE_MAINTENANCE_SCOPE/);
+	assert.match(rejected.stderr, /app\\/page.tsx/);
+});
