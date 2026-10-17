@@ -8,6 +8,31 @@ import {
 } from "../lib/serviceCriticality";
 import type { ServiceTopology } from "../lib/serviceTopology";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 const topology: ServiceTopology = {
 	version: 1,
 	name: "criticality fixture",
@@ -303,8 +328,19 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The block delegates health polling to useHomelabHealth.ts and service
+// filtering/grouping to homelabServiceHierarchy.ts.
+async function blockSource() {
+	const [block, health, hierarchy] = await Promise.all([
+		source("app/components/homelab/HomelabServicesBlock.tsx"),
+		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabServiceHierarchy.ts"),
+	]);
+	return `${block}\n${health}\n${hierarchy}`;
+}
+
 test("TrueNAS cards use service-first groups while technical criticality remains separate", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 
 	assert.match(block, /data-homelab-service-hierarchy/);
 	assert.match(block, /data-service-presentation-group/);
@@ -320,9 +356,7 @@ test("architecture and TrueNAS share dependency, lifecycle, optional-edge and bl
 	const architecture = await source(
 		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
 	);
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const explorer = await explorerSource();
 	const hierarchy = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);

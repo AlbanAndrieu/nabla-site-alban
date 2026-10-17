@@ -2,6 +2,31 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
@@ -11,7 +36,7 @@ test("architecture uses the standalone mobile hierarchy as the single compact vi
 		source("app/[locale]/architecture/ArchitectureTopologyView.tsx"),
 		source("app/[locale]/architecture/MobileArchitectureHierarchy.tsx"),
 		source("app/[locale]/architecture/MobileArchitectureHierarchy.module.css"),
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 	]);
 
 	assert.match(view, /<MobileArchitectureHierarchy/);
@@ -28,7 +53,7 @@ test("architecture uses the standalone mobile hierarchy as the single compact vi
 
 test("desktop React Flow remains the single interactive graph and yields to page scrolling", async () => {
 	const [explorer, styles] = await Promise.all([
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 		source(
 			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
 		),

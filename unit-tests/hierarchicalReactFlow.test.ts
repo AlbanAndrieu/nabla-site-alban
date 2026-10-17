@@ -2,6 +2,31 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
@@ -9,7 +34,7 @@ async function source(path: string) {
 test("architecture topology view uses the grouped hierarchical React Flow", async () => {
 	const [view, explorer] = await Promise.all([
 		source("app/[locale]/architecture/ArchitectureTopologyView.tsx"),
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 	]);
 	assert.match(view, /HierarchicalArchitectureExplorer/);
 	assert.match(explorer, /data-hierarchical-architecture-explorer/);
@@ -20,9 +45,7 @@ test("architecture topology view uses the grouped hierarchical React Flow", asyn
 });
 
 test("React Flow preserves document scrolling and makes graph zoom explicit", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const explorer = await explorerSource();
 	assert.match(explorer, /zoomOnScroll=\{false\}/);
 	assert.match(explorer, /panOnScroll=\{false\}/);
 	assert.match(explorer, /preventScrolling=\{false\}/);
@@ -32,9 +55,7 @@ test("React Flow preserves document scrolling and makes graph zoom explicit", as
 });
 
 test("Nabla TrueNAS graph reuses criticality tiers, blast radius and required dependency direction", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const explorer = await explorerSource();
 	assert.match(explorer, /analyzeServiceCriticality\(topology\)/);
 	assert.match(explorer, /compareServiceCriticality/);
 	assert.match(explorer, /"foundation"/);
@@ -51,9 +72,7 @@ test("Nabla TrueNAS graph reuses criticality tiers, blast radius and required de
 });
 
 test("AI Platform is rendered as functional swimlanes and optional edges remain explicit", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const explorer = await explorerSource();
 	for (const label of [
 		"Interfaces & agents",
 		"Control plane",
@@ -77,7 +96,7 @@ test("AI Platform is rendered as functional swimlanes and optional edges remain 
 
 test("hierarchical graph keeps consumer-side dependency evidence on service dependency edges", async () => {
 	const [explorer, evidence] = await Promise.all([
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
 	]);
 	assert.match(explorer, /resolveEffectiveServiceState\(health\)/);
@@ -99,7 +118,7 @@ test("hierarchical graph keeps consumer-side dependency evidence on service depe
 
 test("architecture graph distinguishes relation purpose from required or optional strength", async () => {
 	const [explorer, styles] = await Promise.all([
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 		source(
 			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
 		),
@@ -135,9 +154,7 @@ test("architecture graph distinguishes relation purpose from required or optiona
 });
 
 test("exposure contract keeps direct, tunnel, LAN VPN and internal paths causally separate", async () => {
-	const explorer = await source(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-	);
+	const explorer = await explorerSource();
 	assert.match(explorer, /data-exposure-path-contract/);
 	assert.match(explorer, /data-exposure-path="direct"/);
 	assert.match(explorer, /data-exposure-path="cloudflare"/);

@@ -44,10 +44,18 @@ test("Nabla and TrueNAS pages stay statically renderable with shared homelab UI"
 });
 
 test("dynamic homelab data is isolated behind same-origin APIs", async () => {
-	const source = await readFile(
-		new URL("app/components/homelab/HomelabServicesBlock.tsx", ROOT),
-		"utf8",
-	);
+	// The block delegates its same-origin fetches to useHomelabHealth.ts.
+	const [block, health] = await Promise.all([
+		readFile(
+			new URL("app/components/homelab/HomelabServicesBlock.tsx", ROOT),
+			"utf8",
+		),
+		readFile(
+			new URL("app/components/homelab/useHomelabHealth.ts", ROOT),
+			"utf8",
+		),
+	]);
+	const source = `${block}\n${health}`;
 
 	assert.match(source, /^"use client";/);
 	assert.match(source, /fetch\("\/api\/homelab-services"/);

@@ -11,6 +11,31 @@ import {
 	type ServiceTopology,
 } from "../lib/serviceTopology";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 const topology: ServiceTopology = {
 	version: 1,
 	name: "hosted placement fixture",
@@ -112,10 +137,7 @@ test("hosting expands infrastructure blast radius without becoming a functional 
 });
 
 test("architecture graph treats hostedBy and partOf as structural placement without target-health colouring", async () => {
-	const explorer = await readFile(
-		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
-		"utf8",
-	);
+	const explorer = await explorerSource();
 	assert.match(explorer, /\["partOf", "hostedBy"\]/);
 	assert.match(
 		explorer,

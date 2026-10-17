@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	EFFECTIVE_HEALTH_ICON_CLASS,
+	ENDPOINT_HEALTH_CLASS,
 	endpointUrlHostIsPrivateS3,
+	INTERNAL_HEALTH_CLASS,
 	internalPresentationState,
+	RUNTIME_ICON_CLASS,
 	runtimePresentationState,
 } from "../app/components/homelab/homelabGridPresentation";
 
@@ -67,4 +71,30 @@ test("unavailable TrueNAS runtime is not presented as healthy", () => {
 		runtimePresentationState(running, true, "truenas", false, false),
 		null,
 	);
+});
+
+test("endpoint and internal links share health button classes", () => {
+	assert.deepEqual(ENDPOINT_HEALTH_CLASS, {
+		pending: "btn-outline-primary",
+		ok: "btn-outline-success",
+		warn: "btn-outline-warning",
+		fail: "btn-outline-danger",
+		unknown: "btn-outline-secondary",
+	});
+	for (const state of ["ok", "warn", "fail", "unknown"] as const) {
+		assert.equal(ENDPOINT_HEALTH_CLASS[state], INTERNAL_HEALTH_CLASS[state]);
+	}
+});
+
+test("runtime icons reuse effective health icons and add a missing marker", () => {
+	assert.deepEqual(RUNTIME_ICON_CLASS, {
+		ok: "fas fa-circle-check",
+		warn: "fas fa-triangle-exclamation",
+		fail: "fas fa-circle-xmark",
+		unknown: "fas fa-circle-question",
+		missing: "fas fa-skull-crossbones",
+	});
+	for (const state of ["ok", "warn", "fail", "unknown"] as const) {
+		assert.equal(RUNTIME_ICON_CLASS[state], EFFECTIVE_HEALTH_ICON_CLASS[state]);
+	}
 });

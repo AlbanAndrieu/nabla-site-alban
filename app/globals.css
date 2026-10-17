@@ -211,6 +211,36 @@ html body .form-control::placeholder {
 	opacity: 1;
 }
 
+/* Outline buttons: Bootstrap's fixed #0d6efd / #6c757d fall below 4.5:1 on
+ * the off-white, dark-theme and TrueNAS card surfaces. Only the Bootstrap
+ * button variables are remapped, so `.btn` state rules and component styles
+ * keep their cascade; the semantic tokens follow light, dark and TrueNAS. */
+html body .btn-outline-primary {
+	--bs-btn-color: var(--ui-link);
+	--bs-btn-border-color: var(--ui-link);
+	--bs-btn-hover-color: var(--ui-surface-card);
+	--bs-btn-hover-bg: var(--ui-link);
+	--bs-btn-hover-border-color: var(--ui-link);
+	--bs-btn-active-color: var(--ui-surface-card);
+	--bs-btn-active-bg: var(--ui-link);
+	--bs-btn-active-border-color: var(--ui-link);
+	--bs-btn-disabled-color: var(--ui-link);
+	--bs-btn-disabled-border-color: var(--ui-link);
+}
+
+html body .btn-outline-secondary {
+	--bs-btn-color: var(--ui-text-secondary);
+	--bs-btn-border-color: var(--ui-text-secondary);
+	--bs-btn-hover-color: var(--ui-surface-card);
+	--bs-btn-hover-bg: var(--ui-text-secondary);
+	--bs-btn-hover-border-color: var(--ui-text-secondary);
+	--bs-btn-active-color: var(--ui-surface-card);
+	--bs-btn-active-bg: var(--ui-text-secondary);
+	--bs-btn-active-border-color: var(--ui-text-secondary);
+	--bs-btn-disabled-color: var(--ui-text-secondary);
+	--bs-btn-disabled-border-color: var(--ui-text-secondary);
+}
+
 /* TrueNAS page: keep Bootstrap utility text readable on the dark site surface. */
 .page-truenas {
 	--truenas-text-primary: #f8fafc;
