@@ -54,6 +54,9 @@ precommit_fix_until_stable() {
     local after
     local log
     local rc
+    local before_digests
+    # Per-pass hook/file evidence used to name the sources of an oscillation.
+    local evidence=""
     declare -A seen_fingerprints=()
 
     for ((pass = 1; pass <= FIX_PASSES; pass++)); do
@@ -67,17 +70,20 @@ precommit_fix_until_stable() {
         if [[ -n "${seen_fingerprints[${before}]:-}" ]]; then
             printf '❌ QG_FIX_OSCILLATION: workspace fingerprint repeated (passes %s and %s).\n' \
                 "${seen_fingerprints[${before}]}" "${pass}" >&2
+            report_fix_oscillation "${seen_fingerprints[${before}]}" "${pass}" "${evidence}" >&2
             printf '   Inspect changed paths and the mutating pre-commit hooks.\n' >&2
             git status --short >&2
             return 1
         fi
         seen_fingerprints["${before}"]="${pass}"
+        before_digests="$(fix_file_digests "${fix_files[@]}")"
         log="$(mktemp)"
         set +e
         pre-commit run --hook-stage pre-commit --files "${fix_files[@]}" >"${log}" 2>&1
         rc=$?
         set -e
         after="$(workspace_fingerprint)"
+        evidence+="$(fix_pass_evidence "${pass}" "${log}" "${before_digests}" "$(fix_file_digests "${fix_files[@]}")")"$'\n'
 
         if ((rc == 0)); then
             rm -f "${log}"
