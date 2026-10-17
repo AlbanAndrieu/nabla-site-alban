@@ -23,6 +23,11 @@ if ! command -v pre-commit >/dev/null 2>&1; then
 fi
 
 LOG_TAIL="${QUALITY_LOG_TAIL:-20}"
+QUALITY_ERROR_LINES="${QUALITY_ERROR_LINES:-20}"
+if [[ ! "${QUALITY_ERROR_LINES}" =~ ^[1-9][0-9]*$ ]]; then
+    echo "❌ QUALITY_ERROR_LINES must be a positive integer" >&2
+    exit 2
+fi
 
 resolve_base_ref() {
     if [[ -n "${QUALITY_BASE_REF:-}" ]]; then
@@ -106,7 +111,7 @@ if (("${#CHANGED_FILES[@]}" > 0)); then
             if [[ "${QUALITY_VERBOSE:-0}" == "1" ]]; then
                 cat "${log}" >&2
             else
-                tail -n "${LOG_TAIL}" "${log}" >&2 || true
+                awk -v max="${QUALITY_ERROR_LINES}" -f scripts/lib/quality-log-excerpt.awk "${log}" >&2 || tail -n "${LOG_TAIL}" "${log}" >&2 || true
             fi
         fi
         rm -f "${log}"

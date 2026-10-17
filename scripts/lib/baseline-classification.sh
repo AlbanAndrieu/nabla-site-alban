@@ -172,7 +172,7 @@ maintenance_only_hop() {
 
     for file in "${maintenance_files[@]}"; do
         case "${file}" in
-            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | renovate.json | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/check_code_size.py | scripts/ci-performance-budget.sh | scripts/ci-scope.sh | scripts/lib/baseline-classification.sh | scripts/verify-master-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/eslint-github-formatter.mjs)
+            .assetsignore | docs/* | unit-tests/* | *.md | .github/* | .vscode/* | .idea/* | .agents/* | .cursor/* | .claude/* | .zap/* | .pre-commit-config.yaml | .pre-commit-pre-push.yaml | .python-version | mise.toml | renovate.json | eslint.config.js | stylelint.config.cjs | scripts/agent-quality-gate.sh | scripts/check_code_size.py | scripts/ci-performance-budget.sh | scripts/ci-scope.sh | scripts/lib/baseline-classification.sh | scripts/verify-master-baseline.sh | scripts/publish-vercel-preview-checkpoint.sh | scripts/quality-gate.sh | scripts/lib/quality-log-excerpt.awk | scripts/agent-output-metrics.sh | scripts/eslint-github-formatter.mjs)
                 ;;
             public/cv/kleta/*.pdf)
                 if ! kleta_pdf_filename_only_rename "${parent}" "${child}" "${file}"; then
