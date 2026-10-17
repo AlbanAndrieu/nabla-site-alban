@@ -53,7 +53,7 @@ release_only_hop() {
         return 1
     fi
 
-    mapfile -t release_files < <(git diff --name-only --diff-filter=ACMRD "${parent}" "${child}" | awk 'NF' | sort -u)
+    mapfile -t release_files < <(git -c core.quotePath=false diff --name-only --diff-filter=ACMRD "${parent}" "${child}" | awk 'NF' | sort -u)
     if (("${#release_files[@]}" == 0)); then
         return 1
     fi
