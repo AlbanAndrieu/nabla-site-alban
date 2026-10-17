@@ -31,6 +31,7 @@ test("agent quality keeps route types and unit coverage in both CI scopes", asyn
 		/full pre-build lint, route types, TypeScript and unit gate/,
 	);
 });
+
 test("publication proof builds deploy-relevant changes only after strict agent validation", async () => {
 	const publish = await read("scripts/agent-publish.sh");
 
