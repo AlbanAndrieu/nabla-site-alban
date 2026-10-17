@@ -206,6 +206,11 @@
 	font-size: 0.9rem;
 }
 
+.sources a {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
 .disclaimer {
 	margin-block: var(--ui-space-xl);
 	color: var(--ui-text-muted);
