@@ -4,9 +4,9 @@ import test from "node:test";
 
 const reviewedInstallScriptVersions = {
 	"@parcel/watcher": ["2.6.0"],
-	"@swc/core": ["1.15.46"],
+	"@swc/core": ["1.16.18"],
 	esbuild: ["0.28.1"],
-	fsevents: ["2.3.2", "2.3.3"],
+	fsevents: ["2.3.3"],
 	"unrs-resolver": ["1.12.2"],
 } as const;
 
