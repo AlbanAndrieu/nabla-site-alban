@@ -6,8 +6,17 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The grid delegates pure health/presentation helpers to homelabGridPresentation.ts.
+async function gridSource() {
+	const [grid, presentation] = await Promise.all([
+		source("app/components/homelab/HomelabServiceGrid.tsx"),
+		source("app/components/homelab/homelabGridPresentation.ts"),
+	]);
+	return `${grid}\n${presentation}`;
+}
+
 test("homelab service grid keeps endpoints clickable and matches FastAPI health by stable identity", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /const endpointUrl = homelabServiceEndpointUrl\(svc\)/);
 	assert.match(page, /const endpointEnabled = svc\.endpointEnabled !== false/);
 	assert.match(page, /const stableId = homelabServiceId\(service\)/);
@@ -23,7 +32,7 @@ test("homelab service grid keeps endpoints clickable and matches FastAPI health 
 });
 
 test("schema-v4 service state remains authoritative and older snapshots keep local reconciliation fallback", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /if \(\(schemaVersion \?\? 0\) >= 4\) return entry/);
 	assert.match(page, /snapshot\?\.schema_version/);
 	assert.match(page, /reconcileHomelabHealth\(entry, \{/);
@@ -33,7 +42,7 @@ test("schema-v4 service state remains authoritative and older snapshots keep loc
 });
 
 test("TrueNAS card uses only the dedicated public port-7000 probe for link color", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /function serviceHealthEvidence/);
 	assert.match(page, /homelabServiceId\(service\) !== "truenas"/);
 	assert.match(page, /snapshot\?\.truenas\?\.public/);
@@ -48,7 +57,7 @@ test("TrueNAS card uses only the dedicated public port-7000 probe for link color
 });
 
 test("TrueNAS runtime/API failures are explicit even when the public UI remains reachable", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
 	const health = await source("lib/homelabHealth.ts");
 	const healthValidation = await source("lib/homelabHealthValidation.ts");
@@ -72,7 +81,7 @@ test("TrueNAS runtime/API failures are explicit even when the public UI remains 
 });
 
 test("TrueNAS application cards show runtime icons and a legend", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /function runtimePresentationState/);
 	assert.match(
 		page,
@@ -88,7 +97,7 @@ test("TrueNAS application cards show runtime icons and a legend", async () => {
 });
 
 test("service cards promote effective health above runtime and troubleshooting details", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	const css = await source(
 		"app/components/homelab/HomelabServicesBlock.module.css",
 	);
@@ -103,7 +112,7 @@ test("service cards promote effective health above runtime and troubleshooting d
 });
 
 test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /const dependsOnTrueNas =/);
 	assert.match(page, /svc\.internalHost === "172\.17\.0\.24"/);
 	assert.match(page, /initialHealth\?\.runtime_app != null/);
@@ -111,7 +120,7 @@ test("TrueNAS dependency failures only affect services hosted on TrueNAS", async
 });
 
 test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
-	const page = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const page = await gridSource();
 	assert.match(page, /internalPresentationState\(/);
 	assert.match(page, /truenasRuntimeUnavailable \|\|/);
 	assert.match(page, /initialHealth\?\.runtime_stale === true/);

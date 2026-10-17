@@ -281,7 +281,9 @@ async function source(path: string) {
 }
 
 test("TrueNAS public line cannot inherit dependency degradation", async () => {
-	const grid = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	const grid = await source(
+		"app/components/homelab/homelabGridPresentation.ts",
+	);
 
 	assert.match(grid, /state: publicHealth\.state/);
 	assert.match(grid, /local_state: publicHealth\.state/);
