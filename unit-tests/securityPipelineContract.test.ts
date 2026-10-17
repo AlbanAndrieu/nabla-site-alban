@@ -114,9 +114,9 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		await Promise.all([
 			read(".github/workflows/playwright.yml"),
 			read(".github/workflows/zap-preview.yml"),
-			read(".github/workflows/production-dast.yml"),
+			read(".github/workflows/master-dast.yml"),
 			read(".zap/rules.tsv"),
-			read(".github/workflows/production-smoke.yml"),
+			read(".github/workflows/master-smoke.yml"),
 			read(".github/workflows/vercel-preview.yml"),
 		]);
 

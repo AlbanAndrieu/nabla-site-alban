@@ -1,6 +1,6 @@
 {
 	"permissions": {
-		"allow": ["Bash(sed *)", "Bash(mise exec *)"]
+		"allow": ["Bash(sed *)", "Bash(mise exec *)", "Bash(gh api *)"]
 	},
 	"enabledMcpjsonServers": ["next-devtools"],
 	"disabledMcpjsonServers": ["defectdojo"]

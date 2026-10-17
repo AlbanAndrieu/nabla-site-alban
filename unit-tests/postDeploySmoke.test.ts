@@ -111,7 +111,7 @@ test("HTML attribute decoding is single-pass", () => {
 
 test("production smoke stays lightweight and production-only", async () => {
 	const workflow = await readFile(
-		new URL("../.github/workflows/production-smoke.yml", import.meta.url),
+		new URL("../.github/workflows/master-smoke.yml", import.meta.url),
 		"utf8",
 	);
 	const script = await readFile(
