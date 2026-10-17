@@ -39,3 +39,39 @@ test("agent quality support owns mechanics but not quality policy", async () => 
 		2,
 	);
 });
+
+test("agent quality guards are sourced and covered like the support library", async () => {
+	const [gate, support, guards, scope, copilotSetup, preview] =
+		await Promise.all([
+			source("scripts/agent-quality-gate.sh"),
+			source("scripts/lib/agent-quality-support.sh"),
+			source("scripts/lib/agent-quality-guards.sh"),
+			source("scripts/ci-scope.sh"),
+			source(".github/workflows/copilot-setup-steps.yml"),
+			source(".github/workflows/vercel-preview.yml"),
+		]);
+
+	assert.match(gate, /source scripts\/lib\/agent-quality-guards\.sh/);
+	for (const guard of ["check_large_deletions", "check_executable_bits"]) {
+		assert.match(guards, new RegExp(`^${guard}\\(\\) \\{`, "m"));
+		assert.doesNotMatch(gate, new RegExp(`^${guard}\\(\\)`, "m"));
+		// The gate must keep stopping on every guard failure.
+		assert.match(gate, new RegExp(`^${guard} \\|\\| exit 1$`, "m"));
+	}
+	assert.doesNotMatch(guards, /\bexit\b/);
+	assert.doesNotMatch(guards, /pre-commit run|npm run/);
+	assert.match(support, /scripts\/lib\/agent-quality-guards\.sh\)/);
+	assert.equal(
+		(scope.match(/scripts\/lib\/agent-quality-guards\.sh/g) ?? []).length,
+		2,
+	);
+	assert.equal(
+		(copilotSetup.match(/scripts\/lib\/agent-quality-guards\.sh/g) ?? [])
+			.length,
+		2,
+	);
+	assert.match(
+		preview,
+		/filename === 'scripts\/lib\/agent-quality-guards\.sh'/,
+	);
+});

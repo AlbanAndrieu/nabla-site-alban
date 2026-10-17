@@ -43,6 +43,7 @@ is_maintenance_only_path() {
             scripts/agent-quality-gate.sh | \
             scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
+            scripts/lib/agent-quality-guards.sh | \
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
             scripts/check_code_size.py | \
@@ -84,6 +85,7 @@ is_preview_safe_path() {
             scripts/agent-quality-gate.sh | \
             scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
+            scripts/lib/agent-quality-guards.sh | \
             scripts/agent-publish.sh | \
             scripts/check_code_size.py | \
             scripts/ci-performance-budget.sh | \

@@ -8,7 +8,7 @@ async function source(path: string) {
 
 test("reviewed homelab splits keep the destructive-diff exceptions path-scoped", async () => {
 	const [gate, ci] = await Promise.all([
-		source("scripts/agent-quality-gate.sh"),
+		source("scripts/lib/agent-quality-guards.sh"),
 		source(".github/workflows/ci.yml"),
 	]);
 
