@@ -20,7 +20,6 @@ on:
       - ".releaserc.yaml"
       - ".npmrc"
       - ".nvmrc"
-      - ".nvmrc-production"
       - ".python-version"
       - ".envrc"
       - "mise.toml"
@@ -64,7 +63,6 @@ on:
       - ".releaserc.yaml"
       - ".npmrc"
       - ".nvmrc"
-      - ".nvmrc-production"
       - ".python-version"
       - ".envrc"
       - "mise.toml"
@@ -351,12 +349,16 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Pin npm
+      - name: Install npm from mise
+        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          version: 2026.10.8
+          install_args: npm
+          env: false
+
+      - name: Verify npm matches mise.toml
         shell: bash
-        run: |
-          set -euo pipefail
-          cd "${RUNNER_TEMP}"
-          npm install --global npm@11.17.0 --no-audit --no-fund
+        run: bash scripts/verify-mise-npm.sh
 
       - name: Install dependencies
         id: install

@@ -27,7 +27,7 @@ OpenCommit reste un outil local/on-demand : aucun workflow OpenCommit n'est requ
 
 ## Runtime et secrets
 
-GitHub Actions lit `.nvmrc` pour Node.js 26.8.2 et utilise npm 11.17.x.
+GitHub Actions lit `.nvmrc` pour Node.js 26.8.2 et installe npm depuis `mise.toml` via `jdx/mise-action` (`install_args: npm`), vérifié par `scripts/verify-mise-npm.sh`.
 L'installation canonique est `npm ci` avec `strict-allow-scripts=true`.
 
 Secrets/variables utiles selon les workflows :

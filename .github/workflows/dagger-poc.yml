@@ -16,7 +16,6 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".nvmrc"
-      - ".nvmrc-production"
       - "dagger.json"
       - ".dagger/**"
       - "justfile"

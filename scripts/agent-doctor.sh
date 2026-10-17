@@ -47,9 +47,10 @@ ACTUAL_NODE="$(tool_version node node --version)"
 ACTUAL_NODE="${ACTUAL_NODE#v}"
 [[ "${ACTUAL_NODE}" == "${EXPECTED_NODE}" ]] || fail "AGENT_DOCTOR_VERSION_MISMATCH" "node expected=${EXPECTED_NODE} actual=${ACTUAL_NODE}"
 
+EXPECTED_NPM="$(sed -n 's/^npm = "\([^"]*\)"/\1/p' mise.toml | head -n1)"
+[[ -n "${EXPECTED_NPM}" ]] || fail "AGENT_DOCTOR_CONFIG_INVALID" "mise.toml does not pin npm"
 ACTUAL_NPM="$(tool_version npm npm --version)"
-IFS=. read -r NPM_MAJOR NPM_MINOR _ <<<"${ACTUAL_NPM}"
-[[ "${NPM_MAJOR}" == "11" && "${NPM_MINOR}" =~ ^[0-9]+$ && "${NPM_MINOR}" -ge 17 ]] || fail "AGENT_DOCTOR_VERSION_MISMATCH" "npm expected=>=11.17.0,<12 actual=${ACTUAL_NPM}"
+[[ "${ACTUAL_NPM}" == "${EXPECTED_NPM}" ]] || fail "AGENT_DOCTOR_VERSION_MISMATCH" "npm expected=${EXPECTED_NPM} actual=${ACTUAL_NPM} (run: mise install npm)"
 
 EXPECTED_PYTHON="$(tr -d '[:space:]' < .python-version)"
 ACTUAL_PYTHON="$(tool_version python3 python3 --version)"

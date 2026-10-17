@@ -5,8 +5,8 @@
 ## Runtime
 
 - Next.js 16 / React 19 / TypeScript / next-intl from the repository root.
-- Node.js: local/CI target **26.8.2**; `package.json` accepts `>=24.11.0 <27` so local/CI can use Node 26 while Vercel can continue using its supported Node 24 runtime.
-- npm: `>=11.17.0 <12`.
+- Node.js: local/CI target **26.8.2**; `package.json` accepts `>=24.22.0 <27` so local/CI can use Node 26 while Vercel can continue using its supported Node 24 runtime.
+- npm: `12.2.0` pinned in `mise.toml` (single source of truth); `engines.npm` accepts `>=12.2.0 <13`.
 - Root `package.json` and `package-lock.json` are the only application npm manifests.
 - Vercel deployment is handled by Git Integration; there is no local Vercel CLI deployment path.
 - OpenCommit is retained as an on-demand local commit-message helper through `npm run oco` / `npm run opencommit`; no GitHub OpenCommit workflow is versioned.

@@ -33,7 +33,7 @@ test("npm install scripts stay explicitly denied and strict", async () => {
 		packages: Record<string, { version?: string; hasInstallScript?: boolean }>;
 	};
 
-	assert.equal(packageJson.engines?.npm, ">=11.17.0 <12");
+	assert.equal(packageJson.engines?.npm, ">=12.2.0 <13");
 	assert.deepEqual(packageJson.allowScripts, {
 		"@parcel/watcher": false,
 		"@swc/core": false,

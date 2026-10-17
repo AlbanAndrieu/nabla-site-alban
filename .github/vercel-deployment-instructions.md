@@ -15,8 +15,8 @@ Follow `/AGENTS.md` as the canonical repository policy.
 ## Runtime versions
 
 - Local and GitHub Actions runtime: read `.nvmrc` (Node.js **26.8.2**).
-- npm: **11.17.0** in CI.
-- `package.json#engines.node` is `>=24.11.0 <27`: local/CI use Node 26.8.2 while the connected Vercel project continues to select its supported Node 24.x runtime.
+- npm: **12.2.0** in CI, installed from `mise.toml` via `jdx/mise-action`. Vercel keeps the npm bundled with its Node 24 runtime (npm 11); `engines.npm` only produces an `EBADENGINE` warning there because `engine-strict` is not enabled.
+- `package.json#engines.node` is `>=24.22.0 <27`: local/CI use Node 26.8.2 while the connected Vercel project continues to select its supported Node 24.x runtime.
 - Build command: `npm run build`.
 - Install command: `npm ci`.
 
