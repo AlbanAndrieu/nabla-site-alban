@@ -20,7 +20,7 @@ test("reviewed homelab splits keep the destructive-diff exceptions path-scoped",
 	assert.match(gate, /lib\/homelabHealthBase\.ts \|/);
 	assert.match(
 		gate,
-		/app\/\\\[locale\\\]\/architecture\/HierarchicalArchitectureExplorer\.tsx \| \\[\s\S]*?app\/components\/homelab\/HomelabServicesBlock\.tsx\)/,
+		/app\/\\\[locale\\\]\/architecture\/HierarchicalArchitectureExplorer\.tsx \| \\[\s\S]*?app\/components\/homelab\/HomelabServiceGrid\.tsx \| \\[\s\S]*?app\/\\\[locale\\\]\/architecture\/ArchitectureTopologyView\.tsx\)/,
 	);
 	assert.match(gate, /QUALITY_ALLOW_LARGE_DELETION:-0/);
 	assert.doesNotMatch(ci, /QUALITY_ALLOW_LARGE_DELETION:\s*["']?1["']?/);

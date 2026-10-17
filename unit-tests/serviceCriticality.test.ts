@@ -328,6 +328,24 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The topology view is split into cohesive sibling modules; source contracts
+// apply to the whole view implementation (original file first).
+const TOPOLOGY_VIEW_SOURCE_FILES = [
+	"ArchitectureTopologyView.tsx",
+	"ArchitectureHealthDashboard.tsx",
+	"architectureTopologyFilters.ts",
+	"useArchitectureLiveData.ts",
+];
+
+async function topologyViewSource() {
+	const parts = await Promise.all(
+		TOPOLOGY_VIEW_SOURCE_FILES.map((file) =>
+			source(`app/[locale]/architecture/${file}`),
+		),
+	);
+	return parts.join("\n");
+}
+
 // The block delegates health polling to useHomelabHealth.ts and service
 // filtering/grouping to homelabServiceHierarchy.ts.
 async function blockSource() {
@@ -353,9 +371,7 @@ test("TrueNAS cards use service-first groups while technical criticality remains
 });
 
 test("architecture and TrueNAS share dependency, lifecycle, optional-edge and blast-radius semantics", async () => {
-	const architecture = await source(
-		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
-	);
+	const architecture = await topologyViewSource();
 	const explorer = await explorerSource();
 	const hierarchy = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",

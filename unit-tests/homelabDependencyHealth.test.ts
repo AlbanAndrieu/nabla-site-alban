@@ -319,7 +319,15 @@ test("TrueNAS public line cannot inherit dependency degradation", async () => {
 });
 
 test("service grid shows effective dependency degradation without replacing runtime status", async () => {
-	const grid = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	// The grid delegates each card to HomelabServiceCard.tsx and its legends
+	// to HomelabServiceGridLegends.tsx.
+	const grid = (
+		await Promise.all([
+			source("app/components/homelab/HomelabServiceGrid.tsx"),
+			source("app/components/homelab/HomelabServiceCard.tsx"),
+			source("app/components/homelab/HomelabServiceGridLegends.tsx"),
+		])
+	).join("\n");
 
 	assert.match(grid, /resolveEffectiveServiceState\(initialHealth\)/);
 	assert.match(grid, /blockedDependencyLabels\(initialHealth\)/);
