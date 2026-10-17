@@ -48,18 +48,16 @@ fi
 
 BASE_REF="$(resolve_base_ref)"
 
-# shellcheck disable=SC2034 # pass_hooks/pass_files are read by report_fix_oscillation through namerefs
 precommit_fix_until_stable() {
     local pass
     local before
     local after
     local log
     local rc
-    local file
+    local before_digests
+    # Per-pass hook/file evidence used to name the sources of an oscillation.
+    local evidence=""
     declare -A seen_fingerprints=()
-    # Per-pass evidence used to name the hooks/files involved in an oscillation.
-    declare -A pass_hooks=() pass_files=()
-    declare -A file_digests=()
 
     for ((pass = 1; pass <= FIX_PASSES; pass++)); do
         mapfile -t fix_files < <(collect_changed_files)
@@ -72,28 +70,20 @@ precommit_fix_until_stable() {
         if [[ -n "${seen_fingerprints[${before}]:-}" ]]; then
             printf '❌ QG_FIX_OSCILLATION: workspace fingerprint repeated (passes %s and %s).\n' \
                 "${seen_fingerprints[${before}]}" "${pass}" >&2
-            report_fix_oscillation "${seen_fingerprints[${before}]}" "${pass}" pass_hooks pass_files >&2
+            report_fix_oscillation "${seen_fingerprints[${before}]}" "${pass}" "${evidence}" >&2
             printf '   Inspect changed paths and the mutating pre-commit hooks.\n' >&2
             git status --short >&2
             return 1
         fi
         seen_fingerprints["${before}"]="${pass}"
-        file_digests=()
-        for file in "${fix_files[@]}"; do
-            file_digests["${file}"]="$(file_content_digest "${file}")"
-        done
+        before_digests="$(fix_file_digests "${fix_files[@]}")"
         log="$(mktemp)"
         set +e
         pre-commit run --hook-stage pre-commit --files "${fix_files[@]}" >"${log}" 2>&1
         rc=$?
         set -e
         after="$(workspace_fingerprint)"
-        pass_hooks["${pass}"]="$(precommit_modifying_hooks "${log}")"
-        pass_files["${pass}"]=""
-        for file in "${fix_files[@]}"; do
-            [[ "$(file_content_digest "${file}")" == "${file_digests[${file}]}" ]] ||
-                pass_files["${pass}"]+="${file}"$'\n'
-        done
+        evidence+="$(fix_pass_evidence "${pass}" "${log}" "${before_digests}" "$(fix_file_digests "${fix_files[@]}")")"$'\n'
 
         if ((rc == 0)); then
             rm -f "${log}"

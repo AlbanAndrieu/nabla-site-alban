@@ -230,6 +230,14 @@
 	letter-spacing: 0.03em;
 }
 
+/* Legacy wireframe.css repaints .bg-info as #8e8e8e (4.46:1 with dark text);
+ * semantic tokens keep the "Interne" badge above WCAG AA in both themes. */
+:global(.badge).internalBadge {
+	border: 1px solid var(--ui-border);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-primary);
+}
+
 .groupDetails[data-needs-attention="true"] {
 	border-color: var(--ui-warning-border);
 }

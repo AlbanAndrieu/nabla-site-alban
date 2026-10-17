@@ -34,6 +34,14 @@ case "${QG_TEST_SCENARIO}" in
         printf 'fake formatter.....Failed\n- hook id: fake-formatter\n- exit code: 1\n- files were modified by this hook\n'
         exit 1
         ;;
+    oscillate-silent)
+        if [[ "$(cat "${QG_TEST_STATE_FILE}")" == A ]]; then
+            printf B >"${QG_TEST_STATE_FILE}"
+        else
+            printf A >"${QG_TEST_STATE_FILE}"
+        fi
+        exit 1
+        ;;
     converge)
         if [[ "$(cat "${QG_TEST_STATE_FILE}")" == A ]]; then
             printf B >"${QG_TEST_STATE_FILE}"
@@ -72,6 +80,11 @@ HOOK
                 grep -qF 'QG_FIX_OSCILLATION_HOOKS: fake-formatter (passes 1 2)' "${tmp}/out" &&
                 grep -qF "QG_FIX_OSCILLATION_FILES: ${QG_TEST_STATE_FILE} (passes 1 2)" "${tmp}/out"
             ;;
+        oscillate-silent)
+            [[ ${rc} -ne 0 ]] &&
+                grep -qF 'QG_FIX_OSCILLATION_HOOKS: unknown (no hook reported modified files)' "${tmp}/out" &&
+                grep -qF "QG_FIX_OSCILLATION_FILES: ${QG_TEST_STATE_FILE} (passes 1 2)" "${tmp}/out"
+            ;;
         converge)
             [[ ${rc} -eq 0 ]] && grep -q 'converged after pass 2' "${tmp}/out"
             ;;
@@ -84,6 +97,7 @@ HOOK
     }
 )
 run_case oscillate oscillate
+run_case oscillate-silent oscillate-silent
 run_case converge converge
 run_case fail fail
 printf 'QG_OSCILLATION_CONTRACT_OK\n'
