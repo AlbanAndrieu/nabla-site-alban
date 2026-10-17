@@ -47,8 +47,6 @@ is_maintenance_only_path() {
             scripts/lib/agent-quality-support.sh | \
             scripts/agent-publish.sh | \
             scripts/quality-gate.sh | \
-            scripts/lib/quality-log-excerpt.awk | \
-            scripts/agent-output-metrics.sh | \
             scripts/check_code_size.py | \
             scripts/ci-performance-budget.sh | \
             scripts/ci-scope.sh | \
@@ -97,6 +95,8 @@ is_preview_safe_path() {
             scripts/verify-master-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \
             scripts/quality-gate.sh | \
+            scripts/lib/quality-log-excerpt.awk | \
+            scripts/agent-output-metrics.sh | \
             scripts/eslint-github-formatter.mjs)
             return 0
             ;;
