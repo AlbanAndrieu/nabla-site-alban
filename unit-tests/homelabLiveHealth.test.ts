@@ -224,3 +224,17 @@ test("homelab health refreshes every thirty seconds, preserves context and expos
 	);
 	assert.match(page, /healthHttpStatus=\{state\.healthStatus\}/);
 });
+
+test("internal badge uses semantic tokens instead of the low-contrast legacy bg-info", async () => {
+	const page = await gridSource();
+	const css = await source(
+		"app/components/homelab/HomelabServicesBlock.module.css",
+	);
+	// wireframe.css repaints .bg-info as #8e8e8e: 4.47:1 with dark text (axe color-contrast).
+	assert.match(page, /className=\{`badge \$\{styles\.internalBadge\}`\}/);
+	assert.doesNotMatch(page, /bg-info/);
+	assert.match(
+		css,
+		/:global\(\.badge\)\.internalBadge \{[^}]*background: var\(--ui-surface-muted\);[^}]*color: var\(--ui-text-primary\);/,
+	);
+});
