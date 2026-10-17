@@ -153,6 +153,51 @@ workspace_fingerprint() {
     } | sha256sum | awk '{print $1}'
 }
 
+file_content_digest() {
+    git hash-object -- "$1" 2>/dev/null || echo missing
+}
+
+# Print the pre-commit hook ids that reported modifying files in LOG.
+precommit_modifying_hooks() {
+    awk '/^- hook id: /{id=$4} /^- files were modified by this hook/{print id}' "$1" | sort -u | tr '\n' ' '
+}
+
+# Name the hooks and files that changed during the oscillating passes
+# FIRST..LAST-1, from the caller's per-pass associative arrays.
+report_fix_oscillation() {
+    local first="$1" last="$2"
+    local -n oscillation_hooks="$3"
+    local -n oscillation_files="$4"
+    local cycle_pass item
+    local -a hooks=()
+    local -A by_hook=() by_file=()
+
+    for ((cycle_pass = first; cycle_pass < last; cycle_pass++)); do
+        read -r -a hooks <<<"${oscillation_hooks[${cycle_pass}]:-}"
+        for item in "${hooks[@]}"; do
+            by_hook["${item}"]+="${cycle_pass} "
+        done
+        while IFS= read -r item; do
+            [[ -n "${item}" ]] && by_file["${item}"]+="${cycle_pass} "
+        done <<<"${oscillation_files[${cycle_pass}]:-}"
+    done
+
+    if (("${#by_hook[@]}" > 0)); then
+        for item in "${!by_hook[@]}"; do
+            printf '   QG_FIX_OSCILLATION_HOOKS: %s (passes %s)\n' "${item}" "${by_hook[${item}]% }"
+        done | sort
+    else
+        printf '   QG_FIX_OSCILLATION_HOOKS: unknown (no hook reported modified files)\n'
+    fi
+    if (("${#by_file[@]}" > 0)); then
+        for item in "${!by_file[@]}"; do
+            printf '   QG_FIX_OSCILLATION_FILES: %s (passes %s)\n' "${item}" "${by_file[${item}]% }"
+        done | sort
+    else
+        printf '   QG_FIX_OSCILLATION_FILES: unknown (fingerprint changed outside tracked fix files)\n'
+    fi
+}
+
 classify_changed_files() {
     local file
     agent_gate_changed=false
