@@ -11,8 +11,8 @@ test("maintenance paths stay aligned across local scope, on-demand Preview and p
 			read("scripts/ci-scope.sh"),
 			read(".github/workflows/ci.yml"),
 			read(".github/workflows/vercel-preview.yml"),
-			read("scripts/verify-production-baseline.sh"),
-			read("scripts/lib/production-baseline-classification.sh"),
+			read("scripts/verify-master-baseline.sh"),
+			read("scripts/lib/baseline-classification.sh"),
 		]);
 	const productionBaselinePolicy = `${baseline}\n${baselineClassification}`;
 
@@ -41,7 +41,7 @@ test("maintenance paths stay aligned across local scope, on-demand Preview and p
 		"scripts/agent-quality-gate.sh",
 		"scripts/quality-gate.sh",
 		"scripts/ci-scope.sh",
-		"scripts/verify-production-baseline.sh",
+		"scripts/verify-master-baseline.sh",
 		"scripts/publish-vercel-preview-checkpoint.sh",
 		"scripts/check_code_size.py",
 		"scripts/ci-performance-budget.sh",
@@ -75,7 +75,7 @@ test("maintenance paths stay aligned across local scope, on-demand Preview and p
 	);
 	assert.doesNotMatch(onDemandWorkflow, /forceCheckpoint/);
 
-	const classifierPath = "scripts/lib/production-baseline-classification.sh";
+	const classifierPath = "scripts/lib/baseline-classification.sh";
 	assert.ok(
 		baselineClassification.includes(classifierPath),
 		"classifier must accept its own policy-only maintenance hop",

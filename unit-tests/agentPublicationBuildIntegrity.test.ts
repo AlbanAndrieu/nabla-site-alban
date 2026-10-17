@@ -78,7 +78,7 @@ test("publication proof is written only after a clean deployable build", async (
 			`#!/usr/bin/env bash
 set -euo pipefail
 if [[ "\${1:-}" == "--version" ]]; then
-    printf '%s\\n' '11.17.0'
+    printf '%s\\n' '12.2.0'
     exit 0
 fi
 if [[ "\${1:-}" == "run" && "\${2:-}" == "build" ]]; then
@@ -122,7 +122,7 @@ exit 2
 			`#!/usr/bin/env bash
 set -euo pipefail
 if [[ "\${1:-}" == "--version" ]]; then
-    printf '%s\\n' '11.17.0'
+    printf '%s\\n' '12.2.0'
     exit 0
 fi
 if [[ "\${1:-}" == "run" && "\${2:-}" == "build" ]]; then

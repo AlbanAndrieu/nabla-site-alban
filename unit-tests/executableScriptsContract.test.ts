@@ -8,7 +8,7 @@ test("critical quality, performance and Preview shell entrypoints remain executa
 		"scripts/agent-quality-gate.sh",
 		"scripts/ci-scope.sh",
 		"scripts/ci-performance-budget.sh",
-		"scripts/verify-production-baseline.sh",
+		"scripts/verify-master-baseline.sh",
 		"scripts/publish-vercel-preview-checkpoint.sh",
 	] as const;
 	const stats = await Promise.all(

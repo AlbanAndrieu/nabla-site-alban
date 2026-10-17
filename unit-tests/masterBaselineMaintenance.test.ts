@@ -7,7 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const baselineScript = fileURLToPath(
-	new URL("../scripts/verify-production-baseline.sh", import.meta.url),
+	new URL("../scripts/verify-master-baseline.sh", import.meta.url),
 );
 
 type Fixture = {
@@ -210,7 +210,6 @@ test("production baseline enforces the maintenance-only hop budget", async (t) =
 	assert.match(result.stderr, /PROD_BASE_MAINTENANCE_HOPS/);
 	assert.match(result.stderr, /maintenance-only hop budget 0/);
 });
-
 
 test("production baseline accepts missing DAST when Vercel and smoke are successful", async (t) => {
 	const fixture = await createFixture({ path: ".github/workflows/ci.yml" });

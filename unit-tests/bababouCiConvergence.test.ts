@@ -74,11 +74,11 @@ test("Node workflows cache npm only after selecting the reviewed runtime", async
 			/npm-\$\{\{ runner\.os \}\}-\$\{\{ runner\.arch \}\}-\$\{\{ hashFiles\('package-lock\.json'\) \}\}/,
 		);
 		assert.doesNotMatch(workflow, /cache:\s*"?npm"?/);
-		assert.match(workflow, /cd "\$\{RUNNER_TEMP\}"/);
-		assert.match(
-			workflow,
-			/npm install --global npm@11\.17\.0 --no-audit --no-fund/,
-		);
+		// npm comes from mise.toml/mise.lock, never from an inline global pin.
+		assert.match(workflow, /jdx\/mise-action@[0-9a-f]{40}\s+# v5/);
+		assert.match(workflow, /install_args: npm/);
+		assert.match(workflow, /bash scripts\/verify-mise-npm\.sh/);
+		assert.doesNotMatch(workflow, /npm install --global npm@/);
 	}
 	assert.match(quality, /\.github\/workflows\/copilot-setup-steps\.yml/);
 	assert.match(quality, /\.github\/workflows\/docker-build\.yml/);
@@ -129,7 +129,8 @@ test("semantic release authenticates before freshness and avoids npm ci", async 
 	assert.doesNotMatch(release, /Install application dependencies/);
 	assert.doesNotMatch(release, /npm ci/);
 	assert.doesNotMatch(release, /cache:\s*npm/);
-	assert.match(release, /cd "\$\{RUNNER_TEMP\}"/);
+	assert.match(release, /install_args: npm/);
+	assert.match(release, /bash scripts\/verify-mise-npm\.sh/);
 	assert.match(release, /npm exec --yes --ignore-scripts/);
 	assert.doesNotMatch(
 		release,

@@ -4,17 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "19 4 * * 1"
-  push:
-    branches: [master]
-    paths:
-      - ".github/workflows/nuclei-public.yml"
-      - ".nuclei/**"
-      - "scripts/nuclei-*.mjs"
-      - "app/**"
-      - "components/**"
-      - "lib/**"
-      - "next.config.mjs"
-      - "vercel.json"
 
 permissions:
   contents: read
@@ -65,6 +54,8 @@ jobs:
           set -euo pipefail
           mkdir -p nuclei-results
           # No credentials, fuzzing, OAST, headless browser or network discovery.
+          # Cost/load budget: narrow the weekly profile to actionable medium+ findings.
+          # Full-template scans must be an explicitly approved separate workflow.
           # Cap concurrency and rate to reduce load on production and Cloudflare.
           excludes=()
           while IFS= read -r id; do
@@ -83,6 +74,8 @@ jobs:
           "${RUNNER_TEMP}/nuclei" \
             -u https://albanandrieu.com \
             -pt http -ni \
+            -tags cve,misconfig,exposure \
+            -severity medium,high,critical \
             -etags dos,fuzz,bruteforce,intrusive \
             -rl 2 -c 1 -timeout 5 -retries 0 \
             -duc -jsonl -o nuclei-results/nuclei.jsonl \
@@ -97,8 +90,8 @@ jobs:
           SCAN_OUTCOME: ${{ steps.nuclei.outcome }}
         run: |
           if [[ "$SCAN_OUTCOME" != "success" ]]; then
-            echo "## Nuclei public DAST — NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
-            echo "Scanner failed before completion; empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
+            echo "## Nuclei public DAST — INCOMPLETE / NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
+            echo "Scan did not complete successfully (failed, canceled or not started); partial or empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
           else
             node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -166,7 +159,7 @@ jobs:
           echo "DefectDojo reimport API accepted the report; check server-side processing."
 
       - name: Retrieve DefectDojo findings for this product (trusted runner)
-        if: github.ref == 'refs/heads/master'
+        if: steps.nuclei.outcome == 'success' && github.ref == 'refs/heads/master'
         continue-on-error: true
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}

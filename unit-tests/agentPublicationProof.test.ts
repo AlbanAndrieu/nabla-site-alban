@@ -115,7 +115,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		const buildCounter = path.join(cwd, ".git", "build-count.txt");
 		await makeExecutable(
 			path.join(bin, "npm"),
-			`#!/usr/bin/env bash\nset -euo pipefail\nif [[ "\${1:-}" == "--version" ]]; then printf '%s\\n' '11.17.0'; exit 0; fi\nif [[ "\${1:-}" == "run" && "\${2:-}" == "build" ]]; then printf '1\\n' >> "\${QUALITY_TEST_BUILD_COUNTER}"; exit 0; fi\nexit 2\n`,
+			`#!/usr/bin/env bash\nset -euo pipefail\nif [[ "\${1:-}" == "--version" ]]; then printf '%s\\n' '12.2.0'; exit 0; fi\nif [[ "\${1:-}" == "run" && "\${2:-}" == "build" ]]; then printf '1\\n' >> "\${QUALITY_TEST_BUILD_COUNTER}"; exit 0; fi\nexit 2\n`,
 		);
 		const env = {
 			...process.env,
@@ -157,7 +157,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		);
 		assert.match(status.stdout, /toolchain_sha=[0-9a-f]{64}/);
 		assert.match(status.stdout, /node=v26\.8\.2/);
-		assert.match(status.stdout, /npm=11\.17\.0/);
+		assert.match(status.stdout, /npm=12\.2\.0/);
 		assert.match(status.stdout, /python=Python 3\.12\.10/);
 		assert.match(status.stdout, /pre-commit=pre-commit 4\.6\.2/);
 

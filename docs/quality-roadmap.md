@@ -22,7 +22,7 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Domaine | État à préserver |
 | --- | --- |
 | Runtime | Next.js App Router + `next-intl` pour EN/FR ; CV HTML et 404 statique restent des exceptions explicitement conservées |
-| Toolchain | Node 26.8.2 / npm 11.17.x en local/CI ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
+| Toolchain | Node 26.8.2 / npm 12.2.0 en local/CI, épinglé dans `mise.toml` ; `next` et `eslint-config-next` restent alignés ; ESLint reste sur une major supportée par les plugins Next/React |
 | Qualité | Gate local-first, auto-fix déterministe, SAST, Betterleaks v1.9.0, lint/types/tests, build conditionnel et preuve exact-SHA ; Just 1.58.0 complète le Makefile conservé ; Axe EN/FR reste reproductible |
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
 | Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `/security.txt` est canonique, `/.well-known/security.txt` publie la même copie RFC 9116 et la policy unique utilise la route native `/policy/privacy_policy` |
@@ -46,11 +46,19 @@ runbooks et les retours d'incident sous `docs/incidents/`.
   couvrent trigger master, séparation read/write, patch déterministe, déduplication
   et fallbacks PR/issue/dispatch. Il reste à prouver sur le dépôt réel :
   auto-fixable → PR + dispatch CI ; non auto-fixable → issue dédupliquée.
-- [ ] **Prouver un cycle workstation complet** :
-  `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`,
-  arbre propre et preuve exacte encore valide avec `--status`.
+- [x] **Prouver un cycle workstation complet** :
+  `quality:agent:fix` → revue du diff → commit → `quality:agent:publish`
+  (pre-push), arbre propre et `--status` = `QG_PUBLISH_PROOF_OK` sur
+  `d9bade5` (PR #224, 17/10/2026). Le premier push a été correctement refusé
+  par la gate (contrats source homelab cassés par l'extraction).
+- [ ] **Décider du lockfile `gh actions-lock`** : `.github/workflows/actions.lock`
+  (#226) était refusé par GitHub (« The lockfile could not be validated ») et
+  plaçait tous les workflows en `startup_failure` ; il est retiré par la PR #224,
+  l'épinglage par SHA dans les workflows est conservé. Ne le réintroduire
+  qu'après validation sur une branche de test que GitHub l'accepte avec des
+  `uses:` épinglés par SHA.
 - [ ] **Boucle offline-first / agent à faible contexte** : tester le fallback artefact Dagger exact-SHA dans un environnement sans DNS GitHub et sans registry npm, valider les tests sans dépendances, distinguer `NOT_RUN` de `PASS`, et conserver une preuve de publication uniquement lorsque le checkout Git, la base et la toolchain ont été réellement contrôlés. Le skill `nabla-ci-debug` décrit désormais le protocole de diagnostic minimal et la politique de réduction des tokens (inspirés de `fastapi-sample` #329/#330, `nabla-compose` #240/#247 et `nabla-site-bababou` #209/#210).
-- [ ] **Valider le fail-fast sur oscillation d'auto-fix** : le contrat sans réseau `bash scripts/test-agent-quality-oscillation.sh` couvre A→B→A, la convergence et le code retour d’échec ; le harnais a été exécuté sur la fonction correspondante en environnement isolé. Restent la preuve complète avec le script versionné dans le checkout exact-HEAD et la quality gate ShellCheck/pre-commit.
+- [x] **Valider le fail-fast sur oscillation d'auto-fix** : le contrat sans réseau `bash scripts/test-agent-quality-oscillation.sh` (A→B→A, convergence, code retour d’échec) retourne `QG_OSCILLATION_CONTRACT_OK` dans le checkout exact-HEAD `d9bade5`, ShellCheck est propre sur le contrat et `agent-quality-gate.sh`, et la gate pre-commit/pre-push est passée (17/10/2026).
 - [x] **Introduire une détection de fingerprint répété** pour éviter de lancer les 12 passes quand le workspace revient dans un état déjà vu.
 - [ ] **Identifier les hooks et fichiers oscillants** dans le diagnostic
   `QG_FIX_OSCILLATION` (détection des fingerprints répétés déjà livrée).

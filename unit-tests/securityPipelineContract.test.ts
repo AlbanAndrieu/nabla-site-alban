@@ -8,8 +8,8 @@ const read = (path: string) =>
 test("quality gate checks production health before build and runs diff-scoped SAST", async () => {
 	const [ci, baseline, baselineClassification] = await Promise.all([
 		read(".github/workflows/ci.yml"),
-		read("scripts/verify-production-baseline.sh"),
-		read("scripts/lib/production-baseline-classification.sh"),
+		read("scripts/verify-master-baseline.sh"),
+		read("scripts/lib/baseline-classification.sh"),
 	]);
 
 	const checkout = ci.indexOf("- name: Checkout");
@@ -34,7 +34,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.ok(saveNextCache > build);
 
 	assert.match(ci, /statuses:\s*read/);
-	assert.match(ci, /bash scripts\/verify-production-baseline\.sh/);
+	assert.match(ci, /bash scripts\/verify-master-baseline\.sh/);
 	assert.match(ci, /QUALITY_BASELINE_RELEASE_HOPS:\s*"3"/);
 	assert.match(ci, /QUALITY_BASELINE_MAINTENANCE_HOPS:\s*"5"/);
 	assert.match(
@@ -45,7 +45,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(baseline, /Production DAST/);
 	assert.match(
 		baseline,
-		/source "\$\{SCRIPT_DIR\}\/lib\/production-baseline-classification\.sh"/,
+		/source "\$\{SCRIPT_DIR\}\/lib\/baseline-classification\.sh"/,
 	);
 	assert.match(baseline, /maintenance_only_hop/);
 	assert.match(baselineClassification, /--diff-filter=ACMRD/);
@@ -114,9 +114,9 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		await Promise.all([
 			read(".github/workflows/playwright.yml"),
 			read(".github/workflows/zap-preview.yml"),
-			read(".github/workflows/production-dast.yml"),
+			read(".github/workflows/master-dast.yml"),
 			read(".zap/rules.tsv"),
-			read(".github/workflows/production-smoke.yml"),
+			read(".github/workflows/master-smoke.yml"),
 			read(".github/workflows/vercel-preview.yml"),
 		]);
 

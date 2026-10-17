@@ -7,9 +7,8 @@ import {
 	object,
 } from "@dagger.io/dagger";
 
-const NPM_VERSION = "11.17.0";
 const NODE_DEVELOPMENT = "26.8.2";
-const NODE_VERCEL = "24.11.0";
+const NODE_VERCEL = "24.22.0";
 const SOURCE_IGNORE = [
 	".git",
 	".git/**",
@@ -32,41 +31,42 @@ const SOURCE_IGNORE = [
 @object()
 export class NablaSiteAlbanCi {
 	private environment(source: Directory, nodeVersion: string): Container {
-		return dag
-			.container()
-			.from(`node:${nodeVersion}-bookworm-slim`)
-			.withExec([
-				"sh",
-				"-c",
-				"apt-get update && apt-get install --yes --no-install-recommends bash ca-certificates curl git jq python3 && rm -rf /var/lib/apt/lists/*",
-			])
-			.withMountedCache(
-				"/root/.npm",
-				dag.cacheVolume(`nabla-site-alban-npm-${nodeVersion}`),
-			)
-			.withDirectory("/src", source)
-			.withWorkdir("/src")
-			.withEnvVariable("CI", "true")
-			.withExec([
-				"sh",
-				"-c",
-				[
-					"git init --quiet --initial-branch=dagger-source",
-					"git config user.email dagger@example.invalid",
-					"git config user.name 'Dagger Source Snapshot'",
-					"git add --all",
-					"GIT_AUTHOR_DATE='2000-01-01T00:00:00Z' GIT_COMMITTER_DATE='2000-01-01T00:00:00Z' git commit --quiet --no-gpg-sign -m 'Dagger source snapshot'",
-				].join(" && "),
-			])
-			.withExec([
-				"npm",
-				"install",
-				"--global",
-				`npm@${NPM_VERSION}`,
-				"--no-audit",
-				"--no-fund",
-			])
-			.withExec(["npm", "ci", "--no-audit", "--no-fund"]);
+		return (
+			dag
+				.container()
+				.from(`node:${nodeVersion}-bookworm-slim`)
+				.withExec([
+					"sh",
+					"-c",
+					"apt-get update && apt-get install --yes --no-install-recommends bash ca-certificates curl git jq python3 && rm -rf /var/lib/apt/lists/*",
+				])
+				.withMountedCache(
+					"/root/.npm",
+					dag.cacheVolume(`nabla-site-alban-npm-${nodeVersion}`),
+				)
+				.withDirectory("/src", source)
+				.withWorkdir("/src")
+				.withEnvVariable("CI", "true")
+				.withExec([
+					"sh",
+					"-c",
+					[
+						"git init --quiet --initial-branch=dagger-source",
+						"git config user.email dagger@example.invalid",
+						"git config user.name 'Dagger Source Snapshot'",
+						"git add --all",
+						"GIT_AUTHOR_DATE='2000-01-01T00:00:00Z' GIT_COMMITTER_DATE='2000-01-01T00:00:00Z' git commit --quiet --no-gpg-sign -m 'Dagger source snapshot'",
+					].join(" && "),
+				])
+				// mise.toml is the single source of truth for the npm version.
+				.withExec([
+					"bash",
+					"-c",
+					`npm install --global "npm@$(sed -n 's/^npm = "\\([^"]*\\)"/\\1/p' mise.toml | head -n1)" --no-audit --no-fund`,
+				])
+				.withExec(["bash", "scripts/verify-mise-npm.sh"])
+				.withExec(["npm", "ci", "--no-audit", "--no-fund"])
+		);
 	}
 
 	private buildEnvironment(source: Directory, nodeVersion: string): Container {

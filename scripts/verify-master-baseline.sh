@@ -59,8 +59,8 @@ latest_status() {
         <<<"${json}"
 }
 
-# shellcheck source=scripts/lib/production-baseline-classification.sh
-source "${SCRIPT_DIR}/lib/production-baseline-classification.sh"
+# shellcheck source=scripts/lib/baseline-classification.sh
+source "${SCRIPT_DIR}/lib/baseline-classification.sh"
 
 candidate="${BASE_SHA}"
 release_hops=0

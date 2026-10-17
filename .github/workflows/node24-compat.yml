@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - ".nvmrc-production"
       - ".npmrc"
       - "package.json"
       - "package-lock.json"
@@ -23,7 +22,6 @@ on:
     branches:
       - master
     paths:
-      - ".nvmrc-production"
       - ".npmrc"
       - "package.json"
       - "package-lock.json"
@@ -58,10 +56,19 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Resolve minimum Node.js from package.json engines
+        id: node-floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          floor="$(jq -r '.engines.node' package.json | sed -n 's/^>=\([0-9][0-9.]*\) .*/\1/p')"
+          [[ -n "${floor}" ]] || { echo "::error::package.json engines.node has no >= floor"; exit 1; }
+          echo "version=${floor}" >>"${GITHUB_OUTPUT}"
+
       - name: Setup minimum production-compatible Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
-          node-version-file: ".nvmrc-production"
+          node-version: ${{ steps.node-floor.outputs.version }}
           package-manager-cache: false
 
       - name: Restore npm downloads
@@ -75,12 +82,16 @@ jobs:
             npm-node24-${{ runner.os }}-${{ runner.arch }}-
             npm-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Pin npm
+      - name: Install npm from mise
+        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          version: 2026.10.8
+          install_args: npm
+          env: false
+
+      - name: Verify npm matches mise.toml
         shell: bash
-        run: |
-          set -euo pipefail
-          cd "${RUNNER_TEMP}"
-          npm install --global npm@11.17.0 --no-audit --no-fund
+        run: bash scripts/verify-mise-npm.sh
 
       - name: Install dependencies
         shell: bash

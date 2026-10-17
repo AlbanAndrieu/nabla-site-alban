@@ -35,7 +35,10 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 
 		await writeFile(path.join(cwd, ".nvmrc"), "26.8.2\n");
 		await writeFile(path.join(cwd, ".python-version"), "3.12.10\n");
-		await writeFile(path.join(cwd, "mise.toml"), 'pre-commit = "4.6.2"\n');
+		await writeFile(
+			path.join(cwd, "mise.toml"),
+			'pre-commit = "4.6.2"\nnpm = "12.2.0"\n',
+		);
 		await writeFile(path.join(cwd, "README.md"), "base\n");
 		await git(
 			cwd,
@@ -63,7 +66,7 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		);
 		await writeExecutable(
 			path.join(bin, "npm"),
-			'#!/usr/bin/env bash\nprintf "11.17.0\\n"\n',
+			'#!/usr/bin/env bash\nprintf "12.2.0\\n"\n',
 		);
 		await writeExecutable(
 			path.join(bin, "python3"),
@@ -97,7 +100,7 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		assert.match(healthy.stdout, /AGENT_DOCTOR_OK/);
 		assert.match(healthy.stdout, /branch=test\/doctor/);
 		assert.match(healthy.stdout, /node=26\.8\.2/);
-		assert.match(healthy.stdout, /npm=11\.17\.0/);
+		assert.match(healthy.stdout, /npm=12\.2\.0/);
 		assert.match(healthy.stdout, /python=3\.12\.10/);
 		assert.match(healthy.stdout, /pre-commit=4\.6\.2/);
 

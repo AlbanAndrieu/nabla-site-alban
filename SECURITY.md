@@ -10,8 +10,8 @@
 
 ## Dependency supply-chain controls
 
-- Local development and GitHub Actions target Node.js 26.8.2; the package engine range is `>=24.11.0 <27` so local/CI can use Node 26 while Vercel selects its supported Node 24 runtime.
-- npm is constrained to `>=11.17.0 <12`.
+- Local development and GitHub Actions target Node.js 26.8.2; the package engine range is `>=24.22.0 <27` so local/CI can use Node 26 while Vercel selects its supported Node 24 runtime.
+- npm is constrained to `>=12.2.0 <13`.
 - `.npmrc` enables `strict-allow-scripts=true`.
 - Packages with reviewed install scripts are explicitly denied through `package.json#allowScripts`; a new install script must fail until reviewed.
 - Never enable `dangerously-allow-all-scripts`.
