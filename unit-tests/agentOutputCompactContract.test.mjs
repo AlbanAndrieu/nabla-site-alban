@@ -44,3 +44,14 @@ test("log tools are maintenance-only and never bypass security scanning", () => 
   assert.match(gate, /-f scripts\/lib\/quality-log-excerpt\.awk/);
   assert.match(gate, /pre-commit/);
 });
+
+test("CI scope contains each diagnostic path once per policy and remains preview-safe", () => {
+  const scope = read("scripts/ci-scope.sh");
+  const maintenance = scope.split("is_maintenance_only_path() {")[1].split("is_preview_safe_path() {")[0];
+  const preview = scope.split("is_preview_safe_path() {")[1].split("mapfile -t CHANGED_FILES")[0];
+  for (const path of ["scripts/lib/quality-log-excerpt.awk", "scripts/agent-output-metrics.sh"]) {
+    for (const [name, policy] of [["maintenance", maintenance], ["preview", preview]]) {
+      assert.equal(policy.split(path).length - 1, 1, name + " must contain exactly one " + path);
+    }
+  }
+});
