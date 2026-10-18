@@ -203,5 +203,9 @@ test("public homelab API refuses requests without querying FastAPI", async () =>
 test("public fallback never exposes PostgreSQL binding details", () => {
 	const catalog = getStaticHomelabServicesCatalog().catalog;
 	assert.equal(catalog.services.length, 1);
-	assert.ok(!catalog.services.some((service) => homelabServiceId(service) === "postgresql"));
+	assert.ok(
+		!catalog.services.some(
+			(service) => homelabServiceId(service) === "postgresql",
+		),
+	);
 });
