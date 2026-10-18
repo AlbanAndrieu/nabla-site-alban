@@ -88,16 +88,23 @@ test("repository exposes local fix, check and reusable strict publication comman
 	assert.match(publish, /git rev-parse --git-path agent-publication-proof/);
 });
 
-test("project checks fail closed when an early command fails", async () => {
+test("project checks fail closed for maintenance and build scopes", async () => {
 	const gate = await source("scripts/agent-quality-gate.sh");
-
+	const checks = gate.split("run_project_checks() {")[1]?.split("\n}")[0];
+	assert.ok(checks, "shared check sequence must exist");
 	assert.match(
-		gate,
-		/run_maintenance_project_checks\(\) \{[\s\S]*?npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+		checks,
+		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
 	);
+	const dispatch = gate.split('case "${build}" in')[1]?.split("\nesac")[0];
+	assert.ok(dispatch, "build scope dispatch must exist");
 	assert.match(
+		dispatch,
+		/true\)[\s\S]*?run_project_checks[\s\S]*?false\)[\s\S]*?run_project_checks/,
+	);
+	assert.doesNotMatch(
 		gate,
-		/run_full_prebuild_checks\(\) \{[\s\S]*?npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+		/run_maintenance_project_checks|run_full_prebuild_checks/,
 	);
 });
 

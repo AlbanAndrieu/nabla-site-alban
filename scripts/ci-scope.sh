@@ -40,6 +40,8 @@ is_maintenance_only_path() {
             .pre-commit-config.yaml | \
             .pre-commit-pre-push.yaml | \
             renovate.json | \
+            scripts/lib/quality-log-excerpt.awk | \
+            scripts/agent-output-metrics.sh | \
             scripts/agent-quality-gate.sh | \
             scripts/agent-doctor.sh | \
             scripts/lib/agent-quality-support.sh | \
@@ -95,6 +97,8 @@ is_preview_safe_path() {
             scripts/verify-master-baseline.sh | \
             scripts/publish-vercel-preview-checkpoint.sh | \
             scripts/quality-gate.sh | \
+            scripts/lib/quality-log-excerpt.awk | \
+            scripts/agent-output-metrics.sh | \
             scripts/eslint-github-formatter.mjs)
             return 0
             ;;

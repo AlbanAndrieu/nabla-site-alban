@@ -216,14 +216,9 @@ scope_output="$(bash scripts/ci-scope.sh "${BASE_REF}" HEAD)"
 printf '%s\n' "${scope_output}"
 build="$(awk -F= '$1 == "build" { print $2; exit }' <<<"${scope_output}")"
 
-run_maintenance_project_checks() {
-    npm run lint &&
-        npm run lint:css &&
-        npm run typecheck &&
-        npm run test:unit
-}
-
-run_full_prebuild_checks() {
+# Route types are required by TypeScript even when a maintenance-only PR
+# does not need a deployable Next.js build. Keep one shared check sequence.
+run_project_checks() {
     npm run lint &&
         npm run lint:css &&
         npx next typegen &&
@@ -233,10 +228,10 @@ run_full_prebuild_checks() {
 
 case "${build}" in
     true)
-        run_compact "full pre-build lint, route types, TypeScript and unit gate" run_full_prebuild_checks
+        run_compact "full pre-build lint, route types, TypeScript and unit gate" run_project_checks
         ;;
     false)
-        run_compact "maintenance lint, CSS, TypeScript and unit gate" run_maintenance_project_checks
+        run_compact "maintenance lint, CSS, route types, TypeScript and unit gate" run_project_checks
         ;;
     *)
         printf '❌ QG_SCOPE_INVALID: ci-scope returned build=%s\n' "${build:-missing}" >&2

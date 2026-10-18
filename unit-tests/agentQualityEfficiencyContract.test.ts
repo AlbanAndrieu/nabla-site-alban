@@ -5,19 +5,27 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("agent quality keeps TypeScript and unit coverage while scoping route type generation", async () => {
+test("agent quality keeps route types and unit coverage in both CI scopes", async () => {
 	const gate = await read("scripts/agent-quality-gate.sh");
 
 	assert.match(gate, /bash scripts\/ci-scope\.sh/);
 	assert.match(gate, /case "\$\{build\}" in/);
-	assert.match(gate, /run_maintenance_project_checks/);
-	assert.match(gate, /maintenance lint, CSS, TypeScript and unit gate/);
+	const checks = gate.split("run_project_checks() {")[1]?.split("\n}")[0];
+	assert.ok(checks, "the shared checks must exist");
+	assert.match(
+		checks,
+		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+	);
+	const scopes = gate.split('case "${build}" in')[1]?.split("\nesac")[0];
+	assert.ok(scopes, "both scope dispatch cases must exist");
+	assert.match(
+		scopes,
+		/true\)[\s\S]*?run_project_checks[\s\S]*?false\)[\s\S]*?run_project_checks/,
+	);
 	assert.match(
 		gate,
-		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+		/maintenance lint, CSS, route types, TypeScript and unit gate/,
 	);
-	assert.match(gate, /run_full_prebuild_checks/);
-	assert.match(gate, /npx next typegen/);
 	assert.match(
 		gate,
 		/full pre-build lint, route types, TypeScript and unit gate/,
