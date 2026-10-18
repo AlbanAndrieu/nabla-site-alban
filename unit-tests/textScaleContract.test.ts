@@ -5,18 +5,19 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("preferred text scaling uses progressive CSS and Chromium emulation", async () => {
+test("preferred text scaling opts in through the text-scale meta and Chromium emulation", async () => {
 	const [reset, layout, e2e] = await Promise.all([
 		read("app/reset.css"),
 		read("app/[locale]/layout.tsx"),
 		read("tests/accessibility-responsive.spec.ts"),
 	]);
 
-	assert.match(
-		reset,
-		/font-size: calc\(100% \* env\(preferred-text-scale, 1\)\)/,
-	);
-	assert.doesNotMatch(layout, /<meta name="text-scale"/);
+	// Chromium 156 exposes the OS text scale only to pages opting in with the
+	// meta, which then scales the initial font size itself: multiplying by
+	// env(preferred-text-scale) as well would double it (64px at 200%).
+	assert.match(layout, /<meta name="text-scale" content="scale" \/>/);
+	assert.match(reset, /html \{\n\tfont-size: 100%;\n\}/);
+	assert.doesNotMatch(reset, /font-size:[^;]*env\(preferred-text-scale/);
 	assert.match(e2e, /newCDPSession\(page\)/);
 	assert.match(e2e, /Emulation\.setEmulatedOSTextScale/);
 	assert.match(e2e, /scale: 2/);
