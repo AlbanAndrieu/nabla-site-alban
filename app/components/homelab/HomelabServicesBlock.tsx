@@ -1,35 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
-import {
-	type HomelabEnvironmentFilter,
-	homelabServiceMatchesEnvironment,
-	resolveHomelabServiceEnvironments,
-} from "@/lib/homelabEnvironments";
-import {
-	type HomelabHealthEntry,
-	type HomelabHealthSnapshot,
-	type HomelabHealthState,
-	parseHomelabHealthSnapshot,
-} from "@/lib/homelabHealth";
-import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
-import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
-import {
-	type HomelabService,
-	type HomelabServicesCatalog,
-	homelabServiceId,
-} from "@/lib/homelabServices";
-import {
-	groupCatalogByPresentation,
-	type ServiceMetricsProfile,
-	type ServicePresentationGroup,
-	type ServicePresentationGroupEntry,
-} from "@/lib/servicePresentation";
-import {
-	parseServiceTopology,
-	type ServiceTopology,
-} from "@/lib/serviceTopology";
+import { useMemo, useState } from "react";
+import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
+import type { HomelabHealthState } from "@/lib/homelabHealth";
+import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
@@ -38,197 +13,34 @@ import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
+import {
+	ALL_GROUPS,
+	filterHierarchyGroups,
+	GROUP_DESCRIPTION_KEY,
+	GROUP_TITLE_KEY,
+	METRICS_PROFILE_KEY,
+} from "./homelabServiceHierarchy";
+import {
+	countHealthStates,
+	effectiveState,
+	healthIndex,
+	useHomelabHealth,
+} from "./useHomelabHealth";
 
-const HEALTH_REFRESH_MS = 30_000;
 const HEALTH_STATES: readonly HomelabHealthState[] = [
 	"ok",
 	"warn",
 	"fail",
 	"unknown",
 ];
-const ALL_GROUPS: readonly ServicePresentationGroup[] = [
-	"services",
-	"core-critical",
-	"security-controls",
-	"shared-core",
-	"support",
-];
-
-type HealthFetchResult = {
-	snapshot: HomelabHealthSnapshot | null;
-	status: number | null;
-};
-
-type State = {
-	catalog: HomelabServicesCatalog | null;
-	topology: ServiceTopology | null;
-	snapshot: HomelabHealthSnapshot | null;
-	error: boolean;
-	healthUnavailable: boolean;
-	healthStatus: number | null;
-	healthRefreshing: boolean;
-};
-
-type HierarchyGroup = ServicePresentationGroupEntry;
 
 type HealthFilter = "all" | HomelabHealthState;
 type GroupFilter = "all" | ServicePresentationGroup;
 
-type GroupTitleKey =
-	| "presentation.groups.services"
-	| "presentation.groups.core-critical"
-	| "presentation.groups.security-controls"
-	| "presentation.groups.shared-core"
-	| "presentation.groups.support";
-
-type GroupDescriptionKey =
-	| "presentation.descriptions.services"
-	| "presentation.descriptions.core-critical"
-	| "presentation.descriptions.security-controls"
-	| "presentation.descriptions.shared-core"
-	| "presentation.descriptions.support";
-
-type MetricsProfileKey =
-	| "presentation.metrics.red"
-	| "presentation.metrics.use"
-	| "presentation.metrics.security"
-	| "presentation.metrics.red-use"
-	| "presentation.metrics.support";
-
-const GROUP_TITLE_KEY: Record<ServicePresentationGroup, GroupTitleKey> = {
-	services: "presentation.groups.services",
-	"core-critical": "presentation.groups.core-critical",
-	"security-controls": "presentation.groups.security-controls",
-	"shared-core": "presentation.groups.shared-core",
-	support: "presentation.groups.support",
-};
-
-const GROUP_DESCRIPTION_KEY: Record<
-	ServicePresentationGroup,
-	GroupDescriptionKey
-> = {
-	services: "presentation.descriptions.services",
-	"core-critical": "presentation.descriptions.core-critical",
-	"security-controls": "presentation.descriptions.security-controls",
-	"shared-core": "presentation.descriptions.shared-core",
-	support: "presentation.descriptions.support",
-};
-
-const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
-	red: "presentation.metrics.red",
-	use: "presentation.metrics.use",
-	security: "presentation.metrics.security",
-	"red-use": "presentation.metrics.red-use",
-	support: "presentation.metrics.support",
-};
-
-async function fetchCatalog(
-	signal: AbortSignal,
-): Promise<HomelabServicesCatalog> {
-	const response = await fetch("/api/homelab-services", {
-		cache: "no-store",
-		signal,
-	});
-	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-	return (await response.json()) as HomelabServicesCatalog;
-}
-
-async function fetchTopology(
-	signal: AbortSignal,
-): Promise<ServiceTopology | null> {
-	try {
-		const response = await fetch("/api/homelab-topology", {
-			cache: "no-store",
-			signal,
-			headers: { Accept: "application/json" },
-		});
-		if (!response.ok) return null;
-		return parseServiceTopology(await response.json());
-	} catch (error) {
-		if (signal.aborted) throw error;
-		return null;
-	}
-}
-
-async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
-	try {
-		const response = await fetch("/api/homelab-health", {
-			cache: "no-store",
-			signal,
-		});
-		if (!response.ok) return { snapshot: null, status: response.status };
-		return {
-			snapshot: parseHomelabHealthSnapshot(await response.json()),
-			status: response.status,
-		};
-	} catch {
-		return { snapshot: null, status: null };
-	}
-}
-
-async function fetchProbeHealth(
-	signal: AbortSignal,
-): Promise<HealthFetchResult> {
-	try {
-		const response = await fetch("/api/homelab-probes", {
-			cache: "no-store",
-			signal,
-			headers: {
-				Accept: "application/json",
-				"Cache-Control": "no-cache",
-			},
-		});
-		if (!response.ok) return { snapshot: null, status: response.status };
-		return {
-			snapshot: parseHomelabHealthSnapshot(await response.json()),
-			status: response.status,
-		};
-	} catch {
-		return { snapshot: null, status: null };
-	}
-}
-
-function normalizedName(value: string): string {
-	return value.trim().toLowerCase();
-}
-
-function healthIndex(snapshot: HomelabHealthSnapshot | null): {
-	byId: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
-} {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-	}
-	return { byId, byName };
-}
-
-function effectiveState(
-	service: HomelabService,
-	index: ReturnType<typeof healthIndex>,
-	healthUnavailable = false,
-): HomelabHealthState {
-	if (healthUnavailable) return "unknown";
-	const entry =
-		index.byId.get(homelabServiceId(service)) ??
-		index.byName.get(normalizedName(service.name));
-	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
-}
-
 export default function HomelabServicesBlock() {
 	const t = useTranslations("homelab");
 	const french = useLocale() === "fr";
-	const [state, setState] = useState<State>({
-		catalog: null,
-		topology: null,
-		snapshot: null,
-		error: false,
-		healthUnavailable: false,
-		healthStatus: null,
-		healthRefreshing: true,
-	});
+	const state = useHomelabHealth();
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [environmentFilter, setEnvironmentFilter] =
 		useState<HomelabEnvironmentFilter>("all");
@@ -239,148 +51,39 @@ export default function HomelabServicesBlock() {
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 
-	useEffect(() => {
-		const initialController = new AbortController();
-		let refreshController: AbortController | null = null;
-
-		const runHealthCycle = async (signal: AbortSignal) => {
-			setState((current) => ({ ...current, healthRefreshing: true }));
-			const probesPromise = fetchProbeHealth(signal);
-			const aggregatePromise = fetchHealth(signal);
-
-			const probes = await probesPromise;
-			if (signal.aborted) return;
-			if (probes.snapshot) {
-				setState((current) => ({
-					...current,
-					snapshot: probes.snapshot,
-					healthUnavailable: false,
-					healthStatus: probes.status,
-					healthRefreshing: true,
-					error: false,
-				}));
-			}
-
-			const aggregate = await aggregatePromise;
-			if (signal.aborted) return;
-			setState((current) => ({
-				...current,
-				snapshot: aggregate.snapshot
-					? mergeHomelabProbeDiagnostics(aggregate.snapshot, probes.snapshot)
-					: (probes.snapshot ?? current.snapshot),
-				healthUnavailable:
-					aggregate.snapshot === null && probes.snapshot === null,
-				healthStatus: aggregate.status ?? probes.status,
-				healthRefreshing: false,
-				error:
-					current.catalog === null &&
-					aggregate.snapshot === null &&
-					probes.snapshot === null,
-			}));
-		};
-
-		const refreshHealth = () => {
-			if (document.hidden) return;
-			refreshController?.abort();
-			refreshController = new AbortController();
-			void runHealthCycle(refreshController.signal);
-		};
-
-		void Promise.all([
-			fetchCatalog(initialController.signal),
-			fetchTopology(initialController.signal),
-		])
-			.then(([catalog, topology]) => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({
-						...current,
-						catalog,
-						topology,
-						error: false,
-					}));
-				}
-			})
-			.catch(() => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({ ...current, error: true }));
-				}
-			});
-		void runHealthCycle(initialController.signal);
-
-		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);
-		const onVisibilityChange = () => {
-			if (!document.hidden) refreshHealth();
-		};
-		document.addEventListener("visibilitychange", onVisibilityChange);
-		return () => {
-			initialController.abort();
-			refreshController?.abort();
-			window.clearInterval(interval);
-			document.removeEventListener("visibilitychange", onVisibilityChange);
-		};
-	}, []);
-
 	const indexedHealth = useMemo(
 		() => healthIndex(state.snapshot),
 		[state.snapshot],
 	);
-	const healthCounts = useMemo(() => {
-		const counts: Record<HomelabHealthState, number> = {
-			ok: 0,
-			warn: 0,
-			fail: 0,
-			unknown: 0,
-		};
-		for (const service of state.catalog?.services ?? [])
-			counts[effectiveState(service, indexedHealth, state.healthUnavailable)] +=
-				1;
-		return counts;
-	}, [indexedHealth, state.catalog?.services, state.healthUnavailable]);
+	const healthCounts = useMemo(
+		() =>
+			countHealthStates(
+				state.catalog?.services ?? [],
+				indexedHealth,
+				state.healthUnavailable,
+			),
+		[indexedHealth, state.catalog?.services, state.healthUnavailable],
+	);
 
-	const hierarchyGroups = useMemo<HierarchyGroup[]>(() => {
-		if (!state.catalog) return [];
-		const query = searchQuery.trim().toLowerCase();
-		const filteredServices = state.catalog.services.filter((service) => {
-			const matchesHealth =
-				healthFilter === "all" ||
-				effectiveState(service, indexedHealth, state.healthUnavailable) ===
-					healthFilter;
-			const serviceEnvironments = resolveHomelabServiceEnvironments(
-				service,
+	const hierarchyGroups = useMemo(
+		() =>
+			filterHierarchyGroups(
+				state.catalog,
 				state.topology,
-			);
-			const matchesEnvironment = homelabServiceMatchesEnvironment(
-				serviceEnvironments,
-				environmentFilter,
-			);
-			const matchesSearch =
-				query.length === 0 ||
-				service.name.toLowerCase().includes(query) ||
-				homelabServiceId(service).includes(query);
-			return matchesHealth && matchesEnvironment && matchesSearch;
-		});
-		const filteredCatalog = { ...state.catalog, services: filteredServices };
-		if (!state.topology) {
-			return filteredServices.length === 0
-				? []
-				: [
-						{
-							group: "services",
-							catalog: filteredCatalog,
-							metricsProfile: "red",
-						},
-					];
-		}
-		return groupCatalogByPresentation(filteredCatalog, state.topology);
-	}, [
-		environmentFilter,
-		healthFilter,
-		indexedHealth,
-		searchQuery,
-		state.catalog,
-		state.healthUnavailable,
-		state.topology,
-	]);
+				indexedHealth,
+				state.healthUnavailable,
+				{ healthFilter, environmentFilter, searchQuery },
+			),
+		[
+			environmentFilter,
+			healthFilter,
+			indexedHealth,
+			searchQuery,
+			state.catalog,
+			state.healthUnavailable,
+			state.topology,
+		],
+	);
 
 	const visibleHierarchyGroups = useMemo(
 		() =>

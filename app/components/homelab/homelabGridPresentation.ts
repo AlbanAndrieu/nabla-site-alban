@@ -43,11 +43,16 @@ export const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
 	unknown: "btn-outline-secondary",
 };
 
+/** Endpoint links add a browser-probe "pending" state to the shared health button classes. */
+export type EndpointHealthState = HomelabHealthState | "pending";
+
+export const ENDPOINT_HEALTH_CLASS: Record<EndpointHealthState, string> = {
+	pending: "btn-outline-primary",
+	...INTERNAL_HEALTH_CLASS,
+};
+
 export const RUNTIME_ICON_CLASS: Record<RuntimePresentationState, string> = {
-	ok: "fas fa-circle-check",
-	warn: "fas fa-triangle-exclamation",
-	fail: "fas fa-circle-xmark",
-	unknown: "fas fa-circle-question",
+	...EFFECTIVE_HEALTH_ICON_CLASS,
 	missing: "fas fa-skull-crossbones",
 };
 

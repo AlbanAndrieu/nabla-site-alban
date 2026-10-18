@@ -6,9 +6,29 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The topology view is split into cohesive sibling modules; source contracts
+// apply to the whole view implementation (original file first).
+const TOPOLOGY_VIEW_SOURCE_FILES = [
+	"ArchitectureTopologyView.tsx",
+	"ArchitectureHealthDashboard.tsx",
+	"architectureTopologyFilters.ts",
+	"useArchitectureLiveData.ts",
+];
+
+async function topologyViewSource() {
+	const parts = await Promise.all(
+		TOPOLOGY_VIEW_SOURCE_FILES.map((file) =>
+			source(`app/[locale]/architecture/${file}`),
+		),
+	);
+	return parts.join("\n");
+}
+
 test("architecture exposes stable anchors for every major section", async () => {
 	const page = await source("app/[locale]/architecture/page.tsx");
-	const nav = await source("app/[locale]/architecture/ArchitectureSectionNav.tsx");
+	const nav = await source(
+		"app/[locale]/architecture/ArchitectureSectionNav.tsx",
+	);
 	const topology = await source(
 		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
 	);
@@ -39,12 +59,13 @@ test("architecture exposes stable anchors for every major section", async () => 
 });
 
 test("architecture dashboard filters declared services by health and operator presentation", async () => {
-	const topology = await source(
-		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
-	);
+	const topology = await topologyViewSource();
 
 	assert.match(topology, /type HealthFilter = "all" \| HomelabHealthState/);
-	assert.match(topology, /type GroupFilter = "all" \| ServicePresentationGroup/);
+	assert.match(
+		topology,
+		/type GroupFilter = "all" \| ServicePresentationGroup/,
+	);
 	assert.match(topology, /resolveEffectiveServiceState/);
 	assert.match(topology, /analyzeServicePresentation/);
 	assert.match(topology, /filteredCatalog/);

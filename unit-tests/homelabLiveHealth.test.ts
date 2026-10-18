@@ -6,13 +6,39 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-// The grid delegates pure health/presentation helpers to homelabGridPresentation.ts.
+// The block delegates health polling to useHomelabHealth.ts and service
+// filtering/grouping to homelabServiceHierarchy.ts.
+async function blockSource() {
+	const [block, health, hierarchy] = await Promise.all([
+		source("app/components/homelab/HomelabServicesBlock.tsx"),
+		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabServiceHierarchy.ts"),
+	]);
+	return `${block}\n${health}\n${hierarchy}`;
+}
+
+// The grid delegates pure health/presentation helpers to homelabGridPresentation.ts,
+// each service card to HomelabServiceCard.tsx and legends to
+// HomelabServiceGridLegends.tsx.
 async function gridSource() {
-	const [grid, presentation] = await Promise.all([
+	const [grid, presentation, card, legends] = await Promise.all([
 		source("app/components/homelab/HomelabServiceGrid.tsx"),
 		source("app/components/homelab/homelabGridPresentation.ts"),
+		source("app/components/homelab/HomelabServiceCard.tsx"),
+		source("app/components/homelab/HomelabServiceGridLegends.tsx"),
 	]);
-	return `${grid}\n${presentation}`;
+	return `${grid}\n${presentation}\n${card}\n${legends}`;
+}
+
+// The endpoint action delegates pure health helpers to endpointHealth.ts and
+// the browser probe to useEndpointProbe.ts.
+async function endpointSource() {
+	const [endpoint, health, probe] = await Promise.all([
+		source("app/components/homelab/EndpointAction.tsx"),
+		source("app/components/homelab/endpointHealth.ts"),
+		source("app/components/homelab/useEndpointProbe.ts"),
+	]);
+	return `${endpoint}\n${health}\n${probe}`;
 }
 
 test("homelab service grid keeps endpoints clickable and matches FastAPI health by stable identity", async () => {
@@ -58,7 +84,7 @@ test("TrueNAS card uses only the dedicated public port-7000 probe for link color
 
 test("TrueNAS runtime/API failures are explicit even when the public UI remains reachable", async () => {
 	const page = await gridSource();
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const health = await source("lib/homelabHealth.ts");
 	const healthValidation = await source("lib/homelabHealthValidation.ts");
 	assert.match(page, /healthUnavailable \|\|/);
@@ -135,7 +161,7 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 });
 
 test("endpoint action treats FastAPI runtime evidence as authoritative", async () => {
-	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const page = await endpointSource();
 	assert.match(page, /function hasAuthoritativeEvidence/);
 	assert.match(page, /entry\.direct_state != null/);
 	assert.match(page, /entry\.internal_state != null/);
@@ -157,7 +183,7 @@ test("endpoint action treats FastAPI runtime evidence as authoritative", async (
 });
 
 test("health evidence shows HTTP, TrueNAS, Cloudflare and snapshot age", async () => {
-	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const page = await endpointSource();
 	assert.match(page, /snapshotAgeSeconds/);
 	assert.match(page, /HTTP \$\{initialHealth\.http_status\}/);
 	assert.match(page, /TrueNAS \$\{initialHealth\.runtime_state\}/);
@@ -167,7 +193,7 @@ test("health evidence shows HTTP, TrueNAS, Cloudflare and snapshot age", async (
 });
 
 test("Cloudflare indicator requires tunnel intent and observed API evidence", async () => {
-	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const page = await endpointSource();
 	const presentation = await source("lib/homelabHealthPresentation.ts");
 	assert.match(
 		page,
@@ -190,7 +216,7 @@ test("Cloudflare indicator requires tunnel intent and observed API evidence", as
 });
 
 test("TLS indicator is shown for HTTPS and follows API trust evidence", async () => {
-	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const page = await endpointSource();
 	const presentation = await source("lib/homelabHealthPresentation.ts");
 	assert.match(page, /const https = isHttpsEndpoint\(url\)/);
 	assert.match(page, /className="fas fa-lock"/);
@@ -200,7 +226,7 @@ test("TLS indicator is shown for HTTPS and follows API trust evidence", async ()
 });
 
 test("pending endpoint state is explicit and motion-safe", async () => {
-	const page = await source("app/components/homelab/EndpointAction.tsx");
+	const page = await endpointSource();
 	const css = await source("app/components/homelab/EndpointAction.module.css");
 	assert.match(page, /health === "pending"/);
 	assert.match(page, /t\("pending"\)/);
@@ -209,7 +235,7 @@ test("pending endpoint state is explicit and motion-safe", async () => {
 });
 
 test("homelab health refreshes every thirty seconds, preserves context and exposes failed refreshes", async () => {
-	const page = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const page = await blockSource();
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
@@ -230,7 +256,7 @@ test("internal badge uses semantic tokens instead of the low-contrast legacy bg-
 	const css = await source(
 		"app/components/homelab/HomelabServicesBlock.module.css",
 	);
-	// wireframe.css repaints .bg-info as #8e8e8e: 4.47:1 with dark text (axe color-contrast).
+	// Bootstrap's forced .bg-info cyan fails with light text (axe color-contrast).
 	assert.match(page, /className=\{`badge \$\{styles\.internalBadge\}`\}/);
 	assert.doesNotMatch(page, /bg-info/);
 	assert.match(

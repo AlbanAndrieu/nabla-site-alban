@@ -6,10 +6,23 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("shared homelab React Flow documents WAN, DNS, direct and tunnel paths", async () => {
-	const flow = await source(
-		"app/components/truenas/HierarchicalHomeLabNetworkFlow.tsx",
+// The flow component delegates its static topology and pure node/edge builders
+// to sibling modules; the source contract covers the whole set.
+async function flowSource() {
+	const parts = await Promise.all(
+		[
+			"app/components/truenas/HierarchicalHomeLabNetworkFlow.tsx",
+			"app/components/truenas/homelabNetworkFlowTypes.ts",
+			"app/components/truenas/homelabNetworkFlowNodes.ts",
+			"app/components/truenas/homelabNetworkFlowEdges.ts",
+			"app/components/truenas/homelabNetworkFlowGraph.ts",
+		].map(source),
 	);
+	return parts.join("\n");
+}
+
+test("shared homelab React Flow documents WAN, DNS, direct and tunnel paths", async () => {
+	const flow = await flowSource();
 	assert.match(flow, /name: "WAN switch"/);
 	assert.match(flow, /"cloudflare-tunnel-wan-switch"/);
 	assert.match(flow, /"wan-switch-pfsense"/);
@@ -55,9 +68,7 @@ test("shared homelab React Flow documents WAN, DNS, direct and tunnel paths", as
 });
 
 test("network diagram is grouped by failure domain and can isolate DNS and ingress paths", async () => {
-	const flow = await source(
-		"app/components/truenas/HierarchicalHomeLabNetworkFlow.tsx",
-	);
+	const flow = await flowSource();
 	assert.match(
 		flow,
 		/type FailureDomain = "external" \| "gateway" \| "lan" \| "truenas"/,

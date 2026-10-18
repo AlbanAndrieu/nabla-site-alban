@@ -6,6 +6,17 @@ async function source(path: string) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+// The block delegates health polling to useHomelabHealth.ts and service
+// filtering/grouping to homelabServiceHierarchy.ts.
+async function blockSource() {
+	const [block, health, hierarchy] = await Promise.all([
+		source("app/components/homelab/HomelabServicesBlock.tsx"),
+		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabServiceHierarchy.ts"),
+	]);
+	return `${block}\n${health}\n${hierarchy}`;
+}
+
 test("TrueNAS keeps homelab topology before services and moves Nabla project near the footer", async () => {
 	const page = await source("app/[locale]/truenas/page.tsx");
 	const visualIndex = page.indexOf("<HomeLabSection");
@@ -32,7 +43,7 @@ test("homelab network policy details are enriched but collapsed by default", asy
 });
 
 test("service views are searchable and collapsible while technical criticality stays opt-in", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const hierarchy = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);
@@ -87,7 +98,7 @@ test("critical dependency hierarchy keeps the disclosure arrow next to its label
 });
 
 test("runtime legend is promoted before service groups and links to criticality details", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const overview = await source(
 		"app/components/homelab/HomelabStatusOverview.tsx",
 	);
@@ -102,7 +113,7 @@ test("runtime legend is promoted before service groups and links to criticality 
 });
 
 test("health refresh has a transient status distinct from unavailable runtime evidence", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const overview = await source(
 		"app/components/homelab/HomelabStatusOverview.tsx",
 	);
@@ -115,7 +126,7 @@ test("health refresh has a transient status distinct from unavailable runtime ev
 
 test("DNS posture remains sanitized while Operations owns the active presentation", async () => {
 	const posture = await source("app/components/homelab/PfSenseDnsPosture.tsx");
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const operations = await source(
 		"app/components/homelab/HomelabOperationalEvidence.tsx",
 	);
@@ -131,7 +142,7 @@ test("DNS posture remains sanitized while Operations owns the active presentatio
 });
 
 test("TrueNAS exposes runtime observation and internal probe coverage", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const coverage = await source(
 		"app/components/homelab/HomelabObservationCoverage.tsx",
 	);
@@ -160,7 +171,7 @@ test("TrueNAS exposes runtime observation and internal probe coverage", async ()
 });
 
 test("homelab renders bounded probes before aggregate enrichment", async () => {
-	const block = await source("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = await blockSource();
 	const probeProxy = await source("app/api/homelab-probes/route.ts");
 
 	const probeStart = block.indexOf(

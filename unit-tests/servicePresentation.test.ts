@@ -265,7 +265,15 @@ test("metric profiles stay role-specific instead of becoming one universal healt
 test("TrueNAS and Architecture expose the same scalable service-first controls", async () => {
 	const [truenasSource, architectureSource, styles] = await Promise.all([
 		readFile("app/components/homelab/HomelabServicesBlock.tsx", "utf8"),
-		readFile("app/[locale]/architecture/ArchitectureTopologyView.tsx", "utf8"),
+		// The topology view is split into sibling modules (original file first).
+		Promise.all(
+			[
+				"ArchitectureTopologyView.tsx",
+				"ArchitectureHealthDashboard.tsx",
+				"architectureTopologyFilters.ts",
+				"useArchitectureLiveData.ts",
+			].map((file) => readFile(`app/[locale]/architecture/${file}`, "utf8")),
+		).then((parts) => parts.join("\n")),
 		readFile("app/components/homelab/HomelabServicesBlock.module.css", "utf8"),
 	]);
 

@@ -1,34 +1,29 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import CriticalDependencyHierarchy from "@/app/components/homelab/CriticalDependencyHierarchy";
 import homelabStyles from "@/app/components/homelab/HomelabServicesBlock.module.css";
-import {
-	type HomelabHealthEntry,
-	type HomelabHealthSnapshot,
-	type HomelabHealthState,
-} from "@/lib/homelabHealth";
-import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
-import {
-	type HomelabServicesCatalog,
-	homelabServiceId,
-	parseHomelabServicesCatalog,
-} from "@/lib/homelabServices";
-import {
-	analyzeServicePresentation,
-	type ServicePresentationGroup,
-} from "@/lib/servicePresentation";
-import {
-	parseServiceTopology,
-	type ServiceTopology,
-	type ServiceTopologySource,
+import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import { analyzeServicePresentation } from "@/lib/servicePresentation";
+import type {
+	ServiceTopology,
+	ServiceTopologySource,
 } from "@/lib/serviceTopology";
+import ArchitectureHealthDashboard from "./ArchitectureHealthDashboard";
 import ArchitectureServiceHierarchy from "./ArchitectureServiceHierarchy";
 import styles from "./ArchitectureTopologyView.module.css";
+import {
+	countHealthStates,
+	filterArchitectureCatalog,
+	type GroupFilter,
+	type HealthFilter,
+	indexHealth,
+	snapshotAgeSeconds,
+} from "./architectureTopologyFilters";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
 import useArchitectureHealthPolling from "./useArchitectureHealthPolling";
+import useArchitectureLiveData from "./useArchitectureLiveData";
 
 type Props = {
 	locale: string;
@@ -38,80 +33,6 @@ type Props = {
 	initialTopologySource: ServiceTopologySource;
 };
 
-type HealthFilter = "all" | HomelabHealthState;
-type GroupFilter = "all" | ServicePresentationGroup;
-type PresentationGroupTitleKey =
-	| "presentation.groups.services"
-	| "presentation.groups.core-critical"
-	| "presentation.groups.security-controls"
-	| "presentation.groups.shared-core"
-	| "presentation.groups.support";
-
-type HealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
-};
-
-const HEALTH_STATES: readonly HomelabHealthState[] = [
-	"ok",
-	"warn",
-	"fail",
-	"unknown",
-];
-const GROUP_FILTERS: readonly GroupFilter[] = [
-	"all",
-	"services",
-	"core-critical",
-	"security-controls",
-	"shared-core",
-	"support",
-];
-
-const PRESENTATION_GROUP_TITLE_KEY: Record<
-	ServicePresentationGroup,
-	PresentationGroupTitleKey
-> = {
-	services: "presentation.groups.services",
-	"core-critical": "presentation.groups.core-critical",
-	"security-controls": "presentation.groups.security-controls",
-	"shared-core": "presentation.groups.shared-core",
-	support: "presentation.groups.support",
-};
-
-function normalizedName(value: string): string {
-	return value.trim().toLowerCase();
-}
-
-function indexHealth(snapshot: HomelabHealthSnapshot | null): HealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-	}
-	return { byId, byName };
-}
-
-function effectiveState(
-	serviceId: string,
-	serviceName: string,
-	index: HealthIndex,
-): HomelabHealthState {
-	const entry =
-		index.byId.get(serviceId) ?? index.byName.get(normalizedName(serviceName));
-	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
-}
-
-function snapshotAgeSeconds(
-	checkedAt: string | undefined,
-	now: number,
-): number | null {
-	if (!checkedAt) return null;
-	const checkedAtMs = Date.parse(checkedAt);
-	if (!Number.isFinite(checkedAtMs)) return null;
-	return Math.max(0, Math.floor((now - checkedAtMs) / 1000));
-}
-
 export default function ArchitectureTopologyView({
 	locale,
 	initialCatalog,
@@ -120,112 +41,49 @@ export default function ArchitectureTopologyView({
 	initialTopologySource,
 }: Readonly<Props>) {
 	const french = locale === "fr";
-	const t = useTranslations("homelab");
-	const [catalog, setCatalog] = useState(initialCatalog);
-	const [catalogSource, setCatalogSource] = useState(initialCatalogSource);
-	const [topology, setTopology] = useState(initialTopology);
-	const [topologySource, setTopologySource] = useState<ServiceTopologySource>(
-		initialTopologySource,
-	);
+	const { catalog, catalogSource, topology, topologySource } =
+		useArchitectureLiveData({
+			initialCatalog,
+			initialCatalogSource,
+			initialTopology,
+			initialTopologySource,
+		});
 	const { health, healthUnavailable, refreshing, now, healthSource } =
 		useArchitectureHealthPolling();
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 
-	useEffect(() => {
-		const controller = new AbortController();
-
-		const loadCatalog = async () => {
-			const response = await fetch("/api/homelab-services", {
-				cache: "no-store",
-				signal: controller.signal,
-				headers: { Accept: "application/json" },
-			});
-			if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-			const parsed = parseHomelabServicesCatalog(await response.json());
-			if (!parsed) throw new Error("invalid catalog");
-			setCatalog(parsed);
-			setCatalogSource(
-				response.headers.get("X-Homelab-Services-Source") ?? "fastapi",
-			);
-		};
-
-		const loadTopology = async () => {
-			const response = await fetch("/api/homelab-topology", {
-				cache: "no-store",
-				signal: controller.signal,
-				headers: { Accept: "application/json" },
-			});
-			if (!response.ok) throw new Error(`topology HTTP ${response.status}`);
-			const parsed = parseServiceTopology(await response.json());
-			if (!parsed) throw new Error("invalid topology");
-			setTopology(parsed);
-			setTopologySource(
-				response.headers.get("X-Homelab-Topology-Source") === "local-fallback"
-					? "local-fallback"
-					: "fastapi",
-			);
-		};
-
-		void Promise.allSettled([loadCatalog(), loadTopology()]);
-		return () => controller.abort();
-	}, []);
-
 	const healthIndex = useMemo(() => indexHealth(health), [health]);
 	const presentation = useMemo(
 		() => analyzeServicePresentation(catalog, topology),
 		[catalog, topology],
 	);
-	const counts = useMemo(() => {
-		const result: Record<HomelabHealthState, number> = {
-			ok: 0,
-			warn: 0,
-			fail: 0,
-			unknown: 0,
-		};
-		for (const service of catalog.services) {
-			const state = effectiveState(
-				homelabServiceId(service),
-				service.name,
-				healthIndex,
-			);
-			result[state] += 1;
-		}
-		return result;
-	}, [catalog.services, healthIndex]);
+	const counts = useMemo(
+		() => countHealthStates(catalog.services, healthIndex),
+		[catalog.services, healthIndex],
+	);
 
-	const filteredCatalog = useMemo<HomelabServicesCatalog>(() => {
-		const query = searchQuery.trim().toLowerCase();
-		const services = catalog.services.filter((service) => {
-			const id = homelabServiceId(service);
-			const state = effectiveState(id, service.name, healthIndex);
-			const group = presentation.get(id)?.group ?? "support";
-			const matchesSearch =
-				query.length === 0 ||
-				service.name.toLowerCase().includes(query) ||
-				id.includes(query);
-			return (
-				(healthFilter === "all" || state === healthFilter) &&
-				(groupFilter === "all" || group === groupFilter) &&
-				matchesSearch
-			);
-		});
-		return { ...catalog, services };
-	}, [
-		catalog,
-		groupFilter,
-		healthFilter,
-		healthIndex,
-		presentation,
-		searchQuery,
-	]);
+	const filteredCatalog = useMemo<HomelabServicesCatalog>(
+		() =>
+			filterArchitectureCatalog(catalog, {
+				healthIndex,
+				presentation,
+				healthFilter,
+				groupFilter,
+				searchQuery,
+			}),
+		[
+			catalog,
+			groupFilter,
+			healthFilter,
+			healthIndex,
+			presentation,
+			searchQuery,
+		],
+	);
 
 	const ageSeconds = snapshotAgeSeconds(health?.checked_at, now);
-	const groupLabel = (group: GroupFilter) =>
-		group === "all"
-			? t("presentation.allGroups")
-			: t(PRESENTATION_GROUP_TITLE_KEY[group]);
 
 	return (
 		<>
@@ -235,156 +93,21 @@ export default function ArchitectureTopologyView({
 					className={homelabStyles.healthDashboard}
 					aria-labelledby="architecture-health-dashboard-title"
 				>
-					<div className={homelabStyles.healthDashboardHeader}>
-						<div>
-							<h2
-								id="architecture-health-dashboard-title"
-								className={homelabStyles.healthDashboardTitle}
-							>
-								{french
-									? "État et filtres de l’architecture"
-									: "Architecture health and filters"}
-							</h2>
-							<p>
-								{french
-									? "Les filtres s’appliquent aux services déclarés du graphe ; la topologie complète reste utilisée pour calculer la criticité et le rayon d’impact."
-									: "Services stay first; filters use operator presentation roles while the complete topology remains the basis for dependency criticality and blast-radius calculations."}
-							</p>
-						</div>
-						<div
-							className={homelabStyles.refreshStatus}
-							role="status"
-							aria-live="polite"
-						>
-							{refreshing
-								? french
-									? "Actualisation…"
-									: "Refreshing…"
-								: healthUnavailable
-									? french
-										? "Actualisation indisponible · dernier snapshot conservé"
-										: "Refresh unavailable · keeping last snapshot"
-									: ageSeconds === null
-										? french
-											? "Snapshot en attente"
-											: "Waiting for snapshot"
-										: french
-											? `Mis à jour il y a ${ageSeconds}s`
-											: `Updated ${ageSeconds}s ago`}
-						</div>
-					</div>
-
-					<div
-						className={homelabStyles.healthSummary}
-						aria-label={french ? "Résumé santé" : "Health summary"}
-					>
-						{HEALTH_STATES.map((state) => (
-							<button
-								type="button"
-								key={state}
-								className={homelabStyles.healthChip}
-								data-health-filter={state}
-								aria-pressed={healthFilter === state}
-								onClick={() =>
-									setHealthFilter((current) =>
-										current === state ? "all" : state,
-									)
-								}
-							>
-								<strong>{counts[state]}</strong>{" "}
-								{state === "ok"
-									? french
-										? "sains"
-										: "healthy"
-									: state === "warn"
-										? french
-											? "dégradés"
-											: "degraded"
-										: state === "fail"
-											? french
-												? "en échec"
-												: "failed"
-											: french
-												? "inconnus"
-												: "unknown"}
-							</button>
-						))}
-					</div>
-
-					<div className={homelabStyles.controls}>
-						<label className={homelabStyles.filterField}>
-							<span className={homelabStyles.filterLabel}>
-								{french ? "Santé" : "Health"}
-							</span>
-							<select
-								className={homelabStyles.filterSelect}
-								value={healthFilter}
-								onChange={(event) =>
-									setHealthFilter(event.target.value as HealthFilter)
-								}
-							>
-								<option value="all">
-									{french ? "Tous les états" : "All health states"}
-								</option>
-								<option value="ok">{french ? "Sain" : "Healthy"}</option>
-								<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
-								<option value="fail">{french ? "En échec" : "Failed"}</option>
-								<option value="unknown">
-									{french ? "Inconnu" : "Unknown"}
-								</option>
-							</select>
-						</label>
-						<label className={homelabStyles.filterField}>
-							<span className={homelabStyles.filterLabel}>
-								{t("presentation.searchLabel")}
-							</span>
-							<input
-								type="search"
-								className={homelabStyles.filterSelect}
-								value={searchQuery}
-								onChange={(event) => setSearchQuery(event.currentTarget.value)}
-								placeholder={t("presentation.searchPlaceholder")}
-								data-architecture-service-search
-							/>
-						</label>
-						<label className={homelabStyles.filterField}>
-							<span className={homelabStyles.filterLabel}>
-								{t("presentation.filterLabel")}
-							</span>
-							<select
-								className={homelabStyles.filterSelect}
-								value={groupFilter}
-								onChange={(event) =>
-									setGroupFilter(event.target.value as GroupFilter)
-								}
-								data-architecture-presentation-filter
-							>
-								{GROUP_FILTERS.map((group) => (
-									<option value={group} key={group}>
-										{groupLabel(group)}
-									</option>
-								))}
-							</select>
-						</label>
-						<div className={homelabStyles.controlButtons}>
-							<button
-								type="button"
-								className={homelabStyles.controlButton}
-								onClick={() => {
-									setHealthFilter("all");
-									setGroupFilter("all");
-									setSearchQuery("");
-								}}
-							>
-								{french ? "Réinitialiser" : "Reset filters"}
-							</button>
-						</div>
-					</div>
-					<p className={homelabStyles.matchCount}>
-						{french
-							? `${filteredCatalog.services.length} services déclarés affichés sur ${catalog.services.length}`
-							: `${filteredCatalog.services.length} declared services shown of ${catalog.services.length}`}
-					</p>
+					<ArchitectureHealthDashboard
+						french={french}
+						refreshing={refreshing}
+						healthUnavailable={healthUnavailable}
+						ageSeconds={ageSeconds}
+						counts={counts}
+						healthFilter={healthFilter}
+						setHealthFilter={setHealthFilter}
+						groupFilter={groupFilter}
+						setGroupFilter={setGroupFilter}
+						searchQuery={searchQuery}
+						setSearchQuery={setSearchQuery}
+						shownCount={filteredCatalog.services.length}
+						totalCount={catalog.services.length}
+					/>
 				</section>
 
 				<ArchitectureServiceHierarchy

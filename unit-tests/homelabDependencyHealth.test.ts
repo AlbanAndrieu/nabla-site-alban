@@ -15,6 +15,31 @@ import {
 	unconfirmedDependencyLabels,
 } from "../lib/homelabHealthResolver";
 
+// The explorer is split into cohesive sibling modules; source contracts apply
+// to the whole explorer implementation.
+const EXPLORER_SOURCE_FILES = [
+	"HierarchicalArchitectureExplorer.tsx",
+	"HierarchicalArchitectureToolbar.tsx",
+	"HierarchicalArchitectureLegends.tsx",
+	"HierarchicalArchitectureNodes.tsx",
+	"hierarchicalArchitectureModel.ts",
+	"hierarchicalArchitectureGroups.ts",
+	"hierarchicalArchitectureFlow.ts",
+	"useHierarchicalArchitectureGraph.ts",
+];
+
+async function explorerSource() {
+	const parts = await Promise.all(
+		EXPLORER_SOURCE_FILES.map((file) =>
+			readFile(
+				new URL(`../app/[locale]/architecture/${file}`, import.meta.url),
+				"utf8",
+			),
+		),
+	);
+	return parts.join("\n");
+}
+
 const DEPENDENCY_ENTRY: HomelabHealthEntry = {
 	id: "langfuse-web",
 	name: "Langfuse web",
@@ -294,7 +319,15 @@ test("TrueNAS public line cannot inherit dependency degradation", async () => {
 });
 
 test("service grid shows effective dependency degradation without replacing runtime status", async () => {
-	const grid = await source("app/components/homelab/HomelabServiceGrid.tsx");
+	// The grid delegates each card to HomelabServiceCard.tsx and its legends
+	// to HomelabServiceGridLegends.tsx.
+	const grid = (
+		await Promise.all([
+			source("app/components/homelab/HomelabServiceGrid.tsx"),
+			source("app/components/homelab/HomelabServiceCard.tsx"),
+			source("app/components/homelab/HomelabServiceGridLegends.tsx"),
+		])
+	).join("\n");
 
 	assert.match(grid, /resolveEffectiveServiceState\(initialHealth\)/);
 	assert.match(grid, /blockedDependencyLabels\(initialHealth\)/);
@@ -306,7 +339,7 @@ test("service grid shows effective dependency degradation without replacing runt
 
 test("architecture graph uses explicit consumer-side dependency evidence on required edges", async () => {
 	const [explorer, evidence] = await Promise.all([
-		source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx"),
+		explorerSource(),
 		source("app/[locale]/architecture/ArchitectureDependencyEvidence.tsx"),
 	]);
 

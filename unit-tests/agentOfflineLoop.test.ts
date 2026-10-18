@@ -70,6 +70,7 @@ test("auto-fix loop detects an oscillating formatter before 12 passes", async ()
 		for (const p of [
 			"scripts/agent-quality-gate.sh",
 			"scripts/lib/agent-quality-support.sh",
+			"scripts/lib/agent-quality-guards.sh",
 		]) {
 			await copyFile(path.join(project, p), path.join(cwd, p));
 		}
