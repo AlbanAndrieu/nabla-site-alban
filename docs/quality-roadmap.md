@@ -1,6 +1,6 @@
 # Feuille de route produit et qualité
 
-Dernière réconciliation : 7 octobre 2026.
+Dernière réconciliation : 18 octobre 2026 (5 dernières PR fusionnées).
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
 nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
@@ -27,13 +27,39 @@ runbooks et les retours d'incident sous `docs/incidents/`.
 | Preview | Les changements runtime gardent Vercel Preview + Playwright/ZAP ; les changements non déployables suivent `ci-scope.sh` |
 | Sécurité | Headers de base, ZAP Preview/production et install scripts explicitement contrôlés ; `/security.txt` est canonique, `/.well-known/security.txt` publie la même copie RFC 9116 et la policy unique utilise la route native `/policy/privacy_policy` |
 | CSS/UI | Tailwind/PostCSS retiré ; Bootstrap/CDN reste la dette résiduelle à réduire progressivement |
-| Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes ; un tunnel sain ne prouve pas une origine saine |
+| Homelab | Déclaration, observation runtime, santé, provenance/fraîcheur et exposition restent distinctes **dans le plan privé uniquement** ; la vitrine publique n'expose plus les sondes/ports ; un tunnel sain ne prouve pas une origine saine |
 | Dépendances | Renovate est l'unique propriétaire prévu des PR/rebases de dépendances ; Dependabot ne doit pas créer une seconde famille de PR |
 | Documentation | Index central, deux roadmaps actives, incidents séparés des runbooks et backlog ouvert limité aux roadmaps par `documentationPolicyContract.test.ts` |
 | DSOMM | Snapshot OWASP 5.0.2 statique et commit-pinné ; assessment repository v1 portable ; traduction FR build-time complète 251/251 liée par UUID/sourceCommit ; miroir `.well-known` et validation fail-closed pour agrégation future par `nabla-compose` |
 
 - [ ] **Installation npm sans DNS (local-first)** : `just npm-offline-check` indique seulement la disponibilité des outils/cache (aucun contrôle d’intégrité des dépendances) ; `just npm-offline-install` utilise `npm ci --offline --ignore-scripts --no-audit --no-fund` sur un arbre sans `node_modules` et échoue si le cache est incomplet. Rejouer les scripts requis et la gate stricte uniquement depuis un checkout Git complet, avec dépendances installées et provenance vérifiée. Ne jamais convertir une preuve source-only en PASS publication.
 - [ ] **Valider le compactage des diagnostics CI/runtime** : sorties par défaut limitées à 20 lignes dans les gates et la CI (`QUALITY_LOG_TAIL`), détails activables par `QUALITY_VERBOSE=1`, warnings Health Board activables par `HOMELAB_HEALTH_VERBOSE=1`. Preuve intermédiaire : PR #232, quality gate, Semgrep, types et tests unitaires verts sur `fd4fbed` (run `39079985149`) ; garde de parité des types entre maintenance et build ajoutée ensuite. Mesurer la réduction réelle lignes/octets sur deux logs représentatifs avec `scripts/agent-output-metrics.sh` ; conserver les preuves d'échec complètes accessibles hors console et revalider le HEAD final avant clôture. Ne pas assimiler une estimation de tokens à une mesure.
+
+## P0 — Confidentialité homelab et transfert vers ops.albandrieu.com
+
+Réconciliation des cinq dernières PR fusionnées : [dossier vérifié](roadmap-merge-reconciliation-2026-10-18.md)
+— **#234** (cadrage), **#232** (logs/quality gate), **#230** (architecture/a11y),
+**#231** (text-scale), **#227** (oscillation). Ces acquis doivent survivre
+à la suppression des détails publics. Contrat et backlog approfondi :
+[docs/private-homelab-observability.md](private-homelab-observability.md).
+
+- [ ] Livrer et vérifier la PR de confinement public **#235** : huit routes
+  opérationnelles renvoient 404 sans proxy FastAPI, catalogues et legacy HTML
+  assainis, pages `/truenas`, `/nabla`, `/architecture` rendues en mode vitrine.
+  Le HEAD Git ne constitue pas une preuve de déploiement.
+- [ ] Migrer les tests hérités qui supposaient les données privées en accès
+  anonyme : conserver leurs assertions métier sur fixtures synthétiques
+  et transférer les scénarios E2E opérateur vers la future UI `ops`.
+- [ ] Valider la qualité complète, SAST, types, Playwright/axe 200 %, ZAP sur
+  le HEAD exact sans désactiver les garde-fous, puis confirmer l'absence de
+  fuites dans HTML/JS/JSON, erreurs, headers, previews et caches.
+- [ ] Coordination obligatoire : [FastAPI #353](https://github.com/AlbanAndrieu/fastapi-sample/pull/353)
+  et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+  restent distinctes du confinement de Vercel; accès direct à FastAPI Cloud
+  non réputé corrigé par #235.
+- [ ] Après livraison, purge/invalidation des caches de production et
+  previews, test négatif anonyme et postmortem des anciennes copies
+  publiques. Ne jamais affirmer que l'ancien historique Git est privé.
 
 ## P0 — Protection de merge, publication et dépendances
 
