@@ -102,6 +102,9 @@ test("network flow is retained as private-only component and not mounted publicl
 	]);
 	assert.match(entryPoint, /HierarchicalHomeLabNetworkFlow/);
 	assert.doesNotMatch(truenas, /<HomeLabNetworkFlow|import HomeLabNetworkFlow/);
-	assert.doesNotMatch(architecture, /<HomeLabNetworkFlow|import HomeLabNetworkFlow/);
+	assert.doesNotMatch(
+		architecture,
+		/<HomeLabNetworkFlow|import HomeLabNetworkFlow/,
+	);
 	assert.match(architecture, /ops\.albandrieu\.com/);
 });
