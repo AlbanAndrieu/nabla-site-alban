@@ -94,24 +94,14 @@ test("network diagram is grouped by failure domain and can isolate DNS and ingre
 	assert.match(flow, /nodesDraggable=\{false\}/);
 });
 
-test("TrueNAS and architecture pages reuse the hierarchical HomeLabNetworkFlow entry point", async () => {
+test("network flow is retained as private-only component and not mounted publicly", async () => {
 	const [entryPoint, truenas, architecture] = await Promise.all([
 		source("app/components/truenas/HomeLabNetworkFlow.tsx"),
 		source("app/components/truenas/HomeLabSection.tsx"),
 		source("app/[locale]/architecture/page.tsx"),
 	]);
 	assert.match(entryPoint, /HierarchicalHomeLabNetworkFlow/);
-	assert.match(
-		truenas,
-		/import HomeLabNetworkFlow from "\.\/HomeLabNetworkFlow"/,
-	);
-	assert.match(truenas, /<HomeLabNetworkFlow \/>/);
-	assert.match(
-		architecture,
-		/import HomeLabNetworkFlow from "@\/app\/components\/truenas\/HomeLabNetworkFlow"/,
-	);
-	assert.match(architecture, /id="homelab-network-architecture"/);
-	assert.match(architecture, /Outgoing Network Interfaces = All/);
-	assert.match(architecture, /OpenWebUI.*never traverses Traefik/);
-	assert.match(architecture, /<HomeLabNetworkFlow \/>/);
+	assert.doesNotMatch(truenas, /<HomeLabNetworkFlow|import HomeLabNetworkFlow/);
+	assert.doesNotMatch(architecture, /<HomeLabNetworkFlow|import HomeLabNetworkFlow/);
+	assert.match(architecture, /ops\.albandrieu\.com/);
 });

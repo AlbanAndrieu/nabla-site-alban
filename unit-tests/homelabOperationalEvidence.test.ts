@@ -153,25 +153,13 @@ test("operational evidence surfaces pfSense, Cloudflare, freshness and source-aw
 	assert.doesNotMatch(JSON.stringify(evidence), /MUST_NOT_ESCAPE/);
 });
 
-test("same-origin health proxy prefers fresh health-board evidence without letting stale data mask fresher paths", async () => {
+test("public homelab health API refuses all anonymous operational evidence", async () => {
 	const source = await readFile(
 		new URL("../app/api/homelab-health/route.ts", import.meta.url),
 		"utf8",
 	);
-	assert.match(source, /loadFastApiHealthBoard/);
-	assert.match(
-		source,
-		/parseHomelabHealthSnapshot\(boardResult\.board\?\.homelab\)/,
-	);
-	assert.match(source, /fastapi-health-board/);
-	assert.match(source, /boardResult\.board\?\.state === "fresh"/);
-	assert.match(source, /loadHomelabHealthSnapshot/);
-	assert.match(source, /loadHomelabProbeSnapshot/);
-	assert.match(source, /fastapi-health-board-stale/);
-	assert.match(
-		source,
-		/must never overwrite a newer aggregate or bounded probe snapshot/,
-	);
+	assert.match(source, /privateHomelabResponse/);
+	assert.doesNotMatch(source, /loadFastApiHealthBoard|loadHomelabHealthSnapshot/);
 });
 
 test("TrueNAS keeps unified operational evidence behind its disclosure while Architecture renders it directly", async () => {
@@ -203,11 +191,11 @@ test("TrueNAS keeps unified operational evidence behind its disclosure while Arc
 		source("app/components/homelab/HomelabOperationalFreshness.tsx"),
 	]);
 
-	assert.match(section, /HomelabOperationsDisclosure/);
+	assert.doesNotMatch(section, /HomelabOperationsDisclosure/);
 	assert.doesNotMatch(section, /HomelabOperationalEvidence/);
 	assert.match(disclosure, /HomelabOperationalEvidence/);
 	assert.match(disclosure, /data-homelab-operations-disclosure/);
-	assert.match(architecturePage, /HomelabOperationalEvidence/);
+	assert.doesNotMatch(architecturePage, /HomelabOperationalEvidence/);
 	assert.doesNotMatch(architectureNav, /HomelabOperationalEvidence/);
 
 	for (const sectionName of [
