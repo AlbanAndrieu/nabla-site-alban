@@ -1,6 +1,6 @@
 # Feuille de route homelab
 
-## P0/P1 — Confidentialité de /truenas et séparation de l'observabilité (2026-10-18)
+## P0/P1 — Confidentialité de /truenas et espace privé ops.albandrieu.com (2026-10-18)
 
 Épopée [#233](https://github.com/AlbanAndrieu/nabla-site-alban/issues/233) et
 [plan de confidentialité détaillé](private-homelab-observability.md) ; coordination
@@ -12,8 +12,15 @@
   compilés, métadonnées et cache CDN ; publier uniquement un DTO à allowlist.
 - [ ] **P0** Ajouter des contrats de non-régression anti-fuite pour FR/EN,
   HTML/JS/JSON et en-têtes, y compris scénarios dégradés et previews.
-- [ ] **P1** Remplacer les diagnostics publics par une vitrine sûre et un lien
-  vers un espace opérateur distinct derrière Cloudflare Access/Tunnel.
+- [ ] **P1** Remplacer les diagnostics publics par une vitrine sûre avec
+  lien vers **`https://ops.albandrieu.com`**; Access/Tunnel et autorisation
+  FastAPI sont hors Vercel. Aucun token dans le navigateur ni proxy public.
+- [ ] **Gates transverses** : site JSON/public/RSC sans fuite → API FastAPI
+  DTO + JWT validée → Access policy MFA et origine privée → Tunnel/DNS →
+  E2E anonyme/refusé/propriétaire et purge des caches.
+  Références : [Site #234](https://github.com/AlbanAndrieu/nabla-site-alban/pull/234),
+  [FastAPI #353](https://github.com/AlbanAndrieu/fastapi-sample/pull/353),
+  [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263).
 - [ ] **P1** Recette conjointe et contrôle de la rémanence des caches avant clôture ;
   pas de merge automatique ni de revendication de test live sans preuve.
 
