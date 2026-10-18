@@ -28,12 +28,11 @@ check_large_deletions() {
             # The production-baseline split is locked by dedicated release/
             # maintenance classification tests. Once merged, the new <200-line
             # baselines make these exceptions inert.
+            # Public P0 privacy migration adds exact reviewed paths below, not a global bypass.
             scripts/verify-master-baseline.sh | \
                 app/components/homelab/HomelabOperationalEvidence.tsx | \
                 lib/homelabHealth.ts | lib/homelabObservability.ts | \
-                # Public P0 privacy migration: explicitly reviewed removal of previously
-                # published operational inventories/pages, not a general bypass.
-                app/\[locale\]/architecture/page.tsx | \
+app/\[locale\]/architecture/page.tsx | \
                 app/components/truenas/HomeLabSection.tsx | \
                 app/components/homelab/HomelabServicesSection.tsx | \
                 public/homelab-services.json | public/service-topology.json | \
