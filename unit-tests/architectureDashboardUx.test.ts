@@ -55,7 +55,10 @@ test("architecture exposes stable anchors for every major section", async () => 
 	}
 	assert.doesNotMatch(page, /id="homelab-network-architecture"/);
 	assert.match(page, /id="declared-observed-architecture"/);
-	assert.doesNotMatch(page, /<ArchitectureTopologyView|<HomelabOperationalEvidence/);
+	assert.doesNotMatch(
+		page,
+		/<ArchitectureTopologyView|<HomelabOperationalEvidence/,
+	);
 	assert.match(hierarchy, /id="service-directory"/);
 });
 
