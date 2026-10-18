@@ -34,7 +34,10 @@ test("TrueNAS keeps homelab topology before services and moves Nabla project nea
 
 test("public TrueNAS no longer renders network exposure details", async () => {
 	const section = await source("app/components/truenas/HomeLabSection.tsx");
-	assert.doesNotMatch(section, /HomeLabNetworkFlow|network\.tcp|networkDetails/);
+	assert.doesNotMatch(
+		section,
+		/HomeLabNetworkFlow|network\.tcp|networkDetails/,
+	);
 	assert.match(section, /projectDetails/);
 });
 
