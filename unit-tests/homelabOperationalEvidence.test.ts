@@ -159,7 +159,10 @@ test("public homelab health API refuses all anonymous operational evidence", asy
 		"utf8",
 	);
 	assert.match(source, /privateHomelabResponse/);
-	assert.doesNotMatch(source, /loadFastApiHealthBoard|loadHomelabHealthSnapshot/);
+	assert.doesNotMatch(
+		source,
+		/loadFastApiHealthBoard|loadHomelabHealthSnapshot/,
+	);
 });
 
 test("TrueNAS keeps unified operational evidence behind its disclosure while Architecture renders it directly", async () => {
