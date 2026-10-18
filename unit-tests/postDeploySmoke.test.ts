@@ -336,14 +336,18 @@ test("homelab smoke accepts a no-store 404 without upstream evidence", async () 
 test("homelab smoke rejects old 503 diagnostics on public hostname", async () => {
 	const originalFetch = globalThis.fetch;
 	globalThis.fetch = (async () =>
-		new Response(JSON.stringify({ error: "FastAPI homelab status unavailable" }), {
-			status: 503,
-			headers: {
-				"cache-control": "no-store",
-				"content-type": "application/json",
-				"x-homelab-status-primary": "https://fastapi-sample.fastapicloud.dev/api/homelab/status",
+		new Response(
+			JSON.stringify({ error: "FastAPI homelab status unavailable" }),
+			{
+				status: 503,
+				headers: {
+					"cache-control": "no-store",
+					"content-type": "application/json",
+					"x-homelab-status-primary":
+						"https://fastapi-sample.fastapicloud.dev/api/homelab/status",
+				},
 			},
-		})) as typeof fetch;
+		)) as typeof fetch;
 	try {
 		await assert.rejects(checkHomelabStatus(ORIGIN), /returned HTTP 503/);
 	} finally {

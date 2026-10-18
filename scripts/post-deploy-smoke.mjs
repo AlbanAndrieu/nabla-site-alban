@@ -409,7 +409,10 @@ export async function checkHomelabStatus(baseUrl) {
 		new Set([404]),
 	);
 	assertContentType(response, "/api/homelab-status", ["application/json"]);
-	assertCondition(response.status === 404, "public homelab status must be private (HTTP 404)");
+	assertCondition(
+		response.status === 404,
+		"public homelab status must be private (HTTP 404)",
+	);
 	assertCondition(
 		(response.headers.get("cache-control") ?? "").includes("no-store"),
 		"public homelab status refusal must be non-cacheable",
@@ -421,7 +424,8 @@ export async function checkHomelabStatus(baseUrl) {
 	);
 	const payload = await response.json();
 	assertCondition(
-		payload && typeof payload === "object" &&
+		payload &&
+			typeof payload === "object" &&
 			payload.error === "Operational homelab data is private" &&
 			Object.keys(payload).length === 1,
 		"public homelab status refusal includes unexpected operational fields",
