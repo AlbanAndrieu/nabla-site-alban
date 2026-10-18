@@ -73,14 +73,14 @@ test("homelab service endpoint separates browser navigation from tunnel identity
 	);
 });
 
-test("TrueNAS and pfSense navigation keeps their published ports", () => {
+test("legacy navigation no longer overrides TrueNAS and pfSense with admin ports", () => {
 	assert.equal(
 		homelabServiceEndpointUrl({
 			id: "truenas",
 			name: "TrueNAS",
 			tunnelUrl: "https://truenas.albandrieu.com",
 		}),
-		"https://truenas.albandrieu.com:7000/",
+		"https://truenas.albandrieu.com",
 	);
 	assert.equal(
 		homelabServiceEndpointUrl({
@@ -88,72 +88,24 @@ test("TrueNAS and pfSense navigation keeps their published ports", () => {
 			name: "pfSense",
 			tunnelUrl: "https://pfsense.albandrieu.com",
 		}),
-		"https://home.albandrieu.com:10443/",
+		"https://pfsense.albandrieu.com",
 	);
 	assert.equal(homelabServiceId({ name: "pfSense" }), "pfsense");
 });
 
-test("static homelab catalog never probes FastAPI during prerender", () => {
+test("static public catalog does not fetch and exposes only the conceptual node", () => {
 	setApiUrl("https://catalog.example.test/homelab");
 	let fetchCalled = false;
 	globalThis.fetch = (async () => {
 		fetchCalled = true;
 		throw new Error("static catalog must not fetch");
 	}) as typeof fetch;
-
 	const result = getStaticHomelabServicesCatalog();
-	const truenas = result.catalog.services.find(
-		(service) => service.name === "TrueNAS",
-	);
-	const pfsense = result.catalog.services.find(
-		(service) => service.name === "pfSense",
-	);
-	const garageS3 = result.catalog.services.find(
-		(service) => service.id === "garage",
-	);
-	const garage = result.catalog.services.find(
-		(service) => service.id === "garage-webui",
-	);
-	const garageAdmin = result.catalog.services.find(
-		(service) => service.id === "garage-admin",
-	);
-	const scrutinyCollector = result.catalog.services.find(
-		(service) => service.name === "Scrutiny Collector - albandrieu",
-	);
-
 	assert.equal(fetchCalled, false);
 	assert.equal(result.source, "local-fallback");
-	assert.ok(truenas);
-	assert.ok(pfsense);
-	assert.ok(garageS3);
-	assert.ok(garage);
-	assert.ok(garageAdmin);
-	assert.ok(scrutinyCollector);
-	assert.equal(scrutinyCollector.endpointEnabled, false);
-	assert.equal(
-		scrutinyCollector.healthNote,
-		"Expected upstream target: http://172.17.0.24:31054",
-	);
-	assert.equal(
-		homelabServiceEndpointUrl(truenas),
-		"https://truenas.albandrieu.com:7000/",
-	);
-	assert.equal(
-		homelabServiceEndpointUrl(pfsense),
-		"https://home.albandrieu.com:10443/",
-	);
-	assert.equal(
-		homelabServiceEndpointUrl(garageS3),
-		"https://s3.int.albandrieu.com",
-	);
-	assert.equal(
-		homelabServiceEndpointUrl(garage),
-		"https://garage.albandrieu.com",
-	);
-	assert.equal(
-		homelabServiceEndpointUrl(garageAdmin),
-		"https://garage-admin.albandrieu.com",
-	);
+	assert.equal(result.catalog.services.length, 1);
+	assert.equal(result.catalog.services[0].id, "homelab");
+	assert.equal(result.catalog.services[0].endpointEnabled, false);
 });
 
 test("homelab catalog prefers FastAPI and keeps upstream inventory/exposure authoritative", async () => {
@@ -209,8 +161,8 @@ test("homelab catalog prefers FastAPI and keeps upstream inventory/exposure auth
 
 	assert.equal(requestedUrl, HOMELAB_SERVICES_DEFAULT_API_URL);
 	assert.equal(result.source, "fastapi");
-	assert.equal(truenas?.endpointUrl, "https://truenas.albandrieu.com:7000/");
-	assert.equal(pfsense?.endpointUrl, "https://home.albandrieu.com:10443/");
+	assert.equal(truenas?.endpointUrl, undefined);
+	assert.equal(pfsense?.endpointUrl, undefined);
 	assert.equal(adguard?.external, true);
 	assert.equal(joplin?.external, true);
 	assert.equal(joplin?.tunnelUrl, "https://joplin.int.albandrieu.com");
@@ -222,50 +174,34 @@ test("homelab catalog prefers FastAPI and keeps upstream inventory/exposure auth
 	);
 });
 
-test("homelab catalog falls back to the repository JSON when FastAPI is unavailable", async () => {
+test("homelab fallback is generic if upstream FastAPI is unavailable", async () => {
 	setApiUrl("https://catalog.example.test/homelab");
 	globalThis.fetch = (async () =>
 		new Response("unavailable", { status: 503 })) as typeof fetch;
-
 	const result = await loadHomelabServicesCatalog();
-
 	assert.equal(result.source, "local-fallback");
-	assert.equal(result.primaryUrl, "https://catalog.example.test/homelab");
-	assert.ok(result.catalog.services.length > 1);
-	assert.equal(
-		homelabServiceEndpointUrl(
-			result.catalog.services.find((service) => service.name === "TrueNAS")!,
-		),
-		"https://truenas.albandrieu.com:7000/",
-	);
+	assert.equal(result.catalog.services.length, 1);
+	assert.equal(result.catalog.services[0].id, "homelab");
 });
 
-test("homelab proxy exposes which source served the catalog", async () => {
-	setApiUrl("https://catalog.example.test/homelab");
-	globalThis.fetch = (async () =>
-		Response.json({
-			services: [{ name: "Remote through proxy" }],
-		})) as typeof fetch;
-
+test("public homelab API refuses requests without querying FastAPI", async () => {
+	let fetchCalled = false;
+	globalThis.fetch = (async () => {
+		fetchCalled = true;
+		throw new Error("must not call upstream");
+	}) as typeof fetch;
 	const response = await GET();
-	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(response.headers.get("cache-control"), "no-store");
-	assert.equal(response.headers.get("x-homelab-services-source"), "fastapi");
-	assert.equal(
-		response.headers.get("x-homelab-services-primary"),
-		"https://catalog.example.test/homelab",
-	);
-	assert.equal(body.services[0].name, "Remote through proxy");
+	assert.equal(fetchCalled, false);
+	assert.equal(response.status, 404);
+	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+	assert.equal(response.headers.get("x-homelab-services-primary"), null);
+	assert.deepEqual(await response.json(), {
+		error: "Operational homelab data is private",
+	});
 });
 
-test("local fallback keeps the PostgreSQL identity aligned with dependency topology", () => {
-	const local = getStaticHomelabServicesCatalog().catalog;
-	const postgres = local.services.find(
-		(service) => homelabServiceId(service) === "postgresql",
-	);
-	assert.ok(postgres);
-	assert.equal(postgres.id, "postgresql");
-	assert.equal(postgres.internalPort, 5432);
+test("public fallback never exposes PostgreSQL binding details", () => {
+	const catalog = getStaticHomelabServicesCatalog().catalog;
+	assert.equal(catalog.services.length, 1);
+	assert.ok(!catalog.services.some((service) => homelabServiceId(service) === "postgresql"));
 });

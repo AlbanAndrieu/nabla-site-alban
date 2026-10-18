@@ -41,8 +41,8 @@ test("static architecture topology never probes FastAPI during prerender", () =>
 		const result = getStaticServiceTopology();
 		assert.equal(fetchCalled, false);
 		assert.equal(result.source, "local-fallback");
-		assert.ok(result.topology.nodes.length >= 10);
-		assert.ok(result.topology.relations.length >= 10);
+		assert.equal(result.topology.nodes.length, 1);
+		assert.equal(result.topology.relations.length, 0);
 	} finally {
 		globalThis.fetch = originalFetch;
 	}
@@ -67,8 +67,9 @@ test("architecture route uses a static declared shell with live shared service h
 
 	assert.match(page, /buildPageMetadata\(/);
 	assert.match(page, /slug: "architecture"/);
-	assert.match(page, /getStaticHomelabServicesCatalog\(\)/);
-	assert.match(page, /getStaticServiceTopology\(\)/);
+	assert.doesNotMatch(page, /getStaticHomelabServicesCatalog\(\)/);
+	assert.doesNotMatch(page, /getStaticServiceTopology\(\)/);
+	assert.doesNotMatch(page, /<ArchitectureTopologyView/);
 	assert.doesNotMatch(page, /loadHomelabServicesCatalog\(\)/);
 	assert.doesNotMatch(page, /loadServiceTopology\(\)/);
 	assert.match(explorer, /from "@xyflow\/react"/);
