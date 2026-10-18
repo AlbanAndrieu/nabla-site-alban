@@ -229,13 +229,15 @@ jobs:
             echo "::error::Canonical smoke failed on homelab 503 but this PR does not update the smoke policy."
             exit "$baseline_status"
           fi
-          if ! grep -Fq 'WARN /api/homelab-status degraded: FastAPI upstream unavailable (' "$candidate_smoke"; then
-            echo "::error::Candidate smoke is missing the reviewed homelab degraded-state contract."
+          if ! grep -Fq 'new Set([404])' "$candidate_smoke"; then
+            echo "::error::Candidate smoke must require the private 404 homelab contract."
             exit 1
           fi
 
-          echo "::warning::Canonical smoke hit the reviewed homelab 503 transition; validating the candidate smoke against the same production SHA."
-          DEPLOYED_SHA="$PRODUCTION_SHA" node "$candidate_smoke" "$BASE_URL"
+          # Candidate code is not deployed on the production domain yet: do NOT
+          # claim its 404 contract was observed on the old production release.
+          # New behavior is checked by source/unit contracts and Vercel Preview.
+          echo "::warning::Canonical smoke: reviewed 503 transition accepted for old production; candidate private 404 requires Preview and post-deploy validation."
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
