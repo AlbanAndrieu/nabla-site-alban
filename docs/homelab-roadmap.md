@@ -2,6 +2,12 @@
 
 ## P0/P1 — Confidentialité de /truenas et espace privé ops.albandrieu.com (2026-10-18)
 
+**Exécution P0** : [réconciliation des 5 dernières PR fusionnées](roadmap-merge-reconciliation-2026-10-18.md).
+La présente branche met en place le refus des API publiques et retire les pages/exports riches ;
+la réduction fonctionnelle est volontaire tant que `ops` n'est pas opérationnel.
+Ne pas compter une PR documentaire comme preuve de protection live.
+
+
 Épopée [#233](https://github.com/AlbanAndrieu/nabla-site-alban/issues/233) et
 [plan de confidentialité détaillé](private-homelab-observability.md) ; coordination
 [FastAPI #352](https://github.com/AlbanAndrieu/fastapi-sample/issues/352) /
