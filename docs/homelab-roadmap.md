@@ -1,5 +1,27 @@
 # Feuille de route homelab
 
+## P0/P1 — Confidentialité de /truenas et séparation de l'observabilité (2026-10-18)
+
+Épopée [#233](https://github.com/AlbanAndrieu/nabla-site-alban/issues/233) et
+[plan de confidentialité détaillé](private-homelab-observability.md) ; coordination
+[FastAPI #352](https://github.com/AlbanAndrieu/fastapi-sample/issues/352) /
+[Compose #262](https://github.com/AlbanAndrieu/nabla-compose/issues/262).
+
+- [ ] **P0** Scanner et fermer toutes les fuites des routes Next.js, des exports
+  `public/homelab-services.json` et `public/service-topology.json`, des assets
+  compilés, métadonnées et cache CDN ; publier uniquement un DTO à allowlist.
+- [ ] **P0** Ajouter des contrats de non-régression anti-fuite pour FR/EN,
+  HTML/JS/JSON et en-têtes, y compris scénarios dégradés et previews.
+- [ ] **P1** Remplacer les diagnostics publics par une vitrine sûre et un lien
+  vers un espace opérateur distinct derrière Cloudflare Access/Tunnel.
+- [ ] **P1** Recette conjointe et contrôle de la rémanence des caches avant clôture ;
+  pas de merge automatique ni de revendication de test live sans preuve.
+
+**Décision** : le masquage CSS/React ou la seule protection d'un path ne répond
+pas à l'exposition des API et fichiers statiques. Ne pas attendre Keycloak
+pour corriger les fuites P0.
+
+
 - [ ] **P1 — Nuclei public DAST + DefectDojo** : maintenir le profil hebdomadaire ou manuel borné sur `albanandrieu.com` (pas de scan à chaque push/PR), puis obtenir une première exécution complète sur `master` et lire les résultats par sévérité. Les scans interrompus restent `INCOMPLETE / NOT_RUN`. Stabiliser la provenance/version des templates et les exceptions par IDs ; importer les JSONL depuis un environnement autorisé ayant accès à DefectDojo, puis confirmer côté API. Les contrôles statiques du workflow ne remplacent pas la preuve d'exécution. Voir [procédure Nuclei](nuclei-security-scan.md).
 
 - [ ] **P1 — Transfert contrôlé Bababou #230** : distinguer audit générique de code en six phases et audit opérationnel du compte Cloudflare ; réutiliser les validateurs upstream du ledger/findings, l'upstream épinglé et la procédure de sandbox sans données sensibles. Ne pas confondre le validateur local de métadonnées avec une attestation de sécurité. Détails : [runbook](cloudflare-security-audit-runbook.md).
