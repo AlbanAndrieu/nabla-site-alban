@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) =>
+	readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const privateRoutes = [
 	"homelab-diagnostics",
 	"homelab-health",
@@ -35,7 +36,10 @@ test("fallback JSON and legacy documents have no operator-only fields", () => {
 		"public/locales/fr/freenas.html",
 	]) {
 		const source = read(path);
-		assert.doesNotMatch(source, /internalHost|internalPort|internalUrl|sourcePath|endpointUrl|tunnelUrl|172\.17\./);
+		assert.doesNotMatch(
+			source,
+			/internalHost|internalPort|internalUrl|sourcePath|endpointUrl|tunnelUrl|172\.17\./,
+		);
 		assert.doesNotMatch(source, /(?:10|172|192)\.\d+\.\d+\.\d+/);
 		assert.doesNotMatch(source, /https?:\/\/[^\s"'<>]+:\d{2,5}\b/);
 	}
@@ -52,7 +56,10 @@ test("public page entrypoints do not mount privileged components", () => {
 		"app/components/homelab/HomelabServicesSection.tsx",
 		"app/[locale]/architecture/page.tsx",
 	]) {
-		assert.doesNotMatch(read(path), /<HomelabServicesBlock|<HomelabOperationalEvidence|<HomelabOperationsDisclosure|<HomeLabNetworkFlow|<ArchitectureTopologyView|<ArchitectureImpactInspector/);
+		assert.doesNotMatch(
+			read(path),
+			/<HomelabServicesBlock|<HomelabOperationalEvidence|<HomelabOperationsDisclosure|<HomeLabNetworkFlow|<ArchitectureTopologyView|<ArchitectureImpactInspector/,
+		);
 	}
 	assert.match(
 		read("app/components/homelab/HomelabServicesSection.tsx"),

@@ -30,7 +30,14 @@ check_large_deletions() {
             # baselines make these exceptions inert.
             scripts/verify-master-baseline.sh | \
                 app/components/homelab/HomelabOperationalEvidence.tsx | \
-                lib/homelabHealth.ts | lib/homelabObservability.ts)
+                lib/homelabHealth.ts | lib/homelabObservability.ts | \
+                # Public P0 privacy migration: explicitly reviewed removal of previously
+                # published operational inventories/pages, not a general bypass.
+                app/\[locale\]/architecture/page.tsx | \
+                app/components/truenas/HomeLabSection.tsx | \
+                app/components/homelab/HomelabServicesSection.tsx | \
+                public/homelab-services.json | public/service-topology.json | \
+                public/freenas.html | public/locales/fr/freenas.html)
                 continue
                 ;;
             # Reviewed R1-R3 and R8-R9 component splits (PR #230): rendering stays

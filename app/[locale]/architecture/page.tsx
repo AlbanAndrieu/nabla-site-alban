@@ -18,7 +18,9 @@ export async function generateMetadata({
 	if (!hasLocale(routing.locales, locale)) return {};
 	const french = locale === "fr";
 	return buildPageMetadata({
-		title: french ? "Architecture de la plateforme Nabla" : "Nabla platform architecture",
+		title: french
+			? "Architecture de la plateforme Nabla"
+			: "Nabla platform architecture",
 		description: french
 			? "Principes de la plateforme : infrastructure, sécurité et observabilité. Les topologies opérationnelles restent privées."
 			: "Platform principles: infrastructure, security, and observability. Operational topologies are private.",
@@ -55,9 +57,15 @@ export default async function ArchitecturePage({
 								: "A self-hosted platform for security, services, and AI."}
 						</p>
 						<div className="d-flex flex-wrap gap-2 justify-content-center">
-							<ActionLink href={`${prefix}/ai`} variant="secondary">AI</ActionLink>
-							<ActionLink href={`${prefix}/truenas`} variant="secondary">TrueNAS</ActionLink>
-							<ActionLink href={`${prefix}/nabla`} variant="secondary">Nabla</ActionLink>
+							<ActionLink href={`${prefix}/ai`} variant="secondary">
+								AI
+							</ActionLink>
+							<ActionLink href={`${prefix}/truenas`} variant="secondary">
+								TrueNAS
+							</ActionLink>
+							<ActionLink href={`${prefix}/nabla`} variant="secondary">
+								Nabla
+							</ActionLink>
 						</div>
 					</div>
 				</section>
@@ -67,7 +75,10 @@ export default async function ArchitecturePage({
 					aria-labelledby="architecture-principles"
 				>
 					<div className="container py-5">
-						<SectionHeading id="architecture-principles" iconClass="fa-diagram-project">
+						<SectionHeading
+							id="architecture-principles"
+							iconClass="fa-diagram-project"
+						>
 							{french ? "Principes d’architecture" : "Architecture principles"}
 						</SectionHeading>
 						<p>
@@ -77,7 +88,9 @@ export default async function ArchitecturePage({
 						</p>
 						<p>
 							<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
-								{french ? "Consulter l’espace privé" : "Open private operations"}
+								{french
+									? "Consulter l’espace privé"
+									: "Open private operations"}
 							</a>
 						</p>
 					</div>
