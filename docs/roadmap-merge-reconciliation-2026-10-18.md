@@ -14,31 +14,31 @@ et `CI green / fonctionnalité déployée`.
 
 ## Manques et reliquats consolidés
 
-- [ ] **P0 contenu déjà exposé** : les anciens JSON publics, pages HTML,
+- **P0 contenu déjà exposé** : les anciens JSON publics, pages HTML,
   traductions, topologies et headers REST ont existé en production. Déploiement
   après review, purge des caches/CDN et snapshots Vercel/Preview, analyse des
   URLs directes, et recherche de secrets *réellement présents* pour rotation
   ciblée. Les anciennes versions Git publiques ne sont pas effaçables par
   la seule mise à jour de `master`.
-- [ ] **P0 surface hors `/truenas`** : revue continue des pages `/nabla`,
+- **P0 surface hors `/truenas`** : revue continue des pages `/nabla`,
   `/architecture`, `/ai`, `/security`, outils de génération OG, HTML
   historiques, messages Next Intl et ressources téléchargées. Aucune
   restauration automatique de détails via fallback FastAPI.
-- [ ] **P0 tests** : rejets 404 sur toutes les APIs Vercel sensibles, absence
+- **P0 tests** : rejets 404 sur toutes les APIs Vercel sensibles, absence
   de champs privés et de liens vers endpoints internes dans les fichiers
   `public/` et le HTML rendu; CI Node, Biome, lint, TypeScript, SAST/ZAP
   à valider sur le dernier HEAD. Scripts CI existants restent activés.
-- [ ] **P1 UX** : recréer sur `ops.albandrieu.com` les vues de service-first,
+- **P1 UX** : recréer sur `ops.albandrieu.com` les vues de service-first,
   architecture hiérarchique, métriques, sondes, evidence Freshness et
   déploiements avant de rétablir ces fonctionnalités en authentifié;
   ne pas présenter la vitrine simplifiée comme équivalente à ces vues.
-- [ ] **P1 Access / IdP** : PRs FastAPI #353 et Compose #263 sont des contrats
+- **P1 Access / IdP** : PRs FastAPI #353 et Compose #263 sont des contrats
   documentaires, vérifier leur état/merge actuel, implémenter contrôle identité
   vérifiable à l'origine, MFA et réseau sans bypass. Keycloak n'est pas
   un prérequis de la correction de publication.
-- [ ] **P1 performance / a11y** : conserver budget de logs #232, traitement
+- **P1 performance / a11y** : conserver budget de logs #232, traitement
   anti-oscillation #227, contraste AA #230, text-scale 200 % #231.
   Les captures Playwright précédentes ne prouvent pas le nouveau P0.
-- [ ] **P2 qualité** : rapprocher les comparaisons réellement mesurées de
+- **P2 qualité** : rapprocher les comparaisons réellement mesurées de
   logs AWK et des scénarios Dagger/local-first; ne pas déduire d'économies
   de tokens sans mesure.
