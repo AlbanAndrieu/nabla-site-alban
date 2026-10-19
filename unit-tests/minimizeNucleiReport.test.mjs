@@ -19,7 +19,7 @@ test("Nuclei collector artifact contains only approved high findings", () => {
 	assert.deepEqual(finding, {
 		"template-id": "cve-2026-1234",
 		type: "http",
-		info: { name: "Known security issue", severity: "high" },
+		info: { name: "cve-2026-1234", severity: "high" },
 		"matched-at": "https://www.albanandrieu.com",
 	});
 	assert.doesNotMatch(minimal, /SENSITIVE_/);
