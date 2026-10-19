@@ -1,5 +1,20 @@
 # Nuclei DAST public — Site Alban
 
+## Coordination CI/DAST au 19 octobre 2026
+
+- **Nuclei** : filtre HIGH/CRITICAL à la source déjà prévu et inchangé ;
+  cadence hebdomadaire/manuelle, 2 req/s, une concurrence. **NOT_RUN**
+  pour tout nouveau scan `master` non prouvé ; pas de nouveau DAST sur PR.
+- **ZAP Site Alban** : modification source-only dans la PR #236 :
+  production publie un JSON minimal compatible avec le collecteur privé
+  Compose #263, Preview ne publie plus de rapport brut. Validation du
+  workflow déployé **INCOMPLETE**, anciens artefacts GitHub déjà publiés
+  à inventorier et expirer/purger selon permissions.
+- **DefectDojo** : nom du parseur OSS **`ZAP Scan`** ; GitHub App,
+  engagement préexistant, RBAC, parsing installé, Celery et déduplication
+  **NOT_RUN**. Aucun import ni push depuis un runner public.
+
+
 ## Portée et exécution
 
 Le workflow [Nuclei public DAST](../.github/workflows/nuclei-public.yml) cible exclusivement `https://albanandrieu.com` depuis GitHub Actions chaque lundi à 04:19 UTC, ou manuellement via `workflow_dispatch`. **Ce n'est pas un scan de l'homelab**. Il ne suit pas une URL fournie par l'utilisateur, n'injecte pas de Service Token et ne sonde aucune adresse privée. Le trafic de production est limité à 2 requêtes/s et une seule concurrence ; les modèles DoS, fuzzing, brute force et les tests OAST (`-ni`) sont exclus. Le rapport JSONL reste un artefact GitHub à conservation de trois jours.
@@ -99,7 +114,7 @@ restent à conservation limitée et **ne sont jamais envoyés directement vers
   établir les comptes par sévérité, puis le supprime **avant** upload.
 - **ZAP production** : `zap-production-report` produit actuellement
   `report_json.json`. Le collecteur convertit ce JSON en XML expurgé
-  et utilise le scanner DefectDojo OSS `Zed Attack Proxy` (format XML),
+  et utilise le scanner DefectDojo OSS `ZAP Scan` (format XML),
   avec les alertes `riskcode=3` uniquement. **Point bloquant avant
   ingestion automatique** : `zaproxy/action-baseline` archive encore
   lui-même le rapport non expurgé dans GitHub Actions. Aucun filtre
