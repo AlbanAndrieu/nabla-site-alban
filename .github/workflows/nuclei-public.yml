@@ -78,9 +78,10 @@ jobs:
             -severity medium,high,critical \
             -etags dos,fuzz,bruteforce,intrusive \
             -rl 2 -c 1 -timeout 5 -retries 0 \
-            -duc -jsonl -o nuclei-results/nuclei.jsonl \
+            -duc -jsonl -o nuclei-results/nuclei.raw.jsonl \
             "${exclusion_args[@]}"
-          test -f nuclei-results/nuclei.jsonl || : > nuclei-results/nuclei.jsonl
+          test -f nuclei-results/nuclei.raw.jsonl || : > nuclei-results/nuclei.raw.jsonl
+          node scripts/security/minimize-nuclei-report.mjs nuclei-results/nuclei.raw.jsonl nuclei-results/nuclei.jsonl
           node scripts/nuclei-to-sarif.mjs nuclei-results/nuclei.jsonl nuclei-results/nuclei.sarif
 
       - name: Summarize Nuclei findings and reviewed exclusions
@@ -93,8 +94,13 @@ jobs:
             echo "## Nuclei public DAST — INCOMPLETE / NOT_RUN" >> "$GITHUB_STEP_SUMMARY"
             echo "Scan did not complete successfully (failed, canceled or not started); partial or empty results are not zero findings." >> "$GITHUB_STEP_SUMMARY"
           else
-            node scripts/nuclei-summary.mjs nuclei-results/nuclei.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
+            node scripts/nuclei-summary.mjs nuclei-results/nuclei.raw.jsonl .nuclei/ignore-templates.txt >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Delete raw Nuclei HTTP evidence before uploading artifacts
+        if: always()
+        shell: bash
+        run: rm -f nuclei-results/nuclei.raw.jsonl
 
       - name: Upload scan report (restricted artifact lifetime)
         if: always() && hashFiles('nuclei-results/nuclei.jsonl') != ''
