@@ -11,7 +11,10 @@ test("Nuclei artifact removes captured HTTP evidence and URL paths", () => {
 		response: "synthetic-response-marker",
 	});
 	const output = minimizeNucleiJsonl(raw);
-	assert.doesNotMatch(output, /internal-mark|synthetic-request-marker|synthetic-response-marker|login/);
+	assert.doesNotMatch(
+		output,
+		/internal-mark|synthetic-request-marker|synthetic-response-marker|login/,
+	);
 	assert.deepEqual(JSON.parse(output), {
 		"template-id": "cve-2026-1234",
 		type: "http",
