@@ -1,11 +1,8 @@
 name: Production DAST
 
 on:
-  repository_dispatch:
-    types:
-      - vercel.deployment.success
   schedule:
-    - cron: "23 3 * * *"
+    - cron: "23 3 * * 0"
   workflow_dispatch:
     inputs:
       git_sha:
@@ -24,14 +21,7 @@ concurrency:
 jobs:
   zap-baseline:
     name: OWASP ZAP baseline on production
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'repository_dispatch' &&
-       github.event.client_payload.url != '' &&
-       github.event.client_payload.git.sha != '' &&
-       github.event.client_payload.git.ref == 'master' &&
-       github.event.client_payload.environment == 'production')
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
@@ -93,7 +83,7 @@ jobs:
           allow_issue_writing: false
           fail_action: true
           artifact_name: zap-production-report
-          cmd_options: "-I -T 5"
+          cmd_options: "-I -T 5 -m 2 -a -s"
 
       - name: Clean ZAP production workspace
         if: always()

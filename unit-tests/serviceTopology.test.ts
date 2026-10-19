@@ -4,223 +4,103 @@ import test from "node:test";
 import { parseServiceTopology } from "../lib/serviceTopology";
 import {
 	hasRequiredTopologyRelation,
-	hasTopologyEdge,
 	hasTopologyRelation,
 	loadLocalServiceTopology,
-	assertRequiredRelation as required,
 } from "./helpers/serviceTopology";
 
-test("local topology fallback is a valid connected graph", async () => {
-	const topology = await loadLocalServiceTopology();
-
-	assert.ok(topology.nodes.length >= 10);
-	assert.ok(topology.relations.length >= 10);
-	assert.ok(hasTopologyEdge(topology, "openwebui", "litellm"));
-	assert.ok(hasTopologyEdge(topology, "litellm", "ollama"));
-});
-
-test("local fallback preserves the Elasticsearch and Kibana multi-service contract", async () => {
-	const topology = await loadLocalServiceTopology();
-	const nodeIds = new Set(topology.nodes.map((node) => node.id));
-	assert.ok(nodeIds.has("elasticsearch"));
-	assert.ok(nodeIds.has("kibana"));
-	assert.ok(nodeIds.has("docker"));
-	assert.ok(nodeIds.has("truenas"));
-
-	assert.ok(
-		hasRequiredTopologyRelation(
-			topology,
-			"kibana",
-			"elasticsearch",
-			"dependsOn",
-		),
-	);
-	required(topology, "elasticsearch", "docker", "hostedBy");
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "kibana", "docker", "hostedBy"),
-	);
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "docker", "truenas", "hostedBy"),
+test("public topology is a sanitized, valid overview", async () => {
+	const graph = await loadLocalServiceTopology();
+	assert.equal(graph.version, 1);
+	assert.equal(graph.nodes.length, 1);
+	assert.deepEqual(graph.relations, []);
+	assert.doesNotMatch(
+		JSON.stringify(graph),
+		/internalUrl|sourcePath|172\.17\.|endpointUrl|tunnelUrl/,
 	);
 });
 
-test("local fallback tracks current runtime placement and Talos topology", async () => {
-	const topology = await loadLocalServiceTopology();
-	const nodeIds = new Set(topology.nodes.map((node) => node.id));
-	for (const id of [
-		"fastapi-sample",
-		"influxdb",
-		"scrutiny",
-		"scrutiny-collector",
-		"talos",
-		"kubernetes",
-	]) {
-		assert.ok(nodeIds.has(id), `expected authoritative fallback node ${id}`);
-	}
-
-	required(topology, "fastapi-sample", "docker", "hostedBy");
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "scrutiny", "influxdb", "storesIn"),
-	);
-	required(topology, "scrutiny-collector", "scrutiny", "consumesApi");
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "kubernetes", "talos", "hostedBy"),
-	);
-	assert.ok(
-		hasRequiredTopologyRelation(topology, "talos", "truenas", "hostedBy"),
-	);
-});
-
-test("Garage models direct S3 ingress separately from Cloudflare Tunnel administration surfaces", async () => {
-	const topology = await loadLocalServiceTopology();
-	const nodes = new Map(topology.nodes.map((node) => [node.id, node]));
-	assert.equal(nodes.get("garage")?.url, "https://s3.int.albandrieu.com");
-	assert.equal(nodes.get("garage-webui")?.url, "https://garage.albandrieu.com");
-	assert.equal(
-		nodes.get("garage-admin")?.url,
-		"https://garage-admin.albandrieu.com",
-	);
-	assert.ok(nodes.has("cloudflared"));
-
-	assert.ok(hasTopologyRelation(topology, "garage", "traefik", "exposedBy"));
-	assert.ok(
-		hasTopologyRelation(topology, "garage-webui", "cloudflared", "exposedBy"),
-	);
-	assert.ok(
-		hasTopologyRelation(topology, "garage-admin", "cloudflared", "exposedBy"),
-	);
-	assert.equal(
-		topology.relations.some(
-			(relation) =>
-				relation.source === "garage-webui" &&
-				relation.target === "traefik" &&
-				relation.type === "exposedBy",
-		),
-		false,
-	);
-});
-
-test("topology parser accepts hostedBy placement edges", () => {
-	const topology = parseServiceTopology({
+test("the parser retains relation and security contracts on synthetic private data", () => {
+	const graph = parseServiceTopology({
 		version: 1,
-		name: "hosting",
+		name: "synthetic private fixture",
 		nodes: [
-			{ id: "service", name: "Service", kind: "application", category: "test" },
 			{
-				id: "docker",
-				name: "Docker",
-				kind: "container-runtime",
-				category: "infrastructure",
+				id: "application",
+				name: "Application",
+				kind: "service",
+				category: "test",
+			},
+			{
+				id: "database",
+				name: "Database",
+				kind: "database",
+				category: "test",
+				internalUrl: "https://database.example.invalid",
+				securityFunctions: ["protect"],
+			},
+			{
+				id: "runtime",
+				name: "Runtime",
+				kind: "container",
+				category: "test",
 			},
 		],
 		relations: [
 			{
-				source: "service",
-				target: "docker",
-				type: "hostedBy",
-				strength: "required",
-				evidence: ["x-nabla.runtime.containerService"],
-			},
-		],
-	});
-
-	assert.ok(topology);
-	assert.equal(topology.relations[0]?.type, "hostedBy");
-});
-
-test("topology parser rejects edges with unknown nodes", () => {
-	const topology = parseServiceTopology({
-		version: 1,
-		name: "invalid",
-		nodes: [{ id: "a", name: "A", kind: "service", category: "test" }],
-		relations: [
-			{
-				source: "a",
-				target: "missing",
+				source: "application",
+				target: "database",
 				type: "dependsOn",
 				strength: "required",
-				evidence: ["test"],
+				evidence: ["fixture"],
+			},
+			{
+				source: "database",
+				target: "runtime",
+				type: "hostedBy",
+				strength: "required",
+				evidence: ["fixture"],
 			},
 		],
 	});
-
-	assert.equal(topology, null);
-});
-
-test("local topology fallback is synchronized with the current Nabla Compose catalog", async () => {
-	const topology = await loadLocalServiceTopology();
-
-	if (topology.catalogRevision !== undefined) {
-		assert.match(topology.catalogRevision, /^sha256:[0-9a-f]{64}$/);
-	}
-	assert.equal(topology.nodes.length, 113);
-	assert.equal(topology.relations.length, 216);
-
-	const nodeIds = new Set(topology.nodes.map((node) => node.id));
-	for (const id of [
-		"akvorado-console",
-		"akvorado-inlet",
-		"akvorado-orchestrator",
-		"akvorado-outlet",
-		"clamav",
-		"docker-socket-proxy",
-		"doco-cd",
-		"kafka",
-		"keycloak",
-		"mongo",
-		"nexus",
-		"pfsense-unbound",
-		"pihole-dns-sync",
-		"pyroscope",
-		"sentry-edge",
-		"sentry-relay",
-		"sentry-snuba-api",
-		"sentry-taskbroker",
-		"sentry-taskworker",
-	]) {
-		assert.ok(nodeIds.has(id), `expected synchronized topology node ${id}`);
-	}
-
+	assert.ok(graph);
 	assert.ok(
-		hasTopologyRelation(topology, "pfsense-unbound", "pihole", "dependsOn"),
+		hasRequiredTopologyRelation(graph, "application", "database", "dependsOn"),
 	);
-	assert.ok(
-		hasTopologyRelation(topology, "keycloak", "postgresql", "dependsOn"),
+	assert.ok(hasTopologyRelation(graph, "database", "runtime", "hostedBy"));
+	assert.equal(
+		graph.nodes.find((node) => node.id === "database")?.internalUrl,
+		"https://database.example.invalid",
 	);
-	assert.ok(
-		hasTopologyRelation(topology, "openwebui", "cloudflared", "exposedBy"),
-	);
-	assert.ok(
-		hasTopologyRelation(topology, "pihole-dns-sync", "pihole", "automates"),
-	);
-	assert.ok(
-		hasTopologyRelation(topology, "akvorado-inlet", "kafka", "routesTo"),
-	);
-	assert.ok(
-		hasTopologyRelation(topology, "akvorado-outlet", "clickhouse", "storesIn"),
-	);
-	assert.ok(hasTopologyRelation(topology, "pyroscope", "docker", "hostedBy"));
-	assert.ok(
-		hasTopologyRelation(topology, "sentry-edge", "sentry-relay", "routesTo"),
-	);
-});
-
-test("local topology preserves FastAPI Sample production and staging environments", async () => {
-	const topology = await loadLocalServiceTopology();
-	const sample = topology.nodes.find((node) => node.id === "fastapi-sample");
 	assert.deepEqual(
-		sample?.environments?.map((environment) => environment.name),
-		["production", "staging"],
+		graph.nodes.find((node) => node.id === "database")?.securityFunctions,
+		["protect"],
+	);
+});
+
+test("topology parser rejects relations referencing unknown nodes", () => {
+	assert.equal(
+		parseServiceTopology({
+			version: 1,
+			name: "invalid",
+			nodes: [
+				{ id: "a", name: "A", kind: "service", category: "test" },
+			],
+			relations: [
+				{
+					source: "a",
+					target: "missing",
+					type: "dependsOn",
+					strength: "required",
+					evidence: ["fixture"],
+				},
+			],
+		}),
+		null,
 	);
 });
 
 test("topology parser validates deployment environment names and URLs", () => {
-	const base = {
-		version: 1,
-		name: "environment-contract",
-		relations: [],
-	};
-
+	const base = { version: 1, name: "environments", relations: [] };
 	assert.ok(
 		parseServiceTopology({
 			...base,
@@ -235,59 +115,34 @@ test("topology parser validates deployment environment names and URLs", () => {
 			],
 		}),
 	);
-	assert.equal(
-		parseServiceTopology({
-			...base,
-			nodes: [
-				{
-					id: "sample",
-					name: "Sample",
-					kind: "api",
-					category: "test",
-					environments: [
-						{
-							name: "qa",
-							url: "https://qa.example.com",
-							external: true,
-							cloudflareTunnel: false,
-						},
-					],
-				},
-			],
-		}),
-		null,
-	);
-	assert.equal(
-		parseServiceTopology({
-			...base,
-			nodes: [
-				{
-					id: "sample",
-					name: "Sample",
-					kind: "api",
-					category: "test",
-					environments: [
-						{
-							name: "production",
-							url: " ",
-							external: true,
-							cloudflareTunnel: false,
-						},
-					],
-				},
-			],
-		}),
-		null,
-	);
-});
-
-test("synchronized topology preserves internal URL and security-function metadata", async () => {
-	const topology = await loadLocalServiceTopology();
-	const clamav = topology.nodes.find((node) => node.id === "clamav");
-	assert.equal(clamav?.internalUrl, "https://clamav.int.albandrieu.com");
-	assert.deepEqual(clamav?.securityFunctions, ["protect", "detect"]);
-	assert.equal(
-		topology.nodes.find((node) => node.id === "pfsense-unbound")?.criticality,
-		"critical",
-	);
+	for (const environment of [
+		{
+			name: "qa",
+			url: "https://qa.example.invalid",
+			external: true,
+			cloudflareTunnel: false,
+		},
+		{
+			name: "production",
+			url: " ",
+			external: true,
+			cloudflareTunnel: false,
+		},
+	]) {
+		assert.equal(
+			parseServiceTopology({
+				...base,
+				nodes: [
+					{
+						id: "sample",
+						name: "Sample",
+						kind: "api",
+						category: "test",
+						environments: [environment],
+					},
+				],
+			}),
+			null,
+		);
+	}
 });

@@ -337,22 +337,19 @@ test("bounded homelab probes use the dedicated FastAPI probe matrix", async () =
 	assert.equal(result.snapshot?.probe_summary?.catalog_service_count, 72);
 });
 
-test("same-origin bounded probe route is no-store and exposes the dedicated source", async () => {
+test("public probe endpoint is inaccessible, no-store and never calls private FastAPI", async () => {
 	setProbesApiUrl("https://probes.example.test/homelab");
-	globalThis.fetch = (async () =>
-		Response.json(VALID_SNAPSHOT)) as typeof fetch;
+	let calls = 0;
+	globalThis.fetch = (async () => {
+		calls++;
+		throw new Error("Public endpoint must not proxy a private probe");
+	}) as typeof fetch;
 
 	const response = await GET_PROBES();
-	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(response.headers.get("cache-control"), "no-store, max-age=0");
-	assert.equal(response.headers.get("pragma"), "no-cache");
-	assert.equal(
-		response.headers.get("x-homelab-health-source"),
-		"fastapi-probes",
-	);
-	assert.equal(body.probe_summary.public.scheduled, 1);
+	assert.equal(response.status, 404);
+	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+	assert.equal(response.headers.get("x-homelab-health-source"), null);
+	assert.equal(calls, 0);
 });
 
 test("homelab health returns unavailable so endpoint-level fallback can run", async () => {
@@ -367,140 +364,23 @@ test("homelab health returns unavailable so endpoint-level fallback can run", as
 	assert.equal(result.primaryUrl, "https://health.example.test/homelab");
 });
 
-test("homelab health proxy exposes the FastAPI snapshot and cache policy", async () => {
+test("public health endpoint never leaks board, aggregate, probe or error details", async () => {
 	setApiUrl("https://health.example.test/homelab");
-	setProbesApiUrl("https://probes.example.test/homelab");
-	globalThis.fetch = (async (input) => {
-		if (String(input) === "https://probes.example.test/homelab") {
-			return new Response("probe fallback unavailable", { status: 503 });
-		}
-		return Response.json(VALID_SNAPSHOT);
-	}) as typeof fetch;
-
-	const response = await GET();
-	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi");
-	assert.equal(
-		response.headers.get("x-homelab-health-primary"),
-		"https://health.example.test/homelab",
-	);
-	assert.match(response.headers.get("cache-control") ?? "", /s-maxage=15/);
-	assert.equal(body.services[0].http_status, 200);
-	assert.equal(body.truenas.state, "fail");
-});
-
-test("homelab health proxy propagates health-board freshness into the JSON contract", async () => {
 	setBoardApiUrl("https://board.example.test/api");
-	globalThis.fetch = (async (input) => {
-		if (String(input) === "https://board.example.test/api") {
-			return Response.json({
-				schema_version: 1,
-				state: "fresh",
-				refreshing: false,
-				generated_at: "2026-09-09T14:21:06Z",
-				age_seconds: 3.4,
-				error: null,
-				runtime: null,
-				healthz: null,
-				homelab: VALID_SNAPSHOT,
-				platform_metrics: null,
-				sickz: null,
-			});
-		}
-		return new Response("unexpected fallback", { status: 503 });
-	}) as typeof fetch;
-
-	const response = await GET();
-	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(
-		response.headers.get("x-homelab-health-source"),
-		"fastapi-health-board",
-	);
-	assert.equal(body.health_board.state, "fresh");
-	assert.equal(body.health_board.refreshing, false);
-	assert.equal(body.health_board.age_seconds, 3.4);
-	assert.equal(body.health_board.generated_at, "2026-09-09T14:21:06Z");
-});
-
-test("stale health-board does not overwrite a fresher aggregate snapshot", async () => {
-	setBoardApiUrl("https://board.example.test/api");
-	setApiUrl("https://health.example.test/homelab");
-	globalThis.fetch = (async (input) => {
-		const url = String(input);
-		if (url === "https://board.example.test/api") {
-			return Response.json({
-				schema_version: 1,
-				state: "stale",
-				refreshing: true,
-				generated_at: "2026-09-09T14:21:06Z",
-				age_seconds: 63.4,
-				error: null,
-				runtime: null,
-				healthz: null,
-				homelab: {
-					...VALID_SNAPSHOT,
-					services: [
-						{ ...VALID_SNAPSHOT.services[0], state: "fail", reachable: false },
-					],
-				},
-				platform_metrics: null,
-				sickz: null,
-			});
-		}
-		if (url === "https://health.example.test/homelab") {
-			return Response.json(VALID_SNAPSHOT);
-		}
-		return new Response("unexpected", { status: 503 });
-	}) as typeof fetch;
-
-	const response = await GET();
-	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(response.headers.get("x-homelab-health-source"), "fastapi");
-	assert.equal(response.headers.get("x-homelab-health-board-state"), "stale");
-	assert.equal(body.services[0].state, "ok");
-	assert.equal(body.health_board.state, "stale");
-});
-
-test("homelab health proxy returns 503 when FastAPI is unavailable", async () => {
-	setApiUrl("https://health.example.test/homelab");
-	globalThis.fetch = (async () =>
-		new Response("unavailable", { status: 503 })) as typeof fetch;
-
-	const response = await GET();
-
-	assert.equal(response.status, 503);
-	assert.equal(response.headers.get("cache-control"), "no-store");
-	assert.equal(response.headers.get("x-homelab-health-source"), "unavailable");
-});
-
-test("homelab health proxy falls back to bounded probes when board and aggregate are unavailable", async () => {
-	setApiUrl("https://health.example.test/homelab");
 	setProbesApiUrl("https://probes.example.test/homelab");
-	globalThis.fetch = (async (input) => {
-		const url = String(input);
-		if (url === "https://probes.example.test/homelab") {
-			return Response.json(VALID_SNAPSHOT);
-		}
-		return new Response("unavailable", { status: 503 });
+	let calls = 0;
+	globalThis.fetch = (async () => {
+		calls++;
+		throw new Error("Private FastAPI must not be queried");
 	}) as typeof fetch;
 
 	const response = await GET();
 	const body = await response.json();
-
-	assert.equal(response.status, 200);
-	assert.equal(
-		response.headers.get("x-homelab-health-source"),
-		"fastapi-probes",
-	);
-	assert.equal(
-		response.headers.get("x-homelab-health-primary"),
-		"https://probes.example.test/homelab",
-	);
-	assert.equal(body.probe_summary.public.scheduled, 1);
+	assert.equal(response.status, 404);
+	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+	assert.equal(response.headers.get("x-homelab-health-primary"), null);
+	assert.equal(response.headers.get("x-homelab-health-source"), null);
+	assert.equal(body.health_board, undefined);
+	assert.equal(body.services, undefined);
+	assert.equal(calls, 0);
 });

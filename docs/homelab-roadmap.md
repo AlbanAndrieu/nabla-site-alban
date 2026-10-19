@@ -1,5 +1,28 @@
 # Feuille de route homelab
 
+## P0/P1 — Security gates Trivy, CodeQL, Semgrep, ZAP et DefectDojo (2026-10-19)
+
+Contrat [scans/ingestion privée](security-scans-defectdojo-handoff.md) ; implémentation sur
+[PR #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236), sans nouvelle PR.
+
+- [x] Trivy filesystem/lockfile (vuln, misconfig, license), filtre bloquant Critical
+  et SBOM CycloneDX `master` préparés dans `.github/workflows/security-supply-chain.yml`.
+  La couverture effective et les conclusions restent dépendantes des exécutions.
+- [ ] CodeQL : garder le **Default Setup** existant et vérifier dans GitHub ses alertes et la suite `security-extended` ; ne pas déclarer un second Advanced Setup ou un blocage Critical non prouvé.
+- [x] BetterLeaks reste dans pre-commit/quality gate ; Semgrep PR, ZAP Preview
+  et Nuclei/ZAP production existants ne sont pas remplacés ni dupliqués.
+- [ ] Examiner règles Semgrep supplémentaires pour Next.js/SSR, proxy public,
+  authorization, secrets et XSS, avec tests de détection et sans faux positifs bloquants.
+- [ ] Examiner ZAP API/OpenAPI + spider élargi uniquement à cadence manuelle/staging
+  contrôlée ; Nuclei conserve budget réseau et template IDs validés.
+- [ ] Livrer collecteur LAN read-only GitHub pour rapports réussis sur master,
+  provenance SHA/run, mapping produit allowlist, redaction et reimport DefectDojo.
+  Aucun runner GitHub ne se connecte à `.int`; aucune collecte automatique
+  de logs/PII/snapshots complets. À coordonner avec `nabla-compose`.
+- [ ] Tests de format JSON/validité et CI exact HEAD ; mettre `NOT_RUN` lorsque
+  seule la source a été examinée.
+
+
 ## P0/P1 — Confidentialité de /truenas et espace privé ops.albandrieu.com (2026-10-18)
 
 **Exécution P0** : [réconciliation des 5 dernières PR fusionnées](roadmap-merge-reconciliation-2026-10-18.md).
