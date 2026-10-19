@@ -1,5 +1,33 @@
 # Security scans & DefectDojo — contrat de collecte privé
 
+## Mise à jour producteur ZAP — PR #236, 19 octobre 2026
+
+**Code préparé, validation runtime INCOMPLETE** : `master-dast.yml` remplace
+`zaproxy/action-baseline` par `zap-baseline.py` (même profil passif
+`-I -T 5 -m 2 -a -s`) sans téléversement automatique. Le JSON complet,
+les instances, cookies et journaux HTTP restent dans `RUNNER_TEMP` et
+sont supprimés sur tous les chemins de sortie. La publication explicite
+`zap-production-report` (rétention 3 jours) contient **uniquement**
+`report_json.json` réduit à `site[].@name` (origine HTTPS publique
+allowlistée) et `site[].alerts[].{pluginid,riskcode,alert}` (règles HIGH,
+libellé calculé sur l'identifiant, aucune preuve). Si le scanner ou
+l'expurgation échoue, **aucun artefact n'est téléversé**.
+
+`zap-preview.yml` n'utilise plus l'action auto-upload : seuls les comptes
+par gravité sont conservés dans le résumé ; aucun rapport ZAP Preview
+n'est publié. Ce workflow est invoqué via la branche par défaut par
+`repository_dispatch`, donc sa nouvelle définition est **NOT_RUN**
+tant qu'elle n'a pas été déployée et vérifiée séparément.
+
+Le collecteur unique dans Compose #263 conserve le contrat
+`zap-production-report/report_json.json` et la conversion privée en
+XML **`ZAP Scan`**. L'import reste **NOT_RUN / non autorisé** sans
+consentement pour la GitHub App, sans validation du parser installé et
+sans engagement/RBAC approuvés. Les rapports ZAP des **autres dépôts**
+(notamment Bababou) ne bénéficient pas automatiquement de ce correctif
+producteur ; vérifier séparément leur confidentialité avant acceptation.
+
+
 Date : 2026-10-19. Cette documentation ne déploie ni DefectDojo ni un collecteur.
 
 ## Matrice exécution / budget
@@ -93,15 +121,11 @@ restent à conservation limitée et **ne sont jamais envoyés directement vers
   autorisée. Réponses, requêtes, chemins et paramètres ne sont pas publiés
   dans ce JSONL. Le scan conserve en mémoire de job un JSONL brut pour
   établir les comptes par sévérité, puis le supprime **avant** upload.
-- **ZAP production** : `zap-production-report` produit actuellement
-  `report_json.json`. Le collecteur convertit ce JSON en XML expurgé
-  et utilise le scanner DefectDojo OSS `ZAP Scan` (format XML),
-  avec les alertes `riskcode=3` uniquement. **Point bloquant avant
-  ingestion automatique** : `zaproxy/action-baseline` archive encore
-  lui-même le rapport non expurgé dans GitHub Actions. Aucun filtre
-  applicatif ultérieur sur TrueNAS ne garantit sa confidentialité.
-  Remplacer cet upload par un artefact minimisé avant de réautoriser
-  l'automatisation ZAP ou exécuter les DAST sensibles dans le LAN.
+- **ZAP production** : depuis les changements non fusionnés de #236, émission
+  explicite d'un `report_json.json` à schéma minimal `site/alerts` (origines
+  approuvées et identifiants HIGH seulement), sans artefact brut. Compose convertit
+  ce JSON en XML interne `ZAP Scan` et conserve l'approbation indépendante.
+  **INCOMPLETE** jusqu'à l'exécution réelle sur `master` et acceptation parser.
 
 Contrôles nécessaires : provenance `master`/SHA/run/workflow, test de parser
 sur l'édition DefectDojo effectivement installée, interdiction de rejouer
