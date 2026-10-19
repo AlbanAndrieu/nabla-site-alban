@@ -1,11 +1,26 @@
 # Feuille de route homelab
 
+## État du chantier DefectDojo / Preview — 19 octobre 2026 (HEAD de la PR #236)
+
+| Périmètre | Statut | Preuve / limite |
+| --- | --- | --- |
+| Quality + Trivy du HEAD initial `8a19211` | **PASS** | GitHub Actions #39325632157 (quality), #39325632138 |
+| Vercel + ZAP Preview du même HEAD | **PASS** | Statuses exact-SHA, ZAP run #39326142900 ; **ancien scanner**, pas la nouvelle implémentation |
+| Playwright Preview du même HEAD | **FAIL** | Run #39326142907 : 184 passés, 3 ignorés, 1 échec dû aux deux injections `addInitScript` concurrentes (thème dark resté light) |
+| Correction E2E | **INCOMPLETE** | Contextes Playwright distincts en light/dark, puis migration des fixtures détaillées vers `tests/ops-homelab-health-visual.spec.ts` (opt-in privé uniquement) ; nouvelle Preview pas encore attestée |
+| ZAP production et Preview — confidentialité source | **INCOMPLETE** | Dans cette PR, action à téléversement brut supprimée ; CLI ZAP conserve le brut dans le runner, production n'upload que `report_json.json` minimisé, Preview n'upload aucun ZAP. Test d'exécution réel post-merge restant |
+| GitHub App → TrueNAS → DefectDojo | **NOT_RUN** | Identité, environnement, parser installé, RBAC, déduplication et traitement Celery non vérifiés en runtime ; aucun import approuvé |
+| E2E opérateur `ops.albandrieu.com` | **NOT_RUN** | Tests privés sous `OPS_E2E_ENABLED=YES`, environnement authentifié/privé absent de la CI publique |
+
+**Frontière P0 :** ne jamais remettre les fixtures de santé, IP, endpoints privés ni rapports ZAP HTTP bruts sur Vercel public. `PASS` sur l'ancien SHA ne vaut pas `PASS` du dernier commit.
+
+
 ## Transition des contrats E2E publics — 19 octobre 2026
 
 - [x] Replacer les attentes d'API publique riche par des assertions `404`, `no-store` et sans provenance upstream.
 - [x] En PR #236, contrôler les deep links obsolètes, l'absence de graphe privé et d'états de santé sur `/truenas` et `/architecture`, FR/EN selon le cas.
 - [x] Nuclei ne publie le JSONL expurgé que lorsque le scan complet a réussi; contrat de minimisation testé avec URLs contenant secrets simulés.
-- [ ] Migrer les anciens tests visuels détaillés de santé et navigation opérateur vers l'espace `ops.albandrieu.com` après Cloudflare Access + JWT origin, jamais les restaurer sur Vercel public.
+- [x] Déplacer les fixtures visuelles et tests de santé vers `tests/ops-homelab-health-visual.spec.ts`, explicitement privés et désactivés en CI publique. Validation fonctionnelle sur l'UI `ops` : **NOT_RUN**, conditionnée par Access + JWT origin.
 - [ ] Vérifier la CI Playwright Preview sur le HEAD exact après migration des tests ; un succès local source-only n'est pas une preuve de déploiement.
 
 
@@ -27,10 +42,7 @@ et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263).
   source `alban` / `bababou` explicite, approbation d'import distincte,
   Trivy vuln High/Critical uniquement, Nuclei minimisé, conversion ZAP
   JSON en XML et type DefectDojo **`ZAP Scan`**.
-- [ ] **Gate confidentialité ZAP** : l'action `zaproxy/action-baseline` publie
-  encore son propre artefact contenant des données brutes. Ne pas importer
-  automatiquement celui-ci avant retrait/chiffrement à la source ou
-  justification documentée de sa non-sensibilité.
+- [x] **Gate confidentialité ZAP au niveau source (code)** : suppression de l'action auto-upload dans production et Preview ; rapport production minimal seul dans l'artefact, aucun artefact ZAP Preview. **INCOMPLETE** jusqu'au test réel du workflow après déploiement ; les anciens ZIPs doivent expirer/être purgés.
 - [ ] **Gate runtime** : GitHub App autorisée (Actions:read par dépôt), clé
   matérialisée depuis Vaultwarden, cron TrueNAS initialement désactivé,
   parser installé `ZAP Scan`, engagement et RBAC réels, déduplication et
