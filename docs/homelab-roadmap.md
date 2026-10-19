@@ -1,5 +1,36 @@
 # Feuille de route homelab
 
+## Réconciliation — collecteur DefectDojo privé (19 octobre 2026)
+
+Coordination : [Site #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236)
+et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263).
+
+- [x] Nuclei hebdomadaire/manuel uniquement : sortie JSONL publiée après
+  minimisation à `template-id`, gravité et origine HTTPS autorisée ;
+  les titres proviennent de l'ID canonique, jamais d'une réponse reflétée.
+  Le JSONL brut est supprimé avant l'upload ; un scan incomplet ne peut être importé.
+- [x] Produire le rapport d'entrée attendu dans la branche de confiance :
+  `nuclei-results/nuclei.jsonl`; garder `trivy-security.json` au sein
+  de `trivy-master-<sha>` et `report_json.json` pour ZAP master.
+- [x] Maintenir les gates BetterLeaks/Semgrep, Trivy Critical et la politique
+  économique ZAP/Nuclei : **aucun DAST long supplémentaire sur chaque PR**.
+- [x] Côté Compose #263 : sélection du dernier run par workflow et dépôt,
+  source `alban` / `bababou` explicite, approbation d'import distincte,
+  Trivy vuln High/Critical uniquement, Nuclei minimisé, conversion ZAP
+  JSON en XML et type DefectDojo **`ZAP Scan`**.
+- [ ] **Gate confidentialité ZAP** : l'action `zaproxy/action-baseline` publie
+  encore son propre artefact contenant des données brutes. Ne pas importer
+  automatiquement celui-ci avant retrait/chiffrement à la source ou
+  justification documentée de sa non-sensibilité.
+- [ ] **Gate runtime** : GitHub App autorisée (Actions:read par dépôt), clé
+  matérialisée depuis Vaultwarden, cron TrueNAS initialement désactivé,
+  parser installé `ZAP Scan`, engagement et RBAC réels, déduplication et
+  retour de traitement asynchrone DefectDojo vérifiés.
+- [ ] **CI au HEAD final / G0–G5** : contrôles de qualité, scans de
+  confidentialité public/Preview, CDN et chaîne Cloudflare/FastAPI ;
+  `NOT_RUN` ou `PENDING` tant que la preuve n'est pas disponible.
+
+
 ## P0/P1 — Security gates Trivy, CodeQL, Semgrep, ZAP et DefectDojo (2026-10-19)
 
 Contrat [scans/ingestion privée](security-scans-defectdojo-handoff.md) ; implémentation sur
