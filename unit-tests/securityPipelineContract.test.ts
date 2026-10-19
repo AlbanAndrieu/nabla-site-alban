@@ -100,7 +100,8 @@ test("quality gate checks production health before build and runs diff-scoped SA
 		ci,
 		/Candidate smoke must require the private 404 homelab contract/,
 	);
-	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/);
+	assert.doesNotMatch(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/);
+	assert.match(ci, /candidate private 404 requires Preview and post-deploy validation/);
 	assert.doesNotMatch(
 		ci,
 		/continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/,
