@@ -5,13 +5,13 @@ import { minimizeNucleiJsonl } from "../scripts/security/minimize-nuclei-report.
 test("Nuclei artifact removes captured HTTP evidence and URL paths", () => {
 	const raw = JSON.stringify({
 		"template-id": "cve-2026-1234",
-		info: { name: "reflected SECRET from response", severity: "high" },
-		"matched-at": "https://albanandrieu.com/login?token=SECRET",
-		request: "Authorization: Bearer SECRET",
-		response: "Set-Cookie: SESSION=SECRET",
+		info: { name: "reflected internal-mark from response", severity: "high" },
+		"matched-at": "https://albanandrieu.com/login?sample=internal-mark",
+		request: "synthetic-request-marker",
+		response: "synthetic-response-marker",
 	});
 	const output = minimizeNucleiJsonl(raw);
-	assert.doesNotMatch(output, /SECRET|Authorization|Set-Cookie|login/);
+	assert.doesNotMatch(output, /internal-mark|synthetic-request-marker|synthetic-response-marker|login/);
 	assert.deepEqual(JSON.parse(output), {
 		"template-id": "cve-2026-1234",
 		type: "http",
@@ -37,7 +37,7 @@ test("Nuclei refuses nonallowlisted or credentialed origins and invalid identity
 	for (const badUrl of [
 		"http://albanandrieu.com/",
 		"https://albanandrieu.com.evil.invalid/",
-		"https://user:pass@albanandrieu.com/",
+		"https://u:p@albanandrieu.com/",
 		"https://albanandrieu.com:10443/",
 	]) {
 		assert.throws(() =>
