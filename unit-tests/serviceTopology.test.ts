@@ -157,3 +157,34 @@ test("public topology does not expose transport, deployment or authentication me
 	assert.ok(topology.nodes.every((node) => node.id !== "truenas"));
 	assert.deepEqual(topology.relations, []);
 });
+
+test("topology parser rejects unknown relation types without weakening the public boundary", () => {
+	const graph = {
+		version: 1,
+		name: "relation validation",
+		nodes: [
+			{
+				id: "api",
+				name: "API",
+				kind: "application",
+				category: "test",
+			},
+			{
+				id: "store",
+				name: "Store",
+				kind: "database",
+				category: "test",
+			},
+		],
+		relations: [
+			{
+				source: "api",
+				target: "store",
+				type: "unsupportedEdgeType",
+				strength: "required",
+				evidence: ["synthetic fixture"],
+			},
+		],
+	};
+	assert.equal(parseServiceTopology(graph), null);
+});
