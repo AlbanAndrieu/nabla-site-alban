@@ -1,6 +1,7 @@
-#!/usr/bin/env node
 // Fail-closed producer-side minimization. Never upload the raw ZAP report.
 import { readFileSync, writeFileSync, statSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const ALLOWED_HOSTS = new Set(["albanandrieu.com", "www.albanandrieu.com"]);
 const MAX_INPUT_BYTES = 8_000_000;
@@ -66,7 +67,7 @@ function main() {
   process.stdout.write("PASS: minimized ZAP producer artifact (HIGH rule IDs and public origins only)\n");
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
     main();
   } catch {
