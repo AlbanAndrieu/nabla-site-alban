@@ -95,7 +95,7 @@ restent à conservation limitée et **ne sont jamais envoyés directement vers
   établir les comptes par sévérité, puis le supprime **avant** upload.
 - **ZAP production** : `zap-production-report` produit actuellement
   `report_json.json`. Le collecteur convertit ce JSON en XML expurgé
-  et utilise le scanner DefectDojo OSS `Zed Attack Proxy` (format XML),
+  et utilise le scanner DefectDojo OSS `ZAP Scan` (format XML),
   avec les alertes `riskcode=3` uniquement. **Point bloquant avant
   ingestion automatique** : `zaproxy/action-baseline` archive encore
   lui-même le rapport non expurgé dans GitHub Actions. Aucun filtre
@@ -108,3 +108,21 @@ sur l'édition DefectDojo effectivement installée, interdiction de rejouer
 un ancien succès après un nouveau scan échoué, compte import seul,
 engagement explicitement choisi et test de déduplication. Aucun de ces
 points **runtime** ne devient PASS par la seule présence des scripts.
+
+### Alignement avec le parser réel (19/10/2026)
+
+Le parser upstream DefectDojo `dojo/tools/zap/parser.py` annonce
+`get_scan_types() = ["ZAP Scan"]` et exige une extension `.xml`.
+Le collecteur Compose #263 produit le XML de synthèse sur TrueNAS, en
+supprimant tous les corps HTTP, cookies, chemins et paramètres de requête.
+Cela **ne corrige pas** l'artefact ZAP brut encore publié par l'action
+`zaproxy/action-baseline` : interdire l'ingestion automatique tant que
+l'upload du producteur n'est pas révisé. Ne pas ajouter de DAST actif
+ou de runner GitHub supplémentaire pour contourner cette restriction.
+
+Les neuf scénarios E2E de l'ancien tableau de bord public ont été
+réconciliés : les tests publics vérifient désormais le refus 404 et
+l'absence d'éléments privés; les fixtures du test visuel de santé
+sont marquées pour reprise future sous authentification dans
+`ops.albandrieu.com`. Toute assertion réclamant des IP, ports ou
+métriques dans la vitrine publique est invalide.

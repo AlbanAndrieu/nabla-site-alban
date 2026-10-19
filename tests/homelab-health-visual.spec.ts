@@ -197,7 +197,9 @@ async function expectNoHorizontalOverflow(page: Page) {
 	expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
-test.describe("homelab health state visual contracts", () => {
+// Retained as synthetic fixtures for migration to authenticated ops E2E.
+// They must not drive re-exposure of the owner-only UI on the public site.
+test.describe.skip("owner-only health state visuals pending ops authentication", () => {
 	test.beforeEach(async ({ page }) => {
 		await mockHomelabApis(page);
 	});
@@ -231,4 +233,32 @@ test.describe("homelab health state visual contracts", () => {
 			expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
 		}
 	});
+});
+
+
+test("anonymous TrueNAS keeps internal health badges private across themes", async ({
+	page,
+}) => {
+	for (const theme of ["light", "dark"] as const) {
+		await forceTheme(page, theme);
+		await page.goto("/en/truenas#truenas-services");
+		await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+		await expect(page.locator("#truenas-services")).toBeVisible();
+		await expect(page.locator(".service-card-ux")).toHaveCount(0);
+		await expect(page.locator("[data-health-state]")).toHaveCount(0);
+		await expect(
+			page.locator('a[href="https://ops.albandrieu.com/"]'),
+		).toBeVisible();
+	}
+});
+
+test("mobile architecture has no unauthenticated health-state widgets", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 375, height: 812 });
+	await page.goto("/en/architecture");
+	await expect(page.locator("#architecture-title")).toBeVisible();
+	await expect(page.locator("#architecture-health-dashboard")).toHaveCount(0);
+	await expect(page.locator(".service-card-ux")).toHaveCount(0);
+	await expectNoHorizontalOverflow(page);
 });

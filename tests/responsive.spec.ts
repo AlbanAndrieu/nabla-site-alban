@@ -206,36 +206,21 @@ test.describe("Responsive Design Tests", () => {
 		}
 	});
 
-	test("architecture switches to the compact hierarchy on mobile", async ({
+	test("public architecture remains responsive without leaking private topology", async ({
 		page,
 	}) => {
 		await page.setViewportSize({ width: 375, height: 667 });
 		await page.goto("/architecture", { waitUntil: "domcontentloaded" });
-
-		await page.getByRole("button", { name: "Nabla / TrueNAS" }).click();
-
-		const explorer = page.locator("#service-architecture-explorer");
-		const compactHierarchy = page
-			.locator("[data-mobile-architecture-hierarchy]")
-			.filter({ visible: true });
-		await expect(compactHierarchy).toHaveCount(1);
-		await expect(compactHierarchy).toBeVisible();
-		await expect(explorer.locator(".react-flow:visible")).toHaveCount(0);
-
-		const firstGroup = compactHierarchy
-			.locator("[data-mobile-criticality-tier]")
-			.first();
-		await expect(firstGroup).toBeVisible();
-		const groupOpen = await firstGroup.evaluate(
-			(element) => (element as HTMLDetailsElement).open,
-		);
-		if (!groupOpen) await firstGroup.locator("summary").first().click();
-		await expect(firstGroup.locator("[data-mobile-service]").first()).toBeVisible();
+		await expect(page.locator("#architecture-title")).toBeVisible();
+		await expect(page.locator("[data-mobile-architecture-hierarchy]")).toHaveCount(0);
+		await expect(page.locator("#service-architecture-explorer")).toHaveCount(0);
+		await expectNoHorizontalOverflow(page);
+		await expect(
+			page.locator('a[href="https://ops.albandrieu.com/"]'),
+		).toBeVisible();
 
 		await page.setViewportSize({ width: 1280, height: 900 });
-		await expect(
-			page.locator("[data-mobile-architecture-hierarchy]:visible"),
-		).toHaveCount(0);
-		await expect(explorer.locator(".react-flow:visible")).toHaveCount(1);
+		await expectNoHorizontalOverflow(page);
 	});
+
 });

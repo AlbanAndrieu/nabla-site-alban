@@ -1,5 +1,14 @@
 # Feuille de route homelab
 
+## Transition des contrats E2E publics — 19 octobre 2026
+
+- [x] Replacer les attentes d'API publique riche par des assertions `404`, `no-store` et sans provenance upstream.
+- [x] En PR #236, contrôler les deep links obsolètes, l'absence de graphe privé et d'états de santé sur `/truenas` et `/architecture`, FR/EN selon le cas.
+- [x] Nuclei ne publie le JSONL expurgé que lorsque le scan complet a réussi; contrat de minimisation testé avec URLs contenant secrets simulés.
+- [ ] Migrer les anciens tests visuels détaillés de santé et navigation opérateur vers l'espace `ops.albandrieu.com` après Cloudflare Access + JWT origin, jamais les restaurer sur Vercel public.
+- [ ] Vérifier la CI Playwright Preview sur le HEAD exact après migration des tests ; un succès local source-only n'est pas une preuve de déploiement.
+
+
 ## Réconciliation — collecteur DefectDojo privé (19 octobre 2026)
 
 Coordination : [Site #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236)

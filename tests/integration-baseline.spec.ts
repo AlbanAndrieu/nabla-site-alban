@@ -16,7 +16,7 @@ test.describe("Public homelab integration boundary", () => {
 			expect(response.headers()["cache-control"]).toContain("no-store");
 			expect(response.headers()["x-homelab-services-primary"]).toBeUndefined();
 			expect(response.headers()["x-homelab-topology-primary"]).toBeUndefined();
-			expect(await response.json()).toEqual({ error: "Not found" });
+			expect(await response.json()).toEqual({ error: "Operational homelab data is private" });
 		}
 	});
 
