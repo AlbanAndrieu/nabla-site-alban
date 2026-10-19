@@ -127,7 +127,7 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		);
 		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
 		assert.match(workflow, /fail_action:\s*true/);
-		assert.match(workflow, /cmd_options:\s*"-I -T 5"/);
+		assert.match(workflow, /cmd_options:\s*"-I -T 5(?:\s|")/);
 		assert.doesNotMatch(workflow, /cmd_options:.*-c \.zap\/rules\.tsv/);
 	}
 
@@ -147,11 +147,11 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(zapPreview, /context 'OWASP ZAP Preview'/);
 
 	assert.match(production, /https:\/\/www\.albanandrieu\.com/);
-	assert.match(production, /vercel\.deployment\.success/);
-	assert.match(
-		production,
-		/github\.event\.client_payload\.git\.ref == 'master'/,
-	);
+	assert.match(production, /schedule:/);
+	assert.match(production, /workflow_dispatch:/);
+	assert.doesNotMatch(production, /vercel\.deployment\.success/);
+	assert.match(production, /cmd_options:\s*"-I -T 5 -m 2 -a -s"/);
+	assert.match(production, /github\.ref == 'refs\/heads\/master'/);
 	assert.match(production, /Production DAST/);
 	assert.match(production, /ZAP_AUTH_HEADER:\s*x-vercel-protection-bypass/);
 	assert.match(production, /ZAP_AUTH_HEADER_VALUE/);
