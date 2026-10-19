@@ -144,3 +144,16 @@ test("topology parser validates deployment environment names and URLs", () => {
 		);
 	}
 });
+
+test("public topology does not expose transport, deployment or authentication metadata", async () => {
+	const topology = await loadLocalServiceTopology();
+	for (const node of topology.nodes) {
+		assert.equal(node.internalUrl, undefined);
+		assert.equal(node.sourcePath, undefined);
+		assert.equal(node.url, undefined);
+		assert.equal(node.environments, undefined);
+	}
+	assert.ok(topology.nodes.every((node) => node.id !== "pfsense"));
+	assert.ok(topology.nodes.every((node) => node.id !== "truenas"));
+	assert.deepEqual(topology.relations, []);
+});
