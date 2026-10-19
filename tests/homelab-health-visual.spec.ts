@@ -236,10 +236,12 @@ test.describe.skip("owner-only health state visuals pending ops authentication",
 });
 
 
-test("anonymous TrueNAS keeps internal health badges private across themes", async ({
-	page,
-}) => {
-	for (const theme of ["light", "dark"] as const) {
+// Separate browser contexts: Playwright addInitScript registrations persist within a page
+// and would race when light/dark themes are injected on repeated navigations.
+for (const theme of ["light", "dark"] as const) {
+	test(`anonymous TrueNAS keeps internal health badges private in ${theme} mode`, async ({
+		page,
+	}) => {
 		await forceTheme(page, theme);
 		await page.goto("/en/truenas#truenas-services");
 		await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
@@ -249,8 +251,8 @@ test("anonymous TrueNAS keeps internal health badges private across themes", asy
 		await expect(
 			page.locator('a[href="https://ops.albandrieu.com/"]'),
 		).toBeVisible();
-	}
-});
+	});
+}
 
 test("mobile architecture has no unauthenticated health-state widgets", async ({
 	page,
