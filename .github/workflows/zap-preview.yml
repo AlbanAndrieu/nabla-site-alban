@@ -252,7 +252,7 @@ jobs:
             echo "- Vercel mitigation: \`${PREFLIGHT_MITIGATED:-n/a}\`"
             echo "- Vercel auth: \`${{ steps.preflight.outputs.auth_mode || 'n/a' }}\`"
             echo "- Policy: \`.zap/rules.tsv\` (explicit FAIL/WARN rules)"
-            echo "- Report artifact: **no-artifact-private-scan**"
+            echo "- Raw report: **runner-local only**, no GitHub artifact"
             echo
 
             if [[ "$report_state" == "available" ]]; then
@@ -292,7 +292,7 @@ jobs:
           if [[ "$REPORT_AVAILABLE" != "true" ]]; then
             echo "::error::OWASP ZAP Preview failed before producing a report; this is a scanner/configuration error, not a security finding."
           else
-            echo "::error::OWASP ZAP Preview reported a blocking finding. Review the Job Summary and no-artifact-private-scan artifact."
+            echo "::error::OWASP ZAP Preview reported a blocking finding. Review only aggregate counts in the job summary; raw evidence is never uploaded."
           fi
           exit 1
 
