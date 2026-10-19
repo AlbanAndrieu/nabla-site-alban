@@ -46,7 +46,10 @@ export function minimizeNucleiJsonl(raw) {
 	return kept.length ? `${kept.join("\n")}\n` : "";
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "minimize-nuclei-report.mjs") {
+if (
+	process.argv[1] &&
+	basename(process.argv[1]) === "minimize-nuclei-report.mjs"
+) {
 	const [input, output] = process.argv.slice(2);
 	if (!input || !output) {
 		console.error("NUCLEI_REPORT_INPUT_OUTPUT_REQUIRED");
