@@ -14,7 +14,9 @@ export function minimizeNucleiJsonl(raw) {
 		const severity = String(finding.info.severity ?? "").toLowerCase();
 		if (severity !== "high" && severity !== "critical") continue;
 		const id = finding["template-id"] ?? finding.templateID;
-		const name = finding.info.name;
+		// Names returned by templates may contain reflected URLs or response material.
+		// The verified template ID is sufficient for a stable finding title.
+		const name = id;
 		if (
 			typeof id !== "string" ||
 			!/^[\w.-]{1,160}$/.test(id) ||
