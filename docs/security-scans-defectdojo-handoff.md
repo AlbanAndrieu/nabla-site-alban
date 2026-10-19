@@ -73,3 +73,39 @@ public, API token DefectDojo dans une PR ou upload de secret sur GitHub.
 Coordination : [Site Alban #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236),
 [FastAPI #352](https://github.com/AlbanAndrieu/fastapi-sample/issues/352),
 [Compose #262](https://github.com/AlbanAndrieu/nabla-compose/issues/262).
+
+## Intégration réelle du collecteur privé DefectDojo (2026-10-19)
+
+Le collecteur prévu dans [nabla-compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+attend **trois workflows `master` réussis** : `Supply Chain Security (Trivy)`,
+`Nuclei public DAST (Site Alban)` et `Production DAST`. Leurs artefacts
+restent à conservation limitée et **ne sont jamais envoyés directement vers
+`defectdojo.int.albandrieu.com` depuis un runner GitHub**.
+
+- **Trivy** : `trivy-master-<sha>` contient `trivy-security.json` et le
+  SBOM CycloneDX. Le collecteur importe seulement CVE npm lockfile
+  `HIGH/CRITICAL` ; SBOM, licences, misconfigurations et autres scanners
+  sont **exclus** du reimport automatique.
+- **Nuclei** : `nuclei-public-<run-id>` contient un
+  `nuclei-results/nuclei.jsonl` **minimisé avant publication GitHub**.
+  Le fichier de collecte conserve seulement `template-id`, le type HTTP,
+  la sévérité `high/critical`, le nom du template et l'origine HTTPS
+  autorisée. Réponses, requêtes, chemins et paramètres ne sont pas publiés
+  dans ce JSONL. Le scan conserve en mémoire de job un JSONL brut pour
+  établir les comptes par sévérité, puis le supprime **avant** upload.
+- **ZAP production** : `zap-production-report` produit actuellement
+  `report_json.json`. Le collecteur convertit ce JSON en XML expurgé
+  et utilise le scanner DefectDojo OSS `Zed Attack Proxy` (format XML),
+  avec les alertes `riskcode=3` uniquement. **Point bloquant avant
+  ingestion automatique** : `zaproxy/action-baseline` archive encore
+  lui-même le rapport non expurgé dans GitHub Actions. Aucun filtre
+  applicatif ultérieur sur TrueNAS ne garantit sa confidentialité.
+  Remplacer cet upload par un artefact minimisé avant de réautoriser
+  l'automatisation ZAP ou exécuter les DAST sensibles dans le LAN.
+
+Contrôles nécessaires : provenance `master`/SHA/run/workflow, test de parser
+sur l'édition DefectDojo effectivement installée, interdiction de rejouer
+un ancien succès après un nouveau scan échoué, compte import seul,
+engagement explicitement choisi et test de déduplication. Aucun de ces
+points **runtime** ne devient PASS par la seule présence des scripts.
+
