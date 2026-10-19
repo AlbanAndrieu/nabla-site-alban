@@ -50,6 +50,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .zap/rules.tsv
+            scripts/security/minimize-zap-report.mjs
           sparse-checkout-cone-mode: false
 
       - name: Verify production DAST can reach the application
@@ -71,24 +72,57 @@ jobs:
             exit 1
           fi
 
+      # Do not use zaproxy/action-baseline here: it uploads raw HTTP evidence
+      # before any producer-side redaction. The bounded CLI run writes locally
+      # and only the strict High-rule-ID/public-origin projection leaves runner.
       - name: Run OWASP ZAP baseline on canonical production
-        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
+        shell: bash
         env:
           ZAP_AUTH_HEADER: x-vercel-protection-bypass
           ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           ZAP_AUTH_HEADER_SITE: www.albanandrieu.com
+        run: |
+          set -euo pipefail
+          scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-production.XXXXXX")"
+          echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
+          cp .zap/rules.tsv "$scan_dir/rules.tsv"
+          # No raw ZAP stdout, JSON, HTML, cookies or request/response bodies
+          # may reach job logs, summary, CI artifacts, or DefectDojo.
+          if ! docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
+            --volume "$scan_dir:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:2.17.0 \
+            zap-baseline.py -t "$BASE_URL" -c rules.tsv \
+              -J report_json.json -I -T 5 -m 2 -a -s \
+            > "$scan_dir/console.log" 2>&1; then
+            echo "::error::ZAP production failed (policy finding or scanner failure); raw HTTP evidence withheld."
+            exit 1
+          fi
+          test -s "$scan_dir/report_json.json" || {
+            echo "::error::ZAP completed without a report (INCOMPLETE)."
+            exit 1
+          }
+          node scripts/security/minimize-zap-report.mjs \
+            "$scan_dir/report_json.json" "$scan_dir/report_json.safe.json"
+          mkdir -p zap-production-safe
+          mv "$scan_dir/report_json.safe.json" zap-production-safe/report_json.json
+
+      - name: Upload only sanitized production ZAP findings
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          target: ${{ env.BASE_URL }}
-          rules_file_name: ".zap/rules.tsv"
-          allow_issue_writing: false
-          fail_action: true
-          artifact_name: zap-production-report
-          cmd_options: "-I -T 5 -m 2 -a -s"
+          name: zap-production-report
+          path: zap-production-safe/report_json.json
+          retention-days: 3
+          if-no-files-found: error
 
       - name: Clean ZAP production workspace
         if: always()
         shell: bash
-        run: rm -f report_html.html report_json.json report_md.md zap.yaml
+        run: |
+          if [[ -n "${ZAP_SCAN_DIR:-}" ]]; then rm -rf -- "$ZAP_SCAN_DIR"; fi
+          rm -rf zap-production-safe
 
       - name: Summarize production DAST
         if: always()
