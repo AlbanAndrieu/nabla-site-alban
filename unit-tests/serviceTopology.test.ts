@@ -82,9 +82,7 @@ test("topology parser rejects relations referencing unknown nodes", () => {
 		parseServiceTopology({
 			version: 1,
 			name: "invalid",
-			nodes: [
-				{ id: "a", name: "A", kind: "service", category: "test" },
-			],
+			nodes: [{ id: "a", name: "A", kind: "service", category: "test" }],
 			relations: [
 				{
 					source: "a",
