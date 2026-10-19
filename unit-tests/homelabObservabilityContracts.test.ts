@@ -12,7 +12,10 @@ test("public observability route never proxies diagnostic or runtime topology", 
 		"utf8",
 	);
 	assert.match(route, /privateHomelabResponse/);
-	assert.doesNotMatch(route, /parseHomelabObservability|loadRuntimeTopology|loadHomelabDiagnostics/);
+	assert.doesNotMatch(
+		route,
+		/parseHomelabObservability|loadRuntimeTopology|loadHomelabDiagnostics/,
+	);
 	assert.match(privateResponse, /status: 404/);
 	assert.match(privateResponse, /no-store/);
 });
