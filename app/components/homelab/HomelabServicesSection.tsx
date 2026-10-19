@@ -1,19 +1,18 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import SectionHeading from "@/components/SectionHeading";
-import ActionLink from "@/components/ui/ActionLink";
-import HomelabOperationsDisclosure from "./HomelabOperationsDisclosure";
-import HomelabServicesBlock from "./HomelabServicesBlock";
 import styles from "./HomelabServicesSection.module.css";
 
-type Props = {
-	headingId?: string;
-};
+type Props = { headingId?: string };
 
+/** Anonymous visitors see only the editorial platform overview. */
 export default async function HomelabServicesSection({
 	headingId = "homelab-services",
 }: Props) {
-	const t = await getTranslations("homelab.section");
-
+	const [t, locale] = await Promise.all([
+		getTranslations("homelab.section"),
+		getLocale(),
+	]);
+	const french = locale === "fr";
 	return (
 		<section
 			className="stack-page-hero py-5 homelab-services-section page-truenas-apps"
@@ -24,47 +23,17 @@ export default async function HomelabServicesSection({
 					<SectionHeading id={headingId} iconClass="fa-server">
 						{t("title")}
 					</SectionHeading>
-					<div className={styles.introCard}>
-						<span className={styles.introIcon} aria-hidden="true">
-							<i className="fas fa-heart-pulse" />
-						</span>
-						<p className={styles.introText}>{t("lead")}</p>
-						<div className={styles.architectureLink}>
-							<ActionLink
-								href="architecture#declared-observed-architecture"
-								variant="secondary"
-								data-ui-action=""
-							>
-								<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
-								Architecture
-							</ActionLink>
-						</div>
-					</div>
-					<p className="small text-secondary homelab-services-foss-note mt-3 mb-0">
-						{t("iconsBefore")}{" "}
-						<a
-							href="https://selfh.st/icons/"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							selfh.st/icons
+					<p>
+						{french
+							? "Cette plateforme regroupe des expérimentations d’infrastructure, de sécurité et d’IA. Les ports, métriques et diagnostics sont privés."
+							: "This platform supports infrastructure, security, and AI experiments. Ports, metrics and diagnostics are private."}
+					</p>
+					<p>
+						<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
+							{french ? "Espace opérations privé" : "Private operations"}
 						</a>
-						. {t("iconsAfter")}{" "}
-						<a
-							href="https://selfh.st/apps/"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							selfh.st/apps
-						</a>
-						.
 					</p>
 				</div>
-
-				<div className={styles.serviceFirst} data-service-first-homelab-view>
-					<HomelabServicesBlock />
-				</div>
-				<HomelabOperationsDisclosure />
 			</div>
 		</section>
 	);

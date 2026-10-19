@@ -44,10 +44,9 @@ test("major TrueNAS and architecture sections share the anchored blue heading co
 		/<SectionHeading id=\{headingId\} iconClass="fa-server">/,
 	);
 	assert.doesNotMatch(services, /fa-cubes-stacked/);
-	assert.match(architecture, /id="homelab-network-ingress-paths"/);
-	assert.match(architecture, /iconClass="fa-network-wired"/);
-	assert.match(architecture, /id="declared-observed-health"/);
-	assert.match(architecture, /iconClass="fa-heart-pulse"/);
+	assert.doesNotMatch(architecture, /id="homelab-network-ingress-paths"/);
+	assert.match(architecture, /id="architecture-principles"/);
+	assert.match(architecture, /iconClass="fa-diagram-project"/);
 	assert.match(architectureCss, /\.sectionHeading h2::after/);
 	assert.match(architectureCss, /content: "#"/);
 	assert.match(architectureCss, /color: var\(--ui-link\)/);

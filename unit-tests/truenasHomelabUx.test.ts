@@ -32,14 +32,13 @@ test("TrueNAS keeps homelab topology before services and moves Nabla project nea
 	assert.ok(nablaIndex > toolsIndex);
 });
 
-test("homelab network policy details are enriched but collapsed by default", async () => {
+test("public TrueNAS no longer renders network exposure details", async () => {
 	const section = await source("app/components/truenas/HomeLabSection.tsx");
-
-	assert.match(section, /<details className=\{styles\.networkDetails\}>/);
-	assert.doesNotMatch(section, /<details[^>]*\sopen(?:=|\s|>)/);
-	assert.match(section, /network\.tcp10443/);
-	assert.match(section, /network\.tcp9922/);
-	assert.match(section, /network\.sourcesNote/);
+	assert.doesNotMatch(
+		section,
+		/HomeLabNetworkFlow|network\.tcp|networkDetails/,
+	);
+	assert.match(section, /projectDetails/);
 });
 
 test("service views are searchable and collapsible while technical criticality stays opt-in", async () => {

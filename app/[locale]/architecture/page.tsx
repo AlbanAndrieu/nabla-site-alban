@@ -2,23 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import HomelabOperationalEvidence from "@/app/components/homelab/HomelabOperationalEvidence";
-import HomeLabNetworkFlow from "@/app/components/truenas/HomeLabNetworkFlow";
 import SectionHeading from "@/components/SectionHeading";
 import SiteWidgetsScript from "@/components/SiteWidgetsScript";
 import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
-import { getStaticHomelabServicesCatalog } from "@/lib/homelabServices";
-import { getStaticServiceTopology } from "@/lib/serviceTopology";
 import { buildPageMetadata } from "@/lib/socialMetadata";
-import ArchitectureImpactInspector from "./ArchitectureImpactInspector";
-import ArchitectureSectionNav from "./ArchitectureSectionNav";
-import ArchitectureTopologyView from "./ArchitectureTopologyView";
 
-type ArchitecturePageProps = {
-	params: Promise<{ locale: string }>;
-};
+type ArchitecturePageProps = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({
 	params,
@@ -28,11 +19,11 @@ export async function generateMetadata({
 	const french = locale === "fr";
 	return buildPageMetadata({
 		title: french
-			? "Architecture des services Nabla"
-			: "Nabla service architecture",
+			? "Architecture de la plateforme Nabla"
+			: "Nabla platform architecture",
 		description: french
-			? "Diagrammes interactifs de la plateforme IA et de la topologie des services Nabla et TrueNAS."
-			: "Interactive diagrams of the AI platform and the Nabla and TrueNAS service topology.",
+			? "Principes de la plateforme : infrastructure, sécurité et observabilité. Les topologies opérationnelles restent privées."
+			: "Platform principles: infrastructure, security, and observability. Operational topologies are private.",
 		slug: "architecture",
 		locale,
 	});
@@ -45,8 +36,6 @@ export default async function ArchitecturePage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 	setRequestLocale(locale);
 	const french = locale === "fr";
-	const { catalog, source: catalogSource } = getStaticHomelabServicesCatalog();
-	const { topology, source: topologySource } = getStaticServiceTopology();
 	const prefix = french ? "/fr" : "";
 
 	return (
@@ -60,20 +49,12 @@ export default async function ArchitecturePage({
 				>
 					<div className="hero-content">
 						<h1 id="architecture-title" className="hero-title">
-							<i className="fas fa-diagram-project" aria-hidden="true" />{" "}
-							{french
-								? "Architecture interactive Nabla"
-								: "Interactive Nabla architecture"}
+							{french ? "Architecture Nabla" : "Nabla architecture"}
 						</h1>
 						<p className="hero-subtitle">
 							{french
-								? "Plateforme IA, services homelab, dépendances fonctionnelles et intégrations observables."
-								: "AI platform, homelab services, functional dependencies, and observable integrations."}
-						</p>
-						<p className="hero-description">
-							{french
-								? "La lecture commence par les fondations et composants à plus grand rayon d’impact, avant les applications feuilles. La vue détaillée conserve ensuite l’ensemble des relations déclarées dans nabla-compose."
-								: "The page starts with foundations and components with the largest blast radius before leaf applications. The detailed view then keeps the complete relationship graph declared in nabla-compose."}
+								? "Une plateforme auto-hébergée pour la sécurité, les services et l’IA."
+								: "A self-hosted platform for security, services, and AI."}
 						</p>
 						<div className="d-flex flex-wrap gap-2 justify-content-center">
 							<ActionLink href={`${prefix}/ai`} variant="secondary">
@@ -88,128 +69,30 @@ export default async function ArchitecturePage({
 						</div>
 					</div>
 				</section>
-
-				<ArchitectureSectionNav locale={locale} />
-				<div className="container">
-					<HomelabOperationalEvidence />
-				</div>
-				<ArchitectureImpactInspector locale={locale} />
-
-				<ArchitectureTopologyView
-					locale={locale}
-					initialCatalog={catalog}
-					initialCatalogSource={catalogSource}
-					initialTopology={topology}
-					initialTopologySource={topologySource}
-				/>
-
-				<section
-					id="homelab-network-architecture"
-					className="content-section"
-					aria-labelledby="homelab-network-ingress-paths"
-				>
-					<div className="container py-5">
-						<div className="mx-auto mb-4" style={{ maxWidth: "900px" }}>
-							<SectionHeading
-								id="homelab-network-ingress-paths"
-								iconClass="fa-network-wired"
-							>
-								{french
-									? "Réseau homelab et chemins d’ingress"
-									: "Homelab network and ingress paths"}
-							</SectionHeading>
-							<p>
-								{french
-									? "Ce diagramme React Flow est exactement le même composant que celui de la page TrueNAS. Les chemins ingress direct HAProxy/Traefik et Cloudflare Tunnel montrent désormais tous deux leur transit par le WAN avant pfSense, puis le tunnel rejoint TrueNAS/cloudflared via le switch LAN. OpenWebUI illustre une origine tunnel directe sur :31028 qui ne traverse jamais Traefik. Le filtre DNS sépare la résolution de noms du routage HTTP : les clients LAN utilisent pfSense/Unbound 172.17.0.1:53 ; les noms publics sont résolus récursivement avec Quad9/Cloudflare comme fallbacks publics uniquement, tandis que le Domain Override int.albandrieu.com délègue vers Pi-hole 172.17.0.24:53, alimenté par pihole-dns-sync à partir des labels Traefik éligibles. Le graphe documente aussi l’incident où une politique Unbound limitée au WAN faisait expirer le forwarder Pi-hole ; la configuration validée est Outgoing Network Interfaces = All avec Forwarding Mode désactivé. Garage conserve trois surfaces : s3.int.albandrieu.com via HAProxy → TLS ré-chiffré → Traefik → :3900, garage.albandrieu.com via Tunnel → cloudflared → :3909 et garage-admin.albandrieu.com via Tunnel → cloudflared → :3903."
-									: "This React Flow diagram is the exact same component used on the TrueNAS page. Direct HAProxy/Traefik ingress and Cloudflare Tunnel now both show their WAN transit before pfSense, with tunnel traffic then crossing the LAN switch to TrueNAS/cloudflared. OpenWebUI illustrates a direct tunnel origin on :31028 that never traverses Traefik. The DNS filter separates name resolution from HTTP routing: LAN clients use pfSense/Unbound 172.17.0.1:53; public names recurse externally with Quad9/Cloudflare as public-only fallbacks, while the int.albandrieu.com Domain Override delegates to Pi-hole 172.17.0.24:53, fed by pihole-dns-sync from eligible Traefik labels. The graph also captures the previous failure mode where WAN-only Unbound outgoing interfaces made the Pi-hole forwarder expire; the validated setting is Outgoing Network Interfaces = All with Forwarding Mode disabled. Garage keeps three surfaces: s3.int.albandrieu.com through HAProxy → TLS re-encryption → Traefik → :3900, garage.albandrieu.com through Tunnel → cloudflared → :3909, and garage-admin.albandrieu.com through Tunnel → cloudflared → :3903."}
-							</p>
-						</div>
-						<HomeLabNetworkFlow />
-					</div>
-				</section>
-
 				<section
 					id="declared-observed-architecture"
 					className="content-section"
-					aria-labelledby="declared-observed-health"
+					aria-labelledby="architecture-principles"
 				>
 					<div className="container py-5">
-						<div className="mx-auto mb-4" style={{ maxWidth: "860px" }}>
-							<SectionHeading
-								id="declared-observed-health"
-								iconClass="fa-heart-pulse"
-							>
+						<SectionHeading
+							id="architecture-principles"
+							iconClass="fa-diagram-project"
+						>
+							{french ? "Principes d’architecture" : "Architecture principles"}
+						</SectionHeading>
+						<p>
+							{french
+								? "La plateforme distingue configuration déclarative, exécution et observation. Les relations détaillées, chemins réseau et preuves de santé sont réservés au propriétaire."
+								: "The platform separates declared configuration, runtime and observation. Detailed dependencies, network paths and health evidence are owner-only."}
+						</p>
+						<p>
+							<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
 								{french
-									? "Configuration déclarée, runtime observé et santé"
-									: "Declared configuration, observed runtime, and health"}
-							</SectionHeading>
-							<p>
-								{french
-									? "L’architecture sépare volontairement ce qui devrait exister, ce qui tourne réellement et ce qui est effectivement utilisable. Cette séparation permet de détecter les dérives sans faire de l’interface Web ou de l’API TrueNAS une source de vérité de configuration."
-									: "The architecture deliberately separates what should exist, what is actually running, and what is operationally usable. This makes configuration drift visible without turning the website or the TrueNAS API into the configuration source of truth."}
-							</p>
-						</div>
-
-						<div className="row g-3">
-							{[
-								[
-									"1. nabla-compose",
-									french
-										? "Source déclarative : services x-nabla, identité stable, binding runtime et relations de topologie. services.json et service-topology.json sont générés depuis le code."
-										: "Declarative source: x-nabla services, stable identity, runtime binding, and topology relationships. services.json and service-topology.json are generated from code.",
-								],
-								[
-									"2. TrueNAS API",
-									french
-										? "Source runtime observée : le client officiel truenas_api_client interroge app.query pour les Apps, containers, états et versions. Il ne décide jamais qu’un service doit exister ou être public."
-										: "Observed runtime source: the official truenas_api_client queries app.query for Apps, containers, states, and versions. It never decides that a service should exist or be public.",
-								],
-								[
-									"3. fastapi-sample",
-									french
-										? "Couche de réconciliation : joint les bindings déclarés aux workloads TrueNAS, classe les écarts (in_sync, declared_only, observed_only, conflict) et garde les contrôles de santé séparés."
-										: "Reconciliation layer: joins declared bindings to TrueNAS workloads, classifies drift (in_sync, declared_only, observed_only, conflict), and keeps health checks separate.",
-								],
-								[
-									"4. albanandrieu.com",
-									french
-										? "Couche de présentation : visualise la topologie, le statut runtime et la santé sans devenir une source de données backend."
-										: "Presentation layer: visualizes topology, runtime status, and health without becoming a backend data source.",
-								],
-							].map(([title, copy]) => (
-								<div className="col-12 col-md-6 col-xl-3" key={title}>
-									<div
-										className="card h-100 bg-dark border-secondary p-3 text-light"
-										style={{ color: "#f8fafc" }}
-									>
-										<h3 className="h5">{title}</h3>
-										<p className="mb-0" style={{ color: "inherit" }}>
-											{copy}
-										</p>
-									</div>
-								</div>
-							))}
-						</div>
-
-						<div className="text-center mt-4">
-							<p className="mb-3">
-								<strong>Declared ≠ Observed ≠ Healthy</strong>
-							</p>
-							<div className="d-flex flex-wrap gap-2 justify-content-center">
-								<ActionLink
-									href="https://github.com/AlbanAndrieu/nabla-compose"
-									variant="secondary"
-								>
-									nabla-compose
-								</ActionLink>
-								<ActionLink
-									href="https://github.com/AlbanAndrieu/fastapi-sample"
-									variant="secondary"
-								>
-									fastapi-sample
-								</ActionLink>
-							</div>
-						</div>
+									? "Consulter l’espace privé"
+									: "Open private operations"}
+							</a>
+						</p>
 					</div>
 				</section>
 			</main>

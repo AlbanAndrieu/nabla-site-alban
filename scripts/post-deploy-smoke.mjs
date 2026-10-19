@@ -397,83 +397,40 @@ async function checkRobots(baseUrl) {
 	console.log("PASS robots.txt");
 }
 
+/**
+ * The canonical public hostname must refuse all operational homelab evidence.
+ * The owner dashboard will be served on ops.albandrieu.com independently.
+ */
 export async function checkHomelabStatus(baseUrl) {
 	const response = await fetchResponse(
 		baseUrl,
 		"/api/homelab-status",
 		"application/json",
-		new Set([503]),
+		new Set([404]),
 	);
 	assertContentType(response, "/api/homelab-status", ["application/json"]);
-
-	const source = response.headers.get("x-homelab-status-source");
-	if (response.status === 503) {
-		assertCondition(
-			source === "unavailable",
-			"/api/homelab-status 503 must expose source=unavailable",
-		);
-		assertCondition(
-			(response.headers.get("cache-control") ?? "")
-				.toLowerCase()
-				.includes("no-store"),
-			"/api/homelab-status 503 must be non-cacheable",
-		);
-		const primary = response.headers.get("x-homelab-status-primary");
-		assertCondition(
-			Boolean(primary),
-			"/api/homelab-status 503 is missing the primary upstream URL",
-		);
-		let primaryUrl;
-		try {
-			primaryUrl = new URL(primary);
-		} catch {
-			throw new Error(
-				"/api/homelab-status 503 exposes an invalid primary upstream URL",
-			);
-		}
-		assertCondition(
-			primaryUrl.protocol === "https:",
-			"/api/homelab-status production upstream must use HTTPS",
-		);
-		const payload = await response.json();
-		assertCondition(
-			payload &&
-				typeof payload === "object" &&
-				payload.error === "FastAPI homelab status unavailable",
-			"/api/homelab-status 503 returned an unexpected degraded payload",
-		);
-		console.warn(
-			"WARN /api/homelab-status degraded: FastAPI upstream unavailable (" +
-				primary +
-				")",
-		);
-		return;
-	}
-
 	assertCondition(
-		source === "fastapi",
-		"/api/homelab-status is not backed by the FastAPI source",
+		response.status === 404,
+		"public homelab status must be private (HTTP 404)",
 	);
-
+	assertCondition(
+		(response.headers.get("cache-control") ?? "").includes("no-store"),
+		"public homelab status refusal must be non-cacheable",
+	);
+	assertCondition(
+		!response.headers.get("x-homelab-status-source") &&
+			!response.headers.get("x-homelab-status-primary"),
+		"public homelab status refusal leaks upstream provenance",
+	);
 	const payload = await response.json();
 	assertCondition(
-		payload && typeof payload === "object",
-		"/api/homelab-status returned an invalid payload",
+		payload &&
+			typeof payload === "object" &&
+			payload.error === "Operational homelab data is private" &&
+			Object.keys(payload).length === 1,
+		"public homelab status refusal includes unexpected operational fields",
 	);
-	assertCondition(
-		typeof payload.schemaVersion === "number",
-		"/api/homelab-status is missing schemaVersion",
-	);
-	assertCondition(
-		typeof payload.checkedAt === "string",
-		"/api/homelab-status is missing checkedAt",
-	);
-	assertCondition(
-		Array.isArray(payload.services),
-		"/api/homelab-status is missing services",
-	);
-
-	console.log("PASS /api/homelab-status");
+	console.log("PASS /api/homelab-status private (404)");
 }
 
 async function checkSocialCard(baseUrl, pathname, locale, html) {

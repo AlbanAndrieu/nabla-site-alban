@@ -17,12 +17,10 @@ test("TrueNAS services are the primary surface and operations are secondary", as
 		"app/components/homelab/HomelabServicesSection.module.css",
 	);
 
-	const servicesIndex = section.indexOf("<HomelabServicesBlock");
-	const operationsIndex = section.indexOf("<HomelabOperationsDisclosure");
-	assert.ok(servicesIndex >= 0, "services block must be rendered");
-	assert.ok(operationsIndex > servicesIndex, "operations must follow services");
-	assert.match(section, /data-service-first-homelab-view/);
-	assert.doesNotMatch(section, /<HomelabOperationalEvidence/);
+	// The operator components remain reusable but cannot mount in the public shell.
+	assert.doesNotMatch(section, /<HomelabServicesBlock/);
+	assert.doesNotMatch(section, /<HomelabOperationsDisclosure/);
+	assert.match(section, /https:\/\/ops\.albandrieu\.com/);
 
 	assert.match(disclosure, /<details/);
 	assert.match(disclosure, /data-homelab-operations-disclosure/);
@@ -67,8 +65,8 @@ test("TrueNAS service presentation borrows the shared hardware section language"
 		/<SectionHeading id=\{headingId\} iconClass="fa-server">/,
 	);
 	assert.doesNotMatch(section, /fa-cubes-stacked/);
-	assert.match(section, /fa-heart-pulse/);
-	assert.match(section, /fa-diagram-project/);
+	assert.doesNotMatch(section, /fa-heart-pulse/);
+	assert.doesNotMatch(section, /fa-diagram-project/);
 	assert.match(sharedHeading, /color: var\(--ui-link\)/);
 	assert.match(sharedHeading, /font-size: clamp\(2\.25rem, 4\.5vw, 3\.5rem\)/);
 	assert.match(styles, /service-card-ux/);

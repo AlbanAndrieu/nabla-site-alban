@@ -24,7 +24,7 @@ test("Cloudflare uncertainty stays explicit, diagnostic and non-degrading", asyn
 	assert.match(helper, /api_reachable/);
 	assert.match(helper, /empty_inventory/);
 	assert.match(helper, /last_known_reachable/);
-	assert.match(section, /<CloudflareStatusWarning \/>/);
+	assert.doesNotMatch(section, /<CloudflareStatusWarning \/>/);
 });
 
 test("pfSense diagnostic actions use the canonical home endpoint", async () => {

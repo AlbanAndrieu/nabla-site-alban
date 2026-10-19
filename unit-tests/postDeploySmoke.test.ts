@@ -173,7 +173,7 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.match(script, /linkHref\(html, "alternate", "x-default"\)/);
 	assert.match(script, /\/api\/deployment/);
 	assert.match(script, /\/api\/homelab-status/);
-	assert.match(script, /x-homelab-status-source/);
+	assert.match(script, /Operational homelab data is private/);
 	assert.match(script, /\/api\/social-card/);
 	assert.match(script, /image\.readUInt32BE\(16\) === 1200/);
 	assert.match(script, /image\.readUInt32BE\(20\) === 630/);
@@ -185,7 +185,7 @@ test("production smoke stays lightweight and production-only", async () => {
 	assert.match(script, /\/nabla\/index\.html/);
 });
 
-test("production smoke validates pages, homelab API and social cards", async () => {
+test("production smoke validates pages, private homelab refusal and social cards", async () => {
 	const originalFetch = globalThis.fetch;
 	const originalBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 	const requests: string[] = [];
@@ -253,16 +253,12 @@ test("production smoke validates pages, homelab API and social cards", async () 
 
 		if (url.pathname === "/api/homelab-status") {
 			return new Response(
-				JSON.stringify({
-					schemaVersion: 1,
-					checkedAt: "2026-09-07T00:00:00Z",
-					services: [],
-				}),
+				JSON.stringify({ error: "Operational homelab data is private" }),
 				{
-					status: 200,
+					status: 404,
 					headers: {
 						"content-type": "application/json",
-						"x-homelab-status-source": "fastapi",
+						"cache-control": "private, no-store",
 					},
 				},
 			);
@@ -313,39 +309,32 @@ test("production smoke validates pages, homelab API and social cards", async () 
 	assert.ok(requests.includes("/api/social-card?title=Smoke&locale=fr"));
 });
 
-test("homelab smoke accepts only the explicit degraded 503 contract after retries", async () => {
+test("homelab smoke accepts a no-store 404 without upstream evidence", async () => {
 	const originalFetch = globalThis.fetch;
 	let attempts = 0;
-
 	globalThis.fetch = (async () => {
 		attempts += 1;
 		return new Response(
-			JSON.stringify({ error: "FastAPI homelab status unavailable" }),
+			JSON.stringify({ error: "Operational homelab data is private" }),
 			{
-				status: 503,
+				status: 404,
 				headers: {
-					"cache-control": "no-store",
+					"cache-control": "private, no-store",
 					"content-type": "application/json",
-					"x-homelab-status-primary":
-						"https://fastapi-sample.fastapicloud.dev/api/homelab/status",
-					"x-homelab-status-source": "unavailable",
 				},
 			},
 		);
 	}) as typeof fetch;
-
 	try {
 		await checkHomelabStatus(ORIGIN);
 	} finally {
 		globalThis.fetch = originalFetch;
 	}
-
-	assert.equal(attempts, 3);
+	assert.equal(attempts, 1);
 });
 
-test("homelab smoke rejects malformed degraded 503 responses", async () => {
+test("homelab smoke rejects old 503 diagnostics on public hostname", async () => {
 	const originalFetch = globalThis.fetch;
-
 	globalThis.fetch = (async () =>
 		new Response(
 			JSON.stringify({ error: "FastAPI homelab status unavailable" }),
@@ -356,16 +345,11 @@ test("homelab smoke rejects malformed degraded 503 responses", async () => {
 					"content-type": "application/json",
 					"x-homelab-status-primary":
 						"https://fastapi-sample.fastapicloud.dev/api/homelab/status",
-					"x-homelab-status-source": "fastapi",
 				},
 			},
 		)) as typeof fetch;
-
 	try {
-		await assert.rejects(
-			checkHomelabStatus(ORIGIN),
-			/503 must expose source=unavailable/,
-		);
+		await assert.rejects(checkHomelabStatus(ORIGIN), /returned HTTP 503/);
 	} finally {
 		globalThis.fetch = originalFetch;
 	}

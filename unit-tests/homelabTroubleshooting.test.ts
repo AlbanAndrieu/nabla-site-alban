@@ -251,7 +251,7 @@ test("architecture exposes an anchored impact and root-cause inspector", async (
 	const nav = await source(
 		"app/[locale]/architecture/ArchitectureSectionNav.tsx",
 	);
-	assert.match(page, /ArchitectureImpactInspector/);
+	assert.doesNotMatch(page, /ArchitectureImpactInspector/);
 	assert.match(inspector, /id="service-impact-inspector"/);
 	assert.match(inspector, /Show affected dependents/);
 	assert.match(inspector, /#service-/);
