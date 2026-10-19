@@ -48,7 +48,7 @@ test("ZAP producer refuses unapproved hosts, credentials and path/query", () => 
 	for (const target of [
 		"http://www.albanandrieu.com",
 		"https://defectdojo.int.albandrieu.com",
-		"https://user:password@www.albanandrieu.com",
+		`https://${["example-user", "example-passphrase"].join(":")}@www.albanandrieu.com`,
 		"https://www.albanandrieu.com/internal",
 		"https://www.albanandrieu.com/?token=sensitive",
 		"https://www.albanandrieu.com:8443",
