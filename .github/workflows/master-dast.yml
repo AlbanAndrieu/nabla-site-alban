@@ -76,6 +76,7 @@ jobs:
       # before any producer-side redaction. The bounded CLI run writes locally
       # and only the strict High-rule-ID/public-origin projection leaves runner.
       - name: Run OWASP ZAP baseline on canonical production
+        id: production-zap
         shell: bash
         env:
           ZAP_AUTH_HEADER: x-vercel-protection-bypass
@@ -88,7 +89,8 @@ jobs:
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
           # No raw ZAP stdout, JSON, HTML, cookies or request/response bodies
           # may reach job logs, summary, CI artifacts, or DefectDojo.
-          if ! docker run --rm \
+          set +e
+          docker run --rm \
             --user "$(id -u):$(id -g)" \
             --env HOME=/tmp \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
@@ -96,10 +98,17 @@ jobs:
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py -t "$BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -m 2 -a -s \
-            > "$scan_dir/console.log" 2>&1; then
-            echo "::error::ZAP production failed (policy finding or scanner failure); raw HTTP evidence withheld."
+            > "$scan_dir/console.log" 2>&1
+          scan_rc=$?
+          set -e
+          # ZAP baseline exit 1 denotes a blocking finding, not a broken scanner.
+          # Retain HIGH rule identities for human review, while still failing CI
+          # *after* sanitized artifact upload. Any other scanner error fails closed.
+          if [[ "$scan_rc" != 0 && "$scan_rc" != 1 ]]; then
+            echo "::error::ZAP scanner incomplete; raw evidence withheld."
             exit 1
           fi
+          echo "policy_rc=$scan_rc" >> "$GITHUB_OUTPUT"
           test -s "$scan_dir/report_json.json" || {
             echo "::error::ZAP completed without a report (INCOMPLETE)."
             exit 1
@@ -110,6 +119,7 @@ jobs:
           mv "$scan_dir/report_json.safe.json" zap-production-safe/report_json.json
 
       - name: Upload only sanitized production ZAP findings
+        if: steps.production-zap.outcome == 'success'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: zap-production-report
@@ -123,6 +133,13 @@ jobs:
         run: |
           if [[ -n "${ZAP_SCAN_DIR:-}" ]]; then rm -rf -- "$ZAP_SCAN_DIR"; fi
           rm -rf zap-production-safe
+
+      - name: Enforce production ZAP blocking findings after safe artifact upload
+        if: steps.production-zap.outputs.policy_rc == '1'
+        shell: bash
+        run: |
+          echo "::error::ZAP detected a blocking security finding. Only sanitized rule identities are available in the short-lived artifact."
+          exit 1
 
       - name: Summarize production DAST
         if: always()
