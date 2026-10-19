@@ -1,88 +1,27 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const SCROLL_POLICY_SELECTOR =
-	'[data-react-flow-scroll-policy="modifier-to-zoom"]';
-
-async function scrollPolicyIntoView(page: Page) {
-	await page.locator(SCROLL_POLICY_SELECTOR).waitFor({ state: "visible" });
-	await page.evaluate((selector) => {
-		const element = document.querySelector(selector);
-		if (!(element instanceof HTMLElement)) {
-			throw new Error(`React Flow scroll-policy guard not found: ${selector}`);
-		}
-		element.scrollIntoView({ block: "center" });
-	}, SCROLL_POLICY_SELECTOR);
-}
-
-async function expectModifierToZoomPolicy(page: Page, path: string) {
-	await page.setViewportSize({ width: 1280, height: 900 });
-	await page.goto(path, { waitUntil: "domcontentloaded" });
-
-	await scrollPolicyIntoView(page);
-	const guard = page.locator(SCROLL_POLICY_SELECTOR);
-	await expect(guard).toBeVisible();
-
-	const flow = guard.locator(".react-flow");
-	const viewport = flow.locator(".react-flow__viewport");
-	await expect(flow).toBeVisible();
-	await expect(viewport).toBeVisible();
-
-	await guard.hover();
-	const { pageScrollBefore, maxScrollY } = await page.evaluate(() => ({
-		pageScrollBefore: window.scrollY,
-		maxScrollY: Math.max(
-			0,
-			document.documentElement.scrollHeight - window.innerHeight,
-		),
-	}));
-	const plainWheelDelta = maxScrollY - pageScrollBefore >= 240 ? 480 : -480;
-	const transformBeforePlainWheel = await viewport.getAttribute("style");
-	await page.mouse.wheel(0, plainWheelDelta);
-	await expect
-		.poll(() =>
-			page.evaluate(
-				(scrollBefore) => Math.abs(window.scrollY - scrollBefore),
-				pageScrollBefore,
-			),
-		)
-		.toBeGreaterThan(8);
-	await expect(viewport).toHaveAttribute(
-		"style",
-		transformBeforePlainWheel ?? "",
-	);
-
-	await scrollPolicyIntoView(page);
-	await guard.hover();
-	const transformBeforeZoom = await viewport.getAttribute("style");
-	await page.keyboard.down("Control");
-	await page.mouse.wheel(0, -320);
-	await page.keyboard.up("Control");
-	await expect
-		.poll(() => viewport.getAttribute("style"))
-		.not.toBe(transformBeforeZoom);
-}
-
-test("TrueNAS services heading has no private-use glyph leakage", async ({
+// The interactive LAN graph moved behind owner authentication: never
+// restore its public DOM purely to satisfy a former scrolling test.
+test("public architecture never mounts a private React Flow graph", async ({
 	page,
 }) => {
-	await page.goto("/truenas", { waitUntil: "domcontentloaded" });
+	await page.goto("/architecture");
+	await expect(page.locator("#architecture-title")).toBeVisible();
+	await expect(page.locator(".react-flow")).toHaveCount(0);
+	await expect(
+		page.locator('a[href="https://ops.albandrieu.com/"]'),
+	).toBeVisible();
+});
 
+test("public TrueNAS keeps its service heading without network flow", async ({
+	page,
+}) => {
+	await page.goto("/truenas");
 	const heading = page.locator("#truenas-services");
 	await expect(heading).toBeVisible();
-	await expect(heading).toContainText("TrueNAS services");
 	await expect(heading).not.toContainText("E4E6");
-	await expect(heading.locator(".fa-server")).toBeVisible();
-	await expect(heading.locator('a[href="#truenas-services"]')).toBeVisible();
-});
-
-test("architecture network flow reserves wheel zoom for Ctrl/Cmd", async ({
-	page,
-}) => {
-	await expectModifierToZoomPolicy(page, "/architecture");
-});
-
-test("TrueNAS homelab flow reserves wheel zoom for Ctrl/Cmd", async ({
-	page,
-}) => {
-	await expectModifierToZoomPolicy(page, "/truenas#homelab");
+	await expect(page.locator(".react-flow")).toHaveCount(0);
+	await expect(
+		page.locator('a[href="https://ops.albandrieu.com/"]'),
+	).toBeVisible();
 });

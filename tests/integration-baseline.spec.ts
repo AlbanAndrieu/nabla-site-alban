@@ -1,59 +1,33 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("Integration baseline", () => {
-	test("homelab catalog and topology APIs stay coherent with architecture", async ({
-		page,
+test.describe("Public homelab integration boundary", () => {
+	test("catalog, topology and diagnostics fail closed without credentials", async ({
 		request,
 	}) => {
-		const [servicesResponse, topologyResponse] = await Promise.all([
-			request.get("/api/homelab-services"),
-			request.get("/api/homelab-topology"),
-		]);
-
-		expect(servicesResponse.ok()).toBe(true);
-		expect(topologyResponse.ok()).toBe(true);
-		expect(servicesResponse.headers()["cache-control"]).toContain("no-store");
-		expect(topologyResponse.headers()["cache-control"]).toContain("no-store");
-		expect(servicesResponse.headers()["x-homelab-services-source"]).toBeTruthy();
-		expect(topologyResponse.headers()["x-homelab-topology-source"]).toBeTruthy();
-
-		const services = (await servicesResponse.json()) as {
-			version?: number;
-			services?: Array<{ name?: string }>;
-		};
-		const topology = (await topologyResponse.json()) as {
-			version?: number;
-			nodes?: Array<{ id?: string }>;
-			relations?: Array<{ source?: string; target?: string; type?: string }>;
-		};
-
-		expect(services.version).toBe(1);
-		expect(Array.isArray(services.services)).toBe(true);
-		const serviceNames = new Set((services.services ?? []).map((service) => service.name));
-		expect(serviceNames.has("TrueNAS")).toBe(true);
-		expect(serviceNames.has("Open WebUI")).toBe(true);
-
-		expect(topology.version).toBe(1);
-		expect(Array.isArray(topology.nodes)).toBe(true);
-		expect(Array.isArray(topology.relations)).toBe(true);
-		const nodeIds = new Set((topology.nodes ?? []).map((node) => node.id));
-		for (const id of ["truenas", "openwebui", "litellm", "ollama"]) {
-			expect(nodeIds.has(id), `missing topology node ${id}`).toBe(true);
+		for (const endpoint of [
+			"homelab-services",
+			"homelab-topology",
+			"homelab-health",
+			"homelab-observability",
+			"runtime-topology",
+		]) {
+			const response = await request.get(`/api/${endpoint}`);
+			expect(response.status(), `private endpoint ${endpoint}`).toBe(404);
+			expect(response.headers()["cache-control"]).toContain("no-store");
+			expect(response.headers()["x-homelab-services-primary"]).toBeUndefined();
+			expect(response.headers()["x-homelab-topology-primary"]).toBeUndefined();
+			expect(await response.json()).toEqual({ error: "Not found" });
 		}
-		const hasRelation = (source: string, target: string, type: string) =>
-			(topology.relations ?? []).some(
-				(relation) =>
-					relation.source === source &&
-					relation.target === target &&
-					relation.type === type,
-			);
-		expect(hasRelation("openwebui", "litellm", "consumesApi")).toBe(true);
-		expect(hasRelation("litellm", "ollama", "routesTo")).toBe(true);
+	});
 
+	test("public architecture remains readable without operational graph", async ({
+		page,
+	}) => {
 		await page.goto("/en/architecture");
+		await expect(page.locator("#architecture-title")).toBeVisible();
+		await expect(page.locator("#service-architecture-explorer")).toHaveCount(0);
 		await expect(
-			page.getByRole("heading", { level: 1, name: /Interactive Nabla architecture/i }),
+			page.locator('a[href="https://ops.albandrieu.com/"]'),
 		).toBeVisible();
-		await expect(page.locator("#homelab-network-ingress-paths")).toBeVisible();
 	});
 });

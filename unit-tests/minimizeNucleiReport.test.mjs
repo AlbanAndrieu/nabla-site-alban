@@ -2,57 +2,53 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { minimizeNucleiJsonl } from "../scripts/security/minimize-nuclei-report.mjs";
 
-test("Nuclei collector artifact contains only approved high findings", () => {
-	const report = {
+test("Nuclei artifact removes captured HTTP evidence and URL paths", () => {
+	const raw = JSON.stringify({
 		"template-id": "cve-2026-1234",
-		"matched-at": "https://www.albanandrieu.com/login?token=SENSITIVE_VALUE",
-		info: {
-			name: "Known security issue",
-			severity: "high",
-			description: "SENSITIVE_DESCRIPTION",
-		},
-		request: "Authorization: Bearer SENSITIVE_VALUE",
-		response: "Set-Cookie: SENSITIVE_VALUE",
-	};
-	const minimal = minimizeNucleiJsonl(`${JSON.stringify(report)}\n`);
-	const finding = JSON.parse(minimal.trim());
-	assert.deepEqual(finding, {
+		info: { name: "reflected SECRET from response", severity: "high" },
+		"matched-at": "https://albanandrieu.com/login?token=SECRET",
+		request: "Authorization: Bearer SECRET",
+		response: "Set-Cookie: SESSION=SECRET",
+	});
+	const output = minimizeNucleiJsonl(raw);
+	assert.doesNotMatch(output, /SECRET|Authorization|Set-Cookie|login/);
+	assert.deepEqual(JSON.parse(output), {
 		"template-id": "cve-2026-1234",
 		type: "http",
 		info: { name: "cve-2026-1234", severity: "high" },
-		"matched-at": "https://www.albanandrieu.com",
+		"matched-at": "https://albanandrieu.com",
 	});
-	assert.doesNotMatch(minimal, /SENSITIVE_/);
 });
 
-test("Nuclei medium findings are not uploaded to collector", () => {
-	assert.equal(
-		minimizeNucleiJsonl(
-			JSON.stringify({
-				"template-id": "medium-test",
-				"matched-at": "https://albanandrieu.com/",
-				info: { name: "Nonblocking", severity: "medium" },
-			}),
-		),
-		"",
+test("Nuclei publishes only high/critical findings", () => {
+	const item = (severity) =>
+		JSON.stringify({
+			"template-id": "test-123",
+			info: { name: "test", severity },
+			host: "https://www.albanandrieu.com/",
+		});
+	const result = minimizeNucleiJsonl(
+		["medium", "high", "critical", "low"].map(item).join("\n"),
 	);
+	assert.equal(result.trim().split("\n").length, 2);
 });
 
-test("Nuclei off-domain, HTTP and invalid findings fail closed", () => {
-	for (const target of [
-		"http://www.albanandrieu.com/",
-		"https://attacker.invalid/",
-		"https://www.albanandrieu.com.evil.invalid/",
+test("Nuclei refuses nonallowlisted or credentialed origins and invalid identity", () => {
+	for (const badUrl of [
+		"http://albanandrieu.com/",
+		"https://albanandrieu.com.evil.invalid/",
+		"https://user:pass@albanandrieu.com/",
+		"https://albanandrieu.com:10443/",
 	]) {
 		assert.throws(() =>
 			minimizeNucleiJsonl(
 				JSON.stringify({
-					"template-id": "high-test",
-					"matched-at": target,
-					info: { name: "Security issue", severity: "critical" },
+					"template-id": "test-123",
+					info: { name: "test", severity: "critical" },
+					"matched-at": badUrl,
 				}),
 			),
 		);
 	}
-	assert.throws(() => minimizeNucleiJsonl("{not json"));
+	assert.throws(() => minimizeNucleiJsonl("{bad json"));
 });
