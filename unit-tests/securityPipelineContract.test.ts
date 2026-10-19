@@ -98,7 +98,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Candidate smoke checkout does not match the exact PR HEAD/);
 	assert.match(
 		ci,
-		/Candidate smoke is missing the reviewed homelab degraded-state contract/,
+		/Candidate smoke must require the private 404 homelab contract/,
 	);
 	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/);
 	assert.doesNotMatch(
