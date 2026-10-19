@@ -8,15 +8,43 @@ Nuclei est épinglé à `v3.11.1`, archive Linux amd64 vérifiée par SHA-256 `e
 
 Le workflow écrit un résumé par sévérité et ID de modèle. Un résultat Nuclei est un **signal à confirmer**, pas automatiquement une vulnérabilité avérée. Le job est plafonné à 15 minutes ; un scan interrompu, annulé ou échoué est **INCOMPLETE / NOT_RUN**, même si un fichier JSONL partiel existe. Aucun import DefectDojo ni lecture en retour n'est autorisé après un échec de scan. Une absence de rapport est une erreur de scan, jamais « zéro alerte ». Le workflow ne remplace pas ZAP Preview, Semgrep, BetterLeaks ni les validations de publication.
 
-## DefectDojo : import conditionnel
+## DefectDojo : récupération privée, pas d'import par GitHub Actions
 
-L'import utilise l'API v2 `POST /api/v2/reimport-scan/` avec `scan_type=Nuclei Scan`, format JSONL et un test stable `Nuclei public albanandrieu.com`. Il est limité aux exécutions réussies de la branche de confiance `master` (planifiées ou manuelles), **jamais aux événements `pull_request`**, car le contexte PR ne doit pas obtenir le jeton DefectDojo. La lecture en retour n'est pas tentée si le scan a échoué. Le rapport ne doit pas inclure de cookies, en-têtes d'authentification ou autres secrets.
+Le workflow Nuclei de `master` conserve un profil de scan non intrusif,
+plafonné à **2 requêtes/s**, une concurrence et 15 minutes. Aucun scan DAST
+supplémentaire n'est déclenché à chaque PR.
 
-Secrets GitHub nécessaires :
-- `DEFECTDOJO_URL` : URL **HTTPS** de l'instance DefectDojo, joignable depuis le runner ;
-- `DEFECTDOJO_API_TOKEN` : jeton API limité au produit/engagement de destination.
+En cas de succès complet, le job crée `nuclei-public-<run-id>` contenant
+`nuclei-results/nuclei.jsonl` et son SARIF. **Avant toute publication**,
+`scripts/security/minimize-nuclei-report.mjs` réduit le JSONL aux seuls
+findings High/Critical et à des champs explicitement autorisés :
+`template-id`, `info.name` calculé depuis cet ID, `info.severity`, le
+type HTTP et la seule origine HTTPS `albanandrieu.com` ou
+`www.albanandrieu.com`. Le JSONL brut est supprimé. Aucun cookie, URI avec
+chemin ou paramètres, corps de requête ou réponse, en-tête d'authentification
+ne peut être publié dans cet artefact.
 
-Le scanner ne sait pas accéder aux URL privées du LAN depuis un runner GitHub hébergé. Si DefectDojo n'est accessible que sur TrueNAS / derrière Access, prévoir **un runner autonome durci dans le réseau approprié** ou un transfert manuel contrôlé du rapport ; ne jamais publier DefectDojo sans contrôle d'accès pour simplifier l'import. Un échec de connexion génère un avertissement et conserve le rapport, **pas** une déclaration d'import réussi. La réponse synchrone atteste uniquement la prise en charge de l'import, pas la vérification de chaque finding.
+L'ingestion vers DefectDojo est **entièrement externe** à cette CI.
+Le collecteur déclaré dans
+[nabla-compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+utilise depuis TrueNAS une **GitHub App à jeton éphémère** limitée à
+`Actions:read` sur le dépôt Site Alban. Il vérifie l'identité du workflow,
+la branche `master`, la conclusion `success`, l'ID du run et le SHA,
+puis filtre encore le JSONL avant un éventuel import privé au format
+`Nuclei Scan`. Il refuse un ancien succès lorsqu'un scan plus récent a échoué.
+
+**Aucun** secret `DEFECTDOJO_URL`, `DEFECTDOJO_API_TOKEN`, PAT GitHub,
+token Cloudflare Access ou droit de push DefectDojo n'est à fournir aux
+runners publics de Site Alban. L'instance
+`defectdojo.int.albandrieu.com` reste strictement interne. Le collecteur
+n'envoie rien automatiquement : import/reimport `--apply` approuvé,
+engagement produit identifié, compte dédié et vérification du traitement
+asynchrone restent indispensables.
+
+Un rapport absent, partiel, expiré ou sans attestation d'origine reste
+`NOT_RUN` / `INCOMPLETE`, jamais `PASS` ni zéro vulnérabilité.
+La rétention GitHub de trois jours suppose une collecte interne périodique
+et une politique de purge côté TrueNAS.
 
 ## Exceptions : équivalent de `nosec`, `noqa` et `trivyignore`
 
