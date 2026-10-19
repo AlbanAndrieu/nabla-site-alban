@@ -150,7 +150,7 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(zapPreview, /ZAP_AUTH_HEADER_VALUE=/);
 	assert.match(zapPreview, /ZAP_AUTH_HEADER_SITE=/);
 	assert.match(zapPreview, /Clean ZAP Preview workspace/);
-	assert.match(zapPreview, /zap-preview-report/);
+	assert.doesNotMatch(zapPreview, /zap-preview-report/);
 	assert.match(zapPreview, /OWASP ZAP Preview/);
 	assert.match(zapPreview, /report_json\.json/);
 	assert.match(zapPreview, /context 'OWASP ZAP Preview'/);
