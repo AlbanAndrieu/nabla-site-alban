@@ -13,6 +13,7 @@ export function minimizeZapReport(input) {
 		typeof input !== "object" ||
 		Array.isArray(input) ||
 		!Array.isArray(input.site) ||
+		input.site.length === 0 ||
 		input.site.length > 20
 	) {
 		throw new Error("invalid ZAP sites");

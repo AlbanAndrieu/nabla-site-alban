@@ -62,6 +62,7 @@ test("ZAP producer refuses unapproved hosts, credentials and path/query", () => 
 test("ZAP producer rejects invalid report and High finding identities", () => {
 	for (const input of [
 		{},
+		{ site: [] },
 		{ site: "invalid" },
 		{ site: [{ "@name": "https://albanandrieu.com", alerts: "invalid" }] },
 		{
