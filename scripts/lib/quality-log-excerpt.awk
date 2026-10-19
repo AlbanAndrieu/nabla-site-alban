@@ -5,8 +5,11 @@
 found && remaining > 0 {
     # One hook's standard diagnostics: id, exit code, error and next lines.
     if ($0 ~ /^.*\.\.\.(Passed|Skipped|Failed)/) exit
-    gsub(/(Authorization:|Set-Cookie:|Cookie:)[^[:space:]]*/, "[redacted]")
-    print
+    if ($0 ~ /(Authorization:|Set-Cookie:|Cookie:|password|token=)/) {
+        print "[redacted sensitive diagnostic]"
+    } else {
+        print
+    }
     remaining--
     if (remaining == 0) exit
 }
