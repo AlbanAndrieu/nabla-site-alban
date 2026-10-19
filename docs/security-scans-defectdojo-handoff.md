@@ -108,4 +108,3 @@ sur l'édition DefectDojo effectivement installée, interdiction de rejouer
 un ancien succès après un nouveau scan échoué, compte import seul,
 engagement explicitement choisi et test de déduplication. Aucun de ces
 points **runtime** ne devient PASS par la seule présence des scripts.
-
