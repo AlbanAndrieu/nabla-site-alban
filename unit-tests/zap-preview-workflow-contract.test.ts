@@ -73,7 +73,6 @@ test("ZAP negotiates Vercel Automation Bypass or OIDC and scopes the selected he
 test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA diagnostics", async () => {
 	const workflow = await readFile(workflowUrl, "utf8");
 
-
 	assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);
 	assert.doesNotMatch(workflow, /actions\/upload-artifact|artifact_name:/);
 	assert.match(workflow, /ghcr\.io\/zaproxy\/zaproxy:2\.17\.0/);
