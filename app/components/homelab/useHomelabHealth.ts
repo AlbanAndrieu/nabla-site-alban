@@ -54,9 +54,10 @@ class CatalogV2Unavailable extends Error {
 	}
 }
 
-async function fetchCatalog(
-	signal: AbortSignal,
-): Promise<{ catalog: HomelabServicesCatalog; topology: ServiceTopology | null }> {
+async function fetchCatalog(signal: AbortSignal): Promise<{
+	catalog: HomelabServicesCatalog;
+	topology: ServiceTopology | null;
+}> {
 	const response = await fetch("/api/homelab-services", {
 		cache: "no-store",
 		signal,
@@ -276,8 +277,8 @@ export function useHomelabHealth(): HomelabServicesState {
 					error: true,
 					catalogFailure:
 						error instanceof CatalogV2Unavailable
-						? error.reason
-						: "unavailable",
+							? error.reason
+							: "unavailable",
 				}));
 			});
 
