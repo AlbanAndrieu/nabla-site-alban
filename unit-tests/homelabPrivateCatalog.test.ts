@@ -9,7 +9,7 @@ import {
 	SITE_CATALOG_V2_URL,
 	SiteCatalogV2Error,
 } from "../lib/homelabSiteCatalog";
-import { loadHomelabServicesCatalog } from "../lib/homelabServices";
+import { loadHomelabServicesCatalog } from "../lib/homelabServicesServer";
 import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 
 const originalFetch = globalThis.fetch;
