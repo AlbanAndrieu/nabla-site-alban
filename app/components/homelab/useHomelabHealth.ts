@@ -26,6 +26,7 @@ export type HealthFetchResult = {
 
 export type HomelabServicesState = {
 	catalog: HomelabServicesCatalog | null;
+	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
 	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	error: boolean;
@@ -44,6 +45,14 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	healthRefreshing: true,
 };
 
+class CatalogV2Unavailable extends Error {
+	constructor(
+		readonly reason: "key-missing" | "access-denied" | "unavailable",
+	) {
+		super("Backstage v2 catalog unavailable");
+	}
+}
+
 async function fetchCatalog(
 	signal: AbortSignal,
 ): Promise<HomelabServicesCatalog> {
@@ -51,8 +60,31 @@ async function fetchCatalog(
 		cache: "no-store",
 		signal,
 	});
-	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-	return (await response.json()) as HomelabServicesCatalog;
+	if (!response.ok) {
+		// The same-origin owner route returns only a sanitized diagnostic reason.
+		const body: unknown = await response.json().catch(() => null);
+		const reason =
+			typeof body === "object" && body !== null && "reason" in body
+				? (body as { reason?: unknown }).reason
+				: null;
+		throw new CatalogV2Unavailable(
+			reason === "key-missing" || reason === "access-denied"
+				? reason
+				: "unavailable",
+		);
+	}
+	const payload: unknown = await response.json();
+	if (
+		typeof payload !== "object" ||
+		payload === null ||
+		!("version" in payload) ||
+		payload.version !== 2 ||
+		!("services" in payload) ||
+		!Array.isArray(payload.services)
+	) {
+		throw new CatalogV2Unavailable("unavailable");
+	}
+	return payload as HomelabServicesCatalog;
 }
 
 async function fetchTopology(
@@ -141,9 +173,10 @@ export function applyHealthCycle(
 		healthStatus: aggregate.status ?? probes.status,
 		healthRefreshing: false,
 		error:
-			current.catalog === null &&
-			aggregate.snapshot === null &&
-			probes.snapshot === null,
+			current.error ||
+			(current.catalog === null &&
+				aggregate.snapshot === null &&
+				probes.snapshot === null),
 	};
 }
 
@@ -239,9 +272,16 @@ export function useHomelabHealth(): HomelabServicesState {
 				if (initialController.signal.aborted) return;
 				setState((current) => ({ ...current, catalog, error: false }));
 			})
-			.catch(() => {
+			.catch((error: unknown) => {
 				if (initialController.signal.aborted) return;
-				setState((current) => ({ ...current, error: true }));
+				setState((current) => ({
+					...current,
+					error: true,
+					catalogFailure:
+						error instanceof CatalogV2Unavailable
+						? error.reason
+						: "unavailable",
+				}));
 			});
 		void fetchTopology(initialController.signal)
 			.then((topology) => {
