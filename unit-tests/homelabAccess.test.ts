@@ -114,7 +114,7 @@ test("client IP is only read from the Vercel edge header on Vercel", () => {
 	});
 	assert.equal(vercelClientIp(headers, {}), null);
 	assert.equal(vercelClientIp(headers, { VERCEL: "0" }), null);
-	assert.equal(vercelClientIp(headers, { VERCEL: "1" }), "203.0.113.42");
+	assert.equal(vercelClientIp(headers, { VERCEL: "1" }), HOME_IP);
 	assert.equal(vercelClientIp(new Headers(), { VERCEL: "1" }), null);
 });
 
