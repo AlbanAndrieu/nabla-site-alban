@@ -45,28 +45,28 @@ exposition/contrôle Access, jetons, identifiants de sondes et preuves technique
 
 ## Ordre d'exécution
 
-- [ ] **P0 inventaire/snapshot** : scanner toutes les pages et API publiques (GET/HEAD, FR/EN, previews
+- **P0 inventaire/snapshot** : scanner toutes les pages et API publiques (GET/HEAD, FR/EN, previews
       Vercel), assets `public/`, source maps et caches; consigner uniquement nom du fichier,
       catégorie, champs détectés et nombre de violations, sans valeurs sensibles. Baseline `NOT_RUN`
       tant que le déploiement réel n'est pas consulté.
-- [ ] **P0 containment frontend** : supprimer les exports techniques sous `public/`, retirer les
+- **P0 containment frontend** : supprimer les exports techniques sous `public/`, retirer les
       références/fallbacks riches de `lib/homelabServices.ts` et `lib/serviceTopology.ts` (en tenant
       compte du cutover v2 déjà prévu), assainir les routes/API exposées; préférer une indisponibilité
       publique temporaire à un fallback indiscret. Garder les routes publiques stables seulement si leur
       réponse est validée par le DTO public; sinon 404/503 neutre.
-- [ ] **P0 non-régression** : tests Node de propriétés (clés autorisées uniquement), probes récursifs
+- **P0 non-régression** : tests Node de propriétés (clés autorisées uniquement), probes récursifs
       de champs et formats (IPv4 privées, ports, URL internes, labels de télémétrie), variations
       d'en-têtes, erreurs, mode degraded et local fallback. Ne jamais confondre masquage visuel
       et contrôle d'accès.
-- [ ] **P1 adaptation UI** : remplacer `HomelabServicesBlock`/les détails opérateur par une carte
+- **P1 adaptation UI** : remplacer `HomelabServicesBlock`/les détails opérateur par une carte
       vitrine sûre et un lien explicite vers l'espace privé, sans appel navigateur aux APIs privées.
       Conserver responsive/a11y/EN-FR et route `/truenas` indexable; `ops.albandrieu.com` n'est pas indexable.
-- [ ] **P1 validation croisée** : FastAPI livre la projection et la fermeture des routes riches
+- **P1 validation croisée** : FastAPI livre la projection et la fermeture des routes riches
       (issue #352), Compose livre Access/Tunnel (issue #262), puis recette E2E anonyme/autorisé/refusé.
-- [ ] **P1 publication** : purge/invalidations des anciens caches Cloudflare/Vercel et dérivés
+- **P1 publication** : purge/invalidations des anciens caches Cloudflare/Vercel et dérivés
       statiques après déploiement; re-scan www, apex, redirections, versions locales et previews.
       Le git history reste public : vérifier si des secrets **réellement** exposés nécessitent rotation.
-- [ ] **P2 catalogue** : auditer les pages `architecture`, `security`, `nabla`, pages générées,
+- **P2 catalogue** : auditer les pages `architecture`, `security`, `nabla`, pages générées,
       export PDF/JSON et métadonnées. Aucun nouveau composant ne doit accepter un DTO propriétaire
       sur une page publique.
 

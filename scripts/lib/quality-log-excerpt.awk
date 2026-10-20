@@ -1,12 +1,16 @@
-# Store only the last max lines after the first failing hook, bounded in memory.
-# When no failed hook is present, exit nonzero so the caller can show a fallback.
-/\.\.\.Failed/ { found = 1 }
-found {
-    lines[count % max] = $0
-    count++
+# Preserve the *first* failing pre-commit hook rather than the last
+# ${max} lines (which can be unrelated successful secret-scanner output).
+# Print bounded redacted diagnostics; never print source files or HTTP evidence.
+/\.\.\.Failed/ && !found { found = 1; remaining = max; print; next }
+found && remaining > 0 {
+    # One hook's standard diagnostics: id, exit code, error and next lines.
+    if ($0 ~ /^.*\.\.\.(Passed|Skipped|Failed)/) exit
+    if ($0 ~ /(Authorization:|Set-Cookie:|Cookie:|password|token=)/) {
+        print "[redacted sensitive diagnostic]"
+    } else {
+        print
+    }
+    remaining--
+    if (remaining == 0) exit
 }
-END {
-    if (!found) exit 1
-    start = count > max ? count - max : 0
-    for (i = start; i < count; i++) print lines[i % max]
-}
+END { if (!found) exit 1 }

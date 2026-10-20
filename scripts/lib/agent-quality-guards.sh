@@ -39,6 +39,19 @@ app/\[locale\]/architecture/page.tsx | \
                 public/freenas.html | public/locales/fr/freenas.html)
                 continue
                 ;;
+            # Reviewed public-to-private E2E migration (Site PR #236):
+            # allow this one shrink only when the owner-only suite remains
+            # explicitly opt-in on the protected ops origin AND the public
+            # anti-leak assertions remain present. Never globally bypass.
+            tests/homelab-health-visual.spec.ts)
+                if [[ -f tests/ops-homelab-health-visual.spec.ts ]] && \
+                    grep -Fq 'OPS_E2E_ENABLED !== "YES"' tests/ops-homelab-health-visual.spec.ts && \
+                    grep -Fq 'https://ops.albandrieu.com' tests/ops-homelab-health-visual.spec.ts && \
+                    grep -Fq 'page.locator(".service-card-ux")' tests/homelab-health-visual.spec.ts && \
+                    grep -Fq 'page.locator("[data-health-state]")' tests/homelab-health-visual.spec.ts; then
+                    continue
+                fi
+                ;;
             # Reviewed R1-R3 and R8-R9 component splits (PR #230): rendering stays
             # here while graph builders, state hooks and presentation move to
             # sibling modules.

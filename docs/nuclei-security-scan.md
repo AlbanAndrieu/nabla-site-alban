@@ -1,5 +1,20 @@
 # Nuclei DAST public — Site Alban
 
+## Coordination CI/DAST au 19 octobre 2026
+
+- **Nuclei** : filtre HIGH/CRITICAL à la source déjà prévu et inchangé ;
+  cadence hebdomadaire/manuelle, 2 req/s, une concurrence. **NOT_RUN**
+  pour tout nouveau scan `master` non prouvé ; pas de nouveau DAST sur PR.
+- **ZAP Site Alban** : modification source-only dans la PR #236 :
+  production publie un JSON minimal compatible avec le collecteur privé
+  Compose #263, Preview ne publie plus de rapport brut. Validation du
+  workflow déployé **INCOMPLETE**, anciens artefacts GitHub déjà publiés
+  à inventorier et expirer/purger selon permissions.
+- **DefectDojo** : nom du parseur OSS **`ZAP Scan`** ; GitHub App,
+  engagement préexistant, RBAC, parsing installé, Celery et déduplication
+  **NOT_RUN**. Aucun import ni push depuis un runner public.
+
+
 ## Portée et exécution
 
 Le workflow [Nuclei public DAST](../.github/workflows/nuclei-public.yml) cible exclusivement `https://albanandrieu.com` depuis GitHub Actions chaque lundi à 04:19 UTC, ou manuellement via `workflow_dispatch`. **Ce n'est pas un scan de l'homelab**. Il ne suit pas une URL fournie par l'utilisateur, n'injecte pas de Service Token et ne sonde aucune adresse privée. Le trafic de production est limité à 2 requêtes/s et une seule concurrence ; les modèles DoS, fuzzing, brute force et les tests OAST (`-ni`) sont exclus. Le rapport JSONL reste un artefact GitHub à conservation de trois jours.
@@ -8,15 +23,43 @@ Nuclei est épinglé à `v3.11.1`, archive Linux amd64 vérifiée par SHA-256 `e
 
 Le workflow écrit un résumé par sévérité et ID de modèle. Un résultat Nuclei est un **signal à confirmer**, pas automatiquement une vulnérabilité avérée. Le job est plafonné à 15 minutes ; un scan interrompu, annulé ou échoué est **INCOMPLETE / NOT_RUN**, même si un fichier JSONL partiel existe. Aucun import DefectDojo ni lecture en retour n'est autorisé après un échec de scan. Une absence de rapport est une erreur de scan, jamais « zéro alerte ». Le workflow ne remplace pas ZAP Preview, Semgrep, BetterLeaks ni les validations de publication.
 
-## DefectDojo : import conditionnel
+## DefectDojo : récupération privée, pas d'import par GitHub Actions
 
-L'import utilise l'API v2 `POST /api/v2/reimport-scan/` avec `scan_type=Nuclei Scan`, format JSONL et un test stable `Nuclei public albanandrieu.com`. Il est limité aux exécutions réussies de la branche de confiance `master` (planifiées ou manuelles), **jamais aux événements `pull_request`**, car le contexte PR ne doit pas obtenir le jeton DefectDojo. La lecture en retour n'est pas tentée si le scan a échoué. Le rapport ne doit pas inclure de cookies, en-têtes d'authentification ou autres secrets.
+Le workflow Nuclei de `master` conserve un profil de scan non intrusif,
+plafonné à **2 requêtes/s**, une concurrence et 15 minutes. Aucun scan DAST
+supplémentaire n'est déclenché à chaque PR.
 
-Secrets GitHub nécessaires :
-- `DEFECTDOJO_URL` : URL **HTTPS** de l'instance DefectDojo, joignable depuis le runner ;
-- `DEFECTDOJO_API_TOKEN` : jeton API limité au produit/engagement de destination.
+En cas de succès complet, le job crée `nuclei-public-<run-id>` contenant
+`nuclei-results/nuclei.jsonl` et son SARIF. **Avant toute publication**,
+`scripts/security/minimize-nuclei-report.mjs` réduit le JSONL aux seuls
+findings High/Critical et à des champs explicitement autorisés :
+`template-id`, `info.name` calculé depuis cet ID, `info.severity`, le
+type HTTP et la seule origine HTTPS `albanandrieu.com` ou
+`www.albanandrieu.com`. Le JSONL brut est supprimé. Aucun cookie, URI avec
+chemin ou paramètres, corps de requête ou réponse, en-tête d'authentification
+ne peut être publié dans cet artefact.
 
-Le scanner ne sait pas accéder aux URL privées du LAN depuis un runner GitHub hébergé. Si DefectDojo n'est accessible que sur TrueNAS / derrière Access, prévoir **un runner autonome durci dans le réseau approprié** ou un transfert manuel contrôlé du rapport ; ne jamais publier DefectDojo sans contrôle d'accès pour simplifier l'import. Un échec de connexion génère un avertissement et conserve le rapport, **pas** une déclaration d'import réussi. La réponse synchrone atteste uniquement la prise en charge de l'import, pas la vérification de chaque finding.
+L'ingestion vers DefectDojo est **entièrement externe** à cette CI.
+Le collecteur déclaré dans
+[nabla-compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+utilise depuis TrueNAS une **GitHub App à jeton éphémère** limitée à
+`Actions:read` sur le dépôt Site Alban. Il vérifie l'identité du workflow,
+la branche `master`, la conclusion `success`, l'ID du run et le SHA,
+puis filtre encore le JSONL avant un éventuel import privé au format
+`Nuclei Scan`. Il refuse un ancien succès lorsqu'un scan plus récent a échoué.
+
+**Aucun** secret `DEFECTDOJO_URL`, `DEFECTDOJO_API_TOKEN`, PAT GitHub,
+token Cloudflare Access ou droit de push DefectDojo n'est à fournir aux
+runners publics de Site Alban. L'instance
+`defectdojo.int.albandrieu.com` reste strictement interne. Le collecteur
+n'envoie rien automatiquement : import/reimport `--apply` approuvé,
+engagement produit identifié, compte dédié et vérification du traitement
+asynchrone restent indispensables.
+
+Un rapport absent, partiel, expiré ou sans attestation d'origine reste
+`NOT_RUN` / `INCOMPLETE`, jamais `PASS` ni zéro vulnérabilité.
+La rétention GitHub de trois jours suppose une collecte interne périodique
+et une politique de purge côté TrueNAS.
 
 ## Exceptions : équivalent de `nosec`, `noqa` et `trivyignore`
 
@@ -49,3 +92,38 @@ Le skill Cloudflare épinglé `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` organis
 Le profil Nuclei hebdomadaire est réservé aux exécutions de `master` (programmation le lundi 04:19 UTC ou déclenchement manuel). Les changements applicatifs n'entraînent pas de scan sur push. Ce profil est délibérément restreint aux tags `cve,misconfig,exposure` et sévérités `medium,high,critical`, afin de limiter les minutes Actions et la charge sur la production ; il ne constitue **pas** une campagne exhaustive. Le workflow tel que modifié dans la PR #219 ne se déclenchera avec cette programmation qu'après fusion sur la branche par défaut. Les PR ne reçoivent **jamais** le jeton DefectDojo. La récupération des findings par API est tentée uniquement depuis `master`, avec secrets et mapping de produit explicitement configurés. Une PR peut consulter les synthèses non sensibles publiées par une exécution de confiance ; elle ne peut pas prétendre lire directement les findings privés en l'absence d'un canal de publication expurgé.
 
 L'instance DefectDojo du homelab est déclarée dans `nabla-compose` sur l'IP LAN `172.17.0.24`, port `31085`, en HTTP, et non accessible directement depuis un runner public sans exposition ou accès réseau supplémentaire. Ce bind LAN est préférable à une écoute WAN, mais **ne constitue ni TLS ni authentification forte**. Tout accès distant API nécessite un frontal HTTPS fiable avec validation du certificat, contrôle d'accès, identité de service dédiée et jeton à privilèges minimaux. Ne pas publier le port ni contourner Cloudflare Access pour faire fonctionner l'import. Le serveur MCP communautaire `dcianciulli/defectdojo-mcp-server` (révision épinglée `4d34d17f346dccab92e97e3d50e77b568689f283`) est déclarable dans `.mcp.json` ; ses outils d'écriture sont puissants et doivent être audités et restreints avant activation sur la production. Aucun connecteur MCP n'est exécuté automatiquement par la déclaration.
+
+## Intégration réelle du collecteur privé DefectDojo (2026-10-19)
+
+Le collecteur prévu dans [nabla-compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+attend **trois workflows `master` réussis** : `Supply Chain Security (Trivy)`,
+`Nuclei public DAST (Site Alban)` et `Production DAST`. Leurs artefacts
+restent à conservation limitée et **ne sont jamais envoyés directement vers
+`defectdojo.int.albandrieu.com` depuis un runner GitHub**.
+
+- **Trivy** : `trivy-master-<sha>` contient `trivy-security.json` et le
+  SBOM CycloneDX. Le collecteur importe seulement CVE npm lockfile
+  `HIGH/CRITICAL` ; SBOM, licences, misconfigurations et autres scanners
+  sont **exclus** du reimport automatique.
+- **Nuclei** : `nuclei-public-<run-id>` contient un
+  `nuclei-results/nuclei.jsonl` **minimisé avant publication GitHub**.
+  Le fichier de collecte conserve seulement `template-id`, le type HTTP,
+  la sévérité `high/critical`, le nom du template et l'origine HTTPS
+  autorisée. Réponses, requêtes, chemins et paramètres ne sont pas publiés
+  dans ce JSONL. Le scan conserve en mémoire de job un JSONL brut pour
+  établir les comptes par sévérité, puis le supprime **avant** upload.
+- **ZAP production** : `zap-production-report` produit actuellement
+  `report_json.json`. Le collecteur convertit ce JSON en XML expurgé
+  et utilise le scanner DefectDojo OSS `ZAP Scan` (format XML),
+  avec les alertes `riskcode=3` uniquement. **Point bloquant avant
+  ingestion automatique** : `zaproxy/action-baseline` archive encore
+  lui-même le rapport non expurgé dans GitHub Actions. Aucun filtre
+  applicatif ultérieur sur TrueNAS ne garantit sa confidentialité.
+  Remplacer cet upload par un artefact minimisé avant de réautoriser
+  l'automatisation ZAP ou exécuter les DAST sensibles dans le LAN.
+
+Contrôles nécessaires : provenance `master`/SHA/run/workflow, test de parser
+sur l'édition DefectDojo effectivement installée, interdiction de rejouer
+un ancien succès après un nouveau scan échoué, compte import seul,
+engagement explicitement choisi et test de déduplication. Aucun de ces
+points **runtime** ne devient PASS par la seule présence des scripts.

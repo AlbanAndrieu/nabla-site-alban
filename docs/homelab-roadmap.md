@@ -1,5 +1,80 @@
 # Feuille de route homelab
 
+## État du chantier DefectDojo / Preview — 19 octobre 2026 (HEAD de la PR #236)
+
+| Périmètre | Statut | Preuve / limite |
+| --- | --- | --- |
+| Quality + Trivy du HEAD initial `8a19211` | **PASS** | GitHub Actions #39325632157 (quality), #39325632138 |
+| Vercel + ZAP Preview du même HEAD | **PASS** | Statuses exact-SHA, ZAP run #39326142900 ; **ancien scanner**, pas la nouvelle implémentation |
+| Playwright Preview du même HEAD | **FAIL** | Run #39326142907 : 184 passés, 3 ignorés, 1 échec dû aux deux injections `addInitScript` concurrentes (thème dark resté light) |
+| Correction E2E | **INCOMPLETE** | Contextes Playwright distincts en light/dark, puis migration des fixtures détaillées vers `tests/ops-homelab-health-visual.spec.ts` (opt-in privé uniquement) ; nouvelle Preview pas encore attestée |
+| ZAP production et Preview — confidentialité source | **INCOMPLETE** | Dans cette PR, action à téléversement brut supprimée ; CLI ZAP conserve le brut dans le runner, production n'upload que `report_json.json` minimisé, Preview n'upload aucun ZAP. Test d'exécution réel post-merge restant |
+| GitHub App → TrueNAS → DefectDojo | **NOT_RUN** | Identité, environnement, parser installé, RBAC, déduplication et traitement Celery non vérifiés en runtime ; aucun import approuvé |
+| E2E opérateur `ops.albandrieu.com` | **NOT_RUN** | Tests privés sous `OPS_E2E_ENABLED=YES`, environnement authentifié/privé absent de la CI publique |
+
+**Frontière P0 :** ne jamais remettre les fixtures de santé, IP, endpoints privés ni rapports ZAP HTTP bruts sur Vercel public. `PASS` sur l'ancien SHA ne vaut pas `PASS` du dernier commit.
+
+
+## Transition des contrats E2E publics — 19 octobre 2026
+
+- [x] Replacer les attentes d'API publique riche par des assertions `404`, `no-store` et sans provenance upstream.
+- [x] En PR #236, contrôler les deep links obsolètes, l'absence de graphe privé et d'états de santé sur `/truenas` et `/architecture`, FR/EN selon le cas.
+- [x] Nuclei ne publie le JSONL expurgé que lorsque le scan complet a réussi; contrat de minimisation testé avec URLs contenant secrets simulés.
+- [x] Déplacer les fixtures visuelles et tests de santé vers `tests/ops-homelab-health-visual.spec.ts`, explicitement privés et désactivés en CI publique. Validation fonctionnelle sur l'UI `ops` : **NOT_RUN**, conditionnée par Access + JWT origin.
+- [ ] Vérifier la CI Playwright Preview sur le HEAD exact après migration des tests ; un succès local source-only n'est pas une preuve de déploiement.
+
+
+## Réconciliation — collecteur DefectDojo privé (19 octobre 2026)
+
+Coordination : [Site #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236)
+et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263).
+
+- [x] Nuclei hebdomadaire/manuel uniquement : sortie JSONL publiée après
+  minimisation à `template-id`, gravité et origine HTTPS autorisée ;
+  les titres proviennent de l'ID canonique, jamais d'une réponse reflétée.
+  Le JSONL brut est supprimé avant l'upload ; un scan incomplet ne peut être importé.
+- [x] Produire le rapport d'entrée attendu dans la branche de confiance :
+  `nuclei-results/nuclei.jsonl`; garder `trivy-security.json` au sein
+  de `trivy-master-<sha>` et `report_json.json` pour ZAP master.
+- [x] Maintenir les gates BetterLeaks/Semgrep, Trivy Critical et la politique
+  économique ZAP/Nuclei : **aucun DAST long supplémentaire sur chaque PR**.
+- [x] Côté Compose #263 : sélection du dernier run par workflow et dépôt,
+  source `alban` / `bababou` explicite, approbation d'import distincte,
+  Trivy vuln High/Critical uniquement, Nuclei minimisé, conversion ZAP
+  JSON en XML et type DefectDojo **`ZAP Scan`**.
+- [x] **Gate confidentialité ZAP au niveau source (code)** : suppression de l'action auto-upload dans production et Preview ; rapport production minimal seul dans l'artefact, aucun artefact ZAP Preview. **INCOMPLETE** jusqu'au test réel du workflow après déploiement ; les anciens ZIPs doivent expirer/être purgés.
+- [ ] **Gate runtime** : GitHub App autorisée (Actions:read par dépôt), clé
+  matérialisée depuis Vaultwarden, cron TrueNAS initialement désactivé,
+  parser installé `ZAP Scan`, engagement et RBAC réels, déduplication et
+  retour de traitement asynchrone DefectDojo vérifiés.
+- [ ] **CI au HEAD final / G0–G5** : contrôles de qualité, scans de
+  confidentialité public/Preview, CDN et chaîne Cloudflare/FastAPI ;
+  `NOT_RUN` ou `PENDING` tant que la preuve n'est pas disponible.
+
+
+## P0/P1 — Security gates Trivy, CodeQL, Semgrep, ZAP et DefectDojo (2026-10-19)
+
+Contrat [scans/ingestion privée](security-scans-defectdojo-handoff.md) ; implémentation sur
+[PR #236](https://github.com/AlbanAndrieu/nabla-site-alban/pull/236), sans nouvelle PR.
+
+- [x] Trivy filesystem/lockfile (vuln, misconfig, license), filtre bloquant Critical
+  et SBOM CycloneDX `master` préparés dans `.github/workflows/security-supply-chain.yml`.
+  La couverture effective et les conclusions restent dépendantes des exécutions.
+- [ ] CodeQL : garder le **Default Setup** existant et vérifier dans GitHub ses alertes et la suite `security-extended` ; ne pas déclarer un second Advanced Setup ou un blocage Critical non prouvé.
+- [x] BetterLeaks reste dans pre-commit/quality gate ; Semgrep PR, ZAP Preview
+  et Nuclei/ZAP production existants ne sont pas remplacés ni dupliqués.
+- [ ] Examiner règles Semgrep supplémentaires pour Next.js/SSR, proxy public,
+  authorization, secrets et XSS, avec tests de détection et sans faux positifs bloquants.
+- [ ] Examiner ZAP API/OpenAPI + spider élargi uniquement à cadence manuelle/staging
+  contrôlée ; Nuclei conserve budget réseau et template IDs validés.
+- [ ] Livrer collecteur LAN read-only GitHub pour rapports réussis sur master,
+  provenance SHA/run, mapping produit allowlist, redaction et reimport DefectDojo.
+  Aucun runner GitHub ne se connecte à `.int`; aucune collecte automatique
+  de logs/PII/snapshots complets. À coordonner avec `nabla-compose`.
+- [ ] Tests de format JSON/validité et CI exact HEAD ; mettre `NOT_RUN` lorsque
+  seule la source a été examinée.
+
+
 ## P0/P1 — Confidentialité de /truenas et espace privé ops.albandrieu.com (2026-10-18)
 
 **Exécution P0** : [réconciliation des 5 dernières PR fusionnées](roadmap-merge-reconciliation-2026-10-18.md).

@@ -7,6 +7,39 @@ nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
 complète des PR, commits et runs ; les procédures de diagnostic restent dans les
 runbooks et les retours d'incident sous `docs/incidents/`.
 
+## P0/P1 — Portefeuille de scans AppSec proportionnel au risque (2026-10-19)
+
+Le [contrat de scan](security-scan-matrix.md) explicite la matrice
+PR/master et le budget CI, en cohérence avec Bababou sans cloner tous les jobs.
+
+- [x] Conserver BetterLeaks v1.9.0 et `detect-private-key` dans la gate PR ;
+  le matcher `public/**` inclut aussi les anciennes pages HTML, sans
+  ajouter un second scanner de secrets identique.
+- [x] Ajouter Trivy `fs` sur `package-lock.json` et le dépôt : vuln/misconfig
+  `CRITICAL` bloquants; licences signalées pour revue; SBOM CycloneDX
+  uniquement sur `master` / scans manuels.
+- [x] Étendre la passe Semgrep diff-only par `p/owasp-top-ten` en plus de
+  `p/ci`, sans SAST full-repo à chaque push.
+- [x] Reconnaître CodeQL **Default Setup déjà activé** sur GitHub;
+  ne pas maintenir de workflow Advanced incompatible (échec SARIF avéré).
+- [x] Réduire le ZAP production de « chaque déploiement + quotidien » à
+  **hebdomadaire/manuellement**; conserver ZAP Preview pour les PR déployables
+  et Nuclei hebdomadaire à faible débit.
+- [x] Retirer l'ancien import Nuclei direct depuis GitHub Actions vers
+  DefectDojo : ingestion pull locale filtrée préparée dans
+  [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263).
+- [ ] Faire respecter la politique de blocage de CodeQL Critical via
+  GitHub Code Scanning/Rulesets; vérifier couverture du Default Setup.
+- [ ] Étudier ZAP active/full DAST uniquement après approbation et garde
+  de trafic sur des routes publiques explicitement autorisées.
+- [ ] Mettre en place une remise **chiffrée** des rapports DAST détaillés
+  ou les produire directement sur TrueNAS avant import : artifacts GitHub
+  d'un dépôt public ne sont pas un stockage privé.
+- [ ] Évaluer les licences `Forbidden/Restricted/Unknown` puis choisir
+  les exceptions documentées et un éventuel gate bloquant.
+- [ ] Faire aboutir quality gate, tests et Preview sécurité sur HEAD exact.
+  Les preuves `SKIPPED`/`NOT_RUN` ne valent pas `PASS`.
+
 ## Règles de maintenance
 
 - Garder ici les décisions structurantes, invariants et tâches ouvertes.

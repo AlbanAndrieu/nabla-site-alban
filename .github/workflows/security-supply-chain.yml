@@ -1,0 +1,92 @@
+name: Supply Chain Security (Trivy)
+
+on:
+  pull_request:
+    paths:
+      - "package-lock.json"
+      - "package.json"
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/security-supply-chain.yml"
+      - "scripts/security/trivy-report-gate.mjs"
+  push:
+    branches: [master]
+    paths:
+      - "package-lock.json"
+      - "package.json"
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/security-supply-chain.yml"
+      - "scripts/security/trivy-report-gate.mjs"
+  schedule:
+    - cron: "17 5 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trivy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  filesystem:
+    name: Trivy lockfile, filesystem and license policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Require the canonical npm lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s package-lock.json
+          test -s package.json
+          node -e 'const p=require("./package-lock.json");if(!p.lockfileVersion||!p.packages||!p.packages[""])process.exit(1)'
+      # No duplicate secret scanner: BetterLeaks is blocking in the canonical gate.
+      # The filesystem scan reads package-lock.json's dependency graph.
+      # Licenses require reviewed baseline before a blocking policy is enabled.
+      - name: Trivy vulnerability, config and license filesystem scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: "."
+          version: "v0.74.0"
+          scanners: "vuln,misconfig,license"
+          format: json
+          output: trivy-security.json
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          exit-code: "0"
+          hide-progress: true
+          skip-dirs: "node_modules,.next,.git,coverage"
+      - name: Fail on Critical vulnerabilities and configurations
+        shell: bash
+        run: node scripts/security/trivy-report-gate.mjs trivy-security.json
+      - name: Generate CycloneDX SBOM (trusted master only)
+        if: github.event_name != 'pull_request'
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: "."
+          version: "v0.74.0"
+          format: cyclonedx
+          output: trivy-sbom.cdx.json
+          hide-progress: true
+          skip-dirs: "node_modules,.next,.git,coverage"
+      - name: Publish bounded master reports for private DefectDojo pull
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: trivy-master-${{ github.sha }}
+          path: |
+            trivy-security.json
+            trivy-sbom.cdx.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Remove reports
+        if: always()
+        shell: bash
+        run: rm -f trivy-security.json trivy-sbom.cdx.json

@@ -99,7 +99,8 @@ is_preview_safe_path() {
             scripts/quality-gate.sh | \
             scripts/lib/quality-log-excerpt.awk | \
             scripts/agent-output-metrics.sh | \
-            scripts/eslint-github-formatter.mjs)
+            scripts/eslint-github-formatter.mjs | \
+            scripts/security/trivy-report-gate.mjs)
             return 0
             ;;
         *)

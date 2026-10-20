@@ -98,9 +98,16 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	assert.match(ci, /Candidate smoke checkout does not match the exact PR HEAD/);
 	assert.match(
 		ci,
-		/Candidate smoke is missing the reviewed homelab degraded-state contract/,
+		/Candidate smoke must require the private 404 homelab contract/,
 	);
-	assert.match(ci, /DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/);
+	assert.doesNotMatch(
+		ci,
+		/DEPLOYED_SHA="\$PRODUCTION_SHA" node "\$candidate_smoke"/,
+	);
+	assert.match(
+		ci,
+		/candidate private 404 requires Preview and post-deploy validation/,
+	);
 	assert.doesNotMatch(
 		ci,
 		/continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/,
@@ -121,15 +128,17 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		]);
 
 	for (const workflow of [zapPreview, production]) {
-		assert.match(
-			workflow,
-			/zaproxy\/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0\.15\.0/,
-		);
-		assert.match(workflow, /rules_file_name:\s*"\.zap\/rules\.tsv"/);
-		assert.match(workflow, /fail_action:\s*true/);
-		assert.match(workflow, /cmd_options:\s*"-I -T 5"/);
-		assert.doesNotMatch(workflow, /cmd_options:.*-c \.zap\/rules\.tsv/);
+		assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);
+		assert.match(workflow, /ghcr\.io\/zaproxy\/zaproxy:2\.17\.0/);
+		assert.match(workflow, /zap-baseline\.py -t/);
+		assert.match(workflow, /-c rules\.tsv/);
+		assert.match(workflow, /-J report_json\.json/);
+		assert.match(workflow, /--env ZAP_AUTH_HEADER/);
+		assert.match(workflow, /console\.log" 2>&1/);
 	}
+	assert.doesNotMatch(zapPreview, /actions\/upload-artifact/);
+	assert.match(production, /minimize-zap-report\.mjs/);
+	assert.match(production, /retention-days:\s*3/);
 
 	assert.doesNotMatch(playwright, /zaproxy\/action-baseline/);
 	assert.match(playwright, /context 'Playwright Preview E2E'/);
@@ -141,17 +150,17 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	assert.match(zapPreview, /ZAP_AUTH_HEADER_VALUE=/);
 	assert.match(zapPreview, /ZAP_AUTH_HEADER_SITE=/);
 	assert.match(zapPreview, /Clean ZAP Preview workspace/);
-	assert.match(zapPreview, /zap-preview-report/);
+	assert.doesNotMatch(zapPreview, /zap-preview-report/);
 	assert.match(zapPreview, /OWASP ZAP Preview/);
 	assert.match(zapPreview, /report_json\.json/);
 	assert.match(zapPreview, /context 'OWASP ZAP Preview'/);
 
 	assert.match(production, /https:\/\/www\.albanandrieu\.com/);
-	assert.match(production, /vercel\.deployment\.success/);
-	assert.match(
-		production,
-		/github\.event\.client_payload\.git\.ref == 'master'/,
-	);
+	assert.match(production, /schedule:/);
+	assert.match(production, /workflow_dispatch:/);
+	assert.doesNotMatch(production, /vercel\.deployment\.success/);
+	assert.match(production, /-I -T 5 -m 2 -a -s/);
+	assert.match(production, /github\.ref == 'refs\/heads\/master'/);
 	assert.match(production, /Production DAST/);
 	assert.match(production, /ZAP_AUTH_HEADER:\s*x-vercel-protection-bypass/);
 	assert.match(production, /ZAP_AUTH_HEADER_VALUE/);

@@ -27,15 +27,12 @@ test("Nuclei production scan is scheduled or manually dispatched, never on push/
 	assert.match(workflow, /-pt http -ni/);
 });
 
-test("DefectDojo is restricted to complete master scans with explicit Access credentials", () => {
-	const guards =
-		workflow.match(
-			/if: steps\.nuclei\.outcome == 'success' && github\.ref == 'refs\/heads\/master'/g,
-		) ?? [];
-	assert.equal(guards.length, 2, "both import and readback must be guarded");
-	assert.match(workflow, /CF_ACCESS_CLIENT_SECRET/);
-	assert.match(workflow, /DEFECTDOJO_PRODUCT_NAME/);
+test("DefectDojo is never pushed to the internal LAN from public GitHub runners", () => {
+	assert.doesNotMatch(workflow, /DEFECTDOJO_API_TOKEN|CF_ACCESS_CLIENT_SECRET/);
+	assert.doesNotMatch(workflow, /reimport-scan|\/api\/v2\/findings/);
+	assert.match(workflow, /read-only TrueNAS collector pulls approved master/);
 	assert.match(workflow, /INCOMPLETE \/ NOT_RUN/);
+	assert.match(workflow, /retention-days: 3/);
 });
 
 test("Documentation describes actual scan cadence and incomplete result semantics", () => {

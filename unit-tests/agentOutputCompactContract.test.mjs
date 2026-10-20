@@ -15,7 +15,7 @@ const metrics = fileURLToPath(
 );
 const read = (path) => readFileSync(new URL(path, root), "utf8");
 
-test("bounded pre-commit excerpt retains last actionable lines", () => {
+test("bounded pre-commit excerpt retains first actionable failure without trailing noise", () => {
 	const input = [
 		"initial noise",
 		"hook........Failed",
@@ -27,10 +27,14 @@ test("bounded pre-commit excerpt retains last actionable lines", () => {
 		encoding: "utf8",
 	});
 	assert.equal(result.status, 0, result.stderr);
-	assert.deepEqual(result.stdout.trim().split("\n").slice(-1), [
-		"last failure",
+	assert.deepEqual(result.stdout.trim().split("\n").slice(0, 2), [
+		"hook........Failed",
+		"diagnostic 0",
 	]);
-	assert.equal(result.stdout.trim().split("\n").length, 4);
+	assert.deepEqual(result.stdout.trim().split("\n").slice(-1), [
+		"diagnostic 3",
+	]);
+	assert.equal(result.stdout.trim().split("\n").length, 5);
 	assert.equal(
 		spawnSync("awk", ["-v", "max=4", "-f", awk], {
 			input: "all passed",
