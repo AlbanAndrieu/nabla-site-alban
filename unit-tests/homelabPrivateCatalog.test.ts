@@ -71,7 +71,10 @@ test("scoped inventory credentials override a legacy shared diagnostics key", as
 	};
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(result.source, "fastapi");
-	assert.doesNotMatch(JSON.stringify(result.catalog), /fixture-(inventory|legacy)-key/);
+	assert.doesNotMatch(
+		JSON.stringify(result.catalog),
+		/fixture-(inventory|legacy)-key/,
+	);
 });
 
 test("upstream placeholder never masquerades as the operational inventory", async () => {
