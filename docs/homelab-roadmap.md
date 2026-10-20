@@ -1,3 +1,23 @@
+## P0 — Réparer les cartes de services privées après #238 (20 octobre 2026)
+
+- [x] Le diagnostic owner de la PR #240 a été confirmé depuis le Wi-Fi domicile :
+  `trusted:true`, `authorized`, IPv4, CIDR chargé. Ce n'est pas une erreur d'accès.
+- [x] Identifier le **placeholder unique** de `public/homelab-services.json` :
+  l'ancien catalogue complet n'est plus publié (confidentialité). Son utilisation
+  en repli ne doit plus ressembler à une liste opérationnelle vide.
+- [x] Faire accepter au client serveur FastAPI un `HOMELAB_SERVICES_API_KEY`
+  (en-tête `X-Diagnostics-Key`, secret Vercel serveur uniquement), sans l'exposer
+  aux bundles, assets, URL de logs ou pages publiques. Garder le fallback sûr.
+- [ ] Définir `HOMELAB_SERVICES_API_KEY` comme secret Vercel et vérifier les droits
+  read-only du compte FastAPI ; contrôler que la réponse FastAPI comprend
+  PostgreSQL, Prometheus, etc. Ne pas publier le JSON brut dans Git ou Vercel public.
+- [ ] Tester, depuis le domicile, `/api/homelab-services` (HTTP 200, provenance
+  `fastapi`, `X-Homelab-Inventory-Complete: true`) puis les cartes et les
+  liens `#service-postgresql`. Depuis un réseau extérieur, exiger toujours 404.
+- [ ] Fermer la dette ZAP Preview : échec scanner sans rapport (CI #39490343618)
+  sur PR #240. Garder gate bloquante, classifier les erreurs sans logs sensibles,
+  valider le workflow de confiance après intégration autorisée.
+
 # Feuille de route homelab
 
 ## État du chantier DefectDojo / Preview — 19 octobre 2026 (HEAD de la PR #236)

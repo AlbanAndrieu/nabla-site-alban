@@ -38,6 +38,15 @@ export type HomelabServicesCatalog = {
 
 export type HomelabServicesSource = "fastapi" | "local-fallback";
 
+/** The sole public fallback is a non-operational placeholder, not a catalog. */
+export function isHomelabCatalogPlaceholder(catalog: HomelabServicesCatalog): boolean {
+	return (
+		catalog.services.length === 1 &&
+		catalog.services[0]?.id === "homelab" &&
+		catalog.services[0]?.endpointEnabled === false
+	);
+}
+
 export const HOMELAB_SERVICES_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab-services";
 
@@ -215,10 +224,14 @@ export async function loadHomelabServicesCatalog(): Promise<{
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 
 	try {
+		// Applied only to the server-to-server FastAPI request; never sent to
+		// browsers, the public fallback or any NEXT_PUBLIC_* configuration.
+		const privateKey = process.env.HOMELAB_SERVICES_API_KEY?.trim();
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
 				"User-Agent": "nabla-site-homelab-catalog/1.0",
+				...(privateKey ? { "X-Diagnostics-Key": privateKey } : {}),
 			},
 			signal: controller.signal,
 			cache: "no-store",
@@ -230,6 +243,9 @@ export async function loadHomelabServicesCatalog(): Promise<{
 		if (!catalog) {
 			throw new Error("Invalid homelab catalog payload");
 		}
+		if (isHomelabCatalogPlaceholder(catalog)) {
+			throw new Error("Upstream provided a public placeholder, not a private inventory");
+		}
 		return {
 			catalog: applyLocalPresentationOverrides(catalog),
 			source: "fastapi",
@@ -237,8 +253,9 @@ export async function loadHomelabServicesCatalog(): Promise<{
 		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
+		// Don't log private endpoint URLs, request headers or service names.
 		console.warn(
-			`[homelab-services] FastAPI catalog unavailable (${primaryUrl}): ${reason}; using local fallback`,
+			`[homelab-services] Private catalog unavailable (${reason.replace(/https?:\\/\\/\\S+/g, "[endpoint]")}); placeholder only`,
 		);
 		return {
 			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),

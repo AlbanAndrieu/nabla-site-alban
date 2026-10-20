@@ -1,3 +1,23 @@
+## Catalogue de services owner (20 octobre 2026, PR #240)
+
+Le diagnostic sur Wi-Fi maison prouve `trusted:true`. Cela n'implique pas
+que `/api/homelab-services` puisse interroger un inventaire riche :
+`public/homelab-services.json` ne contient que le placeholder `homelab`
+(volume volontairement retiré de la publication publique). Ce dernier ne peut
+pas remplacer les cartes historiques. Le front affiche explicitement le
+problème au lieu de fabriquer des services depuis ce placeholder.
+
+**Configuration à provisionner dans Vercel (serveur seulement)** :
+`HOMELAB_SERVICES_API_URL` doit pointer vers l'API FastAPI autorisée
+(`/api/homelab-services`), et `HOMELAB_SERVICES_API_KEY` vers une clé
+**read-only** obtenue depuis Vaultwarden et renseignée comme secret sensible.
+L'appel utilise `X-Diagnostics-Key` ; jamais `NEXT_PUBLIC_*` et jamais une clé
+dans la chaîne URL. Si la source fournit un placeholder ou échoue, le repli
+public reste neutre : le contenu privé ne doit pas être commité ou placé dans
+`public/`. Après configuration Vercel, un nouveau déploiement sera nécessaire
+pour appliquer la variable. Vérifier `X-Homelab-Inventory-Complete` en restant
+sur le réseau de confiance.
+
 ### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
 
 **État vérifié le 20 octobre :** la PR #238 est fusionnée. La production
