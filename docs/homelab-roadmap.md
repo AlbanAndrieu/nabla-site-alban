@@ -1,12 +1,16 @@
 ## Diagnostic supplémentaire — 20 octobre 2026
-Le catalogue n'est pas récupéré lorsque FastAPI répond 401/403 ; l'interface
-affiche alors « accès refusé, vérifier DIAGNOSTICS_ACCESS_KEY », sans publier
-la valeur de la clé. Une variable Vercel temporaire `DIAGNOSTICS_ACCESS_KEY`
-a été signalée par l'utilisateur avec une valeur de test : **ne jamais
-conserver cette valeur en production**. FastAPI attend `X-Diagnostics-Key`
-et sa valeur serveur `DIAGNOSTICS_ACCESS_KEY` ; l'authentification ne dépend
-pas du CIDR seul. Confirmer un HTTP 200 et une liste contenant PostgreSQL
-avant de considérer la récupération des cartes comme fonctionnelle.
+L'accès propriétaire `trusted:true` est confirmé depuis le Wi-Fi du domicile.
+La clé `DIAGNOSTICS_ACCESS_KEY` est désormais présente en **Preview** dans Vercel
+(variable sensible créée le 20 octobre, avant la Preview READY du HEAD `7fae991`).
+Ce constat **ne prouve pas** que FastAPI accepte la clé ni que l'inventaire est complet :
+depuis le domicile, vérifier l'API privée et la présence effective de PostgreSQL.
+Ne pas partager la valeur de la clé ni la promouvoir en production.
+
+Le catalogue est chargé indépendamment de la topologie (PR #240), afin qu'un
+échec de `/api/homelab-topology` ne masque pas les cartes valides.
+Le serveur préfère `HOMELAB_SERVICES_API_KEY` à la clé générique de transition,
+transmet `X-Diagnostics-Key` exclusivement au backend et interdit de suivre une
+redirection avec cette clé. Une réponse FastAPI 401/403 laisse le fallback neutre.
 
 ## P0 — Réparer les cartes de services privées après #238 (20 octobre 2026)
 
@@ -18,16 +22,24 @@ avant de considérer la récupération des cartes comme fonctionnelle.
 - [x] Faire accepter au client serveur FastAPI un `HOMELAB_SERVICES_API_KEY`
   (en-tête `X-Diagnostics-Key`, secret Vercel serveur uniquement), sans l'exposer
   aux bundles, assets, URL de logs ou pages publiques. Garder le fallback sûr.
-- [ ] **Bloquant confirmé** : `HOMELAB_SERVICES_API_KEY` est absent des variables Vercel Production/Preview/Development consultées le 20 octobre. Provisionner une clé FastAPI dédiée lecture seule (source Vaultwarden), puis définir ce secret sur Vercel ; vérifier les droits
-  read-only du compte FastAPI ; contrôler que la réponse FastAPI comprend
-  PostgreSQL, Prometheus, etc. Ne pas publier le JSON brut dans Git ou Vercel public.
+- [ ] **Validation runtime bloquante** : la clé générique `DIAGNOSTICS_ACCESS_KEY` existe en Preview et la Preview `7fae991` est READY, mais aucune réponse authentifiée propriétaire du catalogue n'a encore été constatée sur ce build. Depuis le domicile, contrôler que FastAPI renvoie PostgreSQL et Prometheus. Le fallback public reste uniquement un placeholder.
+- [ ] **Séparation des privilèges** : provisionner une `HOMELAB_SERVICES_API_KEY` dédiée en lecture seule (Vaultwarden), confirmer les droits du backend, l'utiliser dans Vercel et retirer la clé générique dès validation. Ne pas publier le JSON brut dans Git ou les artefacts.
 - [x] Contrat unitaire : clé réservée au fetch serveur, PostgreSQL accepté dans le catalogue FastAPI, erreur 403 amont → repli placeholder sans fuite de secret (tests dans la PR #240, exécution sur HEAD final à revalider).
-- [ ] Tester, depuis le domicile, `/api/homelab-services` (HTTP 200, provenance
-  `fastapi`, `X-Homelab-Inventory-Complete: true`) puis les cartes et les
-  liens `#service-postgresql`. Depuis un réseau extérieur, exiger toujours 404.
-- [ ] Fermer la dette ZAP Preview : échec scanner sans rapport (CI #39490343618)
-  sur PR #240. Garder gate bloquante, classifier les erreurs sans logs sensibles,
-  valider le workflow de confiance après intégration autorisée.
+- [ ] Tester sur la dernière Preview du HEAD après déploiement, depuis le domicile,
+  `/api/homelab-services` (HTTP 200, `X-Homelab-Services-Source: fastapi`,
+  `X-Homelab-Inventory-Complete: true`), puis les cartes et les liens
+  `#service-postgresql` et `#homelab-service-postgresql`.
+  Depuis un réseau extérieur, exiger toujours 404.
+- [x] Corriger l'initialisation indépendante catalogue/topologie et ajouter
+  trois contrats E2E avec API simulées : inventaire valide malgré topologie
+  inaccessible, placeholder explicite, refus visiteur. **Exécution locale NOT_RUN**
+  (pas de checkout et DNS GitHub indisponible dans l'environnement d'agent).
+- [ ] Fermer la dette ZAP Preview : échec scanner sans rapport sur PR #240.
+  La CI historique #39490804675 n'est **pas** une preuve du nouveau workflow.
+  Classification exit=3 (scanner), rapport JSON valide avec site(s), détection
+  démarrage/docker, et absence d'artefact HTTP brut ajoutées dans la PR.
+  **Reste NOT_RUN** : un scan réel exact-SHA via la politique déployée, sans
+  retirer la gate bloquante ni déclencher des pipelines inutilement.
 
 ## Qualité — parité choisie avec nabla-site-bababou
 
