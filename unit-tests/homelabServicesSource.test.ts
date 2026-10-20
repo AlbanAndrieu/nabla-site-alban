@@ -24,9 +24,11 @@ function setApiUrl(value: string | undefined) {
 }
 
 test.afterEach(() => {
-	if (ORIGINAL_DIAGNOSTICS_KEY === undefined) delete process.env.DIAGNOSTICS_ACCESS_KEY;
+	if (ORIGINAL_DIAGNOSTICS_KEY === undefined)
+		delete process.env.DIAGNOSTICS_ACCESS_KEY;
 	else process.env.DIAGNOSTICS_ACCESS_KEY = ORIGINAL_DIAGNOSTICS_KEY;
-	if (ORIGINAL_API_KEY === undefined) delete process.env.HOMELAB_SERVICES_API_KEY;
+	if (ORIGINAL_API_KEY === undefined)
+		delete process.env.HOMELAB_SERVICES_API_KEY;
 	else process.env.HOMELAB_SERVICES_API_KEY = ORIGINAL_API_KEY;
 	setApiUrl(ORIGINAL_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
@@ -204,7 +206,9 @@ test("private inventory sends read-only diagnostics key server-to-server only", 
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(result.source, "fastapi");
 	assert.equal(passedHeader, "test-only-private-key");
-	assert.ok(result.catalog.services.some((service) => service.id === "postgresql"));
+	assert.ok(
+		result.catalog.services.some((service) => service.id === "postgresql"),
+	);
 	assert.doesNotMatch(JSON.stringify(result.catalog), /test-only-private-key/);
 });
 
