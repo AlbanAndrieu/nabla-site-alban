@@ -21,8 +21,7 @@ fi
 scope="$(mktemp)"
 trap 'rm -f "$scope"' EXIT
 base_ok=false
-if [[ -n "$base" ]] && git rev-parse --verify "$base^{commit}" >/dev/null 2>&1 &&
-    git merge-base "$base" HEAD >/dev/null 2>&1; then
+if [[ -n "$base" ]] && git rev-parse --verify "$base^{commit}" >/dev/null 2>&1 && git merge-base "$base" HEAD >/dev/null 2>&1; then
     base_ok=true
 fi
 if [[ "$base_ok" == true ]]; then
@@ -58,7 +57,9 @@ for file in "${files[@]}"; do
             ;;
     esac
 done
-if [[ "$base_ok" == true ]]; then git diff --check "$base...HEAD"; fi
+if [[ "$base_ok" == true ]]; then
+    git diff --check "$base...HEAD"
+fi
 git diff --check
 git diff --cached --check
 printf 'OFFLINE_L1_PASS paths=%d syntax_checked=%d\n' "${#files[@]}" "$checked"
