@@ -11,6 +11,10 @@ context:
 preflight:
     bash scripts/agent-offline-context.sh preflight
 
+# Offline L1 syntax-only fallback, aligned with Bababou.
+offline-l1:
+    bash scripts/agent-offline-check.sh
+
 # SHA/digest come from the exact-head Dagger GitHub artifact.
 snapshot-check archive head digest destination:
     python3 scripts/agent-source-snapshot.py "{{archive}}" "{{head}}" "{{digest}}" "{{destination}}"

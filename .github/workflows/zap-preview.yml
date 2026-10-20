@@ -200,7 +200,10 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-preview.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
-          if ! docker run --rm \
+          # Raw HTTP traffic and console output remain runner-local only.
+          # A scanner may return a blocking exit code with a valid JSON report.
+          zap_exit=0
+          docker run --rm \
             --user "$(id -u):$(id -g)" \
             --env HOME=/tmp \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
@@ -208,14 +211,29 @@ jobs:
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py -t "$PREVIEW_BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -s \
-            > "$scan_dir/console.log" 2>&1; then
-            echo "::error::ZAP Preview blocked or scanner failed; raw evidence withheld."
+            > "$scan_dir/console.log" 2>&1 || zap_exit=$?
+          echo "ZAP_SCAN_EXIT_CODE=$zap_exit" >> "$GITHUB_ENV"
+          if [[ ! -s "$scan_dir/report_json.json" ]]; then
+            category=unknown
+            if grep -Eiq 'permission denied|read-only file system' "$scan_dir/console.log"; then
+              category=filesystem-permission
+            elif grep -Eiq 'no space left on device|disk quota' "$scan_dir/console.log"; then
+              category=runner-disk
+            elif grep -Eiq 'connection refused|timed out|failed to connect|name resolution' "$scan_dir/console.log"; then
+              category=network
+            elif grep -Eiq 'unauthorized|forbidden|status code: 40[13]|HTTP 40[13]' "$scan_dir/console.log"; then
+              category=preview-auth
+            elif grep -Eiq 'invalid option|unrecognized arguments|usage: zap-baseline' "$scan_dir/console.log"; then
+              category=scanner-arguments
+            fi
+            # Never publish the raw ZAP HTTP evidence, URLs, cookies or keys.
+            echo "::error::ZAP_NO_REPORT class=$category exit=$zap_exit (raw evidence withheld)"
             exit 1
           fi
-          test -s "$scan_dir/report_json.json" || {
-            echo "::error::ZAP Preview produced no report (INCOMPLETE)."
+          if (( zap_exit != 0 )); then
+            echo "::error::ZAP blocked findings; sanitized counts in job summary only."
             exit 1
-          }
+          fi
 
       - name: Summarize ZAP Preview diagnostics
         id: summary
