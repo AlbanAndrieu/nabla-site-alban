@@ -3,8 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
-import { homelabServiceId } from "@/lib/homelabServices";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
+import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
@@ -115,9 +115,7 @@ export default function HomelabServicesBlock() {
 		if (!group) return;
 		handledAnchor.current = hash;
 		setExpandedGroups((current) =>
-			current.has(group.group)
-				? current
-				: new Set([...current, group.group]),
+			current.has(group.group) ? current : new Set([...current, group.group]),
 		);
 		let secondFrame = 0;
 		const firstFrame = window.requestAnimationFrame(() => {
