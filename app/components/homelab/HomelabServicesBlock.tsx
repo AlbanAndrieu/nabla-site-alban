@@ -153,9 +153,24 @@ export default function HomelabServicesBlock() {
 	};
 
 	if (!state.catalog) {
+		const catalogError = state.catalogFailure;
 		return (
-			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
-				{state.error ? t("unavailable") : t("loading")}
+			<div
+				className="text-center py-4"
+				role={state.error ? "alert" : "status"}
+				data-homelab-inventory-unavailable={state.error ? true : undefined}
+			>
+				{!state.error
+					? t("loading")
+					: catalogError === "access-denied"
+						? french
+							? "Clé de diagnostic refusée par FastAPI : le catalogue Backstage v2 reste privé."
+							: "FastAPI rejected the diagnostics key: the Backstage v2 catalog remains private."
+						: catalogError === "key-missing"
+							? french
+								? "Clé serveur manquante : catalogue Backstage v2 indisponible."
+								: "Missing server key: Backstage v2 catalog unavailable."
+							: t("unavailable")}
 			</div>
 		);
 	}
