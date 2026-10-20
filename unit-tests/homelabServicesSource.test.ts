@@ -223,7 +223,7 @@ test("rejected upstream key never publishes a private fallback catalog", async (
 	assert.equal(result.catalog.services[0].id, "homelab");
 });
 
-test("DIAGNOSTICS_ACCESS_KEY takes precedence and denied response is explained without secrets", async () => {
+test("dedicated inventory key takes precedence and denied response is explained without secrets", async () => {
 	process.env.DIAGNOSTICS_ACCESS_KEY = "1234";
 	process.env.HOMELAB_SERVICES_API_KEY = "legacy-test-key";
 	setApiUrl("https://catalog.example.test/homelab");
@@ -233,7 +233,7 @@ test("DIAGNOSTICS_ACCESS_KEY takes precedence and denied response is explained w
 		return new Response("denied", { status: 403 });
 	}) as typeof fetch;
 	const result = await loadHomelabServicesCatalog();
-	assert.equal(sent, "1234");
+	assert.equal(sent, "legacy-test-key");
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.catalog.privateInventoryStatus, "access-denied");
 	assert.equal(result.catalog.services.length, 1);
