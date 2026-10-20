@@ -1,16 +1,16 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { GET as getCards } from "../app/api/homelab-services/route";
 import { GET as getV2 } from "../app/api/homelab-catalog-v2/route";
+import { GET as getCards } from "../app/api/homelab-services/route";
+import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "../lib/homelabCatalogV2Projection";
+import { loadHomelabServicesCatalog } from "../lib/homelabServicesServer";
 import {
 	fetchSiteCatalogV2,
-	sanitizeSiteCatalogV2,
 	SITE_CATALOG_V2_URL,
 	SiteCatalogV2Error,
+	sanitizeSiteCatalogV2,
 } from "../lib/homelabSiteCatalog";
-import { loadHomelabServicesCatalog } from "../lib/homelabServicesServer";
-import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.DIAGNOSTICS_ACCESS_KEY;
@@ -33,7 +33,7 @@ function fixture() {
 					annotations: { secret: "DO_NOT_EXPORT" },
 					labels: {
 						"albandrieu.com/operational-criticality": "critical",
-						"token": "DO_NOT_EXPORT",
+						token: "DO_NOT_EXPORT",
 					},
 				},
 				spec: { type: "database" },
@@ -95,10 +95,18 @@ test("v2 503, v1 payload and invalid graph cannot become service cards", async (
 	process.env.DIAGNOSTICS_ACCESS_KEY = "fixture-read-only";
 	for (const response of [
 		new Response("unavailable", { status: 503 }),
-		Response.json({ version: 1, services: [{ id: "postgresql", name: "PostgreSQL" }] }),
+		Response.json({
+			version: 1,
+			services: [{ id: "postgresql", name: "PostgreSQL" }],
+		}),
 		Response.json({
 			...fixture(),
-			entities: [{ ...fixture().entities[1], spec: { dependsOn: ["resource:default/missing"] } }],
+			entities: [
+				{
+					...fixture().entities[1],
+					spec: { dependsOn: ["resource:default/missing"] },
+				},
+			],
 		}),
 	]) {
 		globalThis.fetch = async () => response.clone();
@@ -117,23 +125,36 @@ test("only Backstage v2 can materialize cards and canonical dependencies", async
 	assert.equal(result.source, "fastapi");
 	assert.equal(result.primaryUrl, SITE_CATALOG_V2_URL);
 	assert.equal(result.catalog.catalogRevision, revision);
-	assert.deepEqual(result.catalog.services.map((item) => item.id), ["fastapi", "postgresql"]);
-	assert.ok(result.catalog.services.every((item) => item.endpointEnabled === false));
-	assert.doesNotMatch(JSON.stringify(result.catalog), /DO_NOT_EXPORT|5432|internal\\.invalid/);
+	assert.deepEqual(
+		result.catalog.services.map((item) => item.id),
+		["fastapi", "postgresql"],
+	);
+	assert.ok(
+		result.catalog.services.every((item) => item.endpointEnabled === false),
+	);
+	assert.doesNotMatch(
+		JSON.stringify(result.catalog),
+		/DO_NOT_EXPORT|5432|internal\\.invalid/,
+	);
 	const parsed = parseHomelabCatalogV2(fixture());
 	assert.ok(parsed);
 	const sanitized = sanitizeSiteCatalogV2(parsed);
 	assert.ok(sanitized);
 	const projected = projectHomelabCatalogV2(sanitized);
 	assert.equal(projected.topology.catalogRevision, revision);
-	assert.deepEqual(projected.topology.relations, [{
-		source: "fastapi",
-		target: "postgresql",
-		type: "dependsOn",
-		strength: "required",
-		evidence: [],
-	}]);
-	assert.doesNotMatch(JSON.stringify(sanitized), /DO_NOT_EXPORT|5432|internal\\.invalid/);
+	assert.deepEqual(projected.topology.relations, [
+		{
+			source: "fastapi",
+			target: "postgresql",
+			type: "dependsOn",
+			strength: "required",
+			evidence: [],
+		},
+	]);
+	assert.doesNotMatch(
+		JSON.stringify(sanitized),
+		/DO_NOT_EXPORT|5432|internal\\.invalid/,
+	);
 });
 
 test("v2 backend rejects an invalid sourcePath and dangling relations", () => {
