@@ -231,8 +231,8 @@ export async function loadHomelabServicesCatalog(): Promise<{
 		// Applied only to the server-to-server FastAPI request; never sent to
 		// browsers, the public fallback or any NEXT_PUBLIC_* configuration.
 		const privateKey =
-			process.env.DIAGNOSTICS_ACCESS_KEY?.trim() ||
-			process.env.HOMELAB_SERVICES_API_KEY?.trim();
+			process.env.HOMELAB_SERVICES_API_KEY?.trim() ||
+			process.env.DIAGNOSTICS_ACCESS_KEY?.trim();
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
@@ -240,6 +240,8 @@ export async function loadHomelabServicesCatalog(): Promise<{
 				...(privateKey ? { "X-Diagnostics-Key": privateKey } : {}),
 			},
 			signal: controller.signal,
+			// Never forward a server-side diagnostics credential to a redirect target.
+			redirect: "error",
 			cache: "no-store",
 		});
 		if (response.status === 401 || response.status === 403) {
