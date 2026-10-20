@@ -1,7 +1,7 @@
 import {
-	parseHomelabCatalogV2,
 	type CatalogV2Entity,
 	type HomelabCatalogV2,
+	parseHomelabCatalogV2,
 } from "./homelabCatalogV2";
 
 export const SITE_CATALOG_V2_URL =
@@ -55,9 +55,7 @@ export function sanitizeSiteCatalogV2(
 			...(entity.metadata.namespace
 				? { namespace: entity.metadata.namespace }
 				: {}),
-			...(entity.metadata.title
-				? { title: entity.metadata.title }
-				: {}),
+			...(entity.metadata.title ? { title: entity.metadata.title } : {}),
 		};
 		if (entity.metadata.tags) {
 			metadata.tags = entity.metadata.tags.filter((tag) => SAFE_TAG.test(tag));
@@ -65,7 +63,8 @@ export function sanitizeSiteCatalogV2(
 		const labels = Object.fromEntries(
 			ALLOWED_LABELS.flatMap((name) => {
 				const value = entity.metadata.labels?.[name];
-				return value && CRITICALITY.includes(value as (typeof CRITICALITY)[number])
+				return value &&
+					CRITICALITY.includes(value as (typeof CRITICALITY)[number])
 					? [[name, value]]
 					: [];
 			}),
