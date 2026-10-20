@@ -56,7 +56,7 @@ class CatalogV2Unavailable extends Error {
 
 async function fetchCatalog(
 	signal: AbortSignal,
-): Promise<HomelabServicesCatalog> {
+): Promise<{ catalog: HomelabServicesCatalog; topology: ServiceTopology | null }> {
 	const response = await fetch("/api/homelab-services", {
 		cache: "no-store",
 		signal,
@@ -85,24 +85,14 @@ async function fetchCatalog(
 	) {
 		throw new CatalogV2Unavailable("unavailable");
 	}
-	return payload as HomelabServicesCatalog;
-}
-
-async function fetchTopology(
-	signal: AbortSignal,
-): Promise<ServiceTopology | null> {
-	try {
-		const response = await fetch("/api/homelab-topology", {
-			cache: "no-store",
-			signal,
-			headers: { Accept: "application/json" },
-		});
-		if (!response.ok) return null;
-		return parseServiceTopology(await response.json());
-	} catch (error) {
-		if (signal.aborted) throw error;
-		return null;
-	}
+	const catalog = payload as HomelabServicesCatalog;
+	const topology =
+		"topology" in payload ? parseServiceTopology(payload.topology) : null;
+	return {
+		catalog,
+		topology:
+			topology?.catalogRevision === catalog.catalogRevision ? topology : null,
+	};
 }
 
 async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
@@ -269,9 +259,15 @@ export function useHomelabHealth(): HomelabServicesState {
 		// Catalog drives the service cards; topology is optional enrichment.
 		// Never make an unavailable topology hide an otherwise valid inventory.
 		void fetchCatalog(initialController.signal)
-			.then((catalog) => {
+			.then(({ catalog, topology }) => {
 				if (initialController.signal.aborted) return;
-				setState((current) => ({ ...current, catalog, catalogFailure: null, error: false }));
+				setState((current) => ({
+					...current,
+					catalog,
+					topology,
+					catalogFailure: null,
+					error: false,
+				}));
 			})
 			.catch((error: unknown) => {
 				if (initialController.signal.aborted) return;
@@ -284,14 +280,7 @@ export function useHomelabHealth(): HomelabServicesState {
 						: "unavailable",
 				}));
 			});
-		void fetchTopology(initialController.signal)
-			.then((topology) => {
-				if (initialController.signal.aborted) return;
-				setState((current) => ({ ...current, topology }));
-			})
-			.catch(() => {
-				// Abort during navigation is expected. The catalog remains independent.
-			});
+
 		void runHealthCycle(initialController.signal);
 
 		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);
