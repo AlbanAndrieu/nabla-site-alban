@@ -140,7 +140,7 @@ test("owner cards preserve the historical #service-* link after async access", (
 	const block = read("app/components/homelab/HomelabServicesBlock.tsx");
 	const gate = read("app/components/homelab/HomelabPrivateServices.tsx");
 	assert.match(card, /anchorId\.replace\(\/\^homelab-service-\//);
-	assert.match(block, /getElementById\(decodeURIComponent\(hash\.slice\(1\)\)\)/);
+	assert.match(block, /getElementById\(hash\.slice\(1\)\)/);
 	assert.match(block, /scrollIntoView\(/);
 	assert.match(gate, /if \(access === "denied"\)/);
 	assert.match(gate, /data-homelab-private-view/);
