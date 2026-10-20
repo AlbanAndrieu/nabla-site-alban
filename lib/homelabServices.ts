@@ -1,6 +1,3 @@
-import { projectHomelabCatalogV2 } from "./homelabCatalogV2Projection";
-import { fetchSiteCatalogV2, SITE_CATALOG_V2_URL } from "./homelabSiteCatalog";
-import type { ServiceTopology } from "./serviceTopology";
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 
@@ -54,7 +51,8 @@ export function isHomelabCatalogPlaceholder(
 	);
 }
 
-export const HOMELAB_SERVICES_DEFAULT_API_URL = SITE_CATALOG_V2_URL;
+export const HOMELAB_SERVICES_DEFAULT_API_URL =
+	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -218,19 +216,3 @@ export function getStaticHomelabServicesCatalog(): {
 	};
 }
 
-/** Strict Backstage v2 SERVICE consumer. No legacy or local-fallback read. */
-export async function loadHomelabServicesCatalog(): Promise<{
-	catalog: HomelabServicesCatalog;
-	topology: ServiceTopology;
-	source: HomelabServicesSource;
-	primaryUrl: string;
-}> {
-	const v2 = await fetchSiteCatalogV2();
-	const projected = projectHomelabCatalogV2(v2);
-	return {
-		catalog: projected.services,
-		topology: projected.topology,
-		source: "fastapi",
-		primaryUrl: SITE_CATALOG_V2_URL,
-	};
-}
