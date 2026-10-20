@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import { homelabServiceId } from "@/lib/homelabServices";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
@@ -51,6 +51,7 @@ export default function HomelabServicesBlock() {
 		Set<ServicePresentationGroup>
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
+	const handledAnchor = useRef<string | null>(null);
 
 	const indexedHealth = useMemo(
 		() => healthIndex(state.snapshot),
@@ -104,7 +105,7 @@ export default function HomelabServicesBlock() {
 		if (!state.catalog) return;
 		const hash = window.location.hash;
 		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
-		if (!match) return;
+		if (!match || handledAnchor.current === hash) return;
 		const serviceId = match[1];
 		const group = hierarchyGroups.find((item) =>
 			item.catalog.services.some(
@@ -112,6 +113,7 @@ export default function HomelabServicesBlock() {
 			),
 		);
 		if (!group) return;
+		handledAnchor.current = hash;
 		setExpandedGroups((current) =>
 			current.has(group.group)
 				? current
@@ -121,7 +123,7 @@ export default function HomelabServicesBlock() {
 		const firstFrame = window.requestAnimationFrame(() => {
 			secondFrame = window.requestAnimationFrame(() => {
 				document
-					.getElementById(decodeURIComponent(hash.slice(1)))
+					.getElementById(hash.slice(1))
 					?.scrollIntoView({ block: "center" });
 			});
 		});
