@@ -7,9 +7,9 @@ import {
 	HOMELAB_SERVICES_DEFAULT_API_URL,
 	homelabServiceEndpointUrl,
 	homelabServiceId,
+	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
 import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
-import { parseHomelabServicesCatalog } from "../lib/homelabServices";
 
 test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
 	assert.equal(HOMELAB_SERVICES_DEFAULT_API_URL, SITE_CATALOG_V2_URL);
