@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useLocale } from "next-intl";
 import styles from "./HomelabServicesSection.module.css";
 import useHomelabAccess from "./useHomelabAccess";
 
@@ -14,9 +15,19 @@ const HomelabOperationsDisclosure = dynamic(
 	{ ssr: false },
 );
 
-/** Owner-only TrueNAS service catalog, health and troubleshooting. */
+/** Owner-only TrueNAS services; visitors get an operations link, not private data. */
 export default function HomelabPrivateServices() {
-	if (useHomelabAccess() !== "trusted") return null;
+	const french = useLocale() === "fr";
+	const access = useHomelabAccess();
+	if (access === "pending") return null;
+	if (access === "denied")
+		return (
+			<p data-homelab-private-denied>
+				<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
+					{french ? "Espace opérations privé" : "Private operations"}
+				</a>
+			</p>
+		);
 	return (
 		<div data-homelab-private-view>
 			<div className={styles.serviceFirst} data-service-first-homelab-view>

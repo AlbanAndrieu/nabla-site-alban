@@ -101,8 +101,12 @@ test("public pages only mount the client access gates", () => {
 		);
 	}
 	assert.match(
-		read("app/components/homelab/HomelabServicesSection.tsx"),
+		read("app/components/homelab/HomelabPrivateServices.tsx"),
 		/https:\/\/ops\.albandrieu\.com/,
+	);
+	assert.doesNotMatch(
+		read("app/components/homelab/HomelabServicesSection.tsx"),
+		/Espace opérations privé/,
 	);
 });
 
@@ -129,6 +133,17 @@ test("gates ask the server first and dynamically import the private views", () =
 	assert.match(hook, /cache: "no-store"/);
 	assert.match(hook, /useState<HomelabAccessState>\("pending"\)/);
 	assert.match(hook, /setState\(trusted \? "trusted" : "denied"\)/);
+});
+
+test("owner cards preserve the historical #service-* link after async access", () => {
+	const card = read("app/components/homelab/HomelabServiceCard.tsx");
+	const block = read("app/components/homelab/HomelabServicesBlock.tsx");
+	const gate = read("app/components/homelab/HomelabPrivateServices.tsx");
+	assert.match(card, /anchorId\.replace\(\/\^homelab-service-\//);
+	assert.match(block, /getElementById\(decodeURIComponent\(hash\.slice\(1\)\)\)/);
+	assert.match(block, /scrollIntoView\(/);
+	assert.match(gate, /if \(access === "denied"\)/);
+	assert.match(gate, /data-homelab-private-view/);
 });
 
 test("network topology data never reaches a client bundle", () => {

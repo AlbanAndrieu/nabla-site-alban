@@ -1,8 +1,9 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
+import { homelabServiceId } from "@/lib/homelabServices";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
@@ -96,6 +97,39 @@ export default function HomelabServicesBlock() {
 		(total, group) => total + group.catalog.services.length,
 		0,
 	);
+
+	// Cards mount asynchronously only after owner access. The browser's initial
+	// fragment jump happens before that mount, so restore historical deep links.
+	useEffect(() => {
+		if (!state.catalog) return;
+		const hash = window.location.hash;
+		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
+		if (!match) return;
+		const serviceId = match[1];
+		const group = hierarchyGroups.find((item) =>
+			item.catalog.services.some(
+				(service) => homelabServiceId(service) === serviceId,
+			),
+		);
+		if (!group) return;
+		setExpandedGroups((current) =>
+			current.has(group.group)
+				? current
+				: new Set([...current, group.group]),
+		);
+		let secondFrame = 0;
+		const firstFrame = window.requestAnimationFrame(() => {
+			secondFrame = window.requestAnimationFrame(() => {
+				document
+					.getElementById(decodeURIComponent(hash.slice(1)))
+					?.scrollIntoView({ block: "center" });
+			});
+		});
+		return () => {
+			window.cancelAnimationFrame(firstFrame);
+			window.cancelAnimationFrame(secondFrame);
+		};
+	}, [state.catalog, hierarchyGroups]);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {

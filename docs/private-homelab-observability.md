@@ -1,3 +1,23 @@
+### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
+
+**Etat observé :** `www.albanandrieu.com` sert encore `master` à
+`dca0755058ccb029109e180522b9d08872233ccb` (PR #236) : il n'exécute
+pas le nouveau contrôle owner et n'affiche pas les cartes et React Flow.
+La PR #238 est seulement en Preview ; modifier les variables Vercel ne
+déploie pas le code de la PR sur `www`. Aucune fusion automatique.
+
+**Recette après fusion approuvée :** depuis le domicile tester
+`/api/homelab-access` (seulement `{"trusted":true}`), puis les cartes
+et le graphique depuis `/fr/truenas`, le deep link historique
+`#service-postgresql` et le lien canonique
+`#homelab-service-postgresql`. Depuis un réseau externe, vérifier le
+refus neutre de toutes les API owner. Vérifier aussi que le navigateur
+n'est pas connecté par VPN, proxy ou IPv6 de sortie non autorisé.
+L'authentification Access reste nécessaire si configurée. L'IP seule
+n'est pas une preuve d'identité individuelle.
+
+---
+
 ## PR #238 — contrôle CIDR des vues homelab (20 octobre 2026)
 
 Sur la plateforme Vercel, déclarer la variable **serveur uniquement** :

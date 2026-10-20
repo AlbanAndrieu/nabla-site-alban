@@ -32,11 +32,6 @@ export default async function HomelabServicesSection({
 							? "Cette plateforme regroupe des expérimentations d’infrastructure, de sécurité et d’IA. Les ports, métriques et diagnostics sont privés."
 							: "This platform supports infrastructure, security, and AI experiments. Ports, metrics and diagnostics are private."}
 					</p>
-					<p>
-						<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
-							{french ? "Espace opérations privé" : "Private operations"}
-						</a>
-					</p>
 				</div>
 				<HomelabPrivateServices />
 			</div>
