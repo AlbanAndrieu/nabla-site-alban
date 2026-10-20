@@ -40,7 +40,7 @@ test("owner cards render when private catalog succeeds and topology fails", asyn
 		}),
 	);
 	await page.goto("/fr/truenas");
-	await expect(page.locator("[data-homelab-private-view]")).toBeVisible();
+	await expect(page.locator("[data-homelab-private-view]").first()).toBeVisible();
 	await expect(page.locator("#homelab-service-postgresql")).toBeVisible();
 	await expect(page.locator("#service-postgresql")).toHaveCount(1);
 	await expect(page.locator("#homelab-service-prometheus")).toBeVisible();
