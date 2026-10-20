@@ -3,10 +3,7 @@ import {
 	type HomelabCatalogV2,
 } from "./homelabCatalogV2";
 import type { HomelabServicesCatalog } from "./homelabServices";
-import type {
-	ServiceRelationType,
-	ServiceTopology,
-} from "./serviceTopology";
+import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 
 /** One canonical Backstage v2 source for cards and the architecture graph. */
 export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
