@@ -232,24 +232,24 @@ export function useHomelabHealth(): HomelabServicesState {
 			void runHealthCycle(refreshController.signal);
 		};
 
-		void Promise.all([
-			fetchCatalog(initialController.signal),
-			fetchTopology(initialController.signal),
-		])
-			.then(([catalog, topology]) => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({
-						...current,
-						catalog,
-						topology,
-						error: false,
-					}));
-				}
+		// Catalog drives the service cards; topology is optional enrichment.
+		// Never make an unavailable topology hide an otherwise valid inventory.
+		void fetchCatalog(initialController.signal)
+			.then((catalog) => {
+				if (initialController.signal.aborted) return;
+				setState((current) => ({ ...current, catalog, error: false }));
 			})
 			.catch(() => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({ ...current, error: true }));
-				}
+				if (initialController.signal.aborted) return;
+				setState((current) => ({ ...current, error: true }));
+			});
+		void fetchTopology(initialController.signal)
+			.then((topology) => {
+				if (initialController.signal.aborted) return;
+				setState((current) => ({ ...current, topology }));
+			})
+			.catch(() => {
+				// Abort during navigation is expected. The catalog remains independent.
 			});
 		void runHealthCycle(initialController.signal);
 
