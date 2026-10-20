@@ -41,23 +41,37 @@ test("inert legacy JSON remains a non-operational placeholder, never a v2 source
 
 test("runtime loader and owner architecture never request legacy endpoints or fall back", async () => {
 	const [loader, architecture, refreshing] = await Promise.all([
-		readFile(new URL("../lib/homelabServicesServer.ts", import.meta.url), "utf8"),
 		readFile(
-			new URL("../app/[locale]/architecture/ArchitecturePrivateViews.tsx", import.meta.url),
+			new URL("../lib/homelabServicesServer.ts", import.meta.url),
 			"utf8",
 		),
 		readFile(
-			new URL("../app/[locale]/architecture/useArchitectureLiveData.ts", import.meta.url),
+			new URL(
+				"../app/[locale]/architecture/ArchitecturePrivateViews.tsx",
+				import.meta.url,
+			),
+			"utf8",
+		),
+		readFile(
+			new URL(
+				"../app/[locale]/architecture/useArchitectureLiveData.ts",
+				import.meta.url,
+			),
 			"utf8",
 		),
 	]);
 	assert.match(loader, /fetchSiteCatalogV2\(\)/);
 	assert.doesNotMatch(
-		loader.slice(loader.indexOf("export async function loadHomelabServicesCatalog")),
+		loader.slice(
+			loader.indexOf("export async function loadHomelabServicesCatalog"),
+		),
 		/LOCAL_FALLBACK|getStaticHomelabServicesCatalog|homelab-services\.json/,
 	);
 	assert.match(architecture, /fetchJson\("\/api\/homelab-catalog-v2"/);
-	assert.doesNotMatch(architecture, /getStaticHomelabServicesCatalog|getStaticServiceTopology/);
+	assert.doesNotMatch(
+		architecture,
+		/getStaticHomelabServicesCatalog|getStaticServiceTopology/,
+	);
 	assert.match(refreshing, /fetch\("\/api\/homelab-catalog-v2"/);
 	assert.doesNotMatch(refreshing, /fetch\("\/api\/homelab-topology"/);
 });
