@@ -29,7 +29,8 @@ test("public placeholder is not a private service catalog", async () => {
 
 test("server-to-server FastAPI request uses read-only key only in headers", async () => {
 	process.env.HOMELAB_SERVICES_API_KEY = "fixture-read-only-key";
-	process.env.HOMELAB_SERVICES_API_URL = "https://fastapi-sample.fastapicloud.dev/api/homelab-services";
+	process.env.HOMELAB_SERVICES_API_URL =
+		"https://fastapi-sample.fastapicloud.dev/api/homelab-services";
 	let called = false;
 	globalThis.fetch = async (input, init) => {
 		called = true;
@@ -67,7 +68,9 @@ test("upstream placeholder never masquerades as the operational inventory", asyn
 });
 
 test("private inventory routes remain owner gated", async () => {
-	const response = await GET(new Request("https://site.example/api/homelab-services"));
+	const response = await GET(
+		new Request("https://site.example/api/homelab-services"),
+	);
 	assert.equal(response.status, 404);
 	assert.match(response.headers.get("Cache-Control") ?? "", /no-store/);
 });

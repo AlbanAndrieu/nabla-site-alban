@@ -81,8 +81,8 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.match(workflow, /-J report_json\.json -I -T 5 -s/);
 	assert.match(workflow, /--env ZAP_AUTH_HEADER/);
 	assert.match(workflow, /console\.log" 2>&1/);
-	assert.equal(workflow.includes('ZAP_NO_REPORT class=$category'), true);
-	assert.equal(workflow.includes('ZAP_SCAN_EXIT_CODE=$zap_exit'), true);
+	assert.equal(workflow.includes("ZAP_NO_REPORT class=$category"), true);
+	assert.equal(workflow.includes("ZAP_SCAN_EXIT_CODE=$zap_exit"), true);
 	assert.equal(workflow.includes('cat "$scan_dir/console.log"'), false);
 	assert.match(workflow, /continue-on-error: true/);
 	assert.match(workflow, /Clean ZAP Preview workspace/);

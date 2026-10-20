@@ -246,7 +246,9 @@ export async function loadHomelabServicesCatalog(): Promise<{
 			throw new Error("Invalid homelab catalog payload");
 		}
 		if (isHomelabCatalogPlaceholder(catalog)) {
-			throw new Error("Upstream provided a public placeholder, not a private inventory");
+			throw new Error(
+				"Upstream provided a public placeholder, not a private inventory",
+			);
 		}
 		return {
 			catalog: applyLocalPresentationOverrides(catalog),
@@ -255,7 +257,9 @@ export async function loadHomelabServicesCatalog(): Promise<{
 		};
 	} catch (error) {
 		// Never log private upstream URLs, keys or response bodies.
-		console.warn("[homelab-services] Private inventory unavailable; public placeholder only");
+		console.warn(
+			"[homelab-services] Private inventory unavailable; public placeholder only",
+		);
 		return {
 			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 			source: "local-fallback",
