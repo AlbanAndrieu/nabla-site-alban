@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { isHomelabCatalogPlaceholder, loadHomelabServicesCatalog } from "@/lib/homelabServices";
+import {
+	isHomelabCatalogPlaceholder,
+	loadHomelabServicesCatalog,
+} from "@/lib/homelabServices";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
 export const runtime = "nodejs";
@@ -15,7 +18,9 @@ async function catalogResponse() {
 	return NextResponse.json(catalog, {
 		headers: {
 			"X-Homelab-Services-Source": source,
-			"X-Homelab-Inventory-Complete": String(!isHomelabCatalogPlaceholder(catalog)),
+			"X-Homelab-Inventory-Complete": String(
+				!isHomelabCatalogPlaceholder(catalog),
+			),
 			"X-Homelab-Services-Primary": primaryUrl,
 			...(catalogRevision
 				? { "X-Homelab-Catalog-Revision": catalogRevision }

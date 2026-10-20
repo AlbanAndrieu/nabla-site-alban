@@ -4,7 +4,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
-import { homelabServiceId, isHomelabCatalogPlaceholder } from "@/lib/homelabServices";
+import {
+	homelabServiceId,
+	isHomelabCatalogPlaceholder,
+} from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
@@ -159,11 +162,21 @@ export default function HomelabServicesBlock() {
 
 	if (isHomelabCatalogPlaceholder(state.catalog)) {
 		return (
-			<section data-homelab-inventory-unavailable role="status" className="alert alert-warning">
-				<strong>{french ? "Catalogue privé indisponible" : "Private catalog unavailable"}</strong>
-				<p>{french
-					? "L’accès réseau est autorisé, mais FastAPI ne fournit pas encore l’inventaire privé. Le catalogue public de secours ne contient aucune carte opérationnelle."
-					: "Network access is authorized, but FastAPI is not returning the private inventory. The public placeholder cannot supply operational cards."}</p>
+			<section
+				data-homelab-inventory-unavailable
+				role="status"
+				className="alert alert-warning"
+			>
+				<strong>
+					{french
+						? "Catalogue privé indisponible"
+						: "Private catalog unavailable"}
+				</strong>
+				<p>
+					{french
+						? "L’accès réseau est autorisé, mais FastAPI ne fournit pas encore l’inventaire privé. Le catalogue public de secours ne contient aucune carte opérationnelle."
+						: "Network access is authorized, but FastAPI is not returning the private inventory. The public placeholder cannot supply operational cards."}
+				</p>
 			</section>
 		);
 	}

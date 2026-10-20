@@ -39,7 +39,9 @@ export type HomelabServicesCatalog = {
 export type HomelabServicesSource = "fastapi" | "local-fallback";
 
 /** The sole public fallback is a non-operational placeholder, not a catalog. */
-export function isHomelabCatalogPlaceholder(catalog: HomelabServicesCatalog): boolean {
+export function isHomelabCatalogPlaceholder(
+	catalog: HomelabServicesCatalog,
+): boolean {
 	return (
 		catalog.services.length === 1 &&
 		catalog.services[0]?.id === "homelab" &&
@@ -252,11 +254,8 @@ export async function loadHomelabServicesCatalog(): Promise<{
 			primaryUrl,
 		};
 	} catch (error) {
-		const reason = error instanceof Error ? error.message : String(error);
-		// Don't log private endpoint URLs, request headers or service names.
-		console.warn(
-			`[homelab-services] Private catalog unavailable (${reason.replace(/https?:\\/\\/\\S+/g, "[endpoint]")}); placeholder only`,
-		);
+		// Never log private upstream URLs, keys or response bodies.
+		console.warn("[homelab-services] Private inventory unavailable; public placeholder only");
 		return {
 			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
 			source: "local-fallback",

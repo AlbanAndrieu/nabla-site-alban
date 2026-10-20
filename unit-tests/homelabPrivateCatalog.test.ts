@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
+import { GET } from "../app/api/homelab-services/route";
 import {
 	isHomelabCatalogPlaceholder,
 	loadHomelabServicesCatalog,
 } from "../lib/homelabServices";
-import { GET } from "../app/api/homelab-services/route";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.HOMELAB_SERVICES_API_KEY;
@@ -18,7 +18,9 @@ afterEach(() => {
 });
 
 test("public placeholder is not a private service catalog", async () => {
-	globalThis.fetch = async () => { throw new Error("source unavailable"); };
+	globalThis.fetch = async () => {
+		throw new Error("source unavailable");
+	};
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(result.source, "local-fallback");
 	assert.equal(isHomelabCatalogPlaceholder(result.catalog), true);
@@ -34,7 +36,10 @@ test("server-to-server FastAPI request uses read-only key only in headers", asyn
 		assert.equal(String(input), process.env.HOMELAB_SERVICES_API_URL);
 		const headers = new Headers(init?.headers);
 		assert.equal(headers.get("X-Diagnostics-Key"), "fixture-read-only-key");
-		return Response.json({ version: 1, services: [{ id: "postgresql", name: "PostgreSQL", kind: "database" }] });
+		return Response.json({
+			version: 1,
+			services: [{ id: "postgresql", name: "PostgreSQL", kind: "database" }],
+		});
 	};
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(called, true);
@@ -45,9 +50,17 @@ test("server-to-server FastAPI request uses read-only key only in headers", asyn
 });
 
 test("upstream placeholder never masquerades as the operational inventory", async () => {
-	globalThis.fetch = async () => Response.json({ version: 1, services: [
-		{ id: "homelab", name: "Self-hosted engineering platform", endpointEnabled: false },
-	] });
+	globalThis.fetch = async () =>
+		Response.json({
+			version: 1,
+			services: [
+				{
+					id: "homelab",
+					name: "Self-hosted engineering platform",
+					endpointEnabled: false,
+				},
+			],
+		});
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(result.source, "local-fallback");
 	assert.equal(isHomelabCatalogPlaceholder(result.catalog), true);
