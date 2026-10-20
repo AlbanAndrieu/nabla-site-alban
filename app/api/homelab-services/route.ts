@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadHomelabServicesCatalog } from "@/lib/homelabServices";
+import { loadHomelabServicesCatalog } from "@/lib/homelabServicesServer";
 import { SiteCatalogV2Error } from "@/lib/homelabSiteCatalog";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
