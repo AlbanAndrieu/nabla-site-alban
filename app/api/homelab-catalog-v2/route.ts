@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { fetchSiteCatalogV2, SiteCatalogV2Error } from "@/lib/homelabSiteCatalog";
+import {
+	fetchSiteCatalogV2,
+	SiteCatalogV2Error,
+} from "@/lib/homelabSiteCatalog";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
 export const runtime = "nodejs";
