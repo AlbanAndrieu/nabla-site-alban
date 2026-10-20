@@ -30,7 +30,8 @@ test("owner cards render when private catalog succeeds and topology fails", asyn
 			status: 200,
 			contentType: "application/json",
 			body: JSON.stringify({
-				version: 1,
+				version: 2,
+				catalogRevision: `sha256:${"a".repeat(64)}`,
 				services: [
 					{ id: "postgresql", name: "PostgreSQL", endpointEnabled: false },
 					{ id: "prometheus", name: "Prometheus", endpointEnabled: false },
@@ -55,18 +56,11 @@ test("owner gets an explicit unavailable state, not an invented card", async ({
 	);
 	await page.route("**/api/homelab-services", (route) =>
 		route.fulfill({
-			status: 200,
+			status: 503,
 			contentType: "application/json",
 			body: JSON.stringify({
-				version: 1,
-				privateInventoryStatus: "access-denied",
-				services: [
-					{
-						id: "homelab",
-						name: "Private inventory unavailable",
-						endpointEnabled: false,
-					},
-				],
+				error: "Backstage v2 inventory unavailable",
+				reason: "access-denied",
 			}),
 		}),
 	);
