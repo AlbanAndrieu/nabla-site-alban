@@ -1,22 +1,38 @@
-## Catalogue de services owner (20 octobre 2026, PR #240)
+## Migration du catalogue propriétaire vers Backstage v2 — 20 octobre 2026
 
-Le diagnostic sur Wi-Fi maison prouve `trusted:true`. Cela n'implique pas
-que `/api/homelab-services` puisse interroger un inventaire riche :
-`public/homelab-services.json` ne contient que le placeholder `homelab`
-(volume volontairement retiré de la publication publique). Ce dernier ne peut
-pas remplacer les cartes historiques. Le front affiche explicitement le
-problème au lieu de fabriquer des services depuis ce placeholder.
+**Contexte source :** [FastAPI #358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358)
+définit `GET /api/site/catalog/v2` et [Compose #265](https://github.com/AlbanAndrieu/nabla-compose/pull/265)
+génère `catalog/generated/entities.json`. Les deux PR sont encore ouvertes :
+l'API et la source v2 ne sont **pas** garanties déployées sur Production.
 
-**Configuration à provisionner dans Vercel (serveur seulement)** :
-`HOMELAB_SERVICES_API_URL` doit pointer vers l'API FastAPI autorisée
-(`/api/homelab-services`), et `HOMELAB_SERVICES_API_KEY` vers une clé
-**read-only** obtenue depuis Vaultwarden et renseignée comme secret sensible.
-L'appel utilise `X-Diagnostics-Key` ; jamais `NEXT_PUBLIC_*` et jamais une clé
-dans la chaîne URL. Si la source fournit un placeholder ou échoue, le repli
-public reste neutre : le contenu privé ne doit pas être commité ou placé dans
-`public/`. Après configuration Vercel, un nouveau déploiement sera nécessaire
-pour appliquer la variable. Vérifier `X-Homelab-Inventory-Complete` en restant
-sur le réseau de confiance.
+Le site demande le **catalogue v2 uniquement**, depuis ses routes serveur
+`/api/homelab-catalog-v2` et `/api/homelab-services`, après vérification
+`HOMELAB_TRUSTED_CIDRS` sur la requête propriétaire. Le serveur Next.js
+interroge FastAPI avec `X-Diagnostics-Key` alimenté par
+`DIAGNOSTICS_ACCESS_KEY` (jamais `NEXT_PUBLIC_*`). La réponse Backstage est
+validée par le parseur existant `parseHomelabCatalogV2`, filtrée par allowlist
+et convertie en cartes et relations via `entityRef` et `catalogRevision`.
+Le rendu Architecture et les cartes partagent désormais la même révision et
+ne relisent pas `/api/homelab-services` v1 ou les JSON publics de secours.
+
+**Test négatif volontaire :** la valeur Preview actuelle de
+`DIAGNOSTICS_ACCESS_KEY` est factice et invalide. Un refus de FastAPI
+(401/403) produit `access-denied`, HTTP 503 sur la route propriétaire du
+site et un message d'indisponibilité ; **aucune carte inventée**, aucun jeton
+dans la réponse, les logs ou les bundles. Un 404 FastAPI (endpoint #358 non
+déployé) ou un 503 source (#265 non fusionnée) demeure `unavailable`, pas
+`access-denied`. Ne pas traiter un test invalide comme validation positive.
+
+Les DTO v2 excluent les IP, ports, URLs et secrets ; les cartes qui ne disposent
+pas de cible de navigation vérifiée restent non cliquables. La topologie
+opérateur détaillée et les observations WAN sont une autre frontière :
+elles ne doivent pas être recréées à partir de champs v1.
+
+**Acceptation restante :** vérifier sur Preview exacte un 404 visiteur,
+un 503 owner + clé invalide, puis après publication #358/#265 et fourniture
+d'une clé valide, un 200 avec un catalogue non vide et un même
+`catalogRevision` pour Architecture et les cartes. Ni clé valide ni
+publication v2 ne sont attestées à ce stade.
 
 ### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
 
