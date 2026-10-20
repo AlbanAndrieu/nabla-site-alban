@@ -114,11 +114,11 @@ export default function HomelabServicesBlock() {
 		);
 		if (!group) return;
 		handledAnchor.current = hash;
-		setExpandedGroups((current) =>
-			current.has(group.group) ? current : new Set([...current, group.group]),
-		);
 		let secondFrame = 0;
 		const firstFrame = window.requestAnimationFrame(() => {
+			setExpandedGroups((current) =>
+				current.has(group.group) ? current : new Set([...current, group.group]),
+			);
 			secondFrame = window.requestAnimationFrame(() => {
 				document
 					.getElementById(hash.slice(1))
