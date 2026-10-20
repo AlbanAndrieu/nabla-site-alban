@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import {
 	fetchSiteCatalogV2,
-	SiteCatalogV2Error,
 	SITE_CATALOG_V2_URL,
+	SiteCatalogV2Error,
 } from "../lib/homelabSiteCatalog";
 
 const originalKey = process.env.DIAGNOSTICS_ACCESS_KEY;
@@ -25,7 +25,8 @@ test("deliberately invalid Vercel diagnostics key fails closed (401), no fallbac
 		assert.equal(init?.redirect, "error");
 		assert.equal(init?.cache, "no-store");
 		return new Response(JSON.stringify({ detail: "credential rejected" }), {
-			status: 401, headers: { "Content-Type": "application/json" },
+			status: 401,
+			headers: { "Content-Type": "application/json" },
 		});
 	}) as typeof fetch;
 
@@ -40,8 +41,12 @@ test("deliberately invalid Vercel diagnostics key fails closed (401), no fallbac
 
 test("403 remains access-denied and a non-deployed v2 endpoint (404) is unavailable", async () => {
 	process.env.DIAGNOSTICS_ACCESS_KEY = "1234";
-	for (const [status, expected] of [[403, "access-denied"], [404, "unavailable"]] as const) {
-		globalThis.fetch = (async () => new Response(null, { status })) as typeof fetch;
+	for (const [status, expected] of [
+		[403, "access-denied"],
+		[404, "unavailable"],
+	] as const) {
+		globalThis.fetch = (async () =>
+			new Response(null, { status })) as typeof fetch;
 		await assert.rejects(fetchSiteCatalogV2(), (error: unknown) => {
 			assert.ok(error instanceof SiteCatalogV2Error);
 			assert.equal(error.reason, expected);
