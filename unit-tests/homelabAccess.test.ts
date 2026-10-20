@@ -16,7 +16,11 @@ const ISSUER = "https://nabla.cloudflareaccess.com";
 const AUDIENCE = "aud-tag-1234";
 const NOW = Date.UTC(2026, 9, 20, 12, 0, 0);
 const NOW_SECONDS = Math.floor(NOW / 1000);
+const HOME_IP = "82.66.4.247";
+const HOME_CIDR = "82.66.4.247/32";
 const ACCESS_ENV = {
+	VERCEL: "1",
+	HOMELAB_TRUSTED_CIDRS: HOME_CIDR,
 	CF_ACCESS_TEAM_DOMAIN: "nabla.cloudflareaccess.com",
 	CF_ACCESS_AUD: AUDIENCE,
 };
@@ -64,6 +68,8 @@ function validClaims(overrides: Record<string, unknown> = {}) {
 	return {
 		iss: ISSUER,
 		aud: [AUDIENCE],
+		sub: "home-owner",
+		type: "app",
 		exp: NOW_SECONDS + 600,
 		nbf: NOW_SECONDS - 10,
 		...overrides,
@@ -103,7 +109,7 @@ test("invalid and catch-all CIDRs are ignored instead of trusting everyone", () 
 
 test("client IP is only read from the Vercel edge header on Vercel", () => {
 	const headers = new Headers({
-		"x-real-ip": "203.0.113.42",
+		"x-real-ip": HOME_IP,
 		"x-forwarded-for": "198.51.100.1",
 	});
 	assert.equal(vercelClientIp(headers, {}), null);
@@ -112,21 +118,21 @@ test("client IP is only read from the Vercel edge header on Vercel", () => {
 	assert.equal(vercelClientIp(new Headers(), { VERCEL: "1" }), null);
 });
 
-test("owner network is trusted only on Vercel with a matching CIDR", async () => {
-	const headers = new Headers({ "x-real-ip": "203.0.113.42" });
-	const env = { VERCEL: "1", HOMELAB_TRUSTED_CIDRS: "203.0.113.0/24" };
+test("owner network is trusted only on Vercel with the home /32 CIDR", async () => {
+	const headers = new Headers({ "x-real-ip": HOME_IP });
+	const env = { VERCEL: "1", HOMELAB_TRUSTED_CIDRS: HOME_CIDR };
 	assert.deepEqual(await decideHomelabAccess(headers, { env }), {
 		trusted: true,
 		via: "trusted-network",
 	});
 	assert.deepEqual(
 		await decideHomelabAccess(headers, {
-			env: { HOMELAB_TRUSTED_CIDRS: "203.0.113.0/24" },
+			env: { HOMELAB_TRUSTED_CIDRS: HOME_CIDR },
 		}),
 		{ trusted: false, via: null },
 	);
 	assert.deepEqual(
-		await decideHomelabAccess(new Headers({ "x-real-ip": "192.0.2.1" }), {
+		await decideHomelabAccess(new Headers({ "x-real-ip": "82.66.4.246" }), {
 			env,
 		}),
 		{ trusted: false, via: null },
@@ -242,9 +248,12 @@ test("JWKS outages fail closed", async () => {
 	}
 });
 
-test("Cloudflare Access grants access only when fully configured", async () => {
+test("Cloudflare Access requires both the home CIDR and a verified owner", async () => {
 	const token = await signToken(validClaims());
-	const headers = new Headers({ "cf-access-jwt-assertion": token });
+	const headers = new Headers({
+		"cf-access-jwt-assertion": token,
+		"x-real-ip": HOME_IP,
+	});
 	assert.deepEqual(
 		await decideHomelabAccess(headers, {
 			env: ACCESS_ENV,
@@ -270,11 +279,24 @@ test("Cloudflare Access grants access only when fully configured", async () => {
 	}
 });
 
+test("a valid JWT from outside the home IP is still denied", async () => {
+	const token = await signToken(validClaims());
+	const decision = await decideHomelabAccess(
+		new Headers({
+			"cf-access-jwt-assertion": token,
+			"x-real-ip": "203.0.113.50",
+			"x-forwarded-for": HOME_IP,
+		}),
+		{ env: ACCESS_ENV, fetchImpl: jwksFetch(), now: NOW },
+	);
+	assert.deepEqual(decision, { trusted: false, via: null });
+});
+
 test("gated responses are a neutral 404 for anonymous visitors", async () => {
 	let handled = false;
 	const response = await gatedHomelabResponse(
 		new Request("https://www.albanandrieu.com/api/homelab-services", {
-			headers: { "x-real-ip": "203.0.113.42" },
+			headers: { "x-real-ip": HOME_IP },
 		}),
 		async () => {
 			handled = true;
@@ -295,11 +317,11 @@ test("gated responses are a neutral 404 for anonymous visitors", async () => {
 test("trusted responses always override caching with private no-store", async () => {
 	const previous = { ...process.env };
 	process.env.VERCEL = "1";
-	process.env.HOMELAB_TRUSTED_CIDRS = "203.0.113.0/24";
+	process.env.HOMELAB_TRUSTED_CIDRS = HOME_CIDR;
 	try {
 		const response = await gatedHomelabResponse(
 			new Request("https://www.albanandrieu.com/api/homelab-services", {
-				headers: { "x-real-ip": "203.0.113.42" },
+				headers: { "x-real-ip": HOME_IP },
 			}),
 			async () =>
 				Response.json(
@@ -317,7 +339,7 @@ test("trusted responses always override caching with private no-store", async ()
 
 		const access = await GET_ACCESS(
 			new Request("https://www.albanandrieu.com/api/homelab-access", {
-				headers: { "x-real-ip": "203.0.113.42" },
+				headers: { "x-real-ip": HOME_IP },
 			}),
 		);
 		assert.deepEqual(await access.json(), { trusted: true });
@@ -330,7 +352,7 @@ test("access probe answers only a boolean and is never cached", async () => {
 	const response = await GET_ACCESS(
 		new Request("https://www.albanandrieu.com/api/homelab-access", {
 			headers: {
-				"x-real-ip": "203.0.113.42",
+				"x-real-ip": HOME_IP,
 				"cf-access-jwt-assertion": "forged.token.value",
 			},
 		}),

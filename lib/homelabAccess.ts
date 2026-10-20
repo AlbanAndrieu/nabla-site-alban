@@ -1,16 +1,13 @@
 /**
  * Owner-network gate for the private homelab views and their data APIs.
  *
- * A request is trusted when EITHER:
- * - it reaches Vercel from an allowed public egress range
- *   (`HOMELAB_TRUSTED_CIDRS`, e.g. the home router's IPv4 /32 and IPv6 prefix:
- *   Vercel only sees the NAT/egress address, never the private VLAN address);
- * - or it carries a Cloudflare Access JWT whose RS256 signature, issuer,
- *   audience and validity window are verified (`CF_ACCESS_TEAM_DOMAIN`,
- *   `CF_ACCESS_AUD`).
+ * A request MUST originate from a CIDR explicitly allowed through
+ * `HOMELAB_TRUSTED_CIDRS` as observed by the Vercel edge.
+ * If Cloudflare Access is configured, its valid signed owner identity is an
+ * additional requirement, never an alternative that bypasses the IP rule.
  *
- * Every path fails closed: missing configuration, unparsable input, network
- * errors or a header that could be spoofed outside Vercel all mean "public".
+ * Every path fails closed: missing/invalid network configuration, network
+ * errors or headers outside the verified Vercel runtime mean "public".
  * Hiding UI is not access control: every data route must call this gate too.
  */
 
@@ -126,7 +123,8 @@ export function vercelClientIp(
 ): string | null {
 	if (env.VERCEL !== "1") return null;
 	const realIp = headers.get("x-real-ip")?.trim();
-	return realIp ? realIp : null;
+	if (!realIp || /[,\r\n\s]/.test(realIp)) return null;
+	return realIp;
 }
 
 type Jwk = JsonWebKey & { kid?: string };
@@ -223,6 +221,9 @@ export async function verifyCloudflareAccessJwt(
 	if (payload.iss !== options.issuer) return false;
 	const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
 	if (!audiences.includes(options.audience)) return false;
+	if (typeof payload.sub !== "string" || !payload.sub.trim()) return false;
+	if (payload.type !== "app" || payload.service_token_id || payload.common_name)
+		return false;
 	if (typeof payload.exp !== "number") return false;
 	if (payload.exp + CLOCK_SKEW_SECONDS < nowSeconds) return false;
 	if (
@@ -269,9 +270,15 @@ export async function decideHomelabAccess(
 	const env = options.env ?? process.env;
 
 	const ip = vercelClientIp(headers, env);
-	if (ip && isIpInCidrs(ip, parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS))) {
+	// Never allow a valid JWT (or spoofable forwarding header) to bypass the
+	// owner network allowlist. Public/anonymous requests remain neutral 404.
+	if (!ip || !isIpInCidrs(ip, parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS)))
+		return PUBLIC;
+
+	// The public Vercel site has no Access application by default. Where an
+	// Access tenant/audience is configured, require *both* network and identity.
+	if (!env.CF_ACCESS_TEAM_DOMAIN && !env.CF_ACCESS_AUD)
 		return { trusted: true, via: "trusted-network" };
-	}
 
 	const token = headers.get("cf-access-jwt-assertion")?.trim();
 	const issuer = cloudflareAccessIssuer(env.CF_ACCESS_TEAM_DOMAIN);

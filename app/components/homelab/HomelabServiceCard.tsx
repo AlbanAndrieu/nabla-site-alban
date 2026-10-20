@@ -85,7 +85,7 @@ export default function HomelabServiceCard({
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
 	const dependsOnTrueNas =
-		svc.internalHost === "172.17.0.24" || initialHealth?.runtime_app != null;
+		initialHealth?.runtime_app != null;
 	const internalState = internalPresentationState(
 		initialHealth,
 		truenasRuntimeUnavailable ||

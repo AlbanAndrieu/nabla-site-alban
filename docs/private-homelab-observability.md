@@ -1,3 +1,32 @@
+## PR #238 — contrôle CIDR des vues homelab (20 octobre 2026)
+
+Sur la plateforme Vercel, déclarer la variable **serveur uniquement** :
+`HOMELAB_TRUSTED_CIDRS=82.66.4.247/32`. Cette valeur correspond à
+l'adresse IPv4 publique fixe du domicile, et ne doit jamais être exposée
+comme variable `NEXT_PUBLIC_*` ou utilisée pour des décisions côté React.
+
+Chaque API privée `/api/homelab-*` et `/api/runtime-topology` exige une IP
+source dans cette allowlist, d'après `x-real-ip` réécrit par le proxy Vercel
+(`VERCEL=1`), avant d'appeler l'amont. La réponse refusée reste un
+`404` neutre avec `Cache-Control: private, no-store`.
+Une signature Cloudflare Access, même valide, **ne contourne jamais** le CIDR.
+Lorsque `CF_ACCESS_TEAM_DOMAIN` et `CF_ACCESS_AUD` sont configurés,
+la validation du JWT devient un **second facteur obligatoire** ; sinon le
+contrôle IP seul autorise l'accès depuis le domicile. Une IP autorisée ne
+constitue toutefois pas une identité forte, car tous les équipements derrière
+le même NAT public la partagent. Pour une confidentialité renforcée, préférer
+l'application opérateur `ops.albandrieu.com` derrière Access + MFA.
+
+Ce contrôle s'applique aux **requêtes serveur**, pas aux assets JS statiques,
+dont les URL restent publiques. Les données sensibles doivent donc être
+absentes du bundle public et transmises uniquement par les APIs protégées.
+Contrôler aussi IPv6 : ne pas ajouter de préfixe IPv6 sans besoin vérifié.
+La variable devra être renseignée dans la configuration Vercel et validée
+sur un déploiement Preview depuis la maison puis un réseau externe.
+Un succès unitaire n'est pas une preuve de configuration runtime Vercel.
+
+---
+
 # Frontière de confidentialité du homelab — Site Alban
 
 Statut : **architecture/roadmap approuvable, non déployée** (18 octobre 2026).

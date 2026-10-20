@@ -17,7 +17,7 @@ const privateRoutes = [
 	"runtime-topology",
 ];
 
-test("homelab APIs only answer the owner network or Cloudflare Access", () => {
+test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Access", () => {
 	for (const path of privateRoutes) {
 		const source = read(`app/api/${path}/route.ts`);
 		assert.match(source, /export function GET\(request: Request\)/, path);

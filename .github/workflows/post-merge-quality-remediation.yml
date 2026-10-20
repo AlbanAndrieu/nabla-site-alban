@@ -34,7 +34,9 @@ jobs:
       artifact_name: ${{ steps.remediate.outputs.artifact_name }}
 
     steps:
-      - name: Checkout failed master SHA without persisted credentials
+      # Semgrep false positive: the only caller is the push/master-only
+      # workflow_run gated by prepare.if; this SHA is from a trusted master push.
+      - name: Checkout failed master SHA without persisted credentials # nosemgrep: yaml.github-actions.security.workflow-run-target-code-checkout.workflow-run-target-code-checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
@@ -179,7 +181,9 @@ jobs:
             core.setOutput('number', existing?.number?.toString() || '');
             core.setOutput('url', existing?.html_url || '');
 
-      - name: Checkout failed master SHA for patch publication
+      # Semgrep false positive: prepare only runs for completed master pushes;
+      # persist-credentials is disabled, and patch publication uses that SHA.
+      - name: Checkout failed master SHA for patch publication # nosemgrep: yaml.github-actions.security.workflow-run-target-code-checkout.workflow-run-target-code-checkout
         if: >-
           needs.prepare.result == 'success' &&
           needs.prepare.outputs.action == 'pr' &&
