@@ -38,18 +38,33 @@ test("missing settings are observable, but remain fail-closed", async () => {
 	for (const [settings, reason] of [
 		[{}, "runtime-unverified"],
 		[{ VERCEL: "1" }, "trusted-cidrs-not-configured"],
-		[{ VERCEL: "1", HOMELAB_TRUSTED_CIDRS: "wrong" }, "trusted-cidrs-not-configured"],
+		[
+			{ VERCEL: "1", HOMELAB_TRUSTED_CIDRS: "wrong" },
+			"trusted-cidrs-not-configured",
+		],
 	] as const) {
-		assert.equal((await decideHomelabAccess(headers, { env: settings })).trusted, false);
-		assert.equal(diagnoseHomelabAccessNetwork(headers, settings).reason, reason);
+		assert.equal(
+			(await decideHomelabAccess(headers, { env: settings })).trusted,
+			false,
+		);
+		assert.equal(
+			diagnoseHomelabAccessNetwork(headers, settings).reason,
+			reason,
+		);
 	}
 });
 
 test("identity remains mandatory after network authorization", async () => {
 	const headers = new Headers({ "x-real-ip": "82.66.4.247" });
 	const settings = { ...env, CF_ACCESS_AUD: "owner-audience" };
-	assert.equal((await decideHomelabAccess(headers, { env: settings })).trusted, false);
-	assert.equal(diagnoseHomelabAccessNetwork(headers, settings).reason, "identity-not-authorized");
+	assert.equal(
+		(await decideHomelabAccess(headers, { env: settings })).trusted,
+		false,
+	);
+	assert.equal(
+		diagnoseHomelabAccessNetwork(headers, settings).reason,
+		"identity-not-authorized",
+	);
 });
 
 test("default access response remains boolean; explicit diagnostics do not echo IPs", () => {
@@ -61,7 +76,10 @@ test("default access response remains boolean; explicit diagnostics do not echo 
 	assert.match(route, /: \{ trusted: decision\.trusted \}/);
 	assert.match(route, /private, no-store, max-age=0/);
 	const view = readFileSync(
-		new URL("../app/components/homelab/HomelabPrivateServices.tsx", import.meta.url),
+		new URL(
+			"../app/components/homelab/HomelabPrivateServices.tsx",
+			import.meta.url,
+		),
 		"utf8",
 	);
 	assert.match(view, /data-homelab-access-diagnostic/);

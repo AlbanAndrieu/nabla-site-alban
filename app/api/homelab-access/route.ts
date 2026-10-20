@@ -24,14 +24,11 @@ export async function GET(request: Request) {
 				),
 			}
 		: { trusted: decision.trusted };
-	return NextResponse.json(
-		body,
-		{
-			headers: {
-				"Cache-Control": "private, no-store, max-age=0",
-				Pragma: "no-cache",
-				"X-Robots-Tag": "noindex, nofollow",
-			},
+	return NextResponse.json(body, {
+		headers: {
+			"Cache-Control": "private, no-store, max-age=0",
+			Pragma: "no-cache",
+			"X-Robots-Tag": "noindex, nofollow",
 		},
-	);
+	});
 }
