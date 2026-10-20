@@ -84,8 +84,7 @@ export default function HomelabServiceCard({
 	const dependencyDegraded =
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
-	const dependsOnTrueNas =
-		initialHealth?.runtime_app != null;
+	const dependsOnTrueNas = initialHealth?.runtime_app != null;
 	const internalState = internalPresentationState(
 		initialHealth,
 		truenasRuntimeUnavailable ||
