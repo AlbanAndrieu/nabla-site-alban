@@ -296,41 +296,6 @@ export async function decideHomelabAccess(
 	return PUBLIC;
 }
 
-/** Safe diagnostic of this visitor's network authorization, without raw IPs.
- * Do not use this for enforcement: decideHomelabAccess also verifies identity.
- */
-export function diagnoseHomelabAccessNetwork(
-	headers: Headers,
-	env: Record<string, string | undefined> = process.env,
-	trusted = false,
-) {
-	const platformTrusted = env.VERCEL === "1";
-	const cidrs = parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS);
-	const ip = vercelClientIp(headers, env);
-	const parsed = ip ? parseIp(ip) : null;
-	const sourceFamily = parsed?.version === 4 ? "ipv4" : parsed?.version === 6 ? "ipv6" : "unknown";
-	const networkAllowed = ip !== null && isIpInCidrs(ip, cidrs);
-	const identityRequired = Boolean(env.CF_ACCESS_TEAM_DOMAIN || env.CF_ACCESS_AUD);
-	const reason = !platformTrusted
-		? "runtime-unverified"
-		: cidrs.length === 0
-			? "trusted-cidrs-not-configured"
-			: !parsed
-				? "client-ip-unavailable"
-				: !networkAllowed
-					? "client-ip-outside-trusted-cidrs"
-					: identityRequired && !trusted
-						? "identity-not-authorized"
-						: "authorized";
-	return {
-		reason,
-		sourceFamily,
-		trustedCidrsConfigured: cidrs.length > 0,
-		networkAllowed,
-		identityRequired,
-	};
-}
-
 export async function isTrustedHomelabRequest(
 	request: Request,
 ): Promise<boolean> {

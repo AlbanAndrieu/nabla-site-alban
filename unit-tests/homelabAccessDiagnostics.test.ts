@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import {
-	decideHomelabAccess,
-	diagnoseHomelabAccessNetwork,
-} from "../lib/homelabAccess";
+import { decideHomelabAccess } from "../lib/homelabAccess";
+import { diagnoseHomelabAccessNetwork } from "../lib/homelabAccessDiagnostics";
 
 const home = "82.66.4.247/32";
 const env = { VERCEL: "1", HOMELAB_TRUSTED_CIDRS: home };

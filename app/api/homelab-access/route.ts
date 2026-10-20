@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-	decideHomelabAccess,
-	diagnoseHomelabAccessNetwork,
-} from "@/lib/homelabAccess";
+import { decideHomelabAccess } from "@/lib/homelabAccess";
+import { diagnoseHomelabAccessNetwork } from "@/lib/homelabAccessDiagnostics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
