@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-	type HomelabServicesCatalog,
-	parseHomelabServicesCatalog,
-} from "@/lib/homelabServices";
-import {
-	parseServiceTopology,
-	type ServiceTopology,
-	type ServiceTopologySource,
+import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
+import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
+import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import type {
+	ServiceTopology,
+	ServiceTopologySource,
 } from "@/lib/serviceTopology";
 
 type InitialArchitectureData = {
@@ -18,10 +16,7 @@ type InitialArchitectureData = {
 	initialTopologySource: ServiceTopologySource;
 };
 
-/**
- * Start from the server-rendered catalog and topology, then refresh both once
- * from the live API routes. Failed refreshes keep the initial data.
- */
+/** An initial verified v2 snapshot may be refreshed only by another v2 snapshot. */
 export default function useArchitectureLiveData({
 	initialCatalog,
 	initialCatalogSource,
@@ -37,40 +32,27 @@ export default function useArchitectureLiveData({
 
 	useEffect(() => {
 		const controller = new AbortController();
-
-		const loadCatalog = async () => {
-			const response = await fetch("/api/homelab-services", {
-				cache: "no-store",
-				signal: controller.signal,
-				headers: { Accept: "application/json" },
+		void fetch("/api/homelab-catalog-v2", {
+			cache: "no-store",
+			signal: controller.signal,
+			headers: { Accept: "application/json" },
+		})
+			.then(async (response) => {
+				if (!response.ok) throw new Error("Backstage v2 refresh unavailable");
+				const parsed = parseHomelabCatalogV2(await response.json());
+				if (!parsed || parsed.entities.length === 0)
+					throw new Error("Invalid Backstage v2 response");
+				if (controller.signal.aborted) return;
+				const projected = projectHomelabCatalogV2(parsed);
+				setCatalog(projected.services);
+				setCatalogSource("backstage-v2");
+				setTopology(projected.topology);
+				setTopologySource("fastapi");
+			})
+			.catch(() => {
+				// The initial snapshot is already a verified v2 response. Never
+				// recover by requesting v1 or reading a static fallback.
 			});
-			if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-			const parsed = parseHomelabServicesCatalog(await response.json());
-			if (!parsed) throw new Error("invalid catalog");
-			setCatalog(parsed);
-			setCatalogSource(
-				response.headers.get("X-Homelab-Services-Source") ?? "fastapi",
-			);
-		};
-
-		const loadTopology = async () => {
-			const response = await fetch("/api/homelab-topology", {
-				cache: "no-store",
-				signal: controller.signal,
-				headers: { Accept: "application/json" },
-			});
-			if (!response.ok) throw new Error(`topology HTTP ${response.status}`);
-			const parsed = parseServiceTopology(await response.json());
-			if (!parsed) throw new Error("invalid topology");
-			setTopology(parsed);
-			setTopologySource(
-				response.headers.get("X-Homelab-Topology-Source") === "local-fallback"
-					? "local-fallback"
-					: "fastapi",
-			);
-		};
-
-		void Promise.allSettled([loadCatalog(), loadTopology()]);
 		return () => controller.abort();
 	}, []);
 
