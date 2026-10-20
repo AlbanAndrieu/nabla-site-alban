@@ -8,6 +8,7 @@ import TopAnchor from "@/components/TopAnchor";
 import ActionLink from "@/components/ui/ActionLink";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata } from "@/lib/socialMetadata";
+import ArchitecturePrivateViews from "./ArchitecturePrivateViews";
 
 type ArchitecturePageProps = { params: Promise<{ locale: string }> };
 
@@ -69,6 +70,7 @@ export default async function ArchitecturePage({
 						</div>
 					</div>
 				</section>
+				<ArchitecturePrivateViews locale={locale} />
 				<section
 					id="declared-observed-architecture"
 					className="content-section"

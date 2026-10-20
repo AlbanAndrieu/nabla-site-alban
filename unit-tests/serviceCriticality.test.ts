@@ -398,8 +398,8 @@ test("architecture and TrueNAS share dependency, lifecycle, optional-edge and bl
 
 test("same-origin topology API keeps live topology out of static prerender", async () => {
 	const route = await source("app/api/homelab-topology/route.ts");
-	assert.match(route, /privateHomelabResponse/);
-	assert.doesNotMatch(route, /loadServiceTopology/);
+	assert.match(route, /gatedHomelabResponse\(request, \w+Response\)/);
+	assert.doesNotMatch(route, /s-maxage|public,/);
 	assert.match(route, /dynamic = "force-dynamic"/);
 	const response = await source("lib/privateHomelabResponse.ts");
 	assert.match(response, /Cache-Control/);

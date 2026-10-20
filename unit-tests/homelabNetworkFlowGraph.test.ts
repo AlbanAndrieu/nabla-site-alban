@@ -12,8 +12,12 @@ import {
 	MAX_COLUMNS,
 	NODE_WIDTH,
 	PATH_NODE_IDS,
+	parseNetworkGraph,
+	visibleNodeIds,
 } from "../app/components/truenas/homelabNetworkFlowGraph";
 import { NODES } from "../app/components/truenas/homelabNetworkFlowNodes";
+
+const ALL = visibleNodeIds(NODES, "all");
 
 test("static topology has unique node and edge ids with resolvable endpoints", () => {
 	const nodeIds = NODES.map((node) => node.id);
@@ -30,7 +34,7 @@ test("static topology has unique node and edge ids with resolvable endpoints", (
 });
 
 test("all paths build one group per failure domain plus every network node", () => {
-	const nodes = buildNodes(PATH_NODE_IDS.all, false);
+	const nodes = buildNodes(NODES, ALL, false);
 	assert.equal(NODES.length, 22);
 	assert.equal(nodes.length, NODES.length + DOMAIN_ORDER.length);
 	const groups = nodes.filter((node) => node.type === "networkGroup");
@@ -49,7 +53,7 @@ test("all paths build one group per failure domain plus every network node", () 
 	);
 	assert.equal(groups[3]?.data.label, "4 · TrueNAS failure domain");
 	assert.equal(
-		buildNodes(PATH_NODE_IDS.all, true)[0]?.data.label,
+		buildNodes(NODES, ALL, true)[0]?.data.label,
 		"1 · Externe / WAN",
 	);
 	for (const group of groups) {
@@ -60,7 +64,7 @@ test("all paths build one group per failure domain plus every network node", () 
 });
 
 test("network nodes are parented to their failure-domain group and laid out on a grid", () => {
-	const nodes = buildNodes(PATH_NODE_IDS.all, false);
+	const nodes = buildNodes(NODES, ALL, false);
 	const byId = new Map(nodes.map((node) => [node.id, node]));
 	for (const spec of NODES) {
 		const node = byId.get(spec.id);
@@ -94,18 +98,18 @@ test("network nodes are parented to their failure-domain group and laid out on a
 });
 
 test("path filters drop hidden domains and edges with hidden endpoints", () => {
-	const tunnelNodes = buildNodes(PATH_NODE_IDS.tunnel, false);
+	const tunnelNodes = buildNodes(NODES, PATH_NODE_IDS.tunnel, false);
 	assert.equal(
 		tunnelNodes.filter((node) => node.type === "network").length,
 		PATH_NODE_IDS.tunnel.size,
 	);
-	const lanNodes = buildNodes(PATH_NODE_IDS.lan, false);
+	const lanNodes = buildNodes(NODES, PATH_NODE_IDS.lan, false);
 	assert.equal(
 		lanNodes.some((node) => node.id === "network-group-external"),
 		false,
 	);
-	assert.equal(buildEdges(PATH_NODE_IDS.all).length, EDGES.length);
-	const tunnelEdges = buildEdges(PATH_NODE_IDS.tunnel);
+	assert.equal(buildEdges(EDGES, ALL).length, EDGES.length);
+	const tunnelEdges = buildEdges(EDGES, PATH_NODE_IDS.tunnel);
 	for (const edge of tunnelEdges) {
 		assert.ok(PATH_NODE_IDS.tunnel.has(edge.source), edge.id);
 		assert.ok(PATH_NODE_IDS.tunnel.has(edge.target), edge.id);
@@ -118,9 +122,7 @@ test("path filters drop hidden domains and edges with hidden endpoints", () => {
 });
 
 test("link kinds map to stroke colour, dash pattern and animation", () => {
-	const edges = new Map(
-		buildEdges(PATH_NODE_IDS.all).map((edge) => [edge.id, edge]),
-	);
+	const edges = new Map(buildEdges(EDGES, ALL).map((edge) => [edge.id, edge]));
 	const tunnel = edges.get("cloudflared-openwebui");
 	assert.equal(tunnel?.animated, true);
 	assert.deepEqual(tunnel?.style, {
@@ -138,4 +140,27 @@ test("link kinds map to stroke colour, dash pattern and animation", () => {
 	assert.equal(lan?.style?.strokeDasharray, undefined);
 	assert.equal(lan?.label, "Ethernet");
 	assert.equal(edges.get("pfsense-unbound")?.style?.strokeDasharray, "4 6");
+});
+
+test("focused paths reuse fixed ids while all follows the fetched graph", () => {
+	assert.equal(ALL.size, NODES.length);
+	assert.equal(visibleNodeIds(NODES, "dns"), PATH_NODE_IDS.dns);
+	assert.equal(visibleNodeIds([], "all").size, 0);
+});
+
+test("gated API payload is validated before rendering", () => {
+	assert.deepEqual(parseNetworkGraph({ nodes: NODES, edges: EDGES }), {
+		nodes: NODES,
+		edges: EDGES,
+	});
+	assert.equal(parseNetworkGraph(null), null);
+	assert.equal(parseNetworkGraph({ error: "private" }), null);
+	assert.equal(parseNetworkGraph({ nodes: [{ id: 1 }], edges: [] }), null);
+	assert.equal(
+		parseNetworkGraph({
+			nodes: NODES,
+			edges: [{ ...EDGES[0], kind: "unknown" }],
+		}),
+		null,
+	);
 });

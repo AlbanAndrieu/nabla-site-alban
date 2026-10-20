@@ -376,12 +376,17 @@ repos:
     #       args: ["-o", "4", "--strip", "safe", "--alpha"]
 
     ### Additional File Types ###
--   repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    # Biome cannot format YAML or SCSS, so Prettier keeps these file types. The
+    # pre-commit/mirrors-prettier repository is archived: run the pinned npm
+    # package directly through a local node hook instead.
+-   repo: local
     hooks:
     -   id: prettier
         name: "✨ misc-files · Format misc web files"
+        entry: prettier --write --ignore-unknown
+        language: node
         types_or: [yaml, html, scss]
+        require_serial: false
         additional_dependencies:
         -   prettier@3.4.2
         exclude: >
@@ -408,6 +413,24 @@ repos:
         args: ["--verbose"]
     -   id: check-taskfile
         name: "✅ taskfile · Validate Task configuration"
+
+    # GitHub Actions semantics (expressions, contexts, embedded ShellCheck).
+-   repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+    -   id: actionlint
+        name: "🧩 github-actions · Lint workflows with actionlint"
+
+    # GitHub Actions security audit (injection, permissions, triggers, credentials).
+    # Offline keeps the hook deterministic; intentional cases are ignored inline
+    # with a justification next to `# zizmor: ignore[...]`.
+-   repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.30.1
+    hooks:
+    -   id: zizmor
+        name: "🔒 github-actions · Audit workflows with zizmor"
+        args: ["--offline"]
+        files: ^\.github/(workflows/[^/]+\.ya?ml|actions/.+/action\.ya?ml|dependabot\.ya?ml)$
 
     # ----------------------------- 🔒 Deployment Tools ---------------------------- #
 -   repo: https://github.com/hadolint/hadolint

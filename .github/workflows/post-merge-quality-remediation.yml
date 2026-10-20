@@ -1,6 +1,7 @@
 name: Post-merge Quality Remediation
 
-on:
+# workflow_run is intentional: master-only recovery after a failed CI run.
+on: # zizmor: ignore[dangerous-triggers]
   workflow_run:
     workflows:
       - "CI (Quality and Security)"

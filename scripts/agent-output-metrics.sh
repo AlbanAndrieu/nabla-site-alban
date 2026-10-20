@@ -7,7 +7,7 @@ if (($# != 2)) || [[ ! -f "$1" || ! -f "$2" ]]; then
     exit 2
 fi
 for file in "$1" "$2"; do
-    if [[ ! -r "$file" ]]; then
+    if [[ ! -r "${file}" ]]; then
         echo '❌ OUTPUT_METRICS_UNREADABLE: one input cannot be read' >&2
         exit 2
     fi
@@ -18,7 +18,8 @@ current_lines="$(awk 'END { print NR+0 }' "$2")"
 baseline_bytes="$(wc -c <"$1" | tr -d ' ')"
 current_bytes="$(wc -c <"$2" | tr -d ' ')"
 
-awk -v bl="$baseline_lines" -v cl="$current_lines" -v bb="$baseline_bytes" -v cb="$current_bytes" 'BEGIN {
+# Force a dot decimal separator: a French locale would print 50,0.
+LC_ALL=C awk -v bl="${baseline_lines}" -v cl="${current_lines}" -v bb="${baseline_bytes}" -v cb="${current_bytes}" 'BEGIN {
     if (bl == 0 || bb == 0) {
         print "❌ OUTPUT_METRICS_EMPTY_BASELINE: baseline log must contain data" > "/dev/stderr"
         exit 2

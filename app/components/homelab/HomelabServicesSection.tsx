@@ -1,10 +1,14 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import SectionHeading from "@/components/SectionHeading";
+import HomelabPrivateServices from "./HomelabPrivateServices";
 import styles from "./HomelabServicesSection.module.css";
 
 type Props = { headingId?: string };
 
-/** Anonymous visitors see only the editorial platform overview. */
+/**
+ * Anonymous visitors see only the editorial platform overview; the owner
+ * network or Cloudflare Access additionally loads the private service views.
+ */
 export default async function HomelabServicesSection({
 	headingId = "homelab-services",
 }: Props) {
@@ -34,6 +38,7 @@ export default async function HomelabServicesSection({
 						</a>
 					</p>
 				</div>
+				<HomelabPrivateServices />
 			</div>
 		</section>
 	);

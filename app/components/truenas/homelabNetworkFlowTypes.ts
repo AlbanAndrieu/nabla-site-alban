@@ -41,3 +41,8 @@ export type NetworkEdgeSpec = {
 	label: string;
 	kind: LinkKind;
 };
+
+export type NetworkGraph = {
+	nodes: NetworkNodeSpec[];
+	edges: NetworkEdgeSpec[];
+};

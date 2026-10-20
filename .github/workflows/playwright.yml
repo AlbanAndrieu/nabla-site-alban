@@ -233,11 +233,13 @@ jobs:
       - name: Failure summary
         if: failure() && !cancelled()
         run: |
-          echo "## Playwright tests failed" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Target: $BASE_URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the **playwright-report** artifact for traces and screenshots when tests reached Playwright." >> "$GITHUB_STEP_SUMMARY"
-          echo "Also inspect the exact-SHA **OWASP ZAP Preview** status and its **zap-preview-report** artifact to distinguish browser regressions from DAST findings." >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Playwright tests failed"
+            echo ""
+            echo "Target: $BASE_URL"
+            echo "Download the **playwright-report** artifact for traces and screenshots when tests reached Playwright."
+            echo "Also inspect the exact-SHA **OWASP ZAP Preview** status and its **zap-preview-report** artifact to distinguish browser regressions from DAST findings."
+          } >> "$GITHUB_STEP_SUMMARY"
         env:
           BASE_URL: ${{ env.PREVIEW_BASE_URL }}
 
@@ -267,5 +269,5 @@ jobs:
             --header "Authorization: Bearer $GH_TOKEN" \
             --header 'Accept: application/vnd.github+json' \
             --header 'X-GitHub-Api-Version: 2022-11-28' \
-            "${{ github.api_url }}/repos/${{ github.repository }}/statuses/$STATUS_SHA" \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/statuses/${STATUS_SHA}" \
             --data "$payload"

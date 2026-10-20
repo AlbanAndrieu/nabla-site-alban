@@ -50,25 +50,27 @@ par les composants React dédiés.
 ## Homelab
 
 `app/components/homelab/` est la seule implémentation active des cartes de
-services partagées entre Nabla et TrueNAS :
+services partagées entre Nabla et TrueNAS. Les vues opérateur sont réservées au
+propriétaire (réseau domestique ou Cloudflare Access, voir
+[`private-homelab-observability.md`](private-homelab-observability.md#accès-propriétaire-sur-www-amendement-du-20-octobre-2026)) :
 
 ```text
-HomelabServicesSection
-  -> HomelabServicesBlock (client)
-      -> /api/homelab-services
-      -> /api/homelab-health
-      -> HomelabServiceGrid
-          -> EndpointAction
+HomelabServicesSection (serveur, texte éditorial public)
+  -> HomelabPrivateServices (client)
+      -> /api/homelab-access          (no-store, booléen)
+      -> next/dynamic si autorisé :
+          HomelabServicesBlock -> /api/homelab-services, /api/homelab-health…
+          HomelabOperationsDisclosure
+HomeLabSection -> HomeLabPrivateNetwork -> CloudflareStatusWarning, HomeLabNetworkFlow
+architecture/page -> ArchitecturePrivateViews -> explorateur, inspecteur, réseau
 ```
 
-Les pages `/nabla`, `/fr/nabla`, `/truenas` et `/fr/truenas` restent SSG/CDN ;
-seul le bloc homelab charge les données dynamiques après hydratation. Une panne
-du snapshot santé ne masque pas un catalogue valide.
-
-Les anciens renderers/probes globaux (`homelab-services-render.js`,
-`nabla-service-status.js` et `/api/homelab-tunnel-check`) sont retirés. La santé
-publique vient du snapshot FastAPI et les sondes privées restent encapsulées
-dans les composants React.
+Les pages `/nabla`, `/truenas` et `/architecture` (FR/EN) restent SSG/CDN et
+identiques pour tous : le HTML ne contient ni catalogue ni topologie. Toutes les
+routes `/api/homelab-*`, `/api/runtime-topology` et `/api/homelab-network-flow`
+passent par `gatedHomelabResponse` (`lib/privateHomelabResponse.ts`) : 404 neutre
+sans appel amont pour un visiteur anonyme, `Cache-Control: private, no-store`
+dans tous les cas.
 
 ## Observabilité
 

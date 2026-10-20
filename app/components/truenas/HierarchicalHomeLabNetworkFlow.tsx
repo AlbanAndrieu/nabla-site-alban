@@ -16,10 +16,11 @@ import styles from "./HierarchicalHomeLabNetworkFlow.module.css";
 import {
 	buildEdges,
 	buildNodes,
-	PATH_NODE_IDS,
+	visibleNodeIds,
 } from "./homelabNetworkFlowGraph";
 import type {
 	GroupNodeData,
+	NetworkGraph,
 	NetworkNodeData,
 	PathMode,
 } from "./homelabNetworkFlowTypes";
@@ -72,15 +73,23 @@ const NODE_TYPES: NodeTypes = {
 	networkGroup: NetworkGroupNode,
 };
 
-export default function HierarchicalHomeLabNetworkFlow() {
+export default function HierarchicalHomeLabNetworkFlow({
+	graph,
+}: Readonly<{ graph: NetworkGraph }>) {
 	const french = useLocale() === "fr";
 	const [pathMode, setPathMode] = useState<PathMode>("all");
-	const visibleIds = PATH_NODE_IDS[pathMode];
-	const nodes = useMemo(
-		() => buildNodes(visibleIds, french),
-		[french, visibleIds],
+	const visibleIds = useMemo(
+		() => visibleNodeIds(graph.nodes, pathMode),
+		[graph.nodes, pathMode],
 	);
-	const edges = useMemo(() => buildEdges(visibleIds), [visibleIds]);
+	const nodes = useMemo(
+		() => buildNodes(graph.nodes, visibleIds, french),
+		[french, graph.nodes, visibleIds],
+	);
+	const edges = useMemo(
+		() => buildEdges(graph.edges, visibleIds),
+		[graph.edges, visibleIds],
+	);
 
 	const labels: Record<PathMode, string> = french
 		? {

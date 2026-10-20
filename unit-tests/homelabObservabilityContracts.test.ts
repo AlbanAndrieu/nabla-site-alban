@@ -11,11 +11,10 @@ test("public observability route never proxies diagnostic or runtime topology", 
 		new URL("../lib/privateHomelabResponse.ts", import.meta.url),
 		"utf8",
 	);
-	assert.match(route, /privateHomelabResponse/);
-	assert.doesNotMatch(
-		route,
-		/parseHomelabObservability|loadRuntimeTopology|loadHomelabDiagnostics/,
-	);
+	// The FastAPI proxy only runs behind the owner-network/Access gate.
+	assert.match(route, /gatedHomelabResponse\(request, observabilityResponse\)/);
+	assert.doesNotMatch(route, /export async function observabilityResponse/);
+	assert.match(privateResponse, /isTrustedHomelabRequest\(request\)/);
 	assert.match(privateResponse, /status: 404/);
 	assert.match(privateResponse, /no-store/);
 });
