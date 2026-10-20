@@ -41,7 +41,7 @@ test("inert legacy JSON remains a non-operational placeholder, never a v2 source
 
 test("runtime loader and owner architecture never request legacy endpoints or fall back", async () => {
 	const [loader, architecture, refreshing] = await Promise.all([
-		readFile(new URL("../lib/homelabServices.ts", import.meta.url), "utf8"),
+		readFile(new URL("../lib/homelabServicesServer.ts", import.meta.url), "utf8"),
 		readFile(
 			new URL("../app/[locale]/architecture/ArchitecturePrivateViews.tsx", import.meta.url),
 			"utf8",
