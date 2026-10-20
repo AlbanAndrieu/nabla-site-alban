@@ -1,3 +1,33 @@
+## P0 — Cutover direct Backstage v2 (20 octobre 2026, Site #240)
+
+- [x] Cible confirmée auprès de FastAPI [#358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358) :
+  `GET /api/site/catalog/v2`, schéma `{schemaVersion:2, model:"backstage", catalogRevision, entities}`,
+  `X-Diagnostics-Key` server-only. Aucun lecteur HTTP v1 en secours.
+- [x] Site : API owner `/api/homelab-catalog-v2`, projection `entityRef`
+  vers cartes et graphe, contrôle CIDR indépendant de l'identité SERVICE,
+  confidentialité et gestion explicite 401/403/404/503, tests simulant la clé
+  invalide et les relations sans fuite d'IP/ports.
+- [x] Préserver les cartes même si une topologie indépendante échoue :
+  cartes et topologie résident maintenant dans la même réponse v2.
+  La page Architecture lit uniquement le graphe v2 authentifié.
+- [ ] Déployer FastAPI #358 après qualité, puis rendre disponible le
+  `catalog/generated/entities.json` canonique de Compose #265 sur la branche
+  attendue. Tant que ces PR ne sont pas livrées, un 404/503 est normal ;
+  ne pas basculer vers le fichier v1.
+- [ ] Valider depuis le Wi-Fi autorisé : `GET /api/homelab-access?diagnose=1`
+  reste `trusted:true`; la **clé Preview factice** doit être refusée,
+  via un 503 Site dont la raison est `access-denied` uniquement lorsque
+  FastAPI répond réellement 401/403. Tester aussi le 404 depuis un autre réseau.
+- [ ] Après fourniture d'une vraie clé dédiée, réessayer la Preview exacte :
+  HTTP 200 + `X-Homelab-Inventory-Complete:true`, services non vides, révision
+  identique sur les routes owner et Architecture, aucun détail secret.
+  Aucune clé valide présumée ni récupérée actuellement.
+- [ ] Exécuter les tests local-first et les quality gates sur HEAD exact ;
+  la PR #240 doit rester ouverte et non fusionnée en l'absence d'autorisation.
+- [ ] Confirmer les scans OWASP ZAP Preview réels et la confidentialité
+  des rapports ; la classification des erreurs sans rapport n'est pas une
+  preuve d'exécution du scanner.
+
 ## Diagnostic supplémentaire — 20 octobre 2026
 L'accès propriétaire `trusted:true` est confirmé depuis le Wi-Fi du domicile.
 La clé `DIAGNOSTICS_ACCESS_KEY` est désormais présente en **Preview** dans Vercel
