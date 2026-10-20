@@ -1,10 +1,25 @@
 ### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
 
-**Etat observé :** `www.albanandrieu.com` sert encore `master` à
-`dca0755058ccb029109e180522b9d08872233ccb` (PR #236) : il n'exécute
-pas le nouveau contrôle owner et n'affiche pas les cartes et React Flow.
-La PR #238 est seulement en Preview ; modifier les variables Vercel ne
-déploie pas le code de la PR sur `www`. Aucune fusion automatique.
+**État vérifié le 20 octobre :** la PR #238 est fusionnée. La production
+Vercel READY sert `master` au commit `6b051516220b7bf905e80eae26d8ea83b910897f`
+(#239 inclus). Les cartes et React Flow existent dans ce build mais restent
+masqués lorsque `/api/homelab-access` répond `trusted:false`.
+Cause du refus **non établie** : ne pas conclure que la valeur Vercel est vide,
+car les variables de type `sensitive` sont systématiquement masquées par l'API.
+Un visiteur du domicile peut être vu en IPv6 alors que la liste autorise
+uniquement `82.66.4.247/32`.
+
+**Diagnostic sécurisé à réaliser sur un build contenant ce correctif :**
+ouvrir `/api/homelab-access?diagnose=1` depuis le même appareil et la même
+connexion que la page TrueNAS. La réponse indique `sourceFamily`,
+`trustedCidrsConfigured`, `networkAllowed`, `identityRequired` et
+`reason`, **sans révéler l'IP cliente**, le CIDR configuré, les tokens,
+le catalogue ni les ports homelab. `client-ip-outside-trusted-cidrs` avec
+`sourceFamily=ipv6` signale une sortie IPv6 à qualifier séparément :
+ne pas élargir la règle à un /0, ne pas ajouter de préfixe non vérifié.
+`runtime-unverified` et `trusted-cidrs-not-configured` nécessitent une
+correction de configuration. Les routes sensibles gardent leur refus 404 et
+leurs politiques no-store.
 
 **Recette après fusion approuvée :** depuis le domicile tester
 `/api/homelab-access` (seulement `{"trusted":true}`), puis les cartes

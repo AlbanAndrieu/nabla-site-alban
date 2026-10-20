@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { decideHomelabAccess } from "@/lib/homelabAccess";
+import {
+	decideHomelabAccess,
+	diagnoseHomelabAccessNetwork,
+} from "@/lib/homelabAccess";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,8 +13,21 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request) {
 	const decision = await decideHomelabAccess(request.headers);
+	// Explicit, per-request diagnostics only. Never expose the source IP,
+	// allowed CIDRs, JWT contents, internal topology or proxy headers.
+	const diagnose = new URL(request.url).searchParams.get("diagnose") === "1";
+	const body = diagnose
+		? {
+				trusted: decision.trusted,
+				diagnostic: diagnoseHomelabAccessNetwork(
+					request.headers,
+					process.env,
+					decision.trusted,
+				),
+			}
+		: { trusted: decision.trusted };
 	return NextResponse.json(
-		{ trusted: decision.trusted },
+		body,
 		{
 			headers: {
 				"Cache-Control": "private, no-store, max-age=0",
