@@ -9,13 +9,16 @@ export const dynamic = "force-dynamic";
 async function catalogResponse() {
 	try {
 		const { catalog, topology } = await loadHomelabServicesCatalog();
-		return NextResponse.json({ ...catalog, topology }, {
-			headers: {
-				"X-Homelab-Services-Source": "backstage-v2",
-				"X-Homelab-Inventory-Complete": "true",
-				"X-Homelab-Catalog-Revision": String(catalog.catalogRevision),
+		return NextResponse.json(
+			{ ...catalog, topology },
+			{
+				headers: {
+					"X-Homelab-Services-Source": "backstage-v2",
+					"X-Homelab-Inventory-Complete": "true",
+					"X-Homelab-Catalog-Revision": String(catalog.catalogRevision),
+				},
 			},
-		});
+		);
 	} catch (error) {
 		const reason =
 			error instanceof SiteCatalogV2Error ? error.reason : "unavailable";
