@@ -20,7 +20,13 @@ test("TrueNAS services are the primary surface and operations are secondary", as
 	// The operator components remain reusable but cannot mount in the public shell.
 	assert.doesNotMatch(section, /<HomelabServicesBlock/);
 	assert.doesNotMatch(section, /<HomelabOperationsDisclosure/);
-	assert.match(section, /https:\/\/ops\.albandrieu\.com/);
+	// The public shell must not show the fallback link to an authenticated owner.
+	const deniedView = await source(
+		"app/components/homelab/HomelabPrivateServices.tsx",
+	);
+	assert.doesNotMatch(section, /https:\/\/ops\.albandrieu\.com/);
+	assert.match(deniedView, /https:\/\/ops\.albandrieu\.com/);
+	assert.match(deniedView, /if \(access === "denied"\)/);
 
 	assert.match(disclosure, /<details/);
 	assert.match(disclosure, /data-homelab-operations-disclosure/);

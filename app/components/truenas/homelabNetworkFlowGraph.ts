@@ -1,10 +1,11 @@
 import { type Edge, MarkerType, type Node } from "@xyflow/react";
-import { EDGES } from "./homelabNetworkFlowEdges";
-import { NODES } from "./homelabNetworkFlowNodes";
 import type {
 	FailureDomain,
 	GroupNodeData,
 	LinkKind,
+	NetworkEdgeSpec,
+	NetworkGraph,
+	NetworkNodeSpec,
 	PathMode,
 } from "./homelabNetworkFlowTypes";
 
@@ -36,8 +37,12 @@ export const DOMAIN_ORDER: readonly FailureDomain[] = [
 	"truenas",
 ];
 
-export const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
-	all: new Set(NODES.map((node) => node.id)),
+/**
+ * Node ids of each focused path. The graph itself (addresses, ports, labels)
+ * is private: it is fetched from the gated /api/homelab-network-flow route and
+ * must never be imported by a client module.
+ */
+export const PATH_NODE_IDS: Record<Exclude<PathMode, "all">, Set<string>> = {
 	direct: new Set([
 		"internet",
 		"cloudflare-dns",
@@ -97,6 +102,15 @@ export const PATH_NODE_IDS: Record<PathMode, Set<string>> = {
 	]),
 };
 
+export function visibleNodeIds(
+	nodes: readonly NetworkNodeSpec[],
+	mode: PathMode,
+): Set<string> {
+	return mode === "all"
+		? new Set(nodes.map((node) => node.id))
+		: PATH_NODE_IDS[mode];
+}
+
 export function domainCopy(
 	domain: FailureDomain,
 	french: boolean,
@@ -140,11 +154,15 @@ export function domainCopy(
 	return (french ? fr : en)[domain];
 }
 
-export function buildNodes(visibleIds: Set<string>, french: boolean): Node[] {
+export function buildNodes(
+	specs: readonly NetworkNodeSpec[],
+	visibleIds: Set<string>,
+	french: boolean,
+): Node[] {
 	const nodes: Node[] = [];
 	let y = 0;
 	for (const domain of DOMAIN_ORDER) {
-		const domainNodes = NODES.filter(
+		const domainNodes = specs.filter(
 			(node) => node.domain === domain && visibleIds.has(node.id),
 		);
 		if (domainNodes.length === 0) continue;
@@ -187,27 +205,69 @@ export function buildNodes(visibleIds: Set<string>, french: boolean): Node[] {
 	return nodes;
 }
 
-export function buildEdges(visibleIds: Set<string>): Edge[] {
-	return EDGES.filter(
-		(edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target),
-	).map((edge) => {
-		const link = LINK_STYLES[edge.kind];
-		return {
-			id: edge.id,
-			source: edge.source,
-			target: edge.target,
-			label: edge.label,
-			animated: link.animated,
-			markerEnd: { type: MarkerType.ArrowClosed, color: link.color },
-			style: {
-				stroke: link.color,
-				strokeWidth: 2.3,
-				strokeDasharray: link.dash,
-			},
-			labelStyle: { fill: "#e2e8f0", fontSize: 11, fontWeight: 700 },
-			labelBgStyle: { fill: "#0f172a", fillOpacity: 0.94 },
-			labelBgPadding: [5, 3],
-			labelBgBorderRadius: 4,
-		};
-	});
+export function buildEdges(
+	specs: readonly NetworkEdgeSpec[],
+	visibleIds: Set<string>,
+): Edge[] {
+	return specs
+		.filter(
+			(edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target),
+		)
+		.map((edge) => {
+			const link = LINK_STYLES[edge.kind];
+			return {
+				id: edge.id,
+				source: edge.source,
+				target: edge.target,
+				label: edge.label,
+				animated: link.animated,
+				markerEnd: { type: MarkerType.ArrowClosed, color: link.color },
+				style: {
+					stroke: link.color,
+					strokeWidth: 2.3,
+					strokeDasharray: link.dash,
+				},
+				labelStyle: { fill: "#e2e8f0", fontSize: 11, fontWeight: 700 },
+				labelBgStyle: { fill: "#0f172a", fillOpacity: 0.94 },
+				labelBgPadding: [5, 3],
+				labelBgBorderRadius: 4,
+			};
+		});
+}
+
+const LINK_KINDS = new Set<string>(Object.keys(LINK_STYLES));
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNodeSpec(value: unknown): value is NetworkNodeSpec {
+	return (
+		isRecord(value) &&
+		typeof value.id === "string" &&
+		DOMAIN_ORDER.includes(value.domain as FailureDomain) &&
+		isRecord(value.data) &&
+		typeof value.data.name === "string" &&
+		typeof value.data.role === "string"
+	);
+}
+
+function isEdgeSpec(value: unknown): value is NetworkEdgeSpec {
+	return (
+		isRecord(value) &&
+		typeof value.id === "string" &&
+		typeof value.source === "string" &&
+		typeof value.target === "string" &&
+		typeof value.label === "string" &&
+		LINK_KINDS.has(value.kind as string)
+	);
+}
+
+/** Validates the gated API payload; anything unexpected renders nothing. */
+export function parseNetworkGraph(value: unknown): NetworkGraph | null {
+	if (!isRecord(value)) return null;
+	const { nodes, edges } = value;
+	if (!Array.isArray(nodes) || !Array.isArray(edges)) return null;
+	if (!nodes.every(isNodeSpec) || !edges.every(isEdgeSpec)) return null;
+	return { nodes, edges };
 }

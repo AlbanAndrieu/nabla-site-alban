@@ -185,8 +185,7 @@ test("homelab renders bounded probes before aggregate enrichment", async () => {
 	assert.ok(aggregateRender > probeRender);
 	assert.match(block, /fetch\("\/api\/homelab-probes"/);
 	assert.match(block, /"Cache-Control": "no-cache"/);
-	assert.match(probeProxy, /privateHomelabResponse/);
-	assert.doesNotMatch(probeProxy, /loadHomelabProbeSnapshot/);
+	assert.match(probeProxy, /gatedHomelabResponse\(request, \w+Response\)/);
 });
 
 test("homelab exposes rolling probe evidence coverage from FastAPI", async () => {

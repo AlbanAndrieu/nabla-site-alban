@@ -29,36 +29,52 @@ test("architecture exposes stable anchors for every major section", async () => 
 	const nav = await source(
 		"app/[locale]/architecture/ArchitectureSectionNav.tsx",
 	);
-	const topology = await source(
-		"app/[locale]/architecture/ArchitectureTopologyView.tsx",
+	const privateViews = await source(
+		"app/[locale]/architecture/ArchitecturePrivateViews.tsx",
 	);
+	const evidence = await source(
+		"app/components/homelab/HomelabOperationalEvidence.tsx",
+	);
+	const inspector = await source(
+		"app/[locale]/architecture/ArchitectureImpactInspector.tsx",
+	);
+	const topology = await topologyViewSource();
 	const hierarchy = await source(
 		"app/[locale]/architecture/ArchitectureServiceHierarchy.tsx",
+	);
+	const explorer = await source(
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
 	);
 	const criticality = await source(
 		"app/components/homelab/CriticalDependencyHierarchy.tsx",
 	);
+	const rendered = [
+		page,
+		privateViews,
+		evidence,
+		inspector,
+		topology,
+		hierarchy,
+		explorer,
+		criticality,
+	].join("\n");
 
-	for (const anchor of [
-		"architecture-overview",
-		"architecture-health-dashboard",
-		"architecture-services",
-		"critical-dependency-hierarchy",
-		"service-architecture-explorer",
-		"homelab-network-ingress-paths",
-		"declared-observed-health",
-	]) {
-		assert.match(
-			`${page}\n${nav}\n${topology}\n${hierarchy}\n${criticality}`,
-			new RegExp(anchor),
-		);
+	// Every navigation target must exist in a rendered section, not only in
+	// the navigation itself.
+	const targets = [...nav.matchAll(/\["([a-z-]+)", "/g)].map((m) => m[1]);
+	assert.ok(targets.length >= 9);
+	for (const anchor of new Set(targets)) {
+		// Exact literal (id="…" or an id constant), not a "-title" suffix.
+		assert.match(rendered, new RegExp(`["'\`]${anchor}["'\`]`), anchor);
 	}
-	assert.doesNotMatch(page, /id="homelab-network-architecture"/);
 	assert.match(page, /id="declared-observed-architecture"/);
+	// Owner-only views are mounted through the access gate, never directly.
+	assert.match(page, /<ArchitecturePrivateViews locale=\{locale\} \/>/);
 	assert.doesNotMatch(
 		page,
 		/<ArchitectureTopologyView|<HomelabOperationalEvidence/,
 	);
+	assert.match(privateViews, /id="homelab-network-architecture"/);
 	assert.match(hierarchy, /id="service-directory"/);
 });
 

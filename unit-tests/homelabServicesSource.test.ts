@@ -190,7 +190,11 @@ test("public homelab API refuses requests without querying FastAPI", async () =>
 		fetchCalled = true;
 		throw new Error("must not call upstream");
 	}) as typeof fetch;
-	const response = await GET();
+	const response = await GET(
+		new Request("https://www.albanandrieu.com/api/homelab-services", {
+			headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "10.0.0.2" },
+		}),
+	);
 	assert.equal(fetchCalled, false);
 	assert.equal(response.status, 404);
 	assert.match(response.headers.get("cache-control") ?? "", /no-store/);

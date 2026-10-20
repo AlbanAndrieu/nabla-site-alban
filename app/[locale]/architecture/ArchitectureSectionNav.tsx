@@ -14,7 +14,7 @@ export default function ArchitectureSectionNav({
 				["critical-dependency-hierarchy", "Dépendances critiques"],
 				["service-architecture-explorer", "Topologie services"],
 				["homelab-network-ingress-paths", "Réseau & ingress"],
-				["declared-observed-health", "Déclaré / observé / santé"],
+				["architecture-principles", "Principes d’architecture"],
 			]
 		: [
 				["architecture-overview", "Overview"],
@@ -25,7 +25,7 @@ export default function ArchitectureSectionNav({
 				["critical-dependency-hierarchy", "Critical dependencies"],
 				["service-architecture-explorer", "Service topology"],
 				["homelab-network-ingress-paths", "Network & ingress"],
-				["declared-observed-health", "Declared / observed / health"],
+				["architecture-principles", "Architecture principles"],
 			];
 
 	return (

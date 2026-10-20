@@ -1,3 +1,52 @@
+### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
+
+**Etat observé :** `www.albanandrieu.com` sert encore `master` à
+`dca0755058ccb029109e180522b9d08872233ccb` (PR #236) : il n'exécute
+pas le nouveau contrôle owner et n'affiche pas les cartes et React Flow.
+La PR #238 est seulement en Preview ; modifier les variables Vercel ne
+déploie pas le code de la PR sur `www`. Aucune fusion automatique.
+
+**Recette après fusion approuvée :** depuis le domicile tester
+`/api/homelab-access` (seulement `{"trusted":true}`), puis les cartes
+et le graphique depuis `/fr/truenas`, le deep link historique
+`#service-postgresql` et le lien canonique
+`#homelab-service-postgresql`. Depuis un réseau externe, vérifier le
+refus neutre de toutes les API owner. Vérifier aussi que le navigateur
+n'est pas connecté par VPN, proxy ou IPv6 de sortie non autorisé.
+L'authentification Access reste nécessaire si configurée. L'IP seule
+n'est pas une preuve d'identité individuelle.
+
+---
+
+## PR #238 — contrôle CIDR des vues homelab (20 octobre 2026)
+
+Sur la plateforme Vercel, déclarer la variable **serveur uniquement** :
+`HOMELAB_TRUSTED_CIDRS=82.66.4.247/32`. Cette valeur correspond à
+l'adresse IPv4 publique fixe du domicile, et ne doit jamais être exposée
+comme variable `NEXT_PUBLIC_*` ou utilisée pour des décisions côté React.
+
+Chaque API privée `/api/homelab-*` et `/api/runtime-topology` exige une IP
+source dans cette allowlist, d'après `x-real-ip` réécrit par le proxy Vercel
+(`VERCEL=1`), avant d'appeler l'amont. La réponse refusée reste un
+`404` neutre avec `Cache-Control: private, no-store`.
+Une signature Cloudflare Access, même valide, **ne contourne jamais** le CIDR.
+Lorsque `CF_ACCESS_TEAM_DOMAIN` et `CF_ACCESS_AUD` sont configurés,
+la validation du JWT devient un **second facteur obligatoire** ; sinon le
+contrôle IP seul autorise l'accès depuis le domicile. Une IP autorisée ne
+constitue toutefois pas une identité forte, car tous les équipements derrière
+le même NAT public la partagent. Pour une confidentialité renforcée, préférer
+l'application opérateur `ops.albandrieu.com` derrière Access + MFA.
+
+Ce contrôle s'applique aux **requêtes serveur**, pas aux assets JS statiques,
+dont les URL restent publiques. Les données sensibles doivent donc être
+absentes du bundle public et transmises uniquement par les APIs protégées.
+Contrôler aussi IPv6 : ne pas ajouter de préfixe IPv6 sans besoin vérifié.
+La variable devra être renseignée dans la configuration Vercel et validée
+sur un déploiement Preview depuis la maison puis un réseau externe.
+Un succès unitaire n'est pas une preuve de configuration runtime Vercel.
+
+---
+
 # Frontière de confidentialité du homelab — Site Alban
 
 Statut : **architecture/roadmap approuvable, non déployée** (18 octobre 2026).
@@ -146,3 +195,45 @@ créé/validé par ce chantier.
 Tous les tests d'intégration sur site réel restent `NOT_RUN` jusqu'à
 l'installation de l'infrastructure, sans demande de commande sur la
 workstation ou le TrueNAS de l'utilisateur.
+
+## Accès propriétaire sur `www` (amendement du 20 octobre 2026)
+
+**Décision du propriétaire** : la vue Architecture, `HomelabServicesBlock`,
+l'explorateur, l'inspecteur d'impact, le flux réseau, `HomelabOperationsDisclosure`
+et `CloudflareStatusWarning` sont **conservés** sur `www.albanandrieu.com`, mais
+servis **uniquement** au propriétaire. Ce point amende « ne garder que la
+description » ci-dessus ; `ops.albandrieu.com` reste la cible à terme.
+
+Contrôle d'accès **côté serveur** (`lib/homelabAccess.ts`), sans état ni cookie :
+
+1. **Réseau du propriétaire** : `x-real-ip` posé par l'edge Vercel, lu
+   seulement si `VERCEL=1`, comparé à `HOMELAB_TRUSTED_CIDRS` (IPv4/IPv6,
+   liste séparée par virgules/espaces ; `/0` et entrées invalides ignorés).
+   Vercel voit l'**IP publique de sortie NAT**, pas l'IP du VLAN : tout
+   appareil derrière cette IP (Wi-Fi invité compris) est considéré
+   propriétaire. Une IP résidentielle dynamique change : mettre à jour la
+   variable, sinon l'accès retombe en 404 (échec fermé).
+2. **Cloudflare Access** : en-tête `Cf-Access-Jwt-Assertion` vérifié en RS256
+   avec la JWKS `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`
+   (cache 1 h), contrôles `iss`, `aud`, `exp`, `nbf` (tolérance 60 s).
+   Variables : `CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD`. Inerte tant que le
+   trafic `www` ne transite pas par une application Access ; un en-tête forgé
+   est rejeté.
+
+Sans variable configurée, **tout est refusé**. Les variables se définissent
+dans Vercel (Production et, si voulu, Preview) ; aucune n'est `NEXT_PUBLIC_*`.
+
+Côté pages : `/api/homelab-access` (no-store) répond `{ trusted }` ; si vrai,
+les vues sont chargées par `next/dynamic` (`ssr: false`) et lisent leurs
+données sur les routes protégées. Le graphe réseau (adresses, ports, IP WAN)
+n'est plus intégré au JS : il vient de `/api/homelab-network-flow`.
+
+Limites connues :
+
+- Les chunks JS des composants restent téléchargeables publiquement : ils ne
+  contiennent que du code de présentation, pas de données opérationnelles.
+  Le test `publicHomelabPrivacy.test.mjs` interdit à tout module client
+  d'importer `homelabNetworkFlowNodes`/`homelabNetworkFlowEdges`.
+- Recette live `NOT_RUN` : vérifier sur la production, depuis le réseau
+  domestique puis depuis un réseau mobile, que les vues apparaissent puis
+  disparaissent et que `/api/homelab-services` répond 404 hors réseau.

@@ -84,8 +84,7 @@ export default function HomelabServiceCard({
 	const dependencyDegraded =
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
-	const dependsOnTrueNas =
-		svc.internalHost === "172.17.0.24" || initialHealth?.runtime_app != null;
+	const dependsOnTrueNas = initialHealth?.runtime_app != null;
 	const internalState = internalPresentationState(
 		initialHealth,
 		truenasRuntimeUnavailable ||
@@ -126,6 +125,12 @@ export default function HomelabServiceCard({
 
 	return (
 		<div className="col-md-4 p-3" id={anchorId}>
+			{anchorId?.startsWith("homelab-service-") && (
+				<span
+					id={anchorId.replace(/^homelab-service-/, "service-")}
+					aria-hidden="true"
+				/>
+			)}
 			<div
 				className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
 				data-effective-health={presentationState}

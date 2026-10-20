@@ -1,9 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
+import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
@@ -50,6 +51,7 @@ export default function HomelabServicesBlock() {
 		Set<ServicePresentationGroup>
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
+	const handledAnchor = useRef<string | null>(null);
 
 	const indexedHealth = useMemo(
 		() => healthIndex(state.snapshot),
@@ -96,6 +98,38 @@ export default function HomelabServicesBlock() {
 		(total, group) => total + group.catalog.services.length,
 		0,
 	);
+
+	// Cards mount asynchronously only after owner access. The browser's initial
+	// fragment jump happens before that mount, so restore historical deep links.
+	useEffect(() => {
+		if (!state.catalog) return;
+		const hash = window.location.hash;
+		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
+		if (!match || handledAnchor.current === hash) return;
+		const serviceId = match[1];
+		const group = hierarchyGroups.find((item) =>
+			item.catalog.services.some(
+				(service) => homelabServiceId(service) === serviceId,
+			),
+		);
+		if (!group) return;
+		handledAnchor.current = hash;
+		let secondFrame = 0;
+		const firstFrame = window.requestAnimationFrame(() => {
+			setExpandedGroups((current) =>
+				current.has(group.group) ? current : new Set([...current, group.group]),
+			);
+			secondFrame = window.requestAnimationFrame(() => {
+				document
+					.getElementById(hash.slice(1))
+					?.scrollIntoView({ block: "center" });
+			});
+		});
+		return () => {
+			window.cancelAnimationFrame(firstFrame);
+			window.cancelAnimationFrame(secondFrame);
+		};
+	}, [state.catalog, hierarchyGroups]);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {

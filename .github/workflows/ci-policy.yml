@@ -1,6 +1,7 @@
 name: PR CI policy
 
-on:
+# pull_request_target is intentional: read-only token, no PR checkout, API reads only.
+on: # zizmor: ignore[dangerous-triggers]
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
 

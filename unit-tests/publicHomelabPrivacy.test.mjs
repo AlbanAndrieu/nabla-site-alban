@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { sep } from "node:path";
 import test from "node:test";
 
 const read = (path) =>
@@ -7,6 +8,7 @@ const read = (path) =>
 const privateRoutes = [
 	"homelab-diagnostics",
 	"homelab-health",
+	"homelab-network-flow",
 	"homelab-observability",
 	"homelab-probes",
 	"homelab-services",
@@ -15,16 +17,44 @@ const privateRoutes = [
 	"runtime-topology",
 ];
 
-test("public homelab APIs fail closed without proxying FastAPI", () => {
+test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Access", () => {
 	for (const path of privateRoutes) {
 		const source = read(`app/api/${path}/route.ts`);
-		assert.match(source, /privateHomelabResponse\(\)/);
-		assert.doesNotMatch(source, /loadHomelab|loadFastApi|loadRuntime|fetch\(/);
+		assert.match(source, /export function GET\(request: Request\)/, path);
+		assert.match(source, /return gatedHomelabResponse\(request, \w+\);/, path);
+		// Only GET (plus route config) is exported: no ungated handler.
+		const exported = [
+			...source.matchAll(/^export (?:async )?(?:function|const) (\w+)/gm),
+		]
+			.map((match) => match[1])
+			.sort();
+		assert.deepEqual(exported, ["GET", "dynamic", "runtime"], path);
+		assert.match(source, /dynamic = "force-dynamic"/, path);
+		// A shared CDN cache would replay owner data to anonymous visitors.
+		assert.doesNotMatch(
+			source,
+			/s-maxage|stale-while-revalidate|public,/,
+			path,
+		);
 	}
-	const deny = read("lib/privateHomelabResponse.ts");
-	assert.match(deny, /status: 404/);
-	assert.match(deny, /no-store/);
-	assert.doesNotMatch(deny, /internalHost|internalPort|172\.17/);
+	const gate = read("lib/privateHomelabResponse.ts");
+	assert.match(gate, /status: 404/);
+	assert.match(gate, /"private, no-store, max-age=0"/);
+	assert.doesNotMatch(gate, /internalHost|internalPort|172\.17/);
+	const body = gate.slice(
+		gate.indexOf("export async function gatedHomelabResponse"),
+	);
+	const trustCheck = body.indexOf("isTrustedHomelabRequest(request)");
+	const handlerCall = body.indexOf("await handler()");
+	assert.ok(
+		trustCheck >= 0 && handlerCall > trustCheck,
+		"gate runs before handler",
+	);
+	assert.match(body, /response\.headers\.set\(name, value\)/);
+
+	const access = read("app/api/homelab-access/route.ts");
+	assert.match(access, /\{ trusted: decision\.trusted \}/);
+	assert.match(access, /no-store/);
 });
 
 test("fallback JSON and legacy documents have no operator-only fields", () => {
@@ -50,19 +80,90 @@ test("fallback JSON and legacy documents have no operator-only fields", () => {
 	assert.deepEqual(topology.relations, []);
 });
 
-test("public page entrypoints do not mount privileged components", () => {
-	for (const path of [
-		"app/components/truenas/HomeLabSection.tsx",
-		"app/components/homelab/HomelabServicesSection.tsx",
-		"app/[locale]/architecture/page.tsx",
-	]) {
+const privilegedViews =
+	/HomelabServicesBlock|HomelabOperationalEvidence|HomelabOperationsDisclosure|HomeLabNetworkFlow|ArchitectureTopologyView|ArchitectureImpactInspector|CloudflareStatusWarning/;
+
+test("public pages only mount the client access gates", () => {
+	const gates = {
+		"app/components/truenas/HomeLabSection.tsx": "HomeLabPrivateNetwork",
+		"app/components/homelab/HomelabServicesSection.tsx":
+			"HomelabPrivateServices",
+		"app/[locale]/architecture/page.tsx": "ArchitecturePrivateViews",
+	};
+	for (const [path, gate] of Object.entries(gates)) {
+		const source = read(path);
+		assert.doesNotMatch(source, privilegedViews, path);
+		assert.match(source, new RegExp(`<${gate}\\b`), path);
+		// Static pages must not bake the private catalog or topology.
 		assert.doesNotMatch(
-			read(path),
-			/<HomelabServicesBlock|<HomelabOperationalEvidence|<HomelabOperationsDisclosure|<HomeLabNetworkFlow|<ArchitectureTopologyView|<ArchitectureImpactInspector/,
+			source,
+			/getStaticHomelabServicesCatalog|getStaticServiceTopology/,
 		);
 	}
 	assert.match(
-		read("app/components/homelab/HomelabServicesSection.tsx"),
+		read("app/components/homelab/HomelabPrivateServices.tsx"),
 		/https:\/\/ops\.albandrieu\.com/,
+	);
+	assert.doesNotMatch(
+		read("app/components/homelab/HomelabServicesSection.tsx"),
+		/Espace opérations privé/,
+	);
+});
+
+test("gates ask the server first and dynamically import the private views", () => {
+	for (const path of [
+		"app/components/truenas/HomeLabPrivateNetwork.tsx",
+		"app/components/homelab/HomelabPrivateServices.tsx",
+		"app/[locale]/architecture/ArchitecturePrivateViews.tsx",
+	]) {
+		const source = read(path);
+		assert.match(source, /^"use client";/, path);
+		assert.match(source, /useHomelabAccess\(\)/, path);
+		// A static import would ship and render the view for every visitor.
+		for (const line of source
+			.split("\n")
+			.filter((l) => l.startsWith("import "))) {
+			assert.doesNotMatch(line, privilegedViews, `${path}: ${line}`);
+		}
+		assert.match(source, /dynamic\(\s*\(\) => import\(/, path);
+		assert.doesNotMatch(source, /ssr: true/, path);
+	}
+	const hook = read("app/components/homelab/useHomelabAccess.ts");
+	assert.match(hook, /fetch\("\/api\/homelab-access"/);
+	assert.match(hook, /cache: "no-store"/);
+	assert.match(hook, /useState<HomelabAccessState>\("pending"\)/);
+	assert.match(hook, /setState\(trusted \? "trusted" : "denied"\)/);
+});
+
+test("owner cards preserve the historical #service-* link after async access", () => {
+	const card = read("app/components/homelab/HomelabServiceCard.tsx");
+	const block = read("app/components/homelab/HomelabServicesBlock.tsx");
+	const gate = read("app/components/homelab/HomelabPrivateServices.tsx");
+	assert.match(card, /anchorId\.replace\(\/\^homelab-service-\//);
+	assert.match(block, /getElementById\(hash\.slice\(1\)\)/);
+	assert.match(block, /scrollIntoView\(/);
+	assert.match(gate, /if \(access === "denied"\)/);
+	assert.match(gate, /data-homelab-private-view/);
+});
+
+test("network topology data never reaches a client bundle", () => {
+	const dataModules = /homelabNetworkFlow(?:Nodes|Edges)/;
+	const allowed = new Set([
+		"app/api/homelab-network-flow/route.ts",
+		"app/components/truenas/homelabNetworkFlowNodes.ts",
+		"app/components/truenas/homelabNetworkFlowEdges.ts",
+	]);
+	const files = ["app", "components", "lib"].flatMap((root) =>
+		readdirSync(new URL(`../${root}/`, import.meta.url), { recursive: true })
+			.map((path) => `${root}/${String(path).split(sep).join("/")}`)
+			.filter((path) => /\.tsx?$/.test(path)),
+	);
+	for (const path of files) {
+		if (allowed.has(path)) continue;
+		assert.doesNotMatch(read(path), dataModules, path);
+	}
+	assert.match(
+		read("app/components/truenas/HomeLabNetworkFlow.tsx"),
+		/fetch\("\/api\/homelab-network-flow"/,
 	);
 });

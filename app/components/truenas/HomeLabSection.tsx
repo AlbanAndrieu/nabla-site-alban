@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import SectionHeading from "@/components/SectionHeading";
+import HomeLabPrivateNetwork from "./HomeLabPrivateNetwork";
 
 export default async function HomeLabSection() {
 	const t = await getTranslations("truenas.page.homelab");
@@ -12,6 +13,7 @@ export default async function HomeLabSection() {
 				<p className="text-secondary mb-4">{t("intro")}</p>
 				<p>{t("purpose")}</p>
 				<p className="small">{t("projectDetails")}</p>
+				<HomeLabPrivateNetwork />
 			</div>
 		</section>
 	);

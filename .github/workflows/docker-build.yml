@@ -46,6 +46,7 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 2
+          persist-credentials: false
 
       - name: Resolve Trivy scan policy
         id: trivy-policy
@@ -220,4 +221,6 @@ jobs:
           docker push "${DOCKERHUB_IMAGE}:${GITHUB_SHA}"
 
       - name: Image digest
-        run: echo "${{ steps.docker_build.outputs.digest }}"
+        env:
+          IMAGE_DIGEST: ${{ steps.docker_build.outputs.digest }}
+        run: echo "${IMAGE_DIGEST}"

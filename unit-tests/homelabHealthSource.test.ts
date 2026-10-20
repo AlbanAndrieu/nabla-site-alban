@@ -345,7 +345,11 @@ test("public probe endpoint is inaccessible, no-store and never calls private Fa
 		throw new Error("Public endpoint must not proxy a private probe");
 	}) as typeof fetch;
 
-	const response = await GET_PROBES();
+	const response = await GET_PROBES(
+		new Request("https://www.albanandrieu.com/api/homelab-probes", {
+			headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "10.0.0.2" },
+		}),
+	);
 	assert.equal(response.status, 404);
 	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
 	assert.equal(response.headers.get("x-homelab-health-source"), null);
@@ -374,7 +378,11 @@ test("public health endpoint never leaks board, aggregate, probe or error detail
 		throw new Error("Private FastAPI must not be queried");
 	}) as typeof fetch;
 
-	const response = await GET();
+	const response = await GET(
+		new Request("https://www.albanandrieu.com/api/homelab-health", {
+			headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "10.0.0.2" },
+		}),
+	);
 	const body = await response.json();
 	assert.equal(response.status, 404);
 	assert.match(response.headers.get("cache-control") ?? "", /no-store/);

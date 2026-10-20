@@ -1,6 +1,7 @@
 name: Semantic Release
 
-on:
+# workflow_run is intentional: release only after successful CI on master.
+on: # zizmor: ignore[dangerous-triggers]
   workflow_run:
     workflows:
       - CI (Quality and Security)
@@ -54,6 +55,8 @@ jobs:
             echo "## Semantic Release"
             echo
             echo "Release mutation skipped safely."
+            # Backticks are literal Markdown code spans in the job summary.
+            # shellcheck disable=SC2016
             echo 'Configure repository variable `RELEASE_APP_CLIENT_ID` and secret `RELEASE_APP_PRIVATE_KEY`, then rerun this workflow.'
           } >> "${GITHUB_STEP_SUMMARY}"
 
@@ -90,13 +93,13 @@ jobs:
         id: freshness
         env:
           GH_TOKEN: ${{ steps.release_app_token.outputs.token }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
           git fetch --force origin master:refs/remotes/origin/master --tags
           CURRENT_SHA="$(git rev-parse HEAD)"
           MASTER_SHA="$(git rev-parse origin/master)"
-          VALIDATED_SHA="${{ github.event.workflow_run.head_sha }}"
           if [[ "${CURRENT_SHA}" != "${MASTER_SHA}" ]]; then
             echo "Checkout ${CURRENT_SHA} is not current master ${MASTER_SHA}."
             echo "current=false" >> "${GITHUB_OUTPUT}"

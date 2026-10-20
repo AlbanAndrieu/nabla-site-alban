@@ -140,7 +140,7 @@ test("service cards promote effective health above runtime and troubleshooting d
 test("TrueNAS dependency failures only affect services hosted on TrueNAS", async () => {
 	const page = await gridSource();
 	assert.match(page, /const dependsOnTrueNas =/);
-	assert.match(page, /svc\.internalHost === "172\.17\.0\.24"/);
+	assert.doesNotMatch(page, /172\.17\.0\.24/);
 	assert.match(page, /initialHealth\?\.runtime_app != null/);
 	assert.match(page, /truenasDown=\{truenasDown && dependsOnTrueNas\}/);
 });
