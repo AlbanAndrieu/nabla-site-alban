@@ -8,9 +8,13 @@ import {
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.HOMELAB_SERVICES_API_KEY;
+const originalDiagnosticsKey = process.env.DIAGNOSTICS_ACCESS_KEY;
 const originalUrl = process.env.HOMELAB_SERVICES_API_URL;
 afterEach(() => {
 	globalThis.fetch = originalFetch;
+	if (originalDiagnosticsKey === undefined)
+		delete process.env.DIAGNOSTICS_ACCESS_KEY;
+	else process.env.DIAGNOSTICS_ACCESS_KEY = originalDiagnosticsKey;
 	if (originalKey === undefined) delete process.env.HOMELAB_SERVICES_API_KEY;
 	else process.env.HOMELAB_SERVICES_API_KEY = originalKey;
 	if (originalUrl === undefined) delete process.env.HOMELAB_SERVICES_API_URL;
@@ -37,6 +41,7 @@ test("server-to-server FastAPI request uses read-only key only in headers", asyn
 		assert.equal(String(input), process.env.HOMELAB_SERVICES_API_URL);
 		const headers = new Headers(init?.headers);
 		assert.equal(headers.get("X-Diagnostics-Key"), "fixture-read-only-key");
+		assert.equal(init?.redirect, "error");
 		return Response.json({
 			version: 1,
 			services: [{ id: "postgresql", name: "PostgreSQL", kind: "database" }],
@@ -48,6 +53,25 @@ test("server-to-server FastAPI request uses read-only key only in headers", asyn
 	assert.equal(isHomelabCatalogPlaceholder(result.catalog), false);
 	assert.equal(result.catalog.services[0]?.id, "postgresql");
 	assert.doesNotMatch(JSON.stringify(result.catalog), /fixture-read-only-key/);
+});
+
+test("scoped inventory credentials override a legacy shared diagnostics key", async () => {
+	process.env.HOMELAB_SERVICES_API_KEY = "fixture-inventory-key";
+	process.env.DIAGNOSTICS_ACCESS_KEY = "fixture-legacy-key";
+	globalThis.fetch = async (_input, init) => {
+		assert.equal(
+			new Headers(init?.headers).get("X-Diagnostics-Key"),
+			"fixture-inventory-key",
+		);
+		assert.equal(init?.redirect, "error");
+		return Response.json({
+			version: 1,
+			services: [{ id: "postgresql", name: "PostgreSQL" }],
+		});
+	};
+	const result = await loadHomelabServicesCatalog();
+	assert.equal(result.source, "fastapi");
+	assert.doesNotMatch(JSON.stringify(result.catalog), /fixture-(inventory|legacy)-key/);
 });
 
 test("upstream placeholder never masquerades as the operational inventory", async () => {
