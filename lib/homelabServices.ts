@@ -1,3 +1,5 @@
+import { projectHomelabCatalogV2 } from "./homelabCatalogV2Projection";
+import { fetchSiteCatalogV2, SITE_CATALOG_V2_URL } from "./homelabSiteCatalog";
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 
@@ -51,10 +53,7 @@ export function isHomelabCatalogPlaceholder(
 	);
 }
 
-export const HOMELAB_SERVICES_DEFAULT_API_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/homelab-services";
-
-const PRIMARY_TIMEOUT_MS = 2500;
+export const HOMELAB_SERVICES_DEFAULT_API_URL = SITE_CATALOG_V2_URL;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -218,74 +217,16 @@ export function getStaticHomelabServicesCatalog(): {
 	};
 }
 
+/** Strict Backstage v2 SERVICE consumer. No legacy or local-fallback read. */
 export async function loadHomelabServicesCatalog(): Promise<{
 	catalog: HomelabServicesCatalog;
 	source: HomelabServicesSource;
 	primaryUrl: string;
 }> {
-	const primaryUrl = primaryApiUrl();
-	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
-
-	try {
-		// Applied only to the server-to-server FastAPI request; never sent to
-		// browsers, the public fallback or any NEXT_PUBLIC_* configuration.
-		const privateKey =
-			process.env.HOMELAB_SERVICES_API_KEY?.trim() ||
-			process.env.DIAGNOSTICS_ACCESS_KEY?.trim();
-		const response = await fetch(primaryUrl, {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-catalog/1.0",
-				...(privateKey ? { "X-Diagnostics-Key": privateKey } : {}),
-			},
-			signal: controller.signal,
-			// Never forward a server-side diagnostics credential to a redirect target.
-			redirect: "error",
-			cache: "no-store",
-		});
-		if (response.status === 401 || response.status === 403) {
-			return {
-				catalog: { ...LOCAL_FALLBACK, privateInventoryStatus: "access-denied" },
-				source: "local-fallback",
-				primaryUrl,
-			};
-		}
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}`);
-		}
-		const catalog = parseHomelabServicesCatalog(await response.json());
-		if (!catalog) {
-			throw new Error("Invalid homelab catalog payload");
-		}
-		if (isHomelabCatalogPlaceholder(catalog)) {
-			throw new Error(
-				"Upstream provided a public placeholder, not a private inventory",
-			);
-		}
-		return {
-			catalog: applyLocalPresentationOverrides(catalog),
-			source: "fastapi",
-			primaryUrl,
-		};
-	} catch {
-		// Never log private upstream URLs, keys or response bodies.
-		console.warn(
-			"[homelab-services] Private inventory unavailable; public placeholder only",
-		);
-		return {
-			catalog: {
-				...LOCAL_FALLBACK,
-				privateInventoryStatus:
-					process.env.DIAGNOSTICS_ACCESS_KEY?.trim() ||
-					process.env.HOMELAB_SERVICES_API_KEY?.trim()
-						? "unavailable"
-						: "key-missing",
-			},
-			source: "local-fallback",
-			primaryUrl,
-		};
-	} finally {
-		clearTimeout(timeout);
-	}
+	const catalog = await fetchSiteCatalogV2();
+	return {
+		catalog: projectHomelabCatalogV2(catalog).services,
+		source: "fastapi",
+		primaryUrl: SITE_CATALOG_V2_URL,
+	};
 }
