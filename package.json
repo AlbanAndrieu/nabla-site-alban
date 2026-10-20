@@ -89,7 +89,7 @@
 		"eslint-config-next": "16.4.0",
 		"eslint-formatter-gitlab": "^7.2.0",
 		"lodash-es": "^4.18.1",
-		"opencommit": "^3.2.14",
+		"opencommit": "^3.3.11",
 		"playwright": "^1.64.0",
 		"stylelint": "^17.14.1",
 		"tsx": "^4.23.15",
