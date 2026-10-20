@@ -7,6 +7,22 @@ nécessaires pour comprendre l'état cible. Git/GitHub conserve la chronologie
 complète des PR, commits et runs ; les procédures de diagnostic restent dans les
 runbooks et les retours d'incident sous `docs/incidents/`.
 
+## P2 — Parité CI avec nabla-site-bababou (audit des dix dernières PR, 20 octobre)
+
+| Contrôle transversal | Site Alban (#240) | Site Bababou (master) | Décision |
+| --- | --- | --- | --- |
+| Local-first / justfile | `quality`, `offline-l1`, `source-check`, `snapshot-check` | `quality`, `offline-l1`, `publish-check`, Dagger opt-in | Conserver les preuves L0–L3 et l'offline L1 ajoutés à #240 ; ne pas ajouter une seconde gate |
+| Hooks pre-commit | BetterLeaks, Biome, Ruff, actionlint, zizmor | BetterLeaks, Biome, Ruff ; actionlint/zizmor non configurés comme hooks | Ne pas diminuer les contrôles Alban ; harmoniser les conventions et exceptions utiles seulement |
+| Toolchain | Node 24–26, npm 12, Next 16.4 | Node 24–26, npm 11, Next 16.3 | Divergence de versions intentionnelle ; ne pas rétrograder pour une parité artificielle |
+| SAST / confidentialité | Semgrep, secrets, rapports réduits, tests d'accès privé | Semgrep, BetterLeaks, contrats de confidentialité propres au corpus familial | Garder les gates communes et les protections spécifiques à chaque site |
+| DAST | ZAP Preview exact-SHA ; rapports bruts runner-local ; no-report = FAIL | ZAP Preview + active scan manuel protégé | Conserver le DAST actif manuel et borné ; ne pas copier d'artefacts contenant du trafic |
+| Coût des workflows | `ci-scope.sh`, cache npm/pre-commit, Quality avant build | CI par scope et préflight local-first, Dagger expérimental | Réutiliser le découpage par scope ; mesurer avant toute duplication de job |
+
+- [x] Auditer les PR Bababou #220, #222, #223, #226, #227, #229, #230, #232, #233 et #234 (outillage uniquement) ; transférer les niveaux de preuve et `just offline-l1` dans la PR #240.
+- [ ] Valider localement la nouvelle régression Playwright « catalogue OK / topologie KO », puis la gate Preview sur HEAD exact ; le test source et une ancienne CI verte ne prouvent pas l'exécution en déploiement.
+- [ ] Vérifier le résultat d'un scan ZAP Preview produit par le nouveau workflow, avec rapport JSON structurellement valide et statut exact-SHA. Ne pas relancer un scanner coûteux tant que le workflow de la PR n'est pas exécutable dans un contexte de confiance.
+- [ ] Mesurer à froid/à chaud le coût des jobs `quality`, build conditionnel, Playwright et DAST avant toute optimisation supplémentaire.
+
 ## P0/P1 — Portefeuille de scans AppSec proportionnel au risque (2026-10-19)
 
 Le [contrat de scan](security-scan-matrix.md) explicite la matrice
