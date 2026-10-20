@@ -37,6 +37,7 @@ export type HomelabServicesState = {
 
 export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalog: null,
+	catalogFailure: null,
 	topology: null,
 	snapshot: null,
 	error: false,
@@ -154,7 +155,7 @@ export function applyProbeSnapshot(
 		healthUnavailable: false,
 		healthStatus: probes.status,
 		healthRefreshing: true,
-		error: false,
+		error: current.error,
 	};
 }
 
@@ -270,7 +271,7 @@ export function useHomelabHealth(): HomelabServicesState {
 		void fetchCatalog(initialController.signal)
 			.then((catalog) => {
 				if (initialController.signal.aborted) return;
-				setState((current) => ({ ...current, catalog, error: false }));
+				setState((current) => ({ ...current, catalog, catalogFailure: null, error: false }));
 			})
 			.catch((error: unknown) => {
 				if (initialController.signal.aborted) return;
