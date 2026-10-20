@@ -1,3 +1,13 @@
+## Diagnostic supplémentaire — 20 octobre 2026
+Le catalogue n'est pas récupéré lorsque FastAPI répond 401/403 ; l'interface
+affiche alors « accès refusé, vérifier DIAGNOSTICS_ACCESS_KEY », sans publier
+la valeur de la clé. Une variable Vercel temporaire `DIAGNOSTICS_ACCESS_KEY`
+a été signalée par l'utilisateur avec une valeur de test : **ne jamais
+conserver cette valeur en production**. FastAPI attend `X-Diagnostics-Key`
+et sa valeur serveur `DIAGNOSTICS_ACCESS_KEY` ; l'authentification ne dépend
+pas du CIDR seul. Confirmer un HTTP 200 et une liste contenant PostgreSQL
+avant de considérer la récupération des cartes comme fonctionnelle.
+
 ## P0 — Réparer les cartes de services privées après #238 (20 octobre 2026)
 
 - [x] Le diagnostic owner de la PR #240 a été confirmé depuis le Wi-Fi domicile :

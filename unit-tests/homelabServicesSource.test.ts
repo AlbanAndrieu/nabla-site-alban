@@ -12,6 +12,7 @@ import {
 
 const ORIGINAL_API_URL = process.env.HOMELAB_SERVICES_API_URL;
 const ORIGINAL_API_KEY = process.env.HOMELAB_SERVICES_API_KEY;
+const ORIGINAL_DIAGNOSTICS_KEY = process.env.DIAGNOSTICS_ACCESS_KEY;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 function setApiUrl(value: string | undefined) {
@@ -23,6 +24,8 @@ function setApiUrl(value: string | undefined) {
 }
 
 test.afterEach(() => {
+	if (ORIGINAL_DIAGNOSTICS_KEY === undefined) delete process.env.DIAGNOSTICS_ACCESS_KEY;
+	else process.env.DIAGNOSTICS_ACCESS_KEY = ORIGINAL_DIAGNOSTICS_KEY;
 	if (ORIGINAL_API_KEY === undefined) delete process.env.HOMELAB_SERVICES_API_KEY;
 	else process.env.HOMELAB_SERVICES_API_KEY = ORIGINAL_API_KEY;
 	setApiUrl(ORIGINAL_API_URL);
@@ -214,6 +217,23 @@ test("rejected upstream key never publishes a private fallback catalog", async (
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.catalog.services.length, 1);
 	assert.equal(result.catalog.services[0].id, "homelab");
+});
+
+test("DIAGNOSTICS_ACCESS_KEY takes precedence and denied response is explained without secrets", async () => {
+	process.env.DIAGNOSTICS_ACCESS_KEY = "1234";
+	process.env.HOMELAB_SERVICES_API_KEY = "legacy-test-key";
+	setApiUrl("https://catalog.example.test/homelab");
+	let sent = "";
+	globalThis.fetch = (async (_input, init) => {
+		sent = new Headers(init?.headers).get("X-Diagnostics-Key") ?? "";
+		return new Response("denied", { status: 403 });
+	}) as typeof fetch;
+	const result = await loadHomelabServicesCatalog();
+	assert.equal(sent, "1234");
+	assert.equal(result.source, "local-fallback");
+	assert.equal(result.catalog.privateInventoryStatus, "access-denied");
+	assert.equal(result.catalog.services.length, 1);
+	assert.doesNotMatch(JSON.stringify(result), /1234|legacy-test-key/);
 });
 
 test("public homelab API refuses requests without querying FastAPI", async () => {

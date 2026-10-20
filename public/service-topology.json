@@ -4,7 +4,7 @@
 	"nodes": [
 		{
 			"id": "homelab",
-			"name": "Self-hosted engineering platform",
+			"name": "Private inventory unavailable",
 			"kind": "platform",
 			"category": "overview"
 		}

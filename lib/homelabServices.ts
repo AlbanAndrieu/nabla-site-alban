@@ -32,6 +32,8 @@ export type HomelabService = {
 
 export type HomelabServicesCatalog = {
 	version?: number;
+	/** Sanitized owner-only fallback reason; never include credentials. */
+	privateInventoryStatus?: "key-missing" | "access-denied" | "unavailable";
 	services: HomelabService[];
 	[key: string]: unknown;
 };
@@ -228,7 +230,9 @@ export async function loadHomelabServicesCatalog(): Promise<{
 	try {
 		// Applied only to the server-to-server FastAPI request; never sent to
 		// browsers, the public fallback or any NEXT_PUBLIC_* configuration.
-		const privateKey = process.env.HOMELAB_SERVICES_API_KEY?.trim();
+		const privateKey =
+			process.env.DIAGNOSTICS_ACCESS_KEY?.trim() ||
+			process.env.HOMELAB_SERVICES_API_KEY?.trim();
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
@@ -238,6 +242,13 @@ export async function loadHomelabServicesCatalog(): Promise<{
 			signal: controller.signal,
 			cache: "no-store",
 		});
+		if (response.status === 401 || response.status === 403) {
+			return {
+				catalog: { ...LOCAL_FALLBACK, privateInventoryStatus: "access-denied" },
+				source: "local-fallback",
+				primaryUrl,
+			};
+		}
 		if (!response.ok) {
 			throw new Error(`HTTP ${response.status}`);
 		}
@@ -255,13 +266,20 @@ export async function loadHomelabServicesCatalog(): Promise<{
 			source: "fastapi",
 			primaryUrl,
 		};
-	} catch (error) {
+	} catch {
 		// Never log private upstream URLs, keys or response bodies.
 		console.warn(
 			"[homelab-services] Private inventory unavailable; public placeholder only",
 		);
 		return {
-			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
+			catalog: {
+				...LOCAL_FALLBACK,
+				privateInventoryStatus:
+					process.env.DIAGNOSTICS_ACCESS_KEY?.trim() ||
+					process.env.HOMELAB_SERVICES_API_KEY?.trim()
+						? "unavailable"
+						: "key-missing",
+			},
 			source: "local-fallback",
 			primaryUrl,
 		};

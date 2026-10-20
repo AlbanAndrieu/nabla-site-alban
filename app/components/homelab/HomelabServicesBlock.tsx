@@ -174,8 +174,16 @@ export default function HomelabServicesBlock() {
 				</strong>
 				<p>
 					{french
-						? "L’accès réseau est autorisé, mais FastAPI ne fournit pas encore l’inventaire privé. Le catalogue public de secours ne contient aucune carte opérationnelle."
-						: "Network access is authorized, but FastAPI is not returning the private inventory. The public placeholder cannot supply operational cards."}
+						? state.catalog.privateInventoryStatus === "access-denied"
+							? "FastAPI a refusé l’accès au catalogue privé (HTTP 401/403). Vérifier DIAGNOSTICS_ACCESS_KEY dans Vercel et la valeur attendue côté fastapi-sample."
+							: state.catalog.privateInventoryStatus === "key-missing"
+								? "La clé DIAGNOSTICS_ACCESS_KEY est absente de l’environnement serveur Vercel. Le catalogue privé ne peut pas être récupéré."
+								: "Le catalogue privé n’a pas été récupéré depuis l’API FastAPI (réseau, délai, erreur HTTP ou réponse invalide). Vérifier l’API et la clé DIAGNOSTICS_ACCESS_KEY."
+						: state.catalog.privateInventoryStatus === "access-denied"
+							? "FastAPI denied the private catalog (HTTP 401/403). Check DIAGNOSTICS_ACCESS_KEY in Vercel and the FastAPI server configuration."
+							: state.catalog.privateInventoryStatus === "key-missing"
+								? "DIAGNOSTICS_ACCESS_KEY is missing from the Vercel server environment. The private catalog cannot be retrieved."
+								: "The private catalog could not be retrieved from FastAPI (network, timeout, HTTP error or invalid response). Verify the API and DIAGNOSTICS_ACCESS_KEY."}
 				</p>
 			</section>
 		);
