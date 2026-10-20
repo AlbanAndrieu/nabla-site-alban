@@ -1,9 +1,9 @@
 import { projectHomelabCatalogV2 } from "./homelabCatalogV2Projection";
-import { fetchSiteCatalogV2, SITE_CATALOG_V2_URL } from "./homelabSiteCatalog";
 import type {
 	HomelabServicesCatalog,
 	HomelabServicesSource,
 } from "./homelabServices";
+import { fetchSiteCatalogV2, SITE_CATALOG_V2_URL } from "./homelabSiteCatalog";
 import type { ServiceTopology } from "./serviceTopology";
 
 /** Exclusive server-side canonical v2 reader. Never import into client code. */
