@@ -1,35 +1,35 @@
 import { NextResponse } from "next/server";
-import {
-	isHomelabCatalogPlaceholder,
-	loadHomelabServicesCatalog,
-} from "@/lib/homelabServices";
+import { loadHomelabServicesCatalog } from "@/lib/homelabServices";
+import { SiteCatalogV2Error } from "@/lib/homelabSiteCatalog";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function catalogResponse() {
-	const { catalog, source, primaryUrl } = await loadHomelabServicesCatalog();
-	const catalogRevision =
-		typeof catalog.catalogRevision === "string" &&
-		catalog.catalogRevision.trim()
-			? catalog.catalogRevision.trim()
-			: null;
-	return NextResponse.json(catalog, {
-		headers: {
-			"X-Homelab-Services-Source": source,
-			"X-Homelab-Inventory-Complete": String(
-				!isHomelabCatalogPlaceholder(catalog),
-			),
-			"X-Homelab-Services-Primary": primaryUrl,
-			...(catalogRevision
-				? { "X-Homelab-Catalog-Revision": catalogRevision }
-				: {}),
-		},
-	});
+	try {
+		const { catalog } = await loadHomelabServicesCatalog();
+		return NextResponse.json(catalog, {
+			headers: {
+				"X-Homelab-Services-Source": "backstage-v2",
+				"X-Homelab-Inventory-Complete": "true",
+				"X-Homelab-Catalog-Revision": String(catalog.catalogRevision),
+			},
+		});
+	} catch (error) {
+		const reason =
+			error instanceof SiteCatalogV2Error ? error.reason : "unavailable";
+		return NextResponse.json(
+			{ error: "Backstage v2 inventory unavailable", reason },
+			{
+				status: 503,
+				headers: { "X-Homelab-Inventory-Complete": "false" },
+			},
+		);
+	}
 }
 
-/** Owner network or verified Cloudflare Access only; neutral 404 otherwise. */
+/** Owner-only: an invalid SERVICE key never weakens the CIDR restriction. */
 export function GET(request: Request) {
 	return gatedHomelabResponse(request, catalogResponse);
 }
