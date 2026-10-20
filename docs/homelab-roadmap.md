@@ -8,15 +8,21 @@
 - [x] Faire accepter au client serveur FastAPI un `HOMELAB_SERVICES_API_KEY`
   (en-tête `X-Diagnostics-Key`, secret Vercel serveur uniquement), sans l'exposer
   aux bundles, assets, URL de logs ou pages publiques. Garder le fallback sûr.
-- [ ] Définir `HOMELAB_SERVICES_API_KEY` comme secret Vercel et vérifier les droits
+- [ ] **Bloquant confirmé** : `HOMELAB_SERVICES_API_KEY` est absent des variables Vercel Production/Preview/Development consultées le 20 octobre. Provisionner une clé FastAPI dédiée lecture seule (source Vaultwarden), puis définir ce secret sur Vercel ; vérifier les droits
   read-only du compte FastAPI ; contrôler que la réponse FastAPI comprend
   PostgreSQL, Prometheus, etc. Ne pas publier le JSON brut dans Git ou Vercel public.
+- [x] Contrat unitaire : clé réservée au fetch serveur, PostgreSQL accepté dans le catalogue FastAPI, erreur 403 amont → repli placeholder sans fuite de secret (tests dans la PR #240, exécution sur HEAD final à revalider).
 - [ ] Tester, depuis le domicile, `/api/homelab-services` (HTTP 200, provenance
   `fastapi`, `X-Homelab-Inventory-Complete: true`) puis les cartes et les
   liens `#service-postgresql`. Depuis un réseau extérieur, exiger toujours 404.
 - [ ] Fermer la dette ZAP Preview : échec scanner sans rapport (CI #39490343618)
   sur PR #240. Garder gate bloquante, classifier les erreurs sans logs sensibles,
   valider le workflow de confiance après intégration autorisée.
+
+## Qualité — parité choisie avec nabla-site-bababou
+
+- [x] Réutiliser les niveaux de preuve L0–L3, le chemin source exact-SHA lorsque DNS est indisponible et la lecture du seul job CI réellement échoué dans le skill `nabla-quality`.
+- [ ] Valider la qualité du HEAD final avec les gates Alban existantes ; ne pas recopier intégralement les hooks spéciaux Bababou (données familiales, Dagger expérimental, outillage Python hors périmètre) sans analyse de compatibilité.
 
 # Feuille de route homelab
 

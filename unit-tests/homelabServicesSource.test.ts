@@ -11,6 +11,7 @@ import {
 } from "../lib/homelabServices";
 
 const ORIGINAL_API_URL = process.env.HOMELAB_SERVICES_API_URL;
+const ORIGINAL_API_KEY = process.env.HOMELAB_SERVICES_API_KEY;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 function setApiUrl(value: string | undefined) {
@@ -22,6 +23,8 @@ function setApiUrl(value: string | undefined) {
 }
 
 test.afterEach(() => {
+	if (ORIGINAL_API_KEY === undefined) delete process.env.HOMELAB_SERVICES_API_KEY;
+	else process.env.HOMELAB_SERVICES_API_KEY = ORIGINAL_API_KEY;
 	setApiUrl(ORIGINAL_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
 });
@@ -178,6 +181,35 @@ test("homelab fallback is generic if upstream FastAPI is unavailable", async () 
 	setApiUrl("https://catalog.example.test/homelab");
 	globalThis.fetch = (async () =>
 		new Response("unavailable", { status: 503 })) as typeof fetch;
+	const result = await loadHomelabServicesCatalog();
+	assert.equal(result.source, "local-fallback");
+	assert.equal(result.catalog.services.length, 1);
+	assert.equal(result.catalog.services[0].id, "homelab");
+});
+
+test("private inventory sends read-only diagnostics key server-to-server only", async () => {
+	setApiUrl("https://catalog.example.test/homelab");
+	process.env.HOMELAB_SERVICES_API_KEY = "test-only-private-key";
+	let passedHeader = "";
+	globalThis.fetch = (async (_input, init) => {
+		passedHeader = new Headers(init?.headers).get("X-Diagnostics-Key") ?? "";
+		return Response.json({
+			version: 1,
+			services: [{ id: "postgresql", name: "PostgreSQL" }],
+		});
+	}) as typeof fetch;
+	const result = await loadHomelabServicesCatalog();
+	assert.equal(result.source, "fastapi");
+	assert.equal(passedHeader, "test-only-private-key");
+	assert.ok(result.catalog.services.some((service) => service.id === "postgresql"));
+	assert.doesNotMatch(JSON.stringify(result.catalog), /test-only-private-key/);
+});
+
+test("rejected upstream key never publishes a private fallback catalog", async () => {
+	process.env.HOMELAB_SERVICES_API_KEY = "test-only-invalid-key";
+	setApiUrl("https://catalog.example.test/homelab");
+	globalThis.fetch = (async () =>
+		new Response("Forbidden", { status: 403 })) as typeof fetch;
 	const result = await loadHomelabServicesCatalog();
 	assert.equal(result.source, "local-fallback");
 	assert.equal(result.catalog.services.length, 1);
