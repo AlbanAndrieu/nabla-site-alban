@@ -123,3 +123,20 @@ test("relation order remains stable when upstream changes entity order", () => {
 		["backend", "frontend", "frontend"],
 	);
 });
+
+test("normalizes Backstage punctuation before deduplicating card and graph IDs", () => {
+	const output = project([
+		entity("Component", "default", "a.b"),
+		entity("Component", "edge", "a_b"),
+		entity("Resource", "default", "a-b"),
+	]);
+	const ids = output.services.services.map((service) => service.id);
+	assert.equal(new Set(ids).size, ids.length);
+	assert.ok(
+		ids.every((id) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id ?? "")),
+	);
+	assert.deepEqual(
+		new Set(output.topology.nodes.map((node) => node.id)),
+		new Set(ids),
+	);
+});

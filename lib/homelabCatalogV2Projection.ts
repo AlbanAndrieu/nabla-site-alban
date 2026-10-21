@@ -9,15 +9,25 @@ import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 function stableServiceIds(
 	views: ReturnType<typeof catalogV2ServiceViews>,
 ): Map<string, string> {
+	// Backstage names allow '.' and '_', but card anchors need safe slugs.
+	const slugs = views.map((view) => {
+		const slug = view.id
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, "-")
+			.replace(/^-+|-+$/g, "");
+		return slug || "service";
+	});
 	const names = new Map<string, number>();
-	for (const view of views) {
-		names.set(view.id, (names.get(view.id) ?? 0) + 1);
+	for (const slug of slugs) {
+		names.set(slug, (names.get(slug) ?? 0) + 1);
 	}
-	const initial = views.map((view) =>
-		(names.get(view.id) ?? 0) > 1
-			? `${view.entityKind.toLowerCase()}-${view.id}`
-			: view.id,
-	);
+	const initial = views.map((view, index) => {
+		const slug = slugs[index];
+		if (!slug) throw new Error("Missing normalized Backstage service name");
+		return (names.get(slug) ?? 0) > 1
+			? `${view.entityKind.toLowerCase()}-${slug}`
+			: slug;
+	});
 	const counts = new Map<string, number>();
 	for (const id of initial) counts.set(id, (counts.get(id) ?? 0) + 1);
 
@@ -36,7 +46,7 @@ function stableServiceIds(
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/^-+|-+$/g, "");
 			const safeNamespace = normalizedNamespace || "default";
-			const stem = `${view.entityKind.toLowerCase()}-${safeNamespace}-${view.id}`;
+			const stem = `${view.entityKind.toLowerCase()}-${safeNamespace}-${slugs[index]}`;
 			id = stem;
 			let suffix = 2;
 			while (reserved.has(id) || used.has(id)) {
