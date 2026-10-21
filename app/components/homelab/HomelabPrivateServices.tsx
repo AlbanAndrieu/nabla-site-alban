@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useLocale } from "next-intl";
 import styles from "./HomelabServicesSection.module.css";
 import useHomelabAccess from "./useHomelabAccess";
@@ -25,7 +26,15 @@ export default function HomelabPrivateServices() {
 			<p data-homelab-private-denied>
 				<a href="https://ops.albandrieu.com/" rel="nofollow noreferrer">
 					{french ? "Espace opérations privé" : "Private operations"}
-				</a>
+				</a>{" "}
+				<Link
+					href="/api/homelab-access?diagnose=1"
+					prefetch={false}
+					rel="nofollow"
+					data-homelab-access-diagnostic
+				>
+					{french ? "Diagnostic d’accès" : "Access diagnostics"}
+				</Link>
 			</p>
 		);
 	return (

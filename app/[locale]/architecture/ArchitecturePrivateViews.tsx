@@ -4,16 +4,10 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
 import SectionHeading from "@/components/SectionHeading";
-import {
-	getStaticHomelabServicesCatalog,
-	type HomelabServicesCatalog,
-	parseHomelabServicesCatalog,
-} from "@/lib/homelabServices";
-import {
-	getStaticServiceTopology,
-	parseServiceTopology,
-	type ServiceTopology,
-} from "@/lib/serviceTopology";
+import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
+import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
+import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import type { ServiceTopology } from "@/lib/serviceTopology";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 
 // Loaded only after the server confirmed owner access, so anonymous visitors
@@ -53,45 +47,39 @@ async function fetchJson(url: string, signal: AbortSignal) {
 }
 
 /**
- * Loads the private catalog and topology from the gated routes. The public
- * JSON placeholders only keep the views renderable when a route fails.
+ * A single owner-gated canonical v2 request feeds both the service cards and
+ * graph. Never bootstrap these views from public v1 JSON placeholders.
  */
 function usePrivateArchitectureData(enabled: boolean) {
 	const [data, setData] = useState<PrivateArchitectureData | null>(null);
+	const [unavailable, setUnavailable] = useState(false);
 
 	useEffect(() => {
 		if (!enabled) return;
 		const controller = new AbortController();
-		const fallbackCatalog = getStaticHomelabServicesCatalog();
-		Promise.allSettled([
-			fetchJson("/api/homelab-services", controller.signal),
-			fetchJson("/api/homelab-topology", controller.signal),
-		]).then(([catalogResult, topologyResult]) => {
-			if (controller.signal.aborted) return;
-			const catalog =
-				catalogResult.status === "fulfilled"
-					? parseHomelabServicesCatalog(catalogResult.value.body)
-					: null;
-			const topology =
-				topologyResult.status === "fulfilled"
-					? parseServiceTopology(topologyResult.value.body)
-					: null;
-			setData({
-				catalog: catalog ?? fallbackCatalog.catalog,
-				catalogSource:
-					catalog && catalogResult.status === "fulfilled"
-						? (catalogResult.value.response.headers.get(
-								"X-Homelab-Services-Source",
-							) ?? "fastapi")
-						: fallbackCatalog.source,
-				topology: topology ?? getStaticServiceTopology().topology,
-				topologyLive: topology !== null,
+		void fetchJson("/api/homelab-catalog-v2", controller.signal)
+			.then(({ body }) => {
+				if (controller.signal.aborted) return;
+				const catalog = parseHomelabCatalogV2(body);
+				if (!catalog || catalog.entities.length === 0) {
+					setUnavailable(true);
+					return;
+				}
+				const projected = projectHomelabCatalogV2(catalog);
+				setData({
+					catalog: projected.services,
+					catalogSource: "backstage-v2",
+					topology: projected.topology,
+					topologyLive: true,
+				});
+			})
+			.catch(() => {
+				if (!controller.signal.aborted) setUnavailable(true);
 			});
-		});
 		return () => controller.abort();
 	}, [enabled]);
 
-	return data;
+	return { data, unavailable };
 }
 
 /** Owner-only architecture explorer, impact inspector and network flow. */
@@ -99,9 +87,18 @@ export default function ArchitecturePrivateViews({
 	locale,
 }: Readonly<{ locale: string }>) {
 	const trusted = useHomelabAccess() === "trusted";
-	const data = usePrivateArchitectureData(trusted);
-	if (!trusted || !data) return null;
+	const { data, unavailable } = usePrivateArchitectureData(trusted);
+	if (!trusted) return null;
 	const french = locale === "fr";
+	if (unavailable)
+		return (
+			<div role="alert" data-architecture-catalog-v2-unavailable>
+				{french
+					? "Catalogue Backstage v2 indisponible (authentification ou source)."
+					: "Backstage v2 catalog unavailable (authorization or source)."}
+			</div>
+		);
+	if (!data) return null;
 
 	return (
 		<div data-homelab-private-view>

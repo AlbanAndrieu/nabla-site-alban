@@ -1,3 +1,81 @@
+## P0 — Cutover direct Backstage v2 (20 octobre 2026, Site #240)
+
+- [x] Cible confirmée auprès de FastAPI [#358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358) :
+  `GET /api/site/catalog/v2`, schéma `{schemaVersion:2, model:"backstage", catalogRevision, entities}`,
+  `X-Diagnostics-Key` server-only. Aucun lecteur HTTP v1 en secours.
+- [x] Site : API owner `/api/homelab-catalog-v2`, projection `entityRef`
+  vers cartes et graphe, contrôle CIDR indépendant de l'identité SERVICE,
+  confidentialité et gestion explicite 401/403/404/503, tests simulant la clé
+  invalide et les relations sans fuite d'IP/ports.
+- [x] Préserver les cartes même si une topologie indépendante échoue :
+  cartes et topologie résident maintenant dans la même réponse v2.
+  La page Architecture lit uniquement le graphe v2 authentifié.
+- [ ] Déployer FastAPI #358 après qualité, puis rendre disponible le
+  `catalog/generated/entities.json` canonique de Compose #265 sur la branche
+  attendue. Tant que ces PR ne sont pas livrées, un 404/503 est normal ;
+  ne pas basculer vers le fichier v1.
+- [ ] Valider depuis le Wi-Fi autorisé : `GET /api/homelab-access?diagnose=1`
+  reste `trusted:true`; la **clé Preview factice** doit être refusée,
+  via un 503 Site dont la raison est `access-denied` uniquement lorsque
+  FastAPI répond réellement 401/403. Tester aussi le 404 depuis un autre réseau.
+- [ ] Après fourniture d'une vraie clé dédiée, réessayer la Preview exacte :
+  HTTP 200 + `X-Homelab-Inventory-Complete:true`, services non vides, révision
+  identique sur les routes owner et Architecture, aucun détail secret.
+  Aucune clé valide présumée ni récupérée actuellement.
+- [ ] Exécuter les tests local-first et les quality gates sur HEAD exact ;
+  la PR #240 doit rester ouverte et non fusionnée en l'absence d'autorisation.
+- [ ] Confirmer les scans OWASP ZAP Preview réels et la confidentialité
+  des rapports ; la classification des erreurs sans rapport n'est pas une
+  preuve d'exécution du scanner.
+
+## Diagnostic supplémentaire — 20 octobre 2026
+L'accès propriétaire `trusted:true` est confirmé depuis le Wi-Fi du domicile.
+La clé `DIAGNOSTICS_ACCESS_KEY` est désormais présente en **Preview** dans Vercel
+(variable sensible créée le 20 octobre, avant la Preview READY du HEAD `7fae991`).
+Ce constat **ne prouve pas** que FastAPI accepte la clé ni que l'inventaire est complet :
+depuis le domicile, vérifier l'API privée et la présence effective de PostgreSQL.
+Ne pas partager la valeur de la clé ni la promouvoir en production.
+
+Le catalogue est chargé indépendamment de la topologie (PR #240), afin qu'un
+échec de `/api/homelab-topology` ne masque pas les cartes valides.
+Le serveur préfère `HOMELAB_SERVICES_API_KEY` à la clé générique de transition,
+transmet `X-Diagnostics-Key` exclusivement au backend et interdit de suivre une
+redirection avec cette clé. Une réponse FastAPI 401/403 laisse le fallback neutre.
+
+## P0 — Réparer les cartes de services privées après #238 (20 octobre 2026)
+
+- [x] Le diagnostic owner de la PR #240 a été confirmé depuis le Wi-Fi domicile :
+  `trusted:true`, `authorized`, IPv4, CIDR chargé. Ce n'est pas une erreur d'accès.
+- [x] Identifier le **placeholder unique** de `public/homelab-services.json` :
+  l'ancien catalogue complet n'est plus publié (confidentialité). Son utilisation
+  en repli ne doit plus ressembler à une liste opérationnelle vide.
+- [x] Faire accepter au client serveur FastAPI un `HOMELAB_SERVICES_API_KEY`
+  (en-tête `X-Diagnostics-Key`, secret Vercel serveur uniquement), sans l'exposer
+  aux bundles, assets, URL de logs ou pages publiques. Garder le fallback sûr.
+- [ ] **Validation runtime bloquante** : la clé générique `DIAGNOSTICS_ACCESS_KEY` existe en Preview et la Preview `7fae991` est READY, mais aucune réponse authentifiée propriétaire du catalogue n'a encore été constatée sur ce build. Depuis le domicile, contrôler que FastAPI renvoie PostgreSQL et Prometheus. Le fallback public reste uniquement un placeholder.
+- [ ] **Séparation des privilèges** : provisionner une `HOMELAB_SERVICES_API_KEY` dédiée en lecture seule (Vaultwarden), confirmer les droits du backend, l'utiliser dans Vercel et retirer la clé générique dès validation. Ne pas publier le JSON brut dans Git ou les artefacts.
+- [x] Contrat unitaire : clé réservée au fetch serveur, PostgreSQL accepté dans le catalogue FastAPI, erreur 403 amont → repli placeholder sans fuite de secret (tests dans la PR #240, exécution sur HEAD final à revalider).
+- [ ] Tester sur la dernière Preview du HEAD après déploiement, depuis le domicile,
+  `/api/homelab-services` (HTTP 200, `X-Homelab-Services-Source: fastapi`,
+  `X-Homelab-Inventory-Complete: true`), puis les cartes et les liens
+  `#service-postgresql` et `#homelab-service-postgresql`.
+  Depuis un réseau extérieur, exiger toujours 404.
+- [x] Corriger l'initialisation indépendante catalogue/topologie et ajouter
+  trois contrats E2E avec API simulées : inventaire valide malgré topologie
+  inaccessible, placeholder explicite, refus visiteur. **Exécution locale NOT_RUN**
+  (pas de checkout et DNS GitHub indisponible dans l'environnement d'agent).
+- [ ] Fermer la dette ZAP Preview : échec scanner sans rapport sur PR #240.
+  La CI historique #39490804675 n'est **pas** une preuve du nouveau workflow.
+  Classification exit=3 (scanner), rapport JSON valide avec site(s), détection
+  démarrage/docker, et absence d'artefact HTTP brut ajoutées dans la PR.
+  **Reste NOT_RUN** : un scan réel exact-SHA via la politique déployée, sans
+  retirer la gate bloquante ni déclencher des pipelines inutilement.
+
+## Qualité — parité choisie avec nabla-site-bababou
+
+- [x] Réutiliser les niveaux de preuve L0–L3, le chemin source exact-SHA lorsque DNS est indisponible et la lecture du seul job CI réellement échoué dans le skill `nabla-quality`.
+- [ ] Valider la qualité du HEAD final avec les gates Alban existantes ; ne pas recopier intégralement les hooks spéciaux Bababou (données familiales, Dagger expérimental, outillage Python hors périmètre) sans analyse de compatibilité.
+
 # Feuille de route homelab
 
 ## État du chantier DefectDojo / Preview — 19 octobre 2026 (HEAD de la PR #236)

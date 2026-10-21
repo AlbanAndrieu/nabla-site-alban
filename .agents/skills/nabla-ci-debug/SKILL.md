@@ -93,3 +93,17 @@ régression applicative. Ne pas multiplier les appels réseau identiques.
 
 La compaction des logs et du contexte **ne supprime aucun test** et ne
 transforme jamais un échec en succès.
+
+
+## Parité contrôlée avec nabla-site-bababou (2026-10-20)
+
+Bababou et Alban doivent appliquer les mêmes **niveaux de preuve** : L0
+(lecture), L1 (exécution ciblée), L2 (hooks convergés), L3 (publication
+exact-HEAD). Les scripts et le périmètre métier ne sont pas copiés aveuglément.
+Le parcours `just offline-l1` s'inspire de Bababou et vérifie seulement
+syntaxe shell/Python et espaces sans dépendance réseau ; il ne valide pas
+ESLint/TypeScript, les secrets, le build ni la publication. Le `just quality`
+du site et les hooks pre-commit restent canoniques. Ne pas recopier la
+configuration ZAP Bababou qui peut publier des rapports HTTP bruts ; Site Alban
+ne publie que des catégories de panne comme `ZAP_NO_REPORT` et des compteurs
+agrégés. Une analyse sans rapport reste FAIL et jamais « zéro finding ».

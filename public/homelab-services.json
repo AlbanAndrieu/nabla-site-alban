@@ -3,11 +3,11 @@
 	"services": [
 		{
 			"id": "homelab",
-			"name": "Self-hosted engineering platform",
+			"name": "Private inventory unavailable",
 			"kind": "platform",
 			"category": "overview",
 			"endpointEnabled": false,
-			"description": "Operational inventory is restricted to the owner dashboard."
+			"description": "Private service inventory requires FastAPI diagnostics authorization."
 		}
 	]
 }

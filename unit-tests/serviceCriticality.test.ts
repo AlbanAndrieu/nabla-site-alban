@@ -383,7 +383,7 @@ test("architecture and TrueNAS share dependency, lifecycle, optional-edge and bl
 	assert.match(architecture, /CriticalDependencyHierarchy/);
 	assert.match(hierarchy, /ServiceCriticalityOverview/);
 	assert.match(hierarchy, /phase \+ priorité/);
-	assert.match(architecture, /\/api\/homelab-topology/);
+	assert.match(architecture, /\/api\/homelab-catalog-v2/);
 	assert.match(explorer, /requiredEdgeDependencyState/);
 	assert.match(explorer, /requiredDependencyRelationHealth/);
 	assert.match(explorer, /relation\.optional/);

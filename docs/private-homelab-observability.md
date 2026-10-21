@@ -1,10 +1,61 @@
+## Migration du catalogue propriétaire vers Backstage v2 — 20 octobre 2026
+
+**Contexte source :** [FastAPI #358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358)
+définit `GET /api/site/catalog/v2` et [Compose #265](https://github.com/AlbanAndrieu/nabla-compose/pull/265)
+génère `catalog/generated/entities.json`. Les deux PR sont encore ouvertes :
+l'API et la source v2 ne sont **pas** garanties déployées sur Production.
+
+Le site demande le **catalogue v2 uniquement**, depuis ses routes serveur
+`/api/homelab-catalog-v2` et `/api/homelab-services`, après vérification
+`HOMELAB_TRUSTED_CIDRS` sur la requête propriétaire. Le serveur Next.js
+interroge FastAPI avec `X-Diagnostics-Key` alimenté par
+`DIAGNOSTICS_ACCESS_KEY` (jamais `NEXT_PUBLIC_*`). La réponse Backstage est
+validée par le parseur existant `parseHomelabCatalogV2`, filtrée par allowlist
+et convertie en cartes et relations via `entityRef` et `catalogRevision`.
+Le rendu Architecture et les cartes partagent désormais la même révision et
+ne relisent pas `/api/homelab-services` v1 ou les JSON publics de secours.
+
+**Test négatif volontaire :** la valeur Preview actuelle de
+`DIAGNOSTICS_ACCESS_KEY` est factice et invalide. Un refus de FastAPI
+(401/403) produit `access-denied`, HTTP 503 sur la route propriétaire du
+site et un message d'indisponibilité ; **aucune carte inventée**, aucun jeton
+dans la réponse, les logs ou les bundles. Un 404 FastAPI (endpoint #358 non
+déployé) ou un 503 source (#265 non fusionnée) demeure `unavailable`, pas
+`access-denied`. Ne pas traiter un test invalide comme validation positive.
+
+Les DTO v2 excluent les IP, ports, URLs et secrets ; les cartes qui ne disposent
+pas de cible de navigation vérifiée restent non cliquables. La topologie
+opérateur détaillée et les observations WAN sont une autre frontière :
+elles ne doivent pas être recréées à partir de champs v1.
+
+**Acceptation restante :** vérifier sur Preview exacte un 404 visiteur,
+un 503 owner + clé invalide, puis après publication #358/#265 et fourniture
+d'une clé valide, un 200 avec un catalogue non vide et un même
+`catalogRevision` pour Architecture et les cartes. Ni clé valide ni
+publication v2 ne sont attestées à ce stade.
+
 ### Déploiement propriétaire et accès depuis le domicile — 20 octobre 2026
 
-**Etat observé :** `www.albanandrieu.com` sert encore `master` à
-`dca0755058ccb029109e180522b9d08872233ccb` (PR #236) : il n'exécute
-pas le nouveau contrôle owner et n'affiche pas les cartes et React Flow.
-La PR #238 est seulement en Preview ; modifier les variables Vercel ne
-déploie pas le code de la PR sur `www`. Aucune fusion automatique.
+**État vérifié le 20 octobre :** la PR #238 est fusionnée. La production
+Vercel READY sert `master` au commit `6b051516220b7bf905e80eae26d8ea83b910897f`
+(#239 inclus). Les cartes et React Flow existent dans ce build mais restent
+masqués lorsque `/api/homelab-access` répond `trusted:false`.
+Cause du refus **non établie** : ne pas conclure que la valeur Vercel est vide,
+car les variables de type `sensitive` sont systématiquement masquées par l'API.
+Un visiteur du domicile peut être vu en IPv6 alors que la liste autorise
+uniquement `82.66.4.247/32`.
+
+**Diagnostic sécurisé à réaliser sur un build contenant ce correctif :**
+ouvrir `/api/homelab-access?diagnose=1` depuis le même appareil et la même
+connexion que la page TrueNAS. La réponse indique `sourceFamily`,
+`trustedCidrsConfigured`, `networkAllowed`, `identityRequired` et
+`reason`, **sans révéler l'IP cliente**, le CIDR configuré, les tokens,
+le catalogue ni les ports homelab. `client-ip-outside-trusted-cidrs` avec
+`sourceFamily=ipv6` signale une sortie IPv6 à qualifier séparément :
+ne pas élargir la règle à un /0, ne pas ajouter de préfixe non vérifié.
+`runtime-unverified` et `trusted-cidrs-not-configured` nécessitent une
+correction de configuration. Les routes sensibles gardent leur refus 404 et
+leurs politiques no-store.
 
 **Recette après fusion approuvée :** depuis le domicile tester
 `/api/homelab-access` (seulement `{"trusted":true}`), puis les cartes

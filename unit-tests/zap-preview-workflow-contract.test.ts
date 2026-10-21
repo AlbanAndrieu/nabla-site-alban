@@ -81,6 +81,9 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.match(workflow, /-J report_json\.json -I -T 5 -s/);
 	assert.match(workflow, /--env ZAP_AUTH_HEADER/);
 	assert.match(workflow, /console\.log" 2>&1/);
+	assert.equal(workflow.includes("ZAP_NO_REPORT class=$category"), true);
+	assert.equal(workflow.includes("ZAP_SCAN_EXIT_CODE=$zap_exit"), true);
+	assert.equal(workflow.includes('cat "$scan_dir/console.log"'), false);
 	assert.match(workflow, /continue-on-error: true/);
 	assert.match(workflow, /Clean ZAP Preview workspace/);
 	assert.match(workflow, /Summarize ZAP Preview diagnostics/);
@@ -100,7 +103,13 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.match(workflow, /statuses: write/);
 	assert.match(workflow, /ZAP Preview access preflight failed/);
 	assert.match(workflow, /ZAP Preview passed \$counts/);
-	assert.match(workflow, /ZAP Preview scanner error: no report/);
+	assert.match(workflow, /ZAP Preview scanner failed or invalid report/);
+	assert.match(workflow, /ZAP_SCANNER_ERROR/);
+	assert.match(workflow, /ZAP_INVALID_REPORT/);
+	assert.match(workflow, /SCAN_EXIT_CODE/);
+	assert.match(workflow, /zap-startup/);
+	assert.match(workflow, /docker-image/);
+	assert.match(workflow, /\.site \| type == "array"/);
 	assert.match(workflow, /ZAP Preview blocked \$counts/);
 });
 

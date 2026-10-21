@@ -26,6 +26,7 @@ export type HealthFetchResult = {
 
 export type HomelabServicesState = {
 	catalog: HomelabServicesCatalog | null;
+	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
 	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	error: boolean;
@@ -36,6 +37,7 @@ export type HomelabServicesState = {
 
 export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalog: null,
+	catalogFailure: null,
 	topology: null,
 	snapshot: null,
 	error: false,
@@ -44,32 +46,54 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	healthRefreshing: true,
 };
 
-async function fetchCatalog(
-	signal: AbortSignal,
-): Promise<HomelabServicesCatalog> {
+class CatalogV2Unavailable extends Error {
+	constructor(
+		readonly reason: "key-missing" | "access-denied" | "unavailable",
+	) {
+		super("Backstage v2 catalog unavailable");
+	}
+}
+
+async function fetchCatalog(signal: AbortSignal): Promise<{
+	catalog: HomelabServicesCatalog;
+	topology: ServiceTopology | null;
+}> {
 	const response = await fetch("/api/homelab-services", {
 		cache: "no-store",
 		signal,
 	});
-	if (!response.ok) throw new Error(`catalog HTTP ${response.status}`);
-	return (await response.json()) as HomelabServicesCatalog;
-}
-
-async function fetchTopology(
-	signal: AbortSignal,
-): Promise<ServiceTopology | null> {
-	try {
-		const response = await fetch("/api/homelab-topology", {
-			cache: "no-store",
-			signal,
-			headers: { Accept: "application/json" },
-		});
-		if (!response.ok) return null;
-		return parseServiceTopology(await response.json());
-	} catch (error) {
-		if (signal.aborted) throw error;
-		return null;
+	if (!response.ok) {
+		// The same-origin owner route returns only a sanitized diagnostic reason.
+		const body: unknown = await response.json().catch(() => null);
+		const reason =
+			typeof body === "object" && body !== null && "reason" in body
+				? (body as { reason?: unknown }).reason
+				: null;
+		throw new CatalogV2Unavailable(
+			reason === "key-missing" || reason === "access-denied"
+				? reason
+				: "unavailable",
+		);
 	}
+	const payload: unknown = await response.json();
+	if (
+		typeof payload !== "object" ||
+		payload === null ||
+		!("version" in payload) ||
+		payload.version !== 2 ||
+		!("services" in payload) ||
+		!Array.isArray(payload.services)
+	) {
+		throw new CatalogV2Unavailable("unavailable");
+	}
+	const catalog = payload as HomelabServicesCatalog;
+	const topology =
+		"topology" in payload ? parseServiceTopology(payload.topology) : null;
+	return {
+		catalog,
+		topology:
+			topology?.catalogRevision === catalog.catalogRevision ? topology : null,
+	};
 }
 
 async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
@@ -122,7 +146,7 @@ export function applyProbeSnapshot(
 		healthUnavailable: false,
 		healthStatus: probes.status,
 		healthRefreshing: true,
-		error: false,
+		error: current.error,
 	};
 }
 
@@ -141,9 +165,10 @@ export function applyHealthCycle(
 		healthStatus: aggregate.status ?? probes.status,
 		healthRefreshing: false,
 		error:
-			current.catalog === null &&
-			aggregate.snapshot === null &&
-			probes.snapshot === null,
+			current.error ||
+			(current.catalog === null &&
+				aggregate.snapshot === null &&
+				probes.snapshot === null),
 	};
 }
 
@@ -232,25 +257,31 @@ export function useHomelabHealth(): HomelabServicesState {
 			void runHealthCycle(refreshController.signal);
 		};
 
-		void Promise.all([
-			fetchCatalog(initialController.signal),
-			fetchTopology(initialController.signal),
-		])
-			.then(([catalog, topology]) => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({
-						...current,
-						catalog,
-						topology,
-						error: false,
-					}));
-				}
+		// Catalog drives the service cards; topology is optional enrichment.
+		// Never make an unavailable topology hide an otherwise valid inventory.
+		void fetchCatalog(initialController.signal)
+			.then(({ catalog, topology }) => {
+				if (initialController.signal.aborted) return;
+				setState((current) => ({
+					...current,
+					catalog,
+					topology,
+					catalogFailure: null,
+					error: false,
+				}));
 			})
-			.catch(() => {
-				if (!initialController.signal.aborted) {
-					setState((current) => ({ ...current, error: true }));
-				}
+			.catch((error: unknown) => {
+				if (initialController.signal.aborted) return;
+				setState((current) => ({
+					...current,
+					error: true,
+					catalogFailure:
+						error instanceof CatalogV2Unavailable
+							? error.reason
+							: "unavailable",
+				}));
 			});
+
 		void runHealthCycle(initialController.signal);
 
 		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);

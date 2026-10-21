@@ -32,16 +32,27 @@ export type HomelabService = {
 
 export type HomelabServicesCatalog = {
 	version?: number;
+	/** Sanitized owner-only fallback reason; never include credentials. */
+	privateInventoryStatus?: "key-missing" | "access-denied" | "unavailable";
 	services: HomelabService[];
 	[key: string]: unknown;
 };
 
 export type HomelabServicesSource = "fastapi" | "local-fallback";
 
-export const HOMELAB_SERVICES_DEFAULT_API_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/homelab-services";
+/** The sole public fallback is a non-operational placeholder, not a catalog. */
+export function isHomelabCatalogPlaceholder(
+	catalog: HomelabServicesCatalog,
+): boolean {
+	return (
+		catalog.services.length === 1 &&
+		catalog.services[0]?.id === "homelab" &&
+		catalog.services[0]?.endpointEnabled === false
+	);
+}
 
-const PRIMARY_TIMEOUT_MS = 2500;
+export const HOMELAB_SERVICES_DEFAULT_API_URL =
+	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -203,49 +214,4 @@ export function getStaticHomelabServicesCatalog(): {
 		source: "local-fallback",
 		primaryUrl: primaryApiUrl(),
 	};
-}
-
-export async function loadHomelabServicesCatalog(): Promise<{
-	catalog: HomelabServicesCatalog;
-	source: HomelabServicesSource;
-	primaryUrl: string;
-}> {
-	const primaryUrl = primaryApiUrl();
-	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
-
-	try {
-		const response = await fetch(primaryUrl, {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "nabla-site-homelab-catalog/1.0",
-			},
-			signal: controller.signal,
-			cache: "no-store",
-		});
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}`);
-		}
-		const catalog = parseHomelabServicesCatalog(await response.json());
-		if (!catalog) {
-			throw new Error("Invalid homelab catalog payload");
-		}
-		return {
-			catalog: applyLocalPresentationOverrides(catalog),
-			source: "fastapi",
-			primaryUrl,
-		};
-	} catch (error) {
-		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(
-			`[homelab-services] FastAPI catalog unavailable (${primaryUrl}): ${reason}; using local fallback`,
-		);
-		return {
-			catalog: applyLocalPresentationOverrides(LOCAL_FALLBACK),
-			source: "local-fallback",
-			primaryUrl,
-		};
-	} finally {
-		clearTimeout(timeout);
-	}
 }

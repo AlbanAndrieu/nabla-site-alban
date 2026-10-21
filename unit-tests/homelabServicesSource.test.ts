@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { GET } from "../app/api/homelab-services/route";
 import {
@@ -6,11 +7,93 @@ import {
 	HOMELAB_SERVICES_DEFAULT_API_URL,
 	homelabServiceEndpointUrl,
 	homelabServiceId,
-	loadHomelabServicesCatalog,
 	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
+import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
+
+test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
+	assert.equal(HOMELAB_SERVICES_DEFAULT_API_URL, SITE_CATALOG_V2_URL);
+	assert.equal(
+		SITE_CATALOG_V2_URL,
+		"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2",
+	);
+});
+
+test("browser navigation helpers never override explicitly declared destinations", () => {
+	assert.equal(
+		homelabServiceEndpointUrl({
+			id: "prometheus",
+			name: "Prometheus",
+			endpointUrl: "https://metrics.example.test:9443/",
+			tunnelUrl: "https://metrics.albandrieu.com",
+		}),
+		"https://metrics.example.test:9443/",
+	);
+	assert.equal(homelabServiceId({ name: "pfSense" }), "pfsense");
+});
+
+test("inert legacy JSON remains a non-operational placeholder, never a v2 source", () => {
+	const local = getStaticHomelabServicesCatalog().catalog;
+	assert.equal(local.services.length, 1);
+	assert.equal(local.services[0].id, "homelab");
+	assert.equal(local.services[0].endpointEnabled, false);
+	assert.ok(!local.services.some((s) => s.id === "postgresql"));
+});
+
+test("runtime loader and owner architecture never request legacy endpoints or fall back", async () => {
+	const [loader, architecture, refreshing] = await Promise.all([
+		readFile(
+			new URL("../lib/homelabServicesServer.ts", import.meta.url),
+			"utf8",
+		),
+		readFile(
+			new URL(
+				"../app/[locale]/architecture/ArchitecturePrivateViews.tsx",
+				import.meta.url,
+			),
+			"utf8",
+		),
+		readFile(
+			new URL(
+				"../app/[locale]/architecture/useArchitectureLiveData.ts",
+				import.meta.url,
+			),
+			"utf8",
+		),
+	]);
+	assert.match(loader, /fetchSiteCatalogV2\(\)/);
+	assert.doesNotMatch(
+		loader.slice(
+			loader.indexOf("export async function loadHomelabServicesCatalog"),
+		),
+		/LOCAL_FALLBACK|getStaticHomelabServicesCatalog|homelab-services\.json/,
+	);
+	assert.match(architecture, /fetchJson\("\/api\/homelab-catalog-v2"/);
+	assert.doesNotMatch(
+		architecture,
+		/getStaticHomelabServicesCatalog|getStaticServiceTopology/,
+	);
+	assert.match(refreshing, /fetch\("\/api\/homelab-catalog-v2"/);
+	assert.doesNotMatch(refreshing, /fetch\("\/api\/homelab-topology"/);
+});
+
+test("anonymous service route does not leak catalog, URL or revision", async () => {
+	const response = await GET(
+		new Request("https://www.albanandrieu.com/api/homelab-services", {
+			headers: { "x-real-ip": "203.0.113.7" },
+		}),
+	);
+	assert.equal(response.status, 404);
+	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+	assert.equal(response.headers.get("x-homelab-catalog-revision"), null);
+	assert.equal(response.headers.get("x-homelab-services-primary"), null);
+});
+
+// Retained pure presentation/legacy-shape safety contracts. Runtime is v2-only.
 
 const ORIGINAL_API_URL = process.env.HOMELAB_SERVICES_API_URL;
+const ORIGINAL_API_KEY = process.env.HOMELAB_SERVICES_API_KEY;
+const ORIGINAL_DIAGNOSTICS_KEY = process.env.DIAGNOSTICS_ACCESS_KEY;
 const ORIGINAL_FETCH = globalThis.fetch;
 
 function setApiUrl(value: string | undefined) {
@@ -22,6 +105,12 @@ function setApiUrl(value: string | undefined) {
 }
 
 test.afterEach(() => {
+	if (ORIGINAL_DIAGNOSTICS_KEY === undefined)
+		delete process.env.DIAGNOSTICS_ACCESS_KEY;
+	else process.env.DIAGNOSTICS_ACCESS_KEY = ORIGINAL_DIAGNOSTICS_KEY;
+	if (ORIGINAL_API_KEY === undefined)
+		delete process.env.HOMELAB_SERVICES_API_KEY;
+	else process.env.HOMELAB_SERVICES_API_KEY = ORIGINAL_API_KEY;
 	setApiUrl(ORIGINAL_API_URL);
 	globalThis.fetch = ORIGINAL_FETCH;
 });
@@ -106,82 +195,6 @@ test("static public catalog does not fetch and exposes only the conceptual node"
 	assert.equal(result.catalog.services.length, 1);
 	assert.equal(result.catalog.services[0].id, "homelab");
 	assert.equal(result.catalog.services[0].endpointEnabled, false);
-});
-
-test("homelab catalog prefers FastAPI and keeps upstream inventory/exposure authoritative", async () => {
-	setApiUrl(undefined);
-	let requestedUrl = "";
-	globalThis.fetch = (async (input) => {
-		requestedUrl = String(input);
-		return Response.json({
-			version: 1,
-			services: [
-				{
-					id: "truenas",
-					name: "TrueNAS",
-					tunnelUrl: "https://truenas.albandrieu.com",
-					external: false,
-				},
-				{
-					id: "pfsense",
-					name: "pfSense",
-					tunnelUrl: "https://pfsense.albandrieu.com",
-					external: false,
-				},
-				{
-					id: "adguard-home",
-					name: "AdGuard Home",
-					tunnelUrl: "https://adguardhome.albandrieu.com",
-					external: true,
-				},
-				{
-					id: "joplin",
-					name: "Joplin",
-					tunnelUrl: "https://joplin.int.albandrieu.com",
-					external: true,
-				},
-				{ name: "FastAPI service", external: true },
-			],
-		});
-	}) as typeof fetch;
-
-	const result = await loadHomelabServicesCatalog();
-	const truenas = result.catalog.services.find(
-		(service) => service.id === "truenas",
-	);
-	const pfsense = result.catalog.services.find(
-		(service) => service.id === "pfsense",
-	);
-	const adguard = result.catalog.services.find(
-		(service) => service.id === "adguard-home",
-	);
-	const joplin = result.catalog.services.find(
-		(service) => service.id === "joplin",
-	);
-
-	assert.equal(requestedUrl, HOMELAB_SERVICES_DEFAULT_API_URL);
-	assert.equal(result.source, "fastapi");
-	assert.equal(truenas?.endpointUrl, undefined);
-	assert.equal(pfsense?.endpointUrl, undefined);
-	assert.equal(adguard?.external, true);
-	assert.equal(joplin?.external, true);
-	assert.equal(joplin?.tunnelUrl, "https://joplin.int.albandrieu.com");
-	assert.equal(
-		result.catalog.services.find(
-			(service) => service.name === "FastAPI service",
-		)?.name,
-		"FastAPI service",
-	);
-});
-
-test("homelab fallback is generic if upstream FastAPI is unavailable", async () => {
-	setApiUrl("https://catalog.example.test/homelab");
-	globalThis.fetch = (async () =>
-		new Response("unavailable", { status: 503 })) as typeof fetch;
-	const result = await loadHomelabServicesCatalog();
-	assert.equal(result.source, "local-fallback");
-	assert.equal(result.catalog.services.length, 1);
-	assert.equal(result.catalog.services[0].id, "homelab");
 });
 
 test("public homelab API refuses requests without querying FastAPI", async () => {

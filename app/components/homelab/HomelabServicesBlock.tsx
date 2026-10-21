@@ -4,7 +4,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
-import { homelabServiceId } from "@/lib/homelabServices";
+import {
+	homelabServiceId,
+	isHomelabCatalogPlaceholder,
+} from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
@@ -150,10 +153,54 @@ export default function HomelabServicesBlock() {
 	};
 
 	if (!state.catalog) {
+		const catalogError = state.catalogFailure;
 		return (
-			<div className="text-center py-4" role={state.error ? "alert" : "status"}>
-				{state.error ? t("unavailable") : t("loading")}
+			<div
+				className="text-center py-4"
+				role={state.error ? "alert" : "status"}
+				data-homelab-inventory-unavailable={state.error ? true : undefined}
+			>
+				{!state.error
+					? t("loading")
+					: catalogError === "access-denied"
+						? french
+							? "Clé de diagnostic refusée par FastAPI : le catalogue Backstage v2 reste privé."
+							: "FastAPI rejected the diagnostics key: the Backstage v2 catalog remains private."
+						: catalogError === "key-missing"
+							? french
+								? "Clé serveur manquante : catalogue Backstage v2 indisponible."
+								: "Missing server key: Backstage v2 catalog unavailable."
+							: t("unavailable")}
 			</div>
+		);
+	}
+
+	if (isHomelabCatalogPlaceholder(state.catalog)) {
+		return (
+			<section
+				data-homelab-inventory-unavailable
+				role="status"
+				className="alert alert-warning"
+			>
+				<strong>
+					{french
+						? "Catalogue privé indisponible"
+						: "Private catalog unavailable"}
+				</strong>
+				<p>
+					{french
+						? state.catalog.privateInventoryStatus === "access-denied"
+							? "FastAPI a refusé l’accès au catalogue privé (HTTP 401/403). Vérifier DIAGNOSTICS_ACCESS_KEY dans Vercel et la valeur attendue côté fastapi-sample."
+							: state.catalog.privateInventoryStatus === "key-missing"
+								? "La clé DIAGNOSTICS_ACCESS_KEY est absente de l’environnement serveur Vercel. Le catalogue privé ne peut pas être récupéré."
+								: "Le catalogue privé n’a pas été récupéré depuis l’API FastAPI (réseau, délai, erreur HTTP ou réponse invalide). Vérifier l’API et la clé DIAGNOSTICS_ACCESS_KEY."
+						: state.catalog.privateInventoryStatus === "access-denied"
+							? "FastAPI denied the private catalog (HTTP 401/403). Check DIAGNOSTICS_ACCESS_KEY in Vercel and the FastAPI server configuration."
+							: state.catalog.privateInventoryStatus === "key-missing"
+								? "DIAGNOSTICS_ACCESS_KEY is missing from the Vercel server environment. The private catalog cannot be retrieved."
+								: "The private catalog could not be retrieved from FastAPI (network, timeout, HTTP error or invalid response). Verify the API and DIAGNOSTICS_ACCESS_KEY."}
+				</p>
+			</section>
 		);
 	}
 

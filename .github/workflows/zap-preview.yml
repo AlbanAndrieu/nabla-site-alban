@@ -200,7 +200,10 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-preview.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
-          if ! docker run --rm \
+          # Raw HTTP traffic and console output remain runner-local only.
+          # A scanner may return a blocking exit code with a valid JSON report.
+          zap_exit=0
+          docker run --rm \
             --user "$(id -u):$(id -g)" \
             --env HOME=/tmp \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
@@ -208,14 +211,42 @@ jobs:
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py -t "$PREVIEW_BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -s \
-            > "$scan_dir/console.log" 2>&1; then
-            echo "::error::ZAP Preview blocked or scanner failed; raw evidence withheld."
+            > "$scan_dir/console.log" 2>&1 || zap_exit=$?
+          echo "ZAP_SCAN_EXIT_CODE=$zap_exit" >> "$GITHUB_ENV"
+          if [[ ! -s "$scan_dir/report_json.json" ]]; then
+            category=unknown
+            if grep -Eiq 'permission denied|read-only file system' "$scan_dir/console.log"; then
+              category=filesystem-permission
+            elif grep -Eiq 'no space left on device|disk quota' "$scan_dir/console.log"; then
+              category=runner-disk
+            elif grep -Eiq 'connection refused|timed out|failed to connect|name resolution' "$scan_dir/console.log"; then
+              category=network
+            elif grep -Eiq 'unauthorized|forbidden|status code: 40[13]|HTTP 40[13]' "$scan_dir/console.log"; then
+              category=preview-auth
+            elif grep -Eiq 'invalid option|unrecognized arguments|usage: zap-baseline' "$scan_dir/console.log"; then
+              category=scanner-arguments
+            elif grep -Eiq 'failed to start ZAP|failed to access summary file|java.*exception|address already in use' "$scan_dir/console.log"; then
+              category=zap-startup
+            elif grep -Eiq 'error response from daemon|manifest unknown|pull access denied' "$scan_dir/console.log"; then
+              category=docker-image
+            fi
+            # Never publish the raw ZAP HTTP evidence, URLs, cookies or keys.
+            echo "::error::ZAP_NO_REPORT class=$category exit=$zap_exit (raw evidence withheld)"
             exit 1
           fi
-          test -s "$scan_dir/report_json.json" || {
-            echo "::error::ZAP Preview produced no report (INCOMPLETE)."
+          # ZAP baseline exit 3 means scanner failure, not a security finding.
+          if ! jq -e '(.site | type == "array") and ((.site | length) > 0)' "$scan_dir/report_json.json" >/dev/null 2>&1; then
+            echo "::error::ZAP_INVALID_REPORT: missing scanned sites (raw evidence withheld)"
             exit 1
-          }
+          fi
+          if (( zap_exit == 3 || zap_exit > 3 )); then
+            echo "::error::ZAP_SCANNER_ERROR: exit=$zap_exit (raw evidence withheld)"
+            exit 1
+          fi
+          if (( zap_exit != 0 )); then
+            echo "::error::ZAP blocking findings; sanitized counts in job summary only."
+            exit 1
+          fi
 
       - name: Summarize ZAP Preview diagnostics
         id: summary
@@ -237,7 +268,8 @@ jobs:
           low=0
           informational=0
 
-          if [[ -n "${ZAP_SCAN_DIR:-}" && -s "$ZAP_SCAN_DIR/report_json.json" ]]; then
+          if [[ -n "${ZAP_SCAN_DIR:-}" && -s "$ZAP_SCAN_DIR/report_json.json" ]] && \
+             jq -e '(.site | type == "array") and ((.site | length) > 0)' "$ZAP_SCAN_DIR/report_json.json" >/dev/null 2>&1; then
             report_state="available"
             report_available=true
             high="$(jq '[.site[]?.alerts[]? | select(((.riskcode // "0") | tonumber) == 3)] | length' "$ZAP_SCAN_DIR/report_json.json")"
@@ -294,10 +326,13 @@ jobs:
         if: steps.preflight.outcome == 'success' && steps.zap.outcome != 'success'
         env:
           REPORT_AVAILABLE: ${{ steps.summary.outputs.report_available }}
+          SCAN_EXIT_CODE: ${{ env.ZAP_SCAN_EXIT_CODE }}
         shell: bash
         run: |
           if [[ "$REPORT_AVAILABLE" != "true" ]]; then
             echo "::error::OWASP ZAP Preview failed before producing a report; this is a scanner/configuration error, not a security finding."
+          elif [[ "${SCAN_EXIT_CODE:-}" == "3" ]]; then
+            echo "::error::OWASP ZAP Preview scanner failed (exit 3); findings are unverified."
           else
             echo "::error::OWASP ZAP Preview reported a blocking finding. Review only aggregate counts in the job summary; raw evidence is never uploaded."
           fi
@@ -311,6 +346,7 @@ jobs:
           PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
           ZAP_OUTCOME: ${{ steps.zap.outcome }}
           REPORT_AVAILABLE: ${{ steps.summary.outputs.report_available }}
+          SCAN_EXIT_CODE: ${{ env.ZAP_SCAN_EXIT_CODE }}
           ZAP_HIGH: ${{ steps.summary.outputs.high }}
           ZAP_MEDIUM: ${{ steps.summary.outputs.medium }}
           ZAP_LOW: ${{ steps.summary.outputs.low }}
@@ -329,9 +365,9 @@ jobs:
           elif [[ "$ZAP_OUTCOME" == "cancelled" ]]; then
             STATE=error
             DESCRIPTION='ZAP Preview baseline cancelled'
-          elif [[ "$REPORT_AVAILABLE" != "true" ]]; then
+          elif [[ "$REPORT_AVAILABLE" != "true" || "${SCAN_EXIT_CODE:-}" == "3" ]]; then
             STATE=error
-            DESCRIPTION='ZAP Preview scanner error: no report'
+            DESCRIPTION='ZAP Preview scanner failed or invalid report'
           else
             STATE=failure
             DESCRIPTION="ZAP Preview blocked $counts"

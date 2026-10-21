@@ -70,3 +70,10 @@ When repository files are edited through a remote API instead of the canonical w
 - avoid overlapping remote edits while the user is rebasing or resolving the same file.
 
 This prevents API-authored formatting drift from creating avoidable merge/rebase conflicts.
+
+## Parité utile avec nabla-site-bababou (audit 2026-10-20)
+
+- Adopter ses **niveaux de preuve L0 (lecture), L1 (exécution ciblée), L2 (convergence), L3 (publication sur HEAD Git exact)**. Une lecture GitHub ou une CI verte ne vaut jamais publication locale L3 ; journaliser l'état réellement atteint.
+- Si GitHub DNS est bloqué, utiliser les fichiers exact-SHA du connecteur ou une archive attestée (sans la prétendre checkout Git), sans relancer de clone identique. Préférer un seul log du premier job défaillant et des fixtures locales courtes.
+- Conserver les scans de secrets, le blocage des directives `[skip ci]`, la confidentialité des artefacts et les gates de Preview déjà propres à Alban. **Ne pas copier** les hooks Bababou propres aux documents familiaux, les commandes Dagger ni les tableaux de versions sans inventaire de compatibilité.
+- Pour une nouvelle route propriétaire, tester séparément : authorization owner, rejet externe 404, source FastAPI authentifiée, fallback non opérationnel, suppression de secrets dans l'UI. Les secrets Vercel ne sont jamais lus ni imprimés par les tests.
