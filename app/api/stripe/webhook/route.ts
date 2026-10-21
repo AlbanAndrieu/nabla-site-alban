@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_EVENT_BYTES = 65536;
-const PAYMENT_EVENTS = new Set([
+export const PAYMENT_EVENTS = new Set([
   "checkout.session.completed",
   "checkout.session.async_payment_succeeded",
   "checkout.session.async_payment_failed",
@@ -28,9 +28,13 @@ export async function POST(request: Request) {
   if (!signature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
-  const declaredLength = Number(request.headers.get("content-length") || 0);
-  if (!Number.isFinite(declaredLength) || declaredLength > MAX_EVENT_BYTES) {
+  const rawLength = request.headers.get("content-length");
+  const declaredLength = rawLength === null ? 0 : Number(rawLength);
+  if (rawLength !== null && (!/^\\d+$/.test(rawLength) || !Number.isSafeInteger(declaredLength) || declaredLength > MAX_EVENT_BYTES)) {
     return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+  if (request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") {
+    return NextResponse.json({ error: "Unsupported media type" }, { status: 415 });
   }
   const payload = await request.text();
   if (Buffer.byteLength(payload, "utf8") > MAX_EVENT_BYTES) {
