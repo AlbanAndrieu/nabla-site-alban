@@ -10,7 +10,9 @@ export type SiteHealthV2 = {
 };
 
 const REVISION = /^sha256:[0-9a-f]{64}$/;
-const REF = /^(component|resource|api):[a-z0-9-]+\/[a-z0-9-]+$/;
+// Canonical Backstage names and namespaces may contain dots or underscores.
+// Bound segment lengths and reject paths and whitespace.
+const REF = /^(component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/;
 const STATES = new Set(["ok", "warn", "fail", "unknown"]);
 
 export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
@@ -21,7 +23,8 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 		raw.model !== "backstage-health" ||
 		typeof raw.catalogRevision !== "string" ||
 		!REVISION.test(raw.catalogRevision) ||
-		!["fresh", "stale", "pending"].includes(String(raw.boardState)) ||
+		(typeof raw.boardState !== "string" ||
+			!["fresh", "stale", "pending"].includes(raw.boardState)) ||
 		!Array.isArray(raw.services) ||
 		raw.services.length > 2000
 	)
@@ -36,7 +39,8 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 			typeof entry.entityRef !== "string" ||
 			!REF.test(entry.entityRef) ||
 			seen.has(entry.entityRef) ||
-			!STATES.has(String(entry.state))
+			typeof entry.state !== "string" ||
+			!STATES.has(entry.state)
 		)
 			return null;
 		seen.add(entry.entityRef);
