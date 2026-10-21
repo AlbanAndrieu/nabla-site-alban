@@ -14,15 +14,15 @@ export const dynamic = "force-dynamic";
 async function observabilityResponse() {
 	const { board, primaryUrl, error } = await loadFastApiHealthBoard();
 	if (!board) {
+		// A SERVICE key cannot authorize OWNER diagnostics from Vercel.
+		// Only expose a fixed reason, never an upstream body, URL or raw error.
+		const reason =
+			error === "owner-upstream-disabled"
+				? "owner-boundary"
+				: "upstream-unavailable";
 		return NextResponse.json(
-			{
-				error: "FastAPI operational evidence is unavailable",
-				detail: error,
-			},
-			{
-				status: 503,
-				headers: { "X-Homelab-Observability-Primary": primaryUrl },
-			},
+			{ error: "FastAPI operational evidence unavailable", reason },
+			{ status: 503 },
 		);
 	}
 

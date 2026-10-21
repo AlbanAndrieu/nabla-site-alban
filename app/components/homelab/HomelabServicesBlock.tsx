@@ -57,8 +57,13 @@ export default function HomelabServicesBlock() {
 	const handledAnchor = useRef<string | null>(null);
 
 	const indexedHealth = useMemo(
-		() => healthIndex(state.snapshot),
-		[state.snapshot],
+		() =>
+			healthIndex(
+				state.snapshot,
+				state.siteHealth,
+				state.catalog?.catalogRevision,
+			),
+		[state.snapshot, state.siteHealth, state.catalog?.catalogRevision],
 	);
 	const healthCounts = useMemo(
 		() =>
@@ -474,6 +479,7 @@ export default function HomelabServicesBlock() {
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
+									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={state.healthUnavailable}
 									healthHttpStatus={state.healthStatus}

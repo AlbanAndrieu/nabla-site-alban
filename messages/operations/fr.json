@@ -11,6 +11,18 @@
 			"age": "âgé de {seconds}s",
 			"probeDuration": "sonde homelab {milliseconds} ms"
 		},
+		"availability": {
+			"ownerBoundaryStatus": "Accès aux preuves détaillées restreint",
+			"ownerBoundaryTitle": "Diagnostics détaillés réservés à un accès propriétaire",
+			"ownerBoundaryDescription": "Le serveur Vercel ne dispose pas d'un canal OWNER vers FastAPI. La clé DIAGNOSTICS_ACCESS_KEY authentifie uniquement les API SERVICE (catalogue et états synthétiques), pas le health-board complet. L'accès depuis votre Wi-Fi autorise l'affichage privé du site, mais ne modifie pas l'identité réseau du serveur Vercel.",
+			"accessDeniedStatus": "Accès propriétaire non confirmé",
+			"accessDeniedTitle": "Accès privé à confirmer",
+			"accessDeniedDescription": "Le contrôle d'accès de cette requête n'est plus confirmé. Vérifiez votre accès au réseau propriétaire ou votre identité Cloudflare Access, puis réessayez.",
+			"upstreamUnavailableTitle": "Collecte des preuves indisponible",
+			"upstreamUnavailableDescription": "Les diagnostics détaillés n'ont pas été obtenus. La disponibilité du backend ou du canal d'accès reste à vérifier ; ce résultat ne constitue pas une panne des services.",
+			"healthSeparation": "L'absence de preuves détaillées n'est pas un état de santé FAIL. Les états synthétiques du catalogue Backstage v2 sont gérés séparément.",
+			"retry": "Réessayer la collecte"
+		},
 		"sources": {
 			"title": "Sources des preuves",
 			"board": "Health board",

@@ -2,6 +2,7 @@ name: Build CV PDFs
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main, master, develop]
     paths:
       - "public/cv/**/*.tex"
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   build-cv-pdfs:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Build CV PDFs (EN / FR)
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -58,14 +60,17 @@ jobs:
             ./public/cv/cv-aandrieu-2026-en.pdf \
             ./public/cv/cv-aandrieu-2026-fr.pdf >> "$GITHUB_STEP_SUMMARY" || true
 
+      # Keep generated CVs downloadable for explicit manual runs only.
+      # PR quality gates still build and validate both PDFs without storing them.
       - name: Upload CV PDFs
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: cv-pdfs
           path: |
             ./public/cv/cv-aandrieu-2026-en.pdf
             ./public/cv/cv-aandrieu-2026-fr.pdf
-          retention-days: 7
+          retention-days: 1
 
       - name: Upload logs on failure
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -73,5 +78,5 @@ jobs:
         with:
           name: cv-logs
           path: ./public/cv/*.log
-          retention-days: 7
+          retention-days: 1
           if-no-files-found: ignore

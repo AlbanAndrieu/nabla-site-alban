@@ -32,6 +32,7 @@ concurrency:
 
 jobs:
   dagger-poc:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Dagger parity PoC (non-blocking)
     runs-on: ubuntu-latest
     timeout-minutes: 25

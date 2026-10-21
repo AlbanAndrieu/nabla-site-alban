@@ -30,6 +30,12 @@ async function loadSnapshot(
 	userAgent: string,
 	cacheControl?: string,
 ): Promise<HomelabHealthSnapshot> {
+	if (
+		process.env.VERCEL_ENV &&
+		process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED !== "true"
+	) {
+		throw new Error("owner-upstream-disabled");
+	}
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), timeoutMs);
 	try {
@@ -69,9 +75,11 @@ export async function loadHomelabHealthSnapshot(): Promise<{
 		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(
-			`[homelab-health] FastAPI snapshot unavailable (${primaryUrl}): ${reason}; using endpoint-level fallback`,
-		);
+		if (reason !== "owner-upstream-disabled") {
+			console.warn(
+				`[homelab-health] FastAPI snapshot unavailable (${primaryUrl}): ${reason}; using endpoint-level fallback`,
+			);
+		}
 		return { snapshot: null, source: "unavailable", primaryUrl };
 	}
 }
@@ -95,9 +103,11 @@ export async function loadHomelabProbeSnapshot(): Promise<{
 		};
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		console.warn(
-			`[homelab-probes] FastAPI probe matrix unavailable (${primaryUrl}): ${reason}`,
-		);
+		if (reason !== "owner-upstream-disabled") {
+			console.warn(
+				`[homelab-probes] FastAPI probe matrix unavailable (${primaryUrl}): ${reason}`,
+			);
+		}
 		return { snapshot: null, source: "unavailable", primaryUrl };
 	}
 }

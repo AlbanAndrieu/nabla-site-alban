@@ -8,6 +8,8 @@ import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import type { ServiceTopology } from "@/lib/serviceTopology";
+import ArchitectureCatalogNotice from "./ArchitectureCatalogNotice";
+import noticeStyles from "./ArchitectureCatalogNotice.module.css";
 import ArchitectureSectionNav from "./ArchitectureSectionNav";
 
 // Loaded only after the server confirmed owner access, so anonymous visitors
@@ -36,50 +38,95 @@ type PrivateArchitectureData = {
 	topologyLive: boolean;
 };
 
-async function fetchJson(url: string, signal: AbortSignal) {
+type CatalogFailureReason = "key-missing" | "access-denied" | "unavailable";
+type CatalogRequestState =
+	| { status: "loading"; data: null; reason: null }
+	| { status: "error"; data: null; reason: CatalogFailureReason }
+	| { status: "ready"; data: PrivateArchitectureData; reason: null };
+
+class CatalogRequestError extends Error {
+	constructor(readonly reason: CatalogFailureReason) {
+		super("Private Backstage v2 catalog request failed");
+	}
+}
+
+/** Only accept server-sanitized reasons; never render raw upstream errors. */
+export function catalogFailureReason(value: unknown): CatalogFailureReason {
+	if (
+		typeof value === "object" &&
+		value !== null &&
+		"reason" in value &&
+		(value.reason === "key-missing" || value.reason === "access-denied")
+	) {
+		return value.reason;
+	}
+	return "unavailable";
+}
+
+async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
 	const response = await fetch(url, {
 		cache: "no-store",
 		signal,
 		headers: { Accept: "application/json" },
 	});
-	if (!response.ok) throw new Error(`${url} HTTP ${response.status}`);
-	return { body: (await response.json()) as unknown, response };
+	if (!response.ok) {
+		const body: unknown = await response.json().catch(() => null);
+		throw new CatalogRequestError(catalogFailureReason(body));
+	}
+	return response.json();
 }
 
 /**
- * A single owner-gated canonical v2 request feeds both the service cards and
- * graph. Never bootstrap these views from public v1 JSON placeholders.
+ * Single owner-gated canonical v2 request for service cards and topology.
+ * Retry the catalog alone; do not reload the page or fall back to public v1.
  */
 function usePrivateArchitectureData(enabled: boolean) {
-	const [data, setData] = useState<PrivateArchitectureData | null>(null);
-	const [unavailable, setUnavailable] = useState(false);
+	const [request, setRequest] = useState<CatalogRequestState>({
+		status: "loading",
+		data: null,
+		reason: null,
+	});
+	const [attempt, setAttempt] = useState(0);
 
 	useEffect(() => {
 		if (!enabled) return;
 		const controller = new AbortController();
 		void fetchJson("/api/homelab-catalog-v2", controller.signal)
-			.then(({ body }) => {
+			.then((body) => {
 				if (controller.signal.aborted) return;
 				const catalog = parseHomelabCatalogV2(body);
 				if (!catalog || catalog.entities.length === 0) {
-					setUnavailable(true);
-					return;
+					throw new CatalogRequestError("unavailable");
 				}
 				const projected = projectHomelabCatalogV2(catalog);
-				setData({
-					catalog: projected.services,
-					catalogSource: "backstage-v2",
-					topology: projected.topology,
-					topologyLive: true,
+				setRequest({
+					status: "ready",
+					data: {
+						catalog: projected.services,
+						catalogSource: "backstage-v2",
+						topology: projected.topology,
+						topologyLive: true,
+					},
+					reason: null,
 				});
 			})
-			.catch(() => {
-				if (!controller.signal.aborted) setUnavailable(true);
+			.catch((error: unknown) => {
+				if (controller.signal.aborted) return;
+				setRequest({
+					status: "error",
+					data: null,
+					reason:
+						error instanceof CatalogRequestError ? error.reason : "unavailable",
+				});
 			});
 		return () => controller.abort();
-	}, [enabled]);
+	}, [enabled, attempt]);
 
-	return { data, unavailable };
+	const retry = () => {
+		setRequest({ status: "loading", data: null, reason: null });
+		setAttempt((current) => current + 1);
+	};
+	return { ...request, retry };
 }
 
 /** Owner-only architecture explorer, impact inspector and network flow. */
@@ -87,18 +134,27 @@ export default function ArchitecturePrivateViews({
 	locale,
 }: Readonly<{ locale: string }>) {
 	const trusted = useHomelabAccess() === "trusted";
-	const { data, unavailable } = usePrivateArchitectureData(trusted);
+	const { data, status, reason, retry } = usePrivateArchitectureData(trusted);
 	if (!trusted) return null;
 	const french = locale === "fr";
-	if (unavailable)
+	if (status === "error")
 		return (
-			<div role="alert" data-architecture-catalog-v2-unavailable>
-				{french
-					? "Catalogue Backstage v2 indisponible (authentification ou source)."
-					: "Backstage v2 catalog unavailable (authorization or source)."}
+			<ArchitectureCatalogNotice
+				french={french}
+				reason={reason}
+				onRetry={retry}
+			/>
+		);
+	if (status === "loading" || !data)
+		return (
+			<div className="container py-4" role="status" aria-live="polite">
+				<p className={noticeStyles.loading}>
+					{french
+						? "Chargement de la cartographie privée des services…"
+						: "Loading the private service architecture…"}
+				</p>
 			</div>
 		);
-	if (!data) return null;
 
 	return (
 		<div data-homelab-private-view>

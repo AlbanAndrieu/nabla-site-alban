@@ -16,6 +16,11 @@ import {
 	parseServiceTopology,
 	type ServiceTopology,
 } from "@/lib/serviceTopology";
+import {
+	parseSiteHealthV2,
+	type SiteHealthV2,
+	siteHealthIndex,
+} from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
 
@@ -29,6 +34,7 @@ export type HomelabServicesState = {
 	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
 	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
+	siteHealth: SiteHealthV2 | null;
 	error: boolean;
 	healthUnavailable: boolean;
 	healthStatus: number | null;
@@ -40,6 +46,7 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalogFailure: null,
 	topology: null,
 	snapshot: null,
+	siteHealth: null,
 	error: false,
 	healthUnavailable: false,
 	healthStatus: null,
@@ -179,10 +186,13 @@ function normalizedName(value: string): string {
 export type HomelabHealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
+	byRef: Map<string, HomelabHealthState>;
 };
 
 export function healthIndex(
 	snapshot: HomelabHealthSnapshot | null,
+	siteHealth?: SiteHealthV2 | null,
+	catalogRevision?: unknown,
 ): HomelabHealthIndex {
 	const byId = new Map<string, HomelabHealthEntry>();
 	const byName = new Map<string, HomelabHealthEntry>();
@@ -190,7 +200,7 @@ export function healthIndex(
 		if (entry.id) byId.set(entry.id, entry);
 		byName.set(normalizedName(entry.name), entry);
 	}
-	return { byId, byName };
+	return { byId, byName, byRef: siteHealthIndex(siteHealth, catalogRevision) };
 }
 
 export function effectiveState(
@@ -198,11 +208,17 @@ export function effectiveState(
 	index: HomelabHealthIndex,
 	healthUnavailable = false,
 ): HomelabHealthState {
-	if (healthUnavailable) return "unknown";
 	const entry =
 		index.byId.get(homelabServiceId(service)) ??
 		index.byName.get(normalizedName(service.name));
-	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
+	if (entry && !healthUnavailable) {
+		return resolveEffectiveServiceState(entry).effectiveState;
+	}
+	if (typeof service.entityRef === "string") {
+		const state = index.byRef.get(service.entityRef);
+		if (state) return state;
+	}
+	return "unknown";
 }
 
 export function countHealthStates(
@@ -236,6 +252,23 @@ export function useHomelabHealth(): HomelabServicesState {
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			setState((current) => ({ ...current, healthRefreshing: true }));
+			// SERVICE status DTO is independent from OWNER-only probe details.
+			void fetch("/api/homelab-health-v2", {
+				cache: "no-store",
+				signal,
+				headers: { Accept: "application/json" },
+			})
+				.then(async (response) =>
+					response.ok ? parseSiteHealthV2(await response.json()) : null,
+				)
+				.then((siteHealth) => {
+					if (!signal.aborted)
+						setState((current) => ({ ...current, siteHealth }));
+				})
+				.catch(() => {
+					if (!signal.aborted)
+						setState((current) => ({ ...current, siteHealth: null }));
+				});
 			const probesPromise = fetchProbeHealth(signal);
 			const aggregatePromise = fetchHealth(signal);
 
