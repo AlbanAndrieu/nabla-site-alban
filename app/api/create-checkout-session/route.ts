@@ -5,12 +5,12 @@ export const runtime = "nodejs";
 
 /** Parse env DOMAIN into a safe origin (scheme + host only). Never use request Host headers — open redirect risk. */
 export function originFromDomainEnv(raw: string): string | null {
-	const trimmed = raw.replace(/\/$/, "").trim();
+	const trimmed = raw.trim();
 	if (!trimmed) return null;
 	try {
 		const u = new URL(trimmed);
 		if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-		if (u.username || u.password) return null;
+		if (u.username || u.password || u.pathname !== "/" || u.search || u.hash) return null;
 		return `${u.protocol}//${u.host}`;
 	} catch {
 		return null;
@@ -131,8 +131,8 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ url: session.url });
 		}
 		return NextResponse.redirect(session.url, 303);
-	} catch (err: unknown) {
-		console.error("create-checkout-session:", err);
+	} catch {
+		console.error("create-checkout-session: Stripe request failed");
 		const message = "Could not create checkout session. Please try again.";
 		return wantsJson(req)
 			? NextResponse.json({ error: message }, { status: 500 })
