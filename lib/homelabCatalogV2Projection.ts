@@ -22,9 +22,7 @@ function stableServiceIds(
 	for (const id of initial) counts.set(id, (counts.get(id) ?? 0) + 1);
 
 	// Reserve non-conflicting IDs first so a disambiguation never steals one.
-	const reserved = new Set(
-		initial.filter((id) => counts.get(id) === 1),
-	);
+	const reserved = new Set(initial.filter((id) => counts.get(id) === 1));
 	const used = new Set<string>();
 	const byRef = new Map<string, string>();
 	for (const [index, view] of views.entries()) {
@@ -33,10 +31,11 @@ function stableServiceIds(
 		let id = base;
 		if ((counts.get(base) ?? 0) > 1) {
 			const namespace = view.entityRef.split(":", 2)[1]?.split("/", 1)[0];
-			const safeNamespace = (namespace ?? "default")
+			const normalizedNamespace = (namespace ?? "default")
 				.toLowerCase()
 				.replace(/[^a-z0-9]+/g, "-")
-				.replace(/^-+|-+$/g, "") || "default";
+				.replace(/^-+|-+$/g, "");
+			const safeNamespace = normalizedNamespace || "default";
 			const stem = `${view.entityKind.toLowerCase()}-${safeNamespace}-${view.id}`;
 			id = stem;
 			let suffix = 2;
