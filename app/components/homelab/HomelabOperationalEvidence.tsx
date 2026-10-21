@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import AnchoredHeading from "@/components/AnchoredHeading";
 import type { HomelabObservabilitySnapshot } from "@/lib/homelabObservability";
 import {
-	operationalEvidenceFailure,
 	type OperationalEvidenceFailure,
+	operationalEvidenceFailure,
 } from "@/lib/homelabOperationalAvailability";
 import HomelabOperationalControlPlane from "./HomelabOperationalControlPlane";
 import HomelabOperationalDeepDiagnostics from "./HomelabOperationalDeepDiagnostics";
@@ -193,14 +193,18 @@ export default function HomelabOperationalEvidence() {
 			) : (
 				<div
 					className={styles.emptyState}
-					role={unavailable && failure !== "owner-boundary" ? "alert" : "status"}
+					role={
+						unavailable && failure !== "owner-boundary" ? "alert" : "status"
+					}
 					data-operational-evidence-reason={unavailable ? failure : undefined}
 				>
 					{unavailable ? (
 						<>
 							<h3 className={styles.emptyTitle}>{failureTitle}</h3>
 							<p>{failureDescription}</p>
-							<p className={styles.emptyScope}>{t("availability.healthSeparation")}</p>
+							<p className={styles.emptyScope}>
+								{t("availability.healthSeparation")}
+							</p>
 							{failure !== "owner-boundary" ? (
 								<button
 									type="button"

@@ -34,10 +34,16 @@ test("the owner-only observability route never returns raw upstream errors", asy
 		"utf8",
 	);
 	const browser = await readFile(
-		new URL("../app/components/homelab/HomelabOperationalEvidence.tsx", import.meta.url),
+		new URL(
+			"../app/components/homelab/HomelabOperationalEvidence.tsx",
+			import.meta.url,
+		),
 		"utf8",
 	);
-	assert.match(source, /gatedHomelabResponse\(request, observabilityResponse\)/);
+	assert.match(
+		source,
+		/gatedHomelabResponse\(request, observabilityResponse\)/,
+	);
 	assert.match(source, /error === "owner-upstream-disabled"/);
 	assert.match(source, /"owner-boundary"/);
 	assert.doesNotMatch(source, /detail: error/);
