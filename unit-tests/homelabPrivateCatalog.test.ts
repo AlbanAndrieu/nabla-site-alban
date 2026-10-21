@@ -99,6 +99,23 @@ test("v2 503, v1 payload and invalid graph cannot become service cards", async (
 			version: 1,
 			services: [{ id: "postgresql", name: "PostgreSQL" }],
 		}),
+		// A valid Backstage catalog containing only organizational entities must
+		// fail visibly, not render an apparently healthy but empty service grid.
+		Response.json({
+			schemaVersion: 2,
+			model: "backstage",
+			catalogRevision: revision,
+			entities: [
+				{
+					apiVersion: "backstage.io/v1alpha1",
+					kind: "System",
+					entityRef: "system:default/platform",
+					sourcePath: "catalog/catalog-info.yaml",
+					metadata: { name: "platform" },
+					spec: {},
+				},
+			],
+		}),
 		Response.json({
 			...fixture(),
 			entities: [

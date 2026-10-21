@@ -103,3 +103,23 @@ test("scalar subcomponentOf builds the parent partOf graph edge", () => {
 		},
 	]);
 });
+
+test("relation order remains stable when upstream changes entity order", () => {
+	const entries = [
+		entity("Component", "default", "frontend", {
+			dependsOn: ["resource:default/cache", "resource:default/postgres"],
+		}),
+		entity("Resource", "default", "cache"),
+		entity("Resource", "default", "postgres"),
+		entity("Component", "default", "backend", {
+			dependsOn: ["resource:default/postgres"],
+		}),
+	];
+	const normal = project(entries);
+	const reversed = project([...entries].reverse());
+	assert.deepEqual(normal.topology.relations, reversed.topology.relations);
+	assert.deepEqual(
+		normal.topology.relations.map((relation) => relation.source),
+		["backend", "frontend", "frontend"],
+	);
+});

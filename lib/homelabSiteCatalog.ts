@@ -1,4 +1,5 @@
 import {
+	catalogV2ServiceViews,
 	type CatalogV2Entity,
 	type HomelabCatalogV2,
 	parseHomelabCatalogV2,
@@ -127,7 +128,7 @@ export async function fetchSiteCatalogV2(): Promise<HomelabCatalogV2> {
 		if (!response.ok) throw new SiteCatalogV2Error("unavailable");
 		const parsed = parseHomelabCatalogV2(await response.json());
 		const safe = parsed && sanitizeSiteCatalogV2(parsed);
-		if (!safe || safe.entities.length === 0) {
+		if (!safe || catalogV2ServiceViews(safe).length === 0) {
 			throw new SiteCatalogV2Error("unavailable");
 		}
 		return safe;

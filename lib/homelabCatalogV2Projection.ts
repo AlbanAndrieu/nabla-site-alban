@@ -121,6 +121,13 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			}
 		}
 	}
+	// Stable React Flow edges regardless of the order received from FastAPI.
+	relations.sort(
+		(left, right) =>
+			left.source.localeCompare(right.source) ||
+			left.target.localeCompare(right.target) ||
+			left.type.localeCompare(right.type),
+	);
 	return {
 		services,
 		topology: {
