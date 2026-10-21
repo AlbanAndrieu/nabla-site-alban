@@ -34,10 +34,10 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--owner", default="AlbanAndrieu")
     p.add_argument("--days", type=int, default=30)
-    p.add_argument("--max-runs", type=int, default=150)
+    p.add_argument("--max-runs", type=int, default=40)\n    p.add_argument("--repo", action="append", help="Repository name; repeat to include more. Defaults to the four active projects.")
     a = p.parse_args()
     since = dt.datetime.now(UTC) - dt.timedelta(days=a.days)
-    repos = items(f"users/{a.owner}/repos?per_page=100&type=owner", "repositories") if False else api(f"users/{a.owner}/repos?per_page=100&type=owner")
+    selected = a.repo or ["nabla-compose", "fastapi-sample", "nabla-site-alban", "nabla-site-bababou"]\n    repos = [{"full_name": f"{a.owner}/{name}"} for name in selected]
     total = collections.defaultdict(lambda: {"runs": 0, "job_wall_minutes": 0., "artifact_mib": 0., "skipped_jobs": 0})
     for repo in repos:
         if not isinstance(repo, dict) or "full_name" not in repo or repo.get("archived"):
