@@ -104,3 +104,33 @@ test("malformed SERVICE entity refs and non-string health values fail closed", (
 		null,
 	);
 });
+
+test("ambiguous FastAPI name-only health across Backstage namespaces fails closed", () => {
+	const parsed = parseSiteHealthV2({
+		...DTO,
+		services: [
+			{ entityRef: "component:default/api", state: "ok" },
+			{ entityRef: "component:edge/api", state: "ok" },
+			{ entityRef: "resource:default/database", state: "warn" },
+		],
+	});
+	assert.ok(parsed);
+	const indexed = siteHealthIndex(parsed, REVISION);
+	assert.equal(indexed.get("component:default/api"), "unknown");
+	assert.equal(indexed.get("component:edge/api"), "unknown");
+	assert.equal(indexed.get("resource:default/database"), "warn");
+});
+
+test("different Backstage kinds with the same name cannot inherit each other's probes", () => {
+	const parsed = parseSiteHealthV2({
+		...DTO,
+		services: [
+			{ entityRef: "component:default/redis", state: "ok" },
+			{ entityRef: "resource:default/redis", state: "fail" },
+		],
+	});
+	assert.ok(parsed);
+	const indexed = siteHealthIndex(parsed, REVISION);
+	assert.equal(indexed.get("component:default/redis"), "unknown");
+	assert.equal(indexed.get("resource:default/redis"), "unknown");
+});

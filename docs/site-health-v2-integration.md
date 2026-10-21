@@ -6,6 +6,14 @@ Le backend FastAPI #360 ajoute `GET /api/site/health/v2` authentifié par la cl�
 
 Cette PR Next.js consomme l'API uniquement côté serveur (Vercel), derrière `gatedHomelabResponse`. L'UI rapproche les états à `entityRef` et refuse les révisions qui ne correspondent pas au catalogue v2 chargé ; observations périmées ou ambiguës = UNKNOWN, et un éventuel instantané enrichi correctement autorisé reste prioritaire. Aucun secret n'est livré à React.
 
+## Sécurité de la corrélation santé / identité Backstage
+
+Dans le producteur FastAPI, `project_site_health_v2` associe encore les observations de santé par `metadata.name`, alors que le catalogue Backstage v2 distingue les entités par `entityRef` (type, namespace, nom). Un même nom dans deux namespaces ou deux types peut donc produire un état faussement attribué.
+
+En attendant que FastAPI rapproche les sondes par identité canonique, le site considère **UNKNOWN** toutes les entrées SERVICE partageant le même dernier segment d'`entityRef`. Les noms uniques, l'exactitude de `catalogRevision` et la protection contre les instantanés `stale` restent inchangés. Cette mesure ne certifie pas qu'une réponse runtime est disponible ni que la source des sondes est exhaustive.
+
+**Validation à effectuer en amont** : corriger la jointure FastAPI avec une clé `entityRef` fiable et documenter la provenance de cette clé dans les sondes ; ajouter des fixtures identiques entre les deux dépôts avant de supprimer cette protection conservatrice.
+
 ## Ordre de déploiement
 
 1. Vérifier que l'artefact v2 de Compose #265 est bien présent et consommé par le backend déployé (fusion Git ≠ disponibilité du runtime).

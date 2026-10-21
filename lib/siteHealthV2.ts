@@ -71,5 +71,21 @@ export function siteHealthIndex(
 		health.catalogRevision !== catalogRevision
 	)
 		return new Map();
-	return new Map(health.services.map((e) => [e.entityRef, e.state]));
+	// FastAPI currently reconciles probe rows by metadata.name, not entityRef.
+	// Distinct Backstage entities with the same name could inherit each other's
+	// health. Until the producer joins by entityRef, fail closed for all of them.
+	const nameCounts = new Map<string, number>();
+	for (const entry of health.services) {
+		const name = entry.entityRef.slice(entry.entityRef.lastIndexOf("/") + 1);
+		nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
+	}
+	return new Map(
+		health.services.map((entry) => {
+			const name = entry.entityRef.slice(entry.entityRef.lastIndexOf("/") + 1);
+			return [
+				entry.entityRef,
+				(nameCounts.get(name) ?? 0) > 1 ? "unknown" : entry.state,
+			] as const;
+		}),
+	);
 }
