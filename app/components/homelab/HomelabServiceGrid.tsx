@@ -8,6 +8,7 @@ import {
 	homelabServiceEndpointUrl,
 	homelabServiceId,
 } from "@/lib/homelabServices";
+import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
 import { healthIndex } from "./homelabGridPresentation";
@@ -15,6 +16,7 @@ import { healthIndex } from "./homelabGridPresentation";
 type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
+	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
 };
@@ -22,6 +24,7 @@ type Props = {
 export default function HomelabServiceGrid({
 	catalog,
 	snapshot,
+	siteHealth = null,
 	healthUnavailable = false,
 	healthHttpStatus = null,
 }: Props) {
@@ -29,6 +32,7 @@ export default function HomelabServiceGrid({
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
 	const serviceHealth = healthIndex(snapshot);
+	const safeStatus = siteHealthIndex(siteHealth, catalog.catalogRevision);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
 	const truenasApi = snapshot?.truenas?.api;
@@ -116,6 +120,11 @@ export default function HomelabServiceGrid({
 						<HomelabServiceCard
 							key={`${serviceId}:${endpointUrl}`}
 							svc={svc}
+							siteState={
+								typeof svc.entityRef === "string"
+									? safeStatus.get(svc.entityRef)
+									: undefined
+							}
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
 							anchorId={

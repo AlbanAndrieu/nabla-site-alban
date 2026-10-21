@@ -123,6 +123,14 @@ async function loadFastApiHealthBoardUncached(
 	primaryUrl: string,
 	fetchImpl: typeof fetch,
 ): Promise<FastApiHealthBoardLoadResult> {
+	// A Vercel machine key cannot bypass FastAPI's OWNER source-CIDR boundary.
+	// Only the separate, narrow SERVICE v2 feed is suitable for this deployment.
+	if (
+		process.env.VERCEL_ENV &&
+		process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED !== "true"
+	) {
+		return { board: null, primaryUrl, error: "owner-upstream-disabled" };
+	}
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), HEALTH_BOARD_TIMEOUT_MS);
 

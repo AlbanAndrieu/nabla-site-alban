@@ -34,6 +34,7 @@ import ServiceHealthReasons from "./ServiceHealthReasons";
 
 type Props = {
 	svc: HomelabService;
+	siteState?: HomelabHealthState;
 	serviceId: string;
 	endpointUrl: string;
 	anchorId?: string;
@@ -48,6 +49,7 @@ type Props = {
 /** One homelab service card: effective health, runtime and endpoint links. */
 export default function HomelabServiceCard({
 	svc,
+	siteState,
 	serviceId,
 	endpointUrl,
 	anchorId,
@@ -76,9 +78,10 @@ export default function HomelabServiceCard({
 	const resolvedHealth = resolveEffectiveServiceState(initialHealth);
 	const runtimeInventoryConflict =
 		hasFreshRuntimeInventoryConflict(initialHealth);
-	const presentationState: HomelabHealthState = healthUnavailable
-		? "unknown"
-		: resolvedHealth.effectiveState;
+	const presentationState: HomelabHealthState =
+		initialHealth && !healthUnavailable
+			? resolvedHealth.effectiveState
+			: (siteState ?? "unknown");
 	const effectiveHealthLabel = t(EFFECTIVE_HEALTH_LABEL_KEY[presentationState]);
 	const blockerLabels = blockedDependencyLabels(initialHealth);
 	const dependencyDegraded =
