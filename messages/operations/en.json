@@ -11,6 +11,18 @@
 			"age": "{seconds}s old",
 			"probeDuration": "homelab probe {milliseconds} ms"
 		},
+		"availability": {
+			"ownerBoundaryStatus": "Detailed evidence access restricted",
+			"ownerBoundaryTitle": "Detailed diagnostics require owner access",
+			"ownerBoundaryDescription": "The Vercel server has no OWNER channel to FastAPI. DIAGNOSTICS_ACCESS_KEY authenticates SERVICE APIs (catalog and summary health), not the full health board. Being on your home Wi-Fi authorizes the site's private view but does not change Vercel's network identity.",
+			"accessDeniedStatus": "Owner access not confirmed",
+			"accessDeniedTitle": "Private access needs verification",
+			"accessDeniedDescription": "This request's private access check is no longer confirmed. Verify your owner network access or Cloudflare Access identity, then retry.",
+			"upstreamUnavailableTitle": "Operational evidence cannot be retrieved",
+			"upstreamUnavailableDescription": "Detailed diagnostics could not be retrieved. Backend availability or the access channel needs checking; this does not establish a service outage.",
+			"healthSeparation": "Missing detailed evidence is not a FAIL health state. Backstage v2 summary states are handled separately.",
+			"retry": "Retry evidence collection"
+		},
 		"sources": {
 			"title": "Evidence sources",
 			"board": "Health board",
