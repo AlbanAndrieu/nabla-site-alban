@@ -10,10 +10,11 @@
 - [x] Préserver les cartes même si une topologie indépendante échoue :
   cartes et topologie résident maintenant dans la même réponse v2.
   La page Architecture lit uniquement le graphe v2 authentifié.
-- [ ] Déployer FastAPI #358 après qualité, puis rendre disponible le
-  `catalog/generated/entities.json` canonique de Compose #265 sur la branche
-  attendue. Tant que ces PR ne sont pas livrées, un 404/503 est normal ;
-  ne pas basculer vers le fichier v1.
+- [ ] **Validation effective du runtime v2** : Site #240, FastAPI #358
+  et Compose #265 sont fusionnées ; vérifier toutefois que FastAPI déployé
+  charge réellement `catalog/generated/entities.json` et répond avec un
+  catalogue SERVICE contenant des Component, Resource ou API. La fusion des PR
+  n'atteste pas ce résultat. Aucun fallback v1.
 - [ ] Valider depuis le Wi-Fi autorisé : `GET /api/homelab-access?diagnose=1`
   reste `trusted:true`; la **clé Preview factice** doit être refusée,
   via un 503 Site dont la raison est `access-denied` uniquement lorsque
@@ -22,8 +23,11 @@
   HTTP 200 + `X-Homelab-Inventory-Complete:true`, services non vides, révision
   identique sur les routes owner et Architecture, aucun détail secret.
   Aucune clé valide présumée ni récupérée actuellement.
-- [ ] Exécuter les tests local-first et les quality gates sur HEAD exact ;
-  la PR #240 doit rester ouverte et non fusionnée en l'absence d'autorisation.
+- [ ] Exécuter les quality gates complètes sur le HEAD exact dès qu'un
+  environnement compatible Node/npm est disponible ; pendant le quota Actions
+  épuisé, conserver la branche de stabilisation en dehors d'une PR pour
+  éviter l'exécution du workflow `pull_request_target` sur `master`.
+  Aucune fusion sans autorisation.
 - [ ] Confirmer les scans OWASP ZAP Preview réels et la confidentialité
   des rapports ; la classification des erreurs sans rapport n'est pas une
   preuve d'exécution du scanner.
