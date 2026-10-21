@@ -5,25 +5,59 @@ import {
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 
+/** Pick one stable, URL-safe service ID per canonical Backstage entity reference. */
+function stableServiceIds(
+	views: ReturnType<typeof catalogV2ServiceViews>,
+): Map<string, string> {
+	const names = new Map<string, number>();
+	for (const view of views) {
+		names.set(view.id, (names.get(view.id) ?? 0) + 1);
+	}
+	const initial = views.map((view) =>
+		(names.get(view.id) ?? 0) > 1
+			? `${view.entityKind.toLowerCase()}-${view.id}`
+			: view.id,
+	);
+	const counts = new Map<string, number>();
+	for (const id of initial) counts.set(id, (counts.get(id) ?? 0) + 1);
+
+	// Reserve non-conflicting IDs first so a disambiguation never steals one.
+	const reserved = new Set(
+		initial.filter((id) => counts.get(id) === 1),
+	);
+	const used = new Set<string>();
+	const byRef = new Map<string, string>();
+	for (const [index, view] of views.entries()) {
+		const base = initial[index];
+		if (!base) throw new Error("Missing Backstage service identity");
+		let id = base;
+		if ((counts.get(base) ?? 0) > 1) {
+			const namespace = view.entityRef.split(":", 2)[1]?.split("/", 1)[0];
+			const safeNamespace = (namespace ?? "default")
+				.toLowerCase()
+				.replace(/[^a-z0-9]+/g, "-")
+				.replace(/^-+|-+$/g, "") || "default";
+			const stem = `${view.entityKind.toLowerCase()}-${safeNamespace}-${view.id}`;
+			id = stem;
+			let suffix = 2;
+			while (reserved.has(id) || used.has(id)) {
+				id = `${stem}-${suffix++}`;
+			}
+		}
+		if (used.has(id)) throw new Error("Duplicate Backstage service identity");
+		used.add(id);
+		byRef.set(view.entityRef, id);
+	}
+	return byRef;
+}
+
 /** One canonical Backstage v2 source for cards and the architecture graph. */
 export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	services: HomelabServicesCatalog;
 	topology: ServiceTopology;
 } {
 	const views = catalogV2ServiceViews(catalog);
-	const duplicates = new Map<string, number>();
-	for (const view of views) {
-		duplicates.set(view.id, (duplicates.get(view.id) ?? 0) + 1);
-	}
-	// Stable canonical identity survives collisions across Backstage kinds.
-	const byRef = new Map(
-		views.map((view) => [
-			view.entityRef,
-			(duplicates.get(view.id) ?? 0) > 1
-				? `${view.entityKind.toLowerCase()}-${view.id}`
-				: view.id,
-		]),
-	);
+	const byRef = stableServiceIds(views);
 	const services: HomelabServicesCatalog = {
 		version: 2,
 		catalogRevision: catalog.catalogRevision,
@@ -63,8 +97,14 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			keyof typeof relationFields,
 			ServiceRelationType,
 		][]) {
-			const refs = entity.spec[field];
-			if (!Array.isArray(refs)) continue;
+			const raw = entity.spec[field];
+			// Backstage's subcomponentOf is a scalar reference, unlike dependsOn.
+			const refs =
+				field === "subcomponentOf" && typeof raw === "string"
+					? [raw]
+					: Array.isArray(raw)
+						? raw
+						: [];
 			for (const ref of refs) {
 				if (typeof ref !== "string") continue;
 				const target = byRef.get(ref);
