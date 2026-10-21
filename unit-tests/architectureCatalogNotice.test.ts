@@ -27,6 +27,9 @@ test("private architecture error is actionable, accessible and localized", async
 	);
 	assert.match(notice, /data-catalog-failure-reason=\{reason\}/);
 	assert.match(notice, /Réessayer le chargement/);
+	assert.match(notice, /Accès au catalogue des services à vérifier/);
+	assert.match(notice, /Cartographie des services indisponible/);
+	assert.match(notice, /sans élargir l’accès OWNER/);
 	assert.match(notice, /Try loading again/);
 	assert.match(notice, /Cela ne signifie pas que les services sont arrêtés/);
 	assert.match(notice, /This does not mean the services are down/);

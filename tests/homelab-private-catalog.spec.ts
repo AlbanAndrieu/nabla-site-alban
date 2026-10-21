@@ -134,9 +134,9 @@ test("architecture owner sees a private catalog error and recovers on retry", as
 	const unavailable = page.locator("[data-architecture-catalog-v2-unavailable]");
 	await expect(unavailable).toBeVisible();
 	await expect(unavailable).toContainText(
-		"Cartographie des services momentanément indisponible",
+		"Accès au catalogue des services à vérifier",
 	);
-	await expect(unavailable).toContainText("FastAPI a refusé");
+	await expect(unavailable).toContainText("L’accès au catalogue a été refusé");
 	await expect(unavailable).not.toContainText("INTERNAL_DIAGNOSTICS_SHOULD_NOT_RENDER");
 	recovered = true;
 	await page.getByRole("button", { name: "Réessayer le chargement" }).click();

@@ -12,16 +12,16 @@ type Props = {
 
 const HELP: Record<CatalogFailureReason, { fr: string; en: string }> = {
 	"key-missing": {
-		fr: "La configuration d’accès au service FastAPI est incomplète. Vérifiez la clé serveur de diagnostic dans Vercel.",
-		en: "The FastAPI service access configuration is incomplete. Check the server-side diagnostics key in Vercel.",
+		fr: "La clé de diagnostic serveur est absente. Vérifiez la configuration de l’environnement Vercel concerné (Preview ou Production), puis redéployez.",
+		en: "The server-side diagnostics key is missing. Check the corresponding Vercel environment (Preview or Production), then redeploy.",
 	},
 	"access-denied": {
-		fr: "FastAPI a refusé l’authentification du service. Vérifiez la correspondance de la clé de diagnostic entre Vercel et FastAPI.",
-		en: "FastAPI rejected service authentication. Check that the diagnostics key matches between Vercel and FastAPI.",
+		fr: "L’accès au catalogue a été refusé. Vérifiez l’identité SERVICE et ses permissions côté FastAPI, sans élargir l’accès OWNER.",
+		en: "Catalog access was denied. Check the SERVICE identity and its FastAPI permissions without broadening OWNER access.",
 	},
 	unavailable: {
-		fr: "La source Backstage v2 ne répond pas, n’est pas encore publiée ou a renvoyé une réponse invalide. Vérifiez d’abord sa disponibilité.",
-		en: "The Backstage v2 source is unreachable, not yet published, or returned an invalid response. Check its availability first.",
+		fr: "Le catalogue n’a pas pu être chargé. Vérifiez le déploiement de la source v2 et le contrat de réponse ; aucune donnée de remplacement n’est inventée.",
+		en: "The catalog could not be loaded. Check the v2 source deployment and response contract; no substitute data is invented.",
 	},
 };
 
@@ -31,6 +31,7 @@ export default function ArchitectureCatalogNotice({
 	onRetry,
 }: Readonly<Props>) {
 	const help = HELP[reason];
+	const configurationIssue = reason === "key-missing" || reason === "access-denied";
 	return (
 		<section
 			className="container py-4"
@@ -66,8 +67,12 @@ export default function ArchitectureCatalogNotice({
 						className={styles.title}
 					>
 						{french
-							? "Cartographie des services momentanément indisponible"
-							: "Service architecture temporarily unavailable"}
+							? configurationIssue
+								? "Accès au catalogue des services à vérifier"
+								: "Cartographie des services indisponible"
+							: configurationIssue
+								? "Service catalog access needs attention"
+								: "Service architecture unavailable"}
 					</h2>
 					<p className={styles.description}>
 						{french
