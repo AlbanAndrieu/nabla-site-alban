@@ -156,3 +156,7 @@ Report:
 1. what changed;
 2. checks executed;
 3. unresolved failures or risks.
+
+### Measure before expanding CI
+
+Run `python3 scripts/github-actions-usage.py --days 30` locally with authenticated `gh` to compare per-workflow job wall time and retained artifacts for the four active repositories. The inventory is read-only and uses GitHub REST; it is intentionally **not** scheduled in GitHub Actions to avoid consuming the very credits it audits. Job wall minutes are only an operational proxy, **not** invoiced minutes; rely on GitHub Billing for authoritative usage. Run `--repo NAME` to narrow scope or repeat it to select multiple repositories. Review the worst offenders before adding jobs or artifacts, keep PDF uploads at one day, and preserve mandatory security checks on Ready for review.
