@@ -80,3 +80,11 @@ Ne pas activer l'import automatique de dumps DAST bruts publics.
       dédié uniquement après consentement et preuve d'accès interne.
 - Compter distinctement `PASS`, `FAIL`, `SKIPPED`,
       `NOT_RUN` et `INCOMPLETE`, y compris pour CodeQL/DAST.
+
+
+## Convergence des quality gates avec Bababou (octobre 2026)
+
+- Secrets : en plus du hook BetterLeaks pre-commit, chaque PR non draft analyse **tout le diff Git commité** avec BetterLeaks v1.9.0, redaction active et base/head SHA vérifiés. Ceci évite un scan vide sur un checkout GitHub Actions propre.
+- SCA : `npm audit --omit=dev --audit-level=high` est bloquant pour la production sur chaque exécution Quality. L'audit complet des dépendances de développement est résumé sans exposer d'artefact JSON brut ; toute vulnérabilité CRITICAL ou réponse invalide bloque également.
+- Trivy lockfile/SBOM et ZAP production existaient déjà dans Alban et ne sont pas dupliqués. Les URLs et règles de confidentialité propres à chaque site restent séparées.
+- État : contrôles implémentés avec tests de contrat, **exécution GitHub et npm audit réels à attester sur le HEAD de cette PR**. Aucun gate contourné ni fusion automatique.

@@ -265,6 +265,49 @@ jobs:
       - name: Install pre-commit
         run: python -m pip install --disable-pip-version-check --quiet pre-commit==4.6.2
 
+      # A --staged hook cannot see PR commits in a clean Actions checkout.
+      # Review every commit since the exact PR base, not only working-tree files.
+      # Cache Go modules, never an unverified scanner executable.
+      - name: Restore BetterLeaks Go caches
+        id: betterleaks-go-cache
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+        continue-on-error: true
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: betterleaks-v1.9.0-go-${{ runner.os }}-${{ runner.arch }}-v1
+
+      - name: BetterLeaks committed PR diff (blocking)
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.production-baseline.outputs.base-sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$HEAD_SHA"
+          git cat-file -e "${BASE_SHA}^{commit}"
+          command -v go >/dev/null || { echo "::error::Go required for BetterLeaks"; exit 1; }
+          GOBIN="${RUNNER_TEMP}/betterleaks-bin" go install github.com/betterleaks/betterleaks@v1.9.0
+          "${RUNNER_TEMP}/betterleaks-bin/betterleaks" git . \
+            --log-opts="${BASE_SHA}..${HEAD_SHA}" \
+            --config .betterleaks.toml --redact
+          echo "BetterLeaks: full committed PR diff passed"
+
+      - name: Save BetterLeaks Go caches
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.draft == false &&
+          steps.betterleaks-go-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: betterleaks-v1.9.0-go-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Run canonical changed-file quality gate before SAST/npm bootstrap
         id: canonical-quality-gate
         continue-on-error: true
@@ -387,6 +430,51 @@ jobs:
         shell: bash
         run: bash scripts/verify-mise-npm.sh
 
+      # Production advisories are blocking on EVERY quality execution, not only
+      # on lockfile changes. Separate this from npm ci's redundant audit.
+      - name: Audit production npm dependencies (blocking SCA)
+        shell: bash
+        run: npm audit --omit=dev --audit-level=high
+
+      # Do not interpret a skipped optional Snyk job as a full-SCA PASS.
+      # Report development debt, block any CRITICAL or invalid audit response.
+      - name: Report full npm SCA and development-tool debt
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="${RUNNER_TEMP}/npm-audit-full.json"
+          trap 'rm -f "$report"' EXIT
+          audit_exit=0
+          npm audit --json > "$report" || audit_exit=$?
+          if ! jq -e '.metadata.vulnerabilities | type == "object"' "$report" >/dev/null; then
+            echo "::error::npm audit failed without valid advisory metadata"
+            exit 1
+          fi
+          critical="$(jq -r '.metadata.vulnerabilities.critical // 0' "$report")"
+          high="$(jq -r '.metadata.vulnerabilities.high // 0' "$report")"
+          moderate="$(jq -r '.metadata.vulnerabilities.moderate // 0' "$report")"
+          low="$(jq -r '.metadata.vulnerabilities.low // 0' "$report")"
+          {
+            echo "## npm SCA — full dependency tree"
+            echo
+            echo "- Production: **HIGH/CRITICAL blocking** (separate gate)"
+            echo "- All dependencies: CRITICAL=${critical}, HIGH=${high}, MODERATE=${moderate}, LOW=${low}"
+            echo "- Snyk is optional and complementary, not a substitute for npm audit"
+            echo
+            echo "### Affected package names"
+            jq -r '.vulnerabilities | keys[] | "- `" + . + "`"' "$report"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if ((critical > 0)); then
+            echo "::error::Full npm SCA found ${critical} CRITICAL advisories"
+            exit 1
+          fi
+          if ((audit_exit != 0 && high == 0 && moderate == 0 && low == 0)); then
+            echo "::error::npm audit exited ${audit_exit} without reportable findings"
+            exit 1
+          fi
+          if ((high > 0)); then
+            echo "::warning::Full npm SCA: ${high} HIGH advisories need triage"
+          fi
       - name: Install dependencies
         id: install
         shell: bash
