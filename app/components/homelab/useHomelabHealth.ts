@@ -5,6 +5,7 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
+import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
@@ -208,9 +209,13 @@ export function effectiveState(
 	index: HomelabHealthIndex,
 	healthUnavailable = false,
 ): HomelabHealthState {
-	const entry =
-		index.byId.get(homelabServiceId(service)) ??
-		index.byName.get(normalizedName(service.name));
+	const serviceId = homelabServiceId(service);
+	const entry = compatibleHomelabEvidence(
+		service.entityRef,
+		serviceId,
+		index.byId.get(serviceId) ??
+			index.byName.get(normalizedName(service.name)),
+	);
 	if (entry && !healthUnavailable) {
 		return resolveEffectiveServiceState(entry).effectiveState;
 	}

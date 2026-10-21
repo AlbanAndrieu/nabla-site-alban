@@ -3,6 +3,7 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
+import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
@@ -121,7 +122,11 @@ export function serviceHealthEvidence(
 	url: string,
 	snapshot: HomelabHealthSnapshot | null,
 ): HomelabHealthEntry | undefined {
-	const generic = lookupHealth(index, service, url);
+	const generic = compatibleHomelabEvidence(
+		service.entityRef,
+		homelabServiceId(service),
+		lookupHealth(index, service, url),
+	);
 	if (homelabServiceId(service) !== "truenas" || !snapshot?.truenas?.public) {
 		return generic;
 	}
