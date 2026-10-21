@@ -1,7 +1,8 @@
 # Durcissement Stripe Checkout — 21 octobre 2026
 
 ## Implémenté dans cette branche
-- Endpoint `POST /api/stripe/webhook` : corps brut, validation cryptographique de `Stripe-Signature`, borne de 64 KiB, aucune donnée personnelle dans les logs.
+- Endpoint `POST /api/stripe/webhook` : corps brut, validation cryptographique de `Stripe-Signature`, borne de 64 KiB, contrôle strict de `Content-Length` et `Content-Type`, aucune donnée personnelle dans les logs.
+- Tests synthétiques `unit-tests/stripe-webhook.test.ts` : signature absente/altérée, événements non financiers, refus de trois événements de paiement et validations HTTP. **Tests ajoutés, exécution locale et CI non vérifiées.**
 - **Fail closed** : aucun événement de paiement n'est acquitté tant que la persistance et le traitement idempotent ne sont pas opérationnels. Stripe réessaiera les événements répondant 503.
 - Le Checkout existant n'est pas modifié pour éviter une régression du parcours de paiement en production.
 
