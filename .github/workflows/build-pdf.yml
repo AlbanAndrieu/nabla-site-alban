@@ -2,6 +2,7 @@ name: Build CV PDFs
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main, master, develop]
     paths:
       - "public/cv/**/*.tex"
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   build-cv-pdfs:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Build CV PDFs (EN / FR)
     runs-on: ubuntu-24.04
     timeout-minutes: 30
