@@ -1,3 +1,25 @@
+## P0 — Corrélation des états SERVICE v2 et cartes privées (21 octobre 2026)
+
+- [x] Empêcher l'attribution d'un état SERVICE à plusieurs `entityRef`
+  partageant le même nom lorsque FastAPI ne corrèle encore les sondes que sur
+  `metadata.name` : état `unknown`, jamais état positif supposé.
+- [x] Pour les cartes Backstage v2, n'accepter les observations OWNER détaillées
+  que si leur identifiant explicite correspond exactement au service projeté.
+  Les cartes historiques sans `entityRef` gardent leur rapprochement par nom/URL.
+- [x] Vérifier dans l'environnement agent : 8 tests isolés d'états SERVICE,
+  5 tests isolés d'identité et 5 tests de projection (18 PASS), compilation
+  TypeScript ciblée stricte. Ces bancs partiels ne prouvent pas le build Next.js.
+- [ ] **FastAPI** : supprimer la jointure sur `metadata.name` au profit d'une
+  identité canonique `entityRef` étayée par la source de sondes, puis
+  synchroniser les tests inter-repos et retirer la mesure conservatrice.
+- [ ] **Contrat inter-repos** : aligner le traitement des points et underscores
+  dans les noms/références : le Site accepte ces caractères mais les validateurs
+  FastAPI actuels n'acceptent que les noms avec tirets.
+- [ ] **Validation restante** : vrai checkout Node 26/npm 12, quality gate
+  local-first, tests Playwright exact-SHA et recette SERVICE live. Ne pas
+  utiliser GitHub Actions en quota épuisé ; conserver cette branche sans PR,
+  car `pull_request_target` côté `master` peut encore réserver un runner.
+
 ## P0 — Cutover direct Backstage v2 (20 octobre 2026, Site #240)
 
 - [x] Cible confirmée auprès de FastAPI [#358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358) :

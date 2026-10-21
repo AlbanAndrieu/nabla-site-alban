@@ -2,7 +2,7 @@
 
 FastAPI #358 et Site Alban #240 ont été fusionnées. **La PR nabla-compose #265 est désormais fusionnée.** Le fichier v2 est attendu côté source, mais sa publication effective dans le runtime FastAPI doit encore être vérifiée ; un 503 ne prouve pas à lui seul un problème de clé. Pas de fallback vers v1.
 
-Le backend FastAPI #360 ajoute `GET /api/site/health/v2` authentifié par la clé machine existante, en projection stricte `{schemaVersion:2,model:"backstage-health",catalogRevision,boardState,services:[{entityRef,state}]}`. Aucun hôte, port, URL, token, preuve brute ou métrique. L'accès OWNER aux endpoints enrichis garde son CIDR et son identité indépendants.
+Le backend FastAPI #360 (PR fusionnée, déploiement runtime à confirmer) ajoute `GET /api/site/health/v2` authentifié par la clé machine existante, en projection stricte `{schemaVersion:2,model:"backstage-health",catalogRevision,boardState,services:[{entityRef,state}]}`. Aucun hôte, port, URL, token, preuve brute ou métrique. L'accès OWNER aux endpoints enrichis garde son CIDR et son identité indépendants.
 
 Cette PR Next.js consomme l'API uniquement côté serveur (Vercel), derrière `gatedHomelabResponse`. L'UI rapproche les états à `entityRef` et refuse les révisions qui ne correspondent pas au catalogue v2 chargé ; observations périmées ou ambiguës = UNKNOWN, et un éventuel instantané enrichi correctement autorisé reste prioritaire. Aucun secret n'est livré à React.
 
@@ -12,12 +12,14 @@ Dans le producteur FastAPI, `project_site_health_v2` associe encore les observat
 
 En attendant que FastAPI rapproche les sondes par identité canonique, le site considère **UNKNOWN** toutes les entrées SERVICE partageant le même dernier segment d'`entityRef`. Les noms uniques, l'exactitude de `catalogRevision` et la protection contre les instantanés `stale` restent inchangés. Cette mesure ne certifie pas qu'une réponse runtime est disponible ni que la source des sondes est exhaustive.
 
+Le rapprochement des instantanés OWNER historiques avec une carte Backstage utilise désormais uniquement l'identifiant explicite de l'observation lorsqu'un `entityRef` canonique est présent. Un match par nom ou URL seul ne peut pas supplanter l'état SERVICE de cette entité. Les cartes sans `entityRef` conservent les règles historiques. Les observations OWNER identifiées exactement restent prioritaires lorsqu'elles sont autorisées et fraîches.
+
 **Validation à effectuer en amont** : corriger la jointure FastAPI avec une clé `entityRef` fiable et documenter la provenance de cette clé dans les sondes ; ajouter des fixtures identiques entre les deux dépôts avant de supprimer cette protection conservatrice.
 
 ## Ordre de déploiement
 
 1. Vérifier que l'artefact v2 de Compose #265 est bien présent et consommé par le backend déployé (fusion Git ≠ disponibilité du runtime).
-2. Déployer la PR fastapi-sample #360 avec la même `DIAGNOSTICS_ACCESS_KEY` actuelle côté FastAPI.
+2. Vérifier que FastAPI #360, désormais fusionnée, est effectivement déployée et expose `/api/site/health/v2` avec une identité SERVICE valide ; la présence du code sur `master` ne prouve pas la disponibilité runtime.
 3. Déployer cette PR Site Alban, vérifier la variable `DIAGNOSTICS_ACCESS_KEY` dans les environnements de production/preview Vercel, sans l'exposer en `NEXT_PUBLIC_*`.
 4. Vérifier `GET /api/homelab-catalog-v2` et `GET /api/homelab-health-v2` depuis une session propriétaire, comparant `catalogRevision`. Vérifier absence de données privées dans HTML, JSON, headers ou cache public. Statuts absents → UNKNOWN, jamais FAIL.
 5. Désactiver les routes HTTP v1 FastAPI avec `HOMELAB_V1_HTTP_ENABLED=false` une fois les autres consommateurs identifiés ; ne pas supprimer les entrées historiques servant aux probes.

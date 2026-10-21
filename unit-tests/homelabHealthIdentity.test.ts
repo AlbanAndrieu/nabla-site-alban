@@ -24,8 +24,14 @@ test("exact owner ID matches remain eligible for enrichment", () => {
 });
 
 test("legacy cards and absent snapshots retain their current behavior", () => {
-	assert.equal(compatibleHomelabEvidence(undefined, "api", ownerEvidence), ownerEvidence);
-	assert.equal(compatibleHomelabEvidence("component:default/api", "api", undefined), undefined);
+	assert.equal(
+		compatibleHomelabEvidence(undefined, "api", ownerEvidence),
+		ownerEvidence,
+	);
+	assert.equal(
+		compatibleHomelabEvidence("component:default/api", "api", undefined),
+		undefined,
+	);
 });
 
 test("both service-card and health-summary paths apply canonical identity checks", () => {
