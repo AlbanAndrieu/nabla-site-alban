@@ -1,3 +1,12 @@
+## P0 — Vue extérieure : ne plus sonder OWNER depuis le navigateur (23 octobre 2026)
+
+- [x] Les vues externes en lecture seule de TrueNAS et de l'architecture consomment seulement les projections publiques `/api/homelab-services`, `/api/homelab-catalog-v2` et `/api/homelab-health-v2` ; aucun polling du runtime `/api/homelab-status`, des probes `/api/homelab-probes` ou de l'agrégat OWNER `/api/homelab-health`.
+- [x] Réutiliser le parseur strict `SiteHealthV2` et indexer les états par `entityRef` et `catalogRevision` ; conserver `unknown` quand le catalogue ne correspond pas ou que `boardState` n'est pas `fresh`.
+- [x] Projeter ces statuts sur les cards, filtres et hiérarchies mobile et desktop, sans afficher les composants de diagnostics bruts, sans déduire une panne de l'absence de droits OWNER.
+- [ ] Exécuter localement `just offline-l1`, `just p0` et la suite TypeScript/Playwright sur un checkout complet du HEAD. **NOT_RUN** tant que le DNS GitHub bloque l'obtention de la branche dans l'agent ; l'analyse statique des sources ne remplace pas les gates.
+- [ ] Valider sur Vercel Preview, hors Wi-Fi et au domicile, que le même `catalogRevision` affiche bien des services avec états publics et que le navigateur ne fait aucun appel OWNER non authentifié. Conserver un LKG uniquement pour l'affichage de la dernière observation, jamais pour déclarer un état `OK` courant.
+- [ ] Après MFA/VPN distant opérationnel, rétablir les restrictions OWNER conformément à la section ci-dessous, sans réintroduire de double lecteur v1 ou de contrat parallèle.
+
 ## P0 — External remote access, temporary public read-only (22 octobre 2026)
 
 - [x] `HOMELAB_PUBLIC_READONLY_ENABLED=true` (temporary default) serves **only** allowlisted Backstage v2 read projections from the Vercel site to external visitors, without the home CIDR: `/api/homelab-services`, `/api/homelab-catalog-v2`, `/api/homelab-health-v2`. The server-to-FastAPI SERVICE key remains required and must not reach client bundles.
