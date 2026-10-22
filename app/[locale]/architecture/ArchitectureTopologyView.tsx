@@ -161,6 +161,7 @@ export default function ArchitectureTopologyView({
 					topologySource={topologySource}
 					healthStatus={health}
 					healthSource={healthSource}
+					readOnly={readOnly}
 				/>
 			</section>
 		</>
