@@ -31,7 +31,8 @@ test("remote architecture uses the v2 read model and never polls OWNER runtime",
 	assert.match(poll, /readOnly \? "\/api\/homelab-health-v2" : "\/api\/homelab-health"/);
 	assert.match(poll, /parseSiteHealthV2\(await response.json\(\)\)/);
 	assert.match(runtime, /if \(readOnly\) \{/);
-	assert.match(runtime, /setRuntimeSource\("unavailable"\);\s*return;/);
+	assert.match(runtime, /if \(readOnly\) \{[\s\S]*?return;/);
+	assert.match(runtime, /runtimeStatus: readOnly \? null : runtimeStatus/);
 });
 
 test("owner-only status is not published via v2 read-only response", () => {
