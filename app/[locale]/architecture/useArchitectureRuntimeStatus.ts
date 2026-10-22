@@ -10,13 +10,19 @@ export type ArchitectureRuntimeSource = "loading" | "fastapi" | "unavailable";
 
 const RUNTIME_POLL_MS = 30_000;
 
-export default function useArchitectureRuntimeStatus() {
+export default function useArchitectureRuntimeStatus(readOnly = false) {
 	const [runtimeStatus, setRuntimeStatus] =
 		useState<HomelabStatusSnapshot | null>(null);
 	const [runtimeSource, setRuntimeSource] =
 		useState<ArchitectureRuntimeSource>("loading");
 
 	useEffect(() => {
+		if (readOnly) {
+			// No raw OWNER runtime inventory requests in the public projection.
+			setRuntimeStatus(null);
+			setRuntimeSource("unavailable");
+			return;
+		}
 		let active = true;
 		let controller: AbortController | null = null;
 
@@ -56,7 +62,7 @@ export default function useArchitectureRuntimeStatus() {
 			window.clearInterval(timer);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
-	}, []);
+	}, [readOnly]);
 
 	return { runtimeStatus, runtimeSource } as const;
 }
