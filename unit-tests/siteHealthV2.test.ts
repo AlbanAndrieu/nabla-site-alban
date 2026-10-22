@@ -92,7 +92,12 @@ test("malformed SERVICE entity refs and non-string health values fail closed", (
 	assert.equal(
 		parseSiteHealthV2({
 			...DTO,
-			services: [{ entityRef: "component:default/service", state: { toString: () => "ok" } }],
+			services: [
+				{
+					entityRef: "component:default/service",
+					state: { toString: () => "ok" },
+				},
+			],
 		}),
 		null,
 	);

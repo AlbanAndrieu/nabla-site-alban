@@ -118,7 +118,11 @@ export function parseHomelabCatalogV2(value: unknown): HomelabCatalogV2 | null {
 	}
 
 	const refs = value.entities.map((entity) => entity.entityRef);
-	if (new Set(refs).size !== refs.length || !hasUniqueCatalogServiceNames(value.entities)) return null;
+	if (
+		new Set(refs).size !== refs.length ||
+		!hasUniqueCatalogServiceNames(value.entities)
+	)
+		return null;
 
 	return value as HomelabCatalogV2;
 }

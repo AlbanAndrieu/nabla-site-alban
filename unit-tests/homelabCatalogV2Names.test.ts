@@ -63,8 +63,14 @@ test("distinct source names cannot share the same generated card ID", () => {
 });
 
 test("blank names, titles and invalid title types fail closed", () => {
-	assert.equal(hasUniqueCatalogServiceNames([entity("Component", "___")]), false);
-	assert.equal(hasUniqueCatalogServiceNames([entity("Component", "valid", " ")]), false);
+	assert.equal(
+		hasUniqueCatalogServiceNames([entity("Component", "___")]),
+		false,
+	);
+	assert.equal(
+		hasUniqueCatalogServiceNames([entity("Component", "valid", " ")]),
+		false,
+	);
 	assert.equal(
 		hasUniqueCatalogServiceNames([
 			entity("Component", "valid", 99 as unknown as string),

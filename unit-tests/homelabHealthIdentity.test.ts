@@ -7,7 +7,11 @@ const ownerEvidence = { id: "api", state: "ok", source: "owner-probes" };
 
 test("Backstage cards reject name/URL-only observations from a different identity", () => {
 	assert.equal(
-		compatibleHomelabEvidence("component:edge/api", "component-edge-api", ownerEvidence),
+		compatibleHomelabEvidence(
+			"component:edge/api",
+			"component-edge-api",
+			ownerEvidence,
+		),
 		undefined,
 	);
 	assert.equal(
@@ -36,7 +40,10 @@ test("legacy cards and absent snapshots retain their current behavior", () => {
 
 test("both service-card and health-summary paths apply canonical identity checks", () => {
 	const grid = readFileSync(
-		new URL("../app/components/homelab/homelabGridPresentation.ts", import.meta.url),
+		new URL(
+			"../app/components/homelab/homelabGridPresentation.ts",
+			import.meta.url,
+		),
 		"utf8",
 	);
 	const hook = readFileSync(

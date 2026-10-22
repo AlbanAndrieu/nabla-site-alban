@@ -8,7 +8,10 @@ type NamedEntity = {
 
 /** Stable service-card anchor, without any collision-repair suffix. */
 export function catalogServiceSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+	return name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
 }
 
 /** A catalog with ambiguous visible service names is not safe to publish. */

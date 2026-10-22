@@ -1,6 +1,6 @@
 import {
-	catalogV2ServiceViews,
 	type CatalogV2Entity,
+	catalogV2ServiceViews,
 	type HomelabCatalogV2,
 	parseHomelabCatalogV2,
 } from "./homelabCatalogV2";

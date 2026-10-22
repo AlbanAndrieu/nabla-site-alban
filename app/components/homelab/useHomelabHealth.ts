@@ -213,8 +213,7 @@ export function effectiveState(
 	const entry = compatibleHomelabEvidence(
 		service.entityRef,
 		serviceId,
-		index.byId.get(serviceId) ??
-			index.byName.get(normalizedName(service.name)),
+		index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name)),
 	);
 	if (entry && !healthUnavailable) {
 		return resolveEffectiveServiceState(entry).effectiveState;

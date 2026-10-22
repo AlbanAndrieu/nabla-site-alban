@@ -12,7 +12,8 @@ export type SiteHealthV2 = {
 const REVISION = /^sha256:[0-9a-f]{64}$/;
 // Canonical Backstage names and namespaces may contain dots or underscores.
 // Bound segment lengths and reject paths and whitespace.
-const REF = /^(component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/;
+const REF =
+	/^(component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/;
 const STATES = new Set(["ok", "warn", "fail", "unknown"]);
 
 export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
@@ -23,8 +24,8 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 		raw.model !== "backstage-health" ||
 		typeof raw.catalogRevision !== "string" ||
 		!REVISION.test(raw.catalogRevision) ||
-		(typeof raw.boardState !== "string" ||
-			!["fresh", "stale", "pending"].includes(raw.boardState)) ||
+		typeof raw.boardState !== "string" ||
+		!["fresh", "stale", "pending"].includes(raw.boardState) ||
 		!Array.isArray(raw.services) ||
 		raw.services.length > 2000
 	)
