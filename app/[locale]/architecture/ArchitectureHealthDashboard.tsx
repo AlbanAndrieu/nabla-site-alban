@@ -16,6 +16,7 @@ type Props = {
 	french: boolean;
 	refreshing: boolean;
 	healthUnavailable: boolean;
+	healthSource?: "loading" | "fastapi" | "site-v2" | "unavailable";
 	ageSeconds: number | null;
 	counts: HealthStateCounts;
 	healthFilter: HealthFilter;
@@ -33,6 +34,7 @@ export default function ArchitectureHealthDashboard({
 	french,
 	refreshing,
 	healthUnavailable,
+	healthSource,
 	ageSeconds,
 	counts,
 	healthFilter,
@@ -81,7 +83,11 @@ export default function ArchitectureHealthDashboard({
 							? french
 								? "Actualisation indisponible · dernier snapshot conservé"
 								: "Refresh unavailable · keeping last snapshot"
-							: ageSeconds === null
+							: healthSource === "site-v2"
+					? french
+						? "États v2 actualisés · sondes détaillées privées"
+						: "V2 states refreshed · detailed probes private"
+				: ageSeconds === null
 								? french
 									? "Snapshot en attente"
 									: "Waiting for snapshot"
