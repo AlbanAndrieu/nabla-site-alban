@@ -26,7 +26,6 @@ export default function useArchitectureHealthPolling() {
 	const [health, setHealth] = useState<HomelabHealthSnapshot | null>(null);
 	const [healthUnavailable, setHealthUnavailable] = useState(false);
 	const [refreshing, setRefreshing] = useState(true);
-	const [now, setNow] = useState(() => Date.now());
 
 	useEffect(() => {
 		let active = true;
@@ -72,7 +71,6 @@ export default function useArchitectureHealthPolling() {
 				if (active) {
 					setHealth(parsed);
 					setHealthUnavailable(false);
-					setNow(Date.now());
 				}
 			} catch {
 				if (active && !requestController.signal.aborted) {
@@ -88,7 +86,6 @@ export default function useArchitectureHealthPolling() {
 		};
 
 		void loadHealth();
-		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
 		const onVisibilityChange = () => {
 			if (document.hidden) {
 				clearRefreshTimer();
@@ -102,7 +99,6 @@ export default function useArchitectureHealthPolling() {
 			active = false;
 			controller?.abort();
 			clearRefreshTimer();
-			window.clearInterval(clockTimer);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, []);
@@ -113,5 +109,5 @@ export default function useArchitectureHealthPolling() {
 			? "fastapi"
 			: "loading";
 
-	return { health, healthUnavailable, refreshing, now, healthSource } as const;
+	return { health, healthUnavailable, refreshing, healthSource } as const;
 }

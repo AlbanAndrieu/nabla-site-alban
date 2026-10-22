@@ -16,30 +16,38 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	const byRef = new Map(
 		views.map((view) => [view.entityRef, catalogServiceSlug(view.id)]),
 	);
+	const shared = views.map((view) => ({
+		view,
+		id: byRef.get(view.entityRef) ?? view.id,
+		kind: view.type ?? view.entityKind.toLowerCase(),
+		category: view.category ?? "other",
+	}));
 	const services: HomelabServicesCatalog = {
 		version: 2,
 		catalogRevision: catalog.catalogRevision,
-		services: views.map((view) => ({
-			id: byRef.get(view.entityRef),
+		services: shared.map(({ view, id, kind, category }) => ({
+			id,
 			entityRef: view.entityRef,
 			name: view.name,
 			description: view.description,
-			kind: view.type ?? view.entityKind.toLowerCase(),
-			category: view.category ?? "other",
+			kind,
+			category,
 			criticality: view.operationalCriticality,
 			// No endpoint, tunnel, internal host or port exists in the safe v2 DTO.
 			endpointEnabled: false,
 		})),
 	};
-	const nodes: ServiceTopology["nodes"] = views.map((view) => ({
-		id: byRef.get(view.entityRef) ?? view.id,
-		name: view.name,
-		kind: view.type ?? view.entityKind.toLowerCase(),
-		category: view.category ?? "other",
-		criticality: view.operationalCriticality,
-		securityFunctions: view.securityFunctions,
-		sourcePath: view.sourcePath,
-	}));
+	const nodes: ServiceTopology["nodes"] = shared.map(
+		({ view, id, kind, category }) => ({
+			id,
+			name: view.name,
+			kind,
+			category,
+			criticality: view.operationalCriticality,
+			securityFunctions: view.securityFunctions,
+			sourcePath: view.sourcePath,
+		}),
+	);
 	const relationFields = {
 		dependsOn: "dependsOn",
 		consumesApis: "consumesApi",

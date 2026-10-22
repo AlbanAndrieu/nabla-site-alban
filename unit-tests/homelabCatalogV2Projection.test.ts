@@ -31,7 +31,9 @@ function project(entities: ReturnType<typeof entity>[]) {
 }
 
 function idsByRef(output: ReturnType<typeof project>) {
-	return new Map(output.services.services.map((service) => [service.entityRef, service.id]));
+	return new Map(
+		output.services.services.map((service) => [service.entityRef, service.id]),
+	);
 }
 
 test("unique Backstage names retain their existing service IDs", () => {
@@ -50,12 +52,15 @@ test("duplicate names across namespaces are invalid catalog data", () => {
 		entity("Component", "default", "api"),
 		entity("Component", "edge", "api"),
 	];
-	assert.equal(parseHomelabCatalogV2({
-		schemaVersion: 2,
-		model: "backstage",
-		catalogRevision: `sha256:${"a".repeat(64)}`,
-		entities,
-	}), null);
+	assert.equal(
+		parseHomelabCatalogV2({
+			schemaVersion: 2,
+			model: "backstage",
+			catalogRevision: `sha256:${"a".repeat(64)}`,
+			entities,
+		}),
+		null,
+	);
 });
 
 test("duplicate service names across Backstage kinds are rejected", () => {
@@ -63,12 +68,15 @@ test("duplicate service names across Backstage kinds are rejected", () => {
 		entity("Component", "default", "foo"),
 		entity("Resource", "default", "foo"),
 	];
-	assert.equal(parseHomelabCatalogV2({
-		schemaVersion: 2,
-		model: "backstage",
-		catalogRevision: `sha256:${"a".repeat(64)}`,
-		entities,
-	}), null);
+	assert.equal(
+		parseHomelabCatalogV2({
+			schemaVersion: 2,
+			model: "backstage",
+			catalogRevision: `sha256:${"a".repeat(64)}`,
+			entities,
+		}),
+		null,
+	);
 });
 
 test("service IDs and graph relations are independent of source entity order", () => {
@@ -128,10 +136,13 @@ test("different names that normalize to the same service-card slug are rejected"
 		entity("Component", "default", "a.b"),
 		entity("Resource", "default", "a_b"),
 	];
-	assert.equal(parseHomelabCatalogV2({
-		schemaVersion: 2,
-		model: "backstage",
-		catalogRevision: `sha256:${"a".repeat(64)}`,
-		entities,
-	}), null);
+	assert.equal(
+		parseHomelabCatalogV2({
+			schemaVersion: 2,
+			model: "backstage",
+			catalogRevision: `sha256:${"a".repeat(64)}`,
+			entities,
+		}),
+		null,
+	);
 });
