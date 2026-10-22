@@ -44,3 +44,7 @@ run = "bash scripts/agent-quality-gate.sh --fix"
 [tasks.agent-publish]
 description = "Run or reuse the exact strict publication proof for the current HEAD/base/toolchain"
 run = "bash scripts/agent-publish.sh"
+
+[tasks.agent-loop]
+description = "Run changed-file pre-commit checks locally; no build or publication proof"
+run = "bash scripts/agent-local-loop.sh"

@@ -1,3 +1,10 @@
+## P1 — Convergence qualité nabla-compose → site-alban (23 octobre 2026)
+
+- [x] Comparaison des contrôles des deux dépôts : actionlint, zizmor, hadolint, ShellCheck, Betterleaks, contrôle des exécutables, hook Git pre-push et politique Draft/Ready déjà présents ; ne pas les dupliquer.
+- [x] Ajouter `just loop` et `mise run agent-loop` comme étape rapide pre-commit sur les fichiers modifiés, avec comparaison Git stricte et sans publication.
+- [ ] Vérifier la convergence complète du gate local sur un checkout Node 26/npm 12 ; le mode loop ne remplace ni typecheck, tests, build, ni quality:agent:publish.
+- [ ] Auditer le workflow image Kubernetes : le Dockerfile historique reste uniquement Nginx fallback et Vercel continue le build natif Next.js ; séparer la diffusion d'une image SSR Kubernetes du workflow fallback, sans CI payante.
+
 ## P0 — Convergence CI / hooks avec nabla-compose (22 octobre 2026)
 
 - [x] Reprendre le principe `Draft` sans runner facturé : jobs conditionnels dans Docker fallback, Trivy SCA, RSS OPML et MegaLinter ; `ready_for_review` doit réactiver les contrôles obligatoires, sans directives de skip.

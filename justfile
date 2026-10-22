@@ -56,6 +56,10 @@ unit:
 a11y:
     npm run test:a11y
 
+# Fast changed-file feedback from nabla-compose; never sufficient to publish.
+loop:
+    bash scripts/agent-local-loop.sh
+
 quality:
     npm run quality:agent
 
