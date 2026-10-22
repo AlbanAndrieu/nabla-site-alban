@@ -273,7 +273,9 @@ export async function decideHomelabAccess(
 	const homeAllowed =
 		ip !== null && isIpInCidrs(ip, parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS));
 	const remoteOwnerEnabled =
-		env.VERCEL === "1" && env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED !== "false";
+		env.VERCEL === "1" &&
+		(env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED === undefined ||
+			env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED.trim().toLowerCase() === "true");
 	// Without a home-network match, ONLY a verified Access identity can admit
 	// an operator. This temporary flag never makes raw OWNER data anonymous.
 	if (!homeAllowed && !remoteOwnerEnabled) return PUBLIC;
