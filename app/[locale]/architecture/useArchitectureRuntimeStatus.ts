@@ -19,8 +19,6 @@ export default function useArchitectureRuntimeStatus(readOnly = false) {
 	useEffect(() => {
 		if (readOnly) {
 			// No raw OWNER runtime inventory requests in the public projection.
-			setRuntimeStatus(null);
-			setRuntimeSource("unavailable");
 			return;
 		}
 		let active = true;
@@ -64,5 +62,8 @@ export default function useArchitectureRuntimeStatus(readOnly = false) {
 		};
 	}, [readOnly]);
 
-	return { runtimeStatus, runtimeSource } as const;
+	return {
+		runtimeStatus: readOnly ? null : runtimeStatus,
+		runtimeSource: readOnly ? ("unavailable" as const) : runtimeSource,
+	} as const;
 }
