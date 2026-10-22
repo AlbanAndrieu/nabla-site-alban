@@ -29,7 +29,9 @@ export function diagnoseHomelabAccessNetwork(
 			? "trusted-cidrs-not-configured"
 			: family === 0
 				? "client-ip-unavailable"
-				: !networkAllowed
+				: !networkAllowed && trusted && identityRequired && env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED !== "false"
+				? "authorized-remote-identity"
+			: !networkAllowed
 					? "client-ip-outside-trusted-cidrs"
 					: identityRequired && !trusted
 						? "identity-not-authorized"
