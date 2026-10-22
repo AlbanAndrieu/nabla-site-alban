@@ -158,3 +158,39 @@ test("filter option constants keep their rendered order and i18n keys", () => {
 		);
 	}
 });
+
+test("external Backstage v2 health maps by entityRef only at matching fresh revision", () => {
+	const revision = "sha256:" + "a".repeat(64);
+	const entity = "component:default/grafana";
+	const projected = {
+		schemaVersion: 2 as const,
+		model: "backstage-health" as const,
+		catalogRevision: revision,
+		boardState: "fresh" as const,
+		services: [{ entityRef: entity, state: "ok" as const }],
+	};
+	const projectedCatalog: HomelabServicesCatalog = {
+		version: 2,
+		catalogRevision: revision,
+		services: [
+			{ id: "grafana", name: "Grafana", entityRef: entity },
+			{ id: "vault", name: "Vault", entityRef: "component:default/vault" },
+		],
+	};
+	const matching = indexHealth(null, projected, projectedCatalog.catalogRevision);
+	assert.deepEqual(countHealthStates(projectedCatalog.services, matching), {
+		ok: 1,
+		warn: 0,
+		fail: 0,
+		unknown: 1,
+	});
+	const staleRevision = indexHealth(null, projected, "sha256:" + "b".repeat(64));
+	assert.deepEqual(countHealthStates(projectedCatalog.services, staleRevision), {
+		ok: 0,
+		warn: 0,
+		fail: 0,
+		unknown: 2,
+	});
+	const stale = indexHealth(null, { ...projected, boardState: "stale" }, revision);
+	assert.equal(effectiveState("grafana", "Grafana", stale, entity), "unknown");
+});
