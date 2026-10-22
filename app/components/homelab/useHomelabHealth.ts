@@ -28,6 +28,7 @@ export const HEALTH_REFRESH_MS = 30_000;
 export type HealthFetchResult = {
 	snapshot: HomelabHealthSnapshot | null;
 	status: number | null;
+	reason?: "owner-boundary";
 };
 
 export type HomelabServicesState = {
@@ -40,6 +41,7 @@ export type HomelabServicesState = {
 	healthUnavailable: boolean;
 	healthStatus: number | null;
 	healthRefreshing: boolean;
+	ownerBoundary?: boolean;
 };
 
 export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
@@ -52,6 +54,7 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	healthUnavailable: false,
 	healthStatus: null,
 	healthRefreshing: true,
+	ownerBoundary: false,
 };
 
 class CatalogV2Unavailable extends Error {
@@ -110,7 +113,15 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 			cache: "no-store",
 			signal,
 		});
-		if (!response.ok) return { snapshot: null, status: response.status };
+		if (!response.ok) {
+			return {
+				snapshot: null,
+				status: response.status,
+				...(response.headers.get("X-Homelab-Health-Reason") === "owner-boundary"
+					? { reason: "owner-boundary" as const }
+					: {}),
+			};
+		}
 		return {
 			snapshot: parseHomelabHealthSnapshot(await response.json()),
 			status: response.status,
@@ -132,7 +143,15 @@ async function fetchProbeHealth(
 				"Cache-Control": "no-cache",
 			},
 		});
-		if (!response.ok) return { snapshot: null, status: response.status };
+		if (!response.ok) {
+			return {
+				snapshot: null,
+				status: response.status,
+				...(response.headers.get("X-Homelab-Health-Reason") === "owner-boundary"
+					? { reason: "owner-boundary" as const }
+					: {}),
+			};
+		}
 		return {
 			snapshot: parseHomelabHealthSnapshot(await response.json()),
 			status: response.status,
@@ -171,6 +190,8 @@ export function applyHealthCycle(
 			: (probes.snapshot ?? current.snapshot),
 		healthUnavailable: aggregate.snapshot === null && probes.snapshot === null,
 		healthStatus: aggregate.status ?? probes.status,
+		ownerBoundary:
+			aggregate.reason === "owner-boundary" && probes.reason === "owner-boundary",
 		healthRefreshing: false,
 		error:
 			current.error ||
@@ -253,6 +274,7 @@ export function useHomelabHealth(): HomelabServicesState {
 	useEffect(() => {
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
+		let ownerUpstreamBlocked = false;
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			setState((current) => ({ ...current, healthRefreshing: true }));
@@ -273,6 +295,11 @@ export function useHomelabHealth(): HomelabServicesState {
 					if (!signal.aborted)
 						setState((current) => ({ ...current, siteHealth: null }));
 				});
+			// Keep SERVICE v2 polling even after Vercel's OWNER boundary is confirmed.
+			if (ownerUpstreamBlocked) {
+				setState((current) => ({ ...current, healthRefreshing: false }));
+				return;
+			}
 			const probesPromise = fetchProbeHealth(signal);
 			const aggregatePromise = fetchHealth(signal);
 
@@ -284,6 +311,8 @@ export function useHomelabHealth(): HomelabServicesState {
 
 			const aggregate = await aggregatePromise;
 			if (signal.aborted) return;
+			ownerUpstreamBlocked =
+				aggregate.reason === "owner-boundary" && probes.reason === "owner-boundary";
 			setState((current) => applyHealthCycle(current, aggregate, probes));
 		};
 

@@ -214,6 +214,7 @@ export default function HomelabServicesBlock() {
 			<HomelabStatusOverview
 				snapshot={state.snapshot}
 				healthUnavailable={state.healthUnavailable}
+				ownerBoundary={state.ownerBoundary === true}
 				healthHttpStatus={state.healthStatus}
 				healthRefreshing={state.healthRefreshing}
 				onOpenCriticality={openCriticality}
@@ -482,6 +483,7 @@ export default function HomelabServicesBlock() {
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={state.healthUnavailable}
+									ownerBoundary={state.ownerBoundary === true}
 									healthHttpStatus={state.healthStatus}
 								/>
 							</div>
