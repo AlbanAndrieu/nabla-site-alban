@@ -12,7 +12,8 @@ const PUBLIC_READONLY_PATHS = new Set([
 export function publicRemoteReadOnlyEnabled(
 	env: Record<string, string | undefined> = process.env,
 ): boolean {
-	return env.HOMELAB_PUBLIC_READONLY_ENABLED !== "false";
+	const setting = env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	return setting === undefined || setting.trim().toLowerCase() === "true";
 }
 
 export function allowPublicHomelabProjection(
