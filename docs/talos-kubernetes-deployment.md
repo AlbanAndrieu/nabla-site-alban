@@ -1,26 +1,17 @@
-# Préparation Nabla Site Alban sur Talos/Kubernetes
+# Déploiement Next.js sur Talos/Kubernetes — image unique
 
-## Deux conteneurs, pas deux moteurs de déploiement
+## Un seul Dockerfile, deux plateformes
 
-Le site publié sur **Vercel** est construit avec l'intégration native Next.js ;
-dans la configuration actuelle du projet, le Dockerfile du dépôt n'est pas
-l'image utilisée par Vercel. Le `Dockerfile` existant fabrique un **fallback
-statique Nginx** et dispose déjà de son workflow et de ses tests de non-régression.
-Il ne sait pas exécuter les API Next.js.
-
-Le `Dockerfile.k8s` est donc volontairement séparé pour produire un serveur
-**Next.js complet** sur Talos sans transformer silencieusement la publication
-Nginx. Les deux fichiers ne doivent pas être confondus dans les tags GHCR.
-La consolidation en un Dockerfile multi-target (`fallback` et `standalone`)
-est une optimisation différée jusqu'à un build/scan de l'image Talos vérifié
-sur une machine disposant de Docker.
-
+- `Dockerfile` produit **l'application Next.js complète**, avec SSR et routes API sur le port 3000. `Dockerfile.k8s` est supprimé, de même que son fichier `.dockerignore` dédié.
+- `.dockerignore` exclut les clés, secrets locaux, `.git`, dépendances installées et artefacts de tests. Le `Dockerfile` ne contient aucun ARG de secret.
+- Vercel continue à compiler le projet **nativement** via `vercel.json` ; le Dockerfile n'est pas le mode de production Vercel.
+- L'ancien conteneur Nginx de fallback n'est plus l'image de ce dépôt. Les clients des tags GHCR/Docker Hub existants doivent être vérifiés **avant publication** : leur contenu passe de Nginx port 8080 à Next.js port 3000.
 
 ## Cible et limites
 
 Recette **privée** sur `alban-site.int.albandrieu.com` via le Traefik du cluster Talos TrueNAS. Aucune bascule de DNS public, aucun changement du site Vercel actuel.
 
-`Dockerfile` continue à servir uniquement le fallback statique Nginx port 8080. `Dockerfile.k8s` contient la **vraie application Next.js** SSR/API port 3000 : Node 26.8.2, npm 12.2, sortie `standalone` opt-in et UID/GID 10001. Le contexte Docker spécifique exclut `.git`, les secrets `.env*` et les clés. Pas de clé de diagnostic dans l'image.
+`Dockerfile` produit la **vraie application Next.js** SSR/API port 3000 : Node 26.8.2, npm 12.2, sortie `standalone` opt-in et UID/GID 10001. Le contexte Docker racine exclut `.git`, les secrets `.env*` et les clés. Pas de clé de diagnostic dans l'image.
 
 ## Build, contrôle et image immuable
 
@@ -34,7 +25,7 @@ trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL \
 just k8s-smoke ghcr.io/albanandrieu/nabla-site-alban:talos-test
 ```
 
-Le smoke lance le conteneur read-only/non root, monte les caches temporaires, teste `/fr` et assure `/api/homelab-access` → `trusted:false`, **sans fabriquer VERCEL=1**. Publier sur un registre accessible aux nœuds Talos uniquement après validation, puis récupérer le digest `sha256` **du registre**. Ne pas utiliser `:latest` ni déployer l'image fallback.
+Le smoke lance l'unique image en conteneur read-only/non root, monte les caches temporaires, teste `/fr` et assure `/api/homelab-access` → `trusted:false`, **sans fabriquer VERCEL=1**. Publier sur un registre accessible aux nœuds Talos uniquement après validation, puis récupérer le digest `sha256` **du registre**. Ne pas utiliser `:latest` : déployer l'image Next.js validée par digest.
 
 ## Déploiement GitOps dans nabla-compose
 

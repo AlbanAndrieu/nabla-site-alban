@@ -125,7 +125,7 @@ k8s-contract:
     node --test unit-tests/k8sStandaloneContract.test.mjs
 
 k8s-build tag="nabla-site-alban:talos":
-    docker build --pull -f Dockerfile.k8s -t "{{tag}}" .
+    docker build --pull -f Dockerfile -t "{{tag}}" .
 
 k8s-smoke tag="nabla-site-alban:talos":
     bash scripts/k8s/smoke-standalone.sh "{{tag}}"

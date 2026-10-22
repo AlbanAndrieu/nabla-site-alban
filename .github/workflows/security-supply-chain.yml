@@ -8,8 +8,6 @@ on:
       - "package.json"
       - "Dockerfile"
       - ".dockerignore"
-      - "Dockerfile.k8s"
-      - "Dockerfile.k8s.dockerignore"
       - ".github/workflows/security-supply-chain.yml"
       - "scripts/security/trivy-report-gate.mjs"
   push:
@@ -19,8 +17,6 @@ on:
       - "package.json"
       - "Dockerfile"
       - ".dockerignore"
-      - "Dockerfile.k8s"
-      - "Dockerfile.k8s.dockerignore"
       - ".github/workflows/security-supply-chain.yml"
       - "scripts/security/trivy-report-gate.mjs"
   schedule:

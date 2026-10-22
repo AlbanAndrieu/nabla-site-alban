@@ -3,14 +3,14 @@
 ## P1 — Parité CI local-first avec nabla-compose (22 octobre)
 
 - [x] Les jobs déclenchés par pull_request respectent le cycle Draft/Ready pour réduire les minutes, sans `[skip ci]`.
-- [x] Les workflows CI et Trivy suivent explicitement `Dockerfile.k8s*` ; l'image Nginx historique reste testée séparément.
+- [x] Les workflows CI et Trivy suivent le seul `Dockerfile` Next.js standalone et `.dockerignore` ; le workflow Docker exécute smoke et scan image obligatoires sur les PR Ready.
 - [x] shfmt passe du hook Docker à shfmt natif, avec Go géré par mise et invocation `agent-quality-gate.sh` synchronisée.
 - [x] Tests Python du rapport Actions rattachés au pre-commit modifié, sans appel externe ; détection des régressions y compris hors GitHub Actions.
 - [x] Test de contrat autonome `ciBudgetConvergence.test.mjs` intégré à pre-commit pour détecter toute régression de la politique Draft et du périmètre Dockerfile.
 - [x] `just source-check` exécute aussi les contrats CI et l'inventaire GitHub Actions hors ligne, sans dépendre d'un GitHub Runner ni des dépendances Node.
 - [x] L'inventaire Actions de nabla-compose PR #269 (Draft) est porté avec pagination bornée, validation des identifiants et détection d'inventaire incomplet.
 - [x] MegaLinter devient un audit manuel en lecture seule (comme nabla-compose) : aucune correction automatisée des PR, aucun runner supplémentaire sur Ready ; l'ensemble ESLint/Stylelint/Biome/secret/SAST de la gate principale reste inchangé.
-- [x] Réduire la rétention du SARIF d'image fallback Docker de 14 à 2 jours pour économiser l'espace Actions (l'upload Code Scanning reste conservé).
+- [x] Réduire la rétention du SARIF d'image Next.js de 14 à 1 jour pour économiser l'espace Actions (l'upload Code Scanning reste conservé).
 - [ ] Passer la quality gate complète `npm run quality:agent:publish` avec Go/npm/Node installés, sur checkout exact et propre ; ne pas confondre revue de fichiers et preuve L3.
 - [ ] Vérifier les politiques GitHub Rulesets et que les check runs de sécurité sont réellement requis lors du Ready.
 - [ ] Éviter de dupliquer les scans : les hooks actionlint, zizmor, Hadolint et BetterLeaks existaient déjà dans ce site.

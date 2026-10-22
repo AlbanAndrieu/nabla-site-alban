@@ -15,18 +15,18 @@ test("paid PR jobs skip drafts and can run on ready_for_review", () => {
 		assert.match(workflow, /github\.event\.pull_request\.draft == false/);
 	}
 });
-test("new Kubernetes Dockerfile is never omitted from Next.js CI scope", () => {
-	const workflow = read(".github/workflows/ci.yml");
-	const supply = read(".github/workflows/security-supply-chain.yml");
-	for (const path of ["Dockerfile.k8s", "Dockerfile.k8s.dockerignore"]) {
-		assert.ok(workflow.split(`"${path}"`).length >= 3, path);
-		assert.ok(supply.split(`"${path}"`).length >= 3, path);
+test("single root Dockerfile is always in CI/SCA and image build scope", () => {
+	for (const path of [
+		".github/workflows/ci.yml",
+		".github/workflows/security-supply-chain.yml",
+		".github/workflows/docker-build.yml",
+	]) {
+		const workflow = read(path);
+		assert.ok(workflow.split('"Dockerfile"').length >= 3, path);
+		assert.ok(workflow.split('".dockerignore"').length >= 3, path);
+		assert.doesNotMatch(workflow, /Dockerfile\.k8s/);
 	}
-});
-test("fallback Docker workflow remains scoped to Nginx and avoids docker build on drafts", () => {
-	const workflow = read(".github/workflows/docker-build.yml");
-	assert.match(workflow, /name: Build static fallback/);
-	assert.doesNotMatch(workflow, /"Dockerfile\.k8s"/);
+	assert.match(read(".github/workflows/docker-build.yml"), /name: Build Next.js standalone image/);
 });
 test("shell formatter matches native Compose pattern without a Docker daemon", () => {
 	const config = read(".pre-commit-config.yaml");

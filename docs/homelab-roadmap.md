@@ -1,14 +1,22 @@
+## P0 — Une seule image Dockerfile pour Talos (23 octobre 2026)
+
+- [x] Le Dockerfile racine devient l'application complète Next.js SSR/API (port 3000), non-root et multi-stage ; supprimer Dockerfile.k8s et son ignore spécifique.
+- [x] Mettre à jour .dockerignore, justfile, tests de contrat, CI Docker et SCA, ainsi que le runbook ; ne pas modifier le build natif Vercel.
+- [x] Ne plus ignorer Trivy sur des mises à jour Next.js : construire, smoke et scanner l'image avant publication ; image par SHA et déploiement par digest.
+- [ ] Construire et lancer le vrai conteneur avec Node/npm/Docker disponibles ; scan Trivy et tests de bout en bout à prouver avant passage en Ready.
+- [ ] Inventorier les consommateurs historiques de l'image de fallback Nginx avant publication sous les anciens tags GHCR/Docker Hub.
+
 ## P1 — Convergence qualité nabla-compose → site-alban (23 octobre 2026)
 
 - [x] Comparaison des contrôles des deux dépôts : actionlint, zizmor, hadolint, ShellCheck, Betterleaks, contrôle des exécutables, hook Git pre-push et politique Draft/Ready déjà présents ; ne pas les dupliquer.
 - [x] Ajouter `just loop` et `mise run agent-loop` comme étape rapide pre-commit sur les fichiers modifiés, avec comparaison Git stricte et sans publication.
 - [ ] Vérifier la convergence complète du gate local sur un checkout Node 26/npm 12 ; le mode loop ne remplace ni typecheck, tests, build, ni quality:agent:publish.
-- [ ] Auditer le workflow image Kubernetes : le Dockerfile historique reste uniquement Nginx fallback et Vercel continue le build natif Next.js ; séparer la diffusion d'une image SSR Kubernetes du workflow fallback, sans CI payante.
+- [ ] Déployé en un seul `Dockerfile` pour le serveur Next.js port 3000 (Vercel reste natif) ; le workflow Docker vérifie cette image uniquement hors PR Draft. Tests de build réels restant à faire localement.
 
 ## P0 — Convergence CI / hooks avec nabla-compose (22 octobre 2026)
 
 - [x] Reprendre le principe `Draft` sans runner facturé : jobs conditionnels dans Docker fallback, Trivy SCA, RSS OPML et MegaLinter ; `ready_for_review` doit réactiver les contrôles obligatoires, sans directives de skip.
-- [x] Inclure les fichiers `Dockerfile.k8s*` dans les filtres CI et Trivy filesystem ; ne pas les faire construire par le workflow Nginx de secours.
+- [x] Remplacer `Dockerfile.k8s*` par le seul `Dockerfile` dans la portée CI/SCA et supprimer le fallback Nginx du workflow Docker ; Trivy de l'image est bloquant sur Ready.
 - [x] Remplacer le hook shfmt-docker par shfmt natif comme dans nabla-compose, avec Go 1.25.12 géré par mise. Le premier bootstrap du hook requiert Go et l'accès aux dépendances, **non validés ici**.
 - [x] Adapter l'inventaire GitHub Actions à la proposition bornée de nabla-compose #269 (encore Draft) : pagination limitée, validation des IDs, métriques partielles en échec explicite et tests hors ligne indépendants de GitHub CLI. Les tests du vrai checkout restent à exécuter.
 - [ ] Exécuter `just hooks`, quality fix/publish, actionlint, zizmor, BetterLeaks et Next.js build dans un checkout complet avant revue. Source-check ajoute désormais le contrat CI et les tests Actions, sans prétendre à une preuve de publication. Aucun GitHub Actions lancé.
@@ -16,7 +24,7 @@
 
 ## P1 — Image Next.js pour Talos/Kubernetes (22 octobre 2026)
 
-- [x] Conserver le fallback Nginx (Dockerfile) et préparer Dockerfile.k8s distinct pour Next.js standalone SSR/API, Node 26.8.2 et npm 12.2, UID/GID 10001 et port 3000.
+- [x] Conserver un seul Dockerfile racine pour Next.js standalone SSR/API, Node 26.8.2 et npm 12.2, UID/GID 10001 et port 3000.
 - [x] Ajouter un contexte Docker spécifique excluant les secrets, un smoke read-only avec frontière OWNER fermée et des cibles justfile sans Actions.
 - [x] Aligner le conteneur sur scripts/talos/deploy-site-alban.sh déjà présent dans nabla-compose ; déploiement Talos limité au hostname privé de recette, sans bascule de www.albanandrieu.com.
 - [ ] Protéger le déploiement par Traefik TLS/LAN-only, fournir le cache .next writable en emptyDir et une Secret Kubernetes via GitOps (source d'autorité nabla-compose).

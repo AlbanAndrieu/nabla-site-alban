@@ -1,20 +1,36 @@
-# syntax=docker/dockerfile:1
-# Static fallback only. Production remains the Next.js application on Vercel.
-FROM nginxinc/nginx-unprivileged:1.30.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7364b4a14f9bad4763ae8f5317c437b896afa3df4b84
+# syntax=docker/dockerfile:1.7
+# One build definition for the full Next.js runtime on Talos; Vercel builds natively.
+# Build: docker build --pull -t nabla-site-alban:talos .
+ARG NODE_IMAGE=node:26.8.2-alpine3.24
+FROM ${NODE_IMAGE} AS dependencies
+WORKDIR /app
+COPY package.json package-lock.json .npmrc ./
+# Node's bundled npm may predate the repository's required npm 12.x.
+RUN npm install --global npm@12.2.0 \
+    && npm ci --no-audit --no-fund
 
-# The pinned upstream image predates Alpine's pcre2 10.49 security rebuild.
-# Upgrade only the affected runtime package, then drop back to the unprivileged UID.
-USER 0
-RUN apk add --no-cache 'pcre2>=10.49-r0'
+FROM ${NODE_IMAGE} AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NABLA_K8S_BUILD=1
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY . .
+# Do not run scripts/run-next-clean.sh: git metadata is excluded from images.
+RUN ./node_modules/.bin/next build \
+    && test -s .next/standalone/server.js
 
-LABEL org.opencontainers.image.title="nabla-site-alban" \
-      org.opencontainers.image.vendor="nabla" \
-      org.opencontainers.image.description="Static public/ fallback for nabla-site-alban"
-
-COPY public/ /usr/share/nginx/html/
-
-EXPOSE 8080
-
-USER 101
-
-CMD ["nginx", "-g", "daemon off;"]
+FROM ${NODE_IMAGE} AS runtime
+WORKDIR /app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+RUN addgroup -S -g 10001 nextjs \
+    && adduser -S -D -H -u 10001 -G nextjs nextjs
+COPY --from=builder --chown=10001:10001 /app/.next/standalone ./
+COPY --from=builder --chown=10001:10001 /app/.next/static ./.next/static
+COPY --from=builder --chown=10001:10001 /app/public ./public
+RUN mkdir -p /app/.next/cache && chown -R 10001:10001 /app/.next
+USER 10001:10001
+EXPOSE 3000
+CMD ["node", "server.js"]
