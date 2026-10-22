@@ -133,6 +133,7 @@
 			"refreshing": "Refreshing homelab health",
 			"refreshingNote": "The last known snapshot remains visible while the live FastAPI health snapshot is refreshed.",
 			"liveSnapshotUnavailable": "Live FastAPI health refresh failed ({status}); the UI is showing the last known snapshot where available.",
+			"ownerBoundary": "Detailed OWNER diagnostics are inaccessible from Vercel without an authorized relay. SERVICE v2 states remain independent. HTTP 503 does not mean TrueNAS is down.",
 			"apiUnavailable": "TrueNAS API probe is unavailable: {error}.",
 			"runtimeUnavailable": "The TrueNAS app.query runtime is unreachable.",
 			"runtimeStale": "The TrueNAS runtime snapshot is stale.",

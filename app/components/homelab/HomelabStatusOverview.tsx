@@ -17,6 +17,7 @@ type Props = {
 	snapshot: HomelabHealthSnapshot | null;
 	healthUnavailable: boolean;
 	healthHttpStatus: number | null;
+	ownerBoundary?: boolean;
 	healthRefreshing: boolean;
 	onOpenCriticality: () => void;
 };
@@ -25,6 +26,7 @@ export default function HomelabStatusOverview({
 	snapshot,
 	healthUnavailable,
 	healthHttpStatus,
+	ownerBoundary = false,
 	healthRefreshing,
 	onOpenCriticality,
 }: Readonly<Props>) {
@@ -44,7 +46,9 @@ export default function HomelabStatusOverview({
 
 	if (healthUnavailable) {
 		runtimeWarningDetails.push(
-			t("truenas.liveSnapshotUnavailable", {
+			ownerBoundary
+				? t("truenas.ownerBoundary")
+				: t("truenas.liveSnapshotUnavailable", {
 				status:
 					healthHttpStatus === null
 						? t("truenas.networkError")

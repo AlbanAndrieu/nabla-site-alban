@@ -26,3 +26,14 @@ test("owner proxy routes retain the owner gate and no-store boundary status", ()
 		assert.match(source, /gatedHomelabResponse\(request,/);
 	}
 });
+
+test("browser preserves SERVICE v2 polling after identifying the OWNER boundary", () => {
+	const source = readFileSync(
+		new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url),
+		"utf8",
+	);
+	assert.match(source, /if \(ownerUpstreamBlocked\)/);
+	assert.match(source, /aggregate\.reason === "owner-boundary"/);
+	assert.match(source, /probes\.reason === "owner-boundary"/);
+	assert.match(source, /fetch\("\/api\/homelab-health-v2"/);
+});
