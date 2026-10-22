@@ -85,3 +85,5 @@ Lorsque la clé `DIAGNOSTICS_ACCESS_KEY` existe **uniquement côté serveur Verc
 L’inventaire SERVICE Backstage v2 n'ayant pas de champ d'icône, le site réintroduit des icônes statiques par ID canonique ; les icônes restent disponibles même si l'API runtime est inaccessible. L’état de santé reste `unknown` sans preuve courante ; aucune fausse donnée runtime n’est produite.
 
 **Préconditions runtime non vérifiées** : le déploiement Vercel actif porte le HEAD requis ; la clé Vercel correspond à FastAPI ; FastAPI applique toujours le switch temporaire ; `/api/homelab-health`, `/api/homelab-probes` et `/api/homelab-observability` renvoient des données autorisées. Contrôler les trois séparément après Preview exact-SHA.
+
+Les deux endpoints de repli `/api/homelab-diagnostics` et `/api/runtime-topology` partagent désormais le même contrôle OWNER, la même clé serveur FastAPI et la politique `redirect:error`. Ils ne contournent pas la vérification de provenance Next.js.

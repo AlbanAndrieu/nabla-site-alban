@@ -42,3 +42,17 @@ test("browser preserves SERVICE v2 polling after identifying the OWNER boundary"
 	assert.match(source, /probes\.reason === "owner-boundary"/);
 	assert.match(source, /fetch\("\/api\/homelab-health-v2"/);
 });
+
+test("all server-side OWNER upstream consumers use the key and honor the access boundary", () => {
+	for (const sourcePath of [
+		"lib/fastApiHealthBoard.ts",
+		"lib/homelabHealthTransport.ts",
+		"lib/homelabDiagnostics.ts",
+		"lib/runtimeTopology.ts",
+	]) {
+		const source = readFileSync(new URL(`../${sourcePath}`, import.meta.url), "utf8");
+		assert.match(source, /ownerUpstreamBlocked\(/, sourcePath);
+		assert.match(source, /ownerDiagnosticHeaders\(process\.env\.DIAGNOSTICS_ACCESS_KEY\)/, sourcePath);
+		assert.match(source, /redirect: "error"/, sourcePath);
+	}
+});
