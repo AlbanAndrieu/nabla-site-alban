@@ -17,7 +17,8 @@ on:
     paths-ignore:
       - "**.md"
   pull_request:
-    branches: [main]
+    branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 env: # Comment env block if you do not want to apply fixes
   # Apply linter fixes configuration
@@ -31,7 +32,10 @@ concurrency:
 
 jobs:
   build-mega-linter:
-    if: github.actor != 'dependabot[bot]' && github.actor!= 'dependabot-preview[bot]' # ignore the pull request which comes from user dependabot.
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'dependabot-preview[bot]'
     name: MegaLinter
     runs-on: ubuntu-latest
     steps:

@@ -2,11 +2,14 @@ name: Supply Chain Security (Trivy)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "package-lock.json"
       - "package.json"
       - "Dockerfile"
       - ".dockerignore"
+      - "Dockerfile.k8s"
+      - "Dockerfile.k8s.dockerignore"
       - ".github/workflows/security-supply-chain.yml"
       - "scripts/security/trivy-report-gate.mjs"
   push:
@@ -16,6 +19,8 @@ on:
       - "package.json"
       - "Dockerfile"
       - ".dockerignore"
+      - "Dockerfile.k8s"
+      - "Dockerfile.k8s.dockerignore"
       - ".github/workflows/security-supply-chain.yml"
       - "scripts/security/trivy-report-gate.mjs"
   schedule:
@@ -31,6 +36,7 @@ concurrency:
 
 jobs:
   filesystem:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Trivy lockfile, filesystem and license policy
     runs-on: ubuntu-latest
     timeout-minutes: 15

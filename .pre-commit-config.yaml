@@ -229,10 +229,8 @@ repos:
 -   repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.13.1-1
     hooks:
-      # Choose one of:
-      # - id: shfmt         # native (requires Go to build)
-      -   id: shfmt-docker # Docker image (requires Docker to run)
-          name: "🐚 🐳 shell · Format shell scripts"
+      -   id: shfmt
+          name: "🐚 shell · Format shell scripts locally (Go)"
           args: ["-i", "4", "-ci"]
 -   repo: https://github.com/detailyang/pre-commit-shell
     rev: v1.0.6

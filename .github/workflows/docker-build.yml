@@ -17,6 +17,7 @@ on:
       - ".github/workflows/docker-build.yml"
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "Dockerfile"
       - ".dockerignore"
@@ -37,6 +38,7 @@ env:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Build static fallback
     runs-on: ubuntu-latest
     timeout-minutes: 30

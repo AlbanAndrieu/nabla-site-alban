@@ -66,6 +66,13 @@ publish:
 hooks:
     mise run hooks
 
+# GitHub Actions budget: read-only local tests and bounded real usage inventory.
+actions-usage-test:
+    python3 -m unittest discover -s unit-tests -p "test_github_actions_usage.py" -v
+
+actions-usage days="30" max_runs="40":
+    python3 scripts/github-actions-usage.py --days "{{days}}" --max-runs "{{max_runs}}"
+
 secrets:
     betterleaks dir . --config .betterleaks.toml --redact
 
