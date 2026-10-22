@@ -10,7 +10,8 @@ export function originFromDomainEnv(raw: string): string | null {
 	try {
 		const u = new URL(trimmed);
 		if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-		if (u.username || u.password || u.pathname !== "/" || u.search || u.hash) return null;
+		if (u.username || u.password || u.pathname !== "/" || u.search || u.hash)
+			return null;
 		return `${u.protocol}//${u.host}`;
 	} catch {
 		return null;
