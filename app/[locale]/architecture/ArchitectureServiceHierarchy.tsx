@@ -173,7 +173,8 @@ export default function ArchitectureServiceHierarchy({
 							<HomelabServiceGrid
 								catalog={group.catalog}
 								snapshot={snapshot}
-								healthUnavailable={healthUnavailable}
+								siteHealth={siteHealth}
+								healthUnavailable={healthUnavailable && !siteHealth}
 								healthHttpStatus={null}
 							/>
 						</div>
