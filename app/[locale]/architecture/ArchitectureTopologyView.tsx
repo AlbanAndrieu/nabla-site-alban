@@ -102,6 +102,7 @@ export default function ArchitectureTopologyView({
 						french={french}
 						refreshing={refreshing}
 						healthUnavailable={healthUnavailable}
+						healthSource={healthSource}
 						ageSeconds={ageSeconds}
 						counts={counts}
 						healthFilter={healthFilter}
