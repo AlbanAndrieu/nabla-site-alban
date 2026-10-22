@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isTrustedHomelabRequest } from "./homelabAccess";
+import { allowPublicHomelabProjection } from "./remoteHomelabReadOnly";
 
 const PRIVATE_HEADERS = {
 	"Cache-Control": "private, no-store, max-age=0",
@@ -27,7 +28,7 @@ export async function gatedHomelabResponse(
 	request: Request,
 	handler: () => Promise<Response>,
 ): Promise<Response> {
-	if (!(await isTrustedHomelabRequest(request))) {
+	if (!allowPublicHomelabProjection(request) && !(await isTrustedHomelabRequest(request))) {
 		return privateHomelabResponse();
 	}
 	const response = await handler();

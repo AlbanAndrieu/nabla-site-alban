@@ -1,3 +1,12 @@
+## P0 — External remote access, temporary public read-only (22 octobre 2026)
+
+- [x] `HOMELAB_PUBLIC_READONLY_ENABLED=true` (temporary default) serves **only** allowlisted Backstage v2 read projections from the Vercel site to external visitors, without the home CIDR: `/api/homelab-services`, `/api/homelab-catalog-v2`, `/api/homelab-health-v2`. The server-to-FastAPI SERVICE key remains required and must not reach client bundles.
+- [x] A cryptographically verified Cloudflare Access owner JWT may also unlock full OWNER views outside the home CIDR while `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true` (temporary default). This exception never admits an anonymous visitor to raw OWNER data. A missing/malformed JWT remains denied.
+- [x] Public endpoint selection is method- and exact-path-based. Raw probes, `/api/homelab-observability`, runtime topology, security posture, operator controls and mutations remain behind the existing OWNER gate. CDN cache is always `private, no-store`. The /api/homelab-access probe advertises `mode=public-readonly` when that fallback is active.
+- [ ] **Re-enable OWNER protection**: set `HOMELAB_PUBLIC_READONLY_ENABLED=false` and `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=false` when Access MFA/VPN is working remotely, with tests proving an external untrusted visitor gets 404 on all OWNER surfaces. In parallel restore the FastAPI home-CIDR factor by setting `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=false`.
+- [ ] Verify the Vercel production server has a valid `DIAGNOSTICS_ACCESS_KEY` for the canonical FastAPI SERVICE v2 reader; missing, denied, invalid or stale backend catalog remains 503, never a fabricated healthy service or legacy v1 fallback. Validate FR/EN /truenas and /architecture from external/mobile and home networks.
+- [ ] Improve operational UI external view by consuming safe, strictly projected read models for additional statuses; **do not** publish raw LAN IPs, credentials, probe HTTP traces, security posture or private URLs to satisfy a missing card. Both repos remain draft/local-first until explicitly approved.
+
 ## P0 — Restauration diagnostics OWNER depuis Wi-Fi + icônes (23 octobre 2026)
 
 - [x] L'accès OWNER à la page est déjà vérifié via l'edge Vercel ; ne pas confondre cette IP navigateur et l'egress Vercel vers FastAPI.

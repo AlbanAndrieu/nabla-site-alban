@@ -287,12 +287,56 @@ test("a valid JWT from outside the home IP is still denied", async () => {
 			"x-real-ip": "203.0.113.50",
 			"x-forwarded-for": HOME_IP,
 		}),
-		{ env: ACCESS_ENV, fetchImpl: jwksFetch(), now: NOW },
+		{ env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "false" }, fetchImpl: jwksFetch(), now: NOW },
 	);
 	assert.deepEqual(decision, { trusted: false, via: null });
 });
 
+
+test("temporary remote owner access requires a cryptographically valid Access JWT", async () => {
+	const valid = await signToken(validClaims());
+	const outside = new Headers({
+		"x-real-ip": "203.0.113.50",
+		"cf-access-jwt-assertion": valid,
+	});
+	const options = {
+		env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "true" },
+		fetchImpl: jwksFetch(),
+		now: NOW,
+	};
+	assert.deepEqual(await decideHomelabAccess(outside, options), {
+		trusted: true,
+		via: "cloudflare-access",
+	});
+	assert.deepEqual(
+		await decideHomelabAccess(
+			new Headers({
+				"x-real-ip": "203.0.113.50",
+				"x-forwarded-for": HOME_IP,
+				"cf-access-jwt-assertion": "forged.token.value",
+			}),
+			options,
+		),
+		{ trusted: false, via: null },
+	);
+	assert.deepEqual(
+		await decideHomelabAccess(outside, {
+			...options,
+			env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "false" },
+		}),
+		{ trusted: false, via: null },
+	);
+	assert.deepEqual(
+		await decideHomelabAccess(new Headers({ "x-real-ip": "203.0.113.50" }), {
+			env: { VERCEL: "1", HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "true" },
+		}),
+		{ trusted: false, via: null },
+	);
+});
+
 test("gated responses are a neutral 404 for anonymous visitors", async () => {
+	const previous = process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	process.env.HOMELAB_PUBLIC_READONLY_ENABLED = "false";
 	let handled = false;
 	const response = await gatedHomelabResponse(
 		new Request("https://www.albanandrieu.com/api/homelab-services", {
@@ -312,6 +356,8 @@ test("gated responses are a neutral 404 for anonymous visitors", async () => {
 	assert.deepEqual(await response.json(), {
 		error: "Operational homelab data is private",
 	});
+	if (previous === undefined) delete process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	else process.env.HOMELAB_PUBLIC_READONLY_ENABLED = previous;
 });
 
 test("trusted responses always override caching with private no-store", async () => {
@@ -349,6 +395,8 @@ test("trusted responses always override caching with private no-store", async ()
 });
 
 test("access probe answers only a boolean and is never cached", async () => {
+	const previous = process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	process.env.HOMELAB_PUBLIC_READONLY_ENABLED = "false";
 	const response = await GET_ACCESS(
 		new Request("https://www.albanandrieu.com/api/homelab-access", {
 			headers: {
@@ -363,4 +411,6 @@ test("access probe answers only a boolean and is never cached", async () => {
 		/private, no-store/,
 	);
 	assert.deepEqual(await response.json(), { trusted: false });
+	if (previous === undefined) delete process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	else process.env.HOMELAB_PUBLIC_READONLY_ENABLED = previous;
 });

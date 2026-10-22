@@ -53,7 +53,8 @@ test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Acce
 	assert.match(body, /response\.headers\.set\(name, value\)/);
 
 	const access = read("app/api/homelab-access/route.ts");
-	assert.match(access, /\{ trusted: decision\.trusted \}/);
+	assert.match(access, /publicRemoteReadOnlyEnabled\(\)/);
+	assert.match(read("lib/remoteHomelabReadOnly.ts"), /PUBLIC_READONLY_PATHS/);
 	assert.match(access, /no-store/);
 });
 
@@ -132,7 +133,9 @@ test("gates ask the server first and dynamically import the private views", () =
 	assert.match(hook, /fetch\("\/api\/homelab-access"/);
 	assert.match(hook, /cache: "no-store"/);
 	assert.match(hook, /useState<HomelabAccessState>\("pending"\)/);
-	assert.match(hook, /setState\(trusted \? "trusted" : "denied"\)/);
+	assert.match(hook, /setState\(access\)/);
+	assert.match(hook, /"readonly"/);
+	assert.match(read("app/components/homelab/HomelabPrivateServices.tsx"), /data-homelab-public-readonly-view/);
 });
 
 test("owner cards preserve the historical #service-* link after async access", () => {
