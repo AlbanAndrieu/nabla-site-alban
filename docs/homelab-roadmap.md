@@ -3,7 +3,7 @@
 - [x] Reprendre le principe `Draft` sans runner facturé : jobs conditionnels dans Docker fallback, Trivy SCA, RSS OPML et MegaLinter ; `ready_for_review` doit réactiver les contrôles obligatoires, sans directives de skip.
 - [x] Inclure les fichiers `Dockerfile.k8s*` dans les filtres CI et Trivy filesystem ; ne pas les faire construire par le workflow Nginx de secours.
 - [x] Remplacer le hook shfmt-docker par shfmt natif comme dans nabla-compose, avec Go 1.25.12 géré par mise. Le premier bootstrap du hook requiert Go et l'accès aux dépendances, **non validés ici**.
-- [ ] Adapter l'inventaire GitHub Actions aux améliorations bornées actuellement dans la PR nabla-compose #269 (Draft non fusionnée) ; tests unitaires hors ligne et fail-closed sur métriques incomplètes.
+- [x] Adapter l'inventaire GitHub Actions à la proposition bornée de nabla-compose #269 (encore Draft) : pagination limitée, validation des IDs, métriques partielles en échec explicite et tests hors ligne indépendants de GitHub CLI. Les tests du vrai checkout restent à exécuter.
 - [ ] Exécuter `just hooks`, quality fix/publish, actionlint, zizmor, BetterLeaks et Next.js build dans un checkout complet avant revue. Aucun GitHub Actions lancé.
 - [ ] Auditer puis réduire les droits de mutation du workflow MegaLinter sur les PRs externes, sans compromettre les validations obligatoires.
 
