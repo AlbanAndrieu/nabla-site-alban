@@ -31,7 +31,8 @@ export function diagnoseHomelabAccessNetwork(
 		reason =
 			trusted &&
 			identityRequired &&
-			env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED !== "false"
+			(env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED === undefined ||
+				env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED.trim().toLowerCase() === "true")
 				? "authorized-remote-identity"
 				: "client-ip-outside-trusted-cidrs";
 	} else if (identityRequired && !trusted) reason = "identity-not-authorized";
