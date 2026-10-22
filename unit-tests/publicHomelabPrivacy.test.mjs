@@ -53,7 +53,8 @@ test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Acce
 	assert.match(body, /response\.headers\.set\(name, value\)/);
 
 	const access = read("app/api/homelab-access/route.ts");
-	assert.match(access, /\{ trusted: decision\.trusted \}/);
+	assert.match(access, /publicRemoteReadOnlyEnabled\(\)/);
+	assert.match(read("lib/remoteHomelabReadOnly.ts"), /PUBLIC_READONLY_PATHS/);
 	assert.match(access, /no-store/);
 });
 
