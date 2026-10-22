@@ -23,19 +23,18 @@ export function diagnoseHomelabAccessNetwork(
 	const identityRequired = Boolean(
 		env.CF_ACCESS_TEAM_DOMAIN || env.CF_ACCESS_AUD,
 	);
+	const signedRemoteOwner =
+		trusted &&
+		identityRequired &&
+		(env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED === undefined ||
+			env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED.trim().toLowerCase() === "true");
 	let reason: string;
 	if (!platformTrusted) reason = "runtime-unverified";
+	else if (signedRemoteOwner && !networkAllowed) reason = "authorized-remote-identity";
 	else if (cidrs.length === 0) reason = "trusted-cidrs-not-configured";
 	else if (family === 0) reason = "client-ip-unavailable";
-	else if (!networkAllowed) {
-		reason =
-			trusted &&
-			identityRequired &&
-			(env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED === undefined ||
-				env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED.trim().toLowerCase() === "true")
-				? "authorized-remote-identity"
-				: "client-ip-outside-trusted-cidrs";
-	} else if (identityRequired && !trusted) reason = "identity-not-authorized";
+	else if (!networkAllowed) reason = "client-ip-outside-trusted-cidrs";
+	else if (identityRequired && !trusted) reason = "identity-not-authorized";
 	else reason = "authorized";
 	return {
 		reason,
