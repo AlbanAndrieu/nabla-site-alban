@@ -1,5 +1,18 @@
 # Feuille de route produit et qualité
 
+## P1 — Parité CI local-first avec nabla-compose (22 octobre)
+
+- [x] Les jobs déclenchés par pull_request respectent le cycle Draft/Ready pour réduire les minutes, sans `[skip ci]`.
+- [x] Les workflows CI et Trivy suivent explicitement `Dockerfile.k8s*` ; l'image Nginx historique reste testée séparément.
+- [x] shfmt passe du hook Docker à shfmt natif, avec Go géré par mise et invocation `agent-quality-gate.sh` synchronisée.
+- [x] Test de contrat autonome `ciBudgetConvergence.test.mjs` intégré à pre-commit pour détecter toute régression de la politique Draft et du périmètre Dockerfile.
+- [x] `just source-check` exécute aussi les contrats CI et l'inventaire GitHub Actions hors ligne, sans dépendre d'un GitHub Runner ni des dépendances Node.
+- [x] L'inventaire Actions de nabla-compose PR #269 (Draft) est porté avec pagination bornée, validation des identifiants et détection d'inventaire incomplet.
+- [ ] Passer la quality gate complète `npm run quality:agent:publish` avec Go/npm/Node installés, sur checkout exact et propre ; ne pas confondre revue de fichiers et preuve L3.
+- [ ] Vérifier les politiques GitHub Rulesets et que les check runs de sécurité sont réellement requis lors du Ready.
+- [ ] Éviter de dupliquer les scans : les hooks actionlint, zizmor, Hadolint et BetterLeaks existaient déjà dans ce site.
+
+
 Dernière réconciliation : 18 octobre 2026 (5 dernières PR fusionnées).
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants

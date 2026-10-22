@@ -4,7 +4,7 @@
 - [x] Inclure les fichiers `Dockerfile.k8s*` dans les filtres CI et Trivy filesystem ; ne pas les faire construire par le workflow Nginx de secours.
 - [x] Remplacer le hook shfmt-docker par shfmt natif comme dans nabla-compose, avec Go 1.25.12 géré par mise. Le premier bootstrap du hook requiert Go et l'accès aux dépendances, **non validés ici**.
 - [x] Adapter l'inventaire GitHub Actions à la proposition bornée de nabla-compose #269 (encore Draft) : pagination limitée, validation des IDs, métriques partielles en échec explicite et tests hors ligne indépendants de GitHub CLI. Les tests du vrai checkout restent à exécuter.
-- [ ] Exécuter `just hooks`, quality fix/publish, actionlint, zizmor, BetterLeaks et Next.js build dans un checkout complet avant revue. Aucun GitHub Actions lancé.
+- [ ] Exécuter `just hooks`, quality fix/publish, actionlint, zizmor, BetterLeaks et Next.js build dans un checkout complet avant revue. Source-check ajoute désormais le contrat CI et les tests Actions, sans prétendre à une preuve de publication. Aucun GitHub Actions lancé.
 - [ ] Auditer puis réduire les droits de mutation du workflow MegaLinter sur les PRs externes, sans compromettre les validations obligatoires.
 
 ## P1 — Image Next.js pour Talos/Kubernetes (22 octobre 2026)

@@ -34,4 +34,7 @@ test("shell formatter matches native Compose pattern without a Docker daemon", (
 	assert.match(config, /-\s+id: shfmt\n/);
 	assert.doesNotMatch(config, /id: shfmt-docker/);
 	assert.match(read("mise.toml"), /go = "1\.25\.12"/);
+	const gate = read("scripts/agent-quality-gate.sh");
+	assert.match(gate, /pre-commit run shfmt --files/);
+	assert.doesNotMatch(gate, /shfmt-docker/);
 });
