@@ -15,6 +15,7 @@ async function probesResponse() {
 		ownerUpstreamBlocked(
 			process.env.VERCEL_ENV,
 			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
 		)
 	) {
 		return NextResponse.json(

@@ -3,6 +3,7 @@ import {
 	type HomelabCatalogV2,
 } from "./homelabCatalogV2";
 import { catalogServiceSlug } from "./homelabCatalogV2Names";
+import { homelabCatalogIconSrc } from "./homelabCatalogIcons";
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 
@@ -29,6 +30,7 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			id,
 			entityRef: view.entityRef,
 			name: view.name,
+			iconSrc: homelabCatalogIconSrc(id),
 			description: view.description,
 			kind,
 			category,

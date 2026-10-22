@@ -1,3 +1,13 @@
+## P0 — Restauration diagnostics OWNER depuis Wi-Fi + icônes (23 octobre 2026)
+
+- [x] L'accès OWNER à la page est déjà vérifié via l'edge Vercel ; ne pas confondre cette IP navigateur et l'egress Vercel vers FastAPI.
+- [x] Lever le blocage site OWNER uniquement en présence de `DIAGNOSTICS_ACCESS_KEY` côté serveur et d'une requête déjà passée par `gatedHomelabResponse`. Conserver `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED=false` comme arrêt d'urgence.
+- [x] Envoyer `X-Diagnostics-Key` aux trois sources FastAPI (health-board, aggregate, probes), sans chaîne de redirection et sans exposer la clé au navigateur.
+- [x] Rendre les icônes statiques indépendantes des observations runtime : projection canonique Backstage v2 → assets SVG publics autorisés.
+- [ ] Confirmer en production l'activation temporaire FastAPI `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true`, la correspondance de la clé, et le comportement HTTP 200 versus 401/403/503 depuis la vraie IP domestique.
+- [ ] Après disponibilité du relais OWNER authentifié, remettre les deux drapeaux FastAPI et Site à leurs valeurs restrictives ; ne jamais autoriser l'egress Vercel dans `HOMELAB_TRUSTED_CIDRS`.
+- [ ] Compiler et tester le dépôt entier, rebase PR #247 sur master puis Preview exact-SHA avant fusion ; GitHub Actions indisponibles et aucune mise en production faite.
+
 ## P0 — Une seule image Dockerfile pour Talos (23 octobre 2026)
 
 - [x] Le Dockerfile racine devient l'application complète Next.js SSR/API (port 3000), non-root et multi-stage ; supprimer Dockerfile.k8s et son ignore spécifique.

@@ -75,3 +75,13 @@ authentifié**, et non l’ajout de l’adresse de sortie Vercel aux CIDR de con
 Aucun test live depuis le Wi-Fi ni déploiement n’a été réalisé dans cette
 session ; les contrôles ciblés isolés ne remplacent pas les quality gates du
 dépôt.
+
+## Diagnostic propriétaire enrichi depuis le domicile — 23 octobre 2026
+
+FastAPI `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true` supprime **temporairement** son second facteur CIDR, mais conserve le contrôle `X-Diagnostics-Key` ; cette exception ne rend pas les endpoints OWNER publics. Le navigateur est vérifié indépendamment par `gatedHomelabResponse` (IP domestique / identité autorisée) à chaque requête Next.js.
+
+Lorsque la clé `DIAGNOSTICS_ACCESS_KEY` existe **uniquement côté serveur Vercel**, les requêtes OWNER vers FastAPI sont désormais possibles depuis une requête navigateur déjà autorisée ; la clé est envoyée côté serveur et jamais réexposée dans le JSON ou les bundles. `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED=false` referme explicitement le chemin. Absence de clé sur Vercel = motif `owner-boundary`, pas d'anonymisation artificielle des réponses.
+
+L’inventaire SERVICE Backstage v2 n'ayant pas de champ d'icône, le site réintroduit des icônes statiques par ID canonique ; les icônes restent disponibles même si l'API runtime est inaccessible. L’état de santé reste `unknown` sans preuve courante ; aucune fausse donnée runtime n’est produite.
+
+**Préconditions runtime non vérifiées** : le déploiement Vercel actif porte le HEAD requis ; la clé Vercel correspond à FastAPI ; FastAPI applique toujours le switch temporaire ; `/api/homelab-health`, `/api/homelab-probes` et `/api/homelab-observability` renvoient des données autorisées. Contrôler les trois séparément après Preview exact-SHA.

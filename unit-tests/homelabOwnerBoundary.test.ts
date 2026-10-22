@@ -3,15 +3,20 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
 	OWNER_BOUNDARY_REASON,
+	ownerDiagnosticHeaders,
 	ownerUpstreamBlocked,
 } from "../lib/homelabOwnerBoundary";
 
 test("SERVER owner boundary never equates SERVICE credentials with OWNER", () => {
 	assert.equal(ownerUpstreamBlocked("production", undefined), true);
+	assert.equal(ownerUpstreamBlocked("production", undefined, "server-secret"), false);
+	assert.equal(ownerUpstreamBlocked("production", "false", "server-secret"), true);
 	assert.equal(ownerUpstreamBlocked("preview", "false"), true);
-	assert.equal(ownerUpstreamBlocked("production", "true"), false);
+	assert.equal(ownerUpstreamBlocked("production", "true", "server-secret"), false);
 	assert.equal(ownerUpstreamBlocked(undefined, undefined), false);
 	assert.equal(OWNER_BOUNDARY_REASON, "owner-boundary");
+	assert.deepEqual(ownerDiagnosticHeaders("server-secret"), { "X-Diagnostics-Key": "server-secret" });
+	assert.deepEqual(ownerDiagnosticHeaders(undefined), {});
 });
 
 test("owner proxy routes retain the owner gate and no-store boundary status", () => {

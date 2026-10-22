@@ -1,3 +1,4 @@
+import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
 export type FastApiHealthBoardState = "pending" | "fresh" | "stale";
 
 export type FastApiHealthBoardSnapshot = {
@@ -126,8 +127,11 @@ async function loadFastApiHealthBoardUncached(
 	// A Vercel machine key cannot bypass FastAPI's OWNER source-CIDR boundary.
 	// Only the separate, narrow SERVICE v2 feed is suitable for this deployment.
 	if (
-		process.env.VERCEL_ENV &&
-		process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED !== "true"
+		ownerUpstreamBlocked(
+			process.env.VERCEL_ENV,
+			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
+		)
 	) {
 		return { board: null, primaryUrl, error: "owner-upstream-disabled" };
 	}
@@ -138,10 +142,12 @@ async function loadFastApiHealthBoardUncached(
 		const response = await fetchImpl(primaryUrl, {
 			headers: {
 				Accept: "application/json",
+				...ownerDiagnosticHeaders(process.env.DIAGNOSTICS_ACCESS_KEY),
 				"User-Agent": "nabla-site-health-board/1.0",
 			},
 			signal: controller.signal,
 			cache: "no-store",
+			redirect: "error",
 		});
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		const board = parseFastApiHealthBoard(await response.json());
