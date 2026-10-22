@@ -125,7 +125,10 @@ export default function MobileArchitectureHierarchy({
 		() => new Set(["foundation", "shared-data", "shared-platform"]),
 	);
 	const index = useMemo(() => healthIndex(snapshot), [snapshot]);
-	const projectedStates = siteHealthIndex(siteHealth, catalog.catalogRevision);
+	const projectedStates = useMemo(
+		() => siteHealthIndex(siteHealth, catalog.catalogRevision),
+		[siteHealth, catalog.catalogRevision],
+	);
 	const criticality = useMemo(() => analyzeServiceCriticality(topology), [topology]);
 	const namesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node.name])),
