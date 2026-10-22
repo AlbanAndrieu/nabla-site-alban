@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-export type HomelabAccessState = "pending" | "trusted" | "denied";
+export type HomelabAccessState = "pending" | "trusted" | "readonly" | "denied";
 
 // One probe per page load shared by every gate on the page (TrueNAS mounts
 // two). A failed probe is forgotten so the next mount can retry.
-let accessProbe: Promise<boolean> | null = null;
+let accessProbe: Promise<HomelabAccessState> | null = null;
 
-async function probeHomelabAccess(): Promise<boolean> {
+async function probeHomelabAccess(): Promise<HomelabAccessState> {
 	const response = await fetch("/api/homelab-access", {
 		cache: "no-store",
 		credentials: "same-origin",
@@ -16,17 +16,16 @@ async function probeHomelabAccess(): Promise<boolean> {
 	});
 	if (!response.ok) throw new Error(`access HTTP ${response.status}`);
 	const body: unknown = await response.json();
-	return (
-		typeof body === "object" &&
-		body !== null &&
-		(body as { trusted?: unknown }).trusted === true
-	);
+	if (typeof body !== "object" || body === null) return "denied";
+	const result = body as { trusted?: unknown; mode?: unknown };
+	if (result.trusted !== true) return "denied";
+	return result.mode === "public-readonly" ? "readonly" : "trusted";
 }
 
-function sharedAccessProbe(): Promise<boolean> {
+function sharedAccessProbe(): Promise<HomelabAccessState> {
 	accessProbe ??= probeHomelabAccess().catch(() => {
 		accessProbe = null;
-		return false;
+		return "denied";
 	});
 	return accessProbe;
 }
@@ -41,8 +40,8 @@ export default function useHomelabAccess(): HomelabAccessState {
 
 	useEffect(() => {
 		let active = true;
-		sharedAccessProbe().then((trusted) => {
-			if (active) setState(trusted ? "trusted" : "denied");
+		sharedAccessProbe().then((access) => {
+			if (active) setState(access);
 		});
 		return () => {
 			active = false;
