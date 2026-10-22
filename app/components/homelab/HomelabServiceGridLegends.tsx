@@ -42,6 +42,14 @@ export default function HomelabServiceGridLegends() {
 				</span>
 				<span>
 					<i
+						className={RUNTIME_ICON_CLASS.unknown}
+						style={{ color: homelabHealthColor("unknown") }}
+						aria-hidden="true"
+					/>{" "}
+					{t("runtime.legendUnknown")}
+				</span>
+				<span>
+					<i
 						className={RUNTIME_ICON_CLASS.missing}
 						style={{ color: homelabHealthColor("unknown") }}
 						aria-hidden="true"

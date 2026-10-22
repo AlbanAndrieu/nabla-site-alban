@@ -49,12 +49,14 @@
 			"running": "TrueNAS signale l’état applicatif {state}",
 			"failed": "TrueNAS signale l’état applicatif en échec {state}",
 			"degraded": "TrueNAS signale l’état applicatif transitoire/dégradé {state}",
-			"missing": "Aucun statut applicatif TrueNAS courant n’est disponible",
+			"missing": "Application absente de l’inventaire TrueNAS confirmé",
+			"unknown": "Statut applicatif TrueNAS non observable pour le moment",
 			"legendTitle": "Statut applicatif TrueNAS",
 			"legendRunning": "en cours / sain",
 			"legendDegraded": "transitoire / dégradé",
 			"legendFailed": "arrêté / en échec",
-			"legendMissing": "aucun statut runtime courant"
+			"legendUnknown": "statut non observable",
+			"legendMissing": "absence confirmée du runtime"
 		},
 		"dependency": {
 			"blockedBy": "Bloqué par des dépendances requises : {services}",
@@ -134,7 +136,7 @@
 			"apiUnavailable": "Le test de l’API TrueNAS est indisponible : {error}.",
 			"runtimeUnavailable": "Le runtime TrueNAS app.query est injoignable.",
 			"runtimeStale": "Le snapshot runtime TrueNAS est périmé.",
-			"runtimeDependencyNote": "Les icônes runtime des applications utilisent un crâne tant qu’aucun statut TrueNAS courant n’est disponible.",
+			"runtimeDependencyNote": "Les icônes inconnues indiquent une observation absente ou périmée ; le crâne est réservé à une absence explicitement confirmée par TrueNAS.",
 			"networkError": "erreur réseau",
 			"noErrorDetail": "aucun détail d’erreur",
 			"internalTlsTitle": "Le certificat TLS interne n’est pas vérifié par le test TCP côté serveur",

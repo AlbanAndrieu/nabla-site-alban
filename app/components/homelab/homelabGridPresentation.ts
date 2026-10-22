@@ -219,9 +219,11 @@ export function runtimePresentationState(
 		runtimeUnavailable ||
 		runtimeStale ||
 		entry?.runtime_stale === true ||
+		entry?.observation_stale === true ||
 		entry?.runtime_reachable === false
 	) {
-		return "missing";
+		return "unknown";
 	}
-	return runtimeHealthState(entry?.runtime_state) ?? "missing";
+	if (entry?.runtime_missing === true) return "missing";
+	return runtimeHealthState(entry?.runtime_state) ?? "unknown";
 }
