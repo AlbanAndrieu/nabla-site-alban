@@ -17,6 +17,7 @@ import {
 	type ServicePresentationGroup,
 } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
+import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 
@@ -24,6 +25,7 @@ type Props = {
 	catalog: HomelabServicesCatalog;
 	topology: ServiceTopology;
 	snapshot: HomelabHealthSnapshot | null;
+	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
 };
 
@@ -92,6 +94,7 @@ export default function ArchitectureServiceHierarchy({
 	catalog,
 	topology,
 	snapshot,
+	siteHealth = null,
 	healthUnavailable = false,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
@@ -105,6 +108,7 @@ export default function ArchitectureServiceHierarchy({
 		[catalog, topology],
 	);
 	const indexedHealth = useMemo(() => healthById(snapshot), [snapshot]);
+	const projectedHealth = siteHealthIndex(siteHealth, catalog.catalogRevision);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {
@@ -125,7 +129,12 @@ export default function ArchitectureServiceHierarchy({
 				{groups.map((group) => {
 					const issueCount = group.catalog.services.filter((service) => {
 						const entry = indexedHealth.get(homelabServiceId(service));
-						return !entry || resolveEffectiveServiceState(entry).effectiveState !== "ok";
+						const projectedState = service.entityRef
+							? projectedHealth.get(service.entityRef)
+							: undefined;
+						return (entry
+							? resolveEffectiveServiceState(entry).effectiveState
+							: projectedState ?? "unknown") !== "ok";
 					}).length;
 					return (
 					<details
