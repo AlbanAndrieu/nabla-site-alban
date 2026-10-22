@@ -133,9 +133,10 @@ function usePrivateArchitectureData(enabled: boolean) {
 export default function ArchitecturePrivateViews({
 	locale,
 }: Readonly<{ locale: string }>) {
-	const trusted = useHomelabAccess() === "trusted";
-	const { data, status, reason, retry } = usePrivateArchitectureData(trusted);
-	if (!trusted) return null;
+	const access = useHomelabAccess();
+	const visible = access === "trusted" || access === "readonly";
+	const { data, status, reason, retry } = usePrivateArchitectureData(visible);
+	if (!visible) return null;
 	const french = locale === "fr";
 	if (status === "error")
 		return (
@@ -156,6 +157,23 @@ export default function ArchitecturePrivateViews({
 			</div>
 		);
 
+	if (access === "readonly")
+		return (
+			<div data-homelab-public-readonly-view className="container py-4">
+				<p role="status">
+					{french
+						? "Cartographie publiée en lecture seule ; les diagnostics réseau internes restent privés."
+						: "Published read-only architecture; private network diagnostics remain restricted."}
+				</p>
+				<ArchitectureTopologyView
+					locale={locale}
+					initialCatalog={data.catalog}
+					initialCatalogSource={data.catalogSource}
+					initialTopology={data.topology}
+					initialTopologySource="fastapi"
+				/>
+			</div>
+		);
 	return (
 		<div data-homelab-private-view>
 			<ArchitectureSectionNav locale={locale} />
