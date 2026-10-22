@@ -10,6 +10,7 @@ const RUNTIME_ICON_CLASS = {
 	ok: "fas fa-circle-check",
 	warn: "fas fa-triangle-exclamation",
 	fail: "fas fa-circle-xmark",
+	unknown: "fas fa-circle-question",
 	missing: "fas fa-skull-crossbones",
 } as const;
 
