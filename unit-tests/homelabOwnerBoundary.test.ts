@@ -15,7 +15,9 @@ test("SERVER owner boundary never equates SERVICE credentials with OWNER", () =>
 	assert.equal(ownerUpstreamBlocked("production", "true", "server-secret"), false);
 	assert.equal(ownerUpstreamBlocked(undefined, undefined), false);
 	assert.equal(OWNER_BOUNDARY_REASON, "owner-boundary");
-	assert.deepEqual(ownerDiagnosticHeaders("server-secret"), { "X-Diagnostics-Key": "server-secret" });
+	assert.deepEqual(ownerDiagnosticHeaders("server-secret"), {
+		"X-Diagnostics-Key": "server-secret",
+	});
 	assert.deepEqual(ownerDiagnosticHeaders(undefined), {});
 });
 
@@ -43,7 +45,7 @@ test("browser preserves SERVICE v2 polling after identifying the OWNER boundary"
 	assert.match(source, /fetch\("\/api\/homelab-health-v2"/);
 });
 
-test("all server-side OWNER upstream consumers use the key and honor the access boundary", () => {
+test("OWNER upstream readers keep access boundaries and server-only credentials", () => {
 	for (const sourcePath of [
 		"lib/fastApiHealthBoard.ts",
 		"lib/homelabHealthTransport.ts",
@@ -52,7 +54,11 @@ test("all server-side OWNER upstream consumers use the key and honor the access 
 	]) {
 		const source = readFileSync(new URL(`../${sourcePath}`, import.meta.url), "utf8");
 		assert.match(source, /ownerUpstreamBlocked\(/, sourcePath);
-		assert.match(source, /ownerDiagnosticHeaders\(process\.env\.DIAGNOSTICS_ACCESS_KEY\)/, sourcePath);
+		assert.match(
+			source,
+			/ownerDiagnosticHeaders\(process\.env\.DIAGNOSTICS_ACCESS_KEY\)/,
+			sourcePath,
+		);
 		assert.match(source, /redirect: "error"/, sourcePath);
 	}
 });
