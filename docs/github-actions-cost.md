@@ -32,3 +32,9 @@ usage. Run `--repo NAME` to narrow scope or repeat it to select multiple
 repositories. Review the worst offenders before adding jobs or artifacts, keep
 PDF uploads at one day, and preserve mandatory security checks on Ready for
 review.
+
+## Copilot Setup Steps sur les PR Draft (23 octobre 2026)
+
+Le workflow `.github/workflows/copilot-setup-steps.yml` ne conditionnait pas son job au statut Draft et pouvait démarrer une installation complète (Python, mise, pre-commit, npm) lors des itérations agent, même si les autres workflows ignoraient les Drafts. Ajouter la condition au job `copilot-setup-steps` : `pull_request` Draft est `skipped`, `ready_for_review` déclenche le setup requis, `workflow_dispatch` reste explicite. Aucun assouplissement des contrôles de qualité ni changement de nom de job.
+
+Une exécution initiée **avant** cette correction peut continuer ; une modification du workflow ne l'annule pas rétroactivement.
