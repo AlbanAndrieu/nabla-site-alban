@@ -1,5 +1,21 @@
 # Préparation Nabla Site Alban sur Talos/Kubernetes
 
+## Deux conteneurs, pas deux moteurs de déploiement
+
+Le site publié sur **Vercel** est construit avec l'intégration native Next.js ;
+dans la configuration actuelle du projet, le Dockerfile du dépôt n'est pas
+l'image utilisée par Vercel. Le `Dockerfile` existant fabrique un **fallback
+statique Nginx** et dispose déjà de son workflow et de ses tests de non-régression.
+Il ne sait pas exécuter les API Next.js.
+
+Le `Dockerfile.k8s` est donc volontairement séparé pour produire un serveur
+**Next.js complet** sur Talos sans transformer silencieusement la publication
+Nginx. Les deux fichiers ne doivent pas être confondus dans les tags GHCR.
+La consolidation en un Dockerfile multi-target (`fallback` et `standalone`)
+est une optimisation différée jusqu'à un build/scan de l'image Talos vérifié
+sur une machine disposant de Docker.
+
+
 ## Cible et limites
 
 Recette **privée** sur `alban-site.int.albandrieu.com` via le Traefik du cluster Talos TrueNAS. Aucune bascule de DNS public, aucun changement du site Vercel actuel.

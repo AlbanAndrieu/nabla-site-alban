@@ -5,6 +5,7 @@
 - [x] Les jobs déclenchés par pull_request respectent le cycle Draft/Ready pour réduire les minutes, sans `[skip ci]`.
 - [x] Les workflows CI et Trivy suivent explicitement `Dockerfile.k8s*` ; l'image Nginx historique reste testée séparément.
 - [x] shfmt passe du hook Docker à shfmt natif, avec Go géré par mise et invocation `agent-quality-gate.sh` synchronisée.
+- [x] Tests Python du rapport Actions rattachés au pre-commit modifié, sans appel externe ; détection des régressions y compris hors GitHub Actions.
 - [x] Test de contrat autonome `ciBudgetConvergence.test.mjs` intégré à pre-commit pour détecter toute régression de la politique Draft et du périmètre Dockerfile.
 - [x] `just source-check` exécute aussi les contrats CI et l'inventaire GitHub Actions hors ligne, sans dépendre d'un GitHub Runner ni des dépendances Node.
 - [x] L'inventaire Actions de nabla-compose PR #269 (Draft) est porté avec pagination bornée, validation des identifiants et détection d'inventaire incomplet.

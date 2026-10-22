@@ -603,6 +603,13 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         files: ^(\.github/workflows/(ci|docker-build|mega-linter|security-rss-opml|security-supply-chain)\.yml|\.pre-commit-config\.yaml|mise\.toml|scripts/agent-quality-gate\.sh|unit-tests/ciBudgetConvergence\.test\.mjs)$
+    -   id: github-actions-usage-contract
+        name: "🧮 actions · Validate bounded usage inventory locally"
+        language: system
+        entry: python3 -m unittest discover -s unit-tests -p test_github_actions_usage.py
+        pass_filenames: false
+        stages: [pre-commit]
+        files: ^(scripts/github-actions-usage[.]py|unit-tests/test_github_actions_usage[.]py|justfile)$
     -   id: generate-security-rss
         name: "📰 RSS · Regenerate public JSON from authoritative OPML"
         entry: node scripts/generate-security-rss.mjs
