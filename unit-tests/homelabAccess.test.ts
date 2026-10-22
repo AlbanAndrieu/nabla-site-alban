@@ -293,6 +293,8 @@ test("a valid JWT from outside the home IP is still denied", async () => {
 });
 
 test("gated responses are a neutral 404 for anonymous visitors", async () => {
+	const previous = process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	process.env.HOMELAB_PUBLIC_READONLY_ENABLED = "false";
 	let handled = false;
 	const response = await gatedHomelabResponse(
 		new Request("https://www.albanandrieu.com/api/homelab-services", {
@@ -312,6 +314,8 @@ test("gated responses are a neutral 404 for anonymous visitors", async () => {
 	assert.deepEqual(await response.json(), {
 		error: "Operational homelab data is private",
 	});
+	if (previous === undefined) delete process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	else process.env.HOMELAB_PUBLIC_READONLY_ENABLED = previous;
 });
 
 test("trusted responses always override caching with private no-store", async () => {
@@ -349,6 +353,8 @@ test("trusted responses always override caching with private no-store", async ()
 });
 
 test("access probe answers only a boolean and is never cached", async () => {
+	const previous = process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	process.env.HOMELAB_PUBLIC_READONLY_ENABLED = "false";
 	const response = await GET_ACCESS(
 		new Request("https://www.albanandrieu.com/api/homelab-access", {
 			headers: {
@@ -363,4 +369,6 @@ test("access probe answers only a boolean and is never cached", async () => {
 		/private, no-store/,
 	);
 	assert.deepEqual(await response.json(), { trusted: false });
+	if (previous === undefined) delete process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
+	else process.env.HOMELAB_PUBLIC_READONLY_ENABLED = previous;
 });
