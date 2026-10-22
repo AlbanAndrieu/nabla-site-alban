@@ -133,7 +133,9 @@ test("gates ask the server first and dynamically import the private views", () =
 	assert.match(hook, /fetch\("\/api\/homelab-access"/);
 	assert.match(hook, /cache: "no-store"/);
 	assert.match(hook, /useState<HomelabAccessState>\("pending"\)/);
-	assert.match(hook, /setState\(trusted \? "trusted" : "denied"\)/);
+	assert.match(hook, /setState\(access\)/);
+	assert.match(hook, /"readonly"/);
+	assert.match(read("app/components/homelab/HomelabPrivateServices.tsx"), /data-homelab-public-readonly-view/);
 });
 
 test("owner cards preserve the historical #service-* link after async access", () => {
