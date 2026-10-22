@@ -18,7 +18,7 @@ test("paid PR jobs skip drafts and can run on ready_for_review", () => {
 test("Copilot setup never allocates a paid runner on Draft PRs", () => {
 	const workflow = read(".github/workflows/copilot-setup-steps.yml");
 	assert.match(workflow, /name: "Copilot Setup Steps"/);
-	assert.match(workflow, /github\\.event\\.pull_request\\.draft == false/);
+	assert.match(workflow, /github\.event\.pull_request\.draft == false/);
 	assert.match(workflow, /workflow_dispatch:/);
 });
 
