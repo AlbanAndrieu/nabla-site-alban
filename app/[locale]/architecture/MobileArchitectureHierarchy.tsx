@@ -19,6 +19,7 @@ import {
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
 import type { ServiceTopology, ServiceTopologyRelation } from "@/lib/serviceTopology";
+import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import styles from "./MobileArchitectureHierarchy.module.css";
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
 	catalog: HomelabServicesCatalog;
 	topology: ServiceTopology;
 	snapshot: HomelabHealthSnapshot | null;
+	siteHealth?: SiteHealthV2 | null;
 };
 
 type HealthIndex = {
@@ -114,6 +116,7 @@ export default function MobileArchitectureHierarchy({
 	catalog,
 	topology,
 	snapshot,
+	siteHealth = null,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const [criticalOnly, setCriticalOnly] = useState(true);
@@ -122,6 +125,7 @@ export default function MobileArchitectureHierarchy({
 		() => new Set(["foundation", "shared-data", "shared-platform"]),
 	);
 	const index = useMemo(() => healthIndex(snapshot), [snapshot]);
+	const projectedStates = siteHealthIndex(siteHealth, catalog.catalogRevision);
 	const criticality = useMemo(() => analyzeServiceCriticality(topology), [topology]);
 	const namesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node.name])),
@@ -150,7 +154,9 @@ export default function MobileArchitectureHierarchy({
 						service,
 						id,
 						health,
-						state: stateOf(health),
+						state: health
+							? stateOf(health)
+							: (service.entityRef ? projectedStates.get(service.entityRef) : undefined) ?? "unknown",
 						criticality: criticality.get(id),
 					};
 				});
@@ -162,7 +168,7 @@ export default function MobileArchitectureHierarchy({
 					: "unknown" as HomelabHealthState,
 			};
 		}).filter((group) => group.services.length > 0);
-	}, [catalog.services, criticalOnly, criticality, index]);
+	}, [catalog.services, criticalOnly, criticality, index, projectedStates]);
 
 	const setTierExpanded = (tier: ServiceCriticalityTier, open: boolean) => {
 		setExpandedTiers((current) => {
