@@ -83,6 +83,8 @@ const baselineSecurityHeaders = [
 
 const nextConfig = {
 	reactStrictMode: true,
+	// Vercel keeps its normal build; Talos image alone emits the full Node server.
+	...(process.env.NABLA_K8S_BUILD === "1" ? { output: "standalone" } : {}),
 	poweredByHeader: false,
 	/** AGENTS.md is curated by hand: stop `next dev` from injecting its generic agent-rules block. */
 	agentRules: false,

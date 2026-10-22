@@ -1,3 +1,13 @@
+## P1 — Image Next.js pour Talos/Kubernetes (22 octobre 2026)
+
+- [x] Conserver le fallback Nginx (Dockerfile) et préparer Dockerfile.k8s distinct pour Next.js standalone SSR/API, Node 26.8.2 et npm 12.2, UID/GID 10001 et port 3000.
+- [x] Ajouter un contexte Docker spécifique excluant les secrets, un smoke read-only avec frontière OWNER fermée et des cibles justfile sans Actions.
+- [x] Aligner le conteneur sur scripts/talos/deploy-site-alban.sh déjà présent dans nabla-compose ; déploiement Talos limité au hostname privé de recette, sans bascule de www.albanandrieu.com.
+- [ ] Protéger le déploiement par Traefik TLS/LAN-only, fournir le cache .next writable en emptyDir et une Secret Kubernetes via GitOps (source d'autorité nabla-compose).
+- [ ] Construire, scanner Trivy et publier une image par digest sur une machine avec Docker/Node/npm ; procéder au preflight Talos et dry-run serveur puis effectuer un smoke HTTPS.
+- [ ] Ne pas contourner lib/homelabAccess.ts : le contrôle OWNER basé sur les entêtes Vercel ne reconnaît pas le proxy Traefik, faute de chaîne de confiance validée.
+- [ ] Quality gate, tests Next.js complets et mise en production : non exécutés dans l'environnement agent sans checkout ni Docker.
+
 ## P0 — Résilience UI TrueNAS / frontière OWNER (22 octobre 2026)
 
 - [x] Déduire du code la cause structurelle de la réponse OWNER 503 sur Vercel :

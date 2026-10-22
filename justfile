@@ -106,3 +106,13 @@ bench-fast-check:
     hyperfine --warmup 1 --min-runs 3 \
         'hk run fast-check' \
         'npm run lint && npm run lint:css && npm run typecheck'
+
+# Talos private staging: never starts a GitHub workflow or deploys automatically.
+k8s-contract:
+    node --test unit-tests/k8sStandaloneContract.test.mjs
+
+k8s-build tag="nabla-site-alban:talos":
+    docker build --pull -f Dockerfile.k8s -t "{{tag}}" .
+
+k8s-smoke tag="nabla-site-alban:talos":
+    bash scripts/k8s/smoke-standalone.sh "{{tag}}"
