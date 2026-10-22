@@ -7,7 +7,6 @@ const paths = [
 	".github/workflows/security-supply-chain.yml",
 	".github/workflows/docker-build.yml",
 	".github/workflows/security-rss-opml.yml",
-	".github/workflows/mega-linter.yml",
 ];
 test("paid PR jobs skip drafts and can run on ready_for_review", () => {
 	for (const path of paths) {
@@ -37,4 +36,12 @@ test("shell formatter matches native Compose pattern without a Docker daemon", (
 	const gate = read("scripts/agent-quality-gate.sh");
 	assert.match(gate, /pre-commit run shfmt --files/);
 	assert.doesNotMatch(gate, /shfmt-docker/);
+});
+test("MegaLinter is manual, read-only and cannot make auto-fix commits", () => {
+	const workflow = read(".github/workflows/mega-linter.yml");
+	assert.match(workflow, /^  workflow_dispatch:/m);
+	assert.doesNotMatch(workflow, /^  (?:pull_request|push):/m);
+	assert.match(workflow, /permissions:\n  contents: read/);
+	assert.match(workflow, /APPLY_FIXES: none/);
+	assert.doesNotMatch(workflow, /contents: write|pull-requests: write|git push/);
 });
