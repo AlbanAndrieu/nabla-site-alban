@@ -29,6 +29,7 @@ type Props = {
 	topologySource: ServiceTopologySource;
 	healthStatus: HomelabHealthSnapshot | null;
 	healthSource: ArchitectureHealthSource;
+	readOnly?: boolean;
 };
 
 export default function HierarchicalArchitectureExplorer({
@@ -39,6 +40,7 @@ export default function HierarchicalArchitectureExplorer({
 	topologySource,
 	healthStatus,
 	healthSource,
+	readOnly = false,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const {
@@ -61,6 +63,7 @@ export default function HierarchicalArchitectureExplorer({
 		catalog,
 		topology,
 		healthStatus,
+		readOnly,
 	});
 
 	return (
