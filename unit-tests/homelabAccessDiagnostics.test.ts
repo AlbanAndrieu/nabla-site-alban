@@ -73,7 +73,7 @@ test("default access response remains boolean; explicit diagnostics do not echo 
 		"utf8",
 	);
 	assert.match(route, /get\("diagnose"\) === "1"/);
-	assert.match(route, /: \{ trusted: decision\.trusted \}/);
+	assert.match(route, /publicRemoteReadOnlyEnabled\(\)/);
 	assert.match(route, /private, no-store, max-age=0/);
 	const view = readFileSync(
 		new URL(
