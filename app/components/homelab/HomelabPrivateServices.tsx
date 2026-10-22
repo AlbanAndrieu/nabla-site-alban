@@ -37,6 +37,17 @@ export default function HomelabPrivateServices() {
 				</Link>
 			</p>
 		);
+	if (access === "readonly")
+		return (
+			<div data-homelab-public-readonly-view>
+				<p role="status">
+					{french
+						? "Consultation extérieure en lecture seule : catalogue et états publiables uniquement. Les sondes détaillées restent privées."
+						: "External read-only view: published catalog and health states only. Detailed probes remain private."}
+				</p>
+				<HomelabServicesBlock />
+			</div>
+		);
 	return (
 		<div data-homelab-private-view>
 			<div className={styles.serviceFirst} data-service-first-homelab-view>
