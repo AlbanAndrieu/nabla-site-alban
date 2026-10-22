@@ -1,3 +1,24 @@
+## P0 — Résilience UI TrueNAS / frontière OWNER (22 octobre 2026)
+
+- [x] Déduire du code la cause structurelle de la réponse OWNER 503 sur Vercel :
+  `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED` désactivé par défaut ; ne pas le réactiver
+  sans relais d’identité propriétaire validé.
+- [x] Classifier explicitement le 503 `owner-boundary` dans les deux routes
+  protégées, court-circuiter l'amont et éviter leur polling répété depuis le
+  navigateur ; continuer la collecte SERVICE v2.
+- [x] Corriger les faux crânes TrueNAS : `unknown` lorsque la télémétrie est
+  absente ou périmée ; `missing` exclusivement lorsque `runtime_missing`
+  est confirmé sur des données courantes.
+- [ ] **Recette live sur le réseau autorisé** : comparer les réponses
+  `/api/homelab-health-v2`, `/api/homelab-catalog-v2` et le motif OWNER
+  `/api/homelab-health` après déploiement du HEAD exact.
+- [ ] **Diagnostics enrichis** : définir un relais OWNER sécurisé (Access/JWT
+  vérifié, RBAC, audit, anti-replay, TLS), sans accepter l’egress Vercel comme
+  identité humaine.
+- [ ] Quality gate locale complète, tests Playwright et comportement Production
+  vérifié une fois le checkout Node/npm compatible disponible ; pas d'Actions
+  GitHub coûteuses dans le quota actuel.
+
 ## P0 — Unicité stricte des services Backstage v2 (22 octobre 2026)
 
 - [x] Audit de `nabla-compose/master` au SHA `1e4060d58c6553c1717630a024c7739fdb7d24f0` : 153 entités, dont 150 Component/Resource/API ; **0 doublon** de `metadata.name`, titre affiché ou slug de carte. Les noms en collision utilisés auparavant dans les tests étaient fictifs.

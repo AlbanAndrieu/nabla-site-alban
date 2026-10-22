@@ -43,3 +43,35 @@ Sur Vercel, les anciennes routes FastAPI OWNER restent inaccessibles par CIDR m�
 - Les métriques TrueNAS/pfSense/Cloudflare et preuves brutes **ne sont pas remplacées par des données simulées**. Les statuts de santé SERVICE v2 issus de FastAPI #360 restent une capacité distincte, qui nécessite le déploiement de ce contrat.
 - **À réaliser pour les preuves riches** : concevoir un relais authentifié OWNER à domicile ou via Cloudflare Access, avec JWT vérifié, filtrage serveur, RBAC lecture seule, anti-replay, journal d'audit et contrôle d'exposition. Ne pas ajouter les adresses de sortie Vercel à `HOMELAB_TRUSTED_CIDRS`, ne pas activer `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED` pour masquer un 401.
 - Vercel expose maintenant le nom de `DIAGNOSTICS_ACCESS_KEY` en Production et Preview (valeur masquée) ; un nouveau déploiement Production est nécessaire pour utiliser une configuration modifiée. Le dernier déploiement READY observé correspond au SHA `5f8e125d` et ne contient pas les modifications de cette PR. Aucun résultat positif SERVICE en production n'est encore attesté.
+
+## Diagnostic HTTP 503 sur /fr/truenas — 22 octobre 2026
+
+Le bandeau `L’observation du runtime TrueNAS est incomplète` et le `HTTP 503`
+de `/api/homelab-health` ne sont **pas** une preuve de panne TrueNAS. Sur
+Vercel, `lib/fastApiHealthBoard.ts` et `lib/homelabHealthTransport.ts`
+interdisent les API OWNER brutes par défaut. Le serveur Next.js retourne
+désormais le motif borné `owner-boundary` (503, `private, no-store`,
+`X-Homelab-Health-Reason`) sans requête OWNER vers FastAPI. Le navigateur
+cesse de rafraîchir inutilement ces deux diagnostics après confirmation
+des deux réponses OWNER ; **le flux SERVICE `/api/homelab-health-v2` continue**.
+
+Une observation périmée ou inaccessible est `unknown`, symbolisée par un
+point d’interrogation. Seul `runtime_missing: true` associé à une observation
+courante autorise l’icône de runtime manquant (crâne). Ne pas afficher les
+anciens états verts comme une preuve de santé actuelle.
+
+**Recette depuis le réseau propriétaire, après déploiement du HEAD exact** :
+`/api/homelab-access?diagnose=1` doit confirmer l’accès owner ;
+`/api/homelab-health` et `/api/homelab-probes` doivent renvoyer 503 avec
+`reason: owner-boundary` et ne pas contacter un endpoint OWNER FastAPI ;
+`/api/homelab-health-v2` est indépendant et doit être vérifié séparément
+(200 et révision cohérente avec le catalogue ou 503 classifié).
+Le premier essai SERVICE doit permettre de distinguer timeout, erreur 401/403,
+catalogue absent et `boardState: pending/stale`. Une réponse HTTP 503 seule ne
+permet pas d'attribuer une panne à TrueNAS.
+
+La résolution des diagnostics TrueNAS enrichis nécessite **un vrai relais OWNER
+authentifié**, et non l’ajout de l’adresse de sortie Vercel aux CIDR de confiance.
+Aucun test live depuis le Wi-Fi ni déploiement n’a été réalisé dans cette
+session ; les contrôles ciblés isolés ne remplacent pas les quality gates du
+dépôt.
