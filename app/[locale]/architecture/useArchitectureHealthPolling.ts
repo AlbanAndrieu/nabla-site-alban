@@ -5,8 +5,9 @@ import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
+import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
 
-export type ArchitectureHealthSource = "loading" | "fastapi" | "unavailable";
+export type ArchitectureHealthSource = "loading" | "fastapi" | "site-v2" | "unavailable";
 
 const HEALTH_POLL_REFRESHING_MS = 2_000;
 const HEALTH_POLL_FRESH_MS = 5_000;
@@ -22,8 +23,9 @@ export function architectureHealthPollDelay(
 	return HEALTH_POLL_FALLBACK_MS;
 }
 
-export default function useArchitectureHealthPolling() {
+export default function useArchitectureHealthPolling(readOnly = false) {
 	const [health, setHealth] = useState<HomelabHealthSnapshot | null>(null);
+	const [siteHealth, setSiteHealth] = useState<SiteHealthV2 | null>(null);
 	const [healthUnavailable, setHealthUnavailable] = useState(false);
 	const [refreshing, setRefreshing] = useState(true);
 	const [now, setNow] = useState(() => Date.now());
@@ -57,22 +59,37 @@ export default function useArchitectureHealthPolling() {
 			controller = requestController;
 			setRefreshing(true);
 			try {
-				const response = await fetch("/api/homelab-health", {
-					cache: "no-store",
-					signal: requestController.signal,
-					headers: { Accept: "application/json" },
-				});
-				if (!response.ok) {
-					throw new Error(`health HTTP ${response.status}`);
-				}
-				const parsed = parseHomelabHealthSnapshot(await response.json());
-				if (!parsed) throw new Error("invalid health payload");
-				latestSnapshot = parsed;
-				latestUnavailable = false;
-				if (active) {
-					setHealth(parsed);
-					setHealthUnavailable(false);
-					setNow(Date.now());
+				const response = await fetch(
+					readOnly ? "/api/homelab-health-v2" : "/api/homelab-health",
+					{
+						cache: "no-store",
+						signal: requestController.signal,
+						headers: { Accept: "application/json" },
+					},
+				);
+				if (!response.ok) throw new Error(`health HTTP ${response.status}`);
+				if (readOnly) {
+					const projected = parseSiteHealthV2(await response.json());
+					if (!projected) throw new Error("invalid v2 health projection");
+					latestSnapshot = null;
+					latestUnavailable = projected.boardState !== "fresh";
+					if (active) {
+						setSiteHealth(projected);
+						setHealth(null);
+						setHealthUnavailable(latestUnavailable);
+						setNow(Date.now());
+					}
+				} else {
+					const parsed = parseHomelabHealthSnapshot(await response.json());
+					if (!parsed) throw new Error("invalid health payload");
+					latestSnapshot = parsed;
+					latestUnavailable = false;
+					if (active) {
+						setHealth(parsed);
+						setSiteHealth(null);
+						setHealthUnavailable(false);
+						setNow(Date.now());
+					}
 				}
 			} catch {
 				if (active && !requestController.signal.aborted) {
@@ -105,13 +122,15 @@ export default function useArchitectureHealthPolling() {
 			window.clearInterval(clockTimer);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
-	}, []);
+	}, [readOnly]);
 
 	const healthSource: ArchitectureHealthSource = healthUnavailable
 		? "unavailable"
-		: health
-			? "fastapi"
-			: "loading";
+		: readOnly && siteHealth
+			? "site-v2"
+			: health
+				? "fastapi"
+				: "loading";
 
-	return { health, healthUnavailable, refreshing, now, healthSource } as const;
+	return { health, siteHealth, healthUnavailable, refreshing, now, healthSource } as const;
 }
