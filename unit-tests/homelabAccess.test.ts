@@ -287,9 +287,51 @@ test("a valid JWT from outside the home IP is still denied", async () => {
 			"x-real-ip": "203.0.113.50",
 			"x-forwarded-for": HOME_IP,
 		}),
-		{ env: ACCESS_ENV, fetchImpl: jwksFetch(), now: NOW },
+		{ env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "false" }, fetchImpl: jwksFetch(), now: NOW },
 	);
 	assert.deepEqual(decision, { trusted: false, via: null });
+});
+
+
+test("temporary remote owner access requires a cryptographically valid Access JWT", async () => {
+	const valid = await signToken(validClaims());
+	const outside = new Headers({
+		"x-real-ip": "203.0.113.50",
+		"cf-access-jwt-assertion": valid,
+	});
+	const options = {
+		env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "true" },
+		fetchImpl: jwksFetch(),
+		now: NOW,
+	};
+	assert.deepEqual(await decideHomelabAccess(outside, options), {
+		trusted: true,
+		via: "cloudflare-access",
+	});
+	assert.deepEqual(
+		await decideHomelabAccess(
+			new Headers({
+				"x-real-ip": "203.0.113.50",
+				"x-forwarded-for": HOME_IP,
+				"cf-access-jwt-assertion": "forged.token.value",
+			}),
+			options,
+		),
+		{ trusted: false, via: null },
+	);
+	assert.deepEqual(
+		await decideHomelabAccess(outside, {
+			...options,
+			env: { ...ACCESS_ENV, HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "false" },
+		}),
+		{ trusted: false, via: null },
+	);
+	assert.deepEqual(
+		await decideHomelabAccess(new Headers({ "x-real-ip": "203.0.113.50" }), {
+			env: { VERCEL: "1", HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "true" },
+		}),
+		{ trusted: false, via: null },
+	);
 });
 
 test("gated responses are a neutral 404 for anonymous visitors", async () => {
