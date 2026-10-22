@@ -1,5 +1,10 @@
 # Feuille de route produit et qualité
 
+## Stripe Checkout — sécurisation en cours (21 octobre 2026)
+
+Le suivi priorisé P0–P2 et le runbook Stripe sont dans [stripe-hardening-roadmap.md](stripe-hardening-roadmap.md). Le webhook signé refuse temporairement les événements de paiement (503) pour ne pas feindre leur traitement sans persistance. **Ne pas activer en production** avant la clôture des gates P0, tests sandbox et validation exacte du HEAD.
+
+
 Dernière réconciliation : 18 octobre 2026 (5 dernières PR fusionnées).
 
 Cette roadmap contient les **travaux transverses encore ouverts** et les invariants
