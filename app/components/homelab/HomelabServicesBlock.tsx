@@ -221,13 +221,17 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 			/>
 			)}
 
-			{!readOnly && <HomelabObservationCoverage
-				snapshot={state.snapshot}
-				catalogServiceCount={state.catalog.services.length}
-				topologyNodeCount={state.topology?.nodes.length ?? 0}
-				topologyRelationCount={state.topology?.relations.length ?? 0}
-			/>
-			<HomelabProbeDiagnostics snapshot={state.snapshot} />
+			{!readOnly && (
+				<>
+					<HomelabObservationCoverage
+						snapshot={state.snapshot}
+						catalogServiceCount={state.catalog.services.length}
+						topologyNodeCount={state.topology?.nodes.length ?? 0}
+						topologyRelationCount={state.topology?.relations.length ?? 0}
+					/>
+					<HomelabProbeDiagnostics snapshot={state.snapshot} />
+				</>
+			)}
 
 			<section
 				id="truenas-health-dashboard"
