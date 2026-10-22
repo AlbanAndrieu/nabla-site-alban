@@ -1,3 +1,11 @@
+## P0 — Unicité stricte des services Backstage v2 (22 octobre 2026)
+
+- [x] Audit de `nabla-compose/master` au SHA `1e4060d58c6553c1717630a024c7739fdb7d24f0` : 153 entités, dont 150 Component/Resource/API ; **0 doublon** de `metadata.name`, titre affiché ou slug de carte. Les noms en collision utilisés auparavant dans les tests étaient fictifs.
+- [x] Refuser le catalogue v2 dans le parseur si deux entités affichables possèdent le même nom insensible à la casse, le même titre normalisé ou le même identifiant de carte. Ne jamais renommer un service ambigu ou fabriquer une identité alternative.
+- [x] Simplifier la projection React Flow en supprimant l'algorithme de résolution des collisions, tout en conservant les identifiants existants pour les services valides.
+- [ ] Appliquer la même invariant dans le générateur de `nabla-compose` et le validateur FastAPI, avant publication, afin que les erreurs soient diagnostiquées à la source.
+- [ ] Validation intégrale du dépôt (formatage, pre-commit, tests Next.js et Preview exacte) lorsque l'environnement Node/npm compatible et le checkout complet seront disponibles ; aucun runner Actions tant que les crédits sont épuisés.
+
 ## P0 — Corrélation des états SERVICE v2 et cartes privées (21 octobre 2026)
 
 - [x] Empêcher l'attribution d'un état SERVICE à plusieurs `entityRef`

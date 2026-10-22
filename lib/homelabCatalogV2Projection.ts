@@ -2,63 +2,9 @@ import {
 	catalogV2ServiceViews,
 	type HomelabCatalogV2,
 } from "./homelabCatalogV2";
+import { catalogServiceSlug } from "./homelabCatalogV2Names";
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
-
-/** Pick one stable, URL-safe service ID per canonical Backstage entity reference. */
-function stableServiceIds(
-	views: ReturnType<typeof catalogV2ServiceViews>,
-): Map<string, string> {
-	// Backstage names allow '.' and '_', but card anchors need safe slugs.
-	const slugs = views.map((view) => {
-		const slug = view.id
-			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/^-+|-+$/g, "");
-		return slug || "service";
-	});
-	const names = new Map<string, number>();
-	for (const slug of slugs) {
-		names.set(slug, (names.get(slug) ?? 0) + 1);
-	}
-	const initial = views.map((view, index) => {
-		const slug = slugs[index];
-		if (!slug) throw new Error("Missing normalized Backstage service name");
-		return (names.get(slug) ?? 0) > 1
-			? `${view.entityKind.toLowerCase()}-${slug}`
-			: slug;
-	});
-	const counts = new Map<string, number>();
-	for (const id of initial) counts.set(id, (counts.get(id) ?? 0) + 1);
-
-	// Reserve non-conflicting IDs first so a disambiguation never steals one.
-	const reserved = new Set(initial.filter((id) => counts.get(id) === 1));
-	const used = new Set<string>();
-	const byRef = new Map<string, string>();
-	for (const [index, view] of views.entries()) {
-		const base = initial[index];
-		if (!base) throw new Error("Missing Backstage service identity");
-		let id = base;
-		if ((counts.get(base) ?? 0) > 1) {
-			const namespace = view.entityRef.split(":", 2)[1]?.split("/", 1)[0];
-			const normalizedNamespace = (namespace ?? "default")
-				.toLowerCase()
-				.replace(/[^a-z0-9]+/g, "-")
-				.replace(/^-+|-+$/g, "");
-			const safeNamespace = normalizedNamespace || "default";
-			const stem = `${view.entityKind.toLowerCase()}-${safeNamespace}-${slugs[index]}`;
-			id = stem;
-			let suffix = 2;
-			while (reserved.has(id) || used.has(id)) {
-				id = `${stem}-${suffix++}`;
-			}
-		}
-		if (used.has(id)) throw new Error("Duplicate Backstage service identity");
-		used.add(id);
-		byRef.set(view.entityRef, id);
-	}
-	return byRef;
-}
 
 /** One canonical Backstage v2 source for cards and the architecture graph. */
 export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
@@ -66,7 +12,10 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	topology: ServiceTopology;
 } {
 	const views = catalogV2ServiceViews(catalog);
-	const byRef = stableServiceIds(views);
+	// The parser rejects duplicate names, display titles and card slugs.
+	const byRef = new Map(
+		views.map((view) => [view.entityRef, catalogServiceSlug(view.id)]),
+	);
 	const services: HomelabServicesCatalog = {
 		version: 2,
 		catalogRevision: catalog.catalogRevision,

@@ -45,40 +45,39 @@ test("unique Backstage names retain their existing service IDs", () => {
 	);
 });
 
-test("same name and kind across namespaces never collapse cards or graph nodes", () => {
-	const output = project([
-		entity("Component", "default", "api", {
-			dependsOn: ["component:edge/api"],
-		}),
+test("duplicate names across namespaces are invalid catalog data", () => {
+	const entities = [
+		entity("Component", "default", "api"),
 		entity("Component", "edge", "api"),
-	]);
-	const ids = idsByRef(output);
-	assert.notEqual(ids.get("component:default/api"), ids.get("component:edge/api"));
-	assert.equal(new Set(output.topology.nodes.map((node) => node.id)).size, 2);
-	assert.deepEqual(
-		output.topology.relations.map((relation) => [relation.source, relation.target]),
-		[[ids.get("component:default/api"), ids.get("component:edge/api")]],
-	);
+	];
+	assert.equal(parseHomelabCatalogV2({
+		schemaVersion: 2,
+		model: "backstage",
+		catalogRevision: `sha256:${"a".repeat(64)}`,
+		entities,
+	}), null);
 });
 
-test("cross-kind collisions do not steal a different service's reserved ID", () => {
-	const output = project([
+test("duplicate service names across Backstage kinds are rejected", () => {
+	const entities = [
 		entity("Component", "default", "foo"),
 		entity("Resource", "default", "foo"),
-		entity("API", "default", "component-foo"),
-	]);
-	const ids = [...idsByRef(output).values()];
-	assert.equal(new Set(ids).size, ids.length);
-	assert.ok(ids.every((id) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id ?? "")));
+	];
+	assert.equal(parseHomelabCatalogV2({
+		schemaVersion: 2,
+		model: "backstage",
+		catalogRevision: `sha256:${"a".repeat(64)}`,
+		entities,
+	}), null);
 });
 
 test("service IDs and graph relations are independent of source entity order", () => {
 	const entities = [
-		entity("Component", "default", "api", {
-			dependsOn: ["resource:default/api"],
+		entity("Component", "default", "frontend", {
+			dependsOn: ["resource:default/postgres"],
 		}),
-		entity("Resource", "default", "api"),
-		entity("API", "default", "component-api"),
+		entity("Resource", "default", "postgres"),
+		entity("API", "default", "service-api"),
 	];
 	const one = project(entities);
 	const two = project([...entities].reverse());
@@ -124,19 +123,15 @@ test("relation order remains stable when upstream changes entity order", () => {
 	);
 });
 
-test("normalizes Backstage punctuation before deduplicating card and graph IDs", () => {
-	const output = project([
+test("different names that normalize to the same service-card slug are rejected", () => {
+	const entities = [
 		entity("Component", "default", "a.b"),
-		entity("Component", "edge", "a_b"),
-		entity("Resource", "default", "a-b"),
-	]);
-	const ids = output.services.services.map((service) => service.id);
-	assert.equal(new Set(ids).size, ids.length);
-	assert.ok(
-		ids.every((id) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id ?? "")),
-	);
-	assert.deepEqual(
-		new Set(output.topology.nodes.map((node) => node.id)),
-		new Set(ids),
-	);
+		entity("Resource", "default", "a_b"),
+	];
+	assert.equal(parseHomelabCatalogV2({
+		schemaVersion: 2,
+		model: "backstage",
+		catalogRevision: `sha256:${"a".repeat(64)}`,
+		entities,
+	}), null);
 });
