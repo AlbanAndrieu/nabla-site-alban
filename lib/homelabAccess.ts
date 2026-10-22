@@ -1,13 +1,13 @@
 /**
  * Owner-network gate for the private homelab views and their data APIs.
  *
- * A request MUST originate from a CIDR explicitly allowed through
- * `HOMELAB_TRUSTED_CIDRS` as observed by the Vercel edge.
- * If Cloudflare Access is configured, its valid signed owner identity is an
- * additional requirement, never an alternative that bypasses the IP rule.
+ * An owner is normally restricted to HOMELAB_TRUSTED_CIDRS.
+ * TEMPORARY: authenticated Cloudflare Access owners may connect from
+ * outside the home CIDR while HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true.
+ * No JWT or only a spoofed forwarding header is never sufficient.
  *
- * Every path fails closed: missing/invalid network configuration, network
- * errors or headers outside the verified Vercel runtime mean "public".
+ * A remote identity requires valid signed Access JWT and verified Vercel runtime.
+ * Anonymous network failures never authorize protected OWNER data.
  * Hiding UI is not access control: every data route must call this gate too.
  */
 
@@ -270,15 +270,18 @@ export async function decideHomelabAccess(
 	const env = options.env ?? process.env;
 
 	const ip = vercelClientIp(headers, env);
-	// Never allow a valid JWT (or spoofable forwarding header) to bypass the
-	// owner network allowlist. Public/anonymous requests remain neutral 404.
-	if (!ip || !isIpInCidrs(ip, parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS)))
-		return PUBLIC;
+	const homeAllowed =
+		ip !== null && isIpInCidrs(ip, parseTrustedCidrs(env.HOMELAB_TRUSTED_CIDRS));
+	const remoteOwnerEnabled =
+		env.VERCEL === "1" && env.HOMELAB_OWNER_REMOTE_ACCESS_ENABLED !== "false";
+	// Without a home-network match, ONLY a verified Access identity can admit
+	// an operator. This temporary flag never makes raw OWNER data anonymous.
+	if (!homeAllowed && !remoteOwnerEnabled) return PUBLIC;
 
-	// The public Vercel site has no Access application by default. Where an
-	// Access tenant/audience is configured, require *both* network and identity.
+	// No configured Access app? Trusted home network remains the sole owner
+	// identity signal. A remote request without signed JWT is still rejected.
 	if (!env.CF_ACCESS_TEAM_DOMAIN && !env.CF_ACCESS_AUD)
-		return { trusted: true, via: "trusted-network" };
+		return homeAllowed ? { trusted: true, via: "trusted-network" } : PUBLIC;
 
 	const token = headers.get("cf-access-jwt-assertion")?.trim();
 	const issuer = cloudflareAccessIssuer(env.CF_ACCESS_TEAM_DOMAIN);
