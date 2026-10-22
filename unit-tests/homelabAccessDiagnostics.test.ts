@@ -85,3 +85,17 @@ test("default access response remains boolean; explicit diagnostics do not echo 
 	assert.match(view, /data-homelab-access-diagnostic/);
 	assert.match(view, /if \(access === "denied"\)/);
 });
+
+test("remote owner admission reports identity without leaking the remote IP", () => {
+	const headers = new Headers({ "x-real-ip": "203.0.113.50" });
+	const config = {
+		...env,
+		CF_ACCESS_AUD: "owner-audience",
+		HOMELAB_OWNER_REMOTE_ACCESS_ENABLED: "true",
+	};
+	const status = diagnoseHomelabAccessNetwork(headers, config, true);
+	assert.equal(status.reason, "authorized-remote-identity");
+	assert.equal(status.networkAllowed, false);
+	assert.equal(status.identityRequired, true);
+	assert.doesNotMatch(JSON.stringify(status), /203\\.0\\.113\\.50/);
+});
