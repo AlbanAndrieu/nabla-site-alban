@@ -123,7 +123,7 @@ export class NablaSiteAlbanCi {
 		return [
 			"Dagger PoC passed",
 			`Node ${NODE_LTS}: lint + stylelint + typecheck + unit + build`,
-			`Node ${NODE_LTS}: build compatibility`,
+			`Node ${NODE_LTS}: patched LTS runtime`,
 		].join("\n");
 	}
 }
