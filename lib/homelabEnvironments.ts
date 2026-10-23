@@ -17,6 +17,26 @@ export type ResolvedHomelabEnvironments = {
 	source: HomelabEnvironmentSource;
 };
 
+// Filtering resolves every card on each keystroke and poll; index nodes once
+// per immutable topology instead of scanning them per service.
+const nodeIndexCache = new WeakMap<
+	ServiceTopology,
+	Map<string, ServiceTopology["nodes"][number]>
+>();
+
+function topologyNode(topology: ServiceTopology, id: string) {
+	let index = nodeIndexCache.get(topology);
+	if (!index) {
+		index = new Map();
+		// Keep the first node per ID, as the previous linear `find` did.
+		for (const node of topology.nodes) {
+			if (!index.has(node.id)) index.set(node.id, node);
+		}
+		nodeIndexCache.set(topology, index);
+	}
+	return index.get(id);
+}
+
 /**
  * Resolve deployment environments from the authoritative topology first.
  *
@@ -28,9 +48,9 @@ export function resolveHomelabServiceEnvironments(
 	service: HomelabService,
 	topology: ServiceTopology | null,
 ): ResolvedHomelabEnvironments {
-	const node = topology?.nodes.find(
-		(candidate) => candidate.id === homelabServiceId(service),
-	);
+	const node = topology
+		? topologyNode(topology, homelabServiceId(service))
+		: undefined;
 	const declared =
 		node?.environments?.map((environment) => environment.name) ?? [];
 	if (declared.length > 0) {

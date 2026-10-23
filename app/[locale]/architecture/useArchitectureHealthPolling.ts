@@ -7,7 +7,11 @@ import {
 } from "@/lib/homelabHealth";
 import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
 
-export type ArchitectureHealthSource = "loading" | "fastapi" | "site-v2" | "unavailable";
+export type ArchitectureHealthSource =
+	| "loading"
+	| "fastapi"
+	| "site-v2"
+	| "unavailable";
 
 const HEALTH_POLL_REFRESHING_MS = 2_000;
 const HEALTH_POLL_FRESH_MS = 5_000;

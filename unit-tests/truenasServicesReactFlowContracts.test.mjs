@@ -11,15 +11,24 @@ test("TrueNAS SERVICE ReactFlow uses the existing Backstage v2 graph", () => {
 	assert.match(component, /HierarchicalArchitectureExplorer/);
 	assert.match(component, /initialMode="services"/);
 	assert.match(component, /readOnly=\{readOnly\}/);
-	assert.match(component, /healthStatus=\{readOnly \? null : state\.snapshot\}/);
+	assert.match(
+		component,
+		/healthStatus=\{readOnly \? null : state\.snapshot\}/,
+	);
 	assert.match(component, /relations: \[\]/);
 	assert.match(component, /Relations indisponibles/);
 });
 
 test("ReactFlow does not start raw OWNER runtime polling in read-only mode", () => {
-	const explorer = source("app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx");
-	const graph = source("app/[locale]/architecture/useHierarchicalArchitectureGraph.ts");
-	const runtime = source("app/[locale]/architecture/useArchitectureRuntimeStatus.ts");
+	const explorer = source(
+		"app/[locale]/architecture/HierarchicalArchitectureExplorer.tsx",
+	);
+	const graph = source(
+		"app/[locale]/architecture/useHierarchicalArchitectureGraph.ts",
+	);
+	const runtime = source(
+		"app/[locale]/architecture/useArchitectureRuntimeStatus.ts",
+	);
 	assert.match(explorer, /readOnly,/);
 	assert.match(explorer, /initialMode,/);
 	assert.match(graph, /useArchitectureRuntimeStatus\(readOnly\)/);

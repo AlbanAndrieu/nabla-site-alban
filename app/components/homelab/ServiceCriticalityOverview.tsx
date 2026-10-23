@@ -79,6 +79,25 @@ export default function ServiceCriticalityOverview({
 			})).filter((entry) => entry.nodes.length > 0),
 		[analysis, topology],
 	);
+	// Impact paths walk the dependency graph; compute them once per topology
+	// for the visible rows instead of on every health-poll re-render.
+	const focusById = useMemo(
+		() =>
+			new Map(
+				tiers.flatMap(({ nodes }) =>
+					nodes
+						.slice(0, MAX_PER_TIER)
+						.map(
+							(node) =>
+								[
+									node.id,
+									buildServiceImpactFocus(node.id, topology, analysis),
+								] as const,
+						),
+				),
+			),
+		[analysis, tiers, topology],
+	);
 
 	return (
 		<section
@@ -108,11 +127,7 @@ export default function ServiceCriticalityOverview({
 								<div className="d-flex flex-column gap-2">
 									{nodes.slice(0, MAX_PER_TIER).map((node) => {
 										const criticality = analysis.get(node.id);
-										const focus = buildServiceImpactFocus(
-											node.id,
-											topology,
-											analysis,
-										);
+										const focus = focusById.get(node.id) ?? null;
 										const required = namesFor(
 											criticality?.requiredDependencies ?? [],
 										).slice(0, 4);

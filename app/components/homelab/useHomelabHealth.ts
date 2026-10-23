@@ -24,6 +24,7 @@ import {
 } from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
+const MIN_REFRESH_GAP_MS = 5_000;
 
 export type HealthFetchResult = {
 	snapshot: HomelabHealthSnapshot | null;
@@ -191,7 +192,8 @@ export function applyHealthCycle(
 		healthUnavailable: aggregate.snapshot === null && probes.snapshot === null,
 		healthStatus: aggregate.status ?? probes.status,
 		ownerBoundary:
-			aggregate.reason === "owner-boundary" && probes.reason === "owner-boundary",
+			aggregate.reason === "owner-boundary" &&
+			probes.reason === "owner-boundary",
 		healthRefreshing: false,
 		error:
 			current.error ||
@@ -275,8 +277,10 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
 		let ownerUpstreamBlocked = false;
+		let lastCycleStartedAt = 0;
 
 		const runHealthCycle = async (signal: AbortSignal) => {
+			lastCycleStartedAt = Date.now();
 			setState((current) => ({ ...current, healthRefreshing: true }));
 			if (readOnly) {
 				// External views consume only the strict SERVICE v2 projection.
@@ -290,7 +294,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 						headers: { Accept: "application/json" },
 					});
 					status = response.status;
-					if (response.ok) siteHealth = parseSiteHealthV2(await response.json());
+					if (response.ok)
+						siteHealth = parseSiteHealthV2(await response.json());
 				} catch {
 					// Missing v2 evidence is UNKNOWN, not an observed outage.
 				}
@@ -341,12 +346,16 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			const aggregate = await aggregatePromise;
 			if (signal.aborted) return;
 			ownerUpstreamBlocked =
-				aggregate.reason === "owner-boundary" && probes.reason === "owner-boundary";
+				aggregate.reason === "owner-boundary" &&
+				probes.reason === "owner-boundary";
 			setState((current) => applyHealthCycle(current, aggregate, probes));
 		};
 
 		const refreshHealth = () => {
 			if (document.hidden) return;
+			// A tab focus right after a tick (or the initial cycle) must not
+			// fire a second identical burst of health requests.
+			if (Date.now() - lastCycleStartedAt < MIN_REFRESH_GAP_MS) return;
 			refreshController?.abort();
 			refreshController = new AbortController();
 			void runHealthCycle(refreshController.signal);

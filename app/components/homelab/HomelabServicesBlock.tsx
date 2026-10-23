@@ -1,8 +1,8 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
 import {
@@ -46,10 +46,14 @@ const HEALTH_STATES: readonly HomelabHealthState[] = [
 	"unknown",
 ];
 
+const NO_HEALTH_INDEX = healthIndex(null);
+
 type HealthFilter = "all" | HomelabHealthState;
 type GroupFilter = "all" | ServicePresentationGroup;
 
-export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ readOnly?: boolean }>) {
+export default function HomelabServicesBlock({
+	readOnly = false,
+}: Readonly<{ readOnly?: boolean }>) {
 	const t = useTranslations("homelab");
 	const locale = useLocale();
 	const french = locale === "fr";
@@ -69,19 +73,21 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 	// declared services. Never invent relations or assert dependency health.
 	const graphTopology = useMemo<ServiceTopology | null>(() => {
 		if (!state.catalog) return null;
-		return state.topology ?? {
-			version: 2,
-			catalogRevision: state.catalog.catalogRevision,
-			name: "Backstage v2 — declared services only",
-			nodes: state.catalog.services.map((service) => ({
-				id: homelabServiceId(service),
-				name: service.name,
-				kind: service.kind ?? "service",
-				category: service.category ?? "other",
-				criticality: service.criticality,
-			})),
-			relations: [],
-		};
+		return (
+			state.topology ?? {
+				version: 2,
+				catalogRevision: state.catalog.catalogRevision,
+				name: "Backstage v2 — declared services only",
+				nodes: state.catalog.services.map((service) => ({
+					id: homelabServiceId(service),
+					name: service.name,
+					kind: service.kind ?? "service",
+					category: service.category ?? "other",
+					criticality: service.criticality,
+				})),
+				relations: [],
+			}
+		);
 	}, [state.catalog, state.topology]);
 
 	const indexedHealth = useMemo(
@@ -103,22 +109,28 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 		[indexedHealth, state.catalog?.services, state.healthUnavailable],
 	);
 
+	// Health only matters under a health filter; otherwise keep the grouping
+	// stable across polls. Typing stays responsive while regrouping lags.
+	const filterHealth = healthFilter === "all" ? NO_HEALTH_INDEX : indexedHealth;
+	const filterHealthUnavailable =
+		healthFilter !== "all" && state.healthUnavailable;
+	const deferredSearchQuery = useDeferredValue(searchQuery);
 	const hierarchyGroups = useMemo(
 		() =>
 			filterHierarchyGroups(
 				state.catalog,
 				state.topology,
-				indexedHealth,
-				state.healthUnavailable,
-				{ healthFilter, environmentFilter, searchQuery },
+				filterHealth,
+				filterHealthUnavailable,
+				{ healthFilter, environmentFilter, searchQuery: deferredSearchQuery },
 			),
 		[
+			deferredSearchQuery,
 			environmentFilter,
+			filterHealth,
+			filterHealthUnavailable,
 			healthFilter,
-			indexedHealth,
-			searchQuery,
 			state.catalog,
-			state.healthUnavailable,
 			state.topology,
 		],
 	);
@@ -240,14 +252,14 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 	return (
 		<>
 			{!readOnly && (
-			<HomelabStatusOverview
-				snapshot={state.snapshot}
-				healthUnavailable={state.healthUnavailable}
-				ownerBoundary={state.ownerBoundary === true}
-				healthHttpStatus={state.healthStatus}
-				healthRefreshing={state.healthRefreshing}
-				onOpenCriticality={openCriticality}
-			/>
+				<HomelabStatusOverview
+					snapshot={state.snapshot}
+					healthUnavailable={state.healthUnavailable}
+					ownerBoundary={state.ownerBoundary === true}
+					healthHttpStatus={state.healthStatus}
+					healthRefreshing={state.healthRefreshing}
+					onOpenCriticality={openCriticality}
+				/>
 			)}
 
 			{!readOnly && (
@@ -268,7 +280,9 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 					aria-labelledby="truenas-service-graph-title"
 				>
 					<h3 id="truenas-service-graph-title">
-						{french ? "Graphe interactif des services" : "Interactive service graph"}
+						{french
+							? "Graphe interactif des services"
+							: "Interactive service graph"}
 					</h3>
 					{!state.topology ? (
 						<p role="status">
@@ -292,7 +306,6 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 					/>
 				</section>
 			) : null}
-
 
 			<section
 				id="truenas-health-dashboard"

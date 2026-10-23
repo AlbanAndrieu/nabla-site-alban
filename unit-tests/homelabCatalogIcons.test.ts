@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
-import { HOMELAB_CATALOG_ICON_FILES, homelabCatalogIconSrc } from "../lib/homelabCatalogIcons";
+import {
+	HOMELAB_CATALOG_ICON_FILES,
+	homelabCatalogIconSrc,
+} from "../lib/homelabCatalogIcons";
 
 test("canonical SERVICE cards keep local icons without OWNER runtime evidence", () => {
 	assert.equal(
@@ -31,7 +34,9 @@ test("canonical SERVICE cards keep local icons without OWNER runtime evidence", 
 		"unmapped-service",
 	]) {
 		assert.ok(
-			existsSync(new URL(`../public/${homelabCatalogIconSrc(id)}`, import.meta.url)),
+			existsSync(
+				new URL(`../public/${homelabCatalogIconSrc(id)}`, import.meta.url),
+			),
 			id,
 		);
 	}
@@ -55,7 +60,10 @@ test("Backstage v2 aliases use service-specific icons instead of generic fallbac
 	})) {
 		assert.equal(homelabCatalogIconSrc(id), `assets/selfh-icons/${expected}`);
 	}
-	assert.equal(homelabCatalogIconSrc("open_webui"), "assets/selfh-icons/open-webui.png");
+	assert.equal(
+		homelabCatalogIconSrc("open_webui"),
+		"assets/selfh-icons/open-webui.png",
+	);
 });
 
 test("all catalog icon mappings resolve to existing bundled, local-only assets", () => {
@@ -63,7 +71,9 @@ test("all catalog icon mappings resolve to existing bundled, local-only assets",
 	for (const [id, icon] of Object.entries(HOMELAB_CATALOG_ICON_FILES)) {
 		assert.ok(!icon.includes("/") && !icon.includes(".."), id);
 		assert.ok(
-			existsSync(new URL(`../public/assets/selfh-icons/${icon}`, import.meta.url)),
+			existsSync(
+				new URL(`../public/assets/selfh-icons/${icon}`, import.meta.url),
+			),
 			`${id} → ${icon}`,
 		);
 	}

@@ -17,7 +17,10 @@ import {
 } from "./HierarchicalArchitectureLegends";
 import { NODE_TYPES } from "./HierarchicalArchitectureNodes";
 import HierarchicalArchitectureToolbar from "./HierarchicalArchitectureToolbar";
-import type { ArchitectureNodeData, GraphMode } from "./hierarchicalArchitectureModel";
+import type {
+	ArchitectureNodeData,
+	GraphMode,
+} from "./hierarchicalArchitectureModel";
 import type { ArchitectureHealthSource } from "./useArchitectureHealthPolling";
 import useHierarchicalArchitectureGraph from "./useHierarchicalArchitectureGraph";
 

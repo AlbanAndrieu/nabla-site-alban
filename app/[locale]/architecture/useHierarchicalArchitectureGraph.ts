@@ -86,7 +86,8 @@ export default function useHierarchicalArchitectureGraph({
 	const [scope, setScope] = useState<GraphScope>("critical");
 	const [showOptional, setShowOptional] = useState(true);
 	const [query, setQuery] = useState("");
-	const { runtimeStatus, runtimeSource } = useArchitectureRuntimeStatus(readOnly);
+	const { runtimeStatus, runtimeSource } =
+		useArchitectureRuntimeStatus(readOnly);
 
 	const statusById = useMemo(
 		() =>
