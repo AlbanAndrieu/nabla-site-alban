@@ -13,10 +13,11 @@ import type {
 import {
 	affectedDependents,
 	explainHealth,
-	incidentDependencyPath,
 	type HealthCause,
+	incidentDependencyPath,
 	type ServiceImpact,
 } from "@/lib/homelabImpact";
+import { homelabServiceId } from "@/lib/homelabServices";
 import {
 	fetchHomelabDiagnosticsOnce,
 	fetchHomelabHealthOnce,
@@ -81,7 +82,9 @@ function exposureSummary(
 	french: boolean,
 ): string {
 	const declared = exposure.declared.edge_mode ?? "unspecified";
-	const tunnel = exposure.observed.cloudflare_tunnel_observed ? "tunnel observed" : "no tunnel observed";
+	const tunnel = exposure.observed.cloudflare_tunnel_observed
+		? "tunnel observed"
+		: "no tunnel observed";
 	const access = exposure.observed.cloudflare_access_observed
 		? `Access ${exposure.observed.cloudflare_access_public ? "public/bypass" : "protected"}`
 		: "Access not observed";
@@ -94,12 +97,14 @@ export default function ServiceTroubleshootingEvidence({
 	entry,
 }: Readonly<{ entry: HomelabHealthEntry }>) {
 	const french = useLocale() === "fr";
-	const [diagnostics, setDiagnostics] = useState<HomelabDiagnosticsSnapshot | null>(null);
+	const [diagnostics, setDiagnostics] =
+		useState<HomelabDiagnosticsSnapshot | null>(null);
 	const [health, setHealth] = useState<HomelabHealthSnapshot | null>(null);
 	const [topology, setTopology] = useState<ServiceTopology | null>(null);
 	const dependencyEvidence = entry.dependency_evidence ?? [];
 	const cycle = entry.dependency_cycle ?? [];
-	const serviceId = entry.id ?? entry.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+	// Same validated ID/slug as the service cards so deep links stay aligned.
+	const serviceId = homelabServiceId({ id: entry.id, name: entry.name });
 	const detailsId = `service-${serviceId}`;
 	const anchoredDetails = useAnchoredDetails(detailsId);
 
@@ -138,7 +143,9 @@ export default function ServiceTroubleshootingEvidence({
 			),
 		[health],
 	);
-	const exposure = entry.id ? diagnostics?.exposure_by_service[entry.id] : undefined;
+	const exposure = entry.id
+		? diagnostics?.exposure_by_service[entry.id]
+		: undefined;
 	const directImpacts = impacts.filter((impact) => impact.distance === 1);
 	const indirectImpacts = impacts.filter((impact) => impact.distance > 1);
 
@@ -163,7 +170,10 @@ export default function ServiceTroubleshootingEvidence({
 				</div>
 				<ul className="mb-3 ps-3" data-status-explanation>
 					{causes.map((cause, index) => (
-						<li key={`${cause.code}:${index}`} className={stateClass(cause.state)}>
+						<li
+							key={`${cause.code}:${index}`}
+							className={stateClass(cause.state)}
+						>
 							{causeLabel(cause, french)}
 						</li>
 					))}
@@ -171,58 +181,140 @@ export default function ServiceTroubleshootingEvidence({
 
 				<ul className="mb-2 ps-3">
 					<li>
-						{french ? "État local / effectif" : "Local / effective state"}: {" "}
-						<span className={stateClass(entry.local_state ?? entry.state)}>{entry.local_state ?? entry.state}</span>
+						{french ? "État local / effectif" : "Local / effective state"}:{" "}
+						<span className={stateClass(entry.local_state ?? entry.state)}>
+							{entry.local_state ?? entry.state}
+						</span>
 						{" → "}
-						<span className={stateClass(entry.effective_state ?? entry.state)}>{entry.effective_state ?? entry.state}</span>
+						<span className={stateClass(entry.effective_state ?? entry.state)}>
+							{entry.effective_state ?? entry.state}
+						</span>
 					</li>
 					<li>
-						{french ? "Observation" : "Observation"}: {ageLabel(entry.observation_age_seconds)}
-						{entry.observation_stale ? <span className="text-warning"> · stale</span> : null}
+						{french ? "Observation" : "Observation"}:{" "}
+						{ageLabel(entry.observation_age_seconds)}
+						{entry.observation_stale ? (
+							<span className="text-warning"> · stale</span>
+						) : null}
 					</li>
-					{entry.http_status > 0 ? <li>HTTP {entry.http_status}{typeof entry.latency_ms === "number" ? ` · ${entry.latency_ms} ms` : ""}{entry.tls_trusted === true ? " · TLS trusted" : entry.tls_trusted === false ? " · TLS invalid" : ""}</li> : null}
-					{entry.direct_state ? <li>direct: <span className={stateClass(entry.direct_state)}>{entry.direct_state}</span></li> : null}
-					{entry.internal_state ? <li>internal: <span className={stateClass(entry.internal_state)}>{entry.internal_state}</span></li> : null}
-					{entry.runtime_state ? <li>TrueNAS app: {entry.runtime_state}{entry.runtime_app ? ` (${entry.runtime_app})` : ""}{entry.runtime_reachable === false ? " · runtime unreachable" : ""}</li> : null}
-					{entry.tunnel_status || entry.tunnel_name ? <li>Cloudflare: {entry.tunnel_status ?? "observed"}{entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}</li> : null}
-					{entry.application_error ? <li className="text-danger">application: {entry.application_error}</li> : null}
-					{entry.error ? <li className="text-warning">transport: {entry.error}</li> : null}
+					{entry.http_status > 0 ? (
+						<li>
+							HTTP {entry.http_status}
+							{typeof entry.latency_ms === "number"
+								? ` · ${entry.latency_ms} ms`
+								: ""}
+							{entry.tls_trusted === true
+								? " · TLS trusted"
+								: entry.tls_trusted === false
+									? " · TLS invalid"
+									: ""}
+						</li>
+					) : null}
+					{entry.direct_state ? (
+						<li>
+							direct:{" "}
+							<span className={stateClass(entry.direct_state)}>
+								{entry.direct_state}
+							</span>
+						</li>
+					) : null}
+					{entry.internal_state ? (
+						<li>
+							internal:{" "}
+							<span className={stateClass(entry.internal_state)}>
+								{entry.internal_state}
+							</span>
+						</li>
+					) : null}
+					{entry.runtime_state ? (
+						<li>
+							TrueNAS app: {entry.runtime_state}
+							{entry.runtime_app ? ` (${entry.runtime_app})` : ""}
+							{entry.runtime_reachable === false
+								? " · runtime unreachable"
+								: ""}
+						</li>
+					) : null}
+					{entry.tunnel_status || entry.tunnel_name ? (
+						<li>
+							Cloudflare: {entry.tunnel_status ?? "observed"}
+							{entry.tunnel_name ? ` (${entry.tunnel_name})` : ""}
+						</li>
+					) : null}
+					{entry.application_error ? (
+						<li className="text-danger">
+							application: {entry.application_error}
+						</li>
+					) : null}
+					{entry.error ? (
+						<li className="text-warning">transport: {entry.error}</li>
+					) : null}
 				</ul>
 
 				{exposure ? (
 					<div className="mb-3" data-service-exposure-evidence>
-						<strong>{french ? "Exposition déclarée vs observée" : "Declared vs observed exposure"}</strong>
+						<strong>
+							{french
+								? "Exposition déclarée vs observée"
+								: "Declared vs observed exposure"}
+						</strong>
 						<p className={`mb-1 mt-1 ${stateClass(exposure.state)}`}>
 							{exposure.state}: {exposureSummary(exposure, french)}
 						</p>
 						{exposure.reasons.length > 0 ? (
 							<ul className="mb-0 ps-3">
-								{exposure.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+								{exposure.reasons.map((reason) => (
+									<li key={reason}>{reason}</li>
+								))}
 							</ul>
 						) : null}
 					</div>
 				) : null}
 
 				{cycle.length > 0 ? (
-					<div className="alert alert-warning py-1 px-2 mb-2" data-dependency-cycle>
-						<strong>{french ? "Cycle de dépendance requis" : "Required dependency cycle"}:</strong>{" "}
+					<div
+						className="alert alert-warning py-1 px-2 mb-2"
+						data-dependency-cycle
+					>
+						<strong>
+							{french
+								? "Cycle de dépendance requis"
+								: "Required dependency cycle"}
+							:
+						</strong>{" "}
 						{cycle.join(" → ")}
 					</div>
 				) : null}
 
 				{dependencyEvidence.length > 0 ? (
 					<div data-dependency-evidence-details>
-						<strong>{french ? "Dépendances requises" : "Required dependencies"}</strong>
+						<strong>
+							{french ? "Dépendances requises" : "Required dependencies"}
+						</strong>
 						<ul className="mb-0 mt-1 ps-3">
 							{dependencyEvidence.map((evidence) => (
 								<li key={`${evidence.target}:${evidence.relation_type}`}>
-									<a href={`#service-${evidence.target}`}>{evidence.target_name ?? evidence.target}</a> · {evidence.relation_type} · {" "}
-									<span className={stateClass(evidence.target_state)}>{evidence.target_state}</span>
-									{evidence.target_effective_state && evidence.target_effective_state !== evidence.target_state ? ` (raw ${evidence.target_effective_state})` : ""}
-									{typeof evidence.target_observation_age_seconds === "number" ? ` · ${ageLabel(evidence.target_observation_age_seconds)}` : ""}
+									<a href={`#service-${evidence.target}`}>
+										{evidence.target_name ?? evidence.target}
+									</a>{" "}
+									· {evidence.relation_type} ·{" "}
+									<span className={stateClass(evidence.target_state)}>
+										{evidence.target_state}
+									</span>
+									{evidence.target_effective_state &&
+									evidence.target_effective_state !== evidence.target_state
+										? ` (raw ${evidence.target_effective_state})`
+										: ""}
+									{typeof evidence.target_observation_age_seconds === "number"
+										? ` · ${ageLabel(evidence.target_observation_age_seconds)}`
+										: ""}
 									{evidence.target_observation_stale ? " · stale" : ""}
 									{evidence.description ? ` — ${evidence.description}` : ""}
-									{evidence.evidence.length > 0 ? <span className="d-block text-muted">source: {evidence.evidence.join(" · ")}</span> : null}
+									{evidence.evidence.length > 0 ? (
+										<span className="d-block text-muted">
+											source: {evidence.evidence.join(" · ")}
+										</span>
+									) : null}
 								</li>
 							))}
 						</ul>
@@ -231,7 +323,12 @@ export default function ServiceTroubleshootingEvidence({
 
 				{incidentPath.length > 1 ? (
 					<div className="mt-3" data-incident-dependency-path>
-						<strong>{french ? "Chemin probable de l’incident" : "Probable incident dependency path"}:</strong>{" "}
+						<strong>
+							{french
+								? "Chemin probable de l’incident"
+								: "Probable incident dependency path"}
+							:
+						</strong>{" "}
 						{incidentPath.map((id, index) => (
 							<span key={`${id}:${index}`}>
 								{index > 0 ? " → " : ""}
@@ -239,7 +336,9 @@ export default function ServiceTroubleshootingEvidence({
 							</span>
 						))}
 						<p className="text-muted mb-0 mt-1">
-							{french ? "Chemin dérivé des blocked_by observés ; il indique une piste de cause racine, pas une causalité absolue." : "Derived from observed blocked_by evidence; this is a root-cause lead, not proof of absolute causality."}
+							{french
+								? "Chemin dérivé des blocked_by observés ; il indique une piste de cause racine, pas une causalité absolue."
+								: "Derived from observed blocked_by evidence; this is a root-cause lead, not proof of absolute causality."}
 						</p>
 					</div>
 				) : null}
@@ -247,27 +346,45 @@ export default function ServiceTroubleshootingEvidence({
 				{impacts.length > 0 ? (
 					<details className="mt-3" data-affected-dependents>
 						<summary className="fw-semibold">
-							{french ? "Afficher les services potentiellement impactés" : "Show potentially affected dependents"} ({impacts.length})
+							{french
+								? "Afficher les services potentiellement impactés"
+								: "Show potentially affected dependents"}{" "}
+							({impacts.length})
 						</summary>
 						<div className="mt-2">
 							{directImpacts.length > 0 ? (
 								<>
-									<strong>{french ? "Dépendants directs" : "Direct dependents"}</strong>
+									<strong>
+										{french ? "Dépendants directs" : "Direct dependents"}
+									</strong>
 									<ul className="ps-3">
-										{directImpacts.map((impact) => <li key={impact.id}><a href={`#service-${impact.id}`}>{impact.name}</a></li>)}
+										{directImpacts.map((impact) => (
+											<li key={impact.id}>
+												<a href={`#service-${impact.id}`}>{impact.name}</a>
+											</li>
+										))}
 									</ul>
 								</>
 							) : null}
 							{indirectImpacts.length > 0 ? (
 								<>
-									<strong>{french ? "Dépendants indirects" : "Indirect dependents"}</strong>
+									<strong>
+										{french ? "Dépendants indirects" : "Indirect dependents"}
+									</strong>
 									<ul className="mb-0 ps-3">
-										{indirectImpacts.map((impact) => <li key={impact.id}><a href={`#service-${impact.id}`}>{impact.name}</a> · {impact.distance} hops</li>)}
+										{indirectImpacts.map((impact) => (
+											<li key={impact.id}>
+												<a href={`#service-${impact.id}`}>{impact.name}</a> ·{" "}
+												{impact.distance} hops
+											</li>
+										))}
 									</ul>
 								</>
 							) : null}
 							<p className="text-muted mb-0 mt-1">
-								{french ? "Impact structurel calculé depuis les relations requises de la topologie ; cela ne signifie pas que tous ces services sont actuellement en panne." : "Structural blast radius from required topology relations; this does not mean every listed service is currently failing."}
+								{french
+									? "Impact structurel calculé depuis les relations requises de la topologie ; cela ne signifie pas que tous ces services sont actuellement en panne."
+									: "Structural blast radius from required topology relations; this does not mean every listed service is currently failing."}
 							</p>
 						</div>
 					</details>

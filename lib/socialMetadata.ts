@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { AppLocale } from "@/i18n/routing";
 import {
 	canonicalPageAlternates,
 	canonicalPagePath,
@@ -11,7 +12,7 @@ export const SOCIAL_CARD_WIDTH = 1200;
 export const SOCIAL_CARD_HEIGHT = 630;
 export const TWITTER_HANDLE = "@AlbanAndrieu";
 
-export type SiteLocale = "en" | "fr";
+export type SiteLocale = AppLocale;
 
 type SocialMetadataOptions = {
 	title: string;

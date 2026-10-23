@@ -43,3 +43,17 @@ test("service troubleshooting and pfSense evidence share delayed hash handling",
 	assert.match(operationalSource, /Boolean\(evidence\?\.pfsense\)/);
 	assert.match(operationalSource, /open=\{pfsenseDetails\.open\}/);
 });
+
+test("troubleshooting anchors reuse the canonical card service ID", async () => {
+	const { homelabServiceId } = await import("../lib/homelabServices");
+	assert.match(
+		serviceSource,
+		/const serviceId = homelabServiceId\(\{ id: entry\.id, name: entry\.name \}\)/,
+	);
+	assert.doesNotMatch(serviceSource, /\.replace\(\/\[\^a-z0-9\]\+\/g/);
+	// Invalid upstream IDs fall back to the same trimmed, accent-free slug.
+	assert.equal(
+		homelabServiceId({ id: "Bad ID!", name: " Élan Vital " }),
+		"elan-vital",
+	);
+});

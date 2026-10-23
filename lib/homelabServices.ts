@@ -1,5 +1,7 @@
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
+import { isRecord } from "./guards";
+import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -8,12 +10,14 @@ export type HomelabEnvironment = "production" | "staging" | "dev";
 
 export type HomelabService = {
 	id?: string;
+	/** Canonical Backstage v2 identity, not a service URL. */
+	entityRef?: string;
 	name: string;
 	environment?: HomelabEnvironment;
 	kind?: string;
 	category?: string;
 	presentationRole?: "service" | "core" | "support";
-	criticality?: "critical" | "high" | "medium" | "low";
+	criticality?: ServiceCriticalityLevel;
 	description?: string;
 	healthNote?: string;
 	icon?: string;
@@ -32,6 +36,8 @@ export type HomelabService = {
 
 export type HomelabServicesCatalog = {
 	version?: number;
+	/** Required for correlating public service health with the matching catalog. */
+	catalogRevision?: string;
 	/** Sanitized owner-only fallback reason; never include credentials. */
 	privateInventoryStatus?: "key-missing" | "access-denied" | "unavailable";
 	services: HomelabService[];
@@ -54,10 +60,6 @@ export function isHomelabCatalogPlaceholder(
 export const HOMELAB_SERVICES_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function slugifyServiceName(name: string): string {
 	return (
 		name
@@ -75,19 +77,6 @@ export function homelabServiceId(service: HomelabService): string {
 	return explicitId && SERVICE_ID_RE.test(explicitId)
 		? explicitId
 		: slugifyServiceName(service.name);
-}
-
-/**
- * Resolve legacy single-environment metadata.
- *
- * Deployment environments are owned by nabla-compose x-nabla.environments and
- * consumed through service-topology. This helper is only the fallback for
- * presentation-catalog entries that do not have topology environments.
- */
-export function homelabServiceEnvironment(
-	service: HomelabService,
-): HomelabEnvironment {
-	return service.environment ?? "production";
 }
 
 const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(

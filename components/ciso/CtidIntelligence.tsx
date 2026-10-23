@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { AppLocale } from "@/i18n/routing";
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
 import { type CtidItem, selectCtidDigest } from "@/lib/ctidDigest";
 import styles from "./CtidIntelligence.module.css";
 
-type Language = "en" | "fr";
+type Language = AppLocale;
 
 async function fetchNews(
 	signal: AbortSignal,

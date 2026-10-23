@@ -1,13 +1,13 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Metadata } from "next";
-
+import type { AppLocale } from "@/i18n/routing";
 import {
 	extractDocumentMetadata,
 	rewriteLegacyHtmlHrefs,
 } from "@/lib/htmlFromPublic";
 
-export type CvLocale = "en" | "fr";
+export type CvLocale = AppLocale;
 
 const CV_HTML_FILES = {
 	"cv/index.html": path.join(process.cwd(), "public/cv/index.html"),

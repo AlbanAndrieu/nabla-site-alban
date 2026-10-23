@@ -82,3 +82,31 @@ test("missing environment metadata defaults to production and is reviewable", ()
 	assert.equal(homelabServiceMatchesEnvironment(resolved, "production"), true);
 	assert.equal(homelabServiceMatchesEnvironment(resolved, "defaulted"), true);
 });
+
+test("indexed topology lookup keeps the first node for a duplicated ID", () => {
+	const topology = topologyWithEnvironments([
+		{
+			name: "staging",
+			url: "https://staging.example.com",
+			external: false,
+			cloudflareTunnel: false,
+		},
+	]);
+	const first = topology.nodes[0];
+	assert.ok(first);
+	topology.nodes.push({
+		...first,
+		environments: [
+			{
+				name: "dev",
+				url: "https://dev.example.com",
+				external: false,
+				cloudflareTunnel: false,
+			},
+		],
+	});
+	const service: HomelabService = { id: "sample", name: "Sample" };
+	const resolved = resolveHomelabServiceEnvironments(service, topology);
+	assert.deepEqual([...resolved.names], ["staging"]);
+	assert.equal(resolved.source, "topology");
+});

@@ -89,7 +89,10 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(explorer, /health\?\.url \?\? entity\.url/);
 	assert.doesNotMatch(explorer, /parseHomelabHealthSnapshot/);
 	assert.match(healthPolling, /parseHomelabHealthSnapshot/);
-	assert.match(healthPolling, /fetch\("\/api\/homelab-health"/);
+	assert.match(
+		healthPolling,
+		/readOnly \? "\/api\/homelab-health-v2" : "\/api\/homelab-health"/,
+	);
 	assert.match(data, /iconSrc: serviceIconSrc\(service\)/);
 	assert.match(css, /background: #020617/);
 	assert.match(css, /\.nodeIconFrame/);

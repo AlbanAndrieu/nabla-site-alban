@@ -166,6 +166,7 @@ export default function ArchitecturePrivateViews({
 						: "Published read-only architecture; private network diagnostics remain restricted."}
 				</p>
 				<ArchitectureTopologyView
+					readOnly
 					locale={locale}
 					initialCatalog={data.catalog}
 					initialCatalogSource={data.catalogSource}
@@ -185,7 +186,6 @@ export default function ArchitecturePrivateViews({
 				initialTopology={data.topology}
 			/>
 			<ArchitectureTopologyView
-				readOnly
 				locale={locale}
 				initialCatalog={data.catalog}
 				initialCatalogSource={data.catalogSource}

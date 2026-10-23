@@ -100,14 +100,12 @@ export function filterHierarchyGroups(
 			healthFilter === "all" ||
 			effectiveState(service, indexedHealth, healthUnavailable) ===
 				healthFilter;
-		const serviceEnvironments = resolveHomelabServiceEnvironments(
-			service,
-			topology,
-		);
-		const matchesEnvironment = homelabServiceMatchesEnvironment(
-			serviceEnvironments,
-			environmentFilter,
-		);
+		const matchesEnvironment =
+			environmentFilter === "all" ||
+			homelabServiceMatchesEnvironment(
+				resolveHomelabServiceEnvironments(service, topology),
+				environmentFilter,
+			);
 		const matchesSearch =
 			query.length === 0 ||
 			service.name.toLowerCase().includes(query) ||

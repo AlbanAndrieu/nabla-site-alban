@@ -1,3 +1,5 @@
+import { isRecord } from "./guards";
+
 export type HomelabReconciliationState =
 	| "in_sync"
 	| "declared_only"
@@ -51,10 +53,6 @@ export const HOMELAB_STATUS_DEFAULT_API_URL =
 // aligned with the richer health/diagnostic loaders so Vercel does not abort a
 // healthy-but-slower FastAPI response at the former 2.5s boundary.
 const PRIMARY_TIMEOUT_MS = 8_000;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function isReconciliationState(
 	value: unknown,

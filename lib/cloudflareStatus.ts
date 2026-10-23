@@ -1,3 +1,5 @@
+import { isRecord } from "./guards";
+
 export type CloudflareControlPlaneStatus = {
 	present: boolean;
 	statusConfirmed: boolean | null;
@@ -12,12 +14,6 @@ export type CloudflareControlPlaneStatus = {
 	stale: boolean;
 	tunnelCount?: number;
 };
-
-type UnknownRecord = Record<string, unknown>;
-
-function isRecord(value: unknown): value is UnknownRecord {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function optionalString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;

@@ -7,9 +7,9 @@ import type {
 	VerifiedHomelabHealthState,
 } from "./homelabHealthTypes";
 
-export function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+export { isRecord } from "./guards";
+
+import { isRecord } from "./guards";
 
 export function isHealthState(value: unknown): value is HomelabHealthState {
 	return (

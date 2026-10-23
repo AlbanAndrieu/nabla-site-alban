@@ -1,3 +1,4 @@
+import { isRecord, type UnknownRecord } from "./guards";
 import type { HomelabHealthSnapshot } from "./homelabHealth";
 import {
 	readTrueNasApiOperatorEvidence,
@@ -5,8 +6,6 @@ import {
 	type TrueNasApiOperatorEvidence,
 	type TrueNasTransportEvidence,
 } from "./homelabTrueNasDiagnostics";
-
-type UnknownRecord = Record<string, unknown>;
 
 export type ProbeRuntimeEvidence = {
 	startedAt?: string;
@@ -32,10 +31,6 @@ export type HomelabOperatorDiagnostics = {
 	trueNasTransport?: TrueNasTransportEvidence;
 	trueNasRuntimeError?: string;
 };
-
-function isRecord(value: unknown): value is UnknownRecord {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function text(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;

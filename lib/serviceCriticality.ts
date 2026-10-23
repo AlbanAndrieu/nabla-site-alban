@@ -434,7 +434,3 @@ export function compareServiceCriticality(
 		leftId.localeCompare(rightId)
 	);
 }
-
-export function criticalityTierOrder(tier: ServiceCriticalityTier): number {
-	return TIER_ORDER[tier];
-}

@@ -1,4 +1,6 @@
 import localTopology from "../public/service-topology.json";
+import { isRecord } from "./guards";
+import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 
 export type ServiceDeploymentEnvironment = {
 	name: "production" | "staging" | "dev";
@@ -27,7 +29,7 @@ export type ServiceTopologyNode = {
 	kind: string;
 	category: string;
 	presentationRole?: "service" | "core" | "support";
-	criticality?: "critical" | "high" | "medium" | "low";
+	criticality?: ServiceCriticalityLevel;
 	lifecycle?: ServiceLifecycle;
 	sourcePath?: string;
 	url?: string;
@@ -101,10 +103,6 @@ const RELATION_TYPES = new Set<ServiceRelationType>([
 	"exposedBy",
 	"automates",
 ]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function validLifecycle(value: unknown): boolean {
 	if (value === undefined) return true;

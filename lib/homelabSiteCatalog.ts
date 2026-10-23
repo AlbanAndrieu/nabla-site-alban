@@ -114,9 +114,57 @@ export function sanitizeSiteCatalogV2(
 	});
 }
 
+// The catalog changes on Backstage commits, not per request: share one verified
+// copy across requests and de-duplicate concurrent loads. Failures are never
+// cached. Keys include the fetch implementation (like fastApiHealthBoard) so a
+// replaced fetch, e.g. in tests, never sees another caller's result.
+const SITE_CATALOG_CACHE_MS = 60_000;
+
+type SiteCatalogCacheKey = { key: string; fetchImpl: typeof fetch };
+
+let cachedSiteCatalog:
+	| (SiteCatalogCacheKey & { expiresAt: number; catalog: HomelabCatalogV2 })
+	| null = null;
+let inFlightSiteCatalog:
+	| (SiteCatalogCacheKey & { promise: Promise<HomelabCatalogV2> })
+	| null = null;
+
+function sameCacheKey(a: SiteCatalogCacheKey, b: SiteCatalogCacheKey) {
+	return a.key === b.key && a.fetchImpl === b.fetchImpl;
+}
+
 export async function fetchSiteCatalogV2(): Promise<HomelabCatalogV2> {
 	const key = process.env.DIAGNOSTICS_ACCESS_KEY?.trim();
 	if (!key) throw new SiteCatalogV2Error("key-missing");
+	const cacheKey = { key, fetchImpl: globalThis.fetch };
+	if (
+		cachedSiteCatalog &&
+		sameCacheKey(cachedSiteCatalog, cacheKey) &&
+		cachedSiteCatalog.expiresAt > Date.now()
+	) {
+		return cachedSiteCatalog.catalog;
+	}
+	if (inFlightSiteCatalog && sameCacheKey(inFlightSiteCatalog, cacheKey)) {
+		return inFlightSiteCatalog.promise;
+	}
+	const promise = fetchSiteCatalogV2Uncached(key);
+	inFlightSiteCatalog = { ...cacheKey, promise };
+	try {
+		const catalog = await promise;
+		cachedSiteCatalog = {
+			...cacheKey,
+			expiresAt: Date.now() + SITE_CATALOG_CACHE_MS,
+			catalog,
+		};
+		return catalog;
+	} finally {
+		if (inFlightSiteCatalog?.promise === promise) inFlightSiteCatalog = null;
+	}
+}
+
+async function fetchSiteCatalogV2Uncached(
+	key: string,
+): Promise<HomelabCatalogV2> {
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 	try {

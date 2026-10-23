@@ -11,10 +11,14 @@ test("shared platform hardening keeps the reviewed security baseline", async () 
 		source("next.config.mjs"),
 	]);
 
+	// The Talos runtime is Node standalone (k8sStandaloneContract); every stage
+	// still uses a digest-pinned, unprivileged base image.
 	assert.match(
 		dockerfile,
-		/FROM nginxinc\/nginx-unprivileged:1\.30\.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7364b4a14f9bad4763ae8f5317c437b896afa3df4b84/,
+		/^ARG NODE_IMAGE=node:24\.22\.1-alpine3\.24@sha256:[0-9a-f]{64}$/m,
 	);
+	assert.doesNotMatch(dockerfile, /^FROM (?!\$\{NODE_IMAGE\})/m);
+	assert.match(dockerfile, /^USER 10001:10001$/m);
 	assert.match(nextConfig, /poweredByHeader:\s*false/);
 	assert.match(nextConfig, /X-Content-Type-Options/);
 	assert.match(nextConfig, /Referrer-Policy/);

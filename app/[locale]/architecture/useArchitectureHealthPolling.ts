@@ -7,7 +7,11 @@ import {
 } from "@/lib/homelabHealth";
 import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
 
-export type ArchitectureHealthSource = "loading" | "fastapi" | "site-v2" | "unavailable";
+export type ArchitectureHealthSource =
+	| "loading"
+	| "fastapi"
+	| "site-v2"
+	| "unavailable";
 
 const HEALTH_POLL_REFRESHING_MS = 2_000;
 const HEALTH_POLL_FRESH_MS = 5_000;
@@ -119,13 +123,24 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		};
 	}, [readOnly]);
 
+	// Access changes can precede effect cleanup. Mask cached OWNER data immediately.
+	const visibleHealth = readOnly ? null : health;
+	const visibleSiteHealth = readOnly ? siteHealth : null;
 	const healthSource: ArchitectureHealthSource = healthUnavailable
 		? "unavailable"
-		: readOnly && siteHealth
-			? "site-v2"
-			: health
+		: readOnly
+			? visibleSiteHealth
+				? "site-v2"
+				: "loading"
+			: visibleHealth
 				? "fastapi"
 				: "loading";
 
-	return { health, siteHealth, healthUnavailable, refreshing, healthSource } as const;
+	return {
+		health: visibleHealth,
+		siteHealth: visibleSiteHealth,
+		healthUnavailable,
+		refreshing,
+		healthSource,
+	} as const;
 }

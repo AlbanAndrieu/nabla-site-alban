@@ -61,9 +61,12 @@ test("originFromDomainEnv keeps only safe scheme and host", () => {
 		"https://example.com",
 	);
 	assert.equal(
-		originFromDomainEnv("http://example.com:8080/path?x=1"),
+		originFromDomainEnv("http://example.com:8080"),
 		"http://example.com:8080",
 	);
+	// DOMAIN must be a bare origin: paths or queries are refused, not truncated.
+	assert.equal(originFromDomainEnv("http://example.com:8080/path?x=1"), null);
+	assert.equal(originFromDomainEnv("https://example.com/#fragment"), null);
 });
 
 test("originFromDomainEnv rejects unsupported or credentialed URLs", () => {

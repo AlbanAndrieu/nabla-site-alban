@@ -1,10 +1,9 @@
+import { isRecord, type UnknownRecord } from "./guards";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
 	HomelabInternalHealthEntry,
 } from "./homelabHealth";
-
-type UnknownRecord = Record<string, unknown>;
 
 const ROLLING_DIAGNOSTIC_KEYS = [
 	"probe_source",
@@ -52,10 +51,6 @@ const SERVICE_DIAGNOSTIC_KEYS = [
 
 const INTERNAL_DIAGNOSTIC_KEYS = ROLLING_DIAGNOSTIC_KEYS;
 
-function isRecord(value: unknown): value is UnknownRecord {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function copyAllowed(
 	value: unknown,
 	keys: readonly string[],
@@ -78,7 +73,10 @@ function copyAllowed(
 
 function normalizedName(value: unknown): string | null {
 	return typeof value === "string" && value.trim()
-		? value.trim().toLowerCase().replace(/[\s_-]+/g, "")
+		? value
+				.trim()
+				.toLowerCase()
+				.replace(/[\s_-]+/g, "")
 		: null;
 }
 

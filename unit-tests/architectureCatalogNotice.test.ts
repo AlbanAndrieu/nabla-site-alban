@@ -17,7 +17,19 @@ test("private architecture error is actionable, accessible and localized", async
 	assert.match(view, /fetchJson\("\/api\/homelab-catalog-v2"/);
 	assert.match(view, /controller\.abort\(\)/);
 	assert.match(view, /setAttempt\(\(current\) => current \+ 1\)/);
-	assert.match(view, /if \(!trusted\) return null/);
+	assert.match(
+		view,
+		/const visible = access === "trusted" \|\| access === "readonly";/,
+	);
+	assert.match(view, /if \(!visible\) return null/);
+	// Read-only visitors get the sanitized topology only, never OWNER views.
+	const readOnlyBranch = view.indexOf('if (access === "readonly")');
+	const privateView = view.indexOf("<div data-homelab-private-view>");
+	assert.ok(readOnlyBranch > 0 && readOnlyBranch < privateView);
+	assert.doesNotMatch(
+		view.slice(readOnlyBranch, privateView),
+		/HomelabOperationalEvidence|ArchitectureImpactInspector/,
+	);
 	assert.match(view, /if \(status === "loading"/);
 	assert.match(notice, /role="alert"/);
 	assert.match(notice, /data-architecture-catalog-v2-unavailable/);

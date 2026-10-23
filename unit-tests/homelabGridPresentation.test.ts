@@ -55,12 +55,23 @@ test("unavailable TrueNAS runtime is not presented as healthy", () => {
 		runtimePresentationState(running, true, "garage", false, false),
 		"ok",
 	);
+	// Unavailable or stale evidence is UNKNOWN, never an observed outage.
 	assert.equal(
 		runtimePresentationState(running, true, "garage", true, false),
-		"missing",
+		"unknown",
 	);
 	assert.equal(
 		runtimePresentationState(running, true, "garage", false, true),
+		"unknown",
+	);
+	assert.equal(
+		runtimePresentationState(
+			{ runtime_state: "RUNNING", runtime_missing: true },
+			true,
+			"garage",
+			false,
+			false,
+		),
 		"missing",
 	);
 	assert.equal(

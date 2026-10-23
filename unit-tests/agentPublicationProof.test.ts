@@ -156,7 +156,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 			new RegExp(`base=${await git(cwd, "rev-parse", "HEAD~1")}`),
 		);
 		assert.match(status.stdout, /toolchain_sha=[0-9a-f]{64}/);
-		assert.match(status.stdout, /node=v26\.8\.2/);
+		assert.match(status.stdout, /node=v24\.22\.1/);
 		assert.match(status.stdout, /npm=12\.2\.0/);
 		assert.match(status.stdout, /python=Python 3\.12\.10/);
 		assert.match(status.stdout, /pre-commit=pre-commit 4\.6\.2/);
