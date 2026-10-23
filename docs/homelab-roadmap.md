@@ -1,3 +1,12 @@
+## P1 — Revalidation de l'accès navigateur OWNER / lecture publique (23 octobre 2026)
+
+- [x] Remplacer l'ancien `accessProbe` conservé indéfiniment par un coordinateur client dédupliquant les vérifications concurrentes de TrueNAS et d'Architecture.
+- [x] Réexaminer `/api/homelab-access` toutes les **30 secondes** dans les onglets visibles et au retour au premier plan (délai minimal de 2 secondes pour éviter les rafales).
+- [x] Masquer immédiatement les vues OWNER pendant une nouvelle vérification (`pending`), refuser les réponses inconnues et révoquer le rendu après une erreur HTTP, réseau ou JSON. Conserver toutes les autorisations sur les routes serveur ; ce hook ne constitue jamais un mécanisme d'authentification.
+- [x] Purger les projections publiques stockées localement lorsque l'accès est refusé, y compris après changement de Wi-Fi/VPN. Nettoyer les temporisateurs et événements sur démontage.
+- [x] **22/22 tests ciblés réellement exécutés sur le mini-checkout local** sous Node 22 : 14 sur le cache SERVICE, 6 sur la coordination/expiration d'accès et 2 contrats de branchement React. Contrôle `tsc --strict` du nouveau hook, du coordinateur et du cache avec types React simulés.
+- [ ] Quality gate complète sous Node 24 LTS, tests React/Playwright et Vercel Preview exact-SHA sur les transitions Wi-Fi/OWNER/public, y compris plusieurs composants simultanés. Ne pas créer de PR ou lancer de CI payante avant validation locale complète.
+
 ## P0 — Icônes et ReactFlow TrueNAS / catalogue Backstage v2 (23 octobre 2026)
 
 - [x] Vérifier la version réellement servie par Vercel : la production est toujours sur `55ccc4c` (#247), car le build `53419c1` (#248) a échoué au typecheck. Les quatre erreurs remontent aux valeurs `entityRef` non typées (`unknown`) dans les deux hiérarchies et les filtres.

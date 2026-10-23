@@ -2,60 +2,69 @@
 
 import { useEffect, useState } from "react";
 import { clearPublicHomelabBrowserCache } from "@/lib/homelabPublicBrowserCache";
+import {
+	ACCESS_RECHECK_MS,
+	createHomelabAccessProbe,
+	parseHomelabAccessDecision,
+	type HomelabAccessDecision,
+	type HomelabAccessState,
+} from "@/lib/homelabBrowserAccess";
 
-export type HomelabAccessState = "pending" | "trusted" | "readonly" | "denied";
+export type { HomelabAccessState } from "@/lib/homelabBrowserAccess";
 
-// One probe per page load shared by every gate on the page (TrueNAS mounts
-// two). A failed probe is forgotten so the next mount can retry.
-let accessProbe: Promise<HomelabAccessState> | null = null;
-
-async function probeHomelabAccess(): Promise<HomelabAccessState> {
+async function fetchHomelabAccess(): Promise<HomelabAccessDecision> {
 	const response = await fetch("/api/homelab-access", {
 		cache: "no-store",
 		credentials: "same-origin",
 		headers: { Accept: "application/json" },
 	});
 	if (!response.ok) throw new Error(`access HTTP ${response.status}`);
-	const body: unknown = await response.json();
-	if (typeof body !== "object" || body === null) return "denied";
-	const result = body as { trusted?: unknown; mode?: unknown };
-	if (result.trusted !== true) return "denied";
-	return result.mode === "public-readonly" ? "readonly" : "trusted";
+	return parseHomelabAccessDecision(await response.json());
 }
 
-function sharedAccessProbe(): Promise<HomelabAccessState> {
-	accessProbe ??= probeHomelabAccess().catch(() => {
-		accessProbe = null;
-		return "denied";
-	});
-	return accessProbe;
-}
+// TrueNAS and Architecture mount several gates. Share one in-flight request,
+// but never cache a trusted decision indefinitely across Wi-Fi/VPN changes.
+const accessProbe = createHomelabAccessProbe(fetchHomelabAccess);
 
 /**
- * Asks the server whether this browser may load the owner-only homelab views
- * (owner network or verified Cloudflare Access). This only decides what to
- * render: every private datum is still fetched from a server-gated route.
+ * UI gating only: every restricted endpoint still authorizes independently.
+ * Recheck access on focus/visibility and every 30 seconds in visible tabs.
  */
 export default function useHomelabAccess(): HomelabAccessState {
 	const [state, setState] = useState<HomelabAccessState>("pending");
 
 	useEffect(() => {
 		let active = true;
-		sharedAccessProbe().then((access) => {
-			if (!active) return;
-			if (access === "denied") {
-				// Public data was intentionally retained for offline display only
-				// while access was allowed. Revocation invalidates both cache keys.
-				try {
-					clearPublicHomelabBrowserCache(window.localStorage);
-				} catch {
-					// Storage may be blocked; the access gate still denies rendering.
+		const refresh = (onFocus = false) => {
+			if (document.hidden) return;
+			// Unmount previously visible OWNER content while access is rechecked.
+			if (accessProbe.shouldRecheck(onFocus)) setState("pending");
+			void accessProbe.check(onFocus).then((access) => {
+				if (!active) return;
+				if (access === "denied") {
+					try {
+						clearPublicHomelabBrowserCache(window.localStorage);
+					} catch {
+						// Browser storage restrictions cannot grant access.
+					}
 				}
-			}
-			setState(access);
-		});
+				setState(access);
+			});
+		};
+
+		refresh();
+		const onVisibilityOrFocus = () => refresh(true);
+		const onVisibilityChange = () => {
+			if (!document.hidden) onVisibilityOrFocus();
+		};
+		const interval = window.setInterval(() => refresh(), ACCESS_RECHECK_MS);
+		document.addEventListener("visibilitychange", onVisibilityChange);
+		window.addEventListener("focus", onVisibilityOrFocus);
 		return () => {
 			active = false;
+			window.clearInterval(interval);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
+			window.removeEventListener("focus", onVisibilityOrFocus);
 		};
 	}, []);
 
