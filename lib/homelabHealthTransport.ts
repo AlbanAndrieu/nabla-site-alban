@@ -1,3 +1,4 @@
+import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
 import { parseHomelabHealthSnapshot } from "./homelabHealthParser";
 import type {
 	HomelabHealthSnapshot,
@@ -31,8 +32,11 @@ async function loadSnapshot(
 	cacheControl?: string,
 ): Promise<HomelabHealthSnapshot> {
 	if (
-		process.env.VERCEL_ENV &&
-		process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED !== "true"
+		ownerUpstreamBlocked(
+			process.env.VERCEL_ENV,
+			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
+		)
 	) {
 		throw new Error("owner-upstream-disabled");
 	}
@@ -42,11 +46,13 @@ async function loadSnapshot(
 		const response = await fetch(primaryUrl, {
 			headers: {
 				Accept: "application/json",
+				...ownerDiagnosticHeaders(process.env.DIAGNOSTICS_ACCESS_KEY),
 				"User-Agent": userAgent,
 				...(cacheControl ? { "Cache-Control": cacheControl } : {}),
 			},
 			signal: controller.signal,
 			cache: "no-store",
+			redirect: "error",
 		});
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		const snapshot = parseHomelabHealthSnapshot(await response.json());

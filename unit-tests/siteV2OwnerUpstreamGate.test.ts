@@ -9,11 +9,13 @@ import {
 test("Vercel never attempts OWNER-only upstream requests by default", async () => {
 	const oldVercelEnv = process.env.VERCEL_ENV;
 	const oldOverride = process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED;
+	const oldDiagnosticsKey = process.env.DIAGNOSTICS_ACCESS_KEY;
 	const originalFetch = globalThis.fetch;
 	let calls = 0;
 	try {
 		process.env.VERCEL_ENV = "production";
 		delete process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED;
+		delete process.env.DIAGNOSTICS_ACCESS_KEY;
 		globalThis.fetch = (async () => {
 			calls += 1;
 			throw new Error("No OWNER fetch should occur from Vercel");
@@ -33,5 +35,7 @@ test("Vercel never attempts OWNER-only upstream requests by default", async () =
 		if (oldOverride === undefined)
 			delete process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED;
 		else process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED = oldOverride;
+		if (oldDiagnosticsKey === undefined) delete process.env.DIAGNOSTICS_ACCESS_KEY;
+		else process.env.DIAGNOSTICS_ACCESS_KEY = oldDiagnosticsKey;
 	}
 });

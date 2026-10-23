@@ -25,6 +25,101 @@
 - [ ] Verify the Vercel production server has a valid `DIAGNOSTICS_ACCESS_KEY` for the canonical FastAPI SERVICE v2 reader; missing, denied, invalid or stale backend catalog remains 503, never a fabricated healthy service or legacy v1 fallback. Validate FR/EN /truenas and /architecture from external/mobile and home networks.
 - [ ] Improve operational UI external view by consuming safe, strictly projected read models for additional statuses; **do not** publish raw LAN IPs, credentials, probe HTTP traces, security posture or private URLs to satisfy a missing card. Both repos remain draft/local-first until explicitly approved.
 
+## P0 — Restauration diagnostics OWNER depuis Wi-Fi + icônes (23 octobre 2026)
+
+- [x] L'accès OWNER à la page est déjà vérifié via l'edge Vercel ; ne pas confondre cette IP navigateur et l'egress Vercel vers FastAPI.
+- [x] Lever le blocage site OWNER uniquement en présence de `DIAGNOSTICS_ACCESS_KEY` côté serveur et d'une requête déjà passée par `gatedHomelabResponse`. Conserver `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED=false` comme arrêt d'urgence.
+- [x] Envoyer `X-Diagnostics-Key` aux trois sources FastAPI (health-board, aggregate, probes), sans chaîne de redirection et sans exposer la clé au navigateur.
+- [x] Rendre les icônes statiques indépendantes des observations runtime : projection canonique Backstage v2 → assets SVG publics autorisés.
+- [ ] Confirmer en production l'activation temporaire FastAPI `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true`, la correspondance de la clé, et le comportement HTTP 200 versus 401/403/503 depuis la vraie IP domestique.
+- [ ] Après disponibilité du relais OWNER authentifié, remettre les deux drapeaux FastAPI et Site à leurs valeurs restrictives ; ne jamais autoriser l'egress Vercel dans `HOMELAB_TRUSTED_CIDRS`.
+- [ ] Compiler et tester le dépôt entier, rebase PR #247 sur master puis Preview exact-SHA avant fusion ; GitHub Actions indisponibles et aucune mise en production faite.
+
+## P0 — Une seule image Dockerfile pour Talos (23 octobre 2026)
+
+- [x] Le Dockerfile racine devient l'application complète Next.js SSR/API (port 3000), non-root et multi-stage ; supprimer Dockerfile.k8s et son ignore spécifique.
+- [x] Mettre à jour .dockerignore, justfile, tests de contrat, CI Docker et SCA, ainsi que le runbook ; ne pas modifier le build natif Vercel.
+- [x] Ne plus ignorer Trivy sur des mises à jour Next.js : construire, smoke et scanner l'image avant publication ; image par SHA et déploiement par digest.
+- [ ] Construire et lancer le vrai conteneur avec Node/npm/Docker disponibles ; scan Trivy et tests de bout en bout à prouver avant passage en Ready.
+- [ ] Inventorier les consommateurs historiques de l'image de fallback Nginx avant publication sous les anciens tags GHCR/Docker Hub.
+
+## P1 — Convergence qualité nabla-compose → site-alban (23 octobre 2026)
+
+- [x] Comparaison des contrôles des deux dépôts : actionlint, zizmor, hadolint, ShellCheck, Betterleaks, contrôle des exécutables, hook Git pre-push et politique Draft/Ready déjà présents ; ne pas les dupliquer.
+- [x] Ajouter `just loop` et `mise run agent-loop` comme étape rapide pre-commit sur les fichiers modifiés, avec comparaison Git stricte et sans publication.
+- [ ] Vérifier la convergence complète du gate local sur un checkout Node 26/npm 12 ; le mode loop ne remplace ni typecheck, tests, build, ni quality:agent:publish.
+- [ ] Déployé en un seul `Dockerfile` pour le serveur Next.js port 3000 (Vercel reste natif) ; le workflow Docker vérifie cette image uniquement hors PR Draft. Tests de build réels restant à faire localement.
+
+## P0 — Convergence CI / hooks avec nabla-compose (22 octobre 2026)
+
+- [x] Reprendre le principe `Draft` sans runner facturé : jobs conditionnels dans Docker fallback, Trivy SCA, RSS OPML et MegaLinter ; `ready_for_review` doit réactiver les contrôles obligatoires, sans directives de skip.
+- [x] Remplacer `Dockerfile.k8s*` par le seul `Dockerfile` dans la portée CI/SCA et supprimer le fallback Nginx du workflow Docker ; Trivy de l'image est bloquant sur Ready.
+- [x] Remplacer le hook shfmt-docker par shfmt natif comme dans nabla-compose, avec Go 1.25.12 géré par mise. Le premier bootstrap du hook requiert Go et l'accès aux dépendances, **non validés ici**.
+- [x] Adapter l'inventaire GitHub Actions à la proposition bornée de nabla-compose #269 (encore Draft) : pagination limitée, validation des IDs, métriques partielles en échec explicite et tests hors ligne indépendants de GitHub CLI. Les tests du vrai checkout restent à exécuter.
+- [ ] Exécuter `just hooks`, quality fix/publish, actionlint, zizmor, BetterLeaks et Next.js build dans un checkout complet avant revue. Source-check ajoute désormais le contrat CI et les tests Actions, sans prétendre à une preuve de publication. Aucun GitHub Actions lancé.
+- [ ] Auditer puis réduire les droits de mutation du workflow MegaLinter sur les PRs externes, sans compromettre les validations obligatoires.
+
+## P1 — Image Next.js pour Talos/Kubernetes (22 octobre 2026)
+
+- [x] Conserver un seul Dockerfile racine pour Next.js standalone SSR/API, Node 26.8.2 et npm 12.2, UID/GID 10001 et port 3000.
+- [x] Ajouter un contexte Docker spécifique excluant les secrets, un smoke read-only avec frontière OWNER fermée et des cibles justfile sans Actions.
+- [x] Aligner le conteneur sur scripts/talos/deploy-site-alban.sh déjà présent dans nabla-compose ; déploiement Talos limité au hostname privé de recette, sans bascule de www.albanandrieu.com.
+- [ ] Protéger le déploiement par Traefik TLS/LAN-only, fournir le cache .next writable en emptyDir et une Secret Kubernetes via GitOps (source d'autorité nabla-compose).
+- [ ] Construire, scanner Trivy et publier une image par digest sur une machine avec Docker/Node/npm ; procéder au preflight Talos et dry-run serveur puis effectuer un smoke HTTPS.
+- [ ] Ne pas contourner lib/homelabAccess.ts : le contrôle OWNER basé sur les entêtes Vercel ne reconnaît pas le proxy Traefik, faute de chaîne de confiance validée.
+- [ ] Quality gate, tests Next.js complets et mise en production : non exécutés dans l'environnement agent sans checkout ni Docker.
+
+## P0 — Résilience UI TrueNAS / frontière OWNER (22 octobre 2026)
+
+- [x] Déduire du code la cause structurelle de la réponse OWNER 503 sur Vercel :
+  `HOMELAB_OWNER_RAW_UPSTREAM_ENABLED` désactivé par défaut ; ne pas le réactiver
+  sans relais d’identité propriétaire validé.
+- [x] Classifier explicitement le 503 `owner-boundary` dans les deux routes
+  protégées, court-circuiter l'amont et éviter leur polling répété depuis le
+  navigateur ; continuer la collecte SERVICE v2.
+- [x] Corriger les faux crânes TrueNAS : `unknown` lorsque la télémétrie est
+  absente ou périmée ; `missing` exclusivement lorsque `runtime_missing`
+  est confirmé sur des données courantes.
+- [ ] **Recette live sur le réseau autorisé** : comparer les réponses
+  `/api/homelab-health-v2`, `/api/homelab-catalog-v2` et le motif OWNER
+  `/api/homelab-health` après déploiement du HEAD exact.
+- [ ] **Diagnostics enrichis** : définir un relais OWNER sécurisé (Access/JWT
+  vérifié, RBAC, audit, anti-replay, TLS), sans accepter l’egress Vercel comme
+  identité humaine.
+- [ ] Quality gate locale complète, tests Playwright et comportement Production
+  vérifié une fois le checkout Node/npm compatible disponible ; pas d'Actions
+  GitHub coûteuses dans le quota actuel.
+
+## P0 — Unicité stricte des services Backstage v2 (22 octobre 2026)
+
+- [x] Audit de `nabla-compose/master` au SHA `1e4060d58c6553c1717630a024c7739fdb7d24f0` : 153 entités, dont 150 Component/Resource/API ; **0 doublon** de `metadata.name`, titre affiché ou slug de carte. Les noms en collision utilisés auparavant dans les tests étaient fictifs.
+- [x] Refuser le catalogue v2 dans le parseur si deux entités affichables possèdent le même nom insensible à la casse, le même titre normalisé ou le même identifiant de carte. Ne jamais renommer un service ambigu ou fabriquer une identité alternative.
+- [x] Simplifier la projection React Flow en supprimant l'algorithme de résolution des collisions, tout en conservant les identifiants existants pour les services valides.
+- [ ] Appliquer la même invariant dans le générateur de `nabla-compose` et le validateur FastAPI, avant publication, afin que les erreurs soient diagnostiquées à la source.
+- [ ] Validation intégrale du dépôt (formatage, pre-commit, tests Next.js et Preview exacte) lorsque l'environnement Node/npm compatible et le checkout complet seront disponibles ; aucun runner Actions tant que les crédits sont épuisés.
+
+## P0 — Corrélation des états SERVICE v2 et cartes privées (21 octobre 2026)
+
+- [x] Empêcher l'attribution d'un état SERVICE à plusieurs `entityRef`
+  partageant le même nom lorsque FastAPI ne corrèle encore les sondes que sur
+  `metadata.name` : état `unknown`, jamais état positif supposé.
+- [x] Pour les cartes Backstage v2, n'accepter les observations OWNER détaillées
+  que si leur identifiant explicite correspond exactement au service projeté.
+  Les cartes historiques sans `entityRef` gardent leur rapprochement par nom/URL.
+- [x] Vérifier dans l'environnement agent : 8 tests isolés d'états SERVICE,
+  5 tests isolés d'identité et 5 tests de projection (18 PASS), compilation
+  TypeScript ciblée stricte. Ces bancs partiels ne prouvent pas le build Next.js.
+- [ ] **FastAPI** : supprimer la jointure sur `metadata.name` au profit d'une
+  identité canonique `entityRef` étayée par la source de sondes, puis
+  synchroniser les tests inter-repos et retirer la mesure conservatrice.
+- [ ] **Contrat inter-repos** : aligner le traitement des points et underscores
+  dans les noms/références : le Site accepte ces caractères mais les validateurs
+  FastAPI actuels n'acceptent que les noms avec tirets.
+- [ ] **Validation restante** : vrai checkout Node 26/npm 12, quality gate
+  local-first, tests Playwright exact-SHA et recette SERVICE live. Ne pas
+  utiliser GitHub Actions en quota épuisé ; conserver cette branche sans PR,
+  car `pull_request_target` côté `master` peut encore réserver un runner.
+
 ## P0 — Cutover direct Backstage v2 (20 octobre 2026, Site #240)
 
 - [x] Cible confirmée auprès de FastAPI [#358](https://github.com/AlbanAndrieu/fastapi-sample/pull/358) :
@@ -37,10 +132,11 @@
 - [x] Préserver les cartes même si une topologie indépendante échoue :
   cartes et topologie résident maintenant dans la même réponse v2.
   La page Architecture lit uniquement le graphe v2 authentifié.
-- [ ] Déployer FastAPI #358 après qualité, puis rendre disponible le
-  `catalog/generated/entities.json` canonique de Compose #265 sur la branche
-  attendue. Tant que ces PR ne sont pas livrées, un 404/503 est normal ;
-  ne pas basculer vers le fichier v1.
+- [ ] **Validation effective du runtime v2** : Site #240, FastAPI #358
+  et Compose #265 sont fusionnées ; vérifier toutefois que FastAPI déployé
+  charge réellement `catalog/generated/entities.json` et répond avec un
+  catalogue SERVICE contenant des Component, Resource ou API. La fusion des PR
+  n'atteste pas ce résultat. Aucun fallback v1.
 - [ ] Valider depuis le Wi-Fi autorisé : `GET /api/homelab-access?diagnose=1`
   reste `trusted:true`; la **clé Preview factice** doit être refusée,
   via un 503 Site dont la raison est `access-denied` uniquement lorsque
@@ -49,8 +145,11 @@
   HTTP 200 + `X-Homelab-Inventory-Complete:true`, services non vides, révision
   identique sur les routes owner et Architecture, aucun détail secret.
   Aucune clé valide présumée ni récupérée actuellement.
-- [ ] Exécuter les tests local-first et les quality gates sur HEAD exact ;
-  la PR #240 doit rester ouverte et non fusionnée en l'absence d'autorisation.
+- [ ] Exécuter les quality gates complètes sur le HEAD exact dès qu'un
+  environnement compatible Node/npm est disponible ; pendant le quota Actions
+  épuisé, conserver la branche de stabilisation en dehors d'une PR pour
+  éviter l'exécution du workflow `pull_request_target` sur `master`.
+  Aucune fusion sans autorisation.
 - [ ] Confirmer les scans OWASP ZAP Preview réels et la confidentialité
   des rapports ; la classification des erreurs sans rapport n'est pas une
   preuve d'exécution du scanner.

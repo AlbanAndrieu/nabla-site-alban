@@ -111,7 +111,7 @@ test("TrueNAS application cards show runtime icons and a legend", async () => {
 	assert.match(page, /function runtimePresentationState/);
 	assert.match(
 		page,
-		/runtimeHealthState\(entry\?\.runtime_state\) \?\? "missing"/,
+		/runtimeHealthState\(entry\?\.runtime_state\) \?\? "unknown"/,
 	);
 	assert.match(page, /"fas fa-circle-check"/);
 	assert.match(page, /"fas fa-triangle-exclamation"/);
@@ -263,4 +263,14 @@ test("internal badge uses semantic tokens instead of the low-contrast legacy bg-
 		css,
 		/:global\(\.badge\)\.internalBadge \{[^}]*background: var\(--ui-surface-muted\);[^}]*color: var\(--ui-text-primary\);/,
 	);
+});
+
+test("stale TrueNAS evidence never implies missing runtime", async () => {
+	const presentation = await source("app/components/homelab/homelabGridPresentation.ts");
+	assert.match(presentation, /entry\?\.observation_stale === true/);
+	assert.match(presentation, /if \(entry\?\.runtime_missing === true\) return "missing"/);
+	assert.match(presentation, /return "unknown"/);
+	const page = await gridSource();
+	assert.match(page, /t\("runtime\.unknown"\)/);
+	assert.match(page, /t\("runtime\.legendUnknown"\)/);
 });

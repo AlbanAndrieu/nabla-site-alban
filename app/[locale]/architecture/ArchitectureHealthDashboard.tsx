@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import homelabStyles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import {
 	GROUP_FILTERS,
@@ -10,6 +10,7 @@ import {
 	type HealthFilter,
 	type HealthStateCounts,
 	PRESENTATION_GROUP_TITLE_KEY,
+	snapshotAgeSeconds,
 } from "./architectureTopologyFilters";
 
 type Props = {
@@ -17,7 +18,7 @@ type Props = {
 	refreshing: boolean;
 	healthUnavailable: boolean;
 	healthSource?: "loading" | "fastapi" | "site-v2" | "unavailable";
-	ageSeconds: number | null;
+	checkedAt: string | undefined;
 	counts: HealthStateCounts;
 	healthFilter: HealthFilter;
 	setHealthFilter: Dispatch<SetStateAction<HealthFilter>>;
@@ -35,7 +36,7 @@ export default function ArchitectureHealthDashboard({
 	refreshing,
 	healthUnavailable,
 	healthSource,
-	ageSeconds,
+	checkedAt,
 	counts,
 	healthFilter,
 	setHealthFilter,
@@ -47,6 +48,13 @@ export default function ArchitectureHealthDashboard({
 	totalCount,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
+	// The age clock lives here so its ticks never re-render the topology graph.
+	const [now, setNow] = useState(() => Date.now());
+	useEffect(() => {
+		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
+		return () => window.clearInterval(clockTimer);
+	}, []);
+	const ageSeconds = snapshotAgeSeconds(checkedAt, now);
 	const groupLabel = (group: GroupFilter) =>
 		group === "all"
 			? t("presentation.allGroups")
@@ -84,10 +92,10 @@ export default function ArchitectureHealthDashboard({
 								? "Actualisation indisponible · dernier snapshot conservé"
 								: "Refresh unavailable · keeping last snapshot"
 							: healthSource === "site-v2"
-					? french
-						? "États v2 actualisés · sondes détaillées privées"
-						: "V2 states refreshed · detailed probes private"
-				: ageSeconds === null
+							? french
+								? "États v2 actualisés · sondes détaillées privées"
+								: "V2 states refreshed · detailed probes private"
+						: ageSeconds === null
 								? french
 									? "Snapshot en attente"
 									: "Waiting for snapshot"

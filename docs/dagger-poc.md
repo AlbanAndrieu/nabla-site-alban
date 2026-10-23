@@ -36,7 +36,7 @@ just bench-dev-loop
 ```
 
 `bench-dev-loop` utilise Hyperfine et compare, à cache chaud, le contrôle
-Dagger Node 26 avec `npm run check`. Il ne remplace pas les mesures CI
+Dagger Node 24 LTS avec `npm run check`. Il ne remplace pas les mesures CI
 existantes.
 
 ## Snapshot exact-HEAD pour agents sans DNS

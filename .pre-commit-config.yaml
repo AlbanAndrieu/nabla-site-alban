@@ -229,10 +229,8 @@ repos:
 -   repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.13.1-1
     hooks:
-      # Choose one of:
-      # - id: shfmt         # native (requires Go to build)
-      -   id: shfmt-docker # Docker image (requires Docker to run)
-          name: "🐚 🐳 shell · Format shell scripts"
+      -   id: shfmt
+          name: "🐚 shell · Format shell scripts locally (Go)"
           args: ["-i", "4", "-ci"]
 -   repo: https://github.com/detailyang/pre-commit-shell
     rev: v1.0.6
@@ -598,6 +596,27 @@ repos:
 # pre-commit marks modified generated outputs as a failed hook: stage them and retry.
 -   repo: local
     hooks:
+    -   id: ci-budget-contract
+        name: "⚙️ actions · Draft budget and Kubernetes source scope"
+        language: system
+        entry: node --test unit-tests/ciBudgetConvergence.test.mjs
+        pass_filenames: false
+        stages: [pre-commit]
+        files: ^(\.github/workflows/(ci|docker-build|mega-linter|security-rss-opml|security-supply-chain)\.yml|\.pre-commit-config\.yaml|mise\.toml|scripts/agent-quality-gate\.sh|unit-tests/ciBudgetConvergence\.test\.mjs)$
+    -   id: lts-stack-contract
+        name: "🟢 runtime · Node 24 LTS and Next lock integrity"
+        language: system
+        entry: node --test unit-tests/ltsStackContract.test.mjs
+        pass_filenames: false
+        stages: [pre-commit]
+        files: ^(\.nvmrc|\.envrc|package(-lock)?\.json|Dockerfile|\.dagger/src/index\.ts|\.github/workflows/(ci|node24-compat|docker-build)\.yml|unit-tests/(ltsStackContract\.test\.mjs|nodeRuntimeCompatibility\.test\.ts)|justfile)$
+    -   id: github-actions-usage-contract
+        name: "🧮 actions · Validate bounded usage inventory locally"
+        language: system
+        entry: python3 -m unittest discover -s unit-tests -p test_github_actions_usage.py
+        pass_filenames: false
+        stages: [pre-commit]
+        files: ^(scripts/github-actions-usage[.]py|unit-tests/test_github_actions_usage[.]py|justfile)$
     -   id: generate-security-rss
         name: "📰 RSS · Regenerate public JSON from authoritative OPML"
         entry: node scripts/generate-security-rss.mjs

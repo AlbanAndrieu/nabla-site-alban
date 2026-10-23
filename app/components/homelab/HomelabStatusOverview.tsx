@@ -10,6 +10,7 @@ const RUNTIME_ICON_CLASS = {
 	ok: "fas fa-circle-check",
 	warn: "fas fa-triangle-exclamation",
 	fail: "fas fa-circle-xmark",
+	unknown: "fas fa-circle-question",
 	missing: "fas fa-skull-crossbones",
 } as const;
 
@@ -17,6 +18,7 @@ type Props = {
 	snapshot: HomelabHealthSnapshot | null;
 	healthUnavailable: boolean;
 	healthHttpStatus: number | null;
+	ownerBoundary?: boolean;
 	healthRefreshing: boolean;
 	onOpenCriticality: () => void;
 };
@@ -25,6 +27,7 @@ export default function HomelabStatusOverview({
 	snapshot,
 	healthUnavailable,
 	healthHttpStatus,
+	ownerBoundary = false,
 	healthRefreshing,
 	onOpenCriticality,
 }: Readonly<Props>) {
@@ -44,7 +47,9 @@ export default function HomelabStatusOverview({
 
 	if (healthUnavailable) {
 		runtimeWarningDetails.push(
-			t("truenas.liveSnapshotUnavailable", {
+			ownerBoundary
+				? t("truenas.ownerBoundary")
+				: t("truenas.liveSnapshotUnavailable", {
 				status:
 					healthHttpStatus === null
 						? t("truenas.networkError")
@@ -160,6 +165,14 @@ export default function HomelabStatusOverview({
 							aria-hidden="true"
 						/>{" "}
 						{t("runtime.legendFailed")}
+					</span>
+					<span>
+						<i
+							className={RUNTIME_ICON_CLASS.unknown}
+							style={{ color: homelabHealthColor("unknown") }}
+							aria-hidden="true"
+						/>{" "}
+						{t("runtime.legendUnknown")}
 					</span>
 					<span>
 						<i

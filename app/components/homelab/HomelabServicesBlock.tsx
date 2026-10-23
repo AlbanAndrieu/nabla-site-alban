@@ -215,6 +215,7 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 			<HomelabStatusOverview
 				snapshot={state.snapshot}
 				healthUnavailable={state.healthUnavailable}
+				ownerBoundary={state.ownerBoundary === true}
 				healthHttpStatus={state.healthStatus}
 				healthRefreshing={state.healthRefreshing}
 				onOpenCriticality={openCriticality}
@@ -488,6 +489,7 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
+									ownerBoundary={state.ownerBoundary === true}
 									healthHttpStatus={readOnly ? null : state.healthStatus}
 								/>
 							</div>

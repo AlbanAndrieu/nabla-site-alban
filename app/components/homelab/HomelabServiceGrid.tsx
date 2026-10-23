@@ -19,6 +19,7 @@ type Props = {
 	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
+	ownerBoundary?: boolean;
 };
 
 export default function HomelabServiceGrid({
@@ -27,6 +28,7 @@ export default function HomelabServiceGrid({
 	siteHealth = null,
 	healthUnavailable = false,
 	healthHttpStatus = null,
+	ownerBoundary = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
@@ -49,7 +51,9 @@ export default function HomelabServiceGrid({
 	const runtimeWarningDetails: string[] = [];
 	if (healthUnavailable) {
 		runtimeWarningDetails.push(
-			t("truenas.liveSnapshotUnavailable", {
+			ownerBoundary
+				? t("truenas.ownerBoundary")
+				: t("truenas.liveSnapshotUnavailable", {
 				status:
 					healthHttpStatus === null
 						? t("truenas.networkError")

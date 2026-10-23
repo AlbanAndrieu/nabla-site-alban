@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Node runtime policy pins patched development and production Node LTS", async () => {
+test("Node 24.22.1 LTS is the single development and production runtime", async () => {
 	const [nvmrc, envrc, packageRaw, lockRaw, workflow] = await Promise.all([
 		read(".nvmrc"),
 		read(".envrc"),
@@ -15,9 +15,22 @@ test("Node runtime policy pins patched development and production Node LTS", asy
 	]);
 	const packageJson = JSON.parse(packageRaw) as {
 		engines?: { node?: string; npm?: string };
+		devEngines?: { runtime?: { version?: string } };
+		dependencies?: { next?: string };
+		devDependencies?: { "@types/node"?: string };
 	};
 	const lock = JSON.parse(lockRaw) as {
-		packages?: { ""?: { engines?: { node?: string; npm?: string } } };
+		packages?: Record<
+			string,
+			{
+				engines?: { node?: string; npm?: string };
+				version?: string;
+				dependencies?: Record<string, string>;
+				optionalDependencies?: Record<string, string>;
+				integrity?: string;
+				resolved?: string;
+			}
+		>;
 	};
 
 	assert.equal(nvmrc.trim(), "24.22.1");
@@ -28,6 +41,26 @@ test("Node runtime policy pins patched development and production Node LTS", asy
 		"package-lock root engines must stay synchronized with package.json",
 	);
 	assert.match(envrc, /NODE_VERSIONS=\$\{NODE_VERSIONS:-"v24\.22\.1"\}/);
+	assert.equal(packageJson.devEngines?.runtime?.version, "24.22.1");
+	assert.equal(packageJson.dependencies?.next, "16.4.2");
+	assert.equal(lock.packages?.[""]?.dependencies?.next, "16.4.2");
+	assert.equal(lock.packages?.["node_modules/next"]?.version, "16.4.2");
+	assert.equal(lock.packages?.["node_modules/@next/env"]?.version, "16.4.2");
+	assert.equal(packageJson.devDependencies?.["@types/node"], "^24.13.3");
+	assert.equal(lock.packages?.["node_modules/@types/node"]?.version, "24.13.3");
+	const [dockerfile, dagger] = await Promise.all([
+		read("Dockerfile"),
+		read(".dagger/src/index.ts"),
+	]);
+	assert.match(dockerfile, /ARG NODE_IMAGE=node:24\.22\.1-alpine3\.24/);
+	assert.match(dagger, /const NODE_DEVELOPMENT = "24\.22\.1"/);
+	assert.match(dagger, /const NODE_VERCEL = "24\.22\.1"/);
+	for (const [name, version] of Object.entries(
+		lock.packages?.["node_modules/next"]?.optionalDependencies ?? {},
+	)) {
+		if (!name.startsWith("@next/swc-")) continue;
+		assert.equal(lock.packages?.[`node_modules/${name}`]?.version, version);
+	}
 
 	// The minimum production runtime is the package.json engines floor.
 	assert.match(workflow, /jq -r '\.engines\.node' package\.json/);

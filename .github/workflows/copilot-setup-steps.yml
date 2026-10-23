@@ -37,6 +37,9 @@ on:
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
   copilot-setup-steps:
+    # Draft iteration is local-first. The required Copilot setup still runs
+    # on Ready (or explicit workflow_dispatch) without burning draft minutes.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     # Set the permissions to the lowest permissions possible needed for your steps.

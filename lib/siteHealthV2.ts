@@ -10,7 +10,10 @@ export type SiteHealthV2 = {
 };
 
 const REVISION = /^sha256:[0-9a-f]{64}$/;
-const REF = /^(component|resource|api):[a-z0-9-]+\/[a-z0-9-]+$/;
+// Canonical Backstage names and namespaces may contain dots or underscores.
+// Bound segment lengths and reject paths and whitespace.
+const REF =
+	/^(component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/;
 const STATES = new Set(["ok", "warn", "fail", "unknown"]);
 
 export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
@@ -21,7 +24,8 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 		raw.model !== "backstage-health" ||
 		typeof raw.catalogRevision !== "string" ||
 		!REVISION.test(raw.catalogRevision) ||
-		!["fresh", "stale", "pending"].includes(String(raw.boardState)) ||
+		typeof raw.boardState !== "string" ||
+		!["fresh", "stale", "pending"].includes(raw.boardState) ||
 		!Array.isArray(raw.services) ||
 		raw.services.length > 2000
 	)
@@ -36,7 +40,8 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 			typeof entry.entityRef !== "string" ||
 			!REF.test(entry.entityRef) ||
 			seen.has(entry.entityRef) ||
-			!STATES.has(String(entry.state))
+			typeof entry.state !== "string" ||
+			!STATES.has(entry.state)
 		)
 			return null;
 		seen.add(entry.entityRef);
@@ -67,5 +72,21 @@ export function siteHealthIndex(
 		health.catalogRevision !== catalogRevision
 	)
 		return new Map();
-	return new Map(health.services.map((e) => [e.entityRef, e.state]));
+	// FastAPI currently reconciles probe rows by metadata.name, not entityRef.
+	// Distinct Backstage entities with the same name could inherit each other's
+	// health. Until the producer joins by entityRef, fail closed for all of them.
+	const nameCounts = new Map<string, number>();
+	for (const entry of health.services) {
+		const name = entry.entityRef.slice(entry.entityRef.lastIndexOf("/") + 1);
+		nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
+	}
+	return new Map(
+		health.services.map((entry) => {
+			const name = entry.entityRef.slice(entry.entityRef.lastIndexOf("/") + 1);
+			return [
+				entry.entityRef,
+				(nameCounts.get(name) ?? 0) > 1 ? "unknown" : entry.state,
+			] as const;
+		}),
+	);
 }

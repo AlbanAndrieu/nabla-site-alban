@@ -240,7 +240,25 @@ function tierFor(
 	}
 }
 
+// Topologies are immutable snapshots; callers re-analyze the same one from
+// several views and sort comparators, so the O(V·(V+E)) pass runs once each.
+const criticalityCache = new WeakMap<
+	ServiceTopology,
+	Map<string, ServiceCriticality>
+>();
+
+/** The returned map is shared between callers and must be treated as read-only. */
 export function analyzeServiceCriticality(
+	topology: ServiceTopology,
+): Map<string, ServiceCriticality> {
+	const cached = criticalityCache.get(topology);
+	if (cached) return cached;
+	const analysis = computeServiceCriticality(topology);
+	criticalityCache.set(topology, analysis);
+	return analysis;
+}
+
+function computeServiceCriticality(
 	topology: ServiceTopology,
 ): Map<string, ServiceCriticality> {
 	const requiredDependencies = new Map<string, Set<string>>();
@@ -335,21 +353,35 @@ function longestRequiredDependencyPath(
 	return [startId, ...(candidates[0] ?? [])];
 }
 
+// Sort comparators query the same closures O(n log n) times per sort.
+const requiredClosureCache = new WeakMap<
+	Map<string, ServiceCriticality>,
+	Map<string, Set<string>>
+>();
+
 function requiresTransitively(
 	sourceId: string,
 	targetId: string,
 	analysis: Map<string, ServiceCriticality>,
 ): boolean {
-	const seen = new Set<string>();
-	const pending = [...(analysis.get(sourceId)?.requiredDependencies ?? [])];
-	while (pending.length > 0) {
-		const current = pending.pop();
-		if (!current || seen.has(current)) continue;
-		if (current === targetId) return true;
-		seen.add(current);
-		pending.push(...(analysis.get(current)?.requiredDependencies ?? []));
+	let closures = requiredClosureCache.get(analysis);
+	if (!closures) {
+		closures = new Map();
+		requiredClosureCache.set(analysis, closures);
 	}
-	return false;
+	let closure = closures.get(sourceId);
+	if (!closure) {
+		closure = new Set<string>();
+		const pending = [...(analysis.get(sourceId)?.requiredDependencies ?? [])];
+		while (pending.length > 0) {
+			const current = pending.pop();
+			if (!current || closure.has(current)) continue;
+			closure.add(current);
+			pending.push(...(analysis.get(current)?.requiredDependencies ?? []));
+		}
+		closures.set(sourceId, closure);
+	}
+	return closure.has(targetId);
 }
 
 export function buildServiceImpactFocus(

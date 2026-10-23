@@ -18,12 +18,13 @@ import {
 	type GroupFilter,
 	type HealthFilter,
 	indexHealth,
-	snapshotAgeSeconds,
 } from "./architectureTopologyFilters";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
 import useArchitectureHealthPolling from "./useArchitectureHealthPolling";
 import useArchitectureLiveData from "./useArchitectureLiveData";
+
+const NO_HEALTH_INDEX = indexHealth(null);
 
 type Props = {
 	locale: string;
@@ -50,7 +51,7 @@ export default function ArchitectureTopologyView({
 			initialTopology,
 			initialTopologySource,
 		});
-	const { health, siteHealth, healthUnavailable, refreshing, now, healthSource } =
+	const { health, siteHealth, healthUnavailable, refreshing, healthSource } =
 		useArchitectureHealthPolling(readOnly);
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
@@ -69,10 +70,14 @@ export default function ArchitectureTopologyView({
 		[catalog.services, healthIndex],
 	);
 
+	// Health only changes the filtered set under a health filter; otherwise keep
+	// the graph input referentially stable across polls.
+	const filterHealthIndex =
+		healthFilter === "all" ? NO_HEALTH_INDEX : healthIndex;
 	const filteredCatalog = useMemo<HomelabServicesCatalog>(
 		() =>
 			filterArchitectureCatalog(catalog, {
-				healthIndex,
+				healthIndex: filterHealthIndex,
 				presentation,
 				healthFilter,
 				groupFilter,
@@ -80,15 +85,13 @@ export default function ArchitectureTopologyView({
 			}),
 		[
 			catalog,
+			filterHealthIndex,
 			groupFilter,
 			healthFilter,
-			healthIndex,
 			presentation,
 			searchQuery,
 		],
 	);
-
-	const ageSeconds = snapshotAgeSeconds(health?.checked_at, now);
 
 	return (
 		<>
@@ -103,7 +106,7 @@ export default function ArchitectureTopologyView({
 						refreshing={refreshing}
 						healthUnavailable={healthUnavailable}
 						healthSource={healthSource}
-						ageSeconds={ageSeconds}
+						checkedAt={health?.checked_at}
 						counts={counts}
 						healthFilter={healthFilter}
 						setHealthFilter={setHealthFilter}

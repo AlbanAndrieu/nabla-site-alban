@@ -55,3 +55,87 @@ test("extra operational data is never preserved in the status projection", () =>
 		/SECRET|internalHost|private\.invalid|172\.17/,
 	);
 });
+
+test("Backstage v2 health recognizes dot and underscore canonical references", () => {
+	const parsed = parseSiteHealthV2({
+		...DTO,
+		services: [
+			{ entityRef: "component:team_ops/service.v2", state: "ok" },
+			{ entityRef: "resource:default/garage_admin", state: "warn" },
+			{ entityRef: "api:default/service-api", state: "unknown" },
+		],
+	});
+	assert.ok(parsed);
+	const indexed = siteHealthIndex(parsed, REVISION);
+	assert.equal(indexed.get("component:team_ops/service.v2"), "ok");
+	assert.equal(indexed.get("resource:default/garage_admin"), "warn");
+});
+
+test("malformed SERVICE entity refs and non-string health values fail closed", () => {
+	for (const entityRef of [
+		"component:default/../secret",
+		"component:default/name with spaces",
+		"component:default/name/child",
+		"component:/missing-namespace",
+		`component:default/${"a".repeat(64)}`,
+		"system:default/platform",
+	]) {
+		assert.equal(
+			parseSiteHealthV2({
+				...DTO,
+				services: [{ entityRef, state: "ok" }],
+			}),
+			null,
+			entityRef,
+		);
+	}
+	assert.equal(
+		parseSiteHealthV2({
+			...DTO,
+			services: [
+				{
+					entityRef: "component:default/service",
+					state: { toString: () => "ok" },
+				},
+			],
+		}),
+		null,
+	);
+	assert.equal(
+		parseSiteHealthV2({
+			...DTO,
+			boardState: { toString: () => "fresh" },
+		}),
+		null,
+	);
+});
+
+test("ambiguous FastAPI name-only health across Backstage namespaces fails closed", () => {
+	const parsed = parseSiteHealthV2({
+		...DTO,
+		services: [
+			{ entityRef: "component:default/api", state: "ok" },
+			{ entityRef: "component:edge/api", state: "ok" },
+			{ entityRef: "resource:default/database", state: "warn" },
+		],
+	});
+	assert.ok(parsed);
+	const indexed = siteHealthIndex(parsed, REVISION);
+	assert.equal(indexed.get("component:default/api"), "unknown");
+	assert.equal(indexed.get("component:edge/api"), "unknown");
+	assert.equal(indexed.get("resource:default/database"), "warn");
+});
+
+test("different Backstage kinds with the same name cannot inherit each other's probes", () => {
+	const parsed = parseSiteHealthV2({
+		...DTO,
+		services: [
+			{ entityRef: "component:default/redis", state: "ok" },
+			{ entityRef: "resource:default/redis", state: "fail" },
+		],
+	});
+	assert.ok(parsed);
+	const indexed = siteHealthIndex(parsed, REVISION);
+	assert.equal(indexed.get("component:default/redis"), "unknown");
+	assert.equal(indexed.get("resource:default/redis"), "unknown");
+});

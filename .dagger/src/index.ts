@@ -7,8 +7,8 @@ import {
 	object,
 } from "@dagger.io/dagger";
 
-const NODE_LTS = "24.22.1";
-const NODE_LTS = "24.22.0";
+const NODE_DEVELOPMENT = "24.22.1";
+const NODE_VERCEL = "24.22.1";
 const SOURCE_IGNORE = [
 	".git",
 	".git/**",
@@ -77,21 +77,21 @@ export class NablaSiteAlbanCi {
 	}
 
 	private async runNodeLts(source: Directory): Promise<void> {
-		const environment = this.environment(source, NODE_LTS);
+		const environment = this.environment(source, NODE_DEVELOPMENT);
 		const typedEnvironment = environment.withExec(["npx", "next", "typegen"]);
 		await Promise.all([
 			environment.withExec(["npm", "run", "lint"]).stdout(),
 			environment.withExec(["npm", "run", "lint:css"]).stdout(),
 			typedEnvironment.withExec(["npm", "run", "typecheck"]).stdout(),
 			environment.withExec(["npm", "run", "test:unit"]).stdout(),
-			this.buildEnvironment(source, NODE_LTS)
+			this.buildEnvironment(source, NODE_DEVELOPMENT)
 				.withExec(["npx", "next", "build"])
 				.stdout(),
 		]);
 	}
 
-	private async runNodeLtsBuild(source: Directory): Promise<void> {
-		await this.buildEnvironment(source, NODE_LTS)
+	private async runNode24(source: Directory): Promise<void> {
+		await this.buildEnvironment(source, NODE_VERCEL)
 			.withExec(["npx", "next", "build"])
 			.stdout();
 	}
@@ -102,16 +102,16 @@ export class NablaSiteAlbanCi {
 		source: Directory,
 	): Promise<string> {
 		await this.runNodeLts(source);
-		return `Node ${NODE_LTS}: lint, stylelint, typecheck, unit and build passed`;
+		return `Node ${NODE_DEVELOPMENT}: lint, stylelint, typecheck, unit and build passed`;
 	}
 
 	@func()
-	async checkNodeLtsBuild(
+	async checkNode24(
 		@argument({ defaultPath: "/", ignore: SOURCE_IGNORE })
 		source: Directory,
 	): Promise<string> {
-		await this.runNodeLtsBuild(source);
-		return `Node ${NODE_LTS}: production build passed`;
+		await this.runNode24(source);
+		return `Node ${NODE_VERCEL}: production build passed`;
 	}
 
 	@func()
@@ -122,8 +122,7 @@ export class NablaSiteAlbanCi {
 		await this.runNodeLts(source);
 		return [
 			"Dagger PoC passed",
-			`Node ${NODE_LTS}: lint + stylelint + typecheck + unit + build`,
-			`Node ${NODE_LTS}: patched LTS runtime`,
+			`Node ${NODE_DEVELOPMENT}: lint + stylelint + typecheck + unit + build`,
 		].join("\n");
 	}
 }

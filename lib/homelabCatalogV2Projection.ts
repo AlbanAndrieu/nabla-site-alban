@@ -2,6 +2,8 @@ import {
 	catalogV2ServiceViews,
 	type HomelabCatalogV2,
 } from "./homelabCatalogV2";
+import { catalogServiceSlug } from "./homelabCatalogV2Names";
+import { homelabCatalogIconSrc } from "./homelabCatalogIcons";
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 
@@ -11,43 +13,43 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	topology: ServiceTopology;
 } {
 	const views = catalogV2ServiceViews(catalog);
-	const duplicates = new Map<string, number>();
-	for (const view of views) {
-		duplicates.set(view.id, (duplicates.get(view.id) ?? 0) + 1);
-	}
-	// Stable canonical identity survives collisions across Backstage kinds.
+	// The parser rejects duplicate names, display titles and card slugs.
 	const byRef = new Map(
-		views.map((view) => [
-			view.entityRef,
-			(duplicates.get(view.id) ?? 0) > 1
-				? `${view.entityKind.toLowerCase()}-${view.id}`
-				: view.id,
-		]),
+		views.map((view) => [view.entityRef, catalogServiceSlug(view.id)]),
 	);
+	const shared = views.map((view) => ({
+		view,
+		id: byRef.get(view.entityRef) ?? view.id,
+		kind: view.type ?? view.entityKind.toLowerCase(),
+		category: view.category ?? "other",
+	}));
 	const services: HomelabServicesCatalog = {
 		version: 2,
 		catalogRevision: catalog.catalogRevision,
-		services: views.map((view) => ({
-			id: byRef.get(view.entityRef),
+		services: shared.map(({ view, id, kind, category }) => ({
+			id,
 			entityRef: view.entityRef,
 			name: view.name,
+			iconSrc: homelabCatalogIconSrc(id),
 			description: view.description,
-			kind: view.type ?? view.entityKind.toLowerCase(),
-			category: view.category ?? "other",
+			kind,
+			category,
 			criticality: view.operationalCriticality,
 			// No endpoint, tunnel, internal host or port exists in the safe v2 DTO.
 			endpointEnabled: false,
 		})),
 	};
-	const nodes: ServiceTopology["nodes"] = views.map((view) => ({
-		id: byRef.get(view.entityRef) ?? view.id,
-		name: view.name,
-		kind: view.type ?? view.entityKind.toLowerCase(),
-		category: view.category ?? "other",
-		criticality: view.operationalCriticality,
-		securityFunctions: view.securityFunctions,
-		sourcePath: view.sourcePath,
-	}));
+	const nodes: ServiceTopology["nodes"] = shared.map(
+		({ view, id, kind, category }) => ({
+			id,
+			name: view.name,
+			kind,
+			category,
+			criticality: view.operationalCriticality,
+			securityFunctions: view.securityFunctions,
+			sourcePath: view.sourcePath,
+		}),
+	);
 	const relationFields = {
 		dependsOn: "dependsOn",
 		consumesApis: "consumesApi",
@@ -63,8 +65,14 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			keyof typeof relationFields,
 			ServiceRelationType,
 		][]) {
-			const refs = entity.spec[field];
-			if (!Array.isArray(refs)) continue;
+			const raw = entity.spec[field];
+			// Backstage's subcomponentOf is a scalar reference, unlike dependsOn.
+			const refs =
+				field === "subcomponentOf" && typeof raw === "string"
+					? [raw]
+					: Array.isArray(raw)
+						? raw
+						: [];
 			for (const ref of refs) {
 				if (typeof ref !== "string") continue;
 				const target = byRef.get(ref);
@@ -82,6 +90,13 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			}
 		}
 	}
+	// Stable React Flow edges regardless of the order received from FastAPI.
+	relations.sort(
+		(left, right) =>
+			left.source.localeCompare(right.source) ||
+			left.target.localeCompare(right.target) ||
+			left.type.localeCompare(right.type),
+	);
 	return {
 		services,
 		topology: {

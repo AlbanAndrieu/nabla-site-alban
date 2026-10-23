@@ -122,6 +122,8 @@ export default function HomelabServiceCard({
 					? t("runtime.degraded", {
 							state: initialHealth?.runtime_state ?? "UNKNOWN",
 						})
+					: runtimeState === "unknown"
+						? t("runtime.unknown")
 					: runtimeState === "missing"
 						? t("runtime.missing")
 						: undefined;

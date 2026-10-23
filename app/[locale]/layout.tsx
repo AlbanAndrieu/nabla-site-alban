@@ -13,6 +13,7 @@ import Footer from "@/app/components/Footer";
 import RouteHeader from "@/components/RouteHeader";
 import SkipToMainContent from "@/components/SkipToMainContent";
 import ThemeBootstrap from "@/components/ThemeBootstrap";
+import { pickClientMessages } from "@/i18n/messages";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata, SITE_ORIGIN } from "@/lib/socialMetadata";
 
@@ -109,16 +110,13 @@ export default async function LocaleLayout({
 					crossOrigin="anonymous"
 					referrerPolicy="no-referrer"
 				/>
-				<link
-					rel="stylesheet"
-					href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
-					crossOrigin="anonymous"
-					referrerPolicy="no-referrer"
-				/>
 			</head>
 			<body>
 				<SkipToMainContent />
-				<NextIntlClientProvider locale={locale} messages={messages}>
+				<NextIntlClientProvider
+					locale={locale}
+					messages={pickClientMessages(messages)}
+				>
 					<RouteHeader />
 					{children}
 					<Footer

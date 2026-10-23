@@ -1,13 +1,5 @@
 # Repository agent rules
 
-## GitHub Actions credit-saving PR lifecycle
-
-- Agents should create and retain pull requests as **Draft** while iterating, and run the targeted local `just`/quality-gate checks before requesting review.
-- Do **not** put `[skip ci]`, `[ci skip]`, or `skip-checks: true` in commits: these can leave required checks pending, and can suppress the authoritative review gate.
-- `ready_for_review` must start the required CI; subsequent non-draft pushes run it again. Do not weaken SAST, SCA, DAST, secret scanning, or required branch protection to save minutes.
-- Never mark a PR Ready automatically merely to burn credits. Only do so after explicit user direction or the repository's documented publication gate, and never merge without authorization.
-- Keep generated PDFs (when uploaded) for at most **1 day**. Prefer no uploads on successful routine PR jobs and short-lived failure diagnostics.
-
 Canonical compact policy. Load only the task-specific skill under
 `.agents/skills/nabla-*/SKILL.md`. Do not preload whole skill trees, lockfiles, unrelated docs or
 broad CI logs.
@@ -43,6 +35,10 @@ Never write, push, delete or merge `master`, never omit branch on API mutations,
 `--no-verify`, skip CI via commit messages, weaken tests/SAST/secrets/quality gates, or merge a PR
 without an explicit user instruction. Stop on stale base, unknown HEAD, oscillator, dirty proof or
 scope creep.
+
+Keep PRs **Draft** while iterating; mark Ready (which starts required CI) only on user direction or
+the publication gate. Measure with `scripts/github-actions-usage.py` before adding CI jobs or
+artifacts: `docs/github-actions-cost.md`.
 
 ## Context and evidence budget
 
@@ -93,13 +89,8 @@ executed.
 
 Never bypass repository hooks with `git push --no-verify`. Never weaken or disable formatter, lint,
 security, YAML, workflow, generated-file, or validation rules merely to make a push or CI build
-pass.
-
-Agents must not put GitHub-recognized CI bypass directives in pull-request commit
-messages. In particular, do not use bracketed CI/action skip markers or a
-`skip-checks: true` trailer to save runner time. Documentation-only and
-maintenance PRs must rely on the repository's path/scope classification instead
-of suppressing the workflow itself.
+pass. Never put CI skip markers or a `skip-checks: true` trailer in commits; docs-only and
+maintenance PRs rely on the path/scope classification instead.
 
 ### Post-merge remediation is recovery only
 
@@ -156,7 +147,3 @@ Report:
 1. what changed;
 2. checks executed;
 3. unresolved failures or risks.
-
-### Measure before expanding CI
-
-Run `python3 scripts/github-actions-usage.py --days 30` locally with authenticated `gh` to compare per-workflow job wall time and retained artifacts for the four active repositories. The inventory is read-only and uses GitHub REST; it is intentionally **not** scheduled in GitHub Actions to avoid consuming the very credits it audits. Job wall minutes are only an operational proxy, **not** invoiced minutes; rely on GitHub Billing for authoritative usage. Run `--repo NAME` to narrow scope or repeat it to select multiple repositories. Review the worst offenders before adding jobs or artifacts, keep PDF uploads at one day, and preserve mandatory security checks on Ready for review.

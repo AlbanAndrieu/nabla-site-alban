@@ -28,7 +28,6 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 	const [siteHealth, setSiteHealth] = useState<SiteHealthV2 | null>(null);
 	const [healthUnavailable, setHealthUnavailable] = useState(false);
 	const [refreshing, setRefreshing] = useState(true);
-	const [now, setNow] = useState(() => Date.now());
 
 	useEffect(() => {
 		let active = true;
@@ -77,7 +76,6 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 						setSiteHealth(projected);
 						setHealth(null);
 						setHealthUnavailable(latestUnavailable);
-						setNow(Date.now());
 					}
 				} else {
 					const parsed = parseHomelabHealthSnapshot(await response.json());
@@ -88,7 +86,6 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 						setHealth(parsed);
 						setSiteHealth(null);
 						setHealthUnavailable(false);
-						setNow(Date.now());
 					}
 				}
 			} catch {
@@ -105,7 +102,6 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		};
 
 		void loadHealth();
-		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
 		const onVisibilityChange = () => {
 			if (document.hidden) {
 				clearRefreshTimer();
@@ -119,7 +115,6 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 			active = false;
 			controller?.abort();
 			clearRefreshTimer();
-			window.clearInterval(clockTimer);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, [readOnly]);
@@ -132,5 +127,5 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 				? "fastapi"
 				: "loading";
 
-	return { health, siteHealth, healthUnavailable, refreshing, now, healthSource } as const;
+	return { health, siteHealth, healthUnavailable, refreshing, healthSource } as const;
 }
