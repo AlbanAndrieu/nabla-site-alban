@@ -21,7 +21,7 @@ assets historiques progressivement migrés vers les composants de `app/`.
 
 ## Prérequis
 
-- Node.js 26.8.2 pour le développement local et la CI
+- Node.js 24.22.1 pour le développement local et la CI
 - npm 12.2.0, épinglé dans `mise.toml` (`mise install`)
 
 ## Démarrage local
