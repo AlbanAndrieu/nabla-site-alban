@@ -164,7 +164,8 @@ repos:
             public/assets/.*.svg|
             public/other/nabla-build-architecture.jpg|
             public/checklist/article/index.html|
-            public/cv/alban-andrieu-19-12-2017.png|
+            public/cv/alban-andrieu-.*.png|
+            public/cv/alban-andrieu-.*.webp|
             public/arf.json|
             public/assets/mushroom.webp|
             public/d3.v3.min.js|

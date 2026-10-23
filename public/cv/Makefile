@@ -21,7 +21,7 @@ VIEW_PDF = cv-aandrieu-2026-en.pdf
 ### Files that are not  included/input but should be in the distribution
 EXTRA_DIST = \
 	Makefile \
-	alban-andrieu-19-12-2017.png
+	alban-andrieu-2017-12-19.png
 
 VERSION = $(shell git describe --always --dirty)
 DIST = cv-src-$(VERSION).tar.gz
