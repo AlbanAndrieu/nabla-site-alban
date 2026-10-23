@@ -331,9 +331,3 @@ export function groupCatalogByPresentation(
 		];
 	});
 }
-
-export function servicePresentationGroupOrder(
-	group: ServicePresentationGroup,
-): number {
-	return PRESENTATION_GROUP_ORDER.indexOf(group);
-}

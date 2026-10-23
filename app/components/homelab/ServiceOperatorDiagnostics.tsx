@@ -1,13 +1,13 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { type UnknownRecord } from "@/lib/guards";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
 
 type Props = {
 	entry?: HomelabHealthEntry;
 };
 
-type UnknownRecord = Record<string, unknown>;
 type DiagnosticRow = { label: string; value: string };
 
 function scalar(raw: UnknownRecord, key: string): string | undefined {

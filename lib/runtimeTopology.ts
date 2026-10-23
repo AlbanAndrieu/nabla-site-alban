@@ -1,4 +1,8 @@
-import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
+import { isRecord } from "./guards";
+import {
+	ownerDiagnosticHeaders,
+	ownerUpstreamBlocked,
+} from "./homelabOwnerBoundary";
 export type RuntimeRedisEvidence = {
 	backend?: string;
 	provider_attribution?: string;
@@ -65,10 +69,6 @@ export const RUNTIME_TOPOLOGY_DEFAULT_API_URL =
 
 const PRIMARY_TIMEOUT_MS = 5_000;
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function optionalString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
@@ -89,7 +89,9 @@ function parseRedisEvidence(value: unknown): RuntimeRedisEvidence | undefined {
 		configured: optionalBoolean(value.configured),
 		available: optionalBoolean(value.available),
 		telemetry_available: optionalBoolean(value.telemetry_available),
-		...(optionalString(value.backend) ? { backend: optionalString(value.backend) } : {}),
+		...(optionalString(value.backend)
+			? { backend: optionalString(value.backend) }
+			: {}),
 		...(optionalString(value.provider_attribution)
 			? { provider_attribution: optionalString(value.provider_attribution) }
 			: {}),
@@ -99,7 +101,9 @@ function parseRedisEvidence(value: unknown): RuntimeRedisEvidence | undefined {
 		...(optionalString(value.key_count_scope)
 			? { key_count_scope: optionalString(value.key_count_scope) }
 			: {}),
-		...(optionalString(value.reason) ? { reason: optionalString(value.reason) } : {}),
+		...(optionalString(value.reason)
+			? { reason: optionalString(value.reason) }
+			: {}),
 		...(optionalString(value.error_kind)
 			? { error_kind: optionalString(value.error_kind) }
 			: {}),
@@ -154,7 +158,9 @@ function stringArray(value: unknown): string[] {
 		: [];
 }
 
-export function parseRuntimeTopology(value: unknown): RuntimeTopologySnapshot | null {
+export function parseRuntimeTopology(
+	value: unknown,
+): RuntimeTopologySnapshot | null {
 	if (!isRecord(value) || !Array.isArray(value.instances)) return null;
 	if (
 		typeof value.provider !== "string" ||
@@ -168,7 +174,8 @@ export function parseRuntimeTopology(value: unknown): RuntimeTopologySnapshot | 
 		return null;
 	}
 	const instances = value.instances.flatMap((raw) => {
-		if (!isRecord(raw) || typeof raw.id !== "string" || !raw.id.trim()) return [];
+		if (!isRecord(raw) || typeof raw.id !== "string" || !raw.id.trim())
+			return [];
 		return [
 			{
 				id: raw.id,
@@ -231,7 +238,8 @@ export async function loadRuntimeTopology(): Promise<RuntimeTopologySnapshot | n
 			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
 			process.env.DIAGNOSTICS_ACCESS_KEY,
 		)
-	) return null;
+	)
+		return null;
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 	try {

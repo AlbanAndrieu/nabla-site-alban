@@ -1,4 +1,4 @@
-type UnknownRecord = Record<string, unknown>;
+import { isRecord } from "./guards";
 
 export type CircuitBreakerEvidence = {
 	provider?: string;
@@ -52,10 +52,6 @@ export type TrueNasTransportEvidence = {
 	errorKind?: string;
 	stages: TrueNasTransportStage[];
 };
-
-function isRecord(value: unknown): value is UnknownRecord {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function text(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;

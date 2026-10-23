@@ -1,5 +1,13 @@
-import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
-export type ExposureState = "match" | "mismatch" | "incomplete" | "not_applicable";
+import { isRecord } from "./guards";
+import {
+	ownerDiagnosticHeaders,
+	ownerUpstreamBlocked,
+} from "./homelabOwnerBoundary";
+export type ExposureState =
+	| "match"
+	| "mismatch"
+	| "incomplete"
+	| "not_applicable";
 
 export type HomelabExposureEvidence = {
 	state: ExposureState;
@@ -104,11 +112,13 @@ export const HOMELAB_DIAGNOSTICS_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
 
 const PRIMARY_TIMEOUT_MS = 8_000;
-const RUNNING_APP_STATES = new Set(["ACTIVE", "HEALTHY", "RUNNING", "STARTED", "UP"]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const RUNNING_APP_STATES = new Set([
+	"ACTIVE",
+	"HEALTHY",
+	"RUNNING",
+	"STARTED",
+	"UP",
+]);
 
 function optionalString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value : undefined;
@@ -132,7 +142,11 @@ function stringArray(value: unknown): string[] {
 
 function parseExposure(value: unknown): HomelabExposureEvidence | undefined {
 	if (!isRecord(value)) return undefined;
-	if (!["match", "mismatch", "incomplete", "not_applicable"].includes(String(value.state))) {
+	if (
+		!["match", "mismatch", "incomplete", "not_applicable"].includes(
+			String(value.state),
+		)
+	) {
 		return undefined;
 	}
 	if (!isRecord(value.declared) || !isRecord(value.observed)) return undefined;
@@ -193,13 +207,19 @@ function parseExposure(value: unknown): HomelabExposureEvidence | undefined {
 	};
 }
 
-function parseTrueNasLastGood(value: unknown): TrueNasLastGoodDiagnostics | undefined {
+function parseTrueNasLastGood(
+	value: unknown,
+): TrueNasLastGoodDiagnostics | undefined {
 	if (!isRecord(value)) return undefined;
 	const apps = Array.isArray(value.apps)
 		? value.apps.filter((app): app is Record<string, unknown> => isRecord(app))
 		: [];
 	const running = apps.filter((app) =>
-		RUNNING_APP_STATES.has(String(app.state ?? "").trim().toUpperCase()),
+		RUNNING_APP_STATES.has(
+			String(app.state ?? "")
+				.trim()
+				.toUpperCase(),
+		),
 	).length;
 	return {
 		version: optionalString(value.version),
@@ -211,7 +231,8 @@ function parseTrueNasLastGood(value: unknown): TrueNasLastGoodDiagnostics | unde
 }
 
 function parseTrueNasApi(value: unknown): TrueNasApiDiagnostics | undefined {
-	if (!isRecord(value) || typeof value.reachable !== "boolean") return undefined;
+	if (!isRecord(value) || typeof value.reachable !== "boolean")
+		return undefined;
 	const lastGood = parseTrueNasLastGood(value.last_good);
 	return {
 		reachable: value.reachable,
@@ -233,7 +254,9 @@ function parseTrueNasApi(value: unknown): TrueNasApiDiagnostics | undefined {
 	};
 }
 
-function parsePfSenseIngress(value: unknown): PfSenseIngressDiagnostics | undefined {
+function parsePfSenseIngress(
+	value: unknown,
+): PfSenseIngressDiagnostics | undefined {
 	if (
 		!isRecord(value) ||
 		typeof value.state !== "string" ||
@@ -325,7 +348,8 @@ export async function loadHomelabDiagnostics(): Promise<HomelabDiagnosticsSnapsh
 			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
 			process.env.DIAGNOSTICS_ACCESS_KEY,
 		)
-	) return null;
+	)
+		return null;
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 	try {

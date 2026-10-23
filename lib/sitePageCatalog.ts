@@ -131,10 +131,6 @@ const seoPageSlugs = new Set<SitePageSlug>(SEO_PAGE_SLUGS);
 
 export const NON_INDEXABLE_ROBOTS = { index: false, follow: false } as const;
 
-export function isSeoPageSlug(slug: string): slug is SeoPageSlug {
-	return seoPageSlugs.has(slug as SitePageSlug);
-}
-
 export function seoSettings(slug: SeoPageSlug): SeoSettings {
 	const settings = (SITE_PAGES[slug] as SitePageDefinition).seo;
 	if (!settings) throw new Error(`Missing SEO settings for page: ${slug}`);

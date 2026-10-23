@@ -1,8 +1,6 @@
 import type { OperationalHealthState } from "./homelabOperationalEvidence";
 
-export function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+export { isRecord } from "./guards";
 
 export function optionalString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim() ? value.trim() : undefined;

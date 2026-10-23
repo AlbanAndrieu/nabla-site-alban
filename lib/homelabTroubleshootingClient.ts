@@ -1,19 +1,15 @@
 import {
-	parseHomelabDiagnostics,
 	type HomelabDiagnosticsSnapshot,
+	parseHomelabDiagnostics,
 } from "./homelabDiagnostics";
 import {
-	parseHomelabHealthSnapshot,
 	type HomelabHealthSnapshot,
+	parseHomelabHealthSnapshot,
 } from "./homelabHealth";
-import {
-	parseRuntimeTopology,
-	type RuntimeTopologySnapshot,
-} from "./runtimeTopology";
 import { parseServiceTopology, type ServiceTopology } from "./serviceTopology";
 
-let diagnosticsPromise: Promise<HomelabDiagnosticsSnapshot | null> | null = null;
-let runtimePromise: Promise<RuntimeTopologySnapshot | null> | null = null;
+let diagnosticsPromise: Promise<HomelabDiagnosticsSnapshot | null> | null =
+	null;
 let healthPromise: Promise<HomelabHealthSnapshot | null> | null = null;
 let topologyPromise: Promise<ServiceTopology | null> | null = null;
 
@@ -31,28 +27,25 @@ async function fetchParsed<T>(
 }
 
 export function fetchHomelabDiagnosticsOnce(): Promise<HomelabDiagnosticsSnapshot | null> {
-	diagnosticsPromise ??= fetchParsed("/api/homelab-diagnostics", parseHomelabDiagnostics);
+	diagnosticsPromise ??= fetchParsed(
+		"/api/homelab-diagnostics",
+		parseHomelabDiagnostics,
+	);
 	return diagnosticsPromise;
 }
 
-export function fetchRuntimeTopologyOnce(): Promise<RuntimeTopologySnapshot | null> {
-	runtimePromise ??= fetchParsed("/api/runtime-topology", parseRuntimeTopology);
-	return runtimePromise;
-}
-
 export function fetchHomelabHealthOnce(): Promise<HomelabHealthSnapshot | null> {
-	healthPromise ??= fetchParsed("/api/homelab-health", parseHomelabHealthSnapshot);
+	healthPromise ??= fetchParsed(
+		"/api/homelab-health",
+		parseHomelabHealthSnapshot,
+	);
 	return healthPromise;
 }
 
 export function fetchServiceTopologyOnce(): Promise<ServiceTopology | null> {
-	topologyPromise ??= fetchParsed("/api/homelab-topology", parseServiceTopology);
+	topologyPromise ??= fetchParsed(
+		"/api/homelab-topology",
+		parseServiceTopology,
+	);
 	return topologyPromise;
-}
-
-export function resetTroubleshootingClientCacheForTests(): void {
-	diagnosticsPromise = null;
-	runtimePromise = null;
-	healthPromise = null;
-	topologyPromise = null;
 }

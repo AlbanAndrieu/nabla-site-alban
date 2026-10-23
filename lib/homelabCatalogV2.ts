@@ -1,3 +1,4 @@
+import { isRecord } from "./guards";
 import { hasUniqueCatalogServiceNames } from "./homelabCatalogV2Names";
 
 const CATALOG_REVISION_RE = /^sha256:[0-9a-f]{64}$/;
@@ -48,10 +49,6 @@ export type CatalogV2ServiceView = {
 	businessCriticality?: "critical" | "high" | "medium" | "low";
 	sourcePath: string;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function strings(value: unknown): value is string[] {
 	return (

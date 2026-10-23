@@ -1,4 +1,8 @@
-import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
+import { isRecord } from "./guards";
+import {
+	ownerDiagnosticHeaders,
+	ownerUpstreamBlocked,
+} from "./homelabOwnerBoundary";
 export type FastApiHealthBoardState = "pending" | "fresh" | "stale";
 
 export type FastApiHealthBoardSnapshot = {
@@ -45,10 +49,6 @@ type HealthBoardInFlight = {
 
 let cachedHealthBoard: HealthBoardCacheEntry | null = null;
 let inFlightHealthBoard: HealthBoardInFlight | null = null;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function isState(value: unknown): value is FastApiHealthBoardState {
 	return value === "pending" || value === "fresh" || value === "stale";

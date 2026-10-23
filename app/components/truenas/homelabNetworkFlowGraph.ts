@@ -1,4 +1,5 @@
 import { type Edge, MarkerType, type Node } from "@xyflow/react";
+import { isRecord } from "@/lib/guards";
 import type {
 	FailureDomain,
 	GroupNodeData,
@@ -236,10 +237,6 @@ export function buildEdges(
 }
 
 const LINK_KINDS = new Set<string>(Object.keys(LINK_STYLES));
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function isNodeSpec(value: unknown): value is NetworkNodeSpec {
 	return (

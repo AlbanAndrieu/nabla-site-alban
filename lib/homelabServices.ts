@@ -1,5 +1,6 @@
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
+import { isRecord } from "./guards";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -58,10 +59,6 @@ export function isHomelabCatalogPlaceholder(
 export const HOMELAB_SERVICES_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function slugifyServiceName(name: string): string {
 	return (
 		name
@@ -79,19 +76,6 @@ export function homelabServiceId(service: HomelabService): string {
 	return explicitId && SERVICE_ID_RE.test(explicitId)
 		? explicitId
 		: slugifyServiceName(service.name);
-}
-
-/**
- * Resolve legacy single-environment metadata.
- *
- * Deployment environments are owned by nabla-compose x-nabla.environments and
- * consumed through service-topology. This helper is only the fallback for
- * presentation-catalog entries that do not have topology environments.
- */
-export function homelabServiceEnvironment(
-	service: HomelabService,
-): HomelabEnvironment {
-	return service.environment ?? "production";
 }
 
 const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(

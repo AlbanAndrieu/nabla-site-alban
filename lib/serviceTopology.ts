@@ -1,4 +1,5 @@
 import localTopology from "../public/service-topology.json";
+import { isRecord } from "./guards";
 
 export type ServiceDeploymentEnvironment = {
 	name: "production" | "staging" | "dev";
@@ -101,10 +102,6 @@ const RELATION_TYPES = new Set<ServiceRelationType>([
 	"exposedBy",
 	"automates",
 ]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function validLifecycle(value: unknown): boolean {
 	if (value === undefined) return true;
