@@ -14,16 +14,35 @@ on:
       - "Dockerfile"
       - ".dockerignore"
       - "public/**"
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "i18n/**"
+      - "messages/**"
+      - "next.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".npmrc"
+      - "scripts/k8s/smoke-standalone.sh"
       - ".github/workflows/docker-build.yml"
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "Dockerfile"
       - ".dockerignore"
       - "public/**"
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "i18n/**"
+      - "messages/**"
+      - "next.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".npmrc"
+      - "scripts/k8s/smoke-standalone.sh"
       - ".github/workflows/docker-build.yml"
-  schedule:
-    - cron: "0 6 * * 3"
   workflow_dispatch:
 
 concurrency:
@@ -37,7 +56,8 @@ env:
 
 jobs:
   build:
-    name: Build static fallback
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    name: Build Next.js standalone image
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -48,32 +68,10 @@ jobs:
           fetch-depth: 2
           persist-credentials: false
 
-      - name: Resolve Trivy scan policy
-        id: trivy-policy
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${EVENT_NAME}" != "pull_request" ]]; then
-            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-
-          # The fallback image is nginx + public/. A PR that only changes static
-          # files cannot alter the OS/library vulnerability set already scanned
-          # on master; Dockerfile/.dockerignore changes still force Trivy.
-          if git diff --quiet HEAD^1 HEAD -- Dockerfile .dockerignore; then
-            echo "run-trivy=false" >> "${GITHUB_OUTPUT}"
-            echo "::notice::Skipping duplicate Trivy OS/library scan for static-content-only PR."
-          else
-            echo "run-trivy=true" >> "${GITHUB_OUTPUT}"
-          fi
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
-      - name: Build fallback image
+      - name: Build Next.js standalone image
         id: docker_build
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -82,52 +80,16 @@ jobs:
           load: true
           push: false
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-      - name: Smoke test fallback container
+      - name: Smoke test Next.js runtime
         shell: bash
-        run: |
-          set -euo pipefail
-          container_id="$(docker run --detach --rm --publish 127.0.0.1:18080:8080 "${LOCAL_IMAGE}")"
-          cleanup() {
-            docker stop "${container_id}" >/dev/null 2>&1 || true
-          }
-          trap cleanup EXIT
-
-          for attempt in {1..20}; do
-            if curl --fail --silent --show-error http://127.0.0.1:18080/ >/tmp/fallback-index.html; then
-              break
-            fi
-            if [[ "${attempt}" -eq 20 ]]; then
-              docker logs "${container_id}"
-              exit 1
-            fi
-            sleep 1
-          done
-
-          grep --ignore-case --quiet "<html" /tmp/fallback-index.html
-          curl --fail --silent --show-error             http://127.0.0.1:18080/404.html             --output /tmp/fallback-404.html
-          grep --ignore-case --quiet "<html" /tmp/fallback-404.html
-
-          for asset in fontawesome.js solid.js brands.js; do
-            curl --fail --silent --show-error \
-              "http://127.0.0.1:18080/assets/fontawesome-free-7.1.0-web/js/${asset}" \
-              --output "/tmp/${asset}"
-            test -s "/tmp/${asset}"
-          done
-
-          runtime_uid="$(docker exec "${container_id}" id -u)"
-          if [[ "${runtime_uid}" == "0" ]]; then
-            echo "Fallback container unexpectedly runs as root."
-            exit 1
-          fi
-          echo "Fallback container smoke test passed as UID ${runtime_uid}."
+        run: bash scripts/k8s/smoke-standalone.sh "${LOCAL_IMAGE}"
 
       - name: Run Trivy vulnerability scanner
-        if: steps.trivy-policy.outputs.run-trivy == 'true'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.LOCAL_IMAGE }}
@@ -144,19 +106,17 @@ jobs:
       - name: Preserve Trivy SARIF report
         if: >-
           always() &&
-          steps.trivy-policy.outputs.run-trivy == 'true' &&
           hashFiles('trivy-results.sarif') != ''
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: trivy-sarif-${{ github.sha }}
           path: trivy-results.sarif
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
 
       - name: Upload Trivy scan results to GitHub Code Scanning
         if: >-
           always() &&
-          steps.trivy-policy.outputs.run-trivy == 'true' &&
           hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
@@ -197,7 +157,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish validated fallback image to GHCR
+      - name: Publish validated Next.js image to GHCR
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         shell: bash
         run: |
@@ -207,7 +167,7 @@ jobs:
           docker push "${GHCR_IMAGE}:latest"
           docker push "${GHCR_IMAGE}:${GITHUB_SHA}"
 
-      - name: Publish validated fallback image to Docker Hub
+      - name: Publish validated Next.js image to Docker Hub
         if: >-
           github.event_name == 'push' &&
           github.ref == 'refs/heads/master' &&
@@ -220,7 +180,3 @@ jobs:
           docker push "${DOCKERHUB_IMAGE}:latest"
           docker push "${DOCKERHUB_IMAGE}:${GITHUB_SHA}"
 
-      - name: Image digest
-        env:
-          IMAGE_DIGEST: ${{ steps.docker_build.outputs.digest }}
-        run: echo "${IMAGE_DIGEST}"

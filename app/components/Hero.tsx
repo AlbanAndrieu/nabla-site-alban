@@ -1,5 +1,3 @@
-"use client";
-
 import { useLocale, useTranslations } from "next-intl";
 import ActionLink from "@/components/ui/ActionLink";
 import styles from "./Hero.module.css";

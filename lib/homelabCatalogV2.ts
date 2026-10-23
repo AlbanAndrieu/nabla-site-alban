@@ -1,3 +1,5 @@
+import { hasUniqueCatalogServiceNames } from "./homelabCatalogV2Names";
+
 const CATALOG_REVISION_RE = /^sha256:[0-9a-f]{64}$/;
 
 export type BackstageEntityKind =
@@ -116,7 +118,11 @@ export function parseHomelabCatalogV2(value: unknown): HomelabCatalogV2 | null {
 	}
 
 	const refs = value.entities.map((entity) => entity.entityRef);
-	if (new Set(refs).size !== refs.length) return null;
+	if (
+		new Set(refs).size !== refs.length ||
+		!hasUniqueCatalogServiceNames(value.entities)
+	)
+		return null;
 
 	return value as HomelabCatalogV2;
 }

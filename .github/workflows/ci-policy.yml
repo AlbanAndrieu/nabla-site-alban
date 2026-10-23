@@ -15,6 +15,8 @@ concurrency:
 
 jobs:
   ci-policy:
+    # Drafts are for local iteration; ready_for_review invokes this gate.
+    if: github.event.pull_request.draft == false
     name: CI policy guard
     runs-on: ubuntu-latest
     timeout-minutes: 5

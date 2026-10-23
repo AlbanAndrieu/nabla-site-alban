@@ -15,8 +15,8 @@ migration vers 1.0 sera évaluée séparément après stabilisation.
 
 `dagger call check --source=.` exécute en parallèle :
 
-- Node 26.8.2 : ESLint, Stylelint, TypeScript, tests unitaires et build Next.js ;
-- Node 24.22.0 : build de compatibilité Vercel.
+- Node 24.22.1 : ESLint, Stylelint, TypeScript, tests unitaires et build Next.js ;
+- Node 24.22.1 : build de compatibilité Vercel.
 
 Le cache npm et le cache Next.js sont des volumes Dagger persistants. Le build
 Next.js appelle directement `npx next build` dans le conteneur éphémère : le
@@ -31,12 +31,12 @@ Commandes :
 
 ```bash
 just dagger-check
-just dagger-check-node26
+just dagger-check-node-lts
 just bench-dev-loop
 ```
 
 `bench-dev-loop` utilise Hyperfine et compare, à cache chaud, le contrôle
-Dagger Node 26 avec `npm run check`. Il ne remplace pas les mesures CI
+Dagger Node 24 LTS avec `npm run check`. Il ne remplace pas les mesures CI
 existantes.
 
 ## Snapshot exact-HEAD pour agents sans DNS

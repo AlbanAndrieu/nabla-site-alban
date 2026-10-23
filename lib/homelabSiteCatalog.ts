@@ -1,5 +1,6 @@
 import {
 	type CatalogV2Entity,
+	catalogV2ServiceViews,
 	type HomelabCatalogV2,
 	parseHomelabCatalogV2,
 } from "./homelabCatalogV2";
@@ -77,6 +78,14 @@ export function sanitizeSiteCatalogV2(
 		}
 		for (const field of SAFE_REFERENCES) {
 			const value = entity.spec[field];
+			// Structural parents must resolve within the verified source. Other
+			// optional organization refs may be omitted from this narrow DTO.
+			if (
+				field === "subcomponentOf" &&
+				value !== undefined &&
+				(typeof value !== "string" || !refs.has(value))
+			)
+				return null;
 			if (typeof value === "string" && refs.has(value)) spec[field] = value;
 		}
 		for (const field of SAFE_RELATIONS) {
@@ -127,7 +136,7 @@ export async function fetchSiteCatalogV2(): Promise<HomelabCatalogV2> {
 		if (!response.ok) throw new SiteCatalogV2Error("unavailable");
 		const parsed = parseHomelabCatalogV2(await response.json());
 		const safe = parsed && sanitizeSiteCatalogV2(parsed);
-		if (!safe || safe.entities.length === 0) {
+		if (!safe || catalogV2ServiceViews(safe).length === 0) {
 			throw new SiteCatalogV2Error("unavailable");
 		}
 		return safe;

@@ -99,6 +99,23 @@ test("v2 503, v1 payload and invalid graph cannot become service cards", async (
 			version: 1,
 			services: [{ id: "postgresql", name: "PostgreSQL" }],
 		}),
+		// A valid Backstage catalog containing only organizational entities must
+		// fail visibly, not render an apparently healthy but empty service grid.
+		Response.json({
+			schemaVersion: 2,
+			model: "backstage",
+			catalogRevision: revision,
+			entities: [
+				{
+					apiVersion: "backstage.io/v1alpha1",
+					kind: "System",
+					entityRef: "system:default/platform",
+					sourcePath: "catalog/catalog-info.yaml",
+					metadata: { name: "platform" },
+					spec: {},
+				},
+			],
+		}),
 		Response.json({
 			...fixture(),
 			entities: [
@@ -177,4 +194,27 @@ test("anonymous visitors receive a neutral 404 without querying either private r
 		assert.equal(response.status, 404);
 		assert.match(response.headers.get("cache-control") ?? "", /no-store/);
 	}
+});
+
+test("scalar subcomponentOf must resolve before publishing a complete v2 graph", () => {
+	const parsed = parseHomelabCatalogV2(fixture());
+	assert.ok(parsed);
+	parsed.entities[1].spec.subcomponentOf = "component:default/missing";
+	assert.equal(sanitizeSiteCatalogV2(parsed), null);
+	parsed.entities[1].spec.subcomponentOf = ["resource:default/postgresql"];
+	assert.equal(sanitizeSiteCatalogV2(parsed), null);
+	parsed.entities[1].spec.subcomponentOf = "resource:default/postgresql";
+	parsed.entities[1].spec.owner = "group:default/not-published";
+	const sanitized = sanitizeSiteCatalogV2(parsed);
+	assert.ok(sanitized);
+	assert.equal(sanitized.entities[1].spec.owner, undefined);
+	const projected = projectHomelabCatalogV2(sanitized);
+	assert.ok(
+		projected.topology.relations.some(
+			(relation) =>
+				relation.source === "fastapi" &&
+				relation.target === "postgresql" &&
+				relation.type === "partOf",
+		),
+	);
 });

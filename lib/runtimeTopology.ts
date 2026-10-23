@@ -1,3 +1,4 @@
+import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
 export type RuntimeRedisEvidence = {
 	backend?: string;
 	provider_attribution?: string;
@@ -224,6 +225,13 @@ export function parseRuntimeTopology(value: unknown): RuntimeTopologySnapshot | 
 }
 
 export async function loadRuntimeTopology(): Promise<RuntimeTopologySnapshot | null> {
+	if (
+		ownerUpstreamBlocked(
+			process.env.VERCEL_ENV,
+			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
+		)
+	) return null;
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 	try {
@@ -231,8 +239,12 @@ export async function loadRuntimeTopology(): Promise<RuntimeTopologySnapshot | n
 			process.env.RUNTIME_TOPOLOGY_API_URL?.trim() ||
 				RUNTIME_TOPOLOGY_DEFAULT_API_URL,
 			{
-				headers: { Accept: "application/json" },
+				headers: {
+					Accept: "application/json",
+					...ownerDiagnosticHeaders(process.env.DIAGNOSTICS_ACCESS_KEY),
+				},
 				cache: "no-store",
+				redirect: "error",
 				signal: controller.signal,
 			},
 		);

@@ -1,3 +1,4 @@
+import { ownerDiagnosticHeaders, ownerUpstreamBlocked } from "./homelabOwnerBoundary";
 export type ExposureState = "match" | "mismatch" | "incomplete" | "not_applicable";
 
 export type HomelabExposureEvidence = {
@@ -318,6 +319,13 @@ export function parseHomelabDiagnostics(
 }
 
 export async function loadHomelabDiagnostics(): Promise<HomelabDiagnosticsSnapshot | null> {
+	if (
+		ownerUpstreamBlocked(
+			process.env.VERCEL_ENV,
+			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
+		)
+	) return null;
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), PRIMARY_TIMEOUT_MS);
 	try {
@@ -325,8 +333,12 @@ export async function loadHomelabDiagnostics(): Promise<HomelabDiagnosticsSnapsh
 			process.env.HOMELAB_HEALTH_API_URL?.trim() ||
 				HOMELAB_DIAGNOSTICS_DEFAULT_API_URL,
 			{
-				headers: { Accept: "application/json" },
+				headers: {
+					Accept: "application/json",
+					...ownerDiagnosticHeaders(process.env.DIAGNOSTICS_ACCESS_KEY),
+				},
 				cache: "no-store",
+				redirect: "error",
 				signal: controller.signal,
 			},
 		);

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import {
+	OWNER_BOUNDARY_REASON,
+	ownerUpstreamBlocked,
+} from "@/lib/homelabOwnerBoundary";
+import {
 	type FastApiHealthBoardSnapshot,
 	loadFastApiHealthBoard,
 } from "@/lib/fastApiHealthBoard";
@@ -39,6 +43,28 @@ function withHealthBoardMetadata(
 }
 
 async function healthResponse() {
+	// Fast fail: machine SERVICE credentials cannot authorize FastAPI OWNER diagnostics.
+	if (
+		ownerUpstreamBlocked(
+			process.env.VERCEL_ENV,
+			process.env.HOMELAB_OWNER_RAW_UPSTREAM_ENABLED,
+			process.env.DIAGNOSTICS_ACCESS_KEY,
+		)
+	) {
+		return NextResponse.json(
+			{
+				error: "Detailed homelab diagnostics require an OWNER channel",
+				reason: OWNER_BOUNDARY_REASON,
+			},
+			{
+				status: 503,
+				headers: {
+					"X-Homelab-Health-Reason": OWNER_BOUNDARY_REASON,
+					"Cache-Control": "private, no-store",
+				},
+			},
+		);
+	}
 	const boardResult = await loadFastApiHealthBoard();
 	const boardSnapshot = parseHomelabHealthSnapshot(boardResult.board?.homelab);
 	if (boardSnapshot && boardResult.board?.state === "fresh") {

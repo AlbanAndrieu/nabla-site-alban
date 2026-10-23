@@ -64,6 +64,26 @@ function assertUniqueTopLevelNamespaces(
 	});
 }
 
+/**
+ * Namespaces read by client components. Only these are serialized into every
+ * page by `NextIntlClientProvider`; server components keep the full catalog.
+ */
+export const CLIENT_MESSAGE_NAMESPACES = [
+	"site",
+	"homelab",
+	"operations",
+] as const;
+
+export function pickClientMessages(
+	messages: Record<string, unknown>,
+): Record<string, unknown> {
+	return Object.fromEntries(
+		CLIENT_MESSAGE_NAMESPACES.filter((namespace) => namespace in messages).map(
+			(namespace) => [namespace, messages[namespace]],
+		),
+	);
+}
+
 export async function loadMessages(locale: AppLocale) {
 	const [
 		{ default: base },

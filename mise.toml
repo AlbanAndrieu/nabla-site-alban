@@ -5,6 +5,8 @@ python = "{{ get_env(name='PYTHON_VERSION', default='3.12.10') }}"
 pre-commit = "4.6.2"
 npm = "12.2.0"
 just = "1.58.0"
+# Native shfmt pre-commit matches nabla-compose; avoids a Docker daemon.
+go = "1.25.12"
 dagger = "0.21.10"
 hyperfine = "1.21.0"
 hk = "2.5.0"
@@ -42,3 +44,7 @@ run = "bash scripts/agent-quality-gate.sh --fix"
 [tasks.agent-publish]
 description = "Run or reuse the exact strict publication proof for the current HEAD/base/toolchain"
 run = "bash scripts/agent-publish.sh"
+
+[tasks.agent-loop]
+description = "Run changed-file pre-commit checks locally; no build or publication proof"
+run = "bash scripts/agent-local-loop.sh"
