@@ -6,6 +6,12 @@ import {
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
+import {
+	readPublicCatalogCache,
+	readStalePublicHealthCache,
+	writePublicCatalogCache,
+	writePublicHealthCache,
+} from "@/lib/homelabPublicBrowserCache";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
@@ -35,6 +41,8 @@ export type HealthFetchResult = {
 export type HomelabServicesState = {
 	catalog: HomelabServicesCatalog | null;
 	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
+	/** True only while rendering a still-valid SERVICE-only browser cache. */
+	catalogStale: boolean;
 	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	siteHealth: SiteHealthV2 | null;
@@ -48,6 +56,7 @@ export type HomelabServicesState = {
 export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalog: null,
 	catalogFailure: null,
+	catalogStale: false,
 	topology: null,
 	snapshot: null,
 	siteHealth: null,
@@ -278,6 +287,26 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		let refreshController: AbortController | null = null;
 		let ownerUpstreamBlocked = false;
 		let lastCycleStartedAt = 0;
+		// Only a publicly authorized projection may be written to persistent storage.
+		const publicStorage = (() => {
+			if (!readOnly) return null;
+			try {
+				return window.localStorage;
+			} catch {
+				return null;
+			}
+		})();
+		const cachedCatalog = publicStorage ? readPublicCatalogCache(publicStorage) : null;
+		if (cachedCatalog) {
+			setState((current) => ({
+				...current,
+				catalog: cachedCatalog.catalog,
+				topology: cachedCatalog.topology,
+				catalogFailure: null,
+				catalogStale: true,
+				error: false,
+			}));
+		}
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			lastCycleStartedAt = Date.now();
@@ -294,10 +323,18 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 						headers: { Accept: "application/json" },
 					});
 					status = response.status;
-					if (response.ok)
+					if (response.ok) {
 						siteHealth = parseSiteHealthV2(await response.json());
+						if (siteHealth && publicStorage)
+							writePublicHealthCache(publicStorage, siteHealth);
+					}
 				} catch {
 					// Missing v2 evidence is UNKNOWN, not an observed outage.
+				}
+				if (!siteHealth && publicStorage) {
+						siteHealth = readStalePublicHealthCache(
+						publicStorage, cachedCatalog?.catalog.catalogRevision,
+						);
 				}
 				if (!signal.aborted) {
 					setState((current) => ({
@@ -366,11 +403,14 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		void fetchCatalog(initialController.signal)
 			.then(({ catalog, topology }) => {
 				if (initialController.signal.aborted) return;
+				if (publicStorage)
+					writePublicCatalogCache(publicStorage, catalog, topology);
 				setState((current) => ({
 					...current,
 					catalog,
 					topology,
 					catalogFailure: null,
+					catalogStale: false,
 					error: false,
 				}));
 			})
@@ -378,7 +418,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				if (initialController.signal.aborted) return;
 				setState((current) => ({
 					...current,
-					error: true,
+					// Keep a bounded published catalog visible during upstream errors.
+					error: !cachedCatalog,
 					catalogFailure:
 						error instanceof CatalogV2Unavailable
 							? error.reason

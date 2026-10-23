@@ -251,6 +251,13 @@ export default function HomelabServicesBlock({
 
 	return (
 		<>
+			{readOnly && state.catalogStale && (
+				<p data-homelab-catalog-stale role="status" className="alert alert-warning">
+					{french
+						? "Catalogue SERVICE v2 conservé dans ce navigateur. Données potentiellement périmées : les états de santé restent inconnus jusqu’à une nouvelle vérification."
+						: "SERVICE v2 catalog restored from this browser. Data may be stale; health remains unknown until a fresh check."}
+				</p>
+			)}
 			{!readOnly && (
 				<HomelabStatusOverview
 					snapshot={state.snapshot}

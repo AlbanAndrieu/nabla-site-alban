@@ -10,9 +10,11 @@
 
 ## P1 — Cache navigateur limité aux projections SERVICE v2
 
-- [ ] Évaluer un Last-Known-Good versionné par `catalogRevision`, avec TTL borné et état explicitement `stale/unknown` à expiration. Seuls le catalogue publiable, les relations publiques et les statuts SERVICE stricts sont éligibles.
-- [ ] Ne jamais persister en localStorage, sessionStorage ou IndexedDB des probes, métriques, IP LAN, clés, jetons ou données OWNER ; séparer le cache de présentation du contrôle d'accès et purger à la déconnexion.
-- [ ] Ajouter tests de migration de schéma, de révision divergente, d'expiration TTL et de revalidation en arrière-plan avant toute activation.
+- [x] Last-Known-Good **uniquement en lecture publique** : catalogue SERVICE v2 pendant 15 min, derniers états publiables pendant 2 min, corrélation par `catalogRevision`. Le contenu restauré est signalé comme périmé ; tous les états de santé restaurés deviennent `stale/unknown` jusqu'à une nouvelle observation réseau.
+- [x] Liste blanche des champs persistés dans `localStorage` : service ID, nom, référence Backstage, icône statique locale et topologie déclarée (nœuds et relations). Aucun endpoint, IP LAN, clé, jeton, probe, métadonnée brute ou résultat OWNER n'est écrit. `localStorage` n'est pas consulté en mode OWNER.
+- [x] **7/7 tests locaux réels** (Node 22 avec suppression expérimentale des types TypeScript) et contrôle TypeScript strict ciblé, sur le blob exact ajouté à la branche : injection de secrets, URL d'image externe, JSON malformé, quotas bloqués, horloge et expiration TTL, décalage de révision, conservation des états `unknown`.
+- [ ] Vérifier le build/quality gate complet avec Node 24 LTS et les dépendances réelles sur le checkout du HEAD ; essais E2E React/Next sur les modes OWNER/public, la panne FastAPI, les onglets multiples et le retour réseau.
+- [ ] Prévoir une purge explicite du cache public si l'accès est révoqué ou si le produit introduit un mécanisme de déconnexion. Ne jamais utiliser le cache pour autoriser des endpoints privés.
 
 ## P0 — Node.js LTS et outillage stabilisé (23 octobre 2026)
 
