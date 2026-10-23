@@ -20,7 +20,17 @@ test("Node 24.22.1 LTS is the single development and production runtime", async 
 		devDependencies?: { "@types/node"?: string };
 	};
 	const lock = JSON.parse(lockRaw) as {
-		packages?: Record<string, { engines?: { node?: string; npm?: string }; version?: string; dependencies?: Record<string, string>; optionalDependencies?: Record<string, string>; integrity?: string; resolved?: string }>;
+		packages?: Record<
+			string,
+			{
+				engines?: { node?: string; npm?: string };
+				version?: string;
+				dependencies?: Record<string, string>;
+				optionalDependencies?: Record<string, string>;
+				integrity?: string;
+				resolved?: string;
+			}
+		>;
 	};
 
 	assert.equal(nvmrc.trim(), "24.22.1");
@@ -51,7 +61,6 @@ test("Node 24.22.1 LTS is the single development and production runtime", async 
 		if (!name.startsWith("@next/swc-")) continue;
 		assert.equal(lock.packages?.[`node_modules/${name}`]?.version, version);
 	}
-
 
 	// The minimum production runtime is the package.json engines floor.
 	assert.match(workflow, /jq -r '\.engines\.node' package\.json/);

@@ -603,6 +603,13 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         files: ^(\.github/workflows/(ci|docker-build|mega-linter|security-rss-opml|security-supply-chain)\.yml|\.pre-commit-config\.yaml|mise\.toml|scripts/agent-quality-gate\.sh|unit-tests/ciBudgetConvergence\.test\.mjs)$
+    -   id: lts-stack-contract
+        name: "🟢 runtime · Node 24 LTS and Next lock integrity"
+        language: system
+        entry: node --test unit-tests/ltsStackContract.test.mjs
+        pass_filenames: false
+        stages: [pre-commit]
+        files: ^(\.nvmrc|\.envrc|package(-lock)?\.json|Dockerfile|\.dagger/src/index\.ts|\.github/workflows/(ci|node24-compat|docker-build)\.yml|unit-tests/(ltsStackContract\.test\.mjs|nodeRuntimeCompatibility\.test\.ts)|justfile)$
     -   id: github-actions-usage-contract
         name: "🧮 actions · Validate bounded usage inventory locally"
         language: system
