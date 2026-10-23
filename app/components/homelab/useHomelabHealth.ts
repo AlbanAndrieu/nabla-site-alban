@@ -7,6 +7,8 @@ import {
 } from "@/lib/homelabHealth";
 import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
 import {
+	CATALOG_REVALIDATION_MS,
+	catalogRevalidationDue,
 	readPublicCatalogCache,
 	readStalePublicHealthCache,
 	writePublicCatalogCache,
@@ -274,8 +276,8 @@ export function countHealthStates(
 }
 
 /**
- * Loads the catalog and topology once, then polls probe and aggregate health
- * every HEALTH_REFRESH_MS while the page is visible.
+ * Revalidates the canonical catalog periodically while polling service health.
+ * Refreshes pause in hidden tabs and resume on visibility changes.
  */
 export function useHomelabHealth(readOnly = false): HomelabServicesState {
 	const [state, setState] = useState<HomelabServicesState>(
@@ -285,6 +287,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 	useEffect(() => {
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
+		let catalogRefreshController: AbortController | null = null;
+		let lastCatalogAttemptAt = 0;
 		let ownerUpstreamBlocked = false;
 		let lastCycleStartedAt = 0;
 		// Only a publicly authorized projection may be written to persistent storage.
@@ -297,6 +301,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			}
 		})();
 		const cachedCatalog = publicStorage ? readPublicCatalogCache(publicStorage) : null;
+		let activeCatalogRevision = cachedCatalog?.catalog.catalogRevision ?? null;
 		if (cachedCatalog) {
 			setState((current) => ({
 				...current,
@@ -325,16 +330,21 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 					status = response.status;
 					if (response.ok) {
 						siteHealth = parseSiteHealthV2(await response.json());
-						if (siteHealth && publicStorage)
+						// A new health revision cannot validate an older catalog.
+						if (activeCatalogRevision && siteHealth?.catalogRevision !== activeCatalogRevision)
+							siteHealth = null;
+						if (siteHealth && publicStorage && activeCatalogRevision)
 							writePublicHealthCache(publicStorage, siteHealth);
 					}
 				} catch {
 					// Missing v2 evidence is UNKNOWN, not an observed outage.
 				}
-				if (!siteHealth && publicStorage) {
-						siteHealth = readStalePublicHealthCache(
-						publicStorage, cachedCatalog?.catalog.catalogRevision,
-						);
+				if (!siteHealth && publicStorage && activeCatalogRevision) {
+					// A cached green status is never a fresh measurement.
+					siteHealth = readStalePublicHealthCache(
+						publicStorage,
+						activeCatalogRevision,
+					);
 				}
 				if (!signal.aborted) {
 					setState((current) => ({
@@ -398,46 +408,72 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			void runHealthCycle(refreshController.signal);
 		};
 
-		// Catalog drives the service cards; topology is optional enrichment.
-		// Never make an unavailable topology hide an otherwise valid inventory.
-		void fetchCatalog(initialController.signal)
-			.then(({ catalog, topology }) => {
-				if (initialController.signal.aborted) return;
-				if (publicStorage)
-					writePublicCatalogCache(publicStorage, catalog, topology);
-				setState((current) => ({
-					...current,
-					catalog,
-					topology,
-					catalogFailure: null,
-					catalogStale: false,
-					error: false,
-				}));
-			})
-			.catch((error: unknown) => {
-				if (initialController.signal.aborted) return;
-				setState((current) => ({
-					...current,
-					// Keep a bounded published catalog visible during upstream errors.
-					error: !cachedCatalog,
-					catalogFailure:
-						error instanceof CatalogV2Unavailable
-							? error.reason
-							: "unavailable",
-				}));
-			});
+		// Revalidate in long-lived tabs: a new catalogRevision would otherwise
+		// leave the service graph stale while health polling continues.
+		const loadCatalog = (signal: AbortSignal) => {
+			lastCatalogAttemptAt = Date.now();
+			void fetchCatalog(signal)
+				.then(({ catalog, topology }) => {
+					if (signal.aborted) return;
+					activeCatalogRevision = catalog.catalogRevision ?? null;
+					if (publicStorage)
+						writePublicCatalogCache(publicStorage, catalog, topology);
+					setState((current) => ({
+						...current,
+						catalog,
+						topology,
+						// Never retain the previous revision's public health.
+						siteHealth:
+							current.siteHealth?.catalogRevision === catalog.catalogRevision
+								? current.siteHealth
+								: null,
+						catalogFailure: null,
+						catalogStale: false,
+						error: false,
+					}));
+				})
+				.catch((error: unknown) => {
+					if (signal.aborted) return;
+					setState((current) => ({
+						...current,
+						// Keep only a previously verified published catalog available.
+						error: current.catalog === null,
+						catalogStale: readOnly && current.catalog !== null,
+						catalogFailure:
+							error instanceof CatalogV2Unavailable
+								? error.reason
+								: "unavailable",
+					}));
+				});
+		};
+
+		const refreshCatalogIfDue = () => {
+			if (document.hidden || !catalogRevalidationDue(lastCatalogAttemptAt))
+				return;
+			catalogRefreshController?.abort();
+			catalogRefreshController = new AbortController();
+			loadCatalog(catalogRefreshController.signal);
+		};
+
+		loadCatalog(initialController.signal);
 
 		void runHealthCycle(initialController.signal);
 
 		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);
+		const catalogInterval = window.setInterval(refreshCatalogIfDue, CATALOG_REVALIDATION_MS);
 		const onVisibilityChange = () => {
-			if (!document.hidden) refreshHealth();
+			if (!document.hidden) {
+				refreshHealth();
+				refreshCatalogIfDue();
+			}
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
 			initialController.abort();
 			refreshController?.abort();
+			catalogRefreshController?.abort();
 			window.clearInterval(interval);
+			window.clearInterval(catalogInterval);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, [readOnly]);

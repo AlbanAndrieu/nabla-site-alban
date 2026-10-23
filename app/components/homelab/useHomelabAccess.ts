@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { clearPublicHomelabBrowserCache } from "@/lib/homelabPublicBrowserCache";
 
 export type HomelabAccessState = "pending" | "trusted" | "readonly" | "denied";
 
@@ -41,7 +42,17 @@ export default function useHomelabAccess(): HomelabAccessState {
 	useEffect(() => {
 		let active = true;
 		sharedAccessProbe().then((access) => {
-			if (active) setState(access);
+			if (!active) return;
+			if (access === "denied") {
+				// Public data was intentionally retained for offline display only
+				// while access was allowed. Revocation invalidates both cache keys.
+				try {
+					clearPublicHomelabBrowserCache(window.localStorage);
+				} catch {
+					// Storage may be blocked; the access gate still denies rendering.
+				}
+			}
+			setState(access);
 		});
 		return () => {
 			active = false;

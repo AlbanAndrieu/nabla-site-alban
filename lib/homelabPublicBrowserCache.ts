@@ -18,6 +18,8 @@ const RELATIONS = new Set([
 ]);
 const MAX_BYTES = 512 * 1024;
 const MAX_SERVICES = 2000;
+const MAX_RELATIONS_PER_SERVICE = 6;
+export const CATALOG_REVALIDATION_MS = 5 * 60_000;
 
 type StoragePort = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type CatalogCache = { catalog: HomelabServicesCatalog; topology: ServiceTopology | null };
@@ -31,14 +33,16 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 		!REVISION.test(value.catalogRevision) || !Array.isArray(value.services) ||
 		value.services.length === 0 || value.services.length > MAX_SERVICES) return null;
 	const names = new Set<string>();
+	const refs = new Set<string>();
 	const services: HomelabServicesCatalog["services"] = [];
 	for (const service of value.services) {
 		if (!service || typeof service !== "object" || !service.id || !ID.test(service.id) || names.has(service.id) ||
 			typeof service.name !== "string" || !service.name || service.name.length > 150 ||
-			typeof service.entityRef !== "string" || !ENTITY_REF.test(service.entityRef) ||
+			typeof service.entityRef !== "string" || !ENTITY_REF.test(service.entityRef) || refs.has(service.entityRef) ||
 			typeof service.iconSrc !== "string" || !ICON.test(service.iconSrc) ||
 			service.endpointEnabled !== false) return null;
 		names.add(service.id);
+		refs.add(service.entityRef);
 		services.push({
 			id: service.id, name: service.name, entityRef: service.entityRef,
 			iconSrc: service.iconSrc, endpointEnabled: false,
@@ -52,9 +56,10 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 	let safeTopology: ServiceTopology | null = null;
 	if (topology && topology.version === 2 && topology.catalogRevision === value.catalogRevision &&
 		Array.isArray(topology.nodes) && Array.isArray(topology.relations) &&
-		topology.nodes.length <= MAX_SERVICES && topology.relations.length <= MAX_SERVICES * 6 &&
+		topology.nodes.length === names.size && topology.relations.length <= names.size * MAX_RELATIONS_PER_SERVICE &&
 		topology.nodes.every((n) => n && typeof n === "object" && names.has(n.id) && typeof n.name === "string" &&
 			typeof n.kind === "string" && typeof n.category === "string") &&
+		new Set(topology.nodes.map((n) => n.id)).size === names.size &&
 		topology.relations.every((r) => r && typeof r === "object" && names.has(r.source) && names.has(r.target) &&
 			RELATIONS.has(r.type) && ["required", "optional"].includes(r.strength))) {
 		safeTopology = {
@@ -121,6 +126,8 @@ export function writePublicHealthCache(storage: StoragePort, health: SiteHealthV
 		!Array.isArray(health.services) || health.services.length > MAX_SERVICES ||
 		!health.services.every((s) => s && typeof s.entityRef === "string" &&
 			ENTITY_REF.test(s.entityRef) && STATES.has(s.state))) return false;
+	const refs = new Set(health.services.map((s) => s.entityRef));
+	if (refs.size !== health.services.length) return false;
 	const safe: SiteHealthV2 = {
 		schemaVersion: 2, model: "backstage-health", catalogRevision: health.catalogRevision,
 		boardState: "fresh", services: health.services.map((s) => ({ entityRef: s.entityRef, state: s.state })),
@@ -130,12 +137,13 @@ export function writePublicHealthCache(storage: StoragePort, health: SiteHealthV
 
 /** Never replay a cached green state: last-known data renders UNKNOWN until refreshed. */
 export function readStalePublicHealthCache(
-	storage: StoragePort, catalogRevision?: string, now = Date.now(),
+	storage: StoragePort, catalogRevision: string, now = Date.now(),
 ): SiteHealthV2 | null {
+	if (!REVISION.test(catalogRevision)) return null;
 	const raw = get(storage, HEALTH_KEY, HEALTH_TTL_MS, now);
 	if (!isRecord(raw) || raw.schemaVersion !== 2 || raw.model !== "backstage-health" ||
 		!REVISION.test(String(raw.catalogRevision)) ||
-		(catalogRevision && raw.catalogRevision !== catalogRevision) ||
+		raw.catalogRevision !== catalogRevision ||
 		!Array.isArray(raw.services) || raw.services.length > MAX_SERVICES) return null;
 	const seen = new Set<string>();
 	const services: SiteHealthV2["services"] = [];
@@ -150,4 +158,16 @@ export function readStalePublicHealthCache(
 		schemaVersion: 2, model: "backstage-health",
 		catalogRevision: raw.catalogRevision as string, boardState: "stale", services,
 	};
+}
+
+/** Drop published LKG after explicit access revocation or sign-out. */
+export function clearPublicHomelabBrowserCache(storage: StoragePort): void {
+	try { storage.removeItem(CATALOG_KEY); } catch { /* Storage may be disabled. */ }
+	try { storage.removeItem(HEALTH_KEY); } catch { /* Storage may be disabled. */ }
+}
+
+/** Keep long-lived tabs current without extra catalog requests on rapid focus events. */
+export function catalogRevalidationDue(lastAttemptAt: number, now = Date.now()): boolean {
+	return Number.isFinite(lastAttemptAt) && Number.isFinite(now) &&
+		now >= lastAttemptAt && now - lastAttemptAt >= CATALOG_REVALIDATION_MS;
 }

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	clearPublicHomelabBrowserCache,
+	catalogRevalidationDue,
 	readPublicCatalogCache,
 	readStalePublicHealthCache,
 	writePublicCatalogCache,
@@ -126,4 +128,70 @@ test("malformed browser payloads are ignored without rendering exceptions", () =
 	poisoned.data.catalog.services = [null];
 	storage.values.set(key, JSON.stringify(poisoned));
 	assert.equal(readPublicCatalogCache(storage, 1001), null);
+});
+
+test("cached health requires an exact verified catalogue revision", () => {
+	const storage = storageFixture();
+	writePublicHealthCache(storage, healthFixture(), 1000);
+	assert.equal(readStalePublicHealthCache(storage, "", 1001), null);
+	assert.equal(readStalePublicHealthCache(storage, OTHER_REVISION, 1001), null);
+	assert.equal(readStalePublicHealthCache(storage, REVISION, 1001)?.boardState, "stale");
+});
+
+test("duplicate Backstage entity references cannot poison the cached catalog", () => {
+	const storage = storageFixture();
+	const base = catalogFixture();
+	base.services.push({ ...base.services[0], id: "grafana-copy" });
+	assert.equal(writePublicCatalogCache(storage, base, null, 1000), false);
+	assert.equal(storage.values.size, 0);
+});
+
+test("topology with missing nodes becomes explicitly node-only, not fictional edges", () => {
+	const storage = storageFixture();
+	const topology = topologyFixture();
+	topology.nodes.length = 0;
+	assert.equal(writePublicCatalogCache(storage, catalogFixture(), topology, 1000), true);
+	assert.equal(readPublicCatalogCache(storage, 1001).topology, null);
+});
+
+test("a duplicate health entityRef is rejected before persistence", () => {
+	const storage = storageFixture();
+	const health = healthFixture();
+	health.services.push({ ...health.services[0] });
+	assert.equal(writePublicHealthCache(storage, health, 1000), false);
+	assert.equal(storage.values.size, 0);
+});
+
+test("revoke access clears both public cache entries without throwing", () => {
+	const storage = storageFixture();
+	writePublicCatalogCache(storage, catalogFixture(), topologyFixture(), 1000);
+	writePublicHealthCache(storage, healthFixture(), 1000);
+	assert.equal(storage.values.size, 2);
+	clearPublicHomelabBrowserCache(storage);
+	assert.equal(storage.values.size, 0);
+	assert.equal(readPublicCatalogCache(storage, 1001), null);
+	assert.equal(readStalePublicHealthCache(storage, REVISION, 1001), null);
+	clearPublicHomelabBrowserCache({removeItem() { throw new Error("blocked"); }});
+});
+
+test("catalog revalidation is bounded and resumes after a suspended tab", () => {
+	assert.equal(catalogRevalidationDue(1_000, 1_000), false);
+	assert.equal(catalogRevalidationDue(1_000, 1_000 + 5 * 60_000 - 1), false);
+	assert.equal(catalogRevalidationDue(1_000, 1_000 + 5 * 60_000), true);
+	assert.equal(catalogRevalidationDue(1_000, 1_000 + 60 * 60_000), true);
+	assert.equal(catalogRevalidationDue(1_000, 999), false);
+	assert.equal(catalogRevalidationDue(NaN, 1_000), false);
+});
+
+test("duplicated topology nodes cannot hide a missing service", () => {
+	const storage = storageFixture();
+	const catalog = catalogFixture();
+	catalog.services.push({
+		...catalog.services[0], id: "loki", name: "Loki",
+		entityRef: "component:default/loki",
+	});
+	const topology = topologyFixture();
+	topology.nodes.push({ ...topology.nodes[0] });
+	assert.equal(writePublicCatalogCache(storage, catalog, topology, 1000), true);
+	assert.equal(readPublicCatalogCache(storage, 1001).topology, null);
 });
