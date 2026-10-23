@@ -62,7 +62,7 @@ test("publication proof is written only after a clean deployable build", async (
 		const bin = path.join(cwd, ".git", "fake-bin");
 		await mkdir(bin);
 		for (const [name, version] of [
-			["node", "v26.8.2"],
+			["node", "v24.22.1"],
 			["python3", "Python 3.12.10"],
 			["pre-commit", "pre-commit 4.6.2"],
 		] as const) {
