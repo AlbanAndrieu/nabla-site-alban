@@ -21,13 +21,13 @@ test("Node runtime policy pins patched development and production Node LTS", asy
 	};
 
 	assert.equal(nvmrc.trim(), "24.22.1");
-	assert.equal(packageJson.engines?.node, ">=24.22.1 <27");
+	assert.equal(packageJson.engines?.node, ">=24.22.1 <25");
 	assert.deepEqual(
 		lock.packages?.[""]?.engines,
 		packageJson.engines,
 		"package-lock root engines must stay synchronized with package.json",
 	);
-	assert.match(envrc, /NODE_VERSIONS=\$\{NODE_VERSIONS:-"v26\.8\.2"\}/);
+	assert.match(envrc, /NODE_VERSIONS=\$\{NODE_VERSIONS:-"v24\.22\.1"\}/);
 
 	// The minimum production runtime is the package.json engines floor.
 	assert.match(workflow, /jq -r '\.engines\.node' package\.json/);
