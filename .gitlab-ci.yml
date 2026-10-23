@@ -93,7 +93,7 @@ variables:
   CI_IMAGE_PYTHON: python:3.12.10
   PROJECT_PYTHON_VERSION: "3.12"
   POETRY_VERSION: "2.2.1"
-  CI_IMAGE_NPM: node:26.8.2-alpine # keep aligned with .nvmrc
+  CI_IMAGE_NPM: node:24.22.1-alpine # keep aligned with .nvmrc
   MISE_VERSION: v2026.10.8
   # CI_REGISTRY: registry.gitlab.com
   OCI_REGISTRY: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}
