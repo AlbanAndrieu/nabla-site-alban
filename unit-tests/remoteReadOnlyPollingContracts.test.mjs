@@ -45,3 +45,30 @@ test("owner-only status is not published via v2 read-only response", () => {
 	assert.match(view, /access === "readonly"/);
 	assert.match(view, /<ArchitectureTopologyView/);
 });
+
+test("architecture public and OWNER views bind the correct readOnly flag", () => {
+	const view = source("app/[locale]/architecture/ArchitecturePrivateViews.tsx");
+	const publicStart = view.indexOf('if (access === "readonly")');
+	const ownerStart = view.indexOf('<div data-homelab-private-view>', publicStart);
+	assert.ok(publicStart >= 0 && ownerStart > publicStart);
+	const publicView = view.slice(publicStart, ownerStart);
+	const ownerView = view.slice(ownerStart);
+	assert.match(publicView, /<ArchitectureTopologyView\s+readOnly\b/);
+	assert.doesNotMatch(ownerView, /<ArchitectureTopologyView\s+readOnly\b/);
+	assert.equal((publicView.match(/<ArchitectureTopologyView\b/g) ?? []).length, 1);
+	assert.equal((ownerView.match(/<ArchitectureTopologyView\b/g) ?? []).length, 1);
+});
+
+test("mode transitions mask previously fetched OWNER snapshots synchronously", () => {
+	const architecture = source("app/[locale]/architecture/useArchitectureHealthPolling.ts");
+	assert.match(architecture, /const visibleHealth = readOnly \? null : health;/);
+	assert.match(architecture, /const visibleSiteHealth = readOnly \? siteHealth : null;/);
+	assert.match(architecture, /health: visibleHealth,/);
+	assert.match(architecture, /siteHealth: visibleSiteHealth,/);
+
+	const truenas = source("app/components/homelab/useHomelabHealth.ts");
+	const publicResult = truenas.slice(truenas.lastIndexOf("if (readOnly) {"));
+	assert.match(publicResult, /snapshot: null,/);
+	assert.match(publicResult, /ownerBoundary: false,/);
+	assert.match(publicResult, /healthStatus: null,/);
+});

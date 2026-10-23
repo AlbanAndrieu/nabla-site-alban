@@ -3,11 +3,13 @@
 - [x] Revenir de Node 26 Current à **Node 24.22.1 LTS**, correctifs de sécurité du 21 octobre : aligner `.nvmrc`, `.envrc`, les `engines`/ `devEngines` de `package.json`, la racine de `package-lock.json`, le Dagger LTS local et les fixtures de tests. Conserver npm **12.2.0**, outil pin dans `mise.toml`.
 - [x] Ne pas recopier les empreintes SHA-256 de Node 26 : retirer l'ancien bloc du `mise.lock` en attendant un `mise lock` sur une machine ayant accès aux archives signées Node 24.
 - [ ] **Quality gate bloquante** avant Ready/merge : reconstruire l'entrée de `mise.lock` sur un environnement de confiance puis exécuter `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`, `just quality`. Aucun résultat global validé à ce stade, pas de CI GitHub payante.
-- [ ] Réaligner `@types/node` de la série 25.x vers une version 24.x maintenue **avec** résolution de `package-lock.json` via npm 12 ; ne pas inventer d'intégrité ou modifier le lock des packages sans l'outil. Vérifier `next@16.4.0`, React 19.3 et OpenTelemetry après installation.
+- [x] `@types/node` aligné sur **24.13.3** et Next.js sur **16.4.2** dans les manifestes et le lockfile repris de `master` ; conserver la validation `npm ci`/typecheck/build à effectuer sur Node 24.22.1.
 - [ ] Vérifier la configuration runtime Node côté Vercel, la Preview exacte SHA, les pages `/truenas` et `/architecture`, les modes OWNER et public v2 ; aucune migration de déploiement sans validation.
 - [ ] Quand Node 26 sera officiellement LTS (date prévue 28 octobre 2026), reconsidérer une **nouvelle** migration uniquement après tests, pas par anticipation.
 
 ## P0 — Vue extérieure : ne plus sonder OWNER depuis le navigateur (23 octobre 2026)
+
+- [x] **P0 post-merge #248** : corriger l'inversion `readOnly` entre l'architecture publique et la vue OWNER ; tests distincts par branche et masquage immédiat des snapshots OWNER lorsqu'un rendu passe en lecture seule.
 
 - [x] Les vues externes en lecture seule de TrueNAS et de l'architecture consomment seulement les projections publiques `/api/homelab-services`, `/api/homelab-catalog-v2` et `/api/homelab-health-v2` ; aucun polling du runtime `/api/homelab-status`, des probes `/api/homelab-probes` ou de l'agrégat OWNER `/api/homelab-health`.
 - [x] Réutiliser le parseur strict `SiteHealthV2` et indexer les états par `entityRef` et `catalogRevision` ; conserver `unknown` quand le catalogue ne correspond pas ou que `boardState` n'est pas `fresh`.
@@ -33,7 +35,7 @@
 - [x] Rendre les icônes statiques indépendantes des observations runtime : projection canonique Backstage v2 → assets SVG publics autorisés.
 - [ ] Confirmer en production l'activation temporaire FastAPI `HOMELAB_OWNER_REMOTE_ACCESS_ENABLED=true`, la correspondance de la clé, et le comportement HTTP 200 versus 401/403/503 depuis la vraie IP domestique.
 - [ ] Après disponibilité du relais OWNER authentifié, remettre les deux drapeaux FastAPI et Site à leurs valeurs restrictives ; ne jamais autoriser l'egress Vercel dans `HOMELAB_TRUSTED_CIDRS`.
-- [ ] Compiler et tester le dépôt entier, rebase PR #247 sur master puis Preview exact-SHA avant fusion ; GitHub Actions indisponibles et aucune mise en production faite.
+- [ ] Compiler et tester le dépôt entier avec Node 24, puis vérifier la Preview exact-SHA et la production ; PR #247 et #248 déjà fusionnées, ne pas relancer GitHub Actions payantes avant validation locale.
 
 ## P0 — Une seule image Dockerfile pour Talos (23 octobre 2026)
 
@@ -47,7 +49,7 @@
 
 - [x] Comparaison des contrôles des deux dépôts : actionlint, zizmor, hadolint, ShellCheck, Betterleaks, contrôle des exécutables, hook Git pre-push et politique Draft/Ready déjà présents ; ne pas les dupliquer.
 - [x] Ajouter `just loop` et `mise run agent-loop` comme étape rapide pre-commit sur les fichiers modifiés, avec comparaison Git stricte et sans publication.
-- [ ] Vérifier la convergence complète du gate local sur un checkout Node 26/npm 12 ; le mode loop ne remplace ni typecheck, tests, build, ni quality:agent:publish.
+- [ ] Vérifier la convergence du gate local sur un checkout **Node 24.22.1 LTS** et npm 12 ; `just loop` ne remplace ni typecheck, tests, build ni quality:agent:publish.
 - [ ] Déployé en un seul `Dockerfile` pour le serveur Next.js port 3000 (Vercel reste natif) ; le workflow Docker vérifie cette image uniquement hors PR Draft. Tests de build réels restant à faire localement.
 
 ## P0 — Convergence CI / hooks avec nabla-compose (22 octobre 2026)

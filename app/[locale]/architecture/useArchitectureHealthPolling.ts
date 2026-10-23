@@ -119,13 +119,24 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		};
 	}, [readOnly]);
 
+	// Access changes can precede effect cleanup. Mask cached OWNER data immediately.
+	const visibleHealth = readOnly ? null : health;
+	const visibleSiteHealth = readOnly ? siteHealth : null;
 	const healthSource: ArchitectureHealthSource = healthUnavailable
 		? "unavailable"
-		: readOnly && siteHealth
-			? "site-v2"
-			: health
+		: readOnly
+			? visibleSiteHealth
+				? "site-v2"
+				: "loading"
+			: visibleHealth
 				? "fastapi"
 				: "loading";
 
-	return { health, siteHealth, healthUnavailable, refreshing, healthSource } as const;
+	return {
+		health: visibleHealth,
+		siteHealth: visibleSiteHealth,
+		healthUnavailable,
+		refreshing,
+		healthSource,
+	} as const;
 }

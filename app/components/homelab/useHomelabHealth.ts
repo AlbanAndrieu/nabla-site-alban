@@ -392,5 +392,16 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		};
 	}, [readOnly]);
 
+	// An access-mode switch may race with an in-flight OWNER fetch.
+	// Public components must never receive a previously cached OWNER snapshot.
+	if (readOnly) {
+		return {
+			...state,
+			snapshot: null,
+			ownerBoundary: false,
+			healthStatus: null,
+			healthUnavailable: state.siteHealth?.boardState !== "fresh",
+		};
+	}
 	return state;
 }
