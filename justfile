@@ -79,7 +79,7 @@ dagger-check:
 dagger-check-lts:
     dagger call check-node-lts --source=.
 
-# Warm-cache comparison: Dagger Node 26 parity vs the current npm check.
+# Warm-cache comparison: Dagger Node 24 LTS parity vs the current npm check.
 bench-dev-loop:
     hyperfine --warmup 1 --min-runs 3 \
         'dagger call check-node-lts --source=.' \
