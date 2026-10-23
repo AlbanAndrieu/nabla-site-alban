@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
@@ -9,6 +10,7 @@ import {
 	isHomelabCatalogPlaceholder,
 } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
+import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
@@ -31,6 +33,12 @@ import {
 	useHomelabHealth,
 } from "./useHomelabHealth";
 
+// Reuse the existing ReactFlow explorer without requesting private data in public mode.
+const HierarchicalArchitectureExplorer = dynamic(
+	() => import("@/app/[locale]/architecture/HierarchicalArchitectureExplorer"),
+	{ ssr: false },
+);
+
 const HEALTH_STATES: readonly HomelabHealthState[] = [
 	"ok",
 	"warn",
@@ -43,7 +51,8 @@ type GroupFilter = "all" | ServicePresentationGroup;
 
 export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ readOnly?: boolean }>) {
 	const t = useTranslations("homelab");
-	const french = useLocale() === "fr";
+	const locale = useLocale();
+	const french = locale === "fr";
 	const state = useHomelabHealth(readOnly);
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [environmentFilter, setEnvironmentFilter] =
@@ -55,6 +64,25 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const handledAnchor = useRef<string | null>(null);
+
+	// If FastAPI provides cards but no matching relation graph, still show the
+	// declared services. Never invent relations or assert dependency health.
+	const graphTopology = useMemo<ServiceTopology | null>(() => {
+		if (!state.catalog) return null;
+		return state.topology ?? {
+			version: 2,
+			catalogRevision: state.catalog.catalogRevision,
+			name: "Backstage v2 — declared services only",
+			nodes: state.catalog.services.map((service) => ({
+				id: homelabServiceId(service),
+				name: service.name,
+				kind: service.kind ?? "service",
+				category: service.category ?? "other",
+				criticality: service.criticality,
+			})),
+			relations: [],
+		};
+	}, [state.catalog, state.topology]);
 
 	const indexedHealth = useMemo(
 		() =>
@@ -233,6 +261,38 @@ export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ re
 					<HomelabProbeDiagnostics snapshot={state.snapshot} />
 				</>
 			)}
+
+			{graphTopology ? (
+				<section
+					data-homelab-service-reactflow
+					aria-labelledby="truenas-service-graph-title"
+				>
+					<h3 id="truenas-service-graph-title">
+						{french ? "Graphe interactif des services" : "Interactive service graph"}
+					</h3>
+					{!state.topology ? (
+						<p role="status">
+							{french
+								? "Relations indisponibles : seuls les services déclarés sont affichés."
+								: "Relations unavailable: showing declared services only."}
+						</p>
+					) : null}
+					<HierarchicalArchitectureExplorer
+						locale={locale}
+						catalog={state.catalog}
+						catalogSource="backstage-v2"
+						topology={graphTopology}
+						topologySource={state.topology ? "fastapi" : "local-fallback"}
+						healthStatus={readOnly ? null : state.snapshot}
+						healthSource={
+							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
+						}
+						readOnly={readOnly}
+						initialMode="services"
+					/>
+				</section>
+			) : null}
+
 
 			<section
 				id="truenas-health-dashboard"

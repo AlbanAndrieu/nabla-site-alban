@@ -71,6 +71,7 @@ type GraphInputs = {
 	topology: ServiceTopology;
 	healthStatus: HomelabHealthSnapshot | null;
 	readOnly?: boolean;
+	initialMode?: GraphMode;
 };
 
 export default function useHierarchicalArchitectureGraph({
@@ -79,8 +80,9 @@ export default function useHierarchicalArchitectureGraph({
 	topology,
 	healthStatus,
 	readOnly = false,
+	initialMode = "ai",
 }: GraphInputs) {
-	const [mode, setMode] = useState<GraphMode>("ai");
+	const [mode, setMode] = useState<GraphMode>(initialMode);
 	const [scope, setScope] = useState<GraphScope>("critical");
 	const [showOptional, setShowOptional] = useState(true);
 	const [query, setQuery] = useState("");

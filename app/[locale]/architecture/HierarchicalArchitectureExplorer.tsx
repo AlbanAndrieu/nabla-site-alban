@@ -17,7 +17,7 @@ import {
 } from "./HierarchicalArchitectureLegends";
 import { NODE_TYPES } from "./HierarchicalArchitectureNodes";
 import HierarchicalArchitectureToolbar from "./HierarchicalArchitectureToolbar";
-import type { ArchitectureNodeData } from "./hierarchicalArchitectureModel";
+import type { ArchitectureNodeData, GraphMode } from "./hierarchicalArchitectureModel";
 import type { ArchitectureHealthSource } from "./useArchitectureHealthPolling";
 import useHierarchicalArchitectureGraph from "./useHierarchicalArchitectureGraph";
 
@@ -30,6 +30,7 @@ type Props = {
 	healthStatus: HomelabHealthSnapshot | null;
 	healthSource: ArchitectureHealthSource;
 	readOnly?: boolean;
+	initialMode?: GraphMode;
 };
 
 export default function HierarchicalArchitectureExplorer({
@@ -41,6 +42,7 @@ export default function HierarchicalArchitectureExplorer({
 	healthStatus,
 	healthSource,
 	readOnly = false,
+	initialMode = "ai",
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const {
@@ -64,6 +66,7 @@ export default function HierarchicalArchitectureExplorer({
 		topology,
 		healthStatus,
 		readOnly,
+		initialMode,
 	});
 
 	return (

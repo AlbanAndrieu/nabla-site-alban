@@ -8,6 +8,8 @@ export type HomelabEnvironment = "production" | "staging" | "dev";
 
 export type HomelabService = {
 	id?: string;
+	/** Canonical Backstage v2 identity, not a service URL. */
+	entityRef?: string;
 	name: string;
 	environment?: HomelabEnvironment;
 	kind?: string;
@@ -32,6 +34,8 @@ export type HomelabService = {
 
 export type HomelabServicesCatalog = {
 	version?: number;
+	/** Required for correlating public service health with the matching catalog. */
+	catalogRevision?: string;
 	/** Sanitized owner-only fallback reason; never include credentials. */
 	privateInventoryStatus?: "key-missing" | "access-denied" | "unavailable";
 	services: HomelabService[];

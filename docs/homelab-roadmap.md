@@ -1,3 +1,19 @@
+## P0 — Icônes et ReactFlow TrueNAS / catalogue Backstage v2 (23 octobre 2026)
+
+- [x] Vérifier la version réellement servie par Vercel : la production est toujours sur `55ccc4c` (#247), car le build `53419c1` (#248) a échoué au typecheck. Les quatre erreurs remontent aux valeurs `entityRef` non typées (`unknown`) dans les deux hiérarchies et les filtres.
+- [x] Typer explicitement `HomelabService.entityRef` et `HomelabServicesCatalog.catalogRevision` ; ne pas assouplir le parseur strict Backstage v2.
+- [x] Rétablir les icônes spécifiques pour les identifiants canoniques et variantes déclarées, avec 102 alias vers 80 assets déjà présents dans `public/assets/selfh-icons`. Ne jamais charger une URL de logo fournie par un catalogue externe.
+- [x] Réutiliser ReactFlow (mode `services`) sous les cartes de TrueNAS en OWNER et lecture publique : l'accès extérieur exploite exclusivement la projection v2 ; en l'absence de relations, montrer les seuls services déclarés et indiquer explicitement l'absence d'arêtes.
+- [ ] Exécuter Node 24.22.1/npm 12.2.0 : `npm ci`, `npm run typecheck`, `npm run test:unit`, `npm run build`, puis quality gate locale complète. Contrats de sources présents mais compilation et E2E non exécutés dans l'agent sans clone DNS.
+- [ ] Après build Vercel READY exact-SHA, vérifier la présence des icônes (/assets/selfh-icons/...), les réseaux OWNER/publiques, l'affichage du graphe, la correspondance des identités et la mise à jour effective du domaine `www.albanandrieu.com`.
+- [ ] Distinguer les 502/timeouts des endpoints FastAPI OWNER observés en production d'une défaillance des images statiques ou du graphique de services. Le graphe réseau LAN reste OWNER.
+
+## P1 — Cache navigateur limité aux projections SERVICE v2
+
+- [ ] Évaluer un Last-Known-Good versionné par `catalogRevision`, avec TTL borné et état explicitement `stale/unknown` à expiration. Seuls le catalogue publiable, les relations publiques et les statuts SERVICE stricts sont éligibles.
+- [ ] Ne jamais persister en localStorage, sessionStorage ou IndexedDB des probes, métriques, IP LAN, clés, jetons ou données OWNER ; séparer le cache de présentation du contrôle d'accès et purger à la déconnexion.
+- [ ] Ajouter tests de migration de schéma, de révision divergente, d'expiration TTL et de revalidation en arrière-plan avant toute activation.
+
 ## P0 — Node.js LTS et outillage stabilisé (23 octobre 2026)
 
 - [x] Revenir de Node 26 Current à **Node 24.22.1 LTS**, correctifs de sécurité du 21 octobre : aligner `.nvmrc`, `.envrc`, les `engines`/ `devEngines` de `package.json`, la racine de `package-lock.json`, le Dagger LTS local et les fixtures de tests. Conserver npm **12.2.0**, outil pin dans `mise.toml`.
