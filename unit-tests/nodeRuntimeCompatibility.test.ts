@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Node runtime policy separates development Current from production compatibility", async () => {
+test("Node runtime policy pins patched development and production Node LTS", async () => {
 	const [nvmrc, envrc, packageRaw, lockRaw, workflow] = await Promise.all([
 		read(".nvmrc"),
 		read(".envrc"),
@@ -20,8 +20,8 @@ test("Node runtime policy separates development Current from production compatib
 		packages?: { ""?: { engines?: { node?: string; npm?: string } } };
 	};
 
-	assert.equal(nvmrc.trim(), "26.8.2");
-	assert.equal(packageJson.engines?.node, ">=24.22.0 <27");
+	assert.equal(nvmrc.trim(), "24.22.1");
+	assert.equal(packageJson.engines?.node, ">=24.22.1 <27");
 	assert.deepEqual(
 		lock.packages?.[""]?.engines,
 		packageJson.engines,
