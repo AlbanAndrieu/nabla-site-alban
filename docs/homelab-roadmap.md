@@ -1,3 +1,12 @@
+## P0 — Node.js LTS et outillage stabilisé (23 octobre 2026)
+
+- [x] Revenir de Node 26 Current à **Node 24.22.1 LTS**, correctifs de sécurité du 21 octobre : aligner `.nvmrc`, `.envrc`, les `engines`/ `devEngines` de `package.json`, la racine de `package-lock.json`, le Dagger LTS local et les fixtures de tests. Conserver npm **12.2.0**, outil pin dans `mise.toml`.
+- [x] Ne pas recopier les empreintes SHA-256 de Node 26 : retirer l'ancien bloc du `mise.lock` en attendant un `mise lock` sur une machine ayant accès aux archives signées Node 24.
+- [ ] **Quality gate bloquante** avant Ready/merge : reconstruire l'entrée de `mise.lock` sur un environnement de confiance puis exécuter `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`, `just quality`. Aucun résultat global validé à ce stade, pas de CI GitHub payante.
+- [ ] Réaligner `@types/node` de la série 25.x vers une version 24.x maintenue **avec** résolution de `package-lock.json` via npm 12 ; ne pas inventer d'intégrité ou modifier le lock des packages sans l'outil. Vérifier `next@16.4.0`, React 19.3 et OpenTelemetry après installation.
+- [ ] Vérifier la configuration runtime Node côté Vercel, la Preview exacte SHA, les pages `/truenas` et `/architecture`, les modes OWNER et public v2 ; aucune migration de déploiement sans validation.
+- [ ] Quand Node 26 sera officiellement LTS (date prévue 28 octobre 2026), reconsidérer une **nouvelle** migration uniquement après tests, pas par anticipation.
+
 ## P0 — Vue extérieure : ne plus sonder OWNER depuis le navigateur (23 octobre 2026)
 
 - [x] Les vues externes en lecture seule de TrueNAS et de l'architecture consomment seulement les projections publiques `/api/homelab-services`, `/api/homelab-catalog-v2` et `/api/homelab-health-v2` ; aucun polling du runtime `/api/homelab-status`, des probes `/api/homelab-probes` ou de l'agrégat OWNER `/api/homelab-health`.
