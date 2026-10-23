@@ -15,8 +15,8 @@ migration vers 1.0 sera évaluée séparément après stabilisation.
 
 `dagger call check --source=.` exécute en parallèle :
 
-- Node 26.8.2 : ESLint, Stylelint, TypeScript, tests unitaires et build Next.js ;
-- Node 24.22.0 : build de compatibilité Vercel.
+- Node 24.22.1 : ESLint, Stylelint, TypeScript, tests unitaires et build Next.js ;
+- Node 24.22.1 : build de compatibilité Vercel.
 
 Le cache npm et le cache Next.js sont des volumes Dagger persistants. Le build
 Next.js appelle directement `npx next build` dans le conteneur éphémère : le
