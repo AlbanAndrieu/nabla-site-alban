@@ -157,7 +157,10 @@ checksum = "sha256:759f16fb7aa17c5c8b9594b6d4a8c1a6630dfd042cf2b3ff84841454d3d18
 url = "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/casey/just/releases/assets/500511374"
 
-# Node is pinned by .nvmrc; regenerate this entry with `mise lock` on a trusted\n# connected workstation. Never copy v26 checksums into v24 artifacts.\n\n[[tools.npm]]
+# Node is pinned by .nvmrc; regenerate this entry with `mise lock` on a trusted
+# connected workstation. Never copy v26 checksums into v24 artifacts.
+
+[[tools.npm]]
 version = "12.2.0"
 backend = "aqua:npm/cli"
 specifiers = ["12.2.0"]
