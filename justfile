@@ -76,13 +76,13 @@ secrets-history:
 dagger-check:
     dagger call check --source=.
 
-dagger-check-node26:
-    dagger call check-node26 --source=.
+dagger-check-lts:
+    dagger call check-node-lts --source=.
 
 # Warm-cache comparison: Dagger Node 26 parity vs the current npm check.
 bench-dev-loop:
     hyperfine --warmup 1 --min-runs 3 \
-        'dagger call check-node26 --source=.' \
+        'dagger call check-node-lts --source=.' \
         'npm run check'
 
 legacy-help:
