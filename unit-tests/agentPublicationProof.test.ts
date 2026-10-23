@@ -103,7 +103,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		const bin = path.join(cwd, ".git", "fake-bin");
 		await mkdir(bin);
 		for (const [name, version] of [
-			["node", "v26.8.2"],
+			["node", "v24.22.1"],
 			["python3", "Python 3.12.10"],
 			["pre-commit", "pre-commit 4.6.2"],
 		] as const) {
@@ -212,7 +212,7 @@ test("publication proof reuses an exact HEAD/base/toolchain pass and invalidates
 		);
 		await makeExecutable(
 			path.join(bin, "node"),
-			"#!/usr/bin/env bash\nprintf '%s\\n' 'v26.8.2'\n",
+			"#!/usr/bin/env bash\nprintf '%s\\n' 'v24.22.1'\n",
 		);
 
 		await writeFile(path.join(cwd, "README.md"), "dirty\n");
