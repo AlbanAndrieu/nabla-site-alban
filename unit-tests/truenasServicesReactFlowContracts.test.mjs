@@ -41,3 +41,11 @@ test("canonical Backstage entity references are typed rather than unknown", () =
 	assert.match(types, /entityRef\?: string;/);
 	assert.match(types, /catalogRevision\?: string;/);
 });
+
+test("TrueNAS SERVICE view defaults to all declared graph nodes, not only critical paths", () => {
+	const block = source("app/components/homelab/HomelabServicesBlock.tsx");
+	const graph = source("app/[locale]/architecture/useHierarchicalArchitectureGraph.ts");
+	assert.match(block, /initialMode="services"/);
+	assert.match(graph, /initialMode === "services" \? "all" : "critical"/);
+	assert.match(graph, /if \(mode !== "services" \|\| scope === "all" \|\| query\.trim\(\)\)/);
+});

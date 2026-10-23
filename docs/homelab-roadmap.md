@@ -1,3 +1,9 @@
+## P0 — ReactFlow TrueNAS : rendre visibles tous les services déclarés (24 octobre 2026)
+
+- [x] Cause d'une vue trompeusement vide identifiée : le mode `services` initialisait `scope=critical`, ce qui masque les entités de criticité `support` (notamment lorsque Backstage v2 ne publie pas encore de relations de dépendance). Initialiser `scope=all` **uniquement quand** `initialMode=services` ; conserver le filtre « Chemin critique » accessible dans la barre et le défaut `critical` pour le mode AI existant.
+- [x] Ajouter un contrat de régression sur le choix initial « Tous les composants » ; préserver le fallback graphique nœuds seuls quand les relations déclarées sont indisponibles.
+- [ ] Confirmer avec Playwright sur un build Next.js complet que les nœuds/miniatures/icônes apparaissent sur `/fr/truenas` dès que le catalogue v2 est accessible, indépendamment des relations.
+
 ## P0 — Isolation des modes OWNER / SERVICE v2 et refus explicites (24 octobre 2026)
 
 - [x] Détecter la portée du catalogue dans le hook (`catalogScope = owner/public`) et masquer **synchroniquement** catalogue, topologie et santé de l'autre mode avant le nettoyage des effets React ; remettre à zéro l'état lors d'un changement de mode.
