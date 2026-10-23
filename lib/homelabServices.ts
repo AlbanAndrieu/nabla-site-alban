@@ -1,6 +1,7 @@
 import navigationOverrides from "../config/homelab-navigation-overrides.json";
 import localCatalog from "../public/homelab-services.json";
 import { isRecord } from "./guards";
+import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -16,7 +17,7 @@ export type HomelabService = {
 	kind?: string;
 	category?: string;
 	presentationRole?: "service" | "core" | "support";
-	criticality?: "critical" | "high" | "medium" | "low";
+	criticality?: ServiceCriticalityLevel;
 	description?: string;
 	healthNote?: string;
 	icon?: string;

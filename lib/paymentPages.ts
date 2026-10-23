@@ -1,4 +1,6 @@
-export type PaymentLocale = "en" | "fr";
+import type { AppLocale } from "@/i18n/routing";
+
+export type PaymentLocale = AppLocale;
 
 export function paymentLocale(locale: string): PaymentLocale {
 	return locale === "fr" ? "fr" : "en";

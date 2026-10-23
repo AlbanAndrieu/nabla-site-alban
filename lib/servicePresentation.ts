@@ -7,14 +7,11 @@ import {
 	analyzeServiceCriticality,
 	compareServiceCriticality,
 } from "./serviceCriticality";
+import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 import type { ServiceTopology, ServiceTopologyNode } from "./serviceTopology";
 
 export type ServicePresentationRole = "service" | "core" | "support";
-export type ServiceOperationalCriticality =
-	| "critical"
-	| "high"
-	| "medium"
-	| "low";
+export type ServiceOperationalCriticality = ServiceCriticalityLevel;
 export type ServicePresentationGroup =
 	| "services"
 	| "core-critical"

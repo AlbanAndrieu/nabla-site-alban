@@ -1,5 +1,9 @@
 import { isRecord } from "./guards";
 import { hasUniqueCatalogServiceNames } from "./homelabCatalogV2Names";
+import {
+	isServiceCriticalityLevel,
+	type ServiceCriticalityLevel,
+} from "./serviceCriticalityLevel";
 
 const CATALOG_REVISION_RE = /^sha256:[0-9a-f]{64}$/;
 
@@ -45,8 +49,8 @@ export type CatalogV2ServiceView = {
 	lifecycle?: string;
 	category?: string;
 	securityFunctions: string[];
-	operationalCriticality?: "critical" | "high" | "medium" | "low";
-	businessCriticality?: "critical" | "high" | "medium" | "low";
+	operationalCriticality?: ServiceCriticalityLevel;
+	businessCriticality?: ServiceCriticalityLevel;
 	sourcePath: string;
 };
 
@@ -126,10 +130,8 @@ export function parseHomelabCatalogV2(value: unknown): HomelabCatalogV2 | null {
 
 function criticality(
 	value: string | undefined,
-): CatalogV2ServiceView["operationalCriticality"] {
-	return value && ["critical", "high", "medium", "low"].includes(value)
-		? (value as CatalogV2ServiceView["operationalCriticality"])
-		: undefined;
+): ServiceCriticalityLevel | undefined {
+	return isServiceCriticalityLevel(value) ? value : undefined;
 }
 
 export function catalogV2ServiceViews(
