@@ -11,6 +11,7 @@ dagger = "0.21.10"
 hyperfine = "1.21.0"
 hk = "2.5.0"
 prek = "0.5.4"
+node = "24"
 
 [settings]
 lockfile = true
