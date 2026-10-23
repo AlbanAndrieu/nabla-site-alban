@@ -41,10 +41,10 @@ const HEALTH_STATES: readonly HomelabHealthState[] = [
 type HealthFilter = "all" | HomelabHealthState;
 type GroupFilter = "all" | ServicePresentationGroup;
 
-export default function HomelabServicesBlock() {
+export default function HomelabServicesBlock({ readOnly = false }: Readonly<{ readOnly?: boolean }>) {
 	const t = useTranslations("homelab");
 	const french = useLocale() === "fr";
-	const state = useHomelabHealth();
+	const state = useHomelabHealth(readOnly);
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [environmentFilter, setEnvironmentFilter] =
 		useState<HomelabEnvironmentFilter>("all");
@@ -211,6 +211,7 @@ export default function HomelabServicesBlock() {
 
 	return (
 		<>
+			{!readOnly && (
 			<HomelabStatusOverview
 				snapshot={state.snapshot}
 				healthUnavailable={state.healthUnavailable}
@@ -219,14 +220,19 @@ export default function HomelabServicesBlock() {
 				healthRefreshing={state.healthRefreshing}
 				onOpenCriticality={openCriticality}
 			/>
+			)}
 
-			<HomelabObservationCoverage
-				snapshot={state.snapshot}
-				catalogServiceCount={state.catalog.services.length}
-				topologyNodeCount={state.topology?.nodes.length ?? 0}
-				topologyRelationCount={state.topology?.relations.length ?? 0}
-			/>
-			<HomelabProbeDiagnostics snapshot={state.snapshot} />
+			{!readOnly && (
+				<>
+					<HomelabObservationCoverage
+						snapshot={state.snapshot}
+						catalogServiceCount={state.catalog.services.length}
+						topologyNodeCount={state.topology?.nodes.length ?? 0}
+						topologyRelationCount={state.topology?.relations.length ?? 0}
+					/>
+					<HomelabProbeDiagnostics snapshot={state.snapshot} />
+				</>
+			)}
 
 			<section
 				id="truenas-health-dashboard"
@@ -482,9 +488,9 @@ export default function HomelabServicesBlock() {
 									catalog={group.catalog}
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
-									healthUnavailable={state.healthUnavailable}
+									healthUnavailable={readOnly ? false : state.healthUnavailable}
 									ownerBoundary={state.ownerBoundary === true}
-									healthHttpStatus={state.healthStatus}
+									healthHttpStatus={readOnly ? null : state.healthStatus}
 								/>
 							</div>
 						</details>

@@ -6,7 +6,7 @@ Use `/AGENTS.md` as the canonical policy and `docs/agent-frontend-standards.md` 
 
 - App Router lives at repository-root `app/`; there is no nested application package.
 - Next.js **16.3.4** / React 19 / TypeScript / next-intl.
-- Local/CI Node.js target: **26.8.2**. `package.json` accepts `>=24.22.0 <27` so local/CI can use Node 26 while Vercel keeps its supported Node 24 runtime; npm `>=12.2.0 <13`.
+- Local/CI Node.js target: **24.22.1**. `package.json` accepts `>=24.22.0 <27` so local/CI can use Node 26 while Vercel keeps its supported Node 24 runtime; npm `>=12.2.0 <13`.
 - Install and run commands from the repository root.
 - `instrumentation.ts` actively registers OpenTelemetry through `@vercel/otel`.
 - Browser analytics are loaded by the shared analytics script; do not add duplicate `@vercel/analytics` or Speed Insights SDK integration.

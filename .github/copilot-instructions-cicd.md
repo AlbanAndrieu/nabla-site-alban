@@ -17,7 +17,7 @@ Do not document or restore workflows that are no longer versioned.
 
 ## Runtime and dependency installation
 
-- GitHub Actions use the repository `.nvmrc` (**Node.js 26.8.2**).
+- GitHub Actions use the repository `.nvmrc` (**Node.js 24.22.1**).
 - npm: **12.2.0**, pinned in `mise.toml` (single source of truth; install with `mise install`). `engines.npm` accepts `>=12.2.0 <13`.
 - Run Node/npm commands from the repository root.
 - `package.json` and `package-lock.json` are the only application npm manifests.

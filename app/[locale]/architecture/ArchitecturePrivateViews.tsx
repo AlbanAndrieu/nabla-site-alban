@@ -185,6 +185,7 @@ export default function ArchitecturePrivateViews({
 				initialTopology={data.topology}
 			/>
 			<ArchitectureTopologyView
+				readOnly
 				locale={locale}
 				initialCatalog={data.catalog}
 				initialCatalogSource={data.catalogSource}

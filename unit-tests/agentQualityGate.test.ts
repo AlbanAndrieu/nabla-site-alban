@@ -279,7 +279,7 @@ test("local agent toolchain matches CI bootstrap pins", async () => {
 	]);
 
 	assert.equal(pythonVersion.trim(), "3.12.10");
-	assert.equal(nvmrc.trim(), "26.8.2");
+	assert.equal(nvmrc.trim(), "24.22.1");
 	assert.ok(mise.includes('idiomatic_version_file_enable_tools = ["node"]'));
 	assert.ok(mise.includes("default='3.12.10'"));
 	assert.ok(mise.includes('pre-commit = "4.6.2"'));

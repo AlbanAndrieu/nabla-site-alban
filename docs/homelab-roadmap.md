@@ -1,12 +1,20 @@
-## P0 — Alignement LTS Node/Next (23 octobre 2026)
+## P0 — Node.js LTS et outillage stabilisé (23 octobre 2026)
 
-- [x] Node 24.22.1 LTS (version de sécurité du 21 octobre) est la référence unique de `.nvmrc`, `package.json`, `.envrc`, image Docker et Dagger ; Node 26 n'entre en LTS que le 28 octobre 2026.
-- [x] Next.js 16.4.2 Active LTS remplace 16.4.0 et les entrées `@next/env`/`@next/swc-*` du lockfile sont reprises avec leurs intégrités npm du dépôt compagnon Bababou ; `eslint-config-next` 16.4.0 reste compatible et sera mis à jour après résolution reproductible.
-- [x] Types Node 24.13.3 avec dépendance types `undici-types` isolée ; npm 12.2.0 conservé (pin mise, Docker et CI).
-- [x] Dagger utilise l'unique base LTS dans son check normal (plus de double build Node 24/26) ; compatibilité Vercel Node 24 conservée.
-- [ ] Sur checkout avec Node 24.22.1/npm 12.2.0 et registre accessible : `npm ci`, tests unitaires, typecheck, build, quality gate et Trivy ; ne pas déclarer L3 en l'absence d'exécution.
-- [ ] Vérifier puis mettre à jour `eslint-config-next` à la dernière correction patch 16.4.x via `npm install --package-lock-only` et prouver les versions/résolutions avec `npm ci` avant merge.
-- [ ] N'envisager Node 26 LTS qu'après le 28 octobre, confirmation du support Vercel et recette exacte Talos.
+- [x] Revenir de Node 26 Current à **Node 24.22.1 LTS**, correctifs de sécurité du 21 octobre : aligner `.nvmrc`, `.envrc`, les `engines`/ `devEngines` de `package.json`, la racine de `package-lock.json`, le Dagger LTS local et les fixtures de tests. Conserver npm **12.2.0**, outil pin dans `mise.toml`.
+- [x] Ne pas recopier les empreintes SHA-256 de Node 26 : retirer l'ancien bloc du `mise.lock` en attendant un `mise lock` sur une machine ayant accès aux archives signées Node 24.
+- [ ] **Quality gate bloquante** avant Ready/merge : reconstruire l'entrée de `mise.lock` sur un environnement de confiance puis exécuter `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`, `just quality`. Aucun résultat global validé à ce stade, pas de CI GitHub payante.
+- [ ] Réaligner `@types/node` de la série 25.x vers une version 24.x maintenue **avec** résolution de `package-lock.json` via npm 12 ; ne pas inventer d'intégrité ou modifier le lock des packages sans l'outil. Vérifier `next@16.4.0`, React 19.3 et OpenTelemetry après installation.
+- [ ] Vérifier la configuration runtime Node côté Vercel, la Preview exacte SHA, les pages `/truenas` et `/architecture`, les modes OWNER et public v2 ; aucune migration de déploiement sans validation.
+- [ ] Quand Node 26 sera officiellement LTS (date prévue 28 octobre 2026), reconsidérer une **nouvelle** migration uniquement après tests, pas par anticipation.
+
+## P0 — Vue extérieure : ne plus sonder OWNER depuis le navigateur (23 octobre 2026)
+
+- [x] Les vues externes en lecture seule de TrueNAS et de l'architecture consomment seulement les projections publiques `/api/homelab-services`, `/api/homelab-catalog-v2` et `/api/homelab-health-v2` ; aucun polling du runtime `/api/homelab-status`, des probes `/api/homelab-probes` ou de l'agrégat OWNER `/api/homelab-health`.
+- [x] Réutiliser le parseur strict `SiteHealthV2` et indexer les états par `entityRef` et `catalogRevision` ; conserver `unknown` quand le catalogue ne correspond pas ou que `boardState` n'est pas `fresh`.
+- [x] Projeter ces statuts sur les cards, filtres et hiérarchies mobile et desktop, sans afficher les composants de diagnostics bruts, sans déduire une panne de l'absence de droits OWNER.
+- [ ] Exécuter localement `just offline-l1`, `just p0` et la suite TypeScript/Playwright sur un checkout complet du HEAD. **NOT_RUN** tant que le DNS GitHub bloque l'obtention de la branche dans l'agent ; l'analyse statique des sources ne remplace pas les gates.
+- [ ] Valider sur Vercel Preview, hors Wi-Fi et au domicile, que le même `catalogRevision` affiche bien des services avec états publics et que le navigateur ne fait aucun appel OWNER non authentifié. Conserver un LKG uniquement pour l'affichage de la dernière observation, jamais pour déclarer un état `OK` courant.
+- [ ] Après MFA/VPN distant opérationnel, rétablir les restrictions OWNER conformément à la section ci-dessous, sans réintroduire de double lecteur v1 ou de contrat parallèle.
 
 ## P0 — External remote access, temporary public read-only (22 octobre 2026)
 

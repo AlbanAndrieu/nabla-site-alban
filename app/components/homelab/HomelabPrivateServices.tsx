@@ -45,7 +45,7 @@ export default function HomelabPrivateServices() {
 						? "Consultation extérieure en lecture seule : catalogue et états publiables uniquement. Les sondes détaillées restent privées."
 						: "External read-only view: published catalog and health states only. Detailed probes remain private."}
 				</p>
-				<HomelabServicesBlock />
+				<HomelabServicesBlock readOnly />
 			</div>
 		);
 	return (

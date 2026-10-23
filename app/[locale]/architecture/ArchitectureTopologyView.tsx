@@ -32,6 +32,7 @@ type Props = {
 	initialCatalogSource: string;
 	initialTopology: ServiceTopology;
 	initialTopologySource: ServiceTopologySource;
+	readOnly?: boolean;
 };
 
 export default function ArchitectureTopologyView({
@@ -40,6 +41,7 @@ export default function ArchitectureTopologyView({
 	initialCatalogSource,
 	initialTopology,
 	initialTopologySource,
+	readOnly = false,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const { catalog, catalogSource, topology, topologySource } =
@@ -49,13 +51,16 @@ export default function ArchitectureTopologyView({
 			initialTopology,
 			initialTopologySource,
 		});
-	const { health, healthUnavailable, refreshing, healthSource } =
-		useArchitectureHealthPolling();
+	const { health, siteHealth, healthUnavailable, refreshing, healthSource } =
+		useArchitectureHealthPolling(readOnly);
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const healthIndex = useMemo(() => indexHealth(health), [health]);
+	const healthIndex = useMemo(
+		() => indexHealth(health, siteHealth, catalog.catalogRevision),
+		[health, siteHealth, catalog.catalogRevision],
+	);
 	const presentation = useMemo(
 		() => analyzeServicePresentation(catalog, topology),
 		[catalog, topology],
@@ -100,6 +105,7 @@ export default function ArchitectureTopologyView({
 						french={french}
 						refreshing={refreshing}
 						healthUnavailable={healthUnavailable}
+						healthSource={healthSource}
 						checkedAt={health?.checked_at}
 						counts={counts}
 						healthFilter={healthFilter}
@@ -117,6 +123,7 @@ export default function ArchitectureTopologyView({
 					catalog={filteredCatalog}
 					topology={topology}
 					snapshot={health}
+					siteHealth={siteHealth}
 					healthUnavailable={healthUnavailable}
 				/>
 			</div>
@@ -130,6 +137,7 @@ export default function ArchitectureTopologyView({
 				catalog={filteredCatalog}
 				topology={topology}
 				snapshot={health}
+				siteHealth={siteHealth}
 			/>
 
 			<section
@@ -157,6 +165,7 @@ export default function ArchitectureTopologyView({
 					topologySource={topologySource}
 					healthStatus={health}
 					healthSource={healthSource}
+					readOnly={readOnly}
 				/>
 			</section>
 		</>

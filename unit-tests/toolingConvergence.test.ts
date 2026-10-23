@@ -87,10 +87,10 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		read("docs/architecture.md"),
 		read("eslint.config.js"),
 	]);
-	assert.equal(packageJson.engines?.node, ">=24.22.0 <27");
+	assert.equal(packageJson.engines?.node, ">=24.22.1 <25");
 	assert.deepEqual(packageJson.devEngines?.runtime, {
 		name: "node",
-		version: "26.8.2",
+		version: "24.22.1",
 		onFail: "warn",
 	});
 	assert.equal(packageJson.dependencies?.next, "16.4.0");
@@ -110,17 +110,17 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		assert.doesNotMatch(workflow, /node-version:\s*"25"/);
 		assert.doesNotMatch(workflow, /node-version:\s*"26"/);
 	}
-	assert.match(envrc, /NODE_VERSIONS=.*v26\.8\.2/);
-	assert.equal(nvmrc.trim(), "26.8.2");
+	assert.match(envrc, /NODE_VERSIONS=.*v24\.22\.1/);
+	assert.equal(nvmrc.trim(), "24.22.1");
 	assert.match(mise, /idiomatic_version_file_enable_tools = \["node"\]/);
 	assert.match(mise, /^npm = "12\.2\.0"$/m);
 	assert.match(
 		mise,
 		/idiomatic_version_file_disable_files = \["node:\.nvmrc"\]/,
 	);
-	assert.doesNotMatch(mise, /^node\s*=\s*"26\.8\.2"$/m);
+	assert.doesNotMatch(mise, /^node\s*=\s*"26\./m);
 	for (const docs of [cicdDocs, architectureDocs]) {
-		assert.match(docs, /26\.8\.2/);
+		assert.match(docs, /24\.22\.1/);
 		assert.doesNotMatch(docs, /25\.9\.0/);
 	}
 });

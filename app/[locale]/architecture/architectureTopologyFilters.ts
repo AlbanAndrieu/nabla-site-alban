@@ -10,6 +10,7 @@ import {
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
+import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 
 export type HealthFilter = "all" | HomelabHealthState;
 export type GroupFilter = "all" | ServicePresentationGroup;
@@ -23,6 +24,7 @@ type PresentationGroupTitleKey =
 export type HealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
+	byRef: Map<string, HomelabHealthState>;
 };
 
 export type HealthStateCounts = Record<HomelabHealthState, number>;
@@ -59,6 +61,8 @@ function normalizedName(value: string): string {
 
 export function indexHealth(
 	snapshot: HomelabHealthSnapshot | null,
+	siteHealth?: SiteHealthV2 | null,
+	catalogRevision?: unknown,
 ): HealthIndex {
 	const byId = new Map<string, HomelabHealthEntry>();
 	const byName = new Map<string, HomelabHealthEntry>();
@@ -66,17 +70,19 @@ export function indexHealth(
 		if (entry.id) byId.set(entry.id, entry);
 		byName.set(normalizedName(entry.name), entry);
 	}
-	return { byId, byName };
+	return { byId, byName, byRef: siteHealthIndex(siteHealth, catalogRevision) };
 }
 
 export function effectiveState(
 	serviceId: string,
 	serviceName: string,
 	index: HealthIndex,
+	entityRef?: string,
 ): HomelabHealthState {
 	const entry =
 		index.byId.get(serviceId) ?? index.byName.get(normalizedName(serviceName));
-	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
+	if (entry) return resolveEffectiveServiceState(entry).effectiveState;
+	return entityRef ? (index.byRef.get(entityRef) ?? "unknown") : "unknown";
 }
 
 export function snapshotAgeSeconds(
@@ -105,6 +111,7 @@ export function countHealthStates(
 			homelabServiceId(service),
 			service.name,
 			healthIndex,
+			service.entityRef,
 		);
 		result[state] += 1;
 	}
@@ -136,7 +143,7 @@ export function filterArchitectureCatalog(
 	const query = searchQuery.trim().toLowerCase();
 	const services = catalog.services.filter((service) => {
 		const id = homelabServiceId(service);
-		const state = effectiveState(id, service.name, healthIndex);
+		const state = effectiveState(id, service.name, healthIndex, service.entityRef);
 		const group = presentation.get(id)?.group ?? "support";
 		const matchesSearch =
 			query.length === 0 ||

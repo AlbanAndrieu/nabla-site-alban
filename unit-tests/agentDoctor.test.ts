@@ -33,7 +33,7 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		await git(cwd, "config", "user.email", "agent-doctor@example.invalid");
 		await git(cwd, "config", "user.name", "Agent Doctor Test");
 
-		await writeFile(path.join(cwd, ".nvmrc"), "26.8.2\n");
+		await writeFile(path.join(cwd, ".nvmrc"), "24.22.1\n");
 		await writeFile(path.join(cwd, ".python-version"), "3.12.10\n");
 		await writeFile(
 			path.join(cwd, "mise.toml"),
@@ -62,7 +62,7 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		await mkdir(bin);
 		await writeExecutable(
 			path.join(bin, "node"),
-			'#!/usr/bin/env bash\nprintf "v26.8.2\\n"\n',
+			'#!/usr/bin/env bash\nprintf "v24.22.1\\n"\n',
 		);
 		await writeExecutable(
 			path.join(bin, "npm"),

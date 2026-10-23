@@ -266,7 +266,7 @@ export function countHealthStates(
  * Loads the catalog and topology once, then polls probe and aggregate health
  * every HEALTH_REFRESH_MS while the page is visible.
  */
-export function useHomelabHealth(): HomelabServicesState {
+export function useHomelabHealth(readOnly = false): HomelabServicesState {
 	const [state, setState] = useState<HomelabServicesState>(
 		INITIAL_HOMELAB_SERVICES_STATE,
 	);
@@ -278,6 +278,35 @@ export function useHomelabHealth(): HomelabServicesState {
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			setState((current) => ({ ...current, healthRefreshing: true }));
+			if (readOnly) {
+				// External views consume only the strict SERVICE v2 projection.
+				// Do not even request private OWNER aggregate/probe endpoints.
+				let siteHealth: SiteHealthV2 | null = null;
+				let status: number | null = null;
+				try {
+					const response = await fetch("/api/homelab-health-v2", {
+						cache: "no-store",
+						signal,
+						headers: { Accept: "application/json" },
+					});
+					status = response.status;
+					if (response.ok) siteHealth = parseSiteHealthV2(await response.json());
+				} catch {
+					// Missing v2 evidence is UNKNOWN, not an observed outage.
+				}
+				if (!signal.aborted) {
+					setState((current) => ({
+						...current,
+						siteHealth,
+						snapshot: null,
+						healthUnavailable: siteHealth?.boardState !== "fresh",
+						healthStatus: status,
+						healthRefreshing: false,
+					}));
+				}
+				return;
+			}
+
 			// SERVICE status DTO is independent from OWNER-only probe details.
 			void fetch("/api/homelab-health-v2", {
 				cache: "no-store",
@@ -361,7 +390,7 @@ export function useHomelabHealth(): HomelabServicesState {
 			window.clearInterval(interval);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
-	}, []);
+	}, [readOnly]);
 
 	return state;
 }
