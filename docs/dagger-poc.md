@@ -31,7 +31,7 @@ Commandes :
 
 ```bash
 just dagger-check
-just dagger-check-node26
+just dagger-check-node-lts
 just bench-dev-loop
 ```
 
