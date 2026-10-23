@@ -11,6 +11,7 @@ import {
 	SiteCatalogV2Error,
 	sanitizeSiteCatalogV2,
 } from "../lib/homelabSiteCatalog";
+import { withPublicReadOnly } from "./helpers/homelabPublicReadOnly";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.DIAGNOSTICS_ACCESS_KEY;
@@ -181,20 +182,21 @@ test("v2 backend rejects an invalid sourcePath and dangling relations", () => {
 	assert.equal(sanitizeSiteCatalogV2(parsed), null);
 });
 
-test("anonymous visitors receive a neutral 404 without querying either private route", async () => {
-	globalThis.fetch = async () => {
-		throw new Error("should never reach FastAPI");
-	};
-	for (const get of [getCards, getV2]) {
-		const response = await get(
-			new Request("https://www.albanandrieu.com/api/homelab-services", {
-				headers: { "x-real-ip": "203.0.113.7" },
-			}),
-		);
-		assert.equal(response.status, 404);
-		assert.match(response.headers.get("cache-control") ?? "", /no-store/);
-	}
-});
+test("anonymous visitors receive a neutral 404 without querying either private route", () =>
+	withPublicReadOnly(false, async () => {
+		globalThis.fetch = async () => {
+			throw new Error("should never reach FastAPI");
+		};
+		for (const get of [getCards, getV2]) {
+			const response = await get(
+				new Request("https://www.albanandrieu.com/api/homelab-services", {
+					headers: { "x-real-ip": "203.0.113.7" },
+				}),
+			);
+			assert.equal(response.status, 404);
+			assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+		}
+	}));
 
 test("scalar subcomponentOf must resolve before publishing a complete v2 graph", () => {
 	const parsed = parseHomelabCatalogV2(fixture());

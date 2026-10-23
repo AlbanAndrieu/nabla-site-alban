@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path) =>
+	readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const paths = [
 	".github/workflows/security-supply-chain.yml",
 	".github/workflows/docker-build.yml",
@@ -33,7 +34,10 @@ test("single root Dockerfile is always in CI/SCA and image build scope", () => {
 		assert.ok(workflow.split('".dockerignore"').length >= 3, path);
 		assert.doesNotMatch(workflow, /Dockerfile\.k8s/);
 	}
-	assert.match(read(".github/workflows/docker-build.yml"), /name: Build Next.js standalone image/);
+	assert.match(
+		read(".github/workflows/docker-build.yml"),
+		/name: Build Next.js standalone image/,
+	);
 });
 test("shell formatter matches native Compose pattern without a Docker daemon", () => {
 	const config = read(".pre-commit-config.yaml");
@@ -46,9 +50,12 @@ test("shell formatter matches native Compose pattern without a Docker daemon", (
 });
 test("MegaLinter is manual, read-only and cannot make auto-fix commits", () => {
 	const workflow = read(".github/workflows/mega-linter.yml");
-	assert.match(workflow, /^  workflow_dispatch:/m);
-	assert.doesNotMatch(workflow, /^  (?:pull_request|push):/m);
-	assert.match(workflow, /permissions:\n  contents: read/);
+	assert.match(workflow, /^ {2}workflow_dispatch:/m);
+	assert.doesNotMatch(workflow, /^ {2}(?:pull_request|push):/m);
+	assert.match(workflow, /permissions:\n {2}contents: read/);
 	assert.match(workflow, /APPLY_FIXES: none/);
-	assert.doesNotMatch(workflow, /contents: write|pull-requests: write|git push/);
+	assert.doesNotMatch(
+		workflow,
+		/contents: write|pull-requests: write|git push/,
+	);
 });

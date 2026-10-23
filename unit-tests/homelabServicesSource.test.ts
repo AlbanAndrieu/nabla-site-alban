@@ -10,6 +10,7 @@ import {
 	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
 import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
+import { withPublicReadOnly } from "./helpers/homelabPublicReadOnly";
 
 test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
 	assert.equal(HOMELAB_SERVICES_DEFAULT_API_URL, SITE_CATALOG_V2_URL);
@@ -77,17 +78,18 @@ test("runtime loader and owner architecture never request legacy endpoints or fa
 	assert.doesNotMatch(refreshing, /fetch\("\/api\/homelab-topology"/);
 });
 
-test("anonymous service route does not leak catalog, URL or revision", async () => {
-	const response = await GET(
-		new Request("https://www.albanandrieu.com/api/homelab-services", {
-			headers: { "x-real-ip": "203.0.113.7" },
-		}),
-	);
-	assert.equal(response.status, 404);
-	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
-	assert.equal(response.headers.get("x-homelab-catalog-revision"), null);
-	assert.equal(response.headers.get("x-homelab-services-primary"), null);
-});
+test("anonymous service route does not leak catalog, URL or revision", () =>
+	withPublicReadOnly(false, async () => {
+		const response = await GET(
+			new Request("https://www.albanandrieu.com/api/homelab-services", {
+				headers: { "x-real-ip": "203.0.113.7" },
+			}),
+		);
+		assert.equal(response.status, 404);
+		assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+		assert.equal(response.headers.get("x-homelab-catalog-revision"), null);
+		assert.equal(response.headers.get("x-homelab-services-primary"), null);
+	}));
 
 // Retained pure presentation/legacy-shape safety contracts. Runtime is v2-only.
 
@@ -197,25 +199,26 @@ test("static public catalog does not fetch and exposes only the conceptual node"
 	assert.equal(result.catalog.services[0].endpointEnabled, false);
 });
 
-test("public homelab API refuses requests without querying FastAPI", async () => {
-	let fetchCalled = false;
-	globalThis.fetch = (async () => {
-		fetchCalled = true;
-		throw new Error("must not call upstream");
-	}) as typeof fetch;
-	const response = await GET(
-		new Request("https://www.albanandrieu.com/api/homelab-services", {
-			headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "10.0.0.2" },
-		}),
-	);
-	assert.equal(fetchCalled, false);
-	assert.equal(response.status, 404);
-	assert.match(response.headers.get("cache-control") ?? "", /no-store/);
-	assert.equal(response.headers.get("x-homelab-services-primary"), null);
-	assert.deepEqual(await response.json(), {
-		error: "Operational homelab data is private",
-	});
-});
+test("public homelab API refuses requests without querying FastAPI", () =>
+	withPublicReadOnly(false, async () => {
+		let fetchCalled = false;
+		globalThis.fetch = (async () => {
+			fetchCalled = true;
+			throw new Error("must not call upstream");
+		}) as typeof fetch;
+		const response = await GET(
+			new Request("https://www.albanandrieu.com/api/homelab-services", {
+				headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "10.0.0.2" },
+			}),
+		);
+		assert.equal(fetchCalled, false);
+		assert.equal(response.status, 404);
+		assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+		assert.equal(response.headers.get("x-homelab-services-primary"), null);
+		assert.deepEqual(await response.json(), {
+			error: "Operational homelab data is private",
+		});
+	}));
 
 test("public fallback never exposes PostgreSQL binding details", () => {
 	const catalog = getStaticHomelabServicesCatalog().catalog;

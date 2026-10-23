@@ -74,7 +74,10 @@ test("architecture health polling has a single owner and adaptive schedule", asy
 	assert.doesNotMatch(explorer, /parseHomelabHealthSnapshot/);
 	assert.doesNotMatch(explorer, /parseHomelabStatusSnapshot/);
 
-	assert.match(healthPolling, /fetch\("\/api\/homelab-health"/);
+	assert.match(
+		healthPolling,
+		/readOnly \? "\/api\/homelab-health-v2" : "\/api\/homelab-health"/,
+	);
 	assert.match(healthPolling, /HEALTH_POLL_REFRESHING_MS = 2_000/);
 	assert.match(healthPolling, /HEALTH_POLL_FRESH_MS = 5_000/);
 	assert.match(healthPolling, /HEALTH_POLL_FALLBACK_MS = 30_000/);

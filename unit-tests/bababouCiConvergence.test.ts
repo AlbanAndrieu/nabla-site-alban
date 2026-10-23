@@ -152,8 +152,9 @@ test("theme and Docker hardening stay at or above the Bababou 159-160 baseline",
 	assert.match(bootstrap, /site-theme-preference/);
 	assert.match(theme, /--link-color:\s*#0b5ed7/);
 	assert.match(theme, /--toggle-segment-muted:\s*#495057/);
-	assert.match(dockerfile, /nginxinc\/nginx-unprivileged:1\.30\.5-alpine-slim/);
-	assert.match(dockerfile, /USER 101/);
+	// Node standalone runtime (k8sStandaloneContract) replaced static nginx.
+	assert.match(dockerfile, /node:24\.22\.1-alpine3\.24@sha256:[0-9a-f]{64}/);
+	assert.match(dockerfile, /USER 10001:10001/);
 	assert.match(
 		dockerWorkflow,
 		/aquasecurity\/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0\.36\.0/,
@@ -162,5 +163,22 @@ test("theme and Docker hardening stay at or above the Bababou 159-160 baseline",
 		dockerWorkflow,
 		/GHCR_IMAGE: ghcr\.io\/albanandrieu\/nabla-site-alban/,
 	);
-	assert.equal(dockerignore, "**\n!public/\n!public/**\n");
+	// A full Next build needs sources, so the context is a deny-list of
+	// metadata, secrets and key material instead of a public/ allow-list.
+	for (const excluded of [
+		".git",
+		".env",
+		".env.*",
+		"**/.env.*",
+		"**/*.pem",
+		"**/*.key",
+		"**/id_rsa",
+		"**/id_ed25519",
+		"**/*credentials.json",
+	]) {
+		assert.ok(
+			dockerignore.split("\n").includes(excluded),
+			`.dockerignore must exclude ${excluded}`,
+		);
+	}
 });

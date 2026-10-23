@@ -99,7 +99,7 @@ test("agent doctor fails closed on branch, hook and toolchain drift", async () =
 		const healthy = await execFileAsync("bash", [SCRIPT], { cwd, env });
 		assert.match(healthy.stdout, /AGENT_DOCTOR_OK/);
 		assert.match(healthy.stdout, /branch=test\/doctor/);
-		assert.match(healthy.stdout, /node=26\.8\.2/);
+		assert.match(healthy.stdout, /node=24\.22\.1/);
 		assert.match(healthy.stdout, /npm=12\.2\.0/);
 		assert.match(healthy.stdout, /python=3\.12\.10/);
 		assert.match(healthy.stdout, /pre-commit=4\.6\.2/);

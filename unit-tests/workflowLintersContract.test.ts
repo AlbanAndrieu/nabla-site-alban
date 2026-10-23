@@ -44,7 +44,6 @@ test("intentional zizmor exceptions carry an adjacent justification", async () =
 		"release.yml",
 		"ci.yml",
 		"vercel-preview.yml",
-		"mega-linter.yml",
 	]) {
 		const source = await read(`.github/workflows/${workflow}`);
 		const lines = source.split("\n");
@@ -60,4 +59,11 @@ test("intentional zizmor exceptions carry an adjacent justification", async () =
 			);
 		}
 	}
+});
+
+test("read-only MegaLinter needs no zizmor exception", async () => {
+	// Its former artipacked exception covered persisted push credentials.
+	const source = await read(".github/workflows/mega-linter.yml");
+	assert.match(source, /persist-credentials: false/);
+	assert.doesNotMatch(source, /# zizmor: ignore\[/);
 });
