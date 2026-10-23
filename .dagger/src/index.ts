@@ -7,8 +7,8 @@ import {
 	object,
 } from "@dagger.io/dagger";
 
-const NODE_DEVELOPMENT = "26.8.2";
-const NODE_VERCEL = "24.22.0";
+const NODE_DEVELOPMENT = "24.22.1";
+const NODE_VERCEL = "24.22.1";
 const SOURCE_IGNORE = [
 	".git",
 	".git/**",
@@ -76,7 +76,7 @@ export class NablaSiteAlbanCi {
 		);
 	}
 
-	private async runNode26(source: Directory): Promise<void> {
+	private async runNodeLts(source: Directory): Promise<void> {
 		const environment = this.environment(source, NODE_DEVELOPMENT);
 		const typedEnvironment = environment.withExec(["npx", "next", "typegen"]);
 		await Promise.all([
@@ -97,11 +97,11 @@ export class NablaSiteAlbanCi {
 	}
 
 	@func()
-	async checkNode26(
+	async checkNodeLts(
 		@argument({ defaultPath: "/", ignore: SOURCE_IGNORE })
 		source: Directory,
 	): Promise<string> {
-		await this.runNode26(source);
+		await this.runNodeLts(source);
 		return `Node ${NODE_DEVELOPMENT}: lint, stylelint, typecheck, unit and build passed`;
 	}
 
@@ -119,11 +119,10 @@ export class NablaSiteAlbanCi {
 		@argument({ defaultPath: "/", ignore: SOURCE_IGNORE })
 		source: Directory,
 	): Promise<string> {
-		await Promise.all([this.runNode26(source), this.runNode24(source)]);
+		await this.runNodeLts(source);
 		return [
 			"Dagger PoC passed",
 			`Node ${NODE_DEVELOPMENT}: lint + stylelint + typecheck + unit + build`,
-			`Node ${NODE_VERCEL}: build compatibility`,
 		].join("\n");
 	}
 }

@@ -1,3 +1,13 @@
+## P0 — Alignement LTS Node/Next (23 octobre 2026)
+
+- [x] Node 24.22.1 LTS (version de sécurité du 21 octobre) est la référence unique de `.nvmrc`, `package.json`, `.envrc`, image Docker et Dagger ; Node 26 n'entre en LTS que le 28 octobre 2026.
+- [x] Next.js 16.4.2 Active LTS remplace 16.4.0 et les entrées `@next/env`/`@next/swc-*` du lockfile sont reprises avec leurs intégrités npm du dépôt compagnon Bababou ; `eslint-config-next` 16.4.0 reste compatible et sera mis à jour après résolution reproductible.
+- [x] Types Node 24.13.3 avec dépendance types `undici-types` isolée ; npm 12.2.0 conservé (pin mise, Docker et CI).
+- [x] Dagger utilise l'unique base LTS dans son check normal (plus de double build Node 24/26) ; compatibilité Vercel Node 24 conservée.
+- [ ] Sur checkout avec Node 24.22.1/npm 12.2.0 et registre accessible : `npm ci`, tests unitaires, typecheck, build, quality gate et Trivy ; ne pas déclarer L3 en l'absence d'exécution.
+- [ ] Vérifier puis mettre à jour `eslint-config-next` à la dernière correction patch 16.4.x via `npm install --package-lock-only` et prouver les versions/résolutions avec `npm ci` avant merge.
+- [ ] N'envisager Node 26 LTS qu'après le 28 octobre, confirmation du support Vercel et recette exacte Talos.
+
 ## P0 — External remote access, temporary public read-only (22 octobre 2026)
 
 - [x] `HOMELAB_PUBLIC_READONLY_ENABLED=true` (temporary default) serves **only** allowlisted Backstage v2 read projections from the Vercel site to external visitors, without the home CIDR: `/api/homelab-services`, `/api/homelab-catalog-v2`, `/api/homelab-health-v2`. The server-to-FastAPI SERVICE key remains required and must not reach client bundles.

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # One build definition for the full Next.js runtime on Talos; Vercel builds natively.
 # Build: docker build --pull -t nabla-site-alban:talos .
-ARG NODE_IMAGE=node:26.8.2-alpine3.24
+ARG NODE_IMAGE=node:24.22.1-alpine3.24
 FROM ${NODE_IMAGE} AS dependencies
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./

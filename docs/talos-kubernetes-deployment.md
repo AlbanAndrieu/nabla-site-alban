@@ -11,7 +11,7 @@
 
 Recette **privée** sur `alban-site.int.albandrieu.com` via le Traefik du cluster Talos TrueNAS. Aucune bascule de DNS public, aucun changement du site Vercel actuel.
 
-`Dockerfile` produit la **vraie application Next.js** SSR/API port 3000 : Node 26.8.2, npm 12.2, sortie `standalone` opt-in et UID/GID 10001. Le contexte Docker racine exclut `.git`, les secrets `.env*` et les clés. Pas de clé de diagnostic dans l'image.
+`Dockerfile` produit la **vraie application Next.js** SSR/API port 3000 : Node 24.22.1 LTS, npm 12.2, sortie `standalone` opt-in et UID/GID 10001. Le contexte Docker racine exclut `.git`, les secrets `.env*` et les clés. Pas de clé de diagnostic dans l'image.
 
 ## Build, contrôle et image immuable
 
