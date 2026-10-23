@@ -1,3 +1,12 @@
+## P0 — Isolation des modes OWNER / SERVICE v2 et refus explicites (24 octobre 2026)
+
+- [x] Détecter la portée du catalogue dans le hook (`catalogScope = owner/public`) et masquer **synchroniquement** catalogue, topologie et santé de l'autre mode avant le nettoyage des effets React ; remettre à zéro l'état lors d'un changement de mode.
+- [x] Appliquer le parseur client à liste blanche aux réponses SERVICE v2 HTTP 200 avant de les placer dans l'état React ; les métadonnées privées et URLs étrangères ne doivent jamais être affichées, même si la passerelle renvoie un JSON malformé.
+- [x] Distinguer un refus explicite (`401/403/404`, `reason=access-denied/key-missing`) d'une indisponibilité (`502/503` sans refus) : purger et masquer immédiatement tout LKG public dans le premier cas ; conserver seulement le cache SERVICE validé, borné et signalé périmé dans le second.
+- [x] 5 tests ciblés du nouveau module effectivement exécutés en conteneur sous Node 22 (5/5) et vérification `tsc --strict` du module. Ajout de 2 tests d'intégrité du payload public pour la suite de tests du dépôt.
+- [ ] Sur checkout complet Node 24/npm 12 : `npm ci`, lint, typecheck, tests unitaires React/hook, compilation et Playwright sur transitions OWNER → public → refus, erreurs 502 et `catalogRevision`. **Non exécutés** ici (DNS GitHub indisponible).
+- [ ] Lors d'un test distant, vérifier la présence de ReactFlow, des icônes locales et de l'inventaire effectivement exposé. Ne pas rendre publiques les sondes ou chemins réseau OWNER.
+
 ## P1 — Revalidation de l'accès navigateur OWNER / lecture publique (23 octobre 2026)
 
 - [x] Remplacer l'ancien `accessProbe` conservé indéfiniment par un coordinateur client dédupliquant les vérifications concurrentes de TrueNAS et d'Architecture.

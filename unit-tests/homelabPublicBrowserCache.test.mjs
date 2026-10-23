@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	parsePublicHomelabCatalogPayload,
 	clearPublicHomelabBrowserCache,
 	catalogRevalidationDue,
 	readPublicCatalogCache,
@@ -194,4 +195,29 @@ test("duplicated topology nodes cannot hide a missing service", () => {
 	topology.nodes.push({ ...topology.nodes[0] });
 	assert.equal(writePublicCatalogCache(storage, catalog, topology, 1000), true);
 	assert.equal(readPublicCatalogCache(storage, 1001).topology, null);
+});
+
+test("live SERVICE v2 response is sanitized before React can render it", () => {
+	const raw = { ...catalogFixture(), topology: topologyFixture() };
+	const parsed = parsePublicHomelabCatalogPayload(raw);
+	assert.ok(parsed);
+	assert.deepEqual(parsed.catalog.services.map((service) => service.id), ["grafana"]);
+	assert.equal(parsed.catalog.services[0].iconSrc, "assets/selfh-icons/grafana-icon.svg");
+	assert.equal("token" in parsed.catalog.services[0], false);
+	assert.equal("internalHost" in parsed.catalog.services[0], false);
+	assert.equal("accessToken" in parsed.catalog, false);
+	assert.equal("url" in parsed.topology.nodes[0], false);
+	assert.equal("sourcePath" in parsed.topology.nodes[0], false);
+	assert.equal("adminKey" in parsed.topology, false);
+});
+
+test("malformed successful HTTP DTO cannot enter the public state", () => {
+	assert.equal(parsePublicHomelabCatalogPayload(null), null);
+	assert.equal(parsePublicHomelabCatalogPayload({ version: 2, services: [] }), null);
+	const unsafeIcon = catalogFixture();
+	unsafeIcon.services[0].iconSrc = "https://external.example/icon.svg";
+	assert.equal(parsePublicHomelabCatalogPayload(unsafeIcon), null);
+	const activeEndpoint = catalogFixture();
+	activeEndpoint.services[0].endpointEnabled = true;
+	assert.equal(parsePublicHomelabCatalogPayload(activeEndpoint), null);
 });

@@ -79,6 +79,15 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 	return { catalog: { version: 2, catalogRevision: value.catalogRevision, services }, topology: safeTopology };
 }
 
+/** Validate and narrow a live SERVICE response before it can enter public React state. */
+export function parsePublicHomelabCatalogPayload(payload: unknown): CatalogCache | null {
+	if (!isRecord(payload)) return null;
+	return localCatalog(
+		payload as HomelabServicesCatalog,
+		isRecord(payload.topology) ? payload.topology as ServiceTopology : null,
+	);
+}
+
 function put(storage: StoragePort, key: string, value: unknown, ttl: number, now: number): boolean {
 	try {
 		const json = JSON.stringify({ schema: 1, savedAt: now, expiresAt: now + ttl, data: value });

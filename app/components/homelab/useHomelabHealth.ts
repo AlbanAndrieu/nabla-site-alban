@@ -7,8 +7,15 @@ import {
 } from "@/lib/homelabHealth";
 import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
 import {
+	catalogScopeMatches,
+	classifyCatalogFailure,
+	type CatalogScope,
+} from "@/lib/homelabClientAccessBoundary";
+import {
 	CATALOG_REVALIDATION_MS,
 	catalogRevalidationDue,
+	clearPublicHomelabBrowserCache,
+	parsePublicHomelabCatalogPayload,
 	readPublicCatalogCache,
 	readStalePublicHealthCache,
 	writePublicCatalogCache,
@@ -45,6 +52,8 @@ export type HomelabServicesState = {
 	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
 	/** True only while rendering a still-valid SERVICE-only browser cache. */
 	catalogStale: boolean;
+	/** Tracks which access mode produced the current catalog. */
+	catalogScope: CatalogScope;
 	topology: ServiceTopology | null;
 	snapshot: HomelabHealthSnapshot | null;
 	siteHealth: SiteHealthV2 | null;
@@ -59,6 +68,7 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalog: null,
 	catalogFailure: null,
 	catalogStale: false,
+	catalogScope: null,
 	topology: null,
 	snapshot: null,
 	siteHealth: null,
@@ -72,12 +82,13 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 class CatalogV2Unavailable extends Error {
 	constructor(
 		readonly reason: "key-missing" | "access-denied" | "unavailable",
+		readonly revokePublicCache = false,
 	) {
 		super("Backstage v2 catalog unavailable");
 	}
 }
 
-async function fetchCatalog(signal: AbortSignal): Promise<{
+async function fetchCatalog(signal: AbortSignal, readOnly: boolean): Promise<{
 	catalog: HomelabServicesCatalog;
 	topology: ServiceTopology | null;
 }> {
@@ -86,17 +97,9 @@ async function fetchCatalog(signal: AbortSignal): Promise<{
 		signal,
 	});
 	if (!response.ok) {
-		// The same-origin owner route returns only a sanitized diagnostic reason.
 		const body: unknown = await response.json().catch(() => null);
-		const reason =
-			typeof body === "object" && body !== null && "reason" in body
-				? (body as { reason?: unknown }).reason
-				: null;
-		throw new CatalogV2Unavailable(
-			reason === "key-missing" || reason === "access-denied"
-				? reason
-				: "unavailable",
-		);
+		const policy = classifyCatalogFailure(response.status, body);
+		throw new CatalogV2Unavailable(policy.reason, policy.revokePublicCache);
 	}
 	const payload: unknown = await response.json();
 	if (
@@ -108,6 +111,13 @@ async function fetchCatalog(signal: AbortSignal): Promise<{
 		!Array.isArray(payload.services)
 	) {
 		throw new CatalogV2Unavailable("unavailable");
+	}
+	if (readOnly) {
+		// Never render unvalidated JSON or retain OWNER-only catalog fields
+		// merely because the same-origin gateway returned HTTP 200.
+		const safe = parsePublicHomelabCatalogPayload(payload);
+		if (!safe) throw new CatalogV2Unavailable("unavailable");
+		return safe;
 	}
 	const catalog = payload as HomelabServicesCatalog;
 	const topology =
@@ -285,6 +295,9 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 	);
 
 	useEffect(() => {
+		// A reauthorization can change the mode while the hook stays mounted.
+		// Clear old mode state before beginning a new fetch cycle.
+		setState(INITIAL_HOMELAB_SERVICES_STATE);
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
 		let catalogRefreshController: AbortController | null = null;
@@ -309,6 +322,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				topology: cachedCatalog.topology,
 				catalogFailure: null,
 				catalogStale: true,
+				catalogScope: "public",
 				error: false,
 			}));
 		}
@@ -412,7 +426,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		// leave the service graph stale while health polling continues.
 		const loadCatalog = (signal: AbortSignal) => {
 			lastCatalogAttemptAt = Date.now();
-			void fetchCatalog(signal)
+			void fetchCatalog(signal, readOnly)
 				.then(({ catalog, topology }) => {
 					if (signal.aborted) return;
 					activeCatalogRevision = catalog.catalogRevision ?? null;
@@ -429,21 +443,36 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 								: null,
 						catalogFailure: null,
 						catalogStale: false,
+						catalogScope: readOnly ? "public" : "owner",
 						error: false,
 					}));
 				})
 				.catch((error: unknown) => {
 					if (signal.aborted) return;
-					setState((current) => ({
-						...current,
-						// Keep only a previously verified published catalog available.
-						error: current.catalog === null,
-						catalogStale: readOnly && current.catalog !== null,
-						catalogFailure:
-							error instanceof CatalogV2Unavailable
-								? error.reason
-								: "unavailable",
-					}));
+					// 401/403/404 and explicit key denials are not transient outages.
+					const revoke =
+						readOnly && error instanceof CatalogV2Unavailable &&
+						error.revokePublicCache;
+					if (revoke) {
+						activeCatalogRevision = null;
+						if (publicStorage) clearPublicHomelabBrowserCache(publicStorage);
+					}
+					setState((current) => {
+						const retain = !revoke && current.catalog !== null &&
+							catalogScopeMatches(current.catalogScope, readOnly);
+						return {
+							...current,
+							...(revoke ? { catalog: null, topology: null, siteHealth: null } : {}),
+							// 502 may use an already-published LKG; revocation never may.
+							error: !retain,
+							catalogStale: readOnly && retain,
+							catalogScope: readOnly ? "public" : "owner",
+							catalogFailure:
+								error instanceof CatalogV2Unavailable
+									? error.reason
+									: "unavailable",
+						};
+					});
 				});
 		};
 
@@ -478,8 +507,15 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		};
 	}, [readOnly]);
 
-	// An access-mode switch may race with an in-flight OWNER fetch.
-	// Public components must never receive a previously cached OWNER snapshot.
+	// Effects clean up after render. Reject the previous mode's entire
+	// catalog, topology and health synchronously during an OWNER/public switch.
+	if (!catalogScopeMatches(state.catalogScope, readOnly)) {
+		return {
+			...INITIAL_HOMELAB_SERVICES_STATE,
+			error: state.error,
+			healthRefreshing: state.healthRefreshing,
+		};
+	}
 	if (readOnly) {
 		return {
 			...state,
