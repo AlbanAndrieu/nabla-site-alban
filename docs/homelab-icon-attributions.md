@@ -26,7 +26,8 @@ Backstage v2 et ne conserve pas un second inventaire opérationnel.
 - `cyberbro.svg`, `akvorado.svg`, `autoxpose.svg`, `cartography.svg`,
   `dsomm.svg`, `opconnect.svg`, `opencre.svg`, `openrag.svg`,
   `scorecard.svg`, `squid.svg`, `suricata.svg`,
-  `sybase-exporter.svg` : pictogrammes originaux **spécifiques** composés
+  `sybase-exporter.svg`, `cloudflare-tunnel.svg`, `mimir.svg`,
+  `tempo.svg`, `open-terminal.svg` : pictogrammes originaux **spécifiques** composés
   pour le site (monogrammes et couleurs différenciés). Ils ne prétendent
   pas représenter un logo officiel des projets.
 
@@ -45,10 +46,11 @@ la propriété de leurs titulaires respectifs.
 - Le composant de cartes et les nœuds ReactFlow utilisent ce mapping, même
   lorsqu'une réponse FastAPI fournit une ancienne référence d'icône.
 - `localStorage` ne conserve que la projection SERVICE v2 publiable :
-  catalogue 15 min, états 2 min. Les états restaurés sont **stale/unknown**,
+  catalogue 15 min, états 2 min, sans redondance de chemins d’icônes. Les états restaurés sont **stale/unknown**,
   jamais `OK` ; aucune preuve de sonde, IP LAN, secret ou état OWNER n'y entre.
-- La clé du cache de catalogue passe de `:1` à `:2` pour invalider les
-  anciennes icônes génériques en cache. Une révocation purge les deux versions.
+- La clé du cache de catalogue passe à `:3`. Les clés `:1` et `:2` sont
+  purgées à la migration et à la révocation. Les chemins d’icônes ne sont
+  plus stockés dans le navigateur : ils proviennent du mapping statique généré.
 - `unit-tests/homelabIconCoverage.test.mjs` vérifie la présence réelle
   des fichiers locaux et la couverture des IDs connus au 24 octobre 2026.
 
