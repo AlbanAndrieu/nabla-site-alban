@@ -25,3 +25,12 @@ test("OWNER evidence stays non-interactive and does not invent a live probe", ()
   assert.match(source, /describeServiceProbe\(entry, snapshot, "internal"\)/);
   assert.match(source, /probeMetric\("lan"/);
 });
+
+test("Backstage v2 cards do not revive legacy endpoint links without OWNER evidence", () => {
+  const grid = readFileSync(
+    new URL("../app/components/homelab/HomelabServiceGrid.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(grid, /homelabServiceEndpointUrl\(svc\)/);
+  assert.match(grid, /!readOnly && !healthUnavailable \? observed\.externalUrl : ""/);
+});
