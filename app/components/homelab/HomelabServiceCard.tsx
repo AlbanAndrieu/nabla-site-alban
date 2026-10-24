@@ -24,7 +24,6 @@ import {
 	endpointUrlHostIsPrivateS3,
 	type healthIndex,
 	INTERNAL_HEALTH_CLASS,
-	internalPresentationState,
 	RUNTIME_ICON_CLASS,
 	reconciledHealth,
 	runtimePresentationState,
@@ -33,6 +32,7 @@ import {
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
 import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
+import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
 
 type Props = {
 	svc: HomelabService;
@@ -101,13 +101,13 @@ export default function HomelabServiceCard({
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
 	const dependsOnTrueNas = initialHealth?.runtime_app != null;
-	const internalState = internalPresentationState(
-		initialHealth,
-		truenasRuntimeUnavailable ||
-			truenasRuntimeStale ||
-			initialHealth?.runtime_stale === true ||
-			initialHealth?.runtime_reachable === false,
-	);
+  // Docker RUNNING is not proof of a successful TCP/LAN probe.
+  const lanProbe = snapshot ?
+    describeServiceProbe(initialHealth, snapshot, "internal") : null;
+  const internalState: HomelabHealthState = !lanProbe ||
+    ["disabled", "not-run", "stale"].includes(lanProbe.state) ? "unknown" :
+    lanProbe.state === "failed" ? "fail" :
+    initialHealth?.internal_state ?? "unknown";
 	const internalColor = homelabHealthTextColor(internalState);
 	const runtimeState = runtimePresentationState(
 		initialHealth,
@@ -301,6 +301,7 @@ export default function HomelabServiceCard({
 									borderColor: internalColor,
 								}}
 								data-health-state={internalState}
+                data-lan-probe-state={lanProbe?.state ?? "not-run"}
 								title={`FastAPI/TrueNAS: ${internalState}`}
 							>
 								{svc.internalSecure && (
