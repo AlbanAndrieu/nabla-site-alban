@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
 import SectionHeading from "@/components/SectionHeading";
 import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
-import { catalogFailureReason, classifyCatalogFailure, type CatalogFailureReason } from "@/lib/homelabClientAccessBoundary";
+import { catalogFailureReason, catalogScopeMatches, classifyCatalogFailure, type CatalogFailureReason, type CatalogScope } from "@/lib/homelabClientAccessBoundary";
 import { parseOwnerCatalogIncident, type OwnerCatalogIncident } from "@/lib/homelabCatalogFailureStage";
 import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
@@ -41,9 +41,9 @@ type PrivateArchitectureData = {
 };
 
 type CatalogRequestState =
-	| { status: "loading"; data: null; reason: null; incident: null }
-	| { status: "error"; data: null; reason: CatalogFailureReason; incident: OwnerCatalogIncident | null }
-	| { status: "ready"; data: PrivateArchitectureData; reason: null; incident: null };
+	| { status: "loading"; data: null; reason: null; incident: null; scope: null }
+	| { status: "error"; data: null; reason: CatalogFailureReason; incident: OwnerCatalogIncident | null; scope: CatalogScope }
+	| { status: "ready"; data: PrivateArchitectureData; reason: null; incident: null; scope: CatalogScope };
 
 class CatalogRequestError extends Error {
 	constructor(readonly reason: CatalogFailureReason, readonly incident: OwnerCatalogIncident | null = null) {
@@ -84,6 +84,7 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 		data: null,
 		reason: null,
 		incident: null,
+		scope: null,
 	});
 	const [attempt, setAttempt] = useState(0);
 
@@ -108,6 +109,7 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 					},
 					reason: null,
 					incident: null,
+					scope: ownerAuthorized ? "owner" : "public",
 				});
 			})
 			.catch((error: unknown) => {
@@ -118,15 +120,21 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 					reason:
 						error instanceof CatalogRequestError ? error.reason : "unavailable",
 					incident: ownerAuthorized && error instanceof CatalogRequestError ? error.incident : null,
+					scope: ownerAuthorized ? "owner" : "public",
 				});
 			});
 		return () => controller.abort();
 	}, [enabled, ownerAuthorized, attempt]);
 
 	const retry = () => {
-		setRequest({ status: "loading", data: null, reason: null, incident: null });
+		setRequest({ status: "loading", data: null, reason: null, incident: null, scope: null });
 		setAttempt((current) => current + 1);
 	};
+	// Effects run after render. Hide any OWNER data synchronously when access
+	// changes to public, including on a Wi-Fi/VPN or identity transition.
+	if (!catalogScopeMatches(request.scope, !ownerAuthorized)) {
+		return { status: "loading" as const, data: null, reason: null, incident: null, retry };
+	}
 	return { ...request, retry };
 }
 

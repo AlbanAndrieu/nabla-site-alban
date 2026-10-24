@@ -46,3 +46,15 @@ test("Architecture and TrueNAS share failure reasons, while only OWNER may recei
   assert.match(arch, /access === "trusted" \? incident : null/);
   assert.match(notice, /incident\?\s*:\s*OwnerCatalogIncident/);
 });
+
+test("OWNER architecture results cannot survive a public/readonly transition at render time", async () => {
+  const { catalogScopeMatches } = await import("../lib/homelabClientAccessBoundary.ts");
+  assert.equal(catalogScopeMatches("owner", true), false);
+  assert.equal(catalogScopeMatches("public", false), false);
+  assert.equal(catalogScopeMatches("owner", false), true);
+  assert.equal(catalogScopeMatches("public", true), true);
+  const { readFileSync } = await import("node:fs");
+  const component = readFileSync(new URL("../app/[locale]/architecture/ArchitecturePrivateViews.tsx", import.meta.url), "utf8");
+  assert.match(component, /catalogScopeMatches\(request\.scope, !ownerAuthorized\)/);
+  assert.match(component, /scope: ownerAuthorized \? "owner" : "public"/);
+});

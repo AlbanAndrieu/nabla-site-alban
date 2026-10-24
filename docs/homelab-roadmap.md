@@ -10,6 +10,7 @@
 - [ ] Relier les IDs de trace Site / API / collecteur via OpenTelemetry ; ne pas
   assimiler le `requestId` Site actuel à un trace ID partagé.
 - [x] Mutualiser entre les cartes TrueNAS et le panneau Architecture la raison de refus catalogue et la référence d'incident OWNER, sans divulgation au mode SERVICE. Test de contrat ajouté.
+- [x] Rejeter le catalogue Architecture OWNER dès le premier rendu suivant une transition vers SERVICE, avant le nettoyage React asynchrone (`catalogScopeMatches`). Ajouter un test contre la régression.
 - [ ] Montrer une chronologie compacte : catalogue → FastAPI → TrueNAS → Site,
   avec observateur/phase/fraîcheur et cause explicite dans les cartes OWNER.
 - [ ] Valider droits PUBLIC/SERVICE/OWNER, réseau LAN, JWT Cloudflare et refus
