@@ -15,6 +15,7 @@ import {
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
 import type { HomelabService } from "@/lib/homelabServices";
+import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
 import {
@@ -145,7 +146,7 @@ export default function HomelabServiceCard({
 			>
 				<img
 					className="img-fluid d-block mx-auto p-4"
-					src={serviceIconPath(svc.iconSrc)}
+					src={serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc))}
 					width={80}
 					height={80}
 					alt={svc.name}

@@ -221,3 +221,15 @@ test("malformed successful HTTP DTO cannot enter the public state", () => {
 	activeEndpoint.services[0].endpointEnabled = true;
 	assert.equal(parsePublicHomelabCatalogPayload(activeEndpoint), null);
 });
+
+test("a pre-icon-upgrade browser cache is not restored", () => {
+	const storage = storageFixture();
+	assert.equal(writePublicCatalogCache(storage, catalogFixture(), topologyFixture(), 1000), true);
+	const [[key, value]] = storage.values.entries();
+	assert.match(key, /catalog-public-v2:2$/);
+	storage.values.delete(key);
+	storage.values.set(key.replace(/:2$/, ":1"), value);
+	assert.equal(readPublicCatalogCache(storage, 1001), null);
+	clearPublicHomelabBrowserCache(storage);
+	assert.equal(storage.values.size, 0);
+});

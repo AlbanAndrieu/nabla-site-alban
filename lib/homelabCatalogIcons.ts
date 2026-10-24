@@ -102,13 +102,92 @@ export const HOMELAB_CATALOG_ICON_FILES: Readonly<Record<string, string>> = {
 	vault: "vaultproject-icon.svg",
 	vaultwarden: "vaultwarden.png",
 	zap: "zap-by-checkmarx.svg",
+	// Explicit canonical Backstage / nabla-compose service IDs: never use a generic tile.
+	"aistor": "minio.png",
+	"anythingllm-albandrieu": "anythingllm.png",
+	"code-server": "visual-studio-code.svg",
+	"cyberbro": "cyberbro.svg",
+	"defectdojo": "defectdojo.svg",
+	"dependency-track": "dependency-track.svg",
+	"dockhand": "dockhand.svg",
+	"docling": "docling.svg",
+	"dozzle": "dozzle.svg",
+	"drawio": "draw-io.svg",
+	"garage-webui": "garage.png",
+	"hello-int": "nginx.png",
+	"home": "pfsense.png",
+	"homeassistant": "home-assistant.svg",
+	"joplin": "joplin.svg",
+	"litellm-albandrieu": "litellm.png",
+	"localai-gpu": "localai.png",
+	"netbox": "netbox.svg",
+	"ollama-gpu": "ollama.png",
+	"openhands": "openhands.svg",
+	"pihole": "pi-hole.svg",
+	"plumber-api-albandrieu": "plumber.svg",
+	"portracker-albandrieu": "portracker.png",
+	"reactive-albandrieu": "rxresume.png",
+	"scanopy": "scanopy.svg",
+	"scrutiny-collector-albandrieu": "scrutiny.png",
+	"stirling": "stirling-pdf.png",
+	"stirling-albandrieu": "stirling-pdf.png",
+	"traefik": "traefik.svg",
+	"wordpress": "wordpress.svg",
+	// Additional v2 Backstage application families (nabla-compose):
+	"akvorado": "akvorado.svg",
+	"autokuma": "uptime-kuma.png",
+	"autoxpose": "autoxpose.svg",
+	"cartography": "cartography.svg",
+	"code": "visual-studio-code.svg",
+	"crowdsec": "crowdsec.svg",
+	"dsomm": "dsomm.svg",
+	"elasticsearch": "elasticsearch.svg",
+	"haproxy-exporter": "haproxy.svg",
+	"hermes": "hermes-agent.svg",
+	"influxdb": "influxdb.svg",
+	"langflow": "langflow.svg",
+	"neo4j": "neo4j.svg",
+	"npmplus": "nginx.png",
+	"obsidian": "obsidian.svg",
+	"opconnect": "opconnect.svg",
+	"opencre": "opencre.svg",
+	"openrag": "openrag.svg",
+	"opensearch-exporter": "opensearch.svg",
+	"pyroscope": "grafana-pyroscope.svg",
+	"sample": "python-original.svg",
+	"scorecard": "scorecard.svg",
+	"sentry-clickhouse": "sentryio-icon.svg",
+	"sonarqube": "sonarqube.svg",
+	"squid": "squid.svg",
+	"suricata": "suricata.svg",
+	"sybase-exporter": "sybase-exporter.svg",
+	"watchtower": "watchtower.svg",
+	"wazuh": "wazuh.svg",
 };
 
 /** Canonical v2 card IDs and their known aliases share locally versioned assets. */
 export function homelabCatalogIconSrc(serviceId: string): string {
 	const id = serviceId.trim().toLowerCase();
+	const normalized = id.replace(/[._]/g, "-");
 	const icon =
 		HOMELAB_CATALOG_ICON_FILES[id] ??
-		HOMELAB_CATALOG_ICON_FILES[id.replace(/[._]/g, "-")];
+		HOMELAB_CATALOG_ICON_FILES[normalized] ??
+		Object.entries(HOMELAB_CATALOG_ICON_FILES)
+			.filter(([parent]) => normalized.startsWith(parent + "-"))
+			.sort(([a], [b]) => b.length - a.length)[0]?.[1];
 	return `assets/selfh-icons/${icon ?? "generic-app.svg"}`;
 }
+
+/** Prefer the bundled mapping; accept only a vetted local asset as fallback. */
+export function homelabServiceIconSrc(
+	serviceId: string,
+	declaredIconSrc?: string,
+): string {
+	const mapped = homelabCatalogIconSrc(serviceId);
+	if (mapped !== "assets/selfh-icons/generic-app.svg") return mapped;
+	const candidate = declaredIconSrc?.replace(/^\/+/, "");
+	return candidate && /^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/.test(candidate)
+		? candidate
+		: mapped;
+}
+

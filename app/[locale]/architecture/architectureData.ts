@@ -1,3 +1,4 @@
+import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import type { HomelabService } from "@/lib/homelabServices";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 
@@ -359,10 +360,7 @@ function serviceUrl(service: HomelabService): string | undefined {
 }
 
 function serviceIconSrc(service: HomelabService): string | undefined {
-	if (!service.iconSrc) return undefined;
-	return service.iconSrc.startsWith("/")
-		? service.iconSrc
-		: `/${service.iconSrc}`;
+	return `/${homelabServiceIconSrc(serviceId(service), service.iconSrc)}`;
 }
 
 export function buildNablaEntities(

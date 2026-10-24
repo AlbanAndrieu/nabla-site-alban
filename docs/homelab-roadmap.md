@@ -1,3 +1,13 @@
+## P0 — Icônes spécifiées par service + cache SERVICE v2 (24 octobre 2026)
+
+- [x] Audit canonique de `nabla-compose/master` : 89 entrées du fichier historique, 77 catalogues d'application Backstage, soit **126 identifiants distincts** ; 30 entrées historiques auparavant génériques, 45 catalogues d'applications sans mapping au début de l'audit.
+- [x] Porter la couverture explicite à **161 alias** et à **149 fichiers locaux** après ajout de 40 pictogrammes/SVG (logo amont quand disponible, pictogramme spécifique documenté sinon). Vérifier qu'aucune des 161 correspondances ne pointe vers un fichier absent ; 0 ID générique parmi les 126 identifiants canoniques audités. Les déclinaisons (ex. `defectdojo-api`) héritent du logo du service parent.
+- [x] Unifier le choix d'icône pour cards TrueNAS et nœuds ReactFlow ; privilégier un mapping embarqué et n'autoriser qu'un chemin sous `assets/selfh-icons/`, jamais un URL externe arbitraire de FastAPI.
+- [x] Cache `localStorage` SERVICE v2 déjà en place, catalogue TTL 15 min et états TTL 2 min ; lecture des anciens états en `stale/unknown`, sans conserver OWNER. Faire évoluer la clé du catalogue `:1` → `:2` pour évincer les anciennes icônes génériques. Purger les deux clés à la révocation.
+- [x] Ajouter des contrats sur l'existence des ressources graphiques et les identifiants canoniques, et un test de migration de cache. Consigner provenance/licences dans `docs/homelab-icon-attributions.md`.
+- [ ] Sur checkout complet Node 24 exécuter la quality gate et les tests du nouveau jeu d'icônes. **Non exécutés localement** : agent sans accès DNS à GitHub, dépôt complet non disponible.
+- [ ] Valider la page réellement déployée `/fr/truenas` en mode OWNER et public, en comparant tous les IDs remontés par FastAPI Backstage v2 aux fichiers locaux, ainsi que ReactFlow et les images dans le navigateur ; aucune prétention de validation de production sans ces preuves.
+
 ## P0 — ReactFlow TrueNAS : rendre visibles tous les services déclarés (24 octobre 2026)
 
 - [x] Cause d'une vue trompeusement vide identifiée : le mode `services` initialisait `scope=critical`, ce qui masque les entités de criticité `support` (notamment lorsque Backstage v2 ne publie pas encore de relations de dépendance). Initialiser `scope=all` **uniquement quand** `initialMode=services` ; conserver le filtre « Chemin critique » accessible dans la barre et le défaut `critical` pour le mode AI existant.

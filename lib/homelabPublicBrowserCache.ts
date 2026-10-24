@@ -3,7 +3,8 @@ import type { ServiceTopology } from "./serviceTopology";
 import type { SiteHealthV2 } from "./siteHealthV2";
 
 /** Public SERVICE projections only. OWNER snapshots must never enter browser storage. */
-const CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
+const CATALOG_KEY = "nabla:homelab:catalog-public-v2:2";
+const LEGACY_CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
 const HEALTH_KEY = "nabla:homelab:health-public-v2:1";
 const CATALOG_TTL_MS = 15 * 60_000;
 const HEALTH_TTL_MS = 2 * 60_000;
@@ -172,6 +173,7 @@ export function readStalePublicHealthCache(
 /** Drop published LKG after explicit access revocation or sign-out. */
 export function clearPublicHomelabBrowserCache(storage: StoragePort): void {
 	try { storage.removeItem(CATALOG_KEY); } catch { /* Storage may be disabled. */ }
+	try { storage.removeItem(LEGACY_CATALOG_KEY); } catch { /* Storage may be disabled. */ }
 	try { storage.removeItem(HEALTH_KEY); } catch { /* Storage may be disabled. */ }
 }
 
