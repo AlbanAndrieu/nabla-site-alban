@@ -140,7 +140,9 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
   for (const id of ["docker", "https", "cloudflare", "http", "latency", "prometheus", "probe"]) {
     assert.match(summary, new RegExp('key: "' + id + '"'));
   }
-  assert.match(summary, /unavailable \|\| snapshot\.health_board/);
+  assert.match(summary, /const boardStale = snapshot\\.health_board/);
+  assert.match(summary, /const stale = unavailable \\|\\| snapshot\\.truenas_runtime_stale/);
+  assert.match(summary, /data-owner-board-stale/);
   assert.match(summary, /access_protected_origin_unverified/);
   assert.match(summary, /direct_probe_observed_at/);
   assert.match(summary, /runtime_primary_container_issue/);
