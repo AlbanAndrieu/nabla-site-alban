@@ -49,6 +49,8 @@ type Props = {
 	readOnly?: boolean;
 	externalUrlDerived?: boolean;
 	internalProtocolObserved?: boolean;
+	internalRouteMismatch?: boolean;
+	internalTargetSource?: "probe" | "declared" | "none";
 };
 
 /** One homelab service card: effective health, runtime and endpoint links. */
@@ -67,6 +69,8 @@ export default function HomelabServiceCard({
 	readOnly = false,
 	externalUrlDerived = false,
 	internalProtocolObserved = false,
+	internalRouteMismatch = false,
+	internalTargetSource = "none",
 }: Props) {
 	const t = useTranslations("homelab");
   const french = useLocale() === "fr";
@@ -269,6 +273,16 @@ export default function HomelabServiceCard({
               <small className="text-break text-start" data-owner-external-target>
                 {endpointUrl}
                 {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
+              </small>
+            )}
+            {hasInternal && internalTargetSource === "declared" && (
+              <small className="text-start" data-owner-lan-declared>
+                {french ? "Adresse/port issus de la configuration · aucune sonde LAN" : "Address/port from configuration · no LAN probe"}
+              </small>
+            )}
+            {hasInternal && internalRouteMismatch && (
+              <small className="text-warning text-start" data-owner-lan-route-mismatch>
+                {french ? "Écart détecté : origine Cloudflare différente de la cible déclarée" : "Route drift: Cloudflare origin differs from declared target"}
               </small>
             )}
             {hasInternal && !internalProtocolObserved && (
