@@ -9,10 +9,11 @@ const SORTED_PARENTS = Object.keys(HOMELAB_CATALOG_ICON_FILES).sort(
 /** Cards and ReactFlow use exactly the same locally bundled icon. */
 export function homelabCatalogIconSrc(serviceId: string): string {
   const id = serviceId.trim().toLowerCase().replace(/[._]/g, "-");
+  const exact = HOMELAB_CATALOG_ICON_FILES[id];
+  if (exact) return `assets/selfh-icons/${exact}`;
+  // Parent lookup runs only for unknown subcomponent IDs.
   const parent = SORTED_PARENTS.find((key) => id.startsWith(key + "-"));
-  const filename = HOMELAB_CATALOG_ICON_FILES[id] ??
-    (parent ? HOMELAB_CATALOG_ICON_FILES[parent] : undefined);
-  return `assets/selfh-icons/${filename ?? "generic-app.svg"}`;
+  return `assets/selfh-icons/${parent ? HOMELAB_CATALOG_ICON_FILES[parent] : "generic-app.svg"}`;
 }
 
 /** Ignore upstream image URLs. They cannot introduce a second icon authority. */
