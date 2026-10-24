@@ -140,6 +140,8 @@ export default function HomelabServiceGrid({
 							readOnly={readOnly}
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
+							internalRouteMismatch={observed.internalRouteMismatch}
+							internalTargetSource={observed.internalTargetSource}
 							anchorId={
 								services.findIndex(
 									(item) => homelabServiceId(item) === serviceId,
