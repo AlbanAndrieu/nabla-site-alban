@@ -61,6 +61,7 @@ export type HomelabOwnerExposure = {
     topology_internal_host?: string | null;
     topology_internal_port?: number | null;
   };
+  provider_status_confirmed?: boolean;
   state?: string;
   reasons?: string[];
 };
