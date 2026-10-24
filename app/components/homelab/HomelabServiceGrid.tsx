@@ -9,6 +9,7 @@ import {
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
+import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
 import { healthIndex } from "./homelabGridPresentation";
@@ -119,11 +120,13 @@ export default function HomelabServiceGrid({
 			<div className="row service-grid">
 				{services.map((svc, serviceIndex) => {
 					const serviceId = homelabServiceId(svc);
-					const endpointUrl = homelabServiceEndpointUrl(svc);
+					const observed = observedOwnerServiceNavigation(svc, snapshot);
+					const displayService = observed.service;
+					const endpointUrl = observed.externalUrl || (snapshot ? "" : homelabServiceEndpointUrl(svc));
 					return (
 						<HomelabServiceCard
 							key={`${serviceId}:${endpointUrl}`}
-							svc={svc}
+							svc={displayService}
 							siteState={
 								typeof svc.entityRef === "string"
 									? safeStatus.get(svc.entityRef)
@@ -131,6 +134,9 @@ export default function HomelabServiceGrid({
 							}
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
+							observedNavigation={snapshot !== null}
+							externalUrlDerived={observed.externalUrlDerived}
+							internalProtocolObserved={observed.internalProtocolObserved}
 							anchorId={
 								services.findIndex(
 									(item) => homelabServiceId(item) === serviceId,
