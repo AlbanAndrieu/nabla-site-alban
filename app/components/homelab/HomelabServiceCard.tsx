@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/homelabHealthResolver";
 import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
 import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
+import { homelabIconFallback } from "@/lib/homelabIconFallback";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
 import {
@@ -73,6 +75,9 @@ export default function HomelabServiceCard({
 	internalTargetSource = "none",
 }: Props) {
 	const t = useTranslations("homelab");
+	const [failedIconSrc, setFailedIconSrc] = useState<string | null>(null);
+	const iconSrc = serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc));
+	const iconFallback = homelabIconFallback(serviceId, svc.name);
   const french = useLocale() === "fr";
 	const hasInternal =
 		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
@@ -156,16 +161,29 @@ export default function HomelabServiceCard({
 					runtimeInventoryConflict ? "true" : undefined
 				}
 			>
-				<img
-					className="img-fluid d-block mx-auto p-4"
-					src={serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc))}
-					width={80}
-					height={80}
-					alt={homelabServiceDisplayName(svc)}
-					loading="lazy"
-					decoding="async"
-					style={{ minHeight: 60, minWidth: 60, height: "auto" }}
-				/>
+				{failedIconSrc === iconSrc ? (
+					<span
+						className={styles.serviceIconFallback}
+						style={{ backgroundColor: iconFallback.backgroundColor }}
+						role="img"
+						aria-label={homelabServiceDisplayName(svc)}
+						data-service-icon-fallback={serviceId}
+					>
+						{iconFallback.label}
+					</span>
+				) : (
+					<img
+						className="img-fluid d-block mx-auto p-4"
+						src={iconSrc}
+						width={80}
+						height={80}
+						alt={homelabServiceDisplayName(svc)}
+						loading="lazy"
+						decoding="async"
+						onError={() => setFailedIconSrc(iconSrc)}
+						style={{ minHeight: 60, minWidth: 60, height: "auto" }}
+					/>
+				)}
 				<div className="card-body text-center border-top border-secondary">
 					<div className={styles.serviceTitleRow}>
 						<h3 className="h5 card-title mb-0">

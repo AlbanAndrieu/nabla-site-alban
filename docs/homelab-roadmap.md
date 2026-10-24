@@ -12,6 +12,14 @@
 
 **Done :** build Next.js et tests au SHA exact, domaine de production sur ce SHA, recettes FR/EN publiques et OWNER effectuées.
 
+## P1 — Résilience visuelle des icônes TrueNAS et ReactFlow
+
+- [x] Si un asset local est absent ou si son chargement échoue, remplacer l'image cassée par un monogramme **spécifique au service**. Même contrat pour les cartes et les nœuds ReactFlow, sans chargement depuis un CDN ni HTML arbitraire.
+- [x] Utiliser une identité visuelle locale déterministe (initiales et couleur calculée sur l'identifiant canonique), sans modifier les icônes officielles lorsque leurs assets se chargent.
+- [x] Ajouter 6 tests unitaires au module sans dépendances (6/6 exécutés sous Node 22, contrôle TypeScript strict ciblé réussi), et trois contrats statiques d'intégration dans `just source-check`.
+- [ ] Exécuter les nouveaux contrats sur le checkout complet, puis TypeScript/Next.js et Playwright au **HEAD exact** de la PR #255. Vérifier dans le navigateur les images 404 et les changements d'identifiant, et surveiller l'attribut `data-service-icon-fallback` pour auditer les fichiers défectueux.
+- [ ] Compléter l'audit de `nabla-compose/catalog/service-icons.json` à chaque nouvelle application ; un monogramme de repli ne remplace pas le vrai logo lorsqu'il existe.
+
 ## P0 — Terminer la migration d'affichage Backstage v2
 
 - [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `unit-tests/helpers/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
