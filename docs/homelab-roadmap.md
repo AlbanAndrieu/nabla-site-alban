@@ -1,3 +1,15 @@
+## P0 — Restaurer les diagnostics des cartes TrueNAS (24 octobre 2026)
+
+- [x] Identifier la régression : la projection `projectHomelabCatalogV2` impose `endpointEnabled=false` et retire les URLs, IP et ports. En mode `readOnly`, les sondes OWNER sont exclues. Même en OWNER, `ownerUpstreamBlocked` peut renvoyer 503 (`owner-boundary`).
+- [x] Conserver le catalogue Backstage v2 comme autorité des identités et reconstruire uniquement en OWNER les liens à partir des URLs et sondes FastAPI observées ; ne pas fabriquer de cible sur un refus.
+- [x] Ajouter dans les cartes OWNER un résumé Docker/TrueNAS, HTTP, HTTPS/TLS, Cloudflare Tunnel, latence et horodatage de dernière sonde. Les données absentes restent inconnues.
+- [x] Expliquer les erreurs de récupération OWNER et traiter les observations anciennes comme obsolètes. Aucun lien LAN ou statut OWNER dans `localStorage`.
+- [x] Charger les données de troubleshooting seulement à l'ouverture du panneau ; tests OWNER/public, URL invalides et fallback.
+- [ ] Côté `fastapi-sample` : corréler Gatus, Prometheus et exporters par `entityRef` (source, dernier scrape, âge, mesure, état de collecte). Ne pas déclarer la santé Prometheus sans preuve.
+- [ ] Fournir côté API une projection OWNER des endpoints, dérivée de Compose, Traefik, Cloudflare et runtime, avec URL externe et URL LAN typée (schéma, port). Conserver la projection SERVICE sans secrets ni topologie privée.
+- [ ] Tester depuis le VLAN les routes `/api/homelab-access?diagnose=1`, `/api/homelab-health`, `/api/homelab-probes` et les statuts 401/403/503.
+- [ ] Exécuter la quality gate locale Node 24 et vérifier une Preview Vercel au SHA exact, avant tout déploiement.
+
 ## P0 — Unifier l'autorité des icônes Compose → Site (24 octobre 2026)
 
 - [x] Audit élargi : 128 Component, 23 Resource, 89 anciens services et 51 icônes de graphes = **199 IDs distincts** ; 15 mappings complémentaires couvrent les neuf composants, quatre ressources et deux références historiques non couvertes.
@@ -12,10 +24,12 @@
 ## P1 — Performances UI TrueNAS
 
 - [ ] Mesurer LCP, INP, CLS et le poids JavaScript de `/fr/truenas` sur mobile, en production et Preview exact-SHA, avant toute refonte.
-- [ ] Charger l'explorateur ReactFlow au voisinage du viewport plutôt qu'au premier rendu, sans déplacer l'inventaire prioritaire des cartes.
+- [x] Rendre les cartes avant ReactFlow, qui se monte seulement près du viewport ; tester l'IntersectionObserver et son fallback.
 - [ ] Dédupliquer les requêtes SERVICE v2 entre les vues TrueNAS et Architecture et les onglets, avec `BroadcastChannel` et revalidation conditionnelle selon `catalogRevision`/ETag ; conserver les autorisations serveur.
 - [ ] Utiliser `content-visibility: auto` ou une virtualisation accessible pour les groupes volumineux, après mesure et tests de navigation clavier.
-- [ ] Publier en priorité le résumé non sensible (nombre de services, dernière mesure, couverture connue/inconnue) et conserver les diagnostics détaillés derrière OWNER ; ne pas introduire une nouvelle source d'inventaire.
+- [x] Reporter le chargement des preuves de troubleshooting à l'ouverture d'un panneau.
+- [x] Afficher des métriques synthétiques uniquement en OWNER, depuis les observations FastAPI et sans nouvelle source d'inventaire.
+- [ ] Publier un résumé SERVICE non sensible (nombre, fraîcheur et couverture) indépendamment des diagnostics OWNER.
 
 ## P0 — Icônes spécifiées par service + cache SERVICE v2 (24 octobre 2026)
 
