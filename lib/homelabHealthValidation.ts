@@ -114,6 +114,9 @@ export function validHealthEntry(entry: unknown): entry is HomelabHealthEntry {
 		validOptionalBoolean(entry.url_derived) &&
         (entry.exposure_intent === undefined || entry.exposure_intent === "public" || entry.exposure_intent === "internal") &&
         (entry.exposure === undefined || entry.exposure === null || isRecord(entry.exposure)) &&
+        (entry.internal_probe_execution === undefined || [
+          "disabled", "not-configured", "not-executed", "stale", "failed", "observed",
+        ].includes(String(entry.internal_probe_execution))) &&
         validOptionalString(entry.runtime_primary_container_state) &&
         validOptionalBoolean(entry.runtime_primary_container_issue) &&
 		typeof entry.reachable === "boolean" &&
