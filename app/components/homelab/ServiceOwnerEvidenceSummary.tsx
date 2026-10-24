@@ -140,7 +140,7 @@ export default function ServiceOwnerEvidenceSummary({
       aria-label={fr ? "Diagnostics observés" : "Observed diagnostics"}>
       {metrics.map((metric) => (
         <span key={metric.key} className={styles.ownerEvidenceMetric}
-          data-evidence-key={metric.key} data-evidence-state={metric.state}
+          data-evidence-key={metric.key} data-evidence-state={metric.state} data-evidence-key={metric.key}
           title={metric.label + ": " + metric.value}>
           <i className={metric.icon} aria-hidden="true" />
           <span className={styles.ownerEvidenceLabel}>{metric.label}</span>
