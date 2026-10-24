@@ -14,7 +14,7 @@ import {
 	hasFreshRuntimeInventoryConflict,
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
-import type { HomelabService } from "@/lib/homelabServices";
+import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
 import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
@@ -161,7 +161,7 @@ export default function HomelabServiceCard({
 					src={serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc))}
 					width={80}
 					height={80}
-					alt={svc.name}
+					alt={homelabServiceDisplayName(svc)}
 					loading="lazy"
 					decoding="async"
 					style={{ minHeight: 60, minWidth: 60, height: "auto" }}
@@ -169,7 +169,7 @@ export default function HomelabServiceCard({
 				<div className="card-body text-center border-top border-secondary">
 					<div className={styles.serviceTitleRow}>
 						<h3 className="h5 card-title mb-0">
-							{svc.name}
+							{homelabServiceDisplayName(svc)}
 							{runtimeState && runtimeTitle && (
 								<i
 									className={RUNTIME_ICON_CLASS[runtimeState]}
