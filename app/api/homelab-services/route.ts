@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadHomelabServicesCatalog } from "@/lib/homelabServicesServer";
-import { SiteCatalogV2Error } from "@/lib/homelabSiteCatalog";
+import { catalogUnavailableResponse } from "@/lib/homelabCatalogUnavailableResponse";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
 export const runtime = "nodejs";
@@ -20,15 +20,9 @@ async function catalogResponse() {
 			},
 		);
 	} catch (error) {
-		const reason =
-			error instanceof SiteCatalogV2Error ? error.reason : "unavailable";
-		return NextResponse.json(
-			{ error: "Backstage v2 inventory unavailable", reason },
-			{
-				status: 503,
-				headers: { "X-Homelab-Inventory-Complete": "false" },
-			},
-		);
+		return catalogUnavailableResponse(error, "Backstage v2 inventory unavailable", {
+			"X-Homelab-Inventory-Complete": "false",
+		});
 	}
 }
 

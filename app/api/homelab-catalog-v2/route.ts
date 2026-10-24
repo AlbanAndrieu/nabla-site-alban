@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { catalogUnavailableResponse } from "@/lib/homelabCatalogUnavailableResponse";
 import {
 	fetchSiteCatalogV2,
-	SiteCatalogV2Error,
 } from "@/lib/homelabSiteCatalog";
 import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 
@@ -15,19 +15,7 @@ async function catalogResponse() {
 			headers: { "X-Homelab-Catalog-Revision": catalog.catalogRevision },
 		});
 	} catch (error) {
-		const reason =
-			error instanceof SiteCatalogV2Error ? error.reason : "unavailable";
-		const stage = error instanceof SiteCatalogV2Error ? error.stage : "unknown";
-		const requestId = crypto.randomUUID();
-		// Never return a partial v1 catalog, source URL, credentials or upstream body.
-		return NextResponse.json(
-			{ error: "Backstage v2 catalog unavailable", reason, stage, requestId },
-			{ status: 503, headers: {
-				"Cache-Control": "private, no-store",
-				"X-Nabla-Diagnostic-Stage": stage,
-				"X-Nabla-Request-ID": requestId,
-			} },
-		);
+		return catalogUnavailableResponse(error, "Backstage v2 catalog unavailable");
 	}
 }
 
