@@ -363,3 +363,47 @@
 		min-height: 1.75rem;
 	}
 }
+
+/* Compact OWNER-only evidence. Keep labels visible without hover or tooltips. */
+.ownerEvidenceSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.6rem;
+  margin: 0.75rem 0;
+  background: var(--ui-surface-muted);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  text-align: left;
+}
+
+.ownerEvidenceMetric {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.45rem;
+  min-width: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.ownerEvidenceMetric strong { font-weight: 650; }
+
+.ownerEvidenceLabel { color: var(--ui-text-secondary); }
+
+.ownerEvidenceMetric[data-evidence-state="ok"] {
+  border-color: var(--ui-success-border);
+}
+.ownerEvidenceMetric[data-evidence-state="fail"] {
+  border-color: var(--ui-danger-border);
+}
+.ownerEvidenceMetric[data-evidence-state="warn"] {
+  border-color: var(--ui-warning-border);
+}
+
+@media (max-width: 440px) {
+  .ownerEvidenceSummary { grid-template-columns: minmax(0, 1fr); }
+}
