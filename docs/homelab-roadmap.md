@@ -15,7 +15,7 @@
 - [ ] Côté `fastapi-sample` : corréler Gatus, Prometheus et exporters par `entityRef` (source, dernier scrape, âge, mesure, état de collecte). Ne pas déclarer la santé Prometheus sans preuve.
 - [ ] Fournir côté API une projection OWNER des endpoints, dérivée de Compose, Traefik, Cloudflare et runtime, avec URL externe et URL LAN typée (schéma, port). Conserver la projection SERVICE sans secrets ni topologie privée.
 - [ ] Tester depuis le VLAN les routes `/api/homelab-access?diagnose=1`, `/api/homelab-health`, `/api/homelab-probes` et les statuts 401/403/503.
-- [ ] Vérifier la décision OWNER depuis le Wi-Fi quand Cloudflare Access est configuré : le CIDR domestique seul ne satisfait pas actuellement l'autorisation si le JWT Access manque. Valider l'identité et la politique voulue avant tout changement ; ne pas contourner la signature du JWT.
+- [x] Confirmer avec les réponses réelles du 24/10 : hors Wi-Fi `public-readonly`, sur Wi-Fi `authorized` avec `networkAllowed=true` et `identityRequired=false` ; aucun blocage JWT sur ce trajet effectivement testé. Ne pas assouplir les routes privées.
 - [ ] Exécuter la quality gate locale Node 24 et vérifier une Preview Vercel au SHA exact, avant tout déploiement.
 
 ## P0 — Convergence sécurité et DTO SERVICE v2 (24 octobre 2026)
