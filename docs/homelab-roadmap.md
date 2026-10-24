@@ -1,3 +1,13 @@
+## P0 — Convergence inter-dépôts Compose / FastAPI / Site (24 octobre 2026)
+
+- [x] Consolider l'analyse de la PR #254 (snapshot OWNER du 24/10, frontières de confidentialité, rôles de chaque dépôt) dans [le contrat partagé](homelab-catalog-convergence-2026-10-24.md). Ce document sert d'index des responsabilités, sans recopier le catalogue ou les sondes.
+- [x] Vérifier le périmètre distinct : Compose Backstage v2 = 154 entités (151 Component/Resource/API), 176 mappings `webAssets` ; snapshot FastAPI OWNER = 95 applications et 88 services. Ne pas additionner ni comparer directement ces inventaires.
+- [x] Le Site conserve **uniquement** présentation, ReactFlow, icônes locales, navigation OWNER et cache SERVICE expurgé ; FastAPI #373 possède le DTO de santé et la preuve runtime principale ; Compose possède `entityRef`, les relations et l'intention d'exposition.
+- [ ] Exécuter le contrôle commun de révision `catalogRevision` + identité `entityRef`, le chargement des 151 entités et la résolution de chaque icône depuis le même SHA Compose. Ne pas créer un lecteur parallèle v1.
+- [ ] Sur Preview exact-SHA, contrôler la correspondance entre lien déclaré, sonde réussie et URL OWNER ; couvrir Gatus, Bichon, Garage Web UI et Garage Admin, sans deviner les ports ni publier les IP LAN.
+- [ ] Tester transitions OWNER/public, cache TTL 15 min/2 min, révocation, couverture 0/86 LAN désactivée et 16/28 WAN observées, découplage `health_board.state=stale` et date de sonde. La production ne doit pas être déclarée validée sur simple inspection GitHub.
+- [ ] Exécuter les tests Node 24/TypeScript, Playwright et `just quality` en local avant de passer la PR #254 hors Draft. Aucun workflow GitHub payant à déclencher pour cette analyse.
+
 ## P0 — Contrat constaté sur la réponse OWNER du 24 octobre 2026
 
 - [x] Vérification utilisateur : hors Wi-Fi `trusted:true, mode:public-readonly, networkAllowed:false` ; sur Wi-Fi `trusted:true, reason:authorized, networkAllowed:true`. Ne plus diagnostiquer le CIDR domestique comme cause des cartes vides. Le `trusted:true` externe signifie accès public en lecture seule, **pas** accès OWNER.
