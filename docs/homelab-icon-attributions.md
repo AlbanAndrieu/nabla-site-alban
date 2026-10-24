@@ -26,7 +26,8 @@ Backstage v2 et ne conserve pas un second inventaire opérationnel.
 - `cyberbro.svg`, `akvorado.svg`, `autoxpose.svg`, `cartography.svg`,
   `dsomm.svg`, `opconnect.svg`, `opencre.svg`, `openrag.svg`,
   `scorecard.svg`, `squid.svg`, `suricata.svg`,
-  `sybase-exporter.svg` : pictogrammes originaux **spécifiques** composés
+  `sybase-exporter.svg`, `cloudflare-tunnel.svg`, `mimir.svg`,
+  `tempo.svg`, `open-terminal.svg` : pictogrammes originaux **spécifiques** composés
   pour le site (monogrammes et couleurs différenciés). Ils ne prétendent
   pas représenter un logo officiel des projets.
 
@@ -35,17 +36,21 @@ la propriété de leurs titulaires respectifs.
 
 ## Contrat de rendu et de cache
 
-- Le mapping `lib/homelabCatalogIcons.ts` associe un service à une icône
-  *locale et vérifiée*. Les déclinaisons partagent le logo de leur produit
-  (ex. `ollama-gpu`, `defectdojo-api`). Les clés absentes restent auditables :
-  on ne prétend pas avoir une marque officielle si elle n'est pas connue.
+- Le mapping des noms de fichiers est défini **uniquement** dans
+  `nabla-compose/catalog/service-icons.json` (`webAssets`).
+  `lib/homelabCatalogIcons.generated.ts` est un artefact généré ;
+  `lib/homelabCatalogIcons.ts` est seulement son lecteur.
+  Les déclinaisons partagent le logo du produit parent.
+  Les clés absentes restent identifiables : on ne prétend pas connaître
+  leur marque officielle.
 - Le composant de cartes et les nœuds ReactFlow utilisent ce mapping, même
   lorsqu'une réponse FastAPI fournit une ancienne référence d'icône.
 - `localStorage` ne conserve que la projection SERVICE v2 publiable :
-  catalogue 15 min, états 2 min. Les états restaurés sont **stale/unknown**,
+  catalogue 15 min, états 2 min, sans redondance de chemins d’icônes. Les états restaurés sont **stale/unknown**,
   jamais `OK` ; aucune preuve de sonde, IP LAN, secret ou état OWNER n'y entre.
-- La clé du cache de catalogue passe de `:1` à `:2` pour invalider les
-  anciennes icônes génériques en cache. Une révocation purge les deux versions.
+- La clé du cache de catalogue passe à `:3`. Les clés `:1` et `:2` sont
+  purgées à la migration et à la révocation. Les chemins d’icônes ne sont
+  plus stockés dans le navigateur : ils proviennent du mapping statique généré.
 - `unit-tests/homelabIconCoverage.test.mjs` vérifie la présence réelle
   des fichiers locaux et la couverture des IDs connus au 24 octobre 2026.
 
@@ -57,3 +62,21 @@ icônes (y compris sous-ressources et exporters). Le site public et FastAPI
 n'étaient pas accessibles depuis le navigateur de cet agent au moment de
 l'audit ; la couverture ci-dessus porte sur le snapshot canonique GitHub,
 pas sur un comptage observé en production.
+
+## Synchronisation hors ligne
+
+Depuis le dépôt du site, avec un checkout local de `nabla-compose` :
+
+```sh
+node scripts/sync-homelab-icons.mjs --source ../nabla-compose/catalog/service-icons.json
+node scripts/sync-homelab-icons.mjs --source ../nabla-compose/catalog/service-icons.json --check
+node --test unit-tests/homelabIconSync.test.mjs
+```
+
+Les images sous `public/assets/selfh-icons` sont la copie sous licence,
+versionnée avec le site. Aucun accès GitHub ou CDN n'est nécessaire pendant
+le build ou le rendu. Un nouveau service exige une entrée canonique dans
+`nabla-compose` et un asset local vérifié ; la CI Compose contrôle la
+couverture de toutes les entités `Component` et des entrées historiques.
+Les anciens `iconSrc` présents dans le catalogue v1 sont une dette de
+migration, pas une seconde autorité à enrichir.

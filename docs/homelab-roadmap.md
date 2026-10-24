@@ -1,3 +1,22 @@
+## P0 — Unifier l'autorité des icônes Compose → Site (24 octobre 2026)
+
+- [x] Audit élargi : 128 Component, 23 Resource, 89 anciens services et 51 icônes de graphes = **199 IDs distincts** ; 15 mappings complémentaires couvrent les neuf composants, quatre ressources et deux références historiques non couvertes.
+- [x] Définir les 176 correspondances de logos dans `nabla-compose/catalog/service-icons.json:webAssets` et conserver le champ `icons` des graphes historiques intact.
+- [x] Générer `lib/homelabCatalogIcons.generated.ts` hors ligne ; supprimer les alias maintenus manuellement et la liste de services dupliquée dans les tests du site.
+- [x] Unifier cartes et ReactFlow sur un lecteur strict de fichiers locaux ; ignorer toute URL de logo upstream, même interne.
+- [x] Maintenir les TTL du cache public SERVICE v2 (catalogue 15 min, santé 2 min) ; migrer la clé catalogue vers :3 et ne plus enregistrer de chemin d'icône redondant ni de snapshot OWNER.
+- [ ] Exécuter `python -m unittest tests.test_service_icon_web_assets` dans Compose et `node --test unit-tests/homelabIconSync.test.mjs unit-tests/homelabIconCoverage.test.mjs` dans le checkout complet du site, puis `just quality` sous Node 24.
+- [ ] Vérifier les cartes, les statuts et ReactFlow sur la Preview exact-SHA, puis vérifier les 199 identités par rapport aux entités réellement exposées par FastAPI.
+- [ ] Après migration intégrale des consommateurs v1, retirer `catalog/homelab-services.json.iconSrc` pour éliminer cette dernière duplication historique.
+
+## P1 — Performances UI TrueNAS
+
+- [ ] Mesurer LCP, INP, CLS et le poids JavaScript de `/fr/truenas` sur mobile, en production et Preview exact-SHA, avant toute refonte.
+- [ ] Charger l'explorateur ReactFlow au voisinage du viewport plutôt qu'au premier rendu, sans déplacer l'inventaire prioritaire des cartes.
+- [ ] Dédupliquer les requêtes SERVICE v2 entre les vues TrueNAS et Architecture et les onglets, avec `BroadcastChannel` et revalidation conditionnelle selon `catalogRevision`/ETag ; conserver les autorisations serveur.
+- [ ] Utiliser `content-visibility: auto` ou une virtualisation accessible pour les groupes volumineux, après mesure et tests de navigation clavier.
+- [ ] Publier en priorité le résumé non sensible (nombre de services, dernière mesure, couverture connue/inconnue) et conserver les diagnostics détaillés derrière OWNER ; ne pas introduire une nouvelle source d'inventaire.
+
 ## P0 — Icônes spécifiées par service + cache SERVICE v2 (24 octobre 2026)
 
 - [x] Audit canonique de `nabla-compose/master` : 89 entrées du fichier historique, 77 catalogues d'application Backstage, soit **126 identifiants distincts** ; 30 entrées historiques auparavant génériques, 45 catalogues d'applications sans mapping au début de l'audit.
