@@ -105,7 +105,7 @@ export default function HomelabServiceCard({
   const lanProbe = snapshot ?
     describeServiceProbe(initialHealth, snapshot, "internal") : null;
   const internalState: HomelabHealthState = !lanProbe ||
-    ["disabled", "not-run", "stale"].includes(lanProbe.state) ? "unknown" :
+    ["disabled", "not-configured", "not-run", "stale"].includes(lanProbe.state) ? "unknown" :
     lanProbe.state === "failed" ? "fail" :
     initialHealth?.internal_state ?? "unknown";
 	const internalColor = homelabHealthTextColor(internalState);
