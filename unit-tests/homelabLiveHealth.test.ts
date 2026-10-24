@@ -43,8 +43,9 @@ async function endpointSource() {
 
 test("homelab service grid keeps endpoints clickable and matches FastAPI health by stable identity", async () => {
 	const page = await gridSource();
-	assert.match(page, /const endpointUrl = homelabServiceEndpointUrl\(svc\)/);
-	assert.match(page, /const endpointEnabled = svc\.endpointEnabled !== false/);
+	assert.match(page, /observedOwnerServiceNavigation\(svc,/);
+	assert.match(page, /const endpointUrl = !readOnly/);
+	assert.match(page, /const endpointEnabled = !readOnly && svc\.endpointEnabled !== false/);
 	assert.match(page, /const stableId = homelabServiceId\(service\)/);
 	assert.match(page, /index\.byId\.get\(stableId\)/);
 	assert.match(page, /index\.byName\.get\(normalizedName\(service\.name\)\)/);

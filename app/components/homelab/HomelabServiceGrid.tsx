@@ -9,6 +9,7 @@ import {
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
+import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
 import { healthIndex } from "./homelabGridPresentation";
@@ -20,6 +21,7 @@ type Props = {
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
 	ownerBoundary?: boolean;
+  readOnly?: boolean;
 };
 
 export default function HomelabServiceGrid({
@@ -29,10 +31,12 @@ export default function HomelabServiceGrid({
 	healthUnavailable = false,
 	healthHttpStatus = null,
 	ownerBoundary = false,
+  readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
+	const firstServiceIds = new Set<string>();
 	const serviceHealth = healthIndex(snapshot);
 	const safeStatus = siteHealthIndex(siteHealth, catalog.catalogRevision);
 	const truenasPublic = snapshot?.truenas?.public;
@@ -117,13 +121,18 @@ export default function HomelabServiceGrid({
 			)}
 
 			<div className="row service-grid">
-				{services.map((svc, serviceIndex) => {
+				{services.map((svc) => {
 					const serviceId = homelabServiceId(svc);
-					const endpointUrl = homelabServiceEndpointUrl(svc);
+					const observed = observedOwnerServiceNavigation(svc, readOnly || healthUnavailable ? null : snapshot);
+					const displayService = observed.service;
+					const endpointUrl = !readOnly ? observed.externalUrl ||
+            (svc.endpointEnabled === true ? homelabServiceEndpointUrl(svc) : "") : "";
+					const firstOccurrence = !firstServiceIds.has(serviceId);
+                    firstServiceIds.add(serviceId);
 					return (
 						<HomelabServiceCard
 							key={`${serviceId}:${endpointUrl}`}
-							svc={svc}
+							svc={displayService}
 							siteState={
 								typeof svc.entityRef === "string"
 									? safeStatus.get(svc.entityRef)
@@ -131,13 +140,12 @@ export default function HomelabServiceGrid({
 							}
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
-							anchorId={
-								services.findIndex(
-									(item) => homelabServiceId(item) === serviceId,
-								) === serviceIndex
-									? `homelab-service-${serviceId}`
-									: undefined
-							}
+							readOnly={readOnly}
+							externalUrlDerived={observed.externalUrlDerived}
+							internalProtocolObserved={observed.internalProtocolObserved}
+							internalRouteMismatch={observed.internalRouteMismatch}
+							internalTargetSource={observed.internalTargetSource}
+							anchorId={firstOccurrence ? `homelab-service-${serviceId}` : undefined}
 							snapshot={snapshot}
 							serviceHealth={serviceHealth}
 							healthUnavailable={healthUnavailable}

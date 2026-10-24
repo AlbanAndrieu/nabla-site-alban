@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
@@ -14,7 +14,7 @@ import {
 	hasFreshRuntimeInventoryConflict,
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
-import type { HomelabService } from "@/lib/homelabServices";
+import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
 import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
@@ -24,7 +24,6 @@ import {
 	endpointUrlHostIsPrivateS3,
 	type healthIndex,
 	INTERNAL_HEALTH_CLASS,
-	internalPresentationState,
 	RUNTIME_ICON_CLASS,
 	reconciledHealth,
 	runtimePresentationState,
@@ -32,6 +31,8 @@ import {
 	serviceIconPath,
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
+import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
+import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
 
 type Props = {
 	svc: HomelabService;
@@ -45,6 +46,11 @@ type Props = {
 	truenasDown: boolean;
 	truenasRuntimeUnavailable: boolean;
 	truenasRuntimeStale: boolean;
+	readOnly?: boolean;
+	externalUrlDerived?: boolean;
+	internalProtocolObserved?: boolean;
+	internalRouteMismatch?: boolean;
+	internalTargetSource?: "probe" | "declared" | "none";
 };
 
 /** One homelab service card: effective health, runtime and endpoint links. */
@@ -60,22 +66,28 @@ export default function HomelabServiceCard({
 	truenasDown,
 	truenasRuntimeUnavailable,
 	truenasRuntimeStale,
+	readOnly = false,
+	externalUrlDerived = false,
+	internalProtocolObserved = false,
+	internalRouteMismatch = false,
+	internalTargetSource = "none",
 }: Props) {
 	const t = useTranslations("homelab");
+  const french = useLocale() === "fr";
 	const hasInternal =
-		typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 	const isExternal = svc.external === true;
-	const isPrivateEndpoint = !isExternal;
+	const isPrivateEndpoint = !isExternal && hasInternal;
 	const privateExposureDebt =
 		serviceId === "garage" &&
 		endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
 		isExternal;
-	const endpointEnabled = svc.endpointEnabled !== false;
-	const initialHealth = reconciledHealth(
+	const endpointEnabled = !readOnly && svc.endpointEnabled !== false;
+	const initialHealth = !healthUnavailable ? reconciledHealth(
 		serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
 		svc,
 		snapshot?.schema_version,
-	);
+	) : undefined;
 	const resolvedHealth = resolveEffectiveServiceState(initialHealth);
 	const runtimeInventoryConflict =
 		hasFreshRuntimeInventoryConflict(initialHealth);
@@ -89,13 +101,13 @@ export default function HomelabServiceCard({
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
 	const dependsOnTrueNas = initialHealth?.runtime_app != null;
-	const internalState = internalPresentationState(
-		initialHealth,
-		truenasRuntimeUnavailable ||
-			truenasRuntimeStale ||
-			initialHealth?.runtime_stale === true ||
-			initialHealth?.runtime_reachable === false,
-	);
+  // Docker RUNNING is not proof of a successful TCP/LAN probe.
+  const lanProbe = snapshot ?
+    describeServiceProbe(initialHealth, snapshot, "internal") : null;
+  const internalState: HomelabHealthState = !lanProbe ||
+    ["disabled", "not-configured", "not-run", "stale"].includes(lanProbe.state) ? "unknown" :
+    lanProbe.state === "failed" ? "fail" :
+    initialHealth?.internal_state ?? "unknown";
 	const internalColor = homelabHealthTextColor(internalState);
 	const runtimeState = runtimePresentationState(
 		initialHealth,
@@ -149,7 +161,7 @@ export default function HomelabServiceCard({
 					src={serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc))}
 					width={80}
 					height={80}
-					alt={svc.name}
+					alt={homelabServiceDisplayName(svc)}
 					loading="lazy"
 					decoding="async"
 					style={{ minHeight: 60, minWidth: 60, height: "auto" }}
@@ -157,7 +169,7 @@ export default function HomelabServiceCard({
 				<div className="card-body text-center border-top border-secondary">
 					<div className={styles.serviceTitleRow}>
 						<h3 className="h5 card-title mb-0">
-							{svc.name}
+							{homelabServiceDisplayName(svc)}
 							{runtimeState && runtimeTitle && (
 								<i
 									className={RUNTIME_ICON_CLASS[runtimeState]}
@@ -190,6 +202,14 @@ export default function HomelabServiceCard({
 						</p>
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
+          {!readOnly && snapshot && (
+            <ServiceOwnerEvidenceSummary entry={initialHealth} snapshot={snapshot} unavailable={healthUnavailable} />
+          )}
+          {!readOnly && !snapshot && (
+            <p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
+              {t("health.states.unknown")} · {french ? "Docker, TLS, Cloudflare, Prometheus et sondes indisponibles" : "Docker, TLS, Cloudflare, Prometheus and probes unavailable"}
+            </p>
+          )}
 					<ServiceHealthReasons
 						entry={initialHealth}
 						state={presentationState}
@@ -240,7 +260,7 @@ export default function HomelabServiceCard({
 							</span>
 						)}
 						<EndpointAction
-							url={endpointUrl}
+							url={readOnly ? "" : endpointUrl}
 							enabled={endpointEnabled}
 							external={isExternal}
 							tunnelSecure={svc.tunnelSecure === true}
@@ -249,6 +269,27 @@ export default function HomelabServiceCard({
 							snapshotCheckedAt={snapshot?.checked_at}
 							truenasDown={truenasDown && dependsOnTrueNas}
 						/>
+            {!readOnly && endpointEnabled && endpointUrl && (
+              <small className="text-break text-start" data-owner-external-target>
+                {endpointUrl}
+                {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
+              </small>
+            )}
+            {hasInternal && internalTargetSource === "declared" && (
+              <small className="text-start" data-owner-lan-declared>
+                {french ? "Adresse/port issus de la configuration · aucune sonde LAN" : "Address/port from configuration · no LAN probe"}
+              </small>
+            )}
+            {hasInternal && internalRouteMismatch && (
+              <small className="text-warning text-start" data-owner-lan-route-mismatch>
+                {french ? "Écart détecté : origine Cloudflare différente de la cible déclarée" : "Route drift: Cloudflare origin differs from declared target"}
+              </small>
+            )}
+            {hasInternal && !internalProtocolObserved && (
+              <small className="text-start text-warning" data-owner-internal-protocol>
+                {french ? "Protocole LAN non confirmé · lien HTTP proposé" : "LAN protocol unconfirmed · HTTP link suggested"}
+              </small>
+            )}
 						{hasInternal && (
 							<a
 								href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
@@ -260,6 +301,7 @@ export default function HomelabServiceCard({
 									borderColor: internalColor,
 								}}
 								data-health-state={internalState}
+                data-lan-probe-state={lanProbe?.state ?? "not-run"}
 								title={`FastAPI/TrueNAS: ${internalState}`}
 							>
 								{svc.internalSecure && (

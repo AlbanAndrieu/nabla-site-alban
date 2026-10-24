@@ -89,6 +89,27 @@ export default function HomelabServicesBlock({
 			}
 		);
 	}, [state.catalog, state.topology]);
+  // Service cards render first; the expensive ReactFlow bundle mounts near viewport.
+  const [graphInView, setGraphInView] = useState(false);
+  const graphRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!graphTopology || graphInView) return;
+    const target = graphRef.current;
+    if (!target) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setGraphInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) {
+        setGraphInView(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "360px" });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [graphTopology, graphInView]);
+
 
 	const indexedHealth = useMemo(
 		() =>
@@ -258,6 +279,21 @@ export default function HomelabServicesBlock({
 						: "SERVICE v2 catalog restored from this browser. Data may be stale; health remains unknown until a fresh check."}
 				</p>
 			)}
+      {!readOnly && !state.healthRefreshing && !state.snapshot && (
+        <div className="alert alert-warning" role="status" data-owner-diagnostics-unavailable>
+          <strong>{french ? "Diagnostics OWNER indisponibles" : "OWNER diagnostics unavailable"}</strong>
+          <p className="mb-1">
+            {state.ownerBoundary
+              ? (french ? "Le serveur refuse l'accès aux sondes privées (owner-boundary). Vérifiez le canal OWNER, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED et DIAGNOSTICS_ACCESS_KEY côté serveur."
+                  : "The server denies private probes (owner-boundary). Check the OWNER channel, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED and server-side DIAGNOSTICS_ACCESS_KEY.")
+              : (french ? `FastAPI ne fournit pas de preuve détaillée (${state.healthStatus === null ? "réseau ou délai" : `HTTP ${state.healthStatus}`}). Le catalogue et les statuts publics ne confirment pas le fonctionnement de Docker, TLS ou Prometheus.`
+                  : `FastAPI has no detailed evidence (${state.healthStatus === null ? "network or timeout" : `HTTP ${state.healthStatus}`}). Public catalog and health cannot confirm Docker, TLS or Prometheus.`)}
+          </p>
+          <small>{french
+            ? "Consultez /api/homelab-access?diagnose=1 puis /api/homelab-health depuis le réseau autorisé. Aucun lien LAN ne sera inventé."
+            : "Check /api/homelab-access?diagnose=1 and /api/homelab-health from an authorized network. LAN links will not be guessed."}</small>
+        </div>
+      )}
 			{!readOnly && (
 				<HomelabStatusOverview
 					snapshot={state.snapshot}
@@ -281,38 +317,6 @@ export default function HomelabServicesBlock({
 				</>
 			)}
 
-			{graphTopology ? (
-				<section
-					data-homelab-service-reactflow
-					aria-labelledby="truenas-service-graph-title"
-				>
-					<h3 id="truenas-service-graph-title">
-						{french
-							? "Graphe interactif des services"
-							: "Interactive service graph"}
-					</h3>
-					{!state.topology ? (
-						<p role="status">
-							{french
-								? "Relations indisponibles : seuls les services déclarés sont affichés."
-								: "Relations unavailable: showing declared services only."}
-						</p>
-					) : null}
-					<HierarchicalArchitectureExplorer
-						locale={locale}
-						catalog={state.catalog}
-						catalogSource="backstage-v2"
-						topology={graphTopology}
-						topologySource={state.topology ? "fastapi" : "local-fallback"}
-						healthStatus={readOnly ? null : state.snapshot}
-						healthSource={
-							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
-						}
-						readOnly={readOnly}
-						initialMode="services"
-					/>
-				</section>
-			) : null}
 
 			<section
 				id="truenas-health-dashboard"
@@ -571,12 +575,53 @@ export default function HomelabServicesBlock({
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
 									ownerBoundary={state.ownerBoundary === true}
 									healthHttpStatus={readOnly ? null : state.healthStatus}
+									readOnly={readOnly}
 								/>
 							</div>
 						</details>
 					);
 				})}
 			</div>
+
+			{graphTopology ? (
+				<section
+					data-homelab-service-reactflow
+                    ref={graphRef}
+					aria-labelledby="truenas-service-graph-title"
+				>
+					<h3 id="truenas-service-graph-title">
+						{french
+							? "Graphe interactif des services"
+							: "Interactive service graph"}
+					</h3>
+					{!state.topology ? (
+						<p role="status">
+							{french
+								? "Relations indisponibles : seuls les services déclarés sont affichés."
+								: "Relations unavailable: showing declared services only."}
+						</p>
+					) : null}
+					{graphInView ? (
+						<HierarchicalArchitectureExplorer
+						locale={locale}
+						catalog={state.catalog}
+						catalogSource="backstage-v2"
+						topology={graphTopology}
+						topologySource={state.topology ? "fastapi" : "local-fallback"}
+						healthStatus={readOnly ? null : state.snapshot}
+						healthSource={
+							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
+						}
+						readOnly={readOnly}
+						initialMode="services"
+						/>
+					) : (
+						<p role="status" data-homelab-graph-deferred>
+							{french ? "Graphe chargé à l’approche de la section." : "Graph loads near the viewport."}
+						</p>
+					)}
+				</section>
+			) : null}
 
 			{state.topology ? (
 				<CriticalDependencyHierarchy

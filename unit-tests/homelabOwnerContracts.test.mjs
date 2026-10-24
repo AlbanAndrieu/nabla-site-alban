@@ -38,7 +38,8 @@ test("FastAPI OWNER egress requires a server key and never follows redirects", (
 test("catalog v2 uses public SVG icons even when probes are unavailable", () => {
 	const projection = read("lib/homelabCatalogV2Projection.ts");
 	assert.match(projection, /iconSrc: homelabCatalogIconSrc\(id\)/);
-	const icons = read("lib/homelabCatalogIcons.ts");
+	const icons = read("lib/homelabCatalogIcons.generated.ts");
+	assert.match(read("lib/homelabCatalogIcons.ts"), /homelabCatalogIcons\\.generated\\.ts/);
 	const paths = [...icons.matchAll(/"([a-z0-9-]+\.svg)"/g)].map((match) => match[1]);
 	assert.ok(paths.length >= 10);
 	for (const icon of paths) {

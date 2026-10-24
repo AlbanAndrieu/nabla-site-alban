@@ -1,10 +1,12 @@
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceTopology } from "./serviceTopology";
 import type { SiteHealthV2 } from "./siteHealthV2";
+import { isSafePublicText } from "./homelabPublicTextSafety";
 
 /** Public SERVICE projections only. OWNER snapshots must never enter browser storage. */
-const CATALOG_KEY = "nabla:homelab:catalog-public-v2:2";
-const LEGACY_CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
+const CATALOG_KEY = "nabla:homelab:catalog-public-v2:3";
+const LEGACY_CATALOG_KEY = "nabla:homelab:catalog-public-v2:2";
+const OLD_CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
 const HEALTH_KEY = "nabla:homelab:health-public-v2:1";
 const CATALOG_TTL_MS = 15 * 60_000;
 const HEALTH_TTL_MS = 2 * 60_000;
@@ -38,18 +40,19 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 	const services: HomelabServicesCatalog["services"] = [];
 	for (const service of value.services) {
 		if (!service || typeof service !== "object" || !service.id || !ID.test(service.id) || names.has(service.id) ||
-			typeof service.name !== "string" || !service.name || service.name.length > 150 ||
+			!isSafePublicText(service.name, 150) ||
 			typeof service.entityRef !== "string" || !ENTITY_REF.test(service.entityRef) || refs.has(service.entityRef) ||
-			typeof service.iconSrc !== "string" || !ICON.test(service.iconSrc) ||
+			(service.iconSrc !== undefined &&
+				(typeof service.iconSrc !== "string" || !ICON.test(service.iconSrc))) ||
 			service.endpointEnabled !== false) return null;
 		names.add(service.id);
 		refs.add(service.entityRef);
 		services.push({
 			id: service.id, name: service.name, entityRef: service.entityRef,
-			iconSrc: service.iconSrc, endpointEnabled: false,
-			...(typeof service.description === "string" ? { description: service.description.slice(0, 500) } : {}),
-			...(typeof service.kind === "string" ? { kind: service.kind.slice(0, 80) } : {}),
-			...(typeof service.category === "string" ? { category: service.category.slice(0, 80) } : {}),
+			endpointEnabled: false,
+			...(isSafePublicText(service.description) ? { description: service.description } : {}),
+			...(isSafePublicText(service.kind, 80) ? { kind: service.kind } : {}),
+			...(isSafePublicText(service.category, 80) ? { category: service.category } : {}),
 			...(["critical", "high", "medium", "low"].includes(service.criticality ?? "")
 				? { criticality: service.criticality } : {}),
 		});
@@ -58,8 +61,8 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 	if (topology && topology.version === 2 && topology.catalogRevision === value.catalogRevision &&
 		Array.isArray(topology.nodes) && Array.isArray(topology.relations) &&
 		topology.nodes.length === names.size && topology.relations.length <= names.size * MAX_RELATIONS_PER_SERVICE &&
-		topology.nodes.every((n) => n && typeof n === "object" && names.has(n.id) && typeof n.name === "string" &&
-			typeof n.kind === "string" && typeof n.category === "string") &&
+		topology.nodes.every((n) => n && typeof n === "object" && names.has(n.id) && isSafePublicText(n.name, 150) &&
+			isSafePublicText(n.kind, 80) && isSafePublicText(n.category, 80)) &&
 		new Set(topology.nodes.map((n) => n.id)).size === names.size &&
 		topology.relations.every((r) => r && typeof r === "object" && names.has(r.source) && names.has(r.target) &&
 			RELATIONS.has(r.type) && ["required", "optional"].includes(r.strength))) {
@@ -69,7 +72,8 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 			nodes: topology.nodes.map((n) => ({
 				id: n.id, name: n.name.slice(0, 150), kind: n.kind.slice(0, 80),
 				category: n.category.slice(0, 80),
-				...(n.criticality ? { criticality: n.criticality } : {}),
+				...(["critical", "high", "medium", "low"].includes(n.criticality ?? "")
+					? { criticality: n.criticality } : {}),
 			})),
 			relations: topology.relations.map((r) => ({
 				source: r.source, target: r.target, type: r.type,
@@ -120,7 +124,12 @@ export function writePublicCatalogCache(
 	now = Date.now(),
 ): boolean {
 	const projected = localCatalog(catalog, topology);
-	return projected ? put(storage, CATALOG_KEY, projected, CATALOG_TTL_MS, now) : false;
+	if (!projected || !put(storage, CATALOG_KEY, projected, CATALOG_TTL_MS, now)) return false;
+	// Free storage quota after deployment of a new icon contract.
+	for (const key of [LEGACY_CATALOG_KEY, OLD_CATALOG_KEY]) {
+		try { storage.removeItem(key); } catch { /* Storage may be disabled. */ }
+	}
+	return true;
 }
 
 export function readPublicCatalogCache(storage: StoragePort, now = Date.now()): CatalogCache | null {
@@ -174,6 +183,7 @@ export function readStalePublicHealthCache(
 export function clearPublicHomelabBrowserCache(storage: StoragePort): void {
 	try { storage.removeItem(CATALOG_KEY); } catch { /* Storage may be disabled. */ }
 	try { storage.removeItem(LEGACY_CATALOG_KEY); } catch { /* Storage may be disabled. */ }
+	try { storage.removeItem(OLD_CATALOG_KEY); } catch { /* Storage may be disabled. */ }
 	try { storage.removeItem(HEALTH_KEY); } catch { /* Storage may be disabled. */ }
 }
 

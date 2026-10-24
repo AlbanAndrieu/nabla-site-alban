@@ -36,11 +36,34 @@ export type HomelabScopedProbeEvidence = {
 	direct_probe_source?: HomelabProbeSource;
 	direct_probe_observed_at?: string | null;
 	direct_probe_age_seconds?: number | null;
+	direct_probe_stale?: boolean;
 	direct_probe_refresh_error?: string;
 	internal_probe_source?: HomelabProbeSource;
 	internal_probe_observed_at?: string | null;
 	internal_probe_age_seconds?: number | null;
+	internal_probe_stale?: boolean;
 	internal_probe_refresh_error?: string;
+};
+
+/** OWNER-only exposure metadata delivered by the authenticated FastAPI health API.
+ * Never copy this DTO into the public SERVICE v2 cache or the Backstage projection.
+ */
+export type HomelabOwnerExposure = {
+  declared?: {
+    external?: boolean;
+    endpoint_enabled?: boolean | null;
+    internal_host?: string | null;
+    internal_port?: number | null;
+  };
+  observed?: {
+    cloudflare_origin_service?: string | null;
+    cloudflare_origin_matches_topology?: boolean | null;
+    topology_internal_host?: string | null;
+    topology_internal_port?: number | null;
+  };
+  provider_status_confirmed?: boolean;
+  state?: string;
+  reasons?: string[];
 };
 
 export type HomelabHealthEntry = HomelabRollingProbeEvidence &
@@ -49,6 +72,11 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		name: string;
 		url: string;
 		url_derived?: boolean;
+        exposure_intent?: "public" | "internal";
+        exposure?: HomelabOwnerExposure;
+        internal_probe_execution?: "disabled" | "not-configured" | "not-executed" | "stale" | "failed" | "observed";
+        runtime_primary_container_state?: string | null;
+        runtime_primary_container_issue?: boolean;
 		reachable: boolean | null;
 		http_status: number;
 		state: HomelabHealthState;
@@ -102,8 +130,21 @@ export type HomelabInternalHealthEntry = HomelabRollingProbeEvidence & {
 	error?: string;
 };
 
+export type TrueNasRuntimeContainer = {
+  service_name?: string | null;
+  state?: string | null;
+};
+
+export type TrueNasRuntimeApp = {
+  id: string;
+  name: string;
+  state: string;
+  active_workloads?: { container_details?: TrueNasRuntimeContainer[] };
+};
+
 export type TrueNasApiHealth = {
 	reachable: boolean;
+	apps?: TrueNasRuntimeApp[];
 	error?: string;
 };
 

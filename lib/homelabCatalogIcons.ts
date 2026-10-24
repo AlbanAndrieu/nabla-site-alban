@@ -1,193 +1,26 @@
-/** Public, bundled service icons; never use an upstream URL or OWNER metadata as an image source. */
-export const HOMELAB_CATALOG_ICON_FILES: Readonly<Record<string, string>> = {
-	"2fauth": "2fauth.png",
-	"adguard-home": "adguard-home.png",
-	adguardhome: "adguard-home.png",
-	affine: "affine.png",
-	ansible: "ansible-icon.svg",
-	anythingllm: "anythingllm.png",
-	aws: "amazonwebservices-original-wordmark.svg",
-	azure: "microsoft_azure-icon.svg",
-	bichon: "bichon.png",
-	clamav: "clamav.png",
-	clickhouse: "clickhouse.png",
-	consul: "consul.png",
-	convertx: "convertx.png",
-	"ddns-updater": "ddns-updater.png",
-	dnsupdater: "ddns-updater.png",
-	docker: "icon.svg",
-	"domain-watchdog": "domain-watchdog.png",
-	freshrss: "freshrss.png",
-	garage: "garage.png",
-	"garage-admin": "garage.png",
-	gatus: "gatus.png",
-	grafana: "grafana-icon.svg",
-	graylog: "graylog.png",
-	heimdall: "heimdall.png",
-	homarr: "homarr.png",
-	"it-tools": "it-tools.png",
-	ittools: "it-tools.png",
-	k8s: "kubernetes-icon.svg",
-	kafka: "apache_kafka-icon.svg",
-	karakeep: "karakeep.png",
-	keycloak: "keycloak.svg",
-	kubernetes: "kubernetes-icon.svg",
-	langfuse: "langfuse.png",
-	"language-tool": "languagetool.png",
-	languagetool: "languagetool.png",
-	lidarr: "lidarr.png",
-	litellm: "litellm.png",
-	localai: "localai.png",
-	loki: "logo-loki.svg",
-	mariadb: "mariadb-icon.svg",
-	minio: "minio.png",
-	mongo: "mongodb-original-wordmark.svg",
-	mongodb: "mongodb-original-wordmark.svg",
-	mysql: "mysql-original-wordmark.svg",
-	n8n: "n8n.png",
-	netalertx: "netalertx.png",
-	"netboot-xyz": "netboot-xyz.png",
-	netbootxyz: "netboot-xyz.png",
-	nexus: "sonatype-nexus-repository.png",
-	nginx: "nginx.png",
-	"nginx-proxy-manager": "nginx.png",
-	node: "nodejs-original-wordmark.svg",
-	nodejs: "nodejs-original-wordmark.svg",
-	nomad: "nomad.png",
-	ntopng: "ntopng.png",
-	nvidia: "nvidia-icon.svg",
-	ollama: "ollama.png",
-	"open-archiver": "open-archiver.png",
-	"open-speed-test": "openspeedtest.png",
-	"open-webui": "open-webui.png",
-	openarchiver: "open-archiver.png",
-	openclaw: "openclaw.png",
-	opensearch: "elastic-icon.svg",
-	openspeedtest: "openspeedtest.png",
-	openwebui: "open-webui.png",
-	"paperless-ai": "paperless-ai.png",
-	"paperless-ngx": "paperless-ngx.png",
-	paperlessai: "paperless-ai.png",
-	pfsense: "pfsense.png",
-	pgadmin: "pgadmin.png",
-	plumber: "plumber.png",
-	portainer: "portainer.png",
-	portracker: "portracker.png",
-	postgres: "postgresql-original-wordmark.svg",
-	postgresql: "postgresql-original-wordmark.svg",
-	prometheus: "prometheusio-icon.svg",
-	prowlarr: "prowlarr.png",
-	python: "python-original.svg",
-	radarr: "radarr.png",
-	"reactive-resume": "rxresume.png",
-	redis: "redis-original-wordmark.svg",
-	rxresume: "rxresume.png",
-	sabnzbd: "sabnzbd.png",
-	scrutiny: "scrutiny.png",
-	searxng: "searxng.png",
-	sentry: "sentryio-icon.svg",
-	sonarr: "sonarr.png",
-	"sonatype-nexus-repository": "sonatype-nexus-repository.png",
-	speedtest: "speedtest.png",
-	"speedtest-tracker": "speedtest.png",
-	"stirling-pdf": "stirling-pdf.png",
-	stirlingpdf: "stirling-pdf.png",
-	talos: "kubernetes-icon.svg",
-	terraform: "terraformio-icon.svg",
-	transmission: "transmission.png",
-	truenas: "truenas-scale.png",
-	"truenas-scale": "truenas-scale.png",
-	"uptime-kuma": "uptime-kuma.png",
-	uptimekuma: "uptime-kuma.png",
-	vault: "vaultproject-icon.svg",
-	vaultwarden: "vaultwarden.png",
-	zap: "zap-by-checkmarx.svg",
-	// Explicit canonical Backstage / nabla-compose service IDs: never use a generic tile.
-	"aistor": "minio.png",
-	"anythingllm-albandrieu": "anythingllm.png",
-	"code-server": "visual-studio-code.svg",
-	"cyberbro": "cyberbro.svg",
-	"defectdojo": "defectdojo.svg",
-	"dependency-track": "dependency-track.svg",
-	"dockhand": "dockhand.svg",
-	"docling": "docling.svg",
-	"dozzle": "dozzle.svg",
-	"drawio": "draw-io.svg",
-	"garage-webui": "garage.png",
-	"hello-int": "nginx.png",
-	"home": "pfsense.png",
-	"homeassistant": "home-assistant.svg",
-	"joplin": "joplin.svg",
-	"litellm-albandrieu": "litellm.png",
-	"localai-gpu": "localai.png",
-	"netbox": "netbox.svg",
-	"ollama-gpu": "ollama.png",
-	"openhands": "openhands.svg",
-	"pihole": "pi-hole.svg",
-	"plumber-api-albandrieu": "plumber.svg",
-	"portracker-albandrieu": "portracker.png",
-	"reactive-albandrieu": "rxresume.png",
-	"scanopy": "scanopy.svg",
-	"scrutiny-collector-albandrieu": "scrutiny.png",
-	"stirling": "stirling-pdf.png",
-	"stirling-albandrieu": "stirling-pdf.png",
-	"traefik": "traefik.svg",
-	"wordpress": "wordpress.svg",
-	// Additional v2 Backstage application families (nabla-compose):
-	"akvorado": "akvorado.svg",
-	"autokuma": "uptime-kuma.png",
-	"autoxpose": "autoxpose.svg",
-	"cartography": "cartography.svg",
-	"code": "visual-studio-code.svg",
-	"crowdsec": "crowdsec.svg",
-	"dsomm": "dsomm.svg",
-	"elasticsearch": "elasticsearch.svg",
-	"haproxy-exporter": "haproxy.svg",
-	"hermes": "hermes-agent.svg",
-	"influxdb": "influxdb.svg",
-	"langflow": "langflow.svg",
-	"neo4j": "neo4j.svg",
-	"npmplus": "nginx.png",
-	"obsidian": "obsidian.svg",
-	"opconnect": "opconnect.svg",
-	"opencre": "opencre.svg",
-	"openrag": "openrag.svg",
-	"opensearch-exporter": "opensearch.svg",
-	"pyroscope": "grafana-pyroscope.svg",
-	"sample": "python-original.svg",
-	"scorecard": "scorecard.svg",
-	"sentry-clickhouse": "sentryio-icon.svg",
-	"sonarqube": "sonarqube.svg",
-	"squid": "squid.svg",
-	"suricata": "suricata.svg",
-	"sybase-exporter": "sybase-exporter.svg",
-	"watchtower": "watchtower.svg",
-	"wazuh": "wazuh.svg",
-};
+/** Canonical icon filenames come from nabla-compose, not FastAPI DTOs. */
+import { HOMELAB_CATALOG_ICON_FILES } from "./homelabCatalogIcons.generated.ts";
+export { HOMELAB_CATALOG_ICON_FILES } from "./homelabCatalogIcons.generated.ts";
 
-/** Canonical v2 card IDs and their known aliases share locally versioned assets. */
+const SORTED_PARENTS = Object.keys(HOMELAB_CATALOG_ICON_FILES).sort(
+  (left, right) => right.length - left.length,
+);
+
+/** Cards and ReactFlow use exactly the same locally bundled icon. */
 export function homelabCatalogIconSrc(serviceId: string): string {
-	const id = serviceId.trim().toLowerCase();
-	const normalized = id.replace(/[._]/g, "-");
-	const icon =
-		HOMELAB_CATALOG_ICON_FILES[id] ??
-		HOMELAB_CATALOG_ICON_FILES[normalized] ??
-		Object.entries(HOMELAB_CATALOG_ICON_FILES)
-			.filter(([parent]) => normalized.startsWith(parent + "-"))
-			.sort(([a], [b]) => b.length - a.length)[0]?.[1];
-	return `assets/selfh-icons/${icon ?? "generic-app.svg"}`;
+  const id = serviceId.trim().toLowerCase().replace(/[._]/g, "-");
+  const exact = HOMELAB_CATALOG_ICON_FILES[id];
+  if (exact) return `assets/selfh-icons/${exact}`;
+  // Parent lookup runs only for unknown subcomponent IDs.
+  const parent = SORTED_PARENTS.find((key) => id.startsWith(key + "-"));
+  return `assets/selfh-icons/${parent ? HOMELAB_CATALOG_ICON_FILES[parent] : "generic-app.svg"}`;
 }
 
-/** Prefer the bundled mapping; accept only a vetted local asset as fallback. */
+/** Ignore upstream image URLs. They cannot introduce a second icon authority. */
 export function homelabServiceIconSrc(
-	serviceId: string,
-	declaredIconSrc?: string,
+  serviceId: string,
+  declaredIconSrc?: string,
 ): string {
-	const mapped = homelabCatalogIconSrc(serviceId);
-	if (mapped !== "assets/selfh-icons/generic-app.svg") return mapped;
-	const candidate = declaredIconSrc?.replace(/^\/+/, "");
-	return candidate && /^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/.test(candidate)
-		? candidate
-		: mapped;
+  void declaredIconSrc;
+  return homelabCatalogIconSrc(serviceId);
 }
-

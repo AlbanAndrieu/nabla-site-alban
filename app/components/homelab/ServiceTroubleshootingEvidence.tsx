@@ -109,6 +109,9 @@ export default function ServiceTroubleshootingEvidence({
 	const anchoredDetails = useAnchoredDetails(detailsId);
 
 	useEffect(() => {
+    // Do not fetch three OWNER diagnostics for every mounted service card.
+    // Opening a details panel (or its hash deep link) activates the read.
+    if (!anchoredDetails.open) return;
 		let active = true;
 		void Promise.all([
 			fetchHomelabDiagnosticsOnce(),
@@ -123,7 +126,7 @@ export default function ServiceTroubleshootingEvidence({
 		return () => {
 			active = false;
 		};
-	}, []);
+	}, [anchoredDetails.open]);
 
 	const causes = useMemo(() => explainHealth(entry), [entry]);
 	const impacts: ServiceImpact[] = useMemo(

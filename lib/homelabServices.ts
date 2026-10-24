@@ -6,6 +6,15 @@ import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 const HOMELAB_DOMAIN = "albandrieu.com";
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+// Historical service IDs are aliases. Do not rename containers or DNS hosts.
+const CANONICAL_APP_IDS: Readonly<Record<string, string>> = {
+  "home-assistant": "homeassistant",
+  "open-webui": "openwebui",
+};
+const VERIFIED_WEB_UI_IDS = new Set([
+  "bichon", "gatus", "homeassistant", "openwebui", "garage-webui",
+]);
+
 export type HomelabEnvironment = "production" | "staging" | "dev";
 
 export type HomelabService = {
@@ -73,10 +82,25 @@ function slugifyServiceName(name: string): string {
 
 /** Return the same stable identity used by the FastAPI homelab contract. */
 export function homelabServiceId(service: HomelabService): string {
-	const explicitId = service.id?.trim();
-	return explicitId && SERVICE_ID_RE.test(explicitId)
-		? explicitId
-		: slugifyServiceName(service.name);
+  const explicitId = service.id?.trim();
+  const sourceId = explicitId && SERVICE_ID_RE.test(explicitId)
+    ? explicitId
+    : slugifyServiceName(service.name);
+  return CANONICAL_APP_IDS[sourceId] ?? sourceId;
+}
+
+/** Show a verified endpoint role without changing canonical service identities. */
+export function homelabServiceDisplayName(service: HomelabService): string {
+  const name = service.name.trim();
+  const id = homelabServiceId(service);
+  const role = service.kind === "mcp-server" || id.startsWith("mcp-")
+    ? "MCP"
+    : service.kind === "api" || id.endsWith("-api")
+      ? "API"
+      : VERIFIED_WEB_UI_IDS.has(id) ? "UI" : null;
+  if (!role || new RegExp(`\\b${role}$`, "i").test(name) ||
+      (role === "UI" && /Web\s?UI$/i.test(name))) return name;
+  return `${name} ${role}`;
 }
 
 const NAVIGATION_ENDPOINT_OVERRIDES = new Map<string, string>(

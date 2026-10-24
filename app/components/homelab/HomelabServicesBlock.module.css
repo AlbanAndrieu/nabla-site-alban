@@ -363,3 +363,56 @@
 		min-height: 1.75rem;
 	}
 }
+
+/* Operational evidence ledger: one major runtime fact, quiet probe rows.
+   Use site design tokens. Borders communicate separation, not decoration. */
+.ownerEvidenceSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--ui-space-md);
+  margin-block: var(--ui-space-md);
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-block: 1px solid var(--ui-border);
+  text-align: left;
+}
+
+.ownerEvidenceMetric {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.2rem 0.5rem;
+  min-width: 0;
+  padding-block: 0.5rem;
+  border-bottom: 1px solid var(--ui-border);
+  overflow-wrap: anywhere;
+}
+
+.ownerEvidenceMetric strong {
+  grid-column: 2;
+  font-size: 0.85rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.ownerEvidenceMetric[data-evidence-key="docker"] {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+}
+
+.ownerEvidenceMetric[data-evidence-state="fail"] > i { color: var(--ui-danger-text); }
+.ownerEvidenceMetric[data-evidence-state="warn"] > i { color: var(--ui-warning-text); }
+.ownerEvidenceMetric[data-evidence-state="ok"] > i { color: var(--ui-success-text); }
+.ownerEvidenceLabel { color: var(--ui-text-secondary); font-size: 0.8rem; }
+
+.ownerEvidenceSummary > small {
+  grid-column: 1 / -1;
+  margin-block-start: 0.35rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 440px) {
+  .ownerEvidenceSummary {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: var(--ui-space-sm);
+  }
+}
