@@ -34,6 +34,16 @@ test("only an OWNER snapshot can produce navigable targets", () => {
   assert.equal(result.internalProtocolObserved, false);
 });
 
+test("navigation omits health-check query credentials and fragments", () => {
+  const sensitive = { ...snapshot, services: [{
+    ...entry, url: "https://gatus.albandrieu.com/health?token=private#secret",
+  }] };
+  assert.equal(
+    observedOwnerServiceNavigation(service, sensitive).externalUrl,
+    "https://gatus.albandrieu.com/health",
+  );
+});
+
 test("internal-only probe cannot become an external or guessed hostname link", () => {
   const privateOnly = { ...snapshot, services: [{ ...entry, url: "http://172.17.0.24:8085" }] };
   const result = observedOwnerServiceNavigation(service, privateOnly);
