@@ -19,6 +19,10 @@ function validUrl(value: string | undefined): URL | null {
     const url = new URL(value);
     if (!["http:", "https:"].includes(url.protocol) || url.username ||
         url.password || !url.hostname) return null;
+    // Health-check URLs can contain sensitive query arguments; do not
+    // reflect them into clickable navigation targets or data attributes.
+    url.search = "";
+    url.hash = "";
     return url;
   } catch {
     return null;
@@ -36,7 +40,7 @@ function isLanHost(host: string): boolean {
       a === 172 && b >= 16 && b <= 31 || a === 169 && b === 254 ||
       a === 100 && b >= 64 && b <= 127;
   }
-  return name.includes(":") || name.startsWith("fc") || name.startsWith("fd");
+  return name.includes(":");
 }
 
 function validHost(value: unknown): value is string {
