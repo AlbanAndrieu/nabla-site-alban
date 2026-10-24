@@ -117,5 +117,11 @@ Conserver les skills du dépôt comme règles opérationnelles :
 [Docker Compose Patterns](https://www.skills.sh/docker/skills/docker-compose-patterns)
 est une référence complémentaire à évaluer, non une autorité sur TrueNAS.
 Un skill Kubernetes ne peut pas se substituer aux validations Talos/NFS/CSI.
+Le skill Docker externe prescrit par défaut des volumes Docker nommés et
+des fichiers `.env`. Ces recommandations **ne remplacent pas** les règles
+TrueNAS de Nabla : datasets ZFS montés explicitement sous `/mnt/cpool`,
+secrets privés sous `/mnt/cpool/secrets/runtime`, référentiel Compose
+`apps/<service>/compose.yml`, aucun `apt` sur l'appliance et aucun
+redémarrage ou `down -v` implicite. Les consignes locales prévalent.
 Toute installation externe exige une revue de `SKILL.md`, des scripts,
 des permissions et des appels réseau. Rien n'est installé ici.
