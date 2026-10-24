@@ -31,6 +31,9 @@ export function describeServiceProbe(
   snapshot: HomelabHealthSnapshot,
   scope: "public" | "internal",
 ): ProbeDisplay {
+  // A service without a LAN target is not merely disabled by this collector.
+  if (scope === "internal" && entry?.internal_probe_execution === "not-configured")
+    return { state: "not-configured", observedAt: null, source: null, latencyMs: null, status: null };
   if (scope === "internal" && snapshot.internal_probes_enabled === false)
     return { state: "disabled", observedAt: null, source: null, latencyMs: null, status: null };
 
@@ -42,8 +45,6 @@ export function describeServiceProbe(
 
   // "sampled" and "observed" are not synonyms: an eligible target can wait
   // several rotating windows before it is executed for the first time.
-  if (scope === "internal" && entry?.internal_probe_execution === "not-configured")
-    return { ...base, state: "not-configured" };
   if (!entry || !observedAt) return { ...base, state: "not-run" };
 
   const stale = scope === "public" ?
