@@ -36,10 +36,12 @@ export type HomelabScopedProbeEvidence = {
 	direct_probe_source?: HomelabProbeSource;
 	direct_probe_observed_at?: string | null;
 	direct_probe_age_seconds?: number | null;
+	direct_probe_stale?: boolean;
 	direct_probe_refresh_error?: string;
 	internal_probe_source?: HomelabProbeSource;
 	internal_probe_observed_at?: string | null;
 	internal_probe_age_seconds?: number | null;
+	internal_probe_stale?: boolean;
 	internal_probe_refresh_error?: string;
 };
 
