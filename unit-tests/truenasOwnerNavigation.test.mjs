@@ -144,6 +144,8 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
   assert.match(summary, /const stale = unavailable \|\| snapshot\.truenas_runtime_stale/);
   assert.match(summary, /data-owner-board-stale/);
   assert.match(summary, /access_protected_origin_unverified/);
+  assert.match(summary, /provider_status_confirmed === true/);
+  assert.match(summary, /publicProbe.observedAt/);
   const probeHelper = readFileSync(new URL("lib/homelabProbeEvidencePresentation.ts", root), "utf8");
   assert.match(probeHelper, /direct_probe_observed_at/);
   assert.match(probeHelper, /internal_probe_observed_at/);
