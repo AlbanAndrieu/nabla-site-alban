@@ -73,7 +73,7 @@ export default function HomelabServiceCard({
 	const hasInternal =
 		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 	const isExternal = svc.external === true;
-	const isPrivateEndpoint = !isExternal;
+	const isPrivateEndpoint = !isExternal && hasInternal;
 	const privateExposureDebt =
 		serviceId === "garage" &&
 		endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
