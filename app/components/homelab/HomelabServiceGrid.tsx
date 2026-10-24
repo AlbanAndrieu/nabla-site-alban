@@ -122,7 +122,7 @@ export default function HomelabServiceGrid({
 			<div className="row service-grid">
 				{services.map((svc, serviceIndex) => {
 					const serviceId = homelabServiceId(svc);
-					const observed = observedOwnerServiceNavigation(svc, readOnly ? null : snapshot);
+					const observed = observedOwnerServiceNavigation(svc, readOnly || healthUnavailable ? null : snapshot);
 					const displayService = observed.service;
 					const endpointUrl = !readOnly ? observed.externalUrl ||
             (svc.endpointEnabled === true ? homelabServiceEndpointUrl(svc) : "") : "";
