@@ -4,23 +4,32 @@ import type { HomelabService } from "./homelabServices";
 export type ObservedOwnerNavigation = {
   service: HomelabService;
   externalUrl: string;
-  /** Did FastAPI actually observe or declare an HTTPS URL? */
   externalUrlDerived: boolean;
+  /** A known protocol from a matching direct probe or Cloudflare ingress. */
   internalProtocolObserved: boolean;
+  internalTargetSource: "probe" | "declared" | "none";
+  internalRouteMismatch: boolean;
 };
+
+const EMPTY_SOURCE = {
+  externalUrl: "",
+  externalUrlDerived: false,
+  internalProtocolObserved: false,
+  internalTargetSource: "none",
+  internalRouteMismatch: false,
+} as const;
 
 function normalized(value: string): string {
   return value.trim().toLowerCase();
 }
 
-function validUrl(value: string | undefined): URL | null {
+function validUrl(value: string | null | undefined): URL | null {
   if (!value) return null;
   try {
     const url = new URL(value);
-    if (!["http:", "https:"].includes(url.protocol) || url.username ||
-        url.password || !url.hostname) return null;
-    // Health-check URLs can contain sensitive query arguments; do not
-    // reflect them into clickable navigation targets or data attributes.
+    if ((url.protocol !== "http:" && url.protocol !== "https:") ||
+        url.username || url.password || !url.hostname) return null;
+    // Probe URLs can contain auth tokens. The card only needs their destination.
     url.search = "";
     url.hash = "";
     return url;
@@ -36,9 +45,9 @@ function isLanHost(host: string): boolean {
   const parts = name.split(".");
   if (parts.length === 4 && parts.every((part) => /^\d{1,3}$/.test(part) && +part <= 255)) {
     const [a, b] = parts.map(Number);
-    return a === 10 || a === 127 || a === 0 || a === 192 && b === 168 ||
-      a === 172 && b >= 16 && b <= 31 || a === 169 && b === 254 ||
-      a === 100 && b >= 64 && b <= 127;
+    return a === 10 || a === 127 || a === 0 ||
+      (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31) ||
+      (a === 169 && b === 254) || (a === 100 && b >= 64 && b <= 127);
   }
   return name.includes(":");
 }
@@ -49,61 +58,89 @@ function validHost(value: unknown): value is string {
     !value.includes("..");
 }
 
+function validPort(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= 65535;
+}
+
+function portOf(url: URL): number {
+  return Number(url.port || (url.protocol === "https:" ? 443 : 80));
+}
+
 function observedEntry(
   service: HomelabService,
   snapshot: HomelabHealthSnapshot,
 ): HomelabHealthEntry | undefined {
-  const id = service.id;
-  const byId = snapshot.services.filter((entry) => entry.id && entry.id === id);
-  if (byId.length === 1) return byId[0];
-  if (byId.length !== 0) return undefined;
-  const byName = snapshot.services.filter((entry) => normalized(entry.name) === normalized(service.name));
-  return byName.length === 1 ? byName[0] : undefined;
+  const idMatches = snapshot.services.filter((entry) => entry.id === service.id);
+  if (idMatches.length > 0) return idMatches.length === 1 ? idMatches[0] : undefined;
+  const nameMatches = snapshot.services.filter((entry) =>
+    normalized(entry.name) === normalized(service.name));
+  return nameMatches.length === 1 ? nameMatches[0] : undefined;
 }
 
-/**
- * Runtime navigation belongs to the authorized OWNER observation.
- * The public catalog's endpointEnabled:false is intentional; never change it.
- * No synthetic hostname is created when a probe is missing.
- */
+/** OWNER only. Never add these fields to the Backstage public projection or localStorage. */
 export function observedOwnerServiceNavigation(
   service: HomelabService,
   snapshot: HomelabHealthSnapshot | null,
 ): ObservedOwnerNavigation {
-  if (!snapshot) {
-    return { service, externalUrl: "", externalUrlDerived: false, internalProtocolObserved: false };
-  }
-  const observation = observedEntry(service, snapshot);
-  const observedUrl = validUrl(observation?.url);
-  const external = observedUrl && !isLanHost(observedUrl.hostname) ? observedUrl.href : "";
-  const internalFromUrl = observedUrl && isLanHost(observedUrl.hostname) ? observedUrl : null;
+  if (!snapshot) return { service, ...EMPTY_SOURCE };
 
-  const idMatches = snapshot.internal_services?.filter((entry) => entry.id === service.id) ?? [];
-  const nameMatches = idMatches.length ? [] : snapshot.internal_services?.filter(
-    (entry) => normalized(entry.name) === normalized(service.name),
-  ) ?? [];
-  const internal = (idMatches.length === 1 ? idMatches[0] : undefined) ??
-    (nameMatches.length === 1 ? nameMatches[0] : undefined);
-  const internalHost = validHost(internal?.host) ? internal.host :
-    internalFromUrl?.hostname;
-  const internalPort = internal && Number.isInteger(internal.port) &&
-    internal.port > 0 && internal.port <= 65535 ? internal.port :
-    internalFromUrl ? Number(internalFromUrl.port || (internalFromUrl.protocol === "https:" ? "443" : "80")) : undefined;
-  const hasInternal = Boolean(internalHost && internalPort && internalPort > 0 && internalPort <= 65535);
+  const entry = observedEntry(service, snapshot);
+  if (!entry) return { service, ...EMPTY_SOURCE };
+  const declared = entry.exposure?.declared;
+  const observed = entry.exposure?.observed;
+  const configuredPublic = declared?.external === true ||
+    (declared?.external !== false && entry.exposure_intent === "public");
+  const enabled = declared?.endpoint_enabled !== false;
+  const canonical = validUrl(entry.url);
+  const externalUrl = configuredPublic && enabled && canonical &&
+    !isLanHost(canonical.hostname) ? canonical.href : "";
+  const internalFromUrl = canonical && isLanHost(canonical.hostname) ? canonical : null;
+
+  const byId = snapshot.internal_services?.filter((row) => row.id === service.id) ?? [];
+  const byName = byId.length ? [] : snapshot.internal_services?.filter((row) =>
+    normalized(row.name) === normalized(service.name)) ?? [];
+  const probe = (byId.length === 1 ? byId[0] : undefined) ??
+    (byName.length === 1 ? byName[0] : undefined);
+  const host = validHost(probe?.host) ? probe.host :
+    validHost(declared?.internal_host) ? declared.internal_host :
+      internalFromUrl?.hostname;
+  const port = validPort(probe?.port) ? probe.port :
+    validPort(declared?.internal_port) ? declared.internal_port :
+      internalFromUrl ? portOf(internalFromUrl) : undefined;
+  const hasInternal = Boolean(host && validPort(port) && isLanHost(host));
+
+  const tunnelOrigin = validUrl(observed?.cloudflare_origin_service);
+  const matchingOrigin = Boolean(
+    hasInternal && tunnelOrigin &&
+    tunnelOrigin.hostname.toLowerCase() === host?.toLowerCase().replace(/^\[|\]$/g, "") &&
+    portOf(tunnelOrigin) === port &&
+    observed?.cloudflare_origin_matches_topology === true
+  );
+  const internalRouteMismatch = Boolean(
+    hasInternal && observed?.cloudflare_origin_matches_topology === false
+  );
+
+  const internalProtocol = internalFromUrl?.protocol ??
+    (matchingOrigin ? tunnelOrigin?.protocol : undefined);
+  const source = !hasInternal ? "none" as const : probe || internalFromUrl ?
+    "probe" as const : "declared" as const;
 
   return {
-    externalUrl: external,
-    externalUrlDerived: Boolean(external) && observation?.url_derived === true,
-    internalProtocolObserved: Boolean(internalFromUrl),
     service: {
       ...service,
-      endpointEnabled: Boolean(external),
-      external: Boolean(external),
-      tunnelSecure: Boolean(observation?.tunnel_status),
+      external: Boolean(externalUrl),
+      endpointEnabled: Boolean(externalUrl),
+      tunnelSecure: Boolean(externalUrl && entry.tunnel_status),
       ...(hasInternal ? {
-        internalHost, internalPort,
-        internalSecure: internalFromUrl?.protocol === "https:",
+        internalHost: host,
+        internalPort: port,
+        internalSecure: internalProtocol === "https:",
       } : {}),
     },
+    externalUrl,
+    externalUrlDerived: Boolean(externalUrl) && entry.url_derived === true,
+    internalProtocolObserved: Boolean(internalProtocol),
+    internalTargetSource: source,
+    internalRouteMismatch,
   };
 }
