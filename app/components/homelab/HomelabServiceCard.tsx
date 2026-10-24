@@ -79,11 +79,11 @@ export default function HomelabServiceCard({
 		endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
 		isExternal;
 	const endpointEnabled = !readOnly && svc.endpointEnabled !== false;
-	const initialHealth = reconciledHealth(
+	const initialHealth = !healthUnavailable ? reconciledHealth(
 		serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
 		svc,
 		snapshot?.schema_version,
-	);
+	) : undefined;
 	const resolvedHealth = resolveEffectiveServiceState(initialHealth);
 	const runtimeInventoryConflict =
 		hasFreshRuntimeInventoryConflict(initialHealth);
