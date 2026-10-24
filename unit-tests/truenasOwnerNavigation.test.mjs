@@ -65,3 +65,18 @@ test("public cards cannot show owner evidence or clickable private endpoints", (
   assert.match(card, /!readOnly && typeof svc.internalHost/);
   assert.match(card, /!readOnly && svc.endpointEnabled/);
 });
+
+test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
+  const root = new URL("../", import.meta.url);
+  const block = readFileSync(new URL("app/components/homelab/HomelabServicesBlock.tsx", root), "utf8");
+  const troubleshooting = readFileSync(new URL("app/components/homelab/ServiceTroubleshootingEvidence.tsx", root), "utf8");
+  const summary = readFileSync(new URL("app/components/homelab/ServiceOwnerEvidenceSummary.tsx", root), "utf8");
+  assert.ok(block.indexOf('data-homelab-service-hierarchy') < block.indexOf('data-homelab-service-reactflow'));
+  assert.match(block, /IntersectionObserver/);
+  assert.match(block, /graphInView \? \(/);
+  assert.match(troubleshooting, /if \(!anchoredDetails\.open\) return/);
+  for (const id of ["docker", "https", "cloudflare", "http", "latency", "prometheus", "probe"]) {
+    assert.match(summary, new RegExp('key: "' + id + '"'));
+  }
+  assert.match(summary, /unavailable \|\| snapshot\.health_board/);
+});
