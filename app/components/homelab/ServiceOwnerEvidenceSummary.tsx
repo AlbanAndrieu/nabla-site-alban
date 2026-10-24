@@ -48,9 +48,12 @@ export default function ServiceOwnerEvidenceSummary({
   unavailable?: boolean;
 }>) {
   const fr = useLocale() === "fr";
-  const stale = unavailable || snapshot.health_board?.state === "stale" ||
-    snapshot.truenas_runtime_stale === true || entry?.observation_stale === true ||
-    entry?.probe_stale === true;
+  const boardStale = snapshot.health_board?.state === "stale";
+  // Board metadata can lag behind a new TrueNAS/probe observation. Evaluate
+  // evidence freshness independently; report stale board metadata separately.
+  const stale = unavailable || snapshot.truenas_runtime_stale === true ||
+    entry?.observation_stale === true || entry?.probe_stale === true ||
+    entry?.direct_probe_stale === true || entry?.internal_probe_stale === true;
   const probeAt = timestamp(entry?.direct_probe_observed_at) ??
     timestamp(entry?.internal_probe_observed_at) ??
     timestamp(entry?.probe_observed_at);
@@ -139,6 +142,12 @@ export default function ServiceOwnerEvidenceSummary({
       {snapshot.internal_probes_enabled === false ? (
         <small data-owner-internal-disabled>
           {fr ? "Sondes LAN désactivées côté collecteur" : "LAN probes disabled at collector"}
+        </small>
+      ) : null}
+      {boardStale ? (
+        <small className="text-warning" data-owner-board-stale>
+          {fr ? "Health board en actualisation : état du tableau global ancien ; preuves locales datées séparément"
+            : "Health board refreshing: global board is stale; individual evidence timestamps differ"}
         </small>
       ) : null}
       {stale ? (
