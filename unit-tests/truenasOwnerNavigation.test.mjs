@@ -137,16 +137,18 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
   assert.match(block, /IntersectionObserver/);
   assert.match(block, /graphInView \? \(/);
   assert.match(troubleshooting, /if \(!anchoredDetails\.open\) return/);
-  for (const id of ["docker", "https", "cloudflare", "http", "latency", "prometheus", "probe"]) {
+  for (const id of ["docker", "https", "cloudflare", "http", "latency", "prometheus"]) {
     assert.match(summary, new RegExp('key: "' + id + '"'));
   }
   assert.match(summary, /const boardStale = snapshot\\.health_board/);
   assert.match(summary, /const stale = unavailable \\|\\| snapshot\\.truenas_runtime_stale/);
   assert.match(summary, /data-owner-board-stale/);
   assert.match(summary, /access_protected_origin_unverified/);
-  assert.match(summary, /direct_probe_observed_at/);
+  const probeHelper = readFileSync(new URL("lib/homelabProbeEvidencePresentation.ts", root), "utf8");
+  assert.match(probeHelper, /direct_probe_observed_at/);
+  assert.match(probeHelper, /internal_probe_observed_at/);
   assert.match(summary, /runtime_primary_container_issue/);
   assert.match(summary, /internal_probes_enabled === false/);
-  assert.match(summary, /probeCached \? "warn"/);
+  assert.match(summary, /probeMetric\("lan"/);
 
 });
