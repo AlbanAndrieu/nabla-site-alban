@@ -1,6 +1,6 @@
 # Roadmap active — nabla-site-alban
 
-**Réconciliation : 24 octobre 2026.** Ce fichier ne décrit que les changements **exécutés dans ce dépôt**. Les tâches d'infrastructure et de collecte appartiennent aux roadmaps [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) et [FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md). Les anciennes tâches détaillées restent consultables dans [l'historique avant nettoyage](https://github.com/AlbanAndrieu/nabla-site-alban/blob/e3649e3c2332147fb06181dbccdf5a300398de64/docs/homelab-roadmap.md). Aucun `DONE` n'est déduit d'un merge.
+**Réconciliation : 24 octobre 2026.** [PR de travail Site #255](https://github.com/AlbanAndrieu/nabla-site-alban/pull/255) (Draft). Ce fichier ne décrit que les changements **exécutés dans ce dépôt**. Les tâches d'infrastructure et de collecte appartiennent aux roadmaps [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) et [FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md). Les anciennes tâches détaillées restent consultables dans [l'historique avant nettoyage](https://github.com/AlbanAndrieu/nabla-site-alban/blob/e3649e3c2332147fb06181dbccdf5a300398de64/docs/homelab-roadmap.md). Aucun `DONE` n'est déduit d'un merge.
 
 ## P0 — Reprendre le déploiement Vercel du site
 
@@ -14,7 +14,8 @@
 
 ## P0 — Terminer la migration d'affichage Backstage v2
 
-- [ ] Garder la lecture des catalogues via `/api/homelab-catalog-v2` et la source Compose unique `catalogRevision`. Identifier puis retirer seulement les **consommateurs runtime encore actifs** des anciens endpoints/JSON v1 ; ne pas supprimer de module utilisé par la projection v2 ou par des tests tant que la couverture n'est pas équivalente.
+- [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `lib/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
+- [ ] Vérifier les consommateurs de données restants, dont les fixtures statiques de topologie et les scripts, avant toute suppression de fichier v1. Conserver les contrats de compatibilité uniquement dans les tests.
 - [ ] Assurer une correspondance non ambiguë `entityRef` pour les cartes et le graphe, y compris sous-composants, ressources et exporters. Un ID absent ou ambigu affiche `unknown`.
 - [ ] Résoudre les icônes à partir du mapping généré Compose `lib/homelabCatalogIcons.generated.ts` ; vérifier les assets réels, l'attribution et les chemins d'icônes sur FR/EN. Aucun second référentiel `iconSrc`.
 - [ ] Afficher le DTO OWNER FastAPI sans modifier la politique de santé côté navigateur : Docker app + conteneur principal, HTTP/HTTPS/TLS, tunnel Cloudflare, latence **si datée**, horodatage et état de chaque sonde. Respecter `disabled`, `not-configured`, `not-executed`, `stale`, `failed` et `observed`.
