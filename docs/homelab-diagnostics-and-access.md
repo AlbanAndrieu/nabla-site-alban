@@ -80,3 +80,13 @@ Les deux routes catalogue utilisent le même constructeur de 503 et le même
 Le mode SERVICE ignore ces métadonnées et ne les stocke pas dans le cache
 public. Le renouvellement du catalogue supprime l'incident de l'état React.
 L'identifiant appartient encore au Site, pas à une trace FastAPI distribuée.
+
+## Harmonisation Architecture / TrueNAS (P0)
+
+Les cartes TrueNAS et le panneau Architecture utilisent le même
+`catalogFailureReason` et le même validateur `parseOwnerCatalogIncident`.
+Seule une décision `access === "trusted"` autorise l'affichage du stage et
+de l'UUID de support. Le mode `readonly` n'enregistre ni n'affiche l'incident.
+L'interface informe sur la cause catalogue, **pas** sur la santé de TrueNAS.
+Le panneau Réessayer ne contacte que le catalogue, sans déclencher de sondes
+LAN supplémentaires. Les tests navigateur et les droits restent à prouver en Preview.

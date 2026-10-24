@@ -27,10 +27,12 @@ export function catalogTransportFailureStage(error: unknown): CatalogFailureStag
   return "upstream_network";
 }
 /** Do not show an incident unless both fields match allowlisted shapes. */
+export type OwnerCatalogIncident = { stage: CatalogFailureStage; requestId: string };
+
 export function parseOwnerCatalogIncident(
   stage: unknown,
   requestId: unknown,
-): { stage: CatalogFailureStage; requestId: string } | null {
+): OwnerCatalogIncident | null {
   if (typeof stage !== "string" ||
       !([...UPSTREAM_STAGES, "site_configuration"] as string[]).includes(stage) ||
       typeof requestId !== "string" ||

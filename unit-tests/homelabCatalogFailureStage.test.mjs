@@ -34,3 +34,15 @@ test("catalog routes and OWNER UI share the diagnostic contract", async () => {
   assert.match(canonical, /catalogUnavailableResponse\(/);
   assert.match(component, /!readOnly && state\.error && state\.catalogIncident/);
 });
+
+test("Architecture and TrueNAS share failure reasons, while only OWNER may receive incident details", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { catalogFailureReason } = await import("../lib/homelabClientAccessBoundary.ts");
+  assert.equal(catalogFailureReason({ reason: "key-missing" }), "key-missing");
+  assert.equal(catalogFailureReason({ reason: "arbitrary upstream" }), "unavailable");
+  const arch = readFileSync(new URL("../app/[locale]/architecture/ArchitecturePrivateViews.tsx", import.meta.url), "utf8");
+  const notice = readFileSync(new URL("../app/[locale]/architecture/ArchitectureCatalogNotice.tsx", import.meta.url), "utf8");
+  assert.match(arch, /ownerAuthorized\s*\?\s*parseOwnerCatalogIncident/);
+  assert.match(arch, /access === "trusted" \? incident : null/);
+  assert.match(notice, /incident\?\s*:\s*OwnerCatalogIncident/);
+});

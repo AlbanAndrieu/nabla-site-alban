@@ -2,13 +2,14 @@
 
 ## P0 — Corrélation des causes et contrôle d'accès (25 octobre 2026)
 
-**Document canonique Site :** [diagnostic et accès](homelab-diagnostics-and-access.md).
+**Document canonique Site :** [diagnostic et accès](homelab-diagnostics-and-access.md). Gouvernance des décisions transverses : [Compose ADR et dispatch](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md).
 - [x] Qualifier la phase d'erreur du catalogue côté serveur Next.js et accepter
   uniquement les codes FastAPI autorisés ; exposer un `requestId` Site sur 503
   OWNER, sans corps d'erreur amont ni IP/secret.
 - [x] Ajouter des tests purs de classification d'erreur dans `just source-check`.
 - [ ] Relier les IDs de trace Site / API / collecteur via OpenTelemetry ; ne pas
   assimiler le `requestId` Site actuel à un trace ID partagé.
+- [x] Mutualiser entre les cartes TrueNAS et le panneau Architecture la raison de refus catalogue et la référence d'incident OWNER, sans divulgation au mode SERVICE. Test de contrat ajouté.
 - [ ] Montrer une chronologie compacte : catalogue → FastAPI → TrueNAS → Site,
   avec observateur/phase/fraîcheur et cause explicite dans les cartes OWNER.
 - [ ] Valider droits PUBLIC/SERVICE/OWNER, réseau LAN, JWT Cloudflare et refus

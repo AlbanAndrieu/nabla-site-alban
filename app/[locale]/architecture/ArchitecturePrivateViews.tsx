@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
 import SectionHeading from "@/components/SectionHeading";
 import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
+import { catalogFailureReason, classifyCatalogFailure, type CatalogFailureReason } from "@/lib/homelabClientAccessBoundary";
+import { parseOwnerCatalogIncident, type OwnerCatalogIncident } from "@/lib/homelabCatalogFailureStage";
 import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import type { ServiceTopology } from "@/lib/serviceTopology";
@@ -38,32 +40,21 @@ type PrivateArchitectureData = {
 	topologyLive: boolean;
 };
 
-type CatalogFailureReason = "key-missing" | "access-denied" | "unavailable";
 type CatalogRequestState =
-	| { status: "loading"; data: null; reason: null }
-	| { status: "error"; data: null; reason: CatalogFailureReason }
-	| { status: "ready"; data: PrivateArchitectureData; reason: null };
+	| { status: "loading"; data: null; reason: null; incident: null }
+	| { status: "error"; data: null; reason: CatalogFailureReason; incident: OwnerCatalogIncident | null }
+	| { status: "ready"; data: PrivateArchitectureData; reason: null; incident: null };
 
 class CatalogRequestError extends Error {
-	constructor(readonly reason: CatalogFailureReason) {
+	constructor(readonly reason: CatalogFailureReason, readonly incident: OwnerCatalogIncident | null = null) {
 		super("Private Backstage v2 catalog request failed");
 	}
 }
 
-/** Only accept server-sanitized reasons; never render raw upstream errors. */
-export function catalogFailureReason(value: unknown): CatalogFailureReason {
-	if (
-		typeof value === "object" &&
-		value !== null &&
-		"reason" in value &&
-		(value.reason === "key-missing" || value.reason === "access-denied")
-	) {
-		return value.reason;
-	}
-	return "unavailable";
-}
+/** Compatibility export: both pages now use the same public-safe reason classifier. */
+export { catalogFailureReason };
 
-async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
+async function fetchJson(url: string, signal: AbortSignal, ownerAuthorized: boolean): Promise<unknown> {
 	const response = await fetch(url, {
 		cache: "no-store",
 		signal,
@@ -71,7 +62,14 @@ async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
 	});
 	if (!response.ok) {
 		const body: unknown = await response.json().catch(() => null);
-		throw new CatalogRequestError(catalogFailureReason(body));
+		const policy = classifyCatalogFailure(response.status, body);
+		const incident = ownerAuthorized
+			? parseOwnerCatalogIncident(
+					response.headers.get("X-Nabla-Diagnostic-Stage"),
+					response.headers.get("X-Nabla-Request-ID"),
+				)
+			: null;
+		throw new CatalogRequestError(policy.reason, incident);
 	}
 	return response.json();
 }
@@ -80,18 +78,19 @@ async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
  * Single owner-gated canonical v2 request for service cards and topology.
  * Retry the catalog alone; do not reload the page or fall back to public v1.
  */
-function usePrivateArchitectureData(enabled: boolean) {
+function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) {
 	const [request, setRequest] = useState<CatalogRequestState>({
 		status: "loading",
 		data: null,
 		reason: null,
+		incident: null,
 	});
 	const [attempt, setAttempt] = useState(0);
 
 	useEffect(() => {
 		if (!enabled) return;
 		const controller = new AbortController();
-		void fetchJson("/api/homelab-catalog-v2", controller.signal)
+		void fetchJson("/api/homelab-catalog-v2", controller.signal, ownerAuthorized)
 			.then((body) => {
 				if (controller.signal.aborted) return;
 				const catalog = parseHomelabCatalogV2(body);
@@ -108,6 +107,7 @@ function usePrivateArchitectureData(enabled: boolean) {
 						topologyLive: true,
 					},
 					reason: null,
+					incident: null,
 				});
 			})
 			.catch((error: unknown) => {
@@ -117,13 +117,14 @@ function usePrivateArchitectureData(enabled: boolean) {
 					data: null,
 					reason:
 						error instanceof CatalogRequestError ? error.reason : "unavailable",
+					incident: ownerAuthorized && error instanceof CatalogRequestError ? error.incident : null,
 				});
 			});
 		return () => controller.abort();
-	}, [enabled, attempt]);
+	}, [enabled, ownerAuthorized, attempt]);
 
 	const retry = () => {
-		setRequest({ status: "loading", data: null, reason: null });
+		setRequest({ status: "loading", data: null, reason: null, incident: null });
 		setAttempt((current) => current + 1);
 	};
 	return { ...request, retry };
@@ -135,7 +136,9 @@ export default function ArchitecturePrivateViews({
 }: Readonly<{ locale: string }>) {
 	const access = useHomelabAccess();
 	const visible = access === "trusted" || access === "readonly";
-	const { data, status, reason, retry } = usePrivateArchitectureData(visible);
+	const { data, status, reason, incident, retry } = usePrivateArchitectureData(
+		visible, access === "trusted",
+	);
 	if (!visible) return null;
 	const french = locale === "fr";
 	if (status === "error")
@@ -143,6 +146,7 @@ export default function ArchitecturePrivateViews({
 			<ArchitectureCatalogNotice
 				french={french}
 				reason={reason}
+				incident={access === "trusted" ? incident : null}
 				onRetry={retry}
 			/>
 		);

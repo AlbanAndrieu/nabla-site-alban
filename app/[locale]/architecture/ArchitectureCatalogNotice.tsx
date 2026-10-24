@@ -1,12 +1,14 @@
 "use client";
 
 import styles from "./ArchitectureCatalogNotice.module.css";
+import type { OwnerCatalogIncident } from "@/lib/homelabCatalogFailureStage";
 
 type CatalogFailureReason = "key-missing" | "access-denied" | "unavailable";
 
 type Props = {
 	french: boolean;
 	reason: CatalogFailureReason;
+	incident?: OwnerCatalogIncident | null;
 	onRetry: () => void;
 };
 
@@ -28,6 +30,7 @@ const HELP: Record<CatalogFailureReason, { fr: string; en: string }> = {
 export default function ArchitectureCatalogNotice({
 	french,
 	reason,
+	incident = null,
 	onRetry,
 }: Readonly<Props>) {
 	const help = HELP[reason];
@@ -82,6 +85,13 @@ export default function ArchitectureCatalogNotice({
 					<div className={styles.diagnostic}>
 						<strong>{french ? "Point à vérifier" : "What to check"}</strong>
 						<p>{french ? help.fr : help.en}</p>
+						{incident ? (
+							<p data-catalog-failure-stage={incident.stage}>
+								{french ? "Phase" : "Stage"} : <code>{incident.stage}</code>
+								{" · "}
+								{french ? "Référence support" : "Support reference"} : <code>{incident.requestId}</code>
+							</p>
+						) : null}
 					</div>
 					<div className={styles.actions}>
 						<button className={styles.retry} type="button" onClick={onRetry}>
