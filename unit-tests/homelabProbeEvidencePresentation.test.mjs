@@ -65,3 +65,11 @@ test("a LAN observation cannot be inferred from the Cloudflare tunnel status", (
   const entry = { ...running, tunnel_status: "healthy", tunnel_name: "nabla-truescale" };
   assert.equal(describeServiceProbe(entry, snapshot, "internal").state, "not-run");
 });
+
+test("missing LAN endpoint is not called disabled or failed", () => {
+  const entry = { ...running, internal_probe_execution: "not-configured" };
+  const result = describeServiceProbe(
+    entry, { ...snapshot, internal_probes_enabled: false }, "internal",
+  );
+  assert.equal(result.state, "not-configured");
+});
