@@ -11,6 +11,8 @@ const entry = {
   id: "gatus", name: "Gatus", url: "https://gatus.albandrieu.com/",
   reachable: true, http_status: 200, state: "ok",
   tunnel_status: "HEALTHY", runtime_state: "RUNNING",
+  exposure_intent: "public",
+  exposure: { declared: {external: true, internal_host: "172.17.0.24", internal_port: 8085} },
 };
 const snapshot = {
   schema_version: 5, checked_at: "2026-10-24T12:00:00Z",
@@ -61,6 +63,56 @@ test("unmatched, malformed and credentialed endpoints fail closed", () => {
   }
   const duplicate = { ...snapshot, services: [entry, entry] };
   assert.equal(observedOwnerServiceNavigation(service, duplicate).externalUrl, "");
+});
+
+
+test("LAN targets restore from declared FastAPI exposure when internal probes are disabled", () => {
+  const withoutInternalProbes = {
+    ...snapshot,
+    internal_probes_enabled: false,
+    internal_services: [],
+  };
+  const result = observedOwnerServiceNavigation(service, withoutInternalProbes);
+  assert.equal(result.service.internalHost, "172.17.0.24");
+  assert.equal(result.service.internalPort, 8085);
+  assert.equal(result.internalTargetSource, "declared");
+  assert.equal(result.internalProtocolObserved, false);
+  assert.equal(result.externalUrl, "https://gatus.albandrieu.com/");
+});
+
+test("internal intent and disabled endpoints never acquire a public link", () => {
+  const internal = { ...entry,
+    exposure_intent: "internal",
+    exposure: { declared: { external: false, endpoint_enabled: true, internal_host: "172.17.0.24", internal_port: 8085 } },
+  };
+  assert.equal(
+    observedOwnerServiceNavigation(service, { ...snapshot, services: [internal] }).externalUrl,
+    "",
+  );
+  const disabled = { ...entry,
+    exposure: { declared: { external: true, endpoint_enabled: false, internal_host: "172.17.0.24", internal_port: 8085 } },
+  };
+  assert.equal(
+    observedOwnerServiceNavigation(service, { ...snapshot, services: [disabled] }).externalUrl,
+    "",
+  );
+});
+
+test("Cloudflare origin drift is disclosed instead of rewriting declared ports", () => {
+  const withDrift = { ...entry,
+    exposure: {
+      declared: { external: true, internal_host: "172.17.0.24", internal_port: 30287 },
+      observed: {
+        cloudflare_origin_service: "http://172.17.0.24:8085",
+        cloudflare_origin_matches_topology: false,
+      },
+    },
+  };
+  const result = observedOwnerServiceNavigation(service,
+    { ...snapshot, services: [withDrift], internal_services: [] });
+  assert.equal(result.service.internalPort, 30287);
+  assert.equal(result.internalRouteMismatch, true);
+  assert.equal(result.internalProtocolObserved, false);
 });
 
 test("public cards cannot show owner evidence or clickable private endpoints", () => {
