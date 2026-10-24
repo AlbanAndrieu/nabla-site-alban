@@ -36,6 +36,7 @@ export default function HomelabServiceGrid({
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
+	const firstServiceIds = new Set<string>();
 	const serviceHealth = healthIndex(snapshot);
 	const safeStatus = siteHealthIndex(siteHealth, catalog.catalogRevision);
 	const truenasPublic = snapshot?.truenas?.public;
@@ -120,12 +121,14 @@ export default function HomelabServiceGrid({
 			)}
 
 			<div className="row service-grid">
-				{services.map((svc, serviceIndex) => {
+				{services.map((svc) => {
 					const serviceId = homelabServiceId(svc);
 					const observed = observedOwnerServiceNavigation(svc, readOnly || healthUnavailable ? null : snapshot);
 					const displayService = observed.service;
 					const endpointUrl = !readOnly ? observed.externalUrl ||
             (svc.endpointEnabled === true ? homelabServiceEndpointUrl(svc) : "") : "";
+					const firstOccurrence = !firstServiceIds.has(serviceId);
+                    firstServiceIds.add(serviceId);
 					return (
 						<HomelabServiceCard
 							key={`${serviceId}:${endpointUrl}`}
@@ -142,13 +145,7 @@ export default function HomelabServiceGrid({
 							internalProtocolObserved={observed.internalProtocolObserved}
 							internalRouteMismatch={observed.internalRouteMismatch}
 							internalTargetSource={observed.internalTargetSource}
-							anchorId={
-								services.findIndex(
-									(item) => homelabServiceId(item) === serviceId,
-								) === serviceIndex
-									? `homelab-service-${serviceId}`
-									: undefined
-							}
+							anchorId={firstOccurrence ? `homelab-service-${serviceId}` : undefined}
 							snapshot={snapshot}
 							serviceHealth={serviceHealth}
 							healthUnavailable={healthUnavailable}
