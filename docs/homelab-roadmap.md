@@ -28,6 +28,8 @@
 - [ ] **FastAPI #373 — observations :** valider par tests locaux les six états `disabled/not-configured/not-executed/stale/failed/observed`, les limites de concurrence, la rotation et l'anti-SSRF. `0/86` lorsque les sondes LAN sont désactivées n'est pas une panne des 86 services.
 - [ ] **Relais OWNER authentifié :** concevoir puis vérifier un chemin de lecture des mesures **du collecteur interne vers un consommateur autorisé**, avec identité vérifiée, contrôle des cibles, audit, TLS et limitation de débit. Ne pas faire sonder `172.17.0.0/24` directement par Vercel ou FastAPI Cloud. Ne pas rétablir une exposition brute par simple drapeau.
 - [ ] **Écarts de configuration :** auditer sans correction automatique Gatus (origine 8085 / déclaré 30287), Bichon (15630 / 30313), Garage Web UI (3900 / 3909) et Garage Admin (3909 / 3903), sur Compose, TrueNAS, Traefik et Cloudflare.
+- [ ] **Catalogue canonique** : enregistrer les ports LAN confirmés dans Compose : Gatus UI 8085, Bichon UI 15630, Garage S3 API 3900, Garage Admin API 3903, Garage Web UI 3909. Traefik Proxy 443 et Traefik Dashboard UI 8080 sont deux endpoints du même déploiement ; ne pas remplacer silencieusement le port proxy par le port dashboard. La correction du snapshot FastAPI est seulement un repli, pas un changement de la source distante. Aucune nouvelle PR Compose sans instruction.
+- [x] **Cartes Site #254** : IDs canoniques homeassistant/openwebui ; suffixes UI/API/MCP au rendu selon les rôles établis ; noms Docker et DNS préservés. Tests de contrats versionnés, non exécutés au HEAD final.
 - [ ] **Collecte temporelle :** comparer au moins trois cycles du collecteur interne. Documenter services éligibles, sondés, terminés, en rotation, mis en cache et périmés. Une mesure publique 302 Cloudflare Access ne confirme pas l'origine.
 
 **Critère Done :** un collecteur **réellement situé sur le LAN** remonte des sondes datées et bornées, et le site affiche leur provenance en OWNER sans exposer l'amont aux visiteurs externes.
@@ -56,6 +58,8 @@
 **Critère Done :** quality gate et tests de confidentialité vérifiés sur le **même SHA** que la Preview, puis revue des changements opérationnels.
 
 ## P1 — 5. Performance et ergonomie de /truenas
+
+- [ ] **Skill d'audit Web** : demander au propriétaire de lancer lui-même `npx skills use "https://github.com/vercel-labs/agent-skills" --skill "web-design-guidelines"`, puis de partager la sortie et le chemin des `supporting-files`. Ne pas installer le skill automatiquement dans l'agent.
 
 **Code préparé dans Site #254 :** cartes avant ReactFlow ; chargement de ReactFlow près du viewport ; dépannage chargé à l'ouverture ; suppression de la recherche `findIndex` pour chaque carte ; registre de preuves sobre, chiffres tabulaires et mise en page mobile.
 
