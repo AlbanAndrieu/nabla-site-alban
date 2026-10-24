@@ -73,6 +73,7 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		url_derived?: boolean;
         exposure_intent?: "public" | "internal";
         exposure?: HomelabOwnerExposure;
+        internal_probe_execution?: "disabled" | "not-configured" | "not-executed" | "stale" | "failed" | "observed";
         runtime_primary_container_state?: string | null;
         runtime_primary_container_issue?: boolean;
 		reachable: boolean | null;
