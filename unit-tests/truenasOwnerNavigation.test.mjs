@@ -152,3 +152,18 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
   assert.match(summary, /probeMetric\("lan"/);
 
 });
+
+
+test("a declared LAN URL without a probe is never labeled as measured", () => {
+  const withoutProbes = {
+    ...snapshot,
+    internal_probes_enabled: false,
+    internal_services: [],
+    services: [{ ...entry, url: "http://172.17.0.24:8085" }],
+  };
+  const result = observedOwnerServiceNavigation(service, withoutProbes);
+  assert.equal(result.internalTargetSource, "declared");
+  assert.equal(result.internalProtocolObserved, false);
+  assert.equal(result.service.internalHost, "172.17.0.24");
+  assert.equal(result.service.internalPort, 8085);
+});
