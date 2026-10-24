@@ -17,10 +17,16 @@ async function catalogResponse() {
 	} catch (error) {
 		const reason =
 			error instanceof SiteCatalogV2Error ? error.reason : "unavailable";
+		const stage = error instanceof SiteCatalogV2Error ? error.stage : "unknown";
+		const requestId = crypto.randomUUID();
 		// Never return a partial v1 catalog, source URL, credentials or upstream body.
 		return NextResponse.json(
-			{ error: "Backstage v2 catalog unavailable", reason },
-			{ status: 503 },
+			{ error: "Backstage v2 catalog unavailable", reason, stage, requestId },
+			{ status: 503, headers: {
+				"Cache-Control": "private, no-store",
+				"X-Nabla-Diagnostic-Stage": stage,
+				"X-Nabla-Request-ID": requestId,
+			} },
 		);
 	}
 }

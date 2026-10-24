@@ -1,3 +1,4 @@
+import { catalogHttpFailureStage, catalogTransportFailureStage, type CatalogFailureStage } from "./homelabCatalogFailureStage";
 import {
 	type CatalogV2Entity,
 	catalogV2ServiceViews,
@@ -34,7 +35,7 @@ export type SiteCatalogV2ErrorReason =
 	| "unavailable";
 
 export class SiteCatalogV2Error extends Error {
-	constructor(public readonly reason: SiteCatalogV2ErrorReason) {
+	constructor(public readonly reason: SiteCatalogV2ErrorReason, public readonly stage: CatalogFailureStage = "unknown") {
 		super("Backstage v2 catalog unavailable");
 		this.name = "SiteCatalogV2Error";
 	}
@@ -135,7 +136,7 @@ function sameCacheKey(a: SiteCatalogCacheKey, b: SiteCatalogCacheKey) {
 
 export async function fetchSiteCatalogV2(): Promise<HomelabCatalogV2> {
 	const key = process.env.DIAGNOSTICS_ACCESS_KEY?.trim();
-	if (!key) throw new SiteCatalogV2Error("key-missing");
+	if (!key) throw new SiteCatalogV2Error("key-missing", "site_configuration");
 	const cacheKey = { key, fetchImpl: globalThis.fetch };
 	if (
 		cachedSiteCatalog &&
@@ -179,18 +180,19 @@ async function fetchSiteCatalogV2Uncached(
 			cache: "no-store",
 		});
 		if (response.status === 401 || response.status === 403) {
-			throw new SiteCatalogV2Error("access-denied");
+			throw new SiteCatalogV2Error("access-denied", "upstream_auth");
 		}
-		if (!response.ok) throw new SiteCatalogV2Error("unavailable");
+		if (!response.ok) throw new SiteCatalogV2Error("unavailable",
+			catalogHttpFailureStage(response.status, response.headers.get("X-Nabla-Diagnostic-Stage")));
 		const parsed = parseHomelabCatalogV2(await response.json());
 		const safe = parsed && sanitizeSiteCatalogV2(parsed);
 		if (!safe || catalogV2ServiceViews(safe).length === 0) {
-			throw new SiteCatalogV2Error("unavailable");
+			throw new SiteCatalogV2Error("unavailable", "catalog_validation");
 		}
 		return safe;
 	} catch (error) {
 		if (error instanceof SiteCatalogV2Error) throw error;
-		throw new SiteCatalogV2Error("unavailable");
+		throw new SiteCatalogV2Error("unavailable", catalogTransportFailureStage(error));
 	} finally {
 		clearTimeout(timeout);
 	}

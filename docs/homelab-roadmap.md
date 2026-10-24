@@ -1,5 +1,22 @@
 # Roadmap active — nabla-site-alban
 
+## P0 — Corrélation des causes et contrôle d'accès (25 octobre 2026)
+
+**Document canonique Site :** [diagnostic et accès](homelab-diagnostics-and-access.md).
+- [x] Qualifier la phase d'erreur du catalogue côté serveur Next.js et accepter
+  uniquement les codes FastAPI autorisés ; exposer un `requestId` Site sur 503
+  OWNER, sans corps d'erreur amont ni IP/secret.
+- [x] Ajouter des tests purs de classification d'erreur dans `just source-check`.
+- [ ] Relier les IDs de trace Site / API / collecteur via OpenTelemetry ; ne pas
+  assimiler le `requestId` Site actuel à un trace ID partagé.
+- [ ] Montrer une chronologie compacte : catalogue → FastAPI → TrueNAS → Site,
+  avec observateur/phase/fraîcheur et cause explicite dans les cartes OWNER.
+- [ ] Valider droits PUBLIC/SERVICE/OWNER, réseau LAN, JWT Cloudflare et refus
+  d'en-têtes spoofés sur une Preview accessible au SHA exact.
+- [ ] Conserver le transport, l'authentification et l'autorisation **dans le serveur**
+  avant l'arrivée d'une gateway ou de Keycloak.
+
+
 **Réconciliation : 24 octobre 2026.** [Site #255](https://github.com/AlbanAndrieu/nabla-site-alban/pull/255) fusionnée (`86627eb7`) et publiée en production sur Vercel (READY). [PR de reprise Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256) (Draft). La recette fonctionnelle OWNER/SERVICE reste ouverte. Ce fichier ne décrit que les changements **exécutés dans ce dépôt**. Les tâches d'infrastructure et de collecte appartiennent aux roadmaps [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) et [FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md). Les anciennes tâches détaillées restent consultables dans [l'historique avant nettoyage](https://github.com/AlbanAndrieu/nabla-site-alban/blob/e3649e3c2332147fb06181dbccdf5a300398de64/docs/homelab-roadmap.md). Aucun `DONE` n'est déduit d'un merge.
 
 ## P0 — Reprendre le déploiement Vercel du site
