@@ -1,3 +1,17 @@
+## 24 octobre 2026 — Synthèse implémentation frontend-design + preuves LAN (P0)
+
+- [x] Lire le skill `anthropics/skills/frontend-design` : choisir une présentation instrumentée propre au diagnostic réseau plutôt que multiplier les badges identiques. Commande `npx skills use` tentée mais bloquée par DNS/timeout ; source officielle `skills/frontend-design/SKILL.md` lue intégralement par consultation GitHub.
+- [x] Unifier le lexique opérateur entre FastAPI et les cartes : `disabled` = désactivée, `not-configured` = absence de cible, `not-run` = éligible mais non exécutée, `stale` = ancienne, `failed` = échec observé, `observed` = exécutée avec preuve datée.
+- [x] Séparer Docker/TrueNAS, HTTPS public, TCP LAN, Cloudflare, TLS, latence et horodatage : `observed_at` d'inventaire ne prouve aucune exécution HTTP/TCP.
+- [x] Remplacer les micro-cartes répétées par un journal de preuves à typographie alignée, icônes d'état, lignes discrètes, sans nouvelle palette ni police ; mobile une colonne, valeurs numériques tabulaires.
+- [x] Bloquer la fausse équivalence `Docker RUNNING → sonde LAN OK` dans le lien interne, avec état inconnu si la sonde est désactivée, non échantillonnée ou ancienne.
+- [x] Ajouter tests de contrat et d'états de sondes, exécution demandée dans `just` local-first ; aucun run CI déclenché.
+- [x] Éviter `services.findIndex` pour chaque carte afin de réduire le travail de rendu sur inventaire volumineux.
+- [ ] Exécuter `node --experimental-strip-types --test unit-tests/homelabProbeEvidencePresentation.test.mjs unit-tests/truenasOwnerNavigation.test.mjs`, les tests existants et le build Next.js dans un checkout local Node LTS ; validation visuelle Preview SHA exact.
+- [ ] Pour rétablir réellement les sondes LAN : confirmer dans le conteneur TrueNAS `HOMELAB_INTERNAL_PROBES_ENABLED=true` et un `probe_summary.internal.sampled > 0` avec `scripts/truenas/verify-fastapi-lan-probes.sh` dans `nabla-compose`.
+- [ ] Mettre l'upstream OWNER sur le collecteur TrueNAS approuvé, via un canal service authentifié et verrouillé à l'origine ; vérifier les politiques Cloudflare Access, le contrôle des CIDR sources et les secrets. Ne pas autoriser Vercel/FastAPI Cloud à sonder directement 172.17.0.0/24.
+- [ ] Afficher dans la carte la provenance du collecteur, la dernière sonde propre à chaque protocole et un avertissement quand les données cloud ne permettent pas de conclure sur le LAN.
+
 ## P0 — Convergence inter-dépôts Compose / FastAPI / Site (24 octobre 2026)
 
 - [x] Consolider l'analyse de la PR #254 (snapshot OWNER du 24/10, frontières de confidentialité, rôles de chaque dépôt) dans [le contrat partagé](homelab-catalog-convergence-2026-10-24.md). Ce document sert d'index des responsabilités, sans recopier le catalogue ou les sondes.
