@@ -1,21 +1,44 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import type { HomelabHealthEntry, HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type {
+  HomelabHealthEntry, HomelabHealthSnapshot, TrueNasRuntimeApp,
+} from "@/lib/homelabHealth";
 import styles from "./HomelabServicesBlock.module.css";
 
-function observedTime(entry: HomelabHealthEntry): string | null {
-  for (const value of [
-    entry.probe_observed_at, entry.direct_probe_observed_at,
-    entry.internal_probe_observed_at, entry.observed_at,
-  ]) {
-    if (typeof value === "string" && Number.isFinite(Date.parse(value)))
-      return new Date(value).toISOString();
-  }
-  return null;
+function timestamp(value: string | null | undefined): string | null {
+  return value && Number.isFinite(Date.parse(value)) ?
+    new Date(value).toISOString() : null;
 }
 
-type Metric = { key: string; icon: string; label: string; value: string; state: string };
+function primaryContainerState(
+  entry: HomelabHealthEntry | undefined,
+  snapshot: HomelabHealthSnapshot,
+): string | null {
+  if (entry?.runtime_primary_container_state) return entry.runtime_primary_container_state;
+  if (!entry?.runtime_app) return null;
+  const apps = snapshot.truenas?.api?.apps ?? [];
+  const matches = apps.filter((app) => app.id === entry.runtime_app);
+  if (matches.length !== 1) return null;
+  const app: TrueNasRuntimeApp = matches[0];
+  const normalized = (name: string | null | undefined) =>
+    (name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const names = new Set([normalized(app.id), normalized(entry.id)]);
+  const primary = app.active_workloads?.container_details?.filter(
+    (container) => Boolean(normalized(container.service_name)) &&
+      names.has(normalized(container.service_name)),
+  ) ?? [];
+  return primary.length === 1 && primary[0].state ?
+    primary[0].state.toUpperCase() : null;
+}
+
+type Metric = {
+  key: string;
+  icon: string;
+  label: string;
+  value: string;
+  state: "ok" | "warn" | "fail" | "unknown" | "observed";
+};
 
 export default function ServiceOwnerEvidenceSummary({
   entry, snapshot, unavailable = false,
@@ -28,32 +51,41 @@ export default function ServiceOwnerEvidenceSummary({
   const stale = unavailable || snapshot.health_board?.state === "stale" ||
     snapshot.truenas_runtime_stale === true || entry?.observation_stale === true ||
     entry?.probe_stale === true;
-  const observed = entry ? observedTime(entry) : null;
-  const https = entry?.url.startsWith("https://") === true;
+  const probeAt = timestamp(entry?.direct_probe_observed_at) ??
+    timestamp(entry?.internal_probe_observed_at) ??
+    timestamp(entry?.probe_observed_at);
+  const runtimeAt = timestamp(entry?.observed_at);
+  const primary = primaryContainerState(entry, snapshot);
+  const primaryFailed = entry?.runtime_primary_container_issue === true ||
+    (primary != null && !["RUNNING", "HEALTHY", "ACTIVE", "STARTED", "UP"].includes(primary));
+  const runtime = entry?.runtime_state ?? null;
+  const tls = entry?.tls_trusted;
+  const tunnelState = entry?.tunnel_status?.toLowerCase() ?? "";
+  const tunnelConfirmed = !stale && entry?.tunnel_stale !== true &&
+    entry?.cloudflare_status_confirmed !== false && Boolean(tunnelState);
+
   const metrics: Metric[] = [
     {
       key: "docker", icon: "fas fa-server", label: "Docker/TrueNAS",
-      value: entry?.runtime_state ??
+      value: runtime ? primary ? `${runtime} · container ${primary}` : runtime :
         (fr ? "non observé" : "not observed"),
-      state: !entry?.runtime_state || stale ? "unknown" :
-        ["RUNNING", "HEALTHY", "ACTIVE"].includes(entry.runtime_state.toUpperCase()) ? "ok" : "warn",
+      state: stale || !runtime ? "unknown" : primaryFailed ? "warn" :
+        ["RUNNING", "HEALTHY", "ACTIVE"].includes(runtime.toUpperCase()) ? "ok" : "warn",
     },
     {
       key: "https", icon: "fas fa-lock", label: "HTTPS/TLS",
-      value: !https ? (fr ? "non sondé" : "not probed") :
-        entry?.tls_trusted === true ? (fr ? "certificat valide" : "trusted certificate") :
-        entry?.tls_trusted === false ? (fr ? "certificat invalide" : "invalid certificate") :
-        (fr ? "non vérifié" : "unverified"),
-      state: !stale && https && entry?.tls_trusted === true ? "ok" :
-        !stale && https && entry?.tls_trusted === false ? "fail" : "unknown",
+      value: tls === true ? (fr ? "certificat valide" : "trusted certificate") :
+        tls === false ? (fr ? "certificat invalide" : "invalid certificate") :
+        (fr ? "non vérifié" : "not verified"),
+      state: stale || tls == null ? "unknown" : tls ? "ok" : "fail",
     },
     {
-      key: "cloudflare", icon: "fas fa-cloud", label: "Cloudflare",
+      key: "cloudflare", icon: "fas fa-cloud", label: "Cloudflare Tunnel",
       value: entry?.tunnel_status ?
         `${entry.tunnel_status}${entry.tunnel_name ? ` · ${entry.tunnel_name}` : ""}` :
         (fr ? "non observé" : "not observed"),
-      state: stale || !entry?.tunnel_status || entry.cloudflare_status_confirmed !== true ? "unknown" :
-        ["UP", "ACTIVE", "HEALTHY", "OK"].includes(entry.tunnel_status.toUpperCase()) ? "ok" : "warn",
+      state: !tunnelConfirmed ? "unknown" :
+        ["up", "active", "healthy", "ok"].includes(tunnelState) ? "ok" : "warn",
     },
     {
       key: "http", icon: "fas fa-globe", label: "HTTP",
@@ -70,19 +102,21 @@ export default function ServiceOwnerEvidenceSummary({
     },
     {
       key: "prometheus", icon: "fas fa-chart-line", label: "Prometheus",
-      value: fr ? "preuve absente du DTO" : "no metric in DTO",
+      value: fr ? "scrape non fourni" : "scrape unavailable",
       state: "unknown",
     },
     {
       key: "probe", icon: "fas fa-satellite-dish", label: fr ? "Dernière sonde" : "Last probe",
-      value: observed ? observed.replace("T", " ").slice(0, 19) + " UTC" :
-        fr ? "horodatage absent" : "timestamp missing",
-      state: !observed || stale ? "unknown" : "observed",
+      value: probeAt ? probeAt.replace("T", " ").slice(0, 19) + " UTC" :
+        (fr ? "aucune sonde HTTP/TCP" : "no HTTP/TCP probe"),
+      state: !probeAt || stale ? "unknown" : "observed",
     },
   ];
+
   return (
     <div className={styles.ownerEvidenceSummary} data-owner-service-evidence
-      data-evidence-stale={String(stale)} aria-label={fr ? "Diagnostics observés" : "Observed diagnostics"}>
+      data-evidence-stale={String(stale)}
+      aria-label={fr ? "Diagnostics observés" : "Observed diagnostics"}>
       {metrics.map((metric) => (
         <span key={metric.key} className={styles.ownerEvidenceMetric}
           data-evidence-key={metric.key} data-evidence-state={metric.state}
@@ -92,9 +126,23 @@ export default function ServiceOwnerEvidenceSummary({
           <strong>{metric.value}</strong>
         </span>
       ))}
-      {stale ? <small className="text-warning" data-owner-evidence-stale>
-        {fr ? "Preuves anciennes — aucun état sain confirmé" : "Stale evidence — no healthy state confirmed"}
-      </small> : null}
+      {!probeAt && runtimeAt ? (
+        <small data-owner-runtime-observed>
+          {fr ? "Inventaire runtime" : "Runtime inventory"}:{" "}
+          {runtimeAt.replace("T", " ").slice(0, 19)} UTC
+        </small>
+      ) : null}
+      {snapshot.internal_probes_enabled === false ? (
+        <small data-owner-internal-disabled>
+          {fr ? "Sondes LAN désactivées côté collecteur" : "LAN probes disabled at collector"}
+        </small>
+      ) : null}
+      {stale ? (
+        <small className="text-warning" data-owner-evidence-stale>
+          {fr ? "Snapshot ancien — aucune preuve de santé récente confirmée"
+            : "Stale snapshot — no recent health confirmation"}
+        </small>
+      ) : null}
     </div>
   );
 }
