@@ -43,12 +43,36 @@ export type HomelabScopedProbeEvidence = {
 	internal_probe_refresh_error?: string;
 };
 
+/** OWNER-only exposure metadata delivered by the authenticated FastAPI health API.
+ * Never copy this DTO into the public SERVICE v2 cache or the Backstage projection.
+ */
+export type HomelabOwnerExposure = {
+  declared?: {
+    external?: boolean;
+    endpoint_enabled?: boolean | null;
+    internal_host?: string | null;
+    internal_port?: number | null;
+  };
+  observed?: {
+    cloudflare_origin_service?: string | null;
+    cloudflare_origin_matches_topology?: boolean | null;
+    topology_internal_host?: string | null;
+    topology_internal_port?: number | null;
+  };
+  state?: string;
+  reasons?: string[];
+};
+
 export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 	HomelabScopedProbeEvidence & {
 		id?: string;
 		name: string;
 		url: string;
 		url_derived?: boolean;
+        exposure_intent?: "public" | "internal";
+        exposure?: HomelabOwnerExposure;
+        runtime_primary_container_state?: string | null;
+        runtime_primary_container_issue?: boolean;
 		reachable: boolean | null;
 		http_status: number;
 		state: HomelabHealthState;
