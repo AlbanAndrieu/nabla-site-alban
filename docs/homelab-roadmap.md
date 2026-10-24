@@ -10,6 +10,15 @@
 - [ ] Tester depuis le VLAN les routes `/api/homelab-access?diagnose=1`, `/api/homelab-health`, `/api/homelab-probes` et les statuts 401/403/503.
 - [ ] Exécuter la quality gate locale Node 24 et vérifier une Preview Vercel au SHA exact, avant tout déploiement.
 
+## P0 — Convergence sécurité et DTO SERVICE v2 (24 octobre 2026)
+
+- [x] Comparer le catalogue réel Compose (`catalog/generated/entities.json`) avec `service-icons.json:webAssets` : 154 entités, dont 151 Component/Resource/API, 176 mappings d'icônes, **0 identité canonique sans résolution d'icône**. Le fichier `homelabCatalogIcons.generated.ts` correspond octet pour octet au générateur et à `nabla-compose/master`.
+- [x] Compléter la frontière SERVICE côté navigateur : refuser un nom exposant une IP/URL, ignorer descriptions, catégories et types dangereux ; rejeter toute topologie dont les libellés contiennent des références privées. Conserver les TTL catalogue 15 min / santé 2 min, la corrélation `catalogRevision`, les clés de cache v3 et l'absence de cache OWNER (PR #254).
+- [x] Corriger la projection `SiteHealthV2` de FastAPI dans sa PR #373 : si une observation ne distingue pas deux `entityRef` portant le même `metadata.name`, publier `unknown` pour les deux. Le site conserve le même contrôle en défense supplémentaire.
+- [ ] Exécuter les tests `unit-tests/homelabPublicTextSafety.test.mjs` et `unit-tests/homelabPublicBrowserCache.test.mjs` sous Node 24, puis le typecheck, le build et `just quality` sur le HEAD complet. Le helper isolé a passé 3/3 tests locaux sous Node 22 avec `tsc --strict` ciblé ; la suite UI complète reste NON EXÉCUTÉE.
+- [ ] Comparer sur la Preview exact-SHA les cartes et ReactFlow OWNER/public avec la sortie FastAPI Backstage v2 et ses états `unknown`, notamment sur 360/390 px, réseau externe et Wi-Fi domestique. Ne pas exposer IP LAN, URL internes, ports ou traces des sondes OWNER.
+- [ ] Désactiver les lectures détaillées temporairement publiques après la mise en service d'un accès OWNER authentifié. Le rendu SERVICE public doit conserver uniquement des informations expurgées.
+
 ## P0 — Unifier l'autorité des icônes Compose → Site (24 octobre 2026)
 
 - [x] Audit élargi : 128 Component, 23 Resource, 89 anciens services et 51 icônes de graphes = **199 IDs distincts** ; 15 mappings complémentaires couvrent les neuf composants, quatre ressources et deux références historiques non couvertes.
