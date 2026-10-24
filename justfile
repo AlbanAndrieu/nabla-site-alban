@@ -25,6 +25,7 @@ source-check:
     bash scripts/test-agent-quality-oscillation.sh
     node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts unit-tests/agentSourceSnapshot.test.ts
     node --test unit-tests/homelabIconSync.test.mjs unit-tests/ciBudgetConvergence.test.mjs unit-tests/k8sStandaloneContract.test.mjs unit-tests/homelabOwnerContracts.test.mjs unit-tests/ltsStackContract.test.mjs
+    node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs
     node --experimental-strip-types --test unit-tests/homelabProbeEvidencePresentation.test.mjs
     python3 -m unittest discover -s unit-tests -p "test_github_actions_usage.py"
