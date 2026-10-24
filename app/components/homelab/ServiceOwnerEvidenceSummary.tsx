@@ -61,6 +61,8 @@ export default function ServiceOwnerEvidenceSummary({
   const runtime = entry?.runtime_state ?? null;
   const tls = entry?.tls_trusted;
   const tunnelState = entry?.tunnel_status?.toLowerCase() ?? "";
+  const accessBlocked = entry?.public_probe_verification === "access_protected_origin_unverified";
+  const probeCached = entry?.direct_probe_source === "memory" || entry?.internal_probe_source === "memory";
   const tunnelConfirmed = !stale && entry?.tunnel_stale !== true &&
     entry?.cloudflare_status_confirmed !== false && Boolean(tunnelState);
 
@@ -89,10 +91,11 @@ export default function ServiceOwnerEvidenceSummary({
     },
     {
       key: "http", icon: "fas fa-globe", label: "HTTP",
-      value: entry?.http_status && entry.http_status > 0 ? String(entry.http_status) :
+      value: entry?.http_status && entry.http_status > 0 ?
+        `${entry.http_status}${accessBlocked ? " · Cloudflare Access" : ""}` :
         (fr ? "non sondé" : "not probed"),
       state: stale || !entry?.http_status ? "unknown" :
-        entry.http_status < 400 ? "ok" : entry.http_status < 500 ? "warn" : "fail",
+        accessBlocked ? "warn" : entry.http_status < 400 ? "ok" : entry.http_status < 500 ? "warn" : "fail",
     },
     {
       key: "latency", icon: "fas fa-stopwatch", label: fr ? "Latence" : "Latency",
@@ -107,9 +110,10 @@ export default function ServiceOwnerEvidenceSummary({
     },
     {
       key: "probe", icon: "fas fa-satellite-dish", label: fr ? "Dernière sonde" : "Last probe",
-      value: probeAt ? probeAt.replace("T", " ").slice(0, 19) + " UTC" :
+      value: probeAt ? probeAt.replace("T", " ").slice(0, 19) +
+        ` UTC${probeCached ? (fr ? " · cache" : " · cached") : ""}` :
         (fr ? "aucune sonde HTTP/TCP" : "no HTTP/TCP probe"),
-      state: !probeAt || stale ? "unknown" : "observed",
+      state: !probeAt || stale ? "unknown" : probeCached ? "warn" : "observed",
     },
   ];
 
