@@ -141,4 +141,10 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
     assert.match(summary, new RegExp('key: "' + id + '"'));
   }
   assert.match(summary, /unavailable \|\| snapshot\.health_board/);
+  assert.match(summary, /access_protected_origin_unverified/);
+  assert.match(summary, /direct_probe_observed_at/);
+  assert.match(summary, /runtime_primary_container_issue/);
+  assert.match(summary, /internal_probes_enabled === false/);
+  assert.match(summary, /probeCached \? "warn"/);
+
 });
