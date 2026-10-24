@@ -193,7 +193,7 @@ export default function HomelabServiceCard({
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
           {!readOnly && snapshot && (
-            <ServiceOwnerEvidenceSummary entry={initialHealth} snapshot={snapshot} />
+            <ServiceOwnerEvidenceSummary entry={initialHealth} snapshot={snapshot} unavailable={healthUnavailable} />
           )}
           {!readOnly && !snapshot && (
             <p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
