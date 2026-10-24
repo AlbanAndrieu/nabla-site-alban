@@ -5,7 +5,6 @@ import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,
-	homelabServiceEndpointUrl,
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
@@ -125,8 +124,9 @@ export default function HomelabServiceGrid({
 					const serviceId = homelabServiceId(svc);
 					const observed = observedOwnerServiceNavigation(svc, readOnly || healthUnavailable ? null : snapshot);
 					const displayService = observed.service;
-					const endpointUrl = !readOnly ? observed.externalUrl ||
-            (svc.endpointEnabled === true ? homelabServiceEndpointUrl(svc) : "") : "";
+					// Backstage v2 has no publicly navigable endpoint: only verified OWNER
+                    // FastAPI exposure can authorize a card link.
+                    const endpointUrl = !readOnly && !healthUnavailable ? observed.externalUrl : "";
 					const firstOccurrence = !firstServiceIds.has(serviceId);
                     firstServiceIds.add(serviceId);
 					return (

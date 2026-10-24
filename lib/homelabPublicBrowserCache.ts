@@ -1,7 +1,7 @@
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceTopology } from "./serviceTopology";
 import type { SiteHealthV2 } from "./siteHealthV2";
-import { isSafePublicText } from "./homelabPublicTextSafety";
+import { isSafePublicServiceId, isSafePublicText } from "./homelabPublicTextSafety";
 
 /** Public SERVICE projections only. OWNER snapshots must never enter browser storage. */
 const CATALOG_KEY = "nabla:homelab:catalog-public-v2:3";
@@ -12,7 +12,6 @@ const CATALOG_TTL_MS = 15 * 60_000;
 const HEALTH_TTL_MS = 2 * 60_000;
 const REVISION = /^sha256:[0-9a-f]{64}$/;
 const ENTITY_REF = /^(component|resource|api):[a-z0-9._-]+\/[a-z0-9._-]+$/;
-const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ICON = /^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/;
 const STATES = new Set(["ok", "warn", "fail", "unknown"]);
 const RELATIONS = new Set([
@@ -39,7 +38,7 @@ function localCatalog(value: HomelabServicesCatalog, topology: ServiceTopology |
 	const refs = new Set<string>();
 	const services: HomelabServicesCatalog["services"] = [];
 	for (const service of value.services) {
-		if (!service || typeof service !== "object" || !service.id || !ID.test(service.id) || names.has(service.id) ||
+		if (!service || typeof service !== "object" || !isSafePublicServiceId(service.id) || names.has(service.id) ||
 			!isSafePublicText(service.name, 150) ||
 			typeof service.entityRef !== "string" || !ENTITY_REF.test(service.entityRef) || refs.has(service.entityRef) ||
 			(service.iconSrc !== undefined &&

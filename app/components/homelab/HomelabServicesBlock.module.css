@@ -251,6 +251,20 @@
 	border-top: 1px solid var(--ui-border);
 }
 
+.serviceIconFallback {
+	display: grid;
+	place-items: center;
+	width: 80px;
+	height: 80px;
+	margin: 0 auto;
+	border: 1px solid rgb(255 255 255 / 25%);
+	border-radius: 1rem;
+	color: #fff;
+	font-size: 1.35rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+}
+
 .serviceCard {
 	border-width: 1px;
 	border-color: var(--ui-border);

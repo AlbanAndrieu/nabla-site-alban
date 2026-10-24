@@ -2,14 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { GET } from "../app/api/homelab-services/route";
+import { homelabServiceDisplayName, homelabServiceId } from "../lib/homelabServices";
 import {
-	getStaticHomelabServicesCatalog,
-	HOMELAB_SERVICES_DEFAULT_API_URL,
-	homelabServiceEndpointUrl,
-	homelabServiceDisplayName,
-	homelabServiceId,
-	parseHomelabServicesCatalog,
-} from "../lib/homelabServices";
+  getStaticHomelabServicesCatalog,
+  HOMELAB_SERVICES_DEFAULT_API_URL,
+  homelabServiceEndpointUrl,
+  parseHomelabServicesCatalog,
+} from "./helpers/homelabLegacyCatalogFixture";
 import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
 import { withPublicReadOnly } from "./helpers/homelabPublicReadOnly";
 
