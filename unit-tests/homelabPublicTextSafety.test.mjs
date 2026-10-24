@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isSafePublicText } from "../lib/homelabPublicTextSafety.ts";
+import { isSafePublicServiceId, isSafePublicText } from "../lib/homelabPublicTextSafety.ts";
 
 test("accepts ordinary SERVICE display labels and descriptions", () => {
   assert.equal(isSafePublicText("Grafana", 150), true);
@@ -45,5 +45,14 @@ test("rejects private paths wrapped in punctuation or key-value fields", () => {
 test("keeps ordinary public descriptions containing relative URLs", () => {
   for (const value of ["Documentation /docs/index", "Services /architecture", "Proxy /api/status"]) {
     assert.equal(isSafePublicText(value), true, value);
+  }
+});
+
+test("public service IDs reject numbers, objects, empty and non-canonical values", () => {
+  for (const value of [123, 0, true, [], {}, null, undefined, "", "Grafana", "service_name", "service/path", "service--child"]) {
+    assert.equal(isSafePublicServiceId(value), false, String(value));
+  }
+  for (const value of ["grafana", "grafana-api", "a1-b2", "service-42"]) {
+    assert.equal(isSafePublicServiceId(value), true, value);
   }
 });

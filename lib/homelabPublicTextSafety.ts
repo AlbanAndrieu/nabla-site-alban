@@ -11,3 +11,8 @@ export function isSafePublicText(value: unknown, maxLength = 500): value is stri
     !PRIVATE_IPV6.test(value) && !PRIVATE_PATH.test(value) &&
     !CONTROL_CHARACTER.test(value);
 }
+
+/** A malformed or coerced SERVICE identity must never enter public React state. */
+export function isSafePublicServiceId(value: unknown): value is string {
+  return typeof value === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+}
