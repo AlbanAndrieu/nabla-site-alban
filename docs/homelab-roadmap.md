@@ -1,3 +1,15 @@
+## P0 — Contrat constaté sur la réponse OWNER du 24 octobre 2026
+
+- [x] Vérification utilisateur : hors Wi-Fi `trusted:true, mode:public-readonly, networkAllowed:false` ; sur Wi-Fi `trusted:true, reason:authorized, networkAllowed:true`. Ne plus diagnostiquer le CIDR domestique comme cause des cartes vides. Le `trusted:true` externe signifie accès public en lecture seule, **pas** accès OWNER.
+- [x] Snapshot FastAPI `schema_version=6` à 13:08:36 UTC : 95 applications TrueNAS (81 RUNNING, 13 STOPPED, 1 DEPLOYING), 88 entrées services (27 ok, 24 warn, 14 fail, 23 unknown).
+- [x] Source de l'absence de preuves LAN : `internal_probes_enabled=false`, 86 services éligibles, 0 échantillonné ; couverture publique 57,1 % (16/28 connus) ; `health_board.state=stale`, 164 s, refreshing.
+- [x] Incohérence runtime Prometheus : app RUNNING, conteneur `prometheus` exited. Le backend de la PR `fastapi-sample#373` possède déjà `runtime_primary_container_issue` et ses tests ; vérifier son déploiement effectif avant d'ajouter un second détecteur.
+- [ ] Adapter les cartes et les sondes à `exposure.declared.internal_host/internal_port` : `internal_services` est vide lorsque les sondes LAN sont désactivées ; afficher « adresse déclarée, non sondée » et ne jamais prétendre qu'un lien HTTP est validé.
+- [ ] Revoir les écarts entre inventaire et Cloudflare avant toute utilisation de l'origine comme lien : Gatus (8085 observé / 30287 déclaré), Bichon (15630 / 30313), Garage Web UI (3900 / 3909), Garage Admin (3909 / 3903). Le lien externe doit respecter `exposure.declared.external=false`.
+- [ ] Vérifier la politique de rotation (12 sondes publiques par cycle, 28 éligibles), l'absence de preuves directes pour 74/88 entrées du snapshot et la séparation `observed_at` (inventaire) / `direct_probe_observed_at` (sonde HTTP).
+- [ ] Ajouter le mode LAN depuis le collecteur homelab autorisé, jamais depuis le cloud public ; activer uniquement après vérification des règles réseau, de la protection SSRF et des budgets de sondes.
+- [ ] Confirmer depuis le navigateur sur Wi-Fi les réponses HTTP /api/homelab-health et /api/homelab-probes, les erreurs JS et le rendu des cartes sur la Preview SHA exact. Aucun contournement d'authentification.
+
 ## P0 — Restaurer les diagnostics des cartes TrueNAS (24 octobre 2026)
 
 - [x] Reproduire avec le JSON FastAPI schema v6 du 24/10 : 95 applications TrueNAS (81 RUNNING, 13 STOPPED, 1 DEPLOYING), 88 services, 0 entrée `internal_services`, mais 85/88 exposent un host et un port LAN déclarés. Les sondes LAN sont explicitement désactivées ; `health_board.state=stale` au moment du relevé.
