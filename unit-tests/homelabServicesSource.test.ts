@@ -8,7 +8,7 @@ import {
   HOMELAB_SERVICES_DEFAULT_API_URL,
   homelabServiceEndpointUrl,
   parseHomelabServicesCatalog,
-} from "../lib/homelabLegacyCatalogFixture";
+} from "./helpers/homelabLegacyCatalogFixture";
 import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
 import { withPublicReadOnly } from "./helpers/homelabPublicReadOnly";
 
