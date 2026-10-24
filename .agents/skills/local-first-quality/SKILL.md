@@ -98,3 +98,29 @@ Git metadata as proof that the full publication gate passed.
 
 Report the PR link, final SHA, changed paths, checks actually executed,
 tests not executed, and any remaining risks. Use simple sentences.
+
+## External UI skills — manual installation
+
+External skills are optional inputs, not a substitute for this repository's
+local checks. Ask the repository owner to install them manually. Do not run
+remote skill installers without explicit approval.
+
+1. Request installation of Vercel's `web-design-guidelines` skill:
+   `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`.
+2. Request installation of Anthropic's `frontend-design` skill:
+   `npx skills add https://github.com/anthropics/skills --skill frontend-design`.
+3. Review external skill instructions before applying them to the repository.
+4. Keep UI changes in the existing work PR when possible.
+5. Run targeted accessibility and component tests locally.
+6. Mark unavailable visual or browser verification as `NOT_RUN`.
+
+## Zero-credit GitHub Actions mode
+
+- Treat the user's explicit no-CI instruction as a hard constraint.
+- Work in a Draft PR. Do not convert it to Ready without approval.
+- Do not dispatch a GitHub Actions workflow or request a rerun.
+- Do not claim that Draft alone suppresses push-triggered workflows; inspect
+  their event filters before a commit or remote write.
+- Prefer a local checkout with the exact PR HEAD and local checks.
+- State which checks were run and which were not run.
+- Never weaken required security checks to make a future merge pass.
