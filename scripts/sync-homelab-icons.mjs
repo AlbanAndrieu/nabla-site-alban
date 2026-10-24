@@ -42,9 +42,9 @@ export function renderIconModule(catalog, assetDirectory = ICON_DIR) {
 
 function main(argv) {
   const sourceIndex = argv.indexOf("--source");
-  if (sourceIndex < 0 || !argv[sourceIndex + 1] || argv.some(
-    (arg, index) => arg.startsWith("--") && arg !== "--source" && arg !== "--check"
-  )) {
+  if (sourceIndex < 0 || !argv[sourceIndex + 1] ||
+      argv[sourceIndex + 1].startsWith("--") ||
+      argv.some((arg) => arg.startsWith("--") && arg !== "--source" && arg !== "--check")) {
     throw new Error("Usage: node scripts/sync-homelab-icons.mjs --source ../nabla-compose/catalog/service-icons.json [--check]");
   }
   const source = resolve(argv[sourceIndex + 1]);
