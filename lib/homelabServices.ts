@@ -98,7 +98,8 @@ export function homelabServiceDisplayName(service: HomelabService): string {
     : service.kind === "api" || id.endsWith("-api")
       ? "API"
       : VERIFIED_WEB_UI_IDS.has(id) ? "UI" : null;
-  if (!role || new RegExp(`\\b${role}$`, "i").test(name)) return name;
+  if (!role || new RegExp(`\\b${role}$`, "i").test(name) ||
+      (role === "UI" && /Web\s?UI$/i.test(name))) return name;
   return `${name} ${role}`;
 }
 
