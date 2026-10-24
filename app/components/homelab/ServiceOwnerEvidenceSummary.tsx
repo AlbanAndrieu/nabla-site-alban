@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import type {
   HomelabHealthEntry, HomelabHealthSnapshot, TrueNasRuntimeApp,
 } from "@/lib/homelabHealth";
+import { describeServiceProbe, type ProbeDisplay } from "@/lib/homelabProbeEvidencePresentation";
 import styles from "./HomelabServicesBlock.module.css";
 
 function timestamp(value: string | null | undefined): string | null {
@@ -54,9 +55,9 @@ export default function ServiceOwnerEvidenceSummary({
   const stale = unavailable || snapshot.truenas_runtime_stale === true ||
     entry?.observation_stale === true || entry?.probe_stale === true ||
     entry?.direct_probe_stale === true || entry?.internal_probe_stale === true;
-  const probeAt = timestamp(entry?.direct_probe_observed_at) ??
-    timestamp(entry?.internal_probe_observed_at) ??
-    timestamp(entry?.probe_observed_at);
+  const publicProbe = describeServiceProbe(entry, snapshot, "public");
+  const internalProbe = describeServiceProbe(entry, snapshot, "internal");
+  const probeAt = publicProbe.observedAt ?? internalProbe.observedAt;
   const runtimeAt = timestamp(entry?.observed_at);
   const primary = primaryContainerState(entry, snapshot);
   const primaryFailed = entry?.runtime_primary_container_issue === true ||
@@ -65,10 +66,28 @@ export default function ServiceOwnerEvidenceSummary({
   const tls = entry?.tls_trusted;
   const tunnelState = entry?.tunnel_status?.toLowerCase() ?? "";
   const accessBlocked = entry?.public_probe_verification === "access_protected_origin_unverified";
-  const probeCached = entry?.direct_probe_source === "memory" || entry?.internal_probe_source === "memory";
   const tunnelConfirmed = !stale && entry?.tunnel_stale !== true &&
     entry?.cloudflare_status_confirmed !== false && Boolean(tunnelState);
 
+  const probeLabel = (probe: ProbeDisplay): string => {
+    switch (probe.state) {
+      case "disabled": return fr ? "désactivée" : "disabled";
+      case "not-run": return fr ? "non exécutée" : "not run";
+      case "stale": return fr ? "mesure périmée" : "stale evidence";
+      case "failed": return fr ? "échec confirmé" : "confirmed failure";
+      case "observed": return probe.source === "memory" ?
+        (fr ? "observée · cache" : "observed · cached") :
+        (fr ? "observée" : "observed");
+    }
+  };
+  const probeMetric = (key: string, label: string, probe: ProbeDisplay): Metric => ({
+    key, icon: "fas fa-satellite-dish", label,
+    value: `${probeLabel(probe)}${probe.observedAt ?
+      ` · ${probe.observedAt.replace("T", " ").slice(0, 19)} UTC` : ""}`,
+    state: probe.state === "failed" ? "fail" :
+      probe.state === "stale" ? "warn" :
+      probe.state === "observed" ? "observed" : "unknown",
+  });
   const metrics: Metric[] = [
     {
       key: "docker", icon: "fas fa-server", label: "Docker/TrueNAS",
@@ -111,13 +130,8 @@ export default function ServiceOwnerEvidenceSummary({
       value: fr ? "scrape non fourni" : "scrape unavailable",
       state: "unknown",
     },
-    {
-      key: "probe", icon: "fas fa-satellite-dish", label: fr ? "Dernière sonde" : "Last probe",
-      value: probeAt ? probeAt.replace("T", " ").slice(0, 19) +
-        ` UTC${probeCached ? (fr ? " · cache" : " · cached") : ""}` :
-        (fr ? "aucune sonde HTTP/TCP" : "no HTTP/TCP probe"),
-      state: !probeAt || stale ? "unknown" : probeCached ? "warn" : "observed",
-    },
+    probeMetric("probe", fr ? "Sonde HTTPS publique" : "Public HTTPS probe", publicProbe),
+    probeMetric("lan", fr ? "Sonde TCP LAN" : "LAN TCP probe", internalProbe),
   ];
 
   return (
@@ -141,7 +155,8 @@ export default function ServiceOwnerEvidenceSummary({
       ) : null}
       {snapshot.internal_probes_enabled === false ? (
         <small data-owner-internal-disabled>
-          {fr ? "Sondes LAN désactivées côté collecteur" : "LAN probes disabled at collector"}
+          {fr ? "Le collecteur FastAPI interrogé n'exécute pas les sondes LAN."
+            : "The selected FastAPI collector does not run LAN probes."}
         </small>
       ) : null}
       {boardStale ? (
