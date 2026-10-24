@@ -32,6 +32,7 @@ import {
 	serviceIconPath,
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
+import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
 
 type Props = {
 	svc: HomelabService;
@@ -63,14 +64,14 @@ export default function HomelabServiceCard({
 }: Props) {
 	const t = useTranslations("homelab");
 	const hasInternal =
-		typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 	const isExternal = svc.external === true;
 	const isPrivateEndpoint = !isExternal;
 	const privateExposureDebt =
 		serviceId === "garage" &&
 		endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
 		isExternal;
-	const endpointEnabled = svc.endpointEnabled !== false;
+	const endpointEnabled = !readOnly && svc.endpointEnabled !== false;
 	const initialHealth = reconciledHealth(
 		serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
 		svc,
@@ -190,6 +191,14 @@ export default function HomelabServiceCard({
 						</p>
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
+          {!readOnly && snapshot && (
+            <ServiceOwnerEvidenceSummary entry={initialHealth} snapshot={snapshot} />
+          )}
+          {!readOnly && !snapshot && (
+            <p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
+              {t("health.states.unknown")} · Docker, TLS, Cloudflare, Prometheus, sonde : données indisponibles
+            </p>
+          )}
 					<ServiceHealthReasons
 						entry={initialHealth}
 						state={presentationState}
@@ -240,7 +249,7 @@ export default function HomelabServiceCard({
 							</span>
 						)}
 						<EndpointAction
-							url={endpointUrl}
+							url={readOnly ? "" : endpointUrl}
 							enabled={endpointEnabled}
 							external={isExternal}
 							tunnelSecure={svc.tunnelSecure === true}
@@ -249,6 +258,17 @@ export default function HomelabServiceCard({
 							snapshotCheckedAt={snapshot?.checked_at}
 							truenasDown={truenasDown && dependsOnTrueNas}
 						/>
+            {!readOnly && endpointEnabled && endpointUrl && (
+              <small className="text-break text-start" data-owner-external-target>
+                {endpointUrl}
+                {externalUrlDerived ? " · cible déclarée, sonde non confirmée" : ""}
+              </small>
+            )}
+            {hasInternal && !internalProtocolObserved && (
+              <small className="text-start text-warning" data-owner-internal-protocol>
+                Protocole LAN non confirmé · lien HTTP proposé
+              </small>
+            )}
 						{hasInternal && (
 							<a
 								href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
