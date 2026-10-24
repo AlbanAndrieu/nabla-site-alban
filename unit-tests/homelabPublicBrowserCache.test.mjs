@@ -281,3 +281,15 @@ test("unsafe topology labels are discarded without fabricating graph edges", () 
   assert.equal(parsed.topology, null);
   assert.equal(parsed.catalog.services.length, 1);
 });
+
+test("public SERVICE rejects non-string identifiers before React or localStorage", () => {
+  for (const id of [42, true, null, [], {}, "", "Grafana", "broken/path"]) {
+    const original = catalogFixture();
+    const malformed = {
+      ...original,
+      services: [{ ...original.services[0], id }],
+    };
+    assert.equal(parsePublicHomelabCatalogPayload(malformed), null, String(id));
+    assert.equal(writePublicCatalogCache(storageFixture(), malformed, null, 1000), false, String(id));
+  }
+});

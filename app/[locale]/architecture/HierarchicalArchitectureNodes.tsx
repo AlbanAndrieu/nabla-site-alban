@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
 	Handle,
 	type NodeProps,
@@ -11,6 +13,7 @@ import {
 	isHttpsEndpoint,
 	tlsIndicatorColor,
 } from "@/lib/homelabHealthPresentation";
+import { homelabIconFallback } from "@/lib/homelabIconFallback";
 import { ArchitectureDependencyBadges } from "./ArchitectureDependencyEvidence";
 import styles from "./HierarchicalArchitectureExplorer.module.css";
 import type {
@@ -36,9 +39,10 @@ function ArchitectureGroupNode({ data }: NodeProps) {
 	);
 }
 
-function ArchitectureNode({ data, selected }: NodeProps) {
+function ArchitectureNode({ data, selected, id }: NodeProps) {
 	const item = data as ArchitectureNodeData;
-	const fallback = item.name.trim().slice(0, 2).toUpperCase();
+	const [failedIconSrc, setFailedIconSrc] = useState<string | null>(null);
+	const fallback = homelabIconFallback(id, item.name);
 	const healthColor = item.healthState
 		? homelabHealthColor(item.healthState)
 		: undefined;
@@ -80,17 +84,24 @@ function ArchitectureNode({ data, selected }: NodeProps) {
 			</div>
 			<div className={styles.nodeHeading}>
 				<span className={styles.nodeIconFrame} aria-hidden="true">
-					{item.iconSrc ? (
+					{item.iconSrc && failedIconSrc !== item.iconSrc ? (
 						<img
 							className={styles.nodeIconImage}
 							src={item.iconSrc}
 							alt=""
 							loading="lazy"
+							onError={() => setFailedIconSrc(item.iconSrc ?? null)}
 						/>
-					) : item.icon ? (
+					) : item.icon && !item.iconSrc ? (
 						<span className={styles.nodeIcon}>{item.icon}</span>
 					) : (
-						<span className={styles.nodeIconFallback}>{fallback}</span>
+						<span
+							className={styles.nodeIconFallback}
+							style={{ backgroundColor: fallback.backgroundColor }}
+							data-architecture-icon-fallback={id}
+						>
+							{fallback.label}
+						</span>
 					)}
 				</span>
 				<strong

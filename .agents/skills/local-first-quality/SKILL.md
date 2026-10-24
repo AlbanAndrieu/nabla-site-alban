@@ -99,6 +99,67 @@ Git metadata as proof that the full publication gate passed.
 Report the PR link, final SHA, changed paths, checks actually executed,
 tests not executed, and any remaining risks. Use simple sentences.
 
+## Compose #274 parity — safe local-first agent execution
+
+Source: https://github.com/AlbanAndrieu/nabla-compose/pull/274 .
+These are shared **safety patterns**, not Compose deployment commands.
+Preserve Site Alban's AGENTS.md and package-lock.json as the authorities.
+
+### Safe worktrees and prerequisite isolation
+
+- **Never run strict Bash options in an interactive parent shell.** Use
+  a child Bash script or a quoted heredoc for multi-step instructions.
+  Verify an intermediate failure stops that child without closing the
+  operator's terminal.
+- Pin each agent to the selected PR's exact SHA and an isolated worktree.
+  Worktrees share Git objects, so serialize metadata changes with flock.
+  Never share writable node_modules, .next, .venv or uncommitted output.
+  Treat /tmp as disposable; store persistent Git and validation evidence
+  outside it. Do not use reset --hard, clean -fd or worktree prune
+  against unknown working copies.
+- Check .nvmrc, mise.toml, package.json and package-lock.json first.
+  Use Node 24 LTS and locked npm ci before typecheck/build.
+  A Node 22 unit smoke is L1 evidence, **not** a Node 24 build or L3.
+  Do not edit lockfiles to work around missing tooling.
+- For Python helpers **only if** a committed pyproject.toml and uv.lock
+  exist, run uv sync --locked in that worktree with its own .venv.
+  Share just the uv download cache (e.g. $HOME/.cache/uv), not the
+  installed packages or VIRTUAL_ENV. Do not create a Python project
+  merely to validate JavaScript.
+- Never source .envrc, allow direnv, install global packages, or load
+  production secrets for a read-only quality check.
+
+### Exact-HEAD validation, publication and preview
+
+1. Check that the user-selected PR is open and Draft. Pin head and base.
+2. Inspect only relevant changed files and the first failing test.
+3. Run just context and just preflight in the isolated checkout.
+4. Reproduce a failure against original code and cover a negative case.
+5. Classify missing prerequisites as MISSING_RUNTIME, MISSING_DEPS or
+   NO_CHECKOUT; classify actual failures as TEST_FAIL or BUILD_FAIL.
+6. Run npm ci, npm run typecheck, npm run build and the canonical
+   npm run quality:agent:publish on Node 24 and a clean committed checkout.
+7. Re-read remote PR HEAD before writing. Use optimistic blob-SHA
+   updates or a normal fast-forward; never write to master.
+8. Report L0/L1/L2/L3, NOT_RUN, exact SHA and remaining blockers.
+
+If shell DNS prevents a clone, do not retry in a loop. Reconstruct
+minimum required exact files through the GitHub connector, or use a
+trusted exact-SHA archive with its checksum validated. A partial fixture,
+or an archive without .git, cannot prove the full publication gate.
+
+**Site-specific CI contract remains unchanged:** no [skip ci],
+no --no-verify, no bypass of SAST/secrets/hooks, no manual paid
+GitHub Actions reruns. A Draft PR does not suppress every push trigger.
+
+For Preview acceptance, verify Vercel project Node 24.x, build logs
+and Git SHA match the **current** PR HEAD. READY is necessary but not
+sufficient. Review FR/EN TrueNAS, local icons and 404 monograms,
+ReactFlow, keyboard access, public SERVICE redaction and OWNER
+diagnostics. Verify privileged LAN probes only from an authorized
+environment; do not invent access evidence. Never promote a Preview
+or claim the production domain has been validated on build status alone.
+
 ## External UI skills — manual installation
 
 External skills are optional inputs, not a substitute for this repository's

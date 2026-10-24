@@ -25,10 +25,19 @@ source-check:
     bash scripts/test-agent-quality-oscillation.sh
     node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts unit-tests/agentSourceSnapshot.test.ts
     node --test unit-tests/homelabIconSync.test.mjs unit-tests/ciBudgetConvergence.test.mjs unit-tests/k8sStandaloneContract.test.mjs unit-tests/homelabOwnerContracts.test.mjs unit-tests/ltsStackContract.test.mjs
+    node --experimental-strip-types --test unit-tests/homelabIconFallback.test.mjs
+    node --test unit-tests/homelabIconFailureContracts.test.mjs
+    node --test unit-tests/homelabCatalogIconAssets.test.mjs
+    node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
+    node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs
     node --experimental-strip-types --test unit-tests/homelabProbeEvidencePresentation.test.mjs
     python3 -m unittest discover -s unit-tests -p "test_github_actions_usage.py"
     @echo "QG_SOURCE_CHECK_OK: targeted offline smoke only; publication gate NOT_RUN"
+
+# Validate local icon bundle without a nabla-compose checkout.
+icons-local-check:
+    node --test unit-tests/homelabCatalogIconAssets.test.mjs
 
 # Offline upstream icon sync. Run in a checkout alongside nabla-compose.
 icons-sync source="../nabla-compose/catalog/service-icons.json":
