@@ -21,6 +21,7 @@ type Props = {
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
 	ownerBoundary?: boolean;
+  readOnly?: boolean;
 };
 
 export default function HomelabServiceGrid({
@@ -30,6 +31,7 @@ export default function HomelabServiceGrid({
 	healthUnavailable = false,
 	healthHttpStatus = null,
 	ownerBoundary = false,
+  readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
@@ -120,9 +122,10 @@ export default function HomelabServiceGrid({
 			<div className="row service-grid">
 				{services.map((svc, serviceIndex) => {
 					const serviceId = homelabServiceId(svc);
-					const observed = observedOwnerServiceNavigation(svc, snapshot);
+					const observed = observedOwnerServiceNavigation(svc, readOnly ? null : snapshot);
 					const displayService = observed.service;
-					const endpointUrl = observed.externalUrl || (snapshot ? "" : homelabServiceEndpointUrl(svc));
+					const endpointUrl = !readOnly ? observed.externalUrl ||
+            (svc.endpointEnabled === true ? homelabServiceEndpointUrl(svc) : "") : "";
 					return (
 						<HomelabServiceCard
 							key={`${serviceId}:${endpointUrl}`}
@@ -134,7 +137,7 @@ export default function HomelabServiceGrid({
 							}
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
-							observedNavigation={snapshot !== null}
+							readOnly={readOnly}
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
 							anchorId={
