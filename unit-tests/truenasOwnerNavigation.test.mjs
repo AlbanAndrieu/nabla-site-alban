@@ -140,8 +140,8 @@ test("cards precede a deferred ReactFlow and troubleshooting is opt-in", () => {
   for (const id of ["docker", "https", "cloudflare", "http", "latency", "prometheus"]) {
     assert.match(summary, new RegExp('key: "' + id + '"'));
   }
-  assert.match(summary, /const boardStale = snapshot\\.health_board/);
-  assert.match(summary, /const stale = unavailable \\|\\| snapshot\\.truenas_runtime_stale/);
+  assert.match(summary, /const boardStale = snapshot\.health_board/);
+  assert.match(summary, /const stale = unavailable \|\| snapshot\.truenas_runtime_stale/);
   assert.match(summary, /data-owner-board-stale/);
   assert.match(summary, /access_protected_origin_unverified/);
   const probeHelper = readFileSync(new URL("lib/homelabProbeEvidencePresentation.ts", root), "utf8");
