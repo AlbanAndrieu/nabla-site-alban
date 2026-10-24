@@ -601,7 +601,8 @@ export default function HomelabServicesBlock({
 								: "Relations unavailable: showing declared services only."}
 						</p>
 					) : null}
-					{graphInView ? <HierarchicalArchitectureExplorer
+					{graphInView ? (
+						<HierarchicalArchitectureExplorer
 						locale={locale}
 						catalog={state.catalog}
 						catalogSource="backstage-v2"
@@ -613,7 +614,12 @@ export default function HomelabServicesBlock({
 						}
 						readOnly={readOnly}
 						initialMode="services"
-					/>
+						/>
+					) : (
+						<p role="status" data-homelab-graph-deferred>
+							{french ? "Graphe chargé à l’approche de la section." : "Graph loads near the viewport."}
+						</p>
+					)}
 				</section>
 			) : null}
 
