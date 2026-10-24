@@ -60,6 +60,15 @@
 - [ ] Lire la sortie complète fournie par l'utilisateur et résoudre les chemins relatifs depuis le répertoire `supporting-files` annoncé ; vérifier la provenance avant utilisation.
 - [ ] Demander séparément l'accord avant d'installer tout autre skill externe ; ne rien installer sur TrueNAS/Talos.
 
+
+## P0 — Alignement local-first Compose #274
+
+- [x] Reporter les règles multi-agents de [Compose #274](https://github.com/AlbanAndrieu/nabla-compose/pull/274) : shell enfant, isolation des worktrees, `uv` par worktree pour les helpers Python, `npm ci` verrouillé et contrôle du HEAD avant publication.
+- [x] Préserver l'interdiction Site de `[skip ci]` et les contrôles obligatoires.
+- [ ] Exécuter le build Next.js sous **Node 24 LTS** au HEAD exact ; ne pas assimiler un test Node 22 à la preuve de publication.
+- [ ] Vérifier une Preview Vercel du même SHA (FR/EN, icônes, ReactFlow, OWNER/SERVICE, confidentialité).
+- [ ] Exécuter `just source-check` et la gate complète L3 sur checkout propre lorsque l'environnement Node/npm et le dépôt intégral sont disponibles.
+
 ## Dépendances inter-dépôts — référencées, non reprises comme tâches du site
 
 | Propriétaire | Livrable requis par le site | Lien |
