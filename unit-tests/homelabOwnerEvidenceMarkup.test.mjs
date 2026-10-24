@@ -34,3 +34,15 @@ test("Backstage v2 cards do not revive legacy endpoint links without OWNER evide
   assert.doesNotMatch(grid, /homelabServiceEndpointUrl\(svc\)/);
   assert.match(grid, /!readOnly && !healthUnavailable \? observed\.externalUrl : ""/);
 });
+
+test("LAN navigation labels respect configured HTTP or HTTPS without a real probe", () => {
+  const card = readFileSync(
+    new URL("../app/components/homelab/HomelabServiceCard.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(card, /Protocole LAN non confirmé · schéma configuré utilisé/);
+  assert.match(card, /LAN protocol unconfirmed · configured scheme used/);
+  assert.match(card, /svc\.internalSecure \? "https" : "http"/);
+  assert.doesNotMatch(card, /lien HTTP proposé|HTTP link suggested/);
+  assert.match(card, /hasInternal && !internalProtocolObserved/);
+});

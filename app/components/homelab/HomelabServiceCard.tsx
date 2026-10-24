@@ -305,7 +305,7 @@ export default function HomelabServiceCard({
             )}
             {hasInternal && !internalProtocolObserved && (
               <small className="text-start text-warning" data-owner-internal-protocol>
-                {french ? "Protocole LAN non confirmé · lien HTTP proposé" : "LAN protocol unconfirmed · HTTP link suggested"}
+                {french ? "Protocole LAN non confirmé · schéma configuré utilisé" : "LAN protocol unconfirmed · configured scheme used"}
               </small>
             )}
 						{hasInternal && (
