@@ -83,7 +83,9 @@ export default function useHierarchicalArchitectureGraph({
 	initialMode = "ai",
 }: GraphInputs) {
 	const [mode, setMode] = useState<GraphMode>(initialMode);
-	const [scope, setScope] = useState<GraphScope>("critical");
+	const [scope, setScope] = useState<GraphScope>(
+		initialMode === "services" ? "all" : "critical",
+	);
 	const [showOptional, setShowOptional] = useState(true);
 	const [query, setQuery] = useState("");
 	const { runtimeStatus, runtimeSource } =

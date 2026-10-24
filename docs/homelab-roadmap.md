@@ -1,3 +1,37 @@
+## P0 — Icônes spécifiées par service + cache SERVICE v2 (24 octobre 2026)
+
+- [x] Audit canonique de `nabla-compose/master` : 89 entrées du fichier historique, 77 catalogues d'application Backstage, soit **126 identifiants distincts** ; 30 entrées historiques auparavant génériques, 45 catalogues d'applications sans mapping au début de l'audit.
+- [x] Porter la couverture explicite à **161 alias** et à **149 fichiers locaux** après ajout de 40 pictogrammes/SVG (logo amont quand disponible, pictogramme spécifique documenté sinon). Vérifier qu'aucune des 161 correspondances ne pointe vers un fichier absent ; 0 ID générique parmi les 126 identifiants canoniques audités. Les déclinaisons (ex. `defectdojo-api`) héritent du logo du service parent.
+- [x] Unifier le choix d'icône pour cards TrueNAS et nœuds ReactFlow ; privilégier un mapping embarqué et n'autoriser qu'un chemin sous `assets/selfh-icons/`, jamais un URL externe arbitraire de FastAPI.
+- [x] Cache `localStorage` SERVICE v2 déjà en place, catalogue TTL 15 min et états TTL 2 min ; lecture des anciens états en `stale/unknown`, sans conserver OWNER. Faire évoluer la clé du catalogue `:1` → `:2` pour évincer les anciennes icônes génériques. Purger les deux clés à la révocation.
+- [x] Ajouter des contrats sur l'existence des ressources graphiques et les identifiants canoniques, et un test de migration de cache. Consigner provenance/licences dans `docs/homelab-icon-attributions.md`.
+- [ ] Sur checkout complet Node 24 exécuter la quality gate et les tests du nouveau jeu d'icônes. **Non exécutés localement** : agent sans accès DNS à GitHub, dépôt complet non disponible.
+- [ ] Valider la page réellement déployée `/fr/truenas` en mode OWNER et public, en comparant tous les IDs remontés par FastAPI Backstage v2 aux fichiers locaux, ainsi que ReactFlow et les images dans le navigateur ; aucune prétention de validation de production sans ces preuves.
+
+## P0 — ReactFlow TrueNAS : rendre visibles tous les services déclarés (24 octobre 2026)
+
+- [x] Cause d'une vue trompeusement vide identifiée : le mode `services` initialisait `scope=critical`, ce qui masque les entités de criticité `support` (notamment lorsque Backstage v2 ne publie pas encore de relations de dépendance). Initialiser `scope=all` **uniquement quand** `initialMode=services` ; conserver le filtre « Chemin critique » accessible dans la barre et le défaut `critical` pour le mode AI existant.
+- [x] Ajouter un contrat de régression sur le choix initial « Tous les composants » ; préserver le fallback graphique nœuds seuls quand les relations déclarées sont indisponibles.
+- [ ] Confirmer avec Playwright sur un build Next.js complet que les nœuds/miniatures/icônes apparaissent sur `/fr/truenas` dès que le catalogue v2 est accessible, indépendamment des relations.
+
+## P0 — Isolation des modes OWNER / SERVICE v2 et refus explicites (24 octobre 2026)
+
+- [x] Détecter la portée du catalogue dans le hook (`catalogScope = owner/public`) et masquer **synchroniquement** catalogue, topologie et santé de l'autre mode avant le nettoyage des effets React ; remettre à zéro l'état lors d'un changement de mode.
+- [x] Appliquer le parseur client à liste blanche aux réponses SERVICE v2 HTTP 200 avant de les placer dans l'état React ; les métadonnées privées et URLs étrangères ne doivent jamais être affichées, même si la passerelle renvoie un JSON malformé.
+- [x] Distinguer un refus explicite (`401/403/404`, `reason=access-denied/key-missing`) d'une indisponibilité (`502/503` sans refus) : purger et masquer immédiatement tout LKG public dans le premier cas ; conserver seulement le cache SERVICE validé, borné et signalé périmé dans le second.
+- [x] 5 tests ciblés du nouveau module effectivement exécutés en conteneur sous Node 22 (5/5) et vérification `tsc --strict` du module. Ajout de 2 tests d'intégrité du payload public pour la suite de tests du dépôt.
+- [ ] Sur checkout complet Node 24/npm 12 : `npm ci`, lint, typecheck, tests unitaires React/hook, compilation et Playwright sur transitions OWNER → public → refus, erreurs 502 et `catalogRevision`. **Non exécutés** ici (DNS GitHub indisponible).
+- [ ] Lors d'un test distant, vérifier la présence de ReactFlow, des icônes locales et de l'inventaire effectivement exposé. Ne pas rendre publiques les sondes ou chemins réseau OWNER.
+
+## P1 — Revalidation de l'accès navigateur OWNER / lecture publique (23 octobre 2026)
+
+- [x] Remplacer l'ancien `accessProbe` conservé indéfiniment par un coordinateur client dédupliquant les vérifications concurrentes de TrueNAS et d'Architecture.
+- [x] Réexaminer `/api/homelab-access` toutes les **30 secondes** dans les onglets visibles et au retour au premier plan (délai minimal de 2 secondes pour éviter les rafales).
+- [x] Masquer immédiatement les vues OWNER pendant une nouvelle vérification (`pending`), refuser les réponses inconnues et révoquer le rendu après une erreur HTTP, réseau ou JSON. Conserver toutes les autorisations sur les routes serveur ; ce hook ne constitue jamais un mécanisme d'authentification.
+- [x] Purger les projections publiques stockées localement lorsque l'accès est refusé, y compris après changement de Wi-Fi/VPN. Nettoyer les temporisateurs et événements sur démontage.
+- [x] **22/22 tests ciblés réellement exécutés sur le mini-checkout local** sous Node 22 : 14 sur le cache SERVICE, 6 sur la coordination/expiration d'accès et 2 contrats de branchement React. Contrôle `tsc --strict` du nouveau hook, du coordinateur et du cache avec types React simulés.
+- [ ] Quality gate complète sous Node 24 LTS, tests React/Playwright et Vercel Preview exact-SHA sur les transitions Wi-Fi/OWNER/public, y compris plusieurs composants simultanés. Ne pas créer de PR ou lancer de CI payante avant validation locale complète.
+
 ## P0 — Icônes et ReactFlow TrueNAS / catalogue Backstage v2 (23 octobre 2026)
 
 - [x] Vérifier la version réellement servie par Vercel : la production est toujours sur `55ccc4c` (#247), car le build `53419c1` (#248) a échoué au typecheck. Les quatre erreurs remontent aux valeurs `entityRef` non typées (`unknown`) dans les deux hiérarchies et les filtres.
@@ -10,9 +44,14 @@
 
 ## P1 — Cache navigateur limité aux projections SERVICE v2
 
-- [ ] Évaluer un Last-Known-Good versionné par `catalogRevision`, avec TTL borné et état explicitement `stale/unknown` à expiration. Seuls le catalogue publiable, les relations publiques et les statuts SERVICE stricts sont éligibles.
-- [ ] Ne jamais persister en localStorage, sessionStorage ou IndexedDB des probes, métriques, IP LAN, clés, jetons ou données OWNER ; séparer le cache de présentation du contrôle d'accès et purger à la déconnexion.
-- [ ] Ajouter tests de migration de schéma, de révision divergente, d'expiration TTL et de revalidation en arrière-plan avant toute activation.
+- [x] Last-Known-Good **uniquement en lecture publique** : catalogue SERVICE v2 pendant 15 min, derniers états publiables pendant 2 min, corrélation stricte par `catalogRevision`. Les états issus du cache sont toujours `stale/unknown`, jamais déclarés sains sur la base d'une ancienne mesure.
+- [x] Liste blanche des champs autorisés dans `localStorage` : identité Backstage, nom, icône statique et topologie déclarative sans preuve d'exploitation. Aucun endpoint, IP LAN, clé, sonde ni résultat OWNER ; le hook OWNER n'utilise pas ce cache.
+- [x] Rejeter les références Backstage et les sondes dupliquées ; en cas de topologie incohérente, afficher les nœuds déclarés sans inventer de relations.
+- [x] Onglets de longue durée : revalidation du catalogue toutes les 5 minutes lorsque visible et au retour sur l'onglet, sans rafale de requêtes. Un changement de révision invalide les anciens états SERVICE.
+- [x] Sur décision d'accès `denied`, purger les deux clés du cache public (y compris après désactivation de l'accès anonyme).
+- [x] **14/14 tests unitaires exécutés localement** avec Node 22 et suppression expérimentale des types TypeScript ; `tsc --strict` ciblé réussi. Cas : nettoyage des données, TTL, révisions, doublons, topologies invalides, quota stockage et révocation.
+- [ ] Exécuter `npm ci`, typecheck, lint, tests React/Next et build sous Node 24.22.1 LTS sur un checkout complet ; faire une validation Preview exact-SHA de `/fr/truenas` et `/fr/architecture` en OWNER et lecture publique.
+- [ ] Tester en E2E le retour réseau, l'abandon des requêtes lors du démontage, la cohérence des deux vues et le comportement multi-onglets ; la validation du module isolé ne constitue pas une quality gate globale.
 
 ## P0 — Node.js LTS et outillage stabilisé (23 octobre 2026)
 

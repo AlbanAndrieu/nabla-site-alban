@@ -58,9 +58,10 @@ export const RUNTIME_ICON_CLASS: Record<RuntimePresentationState, string> = {
 };
 
 export function serviceIconPath(iconSrc?: string): string {
-	if (!iconSrc) return "/assets/selfh-icons/generic-app.svg";
-	if (/^https?:\/\//i.test(iconSrc)) return iconSrc;
-	return `/${iconSrc}`;
+	const candidate = iconSrc?.replace(/^\/+/, "");
+	return candidate && /^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/.test(candidate)
+		? `/${candidate}`
+		: "/assets/selfh-icons/generic-app.svg";
 }
 
 export function endpointUrlHostIsPrivateS3(value?: string): boolean {

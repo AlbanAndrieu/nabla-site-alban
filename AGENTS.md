@@ -1,8 +1,9 @@
 # Repository agent rules
 
 Canonical compact policy. Load only the task-specific skill under
-`.agents/skills/nabla-*/SKILL.md`. Do not preload whole skill trees, lockfiles, unrelated docs or
-broad CI logs.
+`.agents/skills/nabla-*/SKILL.md`, or `.agents/skills/local-first-quality/SKILL.md`
+for local tests, quality-gate work and PR validation. Do not preload whole skill
+trees, lockfiles, unrelated docs or broad CI logs.
 
 ## Network-free agent loop
 
