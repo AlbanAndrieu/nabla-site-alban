@@ -58,7 +58,7 @@ test("public cards cannot show owner evidence or clickable private endpoints", (
   const grid = readFileSync(new URL("app/components/homelab/HomelabServiceGrid.tsx", root), "utf8");
   const card = readFileSync(new URL("app/components/homelab/HomelabServiceCard.tsx", root), "utf8");
   const block = readFileSync(new URL("app/components/homelab/HomelabServicesBlock.tsx", root), "utf8");
-  assert.match(grid, /readOnly \? null : snapshot/);
+  assert.match(grid, /readOnly \|\| healthUnavailable \? null : snapshot/);
   assert.match(grid, /readOnly=\{readOnly\}/);
   assert.match(block, /readOnly=\{readOnly\}/);
   assert.match(card, /!readOnly && snapshot/);
