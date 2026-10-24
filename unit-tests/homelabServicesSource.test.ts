@@ -6,6 +6,7 @@ import {
 	getStaticHomelabServicesCatalog,
 	HOMELAB_SERVICES_DEFAULT_API_URL,
 	homelabServiceEndpointUrl,
+	homelabServiceDisplayName,
 	homelabServiceId,
 	parseHomelabServicesCatalog,
 } from "../lib/homelabServices";
@@ -228,4 +229,22 @@ test("public fallback never exposes PostgreSQL binding details", () => {
 			(service) => homelabServiceId(service) === "postgresql",
 		),
 	);
+});
+
+
+test("canonical Home Assistant and Open WebUI IDs retain DNS and container slugs", () => {
+  assert.equal(homelabServiceId({ id: "home-assistant", name: "Home Assistant" }), "homeassistant");
+  assert.equal(homelabServiceId({ id: "open-webui", name: "Open WebUI" }), "openwebui");
+  assert.equal(homelabServiceId({ id: "garage-webui", name: "Garage Web UI" }), "garage-webui");
+});
+
+test("explicitly typed endpoint roles do not duplicate UI, API or MCP", () => {
+  assert.equal(homelabServiceDisplayName({ id: "gatus", name: "Gatus" }), "Gatus UI");
+  assert.equal(homelabServiceDisplayName({ id: "bichon", name: "Bichon" }), "Bichon UI");
+  assert.equal(homelabServiceDisplayName({ id: "home-assistant", name: "Home Assistant" }), "Home Assistant UI");
+  assert.equal(homelabServiceDisplayName({ id: "openwebui", name: "Open WebUI" }), "Open WebUI");
+  assert.equal(homelabServiceDisplayName({ id: "garage-webui", name: "Garage Web UI" }), "Garage Web UI");
+  assert.equal(homelabServiceDisplayName({ id: "garage", name: "Garage S3 API", kind: "object-storage" }), "Garage S3 API");
+  assert.equal(homelabServiceDisplayName({ id: "mcp-cyberbro", name: "Cyberbro", kind: "mcp-server" }), "Cyberbro MCP");
+  assert.equal(homelabServiceDisplayName({ id: "traefik", name: "Traefik", kind: "edge" }), "Traefik");
 });
