@@ -46,6 +46,9 @@ type Props = {
 	truenasDown: boolean;
 	truenasRuntimeUnavailable: boolean;
 	truenasRuntimeStale: boolean;
+	readOnly?: boolean;
+	externalUrlDerived?: boolean;
+	internalProtocolObserved?: boolean;
 };
 
 /** One homelab service card: effective health, runtime and endpoint links. */
@@ -61,6 +64,9 @@ export default function HomelabServiceCard({
 	truenasDown,
 	truenasRuntimeUnavailable,
 	truenasRuntimeStale,
+	readOnly = false,
+	externalUrlDerived = false,
+	internalProtocolObserved = false,
 }: Props) {
 	const t = useTranslations("homelab");
   const french = useLocale() === "fr";
