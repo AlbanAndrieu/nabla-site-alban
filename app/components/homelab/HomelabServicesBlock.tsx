@@ -258,6 +258,21 @@ export default function HomelabServicesBlock({
 						: "SERVICE v2 catalog restored from this browser. Data may be stale; health remains unknown until a fresh check."}
 				</p>
 			)}
+      {!readOnly && !state.healthRefreshing && !state.snapshot && (
+        <div className="alert alert-warning" role="status" data-owner-diagnostics-unavailable>
+          <strong>{french ? "Diagnostics OWNER indisponibles" : "OWNER diagnostics unavailable"}</strong>
+          <p className="mb-1">
+            {state.ownerBoundary
+              ? (french ? "Le serveur refuse l'accès aux sondes privées (owner-boundary). Vérifiez le canal OWNER, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED et DIAGNOSTICS_ACCESS_KEY côté serveur."
+                  : "The server denies private probes (owner-boundary). Check the OWNER channel, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED and server-side DIAGNOSTICS_ACCESS_KEY.")
+              : (french ? `FastAPI ne fournit pas de preuve détaillée (${state.healthStatus === null ? "réseau ou délai" : `HTTP ${state.healthStatus}`}). Le catalogue et les statuts publics ne confirment pas le fonctionnement de Docker, TLS ou Prometheus.`
+                  : `FastAPI has no detailed evidence (${state.healthStatus === null ? "network or timeout" : `HTTP ${state.healthStatus}`}). Public catalog and health cannot confirm Docker, TLS or Prometheus.`)}
+          </p>
+          <small>{french
+            ? "Consultez /api/homelab-access?diagnose=1 puis /api/homelab-health depuis le réseau autorisé. Aucun lien LAN ne sera inventé."
+            : "Check /api/homelab-access?diagnose=1 and /api/homelab-health from an authorized network. LAN links will not be guessed."}</small>
+        </div>
+      )}
 			{!readOnly && (
 				<HomelabStatusOverview
 					snapshot={state.snapshot}
@@ -571,6 +586,7 @@ export default function HomelabServicesBlock({
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
 									ownerBoundary={state.ownerBoundary === true}
 									healthHttpStatus={readOnly ? null : state.healthStatus}
+									readOnly={readOnly}
 								/>
 							</div>
 						</details>
