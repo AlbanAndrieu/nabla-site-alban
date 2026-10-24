@@ -1,12 +1,12 @@
 ## P0 — Unifier l'autorité des icônes Compose → Site (24 octobre 2026)
 
-- [x] Audit élargi : 128 Component Backstage + 89 anciens services = 179 IDs uniques ; neuf mappings manquaient à la liste précédente de 126 IDs.
-- [x] Définir les 170 correspondances de logos dans `nabla-compose/catalog/service-icons.json:webAssets` et conserver le champ `icons` des graphes historiques intact.
+- [x] Audit élargi : 128 Component, 23 Resource, 89 anciens services et 51 icônes de graphes = **199 IDs distincts** ; 15 mappings complémentaires couvrent les neuf composants, quatre ressources et deux références historiques non couvertes.
+- [x] Définir les 176 correspondances de logos dans `nabla-compose/catalog/service-icons.json:webAssets` et conserver le champ `icons` des graphes historiques intact.
 - [x] Générer `lib/homelabCatalogIcons.generated.ts` hors ligne ; supprimer les alias maintenus manuellement et la liste de services dupliquée dans les tests du site.
 - [x] Unifier cartes et ReactFlow sur un lecteur strict de fichiers locaux ; ignorer toute URL de logo upstream, même interne.
-- [x] Maintenir le cache public SERVICE v2 avec TTL catalogue 15 min et santé 2 min ; ne jamais enregistrer les snapshots OWNER.
+- [x] Maintenir les TTL du cache public SERVICE v2 (catalogue 15 min, santé 2 min) ; migrer la clé catalogue vers :3 et ne plus enregistrer de chemin d'icône redondant ni de snapshot OWNER.
 - [ ] Exécuter `python -m unittest tests.test_service_icon_web_assets` dans Compose et `node --test unit-tests/homelabIconSync.test.mjs unit-tests/homelabIconCoverage.test.mjs` dans le checkout complet du site, puis `just quality` sous Node 24.
-- [ ] Vérifier les cartes, les statuts et ReactFlow sur la Preview exact-SHA, puis vérifier les 179 identités par rapport aux entités réellement exposées par FastAPI.
+- [ ] Vérifier les cartes, les statuts et ReactFlow sur la Preview exact-SHA, puis vérifier les 199 identités par rapport aux entités réellement exposées par FastAPI.
 - [ ] Après migration intégrale des consommateurs v1, retirer `catalog/homelab-services.json.iconSrc` pour éliminer cette dernière duplication historique.
 
 ## P1 — Performances UI TrueNAS
