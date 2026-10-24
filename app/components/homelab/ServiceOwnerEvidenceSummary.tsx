@@ -72,6 +72,7 @@ export default function ServiceOwnerEvidenceSummary({
   const probeLabel = (probe: ProbeDisplay): string => {
     switch (probe.state) {
       case "disabled": return fr ? "désactivée" : "disabled";
+      case "not-configured": return fr ? "non configurée" : "not configured";
       case "not-run": return fr ? "non exécutée" : "not run";
       case "stale": return fr ? "mesure périmée" : "stale evidence";
       case "failed": return fr ? "échec confirmé" : "confirmed failure";
