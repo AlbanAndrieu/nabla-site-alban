@@ -89,6 +89,27 @@ export default function HomelabServicesBlock({
 			}
 		);
 	}, [state.catalog, state.topology]);
+  // Service cards render first; the expensive ReactFlow bundle mounts near viewport.
+  const [graphInView, setGraphInView] = useState(false);
+  const graphRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!graphTopology || graphInView) return;
+    const target = graphRef.current;
+    if (!target) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setGraphInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) {
+        setGraphInView(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "360px" });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [graphTopology, graphInView]);
+
 
 	const indexedHealth = useMemo(
 		() =>
@@ -296,38 +317,6 @@ export default function HomelabServicesBlock({
 				</>
 			)}
 
-			{graphTopology ? (
-				<section
-					data-homelab-service-reactflow
-					aria-labelledby="truenas-service-graph-title"
-				>
-					<h3 id="truenas-service-graph-title">
-						{french
-							? "Graphe interactif des services"
-							: "Interactive service graph"}
-					</h3>
-					{!state.topology ? (
-						<p role="status">
-							{french
-								? "Relations indisponibles : seuls les services déclarés sont affichés."
-								: "Relations unavailable: showing declared services only."}
-						</p>
-					) : null}
-					<HierarchicalArchitectureExplorer
-						locale={locale}
-						catalog={state.catalog}
-						catalogSource="backstage-v2"
-						topology={graphTopology}
-						topologySource={state.topology ? "fastapi" : "local-fallback"}
-						healthStatus={readOnly ? null : state.snapshot}
-						healthSource={
-							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
-						}
-						readOnly={readOnly}
-						initialMode="services"
-					/>
-				</section>
-			) : null}
 
 			<section
 				id="truenas-health-dashboard"
@@ -593,6 +582,40 @@ export default function HomelabServicesBlock({
 					);
 				})}
 			</div>
+
+			{graphTopology ? (
+				<section
+					data-homelab-service-reactflow
+                    ref={graphRef}
+					aria-labelledby="truenas-service-graph-title"
+				>
+					<h3 id="truenas-service-graph-title">
+						{french
+							? "Graphe interactif des services"
+							: "Interactive service graph"}
+					</h3>
+					{!state.topology ? (
+						<p role="status">
+							{french
+								? "Relations indisponibles : seuls les services déclarés sont affichés."
+								: "Relations unavailable: showing declared services only."}
+						</p>
+					) : null}
+					{graphInView ? <HierarchicalArchitectureExplorer
+						locale={locale}
+						catalog={state.catalog}
+						catalogSource="backstage-v2"
+						topology={graphTopology}
+						topologySource={state.topology ? "fastapi" : "local-fallback"}
+						healthStatus={readOnly ? null : state.snapshot}
+						healthSource={
+							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
+						}
+						readOnly={readOnly}
+						initialMode="services"
+					/>
+				</section>
+			) : null}
 
 			{state.topology ? (
 				<CriticalDependencyHierarchy
