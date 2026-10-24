@@ -5,7 +5,7 @@ import type {
 
 /** A missing probe is never a failed probe. Only a timestamped probe can fail. */
 export type ProbeDisplayState =
-  | "disabled" | "not-run" | "stale" | "failed" | "observed";
+  | "disabled" | "not-configured" | "not-run" | "stale" | "failed" | "observed";
 
 export type ProbeDisplay = {
   state: ProbeDisplayState;
@@ -42,6 +42,8 @@ export function describeServiceProbe(
 
   // "sampled" and "observed" are not synonyms: an eligible target can wait
   // several rotating windows before it is executed for the first time.
+  if (scope === "internal" && entry?.internal_probe_execution === "not-configured")
+    return { ...base, state: "not-configured" };
   if (!entry || !observedAt) return { ...base, state: "not-run" };
 
   const stale = scope === "public" ?
