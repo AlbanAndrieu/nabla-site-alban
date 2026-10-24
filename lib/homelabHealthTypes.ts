@@ -126,8 +126,21 @@ export type HomelabInternalHealthEntry = HomelabRollingProbeEvidence & {
 	error?: string;
 };
 
+export type TrueNasRuntimeContainer = {
+  service_name?: string | null;
+  state?: string | null;
+};
+
+export type TrueNasRuntimeApp = {
+  id: string;
+  name: string;
+  state: string;
+  active_workloads?: { container_details?: TrueNasRuntimeContainer[] };
+};
+
 export type TrueNasApiHealth = {
 	reachable: boolean;
+	apps?: TrueNasRuntimeApp[];
 	error?: string;
 };
 
