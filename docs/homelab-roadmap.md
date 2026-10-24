@@ -14,7 +14,7 @@
 
 ## P0 — Terminer la migration d'affichage Backstage v2
 
-- [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `lib/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
+- [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `unit-tests/helpers/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
 - [ ] Vérifier les consommateurs de données restants, dont les fixtures statiques de topologie et les scripts, avant toute suppression de fichier v1. Conserver les contrats de compatibilité uniquement dans les tests.
 - [ ] Assurer une correspondance non ambiguë `entityRef` pour les cartes et le graphe, y compris sous-composants, ressources et exporters. Un ID absent ou ambigu affiche `unknown`.
 - [ ] Résoudre les icônes à partir du mapping généré Compose `lib/homelabCatalogIcons.generated.ts` ; vérifier les assets réels, l'attribution et les chemins d'icônes sur FR/EN. Aucun second référentiel `iconSrc`.
