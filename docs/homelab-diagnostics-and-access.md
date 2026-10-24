@@ -71,3 +71,12 @@ Tout en-tête inconnu est ramené à `upstream_http`.
   nettoyage du cache `localStorage`.
 - Exiger Playwright/Node 24 et le HEAD exact avant de considérer une Preview
   comme validation fonctionnelle.
+
+## Première présentation OWNER
+
+Les deux routes catalogue utilisent le même constructeur de 503 et le même
+`X-Nabla-Request-ID` de support. La grille TrueNAS affiche le stage et l'ID
+**uniquement en mode OWNER** après un refus ou un échec de collecte.
+Le mode SERVICE ignore ces métadonnées et ne les stocke pas dans le cache
+public. Le renouvellement du catalogue supprime l'incident de l'état React.
+L'identifiant appartient encore au Site, pas à une trace FastAPI distribuée.

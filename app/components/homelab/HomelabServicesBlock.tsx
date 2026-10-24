@@ -237,6 +237,13 @@ export default function HomelabServicesBlock({
 								? "Clé serveur manquante : catalogue Backstage v2 indisponible."
 								: "Missing server key: Backstage v2 catalog unavailable."
 							: t("unavailable")}
+				{!readOnly && state.error && state.catalogIncident && (
+					<p className="small text-muted mt-2" data-catalog-failure-stage={state.catalogIncident.stage}>
+						{french ? "Phase du diagnostic" : "Diagnostic stage"}: <code>{state.catalogIncident.stage}</code>
+						{" · "}
+						{french ? "Référence support" : "Support reference"}: <code>{state.catalogIncident.requestId}</code>
+					</p>
+				)}
 			</div>
 		);
 	}
