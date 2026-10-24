@@ -122,8 +122,9 @@ export function observedOwnerServiceNavigation(
 
   const internalProtocol = internalFromUrl?.protocol ??
     (matchingOrigin ? tunnelOrigin?.protocol : undefined);
-  const source = !hasInternal ? "none" as const : probe || internalFromUrl ?
-    "probe" as const : "declared" as const;
+  // A configured URL is not evidence of a successful LAN probe.
+  const source = !hasInternal ? "none" as const :
+    probe ? "probe" as const : "declared" as const;
 
   return {
     service: {
@@ -139,7 +140,8 @@ export function observedOwnerServiceNavigation(
     },
     externalUrl,
     externalUrlDerived: Boolean(externalUrl) && entry.url_derived === true,
-    internalProtocolObserved: Boolean(internalProtocol),
+    // A protocol inferred from a canonical URL is not a measured probe result.
+    internalProtocolObserved: Boolean(internalProtocol && (probe || matchingOrigin)),
     internalTargetSource: source,
     internalRouteMismatch,
   };
