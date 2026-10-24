@@ -250,3 +250,34 @@ test("successful v3 cache writes clean up old v1 and v2 icon projections", () =>
   assert.equal(writePublicCatalogCache(storage, catalogFixture(), null, 1000), true);
   assert.deepEqual([...storage.values.keys()], ["nabla:homelab:catalog-public-v2:3"]);
 });
+
+
+test("public SERVICE text cannot carry IPs, URLs or credentials into browser storage", () => {
+  const storage = storageFixture();
+  const catalog = catalogFixture();
+  catalog.services[0].description = "Dashboard: https://internal.example";
+  catalog.services[0].kind = "service";
+  catalog.services[0].category = "token=must-not-store";
+  assert.equal(writePublicCatalogCache(storage, catalog, null, 1000), true);
+  const stored = [...storage.values.values()].join(" ");
+  assert.equal(stored.includes("internal.example"), false);
+  assert.equal(stored.includes("must-not-store"), false);
+  const restored = readPublicCatalogCache(storage, 1001);
+  assert.equal("description" in restored.catalog.services[0], false);
+  assert.equal("category" in restored.catalog.services[0], false);
+
+  const poisonedName = catalogFixture();
+  poisonedName.services[0].name = "Grafana 172.17.0.24";
+  assert.equal(parsePublicHomelabCatalogPayload(poisonedName), null);
+  assert.equal(writePublicCatalogCache(storageFixture(), poisonedName, null, 1000), false);
+});
+
+test("unsafe topology labels are discarded without fabricating graph edges", () => {
+  const catalog = catalogFixture();
+  const topology = topologyFixture();
+  topology.nodes[0].name = "Private http://172.17.0.24:3000";
+  const parsed = parsePublicHomelabCatalogPayload({ ...catalog, topology });
+  assert.ok(parsed);
+  assert.equal(parsed.topology, null);
+  assert.equal(parsed.catalog.services.length, 1);
+});
