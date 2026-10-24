@@ -1,5 +1,12 @@
 ## P0 — Restaurer les diagnostics des cartes TrueNAS (24 octobre 2026)
 
+- [x] Reproduire avec le JSON FastAPI schema v6 du 24/10 : 95 applications TrueNAS (81 RUNNING, 13 STOPPED, 1 DEPLOYING), 88 services, 0 entrée `internal_services`, mais 85/88 exposent un host et un port LAN déclarés. Les sondes LAN sont explicitement désactivées ; `health_board.state=stale` au moment du relevé.
+- [x] Restaurer les liens LAN OWNER depuis `services[].exposure.declared.internal_host/internal_port` lorsque la liste des sondes internes est vide. Respecter `external=false` et `endpoint_enabled=false`, afficher les dérives d'origine Cloudflare et distinguer endpoint déclaré / vérifié.
+- [x] Faire apparaître la preuve de conteneur principal TrueNAS : Prometheus est `RUNNING` au niveau application, mais son conteneur `prometheus` est `exited` au relevé ; ne pas confondre les conteneurs d'initialisation `exited` avec une panne applicative.
+- [x] Réserver « dernière sonde HTTP/TCP » aux seuls horodatages de sonde ; distinguer l'horodatage d'inventaire runtime et afficher clairement le LAN disabled (0% de couverture au relevé).
+- [ ] Exécuter les tests TypeScript/Node sur Node 24 depuis un vrai checkout, puis tester avec un jeu de données expurgé issu du payload FastAPI ; ne jamais committer les 307 Ko de diagnostics privés en fixture.
+
+
 - [x] Identifier la régression : la projection `projectHomelabCatalogV2` impose `endpointEnabled=false` et retire les URLs, IP et ports. En mode `readOnly`, les sondes OWNER sont exclues. Même en OWNER, `ownerUpstreamBlocked` peut renvoyer 503 (`owner-boundary`).
 - [x] Conserver le catalogue Backstage v2 comme autorité des identités et reconstruire uniquement en OWNER les liens à partir des URLs et sondes FastAPI observées ; ne pas fabriquer de cible sur un refus.
 - [x] Ajouter dans les cartes OWNER un résumé Docker/TrueNAS, HTTP, HTTPS/TLS, Cloudflare Tunnel, latence et horodatage de dernière sonde. Les données absentes restent inconnues.
