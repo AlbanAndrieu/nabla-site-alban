@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
@@ -63,6 +63,7 @@ export default function HomelabServiceCard({
 	truenasRuntimeStale,
 }: Props) {
 	const t = useTranslations("homelab");
+  const french = useLocale() === "fr";
 	const hasInternal =
 		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
 	const isExternal = svc.external === true;
@@ -196,7 +197,7 @@ export default function HomelabServiceCard({
           )}
           {!readOnly && !snapshot && (
             <p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
-              {t("health.states.unknown")} · Docker, TLS, Cloudflare, Prometheus, sonde : données indisponibles
+              {t("health.states.unknown")} · {french ? "Docker, TLS, Cloudflare, Prometheus et sondes indisponibles" : "Docker, TLS, Cloudflare, Prometheus and probes unavailable"}
             </p>
           )}
 					<ServiceHealthReasons
@@ -261,12 +262,12 @@ export default function HomelabServiceCard({
             {!readOnly && endpointEnabled && endpointUrl && (
               <small className="text-break text-start" data-owner-external-target>
                 {endpointUrl}
-                {externalUrlDerived ? " · cible déclarée, sonde non confirmée" : ""}
+                {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
               </small>
             )}
             {hasInternal && !internalProtocolObserved && (
               <small className="text-start text-warning" data-owner-internal-protocol>
-                Protocole LAN non confirmé · lien HTTP proposé
+                {french ? "Protocole LAN non confirmé · lien HTTP proposé" : "LAN protocol unconfirmed · HTTP link suggested"}
               </small>
             )}
 						{hasInternal && (
