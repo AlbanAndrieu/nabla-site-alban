@@ -67,7 +67,8 @@ export default function ServiceOwnerEvidenceSummary({
   const tunnelState = entry?.tunnel_status?.toLowerCase() ?? "";
   const accessBlocked = entry?.public_probe_verification === "access_protected_origin_unverified";
   const tunnelConfirmed = !stale && entry?.tunnel_stale !== true &&
-    entry?.cloudflare_status_confirmed !== false && Boolean(tunnelState);
+    (entry?.exposure?.provider_status_confirmed === true ||
+      entry?.cloudflare_status_confirmed === true) && Boolean(tunnelState);
 
   const probeLabel = (probe: ProbeDisplay): string => {
     switch (probe.state) {
@@ -122,9 +123,10 @@ export default function ServiceOwnerEvidenceSummary({
     },
     {
       key: "latency", icon: "fas fa-stopwatch", label: fr ? "Latence" : "Latency",
-      value: typeof entry?.latency_ms === "number" && Number.isFinite(entry.latency_ms)
-        ? `${Math.round(entry.latency_ms)} ms` : "—",
-      state: stale || typeof entry?.latency_ms !== "number" ? "unknown" : "observed",
+      value: publicProbe.observedAt && typeof entry?.latency_ms === "number" &&
+        Number.isFinite(entry.latency_ms) ? `${Math.round(entry.latency_ms)} ms` : "—",
+      state: stale || !publicProbe.observedAt || typeof entry?.latency_ms !== "number" ?
+        "unknown" : "observed",
     },
     {
       key: "prometheus", icon: "fas fa-chart-line", label: "Prometheus",
