@@ -1,3 +1,11 @@
+## P0 — Réconciliation UI/API/MCP et ports LAN (24 octobre 2026)
+
+- [x] Côté Site #254, canoniser les alias historiques `home-assistant` → `homeassistant` et `open-webui` → `openwebui` sans toucher aux conteneurs Docker ni aux noms DNS ; afficher les suffixes `UI`, `API` et `MCP` selon le rôle confirmé, sans doublons.
+- [x] Présentation : `Gatus UI`, `Bichon UI`, `Home Assistant UI`, `Open WebUI`, `Garage Web UI`, `Garage S3 API`, `Garage Admin API`. Le service Traefik reste un proxy sur `:443` ; sa Dashboard UI sur `:8080` est un endpoint distinct.
+- [ ] **Amont nabla-compose** : remplacer les ports historiques Gatus `:30287` et Bichon `:30313` par `:8085` et `:15630` dans le catalogue généré depuis les manifests Compose ; conserver Garage S3/Admin/WebUI `:3900/:3903/:3909`. Aucune PR Compose ouverte, ne pas modifier `master` sans autorisation.
+- [ ] Sur Preview exact-SHA Site #254 + FastAPI #373, valider les noms, la parité des IDs, les rôles API/MCP et la confidentialité. Ne pas considérer un port d'API comme une UI ou un conteneur RUNNING comme une sonde réussie.
+- [ ] **Skill Vercel** : demander au propriétaire d'installer lui-même `npx skills use "https://github.com/vercel-labs/agent-skills" --skill "web-design-guidelines"` et de transmettre la sortie complète. Ne pas installer depuis l'agent sans accord.
+
 ## P1 — Skills externes Docker et Kubernetes : demander l'accord plus tard (24 octobre 2026)
 
 - [ ] **Lors de la prochaine reprise, demander à l'utilisateur — actuellement indisponible — son accord pour installer séparément dans le projet** :
