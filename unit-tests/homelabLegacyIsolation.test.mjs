@@ -16,10 +16,10 @@ test("Backstage v2 runtime service model imports no legacy v1 catalog", () => {
 });
 
 test("legacy compatibility remains an isolated test-only module", () => {
-  const fixture = read("lib/homelabLegacyCatalogFixture.ts");
+  const fixture = read("unit-tests/helpers/homelabLegacyCatalogFixture.ts");
   const tests = read("unit-tests/homelabServicesSource.test.ts");
   assert.match(fixture, /public\/homelab-services\.json/);
-  assert.match(tests, /from "\.\.\/lib\/homelabLegacyCatalogFixture"/);
+  assert.match(tests, /from "\.\/helpers\/homelabLegacyCatalogFixture"/);
   assert.doesNotMatch(read("app/components/homelab/HomelabServiceGrid.tsx"),
     /homelabServiceEndpointUrl/);
 });
