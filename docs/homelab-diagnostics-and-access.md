@@ -101,3 +101,7 @@ La réponse publique 503 se limite à
 UUID, cause FastAPI, configuration clé ou identité. OWNER validé conserve
 la phase et la référence. Un contrôle d'affichage dans React n'est jamais
 une mesure suffisante de confidentialité.
+
+## Rendu C4 et séparation des responsabilités
+
+L'ADR/RACI demeure dans [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md), pas dans le frontend. Le composant `C4ArchitectureView` de la page Architecture utilise `@xyflow/react` et la topologie v2 déjà fournie par FastAPI. La vue L1 est **conceptuelle** ; la projection L2 utilise au maximum 16 services et 48 liens canoniques. Les URLs, IP LAN et preuves OWNER n'entrent pas dans cette projection. L3 attend un contrat métier de composants ; aucun inventaire parallèle n'est maintenu. La lecture publique dépend toujours des restrictions du read-model et du contrôle serveur.

@@ -30,6 +30,7 @@ source-check:
     node --test unit-tests/homelabCatalogIconAssets.test.mjs
     node --experimental-strip-types --test unit-tests/homelabHealthIndexUniqueness.test.mjs
     node --experimental-strip-types --test unit-tests/homelabCatalogFailureStage.test.mjs
+    node --experimental-strip-types --test unit-tests/c4ArchitectureModel.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs

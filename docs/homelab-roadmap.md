@@ -1,5 +1,19 @@
 # Roadmap active — nabla-site-alban
 
+
+## P1 — Diagrammes C4 interactifs (ADR-0001, Site owner)
+
+**Décision et RACI :** [Compose architecture governance](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md).
+- [x] Choisir `@xyflow/react` existant : pas de Mermaid concurrent, d'iframe ni de serveur Structurizr à administrer.
+- [x] Ajouter `L1 Contexte` (acteurs et systèmes externes, conceptuel) et `L2 Conteneurs/services` (nœuds et relations depuis la topologie Backstage v2 déjà chargée).
+- [x] Borner L2 à 16 nœuds, 48 liens, ordonner de façon déterministe et ne pas recopier URL LAN, headers, probes ou secrets dans le modèle C4.
+- [x] Prévoir version textuelle accessible, sélecteur clavier et respect du scroll sur mobile.
+- [ ] Confirmer en Preview exact-SHA les diagrammes et leur lisibilité FR/EN, l'accès PUBLIC/OWNER, l'absence de données privées et la navigation avec un lecteur d'écran.
+- [ ] **L3 Composants** seulement après ajout des relations de composants dans la source Compose/Backstage v2, sans inférer des nœuds C4 depuis les services Docker.
+- [ ] Évaluer un export facultatif Structurizr DSL depuis la même source après usage réel ; aucune dépendance au serveur Structurizr.
+
+**Done :** contrôle `just source-check`, build Next.js Node 24 et test navigateur vérifiés au même HEAD. C4 décrit l'architecture, pas la santé runtime.
+
 ## P0 — Corrélation des causes et contrôle d'accès (25 octobre 2026)
 
 **Document canonique Site :** [diagnostic et accès](homelab-diagnostics-and-access.md). Gouvernance des décisions transverses : [Compose ADR et dispatch](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md).
