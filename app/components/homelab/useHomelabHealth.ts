@@ -5,7 +5,7 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
+import { compatibleHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import {
 	catalogScopeMatches,
 	classifyCatalogFailure,
@@ -231,6 +231,7 @@ function normalizedName(value: string): string {
 export type HomelabHealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
+	ambiguousIds: Set<string>;
 	byRef: Map<string, HomelabHealthState>;
 };
 
@@ -239,13 +240,13 @@ export function healthIndex(
 	siteHealth?: SiteHealthV2 | null,
 	catalogRevision?: unknown,
 ): HomelabHealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-	}
-	return { byId, byName, byRef: siteHealthIndex(siteHealth, catalogRevision) };
+	const index = uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
+	return {
+		byId: index.byId,
+		byName: index.byName,
+		ambiguousIds: index.ambiguousIds,
+		byRef: siteHealthIndex(siteHealth, catalogRevision),
+	};
 }
 
 export function effectiveState(
@@ -257,7 +258,8 @@ export function effectiveState(
 	const entry = compatibleHomelabEvidence(
 		service.entityRef,
 		serviceId,
-		index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name)),
+		index.ambiguousIds.has(serviceId) ? undefined :
+			(index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name))),
 	);
 	if (entry && !healthUnavailable) {
 		return resolveEffectiveServiceState(entry).effectiveState;

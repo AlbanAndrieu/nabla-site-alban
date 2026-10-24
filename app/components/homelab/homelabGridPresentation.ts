@@ -3,15 +3,11 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
+import { compatibleHomelabEvidence, uniqueHomelabEvidenceIndex, type UniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
-type HealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byUrl: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
-};
+type HealthIndex = UniqueHomelabEvidenceIndex<HomelabHealthEntry>;
 
 type RuntimePresentationState = HomelabHealthState | "missing";
 type EffectiveHealthLabelKey =
@@ -76,24 +72,8 @@ function normalizedName(value: string): string {
 	return value.trim().toLowerCase();
 }
 
-export function healthIndex(
-	snapshot: HomelabHealthSnapshot | null,
-): HealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byUrl = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-		try {
-			const url = new URL(entry.url);
-			url.hash = "";
-			byUrl.set(url.href, entry);
-		} catch {
-			// The same-origin proxy validates FastAPI payloads; ignore malformed extras defensively.
-		}
-	}
-	return { byId, byUrl, byName };
+export function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
+  return uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
 }
 
 function lookupHealth(
@@ -102,6 +82,7 @@ function lookupHealth(
 	url: string,
 ): HomelabHealthEntry | undefined {
 	const stableId = homelabServiceId(service);
+	if (index.ambiguousIds.has(stableId)) return undefined;
 	const byId = index.byId.get(stableId);
 	if (byId) return byId;
 

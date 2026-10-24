@@ -30,6 +30,7 @@
 
 - [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `unit-tests/helpers/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
 - [ ] Vérifier les consommateurs de données restants, dont les fixtures statiques de topologie et les scripts, avant toute suppression de fichier v1. Conserver les contrats de compatibilité uniquement dans les tests.
+- [x] Ne plus écraser les preuves OWNER lors de collisions par ID, nom ou URL. Les IDs ambigus restent sans preuve de sonde ; 4 tests unitaires du module d'identité passent sous Node 22 (L1 isolé).
 - [ ] Assurer une correspondance non ambiguë `entityRef` pour les cartes et le graphe, y compris sous-composants, ressources et exporters. Un ID absent ou ambigu affiche `unknown`.
 - [ ] Résoudre les icônes à partir du mapping généré Compose `lib/homelabCatalogIcons.generated.ts` ; vérifier les assets réels, l'attribution et les chemins d'icônes sur FR/EN. Aucun second référentiel `iconSrc`.
 - [ ] Afficher le DTO OWNER FastAPI sans modifier la politique de santé côté navigateur : Docker app + conteneur principal, HTTP/HTTPS/TLS, tunnel Cloudflare, latence **si datée**, horodatage et état de chaque sonde. Respecter `disabled`, `not-configured`, `not-executed`, `stale`, `failed` et `observed`.
