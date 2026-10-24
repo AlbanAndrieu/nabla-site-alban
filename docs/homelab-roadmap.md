@@ -1,3 +1,15 @@
+## P1 — Skills externes Docker et Kubernetes : demander l'accord plus tard (24 octobre 2026)
+
+- [ ] **Lors de la prochaine reprise, demander à l'utilisateur — actuellement indisponible — son accord pour installer séparément dans le projet** :
+  - [`docker-compose-patterns`](https://www.skills.sh/docker/skills/docker-compose-patterns) du dépôt officiel `docker/skills` (configurations Compose, healthchecks et réseaux).
+  - [`kubernetes-specialist`](https://www.skills.sh/jeffallan/claude-skills/kubernetes-specialist) du dépôt `jeffallan/claude-skills` (Kubernetes, Helm, RBAC, NetworkPolicy, PV/PVC ; cible Talos).
+- [ ] Relire chaque source `SKILL.md`, ses références/scripts, les permissions et les audits **avant** de demander l'autorisation. Examiner l'avertissement Socket du skill Kubernetes. Préférer une installation **locale au projet**, jamais globale ; n'installer aucun outil sur l'appliance TrueNAS/Talos.
+- [ ] Vérifier la priorité des skills internes (`AGENTS.md`, `docker-compose-orchestration`, `nabla-service-catalog`, `homelab-secrets`, `homelab-runtime-status`, `local-first-quality`) sur les conseils externes. La politique ZFS impose les bind mounts explicites sous `/mnt/cpool` plutôt que les volumes nommés génériques ; les secrets doivent venir de Vaultwarden et des chemins `/mnt/cpool/secrets/runtime`, pas de `.env` dans le dépôt.
+- [ ] Tester hors production un fichier Compose et un manifeste Talos avec les deux sources de règles. Préserver le democratic-CSI/NFS déjà choisi, les manifestes déclaratifs validés et les protections avant `kubectl apply`, `docker compose up/down` ou une mutation TrueNAS.
+- [ ] Si la revue ou les tests révèlent un conflit non résolu, ne pas installer le skill concerné et documenter l'écart. Ne pas déclencher de CI GitHub payante pour cette évaluation.
+
+**Statut : différé, accord utilisateur requis.** La roadmap ne programme pas de notification automatique.
+
 ## 24 octobre 2026 — Synthèse implémentation frontend-design + preuves LAN (P0)
 
 - [x] Lire le skill `anthropics/skills/frontend-design` : choisir une présentation instrumentée propre au diagnostic réseau plutôt que multiplier les badges identiques. Commande `npx skills use` tentée mais bloquée par DNS/timeout ; source officielle `skills/frontend-design/SKILL.md` lue intégralement par consultation GitHub.
