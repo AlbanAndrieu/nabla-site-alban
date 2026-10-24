@@ -39,3 +39,14 @@ export function parseOwnerCatalogIncident(
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId)) return null;
   return { stage: stage as CatalogFailureStage, requestId };
 }
+
+/** A public HTTP response must never expose operational diagnostic metadata. */
+export function visibleCatalogFailureDetails(
+  ownerAuthorized: boolean,
+  reason: "key-missing" | "access-denied" | "unavailable",
+  stage: CatalogFailureStage,
+  requestId: string,
+) {
+  if (!ownerAuthorized) return { reason: "unavailable" as const };
+  return { reason, stage, requestId };
+}

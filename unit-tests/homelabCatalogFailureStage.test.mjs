@@ -58,3 +58,31 @@ test("OWNER architecture results cannot survive a public/readonly transition at 
   assert.match(component, /catalogScopeMatches\(request\.scope, !ownerAuthorized\)/);
   assert.match(component, /scope: ownerAuthorized \? "owner" : "public"/);
 });
+
+test("public catalogue failures redact provenance at the server boundary", async () => {
+  const { visibleCatalogFailureDetails } = await import("../lib/homelabCatalogFailureStage.ts");
+  const uuid = "f82c6652-fcf3-4a89-9f05-3c2e3cc214fd";
+  assert.deepEqual(
+    visibleCatalogFailureDetails(false, "key-missing", "site_configuration", uuid),
+    { reason: "unavailable" },
+  );
+  assert.deepEqual(
+    visibleCatalogFailureDetails(false, "access-denied", "upstream_auth", uuid),
+    { reason: "unavailable" },
+  );
+  assert.deepEqual(
+    visibleCatalogFailureDetails(true, "access-denied", "upstream_auth", uuid),
+    { reason: "access-denied", stage: "upstream_auth", requestId: uuid },
+  );
+});
+
+test("both public-readable catalog routes authorize diagnostics independently", async () => {
+  const { readFileSync } = await import("node:fs");
+  const owner = readFileSync(new URL("../app/api/homelab-services/route.ts", import.meta.url), "utf8");
+  const canonical = readFileSync(new URL("../app/api/homelab-catalog-v2/route.ts", import.meta.url), "utf8");
+  const server = readFileSync(new URL("../lib/homelabCatalogUnavailableResponse.ts", import.meta.url), "utf8");
+  assert.match(owner, /catalogUnavailableResponse\(request, error/);
+  assert.match(canonical, /catalogUnavailableResponse\(request, error/);
+  assert.match(server, /await isTrustedHomelabRequest\(request\)/);
+  assert.match(server, /visibleCatalogFailureDetails\(owner,/);
+});

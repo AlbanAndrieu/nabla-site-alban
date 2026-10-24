@@ -6,7 +6,7 @@ import { gatedHomelabResponse } from "@/lib/privateHomelabResponse";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-async function catalogResponse() {
+async function catalogResponse(request: Request) {
 	try {
 		const { catalog, topology } = await loadHomelabServicesCatalog();
 		return NextResponse.json(
@@ -20,13 +20,13 @@ async function catalogResponse() {
 			},
 		);
 	} catch (error) {
-		return catalogUnavailableResponse(error, "Backstage v2 inventory unavailable", {
+		return catalogUnavailableResponse(request, error, "Backstage v2 inventory unavailable", {
 			"X-Homelab-Inventory-Complete": "false",
 		});
 	}
 }
 
-/** Owner-only: an invalid SERVICE key never weakens the CIDR restriction. */
+/** OWNER gate or allowlisted temporary public SERVICE projection, with neutral errors. */
 export function GET(request: Request) {
-	return gatedHomelabResponse(request, catalogResponse);
+	return gatedHomelabResponse(request, () => catalogResponse(request));
 }

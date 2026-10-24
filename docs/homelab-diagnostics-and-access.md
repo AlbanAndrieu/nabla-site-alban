@@ -90,3 +90,14 @@ de l'UUID de support. Le mode `readonly` n'enregistre ni n'affiche l'incident.
 L'interface informe sur la cause catalogue, **pas** sur la santé de TrueNAS.
 Le panneau Réessayer ne contacte que le catalogue, sans déclencher de sondes
 LAN supplémentaires. Les tests navigateur et les droits restent à prouver en Preview.
+
+### Corrections de frontière de sécurité HTTP (P0)
+
+Le mode temporaire `HOMELAB_PUBLIC_READONLY_ENABLED` peut autoriser
+`/api/homelab-services` et `/api/homelab-catalog-v2` sans identité OWNER.
+**Même en erreur**, le serveur revalide `isTrustedHomelabRequest(request)`.
+La réponse publique 503 se limite à
+`{ "error": "...", "reason": "unavailable" }`, sans en-tête de phase,
+UUID, cause FastAPI, configuration clé ou identité. OWNER validé conserve
+la phase et la référence. Un contrôle d'affichage dans React n'est jamais
+une mesure suffisante de confidentialité.
