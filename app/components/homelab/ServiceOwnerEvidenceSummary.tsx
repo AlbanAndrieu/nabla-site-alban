@@ -18,20 +18,21 @@ function observedTime(entry: HomelabHealthEntry): string | null {
 type Metric = { key: string; icon: string; label: string; value: string; state: string };
 
 export default function ServiceOwnerEvidenceSummary({
-  entry, snapshot,
+  entry, snapshot, unavailable = false,
 }: Readonly<{
   entry?: HomelabHealthEntry;
   snapshot: HomelabHealthSnapshot;
+  unavailable?: boolean;
 }>) {
   const fr = useLocale() === "fr";
-  const stale = snapshot.health_board?.state === "stale" ||
+  const stale = unavailable || snapshot.health_board?.state === "stale" ||
     snapshot.truenas_runtime_stale === true || entry?.observation_stale === true ||
     entry?.probe_stale === true;
   const observed = entry ? observedTime(entry) : null;
   const https = entry?.url.startsWith("https://") === true;
   const metrics: Metric[] = [
     {
-      key: "docker", icon: "fa-brands fa-docker", label: "Docker/TrueNAS",
+      key: "docker", icon: "fas fa-server", label: "Docker/TrueNAS",
       value: entry?.runtime_state ??
         (fr ? "non observé" : "not observed"),
       state: !entry?.runtime_state || stale ? "unknown" :
