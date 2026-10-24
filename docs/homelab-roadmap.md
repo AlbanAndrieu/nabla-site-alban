@@ -34,6 +34,10 @@
 
 ## P0 — Tests de confidentialité et accès OWNER
 
+- [x] Durcir `isSafePublicText` : rejeter les chemins privés cachés derrière `(`, `:`, `=` ou `[` ainsi que `/run/secrets`, `/var/lib` et `/workspace/users`. Nouveau test négatif reproductible sur les fichiers exacts : **échec avant correction ; 5/5 PASS après**, Node 22 L1.
+- [ ] Vérifier en Preview au SHA exact que les projections SERVICE et le cache local ne diffusent aucune donnée OWNER ni chemin privé. Le test Node isolé ne vaut pas un audit navigateur.
+
+
 - [ ] Depuis le Wi-Fi autorisé, comparer `/api/homelab-access?diagnose=1`, `/api/homelab-health`, `/api/homelab-probes` et les cartes. Le statut `authorized` du CIDR ne prouve pas que l'upstream OWNER est accessible.
 - [ ] Depuis un réseau extérieur, vérifier `public-readonly` et le refus des routes OWNER ; aucune IP privée, preuve de sonde, posture ni secret en JSON/HTML/RSC/assets/CDN.
 - [ ] Distinguer 401/403/503, timeout, snapshot ancien et absence de sonde. Tester révocation de session, retour réseau, expiration du cache et accès Cloudflare avec JWT vérifié.

@@ -29,3 +29,21 @@ test("rejects malformed and oversized display text", () => {
     assert.equal(isSafePublicText(value), false);
   }
 });
+
+test("rejects private paths wrapped in punctuation or key-value fields", () => {
+  for (const value of [
+    "OpenRAG (/mnt/cpool/compose/app.env)",
+    "Configuration: /etc/ssl/private/server.key",
+    "trace=/home/operator/.ssh/id_rsa",
+    "service[/root/.kube/config]",
+    "secret_file=/run/secrets/service-api",
+    "container=/var/lib/docker/volumes/private",
+    "code=/workspace/users/agent/project/.env",
+  ]) assert.equal(isSafePublicText(value), false, value);
+});
+
+test("keeps ordinary public descriptions containing relative URLs", () => {
+  for (const value of ["Documentation /docs/index", "Services /architecture", "Proxy /api/status"]) {
+    assert.equal(isSafePublicText(value), true, value);
+  }
+});
