@@ -52,9 +52,11 @@ constitue **jamais** un PASS L3.
 sur une reconstitution partielle le 25 octobre 2026 ; il ne validait
 pas un checkout complet. Le 25 octobre à 23:25 (Paris), un opérateur
 sur Node 24.22.1/npm 12.2.0 a signalé le refus de l'ancien précontrôle
-Node22-only. Le code est corrigé dans PR #260. L'exécution de la suite
-complète sous Node 24 reste **NOT_RUN** tant que le résultat n'est pas
-transmis par l'opérateur.
+Node22-only. Le code est corrigé dans PR #260. **La suite rapide L1
+sur le checkout complet a depuis réussi sous Node 24.22.1/npm 12.2.0 :
+59/59 PASS, aucun échec, 0 skipped, `LOCAL_FAST_L1_PASS`**, sur
+`6cb59e1557c65761c3487e7e724daa4204dfe50f`. Les tests de
+publication L3 restent NOT_RUN.
 
 ## Diagnostic test de parsing TypeScript — 25 octobre 2026
 
@@ -71,8 +73,18 @@ toujours détectée. Aucun `npm ci` ni `next build` n'est nécessaire.
 
 **Preuve agent :** 2 tests ciblés sur une fixture reproduisant cette
 syntaxe, **2 PASS sous Node 22.16.0/npm 10.9.2**. L'exécution sur le
-**fichier TypeScript complet et sous Node 24 reste NOT_RUN côté agent**
-jusqu'au nouveau résultat de l'opérateur.
+**fichier TypeScript complet et sous Node 24 reste NOT_RUN côté agent**,
+mais a réussi **dans le checkout complet de l'opérateur** (test positif
+et test négatif inclus dans les 59 PASS).
 
 Ne pas confondre `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` émis par le mode
 `strip` avec une erreur de syntaxe du fichier TypeScript original.
+
+## Messages de pre-commit lors du smoke Git
+
+Les lignes `.pre-commit-config.yaml config file not found. Skipping pre-commit.`
+proviennent des dépôts Git temporaires créés par
+`unit-tests/vercelIgnoreBuild.test.mjs` (tests du déclenchement Vercel).
+Les tests de ces fixtures passent, mais **les hooks du dépôt réel n'ont
+pas été validés** par cette suite. Exécuter les hooks uniquement dans
+la procédure de publication complète sur le checkout exact.
