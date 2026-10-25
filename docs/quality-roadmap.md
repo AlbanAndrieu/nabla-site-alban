@@ -343,3 +343,18 @@ les sondes et l'identité de l'API relèvent de FastAPI. Ne pas les copier ici.
 Les preuves détaillées des livraisons terminées restent dans Git/GitHub et, si
 elles ont encore une valeur opérationnelle, dans les documents indexés par
 `docs/README.md`.
+
+### P0 — Corriger le faux blocage du profil local rapide (#260, 25/10/2026)
+
+- [x] Le runner `agent-node22-fast.mjs` accepte deux paires cohérentes :
+  Node 22.16+ / npm 10 pour l'agent et Node 24.22.1+ / npm 12.2+
+  pour le projet ; il refuse les paires mélangées et conserve
+  `BLOCKED_INCOMPLETE_CHECKOUT`.
+- [x] Ajouter `npm run test:fast:local` ; garder l'alias historique
+  `npm run test:fast:node22` et `just node22-fast`.
+- [x] Ajouter des tests pour Node 24/npm 12, les bornes LTS,
+  les paires mixtes et les versions invalides.
+- [ ] Exécuter la suite complète sur la workstation en
+  Node 24.22.1/npm 12.2.0 ; un précontrôle PASS ne valide pas le build.
+- [ ] Exécuter `npm run typecheck` et `npm run build` sur un
+  checkout complet sous Node 24 avant de promouvoir la Preview.
