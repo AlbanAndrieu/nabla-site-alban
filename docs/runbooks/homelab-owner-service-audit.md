@@ -82,3 +82,19 @@ l'identité réseau OWNER vue par Vercel ; ne jamais injecter de
 
 Sans réseau WAN alternatif, marquer S-04 `NOT_RUN` et exécuter seulement
 S-03 depuis le LAN réel.
+
+### Observation croisée sans navigateur ni deuxième réseau
+
+Une commande à faible volume effectue exactement **deux GET**, sans retry :
+```bash
+npm run diagnose:homelab-429
+```
+Elle interroge depuis la machine actuelle :
+- Site `/api/homelab-access?diagnose=1` (origine `BASE_URL`) ;
+- FastAPI Cloud `/healthz` (liveness de FastAPI uniquement).
+
+Chaque ligne ne contient que le code HTTP et les métadonnées `Retry-After`,
+`X-Vercel-Id`, `CF-Ray` filtrées. Un JWT Access optionnel n'est
+transmis qu'à l'origine du Site. Aucun corps, cookie, jeton ou en-tête IP
+forgé n'est enregistré. Si Site renvoie 429, sortie 4. Le fonctionnement
+de FastAPI Cloud ne prouve pas l'autorisation OWNER dans Next.js.
