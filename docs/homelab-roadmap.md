@@ -158,3 +158,10 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [ ] **S-11b** : recettes WCAG 2.2 AA et Web Vitals LCP/INP/CLS réels.
 
 - [x] **S-03e prédiagnostic local** : `npm run diagnose:homelab-429`, deux requêtes sans retry ni fuite de secrets ; les droits OWNER restent à vérifier.
+
+### P0 — Build Vercel et blocage 429 (25/10/2026)
+- [x] **S-P0-build (code)** : corriger la virgule manquante dans `INITIAL_HOMELAB_SERVICES_STATE` de `useHomelabHealth.ts`, repérée par le journal Vercel du déploiement master `665d1918` (ERREUR `Expected ',', got 'ident'`).
+- [x] **S-P0-parse (test)** : contrôle hors ligne Node22 utilisant `stripTypeScriptTypes` puis `node --input-type=module --check`. `node --check` directement sur `.ts` ne strippe **pas** les types sous Node22.
+- [x] **S-P0-429 (code)** : préserver `x-vercel-mitigated` sous la forme normalisée `challenge|other` sans recopier le header brut.
+- [ ] **S-P0-429 (opérations)** : rechercher `2026-10-25T20:42:40–41Z` dans Vercel Firewall pour les requêtes identifiées par `X-Vercel-Id`; distinguer WAF custom, system mitigation et protection déploiement avant d'ajuster une règle ciblée.
+- [ ] **S-P0-release (validation)** : confirmer build Next.js complet, état READY d'une Preview, puis vérification OWNER sur réseau réel. La résolution du 429 ne découle pas du correctif de syntaxe ; production non validée.
