@@ -7,7 +7,10 @@ import { parseSiteHealthV2, type SiteHealthV2 } from "./siteHealthV2";
 const URL = "https://fastapi-sample.fastapicloud.dev/api/site/health/v2";
 const TIMEOUT_MS = 5000;
 
-export async function loadSiteHealthV2(traceparent?: string): Promise<SiteHealthV2> {
+export async function loadSiteHealthV2(
+	traceparent?: string,
+	onVerifiedEcho?: (confirmed: boolean) => void,
+): Promise<SiteHealthV2> {
 	const key = process.env.DIAGNOSTICS_ACCESS_KEY?.trim();
 	if (!key) throw new SiteCatalogV2Error("key-missing");
 	const controller = new AbortController();
@@ -22,6 +25,10 @@ export async function loadSiteHealthV2(traceparent?: string): Promise<SiteHealth
 			redirect: "error",
 			signal: controller.signal,
 		});
+		// FastAPI must echo exactly the Site-generated trace; header injection never confirms a trace.
+		if (validHomelabTraceparent(traceparent)) {
+			onVerifiedEcho?.(response.headers.get("X-Nabla-Trace-ID") === traceparent.split("-")[1]);
+		}
 		if (response.status === 401 || response.status === 403) {
 			throw new SiteCatalogV2Error("access-denied", "upstream_auth");
 		}

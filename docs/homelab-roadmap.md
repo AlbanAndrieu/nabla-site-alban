@@ -67,6 +67,7 @@ OWNER commun Architecture/TrueNAS ; révocation synchrone du snapshot C4
 OWNER lors d'une transition de droits ; cache SERVICE versionné. Ces
 invariants sont à préserver, pas à réimplémenter.
 
+- [x] **S-06b Écho validé :** le Site indique `confirmed` uniquement lorsque FastAPI retourne l’ID W3C exact ; autrement `sent`. Producteur : [FastAPI #377](https://github.com/AlbanAndrieu/fastapi-sample/pull/377). Recette sur déploiements correspondants encore NOT_RUN.
 - [x] **S-06a W3C traceparent Site → FastAPI SERVICE v2 :** généré au serveur et transmis ; ID exposé en réponse. Lecture dans les logs FastAPI non vérifiée.
 - [ ] **S-06 Corrélation réelle :** propager un `trace_id` fiable à travers
   collecteur → FastAPI → Route Handler Next.js → support OWNER, avec

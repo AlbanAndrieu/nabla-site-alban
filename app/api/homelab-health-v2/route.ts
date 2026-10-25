@@ -9,12 +9,13 @@ export const dynamic = "force-dynamic";
 
 async function healthResponse() {
 	const trace = createHomelabTrace();
+	let confirmed = false;
 	try {
-		const payload = await loadSiteHealthV2(trace.traceparent);
+		const payload = await loadSiteHealthV2(trace.traceparent, (verified) => { confirmed = verified; });
 		return NextResponse.json(payload, {
 			headers: { "X-Homelab-Catalog-Revision": payload.catalogRevision,
 				"X-Nabla-Trace-ID": trace.traceId,
-				"X-Nabla-Trace-Propagation": "sent",
+				"X-Nabla-Trace-Propagation": confirmed ? "confirmed" : "sent",
 				"Cache-Control": "private, no-store" },
 		});
 	} catch (error) {
@@ -25,7 +26,7 @@ async function healthResponse() {
 		return NextResponse.json(
 			{ error: "Backstage v2 health unavailable", reason },
 			{ status: 503, headers: { "X-Nabla-Trace-ID": trace.traceId,
-				"X-Nabla-Trace-Propagation": "sent",
+				"X-Nabla-Trace-Propagation": confirmed ? "confirmed" : "sent",
 				"Cache-Control": "private, no-store" } },
 		);
 	}
