@@ -320,6 +320,15 @@ export default function HomelabServicesBlock({
 						topologyNodeCount={state.topology?.nodes.length ?? 0}
 						topologyRelationCount={state.topology?.relations.length ?? 0}
 					/>
+					{state.siteHealthTraceId ? (
+						<details data-owner-site-trace className="small my-3">
+							<summary>{french ? "Référence du diagnostic Site → FastAPI" : "Site → FastAPI diagnostic reference"}</summary>
+							<p>{french
+								? "Identifiant envoyé à FastAPI ; vérifier son enregistrement dans les logs FastAPI."
+								: "ID sent to FastAPI; verify its presence in FastAPI logs."}</p>
+							<code data-owner-trace-id>{state.siteHealthTraceId}</code>
+						</details>
+					) : null}
 					<HomelabProbeDiagnostics snapshot={state.snapshot} />
 				</>
 			)}

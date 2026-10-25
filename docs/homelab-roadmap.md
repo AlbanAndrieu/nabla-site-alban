@@ -73,6 +73,7 @@ invariants sont à préserver, pas à réimplémenter.
   logs expurgés et horodatages. Le `requestId` Site actuel est **local**
   et ne constitue pas une trace distribuée.
 - [x] **S-07a Preuve HTTP fraîche :** un code 200 sans timestamp et source de sonde HTTP ne vaut pas un succès ; un résultat périmé ou interrompu reste `unknown`. Le détail OWNER précise origine/cache/deadline, HTTP et l’heure. Cinq tests purs Node 22 PASS dans un arbre isolé.
+- [x] **S-07b Trace visible OWNER :** ID W3C reçu depuis la route SERVICE v2 visible uniquement dans le panneau de diagnostic OWNER, jamais conservé dans le cache public. La réception FastAPI n’est pas supposée.
 - [ ] **S-07 Provenance lisible :** présenter par service les étapes
   catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
   horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
