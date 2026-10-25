@@ -40,6 +40,11 @@ export function safeRateLimitMetadata(headers = {}) {
     data.retryAfterSeconds = Number(retry);
   if (/^[a-z0-9:.-]{3,100}$/i.test(vercelId)) data.vercelRequestId = vercelId;
   if (/^[a-f0-9-]{8,50}$/i.test(ray)) data.cloudflareRay = ray;
+  // Vercel documents x-vercel-mitigated for its security checkpoint.
+  // Do not echo other/raw header values: they could contain arbitrary data.
+  const mitigated = get("x-vercel-mitigated");
+  if (mitigated === "challenge") data.vercelMitigation = "challenge";
+  else if (mitigated) data.vercelMitigation = "other";
   return data;
 }
 
