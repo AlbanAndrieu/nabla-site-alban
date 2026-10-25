@@ -158,6 +158,23 @@ export default function ServiceOwnerEvidenceSummary({
           <strong>{metric.value}</strong>
         </span>
       ))}
+      <details data-owner-diagnostic-timeline>
+        <summary>{fr ? "Parcours et provenance des preuves" : "Evidence path and provenance"}</summary>
+        <p className="small text-muted">
+          {fr ? "Chaque étape est indépendante : absence de mesure = inconnu, pas panne confirmée."
+            : "Each stage is independent: missing evidence means unknown, not a confirmed outage."}
+        </p>
+        <ol>
+          {["docker", "lan", "https", "http", "probe", "cloudflare", "prometheus"]
+            .map((key) => metrics.find((metric) => metric.key === key))
+            .filter((metric): metric is Metric => metric !== undefined)
+            .map((metric) => (
+              <li key={metric.key} data-evidence-phase={metric.key} data-evidence-state={metric.state}>
+                <strong>{metric.label}:</strong> {metric.value}
+              </li>
+            ))}
+        </ol>
+      </details>
       {!probeAt && runtimeAt ? (
         <small data-owner-runtime-observed>
           {fr ? "Inventaire runtime" : "Runtime inventory"}:{" "}

@@ -104,9 +104,11 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [x] **S-10a Projection C4 expurgée :** les nœuds rejettent les noms
   sensibles, les métadonnées non sûres et les types de relation inconnus.
   Test négatif local sur le modèle C4 sous Node 22.
+- [x] **S-10a Chronologie accessible :** étapes Docker/LAN/TLS/HTTP/Cloudflare/Prometheus présentées en liste ordonnée OWNER avec statut et provenance existants ; pas de verdict de panne inventé.
 - [ ] **S-10 WCAG 2.2 AA :** confirmer focus/lecteur d'écran, contraste,
   zoom, clavier, transitions C4 L1/L2, bouton d'effacement, responsive,
   FR/EN et alternatives textuelles. Corriger les anomalies démontrées.
+- [x] **S-11a ReactFlow différé :** C4 et explorateur en chunks dynamiques séparés, montés à moins de 420 px du viewport, avec placeholders `aria-busy`, scroll et ancrages préservés.
 - [ ] **S-11 Performance :** mesurer LCP/INP/CLS, poids du bundle ReactFlow,
   chargement différé des diagnostics, ETag/revalidation SERVICE, cache
   inter-onglets sans état OWNER et comportement des filtres avec beaucoup de services.
