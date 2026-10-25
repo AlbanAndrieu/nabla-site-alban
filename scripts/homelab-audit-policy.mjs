@@ -42,3 +42,21 @@ export function safeRateLimitMetadata(headers = {}) {
   if (/^[a-f0-9-]{8,50}$/i.test(ray)) data.cloudflareRay = ray;
   return data;
 }
+
+/** Project only the documented, privacy-safe access diagnostic DTO. */
+export function safeAccessDiagnostic(value) {
+  if (!value || typeof value !== "object") return null;
+  const reasons = new Set([
+    "runtime-unverified", "authorized-remote-identity",
+    "trusted-cidrs-not-configured", "client-ip-unavailable",
+    "client-ip-outside-trusted-cidrs", "identity-not-authorized", "authorized",
+  ]);
+  const result = {};
+  if (reasons.has(value.reason)) result.reason = value.reason;
+  if (["ipv4", "ipv6", "unknown"].includes(value.sourceFamily))
+    result.sourceFamily = value.sourceFamily;
+  for (const key of ["trustedCidrsConfigured", "networkAllowed", "identityRequired"]) {
+    if (typeof value[key] === "boolean") result[key] = value[key];
+  }
+  return Object.keys(result).length ? result : null;
+}
