@@ -1,126 +1,126 @@
 # Roadmap active — nabla-site-alban
 
+> Réconciliée le **25 octobre 2026**, après fusion de [Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256).
+> **Source d'autorité :** cette roadmap contient uniquement les tâches du site.
+> [Historique intégral précédent](archive/homelab-roadmap-through-2026-10-25.txt)
+> conservé sans suppression de preuve. Les actions Compose et FastAPI ont leurs
+> propres roadmaps ; un merge et un déploiement READY ne valent pas recette navigateur.
 
-## P1 — Diagrammes C4 interactifs (ADR-0001, Site owner)
+## Dernier état vérifié — production
 
-**Décision et RACI :** [Compose architecture governance](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md).
-- [x] Choisir `@xyflow/react` existant : pas de Mermaid concurrent, d'iframe ni de serveur Structurizr à administrer.
-- [x] Ajouter `L1 Contexte` (acteurs et systèmes externes, conceptuel) et `L2 Conteneurs/services` (nœuds et relations depuis la topologie Backstage v2 déjà chargée).
-- [x] Borner L2 à 16 nœuds, 48 liens, ordonner de façon déterministe et ne pas recopier URL LAN, headers, probes ou secrets dans le modèle C4.
-- [x] Prévoir version textuelle accessible, sélecteur clavier et respect du scroll sur mobile.
-- [x] Ajouter un drill-down C4 au clic/clavier : relations entrantes/sortantes déclarées, mise en évidence, navigation vers un service adjacent et effacement explicite de la sélection. Aucun état runtime inféré.
-- [ ] Confirmer en Preview exact-SHA les diagrammes et leur lisibilité FR/EN, l'accès PUBLIC/OWNER, l'absence de données privées et la navigation avec un lecteur d'écran.
-- [ ] **L3 Composants** seulement après ajout des relations de composants dans la source Compose/Backstage v2, sans inférer des nœuds C4 depuis les services Docker.
-- [ ] Évaluer un export facultatif Structurizr DSL depuis la même source après usage réel ; aucune dépendance au serveur Structurizr.
-
-**Done :** contrôle `just source-check`, build Next.js Node 24 et test navigateur vérifiés au même HEAD. C4 décrit l'architecture, pas la santé runtime.
-
-## P0 — Corrélation des causes et contrôle d'accès (25 octobre 2026)
-
-**Document canonique Site :** [diagnostic et accès](homelab-diagnostics-and-access.md). Gouvernance des décisions transverses : [Compose ADR et dispatch](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md).
-- [x] Qualifier la phase d'erreur du catalogue côté serveur Next.js et accepter
-  uniquement les codes FastAPI autorisés ; exposer un `requestId` Site sur 503
-  OWNER, sans corps d'erreur amont ni IP/secret.
-- [x] Ajouter des tests purs de classification d'erreur dans `just source-check`.
-- [ ] Relier les IDs de trace Site / API / collecteur via OpenTelemetry ; ne pas
-  assimiler le `requestId` Site actuel à un trace ID partagé.
-- [x] Mutualiser entre les cartes TrueNAS et le panneau Architecture la raison de refus catalogue et la référence d'incident OWNER, sans divulgation au mode SERVICE. Test de contrat ajouté.
-- [x] Rejeter le catalogue Architecture OWNER dès le premier rendu suivant une transition vers SERVICE, avant le nettoyage React asynchrone (`catalogScopeMatches`). Ajouter un test contre la régression.
-- [x] Assainir également **les réponses HTTP 503** des deux routes catalogue pour les visiteurs publics ; un accès SERVICE temporaire ne doit pas exposer `stage`, `requestId` ni la raison de configuration privée, même hors React. Réautoriser OWNER au serveur et tester le contrat.
-- [ ] Montrer une chronologie compacte : catalogue → FastAPI → TrueNAS → Site,
-  avec observateur/phase/fraîcheur et cause explicite dans les cartes OWNER.
-- [ ] Valider droits PUBLIC/SERVICE/OWNER, réseau LAN, JWT Cloudflare et refus
-  d'en-têtes spoofés sur une Preview accessible au SHA exact.
-- [ ] Conserver le transport, l'authentification et l'autorisation **dans le serveur**
-  avant l'arrivée d'une gateway ou de Keycloak.
-
-
-**Réconciliation : 24 octobre 2026.** [Site #255](https://github.com/AlbanAndrieu/nabla-site-alban/pull/255) fusionnée (`86627eb7`) et publiée en production sur Vercel (READY). [PR de reprise Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256) (Draft). La recette fonctionnelle OWNER/SERVICE reste ouverte. Ce fichier ne décrit que les changements **exécutés dans ce dépôt**. Les tâches d'infrastructure et de collecte appartiennent aux roadmaps [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) et [FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md). Les anciennes tâches détaillées restent consultables dans [l'historique avant nettoyage](https://github.com/AlbanAndrieu/nabla-site-alban/blob/e3649e3c2332147fb06181dbccdf5a300398de64/docs/homelab-roadmap.md). Aucun `DONE` n'est déduit d'un merge.
-
-## P0 — Reprendre le déploiement Vercel du site
-
-- [x] Diagnostiquer les journaux du déploiement `dpl_79f381ZKNByyB24ay5dz8WjjkV9T` de `master` après Site #254 : échec TypeScript `TS17001`, attribut `data-evidence-key` dupliqué dans `ServiceOwnerEvidenceSummary.tsx`.
-- [x] Supprimer l'attribut JSX dupliqué dans une PR Site dédiée ; ajouter un contrat qui empêche la régression.
-- [ ] Exécuter les gates locales `just offline-l1`, `just p0`, `just quality`, `npm run typecheck`, `npm run build`, les tests unitaires et Playwright au **même SHA**. Ne pas lancer de CI GitHub payante.
-- [x] Preview Vercel du SHA `0d99738b` READY, puis fusion de Site #255. Production `www.albanandrieu.com` aliasée à `86627eb7` sur déploiement `dpl_D44EXX5iJKij8hbnHA4hTHuGjwy3` READY.
-- [ ] Recette réelle HTTP et navigateur au commit de production : page TrueNAS FR/EN, architecture, OWNER/LAN autorisé et SERVICE public expurgé ; statut READY seul insuffisant.
-- [ ] Contrôler en production après déploiement les pages `/fr/truenas`, `/en/truenas`, `/fr/architecture`, les icônes locales, la navigation clavier, les liens externes et le graphe ReactFlow ; consigner SHA/HTTP/horodatage. Un déploiement READY seul ne valide pas la page.
-
-**Done :** build Next.js et tests au SHA exact, domaine de production sur ce SHA, recettes FR/EN publiques et OWNER effectuées.
-
-## P1 — Résilience visuelle des icônes TrueNAS et ReactFlow
-
-- [x] Si un asset local est absent ou si son chargement échoue, remplacer l'image cassée par un monogramme **spécifique au service**. Même contrat pour les cartes et les nœuds ReactFlow, sans chargement depuis un CDN ni HTML arbitraire.
-- [x] Utiliser une identité visuelle locale déterministe (initiales et couleur calculée sur l'identifiant canonique), sans modifier les icônes officielles lorsque leurs assets se chargent.
-- [x] Ajouter 6 tests unitaires au module sans dépendances (6/6 exécutés sous Node 22, contrôle TypeScript strict ciblé réussi), et trois contrats statiques d'intégration dans `just source-check`.
-- [ ] Exécuter les nouveaux contrats sur le checkout complet, puis TypeScript/Next.js et Playwright au **HEAD exact** de la PR #255. Vérifier dans le navigateur les images 404 et les changements d'identifiant, et surveiller l'attribut `data-service-icon-fallback` pour auditer les fichiers défectueux.
-- [x] Auditer les assets au commit publié `86627eb7` : 176 identités associées à 125 fichiers distincts, **aucun asset référencé manquant**, et `generic-app.svg` présent (preuve L0 Git).
-- [x] Ajouter `just icons-local-check` et son contrat sans dépendance Compose, branchés sur `just source-check`, pour détecter fichiers absents, vides, liens symboliques et perte de logos critiques. Tests Node 22 sur fixture isolée : **5/5 PASS** ; exécution sur le dépôt complet à confirmer.
-- [ ] Compléter l'audit de `nabla-compose/catalog/service-icons.json` à chaque nouvelle application ; un monogramme de repli ne remplace pas le vrai logo lorsqu'il existe.
-
-## P0 — Terminer la migration d'affichage Backstage v2
-
-- [x] Renforcer la validation des IDs SERVICE publics : refus explicite des types non textuels et des IDs non canoniques avant leur entrée dans React et `localStorage`. Validateur pur : **6/6 tests PASS** sous Node 22 dans l'environnement agent ; contrat d'intégration ajouté, à exécuter avec `just source-check` sur checkout complet.
-
-
-- [x] **Migration de la source runtime** : `lib/homelabServices.ts` ne charge plus le JSON v1 ni les overrides d’URL. Ces contrats historiques sont isolés dans `unit-tests/helpers/homelabLegacyCatalogFixture.ts` pour les tests ; la lecture serveur et les cartes utilisent exclusivement Backstage v2, sans lien inventé lorsqu’une preuve OWNER manque.
-- [ ] Vérifier les consommateurs de données restants, dont les fixtures statiques de topologie et les scripts, avant toute suppression de fichier v1. Conserver les contrats de compatibilité uniquement dans les tests.
-- [x] Ne plus écraser les preuves OWNER lors de collisions par ID, nom ou URL. Les IDs ambigus restent sans preuve de sonde ; 4 tests unitaires du module d'identité passent sous Node 22 (L1 isolé).
-- [ ] Assurer une correspondance non ambiguë `entityRef` pour les cartes et le graphe, y compris sous-composants, ressources et exporters. Un ID absent ou ambigu affiche `unknown`.
-- [ ] Résoudre les icônes à partir du mapping généré Compose `lib/homelabCatalogIcons.generated.ts` ; vérifier les assets réels, l'attribution et les chemins d'icônes sur FR/EN. Aucun second référentiel `iconSrc`.
-- [ ] Afficher le DTO OWNER FastAPI sans modifier la politique de santé côté navigateur : Docker app + conteneur principal, HTTP/HTTPS/TLS, tunnel Cloudflare, latence **si datée**, horodatage et état de chaque sonde. Respecter `disabled`, `not-configured`, `not-executed`, `stale`, `failed` et `observed`.
-- [ ] Rendre les liens externes/LAN **uniquement si autorisés**, étiqueter `déclaré, non sondé`, éviter les paramètres sensibles et afficher les erreurs `owner-boundary` sans créer d'URL de secours fictive.
-- [ ] Dans la vue SERVICE publique, conserver seulement le read-model expurgé et son cache `localStorage` versionné (TTL catalogue 15 min, santé 2 min), avec cache restauré `unknown` et aucun état OWNER.
-
-**Done :** même `catalogRevision` sur les deux vues ; diagnostics complets seulement en OWNER ; aucune fuite LAN ou clé dans le bundle public.
-
-## P0 — Tests de confidentialité et accès OWNER
-
-- [x] Durcir `isSafePublicText` : rejeter les chemins privés cachés derrière `(`, `:`, `=` ou `[` ainsi que `/run/secrets`, `/var/lib` et `/workspace/users`. Nouveau test négatif reproductible sur les fichiers exacts : **échec avant correction ; 5/5 PASS après**, Node 22 L1.
-- [ ] Vérifier en Preview au SHA exact que les projections SERVICE et le cache local ne diffusent aucune donnée OWNER ni chemin privé. Le test Node isolé ne vaut pas un audit navigateur.
-
-
-- [ ] Depuis le Wi-Fi autorisé, comparer `/api/homelab-access?diagnose=1`, `/api/homelab-health`, `/api/homelab-probes` et les cartes. Le statut `authorized` du CIDR ne prouve pas que l'upstream OWNER est accessible.
-- [ ] Depuis un réseau extérieur, vérifier `public-readonly` et le refus des routes OWNER ; aucune IP privée, preuve de sonde, posture ni secret en JSON/HTML/RSC/assets/CDN.
-- [ ] Distinguer 401/403/503, timeout, snapshot ancien et absence de sonde. Tester révocation de session, retour réseau, expiration du cache et accès Cloudflare avec JWT vérifié.
-- [ ] Maintenir BetterLeaks, SAST/DAST, Trivy et les contrôles de qualité du dépôt ; éviter de dupliquer les workflows GitHub coûteux.
-
-**Done :** refus extérieurs et affichage OWNER prouvés au SHA en production, avec contrôles de confidentialité.
-
-## P1 — Performance, accessibilité et UX
-
-- [ ] Mesurer LCP/INP/CLS et le poids JS de `/fr/truenas` (production vs Preview), vérifier que les cartes s'affichent avant ReactFlow et que les panneaux diagnostics sont chargés seulement à l'ouverture.
-- [ ] Dédupliquer la revalidation SERVICE entre TrueNAS et Architecture ; évaluer `ETag` et `BroadcastChannel` avec clé `catalogRevision`, sans partager de donnée OWNER entre onglets.
-- [ ] Évaluer `content-visibility` ou virtualisation pour les groupes nombreux après tests de focus, recherche, filtres et lecteurs d'écran.
-- [ ] Maintenir un registre de preuves compact, nombres tabulaires, erreurs explicites et traductions FR/EN sans doublons de contrôles.
-
-## P1 — Sécurité et contenus du site
-
-- [ ] Vérifier les documents `security.txt`, vie privée et pages sécurité/DSOMM contre leurs références canoniques ; ne pas recopier les métriques ou évaluations de sécurité de FastAPI dans le site.
-- [ ] Conserver la convergence des quality gates génériques avec `nabla-site-bababou`, sans introduire de données ou particularités métier dans Site Alban.
-- [ ] Confirmer par des tests les intégrations Stripe/PostHog déjà configurées, désactivées par défaut si une collecte métier est nouvelle ; conserver leurs plans dans leurs documents dédiés plutôt que dans cette roadmap homelab.
-
-## P1 — Skill `frontend-design` : installation par l'utilisateur
-
-- [x] Skills `frontend-design` et `web-design-guidelines` installés manuellement par l'utilisateur et committés sur `master`. Demander une nouvelle autorisation avant toute future installation ou mise à niveau.
-- [ ] Lire la sortie complète fournie par l'utilisateur et résoudre les chemins relatifs depuis le répertoire `supporting-files` annoncé ; vérifier la provenance avant utilisation.
-- [ ] Demander séparément l'accord avant d'installer tout autre skill externe ; ne rien installer sur TrueNAS/Talos.
-
-
-## P0 — Alignement local-first Compose #274
-
-- [x] Reporter les règles multi-agents de [Compose #274](https://github.com/AlbanAndrieu/nabla-compose/pull/274) : shell enfant, isolation des worktrees, `uv` par worktree pour les helpers Python, `npm ci` verrouillé et contrôle du HEAD avant publication.
-- [x] Préserver l'interdiction Site de `[skip ci]` et les contrôles obligatoires.
-- [ ] Exécuter le build Next.js sous **Node 24 LTS** au HEAD exact ; ne pas assimiler un test Node 22 à la preuve de publication.
-- [ ] Vérifier une Preview Vercel du même SHA (FR/EN, icônes, ReactFlow, OWNER/SERVICE, confidentialité).
-- [ ] Exécuter `just source-check` et la gate complète L3 sur checkout propre lorsque l'environnement Node/npm et le dépôt intégral sont disponibles.
-
-## Dépendances inter-dépôts — référencées, non reprises comme tâches du site
-
-| Propriétaire | Livrable requis par le site | Lien |
+| Dimension | Preuve | Verdict |
 | --- | --- | --- |
-| `fastapi-sample` | Sondes LAN par service, timestamps fiables, Gatus/Prometheus/exporters, statuts HTTP/TLS/Cloudflare et contrat OWNER versionné | [Roadmap FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md) |
-| `nabla-compose` | Collecteur TrueNAS autorisé, LAN probes, catalogue Backstage/icons, DNS/Traefik/Tunnel, secrets Vaultwarden et politiques réseau | [Roadmap Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) |
-| `nabla-compose` | Talos/Kubernetes, migration TrueNAS 26, pfSense/Unbound/pflow, Akvorado, OpenRAG, GitHub App/DefectDojo | [PR Compose #274](https://github.com/AlbanAndrieu/nabla-compose/pull/274) |
+| Git | `master` et commit de merge #256 `99cf7e4016533532bee53a72964ffea1b4a54bc6` identiques | **PASS** |
+| Publication | Vercel `dpl_ETdhg9XfxZijJ3ExA29a2q291SmV` READY, `target=production`, Node 24.x | **PASS build/déploiement** |
+| Domaine | `www.albanandrieu.com` sur le même déploiement ; apex redirigé vers `www` | **PASS métadonnées Vercel** |
+| Logs build | `Build Completed in /vercel/output [22s]` ; pas d'erreur de compilation dans les événements consultés | **PASS build** |
+| Runtime | Aucune erreur regroupée Vercel sur 24 h ; recherche `error/fatal` sur 30 min sans résultat | **Aucune erreur observée, pas une recette** |
+| HTTP public | Navigateur de l'agent : accès direct à Architecture/TrueNAS non disponible ; terminal de l'agent : DNS public indisponible | **BLOCKED côté agent** |
+| OWNER/LAN | Aucun appel authentifié depuis le VLAN domestique | **NOT_RUN** |
+| Source-only / L3 | Pas de checkout complet avec Node 24, `npm ci`, Playwright, Axe, Trivy et quality gate locale sur le merge | **NOT_RUN** |
 
-**Règle de clôture :** source ≠ test réussi ≠ déploiement READY ≠ recette fonctionnelle. Conserver `NOT_RUN`, `stale` et `unknown` sans inventer de résultats. Aucun merge automatique.
+**Routes canoniques :** anglais `/`, `/architecture`, `/truenas` ;
+français `/fr`, `/fr/architecture`, `/fr/truenas`.
+Ne pas présenter `/en/architecture` comme canonique.
+
+[Runbook de vérification production](runbooks/site-production-verification.md) ·
+[Contrat des diagnostics et droits](homelab-diagnostics-and-access.md).
+
+## P0 — Vérifier les parcours réellement publiés
+
+- [ ] **S-01 Smoke HTTP et SHA :** exécuter depuis une machine disposant d'un
+  DNS public fonctionnel `DEPLOYED_SHA=99cf7e4016533532bee53a72964ffea1b4a54bc6 node scripts/post-deploy-smoke.mjs`.
+  Le script vérifie routes FR/EN, canonical/hreflang, sitemap, robots, carte sociale,
+  SHA et refus de l'ancienne route opérationnelle. Conserver la sortie expurgée.
+- [ ] **S-02 Navigateur :** tester Home, TrueNAS et Architecture FR/EN sur le
+  même SHA. Vérifier le chargement des vrais logos, le fallback monogramme,
+  les filtres, le graphe ReactFlow, C4 L1/L2 et son panneau de relations.
+  Confirmer navigation au clavier, mobile, absence de console error.
+- [ ] **S-03 OWNER :** depuis le Wi-Fi/VLAN autorisé, confronter
+  `/api/homelab-access?diagnose=1` à la disponibilité des catalogues,
+  à `/api/homelab-health` / sondes autorisées et au rendu des cartes.
+  Une réponse `trusted` ne prouve pas que FastAPI ou TrueNAS répond.
+- [ ] **S-04 Public :** depuis un réseau non autorisé et sans session Access,
+  vérifier le mode SERVICE (si activé) et les refus OWNER. Contrôler
+  JSON, HTML/RSC, console, requêtes réseau et `localStorage` : aucun token,
+  adresse LAN, header d'accès ou diagnostic OWNER.
+- [ ] **S-05 Quality :** lancer `just source-check`, build Next.js Node 24,
+  tests unitaires et les gates locales pertinentes sur un checkout du
+  **merge SHA**, sans relancer les workflows GitHub payants.
+
+**Done P0 :** preuves HTTP/navigateur datées, parcours OWNER et SERVICE prouvés,
+contrôle de confidentialité négatif et SHA exact. Ne jamais fermer sur READY seul.
+
+## P0 — Diagnostics et contrôle d'accès côté site
+
+**Livré dans #256 :** catalogue Backstage v2 sans repli runtime v1 ; index
+de preuves résistant aux clés ambiguës ; classifieur d'erreurs `stage`,
+réponse HTTP 503 expurgée pour les clients publics ; panneau d'incident
+OWNER commun Architecture/TrueNAS ; révocation synchrone du snapshot C4
+OWNER lors d'une transition de droits ; cache SERVICE versionné. Ces
+invariants sont à préserver, pas à réimplémenter.
+
+- [ ] **S-06 Corrélation réelle :** propager un `trace_id` fiable à travers
+  collecteur → FastAPI → Route Handler Next.js → support OWNER, avec
+  logs expurgés et horodatages. Le `requestId` Site actuel est **local**
+  et ne constitue pas une trace distribuée.
+- [ ] **S-07 Provenance lisible :** présenter par service les étapes
+  catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
+  horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
+  `not-executed`, `403` et `down` sans attribuer une panne au hasard.
+- [ ] **S-08 Contrat d'identité :** vérifier les correspondances exactes
+  `entityRef`, composants et exporters ; refuser un matching par nom,
+  URL ou identifiant ambigu lorsqu'une preuve ne cible pas le même service.
+- [ ] **S-09 Fin du mode SERVICE temporaire :** préparer un cutover
+  `HOMELAB_PUBLIC_READONLY_ENABLED=false` lorsque les parcours OWNER ont
+  leur alternative fonctionnelle. Tant qu'il reste actif, tester que seuls
+  les endpoints de projection allowlistés sont accessibles et que les 503
+  publics ne révèlent aucune phase privée.
+
+## P1 — C4, icônes et expérience utilisateur
+
+**Livré dans #256 :** `@xyflow/react` sans nouveau serveur de diagrammes,
+vues C4 L1 Contexte et L2 Conteneurs/services bornées à 16 nœuds / 48 liens,
+panneau de relations navigable et liste textuelle accessible. La vue L1
+est conceptuelle ; L2 représente un sous-ensemble déclaré, pas la santé runtime.
+Audit précédent des assets : 176 mappings, 125 fichiers distincts, aucun
+asset Git manquant (preuve de dépôt, pas chargement navigateur).
+
+- [ ] **S-10 WCAG 2.2 AA :** confirmer focus/lecteur d'écran, contraste,
+  zoom, clavier, transitions C4 L1/L2, bouton d'effacement, responsive,
+  FR/EN et alternatives textuelles. Corriger les anomalies démontrées.
+- [ ] **S-11 Performance :** mesurer LCP/INP/CLS, poids du bundle ReactFlow,
+  chargement différé des diagnostics, ETag/revalidation SERVICE, cache
+  inter-onglets sans état OWNER et comportement des filtres avec beaucoup de services.
+- [ ] **S-12 Icônes :** exécuter `just icons-local-check` et comparer au
+  catalogue Compose lors de nouvelles apps. Confirmer erreurs HTTP 404 et
+  `data-service-icon-fallback` dans le navigateur, sans substituer
+  systématiquement un monogramme à un logo officiel disponible.
+- [ ] **S-13 C4 L3 :** attendre des relations de composants explicitement
+  publiées dans le catalogue d'autorité Compose/FastAPI. Étudier l'export
+  Structurizr DSL plus tard ; aucun inventaire local parallèle.
+
+## P1/P2 — Qualité, documentation et refactoring
+
+- [ ] **S-14 Dédupliquer les adaptateurs** des snapshots de santé et de
+  catalogue utilisés par TrueNAS/Architecture ; conserver des DTO distincts
+  PUBLIC/SERVICE/OWNER et une unique logique d'autorisation **serveur**.
+- [ ] **S-15 Dépister les consommateurs v1** (fixtures, scripts, tests)
+  avant suppression ; les compatibilités historiques sont réservées aux tests,
+  jamais utilisées en fallback de production.
+- [ ] **S-16 Qualité transverse :** préserver les contrats local-first,
+  Next.js/Node LTS, sécurité SAST/DAST, DSOMM, Stripe/PostHog dans
+  [roadmap produit](quality-roadmap.md), sans importer leur backlog ici.
+  Les skills externes déjà installés restent sous contrôle de l'utilisateur.
+
+## Handoff sans duplication entre dépôts
+
+| Producteur/autorité | Contrat attendu | Source d'autorité |
+| --- | --- | --- |
+| `nabla-compose` | Topologie déclarée, `catalogRevision`, icônes, ingress, APISIX POC, ADR/RACI, collecteur LAN | [Roadmap Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) · [APISIX #280](https://github.com/AlbanAndrieu/nabla-compose/pull/280) |
+| `fastapi-sample` | Probes, identité/permissions, DTO OWNER/SERVICE, codes de diagnostic, timestamps et traces inter-services | [Roadmap FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md) · [#376 fusionnée](https://github.com/AlbanAndrieu/fastapi-sample/pull/376) |
+| `nabla-site-alban` | Contrôle d'exposition Route Handlers, C4, cartes, cache public, i18n, a11y, tests Preview et prod | Ce document |
+
+**Convention :** `DONE (code)` ≠ `READY (Vercel)` ≠ `PASS (HTTP)` ≠
+`PASS (navigateur)` ≠ `PASS (OWNER/LAN)`. Si non mesuré, inscrire
+`NOT_RUN` ou `BLOCKED`. Ne pas recopier les tâches d'un autre dépôt.

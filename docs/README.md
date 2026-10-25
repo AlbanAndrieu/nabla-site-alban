@@ -10,6 +10,8 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 - [Contrat catalogue homelab v2](homelab-services-catalog.md)
 - [Contrat de santé des dépendances homelab](homelab-dependency-health-ui.md)
 - [Runbook réseau TrueNAS / FastAPI Cloud](truenas-fastapi-cloud-network.md)
+- [Contrat Site diagnostic/identité OWNER/SERVICE](homelab-diagnostics-and-access.md)
+- [Gouvernance ADR/RACI/C4 Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md)
 - [Sécurité Kubernetes / Zero Trust](zero-trust-kubernetes-security.md)
 - [Contrat d’évaluation DSOMM portable](dsomm-assessment-contract.md)
 - [Modèle de menaces du site](security-threat-model.md)
@@ -17,13 +19,14 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 ## Roadmaps actives
 
 - [Roadmap produit et qualité](quality-roadmap.md) — backlog transverse canonique.
-- [Roadmap homelab](homelab-roadmap.md) — backlog TrueNAS/FastAPI/Talos/DNS.
+- [Roadmap homelab Site](homelab-roadmap.md) — rendu TrueNAS/C4, accès client, diagnostics Site et recette production ; les actions API/infra restent dans leurs dépôts.
 
 Les roadmaps conservent les travaux ouverts, les invariants et un historique
 compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 
 ## Runbooks
 
+- [Vérification du site après merge](runbooks/site-production-verification.md)
 - [GitHub Actions](../.github/github-actions-best-practices.md)
 - [Ruleset GitHub de master](github-master-ruleset.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)
@@ -32,6 +35,7 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 
 ## Diagnostics, incidents et références
 
+- [Historique intégral roadmap homelab avant consolidation](archive/homelab-roadmap-through-2026-10-25.txt)
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
 - [PoC Dagger et boucle de développement](dagger-poc.md)
