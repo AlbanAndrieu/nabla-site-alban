@@ -5,7 +5,7 @@
  * Requires the project's Playwright browser installation.
  */
 import { chromium } from "playwright";
-import { auditHeadersForUrl, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata } from "./homelab-audit-policy.mjs";
+import { auditHeadersForUrl, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata, safeAccessDiagnostic } from "./homelab-audit-policy.mjs";
 
 const expected = process.env.HOMELAB_AUDIT_EXPECT?.trim();
 const base = process.env.BASE_URL?.trim() || "https://www.albanandrieu.com";
@@ -61,6 +61,8 @@ try {
   }
   const observed = gate.mode;
   audit("access", observed);
+  const accessMetadata = safeAccessDiagnostic(decision.body?.diagnostic);
+  if (accessMetadata) audit("sanitized access diagnostic", JSON.stringify(accessMetadata));
   if (observed !== expected) {
     assert(false, `expected ${expected}, observed ${observed}; check real network and verified Access identity`);
     throw new AuditPreflightBlocked("mode_mismatch");
