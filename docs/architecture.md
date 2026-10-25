@@ -2,7 +2,7 @@
 
 ## Runtime principal
 
-Le site est une application Next.js 16.3.4 App Router avec React 19, TypeScript et
+Le site est une application Next.js 16.4.2 App Router avec React 19, TypeScript et
 `next-intl`. Vercel est l'unique cible de déploiement du runtime web principal.
 Les anciens runtimes Wrangler, Express et Vercel Functions sous `api/` ont été
 retirés : les endpoints applicatifs vivent sous `app/api/**`.
@@ -37,8 +37,7 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 
 - `app/api/create-checkout-session/route.ts` : Checkout Stripe hébergé.
 - `app/api/github-stars/route.ts` : compteur GitHub, cache d'une heure.
-- `app/api/homelab-services/route.ts` : catalogue homelab FastAPI-first avec
-  fallback local.
+- `app/api/homelab-services/route.ts` : projection catalogue Backstage v2 via FastAPI, sans fallback runtime v1 ; réponse d'erreur expurgée pour SERVICE.
 - `app/api/homelab-health/route.ts` : snapshot de santé homelab fourni par
   FastAPI.
 
@@ -63,14 +62,20 @@ HomelabServicesSection (serveur, texte éditorial public)
           HomelabOperationsDisclosure
 HomeLabSection -> HomeLabPrivateNetwork -> CloudflareStatusWarning, HomeLabNetworkFlow
 architecture/page -> ArchitecturePrivateViews -> explorateur, inspecteur, réseau
+  -> C4ArchitectureView (React Flow L1/L2, relations déclarées, aucun verdict runtime)
 ```
 
-Les pages `/nabla`, `/truenas` et `/architecture` (FR/EN) restent SSG/CDN et
-identiques pour tous : le HTML ne contient ni catalogue ni topologie. Toutes les
-routes `/api/homelab-*`, `/api/runtime-topology` et `/api/homelab-network-flow`
-passent par `gatedHomelabResponse` (`lib/privateHomelabResponse.ts`) : 404 neutre
-sans appel amont pour un visiteur anonyme, `Cache-Control: private, no-store`
-dans tous les cas.
+Les pages `/nabla`, `/truenas` et `/architecture` sont rendues en SSG/CDN ;
+les projections dynamiques du catalogue et les preuves de sondes se chargent
+côté client, après le contrôle de frontière appliqué par les Route Handlers.
+`gatedHomelabResponse` interdit par défaut les endpoints OWNER.
+**Exception temporaire explicite :** `HOMELAB_PUBLIC_READONLY_ENABLED`
+autorise, lorsqu'il est activé, uniquement GET/HEAD des projections SERVICE
+`/api/homelab-services`, `/api/homelab-catalog-v2`,
+`/api/homelab-health-v2`. Le serveur expurge les erreurs 503 publiques ;
+aucune route de sonde OWNER ne devient publique. Voir
+[contrat d'accès](homelab-diagnostics-and-access.md) et
+[roadmap Site](homelab-roadmap.md) pour le retrait de cette dérogation.
 
 ## Observabilité
 
@@ -98,7 +103,9 @@ dans tous les cas.
 
 ## Runtime Node.js
 
-Le développement local et GitHub Actions utilisent Node.js 24.22.1 via `.nvmrc`/mise, avec npm 12.2.0 épinglé dans `mise.toml` (source de vérité pour le local, la CI via `jdx/mise-action` et Dagger). `package.json` accepte `>=24.22.1 <27` afin que Vercel puisse continuer à sélectionner son runtime Node 24 supporté pour les Route Handlers tout en autorisant le runtime local/CI Node 26.
+Le développement local et GitHub Actions utilisent Node.js 24.22.1 via `.nvmrc`/mise, avec npm 12.2.0 épinglé dans `mise.toml` (source de vérité pour le local, la CI via `jdx/mise-action` et Dagger). `package.json` accepte `>=24.22.1 <25` : Node 24 demeure la seule famille LTS
+validée pour ce runtime ; toute migration Node 26 exige une nouvelle preuve
+locale/Vercel au même SHA.
 
 ## Contrôles
 
