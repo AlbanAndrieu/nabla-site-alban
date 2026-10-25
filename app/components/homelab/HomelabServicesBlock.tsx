@@ -323,9 +323,11 @@ export default function HomelabServicesBlock({
 					{state.siteHealthTraceId ? (
 						<details data-owner-site-trace className="small my-3">
 							<summary>{french ? "Référence du diagnostic Site → FastAPI" : "Site → FastAPI diagnostic reference"}</summary>
-							<p>{french
-								? "Identifiant envoyé à FastAPI ; vérifier son enregistrement dans les logs FastAPI."
-								: "ID sent to FastAPI; verify its presence in FastAPI logs."}</p>
+							<p>{state.siteHealthTraceConfirmed
+								? (french ? "ID confirmé par l’en-tête FastAPI. Rechercher la trace correspondante dans les logs FastAPI."
+									: "ID confirmed by the FastAPI response header. Find the matching FastAPI log entry.")
+								: (french ? "ID envoyé à FastAPI ; réception non encore confirmée."
+									: "ID sent to FastAPI; downstream receipt not yet confirmed.")}</p>
 							<code data-owner-trace-id>{state.siteHealthTraceId}</code>
 						</details>
 					) : null}
