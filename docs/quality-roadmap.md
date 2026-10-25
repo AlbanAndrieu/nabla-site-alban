@@ -1,5 +1,7 @@
 # Feuille de route produit et qualité
 
+# Feuille de route produit et qualité
+
 ## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
 
 - [x] Fournir `node scripts/agent-node22-fast.mjs`, `just node22-fast`
@@ -156,31 +158,28 @@ PR/master et le budget CI, en cohérence avec Bababou sans cloner tous les jobs.
 - [ ] **Installation npm sans DNS (local-first)** : `just npm-offline-check` indique seulement la disponibilité des outils/cache (aucun contrôle d’intégrité des dépendances) ; `just npm-offline-install` utilise `npm ci --offline --ignore-scripts --no-audit --no-fund` sur un arbre sans `node_modules` et échoue si le cache est incomplet. Rejouer les scripts requis et la gate stricte uniquement depuis un checkout Git complet, avec dépendances installées et provenance vérifiée. Ne jamais convertir une preuve source-only en PASS publication.
 - [ ] **Valider le compactage des diagnostics CI/runtime** : sorties par défaut limitées à 20 lignes dans les gates et la CI (`QUALITY_LOG_TAIL`), détails activables par `QUALITY_VERBOSE=1`, warnings Health Board activables par `HOMELAB_HEALTH_VERBOSE=1`. Preuve intermédiaire : PR #232, quality gate, Semgrep, types et tests unitaires verts sur `fd4fbed` (run `39079985149`) ; garde de parité des types entre maintenance et build ajoutée ensuite. Mesurer la réduction réelle lignes/octets sur deux logs représentatifs avec `scripts/agent-output-metrics.sh` ; conserver les preuves d'échec complètes accessibles hors console et revalider le HEAD final avant clôture. Ne pas assimiler une estimation de tokens à une mesure.
 
-## P0 — Confidentialité homelab et transfert vers ops.albandrieu.com
+## P0 — Confidentialité homelab : état après Site #256 (25 octobre 2026)
 
-Réconciliation des cinq dernières PR fusionnées : [dossier vérifié](roadmap-merge-reconciliation-2026-10-18.md)
-— **#234** (cadrage), **#232** (logs/quality gate), **#230** (architecture/a11y),
-**#231** (text-scale), **#227** (oscillation). Ces acquis doivent survivre
-à la suppression des détails publics. Contrat et backlog approfondi :
-[docs/private-homelab-observability.md](private-homelab-observability.md).
+Le confinement Site [#235](https://github.com/AlbanAndrieu/nabla-site-alban/pull/235),
+la convergence catalogue et la protection des erreurs OWNER de
+[#256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256)
+ont été **fusionnés**. Les PR correspondantes
+[FastAPI #353](https://github.com/AlbanAndrieu/fastapi-sample/pull/353)
+et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
+sont également fusionnées. Une fusion n'établit ni un refus HTTP effectif
+depuis Internet ni l'accès LAN réel.
 
-- [ ] Livrer et vérifier la PR de confinement public **#235** : huit routes
-  opérationnelles renvoient 404 sans proxy FastAPI, catalogues et legacy HTML
-  assainis, pages `/truenas`, `/nabla`, `/architecture` rendues en mode vitrine.
-  Le HEAD Git ne constitue pas une preuve de déploiement.
-- [ ] Migrer les tests hérités qui supposaient les données privées en accès
-  anonyme : conserver leurs assertions métier sur fixtures synthétiques
-  et transférer les scénarios E2E opérateur vers la future UI `ops`.
-- [ ] Valider la qualité complète, SAST, types, Playwright/axe 200 %, ZAP sur
-  le HEAD exact sans désactiver les garde-fous, puis confirmer l'absence de
-  fuites dans HTML/JS/JSON, erreurs, headers, previews et caches.
-- [ ] Coordination obligatoire : [FastAPI #353](https://github.com/AlbanAndrieu/fastapi-sample/pull/353)
-  et [Compose #263](https://github.com/AlbanAndrieu/nabla-compose/pull/263)
-  restent distinctes du confinement de Vercel; accès direct à FastAPI Cloud
-  non réputé corrigé par #235.
-- [ ] Après livraison, purge/invalidation des caches de production et
-  previews, test négatif anonyme et postmortem des anciennes copies
-  publiques. Ne jamais affirmer que l'ancien historique Git est privé.
+Le flag temporaire `HOMELAB_PUBLIC_READONLY_ENABLED` autorise, quand il
+est actif, uniquement les projections SERVICE explicitement allowlistées.
+Les erreurs publiques 503 doivent rester neutres ; aucune preuve OWNER,
+adresse LAN, clé ni état de sonde détaillé ne doit rejoindre le bundle,
+les caches ou les réponses publiques.
+
+**Une seule checklist active** pour les scénarios anon/public/OWNER,
+la purge de caches et le retrait de ce mode temporaire :
+[roadmap homelab Site S-03/S-04/S-09](homelab-roadmap.md).
+Le présent document conserve les invariants produit et qualité, pas une
+seconde séquence de migration ni les anciennes PR marquées ouvertes.
 
 ## P0 — Protection de merge, publication et dépendances
 
@@ -289,9 +288,11 @@ la roadmap homelab.
 
 ## P1 — Homelab transverse
 
-Les tâches détaillées sont dans `docs/homelab-roadmap.md`. Priorités :
-TrueNAS 26 WebSocket, cutover catalogue v2, Talos/Kubernetes, résilience DNS,
-métriques bornées et séparation disponibilité/posture sécurité.
+Les tâches détaillées de présentation, accès client, cache public,
+vérification de la production et diagnostics OWNER sont dans
+[docs/homelab-roadmap.md](homelab-roadmap.md).
+La plateforme TrueNAS/Talos/DNS/APISIX relève de la roadmap Compose ;
+les sondes et l'identité de l'API relèvent de FastAPI. Ne pas les copier ici.
 
 ## P2 — Performance et dette de dépendances
 
