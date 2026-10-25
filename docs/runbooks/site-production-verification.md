@@ -85,3 +85,33 @@ alors que les changements applicatifs sont présents dans les ancêtres.
 Exécuter le test local `node --test unit-tests/vercelIgnoreBuild.test.mjs`
 avant toute modification de cette logique. Ne pas forcer un déploiement
 de production pour tester ce cas : utiliser la Preview de la PR.
+
+## Préparer le typecheck avant le build (octobre 2026)
+
+Next.js génère `PageProps`, `AppRoutes` et les types des routes
+dans `.next/types`. Une nouvelle page peut être absente des fichiers
+produits par un build précédent. Ne pas modifier son type
+`PageProps<"/[locale]/security/lexique">` pour contourner ce cache.
+
+1. Exécuter `npm ci --no-audit --no-fund` sur le checkout choisi.
+2. Exécuter `npm run typecheck`.
+3. Exécuter `npm run build`.
+4. Vérifier le SHA Git réellement construit.
+5. Consulter l'état de la Preview Vercel pour le même SHA.
+
+`npm run typecheck` lance désormais
+`bash scripts/run-next-clean.sh typegen && tsc --noEmit`. Le wrapper
+protège `next-env.d.ts` suivi par Git pendant la génération.
+La quality gate appelle `npm run typecheck`, sans régénération en
+double.
+
+**Diagnostic opérateur du 26/10/2026 :** quatre TS2344/TS2339 sur la
+route lexique avec `tsc --noEmit` lancé avant le build. Un
+`next build` exécuté ensuite a **réussi** avec Next **16.3.4** :
+83/83 pages, lexique EN/FR, TypeScript fini sans erreurs.
+Mais `package.json` et le lockfile verrouillent **Next 16.4.2**.
+Ce succès constitue une preuve de compilation avec une dépendance
+locale divergente, **pas** un PASS de publication 16.4.2.
+En cas de divergence locale, réinstaller les dépendances depuis
+`package-lock.json` avec `npm ci`; ne pas changer la version du dépôt
+pour rejoindre un `node_modules` ancien.
