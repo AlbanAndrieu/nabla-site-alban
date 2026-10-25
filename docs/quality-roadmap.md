@@ -358,3 +358,22 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   Node 24.22.1/npm 12.2.0 ; un précontrôle PASS ne valide pas le build.
 - [ ] Exécuter `npm run typecheck` et `npm run build` sur un
   checkout complet sous Node 24 avant de promouvoir la Preview.
+
+### P0 — Régression de la vérification TypeScript locale (25 octobre 2026)
+
+- [x] **Node 24 réel (opérateur)** : le précontrôle accepte
+  `v24.22.1 / npm 12.2.0` ; **57/58 PASS**, avec une seule erreur
+  `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` émise par le test de parsing.
+- [x] **Correctif de test** : remplacer
+  `stripTypeScriptTypes(..., { mode: "strip" })` par
+  `mode: "transform"`, requis pour les propriétés TypeScript dans les
+  paramètres du constructeur.
+- [x] **Test négatif** : rejeter une fixture ayant une virgule manquante
+  après `error: false`, afin de conserver la couverture de la
+  régression de compilation Vercel.
+- [x] **L1 agent Node22** : 2/2 tests PASS sur une fixture TypeScript
+  représentative après correction.
+- [ ] **L1 opérateur Node24** : réexécuter `npm run test:fast:local`
+  sur les sources intégrales au nouveau HEAD.
+- [ ] **L3 publication** : effectuer `npm run typecheck` et
+  `npm run build` avec la toolchain et les dépendances du projet.
