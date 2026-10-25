@@ -380,3 +380,28 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   (`LOCAL_FAST_L1_PASS`, 0 skipped, 0 failed, ~6,75 s).
 - [ ] **L3 publication** : effectuer `npm run typecheck` et
   `npm run build` avec la toolchain et les dépendances du projet.
+
+### P0 — Synchronisation des types de routes Next.js et des dépendances (26/10/2026)
+
+- [x] **Erreur reproduite par l'opérateur :** `npm run typecheck` échoue
+  avec 4 TS2344/TS2339 sur `PageProps<"/[locale]/security/lexique">`
+  avant le build ; la page suit pourtant le même contrat que `dsomm`.
+- [x] **Build local exécuté :** Next 16.3.4 compile et génère les 83 pages,
+  inclut les deux routes de lexique, et termine son TypeScript sans erreur.
+  Ce PASS ne certifie **pas** la version verrouillée du projet.
+- [x] **Correctif :** `npm run typecheck` exécute
+  `bash scripts/run-next-clean.sh typegen && tsc --noEmit` pour
+  régénérer les types Next.js et préserver le `next-env.d.ts` suivi.
+- [x] **Quality gate :** supprimer son appel `npx next typegen` devenu
+  redondant. Garder une seule génération dans `npm run typecheck`.
+- [x] **Contrat hors ligne :** ajouter les tests de l'ordre typegen/tsc,
+  la protection `next-env.d.ts`, la version lock et l'absence de doublon.
+  **3/3 PASS sous Node 22 sur fixture**, fichier de test exact Git ;
+  checkout entier après correction non encore testé.
+- [ ] **Convergence Next :** la workstation a exécuté Next **16.3.4**
+  alors que `package.json` et `package-lock.json` déclarent **16.4.2**.
+  Refaire `npm ci --no-audit --no-fund` à partir du checkout complet
+  avant toute preuve L3.
+- [ ] **Validation suivante :** obtenir `npm run typecheck` PASS et
+  `npm run build` PASS avec **Next 16.4.2** sur le HEAD de cette PR.
+  Ne pas assimiler le build 16.3.4 à une validation Vercel 16.4.2.
