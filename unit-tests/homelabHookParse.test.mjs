@@ -5,7 +5,7 @@ import { stripTypeScriptTypes } from "node:module";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-test("homelab TS hook parses under Node 22 without a Next build", () => {
+test("homelab TS hook parses under supported local runtimes without a Next build", () => {
   const file = fileURLToPath(new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url));
   const source = stripTypeScriptTypes(readFileSync(file, "utf8"), { mode: "strip" });
   const result = spawnSync(process.execPath, ["--input-type=module", "--check"], {
