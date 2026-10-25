@@ -3,6 +3,11 @@ export type CatalogScope = "owner" | "public" | null;
 export type CatalogFailureReason = "key-missing" | "access-denied" | "unavailable";
 export type CatalogFailurePolicy = { reason: CatalogFailureReason; revokePublicCache: boolean };
 
+/** Reuse the same sanitized reason for TrueNAS cards and Architecture. */
+export function catalogFailureReason(body: unknown): CatalogFailureReason {
+  return classifyCatalogFailure(503, body).reason;
+}
+
 /** An authorization or configuration denial is not an offline connectivity error. */
 export function classifyCatalogFailure(status: number, body: unknown): CatalogFailurePolicy {
   const raw = body && typeof body === "object" && !Array.isArray(body)

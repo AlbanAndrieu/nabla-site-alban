@@ -20,6 +20,7 @@ import {
 	indexHealth,
 } from "./architectureTopologyFilters";
 import HierarchicalArchitectureExplorer from "./HierarchicalArchitectureExplorer";
+import C4ArchitectureView from "./C4ArchitectureView";
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
 import useArchitectureHealthPolling from "./useArchitectureHealthPolling";
 import useArchitectureLiveData from "./useArchitectureLiveData";
@@ -139,6 +140,10 @@ export default function ArchitectureTopologyView({
 				snapshot={health}
 				siteHealth={siteHealth}
 			/>
+
+			<div className={styles.explorerSection}>
+				<C4ArchitectureView locale={locale} topology={topology} readOnly={readOnly} />
+			</div>
 
 			<section
 				id="service-architecture-explorer"

@@ -5,7 +5,8 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { compatibleHomelabEvidence } from "@/lib/homelabHealthIdentity";
+import { compatibleHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
+import { parseOwnerCatalogIncident, type CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
 import {
 	catalogScopeMatches,
 	classifyCatalogFailure,
@@ -50,6 +51,7 @@ export type HealthFetchResult = {
 export type HomelabServicesState = {
 	catalog: HomelabServicesCatalog | null;
 	catalogFailure: "key-missing" | "access-denied" | "unavailable" | null;
+	catalogIncident: { stage: CatalogFailureStage; requestId: string } | null;
 	/** True only while rendering a still-valid SERVICE-only browser cache. */
 	catalogStale: boolean;
 	/** Tracks which access mode produced the current catalog. */
@@ -67,6 +69,7 @@ export type HomelabServicesState = {
 export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	catalog: null,
 	catalogFailure: null,
+	catalogIncident: null,
 	catalogStale: false,
 	catalogScope: null,
 	topology: null,
@@ -83,6 +86,7 @@ class CatalogV2Unavailable extends Error {
 	constructor(
 		readonly reason: "key-missing" | "access-denied" | "unavailable",
 		readonly revokePublicCache = false,
+		readonly incident: { stage: CatalogFailureStage; requestId: string } | null = null,
 	) {
 		super("Backstage v2 catalog unavailable");
 	}
@@ -99,7 +103,11 @@ async function fetchCatalog(signal: AbortSignal, readOnly: boolean): Promise<{
 	if (!response.ok) {
 		const body: unknown = await response.json().catch(() => null);
 		const policy = classifyCatalogFailure(response.status, body);
-		throw new CatalogV2Unavailable(policy.reason, policy.revokePublicCache);
+		const incident = readOnly ? null : parseOwnerCatalogIncident(
+			response.headers.get("X-Nabla-Diagnostic-Stage"),
+			response.headers.get("X-Nabla-Request-ID"),
+		);
+		throw new CatalogV2Unavailable(policy.reason, policy.revokePublicCache, incident);
 	}
 	const payload: unknown = await response.json();
 	if (
@@ -231,6 +239,7 @@ function normalizedName(value: string): string {
 export type HomelabHealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
+	ambiguousIds: Set<string>;
 	byRef: Map<string, HomelabHealthState>;
 };
 
@@ -239,13 +248,13 @@ export function healthIndex(
 	siteHealth?: SiteHealthV2 | null,
 	catalogRevision?: unknown,
 ): HomelabHealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-	}
-	return { byId, byName, byRef: siteHealthIndex(siteHealth, catalogRevision) };
+	const index = uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
+	return {
+		byId: index.byId,
+		byName: index.byName,
+		ambiguousIds: index.ambiguousIds,
+		byRef: siteHealthIndex(siteHealth, catalogRevision),
+	};
 }
 
 export function effectiveState(
@@ -257,7 +266,8 @@ export function effectiveState(
 	const entry = compatibleHomelabEvidence(
 		service.entityRef,
 		serviceId,
-		index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name)),
+		index.ambiguousIds.has(serviceId) ? undefined :
+			(index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name))),
 	);
 	if (entry && !healthUnavailable) {
 		return resolveEffectiveServiceState(entry).effectiveState;
@@ -442,6 +452,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 								? current.siteHealth
 								: null,
 						catalogFailure: null,
+						catalogIncident: null,
 						catalogStale: false,
 						catalogScope: readOnly ? "public" : "owner",
 						error: false,
@@ -467,7 +478,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 							error: !retain,
 							catalogStale: readOnly && retain,
 							catalogScope: readOnly ? "public" : "owner",
-							catalogFailure:
+							catalogIncident: !readOnly && error instanceof CatalogV2Unavailable ? error.incident : null,
+						catalogFailure:
 								error instanceof CatalogV2Unavailable
 									? error.reason
 									: "unavailable",
@@ -520,6 +532,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		return {
 			...state,
 			snapshot: null,
+			catalogIncident: null,
 			ownerBoundary: false,
 			healthStatus: null,
 			healthUnavailable: state.siteHealth?.boardState !== "fresh",
