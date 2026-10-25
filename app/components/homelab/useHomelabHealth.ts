@@ -5,7 +5,7 @@ import {
 	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { compatibleHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
+import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import { parseOwnerCatalogIncident, type CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
 import {
 	catalogScopeMatches,
@@ -232,10 +232,6 @@ export function applyHealthCycle(
 	};
 }
 
-function normalizedName(value: string): string {
-	return value.trim().toLowerCase();
-}
-
 export type HomelabHealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
 	byName: Map<string, HomelabHealthEntry>;
@@ -263,12 +259,7 @@ export function effectiveState(
 	healthUnavailable = false,
 ): HomelabHealthState {
 	const serviceId = homelabServiceId(service);
-	const entry = compatibleHomelabEvidence(
-		service.entityRef,
-		serviceId,
-		index.ambiguousIds.has(serviceId) ? undefined :
-			(index.byId.get(serviceId) ?? index.byName.get(normalizedName(service.name))),
-	);
+	const entry = canonicalHomelabEvidence(index, serviceId);
 	if (entry && !healthUnavailable) {
 		return resolveEffectiveServiceState(entry).effectiveState;
 	}

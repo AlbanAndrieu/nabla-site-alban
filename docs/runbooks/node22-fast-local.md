@@ -28,10 +28,11 @@ exécutent le même profil. Aucun workflow GitHub n'est déclenché.
 
 ## Contrat de test et résultats
 
-Trois fichiers de tests, sans dépendance npm :
+Quatre fichiers de tests, sans dépendance npm :
 `homelabIconFallback.test.mjs` (icônes),
 `agentNode22Core.test.mjs` (C4, provenance, redaction, OWNER,
-sondes), `agentNode22Fast.test.mjs` (modes, prérequis et refus).
+sondes), `agentNode22Fast.test.mjs` (modes, prérequis et refus),
+`homelabCanonicalEvidence.test.mjs` (IDs de sonde et labels C4 expurgés).
 
 - `NODE22_FAST_TOOLCHAIN_OK` : bonnes versions.
 - `NODE22_FAST_L1_PASS` : tous les tests ciblés réussissent.

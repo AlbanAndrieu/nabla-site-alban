@@ -69,9 +69,14 @@ invariants sont à préserver, pas à réimplémenter.
   catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
   horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
   `not-executed`, `403` et `down` sans attribuer une panne au hasard.
-- [ ] **S-08 Contrat d'identité :** vérifier les correspondances exactes
-  `entityRef`, composants et exporters ; refuser un matching par nom,
-  URL ou identifiant ambigu lorsqu'une preuve ne cible pas le même service.
+- [x] **S-08a Identité v2 dans le Site :** les cartes et compteurs
+  n'acceptent plus de fallback de preuve par nom ou URL. La jointure
+  `canonicalHomelabEvidence` exige l'ID identique et non ambigu ; sinon
+  le résultat est `unknown`, sauf preuve directe ou état v2 par `entityRef`.
+  Tests négatifs Node 22 ajoutés.
+- [ ] **S-08b Contrat producteur :** confronter les `entityRef`, les IDs et
+  les exporters réellement publiés par FastAPI/Compose à ce contrat. Documenter
+  séparément les observateurs sans ID canonique ; ne pas réactiver de fallback.
 - [ ] **S-09 Fin du mode SERVICE temporaire :** préparer un cutover
   `HOMELAB_PUBLIC_READONLY_ENABLED=false` lorsque les parcours OWNER ont
   leur alternative fonctionnelle. Tant qu'il reste actif, tester que seuls
@@ -87,6 +92,9 @@ est conceptuelle ; L2 représente un sous-ensemble déclaré, pas la santé runt
 Audit précédent des assets : 176 mappings, 125 fichiers distincts, aucun
 asset Git manquant (preuve de dépôt, pas chargement navigateur).
 
+- [x] **S-10a Projection C4 expurgée :** les nœuds rejettent les noms
+  sensibles, les métadonnées non sûres et les types de relation inconnus.
+  Test négatif local sur le modèle C4 sous Node 22.
 - [ ] **S-10 WCAG 2.2 AA :** confirmer focus/lecteur d'écran, contraste,
   zoom, clavier, transitions C4 L1/L2, bouton d'effacement, responsive,
   FR/EN et alternatives textuelles. Corriger les anomalies démontrées.

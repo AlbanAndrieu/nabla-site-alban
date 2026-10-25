@@ -1,3 +1,5 @@
+import { isSafePublicServiceId, isSafePublicText } from "../../../lib/homelabPublicTextSafety.ts";
+
 /** Bounded C4 projection from the canonical Backstage v2 topology; never a health verdict. */
 export type C4Level = "context" | "containers";
 export type C4Role = "person" | "system" | "external" | "container";
@@ -34,7 +36,10 @@ const CONTEXT_LINKS: C4Link[] = [
 ];
 
 const MAX_CONTAINER_NODES = 16;
-const SAFE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const RELATION_TYPES = new Set([
+  "dependsOn", "consumesApi", "providesApi", "partOf", "hostedBy",
+  "routesTo", "observedBy", "storesIn", "authenticatesVia", "exposedBy", "automates",
+]);
 
 export function projectC4Topology(topology: C4TopologyInput, level: C4Level): C4Projection {
   const revision = topology.catalogRevision ?? null;
@@ -44,17 +49,19 @@ export function projectC4Topology(topology: C4TopologyInput, level: C4Level): C4
   // No URLs, hostnames, LAN IPs, probe evidence or arbitrary descriptions in this projection.
   const unique = new Map<string, C4Item>();
   for (const node of topology.nodes) {
-    if (!SAFE_ID.test(node.id) || !node.name.trim() || unique.has(node.id)) continue;
+    if (!isSafePublicServiceId(node.id) || !isSafePublicText(node.name, 150) || unique.has(node.id)) continue;
+    const description = isSafePublicText(node.kind, 80) ? node.kind :
+      isSafePublicText(node.category, 80) ? node.category : "Service";
     unique.set(node.id, {
       id: node.id,
       label: node.name.slice(0, 80),
-      description: (node.kind || node.category || "Service").slice(0, 48),
+      description: description.slice(0, 48),
       role: "container",
     });
   }
   const degree = new Map<string, number>();
   for (const link of topology.relations) {
-    if (!unique.has(link.source) || !unique.has(link.target)) continue;
+    if (!unique.has(link.source) || !unique.has(link.target) || !RELATION_TYPES.has(link.type)) continue;
     degree.set(link.source, (degree.get(link.source) ?? 0) + 1);
     degree.set(link.target, (degree.get(link.target) ?? 0) + 1);
   }
@@ -65,7 +72,7 @@ export function projectC4Topology(topology: C4TopologyInput, level: C4Level): C4
   const visible = new Set(nodes.map((node) => node.id));
   const links: C4Link[] = [];
   for (const link of topology.relations) {
-    if (visible.has(link.source) && visible.has(link.target) && link.source !== link.target) {
+    if (visible.has(link.source) && visible.has(link.target) && link.source !== link.target && RELATION_TYPES.has(link.type)) {
       links.push({
         id: [link.source, link.type, link.target, String(links.length)].join(":"),
         source: link.source,

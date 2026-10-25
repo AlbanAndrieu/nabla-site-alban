@@ -9,6 +9,10 @@
 - [x] Valider réellement Node 22.16.0/npm 10.9.2 : 18/18 tests PASS sur
   une sélection de sources reconstituées et vérifiées par leurs blobs Git.
   C4, erreurs de catalogue, permissions, identités de sondes et icônes.
+- [x] Ajouter les tests négatifs `homelabCanonicalEvidence.test.mjs` à
+  `test:fast:node22` : jointures de sondes strictes par ID et labels C4
+  expurgés. **5/5 PASS L1** sous Node 22 sur modules au SHA exact ;
+  exécution totale après intégration dans checkout complet encore requise.
 - [ ] Exécuter le profil sur un checkout intégral. Le L3 Node 24 reste
   requis pour le build Next.js et la publication.
 
