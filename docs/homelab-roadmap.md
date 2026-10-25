@@ -8,6 +8,7 @@
 - [x] Ajouter `L1 Contexte` (acteurs et systèmes externes, conceptuel) et `L2 Conteneurs/services` (nœuds et relations depuis la topologie Backstage v2 déjà chargée).
 - [x] Borner L2 à 16 nœuds, 48 liens, ordonner de façon déterministe et ne pas recopier URL LAN, headers, probes ou secrets dans le modèle C4.
 - [x] Prévoir version textuelle accessible, sélecteur clavier et respect du scroll sur mobile.
+- [x] Ajouter un drill-down C4 au clic/clavier : relations entrantes/sortantes déclarées, mise en évidence, navigation vers un service adjacent et effacement explicite de la sélection. Aucun état runtime inféré.
 - [ ] Confirmer en Preview exact-SHA les diagrammes et leur lisibilité FR/EN, l'accès PUBLIC/OWNER, l'absence de données privées et la navigation avec un lecteur d'écran.
 - [ ] **L3 Composants** seulement après ajout des relations de composants dans la source Compose/Backstage v2, sans inférer des nœuds C4 depuis les services Docker.
 - [ ] Évaluer un export facultatif Structurizr DSL depuis la même source après usage réel ; aucune dépendance au serveur Structurizr.

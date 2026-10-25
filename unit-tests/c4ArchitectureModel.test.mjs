@@ -50,3 +50,19 @@ test("C4 view reuses React Flow with keyboard switches and accessible text", () 
   assert.doesNotMatch(component, /<iframe|dangerouslySetInnerHTML/);
   assert.match(page, /<C4ArchitectureView locale=\{locale\} topology=\{topology\} readOnly=\{readOnly\}/);
 });
+
+test("C4 node drilldown lists only declared adjacent relationships", async () => {
+  const { c4NodeRelations } = await import("../app/[locale]/architecture/c4ArchitectureModel.ts");
+  const view = projectC4Topology(sample, "containers");
+  assert.equal(c4NodeRelations(view, "fastapi").length, 1);
+  assert.equal(c4NodeRelations(view, "truenas").length, 1);
+  assert.deepEqual(c4NodeRelations(view, "unknown"), []);
+});
+
+test("C4 focus/selection and dependent navigation are keyboard-accessible", () => {
+  const component = readFileSync(new URL("../app/[locale]/architecture/C4ArchitectureView.tsx", import.meta.url), "utf8");
+  assert.match(component, /onNodeClick=\{\(_, node\) => setSelectedId\(node\.id\)\}/);
+  assert.match(component, /aria-live="polite"/);
+  assert.match(component, /setSelectedId\(other\)/);
+  assert.match(component, /role="region"/);
+});

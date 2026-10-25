@@ -76,3 +76,9 @@ export function projectC4Topology(topology: C4TopologyInput, level: C4Level): C4
   }
   return { level, nodes, links: links.slice(0, 48), omitted: sorted.length - nodes.length, revision };
 }
+
+/** Discover declared inbound/outbound relationships without consulting runtime health. */
+export function c4NodeRelations(view: C4Projection, id: string): C4Link[] {
+  if (!view.nodes.some((node) => node.id === id)) return [];
+  return view.links.filter((link) => link.source === id || link.target === id);
+}

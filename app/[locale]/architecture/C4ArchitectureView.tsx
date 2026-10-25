@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Background, Controls, ReactFlow, type Edge, type Node } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { ServiceTopology } from "@/lib/serviceTopology";
-import { projectC4Topology, type C4Level, type C4Item } from "./c4ArchitectureModel";
+import { c4NodeRelations, projectC4Topology, type C4Level, type C4Item } from "./c4ArchitectureModel";
 import styles from "./C4ArchitectureView.module.css";
 
 type Props = { locale: string; topology: ServiceTopology; readOnly: boolean };
@@ -24,12 +24,15 @@ function position(item: C4Item, index: number, level: C4Level) {
 export default function C4ArchitectureView({ locale, topology, readOnly }: Readonly<Props>) {
   const french = locale === "fr";
   const [level, setLevel] = useState<C4Level>("context");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const projection = useMemo(() => projectC4Topology(topology, level), [topology, level]);
+  const selected = projection.nodes.find((node) => node.id === selectedId);
+  const related = selected ? c4NodeRelations(projection, selected.id) : [];
   const nodes = useMemo<Node[]>(() => projection.nodes.map((item, index) => ({
     id: item.id,
     position: position(item, index, level),
     draggable: false,
-    selectable: false,
+    selectable: true,
     data: { label: (
       <div className={styles.nodeContent}>
         <strong>{item.label}</strong>
@@ -41,22 +44,22 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
       minHeight: 85,
       borderRadius: 12,
       background: item.role === "person" ? "#164e63" : item.role === "system" ? "#1e40af" : "#172b4d",
-      border: item.role === "system" ? "2px solid #7dd3fc" : "1px solid #64748b",
+      border: item.id === selectedId ? "3px solid #fbbf24" : item.role === "system" ? "2px solid #7dd3fc" : "1px solid #64748b",
       color: "#f8fafc",
     },
-  })), [projection.nodes, level]);
+  })), [projection.nodes, level, selectedId]);
   const edges = useMemo<Edge[]>(() => projection.links.map((link) => ({
     id: link.id,
     source: link.source,
     target: link.target,
     type: "smoothstep",
     label: link.label,
-    style: { stroke: "#7dd3fc", strokeWidth: 1.6 },
+    style: { stroke: selectedId && (link.source === selectedId || link.target === selectedId) ? "#fbbf24" : "#7dd3fc", strokeWidth: selectedId && (link.source === selectedId || link.target === selectedId) ? 3 : 1.6 },
     labelStyle: { fill: "#e2e8f0", fontSize: 11 },
     labelBgStyle: { fill: "#0f172a", fillOpacity: 0.94 },
     labelBgPadding: [5, 3],
     labelBgBorderRadius: 4,
-  })), [projection.links]);
+  })), [projection.links, selectedId]);
 
   return (
     <section id="architecture-c4" className={styles.section} aria-labelledby="architecture-c4-title" data-c4-view={level}>
@@ -68,10 +71,10 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
             : "Declared architecture, not live probes. L2 uses the Backstage v2 topology."}</p>
         </div>
         <div className={styles.switcher} role="group" aria-label={french ? "Niveau C4" : "C4 level"}>
-          <button type="button" aria-pressed={level === "context"} onClick={() => setLevel("context")}>
+          <button type="button" aria-pressed={level === "context"} onClick={() => { setLevel("context"); setSelectedId(null); }}>
             {french ? "L1 · Contexte" : "L1 · Context"}
           </button>
-          <button type="button" aria-pressed={level === "containers"} onClick={() => setLevel("containers")}>
+          <button type="button" aria-pressed={level === "containers"} onClick={() => { setLevel("containers"); setSelectedId(null); }}>
             {french ? "L2 · Conteneurs" : "L2 · Containers"}
           </button>
         </div>
@@ -82,7 +85,7 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
         {projection.revision ? " · " + (french ? "révision " : "revision ") + projection.revision.slice(0, 18) : ""}
         {readOnly ? " · " + (french ? "lecture publique" : "public view") : ""}
       </p>
-      <div className={styles.canvas} role="img" aria-label={french ? "Diagramme d'architecture C4 interactif" : "Interactive C4 architecture diagram"}>
+      <div className={styles.canvas} role="region" aria-label={french ? "Diagramme d'architecture C4 interactif" : "Interactive C4 architecture diagram"}>
         <ReactFlow
           key={level}
           nodes={nodes}
@@ -91,7 +94,8 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
           fitViewOptions={{ padding: 0.17, maxZoom: 1.25 }}
           nodesDraggable={false}
           nodesConnectable={false}
-          elementsSelectable={false}
+          elementsSelectable
+          onNodeClick={(_, node) => setSelectedId(node.id)}
           zoomOnScroll={false}
           panOnScroll={false}
           zoomActivationKeyCode={["Control", "Meta"]}
@@ -104,6 +108,27 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
           <Controls showInteractive={false} />
         </ReactFlow>
       </div>
+      <aside className={styles.drilldown} aria-live="polite" aria-label={french ? "Détails du composant sélectionné" : "Selected architecture element details"}>
+        {selected ? (
+          <>
+            <div className={styles.drilldownHeading}>
+              <div><strong>{selected.label}</strong><small>{selected.description}</small></div>
+              <button type="button" onClick={() => setSelectedId(null)}>{french ? "Effacer la sélection" : "Clear selection"}</button>
+            </div>
+            <p>{related.length} {french ? "relations déclarées" : "declared relationships"}</p>
+            {related.length ? <ul>{related.map((relation) => {
+              const other = relation.source === selected.id ? relation.target : relation.source;
+              const neighbor = projection.nodes.find((item) => item.id === other);
+              return (
+                <li key={relation.id}>
+                  <span>{relation.source === selected.id ? "→" : "←"} {relation.label}: </span>
+                  <button type="button" onClick={() => setSelectedId(other)}>{neighbor?.label ?? other}</button>
+                </li>
+              );
+            })}</ul> : null}
+          </>
+        ) : <p>{french ? "Sélectionnez un nœud pour voir ses relations et naviguer vers ses dépendances." : "Select a node to inspect its relationships and navigate to related elements."}</p>}
+      </aside>
       <details className={styles.alternative}>
         <summary>{french ? "Version textuelle accessible des relations" : "Accessible text description of relationships"}</summary>
         <ul>{projection.links.map((link) => (
