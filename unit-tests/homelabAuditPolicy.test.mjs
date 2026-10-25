@@ -58,3 +58,17 @@ test("the 200 response diagnostic never contains IPs, credentials or arbitrary f
   });
   assert.deepEqual(safeAccessDiagnostic({ reason: "127.0.0.1", sourceFamily: "evil", ip: "172.17.0.1" }), null);
 });
+
+test("Vercel challenge indicator is normalized and no raw mitigation value leaks", () => {
+  assert.deepEqual(safeRateLimitMetadata({
+    "x-vercel-mitigated": "challenge",
+    "x-vercel-id": "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
+  }), {
+    vercelRequestId: "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
+    vercelMitigation: "challenge",
+  });
+  assert.deepEqual(safeRateLimitMetadata({
+    "x-vercel-mitigated": "injected\nAuthorization: secret",
+    "set-cookie": "very-private",
+  }), { vercelMitigation: "other" });
+});
