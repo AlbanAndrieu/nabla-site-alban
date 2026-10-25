@@ -354,8 +354,10 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   `npm run test:fast:node22` et `just node22-fast`.
 - [x] Ajouter des tests pour Node 24/npm 12, les bornes LTS,
   les paires mixtes et les versions invalides.
-- [ ] Exécuter la suite complète sur la workstation en
-  Node 24.22.1/npm 12.2.0 ; un précontrôle PASS ne valide pas le build.
+- [x] Exécuter la suite rapide L1 complète sur la workstation en
+  Node 24.22.1/npm 12.2.0 : **59/59 PASS**, zéro échec sur HEAD
+  `6cb59e1557c65761c3487e7e724daa4204dfe50f` (preuve opérateur).
+  Le précontrôle L1 ne valide pas le build.
 - [ ] Exécuter `npm run typecheck` et `npm run build` sur un
   checkout complet sous Node 24 avant de promouvoir la Preview.
 
@@ -373,7 +375,8 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   régression de compilation Vercel.
 - [x] **L1 agent Node22** : 2/2 tests PASS sur une fixture TypeScript
   représentative après correction.
-- [ ] **L1 opérateur Node24** : réexécuter `npm run test:fast:local`
-  sur les sources intégrales au nouveau HEAD.
+- [x] **L1 opérateur Node24** : `npm run test:fast:local`
+  a réussi sur les sources intégrales après correction, **59/59 PASS**
+  (`LOCAL_FAST_L1_PASS`, 0 skipped, 0 failed, ~6,75 s).
 - [ ] **L3 publication** : effectuer `npm run typecheck` et
   `npm run build` avec la toolchain et les dépendances du projet.
