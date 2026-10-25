@@ -15,6 +15,10 @@
   `test:fast:node22` : jointures de sondes strictes par ID et labels C4
   expurgés. **5/5 PASS L1** sous Node 22 sur modules au SHA exact ;
   exécution totale après intégration dans checkout complet encore requise.
+- [x] Inclure un test de régression Vercel (`vercelIgnoreBuild.test.mjs`)
+  dans le profil rapide et `just source-check`. Le cas HEAD de merge sans
+  SHA déployé précédemment est vérifié en local avec un vrai graphe Git.
+  **4/4 PASS**, sans CI payante.
 - [ ] Exécuter le profil sur un checkout intégral. Le L3 Node 24 reste
   requis pour le build Next.js et la publication.
 

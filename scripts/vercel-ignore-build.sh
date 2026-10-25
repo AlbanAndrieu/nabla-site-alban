@@ -21,6 +21,14 @@ if [[ "${git_ref}" == vercel-preview-* ]]; then
 fi
 
 if [[ -z "${base_sha}" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
+    # A reconciliation merge can change only docs compared with its first parent,
+    # while the merged PR contains deploy-relevant application changes. Comparing
+    # HEAD^ would wrongly suppress the exact-SHA Preview. Build conservatively.
+    merge_parent_count="$(git cat-file -p HEAD | grep -c '^parent ' || true)"
+    if [[ "${merge_parent_count}" =~ ^[0-9]+$ ]] && ((merge_parent_count > 1)); then
+        echo "Merge HEAD with no verified previous deployment SHA; build rather than inspect only its first parent."
+        exit 1
+    fi
     if git rev-parse HEAD^ >/dev/null 2>&1; then
         base_sha="$(git rev-parse HEAD^)"
         echo "VERCEL_GIT_PREVIOUS_SHA unavailable; falling back to parent commit ${base_sha}."
@@ -30,7 +38,10 @@ if [[ -z "${base_sha}" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/nul
     fi
 fi
 
-changed_files="$(git diff --name-only "${base_sha}" HEAD)"
+if ! changed_files="$(git diff --name-only "${base_sha}" HEAD)"; then
+    echo "Cannot compare HEAD with ${base_sha}; build deployment."
+    exit 1
+fi
 
 if [[ -z "${changed_files}" ]]; then
     echo "No changed files detected since ${base_sha}; skip deployment."

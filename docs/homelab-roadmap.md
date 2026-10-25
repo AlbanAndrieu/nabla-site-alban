@@ -45,6 +45,11 @@ Ne pas présenter `/en/architecture` comme canonique.
   vérifier le mode SERVICE (si activé) et les refus OWNER. Contrôler
   JSON, HTML/RSC, console, requêtes réseau et `localStorage` : aucun token,
   adresse LAN, header d'accès ou diagnostic OWNER.
+- [x] **S-05a Détection de Preview :** correction du script
+  `vercel-ignore-build.sh` : lorsqu'un HEAD de merge n'a pas de
+  `VERCEL_GIT_PREVIOUS_SHA` valide, construire par défaut plutôt que
+  comparer seulement le premier parent. Un `git diff` impossible construit
+  aussi par sécurité ; tests offline **4/4 PASS** sur de vrais dépôts Git locaux.
 - [ ] **S-05 Quality :** lancer `just source-check`, build Next.js Node 24,
   tests unitaires et les gates locales pertinentes sur un checkout du
   **merge SHA**, sans relancer les workflows GitHub payants.
