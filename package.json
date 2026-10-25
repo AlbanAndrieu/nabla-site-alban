@@ -61,7 +61,8 @@
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
 		"quality:agent:publish": "bash scripts/agent-publish.sh",
 		"test:a11y": "bash scripts/run-a11y-local.sh",
-		"rss:check": "node scripts/generate-security-rss.mjs --check"
+		"rss:check": "node scripts/generate-security-rss.mjs --check",
+		"audit:homelab": "node scripts/audit-homelab-access.mjs"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",

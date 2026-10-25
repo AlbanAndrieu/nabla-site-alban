@@ -160,3 +160,13 @@ k8s-build tag="nabla-site-alban:talos":
 
 k8s-smoke tag="nabla-site-alban:talos":
     bash scripts/k8s/smoke-standalone.sh "{{tag}}"
+
+# Validate the REAL network boundary, never spoof client IP addresses.
+audit-owner:
+    HOMELAB_AUDIT_EXPECT=owner node scripts/audit-homelab-access.mjs
+
+audit-service:
+    HOMELAB_AUDIT_EXPECT=service node scripts/audit-homelab-access.mjs
+
+audit-denied:
+    HOMELAB_AUDIT_EXPECT=denied node scripts/audit-homelab-access.mjs

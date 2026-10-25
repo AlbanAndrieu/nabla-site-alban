@@ -116,3 +116,18 @@ restent une source distincte, contrôlée par `catalogRevision`.
 La vue C4 expurge les noms contenant des origines privées, les descriptions
 sensibles et les types de relation non reconnus avant le rendu ReactFlow.
 Ces contraintes s'appliquent même si l'API renvoie un schéma JSON valide.
+
+## Trace W3C Site → FastAPI, phase 1
+
+Le Site génère un nouveau `traceparent` pour chaque appel
+`/api/homelab-health-v2`. Il le propage à la route FastAPI
+`/api/site/health/v2`, renvoie `X-Nabla-Trace-ID` et journalise ce
+même identifiant en cas d'erreur avec une phase expurgée. Les en-têtes
+injectés par le navigateur sont ignorés. L'en-tête
+`X-Nabla-Trace-Propagation: sent` signifie envoyé et **ne valide pas**
+le stockage de trace côté FastAPI. L'intégration aux autres sondes OWNER
+est encore en backlog inter-dépôts.
+
+La [recette OWNER/SERVICE](runbooks/homelab-owner-service-audit.md)
+doit être exécutée depuis deux réseaux réels. Le script ne conserve
+aucune valeur de cookie ni jeton de connexion.

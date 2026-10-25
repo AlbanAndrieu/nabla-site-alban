@@ -37,6 +37,7 @@ Ne pas présenter `/en/architecture` comme canonique.
   même SHA. Vérifier le chargement des vrais logos, le fallback monogramme,
   les filtres, le graphe ReactFlow, C4 L1/L2 et son panneau de relations.
   Confirmer navigation au clavier, mobile, absence de console error.
+- [x] **S-03a Recette navigateur LAN/externe :** script `audit:homelab` avec trois contextes attendus, inspection du stockage et des routes ; acceptation réelle sur les deux réseaux **NOT_RUN**.
 - [ ] **S-03 OWNER :** depuis le Wi-Fi/VLAN autorisé, confronter
   `/api/homelab-access?diagnose=1` à la disponibilité des catalogues,
   à `/api/homelab-health` / sondes autorisées et au rendu des cartes.
@@ -66,6 +67,7 @@ OWNER commun Architecture/TrueNAS ; révocation synchrone du snapshot C4
 OWNER lors d'une transition de droits ; cache SERVICE versionné. Ces
 invariants sont à préserver, pas à réimplémenter.
 
+- [x] **S-06a W3C traceparent Site → FastAPI SERVICE v2 :** généré au serveur et transmis ; ID exposé en réponse. Lecture dans les logs FastAPI non vérifiée.
 - [ ] **S-06 Corrélation réelle :** propager un `trace_id` fiable à travers
   collecteur → FastAPI → Route Handler Next.js → support OWNER, avec
   logs expurgés et horodatages. Le `requestId` Site actuel est **local**
