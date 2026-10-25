@@ -358,8 +358,10 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   Node 24.22.1/npm 12.2.0 : **59/59 PASS**, zéro échec sur HEAD
   `6cb59e1557c65761c3487e7e724daa4204dfe50f` (preuve opérateur).
   Le précontrôle L1 ne valide pas le build.
-- [ ] Exécuter `npm run typecheck` et `npm run build` sur un
-  checkout complet sous Node 24 avant de promouvoir la Preview.
+- [x] Exécuter `npm run typecheck` et `npm run build` sur un
+  checkout complet sous Node 24.22.1/npm 12.2.0 : typegen, TypeScript,
+  compilation et 83/83 pages PASS sur `89649e5af573642f9d11155e36094e25191f1697`.
+  **La Preview Vercel et la recette navigateur restent NOT_RUN.**
 
 ### P0 — Régression de la vérification TypeScript locale (25 octobre 2026)
 
@@ -378,8 +380,10 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
 - [x] **L1 opérateur Node24** : `npm run test:fast:local`
   a réussi sur les sources intégrales après correction, **59/59 PASS**
   (`LOCAL_FAST_L1_PASS`, 0 skipped, 0 failed, ~6,75 s).
-- [ ] **L3 publication** : effectuer `npm run typecheck` et
-  `npm run build` avec la toolchain et les dépendances du projet.
+- [x] **Validation TypeScript et build** : `npm run typecheck` et
+  `npm run build` PASS après `npm ci`, Next 16.4.2, Node 24.22.1.
+  **L3 publication complète reste NOT_RUN** (lint, hooks, scans,
+  quality gate exact-HEAD, Preview).
 
 ### P0 — Synchronisation des types de routes Next.js et des dépendances (26/10/2026)
 
@@ -398,10 +402,18 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   la protection `next-env.d.ts`, la version lock et l'absence de doublon.
   **3/3 PASS sous Node 22 sur fixture**, fichier de test exact Git ;
   checkout entier après correction non encore testé.
-- [ ] **Convergence Next :** la workstation a exécuté Next **16.3.4**
-  alors que `package.json` et `package-lock.json` déclarent **16.4.2**.
-  Refaire `npm ci --no-audit --no-fund` à partir du checkout complet
-  avant toute preuve L3.
-- [ ] **Validation suivante :** obtenir `npm run typecheck` PASS et
-  `npm run build` PASS avec **Next 16.4.2** sur le HEAD de cette PR.
-  Ne pas assimiler le build 16.3.4 à une validation Vercel 16.4.2.
+- [x] **Convergence Next :** la workstation a exécuté
+  `npm ci --no-audit --no-fund` (653 paquets installés), puis
+  `npm run build` sous **Next 16.4.2** conformément au lockfile.
+- [x] **Validation Next 16.4.2 opérateur :** 62/62 tests rapides PASS,
+  `next typegen` PASS, `tsc --noEmit` PASS, build Turbopack PASS,
+  83/83 pages statiques générées. Le SHA exécuté était
+  `89649e5af573642f9d11155e36094e25191f1697`.
+- [ ] **Publication L3 distincte :** exécuter la quality gate complète
+  (lint, CSS, hooks, tests unitaires, contrôles de sécurité), vérifier
+  un HEAD exact propre puis une Preview Vercel READY.
+- [ ] **Dette dépendances observée :** inventorier les chemins transitifs
+  des alertes npm `crypto@1.0.1`, `node-domexception@1.0.0`,
+  `@azure/openai@1.0.0-beta.13` et `eslint@9.39.5` ; envisager
+  une mise à jour contrôlée dans une PR distincte, sans downgrade
+  ni modification opportuniste du lockfile.
