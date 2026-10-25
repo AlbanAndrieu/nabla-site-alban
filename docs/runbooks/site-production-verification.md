@@ -115,3 +115,42 @@ locale divergente, **pas** un PASS de publication 16.4.2.
 En cas de divergence locale, réinstaller les dépendances depuis
 `package-lock.json` avec `npm ci`; ne pas changer la version du dépôt
 pour rejoindre un `node_modules` ancien.
+
+## Preuve locale après correction typegen — 26/10/2026
+
+**Source :** sortie de la workstation opérateur après mise à jour du
+checkout `fix/homelab-owner-audit-trace-receipt-20261025`,
+HEAD `89649e5af573642f9d11155e36094e25191f1697`.
+
+| Contrôle | Résultat |
+| --- | --- |
+| Runtime | Node 24.22.1 / npm 12.2.0 |
+| `npm ci --no-audit --no-fund` | PASS, 653 paquets installés |
+| `npm run test:fast:local` | **62/62 PASS**, 0 échec, 0 skipped |
+| `npm run typecheck` | **PASS** : `next typegen` puis `tsc --noEmit` |
+| `npm run build` | **PASS** : Next.js **16.4.2**, Turbopack, TypeScript |
+| Pages statiques | **83/83 générées** |
+| `npm run quality:agent:publish` | **NOT_RUN** |
+| Preview Vercel / routes HTTP / OWNER-LAN | **NOT_RUN** |
+
+**Conclusion :** la divergence locale Next.js 16.3.4/16.4.2 est
+résolue par `npm ci`, la signature `PageProps` du lexique fonctionne,
+et le correctif de virgule du hook compilé ne bloque plus le build
+local. Ce résultat **ne garantit pas** que Vercel est déjà READY.
+
+Les avertissements `ExperimentalWarning` et
+`.pre-commit-config.yaml config file not found` sont apparus dans
+la suite rapide. Le second provient des repos Git de test créés
+pour la politique d'ignore Vercel ; il ne constitue pas un contrôle
+des hooks sur le dépôt principal.
+
+Quatre avertissements npm `deprecated` ont été observés pour
+`crypto@1.0.1`, `node-domexception@1.0.0`,
+`@azure/openai@1.0.0-beta.13` et `eslint@9.39.5`.
+Ils demandent un inventaire des dépendances directes/transitives
+avant décision de mise à jour. Ils n'ont pas échoué le build.
+
+**Reste à valider :** gate complète exact-HEAD, Preview déployée,
+recette FR/EN, diagnostic 429 de l'edge, authentification OWNER et
+probes LAN. Aucun de ces états n'est déduit des 62 tests unitaires
+ou de la compilation locale.
