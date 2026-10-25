@@ -7,6 +7,7 @@ import {
 } from "@/lib/homelabHealth";
 import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import { parseOwnerCatalogIncident, type CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
+import { reconcileCatalogFailure } from "@/lib/homelabCatalogFailureReconciliation";
 import {
 	catalogScopeMatches,
 	classifyCatalogFailure,
@@ -460,12 +461,13 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 						if (publicStorage) clearPublicHomelabBrowserCache(publicStorage);
 					}
 					setState((current) => {
-						const retain = !revoke && current.catalog !== null &&
-							catalogScopeMatches(current.catalogScope, readOnly);
+						// No stale OWNER inventory or probe may cross to SERVICE
+						// during a failed revalidation. Only same-scope LKG survives.
+						const { state: safe, retained: retain } =
+							reconcileCatalogFailure(current, readOnly, revoke);
 						return {
-							...current,
-							...(revoke ? { catalog: null, topology: null, siteHealth: null } : {}),
-							// 502 may use an already-published LKG; revocation never may.
+							...safe,
+							// A 502 may reuse same-scope last-known data; revocation never may.
 							error: !retain,
 							catalogStale: readOnly && retain,
 							catalogScope: readOnly ? "public" : "owner",

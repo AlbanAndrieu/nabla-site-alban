@@ -82,6 +82,7 @@ invariants sont à préserver, pas à réimplémenter.
 - [ ] **S-08b Contrat producteur :** confronter les `entityRef`, les IDs et
   les exporters réellement publiés par FastAPI/Compose à ce contrat. Documenter
   séparément les observateurs sans ID canonique ; ne pas réactiver de fallback.
+- [x] **S-09a Isolation des échecs de revalidation :** ne réutiliser un catalogue, une topologie et des preuves que si le périmètre d'accès est inchangé et non révoqué. En cas de changement OWNER/SERVICE, vider ces données avant tout rendu ; tests négatifs Node 22 (5/5 PASS isolés).
 - [ ] **S-09 Fin du mode SERVICE temporaire :** préparer un cutover
   `HOMELAB_PUBLIC_READONLY_ENABLED=false` lorsque les parcours OWNER ont
   leur alternative fonctionnelle. Tant qu'il reste actif, tester que seuls
@@ -106,6 +107,7 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [ ] **S-11 Performance :** mesurer LCP/INP/CLS, poids du bundle ReactFlow,
   chargement différé des diagnostics, ETag/revalidation SERVICE, cache
   inter-onglets sans état OWNER et comportement des filtres avec beaucoup de services.
+- [x] **S-12a Autorité unique des icônes :** `HomelabServiceCard` ignore le champ `iconSrc` distant et calcule chaque chemin via `homelabCatalogIcons.generated.ts`. Le cache public omet intentionnellement `iconSrc` ; ne pas le rajouter depuis FastAPI.
 - [ ] **S-12 Icônes :** exécuter `just icons-local-check` et comparer au
   catalogue Compose lors de nouvelles apps. Confirmer erreurs HTTP 404 et
   `data-service-icon-fallback` dans le navigateur, sans substituer
