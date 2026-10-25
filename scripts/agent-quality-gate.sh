@@ -221,7 +221,6 @@ build="$(awk -F= '$1 == "build" { print $2; exit }' <<<"${scope_output}")"
 run_project_checks() {
     npm run lint &&
         npm run lint:css &&
-        npx next typegen &&
         npm run typecheck &&
         npm run test:unit
 }
