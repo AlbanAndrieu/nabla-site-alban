@@ -156,3 +156,5 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [ ] **S-04 WAN réel** : `NOT_RUN` en absence de réseau extérieur; ne pas falsifier l'IP cliente.
 - [ ] **S-06c trace FastAPI** : confirmer la version réellement déployée et l'écho exact de l'ID W3C.
 - [ ] **S-11b** : recettes WCAG 2.2 AA et Web Vitals LCP/INP/CLS réels.
+
+- [x] **S-03e prédiagnostic local** : `npm run diagnose:homelab-429`, deux requêtes sans retry ni fuite de secrets ; les droits OWNER restent à vérifier.
