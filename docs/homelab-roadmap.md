@@ -18,6 +18,7 @@
 | HTTP public | Navigateur de l'agent : accès direct à Architecture/TrueNAS non disponible ; terminal de l'agent : DNS public indisponible | **BLOCKED côté agent** |
 | OWNER/LAN | Aucun appel authentifié depuis le VLAN domestique | **NOT_RUN** |
 | Source-only / L3 | Pas de checkout complet avec Node 24, `npm ci`, Playwright, Axe, Trivy et quality gate locale sur le merge | **NOT_RUN** |
+| L1 Node 22/npm 10 | Six sources au blob SHA identique au merge ; 18 tests ciblés via source partielle | **18/18 PASS ; non L3** |
 
 **Routes canoniques :** anglais `/`, `/architecture`, `/truenas` ;
 français `/fr`, `/fr/architecture`, `/fr/truenas`.
@@ -36,6 +37,7 @@ Ne pas présenter `/en/architecture` comme canonique.
   même SHA. Vérifier le chargement des vrais logos, le fallback monogramme,
   les filtres, le graphe ReactFlow, C4 L1/L2 et son panneau de relations.
   Confirmer navigation au clavier, mobile, absence de console error.
+- [x] **S-03a Recette navigateur LAN/externe :** script `audit:homelab` avec trois contextes attendus, inspection du stockage et des routes ; acceptation réelle sur les deux réseaux **NOT_RUN**.
 - [ ] **S-03 OWNER :** depuis le Wi-Fi/VLAN autorisé, confronter
   `/api/homelab-access?diagnose=1` à la disponibilité des catalogues,
   à `/api/homelab-health` / sondes autorisées et au rendu des cartes.
@@ -44,6 +46,11 @@ Ne pas présenter `/en/architecture` comme canonique.
   vérifier le mode SERVICE (si activé) et les refus OWNER. Contrôler
   JSON, HTML/RSC, console, requêtes réseau et `localStorage` : aucun token,
   adresse LAN, header d'accès ou diagnostic OWNER.
+- [x] **S-05a Détection de Preview :** correction du script
+  `vercel-ignore-build.sh` : lorsqu'un HEAD de merge n'a pas de
+  `VERCEL_GIT_PREVIOUS_SHA` valide, construire par défaut plutôt que
+  comparer seulement le premier parent. Un `git diff` impossible construit
+  aussi par sécurité ; tests offline **4/4 PASS** sur de vrais dépôts Git locaux.
 - [ ] **S-05 Quality :** lancer `just source-check`, build Next.js Node 24,
   tests unitaires et les gates locales pertinentes sur un checkout du
   **merge SHA**, sans relancer les workflows GitHub payants.
@@ -60,17 +67,26 @@ OWNER commun Architecture/TrueNAS ; révocation synchrone du snapshot C4
 OWNER lors d'une transition de droits ; cache SERVICE versionné. Ces
 invariants sont à préserver, pas à réimplémenter.
 
+- [x] **S-06a W3C traceparent Site → FastAPI SERVICE v2 :** généré au serveur et transmis ; ID exposé en réponse. Lecture dans les logs FastAPI non vérifiée.
 - [ ] **S-06 Corrélation réelle :** propager un `trace_id` fiable à travers
   collecteur → FastAPI → Route Handler Next.js → support OWNER, avec
   logs expurgés et horodatages. Le `requestId` Site actuel est **local**
   et ne constitue pas une trace distribuée.
+- [x] **S-07a Preuve HTTP fraîche :** un code 200 sans timestamp et source de sonde HTTP ne vaut pas un succès ; un résultat périmé ou interrompu reste `unknown`. Le détail OWNER précise origine/cache/deadline, HTTP et l’heure. Cinq tests purs Node 22 PASS dans un arbre isolé.
+- [x] **S-07b Trace visible OWNER :** ID W3C reçu depuis la route SERVICE v2 visible uniquement dans le panneau de diagnostic OWNER, jamais conservé dans le cache public. La réception FastAPI n’est pas supposée.
 - [ ] **S-07 Provenance lisible :** présenter par service les étapes
   catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
   horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
   `not-executed`, `403` et `down` sans attribuer une panne au hasard.
-- [ ] **S-08 Contrat d'identité :** vérifier les correspondances exactes
-  `entityRef`, composants et exporters ; refuser un matching par nom,
-  URL ou identifiant ambigu lorsqu'une preuve ne cible pas le même service.
+- [x] **S-08a Identité v2 dans le Site :** les cartes et compteurs
+  n'acceptent plus de fallback de preuve par nom ou URL. La jointure
+  `canonicalHomelabEvidence` exige l'ID identique et non ambigu ; sinon
+  le résultat est `unknown`, sauf preuve directe ou état v2 par `entityRef`.
+  Tests négatifs Node 22 ajoutés.
+- [ ] **S-08b Contrat producteur :** confronter les `entityRef`, les IDs et
+  les exporters réellement publiés par FastAPI/Compose à ce contrat. Documenter
+  séparément les observateurs sans ID canonique ; ne pas réactiver de fallback.
+- [x] **S-09a Isolation des échecs de revalidation :** ne réutiliser un catalogue, une topologie et des preuves que si le périmètre d'accès est inchangé et non révoqué. En cas de changement OWNER/SERVICE, vider ces données avant tout rendu ; tests négatifs Node 22 (5/5 PASS isolés).
 - [ ] **S-09 Fin du mode SERVICE temporaire :** préparer un cutover
   `HOMELAB_PUBLIC_READONLY_ENABLED=false` lorsque les parcours OWNER ont
   leur alternative fonctionnelle. Tant qu'il reste actif, tester que seuls
@@ -86,12 +102,18 @@ est conceptuelle ; L2 représente un sous-ensemble déclaré, pas la santé runt
 Audit précédent des assets : 176 mappings, 125 fichiers distincts, aucun
 asset Git manquant (preuve de dépôt, pas chargement navigateur).
 
+- [x] **S-10a Projection C4 expurgée :** les nœuds rejettent les noms
+  sensibles, les métadonnées non sûres et les types de relation inconnus.
+  Test négatif local sur le modèle C4 sous Node 22.
+- [x] **S-10a Chronologie accessible :** étapes Docker/LAN/TLS/HTTP/Cloudflare/Prometheus présentées en liste ordonnée OWNER avec statut et provenance existants ; pas de verdict de panne inventé.
 - [ ] **S-10 WCAG 2.2 AA :** confirmer focus/lecteur d'écran, contraste,
   zoom, clavier, transitions C4 L1/L2, bouton d'effacement, responsive,
   FR/EN et alternatives textuelles. Corriger les anomalies démontrées.
+- [x] **S-11a ReactFlow différé :** C4 et explorateur en chunks dynamiques séparés, montés à moins de 420 px du viewport, avec placeholders `aria-busy`, scroll et ancrages préservés.
 - [ ] **S-11 Performance :** mesurer LCP/INP/CLS, poids du bundle ReactFlow,
   chargement différé des diagnostics, ETag/revalidation SERVICE, cache
   inter-onglets sans état OWNER et comportement des filtres avec beaucoup de services.
+- [x] **S-12a Autorité unique des icônes :** `HomelabServiceCard` ignore le champ `iconSrc` distant et calcule chaque chemin via `homelabCatalogIcons.generated.ts`. Le cache public omet intentionnellement `iconSrc` ; ne pas le rajouter depuis FastAPI.
 - [ ] **S-12 Icônes :** exécuter `just icons-local-check` et comparer au
   catalogue Compose lors de nouvelles apps. Confirmer erreurs HTTP 404 et
   `data-service-icon-fallback` dans le navigateur, sans substituer

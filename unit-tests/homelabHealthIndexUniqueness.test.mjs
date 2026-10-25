@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { uniqueHomelabEvidenceIndex } from "../lib/homelabHealthIdentity.ts";
+import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex } from "../lib/homelabHealthIdentity.ts";
 
 const entry = (id, name = id, url = `https://example.test/${id}`) => ({ id, name, url });
 
@@ -39,11 +39,23 @@ test("invalid URLs cannot become lookup keys", () => {
   assert.equal(index.byUrl.size, 0);
 });
 
-test("both OWNER service cards and global counts refuse duplicate ID fallbacks", () => {
+test("cards and counts join probes exclusively by canonical service ID", () => {
   const grid = readFileSync(new URL("../app/components/homelab/homelabGridPresentation.ts", import.meta.url), "utf8");
   const hook = readFileSync(new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url), "utf8");
-  assert.match(grid, /uniqueHomelabEvidenceIndex\(snapshot\?\.services \?\? \[\]\)/);
-  assert.match(grid, /index\.ambiguousIds\.has\(stableId\)/);
-  assert.match(hook, /uniqueHomelabEvidenceIndex\(snapshot\?\.services \?\? \[\]\)/);
-  assert.match(hook, /index\.ambiguousIds\.has\(serviceId\)/);
+  assert.match(grid, /canonicalHomelabEvidence\(index, homelabServiceId\(service\)\)/);
+  assert.match(hook, /canonicalHomelabEvidence\(index, serviceId\)/);
+  assert.doesNotMatch(grid, /index\.byUrl\.get\(|index\.byName\.get\(/);
+  assert.doesNotMatch(hook, /index\.byName\.get\(/);
+});
+
+test("matching URL and name never attach evidence from another service", () => {
+  const evidence = entry("other-service", "Grafana", "https://example.test/grafana");
+  const index = uniqueHomelabEvidenceIndex([evidence]);
+  assert.equal(canonicalHomelabEvidence(index, "grafana"), undefined);
+  assert.equal(canonicalHomelabEvidence(index, "other-service"), evidence);
+});
+
+test("ambiguous canonical IDs have no selected probe", () => {
+  const index = uniqueHomelabEvidenceIndex([entry("grafana", "Primary"), entry("grafana", "Secondary")]);
+  assert.equal(canonicalHomelabEvidence(index, "grafana"), undefined);
 });

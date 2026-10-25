@@ -83,6 +83,24 @@ Do not repeat blocked network requests without a changed prerequisite.
 Do not treat GitHub API reads, static assertions, or a source archive without
 Git metadata as proof that the full publication gate passed.
 
+## Fast Node 22/npm 10 runtime
+
+1. Run `node scripts/agent-node22-fast.mjs --preflight`.
+2. Run `node scripts/agent-node22-fast.mjs`.
+3. Inspect the test count and failures.
+4. Fix a failing targeted contract in the owning module.
+5. Rerun this bounded suite after the fix.
+6. Record L1 and the exact source blob SHAs tested.
+
+Alternatives when installed: `just node22-fast` and
+`npm run test:fast:node22`. This test runner refuses Node/npm
+version mismatches and missing tests. It has no npm install, package
+downloads, Next.js build, hooks or paid GitHub Actions calls.
+Keep `.nvmrc`, `mise.toml` and package engines on Node 24/npm 12.
+Never treat this smoke as an L3 publish gate. Offline source-only
+reproduction must verify file blobs and disclose NO_CHECKOUT.
+See `docs/runbooks/node22-fast-local.md`.
+
 ## CI budget and publication
 
 - Keep an agent-owned PR in Draft while work is incomplete.

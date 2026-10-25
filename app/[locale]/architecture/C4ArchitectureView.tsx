@@ -62,7 +62,7 @@ export default function C4ArchitectureView({ locale, topology, readOnly }: Reado
   })), [projection.links, selectedId]);
 
   return (
-    <section id="architecture-c4" className={styles.section} aria-labelledby="architecture-c4-title" data-c4-view={level}>
+    <section id="architecture-c4-diagram" className={styles.section} aria-labelledby="architecture-c4-title" data-c4-view={level}>
       <header className={styles.header}>
         <div>
           <h2 id="architecture-c4-title">{french ? "Architecture C4" : "C4 architecture"}</h2>

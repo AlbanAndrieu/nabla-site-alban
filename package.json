@@ -51,6 +51,7 @@
 		"test:integration": "playwright test tests/integration-baseline.spec.ts --project=chromium",
 		"test:security": "playwright test tests/security-baseline.spec.ts --project=chromium",
 		"test:performance": "playwright test tests/performance-baseline.spec.ts --project=chromium",
+		"test:fast:node22": "node scripts/agent-node22-fast.mjs",
 		"test:unit": "node --import tsx --test --test-reporter=dot \"unit-tests/**/*.test.ts\" && node --test --test-reporter=dot unit-tests/*.test.mjs",
 		"test:unit:verbose": "node --import tsx --test \"unit-tests/**/*.test.ts\" && node --test unit-tests/*.test.mjs",
 		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs",
@@ -60,7 +61,8 @@
 		"quality:agent:fix": "bash scripts/agent-quality-gate.sh --fix",
 		"quality:agent:publish": "bash scripts/agent-publish.sh",
 		"test:a11y": "bash scripts/run-a11y-local.sh",
-		"rss:check": "node scripts/generate-security-rss.mjs --check"
+		"rss:check": "node scripts/generate-security-rss.mjs --check",
+		"audit:homelab": "node scripts/audit-homelab-access.mjs"
 	},
 	"dependencies": {
 		"@opentelemetry/api": "^1.9.1",

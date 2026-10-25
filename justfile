@@ -11,6 +11,13 @@ context:
 preflight:
     bash scripts/agent-offline-context.sh preflight
 
+# Network-free Node 22/npm 10 targeted L1 tests. Never a publication gate.
+node22-fast:
+    node scripts/agent-node22-fast.mjs
+
+node22-fast-preflight:
+    node scripts/agent-node22-fast.mjs --preflight
+
 # Offline L1 syntax-only fallback, aligned with Bababou.
 offline-l1:
     bash scripts/agent-offline-check.sh
@@ -30,7 +37,10 @@ source-check:
     node --test unit-tests/homelabCatalogIconAssets.test.mjs
     node --experimental-strip-types --test unit-tests/homelabHealthIndexUniqueness.test.mjs
     node --experimental-strip-types --test unit-tests/homelabCatalogFailureStage.test.mjs
+    node --experimental-strip-types --test unit-tests/homelabCatalogFailureReconciliation.test.mjs
+    node --experimental-strip-types --test unit-tests/homelabOwnerHttpEvidence.test.mjs
     node --experimental-strip-types --test unit-tests/c4ArchitectureModel.test.mjs
+    node --test unit-tests/vercelIgnoreBuild.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs
@@ -150,3 +160,13 @@ k8s-build tag="nabla-site-alban:talos":
 
 k8s-smoke tag="nabla-site-alban:talos":
     bash scripts/k8s/smoke-standalone.sh "{{tag}}"
+
+# Validate the REAL network boundary, never spoof client IP addresses.
+audit-owner:
+    HOMELAB_AUDIT_EXPECT=owner node scripts/audit-homelab-access.mjs
+
+audit-service:
+    HOMELAB_AUDIT_EXPECT=service node scripts/audit-homelab-access.mjs
+
+audit-denied:
+    HOMELAB_AUDIT_EXPECT=denied node scripts/audit-homelab-access.mjs

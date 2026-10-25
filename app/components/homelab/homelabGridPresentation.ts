@@ -3,7 +3,7 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { compatibleHomelabEvidence, uniqueHomelabEvidenceIndex, type UniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
+import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex, type UniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
@@ -68,47 +68,18 @@ export function endpointUrlHostIsPrivateS3(value?: string): boolean {
 	}
 }
 
-function normalizedName(value: string): string {
-	return value.trim().toLowerCase();
-}
-
 export function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
   return uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
-}
-
-function lookupHealth(
-	index: HealthIndex,
-	service: HomelabService,
-	url: string,
-): HomelabHealthEntry | undefined {
-	const stableId = homelabServiceId(service);
-	if (index.ambiguousIds.has(stableId)) return undefined;
-	const byId = index.byId.get(stableId);
-	if (byId) return byId;
-
-	try {
-		const normalized = new URL(url);
-		normalized.hash = "";
-		const byUrl = index.byUrl.get(normalized.href);
-		if (byUrl) return byUrl;
-	} catch {
-		// Continue with the name fallback below.
-	}
-
-	return index.byName.get(normalizedName(service.name));
 }
 
 export function serviceHealthEvidence(
 	index: HealthIndex,
 	service: HomelabService,
-	url: string,
+	_url: string,
 	snapshot: HomelabHealthSnapshot | null,
 ): HomelabHealthEntry | undefined {
-	const generic = compatibleHomelabEvidence(
-		service.entityRef,
-		homelabServiceId(service),
-		lookupHealth(index, service, url),
-	);
+	// URLs are accepted for call-site compatibility, never for matching probes.
+	const generic = canonicalHomelabEvidence(index, homelabServiceId(service));
 	if (homelabServiceId(service) !== "truenas" || !snapshot?.truenas?.public) {
 		return generic;
 	}

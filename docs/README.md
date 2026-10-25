@@ -27,6 +27,7 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 ## Runbooks
 
 - [Vérification du site après merge](runbooks/site-production-verification.md)
+- [Test local rapide Node 22/npm 10](runbooks/node22-fast-local.md)
 - [GitHub Actions](../.github/github-actions-best-practices.md)
 - [Ruleset GitHub de master](github-master-ruleset.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)

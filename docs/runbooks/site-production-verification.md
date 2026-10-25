@@ -74,3 +74,14 @@ ni un refus fonctionnel de FastAPI.
 - Parcours OWNER/LAN, Playwright et qualité locale complète : `NOT_RUN`.
 
 Ces résultats sont un **instantané**, non un état permanent du site.
+
+## Déploiement ignoré après merge
+
+Si Vercel indique `Ignored Build Step command returned exit code 0`, consulter
+`scripts/vercel-ignore-build.sh`. Dans le cas d'un commit de merge avec
+`VERCEL_GIT_PREVIOUS_SHA` absent, il doit désormais construire par défaut :
+le premier parent peut ne contenir que des modifications de documentation
+alors que les changements applicatifs sont présents dans les ancêtres.
+Exécuter le test local `node --test unit-tests/vercelIgnoreBuild.test.mjs`
+avant toute modification de cette logique. Ne pas forcer un déploiement
+de production pour tester ce cas : utiliser la Preview de la PR.

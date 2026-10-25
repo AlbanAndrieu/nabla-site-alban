@@ -54,3 +54,13 @@ export function uniqueHomelabEvidenceIndex<T extends {
   }
   return { byId, byName, byUrl, ambiguousIds };
 }
+
+/** Never attach a probe to a different Backstage v2 service by URL or display name. */
+export function canonicalHomelabEvidence<T extends { id?: string }>(
+  index: Pick<UniqueHomelabEvidenceIndex<T>, "byId" | "ambiguousIds">,
+  serviceId: string,
+): T | undefined {
+  if (!serviceId || index.ambiguousIds.has(serviceId)) return undefined;
+  const entry = index.byId.get(serviceId);
+  return entry?.id === serviceId ? entry : undefined;
+}

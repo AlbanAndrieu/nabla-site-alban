@@ -105,3 +105,29 @@ une mesure suffisante de confidentialité.
 ## Rendu C4 et séparation des responsabilités
 
 L'ADR/RACI demeure dans [Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/architecture-governance.md), pas dans le frontend. Le composant `C4ArchitectureView` de la page Architecture utilise `@xyflow/react` et la topologie v2 déjà fournie par FastAPI. La vue L1 est **conceptuelle** ; la projection L2 utilise au maximum 16 services et 48 liens canoniques. Les URLs, IP LAN et preuves OWNER n'entrent pas dans cette projection. L3 attend un contrat métier de composants ; aucun inventaire parallèle n'est maintenu. La lecture publique dépend toujours des restrictions du read-model et du contrôle serveur.
+
+## Contrat d'identité v2 (mise à jour S-08a)
+
+Site ne joint plus les observations de sondes par nom ou URL :
+`canonicalHomelabEvidence` exige `observation.id === service.id`, avec un
+ID non ambigu. Une observation absente donne `unknown` et ne devient pas
+verte par coïncidence de libellé ; les statuts v2 liés par `entityRef`
+restent une source distincte, contrôlée par `catalogRevision`.
+La vue C4 expurge les noms contenant des origines privées, les descriptions
+sensibles et les types de relation non reconnus avant le rendu ReactFlow.
+Ces contraintes s'appliquent même si l'API renvoie un schéma JSON valide.
+
+## Trace W3C Site → FastAPI, phase 1
+
+Le Site génère un nouveau `traceparent` pour chaque appel
+`/api/homelab-health-v2`. Il le propage à la route FastAPI
+`/api/site/health/v2`, renvoie `X-Nabla-Trace-ID` et journalise ce
+même identifiant en cas d'erreur avec une phase expurgée. Les en-têtes
+injectés par le navigateur sont ignorés. L'en-tête
+`X-Nabla-Trace-Propagation: sent` signifie envoyé et **ne valide pas**
+le stockage de trace côté FastAPI. L'intégration aux autres sondes OWNER
+est encore en backlog inter-dépôts.
+
+La [recette OWNER/SERVICE](runbooks/homelab-owner-service-audit.md)
+doit être exécutée depuis deux réseaux réels. Le script ne conserve
+aucune valeur de cookie ni jeton de connexion.

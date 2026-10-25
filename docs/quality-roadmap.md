@@ -1,5 +1,29 @@
 # Feuille de route produit et qualité
 
+# Feuille de route produit et qualité
+
+## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
+
+- [x] Fournir `node scripts/agent-node22-fast.mjs`, `just node22-fast`
+  et `npm run test:fast:node22`, sans installation ni réseau npm.
+- [x] Préserver les engines Node 24/npm 12, le lockfile, la gate de
+  publication et les scans SAST/DAST : ce profil est L1 uniquement.
+- [x] Valider réellement Node 22.16.0/npm 10.9.2 : 18/18 tests PASS sur
+  une sélection de sources reconstituées et vérifiées par leurs blobs Git.
+  C4, erreurs de catalogue, permissions, identités de sondes et icônes.
+- [x] Ajouter les tests négatifs `homelabCanonicalEvidence.test.mjs` à
+  `test:fast:node22` : jointures de sondes strictes par ID et labels C4
+  expurgés. **5/5 PASS L1** sous Node 22 sur modules au SHA exact ;
+  exécution totale après intégration dans checkout complet encore requise.
+- [x] Inclure un test de régression Vercel (`vercelIgnoreBuild.test.mjs`)
+  dans le profil rapide et `just source-check`. Le cas HEAD de merge sans
+  SHA déployé précédemment est vérifié en local avec un vrai graphe Git.
+  **4/4 PASS**, sans CI payante.
+- [ ] Exécuter le profil sur un checkout intégral. Le L3 Node 24 reste
+  requis pour le build Next.js et la publication.
+
+[Runbook de la boucle rapide](runbooks/node22-fast-local.md).
+
 ## P0 — Alignement LTS Node/Next (23 octobre 2026)
 
 - [x] Node 24.22.1 LTS (version de sécurité du 21 octobre) est la référence unique de `.nvmrc`, `package.json`, `.envrc`, image Docker et Dagger ; Node 26 n'entre en LTS que le 28 octobre 2026.

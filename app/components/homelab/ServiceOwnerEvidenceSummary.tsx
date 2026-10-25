@@ -5,6 +5,7 @@ import type {
   HomelabHealthEntry, HomelabHealthSnapshot, TrueNasRuntimeApp,
 } from "@/lib/homelabHealth";
 import { describeServiceProbe, type ProbeDisplay } from "@/lib/homelabProbeEvidencePresentation";
+import { ownerHttpObservationState, ownerLatencyObserved } from "@/lib/homelabOwnerHttpEvidence";
 import styles from "./HomelabServicesBlock.module.css";
 
 function timestamp(value: string | null | undefined): string | null {
@@ -66,6 +67,10 @@ export default function ServiceOwnerEvidenceSummary({
   const tls = entry?.tls_trusted;
   const tunnelState = entry?.tunnel_status?.toLowerCase() ?? "";
   const accessBlocked = entry?.public_probe_verification === "access_protected_origin_unverified";
+  const httpObservationState = ownerHttpObservationState(publicProbe, entry?.http_status, stale, accessBlocked);
+  const latencyObserved = ownerLatencyObserved(publicProbe, stale);
+  const httpCode = typeof entry?.http_status === "number" && Number.isInteger(entry.http_status) &&
+    entry.http_status >= 100 && entry.http_status <= 599 ? entry.http_status : null;
   const tunnelConfirmed = !stale && entry?.tunnel_stale !== true &&
     (entry?.exposure?.provider_status_confirmed === true ||
       entry?.cloudflare_status_confirmed === true) && Boolean(tunnelState);
@@ -84,11 +89,17 @@ export default function ServiceOwnerEvidenceSummary({
   };
   const probeMetric = (key: string, label: string, probe: ProbeDisplay): Metric => ({
     key, icon: "fas fa-satellite-dish", label,
-    value: `${probeLabel(probe)}${probe.observedAt ?
-      ` · ${probe.observedAt.replace("T", " ").slice(0, 19)} UTC` : ""}`,
+    value: [
+      probeLabel(probe),
+      probe.source === "origin" ? (fr ? "source directe" : "direct source") :
+        probe.source === "memory" ? (fr ? "source cache" : "cached source") :
+        probe.source === "deadline" ? (fr ? "budget dépassé" : "probe deadline") : null,
+      probe.status,
+      probe.observedAt ? `${probe.observedAt.replace("T", " ").slice(0, 19)} UTC` : null,
+    ].filter(Boolean).join(" · "),
     state: probe.state === "failed" ? "fail" :
       probe.state === "stale" ? "warn" :
-      probe.state === "observed" ? "observed" : "unknown",
+      probe.state === "observed" && (probe.source === "origin" || probe.source === "memory") ? "observed" : "unknown",
   });
   const metrics: Metric[] = [
     {
@@ -115,18 +126,15 @@ export default function ServiceOwnerEvidenceSummary({
     },
     {
       key: "http", icon: "fas fa-globe", label: "HTTP",
-      value: entry?.http_status && entry.http_status > 0 ?
-        `${entry.http_status}${accessBlocked ? " · Cloudflare Access" : ""}` :
+      value: httpCode !== null ?
+        `${httpCode}${accessBlocked ? " · Cloudflare Access" : ""}${httpObservationState === "unknown" ? (fr ? " · non vérifié" : " · unverified") : ""}` :
         (fr ? "non sondé" : "not probed"),
-      state: stale || !entry?.http_status ? "unknown" :
-        accessBlocked ? "warn" : entry.http_status < 400 ? "ok" : entry.http_status < 500 ? "warn" : "fail",
+      state: httpObservationState,
     },
     {
       key: "latency", icon: "fas fa-stopwatch", label: fr ? "Latence" : "Latency",
-      value: publicProbe.observedAt && typeof entry?.latency_ms === "number" &&
-        Number.isFinite(entry.latency_ms) ? `${Math.round(entry.latency_ms)} ms` : "—",
-      state: stale || !publicProbe.observedAt || typeof entry?.latency_ms !== "number" ?
-        "unknown" : "observed",
+      value: latencyObserved ? `${Math.round(publicProbe.latencyMs ?? 0)} ms` : "—",
+      state: latencyObserved ? "observed" : "unknown",
     },
     {
       key: "prometheus", icon: "fas fa-chart-line", label: "Prometheus",
@@ -150,6 +158,23 @@ export default function ServiceOwnerEvidenceSummary({
           <strong>{metric.value}</strong>
         </span>
       ))}
+      <details data-owner-diagnostic-timeline>
+        <summary>{fr ? "Parcours et provenance des preuves" : "Evidence path and provenance"}</summary>
+        <p className="small text-muted">
+          {fr ? "Chaque étape est indépendante : absence de mesure = inconnu, pas panne confirmée."
+            : "Each stage is independent: missing evidence means unknown, not a confirmed outage."}
+        </p>
+        <ol>
+          {["docker", "lan", "https", "http", "probe", "cloudflare", "prometheus"]
+            .map((key) => metrics.find((metric) => metric.key === key))
+            .filter((metric): metric is Metric => metric !== undefined)
+            .map((metric) => (
+              <li key={metric.key} data-evidence-phase={metric.key} data-evidence-state={metric.state}>
+                <strong>{metric.label}:</strong> {metric.value}
+              </li>
+            ))}
+        </ol>
+      </details>
       {!probeAt && runtimeAt ? (
         <small data-owner-runtime-observed>
           {fr ? "Inventaire runtime" : "Runtime inventory"}:{" "}

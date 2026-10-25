@@ -46,3 +46,10 @@ test("LAN navigation labels respect configured HTTP or HTTPS without a real prob
   assert.doesNotMatch(card, /lien HTTP proposé|HTTP link suggested/);
   assert.match(card, /hasInternal && !internalProtocolObserved/);
 });
+
+test("a green OWNER HTTP metric requires a dated probe, not just an HTTP status", () => {
+  assert.match(source, /ownerHttpObservationState\(/);
+  assert.match(source, /state: httpObservationState/);
+  assert.match(source, /latencyObserved \? "observed" : "unknown"/);
+  assert.match(source, /source cache/);
+});
