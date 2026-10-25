@@ -18,3 +18,11 @@ test("OWNER evidence is keyboard-expandable and each diagnostic phase stays labe
   assert.match(source, /data-evidence-phase=\{metric\.key\}/);
   assert.match(source, /missing evidence means unknown/);
 });
+
+test("OWNER diagnostic phases identify DNS and API evidence gaps without fake green", () => {
+  const source = read("app/components/homelab/ServiceOwnerEvidenceSummary.tsx");
+  assert.match(source, /"catalog", "dns", "lan", "https", "http", "api"/);
+  assert.match(source, /No service-level DNS evidence/);
+  assert.match(source, /No dedicated API probe/);
+  assert.match(source, /state: "unknown"/);
+});

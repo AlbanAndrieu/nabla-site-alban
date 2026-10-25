@@ -147,3 +147,12 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 **Convention :** `DONE (code)` ≠ `READY (Vercel)` ≠ `PASS (HTTP)` ≠
 `PASS (navigateur)` ≠ `PASS (OWNER/LAN)`. Si non mesuré, inscrire
 `NOT_RUN` ou `BLOCKED`. Ne pas recopier les tâches d'un autre dépôt.
+
+### Suivi 429 OWNER et diagnostic local (#260, 25/10/2026)
+- [x] **S-03b audit** : traiter HTTP 429 comme précontrôle bloqué, jamais comme refus OWNER; code de sortie 4 sans requêtes supplémentaires.
+- [x] **S-03c confidentialité** : JWT limité à l'origine auditée, aucun secret dans la sortie, métadonnées de stockage contrôlées.
+- [x] **S-07c UX** : chronologie Catalogue → DNS → TCP → TLS → HTTP → API et `unknown` pour DNS/API non mesurés.
+- [ ] **S-03d LAN réel** : obtenir HTTP 200 sur `/api/homelab-access?diagnose=1`, puis valider OWNER et les sondes.
+- [ ] **S-04 WAN réel** : `NOT_RUN` en absence de réseau extérieur; ne pas falsifier l'IP cliente.
+- [ ] **S-06c trace FastAPI** : confirmer la version réellement déployée et l'écho exact de l'ID W3C.
+- [ ] **S-11b** : recettes WCAG 2.2 AA et Web Vitals LCP/INP/CLS réels.

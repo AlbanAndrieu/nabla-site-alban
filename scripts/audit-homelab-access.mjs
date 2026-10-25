@@ -5,6 +5,7 @@
  * Requires the project's Playwright browser installation.
  */
 import { chromium } from "playwright";
+import { auditHeadersForUrl, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata } from "./homelab-audit-policy.mjs";
 
 const expected = process.env.HOMELAB_AUDIT_EXPECT?.trim();
 const base = process.env.BASE_URL?.trim() || "https://www.albanandrieu.com";
@@ -19,16 +20,29 @@ if ((origin.protocol !== "https:" && !(origin.protocol === "http:" && ["localhos
 }
 const failures = [];
 const results = [];
+let preflightBlocked = false;
+class AuditPreflightBlocked extends Error {}
 const assert = (condition, message) => { if (!condition) failures.push(message); };
 const audit = (label, value) => { results.push({ check: label, result: value }); };
-const headers = { Accept: "application/json", ...(accessJwt ? { "cf-access-jwt-assertion": accessJwt } : {}) };
+const headers = auditHeadersForUrl(origin.origin, origin.origin, accessJwt, { Accept: "application/json" });
 const browser = await chromium.launch({ headless: true });
 try {
   // Context is always fresh. Do not load another user's persistent Chrome profile.
-  const context = await browser.newContext({
-    extraHTTPHeaders: accessJwt ? { "cf-access-jwt-assertion": accessJwt } : {},
-    serviceWorkers: "block",
-  });
+  const context = await browser.newContext({ serviceWorkers: "block" });
+  if (accessJwt) {
+    // Do not forward Access JWT to other origins or across redirects.
+    await context.route("**/*", async (route) => {
+      if (new URL(route.request().url()).origin !== origin.origin) {
+        await route.continue();
+        return;
+      }
+      const upstream = await route.fetch({
+        headers: auditHeadersForUrl(route.request().url(), origin.origin, accessJwt, route.request().headers()),
+        maxRedirects: 0,
+      });
+      await route.fulfill({ response: upstream });
+    });
+  }
   const page = await context.newPage();
   const originUrl = (path) => new URL(path, origin).toString();
   const request = async (path) => {
@@ -38,12 +52,19 @@ try {
     return { status: response.status(), body, headers: response.headers() };
   };
   const decision = await request("/api/homelab-access?diagnose=1");
-  assert(decision.status === 200, "access-check must return JSON 200");
-  const isOwner = decision.body?.trusted === true && decision.body?.mode !== "public-readonly";
-  const isService = decision.body?.trusted === true && decision.body?.mode === "public-readonly";
-  const observed = isOwner ? "owner" : isService ? "service" : "denied";
-  assert(observed === expected, `expected ${expected}, observed ${observed}; check real connection and verified Access identity`);
+  const gate = classifyAuditAccess(decision.status, decision.body);
+  if (!gate.ok) {
+    audit("access", `BLOCKED (${gate.reason}; HTTP ${decision.status})`);
+    const metadata = safeRateLimitMetadata(decision.headers);
+    if (Object.keys(metadata).length) audit("safe response metadata", JSON.stringify(metadata));
+    throw new AuditPreflightBlocked(gate.reason);
+  }
+  const observed = gate.mode;
   audit("access", observed);
+  if (observed !== expected) {
+    assert(false, `expected ${expected}, observed ${observed}; check real network and verified Access identity`);
+    throw new AuditPreflightBlocked("mode_mismatch");
+  }
   const privatePaths = [
     "/api/homelab-health", "/api/homelab-probes",
     "/api/homelab-diagnostics", "/api/homelab-observability",
@@ -86,35 +107,46 @@ try {
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1800);
   const persisted = await page.evaluate(async () => {
-    const violations = [];
-    const homelabKey = (name) => /homelab/i.test(name);
-    const safeKey = /^nabla:homelab:(catalog-public-v2:3|health-public-v2:1)$/;
-    const suspiciousData = /172\.17\.|10\.254\.|cf-access|x-diagnostics-key|(?:access|refresh)[_-]?token|private_inventory|internalHost|service_token|BEGIN PRIVATE KEY/i;
+    const violations = [], entries = [];
+    const scoped = /homelab|(?:^|[:_-])(owner|truenas|diagnostic)(?:$|[:_-])/i;
     for (const [name, storage] of [["localStorage", localStorage], ["sessionStorage", sessionStorage]]) {
       for (let i = 0; i < storage.length; i++) {
         const key = storage.key(i);
-        if (!key || !homelabKey(key)) continue;
-        if (!safeKey.test(key)) violations.push(name + ": unexpected homelab key");
-        if (suspiciousData.test(storage.getItem(key) ?? "")) violations.push(name + ": private data pattern");
+        if (key && scoped.test(key)) entries.push([name, key, storage.getItem(key) ?? ""]);
       }
     }
     if (typeof indexedDB.databases === "function") {
       for (const db of await indexedDB.databases()) {
         if (/homelab.*(owner|private)/i.test(db.name ?? "")) violations.push("IndexedDB: OWNER database");
       }
-    }
+    } else violations.push("IndexedDB: enumeration unsupported");
     if (typeof caches !== "undefined") {
-      for (const name of await caches.keys()) {
+      const names = await caches.keys();
+      if (names.length > 100) violations.push("CacheStorage: over audit budget");
+      for (const name of names.slice(0, 100)) {
         if (/homelab.*(owner|private)/i.test(name)) violations.push("CacheStorage: OWNER cache");
+        const requests = await (await caches.open(name)).keys();
+        if (requests.length > 300) violations.push("CacheStorage: over request budget");
+        for (const req of requests.slice(0, 300)) {
+          if (/^\/api\/(?:homelab-(?:health|probes|diagnostics|observability)|runtime-topology)(?:\/|$)/.test(new URL(req.url).pathname))
+            violations.push("CacheStorage: OWNER API response cached");
+        }
       }
     }
-    return violations;
+    return { entries, violations };
   });
-  assert(persisted.length === 0, "browser persistence check: " + persisted.join(", "));
-  audit("browser persistence (reload)", persisted.length ? "VIOLATIONS" : "PASS; no homelab secret patterns");
+  const violations = [
+    ...persisted.violations,
+    ...auditStoredEntries(persisted.entries.filter(([scope]) => scope === "localStorage").map(([, key, value]) => [key, value]), "localStorage"),
+    ...auditStoredEntries(persisted.entries.filter(([scope]) => scope === "sessionStorage").map(([, key, value]) => [key, value]), "sessionStorage"),
+  ];
+  assert(violations.length === 0, "browser persistence check: " + violations.join(", "));
+  audit("browser persistence (reload)", violations.length ? "VIOLATIONS" : "PASS; no operational cache values");
   await context.close();
 } catch (error) {
-  failures.push(error instanceof Error ? error.name + ": " + error.message.replace(/https?:\/\/[^\s]+/g, "[url]") : "unexpected audit exception");
+  if (error instanceof AuditPreflightBlocked) {
+    preflightBlocked = true;
+  } else failures.push(error instanceof Error ? error.name + ": " + error.message.replace(/https?:\/\/[^\s]+/g, "[url]") : "unexpected audit exception");
 } finally {
   await browser.close();
 }
@@ -122,4 +154,7 @@ for (const line of results) console.log((line.result.startsWith("VIOLATIONS") ? 
 if (failures.length) {
   for (const message of failures) console.error("FAIL " + message);
   process.exitCode = 1;
+} else if (preflightBlocked) {
+  console.error("HOMELAB_ACCESS_AUDIT_BLOCKED: no access verdict; no subsequent probe requests. Investigate rate limiting and Retry-After, then run once from the real LAN.");
+  process.exitCode = 4;
 } else console.log("HOMELAB_ACCESS_AUDIT_PASS: " + expected + " (environment observed, not simulated)");

@@ -102,6 +102,23 @@ export default function ServiceOwnerEvidenceSummary({
       probe.state === "observed" && (probe.source === "origin" || probe.source === "memory") ? "observed" : "unknown",
   });
   const metrics: Metric[] = [
+    // These explicit gaps must remain UNKNOWN until FastAPI provides service-level probes.
+    {
+      key: "catalog", icon: "fas fa-list", label: fr ? "Catalogue" : "Catalog",
+      value: entry?.id ? (fr ? "Identité présente" : "Catalog identity present") :
+        (fr ? "Identité non vérifiée" : "Identity not verified"),
+      state: entry?.id ? "observed" : "unknown",
+    },
+    {
+      key: "dns", icon: "fas fa-network-wired", label: "DNS",
+      value: fr ? "Pas de preuve DNS par service" : "No service-level DNS evidence",
+      state: "unknown",
+    },
+    {
+      key: "api", icon: "fas fa-code", label: "API",
+      value: fr ? "Aucune sonde API dédiée" : "No dedicated API probe",
+      state: "unknown",
+    },
     {
       key: "docker", icon: "fas fa-server", label: "Docker/TrueNAS",
       value: runtime ? primary ? `${runtime} · container ${primary}` : runtime :
@@ -149,7 +166,7 @@ export default function ServiceOwnerEvidenceSummary({
     <div className={styles.ownerEvidenceSummary} data-owner-service-evidence
       data-evidence-stale={String(stale)}
       aria-label={fr ? "Diagnostics observés" : "Observed diagnostics"}>
-      {metrics.map((metric) => (
+      {metrics.filter((metric) => !["catalog", "dns", "api"].includes(metric.key)).map((metric) => (
         <span key={metric.key} className={styles.ownerEvidenceMetric}
           data-evidence-key={metric.key} data-evidence-state={metric.state}
           title={metric.label + ": " + metric.value}>
@@ -165,7 +182,7 @@ export default function ServiceOwnerEvidenceSummary({
             : "Each stage is independent: missing evidence means unknown, not a confirmed outage."}
         </p>
         <ol>
-          {["docker", "lan", "https", "http", "probe", "cloudflare", "prometheus"]
+          {["catalog", "dns", "lan", "https", "http", "api", "probe", "cloudflare", "prometheus", "docker"]
             .map((key) => metrics.find((metric) => metric.key === key))
             .filter((metric): metric is Metric => metric !== undefined)
             .map((metric) => (
