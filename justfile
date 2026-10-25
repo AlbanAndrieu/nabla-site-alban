@@ -11,6 +11,13 @@ context:
 preflight:
     bash scripts/agent-offline-context.sh preflight
 
+# Network-free Node 22/npm 10 targeted L1 tests. Never a publication gate.
+node22-fast:
+    node scripts/agent-node22-fast.mjs
+
+node22-fast-preflight:
+    node scripts/agent-node22-fast.mjs --preflight
+
 # Offline L1 syntax-only fallback, aligned with Bababou.
 offline-l1:
     bash scripts/agent-offline-check.sh

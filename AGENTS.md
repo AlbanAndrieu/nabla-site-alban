@@ -18,6 +18,15 @@ When network works, fetch once, then run `bash scripts/agent-doctor.sh` and `mis
 real checkout. Offline preflight is not remote freshness, dependency validation, or permission to
 publish.
 
+## Fast Node 22/npm 10 smoke
+
+When the agent only has Node 22/npm 10, use
+`node scripts/agent-node22-fast.mjs` or `just node22-fast` for a
+**dependency-free L1 suite**. It checks versions and required files.
+It does not modify engines, install packages, build Next.js or replace
+the canonical Node 24/npm 12 `npm run quality:agent:publish` gate.
+The full procedure is in `docs/runbooks/node22-fast-local.md`.
+
 ## OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH
 
 1. OBSERVE exact HEAD/branch/base and status/stat using `just context`.

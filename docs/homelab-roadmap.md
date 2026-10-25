@@ -18,6 +18,7 @@
 | HTTP public | Navigateur de l'agent : accès direct à Architecture/TrueNAS non disponible ; terminal de l'agent : DNS public indisponible | **BLOCKED côté agent** |
 | OWNER/LAN | Aucun appel authentifié depuis le VLAN domestique | **NOT_RUN** |
 | Source-only / L3 | Pas de checkout complet avec Node 24, `npm ci`, Playwright, Axe, Trivy et quality gate locale sur le merge | **NOT_RUN** |
+| L1 Node 22/npm 10 | Six sources au blob SHA identique au merge ; 18 tests ciblés via source partielle | **18/18 PASS ; non L3** |
 
 **Routes canoniques :** anglais `/`, `/architecture`, `/truenas` ;
 français `/fr`, `/fr/architecture`, `/fr/truenas`.
