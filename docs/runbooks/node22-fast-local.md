@@ -55,3 +55,24 @@ sur Node 24.22.1/npm 12.2.0 a signalé le refus de l'ancien précontrôle
 Node22-only. Le code est corrigé dans PR #260. L'exécution de la suite
 complète sous Node 24 reste **NOT_RUN** tant que le résultat n'est pas
 transmis par l'opérateur.
+
+## Diagnostic test de parsing TypeScript — 25 octobre 2026
+
+L'exécution opérateur sous Node 24.22.1/npm 12.2.0 a exécuté **58 tests** :
+**57 PASS, 1 FAIL**. Seul `unit-tests/homelabHookParse.test.mjs` échouait
+avec `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`, car `stripTypeScriptTypes`
+avait été appelé en mode `strip` sur le constructeur
+`constructor(readonly reason: ...)`. Ce motif est valide en TypeScript.
+
+Le test emploie désormais `mode: "transform"`, qui convertit les
+propriétés de paramètres du constructeur avant `node --check`.
+Un test négatif vérifie que l'ancienne erreur de virgule manquante est
+toujours détectée. Aucun `npm ci` ni `next build` n'est nécessaire.
+
+**Preuve agent :** 2 tests ciblés sur une fixture reproduisant cette
+syntaxe, **2 PASS sous Node 22.16.0/npm 10.9.2**. L'exécution sur le
+**fichier TypeScript complet et sous Node 24 reste NOT_RUN côté agent**
+jusqu'au nouveau résultat de l'opérateur.
+
+Ne pas confondre `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` émis par le mode
+`strip` avec une erreur de syntaxe du fichier TypeScript original.
