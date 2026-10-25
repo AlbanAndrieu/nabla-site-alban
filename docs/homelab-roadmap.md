@@ -70,6 +70,7 @@ invariants sont à préserver, pas à réimplémenter.
   collecteur → FastAPI → Route Handler Next.js → support OWNER, avec
   logs expurgés et horodatages. Le `requestId` Site actuel est **local**
   et ne constitue pas une trace distribuée.
+- [x] **S-07a Preuve HTTP fraîche :** un code 200 sans timestamp et source de sonde HTTP ne vaut pas un succès ; un résultat périmé ou interrompu reste `unknown`. Le détail OWNER précise origine/cache/deadline, HTTP et l’heure. Cinq tests purs Node 22 PASS dans un arbre isolé.
 - [ ] **S-07 Provenance lisible :** présenter par service les étapes
   catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
   horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
