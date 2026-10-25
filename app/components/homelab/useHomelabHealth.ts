@@ -81,7 +81,7 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	siteHealth: null,
 	siteHealthTraceId: null,
 	siteHealthTraceConfirmed: false,
-	error: false
+	error: false,
 	healthUnavailable: false,
 	healthStatus: null,
 	healthRefreshing: true,
