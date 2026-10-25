@@ -62,6 +62,7 @@
 		"quality:agent:publish": "bash scripts/agent-publish.sh",
 		"test:a11y": "bash scripts/run-a11y-local.sh",
 		"rss:check": "node scripts/generate-security-rss.mjs --check",
+		"diagnose:homelab-429": "node scripts/diagnose-homelab-429.mjs",
 		"audit:homelab": "node scripts/audit-homelab-access.mjs"
 	},
 	"dependencies": {
