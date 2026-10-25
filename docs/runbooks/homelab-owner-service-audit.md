@@ -75,7 +75,7 @@ si aucun runtime n'a exécuté la route, rechercher une décision edge
 (Vercel/Cloudflare/proxy) avant tout changement FastAPI.
 
 FastAPI Cloud peut fournir des preuves indépendantes via
-`GET https://fastapi-sample.fastapicloud.dev/healthz` ou les endpoints
+`GET https://fastapi-sample.fastapicloud.dev/livez` ou les endpoints
 authentifiés du catalogue. Une réponse FastAPI ne peut **pas** établir
 l'identité réseau OWNER vue par Vercel ; ne jamais injecter de
 `X-Forwarded-For` ni de faux `X-Real-IP`.
@@ -91,7 +91,7 @@ npm run diagnose:homelab-429
 ```
 Elle interroge depuis la machine actuelle :
 - Site `/api/homelab-access?diagnose=1` (origine `BASE_URL`) ;
-- FastAPI Cloud `/healthz` (liveness de FastAPI uniquement).
+- FastAPI Cloud `/livez` (liveness de FastAPI uniquement).
 
 Chaque ligne ne contient que le code HTTP et les métadonnées `Retry-After`,
 `X-Vercel-Id`, `CF-Ray` filtrées. Un JWT Access optionnel n'est
