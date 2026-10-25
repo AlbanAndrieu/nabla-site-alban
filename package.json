@@ -51,6 +51,7 @@
 		"test:integration": "playwright test tests/integration-baseline.spec.ts --project=chromium",
 		"test:security": "playwright test tests/security-baseline.spec.ts --project=chromium",
 		"test:performance": "playwright test tests/performance-baseline.spec.ts --project=chromium",
+		"test:fast:local": "node scripts/agent-node22-fast.mjs",
 		"test:fast:node22": "node scripts/agent-node22-fast.mjs",
 		"test:unit": "node --import tsx --test --test-reporter=dot \"unit-tests/**/*.test.ts\" && node --test --test-reporter=dot unit-tests/*.test.mjs",
 		"test:unit:verbose": "node --import tsx --test \"unit-tests/**/*.test.ts\" && node --test unit-tests/*.test.mjs",
