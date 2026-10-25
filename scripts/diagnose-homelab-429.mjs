@@ -37,9 +37,9 @@ async function observe(label, url, jwt = "") {
 const site = await observe("SITE_ACCESS",
   new URL("/api/homelab-access?diagnose=1", origin).toString(),
   process.env.HOMELAB_AUDIT_ACCESS_JWT?.trim());
-const fastapi = await observe("FASTAPI_HEALTHZ",
-  "https://fastapi-sample.fastapicloud.dev/healthz");
-console.log("NOTE: FastAPI /healthz is an independent liveness signal, not proof of Site OWNER authorization or Backstage v2 health.");
+const fastapi = await observe("FASTAPI_LIVEZ",
+  "https://fastapi-sample.fastapicloud.dev/livez");
+console.log("NOTE: FastAPI /livez is an independent liveness signal, not proof of Site OWNER authorization or Backstage v2 health.");
 if (site === 429) {
   console.log("BLOCKED: Site access preflight rate-limited; honor Retry-After and inspect Vercel/edge logs.");
   process.exitCode = 4;
