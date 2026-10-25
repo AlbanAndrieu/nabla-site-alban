@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { auditHeadersForUrl, expectedAccessMode, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata } from "../scripts/homelab-audit-policy.mjs";
+import { auditHeadersForUrl, expectedAccessMode, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata, safeAccessDiagnostic } from "../scripts/homelab-audit-policy.mjs";
 test("JWT never reaches third-party assets or redirects", () => {
   const jwt = "test-jwt", origin = "https://www.albanandrieu.com";
   assert.equal(auditHeadersForUrl(origin + "/fr/truenas", origin, jwt)["cf-access-jwt-assertion"], jwt);
@@ -45,4 +45,16 @@ test("429 metadata is allowlisted, never echoes secrets", () => {
     cloudflareRay: "abc123456789-def",
   });
   assert.deepEqual(safeRateLimitMetadata({ "retry-after": "999999", "x-vercel-id": "bad\nSecret:abc" }), {});
+});
+
+test("the 200 response diagnostic never contains IPs, credentials or arbitrary fields", () => {
+  assert.deepEqual(safeAccessDiagnostic({
+    reason: "identity-not-authorized", sourceFamily: "ipv4",
+    trustedCidrsConfigured: true, networkAllowed: true, identityRequired: true,
+    clientIp: "192.0.2.20", token: "secret", reasonInjected: "private",
+  }), {
+    reason: "identity-not-authorized", sourceFamily: "ipv4",
+    trustedCidrsConfigured: true, networkAllowed: true, identityRequired: true,
+  });
+  assert.deepEqual(safeAccessDiagnostic({ reason: "127.0.0.1", sourceFamily: "evil", ip: "172.17.0.1" }), null);
 });
