@@ -246,7 +246,7 @@ export default function ArchitecturePrivateViews({
 					initialCatalog={data.catalog}
 					initialCatalogSource={data.catalogSource}
 					initialTopology={data.topology}
-					initialTopologySource="fastapi"
+					initialTopologySource={data.topologyLive ? "fastapi" : "local-fallback"}
 				/>
 				</div>
 			</div>
