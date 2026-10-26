@@ -21,13 +21,18 @@ async function verifyRecheckLayout(page: Page, routePath: string, selector: stri
   for (let cycle = 0; cycle < 2; cycle += 1) {
     const priorHeight = await region.evaluate((element) =>
       Math.ceil(element.getBoundingClientRect().height));
+    // Observe the viewport inside the service area, not just at scrollY=0.
+    await region.evaluate((element) => {
+      const position = window.scrollY + element.getBoundingClientRect().top;
+      window.scrollTo(0, position + Math.min(240, element.getBoundingClientRect().height / 3));
+    });
     const beforeScroll = await page.evaluate(() => window.scrollY);
     await page.waitForTimeout(2300);
     await page.evaluate(() => window.dispatchEvent(new Event("focus")));
 
     const placeholder = page.locator(
       routePath.includes("truenas")
-        ? "#truenas-services [data-homelab-access-rechecking]"
+        ? ".homelab-services-section [data-homelab-access-rechecking]"
         : "[data-homelab-access-rechecking]",
     ).first();
 
@@ -51,7 +56,7 @@ test.describe("authenticated private layout revalidation", () => {
   test("TrueNAS retains scroll geometry across two access rechecks", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await verifyRecheckLayout(page, "/fr/truenas",
-      "#truenas-services [data-homelab-access-region]");
+      ".homelab-services-section [data-homelab-access-region]");
   });
 
   test("Architecture retains scroll geometry across two access rechecks", async ({ page }) => {
