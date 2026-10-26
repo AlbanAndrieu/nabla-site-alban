@@ -1,8 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type {
 	HomelabHealthEntry,
+	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/lib/homelabHealthPresentation";
 import statusStyles from "./HomelabStatusSurface.module.css";
 import ServiceOperatorDiagnostics from "./ServiceOperatorDiagnostics";
+import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
 import ServiceProbeEvidence from "./ServiceProbeEvidence";
 import ServiceSignalStrip from "./ServiceSignalStrip";
 
@@ -20,6 +22,9 @@ type Props = {
 	tunnelExpected: boolean;
 	cloudflareConfigured?: boolean;
 	runtimeStale?: boolean;
+	snapshot?: HomelabHealthSnapshot | null;
+	ownerView?: boolean;
+	healthUnavailable?: boolean;
 };
 
 type HealthReasonMessageKey =
@@ -74,11 +79,32 @@ export default function ServiceHealthReasons({
 	tunnelExpected,
 	cloudflareConfigured,
 	runtimeStale,
+	snapshot,
+	ownerView = false,
+	healthUnavailable = false,
 }: Props) {
 	const t = useTranslations("homelab");
+	const french = useLocale() === "fr";
 	const signalStrip = <ServiceSignalStrip entry={entry} />;
 	const probeEvidence = <ServiceProbeEvidence entry={entry} />;
-	const operatorDiagnostics = <ServiceOperatorDiagnostics entry={entry} />;
+	const ownerEvidence = ownerView ? snapshot ? (
+		<ServiceOwnerEvidenceSummary
+			entry={entry}
+			snapshot={snapshot}
+			unavailable={healthUnavailable}
+		/>
+	) : (
+		<p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
+			{t("health.states.unknown")} · {french
+				? "Docker, TLS, Cloudflare, Prometheus et sondes indisponibles"
+				: "Docker, TLS, Cloudflare, Prometheus and probes unavailable"}
+		</p>
+	) : null;
+	const operatorDiagnostics = (
+		<ServiceOperatorDiagnostics entry={entry}>
+			{ownerEvidence}
+		</ServiceOperatorDiagnostics>
+	);
 	if (state !== "fail" && state !== "warn") {
 		return (
 			<>
