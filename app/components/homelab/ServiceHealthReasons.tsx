@@ -102,6 +102,7 @@ export default function ServiceHealthReasons({
 	) : null;
 	const operatorDiagnostics = (
 		<ServiceOperatorDiagnostics entry={entry}>
+			{probeEvidence}
 			{ownerEvidence}
 		</ServiceOperatorDiagnostics>
 	);
@@ -109,7 +110,6 @@ export default function ServiceHealthReasons({
 		return (
 			<>
 				{signalStrip}
-				{probeEvidence}
 				{operatorDiagnostics}
 			</>
 		);
