@@ -72,11 +72,6 @@ export default function ArchitectureHealthDashboard({
 							? "État et filtres de l’architecture"
 							: "Architecture health and filters"}
 					</h2>
-					<p>
-						{french
-							? "Les filtres s’appliquent aux services déclarés du graphe ; la topologie complète reste utilisée pour calculer la criticité et le rayon d’impact."
-							: "Services stay first; filters use operator presentation roles while the complete topology remains the basis for dependency criticality and blast-radius calculations."}
-					</p>
 				</div>
 				<div
 					className={homelabStyles.refreshStatus}
@@ -93,8 +88,8 @@ export default function ArchitectureHealthDashboard({
 								: "Refresh unavailable · keeping last snapshot"
 							: healthSource === "site-v2"
 							? french
-								? "États v2 actualisés · sondes détaillées privées"
-								: "V2 states refreshed · detailed probes private"
+								? "Statuts publiés"
+								: "Published status"
 						: ageSeconds === null
 								? french
 									? "Snapshot en attente"
