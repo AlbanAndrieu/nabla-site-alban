@@ -24,6 +24,7 @@ export const FAST_TESTS = Object.freeze([
   "unit-tests/homelabCardLayoutStability.test.mjs",
   "unit-tests/homelabRecheckLayout.test.mjs",
   "unit-tests/homelabSlowApiResilience.test.mjs",
+  "unit-tests/homelabEffectHydration.test.mjs",
   "unit-tests/homelabConcisePresentation.test.mjs",
   "unit-tests/vercelIgnoreBuild.test.mjs",
 ]);
