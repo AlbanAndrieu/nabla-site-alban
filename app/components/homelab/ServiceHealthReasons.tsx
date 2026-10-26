@@ -126,7 +126,6 @@ export default function ServiceHealthReasons({
 	return (
 		<>
 			{signalStrip}
-			{probeEvidence}
 			<div
 				className={`${statusStyles.surface} ${severityClass} small text-start mt-3 mb-0`}
 				data-health-reasons
