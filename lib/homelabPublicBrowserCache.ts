@@ -8,7 +8,9 @@ const CATALOG_KEY = "nabla:homelab:catalog-public-v2:3";
 const LEGACY_CATALOG_KEY = "nabla:homelab:catalog-public-v2:2";
 const OLD_CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
 const HEALTH_KEY = "nabla:homelab:health-public-v2:1";
-const CATALOG_TTL_MS = 15 * 60_000;
+// Public-only metadata remains useful during a prolonged TrueNAS outage.
+// Cached health retains its short TTL and can never display old green states.
+const CATALOG_TTL_MS = 24 * 60 * 60_000;
 const HEALTH_TTL_MS = 2 * 60_000;
 const REVISION = /^sha256:[0-9a-f]{64}$/;
 const ENTITY_REF = /^(component|resource|api):[a-z0-9._-]+\/[a-z0-9._-]+$/;
