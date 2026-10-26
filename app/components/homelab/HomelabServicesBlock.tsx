@@ -22,7 +22,6 @@ import HomelabStatusOverview from "./HomelabStatusOverview";
 import {
 	ALL_GROUPS,
 	filterHierarchyGroups,
-	GROUP_DESCRIPTION_KEY,
 	GROUP_TITLE_KEY,
 	METRICS_PROFILE_KEY,
 } from "./homelabServiceHierarchy";
@@ -560,9 +559,6 @@ export default function HomelabServicesBlock({
 							<summary className={styles.groupSummary}>
 								<span className={styles.groupTitle}>
 									<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
-									<span className={styles.groupDescription}>
-										{t(GROUP_DESCRIPTION_KEY[group.group])}
-									</span>
 								</span>
 								<span className={styles.groupMeta}>
 									<span className={styles.metricsProfileBadge}>
