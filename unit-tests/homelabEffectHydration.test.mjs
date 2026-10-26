@@ -37,3 +37,18 @@ test("OWNER-to-SERVICE transition masks old scope synchronously", () => {
   assert.match(source, /return \(\) => \{/);
   assert.match(source, /initialController\.abort\(\)/);
 });
+
+test("health selectors remain independently testable without hook-side effects", () => {
+  const selectors = readFileSync(
+    new URL("../app/components/homelab/homelabHealthSelectors.ts", import.meta.url),
+    "utf8",
+  );
+  for (const exported of ["healthIndex", "effectiveState", "countHealthStates"]) {
+    assert.match(selectors, new RegExp(`export function ${exported}\\(`));
+    assert.match(source, new RegExp(`\\b${exported}\\b`));
+  }
+  assert.match(selectors, /canonicalHomelabEvidence\\(index, serviceId\\)/);
+  assert.match(selectors, /return "unknown"/);
+  assert.doesNotMatch(selectors, /fetch\\(|localStorage|sessionStorage|useEffect\\(/);
+  assert.doesNotMatch(source, /export function countHealthStates\\(/);
+});
