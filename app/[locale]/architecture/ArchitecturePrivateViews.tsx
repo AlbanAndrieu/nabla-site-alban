@@ -172,11 +172,6 @@ export default function ArchitecturePrivateViews({
 	if (access === "readonly")
 		return (
 			<div data-homelab-public-readonly-view className="container py-4">
-				<p role="status">
-					{french
-						? "Cartographie publiée en lecture seule ; les diagnostics réseau internes restent privés."
-						: "Published read-only architecture; private network diagnostics remain restricted."}
-				</p>
 				<ArchitectureTopologyView
 					readOnly
 					locale={locale}
@@ -219,11 +214,6 @@ export default function ArchitecturePrivateViews({
 								? "Réseau homelab et chemins d’ingress"
 								: "Homelab network and ingress paths"}
 						</SectionHeading>
-						<p>
-							{french
-								? "Même diagramme que la page TrueNAS : ingress direct HAProxy/Traefik, Cloudflare Tunnel, DNS scindé et domaines de panne."
-								: "Same diagram as the TrueNAS page: direct HAProxy/Traefik ingress, Cloudflare Tunnel, split DNS and failure domains."}
-						</p>
 					</div>
 					<HomeLabNetworkFlow />
 				</div>
