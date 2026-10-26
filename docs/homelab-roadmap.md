@@ -197,3 +197,36 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
   cycles de 30 s et vérifier qu'il ne se referme pas.
   Mesurer CLS et défilement vertical ; aucun PASS visuel n'est
   établi tant que Preview et OWNER/LAN ne sont pas accessibles.
+
+### P1 — Densité de lecture TrueNAS et Architecture (26/10/2026, PR #260)
+
+- [x] **S-18a — Nettoyage des cartes :** retirer la ligne
+  « Adresse/port issus de la configuration · aucune sonde LAN ».
+  Conserver l'état réel de la sonde sur le bouton LAN
+  (`data-lan-probe-state`) et la remarque sur le protocole
+  inconnu dans son `title`, sans présenter un endpoint déclaré
+  comme un succès mesuré.
+- [x] **S-18b — Suppression des bandeaux descriptifs :** retirer les
+  textes « Les services restent la finalité… » et
+  « Consultation extérieure en lecture seule… », en français
+  et en anglais. Préserver le contrôle OWNER/SERVICE et ses DTO.
+- [x] **S-18c — Sections épurées :** enlever l'introduction
+  narrative de TrueNAS, les descriptions de groupes répétées,
+  la note de sémantique toujours affichée, les explications
+  redondantes d'Architecture (entête, lecture seule, aide au
+  graphe, diagramme réseau dupliqué).
+- [x] **S-18d — État opérationnel visible :** conserver les
+  compteurs de santé, filtres, noms de groupes, nombre de services,
+  nombre de problèmes et avertissements explicites.
+  L'état `unknown` n'est pas promu en `healthy`.
+- [x] **S-18e — Contrats de source :** 14/14 vérifications statiques
+  sur les fichiers Git modifiés, nouveau test
+  `homelabConcisePresentation.test.mjs` inclus dans
+  `test:fast:local`. Le test structurel
+  `servicePresentation.test.ts` n'exige plus la phrase retirée.
+- [ ] **S-18f — Contrôle local et Preview :**
+  `npm run test:fast:local`, `npm run typecheck`,
+  `npm run build`, puis mesure de mise en page
+  sur /fr/truenas et /fr/architecture.
+  **NOT_RUN après la modification de présentation** ;
+  ne pas assimiler le build précédent à ce HEAD.
