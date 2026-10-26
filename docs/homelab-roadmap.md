@@ -94,6 +94,32 @@ invariants sont à préserver, pas à réimplémenter.
   les endpoints de projection allowlistés sont accessibles et que les 503
   publics ne révèlent aucune phase privée.
 
+## P1 — Référence RAM / GPU / stockage par service (26 octobre)
+
+- [x] **Contrat OWNER** : `lib/homelabResourceEvidence.ts`
+  accepte un snapshot privé `nabla-service-resources/v1`, le
+  valide et nettoie les champs non autorisés ; correspondance
+  stricte par `entityRef` Backstage v2, aucune inférence de nom.
+- [x] **Catalogue de cartes** : import manuel du JSON collecté
+  depuis TrueNAS/workstation, cache `localStorage` OWNER local,
+  effacement explicite et affichage RAM/GPU/couche Docker/ZFS
+  (datasets partagés annotés). Aucune donnée importée n'est
+  présentée comme statut de santé du service.
+- [x] **Fraîcheur** : horodatage, hôte source, `stale >30 min`,
+  avertissement de révision du catalogue, valeurs absentes
+  `— / non vérifié` plutôt que zéro.
+- [x] **Frontière public** : aucun upload vers Vercel,
+  aucun import ni rendu en mode SERVICE/readOnly,
+  pas de récupération automatique de ressources privées.
+- [ ] **Tests de production** : `node --test
+  unit-tests/homelabResourceEvidence.test.mjs`, quality gate
+  locale Node 24 puis contrôle OWNER et absence de fuite
+  SERVICE/public ; **NOT_RUN** dans l'environnement agent.
+- [ ] **Étape suivante** : ingestion automatique via
+  endpoint FastAPI OWNER autorisé, sans second scraper
+  permanent (cAdvisor/Prometheus pour l'historique).
+  [Runbook de ressources](runbooks/homelab-service-resources.md).
+
 ## P1 — C4, icônes et expérience utilisateur
 
 **Livré dans #256 :** `@xyflow/react` sans nouveau serveur de diagrammes,
