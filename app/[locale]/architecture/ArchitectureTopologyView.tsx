@@ -180,11 +180,6 @@ export default function ArchitectureTopologyView({
 							? "Topologie interactive des services"
 							: "Interactive service topology"}
 					</h2>
-					<p>
-						{french
-							? "Utilisez la recherche et les contrôles du graphe pour basculer entre plateforme IA, services, chemin critique, catalogue complet et relations optionnelles. Sur mobile, la hiérarchie compacte ci-dessus fournit une lecture plus directe avant le graphe complet."
-							: "Use the graph search and controls to switch between the AI platform, services, critical path, full catalog, and optional relations. On mobile, the compact hierarchy above provides a more direct view before the complete graph."}
-					</p>
 				</div>
                 {explorerViewport.ready ? (
 				<HierarchicalArchitectureExplorer

@@ -343,3 +343,86 @@ les sondes et l'identité de l'API relèvent de FastAPI. Ne pas les copier ici.
 Les preuves détaillées des livraisons terminées restent dans Git/GitHub et, si
 elles ont encore une valeur opérationnelle, dans les documents indexés par
 `docs/README.md`.
+
+### P0 — Corriger le faux blocage du profil local rapide (#260, 25/10/2026)
+
+- [x] Le runner `agent-node22-fast.mjs` accepte deux paires cohérentes :
+  Node 22.16+ / npm 10 pour l'agent et Node 24.22.1+ / npm 12.2+
+  pour le projet ; il refuse les paires mélangées et conserve
+  `BLOCKED_INCOMPLETE_CHECKOUT`.
+- [x] Ajouter `npm run test:fast:local` ; garder l'alias historique
+  `npm run test:fast:node22` et `just node22-fast`.
+- [x] Ajouter des tests pour Node 24/npm 12, les bornes LTS,
+  les paires mixtes et les versions invalides.
+- [x] Exécuter la suite rapide L1 complète sur la workstation en
+  Node 24.22.1/npm 12.2.0 : **59/59 PASS**, zéro échec sur HEAD
+  `6cb59e1557c65761c3487e7e724daa4204dfe50f` (preuve opérateur).
+  Le précontrôle L1 ne valide pas le build.
+- [x] Exécuter `npm run typecheck` et `npm run build` sur un
+  checkout complet sous Node 24.22.1/npm 12.2.0 : typegen, TypeScript,
+  compilation et 83/83 pages PASS sur `89649e5af573642f9d11155e36094e25191f1697`.
+  **La Preview Vercel et la recette navigateur restent NOT_RUN.**
+
+### P0 — Régression de la vérification TypeScript locale (25 octobre 2026)
+
+- [x] **Node 24 réel (opérateur)** : le précontrôle accepte
+  `v24.22.1 / npm 12.2.0` ; **57/58 PASS**, avec une seule erreur
+  `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` émise par le test de parsing.
+- [x] **Correctif de test** : remplacer
+  `stripTypeScriptTypes(..., { mode: "strip" })` par
+  `mode: "transform"`, requis pour les propriétés TypeScript dans les
+  paramètres du constructeur.
+- [x] **Test négatif** : rejeter une fixture ayant une virgule manquante
+  après `error: false`, afin de conserver la couverture de la
+  régression de compilation Vercel.
+- [x] **L1 agent Node22** : 2/2 tests PASS sur une fixture TypeScript
+  représentative après correction.
+- [x] **L1 opérateur Node24** : `npm run test:fast:local`
+  a réussi sur les sources intégrales après correction, **59/59 PASS**
+  (`LOCAL_FAST_L1_PASS`, 0 skipped, 0 failed, ~6,75 s).
+- [x] **Validation TypeScript et build** : `npm run typecheck` et
+  `npm run build` PASS après `npm ci`, Next 16.4.2, Node 24.22.1.
+  **L3 publication complète reste NOT_RUN** (lint, hooks, scans,
+  quality gate exact-HEAD, Preview).
+
+### P0 — Synchronisation des types de routes Next.js et des dépendances (26/10/2026)
+
+- [x] **Erreur reproduite par l'opérateur :** `npm run typecheck` échoue
+  avec 4 TS2344/TS2339 sur `PageProps<"/[locale]/security/lexique">`
+  avant le build ; la page suit pourtant le même contrat que `dsomm`.
+- [x] **Build local exécuté :** Next 16.3.4 compile et génère les 83 pages,
+  inclut les deux routes de lexique, et termine son TypeScript sans erreur.
+  Ce PASS ne certifie **pas** la version verrouillée du projet.
+- [x] **Correctif :** `npm run typecheck` exécute
+  `bash scripts/run-next-clean.sh typegen && tsc --noEmit` pour
+  régénérer les types Next.js et préserver le `next-env.d.ts` suivi.
+- [x] **Quality gate :** supprimer son appel `npx next typegen` devenu
+  redondant. Garder une seule génération dans `npm run typecheck`.
+- [x] **Contrat hors ligne :** ajouter les tests de l'ordre typegen/tsc,
+  la protection `next-env.d.ts`, la version lock et l'absence de doublon.
+  **3/3 PASS sous Node 22 sur fixture**, fichier de test exact Git ;
+  checkout entier après correction non encore testé.
+- [x] **Convergence Next :** la workstation a exécuté
+  `npm ci --no-audit --no-fund` (653 paquets installés), puis
+  `npm run build` sous **Next 16.4.2** conformément au lockfile.
+- [x] **Validation Next 16.4.2 opérateur :** 62/62 tests rapides PASS,
+  `next typegen` PASS, `tsc --noEmit` PASS, build Turbopack PASS,
+  83/83 pages statiques générées. Le SHA exécuté était
+  `89649e5af573642f9d11155e36094e25191f1697`.
+- [ ] **Publication L3 distincte :** exécuter la quality gate complète
+  (lint, CSS, hooks, tests unitaires, contrôles de sécurité) sur un
+  HEAD propre et conserver la preuve. La Preview du code applicatif
+  `b53994e` est **READY**, mais les GET sont bloqués par HTTP 429 ;
+  la recette navigateur n'est **pas validée**.
+- [x] **Preuve locale récente PR #260 — 26/10/2026 :** sur le checkout
+  `575adfa06ec865606d9eeeedc786c82bcd079c10`, Node 24.22.1
+  et npm 12.2.0 : `npm run test:fast:local` **71/71 PASS**,
+  `npm run typecheck` **PASS**, `npm run build` Next 16.4.2
+  **PASS**, **83/83 pages**. Les tests rapides couvrent la
+  présentation compacte et la réservation de hauteur, **sans mesure
+  Playwright/CLS**. La gate L3 complète reste **NOT_RUN**.
+- [ ] **Dette dépendances observée :** inventorier les chemins transitifs
+  des alertes npm `crypto@1.0.1`, `node-domexception@1.0.0`,
+  `@azure/openai@1.0.0-beta.13` et `eslint@9.39.5` ; envisager
+  une mise à jour contrôlée dans une PR distincte, sans downgrade
+  ni modification opportuniste du lockfile.

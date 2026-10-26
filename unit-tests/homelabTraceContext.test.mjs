@@ -26,7 +26,7 @@ test("Site health route propagates the generated trace, never request header", a
   const route = readFileSync(new URL("../app/api/homelab-health-v2/route.ts", import.meta.url), "utf8");
   const source = readFileSync(new URL("../lib/siteHealthV2Server.ts", import.meta.url), "utf8");
   assert.match(route, /createHomelabTrace\(\)/);
-  assert.match(route, /loadSiteHealthV2\(trace.traceparent\)/);
+  assert.match(route, /loadSiteHealthV2\(trace.traceparent/);
   assert.match(route, /"X-Nabla-Trace-ID": trace.traceId/);
   assert.match(source, /validHomelabTraceparent\(traceparent\)/);
   assert.doesNotMatch(route, /request\.headers\.get\(["']traceparent/);

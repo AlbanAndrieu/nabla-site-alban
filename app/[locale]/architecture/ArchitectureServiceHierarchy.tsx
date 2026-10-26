@@ -38,13 +38,6 @@ type GroupTitleKey =
 	| "presentation.groups.shared-core"
 	| "presentation.groups.support";
 
-type GroupDescriptionKey =
-	| "presentation.descriptions.services"
-	| "presentation.descriptions.core-critical"
-	| "presentation.descriptions.security-controls"
-	| "presentation.descriptions.shared-core"
-	| "presentation.descriptions.support";
-
 type MetricsProfileKey =
 	| "presentation.metrics.red"
 	| "presentation.metrics.use"
@@ -64,14 +57,6 @@ const GROUP_TITLE_KEY: Record<ServicePresentationGroup, GroupTitleKey> = {
 	"security-controls": "presentation.groups.security-controls",
 	"shared-core": "presentation.groups.shared-core",
 	support: "presentation.groups.support",
-};
-
-const GROUP_DESCRIPTION_KEY: Record<ServicePresentationGroup, GroupDescriptionKey> = {
-	services: "presentation.descriptions.services",
-	"core-critical": "presentation.descriptions.core-critical",
-	"security-controls": "presentation.descriptions.security-controls",
-	"shared-core": "presentation.descriptions.shared-core",
-	support: "presentation.descriptions.support",
 };
 
 const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
@@ -151,9 +136,6 @@ export default function ArchitectureServiceHierarchy({
 						<summary className={styles.groupSummary}>
 							<span className={styles.groupTitle}>
 								<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
-								<span className={styles.groupDescription}>
-									{t(GROUP_DESCRIPTION_KEY[group.group])}
-								</span>
 							</span>
 							<span className={styles.groupMeta}>
 								<span className={styles.metricsProfileBadge}>

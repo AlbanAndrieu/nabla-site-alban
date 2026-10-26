@@ -1,53 +1,90 @@
-# Runbook — mode rapide Node 22/npm 10 (agents)
+# Runbook — tests rapides locaux : Node 22/npm 10 et Node 24/npm 12
 
-**Propriétaire :** nabla-site-alban. **But :** tests locaux L1 sans CI.
-[Roadmap qualité](../quality-roadmap.md).
-[Runbook post-déploiement](site-production-verification.md).
+**Propriétaire :** nabla-site-alban. **But :** suite L1 hors CI, sans installation de dépendances.
+Voir [roadmap qualité](../quality-roadmap.md) et [publication](site-production-verification.md).
 
 ## Prérequis
 
-- Node 22.x et npm 10.x.
-- Un checkout isolé, avec les fichiers sources requis.
-- Aucun npm install, aucun accès réseau, aucun secret.
+- **Profil agent :** Node ≥22.16.x (branche 22) et npm 10.x.
+- **Profil projet :** Node ≥24.22.1 (branche 24) et npm ≥12.2.0 (branche 12).
+- Un checkout contenant les fichiers des tests ciblés.
+- Aucun secret, aucun appel réseau et aucun `npm ci` requis pour cette suite.
 
-Conserver les versions Node 24/npm 12 de `.nvmrc`, `mise.toml`,
-`package.json` et du lockfile. Le mode rapide ne les remplace pas.
+Le second profil correspond à `package.json`, `.nvmrc` et `mise.toml`.
+Le premier est une exception locale pour les agents, **pas** un runtime de publication.
+La suite refuse les versions mélangées (Node 24/npm 10, Node 22/npm 12).
 
 ## Procédure
 
-1. Exécuter `node scripts/agent-node22-fast.mjs --preflight`.
-2. Exécuter `node scripts/agent-node22-fast.mjs`.
-3. Lire le nombre de tests réussis.
-4. Corriger chaque échec dans le module concerné.
-5. Réexécuter le même profil.
-6. Enregistrer le SHA testé et les échecs éventuels.
-7. Exécuter la publication complète sous Node 24 lorsque possible.
+1. Lire `node --version`.
+2. Lire `npm --version`.
+3. Exécuter `node scripts/agent-node22-fast.mjs --preflight`.
+4. Exécuter `npm run test:fast:local`.
+5. Corriger le premier test qui échoue.
+6. Relancer `npm run test:fast:local`.
+7. Consigner le SHA exact testé.
+8. Utiliser le quality gate complet du projet sous Node 24 pour publier.
 
-Les recettes `just node22-fast` et `npm run test:fast:node22`
-exécutent le même profil. Aucun workflow GitHub n'est déclenché.
+Les commandes historiques `npm run test:fast:node22` et `just node22-fast`
+demeurent compatibles et utilisent le **même** lanceur.
+Le nom du fichier `agent-node22-fast.mjs` est conservé pour compatibilité.
 
-## Contrat de test et résultats
+## Preuves et limites
 
-Quatre fichiers de tests, sans dépendance npm :
-`homelabIconFallback.test.mjs` (icônes),
-`agentNode22Core.test.mjs` (C4, provenance, redaction, OWNER,
-sondes), `agentNode22Fast.test.mjs` (modes, prérequis et refus),
-`homelabCanonicalEvidence.test.mjs` (IDs de sonde et labels C4 expurgés).
+Le lanceur utilise `--experimental-strip-types --test` pour des
+contrats sans dépendances npm. Il valide les fichiers présents avant
+d'exécuter les tests. Le nombre de fichiers est défini dans
+`FAST_TESTS`; ne pas présenter une liste historique de quatre tests
+comme la totalité de la suite.
 
-- `NODE22_FAST_TOOLCHAIN_OK` : bonnes versions.
-- `NODE22_FAST_L1_PASS` : tous les tests ciblés réussissent.
-- `BLOCKED_NODE_RUNTIME` / `BLOCKED_NPM_RUNTIME` : mauvaise version.
-- `BLOCKED_INCOMPLETE_CHECKOUT` : test manquant ; aucun PASS.
-- `NODE22_FAST_TEST_FAIL` : test effectivement en échec.
-- `NODE22_FAST_RUNNER_FAILED` : exécution interrompue.
+- `LOCAL_FAST_TOOLCHAIN_OK` : une paire de versions autorisée.
+- `LOCAL_FAST_L1_PASS` : tous les tests ciblés sont passés.
+- `BLOCKED_NODE_RUNTIME` / `BLOCKED_NPM_RUNTIME` : paire incompatible.
+- `BLOCKED_INCOMPLETE_CHECKOUT` : il manque au moins un fichier de test.
+- `LOCAL_FAST_TEST_FAIL` : au moins un test a échoué.
+- `LOCAL_FAST_RUNNER_FAILED` : échec du lancement du processus enfant.
 
-**Preuve du 25/10/2026 :** Node 22.16.0, npm 10.9.2,
-**18/18 PASS**, six fichiers récupérés à leurs blobs Git exacts
-depuis le merge `99cf7e4016533532bee53a72964ffea1b4a54bc6`.
-Le clone complet était inaccessible dans le shell (DNS).
-Cette preuve est **L1 sur une reconstitution partielle**, pas L3.
-Les vérifications Node 24, lint, TypeScript, Next, Playwright, Trivy
-et quality gate restent NOT_RUN dans l'agent.
+La suite n'effectue ni installation, ni build Next.js, ni tests
+Playwright sur le LAN, ni validation de la production. Un PASS L1 ne
+constitue **jamais** un PASS L3.
 
-Ce runbook est une procédure réutilisable. Les travaux ouverts restent
-dans la roadmap ; ne pas transformer un TEST_SKIP en PASS.
+**Historique :** un profil Node 22.16.0/npm 10.9.2 a exécuté 18/18 tests
+sur une reconstitution partielle le 25 octobre 2026 ; il ne validait
+pas un checkout complet. Le 25 octobre à 23:25 (Paris), un opérateur
+sur Node 24.22.1/npm 12.2.0 a signalé le refus de l'ancien précontrôle
+Node22-only. Le code est corrigé dans PR #260. **La suite rapide L1
+sur le checkout complet a depuis réussi sous Node 24.22.1/npm 12.2.0 :
+59/59 PASS, aucun échec, 0 skipped, `LOCAL_FAST_L1_PASS`**, sur
+`6cb59e1557c65761c3487e7e724daa4204dfe50f`. Les tests de
+publication L3 restent NOT_RUN.
+
+## Diagnostic test de parsing TypeScript — 25 octobre 2026
+
+L'exécution opérateur sous Node 24.22.1/npm 12.2.0 a exécuté **58 tests** :
+**57 PASS, 1 FAIL**. Seul `unit-tests/homelabHookParse.test.mjs` échouait
+avec `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`, car `stripTypeScriptTypes`
+avait été appelé en mode `strip` sur le constructeur
+`constructor(readonly reason: ...)`. Ce motif est valide en TypeScript.
+
+Le test emploie désormais `mode: "transform"`, qui convertit les
+propriétés de paramètres du constructeur avant `node --check`.
+Un test négatif vérifie que l'ancienne erreur de virgule manquante est
+toujours détectée. Aucun `npm ci` ni `next build` n'est nécessaire.
+
+**Preuve agent :** 2 tests ciblés sur une fixture reproduisant cette
+syntaxe, **2 PASS sous Node 22.16.0/npm 10.9.2**. L'exécution sur le
+**fichier TypeScript complet et sous Node 24 reste NOT_RUN côté agent**,
+mais a réussi **dans le checkout complet de l'opérateur** (test positif
+et test négatif inclus dans les 59 PASS).
+
+Ne pas confondre `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` émis par le mode
+`strip` avec une erreur de syntaxe du fichier TypeScript original.
+
+## Messages de pre-commit lors du smoke Git
+
+Les lignes `.pre-commit-config.yaml config file not found. Skipping pre-commit.`
+proviennent des dépôts Git temporaires créés par
+`unit-tests/vercelIgnoreBuild.test.mjs` (tests du déclenchement Vercel).
+Les tests de ces fixtures passent, mais **les hooks du dépôt réel n'ont
+pas été validés** par cette suite. Exécuter les hooks uniquement dans
+la procédure de publication complète sur le checkout exact.

@@ -83,22 +83,29 @@ Do not repeat blocked network requests without a changed prerequisite.
 Do not treat GitHub API reads, static assertions, or a source archive without
 Git metadata as proof that the full publication gate passed.
 
-## Fast Node 22/npm 10 runtime
+## Local fast suite — two supported runtimes
+
+The dependency-free L1 profile accepts **Node 22 >=22.16/npm 10**
+(agent runtime) and **Node 24 >=24.22.1/npm >=12.2**
+(project toolchain). It rejects mismatched version pairs.
 
 1. Run `node scripts/agent-node22-fast.mjs --preflight`.
-2. Run `node scripts/agent-node22-fast.mjs`.
-3. Inspect the test count and failures.
-4. Fix a failing targeted contract in the owning module.
-5. Rerun this bounded suite after the fix.
-6. Record L1 and the exact source blob SHAs tested.
+2. Run `npm run test:fast:local`.
+3. Inspect the number of passed tests and any failures.
+4. Fix the failing contract in the owning source file.
+5. Rerun the same bounded suite.
+6. Record exact SHA and L1 evidence.
 
-Alternatives when installed: `just node22-fast` and
-`npm run test:fast:node22`. This test runner refuses Node/npm
-version mismatches and missing tests. It has no npm install, package
-downloads, Next.js build, hooks or paid GitHub Actions calls.
-Keep `.nvmrc`, `mise.toml` and package engines on Node 24/npm 12.
-Never treat this smoke as an L3 publish gate. Offline source-only
-reproduction must verify file blobs and disclose NO_CHECKOUT.
+The historical commands `just node22-fast` and
+`npm run test:fast:node22` remain aliases for the same runner.
+Keep `.nvmrc`, `mise.toml` and `package.json` engines on
+Node 24/npm 12; the agent's Node22-only runtime is not a release gate.
+No install, download, Next.js build, hook bypass or paid GitHub CI call
+is performed by this test script.
+
+**Avoid false success:** passing the fast suite under Node24 does not
+prove `npm ci`, `npm run typecheck`, `npm run build`, Playwright or
+an L3 publication gate. When the checkout is incomplete, report BLOCKED.
 See `docs/runbooks/node22-fast-local.md`.
 
 ## CI budget and publication
@@ -137,7 +144,7 @@ Preserve Site Alban's AGENTS.md and package-lock.json as the authorities.
   against unknown working copies.
 - Check .nvmrc, mise.toml, package.json and package-lock.json first.
   Use Node 24 LTS and locked npm ci before typecheck/build.
-  A Node 22 unit smoke is L1 evidence, **not** a Node 24 build or L3.
+  A Node 22 or Node 24 fast unit smoke is L1 evidence, **not** a Next.js build or L3.
   Do not edit lockfiles to work around missing tooling.
 - For Python helpers **only if** a committed pyproject.toml and uv.lock
   exist, run uv sync --locked in that worktree with its own .venv.

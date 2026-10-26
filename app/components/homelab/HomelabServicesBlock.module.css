@@ -65,15 +65,6 @@
 	font-weight: 600;
 }
 
-.healthSemantics {
-	margin: var(--ui-space-md) 0 0;
-	padding: var(--ui-space-sm) var(--ui-space-md);
-	border-inline-start: 3px solid var(--ui-border);
-	background: var(--ui-surface-muted);
-	color: var(--ui-text-secondary);
-	font-size: 0.875rem;
-}
-
 .healthSummary {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -199,12 +190,6 @@
 	gap: 0.15rem;
 }
 
-.groupDescription {
-	font-size: 0.875rem;
-	font-weight: 400;
-	color: var(--ui-text-secondary);
-}
-
 .groupMeta {
 	display: flex;
 	flex: 0 0 auto;
@@ -271,6 +256,31 @@
 	transition:
 		border-color 120ms ease,
 		box-shadow 120ms ease;
+}
+
+/* Reserve the short signal line before async probes arrive. Long reports
+   remain in the native, collapsed diagnostics disclosure below the summary. */
+.serviceSignalSlot {
+	min-height: 3.25rem;
+}
+
+.serviceCard :global([data-service-operator-diagnostics]) {
+	min-height: 2.5rem;
+	margin-top: var(--ui-space-md);
+}
+
+.serviceCard :global([data-service-operator-diagnostics] > summary) {
+	min-height: 2.5rem;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-md);
+	background: var(--ui-surface-muted);
+	cursor: pointer;
+}
+
+.serviceCard :global([data-service-operator-diagnostics] > summary:focus-visible) {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 2px;
 }
 
 .serviceCard[data-effective-health="ok"] {

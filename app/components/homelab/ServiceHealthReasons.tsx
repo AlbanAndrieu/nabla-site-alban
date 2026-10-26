@@ -1,8 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type {
 	HomelabHealthEntry,
+	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
@@ -10,7 +11,9 @@ import {
 	homelabHealthReasons,
 } from "@/lib/homelabHealthPresentation";
 import statusStyles from "./HomelabStatusSurface.module.css";
+import styles from "./HomelabServicesBlock.module.css";
 import ServiceOperatorDiagnostics from "./ServiceOperatorDiagnostics";
+import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
 import ServiceProbeEvidence from "./ServiceProbeEvidence";
 import ServiceSignalStrip from "./ServiceSignalStrip";
 
@@ -20,6 +23,9 @@ type Props = {
 	tunnelExpected: boolean;
 	cloudflareConfigured?: boolean;
 	runtimeStale?: boolean;
+	snapshot?: HomelabHealthSnapshot | null;
+	ownerView?: boolean;
+	healthUnavailable?: boolean;
 };
 
 type HealthReasonMessageKey =
@@ -74,57 +80,76 @@ export default function ServiceHealthReasons({
 	tunnelExpected,
 	cloudflareConfigured,
 	runtimeStale,
+	snapshot,
+	ownerView = false,
+	healthUnavailable = false,
 }: Props) {
 	const t = useTranslations("homelab");
+	const french = useLocale() === "fr";
 	const signalStrip = <ServiceSignalStrip entry={entry} />;
 	const probeEvidence = <ServiceProbeEvidence entry={entry} />;
-	const operatorDiagnostics = <ServiceOperatorDiagnostics entry={entry} />;
-	if (state !== "fail" && state !== "warn") {
-		return (
-			<>
-				{signalStrip}
-				{probeEvidence}
-				{operatorDiagnostics}
-			</>
-		);
-	}
-
-	const reasons = homelabHealthReasons(entry, {
+	const ownerEvidence = ownerView ? snapshot ? (
+		<ServiceOwnerEvidenceSummary
+			entry={entry}
+			snapshot={snapshot}
+			unavailable={healthUnavailable}
+		/>
+	) : (
+		<p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
+			{t("health.states.unknown")} · {french
+				? "Docker, TLS, Cloudflare, Prometheus et sondes indisponibles"
+				: "Docker, TLS, Cloudflare, Prometheus and probes unavailable"}
+		</p>
+	) : null;
+	const operatorDiagnostics = (
+		<ServiceOperatorDiagnostics entry={entry}>
+			{ownerView ? <>{probeEvidence}{ownerEvidence}</> : null}
+		</ServiceOperatorDiagnostics>
+	);
+	// Keep the diagnostics disclosure at one React position across status
+	// transitions, so a fresh probe does not reset its expanded state.
+	const hasHealthIssue = state === "fail" || state === "warn";
+	const reasons = hasHealthIssue ? homelabHealthReasons(entry, {
 		tunnelExpected,
 		cloudflareConfigured,
 		runtimeStale,
-	});
+	}) : [];
 	const severityClass =
 		state === "fail" ? statusStyles.fail : statusStyles.warn;
 
 	return (
 		<>
-			{signalStrip}
-			{probeEvidence}
-			<div
-				className={`${statusStyles.surface} ${severityClass} small text-start mt-3 mb-0`}
-				data-health-reasons
-				data-health-severity={state}
-			>
-				<strong>{t("health.reasonTitle")}</strong>
-				{reasons.length > 0 ? (
-					<ul className="mb-0 mt-1 ps-3">
-						{reasons.map((reason, index) => (
-							<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
-								{reason.detail
-									? t(reasonKey(reason), { detail: reason.detail })
-									: t(reasonKey(reason))}
-							</li>
-						))}
-					</ul>
-				) : (
-					<p className="mb-0 mt-1">
-						{state === "fail"
-							? t("health.reasons.genericFailure")
-							: t("health.reasons.genericDegraded")}
-					</p>
-				)}
-			</div>
+			{ownerView ? (
+				<div className={styles.serviceSignalSlot} data-owner-signal-slot>
+					{signalStrip}
+				</div>
+			) : signalStrip}
+			{hasHealthIssue ? (
+				<div
+					className={`${statusStyles.surface} ${severityClass} small text-start mt-3 mb-0`}
+					data-health-reasons
+					data-health-severity={state}
+				>
+					<strong>{t("health.reasonTitle")}</strong>
+					{reasons.length > 0 ? (
+						<ul className="mb-0 mt-1 ps-3">
+							{reasons.map((reason, index) => (
+								<li key={`${reason.kind}:${reason.detail ?? ""}:${index}`}>
+									{reason.detail
+										? t(reasonKey(reason), { detail: reason.detail })
+										: t(reasonKey(reason))}
+								</li>
+							))}
+						</ul>
+					) : (
+						<p className="mb-0 mt-1">
+							{state === "fail"
+								? t("health.reasons.genericFailure")
+								: t("health.reasons.genericDegraded")}
+						</p>
+					)}
+				</div>
+			) : null}
 			{operatorDiagnostics}
 		</>
 	);

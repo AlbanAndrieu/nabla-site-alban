@@ -22,7 +22,6 @@ import HomelabStatusOverview from "./HomelabStatusOverview";
 import {
 	ALL_GROUPS,
 	filterHierarchyGroups,
-	GROUP_DESCRIPTION_KEY,
 	GROUP_TITLE_KEY,
 	METRICS_PROFILE_KEY,
 } from "./homelabServiceHierarchy";
@@ -351,11 +350,6 @@ export default function HomelabServicesBlock({
 								? "Santé et filtres des services"
 								: "Service health and filters"}
 						</h3>
-						<p>
-							{french
-								? "Les services restent la finalité de la vue ; le socle critique, la sécurité et le support sont séparés sans modifier la propagation des dépendances."
-								: "Services remain the primary outcome; critical core, security and support are separated without changing dependency propagation."}
-						</p>
 					</div>
 					<span
 						className={styles.refreshStatus}
@@ -375,8 +369,6 @@ export default function HomelabServicesBlock({
 									: "Current snapshot"}
 					</span>
 				</div>
-
-				<p className={styles.healthSemantics}>{t("health.semantics")}</p>
 
 				<div
 					className={styles.healthSummary}
@@ -567,9 +559,6 @@ export default function HomelabServicesBlock({
 							<summary className={styles.groupSummary}>
 								<span className={styles.groupTitle}>
 									<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
-									<span className={styles.groupDescription}>
-										{t(GROUP_DESCRIPTION_KEY[group.group])}
-									</span>
 								</span>
 								<span className={styles.groupMeta}>
 									<span className={styles.metricsProfileBadge}>

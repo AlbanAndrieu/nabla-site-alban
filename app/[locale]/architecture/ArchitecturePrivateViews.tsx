@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
+import useAuthorizedLayoutHold from "@/app/components/homelab/useAuthorizedLayoutHold";
 import SectionHeading from "@/components/SectionHeading";
 import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
 import { catalogFailureReason, catalogScopeMatches, classifyCatalogFailure, type CatalogFailureReason, type CatalogScope } from "@/lib/homelabClientAccessBoundary";
@@ -147,7 +148,16 @@ export default function ArchitecturePrivateViews({
 	const { data, status, reason, incident, retry } = usePrivateArchitectureData(
 		visible, access === "trusted",
 	);
-	if (!visible) return null;
+	// The region is only in the DOM after the catalog has resolved.
+	const { regionRef, reservedHeight } = useAuthorizedLayoutHold(
+		visible && status === "ready",
+	);
+	if (!visible) {
+		return access === "pending"
+			? <div data-homelab-access-rechecking aria-hidden="true"
+				style={{ minHeight: reservedHeight }} />
+			: null;
+	}
 	const french = locale === "fr";
 	if (status === "error")
 		return (
@@ -171,12 +181,8 @@ export default function ArchitecturePrivateViews({
 
 	if (access === "readonly")
 		return (
-			<div data-homelab-public-readonly-view className="container py-4">
-				<p role="status">
-					{french
-						? "Cartographie publiée en lecture seule ; les diagnostics réseau internes restent privés."
-						: "Published read-only architecture; private network diagnostics remain restricted."}
-				</p>
+			<div ref={regionRef} data-homelab-access-region>
+				<div data-homelab-public-readonly-view className="container py-4">
 				<ArchitectureTopologyView
 					readOnly
 					locale={locale}
@@ -185,9 +191,11 @@ export default function ArchitecturePrivateViews({
 					initialTopology={data.topology}
 					initialTopologySource="fastapi"
 				/>
+				</div>
 			</div>
 		);
 	return (
+		<div ref={regionRef} data-homelab-access-region>
 		<div data-homelab-private-view>
 			<ArchitectureSectionNav locale={locale} />
 			<div className="container">
@@ -219,15 +227,11 @@ export default function ArchitecturePrivateViews({
 								? "Réseau homelab et chemins d’ingress"
 								: "Homelab network and ingress paths"}
 						</SectionHeading>
-						<p>
-							{french
-								? "Même diagramme que la page TrueNAS : ingress direct HAProxy/Traefik, Cloudflare Tunnel, DNS scindé et domaines de panne."
-								: "Same diagram as the TrueNAS page: direct HAProxy/Traefik ingress, Cloudflare Tunnel, split DNS and failure domains."}
-						</p>
 					</div>
 					<HomeLabNetworkFlow />
 				</div>
 			</section>
+		</div>
 		</div>
 	);
 }

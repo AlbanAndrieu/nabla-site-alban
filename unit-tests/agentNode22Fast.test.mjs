@@ -3,10 +3,18 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { checkFastToolchain, FAST_TESTS, missingSources } from "../scripts/agent-node22-fast.mjs";
 
-test("fast profile requires the real Node 22/npm 10 toolchain", () => {
+test("fast profile accepts agent Node22/npm10 and project Node24/npm12", () => {
   assert.equal(checkFastToolchain("v22.16.0", "10.9.2"), null);
-  assert.match(checkFastToolchain("v24.22.1", "10.9.2"), /BLOCKED_NODE_RUNTIME/);
+  assert.equal(checkFastToolchain("v22.17.1", "10.9.3"), null);
+  assert.equal(checkFastToolchain("v24.22.1", "12.2.0"), null);
+  assert.equal(checkFastToolchain("v24.23.0", "12.3.1"), null);
+  assert.match(checkFastToolchain("v22.15.0", "10.9.2"), /BLOCKED_NODE_RUNTIME/);
+  assert.match(checkFastToolchain("v24.22.0", "12.2.0"), /BLOCKED_NODE_RUNTIME/);
+  assert.match(checkFastToolchain("v23.0.0", "10.9.2"), /BLOCKED_NODE_RUNTIME/);
+  assert.match(checkFastToolchain("v26.0.0", "12.2.0"), /BLOCKED_NODE_RUNTIME/);
+  assert.match(checkFastToolchain("v24.22.1", "10.9.2"), /BLOCKED_NPM_RUNTIME/);
   assert.match(checkFastToolchain("v22.16.0", "12.2.0"), /BLOCKED_NPM_RUNTIME/);
+  assert.match(checkFastToolchain("v24.22.1", "12.1.9"), /BLOCKED_NPM_RUNTIME/);
   assert.match(checkFastToolchain("invalid", "10.9.2"), /BLOCKED_NODE_RUNTIME/);
 });
 
@@ -26,6 +34,6 @@ test("profile does not install packages, rebuild Next.js or bypass publication c
   const code = readFileSync(new URL("../scripts/agent-node22-fast.mjs", import.meta.url), "utf8");
   assert.doesNotMatch(code, /spawnSync\("(?:npm|npx)", \["(?:ci|install|run)"/);
   assert.doesNotMatch(code, /\["--no-verify"\]|\["--force"\]/);
-  assert.match(code, /NODE22_FAST_L1_PASS/);
+  assert.match(code, /LOCAL_FAST_L1_PASS/);
   assert.match(code, /BLOCKED_INCOMPLETE_CHECKOUT/);
 });

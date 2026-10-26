@@ -30,7 +30,7 @@
 		"lint:fix": "eslint --fix --format ./scripts/eslint-github-formatter.mjs .",
 		"lint:css": "stylelint \"app/**/*.css\" \"components/**/*.css\" \"public/*.css\"",
 		"lint:css:fix": "stylelint --fix \"app/**/*.css\" \"components/**/*.css\" \"public/*.css\"",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "bash scripts/run-next-clean.sh typegen && tsc --noEmit",
 		"quality:fix": "bash scripts/agent-quality-gate.sh --fix",
 		"quality:gate": "bash scripts/quality-gate.sh",
 		"check": "npm run rss:check && npm run lint && npm run lint:css && npm run typecheck && npm run test:unit && npm run build",
@@ -51,6 +51,7 @@
 		"test:integration": "playwright test tests/integration-baseline.spec.ts --project=chromium",
 		"test:security": "playwright test tests/security-baseline.spec.ts --project=chromium",
 		"test:performance": "playwright test tests/performance-baseline.spec.ts --project=chromium",
+		"test:fast:local": "node scripts/agent-node22-fast.mjs",
 		"test:fast:node22": "node scripts/agent-node22-fast.mjs",
 		"test:unit": "node --import tsx --test --test-reporter=dot \"unit-tests/**/*.test.ts\" && node --test --test-reporter=dot unit-tests/*.test.mjs",
 		"test:unit:verbose": "node --import tsx --test \"unit-tests/**/*.test.ts\" && node --test unit-tests/*.test.mjs",
@@ -62,6 +63,7 @@
 		"quality:agent:publish": "bash scripts/agent-publish.sh",
 		"test:a11y": "bash scripts/run-a11y-local.sh",
 		"rss:check": "node scripts/generate-security-rss.mjs --check",
+		"diagnose:homelab-429": "node scripts/diagnose-homelab-429.mjs",
 		"audit:homelab": "node scripts/audit-homelab-access.mjs"
 	},
 	"dependencies": {

@@ -280,10 +280,7 @@ test("TrueNAS and Architecture expose the same scalable service-first controls",
 	for (const source of [truenasSource, architectureSource]) {
 		assert.match(source, /presentation\.searchLabel/);
 		assert.match(source, /presentation\.filterLabel/);
-		assert.match(
-			source,
-			/service-first|Services stay first|services restent la finalité/i,
-		);
+		assert.match(source, /data-service-presentation-group|ArchitectureServiceHierarchy/);
 	}
 	assert.match(truenasSource, /data-service-presentation-group/);
 	assert.match(styles, /metricsProfileBadge/);

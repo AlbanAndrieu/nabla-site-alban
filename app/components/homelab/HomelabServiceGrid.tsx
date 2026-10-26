@@ -35,7 +35,9 @@ export default function HomelabServiceGrid({
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
-	const firstServiceIds = new Set<string>();
+	// Keep React identity stable across health/URL refreshes. Changing the URL
+	// must not remount cards or reset their open diagnostics panels.
+	const serviceOccurrences = new Map<string, number>();
 	const serviceHealth = healthIndex(snapshot);
 	const safeStatus = siteHealthIndex(siteHealth, catalog.catalogRevision);
 	const truenasPublic = snapshot?.truenas?.public;
@@ -127,11 +129,12 @@ export default function HomelabServiceGrid({
 					// Backstage v2 has no publicly navigable endpoint: only verified OWNER
                     // FastAPI exposure can authorize a card link.
                     const endpointUrl = !readOnly && !healthUnavailable ? observed.externalUrl : "";
-					const firstOccurrence = !firstServiceIds.has(serviceId);
-                    firstServiceIds.add(serviceId);
+					const occurrence = (serviceOccurrences.get(serviceId) ?? 0) + 1;
+					serviceOccurrences.set(serviceId, occurrence);
+					const firstOccurrence = occurrence === 1;
 					return (
 						<HomelabServiceCard
-							key={`${serviceId}:${endpointUrl}`}
+							key={`${serviceId}:${occurrence}`}
 							svc={displayService}
 							siteState={
 								typeof svc.entityRef === "string"
@@ -144,7 +147,6 @@ export default function HomelabServiceGrid({
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
 							internalRouteMismatch={observed.internalRouteMismatch}
-							internalTargetSource={observed.internalTargetSource}
 							anchorId={firstOccurrence ? `homelab-service-${serviceId}` : undefined}
 							snapshot={snapshot}
 							serviceHealth={serviceHealth}

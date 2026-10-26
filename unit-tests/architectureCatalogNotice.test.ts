@@ -21,7 +21,8 @@ test("private architecture error is actionable, accessible and localized", async
 		view,
 		/const visible = access === "trusted" \|\| access === "readonly";/,
 	);
-	assert.match(view, /if \(!visible\) return null/);
+	assert.match(view, /if \(!visible\) \{/);
+	assert.match(view, /data-homelab-access-rechecking/);
 	// Read-only visitors get the sanitized topology only, never OWNER views.
 	const readOnlyBranch = view.indexOf('if (access === "readonly")');
 	const privateView = view.indexOf("<div data-homelab-private-view>");

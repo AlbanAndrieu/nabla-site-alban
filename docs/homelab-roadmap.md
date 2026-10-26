@@ -147,3 +147,134 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 **Convention :** `DONE (code)` ≠ `READY (Vercel)` ≠ `PASS (HTTP)` ≠
 `PASS (navigateur)` ≠ `PASS (OWNER/LAN)`. Si non mesuré, inscrire
 `NOT_RUN` ou `BLOCKED`. Ne pas recopier les tâches d'un autre dépôt.
+
+### Suivi 429 OWNER et diagnostic local (#260, 25/10/2026)
+- [x] **S-03b audit** : traiter HTTP 429 comme précontrôle bloqué, jamais comme refus OWNER; code de sortie 4 sans requêtes supplémentaires.
+- [x] **S-03c confidentialité** : JWT limité à l'origine auditée, aucun secret dans la sortie, métadonnées de stockage contrôlées.
+- [x] **S-07c UX** : chronologie Catalogue → DNS → TCP → TLS → HTTP → API et `unknown` pour DNS/API non mesurés.
+- [ ] **S-03d LAN réel** : obtenir HTTP 200 sur `/api/homelab-access?diagnose=1`, puis valider OWNER et les sondes.
+- [ ] **S-04 WAN réel** : `NOT_RUN` en absence de réseau extérieur; ne pas falsifier l'IP cliente.
+- [ ] **S-06c trace FastAPI** : confirmer la version réellement déployée et l'écho exact de l'ID W3C.
+- [ ] **S-11b** : recettes WCAG 2.2 AA et Web Vitals LCP/INP/CLS réels.
+
+- [x] **S-03e prédiagnostic local** : `npm run diagnose:homelab-429`, deux requêtes sans retry ni fuite de secrets ; les droits OWNER restent à vérifier.
+
+### P0 — Build Vercel et blocage 429 (25/10/2026)
+- [x] **S-P0-build (code)** : corriger la virgule manquante dans `INITIAL_HOMELAB_SERVICES_STATE` de `useHomelabHealth.ts`, repérée par le journal Vercel du déploiement master `665d1918` (ERREUR `Expected ',', got 'ident'`).
+- [x] **S-P0-parse (test)** : contrôle hors ligne Node22 utilisant `stripTypeScriptTypes` puis `node --input-type=module --check`. `node --check` directement sur `.ts` ne strippe **pas** les types sous Node22.
+- [x] **S-P0-429 (code)** : préserver `x-vercel-mitigated` sous la forme normalisée `challenge|other` sans recopier le header brut.
+- [ ] **S-P0-429 (opérations)** : rechercher `2026-10-25T20:42:40–41Z` dans Vercel Firewall pour les requêtes identifiées par `X-Vercel-Id`; distinguer WAF custom, system mitigation et protection déploiement avant d'ajuster une règle ciblée.
+- [ ] **S-P0-release (validation)** : confirmer build Next.js complet, état READY d'une Preview, puis vérification OWNER sur réseau réel. La résolution du 429 ne découle pas du correctif de syntaxe ; production non validée.
+
+### P1 — Cartes de services compactes et stabilité au polling (26/10/2026, PR #260)
+
+- [x] **S-17a — Diagnostic repliable :** déplacer dans le volet
+  `Métriques / diagnostic` existant les huit mesures OWNER :
+  Docker/TrueNAS, HTTPS/TLS, Cloudflare Tunnel, HTTP, latence,
+  Prometheus, sonde HTTPS publique et sonde TCP LAN.
+- [x] **S-17b — Détails des sondes :** regrouper dans ce même volet
+  les états rolling, la provenance et les contrôles Cloudflare Access.
+  Les signaux de santé courts et les alertes de panne restent visibles.
+- [x] **S-17c — Stabilité React :** remplacer la clé de carte
+  `serviceId:endpointUrl` par `serviceId:occurrence`. L'identité du
+  composant ne dépend plus d'un endpoint enrichi par les sondes.
+- [x] **S-17d — Rafraîchissement :** maintenir le volet
+  `Métriques / diagnostic` dans le même emplacement React malgré
+  les transitions `ok/warn/fail`, stabiliser la zone des signaux
+  OWNER et supprimer le compteur fluctuant du titre.
+- [x] **S-17e — Confidentialité :** conserver le détail OWNER
+  uniquement en mode propriétaire. Aucune sonde manquante n'est
+  promue en `ok` ; l'historique Catalogue → DNS → LAN → TLS →
+  HTTP → API reste consultable au clavier.
+- [x] **S-17f — Contrats statiques :** neuf invariants contrôlés
+  contre les blobs Git de la PR ; nouveau fichier de tests
+  `homelabCardLayoutStability.test.mjs` inclus dans la boucle
+  rapide Node 22/24. **Validation workstation du 26/10/2026 :
+  71/71 PASS sur un checkout complet** après `git pull --ff-only`
+  vers `575adfa06ec865606d9eeeedc786c82bcd079c10`.
+- [ ] **S-17g — Recette navigateur :** comparer à 320/390 px,
+  tablette et desktop les hauteurs de cartes avant et après arrivée
+  des sondes. Laisser le volet ouvert pendant au moins deux
+  cycles de 30 s et vérifier qu'il ne se referme pas.
+  Mesurer CLS et défilement vertical ; aucun PASS visuel n'est
+  établi tant que Preview et OWNER/LAN ne sont pas accessibles.
+
+### P1 — Densité de lecture TrueNAS et Architecture (26/10/2026, PR #260)
+
+- [x] **S-18a — Nettoyage des cartes :** retirer la ligne
+  « Adresse/port issus de la configuration · aucune sonde LAN ».
+  Conserver l'état réel de la sonde sur le bouton LAN
+  (`data-lan-probe-state`) et la remarque sur le protocole
+  inconnu dans son `title`, sans présenter un endpoint déclaré
+  comme un succès mesuré.
+- [x] **S-18b — Suppression des bandeaux descriptifs :** retirer les
+  textes « Les services restent la finalité… » et
+  « Consultation extérieure en lecture seule… », en français
+  et en anglais. Préserver le contrôle OWNER/SERVICE et ses DTO.
+- [x] **S-18c — Sections épurées :** enlever l'introduction
+  narrative de TrueNAS, les descriptions de groupes répétées,
+  la note de sémantique toujours affichée, les explications
+  redondantes d'Architecture (entête, lecture seule, aide au
+  graphe, diagramme réseau dupliqué).
+- [x] **S-18d — État opérationnel visible :** conserver les
+  compteurs de santé, filtres, noms de groupes, nombre de services,
+  nombre de problèmes et avertissements explicites.
+  L'état `unknown` n'est pas promu en `healthy`.
+- [x] **S-18e — Contrats de source :** 14/14 vérifications statiques
+  sur les fichiers Git modifiés, nouveau test
+  `homelabConcisePresentation.test.mjs` inclus dans
+  `test:fast:local`. Le test structurel
+  `servicePresentation.test.ts` n'exige plus la phrase retirée.
+- [x] **S-18f — Tests et build locaux :** opérateur le 26/10/2026,
+  `npm run test:fast:local` **71/71 PASS**, `npm run typecheck`
+  **PASS** (route typegen puis tsc), `npm run build` **PASS**
+  (Next 16.4.2, 83/83 pages).
+- [ ] **S-18g — Recette visuelle :** mesurer les hauteurs, le CLS
+  et les changements de scroll sur `/fr/truenas` et
+  `/fr/architecture` en mobile et desktop, au moins deux cycles.
+  Les GET de Preview ont rencontré HTTP 429 Vercel. **BLOCKED**.
+
+### P0 — Défilement lors de la réautorisation de la vue privée (26/10/2026)
+
+- [x] **Cause du saut :** `useHomelabAccess` revalide les droits
+  toutes les 30 secondes et au focus. Il rend `pending` avant la réponse.
+  TrueNAS, Architecture et le graphe Réseau retiraient toute leur
+  surface du DOM, provoquant un effondrement temporaire de hauteur.
+- [x] **Correction sans rétention OWNER :** nouveau hook
+  `useAuthorizedLayoutHold`, stockage **en mémoire React uniquement**
+  de la dernière hauteur rendue via `ResizeObserver`. Pendant `pending`,
+  rendre un espace `aria-hidden` de cette hauteur ; ne conserver
+  aucun contenu ni snapshot privé dans le DOM ou le cache navigateur.
+  Après refus, retirer cet espace et afficher le refus existant.
+- [x] **Périmètre :** `HomelabPrivateServices`,
+  `ArchitecturePrivateViews`, `HomeLabPrivateNetwork`. La surface
+  `Architecture` est mesurée seulement quand le catalogue est prêt.
+- [x] **Point d'observation E2E :** attribut
+  `data-homelab-service-id` sur chaque carte ; test Playwright
+  `tests/ops-homelab-recheck-layout.spec.ts` avec deux
+  réautorisations, comparaison de hauteurs et scroll, limité à
+  `OPS_E2E_ENABLED=YES` dans un environnement authentifié.
+- [x] **Vercel Preview exact-SHA :** le déploiement de
+  `b53994eeb6b85f4c9f158770048f55d69821d2af` est **READY**
+  sur Next.js 16.4.2 (test navigateur non exécuté).
+  URL : `https://nabla-site-alban-ce7p8n0dq-albanandrieus-projects.vercel.app`.
+  Les commits postérieurs sont des tests et documentation.
+- [x] **Contrats de code :** 9/9 invariants statiques vérifiés sur les
+  blobs Git ; nouveau `unit-tests/homelabRecheckLayout.test.mjs`
+  inscrit dans le profil L1 ; assertion obsolète corrigée dans
+  `unit-tests/architectureCatalogNotice.test.ts`.
+- [ ] **P0 — Edge 429 :** les GET Preview FR/EN sont bloqués par
+  `Vercel Security Checkpoint` (HTTP 429), et un GET a échoué avant
+  lecture. Ne pas boucler les requêtes et ne pas contourner les règles
+  de sécurité. Le rendu HTML et le CLS **NON VALIDÉS**.
+- [x] **Prévalidation locale — 26/10/2026 :** opérateur, branche
+  #260 sur `575adfa06ec865606d9eeeedc786c82bcd079c10` :
+  **71/71 tests rapides PASS**, `next typegen` et `tsc --noEmit`
+  **PASS**, Next.js **16.4.2** `build` **PASS**, **83/83 pages**.
+- [ ] **Recette OWNER autorisée :** navigateur LAN ou Cloudflare Access
+  réellement autorisé ; exécuter les deux cycles du test Playwright
+  privé sur TrueNAS mobile et Architecture desktop. **NOT_RUN** ;
+  aucune validation E2E ou métrique CLS n'est déduite du build.
+- [ ] **Publication complète :** `npm run quality:agent:publish`
+  sur un arbre Git propre, puis inspection de sa preuve ; le profil
+  local rapide n'exécute pas cette gate.
