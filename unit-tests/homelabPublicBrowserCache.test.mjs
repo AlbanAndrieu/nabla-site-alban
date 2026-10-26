@@ -82,8 +82,10 @@ test("invalid catalogs and remote icon URLs cannot enter browser storage", () =>
 test("browser catalog cache expires and rejects future-dated snapshots", () => {
 	const storage = storageFixture();
 	assert.equal(writePublicCatalogCache(storage, catalogFixture(), null, 1000), true);
-	assert.ok(readPublicCatalogCache(storage, 1000 + 15 * 60_000 - 1));
-	assert.equal(readPublicCatalogCache(storage, 1000 + 15 * 60_000), null);
+	// Public catalog survives a typical multi-hour TrueNAS freeze.
+	assert.ok(readPublicCatalogCache(storage, 1000 + 15 * 60_000));
+	assert.ok(readPublicCatalogCache(storage, 1000 + 24 * 60 * 60_000 - 1));
+	assert.equal(readPublicCatalogCache(storage, 1000 + 24 * 60 * 60_000), null);
 	writePublicCatalogCache(storage, catalogFixture(), null, 1000);
 	assert.equal(readPublicCatalogCache(storage, 999), null);
 });
