@@ -154,3 +154,41 @@ avant décision de mise à jour. Ils n'ont pas échoué le build.
 recette FR/EN, diagnostic 429 de l'edge, authentification OWNER et
 probes LAN. Aucun de ces états n'est déduit des 62 tests unitaires
 ou de la compilation locale.
+
+## Validation locale de la PR #260 — 26 octobre 2026
+
+**Source :** journal fourni par l'opérateur après
+`git pull --ff-only` (fast-forward `c94d230..575adfa` sur
+`fix/homelab-owner-audit-trace-receipt-20261025`).
+SHA de référence : `575adfa06ec865606d9eeeedc786c82bcd079c10`.
+L'absence de commande `git status` empêche de certifier un arbre
+entièrement propre pour la gate de publication.
+
+| Exécution | Verdict |
+| --- | --- |
+| Runtime | Node 24.22.1 / npm 12.2.0 |
+| `npm run test:fast:local` | **71/71 PASS**, 0 fail, 0 skipped, 7,40 s |
+| Contrats métriques OWNER et statuts publics | **PASS** (tests L1) |
+| Contrats présentation concise FR/EN | **PASS** (tests L1) |
+| Contrats hauteur pendant réautorisation | **PASS** (tests L1, pas Playwright) |
+| `npm run typecheck` | **PASS**, route types générés, `tsc --noEmit` sans erreur |
+| `npm run build` | **PASS**, Next.js 16.4.2, Turbopack, TypeScript |
+| Génération de pages | **83/83 PASS**, dont TrueNAS et Architecture FR/EN |
+| `npm run quality:agent:publish` | **NOT_RUN** sur ce SHA |
+| Tests navigateur réels OWNER/SERVICE / CLS | **NOT_RUN / BLOCKED** (checkpoint Vercel HTTP 429 sur Preview) |
+
+Le build de la Preview
+`b53994eeb6b85f4c9f158770048f55d69821d2af`
+était `READY` avec le même code applicatif ; les changements
+suivants avant `575adfa` concernent tests et documentation.
+Ne pas confondre `READY` et `PASS` HTTP/navigateur.
+
+Les messages `ExperimentalWarning` de Node et
+`.pre-commit-config.yaml config file not found` dans les
+dépôts Git temporaires sont non bloquants. Ils ne prouvent pas
+l'exécution des hooks du dépôt principal.
+
+**Étape suivante :** obtenir une gate de publication locale
+sur checkout propre et une session navigateur OWNER réellement
+autorisée. Mesurer le scroll et les hauteurs durant deux
+réautorisations sans désactiver le contrôle d'accès.
