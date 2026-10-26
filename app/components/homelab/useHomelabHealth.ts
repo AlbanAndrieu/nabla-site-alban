@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-	type HomelabHealthEntry,
 	type HomelabHealthSnapshot,
-	type HomelabHealthState,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
 import { parseOwnerCatalogIncident, type CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
 import { reconcileCatalogFailure } from "@/lib/homelabCatalogFailureReconciliation";
 import {
@@ -27,12 +24,9 @@ import {
 	boundedHomelabSignal,
 	homelabRetryDelayMs,
 } from "@/lib/homelabSlowApiPolicy";
-import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
-	type HomelabService,
 	type HomelabServicesCatalog,
-	homelabServiceId,
 } from "@/lib/homelabServices";
 import {
 	parseServiceTopology,
@@ -41,7 +35,6 @@ import {
 import {
 	parseSiteHealthV2,
 	type SiteHealthV2,
-	siteHealthIndex,
 } from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
@@ -242,59 +235,13 @@ export function applyHealthCycle(
 	};
 }
 
-export type HomelabHealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
-	ambiguousIds: Set<string>;
-	byRef: Map<string, HomelabHealthState>;
-};
-
-export function healthIndex(
-	snapshot: HomelabHealthSnapshot | null,
-	siteHealth?: SiteHealthV2 | null,
-	catalogRevision?: unknown,
-): HomelabHealthIndex {
-	const index = uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
-	return {
-		byId: index.byId,
-		byName: index.byName,
-		ambiguousIds: index.ambiguousIds,
-		byRef: siteHealthIndex(siteHealth, catalogRevision),
-	};
-}
-
-export function effectiveState(
-	service: HomelabService,
-	index: HomelabHealthIndex,
-	healthUnavailable = false,
-): HomelabHealthState {
-	const serviceId = homelabServiceId(service);
-	const entry = canonicalHomelabEvidence(index, serviceId);
-	if (entry && !healthUnavailable) {
-		return resolveEffectiveServiceState(entry).effectiveState;
-	}
-	if (typeof service.entityRef === "string") {
-		const state = index.byRef.get(service.entityRef);
-		if (state) return state;
-	}
-	return "unknown";
-}
-
-export function countHealthStates(
-	services: readonly HomelabService[],
-	index: HomelabHealthIndex,
-	healthUnavailable: boolean,
-): Record<HomelabHealthState, number> {
-	const counts: Record<HomelabHealthState, number> = {
-		ok: 0,
-		warn: 0,
-		fail: 0,
-		unknown: 0,
-	};
-	for (const service of services)
-		counts[effectiveState(service, index, healthUnavailable)] += 1;
-	return counts;
-}
+// Preserve the existing API consumed by TrueNAS and Architecture cards.
+export {
+  countHealthStates,
+  effectiveState,
+  healthIndex,
+} from "./homelabHealthSelectors";
+export type { HomelabHealthIndex } from "./homelabHealthSelectors";
 
 /**
  * Revalidates the canonical catalog periodically while polling service health.
