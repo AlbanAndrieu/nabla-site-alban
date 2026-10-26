@@ -7,6 +7,11 @@ const MAX_BYTES = 750_000;
 
 export const RESOURCE_SNAPSHOT_KEY = "nabla:owner:service-resources:v1";
 
+export type ResourceCpuMeasurement = {
+  status: "observed" | "unverified";
+  usage_pct: number | null;
+  units: "percent_of_one_core";
+};
 export type ResourceMeasurement = {
   status: "observed" | "unverified";
   working_set_bytes: number | null;
@@ -23,6 +28,7 @@ export type ResourceStorageMeasurement = {
 };
 export type ServiceResourceMeasurement = {
   entityRef: string;
+  cpu?: ResourceCpuMeasurement;
   memory: ResourceMeasurement;
   gpu: ResourceGpuMeasurement;
   storage: ResourceStorageMeasurement;
@@ -63,6 +69,7 @@ export function parseResourceSnapshot(input: unknown): ResourceSnapshot | null {
   const seen = new Set<string>();
   for (const raw of root.services) {
     const item = object(raw);
+    const cpu = object(item?.cpu);
     const mem = object(item?.memory);
     const gpu = object(item?.gpu);
     const storage = object(item?.storage);
@@ -72,6 +79,17 @@ export function parseResourceSnapshot(input: unknown): ResourceSnapshot | null {
     const memBytes = observedBytes(mem.working_set_bytes, mem.status);
     const gpuBytes = observedBytes(gpu.process_memory_bytes, gpu.status);
     const layerBytes = observedBytes(storage.writable_layer_bytes, storage.writable_layer_status);
+    const cpuStatus = cpu?.status;
+    const cpuValue = cpu?.usage_pct;
+    if (cpu && (
+      (cpuStatus !== "observed" && cpuStatus !== "unverified") ||
+      cpu.units !== "percent_of_one_core" ||
+      (cpuStatus === "unverified" && cpuValue !== null) ||
+      (cpuStatus === "observed" && (
+        typeof cpuValue !== "number" || !Number.isFinite(cpuValue) ||
+        cpuValue < 0 || cpuValue > 100000
+      ))
+    )) return null;
     if (memBytes === undefined || gpuBytes === undefined || layerBytes === undefined ||
         (storage.datasets_status !== "observed" && storage.datasets_status !== "unverified") ||
         !Array.isArray(storage.datasets) || storage.datasets.length > 40) return null;
@@ -87,6 +105,13 @@ export function parseResourceSnapshot(input: unknown): ResourceSnapshot | null {
     seen.add(ref);
     sanitized.push({
       entityRef: ref,
+      ...(cpu ? {
+        cpu: {
+          status: cpuStatus as ResourceCpuMeasurement["status"],
+          usage_pct: cpuStatus === "observed" ? cpuValue as number : null,
+          units: "percent_of_one_core" as const,
+        },
+      } : {}),
       memory: {status:mem.status as ResourceMeasurement["status"], working_set_bytes:memBytes},
       gpu: {status:gpu.status as ResourceGpuMeasurement["status"], process_memory_bytes:gpuBytes},
       storage: {
