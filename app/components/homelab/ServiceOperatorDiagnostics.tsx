@@ -1,11 +1,13 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import type { ReactNode } from "react";
 import { type UnknownRecord } from "@/lib/guards";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
 
 type Props = {
 	entry?: HomelabHealthEntry;
+	children?: ReactNode;
 };
 
 type DiagnosticRow = { label: string; value: string };
@@ -47,10 +49,10 @@ function add(
 	if (value !== undefined) rows.push({ label, value });
 }
 
-export default function ServiceOperatorDiagnostics({ entry }: Props) {
+export default function ServiceOperatorDiagnostics({ entry, children }: Props) {
 	const french = useLocale() === "fr";
-	if (!entry) return null;
-	const raw = entry as unknown as UnknownRecord;
+	if (!entry && !children) return null;
+	const raw: UnknownRecord = entry ? (entry as unknown as UnknownRecord) : {};
 	const rows: DiagnosticRow[] = [];
 
 	add(rows, french ? "URL sondée" : "Probed URL", scalar(raw, "url"));
@@ -197,7 +199,7 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 		french ? "Erreur applicative" : "Application error",
 		scalar(raw, "application_error"),
 	);
-	if (rows.length === 0) return null;
+	if (rows.length === 0 && !children) return null;
 
 	return (
 		<details
@@ -206,17 +208,17 @@ export default function ServiceOperatorDiagnostics({ entry }: Props) {
 		>
 			<summary className="fw-semibold">
 				<i className="fas fa-chart-line" aria-hidden="true" />{" "}
-				{french ? "Métriques / diagnostic" : "Metrics / diagnostics"} (
-				{rows.length})
+				{french ? "Métriques / diagnostic" : "Metrics / diagnostics"}
 			</summary>
-			<dl className="row g-1 mt-2 mb-0">
+			{children}
+			{rows.length > 0 && <dl className="row g-1 mt-2 mb-0">
 				{rows.map((row, index) => (
 					<div className="col-12" key={`${row.label}:${index}`}>
 						<dt className="d-inline">{row.label}: </dt>
 						<dd className="d-inline text-break">{row.value}</dd>
 					</div>
 				))}
-			</dl>
+			</dl>}
 		</details>
 	);
 }
