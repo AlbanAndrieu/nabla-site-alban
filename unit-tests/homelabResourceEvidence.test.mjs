@@ -40,6 +40,25 @@ test("imports only whitelisted private resource fields", () => {
   assert.doesNotMatch(JSON.stringify(parsed), /DO_NOT_FORWARD|runtime-name/);
 });
 
+test("optional CPU percent is accepted and never inferred from absent evidence", () => {
+  const payload = fixture();
+  payload.services[0].cpu = {
+    status: "observed", usage_pct: 174.25, units: "percent_of_one_core",
+  };
+  const measured = parseResourceSnapshot(payload);
+  assert.ok(measured);
+  assert.equal(measured.services[0].cpu.usage_pct, 174.25);
+  const old = fixture();
+  const legacy = parseResourceSnapshot(old);
+  assert.ok(legacy);
+  assert.equal(legacy.services[0].cpu, undefined);
+  const invalid = fixture();
+  invalid.services[0].cpu = {
+    status: "observed", usage_pct: -10, units: "percent_of_one_core",
+  };
+  assert.equal(parseResourceSnapshot(invalid), null);
+});
+
 test("GPU unavailable and memory absent are not rendered as zero", () => {
   const original = fixture();
   original.services[0].memory = {status: "unverified", working_set_bytes: null};
