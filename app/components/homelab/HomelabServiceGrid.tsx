@@ -147,7 +147,6 @@ export default function HomelabServiceGrid({
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
 							internalRouteMismatch={observed.internalRouteMismatch}
-							internalTargetSource={observed.internalTargetSource}
 							anchorId={firstOccurrence ? `homelab-service-${serviceId}` : undefined}
 							snapshot={snapshot}
 							serviceHealth={serviceHealth}
