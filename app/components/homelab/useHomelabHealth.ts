@@ -307,8 +307,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 
 	useEffect(() => {
 		// A reauthorization can change the mode while the hook stays mounted.
-		// Clear old mode state before beginning a new fetch cycle.
-		setState(INITIAL_HOMELAB_SERVICES_STATE);
+		// The scope guard below hides old data during that transition.
 		const initialController = new AbortController();
 		let refreshController: AbortController | null = null;
 		let catalogRefreshController: AbortController | null = null;
@@ -328,21 +327,26 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		})();
 		const cachedCatalog = publicStorage ? readPublicCatalogCache(publicStorage) : null;
 		let activeCatalogRevision = cachedCatalog?.catalog.catalogRevision ?? null;
-		if (cachedCatalog) {
-			setState((current) => ({
-				...current,
-				catalog: cachedCatalog.catalog,
-				topology: cachedCatalog.topology,
-				catalogFailure: null,
-				catalogStale: true,
-				catalogScope: "public",
-				// Show the saved inventory immediately, but never replay green health.
-				siteHealth: publicStorage && activeCatalogRevision
-					? readStalePublicHealthCache(publicStorage, activeCatalogRevision) : null,
-				healthUnavailable: true,
-				error: false,
-			}));
-		}
+		// Hydrate after effect setup rather than setting state synchronously
+		// from the effect body. Abort the update if access mode has changed.
+		// Only the validated SERVICE cache can enter public browser state.
+		queueMicrotask(() => {
+			if (initialController.signal.aborted) return;
+			setState(cachedCatalog
+				? {
+					...INITIAL_HOMELAB_SERVICES_STATE,
+					catalog: cachedCatalog.catalog,
+					topology: cachedCatalog.topology,
+					catalogStale: true,
+					catalogScope: "public",
+					// Stale health is never promoted to a fresh/green probe.
+					siteHealth: publicStorage && activeCatalogRevision
+						? readStalePublicHealthCache(publicStorage, activeCatalogRevision)
+						: null,
+					healthUnavailable: true,
+				}
+				: INITIAL_HOMELAB_SERVICES_STATE);
+		});
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			lastCycleStartedAt = Date.now();
