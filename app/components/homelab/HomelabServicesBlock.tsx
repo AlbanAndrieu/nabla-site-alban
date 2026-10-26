@@ -367,8 +367,8 @@ export default function HomelabServicesBlock({
 								: "Refreshing…"
 							: state.healthUnavailable
 								? french
-									? "Dernier snapshot conservé"
-									: "Keeping last snapshot"
+									? "Sondes non vérifiées"
+									: "Probes unverified"
 								: french
 									? "Snapshot courant"
 									: "Current snapshot"}
