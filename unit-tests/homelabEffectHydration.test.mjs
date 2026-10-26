@@ -47,8 +47,8 @@ test("health selectors remain independently testable without hook-side effects",
     assert.match(selectors, new RegExp(`export function ${exported}\\(`));
     assert.match(source, new RegExp(`\\b${exported}\\b`));
   }
-  assert.match(selectors, /canonicalHomelabEvidence\\(index, serviceId\\)/);
+  assert.match(selectors, /canonicalHomelabEvidence\(index, serviceId\)/);
   assert.match(selectors, /return "unknown"/);
-  assert.doesNotMatch(selectors, /fetch\\(|localStorage|sessionStorage|useEffect\\(/);
-  assert.doesNotMatch(source, /export function countHealthStates\\(/);
+  assert.doesNotMatch(selectors, /fetch\(|localStorage|sessionStorage|useEffect\(/);
+  assert.doesNotMatch(source, /export function countHealthStates\(/);
 });
