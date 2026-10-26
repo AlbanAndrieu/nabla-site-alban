@@ -410,8 +410,17 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   83/83 pages statiques générées. Le SHA exécuté était
   `89649e5af573642f9d11155e36094e25191f1697`.
 - [ ] **Publication L3 distincte :** exécuter la quality gate complète
-  (lint, CSS, hooks, tests unitaires, contrôles de sécurité), vérifier
-  un HEAD exact propre puis une Preview Vercel READY.
+  (lint, CSS, hooks, tests unitaires, contrôles de sécurité) sur un
+  HEAD propre et conserver la preuve. La Preview du code applicatif
+  `b53994e` est **READY**, mais les GET sont bloqués par HTTP 429 ;
+  la recette navigateur n'est **pas validée**.
+- [x] **Preuve locale récente PR #260 — 26/10/2026 :** sur le checkout
+  `575adfa06ec865606d9eeeedc786c82bcd079c10`, Node 24.22.1
+  et npm 12.2.0 : `npm run test:fast:local` **71/71 PASS**,
+  `npm run typecheck` **PASS**, `npm run build` Next 16.4.2
+  **PASS**, **83/83 pages**. Les tests rapides couvrent la
+  présentation compacte et la réservation de hauteur, **sans mesure
+  Playwright/CLS**. La gate L3 complète reste **NOT_RUN**.
 - [ ] **Dette dépendances observée :** inventorier les chemins transitifs
   des alertes npm `crypto@1.0.1`, `node-domexception@1.0.0`,
   `@azure/openai@1.0.0-beta.13` et `eslint@9.39.5` ; envisager
