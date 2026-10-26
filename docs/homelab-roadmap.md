@@ -189,8 +189,9 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [x] **S-17f — Contrats statiques :** neuf invariants contrôlés
   contre les blobs Git de la PR ; nouveau fichier de tests
   `homelabCardLayoutStability.test.mjs` inclus dans la boucle
-  rapide Node 22/24. La suite exécutée sur checkout complet
-  reste `NOT_RUN` après ce changement.
+  rapide Node 22/24. **Validation workstation du 26/10/2026 :
+  71/71 PASS sur un checkout complet** après `git pull --ff-only`
+  vers `575adfa06ec865606d9eeeedc786c82bcd079c10`.
 - [ ] **S-17g — Recette navigateur :** comparer à 320/390 px,
   tablette et desktop les hauteurs de cartes avant et après arrivée
   des sondes. Laisser le volet ouvert pendant au moins deux
@@ -224,12 +225,14 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
   `homelabConcisePresentation.test.mjs` inclus dans
   `test:fast:local`. Le test structurel
   `servicePresentation.test.ts` n'exige plus la phrase retirée.
-- [ ] **S-18f — Contrôle local et Preview :**
-  `npm run test:fast:local`, `npm run typecheck`,
-  `npm run build`, puis mesure de mise en page
-  sur /fr/truenas et /fr/architecture.
-  **NOT_RUN après la modification de présentation** ;
-  ne pas assimiler le build précédent à ce HEAD.
+- [x] **S-18f — Tests et build locaux :** opérateur le 26/10/2026,
+  `npm run test:fast:local` **71/71 PASS**, `npm run typecheck`
+  **PASS** (route typegen puis tsc), `npm run build` **PASS**
+  (Next 16.4.2, 83/83 pages).
+- [ ] **S-18g — Recette visuelle :** mesurer les hauteurs, le CLS
+  et les changements de scroll sur `/fr/truenas` et
+  `/fr/architecture` en mobile et desktop, au moins deux cycles.
+  Les GET de Preview ont rencontré HTTP 429 Vercel. **BLOCKED**.
 
 ### P0 — Défilement lors de la réautorisation de la vue privée (26/10/2026)
 
@@ -264,8 +267,14 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
   `Vercel Security Checkpoint` (HTTP 429), et un GET a échoué avant
   lecture. Ne pas boucler les requêtes et ne pas contourner les règles
   de sécurité. Le rendu HTML et le CLS **NON VALIDÉS**.
-- [ ] **Recette locale autorisée :** `npm run test:fast:local`,
-  `npm run typecheck`, `npm run build`, puis navigateur OWNER
-  sur LAN ou Access autorisé ; exécuter le test E2E privé sur
-  TrueNAS mobile et Architecture desktop. Aucun PASS E2E n'est
-  déduit de la build Vercel ou de contrats statiques.
+- [x] **Prévalidation locale — 26/10/2026 :** opérateur, branche
+  #260 sur `575adfa06ec865606d9eeeedc786c82bcd079c10` :
+  **71/71 tests rapides PASS**, `next typegen` et `tsc --noEmit`
+  **PASS**, Next.js **16.4.2** `build` **PASS**, **83/83 pages**.
+- [ ] **Recette OWNER autorisée :** navigateur LAN ou Cloudflare Access
+  réellement autorisé ; exécuter les deux cycles du test Playwright
+  privé sur TrueNAS mobile et Architecture desktop. **NOT_RUN** ;
+  aucune validation E2E ou métrique CLS n'est déduite du build.
+- [ ] **Publication complète :** `npm run quality:agent:publish`
+  sur un arbre Git propre, puis inspection de sa preuve ; le profil
+  local rapide n'exécute pas cette gate.
