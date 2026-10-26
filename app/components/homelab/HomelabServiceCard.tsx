@@ -51,7 +51,6 @@ type Props = {
 	externalUrlDerived?: boolean;
 	internalProtocolObserved?: boolean;
 	internalRouteMismatch?: boolean;
-	internalTargetSource?: "probe" | "declared" | "none";
 };
 
 /** One homelab service card: effective health, runtime and endpoint links. */
@@ -71,7 +70,6 @@ export default function HomelabServiceCard({
 	externalUrlDerived = false,
 	internalProtocolObserved = false,
 	internalRouteMismatch = false,
-	internalTargetSource = "none",
 }: Props) {
 	const t = useTranslations("homelab");
 	const [failedIconSrc, setFailedIconSrc] = useState<string | null>(null);
@@ -288,19 +286,9 @@ export default function HomelabServiceCard({
                 {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
               </small>
             )}
-            {hasInternal && internalTargetSource === "declared" && (
-              <small className="text-start" data-owner-lan-declared>
-                {french ? "Adresse/port issus de la configuration · aucune sonde LAN" : "Address/port from configuration · no LAN probe"}
-              </small>
-            )}
             {hasInternal && internalRouteMismatch && (
               <small className="text-warning text-start" data-owner-lan-route-mismatch>
                 {french ? "Écart détecté : origine Cloudflare différente de la cible déclarée" : "Route drift: Cloudflare origin differs from declared target"}
-              </small>
-            )}
-            {hasInternal && !internalProtocolObserved && (
-              <small className="text-start text-warning" data-owner-internal-protocol>
-                {french ? "Protocole LAN non confirmé · schéma configuré utilisé" : "LAN protocol unconfirmed · configured scheme used"}
               </small>
             )}
 						{hasInternal && (
@@ -315,7 +303,9 @@ export default function HomelabServiceCard({
 								}}
 								data-health-state={internalState}
                 data-lan-probe-state={lanProbe?.state ?? "not-run"}
-								title={`FastAPI/TrueNAS: ${internalState}`}
+								title={!internalProtocolObserved
+									? (french ? "Protocole LAN non confirmé · schéma configuré utilisé" : "LAN protocol unconfirmed · configured scheme used")
+									: `FastAPI/TrueNAS: ${internalState}`}
 							>
 								{svc.internalSecure && (
 									<i
