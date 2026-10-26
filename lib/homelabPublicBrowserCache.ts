@@ -11,6 +11,7 @@ const HEALTH_KEY = "nabla:homelab:health-public-v2:1";
 // Public-only metadata remains useful during a prolonged TrueNAS outage.
 // Cached health retains its short TTL and can never display old green states.
 const CATALOG_TTL_MS = 24 * 60 * 60_000;
+const PREVIOUS_CATALOG_TTL_MS = 15 * 60_000;
 const HEALTH_TTL_MS = 2 * 60_000;
 const REVISION = /^sha256:[0-9a-f]{64}$/;
 const ENTITY_REF = /^(component|resource|api):[a-z0-9._-]+\/[a-z0-9._-]+$/;
@@ -103,16 +104,23 @@ function put(storage: StoragePort, key: string, value: unknown, ttl: number, now
 	} catch { return false; } // Storage can be disabled, private, or full.
 }
 
-function get(storage: StoragePort, key: string, ttl: number, now: number): unknown {
+function get(storage: StoragePort, key: string, ttl: number, now: number,
+	previousTtl: number | null = null): unknown {
 	try {
 		const raw = storage.getItem(key);
 		if (!raw) return null;
 		if (raw.length > MAX_BYTES) { storage.removeItem(key); return null; }
 		const envelope: unknown = JSON.parse(raw);
+		const duration = isRecord(envelope) &&
+			typeof envelope.savedAt === "number" &&
+			typeof envelope.expiresAt === "number"
+			? envelope.expiresAt - envelope.savedAt : NaN;
+		// The same sanitized v3 catalog was previously stored with 15-minute TTL.
+		// Allow its ORIGINAL savedAt for at most 24 hours; do not extend it on read.
 		if (!isRecord(envelope) || envelope.schema !== 1 ||
 			typeof envelope.savedAt !== "number" || typeof envelope.expiresAt !== "number" ||
-			envelope.savedAt > now || envelope.expiresAt <= now ||
-			envelope.expiresAt - envelope.savedAt !== ttl) {
+			envelope.savedAt > now || envelope.savedAt + ttl <= now ||
+			(duration !== ttl && duration !== previousTtl)) {
 			storage.removeItem(key);
 			return null;
 		}
@@ -134,7 +142,7 @@ export function writePublicCatalogCache(
 }
 
 export function readPublicCatalogCache(storage: StoragePort, now = Date.now()): CatalogCache | null {
-	const raw = get(storage, CATALOG_KEY, CATALOG_TTL_MS, now);
+	const raw = get(storage, CATALOG_KEY, CATALOG_TTL_MS, now, PREVIOUS_CATALOG_TTL_MS);
 	if (!isRecord(raw) || !isRecord(raw.catalog)) return null;
 	return localCatalog(raw.catalog as HomelabServicesCatalog,
 		isRecord(raw.topology) ? raw.topology as ServiceTopology : null);
