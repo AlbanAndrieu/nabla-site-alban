@@ -165,3 +165,35 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [x] **S-P0-429 (code)** : préserver `x-vercel-mitigated` sous la forme normalisée `challenge|other` sans recopier le header brut.
 - [ ] **S-P0-429 (opérations)** : rechercher `2026-10-25T20:42:40–41Z` dans Vercel Firewall pour les requêtes identifiées par `X-Vercel-Id`; distinguer WAF custom, system mitigation et protection déploiement avant d'ajuster une règle ciblée.
 - [ ] **S-P0-release (validation)** : confirmer build Next.js complet, état READY d'une Preview, puis vérification OWNER sur réseau réel. La résolution du 429 ne découle pas du correctif de syntaxe ; production non validée.
+
+### P1 — Cartes de services compactes et stabilité au polling (26/10/2026, PR #260)
+
+- [x] **S-17a — Diagnostic repliable :** déplacer dans le volet
+  `Métriques / diagnostic` existant les huit mesures OWNER :
+  Docker/TrueNAS, HTTPS/TLS, Cloudflare Tunnel, HTTP, latence,
+  Prometheus, sonde HTTPS publique et sonde TCP LAN.
+- [x] **S-17b — Détails des sondes :** regrouper dans ce même volet
+  les états rolling, la provenance et les contrôles Cloudflare Access.
+  Les signaux de santé courts et les alertes de panne restent visibles.
+- [x] **S-17c — Stabilité React :** remplacer la clé de carte
+  `serviceId:endpointUrl` par `serviceId:occurrence`. L'identité du
+  composant ne dépend plus d'un endpoint enrichi par les sondes.
+- [x] **S-17d — Rafraîchissement :** maintenir le volet
+  `Métriques / diagnostic` dans le même emplacement React malgré
+  les transitions `ok/warn/fail`, stabiliser la zone des signaux
+  OWNER et supprimer le compteur fluctuant du titre.
+- [x] **S-17e — Confidentialité :** conserver le détail OWNER
+  uniquement en mode propriétaire. Aucune sonde manquante n'est
+  promue en `ok` ; l'historique Catalogue → DNS → LAN → TLS →
+  HTTP → API reste consultable au clavier.
+- [x] **S-17f — Contrats statiques :** neuf invariants contrôlés
+  contre les blobs Git de la PR ; nouveau fichier de tests
+  `homelabCardLayoutStability.test.mjs` inclus dans la boucle
+  rapide Node 22/24. La suite exécutée sur checkout complet
+  reste `NOT_RUN` après ce changement.
+- [ ] **S-17g — Recette navigateur :** comparer à 320/390 px,
+  tablette et desktop les hauteurs de cartes avant et après arrivée
+  des sondes. Laisser le volet ouvert pendant au moins deux
+  cycles de 30 s et vérifier qu'il ne se referme pas.
+  Mesurer CLS et défilement vertical ; aucun PASS visuel n'est
+  établi tant que Preview et OWNER/LAN ne sont pas accessibles.
