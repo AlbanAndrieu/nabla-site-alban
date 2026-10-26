@@ -103,8 +103,7 @@ export default function ServiceHealthReasons({
 	) : null;
 	const operatorDiagnostics = (
 		<ServiceOperatorDiagnostics entry={entry}>
-			{probeEvidence}
-			{ownerEvidence}
+			{ownerView ? <>{probeEvidence}{ownerEvidence}</> : null}
 		</ServiceOperatorDiagnostics>
 	);
 	// Keep the diagnostics disclosure at one React position across status
