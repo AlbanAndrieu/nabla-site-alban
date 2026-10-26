@@ -14,9 +14,12 @@ test("access UI rechecks server after visibility/focus and on interval", () => {
 	assert.match(source, /window\.removeEventListener\("focus", onVisibilityOrFocus\)/);
 });
 
-test("access UI unmounts OWNER while rechecking and clears LKG on denial", () => {
+test("access UI hides OWNER while checking and only revokes public cache for explicit denial", () => {
 	assert.match(source, /if \(accessProbe\.shouldRecheck\(onFocus\)\) setState\("pending"\)/);
-	assert.match(source, /if \(access === "denied"\)/);
+	assert.match(source, /if \\(access === "denied"\\) clearPublishedCacheOnExplicitDenial\\(\\)/);
+	assert.match(source, /\\[401, 403, 404\\]\\.includes\\(response\\.status\\)/);
+	assert.match(source, /signal: AbortSignal\\.timeout\\(5_000\\)/);
+	assert.doesNotMatch(source, /if \\(access === "denied"\\) \\{\\s*try \\{/);
 	assert.match(source, /clearPublicHomelabBrowserCache\(window\.localStorage\)/);
 	assert.match(source, /if \(!active\) return/);
 	assert.match(source, /cache: "no-store"/);
