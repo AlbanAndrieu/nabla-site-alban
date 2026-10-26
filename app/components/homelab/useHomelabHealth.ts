@@ -350,7 +350,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			const recordCycle = (successful: boolean) => {
 				if (signal.aborted) return;
 				consecutiveHealthFailures = successful ? 0 : consecutiveHealthFailures + 1;
-				nextHealthAttemptAt = Date.now() + homelabRetryDelayMs(consecutiveHealthFailures);
+				nextHealthAttemptAt = successful ? 0 : Date.now() + homelabRetryDelayMs(consecutiveHealthFailures);
 			};
 			setState((current) => ({ ...current, healthRefreshing: true }));
 			if (readOnly) {
