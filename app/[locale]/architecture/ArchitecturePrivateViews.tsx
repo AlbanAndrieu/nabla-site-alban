@@ -145,9 +145,12 @@ export default function ArchitecturePrivateViews({
 }: Readonly<{ locale: string }>) {
 	const access = useHomelabAccess();
 	const visible = access === "trusted" || access === "readonly";
-	const { regionRef, reservedHeight } = useAuthorizedLayoutHold(visible);
 	const { data, status, reason, incident, retry } = usePrivateArchitectureData(
 		visible, access === "trusted",
+	);
+	// The region is only in the DOM after the catalog has resolved.
+	const { regionRef, reservedHeight } = useAuthorizedLayoutHold(
+		visible && status === "ready",
 	);
 	if (!visible) {
 		return access === "pending"
