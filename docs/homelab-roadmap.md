@@ -230,3 +230,42 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
   sur /fr/truenas et /fr/architecture.
   **NOT_RUN après la modification de présentation** ;
   ne pas assimiler le build précédent à ce HEAD.
+
+### P0 — Défilement lors de la réautorisation de la vue privée (26/10/2026)
+
+- [x] **Cause du saut :** `useHomelabAccess` revalide les droits
+  toutes les 30 secondes et au focus. Il rend `pending` avant la réponse.
+  TrueNAS, Architecture et le graphe Réseau retiraient toute leur
+  surface du DOM, provoquant un effondrement temporaire de hauteur.
+- [x] **Correction sans rétention OWNER :** nouveau hook
+  `useAuthorizedLayoutHold`, stockage **en mémoire React uniquement**
+  de la dernière hauteur rendue via `ResizeObserver`. Pendant `pending`,
+  rendre un espace `aria-hidden` de cette hauteur ; ne conserver
+  aucun contenu ni snapshot privé dans le DOM ou le cache navigateur.
+  Après refus, retirer cet espace et afficher le refus existant.
+- [x] **Périmètre :** `HomelabPrivateServices`,
+  `ArchitecturePrivateViews`, `HomeLabPrivateNetwork`. La surface
+  `Architecture` est mesurée seulement quand le catalogue est prêt.
+- [x] **Point d'observation E2E :** attribut
+  `data-homelab-service-id` sur chaque carte ; test Playwright
+  `tests/ops-homelab-recheck-layout.spec.ts` avec deux
+  réautorisations, comparaison de hauteurs et scroll, limité à
+  `OPS_E2E_ENABLED=YES` dans un environnement authentifié.
+- [x] **Vercel Preview exact-SHA :** le déploiement de
+  `b53994eeb6b85f4c9f158770048f55d69821d2af` est **READY**
+  sur Next.js 16.4.2 (test navigateur non exécuté).
+  URL : `https://nabla-site-alban-ce7p8n0dq-albanandrieus-projects.vercel.app`.
+  Les commits postérieurs sont des tests et documentation.
+- [x] **Contrats de code :** 9/9 invariants statiques vérifiés sur les
+  blobs Git ; nouveau `unit-tests/homelabRecheckLayout.test.mjs`
+  inscrit dans le profil L1 ; assertion obsolète corrigée dans
+  `unit-tests/architectureCatalogNotice.test.ts`.
+- [ ] **P0 — Edge 429 :** les GET Preview FR/EN sont bloqués par
+  `Vercel Security Checkpoint` (HTTP 429), et un GET a échoué avant
+  lecture. Ne pas boucler les requêtes et ne pas contourner les règles
+  de sécurité. Le rendu HTML et le CLS **NON VALIDÉS**.
+- [ ] **Recette locale autorisée :** `npm run test:fast:local`,
+  `npm run typecheck`, `npm run build`, puis navigateur OWNER
+  sur LAN ou Access autorisé ; exécuter le test E2E privé sur
+  TrueNAS mobile et Architecture desktop. Aucun PASS E2E n'est
+  déduit de la build Vercel ou de contrats statiques.
