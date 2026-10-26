@@ -33,7 +33,6 @@ import {
 	serviceIconPath,
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
-import ServiceOwnerEvidenceSummary from "./ServiceOwnerEvidenceSummary";
 import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
 
 type Props = {
@@ -220,16 +219,12 @@ export default function HomelabServiceCard({
 						</p>
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
-          {!readOnly && snapshot && (
-            <ServiceOwnerEvidenceSummary entry={initialHealth} snapshot={snapshot} unavailable={healthUnavailable} />
-          )}
-          {!readOnly && !snapshot && (
-            <p className="small text-warning mt-2 mb-1" data-service-evidence-unavailable>
-              {t("health.states.unknown")} · {french ? "Docker, TLS, Cloudflare, Prometheus et sondes indisponibles" : "Docker, TLS, Cloudflare, Prometheus and probes unavailable"}
-            </p>
-          )}
+
 					<ServiceHealthReasons
 						entry={initialHealth}
+						snapshot={snapshot}
+						ownerView={!readOnly}
+						healthUnavailable={healthUnavailable}
 						state={presentationState}
 						tunnelExpected={svc.tunnelSecure === true}
 						cloudflareConfigured={snapshot?.cloudflare_configured}
