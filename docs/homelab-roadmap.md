@@ -94,6 +94,27 @@ invariants sont à préserver, pas à réimplémenter.
   les endpoints de projection allowlistés sont accessibles et que les 503
   publics ne révèlent aucune phase privée.
 
+## Ressources CPU/RAM/GPU/ZFS — contrat complémentaire du 27 octobre
+
+- [x] Le producteur `nabla-compose` PR #285 expose
+  `cpu.usage_pct` en pourcentage d'un cœur dans l'instantané
+  privé `nabla-service-resources/v1` ; la présence
+  d'un conteneur dans `docker ps` est distincte du succès
+  de mesure CPU.
+- [x] Les cartes OWNER affichent maintenant CPU en plus de
+  RAM, GPU et ZFS. Les anciennes captures sans champ CPU
+  continuent d'être acceptées et affichent **—**.
+- [x] Le producteur expose `coverage` et les conteneurs
+  RUNNING sans mapping catalogique. Pas de mesure live
+  prétendue dans le catalogue statique ; le rapprochement
+  de ces workloads reste à effectuer sur TrueNAS.
+- [ ] Collecte opérateur CPU/RAM/stockage de tous les
+  conteneurs RUNNING et import OWNER depuis la workstation ;
+  **non effectuée** depuis l'agent GitHub.
+- [ ] API LAN autorisée pour l'actualisation périodique et
+  la conservation des snapshots historiques sans dépendre
+  d'un accès public TrueNAS.
+
 ## P1 — Référence RAM / GPU / stockage par service (26 octobre)
 
 - [x] **Contrat OWNER** : `lib/homelabResourceEvidence.ts`
