@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
+import useAuthorizedLayoutHold from "@/app/components/homelab/useAuthorizedLayoutHold";
 import styles from "./HomeLabSection.module.css";
 
 // Loaded only after the server confirmed owner access. The graph itself is
@@ -18,8 +19,15 @@ const HomeLabNetworkFlow = dynamic(() => import("./HomeLabNetworkFlow"), {
 /** Owner-only Cloudflare status and network topology of the TrueNAS page. */
 export default function HomeLabPrivateNetwork() {
 	const french = useLocale() === "fr";
-	if (useHomelabAccess() !== "trusted") return null;
+	const access = useHomelabAccess();
+	const { regionRef, reservedHeight } = useAuthorizedLayoutHold(access === "trusted");
+	if (access === "pending") {
+		return <div data-homelab-access-rechecking aria-hidden="true"
+			style={{ minHeight: reservedHeight }} />;
+	}
+	if (access !== "trusted") return null;
 	return (
+		<div ref={regionRef} data-homelab-access-region>
 		<div data-homelab-private-view>
 			<CloudflareStatusWarning />
 			<aside
@@ -42,6 +50,7 @@ export default function HomeLabPrivateNetwork() {
 				</div>
 				<HomeLabNetworkFlow />
 			</aside>
+		</div>
 		</div>
 	);
 }
