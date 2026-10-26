@@ -279,10 +279,15 @@ export default function HomelabServicesBlock({
 	return (
 		<>
 			{readOnly && state.catalogStale && (
-				<p data-homelab-catalog-stale role="status" className="alert alert-warning">
+				<p data-homelab-catalog-stale role="status" className="small text-warning my-2">
+					{french ? "Catalogue public en cache · santé non vérifiée" : "Saved public catalog · health unverified"}
+				</p>
+			)}
+			{!state.healthRefreshing && state.healthUnavailable && !state.catalogStale && (
+				<p data-homelab-api-degraded role="status" className="small text-warning my-2">
 					{french
-						? "Catalogue SERVICE v2 conservé dans ce navigateur. Données potentiellement périmées : les états de santé restent inconnus jusqu’à une nouvelle vérification."
-						: "SERVICE v2 catalog restored from this browser. Data may be stale; health remains unknown until a fresh check."}
+						? "Sondes indisponibles ou lentes · état non confirmé"
+						: "Probes unavailable or slow · health unconfirmed"}
 				</p>
 			)}
       {!readOnly && !state.healthRefreshing && !state.snapshot && (
@@ -362,8 +367,8 @@ export default function HomelabServicesBlock({
 								: "Refreshing…"
 							: state.healthUnavailable
 								? french
-									? "Dernier snapshot conservé"
-									: "Keeping last snapshot"
+									? "Sondes non vérifiées"
+									: "Probes unverified"
 								: french
 									? "Snapshot courant"
 									: "Current snapshot"}

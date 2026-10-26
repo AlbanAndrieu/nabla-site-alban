@@ -278,3 +278,50 @@ asset Git manquant (preuve de dépôt, pas chargement navigateur).
 - [ ] **Publication complète :** `npm run quality:agent:publish`
   sur un arbre Git propre, puis inspection de sa preuve ; le profil
   local rapide n'exécute pas cette gate.
+
+### P0 — Mode dégradé lorsque TrueNAS/FastAPI est gelé (26/10/2026)
+
+**Incident déclaré :** TrueNAS et les API du homelab répondent très lentement.
+Le Site ne doit pas transformer une sonde absente en panne ni multiplier
+les requêtes sur une source déjà saturée.
+
+- [x] **S-19a — Budget par appel :** bornage à 8 secondes côté navigateur
+  pour catalogue, santé SERVICE v2, sondes OWNER et catalogue
+  Architecture. Annulation également lors du changement de périmètre.
+- [x] **S-19b — Réduction de charge :** intervalles de sondes
+  Architecture ramenés de 2–5 s à 30 s ; après échec, temporisation
+  exponentielle de 60/120/240 s, plafonnée à 4 min. TrueNAS garde
+  son rythme de 30 s sain et ralentit sur échec. Pas de retry en rafale.
+- [x] **S-19c — Résilience du catalogue SERVICE :** TTL du cache
+  public validé étendu de 15 min à 24 h ; restauration dès le
+  premier rendu autorisé, sans attendre le réseau. États de santé
+  anciens réétiquetés `unknown` et jamais comme `healthy`.
+- [x] **S-19d — Architecture :** partage du même cache local public
+  expurgé, même sans graphe live ; si topologie absente, n'afficher
+  que des nœuds déclarés sans inventer de liens. Indicateur
+  compact `catalogue public mémorisé · santé non vérifiée`.
+  Interdiction de charger ou de persister des snapshots OWNER.
+- [x] **S-19e — Frontière d'accès :** accès vérifié côté Site avant
+  le rendu. Un HTTP 401/403/404 ou un refus explicite purge le
+  cache public ; un timeout, 429 ou 5xx garde le cache sur disque
+  **sans jamais autoriser son affichage avant nouvelle admission**.
+  GET d'autorisation borné à 5 s et toujours fail-closed.
+- [x] **S-19f — Affichage :** bannière légère en cas de catalogue
+  public en cache ; message court si sondes indisponibles. Les
+  informations d'état confirmées restent séparées des données déclarées.
+- [x] **S-19g — Régressions :** durée de vie du cache testée
+  (24 h, pas d'ancien vert), tests pour délais/backoff et
+  révocation, ajout au profil rapide Node 22/24.
+- [ ] **S-19h — Livraison :** build Preview exacte au SHA du correctif
+  et recette visuelle indépendante du contrôle d'accès. Les GET
+  automatisés peuvent encore rencontrer le checkpoint Vercel 429.
+  Aucun diagnostic direct de l'état TrueNAS/LAN depuis l'agent.
+- [ ] **S-19i — Suivi producteur, nabla-compose / FastAPI :** lorsque
+  le LAN répond, instrumenter durée et timeout des appels FastAPI,
+  mémoire TrueNAS, pression I/O, saturation de sockets et workers.
+  Ne pas déclencher de collecte intensive pendant le gel ;
+  garder cette action dans les roadmaps des dépôts producteurs.
+
+**DONE (code)** ≠ **Preview READY** ≠ **API restaurée** ≠
+**OWNER/LAN prouvé**. L3 volontairement différée ; ne pas
+demander à l'opérateur de relancer la quality gate pour ce chantier.

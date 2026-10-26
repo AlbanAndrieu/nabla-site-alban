@@ -6,6 +6,7 @@ import {
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
+import { boundedHomelabSignal, homelabRetryDelayMs } from "@/lib/homelabSlowApiPolicy";
 
 export type ArchitectureHealthSource =
 	| "loading"
@@ -13,9 +14,9 @@ export type ArchitectureHealthSource =
 	| "site-v2"
 	| "unavailable";
 
-const HEALTH_POLL_REFRESHING_MS = 2_000;
-const HEALTH_POLL_FRESH_MS = 5_000;
-const HEALTH_POLL_FALLBACK_MS = 30_000;
+const HEALTH_POLL_REFRESHING_MS = 30_000;
+const HEALTH_POLL_FRESH_MS = 30_000;
+const HEALTH_POLL_FALLBACK_MS = 60_000;
 
 export function architectureHealthPollDelay(
 	snapshot: HomelabHealthSnapshot | null,
@@ -39,6 +40,7 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		let refreshTimer: number | null = null;
 		let latestSnapshot: HomelabHealthSnapshot | null = null;
 		let latestUnavailable = true;
+		let consecutiveFailures = 0;
 
 		const clearRefreshTimer = () => {
 			if (refreshTimer === null) return;
@@ -51,7 +53,9 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 			clearRefreshTimer();
 			refreshTimer = window.setTimeout(
 				() => void loadHealth(),
-				architectureHealthPollDelay(latestSnapshot, latestUnavailable),
+				latestUnavailable
+					? homelabRetryDelayMs(Math.max(1, consecutiveFailures))
+					: architectureHealthPollDelay(latestSnapshot, false),
 			);
 		};
 
@@ -66,11 +70,12 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 					readOnly ? "/api/homelab-health-v2" : "/api/homelab-health",
 					{
 						cache: "no-store",
-						signal: requestController.signal,
+						signal: boundedHomelabSignal(requestController.signal),
 						headers: { Accept: "application/json" },
 					},
 				);
 				if (!response.ok) throw new Error(`health HTTP ${response.status}`);
+				consecutiveFailures = 0;
 				if (readOnly) {
 					const projected = parseSiteHealthV2(await response.json());
 					if (!projected) throw new Error("invalid v2 health projection");
@@ -95,6 +100,10 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 			} catch {
 				if (active && !requestController.signal.aborted) {
 					latestUnavailable = true;
+					consecutiveFailures += 1;
+					// Stale successful probes must not continue to show healthy.
+					setHealth(null);
+					setSiteHealth(null);
 					setHealthUnavailable(true);
 				}
 			} finally {

@@ -82,10 +82,29 @@ test("invalid catalogs and remote icon URLs cannot enter browser storage", () =>
 test("browser catalog cache expires and rejects future-dated snapshots", () => {
 	const storage = storageFixture();
 	assert.equal(writePublicCatalogCache(storage, catalogFixture(), null, 1000), true);
-	assert.ok(readPublicCatalogCache(storage, 1000 + 15 * 60_000 - 1));
-	assert.equal(readPublicCatalogCache(storage, 1000 + 15 * 60_000), null);
+	// Public catalog survives a typical multi-hour TrueNAS freeze.
+	assert.ok(readPublicCatalogCache(storage, 1000 + 15 * 60_000));
+	assert.ok(readPublicCatalogCache(storage, 1000 + 24 * 60 * 60_000 - 1));
+	assert.equal(readPublicCatalogCache(storage, 1000 + 24 * 60 * 60_000), null);
 	writePublicCatalogCache(storage, catalogFixture(), null, 1000);
 	assert.equal(readPublicCatalogCache(storage, 999), null);
+});
+
+test("old 15-minute SERVICE v3 cache remains usable for up to 24h during an outage", () => {
+	const storage = storageFixture();
+	assert.equal(writePublicCatalogCache(storage, catalogFixture(), topologyFixture(), 1000), true);
+	const [[key, serialized]] = [...storage.values.entries()];
+	const old = JSON.parse(serialized);
+	old.expiresAt = old.savedAt + 15 * 60_000;
+	storage.values.set(key, JSON.stringify(old));
+	const cached = readPublicCatalogCache(storage, 1000 + 60 * 60_000);
+	assert.ok(cached);
+	assert.deepEqual(cached.catalog.services.map((s) => s.id), ["grafana"]);
+	assert.equal("accessToken" in cached.catalog, false);
+	assert.equal("internalHost" in cached.catalog.services[0], false);
+	// Do not refresh savedAt by reading the cache; its original age is authoritative.
+	assert.equal(JSON.parse(storage.values.get(key)).savedAt, 1000);
+	assert.equal(readPublicCatalogCache(storage, 1000 + 24 * 60 * 60_000), null);
 });
 
 test("cached green health is always reclassified as stale UNKNOWN", () => {

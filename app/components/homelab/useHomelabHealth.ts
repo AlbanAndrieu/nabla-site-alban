@@ -23,6 +23,10 @@ import {
 	writePublicCatalogCache,
 	writePublicHealthCache,
 } from "@/lib/homelabPublicBrowserCache";
+import {
+	boundedHomelabSignal,
+	homelabRetryDelayMs,
+} from "@/lib/homelabSlowApiPolicy";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
@@ -104,7 +108,7 @@ async function fetchCatalog(signal: AbortSignal, readOnly: boolean): Promise<{
 }> {
 	const response = await fetch("/api/homelab-services", {
 		cache: "no-store",
-		signal,
+		signal: boundedHomelabSignal(signal),
 	});
 	if (!response.ok) {
 		const body: unknown = await response.json().catch(() => null);
@@ -147,7 +151,7 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	try {
 		const response = await fetch("/api/homelab-health", {
 			cache: "no-store",
-			signal,
+			signal: boundedHomelabSignal(signal),
 		});
 		if (!response.ok) {
 			return {
@@ -173,7 +177,7 @@ async function fetchProbeHealth(
 	try {
 		const response = await fetch("/api/homelab-probes", {
 			cache: "no-store",
-			signal,
+			signal: boundedHomelabSignal(signal),
 			headers: {
 				Accept: "application/json",
 				"Cache-Control": "no-cache",
@@ -311,6 +315,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 		let lastCatalogAttemptAt = 0;
 		let ownerUpstreamBlocked = false;
 		let lastCycleStartedAt = 0;
+		let consecutiveHealthFailures = 0;
+		let nextHealthAttemptAt = 0;
 		// Only a publicly authorized projection may be written to persistent storage.
 		const publicStorage = (() => {
 			if (!readOnly) return null;
@@ -330,12 +336,22 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				catalogFailure: null,
 				catalogStale: true,
 				catalogScope: "public",
+				// Show the saved inventory immediately, but never replay green health.
+				siteHealth: publicStorage && activeCatalogRevision
+					? readStalePublicHealthCache(publicStorage, activeCatalogRevision) : null,
+				healthUnavailable: true,
 				error: false,
 			}));
 		}
 
 		const runHealthCycle = async (signal: AbortSignal) => {
 			lastCycleStartedAt = Date.now();
+			// Each failed cycle increases the spacing; a healthy cycle resets it.
+			const recordCycle = (successful: boolean) => {
+				if (signal.aborted) return;
+				consecutiveHealthFailures = successful ? 0 : consecutiveHealthFailures + 1;
+				nextHealthAttemptAt = successful ? 0 : Date.now() + homelabRetryDelayMs(consecutiveHealthFailures);
+			};
 			setState((current) => ({ ...current, healthRefreshing: true }));
 			if (readOnly) {
 				// External views consume only the strict SERVICE v2 projection.
@@ -345,7 +361,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				try {
 					const response = await fetch("/api/homelab-health-v2", {
 						cache: "no-store",
-						signal,
+						signal: boundedHomelabSignal(signal),
 						headers: { Accept: "application/json" },
 					});
 					status = response.status;
@@ -377,13 +393,14 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 						healthRefreshing: false,
 					}));
 				}
+				recordCycle(siteHealth?.boardState === "fresh");
 				return;
 			}
 
 			// SERVICE status DTO is independent from OWNER-only probe details.
 			void fetch("/api/homelab-health-v2", {
 				cache: "no-store",
-				signal,
+				signal: boundedHomelabSignal(signal),
 				headers: { Accept: "application/json" },
 			})
 				.then(async (response) => ({
@@ -404,6 +421,7 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			// Keep SERVICE v2 polling even after Vercel's OWNER boundary is confirmed.
 			if (ownerUpstreamBlocked) {
 				setState((current) => ({ ...current, healthRefreshing: false }));
+				recordCycle(true);
 				return;
 			}
 			const probesPromise = fetchProbeHealth(signal);
@@ -421,13 +439,15 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				aggregate.reason === "owner-boundary" &&
 				probes.reason === "owner-boundary";
 			setState((current) => applyHealthCycle(current, aggregate, probes));
+			recordCycle(Boolean(aggregate.snapshot || probes.snapshot));
 		};
 
 		const refreshHealth = () => {
 			if (document.hidden) return;
 			// A tab focus right after a tick (or the initial cycle) must not
 			// fire a second identical burst of health requests.
-			if (Date.now() - lastCycleStartedAt < MIN_REFRESH_GAP_MS) return;
+			if (Date.now() - lastCycleStartedAt < MIN_REFRESH_GAP_MS ||
+				Date.now() < nextHealthAttemptAt) return;
 			refreshController?.abort();
 			refreshController = new AbortController();
 			void runHealthCycle(refreshController.signal);

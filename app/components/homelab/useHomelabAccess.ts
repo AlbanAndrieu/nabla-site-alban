@@ -12,14 +12,29 @@ import {
 
 export type { HomelabAccessState } from "@/lib/homelabBrowserAccess";
 
+function clearPublishedCacheOnExplicitDenial(): void {
+	try {
+		clearPublicHomelabBrowserCache(window.localStorage);
+	} catch {
+		// Storage can be unavailable. Authorization always remains server-side.
+	}
+}
+
 async function fetchHomelabAccess(): Promise<HomelabAccessDecision> {
 	const response = await fetch("/api/homelab-access", {
 		cache: "no-store",
 		credentials: "same-origin",
+		signal: AbortSignal.timeout(5_000),
 		headers: { Accept: "application/json" },
 	});
-	if (!response.ok) throw new Error(`access HTTP ${response.status}`);
-	return parseHomelabAccessDecision(await response.json());
+	if (!response.ok) {
+		// Do not destroy a public-only cache because of HTTP 429, 5xx or timeout.
+		if ([401, 403, 404].includes(response.status)) clearPublishedCacheOnExplicitDenial();
+		throw new Error(`access HTTP ${response.status}`);
+	}
+	const access = parseHomelabAccessDecision(await response.json());
+	if (access === "denied") clearPublishedCacheOnExplicitDenial();
+	return access;
 }
 
 // TrueNAS and Architecture mount several gates. Share one in-flight request,
@@ -41,13 +56,6 @@ export default function useHomelabAccess(): HomelabAccessState {
 			if (accessProbe.shouldRecheck(onFocus)) setState("pending");
 			void accessProbe.check(onFocus).then((access) => {
 				if (!active) return;
-				if (access === "denied") {
-					try {
-						clearPublicHomelabBrowserCache(window.localStorage);
-					} catch {
-						// Browser storage restrictions cannot grant access.
-					}
-				}
 				setState(access);
 			});
 		};
