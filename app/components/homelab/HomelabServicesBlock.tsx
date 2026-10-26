@@ -351,11 +351,6 @@ export default function HomelabServicesBlock({
 								? "Santé et filtres des services"
 								: "Service health and filters"}
 						</h3>
-						<p>
-							{french
-								? "Les services restent la finalité de la vue ; le socle critique, la sécurité et le support sont séparés sans modifier la propagation des dépendances."
-								: "Services remain the primary outcome; critical core, security and support are separated without changing dependency propagation."}
-						</p>
 					</div>
 					<span
 						className={styles.refreshStatus}
@@ -375,8 +370,6 @@ export default function HomelabServicesBlock({
 									: "Current snapshot"}
 					</span>
 				</div>
-
-				<p className={styles.healthSemantics}>{t("health.semantics")}</p>
 
 				<div
 					className={styles.healthSummary}
