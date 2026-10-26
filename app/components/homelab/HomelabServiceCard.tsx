@@ -153,6 +153,7 @@ export default function HomelabServiceCard({
 			)}
 			<div
 				className={`card box-shadow h-100 service-card-ux ${styles.serviceCard}`}
+				data-homelab-service-id={serviceId}
 				data-effective-health={presentationState}
 				data-runtime-inventory-conflict={
 					runtimeInventoryConflict ? "true" : undefined
