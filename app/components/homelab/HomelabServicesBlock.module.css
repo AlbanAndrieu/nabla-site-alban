@@ -273,6 +273,31 @@
 		box-shadow 120ms ease;
 }
 
+/* Reserve the short signal line before async probes arrive. Long reports
+   remain in the native, collapsed diagnostics disclosure below the summary. */
+.serviceSignalSlot {
+	min-height: 3.25rem;
+}
+
+.serviceCard :global([data-service-operator-diagnostics]) {
+	min-height: 2.5rem;
+	margin-top: var(--ui-space-md);
+}
+
+.serviceCard :global([data-service-operator-diagnostics] > summary) {
+	min-height: 2.5rem;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-md);
+	background: var(--ui-surface-muted);
+	cursor: pointer;
+}
+
+.serviceCard :global([data-service-operator-diagnostics] > summary:focus-visible) {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 2px;
+}
+
 .serviceCard[data-effective-health="ok"] {
 	border-color: var(--ui-success-border);
 }
