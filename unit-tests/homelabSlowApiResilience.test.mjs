@@ -33,7 +33,7 @@ test("slow API requests are bounded in service cards and Architecture without OW
   }
   assert.match(health, /nextHealthAttemptAt/);
   assert.match(health, /homelabRetryDelayMs\(consecutiveHealthFailures\)/);
-  assert.match(health, /readStalePublicHealthCache\(publicStorage, activeCatalogRevision\)/);
+  assert.match(health, /readStalePublicHealthCache\(\s*publicStorage,\s*activeCatalogRevision,?\s*\)/);
   assert.match(polling, /setHealth\(null\)/);
   assert.match(polling, /setSiteHealth\(null\)/);
   assert.doesNotMatch(polling, /HEALTH_POLL_REFRESHING_MS = 2_000/);
