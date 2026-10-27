@@ -29,7 +29,10 @@ function useGraphNearViewport<T extends HTMLElement>() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     if (ready || !ref.current) return;
-    if (typeof IntersectionObserver === "undefined") { setReady(true); return; }
+    if (typeof IntersectionObserver === "undefined") {
+      const timer = window.setTimeout(() => setReady(true), 0);
+      return () => window.clearTimeout(timer);
+    }
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting) { setReady(true); observer.disconnect(); }
     }, { rootMargin: "420px" });
