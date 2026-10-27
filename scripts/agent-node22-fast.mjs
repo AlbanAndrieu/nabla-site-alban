@@ -114,7 +114,7 @@ export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dir
   }
   const logPath = resolve(root, pathResult.stdout.trim());
   const result = spawnSync(process.execPath, [
-    "--experimental-strip-types", "--test", "--test-concurrency=2", ...FAST_TESTS,
+    "--experimental-strip-types", "--test", "--test-reporter=spec", "--test-concurrency=2", ...FAST_TESTS,
   ], { cwd: root, encoding: "utf8", maxBuffer: 32 * 1024 * 1024, timeout: 120_000 });
   const stdout = result.stdout ?? "";
   const stderr = result.stderr ?? "";
@@ -139,7 +139,7 @@ export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dir
       console.error(`  ✖ ${failure.name} — ${failure.location}`);
     }
     if (!summary.failures.length) {
-      const detail = (stderr || stdout).trim().split("\\n").slice(-8)
+      const detail = (stderr || stdout).trim().split("\n").slice(-8)
         .map((line) => line.slice(0, 180)).join("\\n");
       console.error(detail || "Test runner exited without diagnostic output.");
     }
