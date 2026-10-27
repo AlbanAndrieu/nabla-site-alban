@@ -186,8 +186,8 @@ seconde séquence de migration ni les anciennes PR marquées ouvertes.
 ## P0 — Protection de merge, publication et dépendances
 
 - [ ] **Activer le ruleset `master` depuis une workstation autorisée** :
-  l'audit live du 30 septembre confirme qu'aucun ruleset n'est installé. Exécuter
-  `scripts/manage-master-ruleset.sh --apply`, puis fermer uniquement lorsque
+  les audits live du 30 septembre et du **28 octobre 2026** retournent **0 ruleset** (`GET /repos/AlbanAndrieu/nabla-site-alban/rulesets = []`) ; l'intégration GitHub ne peut pas lire la protection de branche (`403`). Exécuter
+  `scripts/manage-master-ruleset.sh --apply` avec des droits admin autorisés, puis fermer uniquement lorsque
   `--check` retourne `RULESET_OK`. Contrat et rollback :
   `docs/github-master-ruleset.md`.
 - [ ] **Valider les permissions live du recovery post-merge** : les contrats locaux
