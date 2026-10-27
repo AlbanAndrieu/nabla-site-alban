@@ -42,3 +42,27 @@ test("health filters still exist independently of resource controls", () => {
   assert.match(filters, /data-homelab-presentation-filter/);
   assert.doesNotMatch(filters, /ResourceSnapshot|localStorage|ownerAllowed/);
 });
+
+test("revocation and replacement cancel pending resource imports", () => {
+  const importer = read("app/components/homelab/HomelabResourceSnapshotImport.tsx");
+  assert.match(importer, /ownerSession\.current = ownerAllowed/);
+  assert.match(importer, /ownerSession\.current = false/);
+  assert.match(importer, /importSequence\.current \+= 1/);
+  assert.match(importer, /const sequence = \+\+importSequence\.current/);
+  assert.match(importer, /if \(!ownerSession\.current \|\| sequence !== importSequence\.current\) return/);
+  assert.match(importer, /const contents = await file\.text\(\)/);
+  assert.match(importer, /if \(!file \|\| !ownerAllowed \|\| !ownerSession\.current\) return/);
+  assert.match(importer, /importSequence\.current \+= 1;\s*try \{ window\.localStorage\.removeItem/);
+});
+
+test("resource age ticks after commit and never reads the clock during render", () => {
+  const importer = read("app/components/homelab/HomelabResourceSnapshotImport.tsx");
+  assert.match(importer, /useState<number \| null>\(null\)/);
+  assert.match(importer, /window\.setTimeout\(\(\) => setNow\(Date\.now\(\)\), 0\)/);
+  assert.match(importer, /window\.setInterval\(\(\) => setNow\(Date\.now\(\)\), 60_000\)/);
+  assert.match(importer, /window\.clearInterval\(interval\)/);
+  assert.match(importer, /window\.clearTimeout\(initial\)/);
+  assert.match(importer, /snapshotAgeState\(snapshot, now, catalogRevision\)/);
+  assert.doesNotMatch(importer, /snapshotAgeState\(snapshot, Date\.now\(\)/);
+  assert.doesNotMatch(importer, /useState\(\(\) => Date\.now\(\)\)/);
+});
