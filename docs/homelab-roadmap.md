@@ -7,9 +7,11 @@
 | --- | --- | --- |
 | Production Vercel | `f26906733e228a27897a48983cae07c01f966c99` (#262), déploiement `dpl_6gAXM1U7aGFJy3y2sESqp2eVZeJu` | **READY** ; ne prouve pas le HTTP, le navigateur ni OWNER/LAN |
 | PR de stabilisation | [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), inclut #262 | **Draft** ; accès/caches, UX, refactoring et tests source |
-| Preview de #263 | Aucun déploiement identifié sur la branche dans les résultats Vercel consultés | **NOT_RUN** ; aucune recette exact-SHA |
+| Preview de #263 | `0c60fbbc8582895c65f673a2cb01eb2d01db4fe0`, déploiement `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` | **READY / build Next PASS**, HTTP et navigateur **NOT_RUN** |
 | Publication locale de #263 | Aucun `QG_PUBLISH_PROOF_OK` sur HEAD actuel | **NOT_RUN** ; ne pas fusionner sur seuls contrôles statiques |
 | OWNER / SERVICE | Contrats de source et purge des ressources OWNER au passage SERVICE | **DONE (code)** ; assertions navigateur LAN/WAN **NOT_RUN** |
+
+**Régression corrigée en #263 :** le premier essai de Preview a été annulé car `vercel-ignore-build.sh` ne comparait que le dernier commit `docs/` sans `VERCEL_GIT_PREVIOUS_SHA`. Le sélecteur compare désormais tout le delta de branche depuis la base `origin/master` quand elle existe ; si cette base ou l'historique déployé n'est pas fiable (clone Vercel peu profond), il construit par sécurité. La seconde Preview est **READY** (22 s de build). Contrats de source et scénarios Git ajoutés, tests Node de la PR encore à exécuter sur checkout complet.
 
 **Critère de clôture P0** : obtenir sur le même SHA un arbre formaté propre, tests rapides + unitaires, TypeScript, lint et build Next.js, attestation `QG_PUBLISH_PROOF_OK`, puis contrôle des accès réels. Sans accès LAN ni navigateur autorisé, garder l'acceptation finale **BLOCKED**, même si Vercel est `READY`. Ne pas déclencher de GitHub Actions payantes ; ni fusion automatique.
 
