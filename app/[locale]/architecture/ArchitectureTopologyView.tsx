@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CriticalDependencyHierarchy from "@/app/components/homelab/CriticalDependencyHierarchy";
 import homelabStyles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
@@ -25,10 +25,12 @@ const HierarchicalArchitectureExplorer = dynamic(() => import("./HierarchicalArc
 const C4ArchitectureView = dynamic(() => import("./C4ArchitectureView"), { ssr: false });
 
 function useGraphNearViewport<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
+  // A callback ref stores the DOM node as state. The render-facing "ready"
+  // boolean is never read from a mutable React ref.
+  const [node, setNode] = useState<T | null>(null);
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (ready || !ref.current) return;
+    if (ready || !node) return;
     if (typeof IntersectionObserver === "undefined") {
       const timer = window.setTimeout(() => setReady(true), 0);
       return () => window.clearTimeout(timer);
@@ -36,10 +38,10 @@ function useGraphNearViewport<T extends HTMLElement>() {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting) { setReady(true); observer.disconnect(); }
     }, { rootMargin: "420px" });
-    observer.observe(ref.current);
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [ready]);
-  return { ref, ready };
+  }, [node, ready]);
+  return { setNode, ready };
 }
 
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
@@ -164,14 +166,14 @@ export default function ArchitectureTopologyView({
 				siteHealth={siteHealth}
 			/>
 
-			<div id="architecture-c4" ref={c4Viewport.ref} className={styles.explorerSection} aria-busy={!c4Viewport.ready}>
+			<div id="architecture-c4" ref={c4Viewport.setNode} className={styles.explorerSection} aria-busy={!c4Viewport.ready}>
 				{c4Viewport.ready
 					? <C4ArchitectureView locale={locale} topology={topology} readOnly={readOnly} />
 					: <p role="status">{french ? "Diagramme C4 chargé à l’approche de la section" : "C4 diagram loads near the viewport"}</p>}
 			</div>
 
 			<section
-				ref={explorerViewport.ref}
+				ref={explorerViewport.setNode}
 				aria-busy={!explorerViewport.ready}
 				id="service-architecture-explorer"
 				className={styles.explorerSection}
