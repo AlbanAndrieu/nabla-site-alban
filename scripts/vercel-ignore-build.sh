@@ -21,19 +21,22 @@ if [[ "${git_ref}" == vercel-preview-* ]]; then
 fi
 
 if [[ -z "${base_sha}" ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
-    # A reconciliation merge can change only docs compared with its first parent,
-    # while the merged PR contains deploy-relevant application changes. Comparing
-    # HEAD^ would wrongly suppress the exact-SHA Preview. Build conservatively.
-    merge_parent_count="$(git cat-file -p HEAD | grep -c '^parent ' || true)"
-    if [[ "${merge_parent_count}" =~ ^[0-9]+$ ]] && ((merge_parent_count > 1)); then
-        echo "Merge HEAD with no verified previous deployment SHA; build rather than inspect only its first parent."
-        exit 1
-    fi
-    if git rev-parse HEAD^ >/dev/null 2>&1; then
-        base_sha="$(git rev-parse HEAD^)"
-        echo "VERCEL_GIT_PREVIOUS_SHA unavailable; falling back to parent commit ${base_sha}."
+    # A previous build may have been skipped: HEAD^ then describes only a
+    # documentation commit, not the application delta waiting for its first
+    # Preview. Prefer the real branch merge base when Git provides it.
+    if [[ -n "${git_ref}" && "${git_ref}" != "master" && "${git_ref}" != "main" ]] &&
+        git rev-parse --verify refs/remotes/origin/master^{commit} >/dev/null 2>&1; then
+        base_sha="$(git merge-base HEAD refs/remotes/origin/master || true)"
+        if [[ -n "${base_sha}" && "${base_sha}" != "$(git rev-parse HEAD)" ]]; then
+            echo "No prior deployed SHA; checking entire branch against master merge-base ${base_sha}."
+        else
+            echo "No reliable prior deployment or branch comparison; build safely."
+            exit 1
+        fi
     else
-        echo "No comparison base available; build deployment."
+        # For a shallow Vercel clone, guessing HEAD^ is unsafe. Build rather
+        # than skip application changes hidden behind tests/docs commits.
+        echo "No verified previous deployment SHA or branch merge-base; build safely."
         exit 1
     fi
 fi
