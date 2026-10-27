@@ -56,18 +56,18 @@ export function missingSources(root, tests = FAST_TESTS) {
 /** Format Node's spec report without embedding complete source files in failures. */
 export function summarizeFastTestOutput(output, exitCode) {
   const stats = Object.fromEntries(
-    [...output.matchAll(/^ℹ (tests|pass|fail|duration_ms) ([\\d.]+)$/gm)]
+    [...output.matchAll(/^ℹ (tests|pass|fail|duration_ms) ([\d.]+)$/gm)]
       .map((match) => [match[1], Number(match[2])]),
   );
-  const failures = [...output.matchAll(/^test at ([^\\n]+?):(\\d+):\\d+\\r?\\n✖ ([^\\n]+)/gm)]
+  const failures = [...output.matchAll(/^test at ([^\n]+?):(\d+):\d+\r?\n✖ ([^\n]+)/gm)]
     .map((match) => ({
       location: `${match[1]}:${match[2]}`,
-      name: match[3].replace(/ \\([\\d.]+ms\\)$/, "").trim(),
+      name: match[3].replace(/ \([\d.]+ms\)$/, "").trim(),
     }));
   if (exitCode !== 0 && failures.length === 0) {
-    const names = [...output.matchAll(/^✖ (?!failing tests:)([^\\n]+)/gm)];
+    const names = [...output.matchAll(/^✖ (?!failing tests:)([^\n]+)/gm)];
     for (const match of names) {
-      const name = match[1].replace(/ \\([\\d.]+ms\\)$/, "").trim();
+      const name = match[1].replace(/ \([\d.]+ms\)$/, "").trim();
       if (!failures.some((item) => item.name === name)) failures.push({ name, location: "unknown" });
     }
   }
