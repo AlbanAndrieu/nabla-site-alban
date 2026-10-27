@@ -43,3 +43,17 @@ test("observer-less browsers reveal lazy graphs asynchronously and cancel on unm
   assert.doesNotMatch(architecture, /if \(typeof IntersectionObserver === "undefined"\) \{\s*setReady\(/);
   assert.match(architecture, /rootMargin: "420px"/);
 });
+
+test("Architecture viewport readiness is React state, not a mutable ref read during render", () => {
+  const source = read("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+  assert.match(source, /const \[node, setNode\] = useState<T \| null>\(null\)/);
+  assert.match(source, /const \[ready, setReady\] = useState\(false\)/);
+  assert.match(source, /return \{ setNode, ready \}/);
+  assert.match(source, /ref=\{c4Viewport\.setNode\}/);
+  assert.match(source, /ref=\{explorerViewport\.setNode\}/);
+  assert.match(source, /\[node, ready\]/);
+  assert.doesNotMatch(source, /return \{ ref, ready \}/);
+  assert.doesNotMatch(source, /\.current/);
+  assert.match(source, /aria-busy=\{!c4Viewport\.ready\}/);
+  assert.match(source, /aria-busy=\{!explorerViewport\.ready\}/);
+});
