@@ -27,6 +27,8 @@ test("resource snapshot hydration is cancellable and revocation deletes storage 
   assert.match(effect, /setSnapshot\(restored\)/);
   assert.match(effect, /onSnapshot\(restored\)/);
   assert.match(effect, /return \(\) => \{\s*cancelled = true;/);
+  assert.match(effect, /\}, \[ownerAllowed, onSnapshot\]\);/);
+  assert.doesNotMatch(importer, /eslint-disable-next-line react-hooks\/exhaustive-deps/);
   assert.match(importer, /if \(!ownerAllowed\) return null/);
   assert.doesNotMatch(importer, /fetch\(/);
 });
