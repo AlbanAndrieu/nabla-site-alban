@@ -426,3 +426,15 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   `@azure/openai@1.0.0-beta.13` et `eslint@9.39.5` ; envisager
   une mise à jour contrôlée dans une PR distincte, sans downgrade
   ni modification opportuniste du lockfile.
+
+### P0 — Stabiliser le formatage et la publication de Site #263 (27 octobre 2026)
+
+- [x] **Réconcilier la fusion de #262** : `master` intègre la collecte RAM/GPU/ZFS OWNER. Le commit de convergence de #263 conserve l'import OWNER, l'ID de révision et `resources={resourceSnapshot}`, sans exposer ces données SERVICE.
+- [x] **Corriger les hooks React** : plus de `setState` synchrone dans l'effet d'hydratation ou le fallback IntersectionObserver ; les vues Architecture n'exposent qu'un booléen React `ready` au rendu.
+- [x] **Réduire les composants** : extraire les sélecteurs purs de santé et les filtres TrueNAS ; `HomelabServicesBlock.tsx` à 480 lignes **avant formatage** après la fusion, sans relever la limite de 600.
+- [x] **Sortie locale compacte** : runner Node 22/24 avec reporter spec fixe, résumé PASS/FAIL, erreurs nommées et journal intégral privé sous `git rev-parse --git-path agent-fast-tests.log` (mode 0600). `QUALITY_VERBOSE=1` est disponible.
+- [x] **Tests de source ciblés dans l'agent** : 21 contrats JavaScript de sources/runner exécutés par émulation V8, plus 10 invariants OWNER/GPU/ZFS. **Ce n'est pas la suite npm ni une preuve de publication**.
+- [ ] **Validation locale réelle du HEAD exact** : convergence Biome/pre-commit, `npm run test:fast:local`, `npm run typecheck`, `npm run quality:agent:publish`, `-- --status` et build Next.js (si la gate ne le lance pas). Ne pas revendiquer L3 avant `QG_PUBLISH_PROOF_OK`. GitHub Actions payantes non relancées.
+- [ ] **Recette navigateur** : OWNER/LAN, SERVICE/WAN, stabilité des cartes C4 et filtres pendant deux rafraîchissements, absence de données privées dans cache et réponses publiques ; le contrôle Vercel 429 doit être diagnostiqué séparément.
+
+La fusion de #262 ne clôt pas la gate #263. Conserver une PR Draft tant que les preuves de publication et les contrôles d'accès réels restent `NOT_RUN`.
