@@ -18,7 +18,7 @@ import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
-import type { ResourceSnapshot } from "@/lib/homelabResourceEvidence";
+import { RESOURCE_SNAPSHOT_KEY, type ResourceSnapshot } from "@/lib/homelabResourceEvidence";
 import HomelabServiceFilters, { type GroupFilter, type HealthFilter } from "./HomelabServiceFilters";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
@@ -60,6 +60,17 @@ export default function HomelabServicesBlock({
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const [resourceSnapshot, setResourceSnapshot] = useState<ResourceSnapshot | null>(null);
+	// SERVICE admission must not preserve an earlier OWNER resource snapshot
+	// in this browser. Clear only the OWNER resource key, not the public cache.
+	useEffect(() => {
+		if (!readOnly) return;
+		try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* disabled */ }
+		let cancelled = false;
+		queueMicrotask(() => {
+			if (!cancelled) setResourceSnapshot(null);
+		});
+		return () => { cancelled = true; };
+	}, [readOnly]);
 	const handledAnchor = useRef<string | null>(null);
 
 	// If FastAPI provides cards but no matching relation graph, still show the
