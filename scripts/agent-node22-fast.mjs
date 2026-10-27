@@ -140,7 +140,7 @@ export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dir
     }
     if (!summary.failures.length) {
       const detail = (stderr || stdout).trim().split("\n").slice(-8)
-        .map((line) => line.slice(0, 180)).join("\\n");
+        .map((line) => line.slice(0, 180)).join("\n");
       console.error(detail || "Test runner exited without diagnostic output.");
     }
     console.error("LOCAL_FAST_TEST_FAIL: full log " + logPath);
