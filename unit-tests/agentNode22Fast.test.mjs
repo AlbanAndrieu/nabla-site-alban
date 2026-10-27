@@ -76,3 +76,17 @@ test("L1 retains the full private test log outside the source tree", () => {
   assert.match(source, /writeFileSync\(logPath, stdout \+ stderr, \{ mode: 0o600 \}\)/);
   assert.match(source, /QUALITY_VERBOSE/);
 });
+
+test("L1 rejects an empty or inconsistent report even when Node exits zero", () => {
+  const missing = summarizeFastTestOutput("", 0);
+  assert.equal(missing.valid, false);
+  assert.match(missing.headline, /❌ L1/);
+
+  const mismatched = summarizeFastTestOutput("ℹ tests 79\nℹ pass 75\nℹ fail 0", 0);
+  assert.equal(mismatched.valid, false);
+  assert.match(mismatched.headline, /❌ L1/);
+
+  const proper = summarizeFastTestOutput("ℹ tests 79\nℹ pass 79\nℹ fail 0", 0);
+  assert.equal(proper.valid, true);
+  assert.match(proper.headline, /✅ L1/);
+});
