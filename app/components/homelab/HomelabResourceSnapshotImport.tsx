@@ -42,10 +42,8 @@ export default function HomelabResourceSnapshotImport({
       setSnapshot(restored);
       onSnapshot(restored);
     });
-    // Parent callback is state-only; this effect reacts to OWNER boundary changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => { cancelled = true; };
-  }, [ownerAllowed]);
+  }, [ownerAllowed, onSnapshot]);
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
