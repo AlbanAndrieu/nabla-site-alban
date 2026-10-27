@@ -26,3 +26,20 @@ test("OWNER diagnostic phases identify DNS and API evidence gaps without fake gr
   assert.match(source, /No dedicated API probe/);
   assert.match(source, /state: "unknown"/);
 });
+
+test("observer-less browsers reveal lazy graphs asynchronously and cancel on unmount", () => {
+  const services = read("app/components/homelab/HomelabServicesBlock.tsx");
+  const architecture = read("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+
+  assert.match(services, /if \(typeof IntersectionObserver === "undefined"\) \{/);
+  assert.match(services, /window\.setTimeout\(\(\) => setGraphInView\(true\), 0\)/);
+  assert.match(services, /return \(\) => window\.clearTimeout\(timer\)/);
+  assert.doesNotMatch(services, /if \(typeof IntersectionObserver === "undefined"\) \{\s*setGraphInView\(/);
+  assert.match(services, /rootMargin: "360px"/);
+
+  assert.match(architecture, /if \(typeof IntersectionObserver === "undefined"\) \{/);
+  assert.match(architecture, /window\.setTimeout\(\(\) => setReady\(true\), 0\)/);
+  assert.match(architecture, /return \(\) => window\.clearTimeout\(timer\)/);
+  assert.doesNotMatch(architecture, /if \(typeof IntersectionObserver === "undefined"\) \{\s*setReady\(/);
+  assert.match(architecture, /rootMargin: "420px"/);
+});
