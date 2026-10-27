@@ -377,10 +377,15 @@ les requêtes sur une source déjà saturée.
 - [x] **S-19g — Régressions :** durée de vie du cache testée
   (24 h, pas d'ancien vert), tests pour délais/backoff et
   révocation, ajout au profil rapide Node 22/24.
-- [ ] **S-19h — Livraison :** build Preview exacte au SHA du correctif
-  et recette visuelle indépendante du contrôle d'accès. Les GET
-  automatisés peuvent encore rencontrer le checkpoint Vercel 429.
-  Aucun diagnostic direct de l'état TrueNAS/LAN depuis l'agent.
+- [x] **S-19h-build — Livraison de la version applicative :** Preview Vercel
+  `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` sur `0c60fbbc` **READY**
+  (Next.js, build 22 s). Régression `vercel-ignore-build.sh` corrigée
+  et prouvée par **7/7 tests Git réels** sur les blobs source exacts.
+  Les commits ultérieurs portent les tests et les roadmaps.
+- [ ] **S-19h-browser — Acceptation réelle :** HTTP, visuels et
+  OWNER/SERVICE depuis des clients autorisés ; l'agent ne peut pas
+  accéder à la Preview par HTTP ni au LAN domestique. Le checkpoint
+  Vercel 429 est un blocage d'admission, pas une panne TrueNAS.
 - [ ] **S-19i — Suivi producteur, nabla-compose / FastAPI :** lorsque
   le LAN répond, instrumenter durée et timeout des appels FastAPI,
   mémoire TrueNAS, pression I/O, saturation de sockets et workers.
