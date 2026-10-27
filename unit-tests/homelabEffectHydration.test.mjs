@@ -13,7 +13,7 @@ test("access-scope reset never synchronously sets React state inside the effect"
   assert.ok(start >= 0 && hydrate > start);
   assert.doesNotMatch(source.slice(start, hydrate), /setState\(/);
   assert.match(source.slice(hydrate, hydrate + 700), /if \(initialController\.signal\.aborted\) return/);
-  assert.match(source.slice(hydrate, hydrate + 700), /setState\(cachedCatalog/);
+  assert.match(source.slice(hydrate, hydrate + 700), /setState\(\s*cachedCatalog/);
 });
 
 test("only validated SERVICE cache is hydrated and stale statuses stay unavailable", () => {
@@ -26,7 +26,7 @@ test("only validated SERVICE cache is hydrated and stale statuses stay unavailab
   assert.match(hydration, /catalogStale: true/);
   assert.match(hydration, /readStalePublicHealthCache/);
   assert.match(hydration, /healthUnavailable: true/);
-  assert.match(hydration, /: INITIAL_HOMELAB_SERVICES_STATE\);/);
+  assert.match(hydration, /: INITIAL_HOMELAB_SERVICES_STATE,?\s*\);/);
 });
 
 test("OWNER-to-SERVICE transition masks old scope synchronously", () => {
