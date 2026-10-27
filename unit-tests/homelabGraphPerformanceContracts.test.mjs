@@ -8,8 +8,8 @@ test("C4 and topology load ReactFlow only near the viewport", () => {
   assert.match(source, /dynamic\(\(\) => import\("\.\/C4ArchitectureView"\)/);
   assert.match(source, /dynamic\(\(\) => import\("\.\/HierarchicalArchitectureExplorer"\)/);
   assert.match(source, /rootMargin: "420px"/);
-  assert.match(source, /aria-busy=\{!c4Viewport\.ready\}/);
-  assert.match(source, /aria-busy=\{!explorerViewport\.ready\}/);
+  assert.match(source, /aria-busy=\{!c4Ready\}/);
+  assert.match(source, /aria-busy=\{!explorerReady\}/);
 });
 test("OWNER evidence is keyboard-expandable and each diagnostic phase stays labeled", () => {
   const source = read("app/components/homelab/ServiceOwnerEvidenceSummary.tsx");
@@ -44,16 +44,15 @@ test("observer-less browsers reveal lazy graphs asynchronously and cancel on unm
   assert.match(architecture, /rootMargin: "420px"/);
 });
 
-test("Architecture viewport readiness is React state, not a mutable ref read during render", () => {
+test("Architecture viewport readiness is state-only, never a ref-like return", () => {
   const source = read("app/[locale]/architecture/ArchitectureTopologyView.tsx");
-  assert.match(source, /const \[node, setNode\] = useState<T \| null>\(null\)/);
-  assert.match(source, /const \[ready, setReady\] = useState\(false\)/);
-  assert.match(source, /return \{ setNode, ready \}/);
-  assert.match(source, /ref=\{c4Viewport\.setNode\}/);
-  assert.match(source, /ref=\{explorerViewport\.setNode\}/);
-  assert.match(source, /\[node, ready\]/);
-  assert.doesNotMatch(source, /return \{ ref, ready \}/);
+  assert.match(source, /function useGraphNearViewport\(elementId: string\): boolean/);
+  assert.match(source, /document\.getElementById\(elementId\)/);
+  assert.match(source, /return ready;/);
+  assert.match(source, /const c4Ready = useGraphNearViewport\("architecture-c4"\)/);
+  assert.match(source, /const explorerReady = useGraphNearViewport\("service-architecture-explorer"\)/);
+  assert.match(source, /aria-busy=\{!c4Ready\}/);
+  assert.match(source, /aria-busy=\{!explorerReady\}/);
+  assert.doesNotMatch(source, /return \{ (?:ref|setNode), ready \}/);
   assert.doesNotMatch(source, /\.current/);
-  assert.match(source, /aria-busy=\{!c4Viewport\.ready\}/);
-  assert.match(source, /aria-busy=\{!explorerViewport\.ready\}/);
 });
