@@ -1,7 +1,5 @@
 # Feuille de route produit et qualité
 
-# Feuille de route produit et qualité
-
 ## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
 
 - [x] Fournir `node scripts/agent-node22-fast.mjs`, `just node22-fast`
@@ -433,9 +431,11 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
 - [x] **Corriger les hooks React** : plus de `setState` synchrone dans l'effet d'hydratation ou le fallback IntersectionObserver ; les vues Architecture n'exposent qu'un booléen React `ready` au rendu.
 - [x] **Réduire les composants** : extraire les sélecteurs purs de santé et les filtres TrueNAS ; `HomelabServicesBlock.tsx` à 480 lignes **avant formatage** après la fusion, sans relever la limite de 600.
 - [x] **Sortie locale compacte** : runner Node 22/24 avec reporter spec fixe, résumé PASS/FAIL, erreurs nommées et journal intégral privé sous `git rev-parse --git-path agent-fast-tests.log` (mode 0600). `QUALITY_VERBOSE=1` est disponible. Contrôle strict des totaux `tests = pass + fail` : un processus Node terminé avec 0 sans rapport valide ne produit plus un faux PASS ; 4/4 assertions ciblées du résumeur exécutées.
-- [x] **Correctif induit par #262** : différer l'hydratation du snapshot OWNER via `queueMicrotask` annulable, purger immédiatement le stockage lors de la révocation ; invalider les lectures de fichiers en attente et les imports remplacés, et mettre à jour l'âge des mesures chaque minute sans `Date.now()` au rendu. Aucun contournement de `react-hooks/*`. Contrat `homelabResourceImportIntegration.test.mjs` (5/5 assertions ciblées exécutées) ajouté au profil rapide, mode exécutable du runner préservé.
+- [x] **Correctif induit par #262** : différer l'hydratation du snapshot OWNER via `queueMicrotask` annulable, purger le stockage lors de la révocation **et en entrant dans SERVICE**, invalider les lectures de fichiers en attente et les imports remplacés, puis mettre à jour l'âge des mesures chaque minute sans `Date.now()` au rendu. Aucun contournement de `react-hooks/*`. Le contrat `homelabResourceImportIntegration.test.mjs` couvre la transition de droits et reste dans le profil rapide.
 - [x] **Tests de source ciblés dans l'agent** : 24 contrats JavaScript de sources/runner exécutés par émulation V8, plus 10 invariants OWNER/GPU/ZFS. **Ce n'est pas la suite npm ni une preuve de publication**.
 - [ ] **Validation locale réelle du HEAD exact** : convergence Biome/pre-commit, `npm run test:fast:local`, `npm run typecheck`, `npm run quality:agent:publish`, `-- --status` et build Next.js (si la gate ne le lance pas). Ne pas revendiquer L3 avant `QG_PUBLISH_PROOF_OK`. GitHub Actions payantes non relancées.
 - [ ] **Recette navigateur** : OWNER/LAN, SERVICE/WAN, stabilité des cartes C4 et filtres pendant deux rafraîchissements, absence de données privées dans cache et réponses publiques ; le contrôle Vercel 429 doit être diagnostiqué séparément.
 
 La fusion de #262 ne clôt pas la gate #263. Conserver une PR Draft tant que les preuves de publication et les contrôles d'accès réels restent `NOT_RUN`.
+
+**Livraison #263 — état exact au 27/10/2026 :** production `READY` uniquement sur `f2690673` (#262), aucun déploiement de la branche #263 identifié dans la liste Vercel consultée. GitHub indique la PR fusionnable et à jour ; ce résultat ne valide pas le build. Les derniers tests JavaScript ciblés sur l'import OWNER et le résumeur local ne remplacent ni `npm run test:fast:local` ni la gate locale Node 24. **État de clôture : BLOCKED (attestation L3 + recette autorisée)**. Les dossiers Stripe, DSOMM, accessibilité, DAST et dépendances restent des workstreams distincts non fermés artificiellement par #263.
