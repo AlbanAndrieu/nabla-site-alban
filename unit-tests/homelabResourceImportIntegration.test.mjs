@@ -66,3 +66,15 @@ test("resource age ticks after commit and never reads the clock during render", 
   assert.doesNotMatch(importer, /snapshotAgeState\(snapshot, Date\.now\(\)/);
   assert.doesNotMatch(importer, /useState\(\(\) => Date\.now\(\)\)/);
 });
+
+test("SERVICE admission deletes browser OWNER resource evidence but preserves public caches", () => {
+  const block = read("app/components/homelab/HomelabServicesBlock.tsx");
+  assert.match(block, /if \(!readOnly\) return;/);
+  assert.match(block, /window\.localStorage\.removeItem\(RESOURCE_SNAPSHOT_KEY\)/);
+  assert.match(block, /queueMicrotask\(\(\) => \{/);
+  assert.match(block, /if \(!cancelled\) setResourceSnapshot\(null\)/);
+  assert.match(block, /return \(\) => \{ cancelled = true; \}/);
+  assert.doesNotMatch(block, /clearPublicHomelabBrowserCache/);
+  assert.match(block, /resources=\{resourceSnapshot\}/);
+  assert.match(block, /ownerAllowed=\{!state\.ownerBoundary\}/);
+});
