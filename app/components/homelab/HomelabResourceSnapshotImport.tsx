@@ -22,24 +22,29 @@ export default function HomelabResourceSnapshotImport({
   const [snapshot, setSnapshot] = useState<ResourceSnapshot | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
+    let cancelled = false;
+    let restored: ResourceSnapshot | null = null;
     if (!ownerAllowed) {
-      setSnapshot(null);
-      onSnapshot(null);
+      // Revoke persisted OWNER evidence immediately, without delaying storage removal.
       try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* blocked */ }
-      return;
+    } else {
+      try {
+        const stored = window.localStorage.getItem(RESOURCE_SNAPSHOT_KEY);
+        restored = stored ? parseResourceSnapshotFile(stored) : null;
+        if (stored && !restored) window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
+      } catch {
+        restored = null;
+      }
     }
-    try {
-      const stored = window.localStorage.getItem(RESOURCE_SNAPSHOT_KEY);
-      const parsed = stored ? parseResourceSnapshotFile(stored) : null;
-      setSnapshot(parsed);
-      onSnapshot(parsed);
-      if (stored && !parsed) window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
-    } catch {
-      setSnapshot(null);
-      onSnapshot(null);
-    }
+    // State updates run after effect setup; StrictMode cleanup cancels stale work.
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setSnapshot(restored);
+      onSnapshot(restored);
+    });
     // Parent callback is state-only; this effect reacts to OWNER boundary changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { cancelled = true; };
   }, [ownerAllowed]);
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
