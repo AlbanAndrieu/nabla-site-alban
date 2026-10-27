@@ -24,13 +24,14 @@ import {
 const HierarchicalArchitectureExplorer = dynamic(() => import("./HierarchicalArchitectureExplorer"), { ssr: false });
 const C4ArchitectureView = dynamic(() => import("./C4ArchitectureView"), { ssr: false });
 
-function useGraphNearViewport<T extends HTMLElement>() {
-  // A callback ref stores the DOM node as state. The render-facing "ready"
-  // boolean is never read from a mutable React ref.
-  const [node, setNode] = useState<T | null>(null);
+function useGraphNearViewport(elementId: string): boolean {
+  // The target is part of the committed DOM when the effect executes.
+  // Return only state, never an object containing a ref and a render value.
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (ready || !node) return;
+    if (ready) return;
+    const target = document.getElementById(elementId);
+    if (!target) return;
     if (typeof IntersectionObserver === "undefined") {
       const timer = window.setTimeout(() => setReady(true), 0);
       return () => window.clearTimeout(timer);
@@ -38,10 +39,10 @@ function useGraphNearViewport<T extends HTMLElement>() {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting) { setReady(true); observer.disconnect(); }
     }, { rootMargin: "420px" });
-    observer.observe(node);
+    observer.observe(target);
     return () => observer.disconnect();
-  }, [node, ready]);
-  return { setNode, ready };
+  }, [elementId, ready]);
+  return ready;
 }
 
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
@@ -80,8 +81,8 @@ export default function ArchitectureTopologyView({
 	const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-	const c4Viewport = useGraphNearViewport<HTMLDivElement>();
-	const explorerViewport = useGraphNearViewport<HTMLElement>();
+	const c4Ready = useGraphNearViewport("architecture-c4");
+	const explorerReady = useGraphNearViewport("service-architecture-explorer");
 
 	const healthIndex = useMemo(
 		() => indexHealth(health, siteHealth, catalog.catalogRevision),
@@ -166,15 +167,14 @@ export default function ArchitectureTopologyView({
 				siteHealth={siteHealth}
 			/>
 
-			<div id="architecture-c4" ref={c4Viewport.setNode} className={styles.explorerSection} aria-busy={!c4Viewport.ready}>
-				{c4Viewport.ready
+			<div id="architecture-c4" className={styles.explorerSection} aria-busy={!c4Ready}>
+				{c4Ready
 					? <C4ArchitectureView locale={locale} topology={topology} readOnly={readOnly} />
 					: <p role="status">{french ? "Diagramme C4 chargé à l’approche de la section" : "C4 diagram loads near the viewport"}</p>}
 			</div>
 
 			<section
-				ref={explorerViewport.setNode}
-				aria-busy={!explorerViewport.ready}
+								aria-busy={!explorerReady}
 				id="service-architecture-explorer"
 				className={styles.explorerSection}
 				aria-labelledby="service-architecture-explorer-title"
@@ -186,7 +186,7 @@ export default function ArchitectureTopologyView({
 							: "Interactive service topology"}
 					</h2>
 				</div>
-                {explorerViewport.ready ? (
+                {explorerReady ? (
 				<HierarchicalArchitectureExplorer
 					locale={locale}
 					catalog={filteredCatalog}
