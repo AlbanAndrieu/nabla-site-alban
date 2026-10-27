@@ -50,7 +50,7 @@ test("an application change is never skipped", (t) => {
   git(root, "commit", "-qm", "application");
   const result = ignore(root);
   assert.equal(result.status, 1, result.stdout + result.stderr);
-  assert.match(result.stdout, /Deploy-relevant change/);
+  assert.match(result.stdout, /build safely/);
 });
 
 test("a merge with docs-only first-parent delta still builds the application Preview", (t) => {
@@ -84,11 +84,11 @@ test("docs-only HEAD cannot hide earlier runtime changes without previous Previe
   const root = fixture();
   t.after(() => rmSync(root, { recursive: true, force: true }));
   git(root, "switch", "-qc", "feature");
-  writeFileSync(join(root, "app.ts"), "export const version = 2;\\n");
+  writeFileSync(join(root, "app.ts"), "export const version = 2;\n");
   git(root, "add", ".");
   git(root, "commit", "-qm", "runtime");
   mkdirSync(join(root, "docs"));
-  writeFileSync(join(root, "docs", "readme.md"), "updated\\n");
+  writeFileSync(join(root, "docs", "readme.md"), "updated\n");
   git(root, "add", ".");
   git(root, "commit", "-qm", "docs");
   const result = ignore(root);
@@ -102,11 +102,11 @@ test("first branch Preview compares full merge-base when master ref is available
   const base = git(root, "rev-parse", "HEAD");
   git(root, "update-ref", "refs/remotes/origin/master", base);
   git(root, "switch", "-qc", "feature");
-  writeFileSync(join(root, "app.ts"), "export const version = 2;\\n");
+  writeFileSync(join(root, "app.ts"), "export const version = 2;\n");
   git(root, "add", ".");
   git(root, "commit", "-qm", "runtime");
   mkdirSync(join(root, "docs"));
-  writeFileSync(join(root, "docs", "readme.md"), "updated\\n");
+  writeFileSync(join(root, "docs", "readme.md"), "updated\n");
   git(root, "add", ".");
   git(root, "commit", "-qm", "docs");
   const result = ignore(root);
@@ -121,7 +121,7 @@ test("a docs-only branch with known master ref still skips without runtime chang
   git(root, "update-ref", "refs/remotes/origin/master", git(root, "rev-parse", "HEAD"));
   git(root, "switch", "-qc", "docs");
   mkdirSync(join(root, "docs"));
-  writeFileSync(join(root, "docs", "readme.md"), "updated\\n");
+  writeFileSync(join(root, "docs", "readme.md"), "updated\n");
   git(root, "add", ".");
   git(root, "commit", "-qm", "docs");
   const result = ignore(root, { VERCEL_GIT_COMMIT_REF: "docs" });
