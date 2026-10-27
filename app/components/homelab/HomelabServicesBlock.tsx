@@ -96,8 +96,8 @@ export default function HomelabServicesBlock({
     const target = graphRef.current;
     if (!target) return;
     if (typeof IntersectionObserver === "undefined") {
-      setGraphInView(true);
-      return;
+      const timer = window.setTimeout(() => setGraphInView(true), 0);
+      return () => window.clearTimeout(timer);
     }
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting) {
