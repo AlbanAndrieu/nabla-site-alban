@@ -1,12 +1,26 @@
 # Roadmap active — nabla-site-alban
 
+
+## Situation au 27 octobre 2026 — priorité de livraison #263
+
+| Surface | Révision / preuve | État |
+| --- | --- | --- |
+| Production Vercel | `f26906733e228a27897a48983cae07c01f966c99` (#262), déploiement `dpl_6gAXM1U7aGFJy3y2sESqp2eVZeJu` | **READY** ; ne prouve pas le HTTP, le navigateur ni OWNER/LAN |
+| PR de stabilisation | [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), inclut #262 | **Draft** ; accès/caches, UX, refactoring et tests source |
+| Preview de #263 | Aucun déploiement identifié sur la branche dans les résultats Vercel consultés | **NOT_RUN** ; aucune recette exact-SHA |
+| Publication locale de #263 | Aucun `QG_PUBLISH_PROOF_OK` sur HEAD actuel | **NOT_RUN** ; ne pas fusionner sur seuls contrôles statiques |
+| OWNER / SERVICE | Contrats de source et purge des ressources OWNER au passage SERVICE | **DONE (code)** ; assertions navigateur LAN/WAN **NOT_RUN** |
+
+**Critère de clôture P0** : obtenir sur le même SHA un arbre formaté propre, tests rapides + unitaires, TypeScript, lint et build Next.js, attestation `QG_PUBLISH_PROOF_OK`, puis contrôle des accès réels. Sans accès LAN ni navigateur autorisé, garder l'acceptation finale **BLOCKED**, même si Vercel est `READY`. Ne pas déclencher de GitHub Actions payantes ; ni fusion automatique.
+
+
 > Réconciliée le **25 octobre 2026**, après fusion de [Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256).
 > **Source d'autorité :** cette roadmap contient uniquement les tâches du site.
 > [Historique intégral précédent](archive/homelab-roadmap-through-2026-10-25.txt)
 > conservé sans suppression de preuve. Les actions Compose et FastAPI ont leurs
 > propres roadmaps ; un merge et un déploiement READY ne valent pas recette navigateur.
 
-## Dernier état vérifié — production
+## Historique de production — état du 25 octobre (remplacé par la situation ci-dessus)
 
 | Dimension | Preuve | Verdict |
 | --- | --- | --- |
@@ -57,6 +71,8 @@ Ne pas présenter `/en/architecture` comme canonique.
 
 **Done P0 :** preuves HTTP/navigateur datées, parcours OWNER et SERVICE prouvés,
 contrôle de confidentialité négatif et SHA exact. Ne jamais fermer sur READY seul.
+
+- [x] **S-04b Confidentialité du navigateur (code #263)** : lorsque TrueNAS entre en mode `readOnly`, supprimer la clé locale des ressources privées OWNER et effacer sa copie React de manière différée et annulable, sans toucher au cache public expurgé. **Le contrôle externe du DOM, des réponses et de Storage reste à effectuer pour fermer S-04.**
 
 ## P0 — Diagnostics et contrôle d'accès côté site
 
