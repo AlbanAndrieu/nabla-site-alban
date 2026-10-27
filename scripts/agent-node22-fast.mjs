@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Offline L1 smoke: Node 22/npm 10 (agent) or Node 24/npm 12 (project). NOT a publish gate. */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { chmodSync, existsSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -53,6 +53,36 @@ export function missingSources(root, tests = FAST_TESTS) {
   return tests.filter((path) => !existsSync(resolve(root, path)));
 }
 
+/** Format Node's spec report without embedding complete source files in failures. */
+export function summarizeFastTestOutput(output, exitCode) {
+  const stats = Object.fromEntries(
+    [...output.matchAll(/^ℹ (tests|pass|fail|duration_ms) ([\\d.]+)$/gm)]
+      .map((match) => [match[1], Number(match[2])]),
+  );
+  const failures = [...output.matchAll(/^test at ([^\\n]+?):(\\d+):\\d+\\r?\\n✖ ([^\\n]+)/gm)]
+    .map((match) => ({
+      location: `${match[1]}:${match[2]}`,
+      name: match[3].replace(/ \\([\\d.]+ms\\)$/, "").trim(),
+    }));
+  if (exitCode !== 0 && failures.length === 0) {
+    const names = [...output.matchAll(/^✖ (?!failing tests:)([^\\n]+)/gm)];
+    for (const match of names) {
+      const name = match[1].replace(/ \\([\\d.]+ms\\)$/, "").trim();
+      if (!failures.some((item) => item.name === name)) failures.push({ name, location: "unknown" });
+    }
+  }
+  const total = stats.tests ?? "?";
+  const passed = stats.pass ?? "?";
+  const failed = stats.fail ?? (exitCode === 0 ? 0 : failures.length);
+  const duration = Number.isFinite(stats.duration_ms)
+    ? ` (${(stats.duration_ms / 1000).toFixed(1)}s)`
+    : "";
+  const headline = exitCode === 0 && failed === 0
+    ? `✅ L1: ${passed}/${total} tests PASS${duration}`
+    : `❌ L1: ${passed}/${total} PASS · ${failed} FAIL${duration}`;
+  return { headline, failures };
+}
+
 export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dirname(fileURLToPath(import.meta.url)), "..") } = {}) {
   if (argv.length > 1 || (argv.length === 1 && argv[0] !== "--preflight")) {
     console.error("usage: node scripts/agent-node22-fast.mjs [--preflight]");
@@ -75,18 +105,49 @@ export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dir
     return 3;
   }
   if (argv[0] === "--preflight") return 0;
+  const pathResult = spawnSync("git", ["rev-parse", "--git-path", "agent-fast-tests.log"], {
+    cwd: root, encoding: "utf8", timeout: 8_000,
+  });
+  if (pathResult.status !== 0 || !pathResult.stdout?.trim()) {
+    console.error("LOCAL_FAST_LOG_PATH_FAILED: Git metadata unavailable");
+    return 2;
+  }
+  const logPath = resolve(root, pathResult.stdout.trim());
   const result = spawnSync(process.execPath, [
     "--experimental-strip-types", "--test", "--test-concurrency=2", ...FAST_TESTS,
-  ], { cwd: root, stdio: "inherit", timeout: 120_000 });
+  ], { cwd: root, encoding: "utf8", maxBuffer: 32 * 1024 * 1024, timeout: 120_000 });
+  const stdout = result.stdout ?? "";
+  const stderr = result.stderr ?? "";
+  try {
+    writeFileSync(logPath, stdout + stderr, { mode: 0o600 });
+    chmodSync(logPath, 0o600);
+  } catch (error) {
+    console.error("LOCAL_FAST_LOG_WRITE_FAILED: " + error.message);
+    return 1;
+  }
+  if (process.env.QUALITY_VERBOSE === "1") {
+    process.stdout.write(stdout);
+    process.stderr.write(stderr);
+  }
+  const summary = summarizeFastTestOutput(stdout, result.status);
+  console.log(summary.headline);
   if (result.error || result.signal) {
     console.error("LOCAL_FAST_RUNNER_FAILED: " + (result.error?.message ?? result.signal));
+  }
+  if (result.status !== 0 || result.error || result.signal) {
+    for (const failure of summary.failures.slice(0, 20)) {
+      console.error(`  ✖ ${failure.name} — ${failure.location}`);
+    }
+    if (!summary.failures.length) {
+      const detail = (stderr || stdout).trim().split("\\n").slice(-8)
+        .map((line) => line.slice(0, 180)).join("\\n");
+      console.error(detail || "Test runner exited without diagnostic output.");
+    }
+    console.error("LOCAL_FAST_TEST_FAIL: full log " + logPath);
+    console.error("Tip: QUALITY_VERBOSE=1 npm run test:fast:local");
     return 1;
   }
-  if (result.status !== 0) {
-    console.error("LOCAL_FAST_TEST_FAIL: exit=" + result.status);
-    return 1;
-  }
-  console.log("LOCAL_FAST_L1_PASS: dependency-free tests only; full publication gate NOT_RUN");
+  console.log("LOCAL_FAST_L1_PASS: full publication gate NOT_RUN");
   return 0;
 }
 
