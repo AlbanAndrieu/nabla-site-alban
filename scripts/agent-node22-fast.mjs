@@ -72,16 +72,20 @@ export function summarizeFastTestOutput(output, exitCode) {
       if (!failures.some((item) => item.name === name)) failures.push({ name, location: "unknown" });
     }
   }
+  const valid = Number.isInteger(stats.tests) && stats.tests > 0 &&
+    Number.isInteger(stats.pass) && stats.pass >= 0 &&
+    Number.isInteger(stats.fail) && stats.fail >= 0 &&
+    stats.tests === stats.pass + stats.fail;
   const total = stats.tests ?? "?";
   const passed = stats.pass ?? "?";
   const failed = stats.fail ?? (exitCode === 0 ? 0 : failures.length);
   const duration = Number.isFinite(stats.duration_ms)
     ? ` (${(stats.duration_ms / 1000).toFixed(1)}s)`
     : "";
-  const headline = exitCode === 0 && failed === 0
+  const headline = exitCode === 0 && valid && failed === 0
     ? `✅ L1: ${passed}/${total} tests PASS${duration}`
     : `❌ L1: ${passed}/${total} PASS · ${failed} FAIL${duration}`;
-  return { headline, failures };
+  return { headline, failures, valid };
 }
 
 export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dirname(fileURLToPath(import.meta.url)), "..") } = {}) {
@@ -135,10 +139,11 @@ export function runNode22Fast({ argv = process.argv.slice(2), root = resolve(dir
   if (result.error || result.signal) {
     console.error("LOCAL_FAST_RUNNER_FAILED: " + (result.error?.message ?? result.signal));
   }
-  if (result.status !== 0 || result.error || result.signal) {
+  if (!summary.valid || result.status !== 0 || result.error || result.signal) {
     for (const failure of summary.failures.slice(0, 20)) {
       console.error(`  ✖ ${failure.name} — ${failure.location}`);
     }
+    if (!summary.valid) console.error("LOCAL_FAST_INVALID_REPORT: missing or inconsistent test totals");
     if (!summary.failures.length) {
       const detail = (stderr || stdout).trim().split("\n").slice(-8)
         .map((line) => line.slice(0, 180)).join("\n");
