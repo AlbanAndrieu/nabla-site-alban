@@ -1,0 +1,114 @@
+"use client";
+
+import { useEffect, useState, type ChangeEvent } from "react";
+import {
+  RESOURCE_SNAPSHOT_KEY,
+  parseResourceSnapshotFile,
+  snapshotAgeState,
+  type ResourceSnapshot,
+} from "@/lib/homelabResourceEvidence";
+
+type Props = {
+  french: boolean;
+  ownerAllowed: boolean;
+  catalogRevision: string | undefined;
+  onSnapshot: (snapshot: ResourceSnapshot | null) => void;
+};
+
+/** Owner-only local import; never uploads a resource inventory to Vercel. */
+export default function HomelabResourceSnapshotImport({
+  french, ownerAllowed, catalogRevision, onSnapshot,
+}: Props) {
+  const [snapshot, setSnapshot] = useState<ResourceSnapshot | null>(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    if (!ownerAllowed) {
+      setSnapshot(null);
+      onSnapshot(null);
+      try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* blocked */ }
+      return;
+    }
+    try {
+      const stored = window.localStorage.getItem(RESOURCE_SNAPSHOT_KEY);
+      const parsed = stored ? parseResourceSnapshotFile(stored) : null;
+      setSnapshot(parsed);
+      onSnapshot(parsed);
+      if (stored && !parsed) window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
+    } catch {
+      setSnapshot(null);
+      onSnapshot(null);
+    }
+    // Parent callback is state-only; this effect reacts to OWNER boundary changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownerAllowed]);
+
+  async function importFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (file.size > 750_000) { setError(true); return; }
+    try {
+      const candidate = parseResourceSnapshotFile(await file.text());
+      if (!candidate) { setError(true); return; }
+      window.localStorage.setItem(RESOURCE_SNAPSHOT_KEY, JSON.stringify(candidate));
+      setError(false);
+      setSnapshot(candidate);
+      onSnapshot(candidate);
+    } catch {
+      setError(true);
+    }
+  }
+
+  function clear() {
+    try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* blocked */ }
+    setSnapshot(null);
+    onSnapshot(null);
+    setError(false);
+  }
+
+  if (!ownerAllowed) return null;
+  const freshness = snapshot ? snapshotAgeState(snapshot, Date.now(), catalogRevision) : null;
+  return (
+    <section className="border rounded p-3 mb-3" data-owner-resource-snapshot>
+      <h3 className="h6">
+        {french ? "Ressources par service · RAM / GPU / stockage" : "Per-service resources · RAM / GPU / storage"}
+      </h3>
+      <p className="small text-muted mb-2">
+        {french
+          ? "Importer le JSON produit sur TrueNAS ou la workstation. Stockage local au navigateur ; aucun envoi au serveur. Les mesures ne prouvent pas la santé des services."
+          : "Import JSON collected on TrueNAS or the workstation. Browser-local only; no server upload. Resources are not health evidence."}
+      </p>
+      <label htmlFor="owner-resource-snapshot-file" className="form-label small fw-semibold">
+        {french ? "Fichier de mesures JSON" : "Resource evidence JSON file"}
+      </label>
+      <input
+        id="owner-resource-snapshot-file"
+        className="form-control form-control-sm"
+        type="file"
+        accept=".json,application/json"
+        onChange={importFile}
+        aria-describedby="owner-resource-evidence-status"
+      />
+      <div id="owner-resource-evidence-status" className="small mt-2" role="status">
+        {error ? (french ? "Fichier invalide ou trop volumineux (750 Ko maximum)." : "Invalid or oversized file (750 KB limit).") : null}
+        {snapshot ? (
+          <span data-resource-snapshot-freshness={freshness}>
+            {french ? "Mesure" : "Observed"}: <time dateTime={snapshot.observed_at_utc}>{snapshot.observed_at_utc}</time>
+            {" · "}{snapshot.source_host}
+            {" · "}{snapshot.services.length} {french ? "entités" : "entities"}
+            {" · "}{freshness === "fresh"
+              ? (french ? "récent" : "fresh")
+              : freshness === "stale"
+                ? (french ? "historique (>30 min)" : "historical (>30 min)")
+                : (french ? "révision différente du catalogue" : "catalog revision mismatch")}
+          </span>
+        ) : (!error ? (french ? "Aucune mesure disponible." : "No resource measurement available.") : null)}
+      </div>
+      {snapshot ? (
+        <button type="button" className="btn btn-outline-secondary btn-sm mt-2" onClick={clear}>
+          {french ? "Effacer le cache local" : "Clear local snapshot"}
+        </button>
+      ) : null}
+    </section>
+  );
+}

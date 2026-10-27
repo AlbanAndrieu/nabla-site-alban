@@ -8,6 +8,7 @@ import {
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
+import { snapshotAgeState, type ResourceSnapshot } from "@/lib/homelabResourceEvidence";
 import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
@@ -20,6 +21,7 @@ type Props = {
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
 	ownerBoundary?: boolean;
+  resources?: ResourceSnapshot | null;
   readOnly?: boolean;
 };
 
@@ -30,11 +32,19 @@ export default function HomelabServiceGrid({
 	healthUnavailable = false,
 	healthHttpStatus = null,
 	ownerBoundary = false,
+  resources = null,
   readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
+  const resourceIndex = new Map(
+    (resources?.services ?? []).map((row) => [row.entityRef, row] as const),
+  );
+  const resourceStale = resources
+    ? snapshotAgeState(resources, Date.now(), catalog.catalogRevision) !== "fresh"
+    : false;
+
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
 	const serviceOccurrences = new Map<string, number>();
@@ -144,6 +154,9 @@ export default function HomelabServiceGrid({
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
 							readOnly={readOnly}
+              resource={!readOnly && !ownerBoundary && svc.entityRef
+                ? resourceIndex.get(svc.entityRef) : undefined}
+              resourceStale={resourceStale}
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
 							internalRouteMismatch={observed.internalRouteMismatch}

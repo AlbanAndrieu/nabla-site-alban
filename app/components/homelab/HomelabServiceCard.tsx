@@ -33,6 +33,8 @@ import {
 	serviceIconPath,
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
+import HomelabServiceResources from "./HomelabServiceResources";
+import type { ServiceResourceMeasurement } from "@/lib/homelabResourceEvidence";
 import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
 
 type Props = {
@@ -48,6 +50,8 @@ type Props = {
 	truenasRuntimeUnavailable: boolean;
 	truenasRuntimeStale: boolean;
 	readOnly?: boolean;
+  resource?: ServiceResourceMeasurement;
+  resourceStale?: boolean;
 	externalUrlDerived?: boolean;
 	internalProtocolObserved?: boolean;
 	internalRouteMismatch?: boolean;
@@ -67,6 +71,8 @@ export default function HomelabServiceCard({
 	truenasRuntimeUnavailable,
 	truenasRuntimeStale,
 	readOnly = false,
+  resource,
+  resourceStale = false,
 	externalUrlDerived = false,
 	internalProtocolObserved = false,
 	internalRouteMismatch = false,
@@ -229,6 +235,13 @@ export default function HomelabServiceCard({
 						cloudflareConfigured={snapshot?.cloudflare_configured}
 						runtimeStale={truenasRuntimeStale}
 					/>
+          {!readOnly && resource && (
+            <HomelabServiceResources
+              resource={resource}
+              french={french}
+              stale={resourceStale}
+            />
+          )}
 					{dependencyDegraded && (
 						<div
 							className="alert alert-warning py-2 px-2 small text-start mt-3 mb-0"

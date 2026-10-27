@@ -17,6 +17,9 @@ import CriticalDependencyHierarchy, {
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabServiceGrid from "./HomelabServiceGrid";
+import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
+import type { ResourceSnapshot } from "@/lib/homelabResourceEvidence";
+
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
 import {
@@ -66,6 +69,7 @@ export default function HomelabServicesBlock({
 		Set<ServicePresentationGroup>
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
+	const [resourceSnapshot, setResourceSnapshot] = useState<ResourceSnapshot | null>(null);
 	const handledAnchor = useRef<string | null>(null);
 
 	// If FastAPI provides cards but no matching relation graph, still show the
@@ -340,6 +344,15 @@ export default function HomelabServicesBlock({
 			)}
 
 
+      {!readOnly && (
+        <HomelabResourceSnapshotImport
+          french={french}
+          ownerAllowed={!state.ownerBoundary}
+          catalogRevision={state.catalog.catalogRevision}
+          onSnapshot={setResourceSnapshot}
+        />
+      )}
+
 			<section
 				id="truenas-health-dashboard"
 				className={styles.healthDashboard}
@@ -588,6 +601,7 @@ export default function HomelabServicesBlock({
 									ownerBoundary={state.ownerBoundary === true}
 									healthHttpStatus={readOnly ? null : state.healthStatus}
 									readOnly={readOnly}
+									resources={resourceSnapshot}
 								/>
 							</div>
 						</details>

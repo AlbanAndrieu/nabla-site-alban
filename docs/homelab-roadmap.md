@@ -94,6 +94,53 @@ invariants sont à préserver, pas à réimplémenter.
   les endpoints de projection allowlistés sont accessibles et que les 503
   publics ne révèlent aucune phase privée.
 
+## Ressources CPU/RAM/GPU/ZFS — contrat complémentaire du 27 octobre
+
+- [x] Le producteur `nabla-compose` PR #285 expose
+  `cpu.usage_pct` en pourcentage d'un cœur dans l'instantané
+  privé `nabla-service-resources/v1` ; la présence
+  d'un conteneur dans `docker ps` est distincte du succès
+  de mesure CPU.
+- [x] Les cartes OWNER affichent maintenant CPU en plus de
+  RAM, GPU et ZFS. Les anciennes captures sans champ CPU
+  continuent d'être acceptées et affichent **—**.
+- [x] Le producteur expose `coverage` et les conteneurs
+  RUNNING sans mapping catalogique. Pas de mesure live
+  prétendue dans le catalogue statique ; le rapprochement
+  de ces workloads reste à effectuer sur TrueNAS.
+- [ ] Collecte opérateur CPU/RAM/stockage de tous les
+  conteneurs RUNNING et import OWNER depuis la workstation ;
+  **non effectuée** depuis l'agent GitHub.
+- [ ] API LAN autorisée pour l'actualisation périodique et
+  la conservation des snapshots historiques sans dépendre
+  d'un accès public TrueNAS.
+
+## P1 — Référence RAM / GPU / stockage par service (26 octobre)
+
+- [x] **Contrat OWNER** : `lib/homelabResourceEvidence.ts`
+  accepte un snapshot privé `nabla-service-resources/v1`, le
+  valide et nettoie les champs non autorisés ; correspondance
+  stricte par `entityRef` Backstage v2, aucune inférence de nom.
+- [x] **Catalogue de cartes** : import manuel du JSON collecté
+  depuis TrueNAS/workstation, cache `localStorage` OWNER local,
+  effacement explicite et affichage RAM/GPU/couche Docker/ZFS
+  (datasets partagés annotés). Aucune donnée importée n'est
+  présentée comme statut de santé du service.
+- [x] **Fraîcheur** : horodatage, hôte source, `stale >30 min`,
+  avertissement de révision du catalogue, valeurs absentes
+  `— / non vérifié` plutôt que zéro.
+- [x] **Frontière public** : aucun upload vers Vercel,
+  aucun import ni rendu en mode SERVICE/readOnly,
+  pas de récupération automatique de ressources privées.
+- [ ] **Tests de production** : `node --test
+  unit-tests/homelabResourceEvidence.test.mjs`, quality gate
+  locale Node 24 puis contrôle OWNER et absence de fuite
+  SERVICE/public ; **NOT_RUN** dans l'environnement agent.
+- [ ] **Étape suivante** : ingestion automatique via
+  endpoint FastAPI OWNER autorisé, sans second scraper
+  permanent (cAdvisor/Prometheus pour l'historique).
+  [Runbook de ressources](runbooks/homelab-service-resources.md).
+
 ## P1 — C4, icônes et expérience utilisateur
 
 **Livré dans #256 :** `@xyflow/react` sans nouveau serveur de diagrammes,
