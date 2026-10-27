@@ -21,7 +21,7 @@ export default function HomelabResourceSnapshotImport({
 }: Props) {
   const [snapshot, setSnapshot] = useState<ResourceSnapshot | null>(null);
   const [error, setError] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
   // Mutable values are accessed only in effects and event handlers, never in JSX.
   const ownerSession = useRef(false);
   const importSequence = useRef(0);
@@ -58,8 +58,12 @@ export default function HomelabResourceSnapshotImport({
 
   useEffect(() => {
     if (!ownerAllowed) return;
+    const initial = window.setTimeout(() => setNow(Date.now()), 0);
     const interval = window.setInterval(() => setNow(Date.now()), 60_000);
-    return () => window.clearInterval(interval);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
   }, [ownerAllowed]);
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
@@ -93,7 +97,9 @@ export default function HomelabResourceSnapshotImport({
   }
 
   if (!ownerAllowed) return null;
-  const freshness = snapshot ? snapshotAgeState(snapshot, now, catalogRevision) : null;
+  const freshness = snapshot && now !== null
+    ? snapshotAgeState(snapshot, now, catalogRevision)
+    : null;
   return (
     <section className="border rounded p-3 mb-3" data-owner-resource-snapshot>
       <h3 className="h6">
@@ -126,7 +132,9 @@ export default function HomelabResourceSnapshotImport({
               ? (french ? "récent" : "fresh")
               : freshness === "stale"
                 ? (french ? "historique (>30 min)" : "historical (>30 min)")
-                : (french ? "révision différente du catalogue" : "catalog revision mismatch")}
+                : freshness === "revision-mismatch"
+                ? (french ? "révision différente du catalogue" : "catalog revision mismatch")
+                : (french ? "vérification en cours" : "checking freshness")}
           </span>
         ) : (!error ? (french ? "Aucune mesure disponible." : "No resource measurement available.") : null)}
       </div>
