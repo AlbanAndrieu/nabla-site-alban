@@ -5,8 +5,8 @@ const read = (path) => readFileSync(new URL("../" + path, import.meta.url), "utf
 
 test("C4 and topology load ReactFlow only near the viewport", () => {
   const source = read("app/[locale]/architecture/ArchitectureTopologyView.tsx");
-  assert.match(source, /dynamic\(\(\) => import\("\.\/C4ArchitectureView"\)/);
-  assert.match(source, /dynamic\(\(\) => import\("\.\/HierarchicalArchitectureExplorer"\)/);
+  assert.match(source, /dynamic\(\s*\(\) => import\("\.\/C4ArchitectureView"\)/);
+  assert.match(source, /dynamic\(\s*\(\) => import\("\.\/HierarchicalArchitectureExplorer"\)/);
   assert.match(source, /rootMargin: "420px"/);
   assert.match(source, /aria-busy=\{!c4Ready\}/);
   assert.match(source, /aria-busy=\{!explorerReady\}/);
