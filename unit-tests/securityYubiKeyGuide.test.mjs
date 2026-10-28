@@ -48,6 +48,12 @@ test("bilingual setup and glossary copy have matching technical terms", () => {
   assert.match(page, /id="yubikey-workflow"/);
 });
 
+test("all 25 bilingual glossary terms are comma-separated", () => {
+  const transitions = [...copy.matchAll(/\{\s*acronym:\s*"age"[^\n]*\},\s*\{\s*acronym:\s*"MFA"/g)];
+  assert.equal(transitions.length, 2, "FR and EN entries must both separate age and MFA");
+  assert.equal(copy.split(/acronym:\s*"/).length - 1, 50);
+});
+
 test("public route never publishes device identifiers or credential material", () => {
   const all = [page, graph, model, copy].join("\n");
   assert.doesNotMatch(all, /(?:23501671|22916048|172\.17\.0\.|10\.254\.255\.)/);
