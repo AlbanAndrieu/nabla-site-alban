@@ -448,7 +448,7 @@ Cette feuille de route concerne uniquement la **présentation publique du Site**
 
 - [x] Sous-page localisée `/security/yubikey` et `/fr/security/yubikey` : contenu FR/EN, canonical/hreflang, lien depuis la section Sécurité personnelle, indexation dans le catalogue SEO.
 - [x] Graphe **ReactFlow** statique de la chaîne poste → clés principale/secondaire → FIDO2/WebAuthn, SSH FIDO, PIV, OpenPGP, OTP/HMAC, age et KeePassXC, avec description textuelle et zoom/pan. Aucune découverte active, aucun appel à un périphérique.
-- [x] Checklist publique distinguant **documenté**, **prévu** et **à débloquer** ; lexique de 16 sigles avec définitions FR/EN ; règles sans mutation pour PIN, PUK, certificats, slots ou secrets.
+- [x] Checklist publique distinguant **documenté**, **prévu** et **à débloquer** ; lexique de 25 termes et sigles avec définitions FR/EN ; règles sans mutation pour PIN, PUK, certificats, slots ou secrets.
 - [x] Ajouter **13 exemples FR/EN** : WebAuthn/MFA, SSH, signatures Git SSH FIDO/GPG, secrets SOPS/age, age-plugin-yubikey (PIV), sauvegarde PostgreSQL chiffrée en flux et signature GPG, certificats PIV, Vaultwarden, HashiCorp Vault via OIDC, KeePassXC et OATH-TOTP. Chaque carte précise ses prérequis, commandes indicatives, limites et source officielle.
 - [x] Vérifier la navigation héritée : icônes globales Home (Font Awesome) et Back to Top (bouton partagé), ancre TopAnchor ; aligner le retour Security sur l'icône standard et corriger le chemin de l'accueil EN vers `/` (FR `/fr`). Deux contrats source ajoutés, non assimilés à une recette navigateur.
 
