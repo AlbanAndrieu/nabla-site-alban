@@ -78,7 +78,7 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
       { acronym: "PIN", expansion: "Personal Identification Number", meaning: "Code personnel de déverrouillage de la clé." },
       { acronym: "PUK", expansion: "PIN Unblocking Key", meaning: "Code de déblocage du PIN de l'application PIV, à conserver hors ligne." },
       { acronym: "CA", expansion: "Certificate Authority", meaning: "Autorité de certification qui émet ou signe des certificats." },
-      { acronym: "age", expansion: "age encryption tool", meaning: "Outil de chiffrement de fichiers utilisé pour les sauvegardes chiffrées." }
+      { acronym: "age", expansion: "age encryption tool", meaning: "Outil de chiffrement de fichiers utilisé pour les sauvegardes chiffrées." },
       { acronym: "MFA", expansion: "Multi-Factor Authentication", meaning: "Authentification multifacteur : au moins deux facteurs indépendants, par exemple mot de passe et clé matérielle." },
       { acronym: "SOPS", expansion: "Secrets OPerationS", meaning: "Outil d'édition et de chiffrement des secrets structurés, notamment avec age." },
       { acronym: "OIDC", expansion: "OpenID Connect", meaning: "Protocole d'identité sur OAuth 2.0 utilisé notamment pour la connexion fédérée à Vault." },
@@ -155,7 +155,7 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
       { acronym: "PIN", expansion: "Personal Identification Number", meaning: "Personal code protecting key access." },
       { acronym: "PUK", expansion: "PIN Unblocking Key", meaning: "Unlock code for the PIV application, kept offline." },
       { acronym: "CA", expansion: "Certificate Authority", meaning: "Authority issuing or signing certificates." },
-      { acronym: "age", expansion: "age encryption tool", meaning: "File encryption tool used for encrypted recovery archives." }
+      { acronym: "age", expansion: "age encryption tool", meaning: "File encryption tool used for encrypted recovery archives." },
       { acronym: "MFA", expansion: "Multi-Factor Authentication", meaning: "Authentication with multiple independent factors, for example a password and hardware key." },
       { acronym: "SOPS", expansion: "Secrets OPerationS", meaning: "Editor and encryption tool for structured secrets, including age recipients." },
       { acronym: "OIDC", expansion: "OpenID Connect", meaning: "Identity protocol built on OAuth 2.0, used for federated Vault login." },
