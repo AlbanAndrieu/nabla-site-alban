@@ -175,10 +175,10 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "purpose": "Associer une base KeePassXC au mécanisme HMAC-SHA1 du slot OTP de la YubiKey. Prévoir la reprise indépendamment de la clé principale.",
       "prerequisites": "Slot défi-réponse existant, KeePassXC compatible, copie de test de la base et procédure de reprise validée.",
       "code": "",
-      "caution": "Dans une copie de test KeePassXC, vérifier l'accès avec la YubiKey principale ; tester ensuite une solution de secours autorisée.",
+      "caution": "Ne jamais reprogrammer le slot OTP sans sauvegarde du secret. Deux clés distinctes ne déverrouillent pas automatiquement la même base.",
       "source": {
-        "url": "Ne jamais reprogrammer le slot OTP sans sauvegarde du secret. Deux clés distinctes ne déverrouillent pas automatiquement la même base.",
-        "label": "https://keepassxc.org/docs/"
+        "url": "https://keepassxc.org/docs/",
+        "label": "KeePassXC"
       }
     },
     {
@@ -189,10 +189,10 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "purpose": "Conserver les secrets OATH-TOTP dans la YubiKey et afficher les codes via Yubico Authenticator, si le service ne prend pas WebAuthn en charge.",
       "prerequisites": "Application OATH configurée, service compatible TOTP et méthode de secours.",
       "code": "",
-      "caution": "Depuis Yubico Authenticator, déverrouiller la clé si nécessaire et demander un code TOTP pour un compte compatible.",
+      "caution": "Le TOTP est moins résistant à l'hameçonnage que WebAuthn. OATH-TOTP et le slot OTP HMAC-SHA1 KeePassXC sont deux applications différentes.",
       "source": {
-        "url": "Le TOTP est moins résistant à l'hameçonnage que WebAuthn. OATH-TOTP et le slot OTP HMAC-SHA1 KeePassXC sont deux applications différentes.",
-        "label": "https://docs.yubico.com/software/yubikey/tools/authenticator/"
+        "url": "https://docs.yubico.com/software/yubikey/tools/authenticator/",
+        "label": "Yubico Authenticator"
       }
     }
   ],
@@ -359,10 +359,10 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "purpose": "Bind a KeePassXC database to the YubiKey HMAC-SHA1 OTP challenge-response slot. Plan independent recovery.",
       "prerequisites": "Existing challenge-response slot, compatible KeePassXC, test copy of the database and validated recovery plan.",
       "code": "",
-      "caution": "On a disposable KeePassXC test database, verify unlock with the primary YubiKey and evaluate an explicitly authorized backup path.",
+      "caution": "Never reprogram an OTP slot without secure secret backup. Separate keys cannot automatically unlock the same database.",
       "source": {
-        "url": "Never reprogram an OTP slot without secure secret backup. Separate keys cannot automatically unlock the same database.",
-        "label": "https://keepassxc.org/docs/"
+        "url": "https://keepassxc.org/docs/",
+        "label": "KeePassXC"
       }
     },
     {
@@ -373,10 +373,10 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "purpose": "Keep OATH-TOTP credentials on the YubiKey and obtain codes through Yubico Authenticator when WebAuthn is unavailable.",
       "prerequisites": "Provisioned OATH app, TOTP-enabled service and recovery method.",
       "code": "",
-      "caution": "In Yubico Authenticator, unlock the key if requested and obtain a TOTP code for the service.",
+      "caution": "TOTP is less phishing-resistant than WebAuthn. OATH-TOTP and the HMAC-SHA1 OTP challenge-response slot are separate applications.",
       "source": {
-        "url": "TOTP is less phishing-resistant than WebAuthn. OATH-TOTP and the HMAC-SHA1 OTP challenge-response slot are separate applications.",
-        "label": "https://docs.yubico.com/software/yubikey/tools/authenticator/"
+        "url": "https://docs.yubico.com/software/yubikey/tools/authenticator/",
+        "label": "Yubico Authenticator"
       }
     }
   ]
