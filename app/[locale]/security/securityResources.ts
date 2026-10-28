@@ -12,7 +12,7 @@ export type ResourceLink =
 			icon?: ResourceLinkIcon;
 	  }
 	| {
-			page: "ai" | "truenas" | "security/dsomm" | "security/lexique";
+			page: "ai" | "truenas" | "security/dsomm" | "security/lexique" | "security/yubikey";
 			hash?: string;
 			icon: ResourceLinkIcon;
 	  };
@@ -75,6 +75,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 			},
 			{ href: "https://digital-defense.io/" },
 			{ href: "https://www.privacytools.io/" },
+			{ page: "security/yubikey", icon: "book" },
 		],
 	},
 	{
