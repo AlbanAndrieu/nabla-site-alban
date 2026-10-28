@@ -79,6 +79,15 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
       { acronym: "PUK", expansion: "PIN Unblocking Key", meaning: "Code de déblocage du PIN de l'application PIV, à conserver hors ligne." },
       { acronym: "CA", expansion: "Certificate Authority", meaning: "Autorité de certification qui émet ou signe des certificats." },
       { acronym: "age", expansion: "age encryption tool", meaning: "Outil de chiffrement de fichiers utilisé pour les sauvegardes chiffrées." }
+      { acronym: "MFA", expansion: "Multi-Factor Authentication", meaning: "Authentification multifacteur : au moins deux facteurs indépendants, par exemple mot de passe et clé matérielle." },
+      { acronym: "SOPS", expansion: "Secrets OPerationS", meaning: "Outil d'édition et de chiffrement des secrets structurés, notamment avec age." },
+      { acronym: "OIDC", expansion: "OpenID Connect", meaning: "Protocole d'identité sur OAuth 2.0 utilisé notamment pour la connexion fédérée à Vault." },
+      { acronym: "IdP", expansion: "Identity Provider", meaning: "Fournisseur d'identité qui authentifie l'utilisateur et applique éventuellement WebAuthn." },
+      { acronym: "OATH", expansion: "Initiative for Open Authentication", meaning: "Famille de standards pour les codes de vérification, distincte de l'application OTP défi-réponse." },
+      { acronym: "TOTP", expansion: "Time-based One-Time Password", meaning: "Code temporaire fondé sur le temps, généralement à six chiffres." },
+      { acronym: "TLS", expansion: "Transport Layer Security", meaning: "Protocole de protection des connexions réseau ; peut utiliser un certificat client." },
+      { acronym: "X.509", expansion: "ITU-T X.509", meaning: "Norme de format et de validation de certificats à clé publique." },
+      { acronym: "SQL", expansion: "Structured Query Language", meaning: "Langage de bases de données utilisé notamment par PostgreSQL." },
     ],
     nextTitle: "Conditions de clôture", nextSteps: [
       "Vérifier les deux clés en lecture seule et enregistrer des résultats expurgés datés.",
@@ -147,6 +156,15 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
       { acronym: "PUK", expansion: "PIN Unblocking Key", meaning: "Unlock code for the PIV application, kept offline." },
       { acronym: "CA", expansion: "Certificate Authority", meaning: "Authority issuing or signing certificates." },
       { acronym: "age", expansion: "age encryption tool", meaning: "File encryption tool used for encrypted recovery archives." }
+      { acronym: "MFA", expansion: "Multi-Factor Authentication", meaning: "Authentication with multiple independent factors, for example a password and hardware key." },
+      { acronym: "SOPS", expansion: "Secrets OPerationS", meaning: "Editor and encryption tool for structured secrets, including age recipients." },
+      { acronym: "OIDC", expansion: "OpenID Connect", meaning: "Identity protocol built on OAuth 2.0, used for federated Vault login." },
+      { acronym: "IdP", expansion: "Identity Provider", meaning: "Provider authenticating users and optionally enforcing WebAuthn." },
+      { acronym: "OATH", expansion: "Initiative for Open Authentication", meaning: "Standards for authentication passcodes, distinct from the OTP challenge-response application." },
+      { acronym: "TOTP", expansion: "Time-based One-Time Password", meaning: "Short-lived time-based code, often six digits." },
+      { acronym: "TLS", expansion: "Transport Layer Security", meaning: "Protocol securing network connections, optionally using client certificates." },
+      { acronym: "X.509", expansion: "ITU-T X.509", meaning: "Standard for public-key certificate format and validation." },
+      { acronym: "SQL", expansion: "Structured Query Language", meaning: "Database language used by PostgreSQL." },
     ],
     nextTitle: "Exit criteria", nextSteps: [
       "Read-only inventory both keys and record dated, redacted results.",
