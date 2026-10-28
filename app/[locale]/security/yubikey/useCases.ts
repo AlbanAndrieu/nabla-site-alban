@@ -118,7 +118,7 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "title": "Signature GPG d'une sauvegarde PostgreSQL",
       "purpose": "Apposer une signature détachée sur une sauvegarde déjà chiffrée afin de contrôler l'origine et l'intégrité avant restauration.",
       "prerequisites": "Sous-clé GPG de signature accessible sur YubiKey, fichier postgres.dump.age déjà produit et copie fiable de la clé publique.",
-      "code": "gpg --local-user "$GPG_SIGNING_FINGERPRINT" --detach-sign --armor --output postgres.dump.age.asc postgres.dump.age\ngpg --verify postgres.dump.age.asc postgres.dump.age",
+      "code": "gpg --local-user \"$GPG_SIGNING_FINGERPRINT\" --detach-sign --armor --output postgres.dump.age.asc postgres.dump.age\ngpg --verify postgres.dump.age.asc postgres.dump.age",
       "caution": "La signature ne chiffre pas le backup. Valider l'empreinte du signataire et vérifier avant toute restauration.",
       "source": {
         "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html",
@@ -302,7 +302,7 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "title": "GPG signing a PostgreSQL backup",
       "purpose": "Add a detached signature to an already encrypted archive to verify origin and integrity before a restore.",
       "prerequisites": "YubiKey-accessible GPG signing subkey, existing postgres.dump.age file, trusted signer public key.",
-      "code": "gpg --local-user "$GPG_SIGNING_FINGERPRINT" --detach-sign --armor --output postgres.dump.age.asc postgres.dump.age\ngpg --verify postgres.dump.age.asc postgres.dump.age",
+      "code": "gpg --local-user \"$GPG_SIGNING_FINGERPRINT\" --detach-sign --armor --output postgres.dump.age.asc postgres.dump.age\ngpg --verify postgres.dump.age.asc postgres.dump.age",
       "caution": "A signature does not encrypt a backup. Check the signer fingerprint and verify before restoring.",
       "source": {
         "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html",
