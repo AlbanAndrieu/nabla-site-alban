@@ -16,12 +16,33 @@ for (const locale of ["fr", "en"] as const) {
       const response = await page.goto(path);
       expect(response?.ok()).toBeTruthy();
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
-      await expect(page.locator("main h1")).toBeVisible();
+      await expect(page.locator(".page-security header h1")).toBeVisible();
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-        "href", new RegExp(`${path.replace(/\\//g, "\\/")}$`)
+        "href", new RegExp(`${path}import { expect, test } from "@playwright/test";
+
+// Public, read-only UI checks. Run locally against a matching exact-SHA Preview:
+// BASE_URL=https://<preview-host> npx playwright test tests/yubikey.spec.ts --project=chromium
+// For protected previews, use the existing Playwright config's bypass settings.
+for (const locale of ["fr", "en"] as const) {
+  const path = `${locale === "fr" ? "/fr" : ""}/security/yubikey`;
+  const homePath = locale === "fr" ? "/fr" : "/";
+  const graphListLabel = locale === "fr"
+    ? "Liste accessible des relations du diagramme"
+    : "Accessible list of diagram relationships";
+  const backupLabel = locale === "fr" ? "YubiKey secondaire" : "Backup YubiKey";
+
+  test.describe(`YubiKey Security (${locale})`, () => {
+    test("renders localized content, metadata and 14 sourced examples", async ({ page }) => {
+      const response = await page.goto(path);
+      expect(response?.ok()).toBeTruthy();
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      await expect(page.locator(".page-security header h1")).toBeVisible();
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+)
       );
       const cases = page.locator('#yubikey-use-cases article[id^="yubikey-use-"]');
       await expect(cases).toHaveCount(14);
+      await expect(cases.locator('a[href^="https://"]')).toHaveCount(14);
       await expect(page.locator("#yubikey-glossary article")).toHaveCount(25);
       await expect(page.locator("#yubikey-graph-title")).toBeVisible();
       await expect(page.locator("#yubikey-use-cases")).toBeVisible();
@@ -36,7 +57,7 @@ for (const locale of ["fr", "en"] as const) {
       await expect(backup).toBeFocused();
       await page.keyboard.press("Enter");
       await expect(backup).toHaveAttribute("aria-pressed", "true");
-      await expect(page.locator('[aria-live="polite"]')).toContainText(backupLabel);
+      await expect(page.locator('section[aria-labelledby="yubikey-graph-title"] [aria-live="polite"]')).toContainText(backupLabel);
 
       const footer = page.locator('footer[role="contentinfo"]');
       const home = footer.locator(`a[href="${homePath}"]:has(i.fa-home)`);
