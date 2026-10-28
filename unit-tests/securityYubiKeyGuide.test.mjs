@@ -37,6 +37,19 @@ test("architecture diagram is interactive with an accessible text alternative", 
   assert.match(page, /<YubiKeyGraph copy=\{copy\} \/>/);
 });
 
+test("graph node selection is keyboard reachable with visible focus and announced state", () => {
+  const css = read(base + "page.module.css");
+  assert.match(graph, /role="group"/);
+  assert.match(graph, /aria-label=\{copy\.accessibleGraph\}/);
+  assert.match(graph, /<button[\s\S]*?type="button"/);
+  assert.match(graph, /aria-pressed=\{selected === item\.id\}/);
+  assert.match(graph, /onClick=\{\(\) => setSelected\(item\.id\)\}/);
+  assert.match(graph, /<div className=\{styles\.graphDetail\} aria-live="polite">/);
+  assert.match(css, /\.graphSelectButton\s*\{/);
+  assert.match(css, /min-height:\s*44px/);
+  assert.match(css, /\.graphSelectButton:focus-visible/);
+});
+
 test("bilingual setup and glossary copy have matching technical terms", () => {
   for (const term of ["FIDO2", "WebAuthn", "CTAP", "SSH", "PIV", "PKCS#11", "GPG", "OpenPGP", "OTP", "HMAC", "SHA-1", "NFC", "PIN", "PUK", "CA", "age", "MFA", "SOPS", "OIDC", "IdP", "OATH", "TOTP", "TLS", "X.509", "SQL"]) {
     assert.equal(copy.split(`acronym: "${term}"`).length - 1, 2, term);
