@@ -9,6 +9,7 @@ import { canonicalPageAlternates, canonicalPagePath } from "@/lib/sitePageCatalo
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
 import YubiKeyGraph from "./YubiKeyGraph";
+import YubiKeyUseCases from "./YubiKeyUseCases";
 import styles from "./page.module.css";
 
 export async function generateMetadata({
@@ -40,7 +41,7 @@ export default async function YubiKeySecurityPage({
       <header className={styles.hero}>
         <Container>
           <a href={canonicalPagePath("security", locale as AppLocale)} className={styles.backLink}>
-            <span aria-hidden="true">←</span> {copy.back}
+            <i className="fa-solid fa-arrow-left" aria-hidden="true" />{" "}{copy.back}
           </a>
           <p className={styles.eyebrow}>{copy.eyebrow}</p>
           <h1>{copy.title}</h1>
@@ -53,6 +54,7 @@ export default async function YubiKeySecurityPage({
           <nav className={styles.toc} aria-label={locale === "fr" ? "Sommaire" : "On this page"}>
             <a href="#yubikey-graph-title">{copy.diagramTitle}</a>
             <a href="#yubikey-workflow">{copy.workflowTitle}</a>
+            <a href="#yubikey-use-cases">{locale === "fr" ? "Exemples" : "Examples"}</a>
             <a href="#yubikey-safety">{copy.safetyTitle}</a>
             <a href="#yubikey-glossary">{copy.glossaryTitle}</a>
             <a href="#yubikey-next">{copy.nextTitle}</a>
@@ -73,6 +75,7 @@ export default async function YubiKeySecurityPage({
               ))}
             </div>
           </section>
+          <YubiKeyUseCases locale={locale as AppLocale} />
           <section id="yubikey-safety" className={styles.section}>
             <h2>{copy.safetyTitle}</h2>
             <ul className={styles.safetyList}>
