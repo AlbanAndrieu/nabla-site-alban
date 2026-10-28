@@ -64,7 +64,7 @@ test("YubiKey use cases cover both locales and do not confuse hardware mechanism
   const css = read(base + "page.module.css");
   const required = [
     "mfa-webauthn", "ssh-fido", "ssh-git-sign", "gpg-git",
-    "sops-age", "age-piv-plugin", "postgres-age", "gpg-backup-sign",
+    "sops-age", "sops-yubikey", "age-piv-plugin", "postgres-age", "gpg-backup-sign",
     "piv-certs", "vaultwarden", "hashicorp-vault", "keepassxc", "yubico-totp"
   ];
   for (const id of required) {
@@ -80,6 +80,9 @@ test("YubiKey use cases cover both locales and do not confuse hardware mechanism
   assert.match(cases, /gpg --verify/);
   assert.match(cases, /pg_dump -Fc/);
   assert.match(cases, /sops exec-env/);
+  assert.match(cases, /SOPS_AGE_KEY_FILE/);
+  assert.match(cases, /independent recovery recipient/);
+  assert.doesNotMatch(cases, /age-plugin-yubikey --generate/);
   assert.doesNotMatch(cases, /(?:23501671|22916048|172\.17\.0\.|10\.254\.255\.|-----BEGIN PRIVATE KEY-----)/);
 });
 
