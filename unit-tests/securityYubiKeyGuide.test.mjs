@@ -88,6 +88,10 @@ test("YubiKey inherits consistent header/footer Home and Back to Top icons", () 
   const footer = read("app/components/Footer.tsx");
   const top = read("components/BackToTopButton.tsx");
   const layout = read("app/[locale]/layout.tsx");
+  const fontAwesome = read("public/assets/fontawesome/css/fontawesome.css");
+  assert.match(fontAwesome, /\.fa-home/);
+  assert.match(fontAwesome, /\.fa-arrow-up/);
+  assert.match(fontAwesome, /\.fa-arrow-left/);
   assert.match(layout, /<RouteHeader \/>/);
   assert.match(layout, /<Footer/);
   assert.match(header, /className="fas fa-home"/);
