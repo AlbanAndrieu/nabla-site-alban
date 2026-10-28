@@ -38,7 +38,7 @@ test("architecture diagram is interactive with an accessible text alternative", 
 });
 
 test("bilingual setup and glossary copy have matching technical terms", () => {
-  for (const term of ["FIDO2", "WebAuthn", "CTAP", "SSH", "PIV", "PKCS#11", "GPG", "OpenPGP", "OTP", "HMAC", "SHA-1", "NFC", "PIN", "PUK", "CA", "age"]) {
+  for (const term of ["FIDO2", "WebAuthn", "CTAP", "SSH", "PIV", "PKCS#11", "GPG", "OpenPGP", "OTP", "HMAC", "SHA-1", "NFC", "PIN", "PUK", "CA", "age", "MFA", "SOPS", "OIDC", "IdP", "OATH", "TOTP", "TLS", "X.509", "SQL"]) {
     assert.equal(copy.split(`acronym: "${term}"`).length - 1, 2, term);
   }
   assert.match(copy, /state: "blocked"/);
