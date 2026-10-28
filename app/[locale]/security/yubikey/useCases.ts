@@ -84,6 +84,20 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       }
     },
     {
+      "id": "sops-yubikey",
+      "level": "advanced",
+      "mechanism": "SOPS / age / PIV",
+      "title": "Secrets SOPS protégés par une identité age YubiKey",
+      "purpose": "Déchiffrer les secrets de développement avec une identité age déjà provisionnée dans une YubiKey, sans créer de fichier en clair. L’accès reste soumis au PIN/toucher configuré sur le matériel.",
+      "prerequisites": "Identité age-plugin-yubikey existante, fichier d'identité accessible, plugin compatible installé, destinataire YubiKey déjà inscrit dans la politique SOPS et destinataire de secours indépendant.",
+      "code": "age-plugin-yubikey --list\nSOPS_AGE_KEY_FILE=\"$HOME/.config/sops/age/yubikey-identity.txt\" \\\n  sops exec-env config/dev.enc.yaml 'just dev-up'",
+      "caution": "L'exemple est une lecture et un lancement de processus, pas un provisioning PIV. La commande exec-env convient seulement aux secrets en valeurs scalaires de premier niveau ; ne jamais afficher l'environnement ou committer des secrets déchiffrés.",
+      "source": {
+        "url": "https://github.com/str4d/age-plugin-yubikey",
+        "label": "age-plugin-yubikey"
+      }
+    },
+    {
       "id": "age-piv-plugin",
       "level": "advanced",
       "mechanism": "age-plugin-yubikey / PIV",
@@ -265,6 +279,20 @@ export const USE_CASES: Record<"fr" | "en", readonly UseCase[]> = {
       "source": {
         "url": "https://getsops.io/docs/",
         "label": "SOPS"
+      }
+    },
+    {
+      "id": "sops-yubikey",
+      "level": "advanced",
+      "mechanism": "SOPS / age / PIV",
+      "title": "SOPS secrets protected by a YubiKey-backed age identity",
+      "purpose": "Decrypt workstation development secrets using an already-provisioned YubiKey age identity, without persisting plaintext. Access follows the configured device PIN/touch policy.",
+      "prerequisites": "Existing age-plugin-yubikey identity, readable identity descriptor, compatible plugin installed, YubiKey recipient already present in the SOPS policy, and a separate recovery recipient.",
+      "code": "age-plugin-yubikey --list\nSOPS_AGE_KEY_FILE=\"$HOME/.config/sops/age/yubikey-identity.txt\" \\\n  sops exec-env config/dev.enc.yaml 'just dev-up'",
+      "caution": "This is a read/decrypt workflow, not PIV provisioning. exec-env requires flat top-level scalar secrets; do not print the environment or commit decrypted credentials.",
+      "source": {
+        "url": "https://github.com/str4d/age-plugin-yubikey",
+        "label": "age-plugin-yubikey"
       }
     },
     {
