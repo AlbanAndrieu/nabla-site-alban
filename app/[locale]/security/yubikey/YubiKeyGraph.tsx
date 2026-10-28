@@ -67,6 +67,19 @@ export default function YubiKeyGraph({ copy }: Readonly<{ copy: GuideCopy }>) {
           <Controls showInteractive={false} />
         </ReactFlow>
       </div>
+      <div className={styles.graphSelector} role="group" aria-label={copy.accessibleGraph}>
+        {YUBIKEY_GRAPH_NODES.map((item) => (
+          <button
+            type="button"
+            key={item.id}
+            className={styles.graphSelectButton}
+            aria-pressed={selected === item.id}
+            onClick={() => setSelected(item.id)}
+          >
+            {copy.graphRoles[item.id]}
+          </button>
+        ))}
+      </div>
       <div className={styles.graphDetail} aria-live="polite">
         <strong>{selected ? copy.graphRoles[selected] : copy.keyLegend}</strong>
         {selected && related.length > 0 ? (
