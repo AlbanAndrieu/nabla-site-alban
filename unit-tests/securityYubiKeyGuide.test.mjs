@@ -57,3 +57,44 @@ test("public route never publishes device identifiers or credential material", (
   assert.match(copy, /without losing access/);
   assert.match(copy, /sans perdre l'accès/);
 });
+
+test("YubiKey use cases cover both locales and do not confuse hardware mechanisms", () => {
+  const cases = read(base + "useCases.ts");
+  const cards = read(base + "YubiKeyUseCases.tsx");
+  const css = read(base + "page.module.css");
+  const required = [
+    "mfa-webauthn", "ssh-fido", "ssh-git-sign", "gpg-git",
+    "sops-age", "age-piv-plugin", "postgres-age", "gpg-backup-sign",
+    "piv-certs", "vaultwarden", "hashicorp-vault", "keepassxc", "yubico-totp"
+  ];
+  for (const id of required) {
+    assert.equal(cases.split(`"id": "${id}"`).length - 1, 2, id);
+  }
+  assert.match(page, /<YubiKeyUseCases locale=\{locale as AppLocale\} \/>/);
+  assert.match(page, /href="#yubikey-use-cases"/);
+  assert.match(cards, /<details/);
+  assert.match(cards, /<pre className=\{styles\.command\} tabIndex=\{0\}/);
+  assert.match(cards, /rel="noopener noreferrer"/);
+  assert.match(css, /\.command:focus-visible/);
+  assert.match(cases, /age-plugin-yubikey/);
+  assert.match(cases, /gpg --verify/);
+  assert.match(cases, /pg_dump -Fc/);
+  assert.match(cases, /sops exec-env/);
+  assert.doesNotMatch(cases, /(?:23501671|22916048|172\.17\.0\.|10\.254\.255\.|-----BEGIN PRIVATE KEY-----)/);
+});
+
+test("YubiKey inherits consistent header/footer Home and Back to Top icons", () => {
+  const header = read("components/RouteHeader.tsx");
+  const footer = read("app/components/Footer.tsx");
+  const top = read("components/BackToTopButton.tsx");
+  const layout = read("app/[locale]/layout.tsx");
+  assert.match(layout, /<RouteHeader \/>/);
+  assert.match(layout, /<Footer/);
+  assert.match(header, /className="fas fa-home"/);
+  assert.match(footer, /className="fas fa-home"/);
+  assert.match(top, /className="fas fa-arrow-up"/);
+  assert.match(top, /window\.scrollTo/);
+  assert.match(page, /<TopAnchor \/>/);
+  assert.match(page, /className="fa-solid fa-arrow-left"/);
+  assert.match(header, /locale === "fr" \? "\/fr" : ""/);
+});
