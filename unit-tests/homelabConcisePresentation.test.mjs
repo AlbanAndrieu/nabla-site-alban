@@ -17,7 +17,7 @@ test("TrueNAS cards show actionable health, not redundant LAN configuration pros
 });
 
 test("service pages omit long editorial copy but preserve health badges, filters and access gating", () => {
-  const block = read("app/components/homelab/HomelabServicesBlock.tsx");
+  const block = read("app/components/homelab/HomelabServicesBlock.tsx") + "\n" + read("app/components/homelab/HomelabServiceFilters.tsx");
   const section = read("app/components/homelab/HomelabServicesSection.tsx");
   const privateServices = read("app/components/homelab/HomelabPrivateServices.tsx");
   assert.doesNotMatch(block, /Les services restent la finalité de la vue|Services remain the primary outcome/);

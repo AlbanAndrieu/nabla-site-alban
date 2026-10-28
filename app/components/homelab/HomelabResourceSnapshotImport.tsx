@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import {
   RESOURCE_SNAPSHOT_KEY,
   parseResourceSnapshotFile,
@@ -21,45 +21,75 @@ export default function HomelabResourceSnapshotImport({
 }: Props) {
   const [snapshot, setSnapshot] = useState<ResourceSnapshot | null>(null);
   const [error, setError] = useState(false);
+  const [now, setNow] = useState<number | null>(null);
+  // Mutable values are accessed only in effects and event handlers, never in JSX.
+  const ownerSession = useRef(false);
+  const importSequence = useRef(0);
   useEffect(() => {
+    ownerSession.current = ownerAllowed;
+    // Invalidate all pending file reads when OWNER access changes.
+    importSequence.current += 1;
+    let cancelled = false;
+    let restored: ResourceSnapshot | null = null;
     if (!ownerAllowed) {
-      setSnapshot(null);
-      onSnapshot(null);
+      // Revoke persisted OWNER evidence immediately, without delaying storage removal.
       try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* blocked */ }
-      return;
+    } else {
+      try {
+        const stored = window.localStorage.getItem(RESOURCE_SNAPSHOT_KEY);
+        restored = stored ? parseResourceSnapshotFile(stored) : null;
+        if (stored && !restored) window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
+      } catch {
+        restored = null;
+      }
     }
-    try {
-      const stored = window.localStorage.getItem(RESOURCE_SNAPSHOT_KEY);
-      const parsed = stored ? parseResourceSnapshotFile(stored) : null;
-      setSnapshot(parsed);
-      onSnapshot(parsed);
-      if (stored && !parsed) window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
-    } catch {
-      setSnapshot(null);
-      onSnapshot(null);
-    }
-    // Parent callback is state-only; this effect reacts to OWNER boundary changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // State updates run after effect setup; StrictMode cleanup cancels stale work.
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setSnapshot(restored);
+      onSnapshot(restored);
+    });
+    return () => {
+      cancelled = true;
+      ownerSession.current = false;
+      importSequence.current += 1;
+    };
+  }, [ownerAllowed, onSnapshot]);
+
+  useEffect(() => {
+    if (!ownerAllowed) return;
+    const initial = window.setTimeout(() => setNow(Date.now()), 0);
+    const interval = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
   }, [ownerAllowed]);
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
     event.currentTarget.value = "";
-    if (!file) return;
+    if (!file || !ownerAllowed || !ownerSession.current) return;
+    const sequence = ++importSequence.current;
     if (file.size > 750_000) { setError(true); return; }
     try {
-      const candidate = parseResourceSnapshotFile(await file.text());
+      const contents = await file.text();
+      // A revoked OWNER session, unmount, or later import cancels this result.
+      if (!ownerSession.current || sequence !== importSequence.current) return;
+      const candidate = parseResourceSnapshotFile(contents);
       if (!candidate) { setError(true); return; }
       window.localStorage.setItem(RESOURCE_SNAPSHOT_KEY, JSON.stringify(candidate));
+      setNow(Date.now());
       setError(false);
       setSnapshot(candidate);
       onSnapshot(candidate);
     } catch {
-      setError(true);
+      if (ownerSession.current && sequence === importSequence.current) setError(true);
     }
   }
 
   function clear() {
+    importSequence.current += 1;
     try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* blocked */ }
     setSnapshot(null);
     onSnapshot(null);
@@ -67,7 +97,9 @@ export default function HomelabResourceSnapshotImport({
   }
 
   if (!ownerAllowed) return null;
-  const freshness = snapshot ? snapshotAgeState(snapshot, Date.now(), catalogRevision) : null;
+  const freshness = snapshot && now !== null
+    ? snapshotAgeState(snapshot, now, catalogRevision)
+    : null;
   return (
     <section className="border rounded p-3 mb-3" data-owner-resource-snapshot>
       <h3 className="h6">
@@ -100,7 +132,9 @@ export default function HomelabResourceSnapshotImport({
               ? (french ? "récent" : "fresh")
               : freshness === "stale"
                 ? (french ? "historique (>30 min)" : "historical (>30 min)")
-                : (french ? "révision différente du catalogue" : "catalog revision mismatch")}
+                : freshness === "revision-mismatch"
+                ? (french ? "révision différente du catalogue" : "catalog revision mismatch")
+                : (french ? "vérification en cours" : "checking freshness")}
           </span>
         ) : (!error ? (french ? "Aucune mesure disponible." : "No resource measurement available.") : null)}
       </div>

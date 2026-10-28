@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
-import type { HomelabHealthState } from "@/lib/homelabHealth";
+
 import {
 	homelabServiceId,
 	isHomelabCatalogPlaceholder,
@@ -18,8 +18,8 @@ import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
-import type { ResourceSnapshot } from "@/lib/homelabResourceEvidence";
-
+import { RESOURCE_SNAPSHOT_KEY, type ResourceSnapshot } from "@/lib/homelabResourceEvidence";
+import HomelabServiceFilters, { type GroupFilter, type HealthFilter } from "./HomelabServiceFilters";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
 import {
@@ -41,17 +41,7 @@ const HierarchicalArchitectureExplorer = dynamic(
 	{ ssr: false },
 );
 
-const HEALTH_STATES: readonly HomelabHealthState[] = [
-	"ok",
-	"warn",
-	"fail",
-	"unknown",
-];
-
 const NO_HEALTH_INDEX = healthIndex(null);
-
-type HealthFilter = "all" | HomelabHealthState;
-type GroupFilter = "all" | ServicePresentationGroup;
 
 export default function HomelabServicesBlock({
 	readOnly = false,
@@ -70,6 +60,17 @@ export default function HomelabServicesBlock({
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const [resourceSnapshot, setResourceSnapshot] = useState<ResourceSnapshot | null>(null);
+	// SERVICE admission must not preserve an earlier OWNER resource snapshot
+	// in this browser. Clear only the OWNER resource key, not the public cache.
+	useEffect(() => {
+		if (!readOnly) return;
+		try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* disabled */ }
+		let cancelled = false;
+		queueMicrotask(() => {
+			if (!cancelled) setResourceSnapshot(null);
+		});
+		return () => { cancelled = true; };
+	}, [readOnly]);
 	const handledAnchor = useRef<string | null>(null);
 
 	// If FastAPI provides cards but no matching relation graph, still show the
@@ -100,8 +101,8 @@ export default function HomelabServicesBlock({
     const target = graphRef.current;
     if (!target) return;
     if (typeof IntersectionObserver === "undefined") {
-      setGraphInView(true);
-      return;
+      const timer = window.setTimeout(() => setGraphInView(true), 0);
+      return () => window.clearTimeout(timer);
     }
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting) {
@@ -344,213 +345,33 @@ export default function HomelabServicesBlock({
 			)}
 
 
-      {!readOnly && (
-        <HomelabResourceSnapshotImport
-          french={french}
-          ownerAllowed={!state.ownerBoundary}
-          catalogRevision={state.catalog.catalogRevision}
-          onSnapshot={setResourceSnapshot}
-        />
-      )}
+			{!readOnly && (
+				<HomelabResourceSnapshotImport
+					french={french}
+					ownerAllowed={!state.ownerBoundary}
+					catalogRevision={state.catalog.catalogRevision}
+					onSnapshot={setResourceSnapshot}
+				/>
+			)}
 
-			<section
-				id="truenas-health-dashboard"
-				className={styles.healthDashboard}
-				aria-labelledby="truenas-health-dashboard-title"
-			>
-				<div className={styles.healthDashboardHeader}>
-					<div>
-						<h3
-							id="truenas-health-dashboard-title"
-							className={styles.healthDashboardTitle}
-						>
-							{french
-								? "Santé et filtres des services"
-								: "Service health and filters"}
-						</h3>
-					</div>
-					<span
-						className={styles.refreshStatus}
-						role="status"
-						aria-live="polite"
-					>
-						{state.healthRefreshing
-							? french
-								? "Actualisation…"
-								: "Refreshing…"
-							: state.healthUnavailable
-								? french
-									? "Sondes non vérifiées"
-									: "Probes unverified"
-								: french
-									? "Snapshot courant"
-									: "Current snapshot"}
-					</span>
-				</div>
-
-				<div
-					className={styles.healthSummary}
-					aria-label={french ? "Résumé santé" : "Health summary"}
-				>
-					{HEALTH_STATES.map((healthState) => (
-						<button
-							type="button"
-							key={healthState}
-							className={styles.healthChip}
-							aria-pressed={healthFilter === healthState}
-							data-homelab-health-filter={healthState}
-							onClick={() =>
-								setHealthFilter((current) =>
-									current === healthState ? "all" : healthState,
-								)
-							}
-						>
-							<strong>{healthCounts[healthState]}</strong>{" "}
-							{healthState === "ok"
-								? french
-									? "sains"
-									: "healthy"
-								: healthState === "warn"
-									? french
-										? "dégradés"
-										: "degraded"
-									: healthState === "fail"
-										? french
-											? "en échec"
-											: "failed"
-										: french
-											? "inconnus"
-											: "unknown"}
-						</button>
-					))}
-				</div>
-
-				<div className={styles.controls} data-homelab-hierarchy-controls>
-					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>
-							{french ? "Santé" : "Health"}
-						</span>
-						<select
-							className={styles.filterSelect}
-							value={healthFilter}
-							onChange={(event) =>
-								setHealthFilter(event.currentTarget.value as HealthFilter)
-							}
-							data-homelab-health-select
-						>
-							<option value="all">
-								{french ? "Tous les états" : "All health states"}
-							</option>
-							<option value="ok">{french ? "Sain" : "Healthy"}</option>
-							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
-							<option value="fail">{french ? "En échec" : "Failed"}</option>
-							<option value="unknown">{french ? "Inconnu" : "Unknown"}</option>
-						</select>
-					</label>
-					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>
-							{t("presentation.searchLabel")}
-						</span>
-						<input
-							type="search"
-							className={styles.filterSelect}
-							value={searchQuery}
-							onChange={(event) => setSearchQuery(event.currentTarget.value)}
-							placeholder={t("presentation.searchPlaceholder")}
-							data-homelab-service-search
-						/>
-					</label>
-					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>
-							{french ? "Environnement" : "Environment"}
-						</span>
-						<select
-							className={styles.filterSelect}
-							value={environmentFilter}
-							onChange={(event) =>
-								setEnvironmentFilter(
-									event.currentTarget.value as HomelabEnvironmentFilter,
-								)
-							}
-							data-homelab-environment-filter
-						>
-							<option value="all">
-								{french ? "Tous les environnements" : "All environments"}
-							</option>
-							<option value="non-dev">
-								{french
-									? "Production + Staging (sans Dev)"
-									: "Production + Staging (exclude Dev)"}
-							</option>
-							<option value="production">Production</option>
-							<option value="staging">Staging</option>
-							<option value="dev">Dev</option>
-							<option value="defaulted">
-								{french
-									? "Production par défaut (métadonnées à revoir)"
-									: "Default production (review metadata)"}
-							</option>
-						</select>
-					</label>
-					<label className={styles.filterField}>
-						<span className={styles.filterLabel}>
-							{t("presentation.filterLabel")}
-						</span>
-						<select
-							className={styles.filterSelect}
-							value={groupFilter}
-							onChange={(event) => {
-								const next = event.currentTarget.value as GroupFilter;
-								setGroupFilter(next);
-								if (next !== "all") setGroupExpanded(next, true);
-							}}
-							data-homelab-presentation-filter
-						>
-							<option value="all">{t("presentation.allGroups")}</option>
-							{ALL_GROUPS.map((group) => (
-								<option value={group} key={group}>
-									{t(GROUP_TITLE_KEY[group])}
-								</option>
-							))}
-						</select>
-					</label>
-					<div className={styles.controlButtons}>
-						<button
-							type="button"
-							className={styles.controlButton}
-							onClick={() => {
-								setHealthFilter("all");
-								setEnvironmentFilter("all");
-								setGroupFilter("all");
-								setSearchQuery("");
-							}}
-						>
-							{french ? "Réinitialiser" : "Reset filters"}
-						</button>
-						<button
-							type="button"
-							className={styles.controlButton}
-							onClick={() => setExpandedGroups(new Set(ALL_GROUPS))}
-							aria-controls="homelab-service-hierarchy"
-						>
-							{t("criticality.expandAll")}
-						</button>
-						<button
-							type="button"
-							className={styles.controlButton}
-							onClick={() => setExpandedGroups(new Set())}
-							aria-controls="homelab-service-hierarchy"
-						>
-							{t("criticality.collapseAll")}
-						</button>
-					</div>
-				</div>
-				<p className={styles.matchCount}>
-					{french
-						? `${visibleCount} services affichés sur ${state.catalog.services.length}`
-						: `${visibleCount} services shown of ${state.catalog.services.length}`}
-				</p>
-			</section>
+			<HomelabServiceFilters
+				french={french}
+				healthRefreshing={state.healthRefreshing}
+				healthUnavailable={state.healthUnavailable}
+				healthCounts={healthCounts}
+				healthFilter={healthFilter}
+				setHealthFilter={setHealthFilter}
+				environmentFilter={environmentFilter}
+				setEnvironmentFilter={setEnvironmentFilter}
+				groupFilter={groupFilter}
+				setGroupFilter={setGroupFilter}
+				setGroupExpanded={setGroupExpanded}
+				searchQuery={searchQuery}
+				setSearchQuery={setSearchQuery}
+				setExpandedGroups={setExpandedGroups}
+				visibleCount={visibleCount}
+				totalCount={state.catalog.services.length}
+			/>
 
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
 				{visibleHierarchyGroups.map((group) => {

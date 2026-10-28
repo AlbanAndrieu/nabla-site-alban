@@ -1,7 +1,5 @@
 # Feuille de route produit et qualité
 
-# Feuille de route produit et qualité
-
 ## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
 
 - [x] Fournir `node scripts/agent-node22-fast.mjs`, `just node22-fast`
@@ -188,8 +186,8 @@ seconde séquence de migration ni les anciennes PR marquées ouvertes.
 ## P0 — Protection de merge, publication et dépendances
 
 - [ ] **Activer le ruleset `master` depuis une workstation autorisée** :
-  l'audit live du 30 septembre confirme qu'aucun ruleset n'est installé. Exécuter
-  `scripts/manage-master-ruleset.sh --apply`, puis fermer uniquement lorsque
+  les audits live du 30 septembre et du **28 octobre 2026** retournent **0 ruleset** (`GET /repos/AlbanAndrieu/nabla-site-alban/rulesets = []`) ; l'intégration GitHub ne peut pas lire la protection de branche (`403`). Exécuter
+  `scripts/manage-master-ruleset.sh --apply` avec des droits admin autorisés, puis fermer uniquement lorsque
   `--check` retourne `RULESET_OK`. Contrat et rollback :
   `docs/github-master-ruleset.md`.
 - [ ] **Valider les permissions live du recovery post-merge** : les contrats locaux
@@ -426,3 +424,20 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
   `@azure/openai@1.0.0-beta.13` et `eslint@9.39.5` ; envisager
   une mise à jour contrôlée dans une PR distincte, sans downgrade
   ni modification opportuniste du lockfile.
+
+### P0 — Stabiliser le formatage et la publication de Site #263 (27 octobre 2026)
+
+- [x] **Réconcilier la fusion de #262** : `master` intègre la collecte RAM/GPU/ZFS OWNER. Le commit de convergence de #263 conserve l'import OWNER, l'ID de révision et `resources={resourceSnapshot}`, sans exposer ces données SERVICE.
+- [x] **Corriger les hooks React** : plus de `setState` synchrone dans l'effet d'hydratation ou le fallback IntersectionObserver ; les vues Architecture n'exposent qu'un booléen React `ready` au rendu.
+- [x] **Réduire les composants** : extraire les sélecteurs purs de santé et les filtres TrueNAS ; `HomelabServicesBlock.tsx` à 480 lignes **avant formatage** après la fusion, sans relever la limite de 600.
+- [x] **Sortie locale compacte** : runner Node 22/24 avec reporter spec fixe, résumé PASS/FAIL, erreurs nommées et journal intégral privé sous `git rev-parse --git-path agent-fast-tests.log` (mode 0600). `QUALITY_VERBOSE=1` est disponible. Contrôle strict des totaux `tests = pass + fail` : un processus Node terminé avec 0 sans rapport valide ne produit plus un faux PASS ; 4/4 assertions ciblées du résumeur exécutées.
+- [x] **Correctif induit par #262** : différer l'hydratation du snapshot OWNER via `queueMicrotask` annulable, purger le stockage lors de la révocation **et en entrant dans SERVICE**, invalider les lectures de fichiers en attente et les imports remplacés, puis mettre à jour l'âge des mesures chaque minute sans `Date.now()` au rendu. Aucun contournement de `react-hooks/*`. Le contrat `homelabResourceImportIntegration.test.mjs` couvre la transition de droits et reste dans le profil rapide.
+- [x] **Tests de source ciblés dans l'agent** : 24 contrats JavaScript de sources/runner exécutés par émulation V8, plus 10 invariants OWNER/GPU/ZFS. **Ce n'est pas la suite npm ni une preuve de publication**.
+- [x] **Preview exact-SHA de #263** : premier essai `0835b457` annulé par `vercel-ignore-build.sh` (comparaison insuffisante d'un seul commit documentaire) ; correctif du script et scénarios Git ajoutés. Deuxième build sur `0c60fbbc` **READY**, sans CI GitHub. Cela valide seulement le build Vercel, pas `quality:agent:publish` ni le navigateur.
+- [x] **Régression sélecteur de déploiement vérifiée hors CI (28/10)** : **7/7 tests Node 22 PASS** avec de vrais dépôts Git temporaires, sur les blobs exacts `scripts/vercel-ignore-build.sh` (`721b83c2`) et `unit-tests/vercelIgnoreBuild.test.mjs` (`7bd9c1b4`). Un premier run à 6/7 a permis de corriger une assertion confondant *construction sécurisée sans base* et *diff applicatif identifié*. Ce PASS ciblé ne prouve ni L3 ni le navigateur.
+- [ ] **Validation locale réelle du HEAD exact** : convergence Biome/pre-commit, `npm run test:fast:local`, `npm run typecheck`, `npm run quality:agent:publish`, `-- --status` et build Next.js (si la gate ne le lance pas). Ne pas revendiquer L3 avant `QG_PUBLISH_PROOF_OK`. GitHub Actions payantes non relancées.
+- [ ] **Recette navigateur** : OWNER/LAN, SERVICE/WAN, stabilité des cartes C4 et filtres pendant deux rafraîchissements, absence de données privées dans cache et réponses publiques ; le contrôle Vercel 429 doit être diagnostiqué séparément.
+
+La fusion de #262 ne clôt pas la gate #263. Conserver une PR Draft tant que les preuves de publication et les contrôles d'accès réels restent `NOT_RUN`.
+
+**Livraison #263 — état exact au 27/10/2026 :** production `READY` sur `f2690673` (#262), Preview `READY` sur `0c60fbbc` (#263, build Vercel terminé en 22 s). L'accès HTTP et l'E2E ne sont pas prouvés. GitHub indique la PR fusionnable et à jour ; ce résultat ne valide pas le build. Les derniers tests JavaScript ciblés sur l'import OWNER et le résumeur local ne remplacent ni `npm run test:fast:local` ni la gate locale Node 24. **État de clôture : BLOCKED (attestation L3 + recette autorisée)**. Les dossiers Stripe, DSOMM, accessibilité, DAST et dépendances restent des workstreams distincts non fermés artificiellement par #263.

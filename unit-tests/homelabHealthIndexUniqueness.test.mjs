@@ -41,9 +41,11 @@ test("invalid URLs cannot become lookup keys", () => {
 
 test("cards and counts join probes exclusively by canonical service ID", () => {
   const grid = readFileSync(new URL("../app/components/homelab/homelabGridPresentation.ts", import.meta.url), "utf8");
+  const selectors = readFileSync(new URL("../app/components/homelab/homelabHealthSelectors.ts", import.meta.url), "utf8");
   const hook = readFileSync(new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url), "utf8");
   assert.match(grid, /canonicalHomelabEvidence\(index, homelabServiceId\(service\)\)/);
-  assert.match(hook, /canonicalHomelabEvidence\(index, serviceId\)/);
+  assert.match(selectors, /canonicalHomelabEvidence\(index, serviceId\)/);
+  assert.match(hook, /from "\.\/homelabHealthSelectors"/);
   assert.doesNotMatch(grid, /index\.byUrl\.get\(|index\.byName\.get\(/);
   assert.doesNotMatch(hook, /index\.byName\.get\(/);
 });

@@ -1,12 +1,28 @@
 # Roadmap active — nabla-site-alban
 
+
+## Situation au 27 octobre 2026 — priorité de livraison #263
+
+| Surface | Révision / preuve | État |
+| --- | --- | --- |
+| Production Vercel | `f26906733e228a27897a48983cae07c01f966c99` (#262), déploiement `dpl_6gAXM1U7aGFJy3y2sESqp2eVZeJu` | **READY** ; ne prouve pas le HTTP, le navigateur ni OWNER/LAN |
+| PR de stabilisation | [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), inclut #262 | **Draft** ; accès/caches, UX, refactoring et tests source |
+| Preview de #263 | `0c60fbbc8582895c65f673a2cb01eb2d01db4fe0`, déploiement `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` | **READY / build Next PASS**, HTTP et navigateur **NOT_RUN** |
+| Publication locale de #263 | Aucun `QG_PUBLISH_PROOF_OK` sur HEAD actuel | **NOT_RUN** ; ne pas fusionner sur seuls contrôles statiques |
+| OWNER / SERVICE | Contrats de source et purge des ressources OWNER au passage SERVICE | **DONE (code)** ; assertions navigateur LAN/WAN **NOT_RUN** |
+
+**Régression corrigée en #263 :** le premier essai de Preview a été annulé car `vercel-ignore-build.sh` ne comparait que le dernier commit `docs/` sans `VERCEL_GIT_PREVIOUS_SHA`. Le sélecteur compare désormais tout le delta de branche depuis la base `origin/master` quand elle existe ; si cette base ou l'historique déployé n'est pas fiable (clone Vercel peu profond), il construit par sécurité. La seconde Preview est **READY** (22 s de build). Contrats de source et scénarios Git ajoutés, tests Node de la PR encore à exécuter sur checkout complet.
+
+**Critère de clôture P0** : obtenir sur le même SHA un arbre formaté propre, tests rapides + unitaires, TypeScript, lint et build Next.js, attestation `QG_PUBLISH_PROOF_OK`, puis contrôle des accès réels. Sans accès LAN ni navigateur autorisé, garder l'acceptation finale **BLOCKED**, même si Vercel est `READY`. Ne pas déclencher de GitHub Actions payantes ; ni fusion automatique.
+
+
 > Réconciliée le **25 octobre 2026**, après fusion de [Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256).
 > **Source d'autorité :** cette roadmap contient uniquement les tâches du site.
 > [Historique intégral précédent](archive/homelab-roadmap-through-2026-10-25.txt)
 > conservé sans suppression de preuve. Les actions Compose et FastAPI ont leurs
 > propres roadmaps ; un merge et un déploiement READY ne valent pas recette navigateur.
 
-## Dernier état vérifié — production
+## Historique de production — état du 25 octobre (remplacé par la situation ci-dessus)
 
 | Dimension | Preuve | Verdict |
 | --- | --- | --- |
@@ -57,6 +73,8 @@ Ne pas présenter `/en/architecture` comme canonique.
 
 **Done P0 :** preuves HTTP/navigateur datées, parcours OWNER et SERVICE prouvés,
 contrôle de confidentialité négatif et SHA exact. Ne jamais fermer sur READY seul.
+
+- [x] **S-04b Confidentialité du navigateur (code #263)** : lorsque TrueNAS entre en mode `readOnly`, supprimer la clé locale des ressources privées OWNER et effacer sa copie React de manière différée et annulable, sans toucher au cache public expurgé. **Le contrôle externe du DOM, des réponses et de Storage reste à effectuer pour fermer S-04.**
 
 ## P0 — Diagnostics et contrôle d'accès côté site
 
@@ -359,10 +377,15 @@ les requêtes sur une source déjà saturée.
 - [x] **S-19g — Régressions :** durée de vie du cache testée
   (24 h, pas d'ancien vert), tests pour délais/backoff et
   révocation, ajout au profil rapide Node 22/24.
-- [ ] **S-19h — Livraison :** build Preview exacte au SHA du correctif
-  et recette visuelle indépendante du contrôle d'accès. Les GET
-  automatisés peuvent encore rencontrer le checkpoint Vercel 429.
-  Aucun diagnostic direct de l'état TrueNAS/LAN depuis l'agent.
+- [x] **S-19h-build — Livraison de la version applicative :** Preview Vercel
+  `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` sur `0c60fbbc` **READY**
+  (Next.js, build 22 s). Régression `vercel-ignore-build.sh` corrigée
+  et prouvée par **7/7 tests Git réels** sur les blobs source exacts.
+  Les commits ultérieurs portent les tests et les roadmaps.
+- [ ] **S-19h-browser — Acceptation réelle :** HTTP, visuels et
+  OWNER/SERVICE depuis des clients autorisés ; l'agent ne peut pas
+  accéder à la Preview par HTTP ni au LAN domestique. Le checkpoint
+  Vercel 429 est un blocage d'admission, pas une panne TrueNAS.
 - [ ] **S-19i — Suivi producteur, nabla-compose / FastAPI :** lorsque
   le LAN répond, instrumenter durée et timeout des appels FastAPI,
   mémoire TrueNAS, pression I/O, saturation de sockets et workers.
