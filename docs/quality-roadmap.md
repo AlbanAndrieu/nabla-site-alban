@@ -441,3 +441,15 @@ elles ont encore une valeur opérationnelle, dans les documents indexés par
 La fusion de #262 ne clôt pas la gate #263. Conserver une PR Draft tant que les preuves de publication et les contrôles d'accès réels restent `NOT_RUN`.
 
 **Livraison #263 — état exact au 27/10/2026 :** production `READY` sur `f2690673` (#262), Preview `READY` sur `0c60fbbc` (#263, build Vercel terminé en 22 s). L'accès HTTP et l'E2E ne sont pas prouvés. GitHub indique la PR fusionnable et à jour ; ce résultat ne valide pas le build. Les derniers tests JavaScript ciblés sur l'import OWNER et le résumeur local ne remplacent ni `npm run test:fast:local` ni la gate locale Node 24. **État de clôture : BLOCKED (attestation L3 + recette autorisée)**. Les dossiers Stripe, DSOMM, accessibilité, DAST et dépendances restent des workstreams distincts non fermés artificiellement par #263.
+
+## P1 — Guide matériel YubiKey dans Security (28 octobre 2026)
+
+Cette feuille de route concerne uniquement la **présentation publique du Site**. Les diagnostics matériels, scripts d'enrôlement, escrow et procédures de restauration appartiennent à `nabla-compose`, pas au runtime Vercel.
+
+- [x] Sous-page localisée `/security/yubikey` et `/fr/security/yubikey` : contenu FR/EN, canonical/hreflang, lien depuis la section Sécurité personnelle, indexation dans le catalogue SEO.
+- [x] Graphe **ReactFlow** statique de la chaîne poste → clés principale/secondaire → FIDO2/WebAuthn, SSH FIDO, PIV, OpenPGP, OTP/HMAC, age et KeePassXC, avec description textuelle et zoom/pan. Aucune découverte active, aucun appel à un périphérique.
+- [x] Checklist publique distinguant **documenté**, **prévu** et **à débloquer** ; lexique de 16 sigles avec définitions FR/EN ; règles sans mutation pour PIN, PUK, certificats, slots ou secrets.
+- [x] Contrat de confidentialité de source : aucune valeur sensible, identifiant matériel, donnée LAN, clé privée ou certificat personnel ; test dédié intégré à `just source-check`.
+- [ ] Valider sur checkout Node 24/npm 12 la qualité L3 : `npm ci`, `npm run test:unit`, `npm run typecheck`, `npm run build` et `npm run quality:agent:publish` (preuve `QG_PUBLISH_PROOF_OK`). Le test structurel ne remplace pas L3.
+- [ ] Recette Preview **exact-SHA** : vérifier liens et SEO FR/EN, lisibilité du graphe sur mobile (320/390 px), navigation clavier, contrastes, alternative textuelle et absence de fuite de données.
+- [ ] Exercice de continuité **hors site** : valider réellement deux clés, enrollment indépendant, chaîne PIV, sauvegardes age distinctes et déverrouillage KeePassXC sans écrire de preuves sensibles sur le site public.
