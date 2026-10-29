@@ -18,7 +18,7 @@ export default function BackToTopButton({
 		window.scrollTo({
 			top: 0,
 			left: 0,
-			behavior: prefersReducedMotion ? "instant" : "smooth",
+			behavior: prefersReducedMotion ? "auto" : "smooth",
 		});
 		window.history.replaceState(
 			null,
