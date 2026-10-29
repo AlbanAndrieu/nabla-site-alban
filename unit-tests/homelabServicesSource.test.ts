@@ -2,14 +2,17 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { GET } from "../app/api/homelab-services/route";
-import { homelabServiceDisplayName, homelabServiceId } from "../lib/homelabServices";
 import {
-  getStaticHomelabServicesCatalog,
-  HOMELAB_SERVICES_DEFAULT_API_URL,
-  homelabServiceEndpointUrl,
-  parseHomelabServicesCatalog,
-} from "./helpers/homelabLegacyCatalogFixture";
+	HOMELAB_SERVICES_DEFAULT_API_URL,
+	homelabServiceDisplayName,
+	homelabServiceId,
+} from "../lib/homelabServices";
 import { SITE_CATALOG_V2_URL } from "../lib/homelabSiteCatalog";
+import {
+	getStaticHomelabServicesCatalog,
+	homelabServiceEndpointUrl,
+	parseHomelabServicesCatalog,
+} from "./helpers/homelabLegacyCatalogFixture";
 import { withPublicReadOnly } from "./helpers/homelabPublicReadOnly";
 
 test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
@@ -69,7 +72,7 @@ test("runtime loader and owner architecture never request legacy endpoints or fa
 		),
 		/LOCAL_FALLBACK|getStaticHomelabServicesCatalog|homelab-services\.json/,
 	);
-	assert.match(architecture, /fetchJson\("\/api\/homelab-catalog-v2"/);
+	assert.match(architecture, /fetchJson\(\s*"\/api\/homelab-catalog-v2"/);
 	assert.doesNotMatch(
 		architecture,
 		/getStaticHomelabServicesCatalog|getStaticServiceTopology/,
@@ -230,20 +233,60 @@ test("public fallback never exposes PostgreSQL binding details", () => {
 	);
 });
 
-
 test("canonical Home Assistant and Open WebUI IDs retain DNS and container slugs", () => {
-  assert.equal(homelabServiceId({ id: "home-assistant", name: "Home Assistant" }), "homeassistant");
-  assert.equal(homelabServiceId({ id: "open-webui", name: "Open WebUI" }), "openwebui");
-  assert.equal(homelabServiceId({ id: "garage-webui", name: "Garage Web UI" }), "garage-webui");
+	assert.equal(
+		homelabServiceId({ id: "home-assistant", name: "Home Assistant" }),
+		"homeassistant",
+	);
+	assert.equal(
+		homelabServiceId({ id: "open-webui", name: "Open WebUI" }),
+		"openwebui",
+	);
+	assert.equal(
+		homelabServiceId({ id: "garage-webui", name: "Garage Web UI" }),
+		"garage-webui",
+	);
 });
 
 test("explicitly typed endpoint roles do not duplicate UI, API or MCP", () => {
-  assert.equal(homelabServiceDisplayName({ id: "gatus", name: "Gatus" }), "Gatus UI");
-  assert.equal(homelabServiceDisplayName({ id: "bichon", name: "Bichon" }), "Bichon UI");
-  assert.equal(homelabServiceDisplayName({ id: "home-assistant", name: "Home Assistant" }), "Home Assistant UI");
-  assert.equal(homelabServiceDisplayName({ id: "openwebui", name: "Open WebUI" }), "Open WebUI");
-  assert.equal(homelabServiceDisplayName({ id: "garage-webui", name: "Garage Web UI" }), "Garage Web UI");
-  assert.equal(homelabServiceDisplayName({ id: "garage", name: "Garage S3 API", kind: "object-storage" }), "Garage S3 API");
-  assert.equal(homelabServiceDisplayName({ id: "mcp-cyberbro", name: "Cyberbro", kind: "mcp-server" }), "Cyberbro MCP");
-  assert.equal(homelabServiceDisplayName({ id: "traefik", name: "Traefik", kind: "edge" }), "Traefik");
+	assert.equal(
+		homelabServiceDisplayName({ id: "gatus", name: "Gatus" }),
+		"Gatus UI",
+	);
+	assert.equal(
+		homelabServiceDisplayName({ id: "bichon", name: "Bichon" }),
+		"Bichon UI",
+	);
+	assert.equal(
+		homelabServiceDisplayName({ id: "home-assistant", name: "Home Assistant" }),
+		"Home Assistant UI",
+	);
+	assert.equal(
+		homelabServiceDisplayName({ id: "openwebui", name: "Open WebUI" }),
+		"Open WebUI",
+	);
+	assert.equal(
+		homelabServiceDisplayName({ id: "garage-webui", name: "Garage Web UI" }),
+		"Garage Web UI",
+	);
+	assert.equal(
+		homelabServiceDisplayName({
+			id: "garage",
+			name: "Garage S3 API",
+			kind: "object-storage",
+		}),
+		"Garage S3 API",
+	);
+	assert.equal(
+		homelabServiceDisplayName({
+			id: "mcp-cyberbro",
+			name: "Cyberbro",
+			kind: "mcp-server",
+		}),
+		"Cyberbro MCP",
+	);
+	assert.equal(
+		homelabServiceDisplayName({ id: "traefik", name: "Traefik", kind: "edge" }),
+		"Traefik",
+	);
 });

@@ -131,7 +131,8 @@ test("filterArchitectureCatalog combines health, group and search filters", () =
 	// Services without a presentation entry fall back to the support group.
 	assert.deepEqual(filtered({ groupFilter: "support" }), ["Home Assistant"]);
 	assert.deepEqual(filtered({ searchQuery: "  GRAF " }), ["Grafana"]);
-	assert.deepEqual(filtered({ searchQuery: "home-assistant" }), [
+	// Search matches the canonical id; "home-assistant" is a historical alias.
+	assert.deepEqual(filtered({ searchQuery: "homeassistant" }), [
 		"Home Assistant",
 	]);
 	assert.deepEqual(
@@ -177,20 +178,35 @@ test("external Backstage v2 health maps by entityRef only at matching fresh revi
 			{ id: "vault", name: "Vault", entityRef: "component:default/vault" },
 		],
 	};
-	const matching = indexHealth(null, projected, projectedCatalog.catalogRevision);
+	const matching = indexHealth(
+		null,
+		projected,
+		projectedCatalog.catalogRevision,
+	);
 	assert.deepEqual(countHealthStates(projectedCatalog.services, matching), {
 		ok: 1,
 		warn: 0,
 		fail: 0,
 		unknown: 1,
 	});
-	const staleRevision = indexHealth(null, projected, "sha256:" + "b".repeat(64));
-	assert.deepEqual(countHealthStates(projectedCatalog.services, staleRevision), {
-		ok: 0,
-		warn: 0,
-		fail: 0,
-		unknown: 2,
-	});
-	const stale = indexHealth(null, { ...projected, boardState: "stale" }, revision);
+	const staleRevision = indexHealth(
+		null,
+		projected,
+		"sha256:" + "b".repeat(64),
+	);
+	assert.deepEqual(
+		countHealthStates(projectedCatalog.services, staleRevision),
+		{
+			ok: 0,
+			warn: 0,
+			fail: 0,
+			unknown: 2,
+		},
+	);
+	const stale = indexHealth(
+		null,
+		{ ...projected, boardState: "stale" },
+		revision,
+	);
 	assert.equal(effectiveState("grafana", "Grafana", stale, entity), "unknown");
 });

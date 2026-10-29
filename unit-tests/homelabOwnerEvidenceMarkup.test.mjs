@@ -3,53 +3,68 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = readFileSync(
-  new URL("../app/components/homelab/ServiceOwnerEvidenceSummary.tsx", import.meta.url),
-  "utf8",
+	new URL(
+		"../app/components/homelab/ServiceOwnerEvidenceSummary.tsx",
+		import.meta.url,
+	),
+	"utf8",
 );
 
 test("each OWNER evidence metric renders one stable data-evidence-key", () => {
-  const metricSpan = source.match(/<span\s+key=\{metric\.key\}[\s\S]*?>/);
-  assert.ok(metricSpan, "OWNER metric span must exist");
-  const attributes = metricSpan[0].match(/data-[a-z-]+(?==)/g) ?? [];
-  assert.equal(
-    attributes.length,
-    new Set(attributes).size,
-    "duplicate data attributes break Next.js TypeScript builds (TS17001)",
-  );
-  assert.equal(attributes.filter((name) => name === "data-evidence-key").length, 1);
-  assert.ok(attributes.includes("data-evidence-state"));
+	const metricSpan = source.match(/<span\s+key=\{metric\.key\}[\s\S]*?>/);
+	assert.ok(metricSpan, "OWNER metric span must exist");
+	const attributes = metricSpan[0].match(/data-[a-z-]+(?==)/g) ?? [];
+	assert.equal(
+		attributes.length,
+		new Set(attributes).size,
+		"duplicate data attributes break Next.js TypeScript builds (TS17001)",
+	);
+	assert.equal(
+		attributes.filter((name) => name === "data-evidence-key").length,
+		1,
+	);
+	assert.ok(attributes.includes("data-evidence-state"));
 });
 
 test("OWNER evidence stays non-interactive and does not invent a live probe", () => {
-  assert.match(source, /data-owner-service-evidence/);
-  assert.match(source, /describeServiceProbe\(entry, snapshot, "internal"\)/);
-  assert.match(source, /probeMetric\("lan"/);
+	assert.match(source, /data-owner-service-evidence/);
+	assert.match(source, /describeServiceProbe\(entry, snapshot, "internal"\)/);
+	assert.match(source, /probeMetric\("lan"/);
 });
 
 test("Backstage v2 cards do not revive legacy endpoint links without OWNER evidence", () => {
-  const grid = readFileSync(
-    new URL("../app/components/homelab/HomelabServiceGrid.tsx", import.meta.url),
-    "utf8",
-  );
-  assert.doesNotMatch(grid, /homelabServiceEndpointUrl\(svc\)/);
-  assert.match(grid, /!readOnly && !healthUnavailable \? observed\.externalUrl : ""/);
+	const grid = readFileSync(
+		new URL(
+			"../app/components/homelab/HomelabServiceGrid.tsx",
+			import.meta.url,
+		),
+		"utf8",
+	);
+	assert.doesNotMatch(grid, /homelabServiceEndpointUrl\(svc\)/);
+	assert.match(
+		grid,
+		/!readOnly && !healthUnavailable \? observed\.externalUrl : ""/,
+	);
 });
 
 test("LAN navigation labels respect configured HTTP or HTTPS without a real probe", () => {
-  const card = readFileSync(
-    new URL("../app/components/homelab/HomelabServiceCard.tsx", import.meta.url),
-    "utf8",
-  );
-  assert.match(card, /Protocole LAN non confirmé · schéma configuré utilisé/);
-  assert.match(card, /LAN protocol unconfirmed · configured scheme used/);
-  assert.match(card, /svc\.internalSecure \? "https" : "http"/);
-  assert.doesNotMatch(card, /lien HTTP proposé|HTTP link suggested/);
-  assert.match(card, /hasInternal && !internalProtocolObserved/);
+	const card = readFileSync(
+		new URL(
+			"../app/components/homelab/HomelabServiceCard.tsx",
+			import.meta.url,
+		),
+		"utf8",
+	);
+	assert.match(card, /Protocole LAN non confirmé · schéma configuré utilisé/);
+	assert.match(card, /LAN protocol unconfirmed · configured scheme used/);
+	assert.match(card, /svc\.internalSecure \? "https" : "http"/);
+	assert.doesNotMatch(card, /lien HTTP proposé|HTTP link suggested/);
+	assert.match(card, /title=\{!internalProtocolObserved/);
 });
 
 test("a green OWNER HTTP metric requires a dated probe, not just an HTTP status", () => {
-  assert.match(source, /ownerHttpObservationState\(/);
-  assert.match(source, /state: httpObservationState/);
-  assert.match(source, /latencyObserved \? "observed" : "unknown"/);
-  assert.match(source, /source cache/);
+	assert.match(source, /ownerHttpObservationState\(/);
+	assert.match(source, /state: httpObservationState/);
+	assert.match(source, /latencyObserved \? "observed" : "unknown"/);
+	assert.match(source, /source cache/);
 });

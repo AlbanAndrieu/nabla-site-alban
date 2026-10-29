@@ -21,7 +21,11 @@ test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Acce
 	for (const path of privateRoutes) {
 		const source = read(`app/api/${path}/route.ts`);
 		assert.match(source, /export function GET\(request: Request\)/, path);
-		assert.match(source, /return gatedHomelabResponse\(request, \w+\);/, path);
+		assert.match(
+			source,
+			/return gatedHomelabResponse\(request, (?:\w+|\(\) => \w+\(request\))\);/,
+			path,
+		);
 		// Only GET (plus route config) is exported: no ungated handler.
 		const exported = [
 			...source.matchAll(/^export (?:async )?(?:function|const) (\w+)/gm),
@@ -134,8 +138,11 @@ test("gates ask the server first and dynamically import the private views", () =
 	assert.match(hook, /cache: "no-store"/);
 	assert.match(hook, /useState<HomelabAccessState>\("pending"\)/);
 	assert.match(hook, /setState\(access\)/);
-	assert.match(hook, /"readonly"/);
-	assert.match(read("app/components/homelab/HomelabPrivateServices.tsx"), /data-homelab-public-readonly-view/);
+	assert.match(read("lib/homelabBrowserAccess.ts"), /return "readonly"/);
+	assert.match(
+		read("app/components/homelab/HomelabPrivateServices.tsx"),
+		/data-homelab-public-readonly-view/,
+	);
 });
 
 test("owner cards preserve the historical #service-* link after async access", () => {

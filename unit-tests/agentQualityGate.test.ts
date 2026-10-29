@@ -19,7 +19,6 @@ test("agent quality gate wraps the canonical publication gate", async () => {
 		"QG_EXEC_BIT",
 		"npm run lint",
 		"npm run lint:css",
-		"npx next typegen",
 		"npm run typecheck",
 		"npm run test:unit",
 		"bash scripts/quality-gate.sh --publish",
@@ -94,8 +93,11 @@ test("project checks fail closed for maintenance and build scopes", async () => 
 	assert.ok(checks, "shared check sequence must exist");
 	assert.match(
 		checks,
-		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
 	);
+	// typecheck owns route typegen so the gate does not generate twice.
+	const pkg = JSON.parse(await source("package.json"));
+	assert.match(pkg.scripts.typecheck, /typegen && tsc --noEmit/);
 	const dispatch = gate.split('case "${build}" in')[1]?.split("\nesac")[0];
 	assert.ok(dispatch, "build scope dispatch must exist");
 	assert.match(

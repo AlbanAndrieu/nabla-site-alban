@@ -14,7 +14,7 @@ test("agent quality keeps route types and unit coverage in both CI scopes", asyn
 	assert.ok(checks, "the shared checks must exist");
 	assert.match(
 		checks,
-		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npx next typegen &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
+		/npm run lint &&[\s\S]*?npm run lint:css &&[\s\S]*?npm run typecheck &&[\s\S]*?npm run test:unit/,
 	);
 	const scopes = gate.split('case "${build}" in')[1]?.split("\nesac")[0];
 	assert.ok(scopes, "both scope dispatch cases must exist");

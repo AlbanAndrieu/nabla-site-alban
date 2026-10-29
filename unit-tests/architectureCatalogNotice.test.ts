@@ -14,7 +14,7 @@ test("private architecture error is actionable, accessible and localized", async
 		source("ArchitectureCatalogNotice.tsx"),
 		source("ArchitectureCatalogNotice.module.css"),
 	]);
-	assert.match(view, /fetchJson\("\/api\/homelab-catalog-v2"/);
+	assert.match(view, /fetchJson\(\s*"\/api\/homelab-catalog-v2"/);
 	assert.match(view, /controller\.abort\(\)/);
 	assert.match(view, /setAttempt\(\(current\) => current \+ 1\)/);
 	assert.match(

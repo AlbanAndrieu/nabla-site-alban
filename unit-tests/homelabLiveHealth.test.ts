@@ -44,12 +44,18 @@ async function endpointSource() {
 
 test("homelab service grid keeps endpoints clickable and matches FastAPI health by stable identity", async () => {
 	const page = await gridSource();
-	assert.match(page, /observedOwnerServiceNavigation\(svc,/);
-	assert.match(page, /const endpointUrl = !readOnly/);
-	assert.match(page, /const endpointEnabled = !readOnly && svc\.endpointEnabled !== false/);
-	assert.match(page, /const stableId = homelabServiceId\(service\)/);
-	assert.match(page, /index\.byId\.get\(stableId\)/);
-	assert.match(page, /index\.byName\.get\(normalizedName\(service\.name\)\)/);
+	assert.match(page, /observedOwnerServiceNavigation\(\s*svc,/);
+	assert.match(page, /const endpointUrl =\s*!readOnly/);
+	assert.match(
+		page,
+		/const endpointEnabled = !readOnly && svc\.endpointEnabled !== false/,
+	);
+	// Canonical id only: never match probes by display name or URL (#258).
+	assert.match(
+		page,
+		/canonicalHomelabEvidence\(index, homelabServiceId\(service\)\)/,
+	);
+	assert.doesNotMatch(page, /index\.byName\.get\(/);
 	assert.match(
 		page,
 		/serviceHealthEvidence\(serviceHealth, svc, endpointUrl, snapshot\)/,
@@ -151,8 +157,8 @@ test("internal links inherit FastAPI or TrueNAS runtime colors", async () => {
 	const page = await gridSource();
 	assert.match(page, /internalPresentationState\(/);
 	assert.match(page, /truenasRuntimeUnavailable \|\|/);
-	assert.match(page, /initialHealth\?\.runtime_stale === true/);
-	assert.match(page, /initialHealth\?\.runtime_reachable === false/);
+	assert.match(page, /entry\?\.runtime_stale === true/);
+	assert.match(page, /entry\?\.runtime_reachable === false/);
 	assert.match(page, /runtimeHealthState\(entry\?\.runtime_state\)/);
 	assert.match(page, /INTERNAL_HEALTH_CLASS\[internalState\]/);
 	assert.match(
@@ -268,9 +274,14 @@ test("internal badge uses semantic tokens instead of the low-contrast legacy bg-
 });
 
 test("stale TrueNAS evidence never implies missing runtime", async () => {
-	const presentation = await source("app/components/homelab/homelabGridPresentation.ts");
+	const presentation = await source(
+		"app/components/homelab/homelabGridPresentation.ts",
+	);
 	assert.match(presentation, /entry\?\.observation_stale === true/);
-	assert.match(presentation, /if \(entry\?\.runtime_missing === true\) return "missing"/);
+	assert.match(
+		presentation,
+		/if \(entry\?\.runtime_missing === true\) return "missing"/,
+	);
 	assert.match(presentation, /return "unknown"/);
 	const page = await gridSource();
 	assert.match(page, /t\("runtime\.unknown"\)/);

@@ -20,12 +20,9 @@ publish.
 
 ## Fast Node 22/npm 10 smoke
 
-When the agent only has Node 22/npm 10, use
-`node scripts/agent-node22-fast.mjs` or `just node22-fast` for a
-**dependency-free L1 suite**. It checks versions and required files.
-It does not modify engines, install packages, build Next.js or replace
-the canonical Node 24/npm 12 `npm run quality:agent:publish` gate.
-The full procedure is in `docs/runbooks/node22-fast-local.md`.
+With only Node 22/npm 10, `just node22-fast` runs a **dependency-free L1 suite**; it never
+replaces the Node 24/npm 12 `npm run quality:agent:publish` gate
+(`docs/runbooks/node22-fast-local.md`).
 
 ## OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH
 
@@ -72,7 +69,7 @@ Before every `git push`, GitHub API file update, or other remote repository muta
 
 1. Confirm the target is a dedicated non-default branch and is **not** `master`.
 2. Run `npm run quality:agent:fix` from a local checkout after the editing batch and let it
-   converge without manually investigating intermediate formatter passes.
+   converge without inspecting intermediate formatter passes.
 3. Review `git status --short` and `git diff --stat`, then inspect only the affected diff necessary
    to confirm the deterministic fixes are safe; commit the complete intended batch.
 4. Run or reuse `npm run quality:agent:publish`; when repository hooks are installed, the versioned
@@ -87,15 +84,12 @@ Before every `git push`, GitHub API file update, or other remote repository muta
 7. Verify `git status --short` is empty after the strict publication gate, then publish through a
    pull request.
 
-When `mise run hooks` has been run, the normal Git `pre-commit` hook validates commits and the
-versioned `pre-push` hook invokes `scripts/agent-publish.sh`. Copilot setup installs the same hooks
-automatically before an agent starts.
+`mise run hooks` (also run by Copilot setup) installs the `pre-commit` hook and the versioned
+`pre-push` hook that invokes `scripts/agent-publish.sh`.
 
-An API-only agent must not silently treat remote API writes as a way to bypass local hooks. If its
-runtime cannot obtain or execute a checkout, it must explicitly report that limitation, reproduce
-the closest deterministic validations available, keep the remote patch minimal, and inspect the
-resulting CI immediately. It must never claim that the local quality gate passed when it was not
-executed.
+An API-only agent must not use remote writes to bypass local hooks: without a runnable checkout it
+reports it, runs the closest deterministic validations, keeps the patch minimal,
+inspects CI immediately, and never claims an unexecuted local gate passed.
 
 Never bypass repository hooks with `git push --no-verify`. Never weaken or disable formatter, lint,
 security, YAML, workflow, generated-file, or validation rules merely to make a push or CI build
@@ -113,7 +107,7 @@ Agents must never rely on this post-merge workflow as justification for publishi
 Next.js 16 / React 19 / TypeScript / next-intl. Node/npm constraints and commands are authoritative
 in `package.json`.
 
-Commands, single-test invocations and architecture: `docs/agent-developer-guide.md` (on-demand).
+Commands, single tests and architecture: `docs/agent-developer-guide.md` (on demand).
 
 ## Legacy static 404 rendering exception
 

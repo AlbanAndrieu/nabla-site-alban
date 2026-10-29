@@ -90,7 +90,11 @@ test("DNS resilience is rendered by unified operational evidence instead of a st
 
 	assert.match(block, /parseHomelabHealthSnapshot\(await response\.json\(\)\)/);
 	assert.doesNotMatch(block, /PfSenseDnsPosture/);
-	assert.equal(block.match(/setInterval\(/g)?.length, 1);
+	// Only health and SERVICE catalog revalidation poll; no standalone DNS poller.
+	assert.deepEqual(block.match(/setInterval\(\w+/g), [
+		"setInterval(refreshHealth",
+		"setInterval(refreshCatalogIfDue",
+	]);
 	assert.match(observabilityTypes, /healthSnapshot:\s*HomelabHealthSnapshot/);
 	assert.match(observability, /parseHomelabHealthSnapshot\(board\.homelab\)/);
 	assert.match(operations, /import PfSenseDnsPosture/);
