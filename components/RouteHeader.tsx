@@ -28,7 +28,10 @@ function routeParts(pathname: string) {
 }
 
 function localizedPath(locale: string, parts: string[]) {
-	return `${locale === "fr" ? "/fr" : ""}${parts.length ? `/${parts.join("/")}` : ""}` || "/";
+	return (
+		`${locale === "fr" ? "/fr" : ""}${parts.length ? `/${parts.join("/")}` : ""}` ||
+		"/"
+	);
 }
 
 function parentLabel(segment: string, locale: string) {

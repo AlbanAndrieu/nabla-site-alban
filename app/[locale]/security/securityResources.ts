@@ -12,7 +12,12 @@ export type ResourceLink =
 			icon?: ResourceLinkIcon;
 	  }
 	| {
-			page: "ai" | "truenas" | "security/dsomm" | "security/lexique" | "security/yubikey";
+			page:
+				| "ai"
+				| "truenas"
+				| "security/dsomm"
+				| "security/lexique"
+				| "security/yubikey";
 			hash?: string;
 			icon: ResourceLinkIcon;
 	  };

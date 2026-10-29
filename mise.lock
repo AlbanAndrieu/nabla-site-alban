@@ -84,31 +84,37 @@ specifiers = ["2.5.0"]
 checksum = "sha256:c800091c414e1c8e8628137275d88c257bcfe0c35dd31d2762923a71dae7df7f"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-aarch64-unknown-linux-gnu.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [tools.hk."platforms.linux-arm64-musl"]
 checksum = "sha256:1e839b96defad21b5118d9554f2146811a2ce8d8eef90b3da1d592834969b717"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-aarch64-unknown-linux-musl.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [tools.hk."platforms.linux-x64"]
 checksum = "sha256:449b83c35ac3a460f80a4c9a41ad99430add8cf6caa6ceadc27e810feac3647d"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-x86_64-unknown-linux-gnu.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [tools.hk."platforms.linux-x64-musl"]
 checksum = "sha256:55b349ed8ebbb9cc11e3ff7f741230035061e45621c0b2c87fffeeb37fadcfd0"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-x86_64-unknown-linux-musl.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [tools.hk."platforms.macos-arm64"]
 checksum = "sha256:fabbed3a44e72c601759fa81d56f3c9403ca466853bdf77e87cc69d986cb151a"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-aarch64-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [tools.hk."platforms.windows-x64"]
 checksum = "sha256:9d3063f0eadb316415dc2aaea51608f436eb6ffe44e00c2e460294c66f269a54"
 url = "https://github.com/jdx/hk/releases/download/v2.5.0/hk-x86_64-pc-windows-msvc.zip"
 signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+repository_ids = { repository = "922514152" }
 
 [[tools.hyperfine]]
 version = "1.21.0"
@@ -193,7 +199,10 @@ url_api = "https://api.github.com/repos/casey/just/releases/assets/500511374"
 [[tools.node]]
 version = "24.22.1"
 backend = "core:node"
-specifiers = ["24"]
+specifiers = [
+    "24",
+    "24.22.1",
+]
 
 [tools.node."platforms.linux-arm64"]
 checksum = "sha256:33c37be234ba8bee041961047b19160f4d7d0f164e8e246f78bdd10feff148b3"
@@ -229,15 +238,19 @@ backend = "aqua:npm/cli"
 specifiers = ["12.2.0"]
 
 [tools.npm."platforms.linux-arm64"]
+checksum = "sha256:6666b48816b39b86c3febac7b51a4ee4de6c5ca589c382ad8004b6b113f86677"
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [tools.npm."platforms.linux-arm64-musl"]
+checksum = "sha256:6666b48816b39b86c3febac7b51a4ee4de6c5ca589c382ad8004b6b113f86677"
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [tools.npm."platforms.linux-x64"]
+checksum = "sha256:6666b48816b39b86c3febac7b51a4ee4de6c5ca589c382ad8004b6b113f86677"
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [tools.npm."platforms.linux-x64-musl"]
+checksum = "sha256:6666b48816b39b86c3febac7b51a4ee4de6c5ca589c382ad8004b6b113f86677"
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [tools.npm."platforms.macos-arm64"]
@@ -245,6 +258,7 @@ checksum = "blake3:b666230e535f2cf3dbaba270943f64f0bda4dffb9aeadc7f2f43367a44973
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [tools.npm."platforms.macos-x64"]
+checksum = "sha256:6666b48816b39b86c3febac7b51a4ee4de6c5ca589c382ad8004b6b113f86677"
 url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
 
 [[tools.pre-commit]]
