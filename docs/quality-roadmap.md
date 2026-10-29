@@ -444,6 +444,9 @@ La fusion de #262 ne clôt pas la gate #263. Conserver une PR Draft tant que les
 
 ## P1 — Guide matériel YubiKey dans Security (28 octobre 2026)
 
+**Livré et fusionné :** PR [#264](https://github.com/AlbanAndrieu/nabla-site-alban/pull/264) le **29 octobre 2026**, merge SHA `89fa8b46`. Le déploiement Vercel de production `dpl_HNC6xUGFjNxsgqgnumUjowPBzVP9` est **READY** sur ce même SHA. Ceci atteste le build et la publication, **pas** le rendu réel ou les clics des deux pages.
+
+
 Cette feuille de route concerne uniquement la **présentation publique du Site**. Les diagnostics matériels, scripts d'enrôlement, escrow et procédures de restauration appartiennent à `nabla-compose`, pas au runtime Vercel.
 
 - [x] Sous-page localisée `/security/yubikey` et `/fr/security/yubikey` : contenu FR/EN, canonical/hreflang, lien depuis la section Sécurité personnelle, indexation dans le catalogue SEO.
@@ -457,5 +460,6 @@ Cette feuille de route concerne uniquement la **présentation publique du Site**
 - [x] Build Vercel Preview Next.js 16.4.2 / TypeScript : READY sur SHA `a19a4830` après correction de deux virgules manquantes dans le lexique FR/EN ; test de non-régression ajouté. Contrôles de source 8/8 PASS. Ceci valide la compilation, pas la recette visuelle.
 - [x] Ajouter des sélecteurs de nœuds utilisables au clavier (boutons 44 px, `aria-pressed`, focus visible et état annoncé). Compilation Next.js/TypeScript Vercel `READY` sur `878fc932` ; 10 contrôles structurels ciblés réussis. Le visuel réel n’est pas vérifié.
 - [x] Préparer `tests/yubikey.spec.ts` (Playwright, routes FR/EN, 14 cas d’usage, SEO, footer, clavier, mobile 320/390 px). **Fichier ajouté, tests navigateur NOT_RUN**. Ne pas les lancer dans GitHub Actions.
-- [ ] Recette Preview **exact-SHA** : exécuter `BASE_URL=<preview> npx playwright test tests/yubikey.spec.ts --project=chromium` depuis un runner autorisé ; vérifier HTTP FR/EN, liens et SEO, lisibilité du graphe sur mobile, navigation clavier, contrastes, alternative textuelle et absence de fuite de données. Utiliser la configuration de bypass existante si la Preview est protégée.
+- [x] **Post-fusion / PR de suivi** : ajuster le défilement « Back to Top » à `prefers-reduced-motion`, ajouter les contrôles de glyphes Font Awesome et l'audit ciblé Axe WCAG A/AA au Playwright FR/EN ; écrire le [runbook de recette UI](runbooks/yubikey-ui-acceptance.md). **Implémenté, non attesté par un navigateur**.
+- [ ] Recette production/Preview **exact-SHA** : exécuter `BASE_URL=https://www.albanandrieu.com npx playwright test tests/yubikey.spec.ts --project=chromium` depuis un runner autorisé, puis tester les modes clair/sombre, 320/390 px, zoom et focus ; rapport Axe, diagnostics des glyphes et absence de fuite. La protection Preview nécessite un bypass injecté secrètement. **NOT_RUN**.
 - [ ] Exercice de continuité **hors site** : valider réellement deux clés, enrollment indépendant, chaîne PIV, sauvegardes age distinctes et déverrouillage KeePassXC sans écrire de preuves sensibles sur le site public.
