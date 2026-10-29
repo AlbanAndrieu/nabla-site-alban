@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // Public, read-only UI checks. Run locally against a matching exact-SHA Preview:
 // BASE_URL=https://<preview-host> npx playwright test tests/yubikey.spec.ts --project=chromium
@@ -44,10 +45,34 @@ for (const locale of ["fr", "en"] as const) {
       const top = footer.locator("button:has(i.fa-arrow-up)");
       await expect(home).toBeVisible();
       await expect(top).toBeVisible();
+      // Check the rendered Font Awesome glyph, not only its CSS class.
+      for (const icon of [home.locator("i.fa-home"), top.locator("i.fa-arrow-up")]) {
+        const content = await icon.evaluate((element) =>
+          window.getComputedStyle(element, "::before").content
+        );
+        expect(["none", "normal", '""', "''"]).not.toContain(content);
+      }
       await page.locator("#yubikey-next").scrollIntoViewIfNeeded();
       await top.click();
       await expect(page).toHaveURL(/#top$/);
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(5);
+    });
+
+    test("scans the YubiKey controls and examples for automated WCAG A/AA issues", async ({ page }) => {
+      await page.goto(path);
+      const selector = page.getByRole("group", { name: graphListLabel });
+      await selector.getByRole("button", { name: backupLabel }).click();
+      const audit = await new AxeBuilder({ page })
+        .include("#yubikey-use-cases")
+        .include("section[aria-labelledby='yubikey-graph-title']")
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+        .analyze();
+      const findings = audit.violations.map(({ id, impact, nodes }) => ({
+        id,
+        impact,
+        targets: nodes.flatMap((node) => node.target),
+      }));
+      expect(findings).toEqual([]);
     });
 
     test("keeps graph, footer and cards within narrow mobile viewports", async ({ page }) => {
