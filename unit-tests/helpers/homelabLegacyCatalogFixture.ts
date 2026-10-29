@@ -3,13 +3,14 @@
  * code: current SERVICE and OWNER readers use Backstage v2 exclusively.
  */
 import navigationOverrides from "../../config/homelab-navigation-overrides.json";
-import localCatalog from "../../public/homelab-services.json";
 import { isRecord } from "../../lib/guards";
 import {
-  homelabServiceId,
-  type HomelabService,
-  type HomelabServicesCatalog,
+	HOMELAB_SERVICES_DEFAULT_API_URL,
+	type HomelabService,
+	type HomelabServicesCatalog,
+	homelabServiceId,
 } from "../../lib/homelabServices";
+import localCatalog from "../../public/homelab-services.json";
 
 const HOMELAB_DOMAIN = "albandrieu.com";
 

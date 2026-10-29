@@ -41,6 +41,7 @@ source-check:
     node --experimental-strip-types --test unit-tests/homelabOwnerHttpEvidence.test.mjs
     node --experimental-strip-types --test unit-tests/c4ArchitectureModel.test.mjs
     node --test unit-tests/vercelIgnoreBuild.test.mjs
+    node --test unit-tests/securityYubiKeyGuide.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs

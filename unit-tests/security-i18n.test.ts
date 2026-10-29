@@ -18,7 +18,7 @@ const messagesLoaderPath = new URL("../i18n/messages.ts", import.meta.url);
 
 const EXPECTED_LINK_COUNTS = {
 	owasp: 9,
-	personal: 3,
+	personal: 4,
 	network: 5,
 	hardening: 9,
 	zeroTrustKubernetes: 9,

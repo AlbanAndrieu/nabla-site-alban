@@ -20,7 +20,10 @@ test("OWNER data routes gate the visitor before reading upstream", () => {
 
 test("FastAPI OWNER egress requires a server key and never follows redirects", () => {
 	const guard = read("lib/homelabOwnerBoundary.ts");
-	assert.match(guard, /Boolean\(vercelEnvironment\) && !diagnosticsKey\?\.trim\(\)/);
+	assert.match(
+		guard,
+		/Boolean\(vercelEnvironment\) && !diagnosticsKey\?\.trim\(\)/,
+	);
 	assert.match(guard, /rawOwnerEnabled === "false"/);
 	for (const path of [
 		"lib/fastApiHealthBoard.ts",
@@ -30,7 +33,10 @@ test("FastAPI OWNER egress requires a server key and never follows redirects", (
 	]) {
 		const source = read(path);
 		assert.match(source, /ownerUpstreamBlocked\(/);
-		assert.match(source, /ownerDiagnosticHeaders\(process\.env\.DIAGNOSTICS_ACCESS_KEY\)/);
+		assert.match(
+			source,
+			/ownerDiagnosticHeaders\(process\.env\.DIAGNOSTICS_ACCESS_KEY\)/,
+		);
 		assert.match(source, /redirect: "error"/);
 	}
 });
@@ -39,10 +45,19 @@ test("catalog v2 uses public SVG icons even when probes are unavailable", () => 
 	const projection = read("lib/homelabCatalogV2Projection.ts");
 	assert.match(projection, /iconSrc: homelabCatalogIconSrc\(id\)/);
 	const icons = read("lib/homelabCatalogIcons.generated.ts");
-	assert.match(read("lib/homelabCatalogIcons.ts"), /homelabCatalogIcons\\.generated\\.ts/);
-	const paths = [...icons.matchAll(/"([a-z0-9-]+\.svg)"/g)].map((match) => match[1]);
+	assert.match(
+		read("lib/homelabCatalogIcons.ts"),
+		/homelabCatalogIcons\.generated\.ts/,
+	);
+	const paths = [...icons.matchAll(/"([a-z0-9-]+\.svg)"/g)].map(
+		(match) => match[1],
+	);
 	assert.ok(paths.length >= 10);
 	for (const icon of paths) {
-		assert.ok(existsSync(new URL(`../public/assets/selfh-icons/${icon}`, import.meta.url)));
+		assert.ok(
+			existsSync(
+				new URL(`../public/assets/selfh-icons/${icon}`, import.meta.url),
+			),
+		);
 	}
 });

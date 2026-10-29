@@ -107,3 +107,6 @@ playwright/.cache/
 
 .env*.local
 .env.sops.secrets
+
+# python
+__pycache__/

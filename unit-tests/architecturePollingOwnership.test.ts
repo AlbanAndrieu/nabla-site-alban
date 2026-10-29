@@ -78,9 +78,10 @@ test("architecture health polling has a single owner and adaptive schedule", asy
 		healthPolling,
 		/readOnly \? "\/api\/homelab-health-v2" : "\/api\/homelab-health"/,
 	);
-	assert.match(healthPolling, /HEALTH_POLL_REFRESHING_MS = 2_000/);
-	assert.match(healthPolling, /HEALTH_POLL_FRESH_MS = 5_000/);
-	assert.match(healthPolling, /HEALTH_POLL_FALLBACK_MS = 30_000/);
+	// Slow TrueNAS API backoff (#261): never poll faster than every 30 s.
+	assert.match(healthPolling, /HEALTH_POLL_REFRESHING_MS = 30_000/);
+	assert.match(healthPolling, /HEALTH_POLL_FRESH_MS = 30_000/);
+	assert.match(healthPolling, /HEALTH_POLL_FALLBACK_MS = 60_000/);
 	assert.match(healthPolling, /health_board\?\.refreshing/);
 	assert.match(healthPolling, /health_board\?\.state === "fresh"/);
 	assert.match(healthPolling, /window\.setTimeout/);

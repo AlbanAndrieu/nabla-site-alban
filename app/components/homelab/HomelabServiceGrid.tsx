@@ -1,15 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
+import {
+	type ResourceSnapshot,
+	snapshotAgeState,
+} from "@/lib/homelabResourceEvidence";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,
 	homelabServiceId,
 } from "@/lib/homelabServices";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
-import { snapshotAgeState, type ResourceSnapshot } from "@/lib/homelabResourceEvidence";
-import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
 import { healthIndex } from "./homelabGridPresentation";
@@ -21,8 +25,8 @@ type Props = {
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
 	ownerBoundary?: boolean;
-  resources?: ResourceSnapshot | null;
-  readOnly?: boolean;
+	resources?: ResourceSnapshot | null;
+	readOnly?: boolean;
 };
 
 export default function HomelabServiceGrid({
@@ -32,18 +36,30 @@ export default function HomelabServiceGrid({
 	healthUnavailable = false,
 	healthHttpStatus = null,
 	ownerBoundary = false,
-  resources = null,
-  readOnly = false,
+	resources = null,
+	readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
-  const resourceIndex = new Map(
-    (resources?.services ?? []).map((row) => [row.entityRef, row] as const),
-  );
-  const resourceStale = resources
-    ? snapshotAgeState(resources, Date.now(), catalog.catalogRevision) !== "fresh"
-    : false;
+	const resourceIndex = new Map(
+		(resources?.services ?? []).map((row) => [row.entityRef, row] as const),
+	);
+	// Render must stay pure: read the clock after mount, then once a minute.
+	const [now, setNow] = useState<number | null>(null);
+	useEffect(() => {
+		if (!resources) return;
+		const initial = window.setTimeout(() => setNow(Date.now()), 0);
+		const interval = window.setInterval(() => setNow(Date.now()), 60_000);
+		return () => {
+			window.clearTimeout(initial);
+			window.clearInterval(interval);
+		};
+	}, [resources]);
+	const resourceStale =
+		resources && now !== null
+			? snapshotAgeState(resources, now, catalog.catalogRevision) !== "fresh"
+			: false;
 
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
@@ -69,11 +85,11 @@ export default function HomelabServiceGrid({
 			ownerBoundary
 				? t("truenas.ownerBoundary")
 				: t("truenas.liveSnapshotUnavailable", {
-				status:
-					healthHttpStatus === null
-						? t("truenas.networkError")
-						: `HTTP ${healthHttpStatus}`,
-			}),
+						status:
+							healthHttpStatus === null
+								? t("truenas.networkError")
+								: `HTTP ${healthHttpStatus}`,
+					}),
 		);
 	}
 	if (truenasApi?.reachable === false) {
@@ -134,11 +150,15 @@ export default function HomelabServiceGrid({
 			<div className="row service-grid">
 				{services.map((svc) => {
 					const serviceId = homelabServiceId(svc);
-					const observed = observedOwnerServiceNavigation(svc, readOnly || healthUnavailable ? null : snapshot);
+					const observed = observedOwnerServiceNavigation(
+						svc,
+						readOnly || healthUnavailable ? null : snapshot,
+					);
 					const displayService = observed.service;
 					// Backstage v2 has no publicly navigable endpoint: only verified OWNER
-                    // FastAPI exposure can authorize a card link.
-                    const endpointUrl = !readOnly && !healthUnavailable ? observed.externalUrl : "";
+					// FastAPI exposure can authorize a card link.
+					const endpointUrl =
+						!readOnly && !healthUnavailable ? observed.externalUrl : "";
 					const occurrence = (serviceOccurrences.get(serviceId) ?? 0) + 1;
 					serviceOccurrences.set(serviceId, occurrence);
 					const firstOccurrence = occurrence === 1;
@@ -154,13 +174,18 @@ export default function HomelabServiceGrid({
 							serviceId={serviceId}
 							endpointUrl={endpointUrl}
 							readOnly={readOnly}
-              resource={!readOnly && !ownerBoundary && svc.entityRef
-                ? resourceIndex.get(svc.entityRef) : undefined}
-              resourceStale={resourceStale}
+							resource={
+								!readOnly && !ownerBoundary && svc.entityRef
+									? resourceIndex.get(svc.entityRef)
+									: undefined
+							}
+							resourceStale={resourceStale}
 							externalUrlDerived={observed.externalUrlDerived}
 							internalProtocolObserved={observed.internalProtocolObserved}
 							internalRouteMismatch={observed.internalRouteMismatch}
-							anchorId={firstOccurrence ? `homelab-service-${serviceId}` : undefined}
+							anchorId={
+								firstOccurrence ? `homelab-service-${serviceId}` : undefined
+							}
 							snapshot={snapshot}
 							serviceHealth={serviceHealth}
 							healthUnavailable={healthUnavailable}

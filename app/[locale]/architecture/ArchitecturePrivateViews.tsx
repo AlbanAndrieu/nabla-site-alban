@@ -2,21 +2,30 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
 import useAuthorizedLayoutHold from "@/app/components/homelab/useAuthorizedLayoutHold";
+import useHomelabAccess from "@/app/components/homelab/useHomelabAccess";
 import SectionHeading from "@/components/SectionHeading";
-import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
 import {
-  clearPublicHomelabBrowserCache,
-  readPublicCatalogCache,
-  writePublicCatalogCache,
-} from "@/lib/homelabPublicBrowserCache";
-import { boundedHomelabSignal } from "@/lib/homelabSlowApiPolicy";
-import { homelabServiceId } from "@/lib/homelabServices";
-import { catalogFailureReason, catalogScopeMatches, classifyCatalogFailure, type CatalogFailureReason, type CatalogScope } from "@/lib/homelabClientAccessBoundary";
-import { parseOwnerCatalogIncident, type OwnerCatalogIncident } from "@/lib/homelabCatalogFailureStage";
+	type OwnerCatalogIncident,
+	parseOwnerCatalogIncident,
+} from "@/lib/homelabCatalogFailureStage";
+import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
+import {
+	type CatalogFailureReason,
+	type CatalogScope,
+	catalogFailureReason,
+	catalogScopeMatches,
+	classifyCatalogFailure,
+} from "@/lib/homelabClientAccessBoundary";
+import {
+	clearPublicHomelabBrowserCache,
+	readPublicCatalogCache,
+	writePublicCatalogCache,
+} from "@/lib/homelabPublicBrowserCache";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
+import { homelabServiceId } from "@/lib/homelabServices";
+import { boundedHomelabSignal } from "@/lib/homelabSlowApiPolicy";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import ArchitectureCatalogNotice from "./ArchitectureCatalogNotice";
 import noticeStyles from "./ArchitectureCatalogNotice.module.css";
@@ -51,12 +60,27 @@ type PrivateArchitectureData = {
 
 type CatalogRequestState =
 	| { status: "loading"; data: null; reason: null; incident: null; scope: null }
-	| { status: "error"; data: null; reason: CatalogFailureReason; incident: OwnerCatalogIncident | null; scope: CatalogScope }
-	| { status: "ready"; data: PrivateArchitectureData; reason: null; incident: null; scope: CatalogScope };
+	| {
+			status: "error";
+			data: null;
+			reason: CatalogFailureReason;
+			incident: OwnerCatalogIncident | null;
+			scope: CatalogScope;
+	  }
+	| {
+			status: "ready";
+			data: PrivateArchitectureData;
+			reason: null;
+			incident: null;
+			scope: CatalogScope;
+	  };
 
 class CatalogRequestError extends Error {
-	constructor(readonly reason: CatalogFailureReason, readonly incident: OwnerCatalogIncident | null = null,
-		readonly revokePublicCache = false) {
+	constructor(
+		readonly reason: CatalogFailureReason,
+		readonly incident: OwnerCatalogIncident | null = null,
+		readonly revokePublicCache = false,
+	) {
 		super("Private Backstage v2 catalog request failed");
 	}
 }
@@ -64,7 +88,11 @@ class CatalogRequestError extends Error {
 /** Compatibility export: both pages now use the same public-safe reason classifier. */
 export { catalogFailureReason };
 
-async function fetchJson(url: string, signal: AbortSignal, ownerAuthorized: boolean): Promise<unknown> {
+async function fetchJson(
+	url: string,
+	signal: AbortSignal,
+	ownerAuthorized: boolean,
+): Promise<unknown> {
 	const response = await fetch(url, {
 		cache: "no-store",
 		signal: boundedHomelabSignal(signal),
@@ -79,7 +107,11 @@ async function fetchJson(url: string, signal: AbortSignal, ownerAuthorized: bool
 					response.headers.get("X-Nabla-Request-ID"),
 				)
 			: null;
-		throw new CatalogRequestError(policy.reason, incident, policy.revokePublicCache);
+		throw new CatalogRequestError(
+			policy.reason,
+			incident,
+			policy.revokePublicCache,
+		);
 	}
 	return response.json();
 }
@@ -88,7 +120,10 @@ async function fetchJson(url: string, signal: AbortSignal, ownerAuthorized: bool
  * Single owner-gated canonical v2 request for service cards and topology.
  * Retry the catalog alone; do not reload the page or fall back to public v1.
  */
-function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) {
+function usePrivateArchitectureData(
+	enabled: boolean,
+	ownerAuthorized: boolean,
+) {
 	const [request, setRequest] = useState<CatalogRequestState>({
 		status: "loading",
 		data: null,
@@ -103,7 +138,11 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 		const controller = new AbortController();
 		const publicStorage = (() => {
 			if (ownerAuthorized) return null;
-			try { return window.localStorage; } catch { return null; }
+			try {
+				return window.localStorage;
+			} catch {
+				return null;
+			}
 		})();
 		const cached = publicStorage ? readPublicCatalogCache(publicStorage) : null;
 		if (cached) {
@@ -120,16 +159,40 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 				})),
 				relations: [],
 			};
-			setRequest({
-				status: "ready",
-				data: { catalog: cached.catalog, catalogSource: "browser-public-cache",
-					topology, topologyLive: false, cacheStale: true },
-				reason: null, incident: null, scope: "public",
+			// Hydrate after effect setup, as useHomelabHealth does; skip if aborted.
+			queueMicrotask(() => {
+				if (controller.signal.aborted) return;
+				setRequest({
+					status: "ready",
+					data: {
+						catalog: cached.catalog,
+						catalogSource: "browser-public-cache",
+						topology,
+						topologyLive: false,
+						cacheStale: true,
+					},
+					reason: null,
+					incident: null,
+					scope: "public",
+				});
 			});
 		} else {
-			setRequest({ status: "loading", data: null, reason: null, incident: null, scope: null });
+			queueMicrotask(() => {
+				if (controller.signal.aborted) return;
+				setRequest({
+					status: "loading",
+					data: null,
+					reason: null,
+					incident: null,
+					scope: null,
+				});
+			});
 		}
-		void fetchJson("/api/homelab-catalog-v2", controller.signal, ownerAuthorized)
+		void fetchJson(
+			"/api/homelab-catalog-v2",
+			controller.signal,
+			ownerAuthorized,
+		)
 			.then((body) => {
 				if (controller.signal.aborted) return;
 				const catalog = parseHomelabCatalogV2(body);
@@ -137,9 +200,12 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 					throw new CatalogRequestError("unavailable");
 				}
 				const projected = projectHomelabCatalogV2(catalog);
-				if (publicStorage) writePublicCatalogCache(
-					publicStorage, projected.services, projected.topology,
-				);
+				if (publicStorage)
+					writePublicCatalogCache(
+						publicStorage,
+						projected.services,
+						projected.topology,
+					);
 				setRequest({
 					status: "ready",
 					data: {
@@ -155,14 +221,18 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 			})
 			.catch((error: unknown) => {
 				if (controller.signal.aborted) return;
-				const denied = error instanceof CatalogRequestError && error.revokePublicCache;
-				if (denied && publicStorage) clearPublicHomelabBrowserCache(publicStorage);
+				const denied =
+					error instanceof CatalogRequestError && error.revokePublicCache;
+				if (denied && publicStorage)
+					clearPublicHomelabBrowserCache(publicStorage);
 				// A timeout can retain only same-scope, validated public cache.
 				// Explicit 401/403/404 and key denial always revoke it.
 				if (cached && !denied) {
-					setRequest((current) => current.scope === "public" && current.status === "ready"
-						? { ...current, data: { ...current.data, cacheStale: true } }
-						: current);
+					setRequest((current) =>
+						current.scope === "public" && current.status === "ready"
+							? { ...current, data: { ...current.data, cacheStale: true } }
+							: current,
+					);
 					return;
 				}
 				setRequest({
@@ -170,7 +240,10 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 					data: null,
 					reason:
 						error instanceof CatalogRequestError ? error.reason : "unavailable",
-					incident: ownerAuthorized && error instanceof CatalogRequestError ? error.incident : null,
+					incident:
+						ownerAuthorized && error instanceof CatalogRequestError
+							? error.incident
+							: null,
 					scope: ownerAuthorized ? "owner" : "public",
 				});
 			});
@@ -178,13 +251,25 @@ function usePrivateArchitectureData(enabled: boolean, ownerAuthorized: boolean) 
 	}, [enabled, ownerAuthorized, attempt]);
 
 	const retry = () => {
-		setRequest({ status: "loading", data: null, reason: null, incident: null, scope: null });
+		setRequest({
+			status: "loading",
+			data: null,
+			reason: null,
+			incident: null,
+			scope: null,
+		});
 		setAttempt((current) => current + 1);
 	};
 	// Effects run after render. Hide any OWNER data synchronously when access
 	// changes to public, including on a Wi-Fi/VPN or identity transition.
 	if (!catalogScopeMatches(request.scope, !ownerAuthorized)) {
-		return { status: "loading" as const, data: null, reason: null, incident: null, retry };
+		return {
+			status: "loading" as const,
+			data: null,
+			reason: null,
+			incident: null,
+			retry,
+		};
 	}
 	return { ...request, retry };
 }
@@ -196,17 +281,21 @@ export default function ArchitecturePrivateViews({
 	const access = useHomelabAccess();
 	const visible = access === "trusted" || access === "readonly";
 	const { data, status, reason, incident, retry } = usePrivateArchitectureData(
-		visible, access === "trusted",
+		visible,
+		access === "trusted",
 	);
 	// The region is only in the DOM after the catalog has resolved.
 	const { regionRef, reservedHeight } = useAuthorizedLayoutHold(
 		visible && status === "ready",
 	);
 	if (!visible) {
-		return access === "pending"
-			? <div data-homelab-access-rechecking aria-hidden="true"
-				style={{ minHeight: reservedHeight }} />
-			: null;
+		return access === "pending" ? (
+			<div
+				data-homelab-access-rechecking
+				aria-hidden="true"
+				style={{ minHeight: reservedHeight }}
+			/>
+		) : null;
 	}
 	const french = locale === "fr";
 	if (status === "error")
@@ -233,62 +322,70 @@ export default function ArchitecturePrivateViews({
 		return (
 			<div ref={regionRef} data-homelab-access-region>
 				<div data-homelab-public-readonly-view className="container py-4">
-				{data.cacheStale ? (
-					<p data-architecture-public-cache-stale role="status" className="small text-warning">
-						{french
-							? "Catalogue public mémorisé · état des services non vérifié"
-							: "Saved public catalog · service health unverified"}
-					</p>
-				) : null}
-				<ArchitectureTopologyView
-					readOnly
-					locale={locale}
-					initialCatalog={data.catalog}
-					initialCatalogSource={data.catalogSource}
-					initialTopology={data.topology}
-					initialTopologySource={data.topologyLive ? "fastapi" : "local-fallback"}
-				/>
+					{data.cacheStale ? (
+						<p
+							data-architecture-public-cache-stale
+							role="status"
+							className="small text-warning"
+						>
+							{french
+								? "Catalogue public mémorisé · état des services non vérifié"
+								: "Saved public catalog · service health unverified"}
+						</p>
+					) : null}
+					<ArchitectureTopologyView
+						readOnly
+						locale={locale}
+						initialCatalog={data.catalog}
+						initialCatalogSource={data.catalogSource}
+						initialTopology={data.topology}
+						initialTopologySource={
+							data.topologyLive ? "fastapi" : "local-fallback"
+						}
+					/>
 				</div>
 			</div>
 		);
 	return (
 		<div ref={regionRef} data-homelab-access-region>
-		<div data-homelab-private-view>
-			<ArchitectureSectionNav locale={locale} />
-			<div className="container">
-				<HomelabOperationalEvidence />
-			</div>
-			<ArchitectureImpactInspector
-				locale={locale}
-				initialTopology={data.topology}
-			/>
-			<ArchitectureTopologyView
-				locale={locale}
-				initialCatalog={data.catalog}
-				initialCatalogSource={data.catalogSource}
-				initialTopology={data.topology}
-				initialTopologySource={data.topologyLive ? "fastapi" : "local-fallback"}
-			/>
-			<section
-				id="homelab-network-architecture"
-				className="content-section"
-				aria-labelledby="homelab-network-ingress-paths"
-			>
-				<div className="container py-5">
-					<div className="mx-auto mb-4" style={{ maxWidth: "900px" }}>
-						<SectionHeading
-							id="homelab-network-ingress-paths"
-							iconClass="fa-network-wired"
-						>
-							{french
-								? "Réseau homelab et chemins d’ingress"
-								: "Homelab network and ingress paths"}
-						</SectionHeading>
-					</div>
-					<HomeLabNetworkFlow />
+			<div data-homelab-private-view>
+				<ArchitectureSectionNav locale={locale} />
+				<div className="container">
+					<HomelabOperationalEvidence />
 				</div>
-			</section>
-		</div>
+				<ArchitectureImpactInspector
+					locale={locale}
+					initialTopology={data.topology}
+				/>
+				<ArchitectureTopologyView
+					locale={locale}
+					initialCatalog={data.catalog}
+					initialCatalogSource={data.catalogSource}
+					initialTopology={data.topology}
+					initialTopologySource={
+						data.topologyLive ? "fastapi" : "local-fallback"
+					}
+				/>
+				<section
+					id="homelab-network-architecture"
+					className="content-section"
+					aria-labelledby="homelab-network-ingress-paths"
+				>
+					<div className="container py-5">
+						<div className="mx-auto mb-4" style={{ maxWidth: "900px" }}>
+							<SectionHeading
+								id="homelab-network-ingress-paths"
+								iconClass="fa-network-wired"
+							>
+								{french
+									? "Réseau homelab et chemins d’ingress"
+									: "Homelab network and ingress paths"}
+							</SectionHeading>
+						</div>
+						<HomeLabNetworkFlow />
+					</div>
+				</section>
+			</div>
 		</div>
 	);
 }

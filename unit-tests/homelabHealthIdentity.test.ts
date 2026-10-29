@@ -46,10 +46,16 @@ test("both service-card and health-summary paths apply canonical identity checks
 		),
 		"utf8",
 	);
-	const hook = readFileSync(
-		new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url),
+	const selectors = readFileSync(
+		new URL(
+			"../app/components/homelab/homelabHealthSelectors.ts",
+			import.meta.url,
+		),
 		"utf8",
 	);
-	assert.match(grid, /const generic = compatibleHomelabEvidence\(/);
-	assert.match(hook, /const entry = compatibleHomelabEvidence\(/);
+	assert.match(grid, /const generic = canonicalHomelabEvidence\(/);
+	assert.match(selectors, /const entry = canonicalHomelabEvidence\(/);
+	for (const source of [grid, selectors]) {
+		assert.doesNotMatch(source, /compatibleHomelabEvidence/);
+	}
 });
