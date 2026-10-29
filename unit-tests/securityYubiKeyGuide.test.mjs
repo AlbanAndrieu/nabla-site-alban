@@ -189,6 +189,8 @@ test("YubiKey inherits consistent header/footer Home and Back to Top icons", () 
 	assert.match(layout, /<Footer/);
 	assert.match(header, /className="fas fa-home"/);
 	assert.match(footer, /className="fas fa-home"/);
+	assert.match(footer, /Navigation de pied de page/);
+	assert.match(footer, /Footer navigation/);
 	assert.match(top, /className="fas fa-arrow-up"/);
 	assert.match(top, /window\.scrollTo/);
 	assert.match(top, /prefers-reduced-motion: reduce/);
