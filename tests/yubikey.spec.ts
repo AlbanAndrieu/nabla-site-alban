@@ -40,13 +40,16 @@ for (const locale of ["fr", "en"] as const) {
       await expect(backup).toHaveAttribute("aria-pressed", "true");
       await expect(page.locator('section[aria-labelledby="yubikey-graph-title"] [aria-live="polite"]')).toContainText(backupLabel);
 
+      const headerHome = page.locator('header nav a:has(i.fa-home)').first();
+      await expect(headerHome).toHaveAttribute("href", homePath);
+      await expect(headerHome).toBeVisible();
       const footer = page.locator('footer[role="contentinfo"]');
       const home = footer.locator(`a[href="${homePath}"]:has(i.fa-home)`);
       const top = footer.locator("button:has(i.fa-arrow-up)");
       await expect(home).toBeVisible();
       await expect(top).toBeVisible();
       // Check the rendered Font Awesome glyph, not only its CSS class.
-      for (const icon of [home.locator("i.fa-home"), top.locator("i.fa-arrow-up")]) {
+      for (const icon of [headerHome.locator("i.fa-home"), home.locator("i.fa-home"), top.locator("i.fa-arrow-up")]) {
         const content = await icon.evaluate((element) =>
           window.getComputedStyle(element, "::before").content
         );
@@ -56,6 +59,25 @@ for (const locale of ["fr", "en"] as const) {
       await top.click();
       await expect(page).toHaveURL(/#top$/);
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(5);
+      await home.click();
+      await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe(homePath);
+    });
+
+    test("respects reduced motion when returning to the top", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      const top = page.locator('footer[role="contentinfo"] button:has(i.fa-arrow-up)');
+      await page.locator("#yubikey-next").scrollIntoViewIfNeeded();
+      await top.scrollIntoViewIfNeeded();
+      await page.evaluate(() => {
+        const nativeScrollTo = window.scrollTo.bind(window);
+        window.scrollTo = ((options: ScrollToOptions) => {
+          document.documentElement.dataset.backToTopBehavior = String(options.behavior);
+          nativeScrollTo(options);
+        }) as typeof window.scrollTo;
+      });
+      await top.click();
+      await expect(page.locator("html")).toHaveAttribute("data-back-to-top-behavior", "auto");
     });
 
     test("scans the YubiKey controls and examples for automated WCAG A/AA issues", async ({ page }) => {
@@ -63,6 +85,7 @@ for (const locale of ["fr", "en"] as const) {
       const selector = page.getByRole("group", { name: graphListLabel });
       await selector.getByRole("button", { name: backupLabel }).click();
       const audit = await new AxeBuilder({ page })
+        .include("footer[role='contentinfo']")
         .include("#yubikey-use-cases")
         .include("section[aria-labelledby='yubikey-graph-title']")
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
