@@ -7,7 +7,7 @@ responsive, thème, i18n, print/PDF, SEO ou performance frontend.
 
 ## Accessibilité et interaction
 
-Conserver WCAG 2.1 AA :
+Conserver WCAG 2.2 AA (y compris les acquis de WCAG 2.1 AA) :
 
 - préférer les éléments HTML natifs ; ARIA seulement quand la sémantique native
   ne suffit pas ;

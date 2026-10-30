@@ -20,6 +20,15 @@ git diff -- <affected-paths>
 
 If the fixer changes files, review them, include the deterministic fixes in the intended commit, and rerun the fix phase until it converges.
 
+## Avoidable agent loops (observed 2026-10-29/30)
+
+- **Last edit, then fix.** Any edit after `quality:agent:fix` (even a test regex) needs another fix pass before handing files over for commit; otherwise Biome, Ruff or `add-trailing-comma` rewrite them in the commit hook and the commit fails.
+- **Before a commit is attempted**, run `pre-commit run --files $(git diff --cached --name-only)` and confirm it changes nothing.
+- **Source-contract regexes** (`assert.match(source, /…/)`) must tolerate formatter wrapping: use `\s*` / `\s+` between tokens, never a single literal space after `(`, `=` or `,`.
+- **New shebang scripts** need Git mode `100755`: `chmod +x` locally and have the file staged; `QG_EXEC_BIT` and `check-shebang-scripts-are-executable` read the index, not the disk.
+- **`npm run test:unit`**: if the script still chains suites with `&&`, a `.ts` failure hides the `.mjs` suite; also run `node --test unit-tests/*.test.mjs` before concluding.
+- **Contract test vs refactor:** when a test pins removed code, check `git log -S '<snippet>'` first; update the test to the new invariant only if the refactor was intentional.
+
 ## Strict publication proof
 
 After the complete batch is committed:

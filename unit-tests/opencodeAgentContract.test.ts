@@ -39,6 +39,11 @@ test("OpenCode prompt routes small-model work through repository skills and scri
 	const prompt = await read(".opencode/prompts/repository-build.txt");
 
 	assert.match(prompt, /AGENTS\.md/);
+	assert.ok(
+		Buffer.byteLength(prompt) < 1800,
+		"OpenCode build prompt exceeds context budget",
+	);
+	assert.match(prompt, /just agent-context/);
 	assert.match(
 		prompt,
 		/OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH/,

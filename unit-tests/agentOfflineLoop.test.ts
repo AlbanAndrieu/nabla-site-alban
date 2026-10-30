@@ -123,7 +123,7 @@ test("offline skill remains explicit about the difference between archive and pu
 test("repository agent entrypoint is compact without losing protected-branch policy", async () => {
 	const policy = await readFile(path.join(project, "AGENTS.md"), "utf8");
 	assert.ok(
-		Buffer.byteLength(policy) < 9000,
+		Buffer.byteLength(policy) < 4500,
 		"agent bootstrap exceeds compact context budget",
 	);
 	for (const essential of [
@@ -140,6 +140,70 @@ test("repository agent entrypoint is compact without losing protected-branch pol
 			`missing canonical invariant: ${essential}`,
 		);
 	}
+});
+
+test("agent instructions use on-demand routing without losing security and 404 safeguards", async () => {
+	const policy = await readFile(path.join(project, "AGENTS.md"), "utf8");
+	const details = await readFile(
+		path.join(project, "docs/agent-policy-details.md"),
+		"utf8",
+	);
+	const claude = await readFile(path.join(project, "CLAUDE.md"), "utf8");
+	assert.equal(claude.trim(), "@AGENTS.md");
+	for (const rule of [
+		"300 lines",
+		"600 lines",
+		"scripts/check_code_size.py",
+		"master",
+		"Draft",
+		"quality:agent:publish",
+		"NOT_RUN",
+		"public/404.html",
+		"docs/agent-policy-details.md",
+		".agents/skills/local-first-quality/SKILL.md",
+	]) {
+		assert.ok(policy.includes(rule), `missing compact policy rule: ${rule}`);
+	}
+	// Documented thresholds must match the enforced code-size gate.
+	const sizeGate = await readFile(
+		path.join(project, "scripts/check_code_size.py"),
+		"utf8",
+	);
+	assert.match(sizeGate, /DEFAULT_WARNING_LINES = 300\b/);
+	assert.match(sizeGate, /DEFAULT_FAILURE_LINES = 600\b/);
+	for (const required of [
+		"## Mandatory agent publish policy",
+		"## Legacy static 404 rendering exception",
+		"loadPublicHtmlFragment",
+		"pre-commit",
+		"never rely on this post-merge workflow",
+		"source-only archive",
+	]) {
+		assert.ok(
+			details.includes(required),
+			`missing on-demand safety detail: ${required}`,
+		);
+	}
+	assert.doesNotMatch(policy, /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/);
+});
+
+test("agent guides match the supported Node LTS and WCAG target", async () => {
+	const pkg = JSON.parse(
+		await readFile(path.join(project, "package.json"), "utf8"),
+	);
+	const copilot = await readFile(
+		path.join(project, ".github/copilot-instructions.md"),
+		"utf8",
+	);
+	const frontend = await readFile(
+		path.join(project, "docs/agent-frontend-standards.md"),
+		"utf8",
+	);
+	assert.equal(pkg.engines.node, ">=24.22.1 <25");
+	assert.match(copilot, /Node 24 LTS/);
+	assert.match(copilot, />=24\.22\.1 <25/);
+	assert.doesNotMatch(copilot, /Node 26 while|>=24\.22\.0 <27/);
+	assert.match(frontend, /WCAG 2\.2 AA/);
 });
 
 test("offline context counts more than 200 paths while printing a bounded summary", async () => {

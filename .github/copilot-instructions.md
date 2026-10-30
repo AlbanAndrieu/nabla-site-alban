@@ -5,7 +5,7 @@
 ## Runtime
 
 - Next.js 16 / React 19 / TypeScript / next-intl from the repository root.
-- Node.js: local/CI target **24.22.1**; `package.json` accepts `>=24.22.0 <27` so local/CI can use Node 26 while Vercel can continue using its supported Node 24 runtime.
+- Node.js: project runtime is **Node 24 LTS**; `package.json` defines `>=24.22.1 <25`. Keep local, CI and Vercel consistent with these constraints; do not infer Node 26 support.
 - npm: `12.2.0` pinned in `mise.toml` (single source of truth); `engines.npm` accepts `>=12.2.0 <13`.
 - Root `package.json` and `package-lock.json` are the only application npm manifests.
 - Vercel deployment is handled by Git Integration; there is no local Vercel CLI deployment path.
