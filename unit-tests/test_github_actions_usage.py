@@ -1,4 +1,5 @@
 """Offline, standard-library contracts for bounded Actions usage inventory."""
+
 import contextlib
 import datetime as dt
 import importlib.util
@@ -12,7 +13,8 @@ from unittest.mock import patch
 
 SOURCE = Path(__file__).resolve().parents[1] / "scripts/github-actions-usage.py"
 SPEC = importlib.util.spec_from_file_location("actions_usage", SOURCE)
-assert SPEC is not None and SPEC.loader is not None
+if SPEC is None or SPEC.loader is None:
+    raise ImportError(f"cannot load {SOURCE}")
 usage = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(usage)
 SINCE = dt.datetime(2026, 10, 1, tzinfo=dt.timezone.utc)
@@ -29,9 +31,11 @@ class ActionsBudgetTests(unittest.TestCase):
 
     def test_pagination_cannot_exceed_max_runs(self):
         calls = []
+
         def fake(path, key, paginate=True):
             calls.append(path)
             return [{"id": n} for n in range(100)]
+
         with patch.object(usage, "items", side_effect=fake):
             actual = usage.recent_runs("example/repo", SINCE, 120)
         self.assertEqual(len(actual), 120)
@@ -72,27 +76,33 @@ class ActionsBudgetTests(unittest.TestCase):
         rows = [
             {"started_at": "2026-10-22T09:00:00Z", "completed_at": "2026-10-22T09:02:30Z", "conclusion": "success"},
             {"conclusion": "skipped"},
+            # Real GitHub payload shape: skipped job stamped end-before-start.
+            {"started_at": "2026-10-30T06:14:01Z", "completed_at": "2026-10-30T06:13:54Z", "conclusion": "skipped"},
         ]
         with patch.object(usage, "items", return_value=rows):
             wall, skipped = usage.job_stats("example/repo", 42)
         self.assertEqual(wall, 2.5)
-        self.assertEqual(skipped, 1)
+        self.assertEqual(skipped, 2)
 
     def test_partial_api_failure_does_not_report_success(self):
-        with patch.object(sys, "argv", ["github-actions-usage.py", "--repo", "nabla-site-alban"]), \
-             patch.object(usage, "recent_runs", side_effect=OSError("credential details")), \
-             patch.object(usage, "items", return_value=[]), \
-             contextlib.redirect_stderr(io.StringIO()) as err, \
-             contextlib.redirect_stdout(io.StringIO()):
+        with (
+            patch.object(sys, "argv", ["github-actions-usage.py", "--repo", "nabla-site-alban"]),
+            patch.object(usage, "recent_runs", side_effect=OSError("credential details")),
+            patch.object(usage, "items", return_value=[]),
+            contextlib.redirect_stderr(io.StringIO()) as err,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
             status = usage.main()
         self.assertEqual(status, 1)
         self.assertIn("metrics incomplete", err.getvalue())
         self.assertNotIn("credential details", err.getvalue())
 
     def test_invalid_cli_limits_are_rejected_before_network(self):
-        with patch.object(sys, "argv", ["github-actions-usage.py", "--max-runs", "0"]), \
-             patch.object(usage, "items", side_effect=AssertionError("no network")), \
-             contextlib.redirect_stderr(io.StringIO()):
+        with (
+            patch.object(sys, "argv", ["github-actions-usage.py", "--max-runs", "0"]),
+            patch.object(usage, "items", side_effect=AssertionError("no network")),
+            contextlib.redirect_stderr(io.StringIO()),
+        ):
             with self.assertRaises(SystemExit) as error:
                 usage.main()
         self.assertEqual(error.exception.code, 2)

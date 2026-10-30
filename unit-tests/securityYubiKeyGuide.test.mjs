@@ -7,6 +7,7 @@ const read = (path) =>
 const base = "app/[locale]/security/yubikey/";
 const page = read(base + "page.tsx");
 const graph = read(base + "YubiKeyGraph.tsx");
+const canvas = read(base + "YubiKeyGraphCanvas.tsx");
 const model = read(base + "model.ts");
 const copy = read(base + "content.ts");
 const catalog = read("lib/sitePageCatalog.ts");
@@ -44,11 +45,16 @@ test("architecture diagram is interactive with an accessible text alternative", 
 		assert.match(model, new RegExp(`id: "${label}"`));
 		assert.match(copy, new RegExp(`${label}: "`));
 	}
-	assert.match(graph, /<ReactFlow/);
-	assert.match(graph, /onNodeClick=/);
+	assert.match(canvas, /<ReactFlow/);
+	assert.match(canvas, /onNodeClick=/);
+	assert.match(
+		graph,
+		/dynamic\(\(\) => import\("\.\/YubiKeyGraphCanvas"\), \{\s*ssr: false,?\s*\}\)/,
+	);
+	assert.doesNotMatch(graph, /from "@xyflow\/react"/);
 	assert.match(graph, /<details/);
 	assert.match(graph, /<summary>/);
-	assert.match(graph, /zoomOnScroll=\{false\}/);
+	assert.match(canvas, /zoomOnScroll=\{false\}/);
 	assert.match(page, /<YubiKeyGraph copy=\{copy\} \/>/);
 });
 
@@ -118,7 +124,7 @@ test("all 25 bilingual glossary terms are comma-separated", () => {
 });
 
 test("public route never publishes device identifiers or credential material", () => {
-	const all = [page, graph, model, copy].join("\n");
+	const all = [page, graph, canvas, model, copy].join("\n");
 	assert.doesNotMatch(all, /(?:23501671|22916048|172\.17\.0\.|10\.254\.255\.)/);
 	assert.doesNotMatch(all, /-----BEGIN (?:PRIVATE KEY|CERTIFICATE)-----/);
 	assert.doesNotMatch(
