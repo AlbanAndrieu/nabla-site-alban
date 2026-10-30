@@ -21,6 +21,7 @@ test("fast profile accepts agent Node22/npm10 and project Node24/npm12", () => {
 test("fast profile stays a bounded dependency-free contract suite", () => {
   assert.equal(new Set(FAST_TESTS).size, FAST_TESTS.length);
   assert.ok(FAST_TESTS.includes("unit-tests/agentNode22Core.test.mjs"));
+  assert.ok(FAST_TESTS.includes("unit-tests/agentTaskContext.test.mjs"));
   assert.ok(FAST_TESTS.includes("unit-tests/homelabIconFallback.test.mjs"));
   assert.ok(FAST_TESTS.every((path) => /^unit-tests\/[a-zA-Z0-9]+\.test\.mjs$/.test(path)));
 });
