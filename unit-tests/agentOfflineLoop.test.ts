@@ -173,6 +173,17 @@ test("agent instructions use on-demand routing without losing security and 404 s
 	assert.doesNotMatch(policy, /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/);
 });
 
+test("agent guides match the supported Node LTS and WCAG target", async () => {
+	const pkg = JSON.parse(await readFile(path.join(project, "package.json"), "utf8"));
+	const copilot = await readFile(path.join(project, ".github/copilot-instructions.md"), "utf8");
+	const frontend = await readFile(path.join(project, "docs/agent-frontend-standards.md"), "utf8");
+	assert.equal(pkg.engines.node, ">=24.22.1 <25");
+	assert.match(copilot, /Node 24 LTS/);
+	assert.match(copilot, />=24\.22\.1 <25/);
+	assert.doesNotMatch(copilot, /Node 26 support|Node 26 while/);
+	assert.match(frontend, /WCAG 2\.2 AA/);
+});
+
 test("offline context counts more than 200 paths while printing a bounded summary", async () => {
 	const cwd = await fixture();
 	try {
