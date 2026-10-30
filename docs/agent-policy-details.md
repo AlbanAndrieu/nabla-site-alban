@@ -17,6 +17,15 @@ publication cache, or quality gate. This section is a decision map, not an alter
 | CI or shell | `bash -n` and focused CI contract; ShellCheck where available | Existing `scripts/ci-scope.sh`, L3 quality gate; do not waive security checks |
 | Unrecognized or cross-cutting files | Fail closed: classify as application-relevant and review | Full Node 24 lint/typecheck/unit/build/security checks |
 
+**Fast task hint:** run `just agent-context agent` (or `ui`, `homelab`, `ci`,
+`security`) after `just context`. It shows only the current branch, short HEAD,
+worktree state, cached base state, one guide, first check and next check.
+The equivalent direct command is `node scripts/agent-task-context.mjs --task ui`.
+The hint never executes a test, publishes a branch, contacts a service,
+reads `.env` files or claims an L3 proof. An unknown task fails closed.
+If Git metadata is missing it exits nonzero and reports `UNAVAILABLE`.
+The existing `just node22-fast` L1 profile includes its 4 unit contracts;
+the full publication gate remains separate.
 Rules for the working loop:
 
 1. Inspect the current PR HEAD, base and at most **12 paths** (`just context`).
