@@ -61,7 +61,15 @@ test("architecture diagram is interactive with an accessible text alternative", 
 test("graph node selection is keyboard reachable with visible focus and announced state", () => {
 	const css = read(base + "page.module.css");
 	assert.match(graph, /role="group"/);
-	assert.match(graph, /aria-label=\{copy\.accessibleGraph\}/);
+	assert.match(graph, /aria-label=\{copy\.graphSelectorLabel\}/);
+	assert.match(canvas, /nodesFocusable=\{false\}/);
+	assert.match(canvas, /edgesFocusable=\{false\}/);
+	assert.match(
+		copy,
+		/graphSelectorLabel: "Sélectionner un composant du graphe"/,
+	);
+	assert.match(copy, /graphSelectorLabel: "Select a graph component"/);
+	assert.match(graph, /<summary>\{copy\.accessibleGraph\}<\/summary>/);
 	assert.match(graph, /<button[\s\S]*?type="button"/);
 	assert.match(graph, /aria-pressed=\{selected === item\.id\}/);
 	assert.match(graph, /onClick=\{\(\) => setSelected\(item\.id\)\}/);
@@ -195,9 +203,26 @@ test("YubiKey inherits consistent header/footer Home and Back to Top icons", () 
 	assert.match(layout, /<Footer/);
 	assert.match(header, /className="fas fa-home"/);
 	assert.match(footer, /className="fas fa-home"/);
+	assert.match(footer, /Navigation de pied de page/);
+	assert.match(footer, /Footer navigation/);
 	assert.match(top, /className="fas fa-arrow-up"/);
 	assert.match(top, /window\.scrollTo/);
+	assert.match(top, /prefers-reduced-motion: reduce/);
+	assert.match(top, /behavior: prefersReducedMotion \? "auto" : "smooth"/);
 	assert.match(page, /<TopAnchor \/>/);
 	assert.match(page, /className="fa-solid fa-arrow-left"/);
 	assert.match(header, /locale === "fr" \? "\/fr" : ""/);
+});
+
+test("YubiKey E2E preflight reports Vercel challenges without masking app failures", () => {
+	const e2e = read("tests/yubikey.spec.ts");
+	assert.equal(e2e.split("async function openGuide").length - 1, 1);
+	assert.equal(e2e.split("import { expect, test").length - 1, 1);
+	assert.equal(e2e.split("await openGuide(page, path)").length - 1, 5);
+	assert.equal(e2e.split('new RegExp(path + "$")').length - 1, 1);
+	assert.match(e2e, /x-vercel-mitigated/);
+	assert.match(e2e, /Vercel Security Checkpoint/);
+	assert.match(e2e, /response\.ok\(\)/);
+	assert.match(e2e, /authorized automation bypass/);
+	assert.doesNotMatch(e2e, /test\.(?:skip|fixme)\(/);
 });

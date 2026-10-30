@@ -121,6 +121,10 @@
 	border-radius: 0.65rem;
 	color: #e2e8f0;
 }
+/* theme.css colors every li for light pages; this panel is always dark. */
+.graphDetail li {
+	color: inherit;
+}
 .graphDetail ul,
 .graphAlternative ul {
 	margin: 0.7rem 0 0;

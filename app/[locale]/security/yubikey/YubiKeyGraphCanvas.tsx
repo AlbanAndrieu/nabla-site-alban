@@ -81,6 +81,8 @@ export default function YubiKeyGraphCanvas({
 			edges={edges}
 			fitView
 			fitViewOptions={{ padding: 0.2, maxZoom: 1.05 }}
+			nodesFocusable={false}
+			edgesFocusable={false}
 			nodesDraggable={false}
 			nodesConnectable={false}
 			onNodeClick={(_, node) => onSelect(node.id)}

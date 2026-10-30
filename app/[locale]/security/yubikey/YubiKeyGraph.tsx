@@ -39,7 +39,7 @@ export default function YubiKeyGraph({ copy }: Readonly<{ copy: GuideCopy }>) {
 			<div
 				className={styles.graphSelector}
 				role="group"
-				aria-label={copy.accessibleGraph}
+				aria-label={copy.graphSelectorLabel}
 			>
 				{YUBIKEY_GRAPH_NODES.map((item) => (
 					<button
