@@ -6,6 +6,8 @@
 - [x] Déplacer les procédures longues vers `docs/agent-policy-details.md`, chargées à la demande ; garder `CLAUDE.md` comme alias.
 - [x] Documenter le triage par diff ciblé, le budget de contexte (12 chemins, 20 lignes de log), les niveaux L0–L3 et les contrats React FR/EN, homelab OWNER/SERVICE, CI et sécurité.
 - [x] Renforcer le test de budget d'instructions et les invariants de sécurité/404 sans nouveau runner ou workflow.
+- [x] Routeur de tâches **hors réseau** `scripts/agent-task-context.mjs` : affichage borné du HEAD, de la branche, de l'état du checkout et de la première vérification par contexte (`agent`, `ui`, `homelab`, `ci`, `security`). Sans exécution ni preuve L3.
+- [x] Intégrer `just agent-context ui`, `unit-tests/agentTaskContext.test.mjs` et le profil L1 `just node22-fast` sans créer de quality gate concurrente. **4/4 tests Node 22 exécutés en environnement isolé**, contrôle complet de la branche encore requis.
 - [ ] Exécuter les tests réels sur checkout Node 24, puis `npm run quality:agent:publish` ; comparer la taille d'instructions et la durée des prochaines sessions sans inventer de consommation de tokens facturés.
 
 ## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
