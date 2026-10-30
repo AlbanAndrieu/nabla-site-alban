@@ -3,6 +3,33 @@
 Operational detail relocated from `AGENTS.md` on 30 October 2026 to reduce recurring model context. 
 The short `AGENTS.md` retains the mandatory safety contract and this page provides the expanded procedures.
 
+## FastAPI → React agent optimizations (30 October 2026)
+
+These are the transferable practices from the FastAPI Sample agent discussions.
+Use the existing Site Alban scripts; do not fork a second CI classifier, test runner,
+publication cache, or quality gate. This section is a decision map, not an alternative authority.
+
+| Change scope | First low-cost check | Additional required evidence |
+| --- | --- | --- |
+| Agent docs or rules | `node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts` | `npm run quality:agent:publish` on clean Node 24 checkout before release |
+| React UI, i18n, accessibility | Closest `unit-tests/*` contract, `npm run typecheck` | Matching Playwright FR/EN, Axe/keyboard/mobile, exact Preview SHA |
+| Homelab catalog or cards | Specific homelab contract, `just node22-fast` if toolchain fits | OWNER/SERVICE/WAN boundary, stale-cache and 401/403 vs outage scenarios |
+| CI or shell | `bash -n` and focused CI contract; ShellCheck where available | Existing `scripts/ci-scope.sh`, L3 quality gate; do not waive security checks |
+| Unrecognized or cross-cutting files | Fail closed: classify as application-relevant and review | Full Node 24 lint/typecheck/unit/build/security checks |
+
+Rules for the working loop:
+
+1. Inspect the current PR HEAD, base and at most **12 paths** (`just context`).
+2. Choose **one** focused contract by changed path; expand only on a failure.
+3. Read the **first failing job and step**, capped to **20 log lines**; store full logs privately.
+4. Run the existing fix convergence loop once per cohesive edit batch; stop on oscillation.
+5. Cache proofs only through existing publish scripts keyed by HEAD, base, toolchain and lockfile.
+6. Never classify an untested or blocked probe as healthy: use `UNKNOWN`, `NOT_RUN` or `BLOCKED`.
+7. Record only a compact PR summary: code change, tests that ran, exact SHA, first blocker, next action.
+
+**Cost controls:** no remote skill installation, no repeated DNS/npm/CI retries,
+no broad documentation preload, no automatic CI reruns, no merge and no sensitive outputs.
+Do not spend GitHub Actions minutes to diagnose a local formatting failure.
 ## Network-free agent loop
 
 Start with `just context` (bounded local Git summary) then `just preflight` (cached refs). Never
