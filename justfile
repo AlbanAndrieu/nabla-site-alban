@@ -29,6 +29,10 @@ lighthouse-core:
 lighthouse-full:
     node scripts/measure-site-lighthouse.mjs full
 
+# Local-only agent measurements; requires a genuine Git checkout.
+agent-efficiency:
+    node scripts/agent-efficiency-snapshot.mjs
+
 # Offline L1 syntax-only fallback, aligned with Bababou.
 offline-l1:
     bash scripts/agent-offline-check.sh
@@ -53,7 +57,7 @@ source-check:
     node --experimental-strip-types --test unit-tests/c4ArchitectureModel.test.mjs
     node --test unit-tests/vercelIgnoreBuild.test.mjs
     node --test unit-tests/securityYubiKeyGuide.test.mjs
-    node --test unit-tests/siteAcceptanceContracts.test.mjs unit-tests/siteDependencyPosture.test.mjs
+    node --test unit-tests/siteAcceptanceContracts.test.mjs unit-tests/siteDependencyPosture.test.mjs unit-tests/agentEfficiencySnapshot.test.mjs
     node --test unit-tests/agentTaskContext.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
