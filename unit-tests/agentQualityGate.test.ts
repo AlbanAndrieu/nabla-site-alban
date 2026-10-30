@@ -77,7 +77,7 @@ test("repository exposes local fix, check and reusable strict publication comman
 		pkg.scripts["quality:agent:publish"],
 		"bash scripts/agent-publish.sh",
 	);
-	assert.match(pkg.scripts["lint:fix"], /eslint --fix/);
+	assert.match(pkg.scripts["lint:fix"], /^eslint --cache .*--fix /);
 	assert.match(pkg.scripts["lint:css:fix"], /stylelint --fix/);
 	assert.match(mise, /run = "bash scripts\/agent-publish\.sh"/);
 	assert.match(prePush, /entry: bash scripts\/agent-publish\.sh/);
@@ -98,6 +98,11 @@ test("project checks fail closed for maintenance and build scopes", async () => 
 	// typecheck owns route typegen so the gate does not generate twice.
 	const pkg = JSON.parse(await source("package.json"));
 	assert.match(pkg.scripts.typecheck, /typegen && tsc --noEmit/);
+	// A failing .ts suite must not hide the plain-Node .mjs suite.
+	for (const script of ["test:unit", "test:unit:verbose"]) {
+		assert.match(pkg.scripts[script], /\.test\.ts"; ts=\$\?; node --test /);
+		assert.match(pkg.scripts[script], /\.test\.mjs && exit \$ts$/);
+	}
 	const dispatch = gate.split('case "${build}" in')[1]?.split("\nesac")[0];
 	assert.ok(dispatch, "build scope dispatch must exist");
 	assert.match(

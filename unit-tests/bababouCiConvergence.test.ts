@@ -14,7 +14,7 @@ test("GitHub lint is primary while GitLab remains available", async () => {
 	};
 	assert.equal(
 		packageJson.scripts?.lint,
-		"eslint --format ./scripts/eslint-github-formatter.mjs .",
+		"eslint --cache --cache-strategy content --cache-location node_modules/.cache/eslint/ --format ./scripts/eslint-github-formatter.mjs .",
 	);
 	assert.equal(
 		packageJson.devDependencies?.["eslint-formatter-gitlab"],

@@ -7,6 +7,7 @@ const read = (path) =>
 const base = "app/[locale]/security/yubikey/";
 const page = read(base + "page.tsx");
 const graph = read(base + "YubiKeyGraph.tsx");
+const canvas = read(base + "YubiKeyGraphCanvas.tsx");
 const model = read(base + "model.ts");
 const copy = read(base + "content.ts");
 const catalog = read("lib/sitePageCatalog.ts");
@@ -44,11 +45,16 @@ test("architecture diagram is interactive with an accessible text alternative", 
 		assert.match(model, new RegExp(`id: "${label}"`));
 		assert.match(copy, new RegExp(`${label}: "`));
 	}
-	assert.match(graph, /<ReactFlow/);
-	assert.match(graph, /onNodeClick=/);
+	assert.match(canvas, /<ReactFlow/);
+	assert.match(canvas, /onNodeClick=/);
+	assert.match(
+		graph,
+		/dynamic\(\(\) => import\("\.\/YubiKeyGraphCanvas"\), \{\s*ssr: false,?\s*\}\)/,
+	);
+	assert.doesNotMatch(graph, /from "@xyflow\/react"/);
 	assert.match(graph, /<details/);
 	assert.match(graph, /<summary>/);
-	assert.match(graph, /zoomOnScroll=\{false\}/);
+	assert.match(canvas, /zoomOnScroll=\{false\}/);
 	assert.match(page, /<YubiKeyGraph copy=\{copy\} \/>/);
 });
 
@@ -56,9 +62,12 @@ test("graph node selection is keyboard reachable with visible focus and announce
 	const css = read(base + "page.module.css");
 	assert.match(graph, /role="group"/);
 	assert.match(graph, /aria-label=\{copy\.graphSelectorLabel\}/);
-	assert.match(graph, /nodesFocusable=\{false\}/);
-	assert.match(graph, /edgesFocusable=\{false\}/);
-	assert.match(copy, /graphSelectorLabel: "Sélectionner un composant du graphe"/);
+	assert.match(canvas, /nodesFocusable=\{false\}/);
+	assert.match(canvas, /edgesFocusable=\{false\}/);
+	assert.match(
+		copy,
+		/graphSelectorLabel: "Sélectionner un composant du graphe"/,
+	);
 	assert.match(copy, /graphSelectorLabel: "Select a graph component"/);
 	assert.match(graph, /<summary>\{copy\.accessibleGraph\}<\/summary>/);
 	assert.match(graph, /<button[\s\S]*?type="button"/);
@@ -123,7 +132,7 @@ test("all 25 bilingual glossary terms are comma-separated", () => {
 });
 
 test("public route never publishes device identifiers or credential material", () => {
-	const all = [page, graph, model, copy].join("\n");
+	const all = [page, graph, canvas, model, copy].join("\n");
 	assert.doesNotMatch(all, /(?:23501671|22916048|172\.17\.0\.|10\.254\.255\.)/);
 	assert.doesNotMatch(all, /-----BEGIN (?:PRIVATE KEY|CERTIFICATE)-----/);
 	assert.doesNotMatch(
@@ -208,8 +217,8 @@ test("YubiKey inherits consistent header/footer Home and Back to Top icons", () 
 test("YubiKey E2E preflight reports Vercel challenges without masking app failures", () => {
 	const e2e = read("tests/yubikey.spec.ts");
 	assert.equal(e2e.split("async function openGuide").length - 1, 1);
-	assert.equal(e2e.split('import { expect, test').length - 1, 1);
-	assert.equal(e2e.split('await openGuide(page, path)').length - 1, 5);
+	assert.equal(e2e.split("import { expect, test").length - 1, 1);
+	assert.equal(e2e.split("await openGuide(page, path)").length - 1, 5);
 	assert.equal(e2e.split('new RegExp(path + "$")').length - 1, 1);
 	assert.match(e2e, /x-vercel-mitigated/);
 	assert.match(e2e, /Vercel Security Checkpoint/);

@@ -23,6 +23,8 @@ async function openGuide(page: Page, path: string) {
 		);
 	}
 	expect(response.ok(), `YubiKey route ${path}: HTTP ${status}`).toBeTruthy();
+	// The client-only canvas renders after hydration; interact only once it exists.
+	await expect(page.locator(".react-flow")).toBeVisible();
 	return response;
 }
 
