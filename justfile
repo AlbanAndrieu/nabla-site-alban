@@ -11,6 +11,10 @@ context:
 preflight:
     bash scripts/agent-offline-context.sh preflight
 
+# Read-only task-specific context; never executes or certifies a quality gate.
+agent-context task="agent":
+    node scripts/agent-task-context.mjs --task "{{task}}"
+
 # Network-free Node 22/npm 10 targeted L1 tests. Never a publication gate.
 node22-fast:
     node scripts/agent-node22-fast.mjs
@@ -42,6 +46,7 @@ source-check:
     node --experimental-strip-types --test unit-tests/c4ArchitectureModel.test.mjs
     node --test unit-tests/vercelIgnoreBuild.test.mjs
     node --test unit-tests/securityYubiKeyGuide.test.mjs
+    node --test unit-tests/agentTaskContext.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs
