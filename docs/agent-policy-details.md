@@ -24,7 +24,7 @@ The equivalent direct command is `node scripts/agent-task-context.mjs --task ui`
 The hint never executes a test, publishes a branch, contacts a service,
 reads `.env` files or claims an L3 proof. An unknown task fails closed.
 If Git metadata is missing it exits nonzero and reports `UNAVAILABLE`.
-The existing `just node22-fast` L1 profile includes its 4 unit contracts;
+The existing `just node22-fast` L1 profile includes its 5 unit contracts;
 the full publication gate remains separate.
 Rules for the working loop:
 
