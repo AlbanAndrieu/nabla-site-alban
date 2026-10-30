@@ -8,7 +8,7 @@ Ce runbook concerne **uniquement le site Next.js**. Il ne programme pas de YubiK
 - Deux routes : `/fr/security/yubikey` et `/security/yubikey`.
 - 14 exemples d'usage et 25 entrées de lexique **par langue**.
 - Navigation partagée : icône Home, bouton Back to Home et bouton Back to Top.
-- Graphe ReactFlow : 11 contrôles clavier et alternative textuelle.
+- Graphe ReactFlow : 11 boutons de sélection accessibles au clavier et liste textuelle des relations séparée, sans tabulations redondantes sur les nœuds/liens graphiques. La sélection à la souris reste disponible.
 - Ne pas confondre un Vercel `READY` avec une recette navigateur `PASS`.
 
 ## Validation locale sans GitHub Actions
@@ -37,7 +37,7 @@ La suite `tests/yubikey.spec.ts` contient **5 scénarios par langue (10 sur Chro
 
 1. Sur FR puis EN : vérifier que l'icône Home est visible dans l'en-tête **et** le footer, que Back to Home mène au bon accueil, et que Back to Top fonctionne après défilement.
 2. Activer « réduire les animations » dans le système : Back to Top doit revenir en haut sans mouvement fluide ; sans cette préférence, le défilement fluide reste possible.
-3. Au clavier : tabuler vers les 11 boutons du graphe, sélectionner avec Entrée/Espace, vérifier `aria-pressed` et le panneau de relations ; ouvrir aussi l'alternative textuelle.
+3. Au clavier : tabuler vers les 11 boutons « Sélectionner un composant du graphe », sélectionner avec Entrée/Espace, vérifier `aria-pressed` et le panneau de relations ; confirmer que les nœuds et liens ReactFlow ne constituent pas une seconde série de tabulations. Ouvrir également la liste textuelle des relations (libellé distinct).
 4. Tester 320 et 390 px, zoom navigateur 200 %, modes clair/sombre : pas de débordement horizontal ni de contrôle coupé ; lire et faire défiler les blocs de commande.
 5. Vérifier les liens officiels de chaque scénario, leur avertissement et l'absence de numéro de série, clé privée, secret OTP, PIN/PUK ou adresse LAN dans la page et les rapports.
 
