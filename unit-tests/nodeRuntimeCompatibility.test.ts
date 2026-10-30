@@ -6,13 +6,15 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("Node 24.22.1 LTS is the single development and production runtime", async () => {
-	const [nvmrc, envrc, packageRaw, lockRaw, workflow] = await Promise.all([
-		read(".nvmrc"),
-		read(".envrc"),
-		read("package.json"),
-		read("package-lock.json"),
-		read(".github/workflows/node24-compat.yml"),
-	]);
+	const [nvmrc, envrc, packageRaw, lockRaw, workflow, preCommit] =
+		await Promise.all([
+			read(".nvmrc"),
+			read(".envrc"),
+			read("package.json"),
+			read("package-lock.json"),
+			read(".github/workflows/node24-compat.yml"),
+			read(".pre-commit-config.yaml"),
+		]);
 	const packageJson = JSON.parse(packageRaw) as {
 		engines?: { node?: string; npm?: string };
 		devEngines?: { runtime?: { version?: string } };
@@ -34,6 +36,11 @@ test("Node 24.22.1 LTS is the single development and production runtime", async 
 	};
 
 	assert.equal(nvmrc.trim(), "24.22.1");
+	assert.match(
+		preCommit,
+		/^default_language_version:\n(?:\s+#.*\n)*\s+node:\s*"24\.22\.1"\s*$/m,
+		"pre-commit Node hooks must use the .nvmrc runtime",
+	);
 	assert.equal(packageJson.engines?.node, ">=24.22.1 <25");
 	assert.deepEqual(
 		lock.packages?.[""]?.engines,
