@@ -204,3 +204,16 @@ test("YubiKey inherits consistent header/footer Home and Back to Top icons", () 
 	assert.match(page, /className="fa-solid fa-arrow-left"/);
 	assert.match(header, /locale === "fr" \? "\/fr" : ""/);
 });
+
+test("YubiKey E2E preflight reports Vercel challenges without masking app failures", () => {
+	const e2e = read("tests/yubikey.spec.ts");
+	assert.equal(e2e.split("async function openGuide").length - 1, 1);
+	assert.equal(e2e.split('import { expect, test').length - 1, 1);
+	assert.equal(e2e.split('await openGuide(page, path)').length - 1, 5);
+	assert.equal(e2e.split('new RegExp(path + "$")').length - 1, 1);
+	assert.match(e2e, /x-vercel-mitigated/);
+	assert.match(e2e, /Vercel Security Checkpoint/);
+	assert.match(e2e, /response\.ok\(\)/);
+	assert.match(e2e, /authorized automation bypass/);
+	assert.doesNotMatch(e2e, /test\.(?:skip|fixme)\(/);
+});
