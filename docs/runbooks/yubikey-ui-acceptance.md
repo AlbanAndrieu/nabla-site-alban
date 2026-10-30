@@ -35,7 +35,7 @@ La suite `tests/yubikey.spec.ts` contient **5 scénarios par langue (10 sur Chro
 
 ## Diagnostic d'accès à la Preview (30 octobre 2026)
 
-Une lecture directe via l'accès Vercel autorisé a obtenu **HTTP 429** avec `x-vercel-mitigated: challenge` et le titre `Vercel Security Checkpoint` sur la Preview de `91d9ebab` (FR et EN). La même réponse a été observée sur l'URL de déploiement Vercel du commit de production `89fa8b46`. **Ce contrôle HTTP n'a pas atteint le HTML de l'application** : il ne prouve ni que la page est en panne, ni que sa navigation est correcte. Le déploiement `READY` atteste séparément le build.
+Le projet Vercel conserve `ssoProtection.enabled=true` pour les déploiements hors domaines personnalisés (`all_except_custom_domains`) ; ces protections ne sont pas modifiées. Une lecture directe via l'accès Vercel autorisé a obtenu **HTTP 429** avec `x-vercel-mitigated: challenge` et le titre `Vercel Security Checkpoint` sur la Preview de `91d9ebab` (FR et EN). La même réponse a été observée sur l'URL de déploiement Vercel du commit de production `89fa8b46`. **Ce contrôle HTTP n'a pas atteint le HTML de l'application** : il ne prouve ni que la page est en panne, ni que sa navigation est correcte. Le déploiement `READY` atteste séparément le build.
 
 `tests/yubikey.spec.ts` échoue désormais **immédiatement avec un diagnostic distinct** en cas de challenge Vercel au lieu d'attendre des éléments HTML de l'application puis de générer une erreur trompeuse « élément introuvable ».
 
