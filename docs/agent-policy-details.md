@@ -1,6 +1,6 @@
 # Agent operations reference — load on demand
 
-Operational detail relocated from `AGENTS.md` on 30 October 2026 to reduce recurring model context. 
+Operational detail relocated from `AGENTS.md` on 30 October 2026 to reduce recurring model context.
 The short `AGENTS.md` retains the mandatory safety contract and this page provides the expanded procedures.
 
 ## FastAPI → React agent optimizations (30 October 2026)

@@ -144,12 +144,16 @@ test("repository agent entrypoint is compact without losing protected-branch pol
 
 test("agent instructions use on-demand routing without losing security and 404 safeguards", async () => {
 	const policy = await readFile(path.join(project, "AGENTS.md"), "utf8");
-	const details = await readFile(path.join(project, "docs/agent-policy-details.md"), "utf8");
+	const details = await readFile(
+		path.join(project, "docs/agent-policy-details.md"),
+		"utf8",
+	);
 	const claude = await readFile(path.join(project, "CLAUDE.md"), "utf8");
 	assert.equal(claude.trim(), "@AGENTS.md");
 	for (const rule of [
-		"400 lines",
-		"700 lines",
+		"300 lines",
+		"600 lines",
+		"scripts/check_code_size.py",
 		"master",
 		"Draft",
 		"quality:agent:publish",
@@ -160,6 +164,13 @@ test("agent instructions use on-demand routing without losing security and 404 s
 	]) {
 		assert.ok(policy.includes(rule), `missing compact policy rule: ${rule}`);
 	}
+	// Documented thresholds must match the enforced code-size gate.
+	const sizeGate = await readFile(
+		path.join(project, "scripts/check_code_size.py"),
+		"utf8",
+	);
+	assert.match(sizeGate, /DEFAULT_WARNING_LINES = 300\b/);
+	assert.match(sizeGate, /DEFAULT_FAILURE_LINES = 600\b/);
 	for (const required of [
 		"## Mandatory agent publish policy",
 		"## Legacy static 404 rendering exception",
@@ -168,15 +179,26 @@ test("agent instructions use on-demand routing without losing security and 404 s
 		"never rely on this post-merge workflow",
 		"source-only archive",
 	]) {
-		assert.ok(details.includes(required), `missing on-demand safety detail: ${required}`);
+		assert.ok(
+			details.includes(required),
+			`missing on-demand safety detail: ${required}`,
+		);
 	}
 	assert.doesNotMatch(policy, /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/);
 });
 
 test("agent guides match the supported Node LTS and WCAG target", async () => {
-	const pkg = JSON.parse(await readFile(path.join(project, "package.json"), "utf8"));
-	const copilot = await readFile(path.join(project, ".github/copilot-instructions.md"), "utf8");
-	const frontend = await readFile(path.join(project, "docs/agent-frontend-standards.md"), "utf8");
+	const pkg = JSON.parse(
+		await readFile(path.join(project, "package.json"), "utf8"),
+	);
+	const copilot = await readFile(
+		path.join(project, ".github/copilot-instructions.md"),
+		"utf8",
+	);
+	const frontend = await readFile(
+		path.join(project, "docs/agent-frontend-standards.md"),
+		"utf8",
+	);
 	assert.equal(pkg.engines.node, ">=24.22.1 <25");
 	assert.match(copilot, /Node 24 LTS/);
 	assert.match(copilot, />=24\.22\.1 <25/);

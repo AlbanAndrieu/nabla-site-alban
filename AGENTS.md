@@ -41,8 +41,8 @@ to justify a failed or unexecuted publication gate.
 Preserve default English (unprefixed), `/fr`, i18n parity, SEO, keyboard WCAG 2.2 AA,
 privacy and OWNER/SERVICE trust boundaries. `Declared` is not `Observed` or `Healthy`.
 Prefer bounded, cache-aware, non-blocking API reads for homelab pages.
-Refactor at **400 lines (warning/review)** and **700 lines (split required)** for code
-and configuration. Avoid new monoliths; retain public contract tests.
+Refactor at **300 lines (warning/review)** and **600 lines (split required)** for code
+and configuration, as enforced by `scripts/check_code_size.py`. Avoid new monoliths; retain public contract tests.
 Keep legacy `public/404.html` as the custom 404 rendering source through
 `app/global-not-found.tsx`; never replace it with native React, remove its styles
 or change HTTP 404/noindex without explicit approval.
