@@ -37,6 +37,8 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 ## Diagnostics, incidents et références
 
 - [Historique intégral roadmap homelab avant consolidation](archive/homelab-roadmap-through-2026-10-25.txt)
+- [Historique qualité avant réconciliation du 30 octobre](archive/quality-roadmap-through-2026-10-30.txt)
+- [Historique homelab Site avant réconciliation du 30 octobre](archive/homelab-roadmap-through-2026-10-30.txt)
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
 - [PoC Dagger et boucle de développement](dagger-poc.md)
