@@ -55,7 +55,12 @@ test("architecture diagram is interactive with an accessible text alternative", 
 test("graph node selection is keyboard reachable with visible focus and announced state", () => {
 	const css = read(base + "page.module.css");
 	assert.match(graph, /role="group"/);
-	assert.match(graph, /aria-label=\{copy\.accessibleGraph\}/);
+	assert.match(graph, /aria-label=\{copy\.graphSelectorLabel\}/);
+	assert.match(graph, /nodesFocusable=\{false\}/);
+	assert.match(graph, /edgesFocusable=\{false\}/);
+	assert.match(copy, /graphSelectorLabel: "Sélectionner un composant du graphe"/);
+	assert.match(copy, /graphSelectorLabel: "Select a graph component"/);
+	assert.match(graph, /<summary>\{copy\.accessibleGraph\}<\/summary>/);
 	assert.match(graph, /<button[\s\S]*?type="button"/);
 	assert.match(graph, /aria-pressed=\{selected === item\.id\}/);
 	assert.match(graph, /onClick=\{\(\) => setSelected\(item\.id\)\}/);
