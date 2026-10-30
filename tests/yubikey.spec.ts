@@ -7,9 +7,9 @@ import AxeBuilder from "@axe-core/playwright";
 for (const locale of ["fr", "en"] as const) {
   const path = `${locale === "fr" ? "/fr" : ""}/security/yubikey`;
   const homePath = locale === "fr" ? "/fr" : "/";
-  const graphListLabel = locale === "fr"
-    ? "Liste accessible des relations du diagramme"
-    : "Accessible list of diagram relationships";
+  const graphSelectorLabel = locale === "fr"
+    ? "Sélectionner un composant du graphe"
+    : "Select a graph component";
   const backupLabel = locale === "fr" ? "YubiKey secondaire" : "Backup YubiKey";
 
   test.describe(`YubiKey Security (${locale})`, () => {
@@ -26,18 +26,23 @@ for (const locale of ["fr", "en"] as const) {
       await expect(cases.locator('a[href^="https://"]')).toHaveCount(14);
       await expect(page.locator("#yubikey-glossary article")).toHaveCount(25);
       await expect(page.locator("#yubikey-graph-title")).toBeVisible();
+      await expect(page.getByText(locale === "fr" ? "Liste accessible des relations du diagramme" : "Accessible list of diagram relationships")).toBeVisible();
       await expect(page.locator("#yubikey-use-cases")).toBeVisible();
     });
 
     test("supports keyboard graph selection and shared footer controls", async ({ page }) => {
       await page.goto(path);
-      const selector = page.getByRole("group", { name: graphListLabel });
+      const selector = page.getByRole("group", { name: graphSelectorLabel });
       const backup = selector.getByRole("button", { name: backupLabel });
       await expect(backup).toBeVisible();
       await backup.focus();
       await expect(backup).toBeFocused();
       await page.keyboard.press("Enter");
       await expect(backup).toHaveAttribute("aria-pressed", "true");
+      // ReactFlow nodes and edges are not duplicate keyboard targets:
+      // the labeled buttons provide the complete selection workflow.
+      await expect(page.locator(".react-flow__node[tabindex='0']")).toHaveCount(0);
+      await expect(page.locator(".react-flow__edge[tabindex='0']")).toHaveCount(0);
       await expect(page.locator('section[aria-labelledby="yubikey-graph-title"] [aria-live="polite"]')).toContainText(backupLabel);
 
       const headerHome = page.locator('header nav a:has(i.fa-home)').first();
@@ -82,7 +87,7 @@ for (const locale of ["fr", "en"] as const) {
 
     test("scans the YubiKey controls and examples for automated WCAG A/AA issues", async ({ page }) => {
       await page.goto(path);
-      const selector = page.getByRole("group", { name: graphListLabel });
+      const selector = page.getByRole("group", { name: graphSelectorLabel });
       await selector.getByRole("button", { name: backupLabel }).click();
       const audit = await new AxeBuilder({ page })
         .include("footer[role='contentinfo']")
@@ -108,7 +113,7 @@ for (const locale of ["fr", "en"] as const) {
           scroll: document.documentElement.scrollWidth,
         }));
         expect(dimensions.scroll, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(dimensions.client + 1);
-        const selectors = page.getByRole("group", { name: graphListLabel }).getByRole("button");
+        const selectors = page.getByRole("group", { name: graphSelectorLabel }).getByRole("button");
         await expect(selectors).toHaveCount(11);
         const first = await selectors.first().boundingBox();
         expect(first?.height ?? 0).toBeGreaterThanOrEqual(44);
