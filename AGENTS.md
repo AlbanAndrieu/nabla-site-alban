@@ -7,6 +7,7 @@ Next.js 16 / React 19 / TypeScript / next-intl; `package.json` defines Node/npm.
 ## Efficient local-first loop
 
 1. **OBSERVE:** `just context`, then `just preflight`; pin PR, HEAD and base SHA.
+   Use `just agent-context ui|agent|ci|homelab|security` for a bounded task hint (not proof).
 2. **ROUTE:** open only the matching `.agents/skills/nabla-*/SKILL.md`,
    `.agents/skills/local-first-quality/SKILL.md`, or frontend standards.
 3. **CHANGE:** one cohesive batch; read only relevant code, first failed test and diff.
