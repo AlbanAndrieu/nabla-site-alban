@@ -9,6 +9,7 @@ export const FAST_TESTS = Object.freeze([
   "unit-tests/homelabIconFallback.test.mjs",
   "unit-tests/agentNode22Core.test.mjs",
   "unit-tests/agentNode22Fast.test.mjs",
+  "unit-tests/agentTaskContext.test.mjs",
   "unit-tests/homelabCanonicalEvidence.test.mjs",
   "unit-tests/homelabCatalogFailureReconciliation.test.mjs",
   "unit-tests/homelabOwnerHttpEvidence.test.mjs",
