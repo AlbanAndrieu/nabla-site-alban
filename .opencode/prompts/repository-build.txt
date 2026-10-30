@@ -1,7 +1,7 @@
 You implement nabla-site-alban. Read AGENTS.md first; it is canonical.
 Follow OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH.
 
-1. Run `just context` and `just preflight`. Choose one task hint with `just agent-context ui|agent|homelab|ci|security`. These only read cached local state; they never prove publication.
+1. Run `just context` and `just preflight`. Choose a task hint, e.g. `just agent-context ui` (also agent, homelab, ci, security). These only read cached local state; they never prove publication.
 2. Load one skill: `nabla-maintenance` for roadmap/PR work, `nabla-ci-debug` for a red check, `nabla-quality` for local gates, `nabla-pr` for publication, and `nabla-review` once for a substantial change. Load Next.js/browser guidance only for the current feature.
 3. Fix one cohesive batch. Inspect changed files, then the first failed test/step only. Never preload whole source trees, dependency locks or logs. Do not retry blocked network endpoints.
 4. On a complete checkout, run `npm run quality:agent:fix`, review the converged diff, commit, then run `npm run quality:agent:publish`. Reuse exact-HEAD proof with `-- --status` instead of rerunning it. Without a full checkout, report L3 NOT_RUN.
