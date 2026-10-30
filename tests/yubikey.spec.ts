@@ -1,9 +1,26 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 // Public, read-only UI checks. Run locally against a matching exact-SHA Preview:
 // BASE_URL=https://<preview-host> npx playwright test tests/yubikey.spec.ts --project=chromium
 // For protected previews, use the existing Playwright config's bypass settings.
+/** Detect a Vercel security checkpoint separately from a failed application page. */
+async function openGuide(page: Page, path: string) {
+  const response = await page.goto(path, { waitUntil: "domcontentloaded" });
+  if (!response) {
+    throw new Error(`YubiKey route ${path}: no navigation response`);
+  }
+  const status = response.status();
+  const mitigation = response.headers()["x-vercel-mitigated"];
+  if (mitigation === "challenge" || (status === 429 && (await page.title()).includes("Vercel Security Checkpoint"))) {
+    throw new Error(
+      `YubiKey route ${path}: Vercel security checkpoint (HTTP ${status}); the app was not reached. Run with an authorized automation bypass or a permitted browser session, without disabling site protection.`
+    );
+  }
+  expect(response.ok(), `YubiKey route ${path}: HTTP ${status}`).toBeTruthy();
+  return response;
+}
+
 for (const locale of ["fr", "en"] as const) {
   const path = `${locale === "fr" ? "/fr" : ""}/security/yubikey`;
   const homePath = locale === "fr" ? "/fr" : "/";
@@ -14,8 +31,7 @@ for (const locale of ["fr", "en"] as const) {
 
   test.describe(`YubiKey Security (${locale})`, () => {
     test("renders localized content, metadata and 14 sourced examples", async ({ page }) => {
-      const response = await page.goto(path);
-      expect(response?.ok()).toBeTruthy();
+      await openGuide(page, path);
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
       await expect(page.locator(".page-security header h1")).toBeVisible();
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -31,7 +47,7 @@ for (const locale of ["fr", "en"] as const) {
     });
 
     test("supports keyboard graph selection and shared footer controls", async ({ page }) => {
-      await page.goto(path);
+      await openGuide(page, path);
       const selector = page.getByRole("group", { name: graphSelectorLabel });
       const backup = selector.getByRole("button", { name: backupLabel });
       await expect(backup).toBeVisible();
@@ -70,7 +86,7 @@ for (const locale of ["fr", "en"] as const) {
 
     test("respects reduced motion when returning to the top", async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.goto(path);
+      await openGuide(page, path);
       const top = page.locator('footer[role="contentinfo"] button:has(i.fa-arrow-up)');
       await page.locator("#yubikey-next").scrollIntoViewIfNeeded();
       await top.scrollIntoViewIfNeeded();
@@ -86,7 +102,7 @@ for (const locale of ["fr", "en"] as const) {
     });
 
     test("scans the YubiKey controls and examples for automated WCAG A/AA issues", async ({ page }) => {
-      await page.goto(path);
+      await openGuide(page, path);
       const selector = page.getByRole("group", { name: graphSelectorLabel });
       await selector.getByRole("button", { name: backupLabel }).click();
       const audit = await new AxeBuilder({ page })
@@ -106,7 +122,7 @@ for (const locale of ["fr", "en"] as const) {
     test("keeps graph, footer and cards within narrow mobile viewports", async ({ page }) => {
       for (const width of [320, 390]) {
         await page.setViewportSize({ width, height: 700 });
-        await page.goto(path);
+        await openGuide(page, path);
         await expect(page.locator("#yubikey-use-cases")).toBeVisible();
         const dimensions = await page.evaluate(() => ({
           client: document.documentElement.clientWidth,
