@@ -166,7 +166,7 @@ test("agent instructions use on-demand routing without losing security and 404 s
 		"loadPublicHtmlFragment",
 		"pre-commit",
 		"never rely on this post-merge workflow",
-		"no .git",
+		"source-only archive",
 	]) {
 		assert.ok(details.includes(required), `missing on-demand safety detail: ${required}`);
 	}
