@@ -1,5 +1,13 @@
 # Feuille de route produit et qualité
 
+## P1 — Agent React efficace / parité FastAPI (30 octobre 2026)
+
+- [x] Compacter le point d'entrée `AGENTS.md` en carte de routage des skills et runbooks ; préserver les règles de branche, la publication stricte, l'exception 404 et les seuils de refactoring 400/700 lignes.
+- [x] Déplacer les procédures longues vers `docs/agent-policy-details.md`, chargées à la demande ; garder `CLAUDE.md` comme alias.
+- [x] Documenter le triage par diff ciblé, le budget de contexte (12 chemins, 20 lignes de log), les niveaux L0–L3 et les contrats React FR/EN, homelab OWNER/SERVICE, CI et sécurité.
+- [x] Renforcer le test de budget d'instructions et les invariants de sécurité/404 sans nouveau runner ou workflow.
+- [ ] Exécuter les tests réels sur checkout Node 24, puis `npm run quality:agent:publish` ; comparer la taille d'instructions et la durée des prochaines sessions sans inventer de consommation de tokens facturés.
+
 ## P1 — Tests ciblés Node 22/npm 10 pour les agents (25 octobre 2026)
 
 - [x] Fournir `node scripts/agent-node22-fast.mjs`, `just node22-fast`
