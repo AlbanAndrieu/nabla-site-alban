@@ -9,8 +9,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const TASKS = Object.freeze({
   agent: Object.freeze({
     guide: ".agents/skills/local-first-quality/SKILL.md",
-    first: "node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts",
-    next: "just loop",
+    first: "node --test unit-tests/agentTaskContext.test.mjs",
+    next: "node --experimental-strip-types --test unit-tests/agentOfflineLoop.test.ts; just loop",
   }),
   ui: Object.freeze({
     guide: "docs/agent-frontend-standards.md",
