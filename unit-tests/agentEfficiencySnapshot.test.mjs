@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { median, summarize, run } from "../scripts/agent-efficiency-snapshot.mjs";
+import {
+	median,
+	run,
+	summarize,
+} from "../scripts/agent-efficiency-snapshot.mjs";
 
 test("median is bounded and does not modify inputs", () => {
 	const samples = [15, 4, 9, 22];
