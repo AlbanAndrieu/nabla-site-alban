@@ -40,49 +40,8 @@ for (const locale of ["fr", "en"] as const) {
 			await expect(page.locator("html")).toHaveAttribute("lang", locale);
 			await expect(page.locator(".page-security header h1")).toBeVisible();
 			await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-				"href", new RegExp(`${path}import { expect, test, type Page } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
-
-// Public, read-only UI checks. Run locally against a matching exact-SHA Preview:
-// BASE_URL=https://<preview-host> npx playwright test tests/yubikey.spec.ts --project=chromium
-// For protected previews, use the existing Playwright config's bypass settings.
-
-// Detect edge protection separately from an application failure.
-async function openGuide(page: Page, path: string) {
-	const response = await page.goto(path, { waitUntil: "domcontentloaded" });
-	if (!response) {
-		throw new Error(`YubiKey route ${path}: no navigation response`);
-	}
-	const status = response.status();
-	const mitigation = response.headers()["x-vercel-mitigated"];
-	if (
-		mitigation === "challenge" ||
-		(status === 429 &&
-			(await page.title()).includes("Vercel Security Checkpoint"))
-	) {
-		throw new Error(
-			`YubiKey route ${path}: Vercel security checkpoint (HTTP ${status}); the app was not reached. Run with an authorized automation bypass or a permitted browser session, without disabling site protection.`
-		);
-	}
-	expect(response.ok(), `YubiKey route ${path}: HTTP ${status}`).toBeTruthy();
-	return response;
-}
-
-for (const locale of ["fr", "en"] as const) {
-	const path = `${locale === "fr" ? "/fr" : ""}/security/yubikey`;
-	const homePath = locale === "fr" ? "/fr" : "/";
-	const graphSelectorLabel = locale === "fr"
-		? "Sélectionner un composant du graphe"
-		: "Select a graph component";
-	const backupLabel = locale === "fr" ? "YubiKey secondaire" : "Backup YubiKey";
-
-	test.describe(`YubiKey Security (${locale})`, () => {
-		test("renders localized content, metadata and 14 sourced examples", async ({ page }) => {
-			await openGuide(page, path);
-			await expect(page.locator("html")).toHaveAttribute("lang", locale);
-			await expect(page.locator(".page-security header h1")).toBeVisible();
-			await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-				"href", )
+				"href",
+				new RegExp(path + "$"),
 			);
 			const cases = page.locator('#yubikey-use-cases article[id^="yubikey-use-"]');
 			await expect(cases).toHaveCount(14);
