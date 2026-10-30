@@ -180,7 +180,7 @@ test("agent guides match the supported Node LTS and WCAG target", async () => {
 	assert.equal(pkg.engines.node, ">=24.22.1 <25");
 	assert.match(copilot, /Node 24 LTS/);
 	assert.match(copilot, />=24\.22\.1 <25/);
-	assert.doesNotMatch(copilot, /Node 26 while|>=24\\.22\\.0 <27/);
+	assert.doesNotMatch(copilot, /Node 26 while|>=24\.22\.0 <27/);
 	assert.match(frontend, /WCAG 2\.2 AA/);
 });
 
