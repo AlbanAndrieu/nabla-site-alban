@@ -26,7 +26,13 @@ export function validateBase(raw) {
 
 export function summarizeReport(report, expectedUrl, minimums = defaultMinimums) {
   const actual = report.finalDisplayedUrl || report.finalUrl || "";
-  if (report.runtimeError || !actual.startsWith(expectedUrl.split("?")[0]))
+  let sameDestination = false;
+  try {
+    const reached = new URL(actual), requested = new URL(expectedUrl);
+    sameDestination = reached.origin === requested.origin &&
+      reached.pathname === requested.pathname;
+  } catch { /* missing or malformed final URL must fail closed */ }
+  if (report.runtimeError || !sameDestination)
     return { status: "BLOCKED", reason: "LH_RUNTIME_OR_NAVIGATION", finalUrl: actual };
   const http = report.audits?.["http-status-code"];
   if (http?.score === 0 || /checkpoint|challenge/i.test(report.finalDisplayedUrl || ""))
