@@ -2,8 +2,8 @@
 /** Read-only and deterministic where possible. Not a billable-token benchmark. */
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { performance } from "node:perf_hooks";
 import { dirname, resolve } from "node:path";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -33,21 +33,30 @@ export function run(options = {}) {
 		console.error("AGENT_BENCH_INVALID_SAMPLES");
 		return 2;
 	}
-	const sizes = sources.map(path => {
-		try { return Buffer.byteLength(readFileSync(resolve(cwd, path), "utf8")); }
-		catch { return null; }
+	const sizes = sources.map((path) => {
+		try {
+			return Buffer.byteLength(readFileSync(resolve(cwd, path), "utf8"));
+		} catch {
+			return null;
+		}
 	});
-	if (sizes.some(size => size === null)) {
+	if (sizes.some((size) => size === null)) {
 		console.error("AGENT_BENCH_INCOMPLETE_CHECKOUT");
 		return 3;
 	}
 	const durations = [];
 	for (let i = 0; i < samples; i++) {
 		const start = performance.now();
-		const result = spawnSync(process.execPath,
-			[resolve(cwd, "scripts/agent-task-context.mjs"), "--task", "agent"], {
-				cwd, encoding: "utf8", timeout: 8_000, maxBuffer: 32_768,
-			});
+		const result = spawnSync(
+			process.execPath,
+			[resolve(cwd, "scripts/agent-task-context.mjs"), "--task", "agent"],
+			{
+				cwd,
+				encoding: "utf8",
+				timeout: 8_000,
+				maxBuffer: 32_768,
+			},
+		);
 		if (result.status !== 0 || !result.stdout?.includes("L3: NOT_RUN")) {
 			console.log(JSON.stringify(summarize(sizes, [], false)));
 			console.error("AGENT_BENCH_BLOCKED_NO_GIT_OR_RUNTIME");
@@ -56,9 +65,14 @@ export function run(options = {}) {
 		durations.push(Math.round(10 * (performance.now() - start)) / 10);
 	}
 	console.log(JSON.stringify(summarize(sizes, durations, true)));
-	console.log("AGENT_BENCH: local process latency only; not a model-token or network metric");
+	console.log(
+		"AGENT_BENCH: local process latency only; not a model-token or network metric",
+	);
 	return 0;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
+if (
+	process.argv[1] &&
+	resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+)
 	process.exitCode = run();
