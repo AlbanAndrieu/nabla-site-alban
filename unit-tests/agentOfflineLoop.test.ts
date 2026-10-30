@@ -123,7 +123,7 @@ test("offline skill remains explicit about the difference between archive and pu
 test("repository agent entrypoint is compact without losing protected-branch policy", async () => {
 	const policy = await readFile(path.join(project, "AGENTS.md"), "utf8");
 	assert.ok(
-		Buffer.byteLength(policy) < 9000,
+		Buffer.byteLength(policy) < 4500,
 		"agent bootstrap exceeds compact context budget",
 	);
 	for (const essential of [
@@ -140,6 +140,37 @@ test("repository agent entrypoint is compact without losing protected-branch pol
 			`missing canonical invariant: ${essential}`,
 		);
 	}
+});
+
+test("agent instructions use on-demand routing without losing security and 404 safeguards", async () => {
+	const policy = await readFile(path.join(project, "AGENTS.md"), "utf8");
+	const details = await readFile(path.join(project, "docs/agent-policy-details.md"), "utf8");
+	const claude = await readFile(path.join(project, "CLAUDE.md"), "utf8");
+	assert.equal(claude.trim(), "@AGENTS.md");
+	for (const rule of [
+		"400 lines",
+		"700 lines",
+		"master",
+		"Draft",
+		"quality:agent:publish",
+		"NOT_RUN",
+		"public/404.html",
+		"docs/agent-policy-details.md",
+		".agents/skills/local-first-quality/SKILL.md",
+	]) {
+		assert.ok(policy.includes(rule), `missing compact policy rule: ${rule}`);
+	}
+	for (const required of [
+		"## Mandatory agent publish policy",
+		"## Legacy static 404 rendering exception",
+		"loadPublicHtmlFragment",
+		"pre-commit",
+		"never rely on this post-merge workflow",
+		"no .git",
+	]) {
+		assert.ok(details.includes(required), `missing on-demand safety detail: ${required}`);
+	}
+	assert.doesNotMatch(policy, /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/);
 });
 
 test("offline context counts more than 200 paths while printing a bounded summary", async () => {
