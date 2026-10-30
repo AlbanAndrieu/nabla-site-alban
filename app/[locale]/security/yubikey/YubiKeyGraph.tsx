@@ -90,6 +90,8 @@ export default function YubiKeyGraph({ copy }: Readonly<{ copy: GuideCopy }>) {
 					edges={edges}
 					fitView
 					fitViewOptions={{ padding: 0.2, maxZoom: 1.05 }}
+					nodesFocusable={false}
+					edgesFocusable={false}
 					nodesDraggable={false}
 					nodesConnectable={false}
 					onNodeClick={(_, node) => setSelected(node.id)}
@@ -107,7 +109,7 @@ export default function YubiKeyGraph({ copy }: Readonly<{ copy: GuideCopy }>) {
 			<div
 				className={styles.graphSelector}
 				role="group"
-				aria-label={copy.accessibleGraph}
+				aria-label={copy.graphSelectorLabel}
 			>
 				{YUBIKEY_GRAPH_NODES.map((item) => (
 					<button

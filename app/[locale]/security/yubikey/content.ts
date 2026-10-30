@@ -21,6 +21,7 @@ export type GuideCopy = {
 	diagramTitle: string;
 	diagramLead: string;
 	accessibleGraph: string;
+	graphSelectorLabel: string;
 	graphRoles: Record<string, string>;
 	graphEdges: Record<string, string>;
 	keyLegend: string;
@@ -54,6 +55,7 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
 		diagramLead:
 			"Sélectionnez un nœud pour explorer son rôle. Les liens décrivent une fonction ou une dépendance, jamais une synchronisation automatique des secrets entre les deux clés.",
 		accessibleGraph: "Liste accessible des relations du diagramme",
+		graphSelectorLabel: "Sélectionner un composant du graphe",
 		graphRoles: {
 			workstation: "Poste de confiance",
 			primary: "YubiKey principale",
@@ -317,6 +319,7 @@ export const GUIDE_COPY: Record<GuideLocale, GuideCopy> = {
 		diagramLead:
 			"Select a node to explore its role. Links describe intended dependencies, not automatic synchronization of private keys between devices.",
 		accessibleGraph: "Accessible list of diagram relationships",
+		graphSelectorLabel: "Select a graph component",
 		graphRoles: {
 			workstation: "Trusted workstation",
 			primary: "Primary YubiKey",

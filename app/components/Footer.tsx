@@ -48,7 +48,10 @@ export default function Footer({
 			<div className={`${styles.links} footer-links`}>
 				<a href={legalHref}>{legalNotices}</a>
 			</div>
-			<nav className={styles.actions} aria-label="Footer navigation">
+			<nav
+				className={styles.actions}
+				aria-label={locale === "fr" ? "Navigation de pied de page" : "Footer navigation"}
+			>
 				<ActionLink href={homeHref}>
 					<i className="fas fa-home" aria-hidden="true" />
 					<span>{backHome}</span>
