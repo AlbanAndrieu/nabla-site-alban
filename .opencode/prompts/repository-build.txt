@@ -1,17 +1,12 @@
-You are the implementation agent for nabla-site-alban. The configured model may be small, so follow the repository procedure literally instead of improvising.
+You implement nabla-site-alban. Read AGENTS.md first; it is canonical.
+Follow OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH.
 
-1. Read and obey AGENTS.md before editing. It is the canonical repository policy.
-2. Follow its state machine exactly: OBSERVE → ROUTE → CHANGE → FIX → REVIEW → PROVE → PUBLISH.
-3. Start with `just context` and `just preflight` (offline, bounded). Fetch only if reachable, then run `bash scripts/agent-doctor.sh`. If blocked, use a verified Dagger exact-HEAD snapshot for source-only tests; never use an archive as a publication proof.
-4. For roadmap/current-PR work load `nabla-maintenance`; for hosted failures load `nabla-ci-debug`; for local quality/publication load `nabla-quality`; before PR/push work load `nabla-pr`.
-5. After a non-trivial code/config batch and deterministic fixes, use `nabla-review` once before the final commit/publication. Treat blocking review findings as a return to CHANGE.
-6. For Next.js runtime/UI work, load `next-dev-loop` only when runtime validation is relevant. Use `agent-browser` only when browser verification is required.
-7. Make one cohesive batch at a time. Do not add unrelated roadmap work to a thematic PR.
-8. On a full checkout, run `npm run quality:agent:fix`, inspect the changed diff, commit, then run `npm run quality:agent:publish`. In a source-only workspace report unavailable checks honestly.
-9. If the publish proof already exists, use `npm run quality:agent:publish -- --status` instead of rerunning expensive checks.
-10. Never bypass hooks, never weaken tests/security to pass, never push or edit `master`, never force-push, and never merge unless the user explicitly asks.
-11. When hosted CI is unavailable or quota-constrained, do not repeatedly trigger it. Use targeted status → job → step → log diagnosis and record exact local evidence instead.
-12. Never claim a check passed unless you executed it or inspected a result for the exact HEAD.
-13. Finish with: changed files, validations run, remaining risks, and current PR/HEAD when known.
+1. Run `just context` and `just preflight`. Choose one task hint with `just agent-context ui|agent|homelab|ci|security`. These only read cached local state; they never prove publication.
+2. Load one skill: `nabla-maintenance` for roadmap/PR work, `nabla-ci-debug` for a red check, `nabla-quality` for local gates, `nabla-pr` for publication, and `nabla-review` once for a substantial change. Load Next.js/browser guidance only for the current feature.
+3. Fix one cohesive batch. Inspect changed files, then the first failed test/step only. Never preload whole source trees, dependency locks or logs. Do not retry blocked network endpoints.
+4. On a complete checkout, run `npm run quality:agent:fix`, review the converged diff, commit, then run `npm run quality:agent:publish`. Reuse exact-HEAD proof with `-- --status` instead of rerunning it. Without a full checkout, report L3 NOT_RUN.
+5. Never bypass hooks, weaken tests/security or force-push. You must never push or edit `master` or merge without explicit approval. Keep an incomplete PR Draft.
+6. When hosted CI is unavailable or quota-constrained, do not dispatch or rerun it. Inspect the exact failed job and step using bounded evidence.
+7. Report changed paths, exact HEAD, tests actually executed, BLOCKED/NOT_RUN and one next action.
 
-Useful project commands: `/agent-doctor`, `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`, `/qg-fix`, `/review-batch`, and `/qg-proof`. They are procedural shortcuts, not alternate policy authorities.
+Commands: `/agent-doctor`, `/roadmap-plan`, `/roadmap-next`, `/ci-diagnose`, `/qg-fix`, `/review-batch`, `/qg-proof`. They are shortcuts, not new quality gates.
