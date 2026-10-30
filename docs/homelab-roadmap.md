@@ -1,397 +1,46 @@
-# Roadmap active — nabla-site-alban
+# Roadmap active — interfaces homelab Site Alban
 
+**Réconciliée le 30 octobre 2026.** Cette feuille ne couvre que les interfaces **Next.js/React** (`/fr/truenas`, `/fr/architecture` et les routes `/api/homelab-*`). Les composants TrueNAS, Talos, pfSense, FastAPI Sample, Gatus et Compose conservent leurs plans dans leurs propres dépôts.
 
-## Situation au 27 octobre 2026 — priorité de livraison #263
+[Historique complet avant consolidation](archive/homelab-roadmap-through-2026-10-30.txt) · [Roadmap qualité canonique](quality-roadmap.md) · [Contrat catalogue](homelab-services-catalog.md) · [Contrat des dépendances](homelab-dependency-health-ui.md).
 
-| Surface | Révision / preuve | État |
+## État vérifiable à date
+
+| Sujet | Preuve | Conclusion |
 | --- | --- | --- |
-| Production Vercel | `f26906733e228a27897a48983cae07c01f966c99` (#262), déploiement `dpl_6gAXM1U7aGFJy3y2sESqp2eVZeJu` | **READY** ; ne prouve pas le HTTP, le navigateur ni OWNER/LAN |
-| PR de stabilisation | [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), inclut #262 | **Draft** ; accès/caches, UX, refactoring et tests source |
-| Preview de #263 | `0c60fbbc8582895c65f673a2cb01eb2d01db4fe0`, déploiement `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` | **READY / build Next PASS**, HTTP et navigateur **NOT_RUN** |
-| Publication locale de #263 | Aucun `QG_PUBLISH_PROOF_OK` sur HEAD actuel | **NOT_RUN** ; ne pas fusionner sur seuls contrôles statiques |
-| OWNER / SERVICE | Contrats de source et purge des ressources OWNER au passage SERVICE | **DONE (code)** ; assertions navigateur LAN/WAN **NOT_RUN** |
+| Branche de référence | `master` au SHA `26bbb7b4257d2d94321eeea42192a6d0be58fe12` ; PR [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), [#265](https://github.com/AlbanAndrieu/nabla-site-alban/pull/265), [#266](https://github.com/AlbanAndrieu/nabla-site-alban/pull/266) et [#267](https://github.com/AlbanAndrieu/nabla-site-alban/pull/267) intégrées | Ne plus afficher #263 comme Draft active |
+| Vercel production | Déploiement `dpl_4QTK6birkaJftqE2XPgXTiDfQs1p`, `READY` sur le SHA ci-dessus | Build publié, pas de preuve des parcours LAN/WAN |
+| Diagnostics OWNER/SERVICE | Tests et contrats d'accès existants ; aucune recette depuis le vrai LAN/WAN au SHA ci-dessus | **NOT_RUN** pour l'acceptation réseau |
+| Réponse edge `429` | Les contrôles automatiques de Preview peuvent rencontrer un challenge Vercel | Distinguer la protection WAF d'une erreur FastAPI ou Next.js ; ne pas désactiver les protections |
+| Gate Node 24 | Même bloqueur que [quality-roadmap.md](quality-roadmap.md) : checkout/toolchain non disponibles dans cette séance | **L3 NOT_RUN** ; ne pas maintenir de seconde checklist de publication ici |
 
-**Régression corrigée en #263 :** le premier essai de Preview a été annulé car `vercel-ignore-build.sh` ne comparait que le dernier commit `docs/` sans `VERCEL_GIT_PREVIOUS_SHA`. Le sélecteur compare désormais tout le delta de branche depuis la base `origin/master` quand elle existe ; si cette base ou l'historique déployé n'est pas fiable (clone Vercel peu profond), il construit par sécurité. La seconde Preview est **READY** (22 s de build). Contrats de source et scénarios Git ajoutés, tests Node de la PR encore à exécuter sur checkout complet.
+La présence d'un service dans le catalogue n'établit **ni** sa disponibilité **ni** son autorisation de lecture. Ne jamais transformer `403`, `401`, `429`, une réponse absente ou un diagnostic non exécuté en `UP`.
 
-**Critère de clôture P0** : obtenir sur le même SHA un arbre formaté propre, tests rapides + unitaires, TypeScript, lint et build Next.js, attestation `QG_PUBLISH_PROOF_OK`, puis contrôle des accès réels. Sans accès LAN ni navigateur autorisé, garder l'acceptation finale **BLOCKED**, même si Vercel est `READY`. Ne pas déclencher de GitHub Actions payantes ; ni fusion automatique.
+## P0 — Recette d'accès et de publication réelle
 
+- [ ] **S-01/S-02 — HTTP et navigateur :** vérifier le SHA via l'endpoint de déploiement, puis les pages Home/TrueNAS/Architecture FR/EN ; photographier les états de chargement, erreur et dégradation, sans données privées.
+- [ ] **S-03 — OWNER depuis le LAN autorisé :** confirmer `/api/homelab-access?diagnose=1`, l'UI privée, les sondes et les transitions réseau. L'accès `OWNER` ne doit pas être déduit d'une adresse IP simulée.
+- [ ] **S-04 — SERVICE depuis un réseau réellement non autorisé :** confirmer les refus attendus et que les cartes, caches navigateur, traces et liens ne révèlent aucune information OWNER. `401/403` est une politique d'accès, pas une panne.
+- [ ] **S-05 — Qualité :** produire l'attestation L3 complète définie **une seule fois** dans [la roadmap qualité](quality-roadmap.md#p0--gate-de-publication-exacte-bloquant-pour-toute-nouvelle-pr) sur un checkout Node 24 propre.
 
-> Réconciliée le **25 octobre 2026**, après fusion de [Site #256](https://github.com/AlbanAndrieu/nabla-site-alban/pull/256).
-> **Source d'autorité :** cette roadmap contient uniquement les tâches du site.
-> [Historique intégral précédent](archive/homelab-roadmap-through-2026-10-25.txt)
-> conservé sans suppression de preuve. Les actions Compose et FastAPI ont leurs
-> propres roadmaps ; un merge et un déploiement READY ne valent pas recette navigateur.
+Critère de clôture P0 : traces datées du SHA exact, résultats OWNER/LAN et SERVICE/WAN réels, absence de fuite et L3 prouvée ; sinon noter `BLOCKED` ou `NOT_RUN` et laisser la recette ouverte.
 
-## Historique de production — état du 25 octobre (remplacé par la situation ci-dessus)
+## P1 — Catalogue, preuves et UX
 
-| Dimension | Preuve | Verdict |
-| --- | --- | --- |
-| Git | `master` et commit de merge #256 `99cf7e4016533532bee53a72964ffea1b4a54bc6` identiques | **PASS** |
-| Publication | Vercel `dpl_ETdhg9XfxZijJ3ExA29a2q291SmV` READY, `target=production`, Node 24.x | **PASS build/déploiement** |
-| Domaine | `www.albanandrieu.com` sur le même déploiement ; apex redirigé vers `www` | **PASS métadonnées Vercel** |
-| Logs build | `Build Completed in /vercel/output [22s]` ; pas d'erreur de compilation dans les événements consultés | **PASS build** |
-| Runtime | Aucune erreur regroupée Vercel sur 24 h ; recherche `error/fatal` sur 30 min sans résultat | **Aucune erreur observée, pas une recette** |
-| HTTP public | Navigateur de l'agent : accès direct à Architecture/TrueNAS non disponible ; terminal de l'agent : DNS public indisponible | **BLOCKED côté agent** |
-| OWNER/LAN | Aucun appel authentifié depuis le VLAN domestique | **NOT_RUN** |
-| Source-only / L3 | Pas de checkout complet avec Node 24, `npm ci`, Playwright, Axe, Trivy et quality gate locale sur le merge | **NOT_RUN** |
-| L1 Node 22/npm 10 | Six sources au blob SHA identique au merge ; 18 tests ciblés via source partielle | **18/18 PASS ; non L3** |
+- [ ] **S-06/S-07 — Traçabilité :** propager et afficher un `traceId` commun Next.js ↔ FastAPI selon le contrat producteur ; rendre les étapes DNS, TCP, TLS, HTTP, métriques et authentification lisibles dans la carte, sans inventer une preuve manquante.
+- [ ] **S-08 — Intégrité du catalogue :** joindre Gatus, métriques, upstream/downstream, `entityRef`, révision et statut par identifiants stables. Rejeter les jointures ambiguës et garder les liens inter-services navigables.
+- [ ] **S-09 — Cache et dégradation :** permettre l'affichage de la dernière preuve autorisée sans bloquer l'UI quand FastAPI est lent ou indisponible ; purger les détails OWNER sur le passage SERVICE ; différencier `UNKNOWN`, `STALE`, `DENIED` et `DOWN`.
+- [ ] **S-10/S-11 — Accessibilité et performance :** tester clavier, lecteur d'écran, 320/390 px, contraste WCAG 2.2 AA, absence de layout shift et métriques LCP/INP/CLS sur vrais navigateurs. Utiliser les tokens du Site et respecter les animations réduites.
+- [ ] **S-12/S-13 — Icônes et C4 :** valider `just icons-local-check` et la correspondance catalogue ; contrôler nœuds/relations/labels ReactFlow. Une relation C4 L3 absente du producteur reste `UNKNOWN`, jamais synthétisée comme observée.
 
-**Routes canoniques :** anglais `/`, `/architecture`, `/truenas` ;
-français `/fr`, `/fr/architecture`, `/fr/truenas`.
-Ne pas présenter `/en/architecture` comme canonique.
+## P2 — Dépendances et refactoring
 
-[Runbook de vérification production](runbooks/site-production-verification.md) ·
-[Contrat des diagnostics et droits](homelab-diagnostics-and-access.md).
+- [ ] **S-14/S-15 — Refactoring :** dédupliquer les adaptateurs de snapshots/sondes, inventorier les consommateurs API v1, migrer vers le contrat v2 avec tests de non-régression et sans détruire le rendu public.
+- [ ] **S-16 — Contrats et instrumentation :** conserver les tests local-first des erreurs 401/403/429, les transitions OWNER/SERVICE, les compteurs de services et les boucles de rendu React ; analyser chaque incident avant d'ajouter un nouveau polling.
+- [ ] **Ressources opérateur :** prévoir la présentation CPU/RAM/GPU/ZFS par service **uniquement après disponibilité d'une preuve producteur expurgée**. L'absence de métrique n'est pas une panne.
 
-## P0 — Vérifier les parcours réellement publiés
+## Transfert entre dépôts
 
-- [ ] **S-01 Smoke HTTP et SHA :** exécuter depuis une machine disposant d'un
-  DNS public fonctionnel `DEPLOYED_SHA=99cf7e4016533532bee53a72964ffea1b4a54bc6 node scripts/post-deploy-smoke.mjs`.
-  Le script vérifie routes FR/EN, canonical/hreflang, sitemap, robots, carte sociale,
-  SHA et refus de l'ancienne route opérationnelle. Conserver la sortie expurgée.
-- [ ] **S-02 Navigateur :** tester Home, TrueNAS et Architecture FR/EN sur le
-  même SHA. Vérifier le chargement des vrais logos, le fallback monogramme,
-  les filtres, le graphe ReactFlow, C4 L1/L2 et son panneau de relations.
-  Confirmer navigation au clavier, mobile, absence de console error.
-- [x] **S-03a Recette navigateur LAN/externe :** script `audit:homelab` avec trois contextes attendus, inspection du stockage et des routes ; acceptation réelle sur les deux réseaux **NOT_RUN**.
-- [ ] **S-03 OWNER :** depuis le Wi-Fi/VLAN autorisé, confronter
-  `/api/homelab-access?diagnose=1` à la disponibilité des catalogues,
-  à `/api/homelab-health` / sondes autorisées et au rendu des cartes.
-  Une réponse `trusted` ne prouve pas que FastAPI ou TrueNAS répond.
-- [ ] **S-04 Public :** depuis un réseau non autorisé et sans session Access,
-  vérifier le mode SERVICE (si activé) et les refus OWNER. Contrôler
-  JSON, HTML/RSC, console, requêtes réseau et `localStorage` : aucun token,
-  adresse LAN, header d'accès ou diagnostic OWNER.
-- [x] **S-05a Détection de Preview :** correction du script
-  `vercel-ignore-build.sh` : lorsqu'un HEAD de merge n'a pas de
-  `VERCEL_GIT_PREVIOUS_SHA` valide, construire par défaut plutôt que
-  comparer seulement le premier parent. Un `git diff` impossible construit
-  aussi par sécurité ; tests offline **4/4 PASS** sur de vrais dépôts Git locaux.
-- [ ] **S-05 Quality :** lancer `just source-check`, build Next.js Node 24,
-  tests unitaires et les gates locales pertinentes sur un checkout du
-  **merge SHA**, sans relancer les workflows GitHub payants.
+**Site Alban :** filtres, cartes, ReactFlow/C4, affichage des preuves, i18n, a11y, privacy et cache d'interface. **FastAPI Sample :** collecteurs, enrichissement des sondes, schéma de preuves et diagnostic réseau. **nabla-compose :** déploiement des sondes LAN, TrueNAS/Talos/pfSense, catalogues infra, Traefik/APISIX et secrets. Les problèmes producteur doivent être suivis dans le dépôt producteur, pas dupliqués comme correctifs React.
 
-**Done P0 :** preuves HTTP/navigateur datées, parcours OWNER et SERVICE prouvés,
-contrôle de confidentialité négatif et SHA exact. Ne jamais fermer sur READY seul.
-
-- [x] **S-04b Confidentialité du navigateur (code #263)** : lorsque TrueNAS entre en mode `readOnly`, supprimer la clé locale des ressources privées OWNER et effacer sa copie React de manière différée et annulable, sans toucher au cache public expurgé. **Le contrôle externe du DOM, des réponses et de Storage reste à effectuer pour fermer S-04.**
-
-## P0 — Diagnostics et contrôle d'accès côté site
-
-**Livré dans #256 :** catalogue Backstage v2 sans repli runtime v1 ; index
-de preuves résistant aux clés ambiguës ; classifieur d'erreurs `stage`,
-réponse HTTP 503 expurgée pour les clients publics ; panneau d'incident
-OWNER commun Architecture/TrueNAS ; révocation synchrone du snapshot C4
-OWNER lors d'une transition de droits ; cache SERVICE versionné. Ces
-invariants sont à préserver, pas à réimplémenter.
-
-- [x] **S-06b Écho validé :** le Site indique `confirmed` uniquement lorsque FastAPI retourne l’ID W3C exact ; autrement `sent`. Producteur : [FastAPI #377](https://github.com/AlbanAndrieu/fastapi-sample/pull/377). Recette sur déploiements correspondants encore NOT_RUN.
-- [x] **S-06a W3C traceparent Site → FastAPI SERVICE v2 :** généré au serveur et transmis ; ID exposé en réponse. Lecture dans les logs FastAPI non vérifiée.
-- [ ] **S-06 Corrélation réelle :** propager un `trace_id` fiable à travers
-  collecteur → FastAPI → Route Handler Next.js → support OWNER, avec
-  logs expurgés et horodatages. Le `requestId` Site actuel est **local**
-  et ne constitue pas une trace distribuée.
-- [x] **S-07a Preuve HTTP fraîche :** un code 200 sans timestamp et source de sonde HTTP ne vaut pas un succès ; un résultat périmé ou interrompu reste `unknown`. Le détail OWNER précise origine/cache/deadline, HTTP et l’heure. Cinq tests purs Node 22 PASS dans un arbre isolé.
-- [x] **S-07b Trace visible OWNER :** ID W3C reçu depuis la route SERVICE v2 visible uniquement dans le panneau de diagnostic OWNER, jamais conservé dans le cache public. La réception FastAPI n’est pas supposée.
-- [ ] **S-07 Provenance lisible :** présenter par service les étapes
-  catalogue → source FastAPI → DNS/TCP/TLS/HTTP/auth → observateur →
-  horodatage/fraîcheur → rendu Site ; distinguer `unknown`, `stale`,
-  `not-executed`, `403` et `down` sans attribuer une panne au hasard.
-- [x] **S-08a Identité v2 dans le Site :** les cartes et compteurs
-  n'acceptent plus de fallback de preuve par nom ou URL. La jointure
-  `canonicalHomelabEvidence` exige l'ID identique et non ambigu ; sinon
-  le résultat est `unknown`, sauf preuve directe ou état v2 par `entityRef`.
-  Tests négatifs Node 22 ajoutés.
-- [ ] **S-08b Contrat producteur :** confronter les `entityRef`, les IDs et
-  les exporters réellement publiés par FastAPI/Compose à ce contrat. Documenter
-  séparément les observateurs sans ID canonique ; ne pas réactiver de fallback.
-- [x] **S-09a Isolation des échecs de revalidation :** ne réutiliser un catalogue, une topologie et des preuves que si le périmètre d'accès est inchangé et non révoqué. En cas de changement OWNER/SERVICE, vider ces données avant tout rendu ; tests négatifs Node 22 (5/5 PASS isolés).
-- [ ] **S-09 Fin du mode SERVICE temporaire :** préparer un cutover
-  `HOMELAB_PUBLIC_READONLY_ENABLED=false` lorsque les parcours OWNER ont
-  leur alternative fonctionnelle. Tant qu'il reste actif, tester que seuls
-  les endpoints de projection allowlistés sont accessibles et que les 503
-  publics ne révèlent aucune phase privée.
-
-## Ressources CPU/RAM/GPU/ZFS — contrat complémentaire du 27 octobre
-
-- [x] Le producteur `nabla-compose` PR #285 expose
-  `cpu.usage_pct` en pourcentage d'un cœur dans l'instantané
-  privé `nabla-service-resources/v1` ; la présence
-  d'un conteneur dans `docker ps` est distincte du succès
-  de mesure CPU.
-- [x] Les cartes OWNER affichent maintenant CPU en plus de
-  RAM, GPU et ZFS. Les anciennes captures sans champ CPU
-  continuent d'être acceptées et affichent **—**.
-- [x] Le producteur expose `coverage` et les conteneurs
-  RUNNING sans mapping catalogique. Pas de mesure live
-  prétendue dans le catalogue statique ; le rapprochement
-  de ces workloads reste à effectuer sur TrueNAS.
-- [ ] Collecte opérateur CPU/RAM/stockage de tous les
-  conteneurs RUNNING et import OWNER depuis la workstation ;
-  **non effectuée** depuis l'agent GitHub.
-- [ ] API LAN autorisée pour l'actualisation périodique et
-  la conservation des snapshots historiques sans dépendre
-  d'un accès public TrueNAS.
-
-## P1 — Référence RAM / GPU / stockage par service (26 octobre)
-
-- [x] **Contrat OWNER** : `lib/homelabResourceEvidence.ts`
-  accepte un snapshot privé `nabla-service-resources/v1`, le
-  valide et nettoie les champs non autorisés ; correspondance
-  stricte par `entityRef` Backstage v2, aucune inférence de nom.
-- [x] **Catalogue de cartes** : import manuel du JSON collecté
-  depuis TrueNAS/workstation, cache `localStorage` OWNER local,
-  effacement explicite et affichage RAM/GPU/couche Docker/ZFS
-  (datasets partagés annotés). Aucune donnée importée n'est
-  présentée comme statut de santé du service.
-- [x] **Fraîcheur** : horodatage, hôte source, `stale >30 min`,
-  avertissement de révision du catalogue, valeurs absentes
-  `— / non vérifié` plutôt que zéro.
-- [x] **Frontière public** : aucun upload vers Vercel,
-  aucun import ni rendu en mode SERVICE/readOnly,
-  pas de récupération automatique de ressources privées.
-- [ ] **Tests de production** : `node --test
-  unit-tests/homelabResourceEvidence.test.mjs`, quality gate
-  locale Node 24 puis contrôle OWNER et absence de fuite
-  SERVICE/public ; **NOT_RUN** dans l'environnement agent.
-- [ ] **Étape suivante** : ingestion automatique via
-  endpoint FastAPI OWNER autorisé, sans second scraper
-  permanent (cAdvisor/Prometheus pour l'historique).
-  [Runbook de ressources](runbooks/homelab-service-resources.md).
-
-## P1 — C4, icônes et expérience utilisateur
-
-**Livré dans #256 :** `@xyflow/react` sans nouveau serveur de diagrammes,
-vues C4 L1 Contexte et L2 Conteneurs/services bornées à 16 nœuds / 48 liens,
-panneau de relations navigable et liste textuelle accessible. La vue L1
-est conceptuelle ; L2 représente un sous-ensemble déclaré, pas la santé runtime.
-Audit précédent des assets : 176 mappings, 125 fichiers distincts, aucun
-asset Git manquant (preuve de dépôt, pas chargement navigateur).
-
-- [x] **S-10a Projection C4 expurgée :** les nœuds rejettent les noms
-  sensibles, les métadonnées non sûres et les types de relation inconnus.
-  Test négatif local sur le modèle C4 sous Node 22.
-- [x] **S-10a Chronologie accessible :** étapes Docker/LAN/TLS/HTTP/Cloudflare/Prometheus présentées en liste ordonnée OWNER avec statut et provenance existants ; pas de verdict de panne inventé.
-- [ ] **S-10 WCAG 2.2 AA :** confirmer focus/lecteur d'écran, contraste,
-  zoom, clavier, transitions C4 L1/L2, bouton d'effacement, responsive,
-  FR/EN et alternatives textuelles. Corriger les anomalies démontrées.
-- [x] **S-11a ReactFlow différé :** C4 et explorateur en chunks dynamiques séparés, montés à moins de 420 px du viewport, avec placeholders `aria-busy`, scroll et ancrages préservés.
-- [ ] **S-11 Performance :** mesurer LCP/INP/CLS, poids du bundle ReactFlow,
-  chargement différé des diagnostics, ETag/revalidation SERVICE, cache
-  inter-onglets sans état OWNER et comportement des filtres avec beaucoup de services.
-- [x] **S-12a Autorité unique des icônes :** `HomelabServiceCard` ignore le champ `iconSrc` distant et calcule chaque chemin via `homelabCatalogIcons.generated.ts`. Le cache public omet intentionnellement `iconSrc` ; ne pas le rajouter depuis FastAPI.
-- [ ] **S-12 Icônes :** exécuter `just icons-local-check` et comparer au
-  catalogue Compose lors de nouvelles apps. Confirmer erreurs HTTP 404 et
-  `data-service-icon-fallback` dans le navigateur, sans substituer
-  systématiquement un monogramme à un logo officiel disponible.
-- [ ] **S-13 C4 L3 :** attendre des relations de composants explicitement
-  publiées dans le catalogue d'autorité Compose/FastAPI. Étudier l'export
-  Structurizr DSL plus tard ; aucun inventaire local parallèle.
-
-## P1/P2 — Qualité, documentation et refactoring
-
-- [ ] **S-14 Dédupliquer les adaptateurs** des snapshots de santé et de
-  catalogue utilisés par TrueNAS/Architecture ; conserver des DTO distincts
-  PUBLIC/SERVICE/OWNER et une unique logique d'autorisation **serveur**.
-- [ ] **S-15 Dépister les consommateurs v1** (fixtures, scripts, tests)
-  avant suppression ; les compatibilités historiques sont réservées aux tests,
-  jamais utilisées en fallback de production.
-- [ ] **S-16 Qualité transverse :** préserver les contrats local-first,
-  Next.js/Node LTS, sécurité SAST/DAST, DSOMM, Stripe/PostHog dans
-  [roadmap produit](quality-roadmap.md), sans importer leur backlog ici.
-  Les skills externes déjà installés restent sous contrôle de l'utilisateur.
-
-## Handoff sans duplication entre dépôts
-
-| Producteur/autorité | Contrat attendu | Source d'autorité |
-| --- | --- | --- |
-| `nabla-compose` | Topologie déclarée, `catalogRevision`, icônes, ingress, APISIX POC, ADR/RACI, collecteur LAN | [Roadmap Compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/roadmap.md) · [APISIX #280](https://github.com/AlbanAndrieu/nabla-compose/pull/280) |
-| `fastapi-sample` | Probes, identité/permissions, DTO OWNER/SERVICE, codes de diagnostic, timestamps et traces inter-services | [Roadmap FastAPI](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/engineering-roadmap.md) · [#376 fusionnée](https://github.com/AlbanAndrieu/fastapi-sample/pull/376) |
-| `nabla-site-alban` | Contrôle d'exposition Route Handlers, C4, cartes, cache public, i18n, a11y, tests Preview et prod | Ce document |
-
-**Convention :** `DONE (code)` ≠ `READY (Vercel)` ≠ `PASS (HTTP)` ≠
-`PASS (navigateur)` ≠ `PASS (OWNER/LAN)`. Si non mesuré, inscrire
-`NOT_RUN` ou `BLOCKED`. Ne pas recopier les tâches d'un autre dépôt.
-
-### Suivi 429 OWNER et diagnostic local (#260, 25/10/2026)
-- [x] **S-03b audit** : traiter HTTP 429 comme précontrôle bloqué, jamais comme refus OWNER; code de sortie 4 sans requêtes supplémentaires.
-- [x] **S-03c confidentialité** : JWT limité à l'origine auditée, aucun secret dans la sortie, métadonnées de stockage contrôlées.
-- [x] **S-07c UX** : chronologie Catalogue → DNS → TCP → TLS → HTTP → API et `unknown` pour DNS/API non mesurés.
-- [ ] **S-03d LAN réel** : obtenir HTTP 200 sur `/api/homelab-access?diagnose=1`, puis valider OWNER et les sondes.
-- [ ] **S-04 WAN réel** : `NOT_RUN` en absence de réseau extérieur; ne pas falsifier l'IP cliente.
-- [ ] **S-06c trace FastAPI** : confirmer la version réellement déployée et l'écho exact de l'ID W3C.
-- [ ] **S-11b** : recettes WCAG 2.2 AA et Web Vitals LCP/INP/CLS réels.
-
-- [x] **S-03e prédiagnostic local** : `npm run diagnose:homelab-429`, deux requêtes sans retry ni fuite de secrets ; les droits OWNER restent à vérifier.
-
-### P0 — Build Vercel et blocage 429 (25/10/2026)
-- [x] **S-P0-build (code)** : corriger la virgule manquante dans `INITIAL_HOMELAB_SERVICES_STATE` de `useHomelabHealth.ts`, repérée par le journal Vercel du déploiement master `665d1918` (ERREUR `Expected ',', got 'ident'`).
-- [x] **S-P0-parse (test)** : contrôle hors ligne Node22 utilisant `stripTypeScriptTypes` puis `node --input-type=module --check`. `node --check` directement sur `.ts` ne strippe **pas** les types sous Node22.
-- [x] **S-P0-429 (code)** : préserver `x-vercel-mitigated` sous la forme normalisée `challenge|other` sans recopier le header brut.
-- [ ] **S-P0-429 (opérations)** : rechercher `2026-10-25T20:42:40–41Z` dans Vercel Firewall pour les requêtes identifiées par `X-Vercel-Id`; distinguer WAF custom, system mitigation et protection déploiement avant d'ajuster une règle ciblée.
-- [ ] **S-P0-release (validation)** : confirmer build Next.js complet, état READY d'une Preview, puis vérification OWNER sur réseau réel. La résolution du 429 ne découle pas du correctif de syntaxe ; production non validée.
-
-### P1 — Cartes de services compactes et stabilité au polling (26/10/2026, PR #260)
-
-- [x] **S-17a — Diagnostic repliable :** déplacer dans le volet
-  `Métriques / diagnostic` existant les huit mesures OWNER :
-  Docker/TrueNAS, HTTPS/TLS, Cloudflare Tunnel, HTTP, latence,
-  Prometheus, sonde HTTPS publique et sonde TCP LAN.
-- [x] **S-17b — Détails des sondes :** regrouper dans ce même volet
-  les états rolling, la provenance et les contrôles Cloudflare Access.
-  Les signaux de santé courts et les alertes de panne restent visibles.
-- [x] **S-17c — Stabilité React :** remplacer la clé de carte
-  `serviceId:endpointUrl` par `serviceId:occurrence`. L'identité du
-  composant ne dépend plus d'un endpoint enrichi par les sondes.
-- [x] **S-17d — Rafraîchissement :** maintenir le volet
-  `Métriques / diagnostic` dans le même emplacement React malgré
-  les transitions `ok/warn/fail`, stabiliser la zone des signaux
-  OWNER et supprimer le compteur fluctuant du titre.
-- [x] **S-17e — Confidentialité :** conserver le détail OWNER
-  uniquement en mode propriétaire. Aucune sonde manquante n'est
-  promue en `ok` ; l'historique Catalogue → DNS → LAN → TLS →
-  HTTP → API reste consultable au clavier.
-- [x] **S-17f — Contrats statiques :** neuf invariants contrôlés
-  contre les blobs Git de la PR ; nouveau fichier de tests
-  `homelabCardLayoutStability.test.mjs` inclus dans la boucle
-  rapide Node 22/24. **Validation workstation du 26/10/2026 :
-  71/71 PASS sur un checkout complet** après `git pull --ff-only`
-  vers `575adfa06ec865606d9eeeedc786c82bcd079c10`.
-- [ ] **S-17g — Recette navigateur :** comparer à 320/390 px,
-  tablette et desktop les hauteurs de cartes avant et après arrivée
-  des sondes. Laisser le volet ouvert pendant au moins deux
-  cycles de 30 s et vérifier qu'il ne se referme pas.
-  Mesurer CLS et défilement vertical ; aucun PASS visuel n'est
-  établi tant que Preview et OWNER/LAN ne sont pas accessibles.
-
-### P1 — Densité de lecture TrueNAS et Architecture (26/10/2026, PR #260)
-
-- [x] **S-18a — Nettoyage des cartes :** retirer la ligne
-  « Adresse/port issus de la configuration · aucune sonde LAN ».
-  Conserver l'état réel de la sonde sur le bouton LAN
-  (`data-lan-probe-state`) et la remarque sur le protocole
-  inconnu dans son `title`, sans présenter un endpoint déclaré
-  comme un succès mesuré.
-- [x] **S-18b — Suppression des bandeaux descriptifs :** retirer les
-  textes « Les services restent la finalité… » et
-  « Consultation extérieure en lecture seule… », en français
-  et en anglais. Préserver le contrôle OWNER/SERVICE et ses DTO.
-- [x] **S-18c — Sections épurées :** enlever l'introduction
-  narrative de TrueNAS, les descriptions de groupes répétées,
-  la note de sémantique toujours affichée, les explications
-  redondantes d'Architecture (entête, lecture seule, aide au
-  graphe, diagramme réseau dupliqué).
-- [x] **S-18d — État opérationnel visible :** conserver les
-  compteurs de santé, filtres, noms de groupes, nombre de services,
-  nombre de problèmes et avertissements explicites.
-  L'état `unknown` n'est pas promu en `healthy`.
-- [x] **S-18e — Contrats de source :** 14/14 vérifications statiques
-  sur les fichiers Git modifiés, nouveau test
-  `homelabConcisePresentation.test.mjs` inclus dans
-  `test:fast:local`. Le test structurel
-  `servicePresentation.test.ts` n'exige plus la phrase retirée.
-- [x] **S-18f — Tests et build locaux :** opérateur le 26/10/2026,
-  `npm run test:fast:local` **71/71 PASS**, `npm run typecheck`
-  **PASS** (route typegen puis tsc), `npm run build` **PASS**
-  (Next 16.4.2, 83/83 pages).
-- [ ] **S-18g — Recette visuelle :** mesurer les hauteurs, le CLS
-  et les changements de scroll sur `/fr/truenas` et
-  `/fr/architecture` en mobile et desktop, au moins deux cycles.
-  Les GET de Preview ont rencontré HTTP 429 Vercel. **BLOCKED**.
-
-### P0 — Défilement lors de la réautorisation de la vue privée (26/10/2026)
-
-- [x] **Cause du saut :** `useHomelabAccess` revalide les droits
-  toutes les 30 secondes et au focus. Il rend `pending` avant la réponse.
-  TrueNAS, Architecture et le graphe Réseau retiraient toute leur
-  surface du DOM, provoquant un effondrement temporaire de hauteur.
-- [x] **Correction sans rétention OWNER :** nouveau hook
-  `useAuthorizedLayoutHold`, stockage **en mémoire React uniquement**
-  de la dernière hauteur rendue via `ResizeObserver`. Pendant `pending`,
-  rendre un espace `aria-hidden` de cette hauteur ; ne conserver
-  aucun contenu ni snapshot privé dans le DOM ou le cache navigateur.
-  Après refus, retirer cet espace et afficher le refus existant.
-- [x] **Périmètre :** `HomelabPrivateServices`,
-  `ArchitecturePrivateViews`, `HomeLabPrivateNetwork`. La surface
-  `Architecture` est mesurée seulement quand le catalogue est prêt.
-- [x] **Point d'observation E2E :** attribut
-  `data-homelab-service-id` sur chaque carte ; test Playwright
-  `tests/ops-homelab-recheck-layout.spec.ts` avec deux
-  réautorisations, comparaison de hauteurs et scroll, limité à
-  `OPS_E2E_ENABLED=YES` dans un environnement authentifié.
-- [x] **Vercel Preview exact-SHA :** le déploiement de
-  `b53994eeb6b85f4c9f158770048f55d69821d2af` est **READY**
-  sur Next.js 16.4.2 (test navigateur non exécuté).
-  URL : `https://nabla-site-alban-ce7p8n0dq-albanandrieus-projects.vercel.app`.
-  Les commits postérieurs sont des tests et documentation.
-- [x] **Contrats de code :** 9/9 invariants statiques vérifiés sur les
-  blobs Git ; nouveau `unit-tests/homelabRecheckLayout.test.mjs`
-  inscrit dans le profil L1 ; assertion obsolète corrigée dans
-  `unit-tests/architectureCatalogNotice.test.ts`.
-- [ ] **P0 — Edge 429 :** les GET Preview FR/EN sont bloqués par
-  `Vercel Security Checkpoint` (HTTP 429), et un GET a échoué avant
-  lecture. Ne pas boucler les requêtes et ne pas contourner les règles
-  de sécurité. Le rendu HTML et le CLS **NON VALIDÉS**.
-- [x] **Prévalidation locale — 26/10/2026 :** opérateur, branche
-  #260 sur `575adfa06ec865606d9eeeedc786c82bcd079c10` :
-  **71/71 tests rapides PASS**, `next typegen` et `tsc --noEmit`
-  **PASS**, Next.js **16.4.2** `build` **PASS**, **83/83 pages**.
-- [ ] **Recette OWNER autorisée :** navigateur LAN ou Cloudflare Access
-  réellement autorisé ; exécuter les deux cycles du test Playwright
-  privé sur TrueNAS mobile et Architecture desktop. **NOT_RUN** ;
-  aucune validation E2E ou métrique CLS n'est déduite du build.
-- [ ] **Publication complète :** `npm run quality:agent:publish`
-  sur un arbre Git propre, puis inspection de sa preuve ; le profil
-  local rapide n'exécute pas cette gate.
-
-### P0 — Mode dégradé lorsque TrueNAS/FastAPI est gelé (26/10/2026)
-
-**Incident déclaré :** TrueNAS et les API du homelab répondent très lentement.
-Le Site ne doit pas transformer une sonde absente en panne ni multiplier
-les requêtes sur une source déjà saturée.
-
-- [x] **S-19a — Budget par appel :** bornage à 8 secondes côté navigateur
-  pour catalogue, santé SERVICE v2, sondes OWNER et catalogue
-  Architecture. Annulation également lors du changement de périmètre.
-- [x] **S-19b — Réduction de charge :** intervalles de sondes
-  Architecture ramenés de 2–5 s à 30 s ; après échec, temporisation
-  exponentielle de 60/120/240 s, plafonnée à 4 min. TrueNAS garde
-  son rythme de 30 s sain et ralentit sur échec. Pas de retry en rafale.
-- [x] **S-19c — Résilience du catalogue SERVICE :** TTL du cache
-  public validé étendu de 15 min à 24 h ; restauration dès le
-  premier rendu autorisé, sans attendre le réseau. États de santé
-  anciens réétiquetés `unknown` et jamais comme `healthy`.
-- [x] **S-19d — Architecture :** partage du même cache local public
-  expurgé, même sans graphe live ; si topologie absente, n'afficher
-  que des nœuds déclarés sans inventer de liens. Indicateur
-  compact `catalogue public mémorisé · santé non vérifiée`.
-  Interdiction de charger ou de persister des snapshots OWNER.
-- [x] **S-19e — Frontière d'accès :** accès vérifié côté Site avant
-  le rendu. Un HTTP 401/403/404 ou un refus explicite purge le
-  cache public ; un timeout, 429 ou 5xx garde le cache sur disque
-  **sans jamais autoriser son affichage avant nouvelle admission**.
-  GET d'autorisation borné à 5 s et toujours fail-closed.
-- [x] **S-19f — Affichage :** bannière légère en cas de catalogue
-  public en cache ; message court si sondes indisponibles. Les
-  informations d'état confirmées restent séparées des données déclarées.
-- [x] **S-19g — Régressions :** durée de vie du cache testée
-  (24 h, pas d'ancien vert), tests pour délais/backoff et
-  révocation, ajout au profil rapide Node 22/24.
-- [x] **S-19h-build — Livraison de la version applicative :** Preview Vercel
-  `dpl_56TMyNfMAjKMoh5WxLq7wMJ2TBZ5` sur `0c60fbbc` **READY**
-  (Next.js, build 22 s). Régression `vercel-ignore-build.sh` corrigée
-  et prouvée par **7/7 tests Git réels** sur les blobs source exacts.
-  Les commits ultérieurs portent les tests et les roadmaps.
-- [ ] **S-19h-browser — Acceptation réelle :** HTTP, visuels et
-  OWNER/SERVICE depuis des clients autorisés ; l'agent ne peut pas
-  accéder à la Preview par HTTP ni au LAN domestique. Le checkpoint
-  Vercel 429 est un blocage d'admission, pas une panne TrueNAS.
-- [ ] **S-19i — Suivi producteur, nabla-compose / FastAPI :** lorsque
-  le LAN répond, instrumenter durée et timeout des appels FastAPI,
-  mémoire TrueNAS, pression I/O, saturation de sockets et workers.
-  Ne pas déclencher de collecte intensive pendant le gel ;
-  garder cette action dans les roadmaps des dépôts producteurs.
-
-**DONE (code)** ≠ **Preview READY** ≠ **API restaurée** ≠
-**OWNER/LAN prouvé**. L3 volontairement différée ; ne pas
-demander à l'opérateur de relancer la quality gate pour ce chantier.
+Les anciennes livraisons, décisions de CI, captures de symptômes et points détaillés S-01 à S-19 sont conservés dans [l'archive datée](archive/homelab-roadmap-through-2026-10-30.txt). Ne pas considérer leur historique comme un contrôle exécuté sur la révision actuelle.
