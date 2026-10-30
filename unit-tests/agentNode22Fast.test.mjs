@@ -33,6 +33,7 @@ test("fast profile stays a bounded dependency-free contract suite", () => {
 	assert.equal(new Set(FAST_TESTS).size, FAST_TESTS.length);
 	assert.ok(FAST_TESTS.includes("unit-tests/agentNode22Core.test.mjs"));
 	assert.ok(FAST_TESTS.includes("unit-tests/agentTaskContext.test.mjs"));
+	assert.ok(FAST_TESTS.includes("unit-tests/agentSkillParity.test.mjs"));
 	assert.ok(FAST_TESTS.includes("unit-tests/homelabIconFallback.test.mjs"));
 	assert.ok(
 		FAST_TESTS.every((path) =>

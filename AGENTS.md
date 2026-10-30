@@ -58,6 +58,14 @@ or change HTTP 404/noindex without explicit approval.
 - Next.js: only targeted installed `node_modules/next/dist/docs/` guides.
 - OpenCode V1/V2: verify installed version before schema changes.
 
+## Claude and Codex
+
+Both agents share this file and `.agents/skills/` (one source; no per-agent copies).
+Claude loads it via `CLAUDE.md` (`@AGENTS.md`) and skills via `.claude/skills/*` symlinks;
+Codex reads `AGENTS.md` and discovers `.agents/skills/*/SKILL.md` (name + description).
+Use one `git worktree` per agent; never edit, fix or publish a checkout another agent uses.
+Git hooks enforce the gate for both; never rely on an agent-specific hook.
+
 ## Compact evidence report
 
 Report changed paths, PR, exact SHA, L0/L1/L2/L3 checks executed, `NOT_RUN`/`BLOCKED`,
