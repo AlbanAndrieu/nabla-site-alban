@@ -27,7 +27,7 @@ test("Lighthouse runner refuses unsafe and ambiguous origins", () => {
   }
 });
 
-test("Lighthouse result is fail-closed for missing audits, RCE gate and HTTP errors", () => {
+test("Lighthouse result is fail-closed for missing audits, redirect substitution and HTTP errors", () => {
   const url = "https://example.com/fr/security/yubikey";
   const success = {
     finalDisplayedUrl: url,
@@ -40,6 +40,7 @@ test("Lighthouse result is fail-closed for missing audits, RCE gate and HTTP err
   assert.equal(s.cls, 0.01);
   assert.equal(summarizeReport({ ...success, runtimeError: { code: "ERRORED_DOCUMENT_REQUEST" } }, url).status, "BLOCKED");
   assert.equal(summarizeReport({ ...success, finalDisplayedUrl: "https://elsewhere.com/" }, url).status, "BLOCKED");
+  assert.equal(summarizeReport({ ...success, finalDisplayedUrl: url + "-fake" }, url).status, "BLOCKED");
   assert.equal(summarizeReport({ ...success, audits: { "http-status-code": { score: 0 } } }, url).status, "BLOCKED");
   assert.equal(summarizeReport({ ...success, categories: {} }, url).status, "BLOCKED");
   assert.equal(summarizeReport({ ...success, categories: { ...success.categories, performance: { score: 0.35 } } }, url).status, "FAIL");
