@@ -14,7 +14,8 @@ test.describe("Performance baseline", () => {
 	test("homepage stays within basic navigation and transfer budgets", async ({
 		page,
 	}) => {
-		await page.goto("/en", { waitUntil: "load" });
+		// The canonical EN homepage is /, not /en; avoid measuring a redirect.
+		await page.goto("/", { waitUntil: "load" });
 
 		const metrics = await page.evaluate(() => {
 			const navigation = performance.getEntriesByType(

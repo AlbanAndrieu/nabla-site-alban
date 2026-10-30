@@ -14,6 +14,7 @@ const localizedRoutePairs = [
 	["/ciso", "/fr/ciso"],
 	["/security/dsomm", "/fr/security/dsomm"],
 	["/security/lexique", "/fr/security/lexique"],
+	["/security/yubikey", "/fr/security/yubikey"],
 	["/cv", "/fr/cv"],
 	["/jm", "/fr/jm"],
 ] as const;
@@ -45,6 +46,9 @@ test.describe("axe accessibility audit EN/FR", () => {
 				await page.emulateMedia({ reducedMotion: "reduce" });
 				await page.goto(route, { waitUntil: "domcontentloaded" });
 				await expect(page.locator("main#main-content")).toHaveCount(1);
+				if (route.includes("/security/yubikey")) {
+					await expect(page.locator(".react-flow")).toBeVisible();
+				}
 
 				const results = await new AxeBuilder({ page })
 					.withTags([

@@ -88,14 +88,6 @@ temp/
 *.swo
 *~
 
-# Temporary files
-tmp/
-temp/
-*.tmp
-*.swp
-*.swo
-*~
-
 # Playwright
 playwright-report/
 test-results/
@@ -106,6 +98,7 @@ playwright/.cache/
 *-old.html
 
 .env*.local
+.env.secrets
 .env.sops.secrets
 
 # python
