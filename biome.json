@@ -18,6 +18,7 @@
 			"!**/.venv",
 			"!**/vendor",
 			"!**/public/assets",
+			"!**/*.generated.ts",
 			"!**/public/checklist",
 			"!**/tsconfig.tsbuildinfo"
 		]
