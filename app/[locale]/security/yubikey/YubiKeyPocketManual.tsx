@@ -39,6 +39,8 @@ const copy = {
 			["OpenPGP : PIN administrateur", "12345678", "À lire sur la clé"],
 		],
 		pinsNote: "Ce sont des valeurs d’usine, jamais tes codes actuels. Le PUK PIV débloque uniquement le PIN PIV. OpenPGP possède son propre code de réinitialisation ; FIDO2 n’a pas de PUK. La clé de gestion PIV (AES-256 sur les clés inspectées) est distincte du PIN.",
+		inspectTitle: "Comment vérifier les deux clés sans les modifier ?",
+		inspectNote: "Brancher une seule clé à la fois. Les commandes lisent les métadonnées et les compteurs, sans entrer de PIN. Ne pas publier les sorties : elles peuvent contenir des identifiants.",
 		filesTitle: "Où retrouver les fichiers et les sauvegardes ?",
 		locations: [
 			["SSH FIDO2", "Création sur la workstation, dossier ~/.ssh ; sauvegarde de l’identité publique/du descripteur à distinguer de la clé privée non exportable du matériel. Signature locale de la clé de secours validée ; connexion distante non démontrée."],
@@ -86,6 +88,8 @@ const copy = {
 			["OpenPGP admin PIN", "12345678", "Read from device"],
 		],
 		pinsNote: "These are factory defaults, not the device's current codes. The PIV PUK only unblocks the PIV PIN. OpenPGP has its own reset code; FIDO2 has no PUK. The PIV management key (AES-256 on the inspected devices) is distinct from the PIN.",
+		inspectTitle: "How to inspect each key without changing it",
+		inspectNote: "Connect one key at a time. These commands read metadata and counters without entering a PIN. Do not publish output: it may contain identifiers.",
 		filesTitle: "Where are the generated files and backups?",
 		locations: [
 			["FIDO2 SSH", "Generated on the workstation under ~/.ssh. The public key / handle is separate from the hardware's non-exportable secret. Backup SSH signature tested locally; remote login is not proven."],
@@ -150,6 +154,11 @@ export default function YubiKeyPocketManual({
 						</table>
 					</div>
 					<p>{t.pinsNote}</p>
+				</details>
+				<details>
+					<summary>{t.inspectTitle}</summary>
+					<p>{t.inspectNote}</p>
+					<pre className={styles.command}><code>{"ykman info\\nykman otp info\\nykman piv info\\nykman fido info\\nykman openpgp info"}</code></pre>
 				</details>
 				<details>
 					<summary>{t.filesTitle}</summary>
