@@ -56,7 +56,7 @@ jobs:
         with:
           scan-type: fs
           scan-ref: "."
-          version: "v0.74.0"
+          version: "v0.76.1"
           scanners: "vuln,misconfig,license"
           format: json
           output: trivy-security.json
@@ -73,7 +73,7 @@ jobs:
         with:
           scan-type: fs
           scan-ref: "."
-          version: "v0.74.0"
+          version: "v0.76.1"
           format: cyclonedx
           output: trivy-sbom.cdx.json
           hide-progress: true

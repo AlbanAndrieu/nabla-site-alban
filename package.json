@@ -99,6 +99,11 @@
 		"tsx": "^4.23.15",
 		"typescript": "^5.9.3"
 	},
+	"overrides": {
+		"opencommit": {
+			"zod": "^4.6.6"
+		}
+	},
 	"allowScripts": {
 		"@parcel/watcher": false,
 		"@swc/core": false,
