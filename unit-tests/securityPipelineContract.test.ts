@@ -60,7 +60,7 @@ test("quality gate checks production health before build and runs diff-scoped SA
 	);
 	assert.match(
 		ci,
-		/semgrep\/semgrep@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e/,
+		/semgrep\/semgrep@sha256:2e45517a85e13a9cca14a2a00df6bb48affd66b8ebfae1b0991cd57578362fb0/,
 	);
 	assert.match(ci, /--config p\/ci/);
 	assert.match(ci, /--metrics=off/);

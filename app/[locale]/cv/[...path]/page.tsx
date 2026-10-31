@@ -68,7 +68,12 @@ export default async function CvPathPage({ params }: Props) {
 	return (
 		<div className="page-cv" suppressHydrationWarning>
 			<TopAnchor />
-			<div id="main-content" dangerouslySetInnerHTML={{ __html: html }} />
+			<div
+				id="main-content"
+				// Only allowlisted first-party files from public/cv (lib/cvFromPublic.ts).
+				// nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml.react-dangerouslysetinnerhtml
+				dangerouslySetInnerHTML={{ __html: html }}
+			/>
 			<nav
 				className={styles.backAction}
 				aria-label={BACK_TO_INDEX_LABEL[documentLocale]}

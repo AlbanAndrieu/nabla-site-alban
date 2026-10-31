@@ -7,8 +7,8 @@ name = "pypi"
 
 [dev-packages]
 ansible-lint = ">=25.8.2"
-gitlint = ">=0.19.1"
-Pillow = ">=12.1.1"
+gitlint-core = ">=0.19.1"
+Pillow = ">=13.0.0"
 mypy = ">=1.19.1"
 
 [requires]
