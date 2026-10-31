@@ -1,0 +1,107 @@
+{
+	"$comment": "Single source of truth for the NDA guard. Job-internal terms are salted SHA-256 token hashes (node scripts/security/nda-guard.mjs --hash \"<term>\"; keep chars for substring matching); never add them in clear text. Private regexes live in the git-ignored .nda-keywords.local or the NDA_KEYWORDS CI secret. Allow entries need explicit owner approval. Reviewed entries are owner-reviewed line fingerprints (--fingerprint <path>:<line>) that silence private-list findings only.",
+	"roots": ["app", "components", "messages", "public", "lib", "docs"],
+	"patterns": [
+		{
+			"id": "job-employer",
+			"sha256": "e86f940ac29bc5886634191d6008b5fe3a891c04ce45658c473bc75b0457f9bf",
+			"chars": 5
+		},
+		{
+			"id": "job-partner-a",
+			"sha256": "19c696c09b2ada9f01e2e9022c149702ac0b662a198d1067cb05debfebcc81d0",
+			"chars": 8
+		},
+		{
+			"id": "job-partner-b",
+			"sha256": "6631750e266079806c762626796850cd1dac3223e1360c528cd0bed53332dc5a",
+			"words": 2
+		},
+		{
+			"id": "job-code-a",
+			"sha256": "2f60a30fd4fc0156ce4a0b69194eda14fceb25f0fa1aa62318f679457dee320a"
+		},
+		{
+			"id": "job-code-b",
+			"sha256": "2c238a17b87175fa67a95328d6c22ceb612c287a6fd2a8f39ab351acc6f99540"
+		},
+		{ "id": "notion-url", "regex": "notion\\.(so|com)" },
+		{ "id": "sharepoint", "regex": "sharepoint" },
+		{ "id": "employer-jus-mundi", "regex": "jus ?mundi" },
+		{ "id": "employer-finastra", "regex": "finastra|misys" },
+		{ "id": "employer-thomson-reuters", "regex": "thomson reuters" },
+		{
+			"id": "employer-societe-generale",
+			"regex": "soci[eé]t[eé] g[eé]n[eé]rale|sgcib"
+		}
+	],
+	"allow": [
+		{
+			"patterns": [
+				"employer-jus-mundi",
+				"employer-finastra",
+				"employer-thomson-reuters",
+				"employer-societe-generale"
+			],
+			"paths": ["public/cv/"],
+			"scope": "public-mention",
+			"reason": "Published CV: public employer name, role, period and official website only."
+		},
+		{
+			"patterns": ["employer-jus-mundi"],
+			"paths": [
+				"app/components/home/HomeTimelineSection.tsx",
+				"components/RouteHeader.tsx",
+				"messages/en.json",
+				"messages/fr.json",
+				"public/index.html",
+				"public/locales/fr/index.html",
+				"public/assets/nabla/signature/signature.html",
+				"public/nabla.css",
+				"public/theme.css",
+				"public/site-content-page.css"
+			],
+			"scope": "public-mention",
+			"reason": "Career timeline, navigation label, e-mail signature and CSS class names: public employer name only."
+		},
+		{
+			"patterns": ["employer-jus-mundi"],
+			"paths": ["public/jm/", "app/[locale]/jm/"],
+			"scope": "employer-data",
+			"approval": {
+				"role": "CFO",
+				"employer": "Jus Mundi",
+				"reference": "https://github.com/AlbanAndrieu/nabla-site-alban/pull/6"
+			},
+			"reason": "Mission reviews with internal KPIs, validated for publication by the employer's CFO (reported by the owner on 2026-10-31)."
+		},
+		{
+			"patterns": ["notion-url"],
+			"paths": [
+				"app/[locale]/architecture/architectureData.ts",
+				"app/[locale]/nabla/page.tsx"
+			],
+			"line": "notion\\.com/p/albandrieu/",
+			"scope": "personal",
+			"reason": "Author's personal public Notion workspace."
+		},
+		{
+			"patterns": ["notion-url"],
+			"paths": ["public/.well-known/nabla/dsomm-assessment.json"],
+			"scope": "personal",
+			"reason": "Author's private personal Notion pages, not an employer workspace (owner-confirmed on 2026-10-31), cited as DSOMM evidence."
+		}
+	],
+	"reviewed": [
+		{
+			"path": "public/jm/yearly-review-2025-aandrieu.html",
+			"sha256": "004f73f6bfe98099d4eeff6a02125121fe5851d4202d7638c9c179d150123dc0",
+			"reason": "Owner-reviewed on 2026-10-31: safe to publish in the CFO-validated mission review (PR #6)."
+		},
+		{
+			"path": "public/jm/yearly-review-2025-aandrieu.html",
+			"sha256": "a2bd5fb76ff5505d015f4f9688b2fe65bff0ebe770d6adb9cd7efcca0bf7efee",
+			"reason": "Owner-reviewed on 2026-10-31: safe to publish in the CFO-validated mission review (PR #6)."
+		}
+	]
+}

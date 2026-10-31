@@ -136,6 +136,23 @@ maintenance PRs rely on the path/scope classification instead.
 
 Agents must never rely on this post-merge workflow as justification for publishing a branch with a failing or unexecuted quality gate. The mandatory pre-publish policy above remains authoritative. An automated remediation PR is itself untrusted until its explicitly dispatched Quality/Security validation succeeds and it is reviewed/merged through the normal PR path.
 
+### Employer NDA validation gate
+
+Publishing an employer's non-public data (internal KPIs, projects, clients, incidents, tools or
+links) is a security gate. That employer's explicit validation on the PR (approver role, employer,
+PR link) must exist before merge. It is recorded as an `employer-data` allow entry in
+`scripts/security/nda-guard.json`, which `unit-tests/ndaGuard.test.mjs` and the `nda-guard`
+pre-commit hook enforce. Agents never add, widen or reclassify such an entry without that
+validation relayed by the owner, and never invent an approver or a link. Procedure:
+`.agents/skills/nabla-nda-guard/SKILL.md`.
+
+Private keyword lists are merged from `NDA_KEYWORDS`, the checkout's `.nda-keywords.local` and
+`~/.nda-keywords.local`; findings name only `<source>:private-<line>`. Agents never read or print
+these lists, never run the gate with a substitute `HOME` to hide a private finding, and report
+`NDA_PRIVATE_LIST_NOT_RUN` instead of a pass when no list is present. A private finding the owner
+reviews as safe is recorded as a `reviewed` line fingerprint (`--fingerprint <path>:<line>`); it
+covers that exact line only, and agents add one only on the owner's explicit statement in chat.
+
 ## Legacy static 404 rendering exception
 
 `public/404.html`, the public `/404` presentation, and `app/global-not-found.tsx` are an
