@@ -52,6 +52,7 @@ or change HTTP 404/noindex without explicit approval.
 - Full hooks, publication, offline and 404 rules: `docs/agent-policy-details.md`.
 - CI triage and L0–L3 proofs: `.agents/skills/local-first-quality/SKILL.md`.
 - Frontend, a11y, i18n, SEO, responsive: `docs/agent-frontend-standards.md`.
+- NDA: `.agents/skills/nabla-nda-guard/SKILL.md`.
 - Project map / single tests: `docs/agent-developer-guide.md`.
 - Node22 offline L1: `docs/runbooks/node22-fast-local.md`.
 - Roadmaps: `docs/quality-roadmap.md` and `docs/homelab-roadmap.md`.
