@@ -31,6 +31,9 @@ ci:
   -   pyright
   -   schemas
   submodules: true
+default_language_version:
+  # Pin to .nvmrc: mise Node lives under $HOME (ignored by pre-commit) and "latest" breaks nodeenv on pre-releases.
+  node: "24.22.1"
 default_install_hook_types:
 -   pre-commit # Betterleaks
     # make sure you include `prepare-commit-msg` in `default_install_hook_types`
