@@ -1,16 +1,16 @@
 /** Pure SERVICE/OWNER health selection. No network or browser storage access. */
 import type {
-  HomelabHealthEntry,
-  HomelabHealthSnapshot,
-  HomelabHealthState,
+	HomelabHealthEntry,
+	HomelabHealthSnapshot,
+	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
-  canonicalHomelabEvidence,
-  uniqueHomelabEvidenceIndex,
+	canonicalHomelabEvidence,
+	uniqueHomelabEvidenceIndex,
 } from "@/lib/homelabHealthIdentity";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
-import { homelabServiceId, type HomelabService } from "@/lib/homelabServices";
-import { siteHealthIndex, type SiteHealthV2 } from "@/lib/siteHealthV2";
+import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
+import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 
 export type HomelabHealthIndex = {
 	byId: Map<string, HomelabHealthEntry>;
@@ -65,4 +65,3 @@ export function countHealthStates(
 		counts[effectiveState(service, index, healthUnavailable)] += 1;
 	return counts;
 }
-
