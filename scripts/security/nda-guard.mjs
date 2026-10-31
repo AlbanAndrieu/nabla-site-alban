@@ -5,10 +5,12 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { privatePatterns, readPrivateLists } from "./nda-private-lists.mjs";
+
+export { readPrivateLists };
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const CONFIG = new URL("./nda-guard.json", import.meta.url);
-const PRIVATE_LIST = join(ROOT, ".nda-keywords.local");
 // Salted so the public hashes are not lookups in generic rainbow tables.
 const SALT = "nabla-nda-guard:v1:";
 const MAX_REPORTED = 20;
@@ -45,35 +47,9 @@ function invalid(detail) {
 	return new Error(`NDA_GUARD_CONFIG_INVALID: ${detail}`);
 }
 
-// Private regexes, one per line: NDA_KEYWORDS (CI secret) or the git-ignored
-// .nda-keywords.local. null means the private check did not run.
-export function readPrivateList() {
-	if (process.env.NDA_KEYWORDS?.trim()) return process.env.NDA_KEYWORDS;
-	try {
-		return readFileSync(PRIVATE_LIST, "utf8");
-	} catch {
-		return null;
-	}
-}
-
-function privatePatterns(source) {
-	const patterns = [];
-	source.split("\n").forEach((line, index) => {
-		const value = line.trim();
-		if (!value || value.startsWith("#")) return;
-		const id = `private-${index + 1}`;
-		try {
-			patterns.push({ id, regex: new RegExp(value, "iu") });
-		} catch {
-			throw invalid(id); // never echo a private pattern
-		}
-	});
-	return patterns;
-}
-
 export function loadConfig(
 	source = readFileSync(CONFIG, "utf8"),
-	privateList = readPrivateList(),
+	privateLists = readPrivateLists(),
 ) {
 	const raw = JSON.parse(source);
 	if (!Array.isArray(raw.roots) || raw.roots.length === 0) {
@@ -128,12 +104,27 @@ export function loadConfig(
 			line: entry.line ? new RegExp(entry.line, "iu") : null,
 		};
 	});
-	const extra = privateList === null ? null : privatePatterns(privateList);
+	const reviewed = new Set(
+		(raw.reviewed ?? []).map((entry, index) => {
+			if (
+				!entry.path ||
+				!/^[0-9a-f]{64}$/.test(entry.sha256 ?? "") ||
+				!entry.reason?.trim()
+			) {
+				throw invalid(`reviewed[${index}] needs path, sha256 and reason`);
+			}
+			return `${entry.path}:${entry.sha256}`;
+		}),
+	);
+	const extra = privatePatterns(privateLists);
 	return {
 		roots: raw.roots,
-		patterns: [...patterns.values(), ...(extra ?? [])],
+		patterns: [...patterns.values(), ...extra],
 		allow,
-		privateCount: extra?.length ?? null,
+		reviewed,
+		// null, not 0: a list without active pattern did not check anything.
+		privateCount: extra.length || null,
+		privateSources: [...new Set(extra.map((p) => p.id.split(":")[0]))],
 	};
 }
 
@@ -171,17 +162,47 @@ function allowed(config, file, text, id) {
 	);
 }
 
+function spans(regex, text) {
+	return [...text.matchAll(new RegExp(regex.source, "giu"))].map((m) => [
+		m.index,
+		m.index + m[0].length,
+	]);
+}
+
+// A private pattern is never allowlisted itself; it only stays silent on the
+// exact characters an explicit public allow entry already approved.
+function approvedText(approved, regex, text) {
+	return spans(regex, text).every(([start, end]) =>
+		approved.some(([from, to]) => from <= start && end <= to),
+	);
+}
+
+// Manual review of one exact line (like .gitleaksignore): any edit re-opens it.
+export function lineFingerprint(text) {
+	return createHash("sha256")
+		.update(`${SALT}line:${text.replace(/\r$/, "")}`)
+		.digest("hex");
+}
+
 export function scanText(file, content, config) {
 	const findings = [];
 	content.split("\n").forEach((text, index) => {
 		const words = tokens(text);
+		const approved = [];
 		for (const pattern of config.patterns) {
-			if (
-				matches(pattern, text, words) &&
-				!allowed(config, file, text, pattern.id)
-			) {
-				findings.push({ file, line: index + 1, pattern: pattern.id });
+			if (!matches(pattern, text, words)) continue;
+			if (pattern.private) {
+				if (
+					approvedText(approved, pattern.regex, text) ||
+					config.reviewed.has(`${file}:${lineFingerprint(text)}`)
+				) {
+					continue;
+				}
+			} else if (allowed(config, file, text, pattern.id)) {
+				if (pattern.regex) approved.push(...spans(pattern.regex, text));
+				continue;
 			}
+			findings.push({ file, line: index + 1, pattern: pattern.id });
 		}
 	});
 	return findings;
@@ -236,10 +257,21 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 		);
 		process.exit(0);
 	}
+	if (flag === "--fingerprint") {
+		const [, path, line] = /^(.+):(\d+)$/.exec(term ?? "") ?? [];
+		const text =
+			path && readFileSync(join(ROOT, path), "utf8").split("\n")[line - 1];
+		if (text === undefined || !path) {
+			console.error("NDA_GUARD_USAGE: --fingerprint <path>:<line>");
+			process.exit(2);
+		}
+		console.log(JSON.stringify({ path, sha256: lineFingerprint(text) }));
+		process.exit(0);
+	}
 	const config = loadConfig();
 	if (config.privateCount === null) {
 		console.error(
-			"NDA_PRIVATE_LIST_NOT_RUN: no NDA_KEYWORDS or .nda-keywords.local; public list only",
+			"NDA_PRIVATE_LIST_NOT_RUN: no NDA_KEYWORDS, ./.nda-keywords.local or ~/.nda-keywords.local; public list only",
 		);
 	}
 	const findings = scanRepository(config);
@@ -250,5 +282,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 		);
 		process.exit(1);
 	}
-	console.log(`NDA_GUARD_OK private=${config.privateCount ?? "NOT_RUN"}`);
+	console.log(
+		`NDA_GUARD_OK private=${config.privateCount ?? "NOT_RUN"} sources=${config.privateSources.join(",") || "none"}`,
+	);
 }

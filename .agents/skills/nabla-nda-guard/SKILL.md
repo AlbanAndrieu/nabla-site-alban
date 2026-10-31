@@ -18,12 +18,18 @@ single source of truth:
 - `employer-*`: previous employers. The public name is accepted only where an
   `allow` entry says so (CV, career timeline, owner-approved reviews).
 
-Optional private list: one case-insensitive regex per line in the git-ignored
-`.nda-keywords.local`, or in the `NDA_KEYWORDS` environment variable (CI
-secret, takes precedence). Findings show `private-<line>` only. Private patterns
-can never be allowlisted, so keep generic patterns (`notion-url`) in the public
-config. Without a private list, the CLI prints `NDA_PRIVATE_LIST_NOT_RUN` and
-the test is skipped under that name: never report the private check as passed.
+Optional private lists, one case-insensitive regex per line, merged so none
+masks another: the `NDA_KEYWORDS` environment variable (CI secret), the
+checkout's git-ignored `.nda-keywords.local`, then `~/.nda-keywords.local`
+(shared by all projects). Findings show `<source>:private-<line>` only (`env`,
+`repo`, `home`). Never read, print or copy a private list; build test fixtures
+with a temporary `HOME`. A private pattern is never allowlisted itself: it only
+stays silent on the exact characters an explicit public allow entry already
+approved (a previous employer's name in the CV). Keep generic patterns
+(`notion-url`) in the public config. Without any private list, the CLI prints
+`NDA_PRIVATE_LIST_NOT_RUN` and the test is skipped under that name: never
+report the private check as passed, and never run the gate with a fake `HOME`
+to hide a private finding.
 
 ## Check a diff before publication
 
@@ -54,6 +60,18 @@ PR before merge. Record it in the entry as `"approval": { "role", "employer",
 consent. The guard refuses an `employer-data` entry without it. Agents never
 add, widen or reclassify such an entry until the owner relays the employer
 validation with its PR link, and never invent an approver, a role or a link.
+
+## Manual review of a private finding
+
+Like `.gitleaksignore`, `reviewed` entries in `nda-guard.json` record an
+owner-reviewed line: `{ "path", "sha256", "reason" }`, where `sha256` comes from
+`node scripts/security/nda-guard.mjs --fingerprint <path>:<line>`. A review
+silences private-list findings on that exact line only: any edit to the line
+re-opens it, and public patterns (`job-*`, `employer-*`) still need the
+allowlist. Inline markers (`# nosec` style) are not used: JSON has no comments
+and editing legacy HTML triggers a full formatter rewrite. Agents add a
+`reviewed` entry only after the owner states in chat that this line is safe;
+`unit-tests/ndaGuard.test.mjs` fails on a stale fingerprint.
 
 ## On `NDA_GUARD_FINDING <file>:<line> <pattern-id>`
 

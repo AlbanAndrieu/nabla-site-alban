@@ -614,7 +614,7 @@ repos:
         pass_filenames: false
         verbose: true
         stages: [pre-commit]
-        files: ^((app|components|messages|public|lib|docs)/|scripts/security/nda-guard\.(mjs|json)$)
+        files: ^((app|components|messages|public|lib|docs)/|scripts/security/nda-(guard|private-lists)\.(mjs|json)$)
     -   id: lts-stack-contract
         name: "🟢 runtime · Node 24 LTS and Next lock integrity"
         language: system

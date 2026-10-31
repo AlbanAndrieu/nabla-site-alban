@@ -1,5 +1,5 @@
 {
-	"$comment": "Single source of truth for the NDA guard. Job-internal terms are salted SHA-256 token hashes (node scripts/security/nda-guard.mjs --hash \"<term>\"; keep chars for substring matching); never add them in clear text. Private regexes live in the git-ignored .nda-keywords.local or the NDA_KEYWORDS CI secret. Allow entries need explicit owner approval.",
+	"$comment": "Single source of truth for the NDA guard. Job-internal terms are salted SHA-256 token hashes (node scripts/security/nda-guard.mjs --hash \"<term>\"; keep chars for substring matching); never add them in clear text. Private regexes live in the git-ignored .nda-keywords.local or the NDA_KEYWORDS CI secret. Allow entries need explicit owner approval. Reviewed entries are owner-reviewed line fingerprints (--fingerprint <path>:<line>) that silence private-list findings only.",
 	"roots": ["app", "components", "messages", "public", "lib", "docs"],
 	"patterns": [
 		{
@@ -90,6 +90,18 @@
 			"paths": ["public/.well-known/nabla/dsomm-assessment.json"],
 			"scope": "personal",
 			"reason": "Author's private personal Notion pages, not an employer workspace (owner-confirmed on 2026-10-31), cited as DSOMM evidence."
+		}
+	],
+	"reviewed": [
+		{
+			"path": "public/jm/yearly-review-2025-aandrieu.html",
+			"sha256": "004f73f6bfe98099d4eeff6a02125121fe5851d4202d7638c9c179d150123dc0",
+			"reason": "Owner-reviewed on 2026-10-31: safe to publish in the CFO-validated mission review (PR #6)."
+		},
+		{
+			"path": "public/jm/yearly-review-2025-aandrieu.html",
+			"sha256": "a2bd5fb76ff5505d015f4f9688b2fe65bff0ebe770d6adb9cd7efcca0bf7efee",
+			"reason": "Owner-reviewed on 2026-10-31: safe to publish in the CFO-validated mission review (PR #6)."
 		}
 	]
 }
