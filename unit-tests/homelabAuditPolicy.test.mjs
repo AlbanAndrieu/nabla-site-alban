@@ -1,74 +1,161 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { auditHeadersForUrl, expectedAccessMode, auditStoredEntries, classifyAuditAccess, safeRateLimitMetadata, safeAccessDiagnostic } from "../scripts/homelab-audit-policy.mjs";
+import {
+	auditHeadersForUrl,
+	auditStoredEntries,
+	classifyAuditAccess,
+	expectedAccessMode,
+	safeAccessDiagnostic,
+	safeRateLimitMetadata,
+} from "../scripts/homelab-audit-policy.mjs";
+
 test("JWT never reaches third-party assets or redirects", () => {
-  const jwt = "test-jwt", origin = "https://www.albanandrieu.com";
-  assert.equal(auditHeadersForUrl(origin + "/fr/truenas", origin, jwt)["cf-access-jwt-assertion"], jwt);
-  for (const target of ["https://example.com", "https://www.albanandrieu.com.attacker.test", "http://www.albanandrieu.com"]) {
-    assert.equal(auditHeadersForUrl(target, origin, jwt)["cf-access-jwt-assertion"], undefined);
-  }
+	const jwt = "test-jwt",
+		origin = "https://www.albanandrieu.com";
+	assert.equal(
+		auditHeadersForUrl(origin + "/fr/truenas", origin, jwt)[
+			"cf-access-jwt-assertion"
+		],
+		jwt,
+	);
+	for (const target of [
+		"https://example.com",
+		"https://www.albanandrieu.com.attacker.test",
+		"http://www.albanandrieu.com",
+	]) {
+		assert.equal(
+			auditHeadersForUrl(target, origin, jwt)["cf-access-jwt-assertion"],
+			undefined,
+		);
+	}
 });
 test("OWNER SERVICE DENIED modes are fail-closed", () => {
-  assert.equal(expectedAccessMode({ trusted: true }), "owner");
-  assert.equal(expectedAccessMode({ trusted: true, mode: "public-readonly" }), "service");
-  assert.equal(expectedAccessMode({ trusted: false, mode: "public-readonly" }), "denied");
-  assert.equal(expectedAccessMode(null), "denied");
+	assert.equal(expectedAccessMode({ trusted: true }), "owner");
+	assert.equal(
+		expectedAccessMode({ trusted: true, mode: "public-readonly" }),
+		"service",
+	);
+	assert.equal(
+		expectedAccessMode({ trusted: false, mode: "public-readonly" }),
+		"denied",
+	);
+	assert.equal(expectedAccessMode(null), "denied");
 });
 test("public browser cache remains allowlisted", () => {
-  assert.deepEqual(auditStoredEntries([["nabla:homelab:catalog-public-v2:3", "safe"]], "localStorage"), []);
-  assert.equal(auditStoredEntries([["nabla:homelab:owner", "x"]], "sessionStorage").length, 1);
-  assert.equal(auditStoredEntries([["nabla:homelab:health-public-v2:1", "172.17.0.24"]], "localStorage").length, 1);
+	assert.deepEqual(
+		auditStoredEntries(
+			[["nabla:homelab:catalog-public-v2:3", "safe"]],
+			"localStorage",
+		),
+		[],
+	);
+	assert.equal(
+		auditStoredEntries([["nabla:homelab:owner", "x"]], "sessionStorage").length,
+		1,
+	);
+	assert.equal(
+		auditStoredEntries(
+			[["nabla:homelab:health-public-v2:1", "172.17.0.24"]],
+			"localStorage",
+		).length,
+		1,
+	);
+	// Split so detect-private-key does not flag the fixture itself.
+	for (const kind of ["", "RSA ", "OPENSSH "]) {
+		const pem = "-----BEGIN " + kind + "PRIVATE KEY-----";
+		assert.equal(
+			auditStoredEntries([["nabla:homelab:owner-cache", pem]], "localStorage")
+				.length,
+			2,
+		);
+	}
 });
 
 test("HTTP 429 and malformed 200 cannot masquerade as a denied OWNER", () => {
-  for (const status of [429, 403, 502]) {
-    const state = classifyAuditAccess(status, { trusted: false });
-    assert.equal(state.ok, false);
-    assert.equal(state.mode, null);
-  }
-  assert.equal(classifyAuditAccess(429, { trusted: true }).reason, "rate_limited");
-  assert.equal(classifyAuditAccess(200, null).reason, "invalid_access_payload");
-  assert.equal(classifyAuditAccess(200, { trusted: false }).mode, "denied");
-  assert.equal(classifyAuditAccess(200, { trusted: true }).mode, "owner");
+	for (const status of [429, 403, 502]) {
+		const state = classifyAuditAccess(status, { trusted: false });
+		assert.equal(state.ok, false);
+		assert.equal(state.mode, null);
+	}
+	assert.equal(
+		classifyAuditAccess(429, { trusted: true }).reason,
+		"rate_limited",
+	);
+	assert.equal(classifyAuditAccess(200, null).reason, "invalid_access_payload");
+	assert.equal(classifyAuditAccess(200, { trusted: false }).mode, "denied");
+	assert.equal(classifyAuditAccess(200, { trusted: true }).mode, "owner");
 });
 
 test("429 metadata is allowlisted, never echoes secrets", () => {
-  assert.deepEqual(safeRateLimitMetadata({
-    "retry-after": "90",
-    "x-vercel-id": "cdg1::sfo1-1234",
-    "cf-ray": "abc123456789-def",
-    "set-cookie": "do-not-log",
-    "x-diagnostics-key": "do-not-log",
-  }), {
-    retryAfterSeconds: 90,
-    vercelRequestId: "cdg1::sfo1-1234",
-    cloudflareRay: "abc123456789-def",
-  });
-  assert.deepEqual(safeRateLimitMetadata({ "retry-after": "999999", "x-vercel-id": "bad\nSecret:abc" }), {});
+	assert.deepEqual(
+		safeRateLimitMetadata({
+			"retry-after": "90",
+			"x-vercel-id": "cdg1::sfo1-1234",
+			"cf-ray": "abc123456789-def",
+			"set-cookie": "do-not-log",
+			"x-diagnostics-key": "do-not-log",
+		}),
+		{
+			retryAfterSeconds: 90,
+			vercelRequestId: "cdg1::sfo1-1234",
+			cloudflareRay: "abc123456789-def",
+		},
+	);
+	assert.deepEqual(
+		safeRateLimitMetadata({
+			"retry-after": "999999",
+			"x-vercel-id": "bad\nSecret:abc",
+		}),
+		{},
+	);
 });
 
 test("the 200 response diagnostic never contains IPs, credentials or arbitrary fields", () => {
-  assert.deepEqual(safeAccessDiagnostic({
-    reason: "identity-not-authorized", sourceFamily: "ipv4",
-    trustedCidrsConfigured: true, networkAllowed: true, identityRequired: true,
-    clientIp: "192.0.2.20", token: "secret", reasonInjected: "private",
-  }), {
-    reason: "identity-not-authorized", sourceFamily: "ipv4",
-    trustedCidrsConfigured: true, networkAllowed: true, identityRequired: true,
-  });
-  assert.deepEqual(safeAccessDiagnostic({ reason: "127.0.0.1", sourceFamily: "evil", ip: "172.17.0.1" }), null);
+	assert.deepEqual(
+		safeAccessDiagnostic({
+			reason: "identity-not-authorized",
+			sourceFamily: "ipv4",
+			trustedCidrsConfigured: true,
+			networkAllowed: true,
+			identityRequired: true,
+			clientIp: "192.0.2.20",
+			token: "secret",
+			reasonInjected: "private",
+		}),
+		{
+			reason: "identity-not-authorized",
+			sourceFamily: "ipv4",
+			trustedCidrsConfigured: true,
+			networkAllowed: true,
+			identityRequired: true,
+		},
+	);
+	assert.deepEqual(
+		safeAccessDiagnostic({
+			reason: "127.0.0.1",
+			sourceFamily: "evil",
+			ip: "172.17.0.1",
+		}),
+		null,
+	);
 });
 
 test("Vercel challenge indicator is normalized and no raw mitigation value leaks", () => {
-  assert.deepEqual(safeRateLimitMetadata({
-    "x-vercel-mitigated": "challenge",
-    "x-vercel-id": "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
-  }), {
-    vercelRequestId: "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
-    vercelMitigation: "challenge",
-  });
-  assert.deepEqual(safeRateLimitMetadata({
-    "x-vercel-mitigated": "injected\nAuthorization: secret",
-    "set-cookie": "very-private",
-  }), { vercelMitigation: "other" });
+	assert.deepEqual(
+		safeRateLimitMetadata({
+			"x-vercel-mitigated": "challenge",
+			"x-vercel-id": "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
+		}),
+		{
+			vercelRequestId: "cdg1::1792960961-QWL1PtLwi3ae4R5uMvkLm7c94jpNMLWI",
+			vercelMitigation: "challenge",
+		},
+	);
+	assert.deepEqual(
+		safeRateLimitMetadata({
+			"x-vercel-mitigated": "injected\nAuthorization: secret",
+			"set-cookie": "very-private",
+		}),
+		{ vercelMitigation: "other" },
+	);
 });
