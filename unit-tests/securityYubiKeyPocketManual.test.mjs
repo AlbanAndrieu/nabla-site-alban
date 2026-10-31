@@ -15,9 +15,11 @@ test("compact bilingual manual appears before the existing accessible graph", ()
 		"manual must appear before the advanced graph",
 	);
 	assert.match(manual, /<section id="yubikey-manual"/);
-	assert.equal((manual.match(/<details>/g) ?? []).length, 3);
+	assert.equal((manual.match(/<details>/g) ?? []).length, 4);
 	assert.match(css, /@media \(max-width: 680px\)/);
 	assert.match(css, /:focus-visible/);
+	assert.match(manual, /ykman openpgp info/);
+	assert.match(manual, /inspectTitle/);
 });
 
 test("OTP1/OTP2, separate PIV slots, PIN/PUK defaults and reset risks are explained", () => {
