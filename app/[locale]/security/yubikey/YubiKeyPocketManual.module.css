@@ -40,3 +40,5 @@
 	.device { padding: 1rem; }
 	.statuses > div { grid-template-columns: 58px minmax(0, 1fr); }
 }
+
+.command { max-width: 100%; margin: .8rem 0 0; padding: .8rem; overflow-x: auto; white-space: pre; border-radius: .55rem; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; line-height: 1.55; font-size: .88rem; }
