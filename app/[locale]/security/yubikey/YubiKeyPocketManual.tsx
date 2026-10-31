@@ -158,7 +158,7 @@ export default function YubiKeyPocketManual({
 				<details>
 					<summary>{t.inspectTitle}</summary>
 					<p>{t.inspectNote}</p>
-					<pre className={styles.command}><code>{"ykman info\\nykman otp info\\nykman piv info\\nykman fido info\\nykman openpgp info"}</code></pre>
+					<pre className={styles.command}><code>{["ykman info", "ykman otp info", "ykman piv info", "ykman fido info", "ykman openpgp info"].join("\n")}</code></pre>
 				</details>
 				<details>
 					<summary>{t.filesTitle}</summary>
