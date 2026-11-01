@@ -14,6 +14,7 @@ import { GUIDE_COPY } from "./content";
 import styles from "./page.module.css";
 import YubiKeyGraph from "./YubiKeyGraph";
 import YubiKeyUseCases from "./YubiKeyUseCases";
+import YubiKeyPocketManual from "./YubiKeyPocketManual";
 
 export async function generateMetadata({
 	params,
@@ -67,6 +68,7 @@ export default async function YubiKeySecurityPage({
 						className={styles.toc}
 						aria-label={locale === "fr" ? "Sommaire" : "On this page"}
 					>
+						<a href="#yubikey-manual">{locale === "fr" ? "Mémo des clés" : "Key quick reference"}</a>
 						<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
 						<a href="#yubikey-workflow">{copy.workflowTitle}</a>
 						<a href="#yubikey-use-cases">
@@ -76,6 +78,7 @@ export default async function YubiKeySecurityPage({
 						<a href="#yubikey-glossary">{copy.glossaryTitle}</a>
 						<a href="#yubikey-next">{copy.nextTitle}</a>
 					</nav>
+					<YubiKeyPocketManual locale={locale as AppLocale} />
 					<YubiKeyGraph copy={copy} />
 					<section id="yubikey-workflow" className={styles.section}>
 						<h2>{copy.workflowTitle}</h2>
