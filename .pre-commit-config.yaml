@@ -607,6 +607,14 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         files: ^(\.github/workflows/(ci|docker-build|mega-linter|security-rss-opml|security-supply-chain)\.yml|\.pre-commit-config\.yaml|mise\.toml|scripts/agent-quality-gate\.sh|unit-tests/ciBudgetConvergence\.test\.mjs)$
+    -   id: nda-guard
+        name: "🤐 security · Block NDA-sensitive employer terms in published content"
+        language: system
+        entry: node scripts/security/nda-guard.mjs
+        pass_filenames: false
+        verbose: true
+        stages: [pre-commit]
+        files: ^((app|components|messages|public|lib|docs)/|scripts/security/nda-(guard|private-lists)\.(mjs|json)$)
     -   id: lts-stack-contract
         name: "🟢 runtime · Node 24 LTS and Next lock integrity"
         language: system

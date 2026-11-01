@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { GLOSSARY_CATEGORIES } from "../app/[locale]/security/lexique/glossary";
+import { loadConfig, scanText } from "../scripts/security/nda-guard.mjs";
 
 type TermCopy = {
 	acronym: string;
@@ -89,15 +90,13 @@ test("glossary term anchors are unique and sources are HTTPS", () => {
 });
 
 test("public glossary contains no employer-internal references", async () => {
-	const forbidden =
-		/wakam|notion\.(so|com)|sharepoint|protegys|\bC2SO\b|\bC3SI\b/i;
+	const config = loadConfig();
 	for (const locale of ["en", "fr"] as const) {
 		const copy = JSON.stringify(await loadGlossary(locale));
-		assert.doesNotMatch(copy, forbidden, `${locale} glossary copy`);
+		assert.deepEqual(scanText(`glossary-${locale}`, copy, config), []);
 	}
-	assert.doesNotMatch(
-		JSON.stringify(GLOSSARY_CATEGORIES),
-		forbidden,
-		"glossary structure",
+	assert.deepEqual(
+		scanText("glossary-structure", JSON.stringify(GLOSSARY_CATEGORIES), config),
+		[],
 	);
 });
