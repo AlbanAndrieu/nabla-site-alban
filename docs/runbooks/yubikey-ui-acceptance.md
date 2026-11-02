@@ -1,10 +1,12 @@
 # Recette UI publique — Security / YubiKey
 
-Ce runbook concerne **uniquement le site Next.js**. Il ne programme pas de YubiKey, ne teste pas de PIN/PUK et n'accède pas aux fichiers d'escrow. Le matériel, les sauvegardes et les preuves de reprise appartiennent à `nabla-compose`.
+Ce runbook concerne **uniquement le site Next.js**. Il ne programme pas de YubiKey, ne teste pas de PIN/PUK et n'accède pas aux fichiers d'escrow. La référence cible des contrôles matériels et des procédures client est [`nabla-yubikey` PR #1](https://github.com/AlbanAndrieu/nabla-yubikey/pull/1), **non fusionnée** au 01/11/2026. Les anciennes recettes restent dans `nabla-compose` jusqu'à migration attestée ; TrueNAS/NFS appartient toujours à `nabla-compose`.
 
 ## État et périmètre
 
-- Fonctionnalité livrée dans la PR #264, fusionnée le 29 octobre 2026.
+- Fonctionnalité livrée dans la PR #264 (29/10), mémo bilingue dans la PR #277 (fusionnée le 01/11/2026).
+- Page mise à jour depuis les runbooks datés du 31/10 : **KeePassXC validé sur les deux clés**, SSH GitHub principale validé, test secondaire final en attente, OpenPGP matériel non provisionné sur la carte inspectée. Ces informations sont historiques, pas un statut temps réel.
+- Les liens vers les runbooks de `nabla-yubikey` sont **épinglés au commit** `91898cf4901c28856293fe568f4c6f60be46ed22` de la PR #1 : éviter les liens cassés vers `master` tant que les runbooks ne sont pas fusionnés.
 - Deux routes : `/fr/security/yubikey` et `/security/yubikey`.
 - 14 exemples d'usage et 25 entrées de lexique **par langue**.
 - Navigation partagée : icône Home, bouton Back to Home et bouton Back to Top.
@@ -17,7 +19,9 @@ Exécuter dans un checkout propre du dernier commit de la PR de suivi, avec Node
 
 ```bash
 npm ci
-node --test unit-tests/securityYubiKeyGuide.test.mjs
+node --test unit-tests/securityYubiKeyGuide.test.mjs \
+  unit-tests/securityYubiKeyPocketManual.test.mjs \
+  unit-tests/securityYubiKeyEvidence.test.mjs
 
 # Si l'environnement de production publique est accessible :
 BASE_URL=https://www.albanandrieu.com \
@@ -31,7 +35,7 @@ Pour une recette mobile plus large, exécuter ensuite le même fichier avec les 
 
 Pour une Preview Vercel, définir `BASE_URL` vers **l'URL du déploiement correspondant au SHA exact**. Si elle est protégée, utiliser les paramètres `VERCEL_PREVIEW_PROTECTED=true` et `VERCEL_AUTOMATION_BYPASS_SECRET` déjà prévus par `playwright.config.ts`, avec une variable injectée par un gestionnaire de secrets. Ne jamais imprimer le bypass token, le placer dans le dépôt ou le transmettre en paramètre de ligne de commande.
 
-La suite `tests/yubikey.spec.ts` contient **5 scénarios par langue (10 sur Chromium)** : HTTP, langue et URL canonique, 14 fiches/25 sigles, sélection du graphe au clavier, glyphes Font Awesome réellement calculés dans l'en-tête et le footer, clic sur Home/Back to Top, contrôle du défilement sous `prefers-reduced-motion`, mises en page 320/390 px et audit automatique Axe WCAG A/AA sur le graphe, les exemples et le footer. Ces scénarios sont **écrits, pas encore exécutés sur un navigateur par l'agent**. Les rapports Playwright et captures d'écran peuvent inclure des informations de navigation ; ils restent locaux, non publics.
+La suite `tests/yubikey.spec.ts` contient **5 scénarios par langue (10 sur Chromium)** : HTTP, langue et URL canonique, 14 fiches/25 sigles, mémo des deux clés, 4 preuves datées, deux panneaux de détails pour les sources et les sondes, sélection du graphe au clavier, glyphes Font Awesome réellement calculés dans l'en-tête et le footer, clic sur Home/Back to Top, contrôle du défilement sous `prefers-reduced-motion`, mises en page 320/390 px et audit automatique Axe WCAG A/AA sur le graphe, les exemples, la synthèse des preuves et le footer. Ces scénarios sont **écrits, pas encore exécutés sur un navigateur par l'agent**. Les rapports Playwright et captures d'écran peuvent inclure des informations de navigation ; ils restent locaux, non publics.
 
 ## Diagnostic d'accès à la Preview (30 octobre 2026)
 
@@ -53,7 +57,8 @@ Référence : [Vercel — Protection Bypass for Automation](https://vercel.com/d
 2. Activer « réduire les animations » dans le système : Back to Top doit revenir en haut sans mouvement fluide ; sans cette préférence, le défilement fluide reste possible.
 3. Au clavier : tabuler vers les 11 boutons « Sélectionner un composant du graphe », sélectionner avec Entrée/Espace, vérifier `aria-pressed` et le panneau de relations ; confirmer que les nœuds et liens ReactFlow ne constituent pas une seconde série de tabulations. Ouvrir également la liste textuelle des relations (libellé distinct).
 4. Tester 320 et 390 px, zoom navigateur 200 %, modes clair/sombre : pas de débordement horizontal ni de contrôle coupé ; lire et faire défiler les blocs de commande.
-5. Vérifier les liens officiels de chaque scénario, leur avertissement et l'absence de numéro de série, clé privée, secret OTP, PIN/PUK ou adresse LAN dans la page et les rapports.
+5. Ouvrir les sections « Dernières preuves » en FR/EN, vérifier que les quatre constats distinguent PASS/partiel/incomplet, que les commandes `just *-readonly` restent des exemples non exécutés et que les runbooks GitHub épinglés sont disponibles.
+6. Vérifier les liens officiels de chaque scénario, leur avertissement et l'absence de numéro de série, clé privée, secret OTP, PIN/PUK ou adresse LAN dans la page et les rapports.
 
 ## Décision de clôture
 

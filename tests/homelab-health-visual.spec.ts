@@ -30,7 +30,7 @@ for (const theme of ["light", "dark"] as const) {
 		await expect(page.locator(".service-card-ux")).toHaveCount(0);
 		await expect(page.locator("[data-health-state]")).toHaveCount(0);
 		await expect(
-			page.locator('a[href="https://ops.albandrieu.com/"]'),
+			page.locator('[data-homelab-public-readonly-view], [data-homelab-private-denied] a[href="https://ops.albandrieu.com/"]'),
 		).toBeVisible();
 	});
 }

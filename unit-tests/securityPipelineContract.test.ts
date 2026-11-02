@@ -135,6 +135,9 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 		assert.match(workflow, /-J report_json\.json/);
 		assert.match(workflow, /--env ZAP_AUTH_HEADER/);
 		assert.match(workflow, /console\.log" 2>&1/);
+		// The runner UID has no passwd entry in the image, so Java's user.home is "?".
+		assert.match(workflow, /-z "-dir \/tmp\/\.ZAP"/);
+		assert.match(workflow, /JAVA_TOOL_OPTIONS=-Duser\.home=\/tmp/);
 	}
 	assert.doesNotMatch(zapPreview, /actions\/upload-artifact/);
 	assert.match(production, /minimize-zap-report\.mjs/);

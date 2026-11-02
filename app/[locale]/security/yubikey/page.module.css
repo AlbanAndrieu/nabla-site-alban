@@ -310,6 +310,10 @@
 }
 .caseSource a {
 	color: var(--ui-link);
+	/* WCAG 1.4.1: distinguish links without color alone. */
+	text-decoration: underline;
+	text-underline-offset: 0.17em;
+	text-decoration-thickness: 1px;
 }
 .caseDetails summary:focus-visible,
 .command:focus-visible,

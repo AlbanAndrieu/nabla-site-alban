@@ -22,6 +22,6 @@ test("public TrueNAS keeps its service heading without network flow", async ({
 	await expect(heading).not.toContainText("E4E6");
 	await expect(page.locator(".react-flow")).toHaveCount(0);
 	await expect(
-		page.locator('a[href="https://ops.albandrieu.com/"]'),
+		page.locator('[data-homelab-public-readonly-view], [data-homelab-private-denied] a[href="https://ops.albandrieu.com/"]'),
 	).toBeVisible();
 });

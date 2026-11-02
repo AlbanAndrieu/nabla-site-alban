@@ -28,10 +28,18 @@ for attempt in $(seq 1 30); do
 done
 
 access="$(curl -fsS --max-time 5 http://127.0.0.1:18080/api/homelab-access)"
-node -e 'const p = JSON.parse(process.argv[1]); if(p.trusted !== false) process.exit(1)' "${access}" || {
+# Public SERVICE read-only mode is not OWNER authorization.
+node -e 'const p = JSON.parse(process.argv[1]); if(p.trusted !== false && !(p.trusted === true && p.mode === "public-readonly")) process.exit(1)' "${access}" || {
   echo "OWNER access unexpectedly opened without Vercel edge" >&2
   exit 1
 }
+for route in homelab-health homelab-topology homelab-observability runtime-topology; do
+  http_status="$(curl --silent --show-error --max-time 8 --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:18080/api/${route}")"
+  if [[ "${http_status}" != "404" ]]; then
+    echo "Private OWNER endpoint /api/${route} unexpectedly returned HTTP ${http_status}" >&2
+    exit 1
+  fi
+done
 uid="$(docker exec "${container}" id -u)"
 [[ "${uid}" == 10001 ]] || { echo "Unexpected container UID: ${uid}" >&2; exit 1; }
 printf 'K8S_NEXT_STANDALONE_SMOKE_PASS image=%s uid=%s owner=closed\n' "${image}" "${uid}"

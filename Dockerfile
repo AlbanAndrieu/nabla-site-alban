@@ -26,7 +26,11 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
-RUN addgroup -S -g 10001 nextjs \
+# The standalone server invokes node directly. Global npm/npx are not
+# runtime requirements and contain vulnerable transitive packages (Trivy SARIF).
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx \
+    && addgroup -S -g 10001 nextjs \
     && adduser -S -D -H -u 10001 -G nextjs nextjs
 COPY --from=builder --chown=10001:10001 /app/.next/standalone ./
 COPY --from=builder --chown=10001:10001 /app/.next/static ./.next/static

@@ -52,6 +52,16 @@ app/\[locale\]/architecture/page.tsx | \
                     continue
                 fi
                 ;;
+            # Reviewed locale split (PR #278): strings move to content.fr.ts and
+            # content.en.ts; content.ts keeps types and assembles both.
+            app/\[locale\]/security/yubikey/content.ts)
+                if grep -Fq 'from "./content.fr"' "${file}" && \
+                    grep -Fq 'from "./content.en"' "${file}" && \
+                    grep -Fq 'export const GUIDE_COPY_FR: GuideCopy' app/\[locale\]/security/yubikey/content.fr.ts && \
+                    grep -Fq 'export const GUIDE_COPY_EN: GuideCopy' app/\[locale\]/security/yubikey/content.en.ts; then
+                    continue
+                fi
+                ;;
             # Reviewed R1-R3 and R8-R9 component splits (PR #230): rendering stays
             # here while graph builders, state hooks and presentation move to
             # sibling modules.

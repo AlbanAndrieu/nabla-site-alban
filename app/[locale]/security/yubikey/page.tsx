@@ -12,10 +12,11 @@ import {
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
 import styles from "./page.module.css";
-import YubiKeyGraph from "./YubiKeyGraph";
-import YubiKeyUseCases from "./YubiKeyUseCases";
-import YubiKeyPocketManual from "./YubiKeyPocketManual";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
+import YubiKeyEvidence from "./YubiKeyEvidence";
+import YubiKeyGraph from "./YubiKeyGraph";
+import YubiKeyPocketManual from "./YubiKeyPocketManual";
+import YubiKeyUseCases from "./YubiKeyUseCases";
 
 export async function generateMetadata({
 	params,
@@ -69,7 +70,12 @@ export default async function YubiKeySecurityPage({
 						className={styles.toc}
 						aria-label={locale === "fr" ? "Sommaire" : "On this page"}
 					>
-						<a href="#yubikey-manual">{locale === "fr" ? "Mémo des clés" : "Key quick reference"}</a>
+						<a href="#yubikey-manual">
+							{locale === "fr" ? "Mémo des clés" : "Key quick reference"}
+						</a>
+						<a href="#yubikey-evidence">
+							{locale === "fr" ? "État des tests" : "Validation status"}
+						</a>
 						<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
 						<a href="#yubikey-vault-pki">Vault PKI</a>
 						<a href="#yubikey-workflow">{copy.workflowTitle}</a>
@@ -81,6 +87,7 @@ export default async function YubiKeySecurityPage({
 						<a href="#yubikey-next">{copy.nextTitle}</a>
 					</nav>
 					<YubiKeyPocketManual locale={locale as AppLocale} />
+					<YubiKeyEvidence locale={locale as AppLocale} />
 					<YubiKeyGraph copy={copy} />
 					<VaultPkiArchitecture locale={locale} />
 					<section id="yubikey-workflow" className={styles.section}>
