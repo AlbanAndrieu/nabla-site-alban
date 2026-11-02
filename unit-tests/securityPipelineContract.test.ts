@@ -130,7 +130,7 @@ test("Preview and production DAST share a reviewed passive ZAP policy", async ()
 	for (const workflow of [zapPreview, production]) {
 		assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);
 		assert.match(workflow, /ghcr\.io\/zaproxy\/zaproxy:2\.17\.0/);
-		assert.match(workflow, /zap-baseline\.py -t/);
+		assert.match(workflow, /zap-baseline\.py --autooff -t/);
 		assert.match(workflow, /-c rules\.tsv/);
 		assert.match(workflow, /-J report_json\.json/);
 		assert.match(workflow, /--env ZAP_AUTH_HEADER/);
