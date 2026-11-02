@@ -76,7 +76,7 @@ test("ZAP baseline enforces explicit policy and publishes actionable exact-SHA d
 	assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);
 	assert.doesNotMatch(workflow, /actions\/upload-artifact|artifact_name:/);
 	assert.match(workflow, /ghcr\.io\/zaproxy\/zaproxy:2\.17\.0/);
-	assert.match(workflow, /zap-baseline\.py -t "\$PREVIEW_BASE_URL"/);
+	assert.match(workflow, /zap-baseline\.py --autooff -t "\$PREVIEW_BASE_URL"/);
 	assert.match(workflow, /-c rules\.tsv/);
 	assert.match(workflow, /-J report_json\.json -I -T 5 -s/);
 	assert.match(workflow, /--env ZAP_AUTH_HEADER/);
