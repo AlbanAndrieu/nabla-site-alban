@@ -15,6 +15,7 @@ import styles from "./page.module.css";
 import YubiKeyGraph from "./YubiKeyGraph";
 import YubiKeyUseCases from "./YubiKeyUseCases";
 import YubiKeyPocketManual from "./YubiKeyPocketManual";
+import VaultPkiArchitecture from "./VaultPkiArchitecture";
 
 export async function generateMetadata({
 	params,
@@ -70,6 +71,7 @@ export default async function YubiKeySecurityPage({
 					>
 						<a href="#yubikey-manual">{locale === "fr" ? "Mémo des clés" : "Key quick reference"}</a>
 						<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
+						<a href="#yubikey-vault-pki">Vault PKI</a>
 						<a href="#yubikey-workflow">{copy.workflowTitle}</a>
 						<a href="#yubikey-use-cases">
 							{locale === "fr" ? "Exemples" : "Examples"}
@@ -80,6 +82,7 @@ export default async function YubiKeySecurityPage({
 					</nav>
 					<YubiKeyPocketManual locale={locale as AppLocale} />
 					<YubiKeyGraph copy={copy} />
+					<VaultPkiArchitecture locale={locale} />
 					<section id="yubikey-workflow" className={styles.section}>
 						<h2>{copy.workflowTitle}</h2>
 						<div className={styles.stepGrid}>
