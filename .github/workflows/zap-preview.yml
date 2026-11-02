@@ -200,20 +200,21 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-preview.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
+          # Runner-group access only; setgid keeps raw scanner evidence group-private.
+          chmod 2770 "$scan_dir"
           # Raw HTTP traffic and console output remain runner-local only.
           # A scanner may return a blocking exit code with a valid JSON report.
           zap_exit=0
-          # Java ignores HOME; the runner UID has no passwd entry, so pin ZAP's dir.
+          # Use the image's existing unprivileged zap account (UID 1000), with
+          # only the runner's group added to access the mounted private workspace.
           docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --env HOME=/tmp \
-            --env JAVA_TOOL_OPTIONS=-Duser.home=/tmp \
+            --user 1000:1000 \
+            --group-add "$(id -g)" \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
             --volume "$scan_dir:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py --autooff -t "$PREVIEW_BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -s \
-              -z "-dir /tmp/.ZAP" \
             > "$scan_dir/console.log" 2>&1 || zap_exit=$?
           echo "ZAP_SCAN_EXIT_CODE=$zap_exit" >> "$GITHUB_ENV"
           if [[ ! -s "$scan_dir/report_json.json" ]]; then
