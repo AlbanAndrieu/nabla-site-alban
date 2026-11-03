@@ -9,7 +9,10 @@ const page = read(base + "page.tsx");
 const graph = read(base + "YubiKeyGraph.tsx");
 const canvas = read(base + "YubiKeyGraphCanvas.tsx");
 const model = read(base + "model.ts");
-const copy = read(base + "content.ts");
+// Guide copy is split into types plus one module per locale.
+const copy = ["content.ts", "content.fr.ts", "content.en.ts"]
+	.map((file) => read(base + file))
+	.join("\n");
 const catalog = read("lib/sitePageCatalog.ts");
 const resources = read("app/[locale]/security/securityResources.ts");
 

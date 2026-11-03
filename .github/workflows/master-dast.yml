@@ -87,16 +87,20 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-production.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
+          # Runner-group access only; setgid keeps raw scanner evidence group-private.
+          chmod 2770 "$scan_dir"
           # No raw ZAP stdout, JSON, HTML, cookies or request/response bodies
           # may reach job logs, summary, CI artifacts, or DefectDojo.
           set +e
+          # Use the image's existing unprivileged zap account (UID 1000), with
+          # only the runner's group added to access the mounted private workspace.
           docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --env HOME=/tmp \
+            --user 1000:1000 \
+            --group-add "$(id -g)" \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
             --volume "$scan_dir:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:2.17.0 \
-            zap-baseline.py -t "$BASE_URL" -c rules.tsv \
+            zap-baseline.py --autooff -t "$BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -m 2 -a -s \
             > "$scan_dir/console.log" 2>&1
           scan_rc=$?

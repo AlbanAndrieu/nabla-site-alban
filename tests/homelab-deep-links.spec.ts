@@ -12,7 +12,7 @@ test.describe("public homelab deep-link privacy", () => {
 			await expect(page.locator("#truenas-services")).toBeVisible();
 			await expect(page.locator(panel)).toHaveCount(0);
 			await expect(
-				page.locator('a[href="https://ops.albandrieu.com/"]').first(),
+				page.locator('[data-homelab-public-readonly-view], [data-homelab-private-denied] a[href="https://ops.albandrieu.com/"]').first(),
 			).toBeVisible();
 		});
 	}

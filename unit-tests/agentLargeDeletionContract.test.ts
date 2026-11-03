@@ -22,6 +22,11 @@ test("reviewed privacy and module splits keep large deletion exceptions path-sco
 	]) {
 		assert.ok(gate.includes(path), `missing reviewed P0 exception: ${path}`);
 	}
+	assert.match(
+		gate,
+		/security\/yubikey\/content\.ts\)\s*if grep -Fq 'from "\.\/content\.fr"'/,
+		"YubiKey locale split exception must stay conditional",
+	);
 	assert.match(gate, /QUALITY_ALLOW_LARGE_DELETION:-0/);
 	assert.doesNotMatch(ci, /QUALITY_ALLOW_LARGE_DELETION:\s*["']?1["']?/);
 });

@@ -1,0 +1,90 @@
+.section {
+	margin: clamp(1.8rem, 4vw, 3rem) 0;
+	scroll-margin-top: 1.5rem;
+	color: var(--ui-text-primary);
+}
+.section h2 {
+	font-size: clamp(1.45rem, 3vw, 2rem);
+	margin-bottom: 0.6rem;
+}
+.intro {
+	line-height: 1.65;
+	max-width: 78ch;
+	margin-bottom: 0.5rem;
+}
+.date {
+	color: var(--ui-text-muted);
+	font-size: 0.88rem;
+}
+.cards {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.9rem;
+	margin: 1rem 0;
+}
+.card {
+	min-width: 0;
+	padding: 1rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.8rem;
+	background: var(--ui-surface-card);
+}
+.card h3 {
+	font-size: 1.08rem;
+	margin: 0 0 0.4rem;
+}
+.card p {
+	margin: 0.5rem 0;
+	line-height: 1.55;
+}
+.card .state {
+	font-weight: 700;
+}
+.card a,
+.details a {
+	color: var(--ui-link);
+	overflow-wrap: anywhere;
+}
+.details {
+	padding: 0.8rem 1rem;
+	margin-top: 0.7rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.7rem;
+	background: var(--ui-surface-card);
+}
+.details summary {
+	min-height: 32px;
+	cursor: pointer;
+	font-weight: 700;
+}
+.details p,
+.details li {
+	line-height: 1.6;
+}
+.details ul {
+	padding-left: 1.3rem;
+}
+.commands {
+	max-width: 100%;
+	padding: 0.8rem;
+	overflow-x: auto;
+	white-space: pre;
+	background: #0f172a;
+	color: #e2e8f0;
+	border: 1px solid #475569;
+	border-radius: 0.55rem;
+	line-height: 1.6;
+	font-size: 0.88rem;
+}
+.section :is(a, summary):focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+}
+@media (max-width: 680px) {
+	.cards {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.card {
+		padding: 0.9rem;
+	}
+}

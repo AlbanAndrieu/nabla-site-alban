@@ -52,6 +52,11 @@ for (const locale of ["fr", "en"] as const) {
 			await expect(page.locator("#yubikey-graph-title")).toBeVisible();
 			await expect(page.getByText(locale === "fr" ? "Liste accessible des relations du diagramme" : "Accessible list of diagram relationships")).toBeVisible();
 			await expect(page.locator("#yubikey-use-cases")).toBeVisible();
+			await expect(page.locator("#yubikey-evidence article")).toHaveCount(4);
+			const inspect = page.locator("#yubikey-evidence details").first();
+			await inspect.locator("summary").click();
+			await expect(inspect).toHaveAttribute("open", "");
+			await expect(inspect.locator("code")).toContainText("just applets-readonly");
 		});
 
 		test("supports keyboard graph selection and shared footer controls", async ({ page }) => {
@@ -116,6 +121,7 @@ for (const locale of ["fr", "en"] as const) {
 			const audit = await new AxeBuilder({ page })
 				.include("footer[role='contentinfo']")
 				.include("#yubikey-use-cases")
+				.include("#yubikey-evidence")
 				.include("section[aria-labelledby='yubikey-graph-title']")
 				.withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
 				.analyze();
