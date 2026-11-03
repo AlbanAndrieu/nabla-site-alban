@@ -193,6 +193,23 @@ test("YubiKey use cases cover both locales and do not confuse hardware mechanism
 	);
 });
 
+test("YubiKey use-case discovery stays local, accessible and bilingual", () => {
+	const explorer = read(base + "YubiKeyUseCases.tsx");
+	const css = read(base + "page.module.css");
+	assert.match(explorer, /^"use client";/);
+	assert.match(explorer, /type="search"/);
+	assert.match(explorer, /onChange=\{\(event\) => setQuery\(event\.target\.value\)\}/);
+	assert.match(explorer, /aria-pressed=\{filter === level\}/);
+	assert.match(explorer, /role="status"/);
+	assert.match(explorer, /aria-live="polite"/);
+	assert.match(explorer, /normalize\("NFD"\)/);
+	assert.match(explorer, /Effacer les filtres/);
+	assert.match(explorer, /Clear filters/);
+	assert.match(css, /\.useCaseToolbar/);
+	assert.match(css, /\.useCaseFilter:focus-visible/);
+	assert.doesNotMatch(explorer, /\bfetch\(|\blocalStorage\b|\bsessionStorage\b/);
+});
+
 test("YubiKey inherits consistent header/footer Home and Back to Top icons", () => {
 	const header = read("components/RouteHeader.tsx");
 	const footer = read("app/components/Footer.tsx");
@@ -221,7 +238,7 @@ test("YubiKey E2E preflight reports Vercel challenges without masking app failur
 	const e2e = read("tests/yubikey.spec.ts");
 	assert.equal(e2e.split("async function openGuide").length - 1, 1);
 	assert.equal(e2e.split("import { expect, test").length - 1, 1);
-	assert.equal(e2e.split("await openGuide(page, path)").length - 1, 5);
+	assert.equal(e2e.split("await openGuide(page, path)").length - 1, 6);
 	assert.equal(e2e.split('new RegExp(path + "$")').length - 1, 1);
 	assert.match(e2e, /x-vercel-mitigated/);
 	assert.match(e2e, /Vercel Security Checkpoint/);
