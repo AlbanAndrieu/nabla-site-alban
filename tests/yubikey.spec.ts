@@ -74,6 +74,41 @@ for (const locale of ["fr", "en"] as const) {
 			await expect(inspect.locator("code")).toContainText("just applets-readonly");
 		});
 
+		test("filters use cases locally and restores all cards in both languages", async ({ page }) => {
+			await openGuide(page, path);
+			const section = page.locator("#yubikey-use-cases");
+			const cards = section.locator('article[id^="yubikey-use-"]');
+			const search = section.locator("#yubikey-use-case-search");
+			const levelGroup = section.getByRole("group", {
+				name: locale === "fr" ? "Niveau des usages" : "Use case level",
+			});
+			await expect(cards).toHaveCount(14);
+			await expect(levelGroup.getByRole("button", {
+				name: locale === "fr" ? "Tous" : "All",
+			})).toHaveAttribute("aria-pressed", "true");
+			await levelGroup.getByRole("button", {
+				name: locale === "fr" ? "Avancés" : "Advanced",
+			}).click();
+			const advancedCount = await cards.count();
+			expect(advancedCount).toBeGreaterThan(0);
+			expect(advancedCount).toBeLessThan(14);
+			await expect(cards.locator('[data-level="common"]')).toHaveCount(0);
+
+			await search.fill("unmatched-phrase-2026");
+			await expect(cards).toHaveCount(0);
+			await expect(section.getByText(
+				locale === "fr"
+					? "Aucun exemple ne correspond aux critères."
+					: "No examples match these filters.",
+			)).toBeVisible();
+			await section.getByRole("button", {
+				name: locale === "fr" ? "Effacer les filtres" : "Clear filters",
+			}).first().click();
+			await expect(search).toHaveValue("");
+			await expect(cards).toHaveCount(14);
+			await expect(section.getByRole("status")).toContainText("14");
+		});
+
 		test("supports keyboard graph selection and shared footer controls", async ({ page }) => {
 			await openGuide(page, path);
 			const selector = page.getByRole("group", { name: graphSelectorLabel });
