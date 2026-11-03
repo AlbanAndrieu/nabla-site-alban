@@ -1,0 +1,70 @@
+.section {
+	margin: clamp(2rem, 5vw, 3.5rem) 0;
+	scroll-margin-top: 1.5rem;
+	color: var(--ui-text-primary);
+}
+.header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.6rem 1rem;
+}
+.header h2 {
+	font-size: clamp(1.45rem, 3vw, 2rem);
+	margin: 0;
+}
+.planned {
+	padding: 0.35rem 0.7rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 999px;
+	color: var(--ui-text-primary);
+	font-size: 0.85rem;
+	font-weight: 650;
+}
+.intro, .note { max-width: 80ch; line-height: 1.7; }
+.intro { margin: 1rem 0; }
+.diagramFrame {
+	max-width: 100%;
+	overflow-x: auto;
+	border: 1px solid #475569;
+	border-radius: 0.85rem;
+	background: #0f172a;
+}
+.diagram {
+	display: block;
+	width: 100%;
+	min-width: 580px;
+	height: auto;
+}
+.flowTitle { font-size: 1.15rem; margin: 1.25rem 0 0.8rem; }
+.flow {
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.85rem;
+	padding: 0;
+	margin: 0 0 1.25rem;
+}
+.flowStep {
+	min-width: 0;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.75rem;
+	background: var(--ui-surface-card);
+	padding: 1rem;
+	line-height: 1.55;
+}
+.stepNumber {
+	display: inline-block;
+	margin-right: 0.65rem;
+	color: var(--ui-text-muted);
+	font-size: 0.85rem;
+	font-weight: 750;
+}
+.flowStep p { margin: 0.5rem 0 0; overflow-wrap: anywhere; }
+.link a { color: var(--ui-link); text-decoration: underline; text-underline-offset: 0.18em; }
+.link a:focus-visible { outline: 3px solid var(--ui-focus-ring); outline-offset: 3px; }
+@media (max-width: 680px) {
+	.diagramFrame { display: none; }
+	.flow { grid-template-columns: minmax(0, 1fr); }
+	.flowStep { padding: 0.85rem; }
+}
