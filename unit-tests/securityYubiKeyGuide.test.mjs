@@ -198,7 +198,10 @@ test("YubiKey use-case discovery stays local, accessible and bilingual", () => {
 	const css = read(base + "page.module.css");
 	assert.match(explorer, /^"use client";/);
 	assert.match(explorer, /type="search"/);
-	assert.match(explorer, /onChange=\{\(event\) => setQuery\(event\.target\.value\)\}/);
+	assert.match(
+		explorer,
+		/onChange=\{\(event\) => setQuery\(event\.target\.value\)\}/,
+	);
 	assert.match(explorer, /aria-pressed=\{filter === level\}/);
 	assert.match(explorer, /role="status"/);
 	assert.match(explorer, /aria-live="polite"/);
@@ -207,7 +210,10 @@ test("YubiKey use-case discovery stays local, accessible and bilingual", () => {
 	assert.match(explorer, /Clear filters/);
 	assert.match(css, /\.useCaseToolbar/);
 	assert.match(css, /\.useCaseFilter:focus-visible/);
-	assert.doesNotMatch(explorer, /\bfetch\(|\blocalStorage\b|\bsessionStorage\b/);
+	assert.doesNotMatch(
+		explorer,
+		/\bfetch\(|\blocalStorage\b|\bsessionStorage\b/,
+	);
 });
 
 test("YubiKey inherits consistent header/footer Home and Back to Top icons", () => {
