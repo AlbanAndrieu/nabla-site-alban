@@ -158,12 +158,16 @@ export default function YubiKeyEvidence({
 		>
 			<h2 id="yubikey-evidence-title">{t.title}</h2>
 			<p className={styles.intro}>{t.intro}</p>
-			<p className={styles.date}><time dateTime="2026-10-31">{t.updated}</time></p>
+			<p className={styles.date}>
+				<time dateTime="2026-10-31">{t.updated}</time>
+			</p>
 			<div className={styles.cards}>
 				{t.results.map((item) => (
 					<article className={styles.card} key={item.id}>
 						<h3>{item.label}</h3>
-						<p className={styles.state} data-tone={item.tone}>{item.state}</p>
+						<p className={styles.state} data-tone={item.tone}>
+							{item.state}
+						</p>
 						<p>{item.explanation}</p>
 						{item.link ? (
 							<a

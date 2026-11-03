@@ -21,8 +21,14 @@
 	font-size: 0.85rem;
 	font-weight: 650;
 }
-.intro, .note { max-width: 80ch; line-height: 1.7; }
-.intro { margin: 1rem 0; }
+.intro,
+.note {
+	max-width: 80ch;
+	line-height: 1.7;
+}
+.intro {
+	margin: 1rem 0;
+}
 .diagramFrame {
 	max-width: 100%;
 	overflow-x: auto;
@@ -36,7 +42,10 @@
 	min-width: 580px;
 	height: auto;
 }
-.flowTitle { font-size: 1.15rem; margin: 1.25rem 0 0.8rem; }
+.flowTitle {
+	font-size: 1.15rem;
+	margin: 1.25rem 0 0.8rem;
+}
 .flow {
 	list-style: none;
 	display: grid;
@@ -60,11 +69,27 @@
 	font-size: 0.85rem;
 	font-weight: 750;
 }
-.flowStep p { margin: 0.5rem 0 0; overflow-wrap: anywhere; }
-.link a { color: var(--ui-link); text-decoration: underline; text-underline-offset: 0.18em; }
-.link a:focus-visible { outline: 3px solid var(--ui-focus-ring); outline-offset: 3px; }
+.flowStep p {
+	margin: 0.5rem 0 0;
+	overflow-wrap: anywhere;
+}
+.link a {
+	color: var(--ui-link);
+	text-decoration: underline;
+	text-underline-offset: 0.18em;
+}
+.link a:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+}
 @media (max-width: 680px) {
-	.diagramFrame { display: none; }
-	.flow { grid-template-columns: minmax(0, 1fr); }
-	.flowStep { padding: 0.85rem; }
+	.diagramFrame {
+		display: none;
+	}
+	.flow {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.flowStep {
+		padding: 0.85rem;
+	}
 }
