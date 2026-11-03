@@ -10,7 +10,7 @@
 - Root `package.json` and `package-lock.json` are the only application npm manifests.
 - Vercel deployment is handled by Git Integration; there is no local Vercel CLI deployment path.
 - OpenCommit is retained as an on-demand local commit-message helper through `npm run oco` / `npm run opencommit`; no GitHub OpenCommit workflow is versioned.
-- Next DevTools MCP is invoked on demand with `npx -y next-devtools-mcp@latest`; it is not a project dependency.
+- Next DevTools MCP is invoked on demand with `npx -y next-devtools-mcp@0.4.0`; it is not a project dependency.
 
 ## Working rules
 

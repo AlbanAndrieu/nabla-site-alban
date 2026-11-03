@@ -157,5 +157,6 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 	assert.ok(packageJson.devDependencies?.["lodash-es"]);
 	assert.equal(packageJson.dependencies?.["lodash-es"], undefined);
 	assert.match(instrumentation, /from "@vercel\/otel"/);
-	assert.match(mcp, /next-devtools-mcp@latest/);
+	assert.match(mcp, /"next-devtools-mcp@\d+\.\d+\.\d+"/);
+	assert.doesNotMatch(mcp, /@latest/);
 });
