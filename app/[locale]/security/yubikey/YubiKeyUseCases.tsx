@@ -40,16 +40,16 @@ export default function YubiKeyUseCases({
 							<p>
 								<strong>{labels.caution} :</strong> {item.caution}
 							</p>
+							{item.code ? (
+								<pre
+									className={styles.command}
+									tabIndex={0}
+									aria-label={item.title}
+								>
+									<code>{item.code}</code>
+								</pre>
+							) : null}
 						</details>
-						{item.code ? (
-							<pre
-								className={styles.command}
-								tabIndex={0}
-								aria-label={item.title}
-							>
-								<code>{item.code}</code>
-							</pre>
-						) : null}
 						<p className={styles.caseSource}>
 							{labels.source} :{" "}
 							<a

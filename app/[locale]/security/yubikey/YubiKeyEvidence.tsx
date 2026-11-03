@@ -16,6 +16,7 @@ const evidence = {
 		results: [
 			{
 				id: "keepassxc",
+				tone: "verified",
 				label: "Coffre KeePassXC",
 				state: "Validé sur les deux clés",
 				explanation:
@@ -24,6 +25,7 @@ const evidence = {
 			},
 			{
 				id: "ssh",
+				tone: "partial",
 				label: "SSH FIDO2",
 				state: "Partiellement validé",
 				explanation:
@@ -32,6 +34,7 @@ const evidence = {
 			},
 			{
 				id: "applets",
+				tone: "inventory",
 				label: "Applet PIV / OpenPGP",
 				state: "Inventaire seulement",
 				explanation:
@@ -40,6 +43,7 @@ const evidence = {
 			},
 			{
 				id: "recovery",
+				tone: "pending",
 				label: "Reprise et sauvegardes",
 				state: "À compléter",
 				explanation:
@@ -80,6 +84,7 @@ const evidence = {
 		results: [
 			{
 				id: "keepassxc",
+				tone: "verified",
 				label: "KeePassXC vault",
 				state: "Verified with both keys",
 				explanation:
@@ -88,6 +93,7 @@ const evidence = {
 			},
 			{
 				id: "ssh",
+				tone: "partial",
 				label: "FIDO2 SSH",
 				state: "Partially verified",
 				explanation:
@@ -96,6 +102,7 @@ const evidence = {
 			},
 			{
 				id: "applets",
+				tone: "inventory",
 				label: "PIV / OpenPGP applets",
 				state: "Inventory only",
 				explanation:
@@ -104,6 +111,7 @@ const evidence = {
 			},
 			{
 				id: "recovery",
+				tone: "pending",
 				label: "Backup and recovery",
 				state: "Incomplete",
 				explanation:
@@ -150,12 +158,16 @@ export default function YubiKeyEvidence({
 		>
 			<h2 id="yubikey-evidence-title">{t.title}</h2>
 			<p className={styles.intro}>{t.intro}</p>
-			<p className={styles.date}>{t.updated}</p>
+			<p className={styles.date}>
+				<time dateTime="2026-10-31">{t.updated}</time>
+			</p>
 			<div className={styles.cards}>
 				{t.results.map((item) => (
 					<article className={styles.card} key={item.id}>
 						<h3>{item.label}</h3>
-						<p className={styles.state}>{item.state}</p>
+						<p className={styles.state} data-tone={item.tone}>
+							{item.state}
+						</p>
 						<p>{item.explanation}</p>
 						{item.link ? (
 							<a
@@ -172,7 +184,7 @@ export default function YubiKeyEvidence({
 			<details className={styles.details}>
 				<summary>{t.moreTitle}</summary>
 				<p>{t.more}</p>
-				<pre className={styles.commands}>
+				<pre className={styles.commands} tabIndex={0} aria-label={t.moreTitle}>
 					<code>
 						{[
 							"just dependencies-readonly",

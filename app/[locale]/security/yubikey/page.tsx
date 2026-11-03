@@ -67,25 +67,72 @@ export default async function YubiKeySecurityPage({
 						{copy.disclaimer}
 					</p>
 					<nav
-						className={styles.toc}
-						aria-label={locale === "fr" ? "Sommaire" : "On this page"}
+						className={styles.quickPaths}
+						aria-label={
+							locale === "fr" ? "Parcours YubiKey" : "YubiKey journeys"
+						}
 					>
-						<a href="#yubikey-manual">
-							{locale === "fr" ? "Mémo des clés" : "Key quick reference"}
-						</a>
-						<a href="#yubikey-evidence">
-							{locale === "fr" ? "État des tests" : "Validation status"}
-						</a>
-						<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
-						<a href="#yubikey-vault-pki">Vault PKI</a>
-						<a href="#yubikey-workflow">{copy.workflowTitle}</a>
-						<a href="#yubikey-use-cases">
-							{locale === "fr" ? "Exemples" : "Examples"}
-						</a>
-						<a href="#yubikey-safety">{copy.safetyTitle}</a>
-						<a href="#yubikey-glossary">{copy.glossaryTitle}</a>
-						<a href="#yubikey-next">{copy.nextTitle}</a>
+						{[
+							{
+								href: "#yubikey-manual",
+								label:
+									locale === "fr"
+										? "Comparer les deux clés"
+										: "Compare both keys",
+							},
+							{
+								href: "#yubikey-evidence",
+								label:
+									locale === "fr"
+										? "Lire les validations"
+										: "Review validations",
+							},
+							{
+								href: "#yubikey-vault-pki",
+								label: locale === "fr" ? "Comprendre la PKI" : "Understand PKI",
+							},
+							{
+								href: "#yubikey-use-cases",
+								label:
+									locale === "fr" ? "Explorer les usages" : "Explore use cases",
+							},
+						].map((item, index) => (
+							<a key={item.href} href={item.href} className={styles.quickPath}>
+								<span className={styles.quickNumber} aria-hidden="true">
+									{String(index + 1).padStart(2, "0")}
+								</span>
+								<strong>{item.label}</strong>
+								<span aria-hidden="true">↓</span>
+							</a>
+						))}
 					</nav>
+					<details className={styles.tocDisclosure}>
+						<summary>
+							{locale === "fr"
+								? "Afficher toutes les rubriques"
+								: "Show all sections"}
+						</summary>
+						<nav
+							className={styles.toc}
+							aria-label={locale === "fr" ? "Sommaire" : "On this page"}
+						>
+							<a href="#yubikey-manual">
+								{locale === "fr" ? "Mémo des clés" : "Key quick reference"}
+							</a>
+							<a href="#yubikey-evidence">
+								{locale === "fr" ? "État des tests" : "Validation status"}
+							</a>
+							<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
+							<a href="#yubikey-vault-pki">Vault PKI</a>
+							<a href="#yubikey-workflow">{copy.workflowTitle}</a>
+							<a href="#yubikey-use-cases">
+								{locale === "fr" ? "Exemples" : "Examples"}
+							</a>
+							<a href="#yubikey-safety">{copy.safetyTitle}</a>
+							<a href="#yubikey-glossary">{copy.glossaryTitle}</a>
+							<a href="#yubikey-next">{copy.nextTitle}</a>
+						</nav>
+					</details>
 					<YubiKeyPocketManual locale={locale as AppLocale} />
 					<YubiKeyEvidence locale={locale as AppLocale} />
 					<YubiKeyGraph copy={copy} />
@@ -127,8 +174,10 @@ export default async function YubiKeySecurityPage({
 									<h3>
 										<abbr title={term.expansion}>{term.acronym}</abbr>
 									</h3>
-									<p className={styles.expansion}>{term.expansion}</p>
-									<p>{term.meaning}</p>
+									<details className={styles.glossaryDisclosure}>
+										<summary>{term.expansion}</summary>
+										<p>{term.meaning}</p>
+									</details>
 								</article>
 							))}
 						</div>
