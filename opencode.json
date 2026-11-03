@@ -85,7 +85,7 @@
 	"mcp": {
 		"next-devtools": {
 			"type": "local",
-			"command": ["npx", "-y", "next-devtools-mcp@latest"],
+			"command": ["npx", "-y", "next-devtools-mcp@0.4.0"],
 			"enabled": true,
 			"environment": {}
 		}

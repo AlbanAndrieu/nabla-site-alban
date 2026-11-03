@@ -11,7 +11,7 @@ Use `/AGENTS.md` as the canonical policy and `docs/agent-frontend-standards.md` 
 - `instrumentation.ts` actively registers OpenTelemetry through `@vercel/otel`.
 - Browser analytics are loaded by the shared analytics script; do not add duplicate `@vercel/analytics` or Speed Insights SDK integration.
 - Vercel Git Integration owns Preview/production deployment; do not restore a local Vercel CLI wrapper.
-- Next DevTools MCP is available on demand through `npx -y next-devtools-mcp@latest`.
+- Next DevTools MCP is available on demand through `npx -y next-devtools-mcp@0.4.0`.
 
 ## Commands
 
