@@ -16,7 +16,7 @@ const FILTER_LABELS = {
 		common: "Courants",
 		advanced: "Avancés",
 		results: (count: number, total: number) =>
-			`${count} exemple${count > 1 ? "s" : ""} sur ${total}`,
+			`${count} exemple${count !== 1 ? "s" : ""} sur ${total}`,
 		empty: "Aucun exemple ne correspond aux critères.",
 		reset: "Effacer les filtres",
 	},
@@ -112,7 +112,7 @@ export default function YubiKeyUseCases({
 				<p role="status" aria-live="polite" aria-atomic="true">
 					{copy.results(visibleCases.length, cases.length)}
 				</p>
-				{(filter !== "all" || needle) && (
+				{visibleCases.length > 0 && (filter !== "all" || needle) && (
 					<button type="button" className={styles.useCaseReset} onClick={reset}>
 						{copy.reset}
 					</button>
