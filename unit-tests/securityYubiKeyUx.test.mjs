@@ -49,6 +49,6 @@ test("planned Vault PKI uses a mobile-readable lifecycle instead of horizontal s
 	assert.match(diagram, /flow\.map/);
 	assert.match(diagram, /Architecture cible, non déployée/);
 	assert.match(styles, /@media \(max-width: 680px\)/);
-	assert.match(styles, /\.diagramFrame \{ display: none; \}/);
+	assert.match(styles, /\.diagramFrame\s*\{\s*display:\s*none;/);
 	assert.doesNotMatch(diagram, /fetch\(|localStorage|sessionStorage/);
 });
