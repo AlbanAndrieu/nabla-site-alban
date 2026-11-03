@@ -56,8 +56,13 @@ export default function YubiKeyUseCases({
 		if (filter !== "all" && item.level !== filter) return false;
 		if (!needle) return true;
 		return normalizeSearch(
-			[item.title, item.mechanism, item.purpose, item.prerequisites, item.caution]
-				.join(" "),
+			[
+				item.title,
+				item.mechanism,
+				item.purpose,
+				item.prerequisites,
+				item.caution,
+			].join(" "),
 		).includes(needle);
 	});
 
