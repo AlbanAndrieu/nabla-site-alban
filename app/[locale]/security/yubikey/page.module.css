@@ -286,6 +286,9 @@
 .caseDetails summary {
 	cursor: pointer;
 	font-weight: 650;
+	min-height: 44px;
+	display: list-item;
+	padding-block: 0.55rem;
 }
 .caseDetails p {
 	margin: 0.65rem 0;
@@ -405,11 +408,6 @@
 }
 .glossaryDisclosure p {
 	margin: 0.5rem 0;
-}
-.caseDetails summary {
-	min-height: 44px;
-	display: list-item;
-	padding-block: 0.55rem;
 }
 .caseDetails[open] {
 	border-top: 1px solid var(--ui-border);
