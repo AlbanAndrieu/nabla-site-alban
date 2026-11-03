@@ -426,3 +426,119 @@
 		align-items: center;
 	}
 }
+
+/* Use-case discovery: keyboard-friendly and responsive, with no analytics. */
+.useCaseToolbar {
+	display: flex;
+	align-items: end;
+	flex-wrap: wrap;
+	gap: 1rem 1.25rem;
+	padding: 1.15rem;
+	margin: 1.15rem 0 0.4rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.85rem;
+	background: var(--ui-surface-card);
+}
+.useCaseSearch {
+	flex: 1 1 17rem;
+	min-width: 0;
+}
+.useCaseSearch label {
+	display: block;
+	font-weight: 700;
+	margin-bottom: 0.4rem;
+	color: var(--ui-text-primary);
+}
+.useCaseSearch input {
+	display: block;
+	width: 100%;
+	min-width: 0;
+	min-height: 44px;
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.55rem;
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	font: inherit;
+}
+.useCaseSearch input::placeholder {
+	color: var(--ui-text-muted);
+	opacity: 1;
+}
+.useCaseHelp {
+	font-size: 0.84rem;
+	line-height: 1.5;
+	color: var(--ui-text-muted);
+	margin: 0.35rem 0 0;
+}
+.useCaseFilters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.45rem;
+}
+.useCaseFilter,
+.useCaseReset {
+	min-height: 44px;
+	padding: 0.55rem 0.85rem;
+	font: inherit;
+	font-weight: 600;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.55rem;
+	background: var(--ui-surface-card);
+	color: var(--ui-text-primary);
+	cursor: pointer;
+}
+.useCaseFilter[aria-pressed="true"] {
+	border-color: var(--ui-link);
+	box-shadow: inset 0 0 0 2px var(--ui-link);
+}
+.useCaseFilter:hover,
+.useCaseReset:hover {
+	border-color: var(--ui-link);
+}
+.useCaseResults {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	margin: 0.75rem 0 1rem;
+}
+.useCaseResults p {
+	color: var(--ui-text-muted);
+	font-weight: 650;
+	margin: 0;
+}
+.useCaseReset {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+.useCaseEmpty {
+	padding: 1.6rem;
+	border: 1px dashed var(--ui-border);
+	border-radius: 0.8rem;
+	text-align: center;
+	background: var(--ui-surface-card);
+}
+.useCaseEmpty p {
+	color: var(--ui-text-primary);
+	margin-bottom: 0.8rem;
+}
+.useCaseSearch input:focus-visible,
+.useCaseFilter:focus-visible,
+.useCaseReset:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+}
+@media (max-width: 480px) {
+	.useCaseToolbar {
+		padding: 0.8rem;
+	}
+	.useCaseFilters {
+		width: 100%;
+	}
+	.useCaseFilter {
+		flex: 1;
+	}
+}
