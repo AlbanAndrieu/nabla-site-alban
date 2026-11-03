@@ -49,6 +49,21 @@ for (const locale of ["fr", "en"] as const) {
 			await expect(cases).toHaveCount(14);
 			await expect(cases.locator('a[href^="https://"]')).toHaveCount(14);
 			await expect(page.locator("#yubikey-glossary article")).toHaveCount(25);
+			await expect(
+				page.getByRole("navigation", {
+					name: locale === "fr" ? "Parcours YubiKey" : "YubiKey journeys",
+				}).getByRole("link"),
+			).toHaveCount(4);
+			await expect(page.locator("#yubikey-glossary article details")).toHaveCount(25);
+			const firstTerm = page.locator("#yubikey-glossary article details").first();
+			await expect(firstTerm).not.toHaveAttribute("open", "");
+			await firstTerm.locator("summary").click();
+			await expect(firstTerm).toHaveAttribute("open", "");
+			const sshExample = page.locator("#yubikey-use-ssh-fido details");
+			await expect(sshExample).not.toHaveAttribute("open", "");
+			await sshExample.locator("summary").click();
+			await expect(sshExample.locator("pre")).toBeVisible();
+			await expect(page.locator("#yubikey-vault-pki ol li")).toHaveCount(4);
 			await expect(page.locator("#yubikey-graph-title")).toBeVisible();
 			await expect(page.getByText(locale === "fr" ? "Liste accessible des relations du diagramme" : "Accessible list of diagram relationships")).toBeVisible();
 			await expect(page.locator("#yubikey-use-cases")).toBeVisible();
@@ -143,6 +158,8 @@ for (const locale of ["fr", "en"] as const) {
 					scroll: document.documentElement.scrollWidth,
 				}));
 				expect(dimensions.scroll, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(dimensions.client + 1);
+				await expect(page.locator("#yubikey-vault-pki svg")).toBeHidden();
+				await expect(page.locator("#yubikey-vault-pki ol li")).toHaveCount(4);
 				const selectors = page.getByRole("group", { name: graphSelectorLabel }).getByRole("button");
 				await expect(selectors).toHaveCount(11);
 				const first = await selectors.first().boundingBox();

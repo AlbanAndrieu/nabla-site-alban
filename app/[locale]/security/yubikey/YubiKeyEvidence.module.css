@@ -88,3 +88,21 @@
 		padding: 0.9rem;
 	}
 }
+
+/* Statuses must be understandable from their text, not their color. */
+.card .state {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.35rem 0.65rem;
+	border: 1px solid var(--ui-border);
+	border-radius: 0.55rem;
+	background: var(--ui-surface-card);
+	font-size: 0.88rem;
+	line-height: 1.35;
+}
+.state[data-tone="verified"] { border-inline-start: 4px solid #0d9488; }
+.state[data-tone="partial"], .state[data-tone="inventory"] { border-inline-start: 4px solid #b45309; }
+.state[data-tone="pending"] { border-inline-start: 4px solid #64748b; }
+.details summary { min-height: 44px; padding-block: 0.55rem; }
+.card a, .details a { text-decoration: underline; text-underline-offset: 0.15em; }
+.commands:focus-visible { outline: 3px solid var(--ui-focus-ring); outline-offset: 3px; }
