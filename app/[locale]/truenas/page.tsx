@@ -19,6 +19,9 @@ import ToolsSection from "../../components/truenas/ToolsSection";
 
 type Props = { params: Promise<{ locale: string }> };
 
+// Public shell only: interactive data remains client-side and OWNER APIs stay gated.
+export const dynamic = "force-static";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { locale } = await params;
 	if (!hasLocale(routing.locales, locale)) return {};
