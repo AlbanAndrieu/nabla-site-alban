@@ -116,6 +116,12 @@ export function GET(request: Request) {
 		{
 			width: SOCIAL_CARD_WIDTH,
 			height: SOCIAL_CARD_HEIGHT,
+			// Public, URL-addressed card variants can be reused at the CDN.
+			// Keep all OWNER/SERVICE API responses uncached.
+			headers: {
+				"Cache-Control":
+					"public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000",
+			},
 		},
 	);
 }
