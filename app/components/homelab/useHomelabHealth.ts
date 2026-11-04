@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
+import { reconcileCatalogFailure } from "@/lib/homelabCatalogFailureReconciliation";
+import {
+	type CatalogFailureStage,
+	parseOwnerCatalogIncident,
+} from "@/lib/homelabCatalogFailureStage";
+import {
+	type CatalogScope,
+	catalogScopeMatches,
+	classifyCatalogFailure,
+} from "@/lib/homelabClientAccessBoundary";
 import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { parseOwnerCatalogIncident, type CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
-import { reconcileCatalogFailure } from "@/lib/homelabCatalogFailureReconciliation";
-import {
-	catalogScopeMatches,
-	classifyCatalogFailure,
-	type CatalogScope,
-} from "@/lib/homelabClientAccessBoundary";
+import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
 	CATALOG_REVALIDATION_MS,
 	catalogRevalidationDue,
@@ -20,22 +24,16 @@ import {
 	writePublicCatalogCache,
 	writePublicHealthCache,
 } from "@/lib/homelabPublicBrowserCache";
+import { type HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
 	boundedHomelabSignal,
 	homelabRetryDelayMs,
 } from "@/lib/homelabSlowApiPolicy";
-import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
-import {
-	type HomelabServicesCatalog,
-} from "@/lib/homelabServices";
 import {
 	parseServiceTopology,
 	type ServiceTopology,
 } from "@/lib/serviceTopology";
-import {
-	parseSiteHealthV2,
-	type SiteHealthV2,
-} from "@/lib/siteHealthV2";
+import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
 // SERVICE projection is not an operator console; reduce Vercel function calls.
@@ -91,13 +89,19 @@ class CatalogV2Unavailable extends Error {
 	constructor(
 		readonly reason: "key-missing" | "access-denied" | "unavailable",
 		readonly revokePublicCache = false,
-		readonly incident: { stage: CatalogFailureStage; requestId: string } | null = null,
+		readonly incident: {
+			stage: CatalogFailureStage;
+			requestId: string;
+		} | null = null,
 	) {
 		super("Backstage v2 catalog unavailable");
 	}
 }
 
-async function fetchCatalog(signal: AbortSignal, readOnly: boolean): Promise<{
+async function fetchCatalog(
+	signal: AbortSignal,
+	readOnly: boolean,
+): Promise<{
 	catalog: HomelabServicesCatalog;
 	topology: ServiceTopology | null;
 }> {
@@ -108,11 +112,17 @@ async function fetchCatalog(signal: AbortSignal, readOnly: boolean): Promise<{
 	if (!response.ok) {
 		const body: unknown = await response.json().catch(() => null);
 		const policy = classifyCatalogFailure(response.status, body);
-		const incident = readOnly ? null : parseOwnerCatalogIncident(
-			response.headers.get("X-Nabla-Diagnostic-Stage"),
-			response.headers.get("X-Nabla-Request-ID"),
+		const incident = readOnly
+			? null
+			: parseOwnerCatalogIncident(
+					response.headers.get("X-Nabla-Diagnostic-Stage"),
+					response.headers.get("X-Nabla-Request-ID"),
+				);
+		throw new CatalogV2Unavailable(
+			policy.reason,
+			policy.revokePublicCache,
+			incident,
 		);
-		throw new CatalogV2Unavailable(policy.reason, policy.revokePublicCache, incident);
 	}
 	const payload: unknown = await response.json();
 	if (
@@ -237,13 +247,13 @@ export function applyHealthCycle(
 	};
 }
 
+export type { HomelabHealthIndex } from "./homelabHealthSelectors";
 // Preserve the existing API consumed by TrueNAS and Architecture cards.
 export {
-  countHealthStates,
-  effectiveState,
-  healthIndex,
+	countHealthStates,
+	effectiveState,
+	healthIndex,
 } from "./homelabHealthSelectors";
-export type { HomelabHealthIndex } from "./homelabHealthSelectors";
 
 /**
  * Revalidates the canonical catalog periodically while polling service health.
@@ -274,27 +284,35 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				return null;
 			}
 		})();
-		const cachedCatalog = publicStorage ? readPublicCatalogCache(publicStorage) : null;
+		const cachedCatalog = publicStorage
+			? readPublicCatalogCache(publicStorage)
+			: null;
 		let activeCatalogRevision = cachedCatalog?.catalog.catalogRevision ?? null;
 		// Hydrate after effect setup rather than setting state synchronously
 		// from the effect body. Abort the update if access mode has changed.
 		// Only the validated SERVICE cache can enter public browser state.
 		queueMicrotask(() => {
 			if (initialController.signal.aborted) return;
-			setState(cachedCatalog
-				? {
-					...INITIAL_HOMELAB_SERVICES_STATE,
-					catalog: cachedCatalog.catalog,
-					topology: cachedCatalog.topology,
-					catalogStale: true,
-					catalogScope: "public",
-					// Stale health is never promoted to a fresh/green probe.
-					siteHealth: publicStorage && activeCatalogRevision
-						? readStalePublicHealthCache(publicStorage, activeCatalogRevision)
-						: null,
-					healthUnavailable: true,
-				}
-				: INITIAL_HOMELAB_SERVICES_STATE);
+			setState(
+				cachedCatalog
+					? {
+							...INITIAL_HOMELAB_SERVICES_STATE,
+							catalog: cachedCatalog.catalog,
+							topology: cachedCatalog.topology,
+							catalogStale: true,
+							catalogScope: "public",
+							// Stale health is never promoted to a fresh/green probe.
+							siteHealth:
+								publicStorage && activeCatalogRevision
+									? readStalePublicHealthCache(
+											publicStorage,
+											activeCatalogRevision,
+										)
+									: null,
+							healthUnavailable: true,
+						}
+					: INITIAL_HOMELAB_SERVICES_STATE,
+			);
 		});
 
 		const runHealthCycle = async (signal: AbortSignal) => {
@@ -302,8 +320,12 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			// Each failed cycle increases the spacing; a healthy cycle resets it.
 			const recordCycle = (successful: boolean) => {
 				if (signal.aborted) return;
-				consecutiveHealthFailures = successful ? 0 : consecutiveHealthFailures + 1;
-				nextHealthAttemptAt = successful ? 0 : Date.now() + homelabRetryDelayMs(consecutiveHealthFailures);
+				consecutiveHealthFailures = successful
+					? 0
+					: consecutiveHealthFailures + 1;
+				nextHealthAttemptAt = successful
+					? 0
+					: Date.now() + homelabRetryDelayMs(consecutiveHealthFailures);
 			};
 			setState((current) => ({ ...current, healthRefreshing: true }));
 			if (readOnly) {
@@ -321,7 +343,10 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 					if (response.ok) {
 						siteHealth = parseSiteHealthV2(await response.json());
 						// A new health revision cannot validate an older catalog.
-						if (activeCatalogRevision && siteHealth?.catalogRevision !== activeCatalogRevision)
+						if (
+							activeCatalogRevision &&
+							siteHealth?.catalogRevision !== activeCatalogRevision
+						)
 							siteHealth = null;
 						if (siteHealth && publicStorage && activeCatalogRevision)
 							writePublicHealthCache(publicStorage, siteHealth);
@@ -357,19 +382,34 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 				headers: { Accept: "application/json" },
 			})
 				.then(async (response) => ({
-					siteHealth: response.ok ? parseSiteHealthV2(await response.json()) : null,
-					traceId: /^[a-f0-9]{32}$/.test(response.headers.get("X-Nabla-Trace-ID") ?? "")
-						? response.headers.get("X-Nabla-Trace-ID") : null,
-					confirmed: response.headers.get("X-Nabla-Trace-Propagation") === "confirmed",
+					siteHealth: response.ok
+						? parseSiteHealthV2(await response.json())
+						: null,
+					traceId: /^[a-f0-9]{32}$/.test(
+						response.headers.get("X-Nabla-Trace-ID") ?? "",
+					)
+						? response.headers.get("X-Nabla-Trace-ID")
+						: null,
+					confirmed:
+						response.headers.get("X-Nabla-Trace-Propagation") === "confirmed",
 				}))
 				.then(({ siteHealth, traceId, confirmed }) => {
 					if (!signal.aborted)
-						setState((current) => ({ ...current, siteHealth, siteHealthTraceId: traceId,
-							siteHealthTraceConfirmed: Boolean(traceId && confirmed) }));
+						setState((current) => ({
+							...current,
+							siteHealth,
+							siteHealthTraceId: traceId,
+							siteHealthTraceConfirmed: Boolean(traceId && confirmed),
+						}));
 				})
 				.catch(() => {
 					if (!signal.aborted)
-						setState((current) => ({ ...current, siteHealth: null, siteHealthTraceId: null, siteHealthTraceConfirmed: false }));
+						setState((current) => ({
+							...current,
+							siteHealth: null,
+							siteHealthTraceId: null,
+							siteHealthTraceConfirmed: false,
+						}));
 				});
 			// Keep SERVICE v2 polling even after Vercel's OWNER boundary is confirmed.
 			if (ownerUpstreamBlocked) {
@@ -399,8 +439,11 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			if (document.hidden) return;
 			// A tab focus right after a tick (or the initial cycle) must not
 			// fire a second identical burst of health requests.
-			if (Date.now() - lastCycleStartedAt < MIN_REFRESH_GAP_MS ||
-				Date.now() < nextHealthAttemptAt) return;
+			if (
+				Date.now() - lastCycleStartedAt < MIN_REFRESH_GAP_MS ||
+				Date.now() < nextHealthAttemptAt
+			)
+				return;
 			refreshController?.abort();
 			refreshController = new AbortController();
 			void runHealthCycle(refreshController.signal);
@@ -436,7 +479,8 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 					if (signal.aborted) return;
 					// 401/403/404 and explicit key denials are not transient outages.
 					const revoke =
-						readOnly && error instanceof CatalogV2Unavailable &&
+						readOnly &&
+						error instanceof CatalogV2Unavailable &&
 						error.revokePublicCache;
 					if (revoke) {
 						activeCatalogRevision = null;
@@ -445,16 +489,22 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 					setState((current) => {
 						// No stale OWNER inventory or probe may cross to SERVICE
 						// during a failed revalidation. Only same-scope LKG survives.
-						const { state: safe, retained: retain } =
-							reconcileCatalogFailure(current, readOnly, revoke);
+						const { state: safe, retained: retain } = reconcileCatalogFailure(
+							current,
+							readOnly,
+							revoke,
+						);
 						return {
 							...safe,
 							// A 502 may reuse same-scope last-known data; revocation never may.
 							error: !retain,
 							catalogStale: readOnly && retain,
 							catalogScope: readOnly ? "public" : "owner",
-							catalogIncident: !readOnly && error instanceof CatalogV2Unavailable ? error.incident : null,
-						catalogFailure:
+							catalogIncident:
+								!readOnly && error instanceof CatalogV2Unavailable
+									? error.incident
+									: null,
+							catalogFailure:
 								error instanceof CatalogV2Unavailable
 									? error.reason
 									: "unavailable",
@@ -479,7 +529,10 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			refreshHealth,
 			readOnly ? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS,
 		);
-		const catalogInterval = window.setInterval(refreshCatalogIfDue, CATALOG_REVALIDATION_MS);
+		const catalogInterval = window.setInterval(
+			refreshCatalogIfDue,
+			CATALOG_REVALIDATION_MS,
+		);
 		const onVisibilityChange = () => {
 			if (!document.hidden) {
 				refreshHealth();
