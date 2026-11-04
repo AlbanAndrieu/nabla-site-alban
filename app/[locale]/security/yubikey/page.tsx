@@ -15,6 +15,7 @@ import styles from "./page.module.css";
 import PivEntraGuide from "./PivEntraGuide";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
 import YubiKeyEvidence from "./YubiKeyEvidence";
+import YubiKeyIntroduction from "./YubiKeyIntroduction";
 import YubiKeyGraph from "./YubiKeyGraph";
 import YubiKeyPocketManual from "./YubiKeyPocketManual";
 import YubiKeyUseCases from "./YubiKeyUseCases";
@@ -64,6 +65,7 @@ export default async function YubiKeySecurityPage({
 			</header>
 			<main id="main-content">
 				<Container>
+					<YubiKeyIntroduction locale={locale as AppLocale} />
 					<p className={styles.disclaimer} role="note">
 						{copy.disclaimer}
 					</p>
@@ -75,11 +77,11 @@ export default async function YubiKeySecurityPage({
 					>
 						{[
 							{
-								href: "#yubikey-manual",
+								href: "#yubikey-introduction",
 								label:
 									locale === "fr"
-										? "Comparer les deux clés"
-										: "Compare both keys",
+										? "Comprendre la YubiKey"
+										: "Understand YubiKey",
 							},
 							{
 								href: "#yubikey-evidence",
@@ -117,6 +119,7 @@ export default async function YubiKeySecurityPage({
 							className={styles.toc}
 							aria-label={locale === "fr" ? "Sommaire" : "On this page"}
 						>
+							<a href="#yubikey-introduction">{locale === "fr" ? "Découvrir la YubiKey" : "YubiKey basics"}</a>
 							<a href="#yubikey-manual">
 								{locale === "fr" ? "Mémo des clés" : "Key quick reference"}
 							</a>
