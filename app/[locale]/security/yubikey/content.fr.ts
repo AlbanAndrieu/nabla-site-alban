@@ -2,14 +2,14 @@ import type { GuideCopy } from "./content";
 
 export const GUIDE_COPY_FR: GuideCopy = {
 	meta: {
-		title: "YubiKey : architecture, configuration et reprise | Sécurité",
+		title: "YubiKey : comprendre, protéger ses comptes et aller plus loin | Sécurité",
 		description:
-			"Guide public des usages FIDO2, SSH, PIV, OpenPGP, OTP, des deux clés et des contrôles de sauvegarde, avec graphe et lexique.",
+			"Comprendre simplement les YubiKey, leurs avantages et FIDO2, puis découvrir la configuration personnelle, PIV, Vault PKI et Microsoft Entra CBA.",
 	},
 	back: "Retour à Sécurité",
 	eyebrow: "Authentification matérielle et continuité",
-	title: "Configurer deux YubiKey sans perdre l'accès",
-	lead: "Une clé principale pour l'usage quotidien et une seconde clé pour la continuité. Cette page décrit une architecture cible et les vérifications en lecture seule, pas un état matériel en direct.",
+	title: "YubiKey : protéger ses comptes avec une clé physique",
+	lead: "D'abord comprendre ce qu'est une YubiKey et pourquoi l'utiliser. Ensuite, explorer une configuration à deux clés, les procédures de reprise et les architectures de certificats pour utilisateurs avancés et entreprises.",
 	disclaimer:
 		"Schéma conceptuel public. Aucun numéro de série, code PIN/PUK, secret OTP, clé privée, certificat personnel, chemin d'escrow ou information de compte n'est publié. « Observé » signifie documenté lors d'une vérification antérieure, pas revérifié aujourd'hui.",
 	diagramTitle: "Graphe des usages et des dépendances",
