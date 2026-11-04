@@ -8,7 +8,7 @@ test("localized public pages are build-time static instead of per-request SSR", 
 	const layout = await read("app/[locale]/layout.tsx");
 	assert.match(layout, /export const dynamicParams = false/);
 	assert.match(layout, /generateStaticParams/);
-	assert.match(layout, /routing\\.locales\\.map/);
+	assert.match(layout, /routing\.locales\.map/);
 
 	for (const path of [
 		"app/[locale]/page.tsx",
@@ -18,7 +18,7 @@ test("localized public pages are build-time static instead of per-request SSR", 
 	]) {
 		const page = await read(path);
 		assert.match(page, /export const dynamic = "force-static"/, path);
-		assert.match(page, /setRequestLocale\\(locale\\)/, path);
+		assert.match(page, /setRequestLocale\(locale\)/, path);
 	}
 });
 
@@ -40,5 +40,5 @@ test("TrueNAS page preserves dynamic authorized client diagnostics", async () =>
 	assert.match(page, /<HomelabServicesSection/, "TrueNAS has live SERVICE\/OWNER tiles");
 	const hook = await read("app/components/homelab/useHomelabHealth.ts");
 	assert.match(hook, /PUBLIC_HEALTH_REFRESH_MS = 120_000/);
-	assert.match(hook, /readOnly \\? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/);
+	assert.match(hook, /readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/);
 });
