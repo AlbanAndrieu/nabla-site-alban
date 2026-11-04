@@ -9,6 +9,9 @@ import { enrichPageMetadata } from "@/lib/socialMetadata";
 import SecurityCoreSections, { SecurityHero } from "./SecurityCoreSections";
 import SecurityVisualizations from "./SecurityVisualizations";
 
+// Public shell only: interactive data remains client-side and OWNER APIs stay gated.
+export const dynamic = "force-static";
+
 export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]/security">): Promise<Metadata> {
