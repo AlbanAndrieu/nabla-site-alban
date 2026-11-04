@@ -3,6 +3,8 @@ export type HomelabAccessState = "pending" | "trusted" | "readonly" | "denied";
 export type HomelabAccessDecision = Exclude<HomelabAccessState, "pending">;
 
 export const ACCESS_RECHECK_MS = 30_000;
+// PUBLIC/SERVICE status is advisory; defer background checks without slowing OWNER revocation.
+export const PUBLIC_ACCESS_RECHECK_MS = 120_000;
 export const ACCESS_FOCUS_RECHECK_MS = 2_000;
 
 /** Fail closed on invalid API responses, including a missing mode or trusted flag. */
@@ -27,7 +29,12 @@ export function createHomelabAccessProbe(
 		if (last === null) return true;
 		const time = now();
 		if (!Number.isFinite(time) || time < last.checkedAt) return true;
-		return time - last.checkedAt >= (onFocus ? ACCESS_FOCUS_RECHECK_MS : ACCESS_RECHECK_MS);
+		const intervalMs = onFocus
+			? ACCESS_FOCUS_RECHECK_MS
+			: last.state === "readonly"
+				? PUBLIC_ACCESS_RECHECK_MS
+				: ACCESS_RECHECK_MS;
+		return time - last.checkedAt >= intervalMs;
 	};
 
 	const check = (onFocus = false): Promise<HomelabAccessDecision> => {
