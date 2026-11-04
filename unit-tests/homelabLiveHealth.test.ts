@@ -242,9 +242,11 @@ test("pending endpoint state is explicit and motion-safe", async () => {
 	assert.match(css, /prefers-reduced-motion: reduce/);
 });
 
-test("homelab health refreshes every thirty seconds, preserves context and exposes failed refreshes", async () => {
+test("OWNER homelab refresh stays at 30s while public SERVICE refresh is throttled", async () => {
 	const page = await blockSource();
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
+	assert.match(page, /PUBLIC_HEALTH_REFRESH_MS = 120_000/);
+	assert.match(page, /readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
 	assert.match(

@@ -14,6 +14,16 @@ test("social image routes avoid deprecated edge runtime and dynamic nabla glyph 
 	assert.match(socialCard, /<svg[\s\S]*<path/);
 });
 
+test("public social card images reuse CDN while private homelab data cannot", async () => {
+	const [socialCard, homelab] = await Promise.all([
+		readFile("app/api/social-card/route.tsx", "utf8"),
+		readFile("app/api/homelab-health-v2/route.ts", "utf8"),
+	]);
+	assert.match(socialCard, /"Cache-Control":/);
+	assert.match(socialCard, /public, max-age=86400, s-maxage=604800/);
+	assert.match(homelab, /"Cache-Control": "private, no-store"/);
+});
+
 test("Vercel auto-deploy rules cover slash-named feature branches", async () => {
 	const config = JSON.parse(await readFile("vercel.json", "utf8")) as {
 		git?: { deploymentEnabled?: Record<string, boolean> };

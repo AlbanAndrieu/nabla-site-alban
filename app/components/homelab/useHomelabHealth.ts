@@ -38,6 +38,8 @@ import {
 } from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
+// SERVICE projection is not an operator console; reduce Vercel function calls.
+export const PUBLIC_HEALTH_REFRESH_MS = 120_000;
 const MIN_REFRESH_GAP_MS = 5_000;
 
 export type HealthFetchResult = {
@@ -473,7 +475,10 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 
 		void runHealthCycle(initialController.signal);
 
-		const interval = window.setInterval(refreshHealth, HEALTH_REFRESH_MS);
+		const interval = window.setInterval(
+			refreshHealth,
+			readOnly ? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS,
+		);
 		const catalogInterval = window.setInterval(refreshCatalogIfDue, CATALOG_REVALIDATION_MS);
 		const onVisibilityChange = () => {
 			if (!document.hidden) {
