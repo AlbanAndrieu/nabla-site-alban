@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
 	ACCESS_RECHECK_MS,
+	PUBLIC_ACCESS_RECHECK_MS,
 	ACCESS_FOCUS_RECHECK_MS,
 	createHomelabAccessProbe,
 	parseHomelabAccessDecision,
@@ -47,6 +48,28 @@ test("long lived tabs recheck periodically but not on every render", async () =>
 	assert.equal(probe.shouldRecheck(), true);
 	assert.equal(await probe.check(), "trusted");
 	assert.equal(calls, 2);
+});
+
+test("public SERVICE polling is four times slower; OWNER stays responsive", async () => {
+	let clock = 10_000;
+	let calls = 0;
+	const decisions = ["readonly", "trusted"];
+	const probe = createHomelabAccessProbe(async () => {
+		calls++;
+		return decisions.shift();
+	}, () => clock);
+	assert.equal(PUBLIC_ACCESS_RECHECK_MS, 4 * ACCESS_RECHECK_MS);
+	assert.equal(await probe.check(), "readonly");
+	clock += ACCESS_RECHECK_MS;
+	assert.equal(probe.shouldRecheck(), false);
+	assert.equal(await probe.check(), "readonly");
+	assert.equal(calls, 1);
+	clock += PUBLIC_ACCESS_RECHECK_MS - ACCESS_RECHECK_MS;
+	assert.equal(probe.shouldRecheck(), true);
+	assert.equal(await probe.check(), "trusted");
+	assert.equal(calls, 2);
+	clock += ACCESS_RECHECK_MS;
+	assert.equal(probe.shouldRecheck(), true);
 });
 
 test("focus rechecks access after a short throttle", async () => {
