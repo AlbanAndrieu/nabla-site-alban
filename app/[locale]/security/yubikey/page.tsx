@@ -12,6 +12,7 @@ import {
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
 import styles from "./page.module.css";
+import PivEntraGuide from "./PivEntraGuide";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
 import YubiKeyEvidence from "./YubiKeyEvidence";
 import YubiKeyGraph from "./YubiKeyGraph";
@@ -124,6 +125,7 @@ export default async function YubiKeySecurityPage({
 							</a>
 							<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
 							<a href="#yubikey-vault-pki">Vault PKI</a>
+							<a href="#yubikey-piv-entra">PIV / Entra CBA</a>
 							<a href="#yubikey-workflow">{copy.workflowTitle}</a>
 							<a href="#yubikey-use-cases">
 								{locale === "fr" ? "Exemples" : "Examples"}
@@ -137,6 +139,7 @@ export default async function YubiKeySecurityPage({
 					<YubiKeyEvidence locale={locale as AppLocale} />
 					<YubiKeyGraph copy={copy} />
 					<VaultPkiArchitecture locale={locale} />
+					<PivEntraGuide locale={locale} />
 					<section id="yubikey-workflow" className={styles.section}>
 						<h2>{copy.workflowTitle}</h2>
 						<div className={styles.stepGrid}>
