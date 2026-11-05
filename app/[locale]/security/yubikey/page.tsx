@@ -11,8 +11,8 @@ import {
 } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
-import styles from "./page.module.css";
 import PivEntraGuide from "./PivEntraGuide";
+import styles from "./page.module.css";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
 import YubiKeyEvidence from "./YubiKeyEvidence";
 import YubiKeyGraph from "./YubiKeyGraph";

@@ -8,7 +8,9 @@ export const PUBLIC_ACCESS_RECHECK_MS = 120_000;
 export const ACCESS_FOCUS_RECHECK_MS = 2_000;
 
 /** Fail closed on invalid API responses, including a missing mode or trusted flag. */
-export function parseHomelabAccessDecision(body: unknown): HomelabAccessDecision {
+export function parseHomelabAccessDecision(
+	body: unknown,
+): HomelabAccessDecision {
 	if (!body || typeof body !== "object" || Array.isArray(body)) return "denied";
 	const result = body as { trusted?: unknown; mode?: unknown };
 	if (result.trusted !== true) return "denied";
@@ -39,7 +41,8 @@ export function createHomelabAccessProbe(
 
 	const check = (onFocus = false): Promise<HomelabAccessDecision> => {
 		if (inFlight !== null) return inFlight;
-		if (!shouldRecheck(onFocus) && last !== null) return Promise.resolve(last.state);
+		if (!shouldRecheck(onFocus) && last !== null)
+			return Promise.resolve(last.state);
 		const request = fetchDecision()
 			.catch((): HomelabAccessDecision => "denied")
 			.then((state) => {
