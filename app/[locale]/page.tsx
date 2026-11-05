@@ -14,6 +14,9 @@ import { routing } from "@/i18n/routing";
 import { HOME_JSON_LD, HOME_JSON_LD_FR } from "@/lib/htmlFromPublic";
 import { buildPageMetadata } from "@/lib/siteMetadata";
 
+// Public shell only: interactive data remains client-side and OWNER APIs stay gated.
+export const dynamic = "force-static";
+
 export async function generateMetadata({
 	params,
 }: PageProps<"/[locale]">): Promise<Metadata> {

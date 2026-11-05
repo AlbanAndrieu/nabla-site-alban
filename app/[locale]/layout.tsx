@@ -17,6 +17,9 @@ import { pickClientMessages } from "@/i18n/messages";
 import { routing } from "@/i18n/routing";
 import { buildPageMetadata, SITE_ORIGIN } from "@/lib/socialMetadata";
 
+// All supported locales are enumerated at build time; reject arbitrary dynamic segments.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
 	return routing.locales.map((locale) => ({ locale }));
 }
