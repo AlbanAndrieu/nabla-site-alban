@@ -2,14 +2,14 @@ import type { GuideCopy } from "./content";
 
 export const GUIDE_COPY_EN: GuideCopy = {
 	meta: {
-		title: "YubiKey: architecture, setup and recovery | Security",
+		title: "YubiKey: understand security keys, protect accounts and go deeper | Security",
 		description:
-			"Public overview of FIDO2, SSH, PIV, OpenPGP, OTP, dual-key recovery, with an interactive graph and acronym glossary.",
+			"Learn what YubiKeys do, why FIDO2 matters, then explore personal setup, recovery, PIV, Vault PKI and Microsoft Entra CBA.",
 	},
 	back: "Back to Security",
 	eyebrow: "Hardware authentication and continuity",
-	title: "Configure two YubiKeys without losing access",
-	lead: "A primary key for daily use and a separate backup key for recovery. This page describes the intended architecture and read-only verification, not a live device inventory.",
+	title: "YubiKey: protect your accounts with a physical key",
+	lead: "Start with what a YubiKey is and why to use one. Then explore a two-key setup, recovery procedures and advanced certificate architecture for individuals and businesses.",
 	disclaimer:
 		"Public conceptual diagram. No serial numbers, PINs/PUKs, OTP seeds, private keys, personal certificates, escrow paths or account identifiers are published. 'Documented' reflects a past observation, not a check performed today.",
 	diagramTitle: "Authentication and recovery graph",
