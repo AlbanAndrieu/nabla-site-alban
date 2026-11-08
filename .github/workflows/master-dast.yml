@@ -67,6 +67,13 @@ jobs:
           trap 'rm -f "$response_headers"' EXIT
           status="$(curl --silent --show-error --output /dev/null --dump-header "$response_headers" --write-out '%{http_code}' --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$BASE_URL/")"
           mitigated="$(awk 'BEGIN { IGNORECASE=1 } /^x-vercel-mitigated:/ { sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' "$response_headers")"
+          # HTTP 402 is a Vercel account/quota gate, not a finding from ZAP.
+          # Fail closed without spending DAST minutes against a paused site.
+          if [[ "$status" == "402" ]]; then
+            echo "DAST_BLOCKER=vercel-http-402" >> "$GITHUB_ENV"
+            echo "::error::VERCEL_DAST_HTTP_402: Vercel returned HTTP 402 (account/quota deployment pause likely). OWASP ZAP was not executed; review Vercel team Usage and fair-use status."
+            exit 1
+          fi
           if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
             echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
             exit 1
@@ -156,6 +163,7 @@ jobs:
             echo
             echo "- Result: **$JOB_STATUS**"
             echo "- Target: $BASE_URL"
+            echo "- Preflight blocker: ${DAST_BLOCKER:-none}"
             echo "- Associated SHA: $DEPLOYED_SHA"
             echo "- Scan: OWASP ZAP Baseline (passive, blocking only explicit FAIL rules)"
             echo "- Report artifact: **zap-production-report**"
@@ -167,15 +175,21 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           STATUS_SHA: ${{ env.DEPLOYED_SHA }}
           JOB_STATUS: ${{ job.status }}
+          DAST_BLOCKER: ${{ env.DAST_BLOCKER }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          case "$JOB_STATUS" in
-            success) STATE=success; DESCRIPTION='Production ZAP baseline passed' ;;
-            cancelled) STATE=error; DESCRIPTION='Production ZAP baseline cancelled' ;;
-            *) STATE=failure; DESCRIPTION='Production ZAP baseline failed' ;;
-          esac
+          if [[ "$DAST_BLOCKER" == "vercel-http-402" ]]; then
+            STATE=failure
+            DESCRIPTION='Production DAST blocked: Vercel HTTP 402'
+          else
+            case "$JOB_STATUS" in
+              success) STATE=success; DESCRIPTION='Production ZAP baseline passed' ;;
+              cancelled) STATE=error; DESCRIPTION='Production ZAP baseline cancelled' ;;
+              *) STATE=failure; DESCRIPTION='Production ZAP baseline failed' ;;
+            esac
+          fi
 
           payload="$(jq -n \
             --arg state "$STATE" \
