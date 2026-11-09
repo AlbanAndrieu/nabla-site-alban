@@ -8,18 +8,19 @@ import { analyzeUsage } from "../scripts/finops/vercel-usage-budget.mjs";
 const location = dirname(fileURLToPath(import.meta.url));
 const script = join(location, "../scripts/finops/vercel-usage-budget.mjs");
 const item = (value, unit = "CPU-hours") => ({ name: "Fluid Active CPU", usage: value, unit });
+const period = { start: "2026-10-10T00:00:00Z", end: "2026-11-09T00:00:00Z" };
 
 test("Hobby CPU ratios are explicitly scoped and deterministic", () => {
   for (const [hours, status] of [[0, "OK"], [1.99, "OK"], [2, "WATCH"], [3, "INVESTIGATE"], [3.6, "CRITICAL"]]) {
-    const value = analyzeUsage({ services: [item(hours)] });
+    const value = analyzeUsage({ period, services: [item(hours)] });
     assert.equal(value.status, status);
     assert.equal(value.cpuHours, hours);
-    assert.equal(value.billedCpuVerified, true);
+    assert.equal(value.cpuQuantityParsed, true);
   }
 });
 
 test("converts seconds and milliseconds without inferring from wall time", () => {
-  const res = analyzeUsage({ services: [item(3600, "s"), item(1800000, "ms")] });
+  const res = analyzeUsage({ period, services: [item(3600, "s"), item(1800000, "ms")] });
   assert.equal(res.cpuHours, 1.5);
   assert.equal(res.status, "OK");
 });
@@ -39,16 +40,23 @@ test("does not silently pass absent or ambiguous CPU evidence", () => {
 });
 
 test("supports FOCUS charge objects without summing daily breakdown twice", () => {
-  const r = analyzeUsage({ charges: [{ ServiceName: "Fluid Active CPU", UsageQuantity: 7200, UsageUnit: "seconds" }], breakdown: [{ services: [item(9000)] }] });
+  const r = analyzeUsage({ period, charges: [{ ServiceName: "Fluid Active CPU", UsageQuantity: 7200, UsageUnit: "seconds" }], breakdown: [{ services: [item(9000)] }] });
   assert.equal(r.cpuHours, 2);
   assert.equal(r.status, "WATCH");
 });
 
+test("refuses to declare a safe budget from an incomplete or unknown date window", () => {
+  const shortWindow = analyzeUsage({ period: { start: "2026-11-08", end: "2026-11-09" }, services: [item(0.1)] });
+  assert.equal(shortWindow.status, "WINDOW_UNVERIFIED");
+  assert.equal(shortWindow.percentOfQuota, null);
+  assert.equal(analyzeUsage({ services: [item(1)] }).status, "WINDOW_UNVERIFIED");
+});
+
 test("stdin CLI emits compact machine-readable JSON with conservative exit codes", () => {
-  const success = spawnSync(process.execPath, [script, "--stdin"], { input: JSON.stringify({ services: [item(2.1)] }), encoding: "utf8" });
+  const success = spawnSync(process.execPath, [script, "--stdin"], { input: JSON.stringify({ period, services: [item(2.1)] }), encoding: "utf8" });
   assert.equal(success.status, 0);
   assert.equal(JSON.parse(success.stdout).status, "WATCH");
-  const strict = spawnSync(process.execPath, [script, "--stdin", "--strict"], { input: JSON.stringify({ services: [item(2.1)] }), encoding: "utf8" });
+  const strict = spawnSync(process.execPath, [script, "--stdin", "--strict"], { input: JSON.stringify({ period, services: [item(2.1)] }), encoding: "utf8" });
   assert.equal(strict.status, 1);
   const missing = spawnSync(process.execPath, [script, "--stdin"], { input: "{}", encoding: "utf8" });
   assert.equal(missing.status, 2);
