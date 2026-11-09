@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -86,4 +86,15 @@ test("CLI returns NOT_RUN exit 2 when there is no Next build", () => {
 	});
 	assert.equal(child.status, 2);
 	assert.equal(JSON.parse(child.stdout).status, "NOT_RUN");
+});
+
+test("social image routes enumerate both locales for build-time generation", async () => {
+	const [og, twitter] = await Promise.all([
+		readFile(new URL("../app/[locale]/opengraph-image.tsx", import.meta.url), "utf8"),
+		readFile(new URL("../app/[locale]/twitter-image.tsx", import.meta.url), "utf8"),
+	]);
+	assert.match(og, /export function generateStaticParams\(\)/);
+	assert.match(og, /routing\.locales\.map/);
+	assert.match(twitter, /generateStaticParams/);
+	assert.doesNotMatch(og, /export const dynamic = "force-dynamic"/);
 });
