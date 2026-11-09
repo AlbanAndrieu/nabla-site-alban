@@ -1,10 +1,20 @@
 # Roadmap active — qualité et produit Site Alban
 
-**Réconciliée le 1er novembre 2026.** Une ligne ouverte correspond à une action vérifiable, pas à un historique de PR. Ordre de traitement : **P0 Gate de publication → P0 AppSec → P1 React, a11y, SEO → P2**. Les opérations TrueNAS, FastAPI et Compose appartiennent à leurs propres dépôts ; les recettes et interfaces homelab du Site (OWNER/SERVICE, `traceId`, catalogue, cache) sont suivies une seule fois dans [la roadmap homelab](homelab-roadmap.md).
+**Réconciliée le 8 novembre 2026 (lot Vercel).** Une ligne ouverte correspond à une action vérifiable, pas à un historique de PR. Ordre de traitement : **P0 Gate de publication → P0 AppSec → P1 React, a11y, SEO → P2**. Les opérations TrueNAS, FastAPI et Compose appartiennent à leurs propres dépôts ; les recettes et interfaces homelab du Site (OWNER/SERVICE, `traceId`, catalogue, cache) sont suivies une seule fois dans [la roadmap homelab](homelab-roadmap.md).
 
 [Historique intégral avant consolidation](archive/quality-roadmap-through-2026-10-30.txt) · [Runbooks](README.md) · [Règles de l'agent](../AGENTS.md).
 
-## État attesté
+## P0 — Rétablissement Vercel Hobby et preuve de publication (8 novembre 2026)
+
+- [ ] **Attendre la réponse de Vercel :** demande de réactivation exceptionnelle envoyée ; l'équipe est suspendue depuis le 3 novembre pour environ **7 h 07 / 4 h Fluid Active CPU**. Ne pas redéployer ni supposer le site READY avant confirmation.
+- [x] **Réduire le risque de CPU côté site :** [#285](https://github.com/AlbanAndrieu/nabla-site-alban/pull/285) (polling/cache) et [#288](https://github.com/AlbanAndrieu/nabla-site-alban/pull/288) (coque publique prérendue) **fusionnées** ; les routes OWNER et API privées restent dynamiques, `private, no-store`.
+- [ ] **Distinguer indisponibilité plateforme et vulnérabilité :** [#291](https://github.com/AlbanAndrieu/nabla-site-alban/pull/291) en Draft, contrat et statut **FAIL fermé** pour HTTP 402 ; [DAST #42471957262](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/42471957262) arrêté au préflight HTTP 402, **ZAP NOT_RUN**.
+- [ ] **L3 exact-SHA local :** relancer sur la tête de PR les tests Next 24, FR/EN, accessibilité, SEO, confidentialité OWNER/SERVICE et la gate AppSec ; CI `skipped` sur Draft ne signifie pas `PASS`.
+- [ ] **Post-réactivation :** comparer SHA Git/déploiement, cartographier les `Functions`, vérifier absence de SSR public inutile, puis mesurer CPU (avant/après, fenêtre identique). Vérifier DAST, Playwright et les parcours vrais LAN/WAN. Un gain n'est **pas encore mesuré**.
+
+**Dépendances distinctes :** [Checklist #2](https://github.com/AlbanAndrieu/personal-security-checklist/pull/2) vérifie le build Qwik statique, mais l'ancien déploiement CLI reste actif ; [Bababou #260](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/260) et [#261](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/261) sont non fusionnées ; [#262](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/262) prépare le registre de preuves privées/publiques. Chaque tâche est exécutée **dans le dépôt propriétaire**, pas ici.
+
+## État attesté — historique au 1er novembre
 
 | Surface | Preuve vérifiée | Verdict |
 | --- | --- | --- |
