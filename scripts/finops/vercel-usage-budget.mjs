@@ -26,6 +26,16 @@ function hours(quantity, unit) {
   return null;
 }
 
+function verifyPeriod(period) {
+  const start = period?.start ?? period?.from ?? period?.startTime;
+  const end = period?.end ?? period?.to ?? period?.endTime;
+  const first = typeof start === "string" ? Date.parse(start) : NaN;
+  const last = typeof end === "string" ? Date.parse(end) : NaN;
+  const days = (last - first) / 86_400_000;
+  // A 30-day Vercel Hobby allocation must not be compared to a 1-day sample.
+  return Number.isFinite(days) && days >= 29 && days <= 32;
+}
+
 export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
   if (!document || typeof document !== "object" || Array.isArray(document)) {
     return { status: "INVALID", reason: "invalid-json-usage", cpuHours: null };
@@ -58,7 +68,15 @@ export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
     return {
       status: "NOT_MEASURED", reason: !matched ? "active-cpu-not-present" : "unrecognized-quantity-or-unit",
       cpuHours: null, quotaHours, matchingEntries: matched, unmeasuredEntries: unmeasured,
-      source: "official-vercel-usage-export", billedCpuVerified: false,
+      source: "provided-vercel-usage-export", cpuQuantityParsed: false,
+    };
+  }
+  if (!verifyPeriod(document.period)) {
+    return {
+      status: "WINDOW_UNVERIFIED", reason: "expected-30-day-period-unverified",
+      cpuHours: Number(total.toFixed(6)), quotaHours, percentOfQuota: null,
+      matchingEntries: matched, source: "provided-vercel-usage-export",
+      cpuQuantityParsed: true, periodVerified: false,
     };
   }
   const ratio = total / quotaHours;
@@ -69,7 +87,7 @@ export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
     quotaHours, percentOfQuota: Number((100 * ratio).toFixed(2)),
     remainingHours: Number(Math.max(0, quotaHours - total).toFixed(6)),
     matchingEntries: matched, unmeasuredEntries: 0,
-    source: "official-vercel-usage-export", billedCpuVerified: true,
+    source: "provided-vercel-usage-export", cpuQuantityParsed: true, periodVerified: true,
   };
 }
 
@@ -92,7 +110,7 @@ export function run(argv, stdin = () => readFileSync(0, "utf8")) {
     const result = analyzeUsage(JSON.parse(raw));
     console.log(JSON.stringify(result));
     return result.status === "INVALID" ? 2 :
-      result.status === "NOT_MEASURED" ? 2 :
+      ["NOT_MEASURED", "WINDOW_UNVERIFIED"].includes(result.status) ? 2 :
       argv.includes("--strict") && result.status !== "OK" ? 1 : 0;
   } catch (error) {
     console.log(JSON.stringify({ status: "NOT_MEASURED", reason: error instanceof SyntaxError ? "invalid-json" : "unreadable-export", cpuHours: null }));
