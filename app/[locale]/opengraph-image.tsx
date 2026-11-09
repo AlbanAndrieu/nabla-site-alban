@@ -1,4 +1,11 @@
 import { ImageResponse } from "next/og";
+import { routing } from "@/i18n/routing";
+
+// Image routes prerender separately from the parent locale layout in Next 16.
+// Avoid running Satori for crawlers requesting these fixed EN/FR images.
+export function generateStaticParams() {
+	return routing.locales.map((locale) => ({ locale }));
+}
 
 export const alt =
 	"Alban Andrieu — DevSecOps, Cloud Security & AI Infrastructure";
