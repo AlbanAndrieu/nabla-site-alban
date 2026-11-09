@@ -37,11 +37,12 @@ Le mode `--strict` retourne un code non nul à partir du seuil `WATCH`. Aucune c
 | `WATCH` | 50–74,99 % | Contrôler les routes les plus sollicitées |
 | `INVESTIGATE` | 75–89,99 % | Réduire le polling non essentiel et les proxys inutiles |
 | `CRITICAL` | 90 % ou plus | Suspendre les traitements facultatifs, revoir les quotas |
+| `WINDOW_UNVERIFIED` | heures CPU lisibles, mais fenêtre de 30 jours non attestée | Ne pas conclure sur le quota ; vérifier `period` |
 | `NOT_MEASURED` | quantité absente, unité ambiguë ou API inaccessible | **Ne rien conclure sur le CPU** ; utiliser le tableau de bord |
 
-La limite Hobby annoncée est **4 heures de Fluid Active CPU**, **360 GB-h de mémoire provisionnée** et **1 million d'invocations** par fenêtre applicable. Le présent script compare **uniquement** la consommation CPU quand une quantité et une unité explicites sont présentes dans l'export. Il ne mesure ni la mémoire, ni les invocations, ni la latence, ni les performances Web Vitals.
+La limite Hobby annoncée est **4 heures de Fluid Active CPU**, **360 GB-h de mémoire provisionnée** et **1 million d'invocations** par fenêtre applicable. Le présent script compare **uniquement** la consommation CPU quand une quantité et une unité explicites **et une fenêtre de ~30 jours attestée par `period`** sont présentes dans l'export. Un export journalier ou une absence de période donne `WINDOW_UNVERIFIED`. Il ne mesure ni la mémoire, ni les invocations, ni la latence, ni les performances Web Vitals.
 
-Attention : les exports de coûts peuvent ne contenir que des montants monétaires : dans ce cas le script signale `NOT_MEASURED`. La forme réelle du JSON doit être validée sur un export authentifié, car la documentation de la CLI ne garantit pas les noms de chaque sous-champ de service.
+Attention : les exports de coûts peuvent ne contenir que des montants monétaires : dans ce cas le script signale `NOT_MEASURED`. La CLI peut elle-même retourner une erreur sur Hobby (le point d'accès Billing renvoyait `costs_not_found`) ; préférer alors la lecture du tableau de bord Usage plutôt que de contourner les restrictions. La forme réelle du JSON doit être validée sur un export authentifié, car la documentation de la CLI ne garantit pas les noms de chaque sous-champ de service.
 
 ## Relevés à conserver (privés)
 
