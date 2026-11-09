@@ -47,7 +47,8 @@ export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
   // FOCUS API JSONL can be converted to {charges: [...]} ; CLI JSON is
   // advertised with {services: [...]}. Do not aggregate breakdown again.
   const entries = Array.isArray(document.services) ? document.services
-    : Array.isArray(document.charges) ? document.charges : [];
+    : Array.isArray(document.charges) ? document.charges
+    : Array.isArray(document.grandTotal?.services) ? document.grandTotal.services : [];
   let total = 0;
   let matched = 0;
   let unmeasured = 0;
@@ -57,9 +58,14 @@ export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
       entry.ServiceName, entry.SKUName, entry.skuName].filter((v) => typeof v === "string").join(" ");
     if (!CPU_NAME.test(name)) continue;
     matched++;
-    const u = entry.unit ?? entry.usageUnit ?? entry.UsageUnit ?? entry.PricingUnit;
+    const measure = entry.usage && typeof entry.usage === "object" ? entry.usage : null;
+    const u = entry.unit ?? entry.usageUnit ?? entry.UsageUnit ?? entry.PricingUnit
+      ?? measure?.unit;
+    // `amount`, `cost` and `total` can be currency. Never treat
+    // monetary amounts as CPU hours even if the SKU name contains CPU.
     const value = entry.quantity ?? entry.usageQuantity ?? entry.UsageQuantity
-      ?? entry.usageValue ?? entry.amount ?? entry.usage;
+      ?? entry.usageValue ?? measure?.quantity ?? measure?.value
+      ?? (typeof entry.usage !== "object" ? entry.usage : null);
     const cpu = hours(value, u);
     if (cpu === null) { unmeasured++; continue; }
     total += cpu;
@@ -97,12 +103,16 @@ function usage() {
 
 export function run(argv, stdin = () => readFileSync(0, "utf8")) {
   const options = new Set(["--stdin", "--strict", "--input"]);
-  if (argv.some((arg) => !options.has(arg) && argv[argv.indexOf(arg) - 1] !== "--input")) {
-    usage(); return 2;
-  }
   const inputIndex = argv.indexOf("--input");
-  if ((inputIndex >= 0 && (!argv[inputIndex + 1] || argv.includes("--stdin"))) ||
-      (inputIndex === -1 && !argv.includes("--stdin"))) { usage(); return 2; }
+  const hasFile = inputIndex >= 0;
+  const expected = hasFile ? (argv.includes("--strict") ? 3 : 2)
+    : (argv.includes("--strict") ? 2 : 1);
+  if ((hasFile && (!argv[inputIndex + 1] || argv[inputIndex + 1].startsWith("--"))) ||
+      (hasFile && argv.includes("--stdin")) ||
+      (!hasFile && !argv.includes("--stdin")) ||
+      argv.length !== expected ||
+      argv.some((arg, i) => !options.has(arg) && !(hasFile && i === inputIndex + 1)) ||
+      argv.filter((arg) => arg === "--strict").length > 1) { usage(); return 2; }
   try {
     const raw = inputIndex >= 0 ? readFileSync(argv[inputIndex + 1], "utf8") : stdin();
     // Keep command bounded on local checkouts; do not print raw data or tokens.
