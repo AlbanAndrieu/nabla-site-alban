@@ -71,3 +71,29 @@ test("malformed/unavailable exports fail closed without raw data echo", () => {
   const none = spawnSync(process.execPath, [script], { encoding: "utf8" });
   assert.equal(none.status, 2);
 });
+
+test("never mistakes billed currency for CPU quantity", () => {
+  const value = analyzeUsage({ period, services: [{ name: "Fluid Active CPU", amount: 100, unit: "hours", cost: 8 }] });
+  assert.equal(value.status, "NOT_MEASURED");
+  assert.equal(value.cpuHours, null);
+});
+
+test("accepts an explicit grandTotal service summary without double-counting breakdown", () => {
+  const value = analyzeUsage({
+    period,
+    grandTotal: { services: [{ name: "Fluid Active CPU", usage: { value: 9000, unit: "seconds" } }] },
+    breakdown: [{ services: [item(15000)] }],
+  });
+  assert.equal(value.status, "WATCH");
+  assert.equal(value.cpuHours, 2.5);
+});
+
+test("CLI argument parsing rejects duplicate switches and ambiguous sources", () => {
+  for (const args of [
+    ["--stdin", "--stdin"], ["--input", "--strict"],
+    ["--stdin", "--input", "/tmp/not-actually-opened"], ["--stdin", "--unknown"],
+  ]) {
+    const r = spawnSync(process.execPath, [script, ...args], { input: "{}", encoding: "utf8" });
+    assert.equal(r.status, 2, args.join(" "));
+  }
+});
