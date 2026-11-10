@@ -97,3 +97,13 @@ test("CLI argument parsing rejects duplicate switches and ambiguous sources", ()
     assert.equal(r.status, 2, args.join(" "));
   }
 });
+
+test("agent freshness mode rejects stale 30-day reports and future periods", () => {
+  const old = analyzeUsage({ period, services: [item(1)] }, { asOf: "2026-11-12T12:00:00Z" });
+  assert.equal(old.status, "STALE_USAGE");
+  assert.equal(old.percentOfQuota, null);
+  const current = analyzeUsage({ period, services: [item(1)] }, { asOf: "2026-11-09T08:00:00Z" });
+  assert.equal(current.status, "OK");
+  const future = analyzeUsage({ period, services: [item(1)] }, { asOf: "2026-11-08T00:00:00Z" });
+  assert.equal(future.status, "STALE_USAGE");
+});
