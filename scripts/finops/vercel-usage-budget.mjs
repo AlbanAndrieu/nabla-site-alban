@@ -36,7 +36,7 @@ function verifyPeriod(period) {
   return Number.isFinite(days) && days >= 29 && days <= 32;
 }
 
-export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
+export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS, asOf = null } = {}) {
   if (!document || typeof document !== "object" || Array.isArray(document)) {
     return { status: "INVALID", reason: "invalid-json-usage", cpuHours: null };
   }
@@ -84,6 +84,21 @@ export function analyzeUsage(document, { quotaHours = CPU_QUOTA_HOURS } = {}) {
       matchingEntries: matched, source: "provided-vercel-usage-export",
       cpuQuantityParsed: true, periodVerified: false,
     };
+  }
+  // Optional freshness proof for daily agents; existing offline tests and
+  // historical comparisons remain possible when asOf is not supplied.
+  if (asOf !== null) {
+    const at = Date.parse(asOf);
+    const end = Date.parse(document.period?.end ?? document.period?.to ?? document.period?.endTime ?? "");
+    if (!Number.isFinite(at) || !Number.isFinite(end) ||
+        end > at + 3_600_000 || at - end > 48 * 3_600_000) {
+      return {
+        status: "STALE_USAGE", reason: "period-end-not-fresh",
+        cpuHours: Number(total.toFixed(6)), quotaHours, percentOfQuota: null,
+        periodVerified: true, freshnessVerified: false, cpuQuantityParsed: true,
+        source: "provided-vercel-usage-export",
+      };
+    }
   }
   const ratio = total / quotaHours;
   const status = ratio >= 0.9 ? "CRITICAL" : ratio >= 0.75 ? "INVESTIGATE"
