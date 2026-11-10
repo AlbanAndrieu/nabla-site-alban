@@ -57,6 +57,34 @@ Source officielle : https://vercel.com/docs/query/reference et https://vercel.co
 - **Checklist** : confirmer que le déploiement Qwik n'installe aucune fonction Next/Node inutile.
 - **Qualité** : comparer CPU par route/temps pour les mêmes SHA et fenêtres ; ne revendiquer aucun gain sans deux mesures.
 
+## Smoke HTTP public après déploiement
+
+Un diagnostic **volontairement limité** contrôle seulement les statuts
+et les en-têtes de cache des pages publiques, sans lire leur contenu :
+`scripts/finops/vercel-public-smoke.mjs`. Les deux sites sont testables
+depuis la workstation avec la même liste de routes autorisées.
+
+```bash
+node --test unit-tests/vercelUsageBudget.test.mjs unit-tests/vercelPublicSmoke.test.mjs
+
+# Environ 5 ou 6 requêtes HEAD par site, jamais en tâche automatique :
+node scripts/finops/vercel-public-smoke.mjs --live --site alban
+node scripts/finops/vercel-public-smoke.mjs --live --site bababou
+```
+
+- Le diagnostic n'émet **aucune requête sans `--live`**.
+- Les destinations sont figées à `www.albanandrieu.com` et
+  `www.bababou.com` ; aucune route `/api/*`, de document privé ou
+  de paiement n'est appelée.
+- `HTTP 402` donne `BLOCKED_PLATFORM`, les redirections et
+  erreurs ne valent pas `PASS`. Le champ `x-vercel-cache` n'est
+  qu'une information de cache, **pas** une mesure du Fluid Active CPU.
+- Aucun échantillonnage continu, drain, cookie, jeton ou déploiement
+  n'est ajouté par ce script. L'évaluation du CPU reste basée sur
+  les heures officielles vérifiées dans Vercel Usage.
+- Ce smoke est aussi porté dans Bababou, et la CLI FinOps est
+  disponible dans `nabla-openclaw`, sans exécution automatique.
+
 ## Validation locale
 
 ```bash
