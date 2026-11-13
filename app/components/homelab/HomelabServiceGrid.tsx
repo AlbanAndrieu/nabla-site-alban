@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
@@ -149,7 +150,8 @@ export default function HomelabServiceGrid({
 
 			<div className="row service-grid">
 				{services.map((svc) => {
-					const serviceId = homelabServiceId(svc);
+					// Cards, anchors and icons keep the entity name slug as presentation key.
+					const serviceId = catalogEntitySlug(homelabServiceId(svc));
 					const observed = observedOwnerServiceNavigation(
 						svc,
 						readOnly || healthUnavailable ? null : snapshot,

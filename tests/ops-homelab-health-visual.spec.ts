@@ -9,17 +9,22 @@ const serviceFixtures = [
 	{ id: "fixture-stale", name: "Stale fixture", state: "ok", stale: true },
 ] as const;
 
+// Backstage v2 is the only catalog source; there are no service URLs in it.
 const catalog = {
-	version: 1,
-	services: serviceFixtures.map((fixture) => ({
-		id: fixture.id,
-		name: fixture.name,
-		description: `E2E health/theme fixture for ${fixture.state}`,
-		endpointUrl: `https://${fixture.id}.example.test/`,
-		external: true,
-		endpointEnabled: true,
-		presentationRole: "service",
-		criticality: "medium",
+	schemaVersion: 2,
+	model: "backstage",
+	catalogRevision: `sha256:${"e".repeat(64)}`,
+	entities: serviceFixtures.map((fixture) => ({
+		apiVersion: "backstage.io/v1alpha1",
+		kind: "Component",
+		entityRef: `component:default/${fixture.id}`,
+		sourcePath: `apps/${fixture.id}/catalog-info.yaml`,
+		metadata: {
+			name: fixture.id,
+			title: fixture.name,
+			labels: { "albandrieu.com/operational-criticality": "medium" },
+		},
+		spec: { type: "service" },
 	})),
 };
 
@@ -50,18 +55,6 @@ const health = {
 	})),
 	truenas_runtime_reachable: true,
 	truenas_runtime_stale: false,
-};
-
-const topology = {
-	version: 1,
-	name: "health-theme-e2e",
-	nodes: serviceFixtures.map((fixture) => ({
-		id: fixture.id,
-		name: fixture.name,
-		kind: "service",
-		category: "application",
-	})),
-	relations: [],
 };
 
 const observability = {
@@ -106,9 +99,8 @@ const observability = {
 
 async function mockHomelabApis(page: Page) {
 	const payloads: Record<string, unknown> = {
-		"homelab-services": catalog,
+		"homelab-catalog-v2": catalog,
 		"homelab-health": health,
-		"homelab-topology": topology,
 		"homelab-observability": observability,
 	};
 	for (const [path, payload] of Object.entries(payloads)) {

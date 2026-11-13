@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
@@ -108,11 +109,14 @@ export default function useHierarchicalArchitectureGraph({
 	);
 	const servicesEntities = useMemo(() => {
 		const declared = buildNablaEntities(catalog.services, topology);
-		const existingIds = new Set(declared.map((entity) => entity.id));
+		// TrueNAS drift rows carry the entity name slug, not the entity ref.
+		const existing = new Set(
+			declared.map((entity) => catalogEntitySlug(entity.id)),
+		);
 		return [
 			...declared,
 			...observedOnlyEntities(runtimeStatus).filter(
-				(entity) => !existingIds.has(entity.id),
+				(entity) => !existing.has(entity.id),
 			),
 		];
 	}, [catalog.services, topology, runtimeStatus]);

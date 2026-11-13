@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const read = (path: string) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const read = (path: string) =>
+	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("localized public pages are build-time static instead of per-request SSR", async () => {
 	const layout = await read("app/[locale]/layout.tsx");
@@ -25,20 +26,31 @@ test("localized public pages are build-time static instead of per-request SSR", 
 test("server API authorization remains runtime-only and uncached", async () => {
 	for (const path of [
 		"app/api/homelab-health/route.ts",
-		"app/api/homelab-services/route.ts",
+		"app/api/homelab-catalog-v2/route.ts",
 		"app/api/homelab-health-v2/route.ts",
 	]) {
 		const source = await read(path);
 		assert.match(source, /export const dynamic = "force-dynamic"/, path);
-		assert.match(source, /gatedHomelabResponse|catalogUnavailableResponse/, path);
+		assert.match(
+			source,
+			/gatedHomelabResponse|catalogUnavailableResponse/,
+			path,
+		);
 		assert.doesNotMatch(source, /export const dynamic = "force-static"/, path);
 	}
 });
 
 test("TrueNAS page preserves dynamic authorized client diagnostics", async () => {
 	const page = await read("app/[locale]/truenas/page.tsx");
-	assert.match(page, /<HomelabServicesSection/, "TrueNAS has live SERVICE\/OWNER tiles");
+	assert.match(
+		page,
+		/<HomelabServicesSection/,
+		"TrueNAS has live SERVICE\/OWNER tiles",
+	);
 	const hook = await read("app/components/homelab/useHomelabHealth.ts");
 	assert.match(hook, /PUBLIC_HEALTH_REFRESH_MS = 120_000/);
-	assert.match(hook, /readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/);
+	assert.match(
+		hook,
+		/readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/,
+	);
 });

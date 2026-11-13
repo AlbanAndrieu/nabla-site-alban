@@ -1,18 +1,33 @@
 /** Validate display-only SERVICE text before rendering or browser caching. */
-const PRIVATE_REFERENCE = /(?:[a-z][a-z0-9+.-]*:\/\/|(?:\d{1,3}\.){3}\d{1,3}|\.int(?:\.|\b)|\b(?:password|secret|token|api[_-]?key)\s*[:=])/i;
+const PRIVATE_REFERENCE =
+	/(?:[a-z][a-z0-9+.-]*:\/\/|(?:\d{1,3}\.){3}\d{1,3}|\.int(?:\.|\b)|\b(?:password|secret|token|api[_-]?key)\s*[:=])/i;
 const PRIVATE_IPV6 = /(?:\b(?:fe80|f[cd][0-9a-f]{2}):|\[[0-9a-f:]+\]|::1\b)/i;
-const PRIVATE_PATH = /(?:^|[^a-z0-9])\/(?:mnt|etc|home|root|run\/secrets|var\/lib|workspace\/users)\//i;
+const PRIVATE_PATH =
+	/(?:^|[^a-z0-9])\/(?:mnt|etc|home|root|run\/secrets|var\/lib|workspace\/users)\//i;
 const CONTROL_CHARACTER = /[\u0000-\u001f\u007f]/;
 
 /** Reject embedded URLs, IP addresses, private hostnames and credentials. */
-export function isSafePublicText(value: unknown, maxLength = 500): value is string {
-  return typeof value === "string" && value.trim().length > 0 &&
-    value.length <= maxLength && !PRIVATE_REFERENCE.test(value) &&
-    !PRIVATE_IPV6.test(value) && !PRIVATE_PATH.test(value) &&
-    !CONTROL_CHARACTER.test(value);
+export function isSafePublicText(
+	value: unknown,
+	maxLength = 500,
+): value is string {
+	return (
+		typeof value === "string" &&
+		value.trim().length > 0 &&
+		value.length <= maxLength &&
+		!PRIVATE_REFERENCE.test(value) &&
+		!PRIVATE_IPV6.test(value) &&
+		!PRIVATE_PATH.test(value) &&
+		!CONTROL_CHARACTER.test(value)
+	);
 }
 
-/** A malformed or coerced SERVICE identity must never enter public React state. */
+/** A SERVICE identity is a bounded Backstage entity ref; nothing else enters public React state. */
 export function isSafePublicServiceId(value: unknown): value is string {
-  return typeof value === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+	return (
+		typeof value === "string" &&
+		/^(?:component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/.test(
+			value,
+		)
+	);
 }

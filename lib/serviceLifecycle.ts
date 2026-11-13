@@ -1,3 +1,4 @@
+import { catalogEntitySlug } from "./homelabCatalogV2Names";
 import type {
 	ServiceLifecycle,
 	ServiceLifecyclePhase,
@@ -91,7 +92,8 @@ function semanticSharedData(node: ServiceTopologyNode): boolean {
 
 // Fallback for catalog entries without a declared lifecycle.
 function compatibilityLifecycle(node: ServiceTopologyNode): ServiceLifecycle {
-	const id = node.id.toLowerCase();
+	// Layout presets are keyed by entity name, not by the full ref.
+	const id = catalogEntitySlug(node.id);
 	if (id === "docker-socket-proxy") {
 		return { phase: "bootstrap-runtime", priority: 0 };
 	}

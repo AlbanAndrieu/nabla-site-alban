@@ -6,14 +6,14 @@ import test from "node:test";
 const read = (path) =>
 	readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const privateRoutes = [
+	"homelab-catalog-v2",
 	"homelab-diagnostics",
 	"homelab-health",
+	"homelab-health-v2",
 	"homelab-network-flow",
 	"homelab-observability",
 	"homelab-probes",
-	"homelab-services",
 	"homelab-status",
-	"homelab-topology",
 	"runtime-topology",
 ];
 
@@ -62,11 +62,8 @@ test("homelab APIs require the trusted owner CIDR and optionally Cloudflare Acce
 	assert.match(access, /no-store/);
 });
 
-test("fallback JSON and legacy documents have no operator-only fields", () => {
+test("legacy documents have no operator-only fields", () => {
 	for (const path of [
-		"public/homelab-services.json",
-		"public/service-topology.json",
-		"config/homelab-navigation-overrides.json",
 		"public/freenas.html",
 		"public/locales/fr/freenas.html",
 	]) {
@@ -78,11 +75,6 @@ test("fallback JSON and legacy documents have no operator-only fields", () => {
 		assert.doesNotMatch(source, /(?:10|172|192)\.\d+\.\d+\.\d+/);
 		assert.doesNotMatch(source, /https?:\/\/[^\s"'<>]+:\d{2,5}\b/);
 	}
-	const services = JSON.parse(read("public/homelab-services.json"));
-	const topology = JSON.parse(read("public/service-topology.json"));
-	assert.equal(services.services.length, 1);
-	assert.equal(topology.nodes.length, 1);
-	assert.deepEqual(topology.relations, []);
 });
 
 const privilegedViews =

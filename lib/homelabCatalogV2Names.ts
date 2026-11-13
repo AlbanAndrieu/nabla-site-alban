@@ -14,6 +14,14 @@ export function catalogServiceSlug(name: string): string {
 		.replace(/^-+|-+$/g, "");
 }
 
+/**
+ * metadata.name slug of an entity ref, unique in an accepted catalog. It keys
+ * presentation (icons, anchors) and OWNER probe rows, never graph identity.
+ */
+export function catalogEntitySlug(ref: string): string {
+	return catalogServiceSlug(ref.slice(ref.lastIndexOf("/") + 1));
+}
+
 /** A catalog with ambiguous visible service names is not safe to publish. */
 export function hasUniqueCatalogServiceNames(
 	entities: readonly NamedEntity[],

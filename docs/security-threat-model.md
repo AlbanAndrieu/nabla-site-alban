@@ -50,7 +50,7 @@ Les contrôles existants sont des **éléments de conception** et ne valent pas 
 
 **TM-03 :** ajouter des tests de configuration `DOMAIN` malformée (userinfo, protocoles inattendus, paramètres de chemin), ainsi qu'un contrôle de l'URL de retour produite. La configuration réelle de Vercel demeure à auditer.
 
-**TM-04 / TM-05 :** assertions de non-divulgation et de provenance sur les payloads `/api/homelab-services` et `/api/homelab-health`. Distinguer absence de preuve, stale, état local, état effectif et dégradation du fournisseur.
+**TM-04 / TM-05 :** assertions de non-divulgation et de provenance sur les payloads `/api/homelab-catalog-v2`, `/api/homelab-health-v2` et `/api/homelab-health`. Distinguer absence de preuve, stale, état local, état effectif et dégradation du fournisseur.
 
 **TM-06 / TM-07 / TM-08 :** compléter l'inventaire des ressources chargées, maintenir les scans et refuser l'introduction d'une sonde SSRF arbitraire.
 

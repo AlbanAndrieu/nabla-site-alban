@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { loadHomelabServicesCatalog } from "../lib/homelabServicesServer";
 import {
 	fetchSiteCatalogV2,
 	SiteCatalogV2Error,
@@ -41,14 +40,13 @@ afterEach(() => {
 	else process.env.DIAGNOSTICS_ACCESS_KEY = originalKey;
 });
 
-test("a verified catalog is shared across requests and its projection reused", async () => {
+test("a verified catalog is shared across sequential requests", async () => {
 	process.env.DIAGNOSTICS_ACCESS_KEY = "fixture-cache-shared";
 	const calls = countingFetch(() => Response.json(catalog()));
-	const first = await loadHomelabServicesCatalog();
-	const second = await loadHomelabServicesCatalog();
+	const first = await fetchSiteCatalogV2();
+	const second = await fetchSiteCatalogV2();
 	assert.equal(calls(), 1);
-	assert.equal(second.catalog, first.catalog);
-	assert.equal(second.topology, first.topology);
+	assert.equal(second, first);
 });
 
 test("concurrent loads share one upstream request", async () => {

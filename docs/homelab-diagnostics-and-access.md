@@ -94,7 +94,7 @@ LAN supplémentaires. Les tests navigateur et les droits restent à prouver en P
 ### Corrections de frontière de sécurité HTTP (P0)
 
 Le mode temporaire `HOMELAB_PUBLIC_READONLY_ENABLED` peut autoriser
-`/api/homelab-services` et `/api/homelab-catalog-v2` sans identité OWNER.
+`/api/homelab-catalog-v2` et `/api/homelab-health-v2` sans identité OWNER.
 **Même en erreur**, le serveur revalide `isTrustedHomelabRequest(request)`.
 La réponse publique 503 se limite à
 `{ "error": "...", "reason": "unavailable" }`, sans en-tête de phase,

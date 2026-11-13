@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type {
 	HomelabDiagnosticsSnapshot,
 	HomelabExposureEvidence,
@@ -109,9 +110,9 @@ export default function ServiceTroubleshootingEvidence({
 	const anchoredDetails = useAnchoredDetails(detailsId);
 
 	useEffect(() => {
-    // Do not fetch three OWNER diagnostics for every mounted service card.
-    // Opening a details panel (or its hash deep link) activates the read.
-    if (!anchoredDetails.open) return;
+		// Do not fetch three OWNER diagnostics for every mounted service card.
+		// Opening a details panel (or its hash deep link) activates the read.
+		if (!anchoredDetails.open) return;
 		let active = true;
 		void Promise.all([
 			fetchHomelabDiagnosticsOnce(),
@@ -129,10 +130,13 @@ export default function ServiceTroubleshootingEvidence({
 	}, [anchoredDetails.open]);
 
 	const causes = useMemo(() => explainHealth(entry), [entry]);
-	const impacts: ServiceImpact[] = useMemo(
-		() => (topology && entry.id ? affectedDependents(topology, entry.id) : []),
-		[topology, entry.id],
-	);
+	const impacts: ServiceImpact[] = useMemo(() => {
+		// OWNER rows carry the entity name slug; the graph is keyed by entity ref.
+		const ref = topology?.nodes.find(
+			(node) => catalogEntitySlug(node.id) === entry.id,
+		)?.id;
+		return topology && ref ? affectedDependents(topology, ref) : [];
+	}, [topology, entry.id]);
 	const incidentPath = useMemo(
 		() => incidentDependencyPath(entry, health?.services ?? [entry]),
 		[entry, health],
@@ -363,7 +367,9 @@ export default function ServiceTroubleshootingEvidence({
 									<ul className="ps-3">
 										{directImpacts.map((impact) => (
 											<li key={impact.id}>
-												<a href={`#service-${impact.id}`}>{impact.name}</a>
+												<a href={`#service-${catalogEntitySlug(impact.id)}`}>
+													{impact.name}
+												</a>
 											</li>
 										))}
 									</ul>
@@ -377,8 +383,10 @@ export default function ServiceTroubleshootingEvidence({
 									<ul className="mb-0 ps-3">
 										{indirectImpacts.map((impact) => (
 											<li key={impact.id}>
-												<a href={`#service-${impact.id}`}>{impact.name}</a> ·{" "}
-												{impact.distance} hops
+												<a href={`#service-${catalogEntitySlug(impact.id)}`}>
+													{impact.name}
+												</a>{" "}
+												· {impact.distance} hops
 											</li>
 										))}
 									</ul>

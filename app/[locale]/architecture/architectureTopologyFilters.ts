@@ -3,6 +3,11 @@ import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
+import {
+	canonicalHomelabEvidence,
+	type UniqueHomelabEvidenceIndex,
+	uniqueHomelabEvidenceIndex,
+} from "@/lib/homelabHealthIdentity";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	type HomelabService,
@@ -22,8 +27,7 @@ type PresentationGroupTitleKey =
 	| "presentation.groups.support";
 
 export type HealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
+	owner: UniqueHomelabEvidenceIndex<HomelabHealthEntry>;
 	byRef: Map<string, HomelabHealthState>;
 };
 
@@ -55,34 +59,25 @@ export const PRESENTATION_GROUP_TITLE_KEY: Record<
 	support: "presentation.groups.support",
 };
 
-function normalizedName(value: string): string {
-	return value.trim().toLowerCase();
-}
-
 export function indexHealth(
 	snapshot: HomelabHealthSnapshot | null,
 	siteHealth?: SiteHealthV2 | null,
 	catalogRevision?: unknown,
 ): HealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalizedName(entry.name), entry);
-	}
-	return { byId, byName, byRef: siteHealthIndex(siteHealth, catalogRevision) };
+	return {
+		owner: uniqueHomelabEvidenceIndex(snapshot?.services ?? []),
+		byRef: siteHealthIndex(siteHealth, catalogRevision),
+	};
 }
 
+/** Join by entity ref only (OWNER rows via its metadata.name), never by display name. */
 export function effectiveState(
 	serviceId: string,
-	serviceName: string,
 	index: HealthIndex,
-	entityRef?: string,
 ): HomelabHealthState {
-	const entry =
-		index.byId.get(serviceId) ?? index.byName.get(normalizedName(serviceName));
+	const entry = canonicalHomelabEvidence(index.owner, serviceId);
 	if (entry) return resolveEffectiveServiceState(entry).effectiveState;
-	return entityRef ? (index.byRef.get(entityRef) ?? "unknown") : "unknown";
+	return index.byRef.get(serviceId) ?? "unknown";
 }
 
 export function snapshotAgeSeconds(
@@ -107,12 +102,7 @@ export function countHealthStates(
 		unknown: 0,
 	};
 	for (const service of services) {
-		const state = effectiveState(
-			homelabServiceId(service),
-			service.name,
-			healthIndex,
-			service.entityRef,
-		);
+		const state = effectiveState(homelabServiceId(service), healthIndex);
 		result[state] += 1;
 	}
 	return result;
@@ -143,7 +133,7 @@ export function filterArchitectureCatalog(
 	const query = searchQuery.trim().toLowerCase();
 	const services = catalog.services.filter((service) => {
 		const id = homelabServiceId(service);
-		const state = effectiveState(id, service.name, healthIndex, service.entityRef);
+		const state = effectiveState(id, healthIndex);
 		const group = presentation.get(id)?.group ?? "support";
 		const matchesSearch =
 			query.length === 0 ||

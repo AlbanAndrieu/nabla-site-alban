@@ -37,7 +37,15 @@ métadonnées localisées, le header, le footer et les scripts partagés.
 
 - `app/api/create-checkout-session/route.ts` : Checkout Stripe hébergé.
 - `app/api/github-stars/route.ts` : compteur GitHub, cache d'une heure.
-- `app/api/homelab-services/route.ts` : projection catalogue Backstage v2 via FastAPI, sans fallback runtime v1 ; réponse d'erreur expurgée pour SERVICE.
+- `app/api/homelab-catalog-v2/route.ts` : seul catalogue (entités Backstage v2
+  assainies et relations `dependsOn`/`consumesApis`/`providesApis`) relayé
+  depuis FastAPI `/api/site/catalog/v2`, sans fallback ; réponse d'erreur
+  expurgée pour SERVICE. Cartes et topologie en sont projetées côté client
+  (`projectHomelabCatalogV2`) : l'identité des nœuds React Flow est l'entity
+  ref complète (`component:default/prometheus`) ; seuls icônes et disposition
+  restent locaux.
+- `app/api/homelab-health-v2/route.ts` : états `ok/warn/fail/unknown` par
+  entity ref depuis FastAPI `/api/site/health/v2`.
 - `app/api/homelab-health/route.ts` : snapshot de santé homelab fourni par
   FastAPI.
 
@@ -58,7 +66,7 @@ HomelabServicesSection (serveur, texte éditorial public)
   -> HomelabPrivateServices (client)
       -> /api/homelab-access          (no-store, booléen)
       -> next/dynamic si autorisé :
-          HomelabServicesBlock -> /api/homelab-services, /api/homelab-health…
+          HomelabServicesBlock -> /api/homelab-catalog-v2, /api/homelab-health…
           HomelabOperationsDisclosure
 HomeLabSection -> HomeLabPrivateNetwork -> CloudflareStatusWarning, HomeLabNetworkFlow
 architecture/page -> ArchitecturePrivateViews -> explorateur, inspecteur, réseau
@@ -71,8 +79,7 @@ côté client, après le contrôle de frontière appliqué par les Route Handler
 `gatedHomelabResponse` interdit par défaut les endpoints OWNER.
 **Exception temporaire explicite :** `HOMELAB_PUBLIC_READONLY_ENABLED`
 autorise, lorsqu'il est activé, uniquement GET/HEAD des projections SERVICE
-`/api/homelab-services`, `/api/homelab-catalog-v2`,
-`/api/homelab-health-v2`. Le serveur expurge les erreurs 503 publiques ;
+`/api/homelab-catalog-v2` et `/api/homelab-health-v2`. Le serveur expurge les erreurs 503 publiques ;
 aucune route de sonde OWNER ne devient publique. Voir
 [contrat d'accès](homelab-diagnostics-and-access.md) et
 [roadmap Site](homelab-roadmap.md) pour le retrait de cette dérogation.

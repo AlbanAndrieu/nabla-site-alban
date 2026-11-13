@@ -11,14 +11,14 @@ const outside = "https://www.albanandrieu.com";
 
 test("only sanitized v2 read endpoints qualify for temporary public access", () => {
 	const on = { HOMELAB_PUBLIC_READONLY_ENABLED: "true" };
-	for (const path of [
-		"/api/homelab-services",
-		"/api/homelab-catalog-v2",
-		"/api/homelab-health-v2",
-	]) {
-		assert.equal(allowPublicHomelabProjection(new Request(outside + path), on), true);
+	for (const path of ["/api/homelab-catalog-v2", "/api/homelab-health-v2"]) {
+		assert.equal(
+			allowPublicHomelabProjection(new Request(outside + path), on),
+			true,
+		);
 	}
 	for (const path of [
+		"/api/homelab-services",
 		"/api/homelab-status",
 		"/api/homelab-health",
 		"/api/homelab-observability",
@@ -29,22 +29,31 @@ test("only sanitized v2 read endpoints qualify for temporary public access", () 
 		"/api/homelab-diagnostics",
 		"/api/admin",
 	]) {
-		assert.equal(allowPublicHomelabProjection(new Request(outside + path), on), false);
+		assert.equal(
+			allowPublicHomelabProjection(new Request(outside + path), on),
+			false,
+		);
 	}
 	assert.equal(
 		allowPublicHomelabProjection(
-			new Request(outside + "/api/homelab-services", { method: "POST" }),
+			new Request(outside + "/api/homelab-catalog-v2", { method: "POST" }),
 			on,
 		),
 		false,
 	);
 	assert.equal(
-		allowPublicHomelabProjection(new Request(outside + "/api/homelab-services"), {
-			HOMELAB_PUBLIC_READONLY_ENABLED: "false",
-		}),
+		allowPublicHomelabProjection(
+			new Request(outside + "/api/homelab-catalog-v2"),
+			{
+				HOMELAB_PUBLIC_READONLY_ENABLED: "false",
+			},
+		),
 		false,
 	);
-	assert.equal(publicRemoteReadOnlyEnabled({ HOMELAB_PUBLIC_READONLY_ENABLED: "false" }), false);
+	assert.equal(
+		publicRemoteReadOnlyEnabled({ HOMELAB_PUBLIC_READONLY_ENABLED: "false" }),
+		false,
+	);
 });
 
 test("remote allowlisted GET works without CIDR but raw endpoints stay denied", async () => {
@@ -64,8 +73,13 @@ test("remote allowlisted GET works without CIDR but raw endpoints stay denied", 
 			async () => Response.json({ private: true }),
 		);
 		assert.equal(raw.status, 404);
-		const access = await probeAccess(new Request(outside + "/api/homelab-access"));
-		assert.deepEqual(await access.json(), { trusted: true, mode: "public-readonly" });
+		const access = await probeAccess(
+			new Request(outside + "/api/homelab-access"),
+		);
+		assert.deepEqual(await access.json(), {
+			trusted: true,
+			mode: "public-readonly",
+		});
 	} finally {
 		if (old === undefined) delete process.env.HOMELAB_PUBLIC_READONLY_ENABLED;
 		else process.env.HOMELAB_PUBLIC_READONLY_ENABLED = old;

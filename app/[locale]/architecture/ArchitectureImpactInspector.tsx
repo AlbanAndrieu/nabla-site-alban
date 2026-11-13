@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
@@ -12,13 +13,8 @@ import {
 	incidentDependencyPath,
 } from "@/lib/homelabImpact";
 import { fetchHomelabHealthOnce } from "@/lib/homelabTroubleshootingClient";
-import {
-	getStaticServiceTopology,
-	type ServiceTopology,
-} from "@/lib/serviceTopology";
+import type { ServiceTopology } from "@/lib/serviceTopology";
 import styles from "./ArchitectureImpactInspector.module.css";
-
-const FALLBACK_TOPOLOGY = getStaticServiceTopology().topology;
 
 function stateClass(state?: string): string {
 	if (state === "ok") return styles.stateOk;
@@ -62,7 +58,8 @@ function causeLabel(cause: HealthCause, french: boolean): string {
 	}
 }
 
-function initialHashService(): string {
+// Deep links keep the historical #service-<slug> form shared with the TrueNAS cards.
+function hashServiceSlug(): string {
 	if (typeof window === "undefined") return "";
 	return window.location.hash.startsWith("#service-")
 		? window.location.hash.slice("#service-".length)
@@ -71,12 +68,12 @@ function initialHashService(): string {
 
 type Props = {
 	locale: string;
-	initialTopology?: ServiceTopology;
+	initialTopology: ServiceTopology;
 };
 
 export default function ArchitectureImpactInspector({
 	locale,
-	initialTopology = FALLBACK_TOPOLOGY,
+	initialTopology,
 }: Readonly<Props>) {
 	const french = locale === "fr";
 	const topology = initialTopology;
@@ -89,7 +86,13 @@ export default function ArchitectureImpactInspector({
 		void fetchHomelabHealthOnce().then((nextHealth) => {
 			if (active) setHealth(nextHealth);
 		});
-		const onHashChange = () => setSelectedId(initialHashService());
+		const onHashChange = () => {
+			const slug = hashServiceSlug();
+			setSelectedId(
+				topology.nodes.find((node) => catalogEntitySlug(node.id) === slug)
+					?.id ?? "",
+			);
+		};
 		const initialFrame = window.requestAnimationFrame(onHashChange);
 		window.addEventListener("hashchange", onHashChange);
 		return () => {
@@ -97,15 +100,17 @@ export default function ArchitectureImpactInspector({
 			window.cancelAnimationFrame(initialFrame);
 			window.removeEventListener("hashchange", onHashChange);
 		};
-	}, []);
+	}, [topology]);
 
 	const nodes = useMemo(
 		() => [...topology.nodes].sort((a, b) => a.name.localeCompare(b.name)),
 		[topology],
 	);
+	// OWNER probe rows are keyed by the entity name slug.
+	const selectedSlug = selectedId ? catalogEntitySlug(selectedId) : "";
 	const entry = useMemo(
-		() => health?.services.find((item) => item.id === selectedId),
-		[health, selectedId],
+		() => health?.services.find((item) => item.id === selectedSlug),
+		[health, selectedSlug],
 	);
 	const impacts = useMemo(
 		() => (selectedId ? affectedDependents(topology, selectedId) : []),
@@ -124,7 +129,12 @@ export default function ArchitectureImpactInspector({
 	const selectService = (id: string) => {
 		setSelectedId(id);
 		setShowImpact(false);
-		if (id) window.history.replaceState(null, "", `#service-${id}`);
+		if (id)
+			window.history.replaceState(
+				null,
+				"",
+				`#service-${catalogEntitySlug(id)}`,
+			);
 		else window.history.replaceState(null, "", "#service-impact-inspector");
 	};
 
@@ -134,7 +144,7 @@ export default function ArchitectureImpactInspector({
 			className="content-section"
 			aria-labelledby="service-impact-inspector-title"
 			data-architecture-impact-inspector
-			data-topology-contract="server-static-fallback"
+			data-topology-contract="backstage-v2"
 		>
 			<div className="container py-4">
 				<div className={styles.panel}>
@@ -182,7 +192,7 @@ export default function ArchitectureImpactInspector({
 						<div className={styles.result} data-selected-service-impact>
 							<div className="d-flex flex-wrap gap-2 align-items-center justify-content-between">
 								<strong>{names.get(selectedId) ?? selectedId}</strong>
-								<a href={`/${locale}/truenas#service-${selectedId}`}>
+								<a href={`/${locale}/truenas#service-${selectedSlug}`}>
 									{french
 										? "Ouvrir la carte TrueNAS"
 										: "Open TrueNAS service card"}
@@ -259,7 +269,7 @@ export default function ArchitectureImpactInspector({
 										{impacts.map((impact) => (
 											<li key={impact.id}>
 												<a
-													href={`#service-${impact.id}`}
+													href={`#service-${catalogEntitySlug(impact.id)}`}
 													onClick={() => selectService(impact.id)}
 												>
 													{impact.name}

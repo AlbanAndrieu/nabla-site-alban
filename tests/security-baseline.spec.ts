@@ -43,7 +43,7 @@ test.describe("Pentest baseline", () => {
 		});
 		expect(trace.status()).toBeGreaterThanOrEqual(400);
 
-		const apiPost = await request.post("/api/homelab-services", {
+		const apiPost = await request.post("/api/homelab-catalog-v2", {
 			failOnStatusCode: false,
 		});
 		expect(apiPost.status()).toBe(405);

@@ -18,23 +18,30 @@ async function mockOwner(page: Page) {
 	);
 }
 
-test("owner cards render when private catalog succeeds and topology fails", async ({
+const v2Entity = (kind: "Component" | "Resource", name: string, title: string) => ({
+	apiVersion: "backstage.io/v1alpha1",
+	kind,
+	entityRef: `${kind.toLowerCase()}:default/${name}`,
+	sourcePath: `apps/${name}/catalog-info.yaml`,
+	metadata: { name, title },
+	spec: {},
+});
+
+test("owner cards render from the Backstage v2 catalog alone", async ({
 	page,
 }) => {
 	await mockOwner(page);
-	await page.route("**/api/homelab-topology", (route) =>
-		route.abort("failed"),
-	);
-	await page.route("**/api/homelab-services", (route) =>
+	await page.route("**/api/homelab-catalog-v2", (route) =>
 		route.fulfill({
 			status: 200,
 			contentType: "application/json",
 			body: JSON.stringify({
-				version: 2,
+				schemaVersion: 2,
+				model: "backstage",
 				catalogRevision: `sha256:${"a".repeat(64)}`,
-				services: [
-					{ id: "postgresql", name: "PostgreSQL", endpointEnabled: false },
-					{ id: "prometheus", name: "Prometheus", endpointEnabled: false },
+				entities: [
+					v2Entity("Resource", "postgresql", "PostgreSQL"),
+					v2Entity("Component", "prometheus", "Prometheus"),
 				],
 			}),
 		}),
@@ -51,15 +58,12 @@ test("owner gets an explicit unavailable state, not an invented card", async ({
 	page,
 }) => {
 	await mockOwner(page);
-	await page.route("**/api/homelab-topology", (route) =>
-		route.fulfill({ status: 503, body: "unavailable" }),
-	);
-	await page.route("**/api/homelab-services", (route) =>
+	await page.route("**/api/homelab-catalog-v2", (route) =>
 		route.fulfill({
 			status: 503,
 			contentType: "application/json",
 			body: JSON.stringify({
-				error: "Backstage v2 inventory unavailable",
+				error: "Backstage v2 catalog unavailable",
 				reason: "access-denied",
 			}),
 		}),
@@ -80,7 +84,7 @@ test("anonymous browsers do not request or render a private catalog", async ({
 			body: JSON.stringify({ trusted: false }),
 		}),
 	);
-	await page.route("**/api/homelab-services", (route) => {
+	await page.route("**/api/homelab-catalog-v2", (route) => {
 		privateCatalogRequests += 1;
 		return route.fulfill({ status: 404 });
 	});

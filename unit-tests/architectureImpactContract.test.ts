@@ -11,11 +11,12 @@ test("impact inspector has an immediate topology-backed service contract", async
 		"app/[locale]/architecture/ArchitectureImpactInspector.tsx",
 	);
 
-	assert.match(inspector, /getStaticServiceTopology\(\)\.topology/);
-	assert.match(inspector, /initialTopology = FALLBACK_TOPOLOGY/);
+	// Only the Backstage v2 projection: no static or legacy topology fallback.
+	assert.doesNotMatch(inspector, /getStaticServiceTopology|FALLBACK_TOPOLOGY/);
+	assert.match(inspector, /initialTopology: ServiceTopology;/);
 	assert.match(inspector, /topology\.nodes/);
 	assert.match(inspector, /nodes\.map\(\(node\) =>/);
-	assert.match(inspector, /data-topology-contract="server-static-fallback"/);
+	assert.match(inspector, /data-topology-contract="backstage-v2"/);
 	assert.match(inspector, /serviceCount/);
 	assert.doesNotMatch(inspector, /fetchServiceTopologyOnce/);
 	assert.doesNotMatch(inspector, /fetch\("\/api\/homelab-topology/);

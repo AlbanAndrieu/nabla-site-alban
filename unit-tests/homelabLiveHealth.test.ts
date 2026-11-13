@@ -51,10 +51,8 @@ test("homelab service grid keeps endpoints clickable and matches FastAPI health 
 		/const endpointEnabled = !readOnly && svc\.endpointEnabled !== false/,
 	);
 	// Canonical id only: never match probes by display name or URL (#258).
-	assert.match(
-		page,
-		/canonicalHomelabEvidence\(index, homelabServiceId\(service\)\)/,
-	);
+	assert.match(page, /const serviceId = homelabServiceId\(service\);/);
+	assert.match(page, /canonicalHomelabEvidence\(index, serviceId\)/);
 	assert.doesNotMatch(page, /index\.byName\.get\(/);
 	assert.match(
 		page,
@@ -78,7 +76,7 @@ test("schema-v4 service state remains authoritative and older snapshots keep loc
 test("TrueNAS card uses only the dedicated public port-7000 probe for link color", async () => {
 	const page = await gridSource();
 	assert.match(page, /function serviceHealthEvidence/);
-	assert.match(page, /homelabServiceId\(service\) !== "truenas"/);
+	assert.match(page, /catalogEntitySlug\(serviceId\) !== "truenas"/);
 	assert.match(page, /snapshot\?\.truenas\?\.public/);
 	assert.match(page, /const publicHealth = snapshot\.truenas\.public/);
 	assert.match(page, /state: publicHealth\.state/);
@@ -246,7 +244,10 @@ test("OWNER homelab refresh stays at 30s while public SERVICE refresh is throttl
 	const page = await blockSource();
 	assert.match(page, /HEALTH_REFRESH_MS = 30_000/);
 	assert.match(page, /PUBLIC_HEALTH_REFRESH_MS = 120_000/);
-	assert.match(page, /readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/);
+	assert.match(
+		page,
+		/readOnly \? PUBLIC_HEALTH_REFRESH_MS : HEALTH_REFRESH_MS/,
+	);
 	assert.match(page, /setInterval/);
 	assert.match(page, /visibilitychange/);
 	assert.match(
