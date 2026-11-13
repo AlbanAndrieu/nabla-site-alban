@@ -5,15 +5,16 @@ définit `GET /api/site/catalog/v2` et [Compose #265](https://github.com/AlbanAn
 génère `catalog/generated/entities.json`. Les deux PR sont encore ouvertes :
 l'API et la source v2 ne sont **pas** garanties déployées sur Production.
 
-Le site demande le **catalogue v2 uniquement**, depuis ses routes serveur
-`/api/homelab-catalog-v2` et `/api/homelab-services`, après vérification
+Le site demande le **catalogue v2 uniquement**, depuis sa route serveur
+`/api/homelab-catalog-v2`, après vérification
 `HOMELAB_TRUSTED_CIDRS` sur la requête propriétaire. Le serveur Next.js
 interroge FastAPI avec `X-Diagnostics-Key` alimenté par
 `DIAGNOSTICS_ACCESS_KEY` (jamais `NEXT_PUBLIC_*`). La réponse Backstage est
 validée par le parseur existant `parseHomelabCatalogV2`, filtrée par allowlist
 et convertie en cartes et relations via `entityRef` et `catalogRevision`.
 Le rendu Architecture et les cartes partagent désormais la même révision et
-ne relisent pas `/api/homelab-services` v1 ou les JSON publics de secours.
+n'ont plus d'autre source : `/api/homelab-services`, `/api/homelab-topology`
+et les JSON publics de secours ont été supprimés (cutover catalogue v2).
 
 **Test négatif volontaire :** la valeur Preview actuelle de
 `DIAGNOSTICS_ACCESS_KEY` est factice et invalide. Un refus de FastAPI
@@ -116,10 +117,8 @@ Ne pas placer Cloudflare comme nouveau reverse proxy global du site Vercel ni s�
 
 | Source | Comportement actuel | Remédiation prioritaire |
 | --- | --- | --- |
-| `public/homelab-services.json` | Fallback **public** avec champs `internalHost`, `internalPort`, `tunnelUrl`, notes | Retirer le détail sensible du répertoire public et des paquets de build |
-| `public/service-topology.json` | Topologie locale sérialisée sous `public/` | Publier seulement une projection strictement assainie |
-| `config/homelab-navigation-overrides.json` | Navigation contenant des endpoints administratifs possibles | Classification, jamais sérialiser les endpoints privés dans le client |
-| `/api/homelab-services`, `/api/homelab-topology` | Renvoyés par des routes Next.js sans vérification d'identité | DTO publics **allowlist**, sans fallback détaillé |
+| `public/homelab-services.json`, `public/service-topology.json`, `config/homelab-navigation-overrides.json` | **Supprimés** au cutover catalogue v2 | — |
+| `/api/homelab-services`, `/api/homelab-topology` | **Supprimées** : remplacées par `/api/homelab-catalog-v2` (allowlist, sans fallback) | — |
 | `/api/homelab-health`, `/api/homelab-status`, `/api/homelab-probes` | État technique, certaines réponses mises en cache publiquement et en-têtes `X-Homelab-*-Primary` | Résumé public minimal ou 404; jamais publier preuves/provenance |
 | `/api/homelab-observability`, `/api/homelab-diagnostics`, `/api/runtime-topology` | Diagnostics et topologie runtime riches, sans vérification d'identité dans les routes | Retirer de la surface publique; ne pas créer de proxy secret ouvert |
 | `/fr/truenas`, `/en/truenas`, `/architecture`, `/nabla` | Consommateurs UI et éventuels diagrammes avec informations intégrées | Scanner SSR, HTML, JS, JSON, source maps et traductions EN/FR |
@@ -287,4 +286,4 @@ Limites connues :
   d'importer `homelabNetworkFlowNodes`/`homelabNetworkFlowEdges`.
 - Recette live `NOT_RUN` : vérifier sur la production, depuis le réseau
   domestique puis depuis un réseau mobile, que les vues apparaissent puis
-  disparaissent et que `/api/homelab-services` répond 404 hors réseau.
+  disparaissent et que `/api/homelab-catalog-v2` répond 404 hors réseau.

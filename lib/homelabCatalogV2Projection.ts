@@ -1,25 +1,24 @@
+import { homelabCatalogIconSrc } from "./homelabCatalogIcons";
 import {
 	catalogV2ServiceViews,
 	type HomelabCatalogV2,
 } from "./homelabCatalogV2";
-import { catalogServiceSlug } from "./homelabCatalogV2Names";
-import { homelabCatalogIconSrc } from "./homelabCatalogIcons";
 import type { HomelabServicesCatalog } from "./homelabServices";
 import type { ServiceRelationType, ServiceTopology } from "./serviceTopology";
 
-/** One canonical Backstage v2 source for cards and the architecture graph. */
+/**
+ * One canonical Backstage v2 source for cards and the architecture graph.
+ * Every service, node and edge endpoint is the full entity ref.
+ */
 export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	services: HomelabServicesCatalog;
 	topology: ServiceTopology;
 } {
 	const views = catalogV2ServiceViews(catalog);
-	// The parser rejects duplicate names, display titles and card slugs.
-	const byRef = new Map(
-		views.map((view) => [view.entityRef, catalogServiceSlug(view.id)]),
-	);
+	const refs = new Set(views.map((view) => view.entityRef));
 	const shared = views.map((view) => ({
 		view,
-		id: byRef.get(view.entityRef) ?? view.id,
+		id: view.entityRef,
 		kind: view.type ?? view.entityKind.toLowerCase(),
 		category: view.category ?? "other",
 	}));
@@ -59,24 +58,27 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 	const relations: ServiceTopology["relations"] = [];
 	const seen = new Set<string>();
 	for (const entity of catalog.entities) {
-		const source = byRef.get(entity.entityRef);
-		if (!source) continue;
+		const source = entity.entityRef;
+		if (!refs.has(source)) continue;
 		for (const [field, type] of Object.entries(relationFields) as [
 			keyof typeof relationFields,
 			ServiceRelationType,
 		][]) {
 			const raw = entity.spec[field];
 			// Backstage's subcomponentOf is a scalar reference, unlike dependsOn.
-			const refs =
+			const targets =
 				field === "subcomponentOf" && typeof raw === "string"
 					? [raw]
 					: Array.isArray(raw)
 						? raw
 						: [];
-			for (const ref of refs) {
-				if (typeof ref !== "string") continue;
-				const target = byRef.get(ref);
-				if (!target || target === source) continue;
+			for (const target of targets) {
+				if (
+					typeof target !== "string" ||
+					!refs.has(target) ||
+					target === source
+				)
+					continue;
 				const key = `${source}:${target}:${type}`;
 				if (seen.has(key)) continue;
 				seen.add(key);

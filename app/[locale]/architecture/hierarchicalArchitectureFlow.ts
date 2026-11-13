@@ -1,4 +1,5 @@
 import { type Edge, MarkerType, type Node } from "@xyflow/react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabHealthEntry } from "@/lib/homelabHealth";
 import {
 	cloudflareIndicatorColor,
@@ -77,10 +78,15 @@ export function buildGroupedNodes(
 		group.entities.forEach((entity, index) => {
 			const col = index % MAX_COLUMNS;
 			const row = Math.floor(index / MAX_COLUMNS);
+			// TrueNAS status and OWNER probe rows are keyed by entity name slug.
 			const runtimeStatus =
-				mode === "services" ? statusById.get(entity.id) : undefined;
+				mode === "services"
+					? statusById.get(catalogEntitySlug(entity.id))
+					: undefined;
 			const health =
-				mode === "services" ? healthById.get(entity.id) : undefined;
+				mode === "services"
+					? healthById.get(catalogEntitySlug(entity.id))
+					: undefined;
 			const resolvedHealth = resolveEffectiveServiceState(health);
 			const blockers = blockedDependencyLabels(health);
 			const degraded = degradedDependencyLabels(health);
@@ -152,8 +158,8 @@ function requiredEdgeDependencyState(
 	if (relation.optional || ["partOf", "hostedBy"].includes(relation.type))
 		return null;
 	return requiredDependencyRelationHealth(
-		healthById.get(relation.source),
-		relation.target,
+		healthById.get(catalogEntitySlug(relation.source)),
+		catalogEntitySlug(relation.target),
 		relation.type,
 	);
 }

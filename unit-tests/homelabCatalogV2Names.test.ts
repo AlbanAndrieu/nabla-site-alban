@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	catalogEntitySlug,
 	catalogServiceSlug,
 	hasUniqueCatalogServiceNames,
 } from "../lib/homelabCatalogV2Names";
@@ -87,4 +88,11 @@ test("organizational entities do not create false visible-service collisions", (
 		]),
 		true,
 	);
+});
+
+test("entity refs map to their metadata.name slug for presentation and OWNER rows", () => {
+	assert.equal(catalogEntitySlug("component:default/prometheus"), "prometheus");
+	assert.equal(catalogEntitySlug("resource:edge/garage.webui"), "garage-webui");
+	// A plain OWNER slug is already its own presentation key.
+	assert.equal(catalogEntitySlug("truenas"), "truenas");
 });

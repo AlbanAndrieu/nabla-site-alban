@@ -1,3 +1,5 @@
+import { parseHomelabCatalogV2 } from "./homelabCatalogV2";
+import { projectHomelabCatalogV2 } from "./homelabCatalogV2Projection";
 import {
 	type HomelabDiagnosticsSnapshot,
 	parseHomelabDiagnostics,
@@ -6,7 +8,7 @@ import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
 } from "./homelabHealth";
-import { parseServiceTopology, type ServiceTopology } from "./serviceTopology";
+import type { ServiceTopology } from "./serviceTopology";
 
 let diagnosticsPromise: Promise<HomelabDiagnosticsSnapshot | null> | null =
 	null;
@@ -42,10 +44,11 @@ export function fetchHomelabHealthOnce(): Promise<HomelabHealthSnapshot | null> 
 	return healthPromise;
 }
 
+/** The graph is the Backstage v2 projection; there is no second topology source. */
 export function fetchServiceTopologyOnce(): Promise<ServiceTopology | null> {
-	topologyPromise ??= fetchParsed(
-		"/api/homelab-topology",
-		parseServiceTopology,
-	);
+	topologyPromise ??= fetchParsed("/api/homelab-catalog-v2", (value) => {
+		const catalog = parseHomelabCatalogV2(value);
+		return catalog ? projectHomelabCatalogV2(catalog).topology : null;
+	});
 	return topologyPromise;
 }

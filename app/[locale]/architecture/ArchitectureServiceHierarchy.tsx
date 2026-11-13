@@ -2,14 +2,12 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type {
-	HomelabHealthEntry,
-	HomelabHealthSnapshot,
-} from "@/lib/homelabHealth";
-import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
+import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
+import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import {
-	homelabServiceId,
 	type HomelabServicesCatalog,
+	homelabServiceId,
 } from "@/lib/homelabServices";
 import {
 	groupCatalogByPresentation,
@@ -17,9 +15,8 @@ import {
 	type ServicePresentationGroup,
 } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
-import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
-import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
-import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
+import type { SiteHealthV2 } from "@/lib/siteHealthV2";
+import { effectiveState, indexHealth } from "./architectureTopologyFilters";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
@@ -67,14 +64,6 @@ const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
 	support: "presentation.metrics.support",
 };
 
-function healthById(snapshot: HomelabHealthSnapshot | null): Map<string, HomelabHealthEntry> {
-	return new Map(
-		(snapshot?.services ?? [])
-			.filter((entry): entry is HomelabHealthEntry & { id: string } => Boolean(entry.id))
-			.map((entry) => [entry.id, entry]),
-	);
-}
-
 export default function ArchitectureServiceHierarchy({
 	catalog,
 	topology,
@@ -84,16 +73,18 @@ export default function ArchitectureServiceHierarchy({
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
 	const locale = useLocale();
-	const [expandedGroups, setExpandedGroups] = useState<Set<ServicePresentationGroup>>(
-		() => new Set(DEFAULT_OPEN_GROUPS),
-	);
+	const [expandedGroups, setExpandedGroups] = useState<
+		Set<ServicePresentationGroup>
+	>(() => new Set(DEFAULT_OPEN_GROUPS));
 
 	const groups = useMemo<HierarchyGroup[]>(
 		() => groupCatalogByPresentation(catalog, topology),
 		[catalog, topology],
 	);
-	const indexedHealth = useMemo(() => healthById(snapshot), [snapshot]);
-	const projectedHealth = siteHealthIndex(siteHealth, catalog.catalogRevision);
+	const healthIndex = useMemo(
+		() => indexHealth(snapshot, siteHealth, catalog.catalogRevision),
+		[snapshot, siteHealth, catalog.catalogRevision],
+	);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {
@@ -112,55 +103,50 @@ export default function ArchitectureServiceHierarchy({
 				data-architecture-services
 			>
 				{groups.map((group) => {
-					const issueCount = group.catalog.services.filter((service) => {
-						const entry = indexedHealth.get(homelabServiceId(service));
-						const projectedState = service.entityRef
-							? projectedHealth.get(service.entityRef)
-							: undefined;
-						return (entry
-							? resolveEffectiveServiceState(entry).effectiveState
-							: projectedState ?? "unknown") !== "ok";
-					}).length;
+					const issueCount = group.catalog.services.filter(
+						(service) =>
+							effectiveState(homelabServiceId(service), healthIndex) !== "ok",
+					).length;
 					return (
-					<details
-						className={styles.groupDetails}
-						key={group.group}
-						open={expandedGroups.has(group.group)}
-						onToggle={(event) =>
-							setGroupExpanded(group.group, event.currentTarget.open)
-						}
-						data-service-presentation-group={group.group}
-						data-metrics-profile={group.metricsProfile}
-						data-needs-attention={issueCount > 0 ? "true" : "false"}
-					>
-						<summary className={styles.groupSummary}>
-							<span className={styles.groupTitle}>
-								<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
-							</span>
-							<span className={styles.groupMeta}>
-								<span className={styles.metricsProfileBadge}>
-									{t(METRICS_PROFILE_KEY[group.metricsProfile])}
+						<details
+							className={styles.groupDetails}
+							key={group.group}
+							open={expandedGroups.has(group.group)}
+							onToggle={(event) =>
+								setGroupExpanded(group.group, event.currentTarget.open)
+							}
+							data-service-presentation-group={group.group}
+							data-metrics-profile={group.metricsProfile}
+							data-needs-attention={issueCount > 0 ? "true" : "false"}
+						>
+							<summary className={styles.groupSummary}>
+								<span className={styles.groupTitle}>
+									<strong>{t(GROUP_TITLE_KEY[group.group])}</strong>
 								</span>
-								<span>
-									{t("presentation.componentCount", {
-										count: group.catalog.services.length,
-									})}
+								<span className={styles.groupMeta}>
+									<span className={styles.metricsProfileBadge}>
+										{t(METRICS_PROFILE_KEY[group.metricsProfile])}
+									</span>
+									<span>
+										{t("presentation.componentCount", {
+											count: group.catalog.services.length,
+										})}
+									</span>
+									<span data-group-issue-count={issueCount}>
+										{t("presentation.issueCount", { count: issueCount })}
+									</span>
 								</span>
-								<span data-group-issue-count={issueCount}>
-									{t("presentation.issueCount", { count: issueCount })}
-								</span>
-							</span>
-						</summary>
-						<div className={`${styles.groupBody} homelab-service-subgrid`}>
-							<HomelabServiceGrid
-								catalog={group.catalog}
-								snapshot={snapshot}
-								siteHealth={siteHealth}
-								healthUnavailable={healthUnavailable && !siteHealth}
-								healthHttpStatus={null}
-							/>
-						</div>
-					</details>
+							</summary>
+							<div className={`${styles.groupBody} homelab-service-subgrid`}>
+								<HomelabServiceGrid
+									catalog={group.catalog}
+									snapshot={snapshot}
+									siteHealth={siteHealth}
+									healthUnavailable={healthUnavailable && !siteHealth}
+									healthHttpStatus={null}
+								/>
+							</div>
+						</details>
 					);
 				})}
 				{groups.length === 0 ? (

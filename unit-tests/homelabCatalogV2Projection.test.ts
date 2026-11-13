@@ -36,14 +36,29 @@ function idsByRef(output: ReturnType<typeof project>) {
 	);
 }
 
-test("unique Backstage names retain their existing service IDs", () => {
+test("service, node and edge identities are full entity refs, never slugs", () => {
 	const output = project([
-		entity("Component", "default", "nexus"),
+		entity("Component", "default", "nexus", {
+			dependsOn: ["resource:default/postgres"],
+		}),
 		entity("Resource", "default", "postgres"),
 	]);
 	assert.deepEqual(
 		output.services.services.map((service) => service.id).sort(),
-		["nexus", "postgres"],
+		["component:default/nexus", "resource:default/postgres"],
+	);
+	assert.deepEqual(output.topology.nodes.map((node) => node.id).sort(), [
+		"component:default/nexus",
+		"resource:default/postgres",
+	]);
+	assert.deepEqual(
+		output.topology.relations.map(({ source, target }) => [source, target]),
+		[["component:default/nexus", "resource:default/postgres"]],
+	);
+	// Icons stay a local presentation mapping keyed by the entity name.
+	assert.match(
+		String(output.services.services[1]?.iconSrc),
+		/^assets\/selfh-icons\//,
 	);
 });
 
@@ -102,8 +117,8 @@ test("scalar subcomponentOf builds the parent partOf graph edge", () => {
 	]);
 	assert.deepEqual(output.topology.relations, [
 		{
-			source: "frontend",
-			target: "backend",
+			source: "component:default/frontend",
+			target: "component:default/backend",
 			type: "partOf",
 			strength: "required",
 			evidence: [],
@@ -127,7 +142,11 @@ test("relation order remains stable when upstream changes entity order", () => {
 	assert.deepEqual(normal.topology.relations, reversed.topology.relations);
 	assert.deepEqual(
 		normal.topology.relations.map((relation) => relation.source),
-		["backend", "frontend", "frontend"],
+		[
+			"component:default/backend",
+			"component:default/frontend",
+			"component:default/frontend",
+		],
 	);
 });
 

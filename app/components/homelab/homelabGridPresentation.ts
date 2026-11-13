@@ -1,9 +1,14 @@
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
-import { canonicalHomelabEvidence, uniqueHomelabEvidenceIndex, type UniqueHomelabEvidenceIndex } from "@/lib/homelabHealthIdentity";
+import {
+	canonicalHomelabEvidence,
+	type UniqueHomelabEvidenceIndex,
+	uniqueHomelabEvidenceIndex,
+} from "@/lib/homelabHealthIdentity";
 import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
@@ -55,7 +60,8 @@ export const RUNTIME_ICON_CLASS: Record<RuntimePresentationState, string> = {
 
 export function serviceIconPath(iconSrc?: string): string {
 	const candidate = iconSrc?.replace(/^\/+/, "");
-	return candidate && /^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/.test(candidate)
+	return candidate &&
+		/^assets\/selfh-icons\/[a-zA-Z0-9._-]+\.(?:png|jpg|svg)$/.test(candidate)
 		? `/${candidate}`
 		: "/assets/selfh-icons/generic-app.svg";
 }
@@ -68,8 +74,10 @@ export function endpointUrlHostIsPrivateS3(value?: string): boolean {
 	}
 }
 
-export function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
-  return uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
+export function healthIndex(
+	snapshot: HomelabHealthSnapshot | null,
+): HealthIndex {
+	return uniqueHomelabEvidenceIndex(snapshot?.services ?? []);
 }
 
 export function serviceHealthEvidence(
@@ -79,8 +87,12 @@ export function serviceHealthEvidence(
 	snapshot: HomelabHealthSnapshot | null,
 ): HomelabHealthEntry | undefined {
 	// URLs are accepted for call-site compatibility, never for matching probes.
-	const generic = canonicalHomelabEvidence(index, homelabServiceId(service));
-	if (homelabServiceId(service) !== "truenas" || !snapshot?.truenas?.public) {
+	const serviceId = homelabServiceId(service);
+	const generic = canonicalHomelabEvidence(index, serviceId);
+	if (
+		catalogEntitySlug(serviceId) !== "truenas" ||
+		!snapshot?.truenas?.public
+	) {
 		return generic;
 	}
 

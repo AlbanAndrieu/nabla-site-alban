@@ -3,12 +3,13 @@
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
-
 import {
-	homelabServiceId,
-	isHomelabCatalogPlaceholder,
-} from "@/lib/homelabServices";
+	RESOURCE_SNAPSHOT_KEY,
+	type ResourceSnapshot,
+} from "@/lib/homelabResourceEvidence";
+import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
@@ -16,10 +17,12 @@ import CriticalDependencyHierarchy, {
 } from "./CriticalDependencyHierarchy";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
-import HomelabServiceGrid from "./HomelabServiceGrid";
 import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
-import { RESOURCE_SNAPSHOT_KEY, type ResourceSnapshot } from "@/lib/homelabResourceEvidence";
-import HomelabServiceFilters, { type GroupFilter, type HealthFilter } from "./HomelabServiceFilters";
+import HomelabServiceFilters, {
+	type GroupFilter,
+	type HealthFilter,
+} from "./HomelabServiceFilters";
+import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
 import {
@@ -59,17 +62,24 @@ export default function HomelabServicesBlock({
 		Set<ServicePresentationGroup>
 	>(() => new Set(["services", "core-critical", "security-controls"]));
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
-	const [resourceSnapshot, setResourceSnapshot] = useState<ResourceSnapshot | null>(null);
+	const [resourceSnapshot, setResourceSnapshot] =
+		useState<ResourceSnapshot | null>(null);
 	// SERVICE admission must not preserve an earlier OWNER resource snapshot
 	// in this browser. Clear only the OWNER resource key, not the public cache.
 	useEffect(() => {
 		if (!readOnly) return;
-		try { window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY); } catch { /* disabled */ }
+		try {
+			window.localStorage.removeItem(RESOURCE_SNAPSHOT_KEY);
+		} catch {
+			/* disabled */
+		}
 		let cancelled = false;
 		queueMicrotask(() => {
 			if (!cancelled) setResourceSnapshot(null);
 		});
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [readOnly]);
 	const handledAnchor = useRef<string | null>(null);
 
@@ -93,27 +103,29 @@ export default function HomelabServicesBlock({
 			}
 		);
 	}, [state.catalog, state.topology]);
-  // Service cards render first; the expensive ReactFlow bundle mounts near viewport.
-  const [graphInView, setGraphInView] = useState(false);
-  const graphRef = useRef<HTMLElement | null>(null);
-  useEffect(() => {
-    if (!graphTopology || graphInView) return;
-    const target = graphRef.current;
-    if (!target) return;
-    if (typeof IntersectionObserver === "undefined") {
-      const timer = window.setTimeout(() => setGraphInView(true), 0);
-      return () => window.clearTimeout(timer);
-    }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) {
-        setGraphInView(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: "360px" });
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [graphTopology, graphInView]);
-
+	// Service cards render first; the expensive ReactFlow bundle mounts near viewport.
+	const [graphInView, setGraphInView] = useState(false);
+	const graphRef = useRef<HTMLElement | null>(null);
+	useEffect(() => {
+		if (!graphTopology || graphInView) return;
+		const target = graphRef.current;
+		if (!target) return;
+		if (typeof IntersectionObserver === "undefined") {
+			const timer = window.setTimeout(() => setGraphInView(true), 0);
+			return () => window.clearTimeout(timer);
+		}
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry?.isIntersecting) {
+					setGraphInView(true);
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: "360px" },
+		);
+		observer.observe(target);
+		return () => observer.disconnect();
+	}, [graphTopology, graphInView]);
 
 	const indexedHealth = useMemo(
 		() =>
@@ -182,7 +194,7 @@ export default function HomelabServicesBlock({
 		const serviceId = match[1];
 		const group = hierarchyGroups.find((item) =>
 			item.catalog.services.some(
-				(service) => homelabServiceId(service) === serviceId,
+				(service) => catalogEntitySlug(homelabServiceId(service)) === serviceId,
 			),
 		);
 		if (!group) return;
@@ -242,74 +254,74 @@ export default function HomelabServicesBlock({
 								: "Missing server key: Backstage v2 catalog unavailable."
 							: t("unavailable")}
 				{!readOnly && state.error && state.catalogIncident && (
-					<p className="small text-muted mt-2" data-catalog-failure-stage={state.catalogIncident.stage}>
-						{french ? "Phase du diagnostic" : "Diagnostic stage"}: <code>{state.catalogIncident.stage}</code>
+					<p
+						className="small text-muted mt-2"
+						data-catalog-failure-stage={state.catalogIncident.stage}
+					>
+						{french ? "Phase du diagnostic" : "Diagnostic stage"}:{" "}
+						<code>{state.catalogIncident.stage}</code>
 						{" · "}
-						{french ? "Référence support" : "Support reference"}: <code>{state.catalogIncident.requestId}</code>
+						{french ? "Référence support" : "Support reference"}:{" "}
+						<code>{state.catalogIncident.requestId}</code>
 					</p>
 				)}
 			</div>
 		);
 	}
 
-	if (isHomelabCatalogPlaceholder(state.catalog)) {
-		return (
-			<section
-				data-homelab-inventory-unavailable
-				role="status"
-				className="alert alert-warning"
-			>
-				<strong>
-					{french
-						? "Catalogue privé indisponible"
-						: "Private catalog unavailable"}
-				</strong>
-				<p>
-					{french
-						? state.catalog.privateInventoryStatus === "access-denied"
-							? "FastAPI a refusé l’accès au catalogue privé (HTTP 401/403). Vérifier DIAGNOSTICS_ACCESS_KEY dans Vercel et la valeur attendue côté fastapi-sample."
-							: state.catalog.privateInventoryStatus === "key-missing"
-								? "La clé DIAGNOSTICS_ACCESS_KEY est absente de l’environnement serveur Vercel. Le catalogue privé ne peut pas être récupéré."
-								: "Le catalogue privé n’a pas été récupéré depuis l’API FastAPI (réseau, délai, erreur HTTP ou réponse invalide). Vérifier l’API et la clé DIAGNOSTICS_ACCESS_KEY."
-						: state.catalog.privateInventoryStatus === "access-denied"
-							? "FastAPI denied the private catalog (HTTP 401/403). Check DIAGNOSTICS_ACCESS_KEY in Vercel and the FastAPI server configuration."
-							: state.catalog.privateInventoryStatus === "key-missing"
-								? "DIAGNOSTICS_ACCESS_KEY is missing from the Vercel server environment. The private catalog cannot be retrieved."
-								: "The private catalog could not be retrieved from FastAPI (network, timeout, HTTP error or invalid response). Verify the API and DIAGNOSTICS_ACCESS_KEY."}
-				</p>
-			</section>
-		);
-	}
-
 	return (
 		<>
 			{readOnly && state.catalogStale && (
-				<p data-homelab-catalog-stale role="status" className="small text-warning my-2">
-					{french ? "Catalogue public en cache · santé non vérifiée" : "Saved public catalog · health unverified"}
-				</p>
-			)}
-			{!state.healthRefreshing && state.healthUnavailable && !state.catalogStale && (
-				<p data-homelab-api-degraded role="status" className="small text-warning my-2">
+				<p
+					data-homelab-catalog-stale
+					role="status"
+					className="small text-warning my-2"
+				>
 					{french
-						? "Sondes indisponibles ou lentes · état non confirmé"
-						: "Probes unavailable or slow · health unconfirmed"}
+						? "Catalogue public en cache · santé non vérifiée"
+						: "Saved public catalog · health unverified"}
 				</p>
 			)}
-      {!readOnly && !state.healthRefreshing && !state.snapshot && (
-        <div className="alert alert-warning" role="status" data-owner-diagnostics-unavailable>
-          <strong>{french ? "Diagnostics OWNER indisponibles" : "OWNER diagnostics unavailable"}</strong>
-          <p className="mb-1">
-            {state.ownerBoundary
-              ? (french ? "Le serveur refuse l'accès aux sondes privées (owner-boundary). Vérifiez le canal OWNER, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED et DIAGNOSTICS_ACCESS_KEY côté serveur."
-                  : "The server denies private probes (owner-boundary). Check the OWNER channel, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED and server-side DIAGNOSTICS_ACCESS_KEY.")
-              : (french ? `FastAPI ne fournit pas de preuve détaillée (${state.healthStatus === null ? "réseau ou délai" : `HTTP ${state.healthStatus}`}). Le catalogue et les statuts publics ne confirment pas le fonctionnement de Docker, TLS ou Prometheus.`
-                  : `FastAPI has no detailed evidence (${state.healthStatus === null ? "network or timeout" : `HTTP ${state.healthStatus}`}). Public catalog and health cannot confirm Docker, TLS or Prometheus.`)}
-          </p>
-          <small>{french
-            ? "Consultez /api/homelab-access?diagnose=1 puis /api/homelab-health depuis le réseau autorisé. Aucun lien LAN ne sera inventé."
-            : "Check /api/homelab-access?diagnose=1 and /api/homelab-health from an authorized network. LAN links will not be guessed."}</small>
-        </div>
-      )}
+			{!state.healthRefreshing &&
+				state.healthUnavailable &&
+				!state.catalogStale && (
+					<p
+						data-homelab-api-degraded
+						role="status"
+						className="small text-warning my-2"
+					>
+						{french
+							? "Sondes indisponibles ou lentes · état non confirmé"
+							: "Probes unavailable or slow · health unconfirmed"}
+					</p>
+				)}
+			{!readOnly && !state.healthRefreshing && !state.snapshot && (
+				<div
+					className="alert alert-warning"
+					role="status"
+					data-owner-diagnostics-unavailable
+				>
+					<strong>
+						{french
+							? "Diagnostics OWNER indisponibles"
+							: "OWNER diagnostics unavailable"}
+					</strong>
+					<p className="mb-1">
+						{state.ownerBoundary
+							? french
+								? "Le serveur refuse l'accès aux sondes privées (owner-boundary). Vérifiez le canal OWNER, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED et DIAGNOSTICS_ACCESS_KEY côté serveur."
+								: "The server denies private probes (owner-boundary). Check the OWNER channel, HOMELAB_OWNER_RAW_UPSTREAM_ENABLED and server-side DIAGNOSTICS_ACCESS_KEY."
+							: french
+								? `FastAPI ne fournit pas de preuve détaillée (${state.healthStatus === null ? "réseau ou délai" : `HTTP ${state.healthStatus}`}). Le catalogue et les statuts publics ne confirment pas le fonctionnement de Docker, TLS ou Prometheus.`
+								: `FastAPI has no detailed evidence (${state.healthStatus === null ? "network or timeout" : `HTTP ${state.healthStatus}`}). Public catalog and health cannot confirm Docker, TLS or Prometheus.`}
+					</p>
+					<small>
+						{french
+							? "Consultez /api/homelab-access?diagnose=1 puis /api/homelab-health depuis le réseau autorisé. Aucun lien LAN ne sera inventé."
+							: "Check /api/homelab-access?diagnose=1 and /api/homelab-health from an authorized network. LAN links will not be guessed."}
+					</small>
+				</div>
+			)}
 			{!readOnly && (
 				<HomelabStatusOverview
 					snapshot={state.snapshot}
@@ -331,19 +343,26 @@ export default function HomelabServicesBlock({
 					/>
 					{state.siteHealthTraceId ? (
 						<details data-owner-site-trace className="small my-3">
-							<summary>{french ? "Référence du diagnostic Site → FastAPI" : "Site → FastAPI diagnostic reference"}</summary>
-							<p>{state.siteHealthTraceConfirmed
-								? (french ? "ID confirmé par l’en-tête FastAPI. Rechercher la trace correspondante dans les logs FastAPI."
-									: "ID confirmed by the FastAPI response header. Find the matching FastAPI log entry.")
-								: (french ? "ID envoyé à FastAPI ; réception non encore confirmée."
-									: "ID sent to FastAPI; downstream receipt not yet confirmed.")}</p>
+							<summary>
+								{french
+									? "Référence du diagnostic Site → FastAPI"
+									: "Site → FastAPI diagnostic reference"}
+							</summary>
+							<p>
+								{state.siteHealthTraceConfirmed
+									? french
+										? "ID confirmé par l’en-tête FastAPI. Rechercher la trace correspondante dans les logs FastAPI."
+										: "ID confirmed by the FastAPI response header. Find the matching FastAPI log entry."
+									: french
+										? "ID envoyé à FastAPI ; réception non encore confirmée."
+										: "ID sent to FastAPI; downstream receipt not yet confirmed."}
+							</p>
 							<code data-owner-trace-id>{state.siteHealthTraceId}</code>
 						</details>
 					) : null}
 					<HomelabProbeDiagnostics snapshot={state.snapshot} />
 				</>
 			)}
-
 
 			{!readOnly && (
 				<HomelabResourceSnapshotImport
@@ -433,7 +452,7 @@ export default function HomelabServicesBlock({
 			{graphTopology ? (
 				<section
 					data-homelab-service-reactflow
-                    ref={graphRef}
+					ref={graphRef}
 					aria-labelledby="truenas-service-graph-title"
 				>
 					<h3 id="truenas-service-graph-title">
@@ -450,21 +469,27 @@ export default function HomelabServicesBlock({
 					) : null}
 					{graphInView ? (
 						<HierarchicalArchitectureExplorer
-						locale={locale}
-						catalog={state.catalog}
-						catalogSource="backstage-v2"
-						topology={graphTopology}
-						topologySource={state.topology ? "fastapi" : "local-fallback"}
-						healthStatus={readOnly ? null : state.snapshot}
-						healthSource={
-							readOnly ? "site-v2" : state.snapshot ? "fastapi" : "unavailable"
-						}
-						readOnly={readOnly}
-						initialMode="services"
+							locale={locale}
+							catalog={state.catalog}
+							catalogSource="backstage-v2"
+							topology={graphTopology}
+							topologySource={state.topology ? "fastapi" : "local-fallback"}
+							healthStatus={readOnly ? null : state.snapshot}
+							healthSource={
+								readOnly
+									? "site-v2"
+									: state.snapshot
+										? "fastapi"
+										: "unavailable"
+							}
+							readOnly={readOnly}
+							initialMode="services"
 						/>
 					) : (
 						<p role="status" data-homelab-graph-deferred>
-							{french ? "Graphe chargé à l’approche de la section." : "Graph loads near the viewport."}
+							{french
+								? "Graphe chargé à l’approche de la section."
+								: "Graph loads near the viewport."}
 						</p>
 					)}
 				</section>

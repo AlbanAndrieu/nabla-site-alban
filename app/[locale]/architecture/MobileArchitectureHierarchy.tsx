@@ -7,18 +7,25 @@ import type {
 	HomelabHealthState,
 } from "@/lib/homelabHealth";
 import {
+	canonicalHomelabEvidence,
+	uniqueHomelabEvidenceIndex,
+} from "@/lib/homelabHealthIdentity";
+import {
 	blockedDependencyLabels,
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
 import {
-	homelabServiceId,
 	type HomelabServicesCatalog,
+	homelabServiceId,
 } from "@/lib/homelabServices";
 import {
 	analyzeServiceCriticality,
 	type ServiceCriticalityTier,
 } from "@/lib/serviceCriticality";
-import type { ServiceTopology, ServiceTopologyRelation } from "@/lib/serviceTopology";
+import type {
+	ServiceTopology,
+	ServiceTopologyRelation,
+} from "@/lib/serviceTopology";
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import styles from "./MobileArchitectureHierarchy.module.css";
 
@@ -28,11 +35,6 @@ type Props = {
 	topology: ServiceTopology;
 	snapshot: HomelabHealthSnapshot | null;
 	siteHealth?: SiteHealthV2 | null;
-};
-
-type HealthIndex = {
-	byId: Map<string, HomelabHealthEntry>;
-	byName: Map<string, HomelabHealthEntry>;
 };
 
 const TIER_ORDER: readonly ServiceCriticalityTier[] = [
@@ -50,28 +52,6 @@ const HEALTH_RANK: Record<HomelabHealthState, number> = {
 	ok: 3,
 };
 
-function normalize(value: string): string {
-	return value.trim().toLowerCase();
-}
-
-function healthIndex(snapshot: HomelabHealthSnapshot | null): HealthIndex {
-	const byId = new Map<string, HomelabHealthEntry>();
-	const byName = new Map<string, HomelabHealthEntry>();
-	for (const entry of snapshot?.services ?? []) {
-		if (entry.id) byId.set(entry.id, entry);
-		byName.set(normalize(entry.name), entry);
-	}
-	return { byId, byName };
-}
-
-function serviceHealth(
-	id: string,
-	name: string,
-	index: HealthIndex,
-): HomelabHealthEntry | undefined {
-	return index.byId.get(id) ?? index.byName.get(normalize(name));
-}
-
 function stateOf(entry: HomelabHealthEntry | undefined): HomelabHealthState {
 	return entry ? resolveEffectiveServiceState(entry).effectiveState : "unknown";
 }
@@ -87,8 +67,14 @@ function tierLabel(tier: ServiceCriticalityTier, french: boolean): string {
 	const labels: Record<ServiceCriticalityTier, [string, string]> = {
 		foundation: ["Infrastructure foundations", "Fondations d’infrastructure"],
 		"shared-data": ["Shared data and state", "Données et état partagés"],
-		"shared-platform": ["Shared platform services", "Services de plateforme partagés"],
-		application: ["Applications and consumers", "Applications et consommateurs"],
+		"shared-platform": [
+			"Shared platform services",
+			"Services de plateforme partagés",
+		],
+		application: [
+			"Applications and consumers",
+			"Applications et consommateurs",
+		],
 		support: ["Support / low impact", "Support / faible impact"],
 	};
 	return labels[tier][french ? 1 : 0];
@@ -104,10 +90,18 @@ function stateLabel(state: HomelabHealthState, french: boolean): string {
 	return labels[state][french ? 1 : 0];
 }
 
-function relationLabel(relation: ServiceTopologyRelation, french: boolean): string {
-	const strength = relation.strength === "required"
-		? french ? "requise" : "required"
-		: french ? "optionnelle" : "optional";
+function relationLabel(
+	relation: ServiceTopologyRelation,
+	french: boolean,
+): string {
+	const strength =
+		relation.strength === "required"
+			? french
+				? "requise"
+				: "required"
+			: french
+				? "optionnelle"
+				: "optional";
 	return `${strength} · ${relation.type}`;
 }
 
@@ -121,15 +115,21 @@ export default function MobileArchitectureHierarchy({
 	const french = locale === "fr";
 	const [criticalOnly, setCriticalOnly] = useState(true);
 	const [showOptional, setShowOptional] = useState(false);
-	const [expandedTiers, setExpandedTiers] = useState<Set<ServiceCriticalityTier>>(
-		() => new Set(["foundation", "shared-data", "shared-platform"]),
+	const [expandedTiers, setExpandedTiers] = useState<
+		Set<ServiceCriticalityTier>
+	>(() => new Set(["foundation", "shared-data", "shared-platform"]));
+	const index = useMemo(
+		() => uniqueHomelabEvidenceIndex(snapshot?.services ?? []),
+		[snapshot],
 	);
-	const index = useMemo(() => healthIndex(snapshot), [snapshot]);
 	const projectedStates = useMemo(
 		() => siteHealthIndex(siteHealth, catalog.catalogRevision),
 		[siteHealth, catalog.catalogRevision],
 	);
-	const criticality = useMemo(() => analyzeServiceCriticality(topology), [topology]);
+	const criticality = useMemo(
+		() => analyzeServiceCriticality(topology),
+		[topology],
+	);
 	const namesById = useMemo(
 		() => new Map(topology.nodes.map((node) => [node.id, node.name])),
 		[topology.nodes],
@@ -137,7 +137,10 @@ export default function MobileArchitectureHierarchy({
 	const relationsBySource = useMemo(() => {
 		const result = new Map<string, ServiceTopologyRelation[]>();
 		for (const relation of topology.relations) {
-			result.set(relation.source, [...(result.get(relation.source) ?? []), relation]);
+			result.set(relation.source, [
+				...(result.get(relation.source) ?? []),
+				relation,
+			]);
 		}
 		return result;
 	}, [topology.relations]);
@@ -152,14 +155,16 @@ export default function MobileArchitectureHierarchy({
 				})
 				.map((service) => {
 					const id = homelabServiceId(service);
-					const health = serviceHealth(id, service.name, index);
+					const health = canonicalHomelabEvidence(index, id);
 					return {
 						service,
 						id,
 						health,
 						state: health
 							? stateOf(health)
-							: (service.entityRef ? projectedStates.get(service.entityRef) : undefined) ?? "unknown",
+							: ((service.entityRef
+									? projectedStates.get(service.entityRef)
+									: undefined) ?? "unknown"),
 						criticality: criticality.get(id),
 					};
 				});
@@ -168,7 +173,7 @@ export default function MobileArchitectureHierarchy({
 				services,
 				state: services.length
 					? worstState(services.map((service) => service.state))
-					: "unknown" as HomelabHealthState,
+					: ("unknown" as HomelabHealthState),
 			};
 		}).filter((group) => group.services.length > 0);
 	}, [catalog.services, criticalOnly, criticality, index, projectedStates]);
@@ -214,7 +219,9 @@ export default function MobileArchitectureHierarchy({
 							checked={showOptional}
 							onChange={(event) => setShowOptional(event.target.checked)}
 						/>
-						<span>{french ? "Relations optionnelles" : "Optional relations"}</span>
+						<span>
+							{french ? "Relations optionnelles" : "Optional relations"}
+						</span>
 					</label>
 				</div>
 			</div>
@@ -224,66 +231,96 @@ export default function MobileArchitectureHierarchy({
 					<details
 						key={group.tier}
 						open={expandedTiers.has(group.tier)}
-						onToggle={(event) => setTierExpanded(group.tier, event.currentTarget.open)}
+						onToggle={(event) =>
+							setTierExpanded(group.tier, event.currentTarget.open)
+						}
 						className={styles.group}
 						data-mobile-criticality-tier={group.tier}
 					>
 						<summary>
 							<span>
 								<strong>{tierLabel(group.tier, french)}</strong>
-								<small>{group.services.length} {french ? "services" : "services"}</small>
+								<small>
+									{group.services.length} {french ? "services" : "services"}
+								</small>
 							</span>
 							<span className={styles.state} data-health-state={group.state}>
 								{stateLabel(group.state, french)}
 							</span>
 						</summary>
 						<div className={styles.serviceList}>
-							{group.services.map(({ service, id, health, state, criticality: itemCriticality }) => {
-								const blockers = blockedDependencyLabels(health);
-								const relations = (relationsBySource.get(id) ?? []).filter(
-									(relation) => showOptional || relation.strength === "required",
-								);
-								return (
-									<article className={styles.service} key={id} data-mobile-service={id}>
-										<div className={styles.serviceHeading}>
-											<div>
-												<strong>{service.name}</strong>
-												<small>
-													{itemCriticality?.tier ?? "support"}
-													{typeof itemCriticality?.transitiveDependents === "number"
-														? ` · ${french ? "impact" : "blast"} ${itemCriticality.transitiveDependents}`
-														: ""}
-												</small>
+							{group.services.map(
+								({
+									service,
+									id,
+									health,
+									state,
+									criticality: itemCriticality,
+								}) => {
+									const blockers = blockedDependencyLabels(health);
+									const relations = (relationsBySource.get(id) ?? []).filter(
+										(relation) =>
+											showOptional || relation.strength === "required",
+									);
+									return (
+										<article
+											className={styles.service}
+											key={id}
+											data-mobile-service={id}
+										>
+											<div className={styles.serviceHeading}>
+												<div>
+													<strong>{service.name}</strong>
+													<small>
+														{itemCriticality?.tier ?? "support"}
+														{typeof itemCriticality?.transitiveDependents ===
+														"number"
+															? ` · ${french ? "impact" : "blast"} ${itemCriticality.transitiveDependents}`
+															: ""}
+													</small>
+												</div>
+												<span
+													className={styles.state}
+													data-health-state={state}
+												>
+													{stateLabel(state, french)}
+												</span>
 											</div>
-											<span className={styles.state} data-health-state={state}>
-												{stateLabel(state, french)}
-											</span>
-										</div>
-										{blockers.length ? (
-											<p className={styles.blocked} data-mobile-service-blockers>
-												{french ? "Bloqué par" : "Blocked by"}: {blockers.join(", ")}
-											</p>
-										) : null}
-										{relations.length ? (
-											<ul className={styles.relations}>
-												{relations.map((relation) => (
-													<li
-														key={`${relation.source}-${relation.type}-${relation.target}`}
-														data-mobile-relation-strength={relation.strength}
-													>
-														<span>{namesById.get(relation.target) ?? relation.target}</span>
-														<small>{relationLabel(relation, french)}</small>
-													</li>
-												))}
-											</ul>
-										) : (
-											<small className={styles.noRelations}>
-												{french ? "Aucune relation directe affichée." : "No direct relations shown."}
-											</small>
-										)}
-									</article>
-								);
-							})}
+											{blockers.length ? (
+												<p
+													className={styles.blocked}
+													data-mobile-service-blockers
+												>
+													{french ? "Bloqué par" : "Blocked by"}:{" "}
+													{blockers.join(", ")}
+												</p>
+											) : null}
+											{relations.length ? (
+												<ul className={styles.relations}>
+													{relations.map((relation) => (
+														<li
+															key={`${relation.source}-${relation.type}-${relation.target}`}
+															data-mobile-relation-strength={relation.strength}
+														>
+															<span>
+																{namesById.get(relation.target) ??
+																	relation.target}
+															</span>
+															<small>{relationLabel(relation, french)}</small>
+														</li>
+													))}
+												</ul>
+											) : (
+												<small className={styles.noRelations}>
+													{french
+														? "Aucune relation directe affichée."
+														: "No direct relations shown."}
+												</small>
+											)}
+										</article>
+									);
+								},
+							)}
 						</div>
 					</details>
 				))}

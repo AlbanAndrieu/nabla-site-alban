@@ -42,43 +42,48 @@ function snapshot(entries: HomelabHealthEntry[]): HomelabHealthSnapshot {
 	} as HomelabHealthSnapshot;
 }
 
+function service(name: string, slug: string) {
+	const entityRef = `component:default/${slug}`;
+	return { id: entityRef, entityRef, name };
+}
+
 const catalog: HomelabServicesCatalog = {
-	version: 1,
+	version: 2,
 	services: [
-		{ id: "grafana", name: "Grafana" },
-		{ id: "vault", name: "Vault" },
-		{ name: "Home Assistant" },
-		{ id: "ollama", name: "Ollama" },
+		service("Grafana", "grafana"),
+		service("Vault", "vault"),
+		service("Home Assistant", "homeassistant"),
+		service("Ollama", "ollama"),
 	],
 };
 
 const presentation = new Map<string, { group: ServicePresentationGroup }>([
-	["grafana", { group: "services" }],
-	["vault", { group: "security-controls" }],
-	["ollama", { group: "services" }],
+	["component:default/grafana", { group: "services" }],
+	["component:default/vault", { group: "security-controls" }],
+	["component:default/ollama", { group: "services" }],
 ]);
 
 const health = indexHealth(
 	snapshot([
 		entry("Grafana", "ok", "grafana"),
-		entry("  VAULT ", "fail"),
-		entry("Home Assistant", "warn", "home-assistant"),
+		entry("Vault", "fail", "vault"),
+		entry("Home Assistant", "warn", "homeassistant"),
+		// Display-name-only evidence is never attached to a catalog entity.
+		entry("Ollama", "ok"),
 	]),
 );
 
-test("indexHealth indexes entries by id and normalized name", () => {
-	assert.equal(health.byId.size, 2);
-	assert.ok(health.byId.has("grafana"));
-	assert.ok(health.byName.has("vault"));
-	assert.ok(health.byName.has("home assistant"));
-	assert.equal(indexHealth(null).byId.size, 0);
-	assert.equal(indexHealth(null).byName.size, 0);
+test("indexHealth keys OWNER evidence by id only", () => {
+	assert.equal(health.owner.byId.size, 3);
+	assert.ok(health.owner.byId.has("grafana"));
+	assert.equal(indexHealth(null).owner.byId.size, 0);
 });
 
-test("effectiveState prefers id, falls back to name, else unknown", () => {
-	assert.equal(effectiveState("grafana", "Other", health), "ok");
-	assert.equal(effectiveState("vault", "Vault", health), "fail");
-	assert.equal(effectiveState("missing", "Missing", health), "unknown");
+test("effectiveState joins OWNER rows by entity name, never by display name", () => {
+	assert.equal(effectiveState("component:default/grafana", health), "ok");
+	assert.equal(effectiveState("component:default/vault", health), "fail");
+	assert.equal(effectiveState("component:default/ollama", health), "unknown");
+	assert.equal(effectiveState("component:default/missing", health), "unknown");
 });
 
 test("snapshotAgeSeconds handles missing, invalid and future timestamps", () => {
@@ -117,7 +122,7 @@ test("filterArchitectureCatalog combines health, group and search filters", () =
 		"Home Assistant",
 		"Ollama",
 	]);
-	assert.equal(all.version, 1);
+	assert.equal(all.version, 2);
 	assert.notEqual(all, catalog);
 
 	const filtered = (overrides: Partial<ArchitectureCatalogFilters>) =>
@@ -131,10 +136,11 @@ test("filterArchitectureCatalog combines health, group and search filters", () =
 	// Services without a presentation entry fall back to the support group.
 	assert.deepEqual(filtered({ groupFilter: "support" }), ["Home Assistant"]);
 	assert.deepEqual(filtered({ searchQuery: "  GRAF " }), ["Grafana"]);
-	// Search matches the canonical id; "home-assistant" is a historical alias.
-	assert.deepEqual(filtered({ searchQuery: "homeassistant" }), [
-		"Home Assistant",
-	]);
+	// Search also matches the canonical entity ref.
+	assert.deepEqual(
+		filtered({ searchQuery: "component:default/homeassistant" }),
+		["Home Assistant"],
+	);
 	assert.deepEqual(
 		filtered({ healthFilter: "ok", groupFilter: "security-controls" }),
 		[],
@@ -174,8 +180,12 @@ test("external Backstage v2 health maps by entityRef only at matching fresh revi
 		version: 2,
 		catalogRevision: revision,
 		services: [
-			{ id: "grafana", name: "Grafana", entityRef: entity },
-			{ id: "vault", name: "Vault", entityRef: "component:default/vault" },
+			{ id: entity, name: "Grafana", entityRef: entity },
+			{
+				id: "component:default/vault",
+				name: "Vault",
+				entityRef: "component:default/vault",
+			},
 		],
 	};
 	const matching = indexHealth(
@@ -208,5 +218,5 @@ test("external Backstage v2 health maps by entityRef only at matching fresh revi
 		{ ...projected, boardState: "stale" },
 		revision,
 	);
-	assert.equal(effectiveState("grafana", "Grafana", stale, entity), "unknown");
+	assert.equal(effectiveState(entity, stale), "unknown");
 });

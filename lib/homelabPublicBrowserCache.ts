@@ -7,9 +7,11 @@ import type { ServiceTopology } from "./serviceTopology";
 import type { SiteHealthV2 } from "./siteHealthV2";
 
 /** Public SERVICE projections only. OWNER snapshots must never enter browser storage. */
-const CATALOG_KEY = "nabla:homelab:catalog-public-v2:3";
-const LEGACY_CATALOG_KEY = "nabla:homelab:catalog-public-v2:2";
-const OLD_CATALOG_KEY = "nabla:homelab:catalog-public-v2:1";
+// :4 keys services by entity ref; earlier slug-keyed caches are dropped.
+const CATALOG_KEY = "nabla:homelab:catalog-public-v2:4";
+const LEGACY_CATALOG_KEYS = [1, 2, 3].map(
+	(version) => `nabla:homelab:catalog-public-v2:${version}`,
+);
 const HEALTH_KEY = "nabla:homelab:health-public-v2:1";
 // Public-only metadata remains useful during a prolonged TrueNAS outage.
 // Cached health retains its short TTL and can never display old green states.
@@ -63,29 +65,25 @@ function localCatalog(
 	)
 		return null;
 	const names = new Set<string>();
-	const refs = new Set<string>();
 	const services: HomelabServicesCatalog["services"] = [];
 	for (const service of value.services) {
 		if (
 			!service ||
 			typeof service !== "object" ||
 			!isSafePublicServiceId(service.id) ||
+			service.entityRef !== service.id ||
 			names.has(service.id) ||
 			!isSafePublicText(service.name, 150) ||
-			typeof service.entityRef !== "string" ||
-			!ENTITY_REF.test(service.entityRef) ||
-			refs.has(service.entityRef) ||
 			(service.iconSrc !== undefined &&
 				(typeof service.iconSrc !== "string" || !ICON.test(service.iconSrc))) ||
 			service.endpointEnabled !== false
 		)
 			return null;
 		names.add(service.id);
-		refs.add(service.entityRef);
 		services.push({
 			id: service.id,
 			name: service.name,
-			entityRef: service.entityRef,
+			entityRef: service.id,
 			endpointEnabled: false,
 			...(isSafePublicText(service.description)
 				? { description: service.description }
@@ -241,8 +239,8 @@ export function writePublicCatalogCache(
 	const projected = localCatalog(catalog, topology);
 	if (!projected || !put(storage, CATALOG_KEY, projected, CATALOG_TTL_MS, now))
 		return false;
-	// Free storage quota after deployment of a new icon contract.
-	for (const key of [LEGACY_CATALOG_KEY, OLD_CATALOG_KEY]) {
+	// Free storage quota after deployment of a new identity contract.
+	for (const key of LEGACY_CATALOG_KEYS) {
 		try {
 			storage.removeItem(key);
 		} catch {
@@ -350,25 +348,12 @@ export function readStalePublicHealthCache(
 
 /** Drop published LKG after explicit access revocation or sign-out. */
 export function clearPublicHomelabBrowserCache(storage: StoragePort): void {
-	try {
-		storage.removeItem(CATALOG_KEY);
-	} catch {
-		/* Storage may be disabled. */
-	}
-	try {
-		storage.removeItem(LEGACY_CATALOG_KEY);
-	} catch {
-		/* Storage may be disabled. */
-	}
-	try {
-		storage.removeItem(OLD_CATALOG_KEY);
-	} catch {
-		/* Storage may be disabled. */
-	}
-	try {
-		storage.removeItem(HEALTH_KEY);
-	} catch {
-		/* Storage may be disabled. */
+	for (const key of [CATALOG_KEY, ...LEGACY_CATALOG_KEYS, HEALTH_KEY]) {
+		try {
+			storage.removeItem(key);
+		} catch {
+			/* Storage may be disabled. */
+		}
 	}
 }
 

@@ -2,8 +2,6 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { getStaticServiceTopology } from "../lib/serviceTopology";
-
 // The explorer is split into cohesive sibling modules; source contracts apply
 // to the whole explorer implementation.
 const EXPLORER_SOURCE_FILES = [
@@ -28,25 +26,6 @@ async function explorerSource() {
 	);
 	return parts.join("\n");
 }
-
-test("static architecture topology never probes FastAPI during prerender", () => {
-	const originalFetch = globalThis.fetch;
-	let fetchCalled = false;
-	globalThis.fetch = (async () => {
-		fetchCalled = true;
-		throw new Error("static topology must not fetch");
-	}) as typeof fetch;
-
-	try {
-		const result = getStaticServiceTopology();
-		assert.equal(fetchCalled, false);
-		assert.equal(result.source, "local-fallback");
-		assert.equal(result.topology.nodes.length, 1);
-		assert.equal(result.topology.relations.length, 0);
-	} finally {
-		globalThis.fetch = originalFetch;
-	}
-});
 
 test("architecture route uses a static declared shell with live shared service health indicators", async () => {
 	const [page, explorer, healthPolling, data, css, packageJson] =

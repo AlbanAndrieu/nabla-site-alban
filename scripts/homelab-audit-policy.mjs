@@ -16,7 +16,7 @@ export function expectedAccessMode(body) {
 }
 export function auditStoredEntries(entries, storageName) {
 	const findings = [];
-	const allowed = /^nabla:homelab:(catalog-public-v2:3|health-public-v2:1)$/;
+	const allowed = /^nabla:homelab:(catalog-public-v2:4|health-public-v2:1)$/;
 	const scoped = /homelab|(?:^|[:_-])(owner|truenas|diagnostic)(?:$|[:_-])/i;
 	const secrets =
 		/172\.17\.|10\.254\.|cf-access|x-diagnostics-key|(?:access|refresh)[_-]?token|private_inventory|internalHost|service_token|BEGIN (?:[A-Z]+ )*PRIVATE KEY/i;

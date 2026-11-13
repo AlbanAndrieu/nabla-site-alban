@@ -1,3 +1,4 @@
+import { catalogEntitySlug } from "./homelabCatalogV2Names";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,
@@ -160,7 +161,10 @@ function inferredRole(
 	directDependencies: number,
 	transitiveDependents: number,
 ): ServicePresentationRole {
-	if (FOUNDATION_IDS.has(node.id) || FOUNDATION_KINDS.has(node.kind))
+	if (
+		FOUNDATION_IDS.has(catalogEntitySlug(node.id)) ||
+		FOUNDATION_KINDS.has(node.kind)
+	)
 		return "core";
 	if (SECURITY_CONTROL_KINDS.has(node.kind)) return "core";
 	if (SERVICE_KINDS.has(node.kind)) return "service";
@@ -182,7 +186,10 @@ function inferredCriticality(
 	role: ServicePresentationRole,
 	transitiveDependents: number,
 ): ServiceOperationalCriticality {
-	if (FOUNDATION_IDS.has(node.id) || FOUNDATION_KINDS.has(node.kind)) {
+	if (
+		FOUNDATION_IDS.has(catalogEntitySlug(node.id)) ||
+		FOUNDATION_KINDS.has(node.kind)
+	) {
 		return "critical";
 	}
 	if (role === "core" && SECURITY_CONTROL_KINDS.has(node.kind)) return "high";
@@ -206,7 +213,10 @@ function presentationGroup(
 ): ServicePresentationGroup {
 	// Canonical nabla-compose metadata controls presentation. Security-category
 	// components belong with controls unless they are platform foundations.
-	if (node.category === "security" && !FOUNDATION_IDS.has(node.id)) {
+	if (
+		node.category === "security" &&
+		!FOUNDATION_IDS.has(catalogEntitySlug(node.id))
+	) {
 		return "security-controls";
 	}
 	if (criticality === "critical") return "core-critical";

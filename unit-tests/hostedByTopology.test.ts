@@ -6,10 +6,7 @@ import {
 	analyzeServiceCriticality,
 	buildServiceImpactFocus,
 } from "../lib/serviceCriticality";
-import {
-	parseServiceTopology,
-	type ServiceTopology,
-} from "../lib/serviceTopology";
+import type { ServiceTopology } from "../lib/serviceTopology";
 
 // The explorer is split into cohesive sibling modules; source contracts apply
 // to the whole explorer implementation.
@@ -97,15 +94,6 @@ const topology: ServiceTopology = {
 		},
 	],
 };
-
-test("hostedBy is accepted as a first-class topology relation", () => {
-	const parsed = parseServiceTopology(topology);
-	assert.ok(parsed);
-	assert.equal(
-		parsed.relations.filter((relation) => relation.type === "hostedBy").length,
-		3,
-	);
-});
 
 test("hosting expands infrastructure blast radius without becoming a functional dependency", () => {
 	const analysis = analyzeServiceCriticality(topology);

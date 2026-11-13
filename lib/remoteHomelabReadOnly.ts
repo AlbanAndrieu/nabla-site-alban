@@ -4,7 +4,6 @@
  * Set HOMELAB_PUBLIC_READONLY_ENABLED=false to restore CIDR/Access-only paths.
  */
 const PUBLIC_READONLY_PATHS = new Set([
-	"/api/homelab-services",
 	"/api/homelab-catalog-v2",
 	"/api/homelab-health-v2",
 ]);

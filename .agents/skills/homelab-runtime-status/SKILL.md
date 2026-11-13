@@ -58,13 +58,9 @@ Use to inspect the service inventory generated from `nabla-compose` `x-nabla` me
 
 If a service is missing here, fix the repository/catalog declaration before trying to fix dashboards or monitoring consumers.
 
-### `/api/homelab-topology`
+### `/api/site/catalog/v2` and `/api/site/health/v2`
 
-Use to inspect declared dependencies and verify that a migration has not silently broken architecture relations such as database, proxy, observability or authentication dependencies.
-
-### `/api/homelab-services`
-
-Use for FastAPI-owned presentation/exposure metadata. This is useful for UI/external exposure reasoning but is not the authoritative runtime state.
+The only catalog and health sources of Site Alban (machine `X-Diagnostics-Key`, never in the browser). Use the catalog to verify that a migration has not silently broken `dependsOn`/`consumesApis`/`providesApis` relations, joined by full entity ref and `catalogRevision`. The legacy `/api/homelab-topology` and `/api/homelab-services` are no longer read by the Site.
 
 ### `/healthz`
 
@@ -87,7 +83,6 @@ curl -fsS "$BASE_URL/api/homelab/status" | jq .
 curl -fsS "$BASE_URL/api/homelab/runtime" | jq .
 curl -fsS "$BASE_URL/api/homelab/health" | jq .
 curl -fsS "$BASE_URL/api/homelab/declared-services" | jq .
-curl -fsS "$BASE_URL/api/homelab-topology" | jq .
 curl -fsS "$BASE_URL/sickz" | jq .
 ```
 

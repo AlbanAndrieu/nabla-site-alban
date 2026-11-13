@@ -1,3 +1,4 @@
+import { catalogEntitySlug } from "./homelabCatalogV2Names";
 import type { ServiceCriticalityLevel } from "./serviceCriticalityLevel";
 
 const SERVICE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -47,27 +48,9 @@ export type HomelabServicesCatalog = {
 	version?: number;
 	/** Required for correlating public service health with the matching catalog. */
 	catalogRevision?: string;
-	/** Sanitized owner-only fallback reason; never include credentials. */
-	privateInventoryStatus?: "key-missing" | "access-denied" | "unavailable";
 	services: HomelabService[];
 	[key: string]: unknown;
 };
-
-export type HomelabServicesSource = "fastapi" | "local-fallback";
-
-/** The sole public fallback is a non-operational placeholder, not a catalog. */
-export function isHomelabCatalogPlaceholder(
-	catalog: HomelabServicesCatalog,
-): boolean {
-	return (
-		catalog.services.length === 1 &&
-		catalog.services[0]?.id === "homelab" &&
-		catalog.services[0]?.endpointEnabled === false
-	);
-}
-
-export const HOMELAB_SERVICES_DEFAULT_API_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
 
 function slugifyServiceName(name: string): string {
 	return (
@@ -80,8 +63,13 @@ function slugifyServiceName(name: string): string {
 	);
 }
 
-/** Return the same stable identity used by the FastAPI homelab contract. */
+/**
+ * Canonical identity: the full Backstage entity ref. Only OWNER probe rows,
+ * which carry no entity ref, fall back to their FastAPI slug.
+ */
 export function homelabServiceId(service: HomelabService): string {
+	if (typeof service.entityRef === "string" && service.entityRef)
+		return service.entityRef;
 	const explicitId = service.id?.trim();
 	const sourceId =
 		explicitId && SERVICE_ID_RE.test(explicitId)
@@ -93,7 +81,7 @@ export function homelabServiceId(service: HomelabService): string {
 /** Show a verified endpoint role without changing canonical service identities. */
 export function homelabServiceDisplayName(service: HomelabService): string {
 	const name = service.name.trim();
-	const id = homelabServiceId(service);
+	const id = catalogEntitySlug(homelabServiceId(service));
 	const role =
 		service.kind === "mcp-server" || id.startsWith("mcp-")
 			? "MCP"

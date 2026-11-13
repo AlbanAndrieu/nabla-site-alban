@@ -11,8 +11,7 @@ test.describe("Public homelab integration boundary", () => {
 		if (publicReadOnly) expect(identity.trusted).toBe(true);
 		else expect(identity.trusted).toBe(false);
 		for (const endpoint of [
-			"homelab-services",
-			"homelab-topology",
+			"homelab-catalog-v2",
 			"homelab-health",
 			"homelab-observability",
 			"runtime-topology",
@@ -21,7 +20,7 @@ test.describe("Public homelab integration boundary", () => {
 			expect(response.headers()["cache-control"]).toContain("no-store");
 			expect(response.headers()["x-homelab-services-primary"]).toBeUndefined();
 			expect(response.headers()["x-homelab-topology-primary"]).toBeUndefined();
-			if (publicReadOnly && endpoint === "homelab-services") {
+			if (publicReadOnly && endpoint === "homelab-catalog-v2") {
 				// Only the allowlisted public SERVICE catalog may be served.
 				expect([200, 503]).toContain(response.status());
 				if (response.status() === 200) {

@@ -2,12 +2,12 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
+import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
 import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import type { HomelabServicesCatalog } from "@/lib/homelabServices";
-import { parseServiceTopology } from "@/lib/serviceTopology";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabOperationalEvidence from "./HomelabOperationalEvidence";
 import styles from "./HomelabOperationsDisclosure.module.css";
@@ -37,12 +37,6 @@ const OPERATIONS_DEEP_LINKS = new Set([
 	"#pfsense-operational-evidence",
 ]);
 
-function catalogCount(value: unknown): number {
-	if (!value || typeof value !== "object") return 0;
-	const services = (value as Partial<HomelabServicesCatalog>).services;
-	return Array.isArray(services) ? services.length : 0;
-}
-
 export default function HomelabOperationsDisclosure() {
 	const t = useTranslations("operations");
 	const french = useLocale() === "fr";
@@ -71,33 +65,25 @@ export default function HomelabOperationsDisclosure() {
 				signal: controller.signal,
 				headers: { Accept: "application/json" },
 			}),
-			fetch("/api/homelab-services", {
-				cache: "no-store",
-				signal: controller.signal,
-				headers: { Accept: "application/json" },
-			}),
-			fetch("/api/homelab-topology", {
+			fetch("/api/homelab-catalog-v2", {
 				cache: "no-store",
 				signal: controller.signal,
 				headers: { Accept: "application/json" },
 			}),
 		])
-			.then(async ([healthResponse, catalogResponse, topologyResponse]) => {
+			.then(async ([healthResponse, catalogResponse]) => {
 				const healthPayload = healthResponse.ok
 					? await healthResponse.json()
 					: null;
-				const catalogPayload = catalogResponse.ok
-					? await catalogResponse.json()
-					: null;
-				const topologyPayload = topologyResponse.ok
-					? await topologyResponse.json()
-					: null;
-				const topology = parseServiceTopology(topologyPayload);
+				const catalog = parseHomelabCatalogV2(
+					catalogResponse.ok ? await catalogResponse.json() : null,
+				);
+				const projected = catalog ? projectHomelabCatalogV2(catalog) : null;
 				setCoverage({
 					snapshot: parseHomelabHealthSnapshot(healthPayload),
-					catalogServiceCount: catalogCount(catalogPayload),
-					topologyNodeCount: topology?.nodes.length ?? 0,
-					topologyRelationCount: topology?.relations.length ?? 0,
+					catalogServiceCount: projected?.services.services.length ?? 0,
+					topologyNodeCount: projected?.topology.nodes.length ?? 0,
+					topologyRelationCount: projected?.topology.relations.length ?? 0,
 					loaded: true,
 					error: !healthResponse.ok,
 				});

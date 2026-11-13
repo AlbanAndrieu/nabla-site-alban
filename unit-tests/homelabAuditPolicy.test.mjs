@@ -44,7 +44,7 @@ test("OWNER SERVICE DENIED modes are fail-closed", () => {
 test("public browser cache remains allowlisted", () => {
 	assert.deepEqual(
 		auditStoredEntries(
-			[["nabla:homelab:catalog-public-v2:3", "safe"]],
+			[["nabla:homelab:catalog-public-v2:4", "safe"]],
 			"localStorage",
 		),
 		[],

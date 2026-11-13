@@ -55,8 +55,8 @@ second hand-maintained generator or a manually edited compatibility catalog.
 
 Until that output exists:
 
-- treat `public/homelab-services.json` as a resilience fallback, not an authoring
-  source;
+- the Site has no local catalog fallback any more: it reads only the Backstage
+  v2 catalog (`/api/site/catalog/v2`) and keys nodes by full entity ref;
 - compare service IDs/topology against the canonical generated contracts after a
   service change;
 - record any manual synchronization still required as unfinished roadmap work.

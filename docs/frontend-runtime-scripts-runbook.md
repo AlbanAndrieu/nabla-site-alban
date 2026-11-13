@@ -80,16 +80,17 @@ TrueNAS compose the same React implementation:
 ```text
 app/components/homelab/HomelabServicesSection.tsx
   -> HomelabServicesBlock.tsx
-      -> GET /api/homelab-services
-      -> GET /api/homelab-health
+      -> GET /api/homelab-catalog-v2
+      -> GET /api/homelab-health (OWNER) or /api/homelab-health-v2 (SERVICE)
       -> HomelabServiceGrid.tsx
           -> EndpointAction.tsx
 ```
 
 Behavior:
 
-- the catalogue is fetched from the same-origin Next API, which is FastAPI-first
-  with a repository JSON fallback;
+- the catalogue is the sanitized Backstage v2 catalogue relayed by the
+  same-origin Next API from FastAPI `/api/site/catalog/v2`, with no fallback;
+  cards and topology are projected client-side and keyed by the full entity ref;
 - public endpoint health is authoritative from the FastAPI health snapshot;
 - a missing/failed health snapshot degrades health to unknown without hiding a
   valid catalogue;
@@ -97,22 +98,10 @@ Behavior:
   LAN and `.int` DNS can be evaluated from the user's network;
 - there is no generic Vercel tunnel-check API anymore.
 
-`public/homelab-services.json` remains a catalogue fallback during the FastAPI
-migration. It is data, not a frontend renderer.
-
-### Catalogue fields
-
-Relevant fields include:
-
-- `name`
-- `iconSrc` / `icons`
-- `description`
-- `internalHost`, `internalPort`, `internalSecure`, `internalPath`
-- historical `tunnelUrl` / `tunnelSecure`
-- `endpointEnabled`
-- `external`: sole exposure flag (`true` public, `false` private/internal)
-- `internalTitle` / `tunnelTitle`
-- `portHtml`
+The legacy `public/homelab-services.json` and `public/service-topology.json`
+fallbacks are removed. The v2 catalogue carries no host, port or URL: only
+OWNER runtime observations (`/api/homelab-health`) can make a card navigable.
+Icons stay a local presentation mapping keyed by the entity name.
 
 Exposure and health are independent concepts. A service can be public but down,
 or private but healthy from the user's LAN.
@@ -152,8 +141,8 @@ indexability is decided separately.
 
 ### Homelab cards missing
 
-- inspect `GET /api/homelab-services`;
-- verify the catalogue contains a `services` array;
+- inspect `GET /api/homelab-catalog-v2`;
+- verify the catalogue contains Backstage `entities` and a `catalogRevision`;
 - a health API failure alone should no longer remove the catalogue from the UI.
 
 ### Homelab health unexpected

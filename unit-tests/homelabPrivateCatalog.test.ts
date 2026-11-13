@@ -1,10 +1,9 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { GET as getV2 } from "../app/api/homelab-catalog-v2/route";
-import { GET as getCards } from "../app/api/homelab-services/route";
+import { GET as getHealthV2 } from "../app/api/homelab-health-v2/route";
 import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "../lib/homelabCatalogV2Projection";
-import { loadHomelabServicesCatalog } from "../lib/homelabServicesServer";
 import {
 	fetchSiteCatalogV2,
 	SITE_CATALOG_V2_URL,
@@ -74,7 +73,7 @@ test("invalid Preview diagnostics key is denied with no fallback", async () => {
 		return new Response("unauthorized", { status: 401 });
 	};
 	await assert.rejects(
-		() => loadHomelabServicesCatalog(),
+		() => fetchSiteCatalogV2(),
 		(error: unknown) =>
 			error instanceof SiteCatalogV2Error && error.reason === "access-denied",
 	);
@@ -139,19 +138,15 @@ test("v2 503, v1 payload and invalid graph cannot become service cards", async (
 test("only Backstage v2 can materialize cards and canonical dependencies", async () => {
 	process.env.DIAGNOSTICS_ACCESS_KEY = "fixture-read-only";
 	globalThis.fetch = async () => Response.json(fixture());
-	const result = await loadHomelabServicesCatalog();
-	assert.equal(result.source, "fastapi");
-	assert.equal(result.primaryUrl, SITE_CATALOG_V2_URL);
-	assert.equal(result.catalog.catalogRevision, revision);
+	const result = projectHomelabCatalogV2(await fetchSiteCatalogV2()).services;
+	assert.equal(result.catalogRevision, revision);
 	assert.deepEqual(
-		result.catalog.services.map((item) => item.id),
-		["fastapi", "postgresql"],
+		result.services.map((item) => item.id),
+		["component:default/fastapi", "resource:default/postgresql"],
 	);
-	assert.ok(
-		result.catalog.services.every((item) => item.endpointEnabled === false),
-	);
+	assert.ok(result.services.every((item) => item.endpointEnabled === false));
 	assert.doesNotMatch(
-		JSON.stringify(result.catalog),
+		JSON.stringify(result),
 		/DO_NOT_EXPORT|5432|internal\\.invalid/,
 	);
 	const parsed = parseHomelabCatalogV2(fixture());
@@ -162,8 +157,8 @@ test("only Backstage v2 can materialize cards and canonical dependencies", async
 	assert.equal(projected.topology.catalogRevision, revision);
 	assert.deepEqual(projected.topology.relations, [
 		{
-			source: "fastapi",
-			target: "postgresql",
+			source: "component:default/fastapi",
+			target: "resource:default/postgresql",
 			type: "dependsOn",
 			strength: "required",
 			evidence: [],
@@ -187,9 +182,9 @@ test("anonymous visitors receive a neutral 404 without querying either private r
 		globalThis.fetch = async () => {
 			throw new Error("should never reach FastAPI");
 		};
-		for (const get of [getCards, getV2]) {
+		for (const get of [getV2, getHealthV2]) {
 			const response = await get(
-				new Request("https://www.albanandrieu.com/api/homelab-services", {
+				new Request("https://www.albanandrieu.com/api/homelab-catalog-v2", {
 					headers: { "x-real-ip": "203.0.113.7" },
 				}),
 			);
@@ -214,8 +209,8 @@ test("scalar subcomponentOf must resolve before publishing a complete v2 graph",
 	assert.ok(
 		projected.topology.relations.some(
 			(relation) =>
-				relation.source === "fastapi" &&
-				relation.target === "postgresql" &&
+				relation.source === "component:default/fastapi" &&
+				relation.target === "resource:default/postgresql" &&
 				relation.type === "partOf",
 		),
 	);

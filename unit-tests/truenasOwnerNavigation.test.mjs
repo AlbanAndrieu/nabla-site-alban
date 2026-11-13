@@ -4,7 +4,7 @@ import test from "node:test";
 import { observedOwnerServiceNavigation } from "../lib/homelabOwnerServiceNavigation.ts";
 
 const service = {
-	id: "gatus",
+	id: "component:default/gatus",
 	name: "Gatus",
 	entityRef: "component:default/gatus",
 	endpointEnabled: false,
@@ -90,7 +90,12 @@ test("internal-only probe cannot become an external or guessed hostname link", (
 test("unmatched, malformed and credentialed endpoints fail closed", () => {
 	assert.equal(
 		observedOwnerServiceNavigation(
-			{ id: "missing", name: "Missing", endpointEnabled: false },
+			{
+				id: "component:default/missing",
+				entityRef: "component:default/missing",
+				name: "Gatus",
+				endpointEnabled: false,
+			},
 			snapshot,
 		).externalUrl,
 		"",
