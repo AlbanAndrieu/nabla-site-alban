@@ -26,6 +26,7 @@ type Props = {
 	snapshot: HomelabHealthSnapshot | null;
 	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
+	readOnly?: boolean;
 };
 
 type HierarchyGroup = ReturnType<typeof groupCatalogByPresentation>[number];
@@ -42,6 +43,7 @@ export default function ArchitectureServiceHierarchy({
 	snapshot,
 	siteHealth = null,
 	healthUnavailable = false,
+	readOnly = false,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
 	const locale = useLocale();
@@ -55,12 +57,12 @@ export default function ArchitectureServiceHierarchy({
 	);
 	const ownerNavigationIndex = useMemo(
 		() =>
-			snapshot && !healthUnavailable ? indexOwnerNavigation(snapshot) : null,
-		[snapshot, healthUnavailable],
+			!readOnly && snapshot && !healthUnavailable ? indexOwnerNavigation(snapshot) : null,
+		[readOnly, snapshot, healthUnavailable],
 	);
 	const healthIndex = useMemo(
-		() => indexHealth(snapshot, siteHealth, catalog.catalogRevision),
-		[snapshot, siteHealth, catalog.catalogRevision],
+		() => indexHealth(readOnly ? null : snapshot, siteHealth, catalog.catalogRevision),
+		[readOnly, snapshot, siteHealth, catalog.catalogRevision],
 	);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
@@ -75,7 +77,8 @@ export default function ArchitectureServiceHierarchy({
 	return (
 		<div id="service-directory">
 			<HomelabRuntimeWarnings
-				snapshot={snapshot}
+				readOnly={readOnly}
+				snapshot={readOnly ? null : snapshot}
 				healthUnavailable={healthUnavailable}
 			/>
 			<div
@@ -124,7 +127,8 @@ export default function ArchitectureServiceHierarchy({
 									ownerNavigationIndex={ownerNavigationIndex}
 									ownerHealthIndex={healthIndex.owner}
 									siteStatusIndex={healthIndex.byRef}
-									snapshot={snapshot}
+									readOnly={readOnly}
+									snapshot={readOnly ? null : snapshot}
 									siteHealth={siteHealth}
 									healthUnavailable={healthUnavailable && !siteHealth}
 								/>

@@ -22,13 +22,14 @@ async function blockSource() {
 // each service card to HomelabServiceCard.tsx and legends to
 // HomelabServiceGridLegends.tsx.
 async function gridSource() {
-	const [grid, presentation, card, legends] = await Promise.all([
+	const [grid, presentation, card, legends, warnings] = await Promise.all([
 		source("app/components/homelab/HomelabServiceGrid.tsx"),
 		source("app/components/homelab/homelabGridPresentation.ts"),
 		source("app/components/homelab/HomelabServiceCard.tsx"),
 		source("app/components/homelab/HomelabServiceGridLegends.tsx"),
+		source("app/components/homelab/HomelabRuntimeWarnings.tsx"),
 	]);
-	return `${grid}\n${presentation}\n${card}\n${legends}`;
+	return `${grid}\n${presentation}\n${card}\n${legends}\n${warnings}`;
 }
 
 // The endpoint action delegates pure health helpers to endpointHealth.ts and
