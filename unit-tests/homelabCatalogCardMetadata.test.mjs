@@ -19,7 +19,7 @@ test("French and English catalog badges explain declaration rather than measured
 	for (const locale of ["fr", "en"]) {
 		const catalog = JSON.parse(read(`messages/homelab/${locale}.json`)).homelab.catalog;
 		for (const key of [
-			"entityKind", "lifecycleLabel", "operationalCriticality", "businessCriticality",
+			"entityKind", "serviceType", "lifecycleLabel", "operationalCriticality", "businessCriticality",
 			"declarativeOnly", "noFreshEvidence",
 		]) {
 			assert.equal(typeof catalog[key], "string", `${locale}.${key}`);
