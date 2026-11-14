@@ -27,6 +27,7 @@ type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
 	ownerNavigationIndex?: OwnerNavigationIndex | null;
+	showRuntimeWarnings?: boolean;
 	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
@@ -39,6 +40,7 @@ export default function HomelabServiceGrid({
 	catalog,
 	snapshot: rawSnapshot,
 	ownerNavigationIndex = null,
+	showRuntimeWarnings = true,
 	siteHealth = null,
 	healthUnavailable = false,
 	healthHttpStatus = null,
@@ -129,7 +131,7 @@ export default function HomelabServiceGrid({
 
 	return (
 		<>
-			{(truenasDown || truenasWarning) && (
+			{showRuntimeWarnings && (truenasDown || truenasWarning) && (
 				<div
 					className={`alert ${truenasDown ? "alert-danger" : "alert-warning"}`}
 					role="alert"
@@ -153,7 +155,7 @@ export default function HomelabServiceGrid({
 				</div>
 			)}
 
-			{(truenasRuntimeUnavailable || truenasRuntimeStale) && (
+			{showRuntimeWarnings && (truenasRuntimeUnavailable || truenasRuntimeStale) && (
 				<div
 					className="alert alert-warning"
 					role="alert"
