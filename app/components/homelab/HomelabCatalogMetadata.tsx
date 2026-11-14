@@ -28,10 +28,11 @@ const LIFECYCLE_KEYS = {
 export default function HomelabCatalogMetadata({ service }: Readonly<{ service: HomelabService }>) {
 	const t = useTranslations("homelab");
 	const kind = service.catalogEntityKind;
+	const technicalType = service.kind && service.kind !== kind?.toLowerCase() ? service.kind : null;
 	const life = service.lifecycle;
 	const business = service.businessCriticality;
 	const operation = service.criticality;
-	if (!kind && !life && !business && !operation) return null;
+	if (!kind && !technicalType && !life && !business && !operation) return null;
 	const lifeKey = life && Object.hasOwn(LIFECYCLE_KEYS, life)
 		? LIFECYCLE_KEYS[life as keyof typeof LIFECYCLE_KEYS]
 		: null;
@@ -42,6 +43,12 @@ export default function HomelabCatalogMetadata({ service }: Readonly<{ service: 
 					<div>
 						<dt>{t("catalog.entityKind")}</dt>
 						<dd>{t(KIND_KEYS[kind])}</dd>
+					</div>
+				)}
+				{technicalType && (
+					<div>
+						<dt>{t("catalog.serviceType")}</dt>
+						<dd>{technicalType}</dd>
 					</div>
 				)}
 				{life && (
