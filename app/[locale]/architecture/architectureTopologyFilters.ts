@@ -8,6 +8,7 @@ import {
 	type UniqueHomelabEvidenceIndex,
 	uniqueHomelabEvidenceIndex,
 } from "@/lib/homelabHealthIdentity";
+import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	type HomelabService,
@@ -135,10 +136,7 @@ export function filterArchitectureCatalog(
 		const id = homelabServiceId(service);
 		const state = effectiveState(id, healthIndex);
 		const group = presentation.get(id)?.group ?? "support";
-		const matchesSearch =
-			query.length === 0 ||
-			service.name.toLowerCase().includes(query) ||
-			id.includes(query);
+		const matchesSearch = matchesCatalogServiceSearch(service, query);
 		return (
 			(healthFilter === "all" || state === healthFilter) &&
 			(groupFilter === "all" || group === groupFilter) &&
