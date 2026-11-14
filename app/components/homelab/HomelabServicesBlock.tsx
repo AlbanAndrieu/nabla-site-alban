@@ -7,9 +7,11 @@ import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import {
 	RESOURCE_SNAPSHOT_KEY,
+	snapshotAgeState,
 	type ResourceSnapshot,
 } from "@/lib/homelabResourceEvidence";
 import { homelabServiceId } from "@/lib/homelabServices";
+import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
@@ -64,6 +66,33 @@ export default function HomelabServicesBlock({
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const [resourceSnapshot, setResourceSnapshot] =
 		useState<ResourceSnapshot | null>(null);
+	// A single clock feeds all service groups. Hidden tabs do not tick until
+	// visible again, and stale/foreign-revision resources are never "fresh".
+	const [resourceClock, setResourceClock] = useState<number | null>(null);
+	useEffect(() => {
+		if (!resourceSnapshot || readOnly || state.ownerBoundary) return;
+		const refresh = () => {
+			if (!document.hidden) setResourceClock(Date.now());
+		};
+		const initial = window.setTimeout(refresh, 0);
+		const interval = window.setInterval(refresh, 60_000);
+		document.addEventListener("visibilitychange", refresh);
+		return () => {
+			window.clearTimeout(initial);
+			window.clearInterval(interval);
+			document.removeEventListener("visibilitychange", refresh);
+		};
+	}, [resourceSnapshot, readOnly, state.ownerBoundary]);
+	const resourceStale = Boolean(
+		resourceSnapshot &&
+			(resourceClock === null ||
+				snapshotAgeState(
+					resourceSnapshot,
+					resourceClock,
+					state.catalog?.catalogRevision,
+				) !== "fresh"),
+	);
+
 	// SERVICE admission must not preserve an earlier OWNER resource snapshot
 	// in this browser. Clear only the OWNER resource key, not the public cache.
 	useEffect(() => {
@@ -127,6 +156,16 @@ export default function HomelabServicesBlock({
 		return () => observer.disconnect();
 	}, [graphTopology, graphInView]);
 
+	const ownerNavigationIndex = useMemo(
+		() =>
+			!readOnly &&
+			!state.healthUnavailable &&
+			!state.ownerBoundary &&
+			state.snapshot
+				? indexOwnerNavigation(state.snapshot)
+				: null,
+		[readOnly, state.healthUnavailable, state.ownerBoundary, state.snapshot],
+	);
 	const indexedHealth = useMemo(
 		() =>
 			healthIndex(
@@ -435,13 +474,16 @@ export default function HomelabServicesBlock({
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
+									ownerNavigationIndex={ownerNavigationIndex}
+									ownerHealthIndex={indexedHealth}
+									siteStatusIndex={indexedHealth.byRef}
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
 									ownerBoundary={state.ownerBoundary === true}
-									healthHttpStatus={readOnly ? null : state.healthStatus}
 									readOnly={readOnly}
 									resources={resourceSnapshot}
+									resourceStale={resourceStale}
 								/>
 							</div>
 						</details>

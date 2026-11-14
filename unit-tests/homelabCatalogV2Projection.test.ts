@@ -165,3 +165,30 @@ test("different names that normalize to the same service-card slug are rejected"
 		null,
 	);
 });
+
+
+test("Backstage v2 card projection retains reviewed lifecycle and criticality without endpoints", () => {
+	const component = {
+		...entity("Component", "default", "auth", { type: "service", lifecycle: "production" }),
+		metadata: {
+			name: "auth",
+			title: "Authentication",
+			tags: ["security", "nist-protect"],
+			labels: {
+				"albandrieu.com/operational-criticality": "high",
+				"albandrieu.com/business-criticality": "critical",
+			},
+		},
+	};
+	const output = project([component]);
+	const card = output.services.services[0];
+	assert.equal(card?.entityRef, "component:default/auth");
+	assert.equal(card?.catalogEntityKind, "Component");
+	assert.equal(card?.lifecycle, "production");
+	assert.equal(card?.criticality, "high");
+	assert.equal(card?.businessCriticality, "critical");
+	assert.equal(card?.endpointEnabled, false);
+	assert.equal(card?.endpointUrl, undefined);
+	assert.equal(card?.internalHost, undefined);
+	assert.equal(output.topology.nodes[0]?.id, card?.entityRef);
+});

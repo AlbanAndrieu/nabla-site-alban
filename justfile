@@ -66,6 +66,10 @@ source-check:
     python3 -m unittest discover -s unit-tests -p "test_github_actions_usage.py"
     @echo "QG_SOURCE_CHECK_OK: targeted offline smoke only; publication gate NOT_RUN"
 
+# Fast, deterministic Backstage v2 consumer contracts: no API, deploy or CI.
+catalog-v2-check:
+    npm run test:catalog:v2
+
 # Validate local icon bundle without a nabla-compose checkout.
 icons-local-check:
     node --test unit-tests/homelabCatalogIconAssets.test.mjs

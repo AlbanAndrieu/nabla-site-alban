@@ -250,6 +250,46 @@
 	letter-spacing: 0.06em;
 }
 
+/* Backstage v2 declarations are presentation metadata, not runtime probes. */
+.catalogMetadata {
+	margin-top: var(--ui-space-sm);
+	padding: 0.45rem 0.6rem;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-md);
+	background: var(--ui-surface-muted);
+	color: var(--ui-text-secondary);
+	font-size: 0.77rem;
+}
+
+.serviceEvidenceNote {
+	margin: 0.35rem 0 0;
+	font-size: 0.78rem;
+	color: var(--ui-text-secondary);
+}
+
+.catalogMetadataList {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.25rem 0.75rem;
+	margin: 0;
+}
+
+.catalogMetadataList > div {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.catalogMetadataList dt {
+	font-weight: 700;
+}
+
+.catalogMetadataList dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
 .serviceCard {
 	border-width: 1px;
 	border-color: var(--ui-border);

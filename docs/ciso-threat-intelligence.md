@@ -8,7 +8,7 @@ Les tags dans `lib/cisoThreatFeed.ts` sont un sous-ensemble **public et volontai
 
 ## Source principale : API GReader FreshRSS
 
-Le service **FreshRSS** est déclaré dans `nabla-compose/catalog/homelab-services.json`, mais aucun export OPML ni paramétrage API dédié n'a été retrouvé dans la branche `master` examinée. Les abonnements réellement configurés et les droits API ne sont donc pas encore vérifiés.
+Le service **FreshRSS** est déclaré dans `nabla-compose/catalog/catalog-info.yaml`, mais aucun export OPML ni paramétrage API dédié n'a été retrouvé dans la branche `master` examinée. Les abonnements réellement configurés et les droits API ne sont donc pas encore vérifiés.
 
 1. Créer dans FreshRSS un compte séparé avec **uniquement des abonnements publics de veille cyber publiables sur Internet**. Ne jamais utiliser un compte personnel : la réponse JSON est publique et cacheable.
 2. Activer l'API FreshRSS et attribuer un mot de passe API au compte de veille. Via `POST /api/greader.php/accounts/ClientLogin` avec `Email` et `Passwd`, récupérer la valeur `Auth`.

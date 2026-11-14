@@ -2,6 +2,7 @@ import { catalogEntitySlug } from "./homelabCatalogV2Names.ts";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
+	HomelabInternalHealthEntry,
 } from "./homelabHealth";
 import type { HomelabService } from "./homelabServices";
 
@@ -14,6 +15,37 @@ export type ObservedOwnerNavigation = {
 	internalTargetSource: "probe" | "declared" | "none";
 	internalRouteMismatch: boolean;
 };
+
+/** OWNER-only indexes for one immutable FastAPI snapshot; never persist in SERVICE. */
+export type OwnerNavigationIndex = {
+	services: Map<string, HomelabHealthEntry>;
+	internal: Map<string, HomelabInternalHealthEntry>;
+};
+
+/** Duplicate row IDs are intentionally omitted rather than arbitrarily selected. */
+function uniqueById<T extends { id?: string }>(entries: readonly T[]): Map<string, T> {
+	const byId = new Map<string, T>();
+	const ambiguous = new Set<string>();
+	for (const entry of entries) {
+		const id = entry.id;
+		if (!id || ambiguous.has(id)) continue;
+		if (byId.has(id)) {
+			byId.delete(id);
+			ambiguous.add(id);
+		} else {
+			byId.set(id, entry);
+		}
+	}
+	return byId;
+}
+
+/** Linear pre-index for all cards in a page; removes repeated snapshot scans. */
+export function indexOwnerNavigation(snapshot: HomelabHealthSnapshot): OwnerNavigationIndex {
+	return {
+		services: uniqueById(snapshot.services),
+		internal: uniqueById(snapshot.internal_services ?? []),
+	};
+}
 
 const EMPTY_SOURCE = {
 	externalUrl: "",
@@ -101,21 +133,22 @@ function ownerRowId(service: HomelabService): string {
 
 function observedEntry(
 	service: HomelabService,
-	snapshot: HomelabHealthSnapshot,
+	index: OwnerNavigationIndex,
 ): HomelabHealthEntry | undefined {
 	const id = ownerRowId(service);
-	const matches = snapshot.services.filter((entry) => entry.id === id);
-	return id && matches.length === 1 ? matches[0] : undefined;
+	return id ? index.services.get(id) : undefined;
 }
 
 /** OWNER only. Never add these fields to the Backstage public projection or localStorage. */
 export function observedOwnerServiceNavigation(
 	service: HomelabService,
 	snapshot: HomelabHealthSnapshot | null,
+	index?: OwnerNavigationIndex,
 ): ObservedOwnerNavigation {
 	if (!snapshot) return { service, ...EMPTY_SOURCE };
 
-	const entry = observedEntry(service, snapshot);
+	const ownerIndex = index ?? indexOwnerNavigation(snapshot);
+	const entry = observedEntry(service, ownerIndex);
 	if (!entry) return { service, ...EMPTY_SOURCE };
 	const declared = entry.exposure?.declared;
 	const observed = entry.exposure?.observed;
@@ -131,9 +164,7 @@ export function observedOwnerServiceNavigation(
 	const internalFromUrl =
 		canonical && isLanHost(canonical.hostname) ? canonical : null;
 
-	const byId =
-		snapshot.internal_services?.filter((row) => row.id === entry.id) ?? [];
-	const probe = byId.length === 1 ? byId[0] : undefined;
+	const probe = ownerIndex.internal.get(entry.id ?? "");
 	const host = validHost(probe?.host)
 		? probe.host
 		: validHost(declared?.internal_host)

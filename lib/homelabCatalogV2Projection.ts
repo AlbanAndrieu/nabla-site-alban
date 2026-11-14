@@ -34,6 +34,9 @@ export function projectHomelabCatalogV2(catalog: HomelabCatalogV2): {
 			kind,
 			category,
 			criticality: view.operationalCriticality,
+			catalogEntityKind: view.entityKind,
+			lifecycle: view.lifecycle,
+			businessCriticality: view.businessCriticality,
 			// No endpoint, tunnel, internal host or port exists in the safe v2 DTO.
 			endpointEnabled: false,
 		})),

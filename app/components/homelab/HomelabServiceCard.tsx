@@ -18,13 +18,14 @@ import {
 import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
 import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import { homelabIconFallback } from "@/lib/homelabIconFallback";
+import HomelabCatalogMetadata from "./HomelabCatalogMetadata";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
 import {
 	EFFECTIVE_HEALTH_ICON_CLASS,
 	EFFECTIVE_HEALTH_LABEL_KEY,
 	endpointUrlHostIsPrivateS3,
-	type healthIndex,
+	type ServiceEvidenceIndex,
 	INTERNAL_HEALTH_CLASS,
 	RUNTIME_ICON_CLASS,
 	reconciledHealth,
@@ -44,7 +45,7 @@ type Props = {
 	endpointUrl: string;
 	anchorId?: string;
 	snapshot: HomelabHealthSnapshot | null;
-	serviceHealth: ReturnType<typeof healthIndex>;
+	serviceHealth: ServiceEvidenceIndex;
 	healthUnavailable: boolean;
 	truenasDown: boolean;
 	truenasRuntimeUnavailable: boolean;
@@ -224,6 +225,12 @@ export default function HomelabServiceCard({
 						</p>
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
+					<HomelabCatalogMetadata service={svc} />
+					{!initialHealth && (siteState === undefined || siteState === "unknown") && (
+						<p className={styles.serviceEvidenceNote} data-catalog-without-fresh-evidence>
+							{t("catalog.noFreshEvidence")}
+						</p>
+					)}
 
 					<ServiceHealthReasons
 						entry={initialHealth}

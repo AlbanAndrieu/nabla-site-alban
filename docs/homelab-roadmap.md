@@ -1,46 +1,66 @@
-# Roadmap active — interfaces homelab Site Alban
+# Roadmap d'ingénierie — interfaces homelab Site Alban
 
-**Réconciliée le 30 octobre 2026.** Cette feuille ne couvre que les interfaces **Next.js/React** (`/fr/truenas`, `/fr/architecture` et les routes `/api/homelab-*`). Les composants TrueNAS, Talos, pfSense, FastAPI Sample, Gatus et Compose conservent leurs plans dans leurs propres dépôts.
+**Réconciliée le 14 novembre 2026** au HEAD GitHub. Ce backlog ne porte que sur le consommateur **Next.js/React** de Backstage V2 : pages `/fr/truenas` et `/fr/architecture`, affichage des services, cache et confidentialité OWNER/SERVICE. Les priorités transverses et la gate L3 appartiennent à la [roadmap générale](quality-roadmap.md).
 
-[Historique complet avant consolidation](archive/homelab-roadmap-through-2026-10-30.txt) · [Roadmap qualité canonique](quality-roadmap.md) · [Contrat catalogue](homelab-services-catalog.md) · [Contrat des dépendances](homelab-dependency-health-ui.md).
+[Archive avant réconciliation](archive/homelab-roadmap-before-v2-reconciliation-2026-11-14.txt) · [Contrat V2 vivant](homelab-services-catalog.md) · [Runbook frontend](frontend-runtime-scripts-runbook.md) · [Contrat de santé](homelab-dependency-health-ui.md).
 
-## État vérifiable à date
+## État réel au 14 novembre
 
-| Sujet | Preuve | Conclusion |
+| Objet | Réalisé dans le code | Preuve à conserver |
 | --- | --- | --- |
-| Branche de référence | `master` au SHA `26bbb7b4257d2d94321eeea42192a6d0be58fe12` ; PR [#263](https://github.com/AlbanAndrieu/nabla-site-alban/pull/263), [#265](https://github.com/AlbanAndrieu/nabla-site-alban/pull/265), [#266](https://github.com/AlbanAndrieu/nabla-site-alban/pull/266) et [#267](https://github.com/AlbanAndrieu/nabla-site-alban/pull/267) intégrées | Ne plus afficher #263 comme Draft active |
-| Vercel production | Déploiement `dpl_4QTK6birkaJftqE2XPgXTiDfQs1p`, `READY` sur le SHA ci-dessus | Build publié, pas de preuve des parcours LAN/WAN |
-| Diagnostics OWNER/SERVICE | Tests et contrats d'accès existants ; aucune recette depuis le vrai LAN/WAN au SHA ci-dessus | **NOT_RUN** pour l'acceptation réseau |
-| Réponse edge `429` | Les contrôles automatiques de Preview peuvent rencontrer un challenge Vercel | Distinguer la protection WAF d'une erreur FastAPI ou Next.js ; ne pas désactiver les protections |
-| Gate Node 24 | Même bloqueur que [quality-roadmap.md](quality-roadmap.md) : checkout/toolchain non disponibles dans cette séance | **L3 NOT_RUN** ; ne pas maintenir de seconde checklist de publication ici |
+| **S0 — Coupure V1 → V2** | **MERGED** [#301](https://github.com/AlbanAndrieu/nabla-site-alban/pull/301) le 13/11 : `/api/homelab-catalog-v2`, source FastAPI, aucune route/fallback V1 ; `entityRef`, `catalogRevision`, cache public dédié | Réception navigateur et runtime **NOT_VERIFIED** ; ne pas refaire le cutover |
+| **S1 — Affichage Backstage V2** | **CODED sur la PR courante** : types, cycle de vie, criticité opérationnelle/métier, recherche enrichie et cache SERVICE expurgé ; icônes locales conservées | Tests ciblés et L3 exact-SHA à exécuter, puis FR/EN en conditions réelles |
+| **S2 — Santé et diagnostic** | **CODED antérieurement** : distinction santé effective / runtime / sonde LAN, traces, signaux `unknown` / `stale` | Corrélation et fraîcheur observées sur le même `catalogRevision` à confirmer |
+| **S3 — Visibilité OWNER/SERVICE** | Routes et composants d'accès séparés, cache public allowlisté, refus d'URL de service dans le DTO SERVICE | Tests LAN et WAN véritables, purge OWNER lors de la révocation |
+| **S4 — Architecture et icônes** | ReactFlow, références d'entité, associations d'icônes locales | Vérifier cohérence du graphe, absence d'arêtes inventées et icônes de toutes les cartes |
 
-La présence d'un service dans le catalogue n'établit **ni** sa disponibilité **ni** son autorisation de lecture. Ne jamais transformer `403`, `401`, `429`, une réponse absente ou un diagnostic non exécuté en `UP`.
+Une entité du catalogue **déclare** un service, une relation et un cycle de vie ; elle ne démontre ni disponibilité, ni déploiement, ni succès du dernier contrôle. Les états `NOT_RUN`, `DENIED` et `STALE` ne deviennent jamais automatiquement `UP` ou `DOWN`.
 
-## P0 — Recette d'accès et de publication réelle
+## Backlog restant — options de priorité
 
-- [ ] **S-01/S-02 — HTTP et navigateur :** vérifier le SHA via l'endpoint de déploiement, puis les pages Home/TrueNAS/Architecture FR/EN ; photographier les états de chargement, erreur et dégradation, sans données privées.
-- [ ] **S-03 — OWNER depuis le LAN autorisé :** confirmer `/api/homelab-access?diagnose=1`, l'UI privée, les sondes et les transitions réseau. L'accès `OWNER` ne doit pas être déduit d'une adresse IP simulée.
-- [ ] **S-04 — SERVICE depuis un réseau réellement non autorisé :** confirmer les refus attendus et que les cartes, caches navigateur, traces et liens ne révèlent aucune information OWNER. `401/403` est une politique d'accès, pas une panne.
-- [ ] **S-05 — Qualité :** produire l'attestation L3 complète définie **une seule fois** dans [la roadmap qualité](quality-roadmap.md#p0--gate-de-publication-exacte-bloquant-pour-toute-nouvelle-pr) sur un checkout Node 24 propre.
+| ID | P | Objectif / critère d'acceptation |
+| --- | --- | --- |
+| **S1** | **P0** | **Figer et valider le rendu V2** (PR courante) : types/criticités/lifecycle sans URL ni secret en SERVICE, FR/EN, tests de parité cartes ↔ architecture, filtre et cache |
+| **S2** | **P0** | **Recette OWNER/LAN et SERVICE/WAN** : vérification SHA, accès `/api/homelab-access?diagnose=1`, refus attendus, observation de l'UI, purge de l'état privé |
+| **S3** | **P1** | **Santé des services** : joindre santé V2, Gatus/Prometheus et sondes OWNER par `entityRef` + révision ; absence de métrique = inconnu, pas panne |
+| **S4** | **P1** | **Lisibilité UX** : distinguer « déclaré », « sans sonde », « preuve ancienne », « indisponible » ; mettre en évidence les dérives runtime et dépendances sans inventer de source |
+| **S5** | **P1** | **Accessibilité et performance** : badges et icônes accessibles, clavier/lecteur d'écran, mobile 320/390 px ; mesurer ReactFlow et taille du catalogue |
+| **S6** | **P1** | **C4 et navigation** : arêtes canoniques uniquement, liens OWNER basés sur les observations autorisées, revisiter les icônes après synchronisation Compose |
+| **S7** | **P2** | **Dette technique** : dédoublonner les adaptateurs et scripts réellement redondants, inventorier les références V1 historiques avant tout retrait, garder les tests négatifs |
+| **S8** | **P2** | **Ressources CPU/RAM/GPU/ZFS** : afficher uniquement des mesures producteur horodatées et autorisées ; jamais de CPU inventé depuis le catalogue |
 
-Critère de clôture P0 : traces datées du SHA exact, résultats OWNER/LAN et SERVICE/WAN réels, absence de fuite et L3 prouvée ; sinon noter `BLOCKED` ou `NOT_RUN` et laisser la recette ouverte.
+**Ordre recommandé après cette PR : S2 → S3 → S5**, tout en laissant la qualité L3 et le budget Vercel dans la roadmap générale. L'intégration V2 **S0** est clôturée côté code et ne figure plus parmi les migrations à réaliser.
 
-## P1 — Catalogue, preuves et UX
+## Critères de clôture
 
-- [ ] **S-06/S-07 — Traçabilité :** propager et afficher un `traceId` commun Next.js ↔ FastAPI selon le contrat producteur ; rendre les étapes DNS, TCP, TLS, HTTP, métriques et authentification lisibles dans la carte, sans inventer une preuve manquante.
-- [ ] **S-08 — Intégrité du catalogue :** joindre Gatus, métriques, upstream/downstream, `entityRef`, révision et statut par identifiants stables. Rejeter les jointures ambiguës et garder les liens inter-services navigables.
-- [ ] **S-09 — Cache et dégradation :** permettre l'affichage de la dernière preuve autorisée sans bloquer l'UI quand FastAPI est lent ou indisponible ; purger les détails OWNER sur le passage SERVICE ; différencier `UNKNOWN`, `STALE`, `DENIED` et `DOWN`.
-- [ ] **S-10/S-11 — Accessibilité et performance :** tester clavier, lecteur d'écran, 320/390 px, contraste WCAG 2.2 AA, absence de layout shift et métriques LCP/INP/CLS sur vrais navigateurs. Utiliser les tokens du Site et respecter les animations réduites.
-- [ ] **S-12/S-13 — Icônes et C4 :** valider `just icons-local-check` et la correspondance catalogue ; contrôler nœuds/relations/labels ReactFlow. Une relation C4 L3 absente du producteur reste `UNKNOWN`, jamais synthétisée comme observée.
+- [ ] **S1 :** exécuter `npm run test:catalog:v2` et L3 au SHA de la PR, puis contrôler les badges V2 sur TrueNAS et Architecture FR/EN.
+- [ ] **S2 :** consigner une recette LAN OWNER et WAN SERVICE réels, y compris révocation et absence de fuite dans le cache ou les liens.
+- [ ] **S3 :** comparer une preuve FastAPI horodatée, sa révision de catalogue et l'état rendu, sans faux vert ni faux rouge.
 
-## P2 — Dépendances et refactoring
+## Optimisations de rendu codées (non mesurées)
 
-- [ ] **S-14/S-15 — Refactoring :** dédupliquer les adaptateurs de snapshots/sondes, inventorier les consommateurs API v1, migrer vers le contrat v2 avec tests de non-régression et sans détruire le rendu public.
-- [ ] **S-16 — Contrats et instrumentation :** conserver les tests local-first des erreurs 401/403/429, les transitions OWNER/SERVICE, les compteurs de services et les boucles de rendu React ; analyser chaque incident avant d'ajouter un nouveau polling.
-- [ ] **Ressources opérateur :** prévoir la présentation CPU/RAM/GPU/ZFS par service **uniquement après disponibilité d'une preuve producteur expurgée**. L'absence de métrique n'est pas une panne.
+- **O(N) plutôt que des scans O(N²) pour les cartes OWNER :** index `indexOwnerNavigation` construit une fois par snapshot et partagé dans les deux pages. Les identifiants dupliqués sont rejetés. Un index est une optimisation de recherche, jamais une nouvelle source de vérité.
+- **Calculs communs :** la carte reçoit les index de santé du parent et conserve la vérification stricte de `catalogRevision` et `boardState=fresh` avant un état SERVICE.
+- **Une horloge par page :** la mesure de fraîcheur des ressources n'est plus répétée par groupe ; elle s'arrête lorsque l'onglet est caché et reprend à la visibilité. OWNER est masqué si accès révoqué.
+- **Une alerte runtime par page :** les groupes ne répètent plus les mêmes avertissements ; les déclarations, preuves et incidents restent séparés.
+- **Recherche et libellés uniques :** `lib/homelabCatalogSearch.ts` et `lib/servicePresentationLabels.ts` alimentent TrueNAS et Architecture ; le regroupement ne recopie plus les tableaux croissants.
+- **Preuve manquante :** aucune mesure comparative réelle CPU/INP/CLS, aucun test L3 exact-SHA ; ne pas appeler ces changements un gain mesuré.
 
-## Transfert entre dépôts
+## Vérifications disponibles
 
-**Site Alban :** filtres, cartes, ReactFlow/C4, affichage des preuves, i18n, a11y, privacy et cache d'interface. **FastAPI Sample :** collecteurs, enrichissement des sondes, schéma de preuves et diagnostic réseau. **nabla-compose :** déploiement des sondes LAN, TrueNAS/Talos/pfSense, catalogues infra, Traefik/APISIX et secrets. Les problèmes producteur doivent être suivis dans le dépôt producteur, pas dupliqués comme correctifs React.
+```bash
+npm ci
+npm run test:unit
+npm run lint
+npm run lint:css
+npm run typecheck
+npm run build
+npm run quality:agent:publish
+# Rapports métier : just icons-local-check (si just installé).
+```
 
-Les anciennes livraisons, décisions de CI, captures de symptômes et points détaillés S-01 à S-19 sont conservés dans [l'archive datée](archive/homelab-roadmap-through-2026-10-30.txt). Ne pas considérer leur historique comme un contrôle exécuté sur la révision actuelle.
+Aucun test sur la workstation ou sur TrueNAS n'est présumé exécuté par cette PR. Les codes `401`/`403`/`429` ne sont pas automatiquement des échecs du service amont. Aucune donnée OWNER ou inventaire secret n'est persisté dans le cache SERVICE.
+
+## Propriété
+
+**Site :** cartes, filtres, métadonnées, accessibilité, C4 et sélecteurs. **FastAPI :** états et diagnostics (producteur). **Compose :** catalogue source, policy d'exposition, déploiements, probes et métriques. L'ancienne roadmap au 30/10 est archivée, sans rouvrir les points déjà livrés.

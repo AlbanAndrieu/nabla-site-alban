@@ -85,6 +85,20 @@ function localCatalog(
 			name: service.name,
 			entityRef: service.id,
 			endpointEnabled: false,
+			// Icons are resolved from the local map, never persisted to SERVICE storage.
+			// Only reviewed Backstage metadata can survive sanitization.
+			...(["Component", "Resource", "API"].includes(service.catalogEntityKind ?? "")
+				? { catalogEntityKind: service.catalogEntityKind }
+				: {}),
+			...(typeof service.lifecycle === "string" &&
+				/^[a-z0-9][a-z0-9-]{0,63}$/.test(service.lifecycle)
+				? { lifecycle: service.lifecycle }
+				: {}),
+			...(["critical", "high", "medium", "low"].includes(
+				service.businessCriticality ?? "",
+			)
+				? { businessCriticality: service.businessCriticality }
+				: {}),
 			...(isSafePublicText(service.description)
 				? { description: service.description }
 				: {}),

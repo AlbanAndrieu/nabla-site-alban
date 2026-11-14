@@ -17,8 +17,6 @@ test("reviewed privacy and module splits keep large deletion exceptions path-sco
 	for (const path of [
 		"public/freenas.html",
 		"public/locales/fr/freenas.html",
-		"public/homelab-services.json",
-		"public/service-topology.json",
 	]) {
 		assert.ok(gate.includes(path), `missing reviewed P0 exception: ${path}`);
 	}

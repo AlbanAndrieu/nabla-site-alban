@@ -28,6 +28,10 @@ export type HomelabService = {
 	category?: string;
 	presentationRole?: "service" | "core" | "support";
 	criticality?: ServiceCriticalityLevel;
+	/** Reviewed, non-operational Backstage v2 metadata for card presentation. */
+	catalogEntityKind?: "Component" | "Resource" | "API";
+	lifecycle?: string;
+	businessCriticality?: ServiceCriticalityLevel;
 	description?: string;
 	healthNote?: string;
 	icon?: string;
