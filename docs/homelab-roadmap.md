@@ -31,6 +31,12 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 
 **Ordre recommandé après cette PR : S2 → S3 → S5**, tout en laissant la qualité L3 et le budget Vercel dans la roadmap générale. L'intégration V2 **S0** est clôturée côté code et ne figure plus parmi les migrations à réaliser.
 
+## Critères de clôture
+
+- [ ] **S1 :** exécuter `npm run test:catalog:v2` et L3 au SHA de la PR, puis contrôler les badges V2 sur TrueNAS et Architecture FR/EN.
+- [ ] **S2 :** consigner une recette LAN OWNER et WAN SERVICE réels, y compris révocation et absence de fuite dans le cache ou les liens.
+- [ ] **S3 :** comparer une preuve FastAPI horodatée, sa révision de catalogue et l'état rendu, sans faux vert ni faux rouge.
+
 ## Vérifications disponibles
 
 ```bash
