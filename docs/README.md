@@ -18,6 +18,8 @@ la source de l'historique d'implémentation ; les documents maintenus doivent ai
 
 ## Roadmaps actives
 
+Les priorités A1–A8 (transverses) et S1–S8 (ingénierie homelab) sont distinctes. Le cutover du catalogue V2 a déjà été fusionné (#301), la réception runtime reste ouverte.
+
 - [Roadmap produit et qualité](quality-roadmap.md) — backlog transverse canonique.
 - [Roadmap homelab Site](homelab-roadmap.md) — rendu TrueNAS/C4, accès client, diagnostics Site et recette production ; les actions API/infra restent dans leurs dépôts.
 
@@ -32,6 +34,7 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 - [Ruleset GitHub de master](github-master-ruleset.md)
 - [Checkout et support Stripe](checkout-support-runbook.md)
 - [Scripts frontend / analytics / Speed Insights](frontend-runtime-scripts-runbook.md)
+- [Index des scripts opérateur du site](../scripts/README.md) et [validation V2](homelab-services-catalog.md)
 - [Internationalisation](i18n-weblate-libretranslate.md)
 
 ## Diagnostics, incidents et références
@@ -39,6 +42,9 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 - [Historique intégral roadmap homelab avant consolidation](archive/homelab-roadmap-through-2026-10-25.txt)
 - [Historique qualité avant réconciliation du 30 octobre](archive/quality-roadmap-through-2026-10-30.txt)
 - [Historique homelab Site avant réconciliation du 30 octobre](archive/homelab-roadmap-through-2026-10-30.txt)
+- [Historique général avant réconciliation V2 (14/11)](archive/quality-roadmap-before-v2-reconciliation-2026-11-14.txt)
+- [Historique homelab avant réconciliation V2 (14/11)](archive/homelab-roadmap-before-v2-reconciliation-2026-11-14.txt)
+- [Ancien guide de migration V2, remplacé par le contrat courant](archive/homelab-catalog-v2-pre-cutover-guide-2026-11-14.txt)
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
 - [PoC Dagger et boucle de développement](dagger-poc.md)
