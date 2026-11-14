@@ -53,16 +53,25 @@ export default function ArchitectureHealthDashboard({
 	const [now, setNow] = useState<number | null>(null);
 	useEffect(() => {
 		if (!checkedAt) return;
+		let clockTimer: number | null = null;
 		const refresh = () => {
 			if (!document.hidden) setNow(Date.now());
 		};
-		const initial = window.setTimeout(refresh, 0);
-		const clockTimer = window.setInterval(refresh, 5_000);
-		document.addEventListener("visibilitychange", refresh);
+		const syncVisibility = () => {
+			if (document.hidden) {
+				if (clockTimer !== null) window.clearInterval(clockTimer);
+				clockTimer = null;
+				return;
+			}
+			refresh();
+			if (clockTimer === null) clockTimer = window.setInterval(refresh, 5_000);
+		};
+		const initial = window.setTimeout(syncVisibility, 0);
+		document.addEventListener("visibilitychange", syncVisibility);
 		return () => {
 			window.clearTimeout(initial);
-			window.clearInterval(clockTimer);
-			document.removeEventListener("visibilitychange", refresh);
+			if (clockTimer !== null) window.clearInterval(clockTimer);
+			document.removeEventListener("visibilitychange", syncVisibility);
 		};
 	}, [checkedAt]);
 	const ageSeconds = now === null ? null : snapshotAgeSeconds(checkedAt, now);
