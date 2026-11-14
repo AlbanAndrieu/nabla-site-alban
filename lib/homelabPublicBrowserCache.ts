@@ -85,8 +85,8 @@ function localCatalog(
 			name: service.name,
 			entityRef: service.id,
 			endpointEnabled: false,
-			// Preserve only the reviewed local asset path and the safe Backstage metadata.
-			...(service.iconSrc ? { iconSrc: service.iconSrc } : {}),
+			// Icons are resolved from the local map, never persisted to SERVICE storage.
+			// Only reviewed Backstage metadata can survive sanitization.
 			...(["Component", "Resource", "API"].includes(service.catalogEntityKind ?? "")
 				? { catalogEntityKind: service.catalogEntityKind }
 				: {}),
