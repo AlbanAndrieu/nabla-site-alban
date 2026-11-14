@@ -18,9 +18,9 @@ test("trace of diagnostic cannot pass Site JWT to FastAPI", () => {
 });
 
 test("local diagnostic supports bounded single-target mode and independent parallel probes", () => {
-  assert.match(source, /Promise\\.all\\(\\[/);
-  assert.match(source, /--site-only/);
-  assert.match(source, /--fastapi-only/);
-  assert.match(source, /Promise\\.resolve\\("SKIPPED"\\)/);
-  assert.match(source, /process\\.exitCode = 3/);
+  assert.ok(source.includes("Promise.all(["));
+  assert.ok(source.includes("--site-only"));
+  assert.ok(source.includes("--fastapi-only"));
+  assert.ok(source.includes('Promise.resolve("SKIPPED")'));
+  assert.ok(source.includes("process.exitCode = 3"));
 });
