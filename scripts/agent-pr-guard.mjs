@@ -125,11 +125,11 @@ export function decideReuse(scope, prs, { current = null, branch = null, expecte
   if (selected && !expectedHead && !trackingHead) throw error("PR_GUARD_HEAD_NOT_PINNED");
   const names = new Set(requested);
   const overlaps = prs.map((pr) => ({
-    number: pr.number, paths: pr.paths.filter((path) => names.has(path)).sort(),
+    number: pr.number, repo: pr.repo ?? REPO, paths: pr.paths.filter((path) => names.has(path)).sort(),
   })).filter((pr) => pr.paths.length);
   const others = overlaps.filter((pr) => pr.number !== selected?.number);
   if (others.length > 1 || (others.length && selected)) return { kind: "CONFLICT", selected: selected?.number ?? null, overlaps };
-  if (others.length === 1) return { kind: "REUSE", selected: null, overlaps };
+  if (others.length === 1) return { kind: others[0].repo === REPO ? "REUSE" : "CONFLICT", selected: null, overlaps };
   return { kind: selected ? "CONTINUE" : "NO_MATCH", selected: selected?.number ?? null, overlaps };
 }
 
