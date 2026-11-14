@@ -31,7 +31,7 @@
 | **A7** | **P1** | Mesurer LCP/INP/CLS, réduire CSS/Bootstrap hérité et hydrations coûteuses sans dégrader la compatibilité | [Baseline](performance-baseline.md) |
 | **A8** | **P2** | Refactorisation guidée des scripts, détection de code mort, dette Node/deps, ROI mesuré des agents et outils | [scripts](../scripts/README.md) |
 
-**Choix proposé : A1 → A2 → A4**, puis A3/A5 selon arbitrage. Une compilation ou un merge n'est pas une recette L3 ni une preuve Vercel.
+**Ordre décidé le 14/11 : G7 → G6 → G8** — terminer d'abord l'affichage Backstage V2 (filtres, santé, icônes, C4), puis l'accessibilité FR/EN/SEO, enfin le nettoyage des scripts et de la documentation des agents. Les exigences A1/A2/A3 restent des critères de publication, non des tâches implicitement validées. Les textes et tests des filtres sont codés sur une branche Draft ; la recette navigateur et la gate L3 restent ouvertes.
 
 ## Livrables ouverts et garde-fous
 

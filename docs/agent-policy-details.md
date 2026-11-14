@@ -3,6 +3,16 @@
 Operational detail relocated from `AGENTS.md` on 30 October 2026 to reduce recurring model context.
 The short `AGENTS.md` retains the mandatory safety contract and this page provides the expanded procedures.
 
+## Capabilities before diagnostics
+
+| Available resources | Preferred work | Never infer |
+| --- | --- | --- |
+| Workstation, full Git checkout, Node 24/npm 12 and deps | `just context`, focused unit tests, Playwright FR/EN, `just audit-owner` only from authorized LAN, then strict L3 | LAN access or healthy service from local Git presence |
+| Workstation with Git but missing deps | `just node22-fast` L1, static/shell checks, local offline cache; `npm ci` only when intentionally allowed | Typecheck/build/L3 PASS |
+| Codex/remote agent with GitHub connector only | exact-HEAD code review, docs/skills, targeted source contracts and safe Draft PR; obtain immutable source snapshot if available | Host resources, live probes, OWNER identity, browser acceptance or L3 PASS |
+
+The task router `scripts/agent-task-context.mjs` reports `LOCAL_READY`, `LOCAL_LIMITED` or `REMOTE_SOURCE` without network calls. `AGENT_EXECUTION_MODE=remote` forces conservative routing; `workstation` never upgrades a missing checkout to a valid proof. No diagnostic script must run on a network the agent cannot actually reach. Use explicit `BASE_URL` and `HOMELAB_AUDIT_EXPECT` for real network audits and redact all findings. Keep `CLAUDE.md` as `@AGENTS.md` (no duplicate policy).
+
 ## FastAPI → React agent optimizations (30 October 2026)
 
 These are the transferable practices from the FastAPI Sample agent discussions.

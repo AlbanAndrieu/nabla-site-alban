@@ -7,6 +7,7 @@ const projectUrl = (path: string) => new URL(`../${path}`, import.meta.url);
 test("retired install/test shell wrappers stay absent", async () => {
 	await assert.rejects(access(projectUrl("scripts/run-install.sh")));
 	await assert.rejects(access(projectUrl("scripts/run-test.sh")));
+	await assert.rejects(access(projectUrl("scripts/old/generate_fr_locale_html.py")));
 });
 
 test("canonical package scripts own dependency installation and Playwright execution", async () => {

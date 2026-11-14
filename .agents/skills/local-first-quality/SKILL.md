@@ -1,212 +1,36 @@
 ---
 name: local-first-quality
 description: >-
-  Validate Site Alban changes locally before publication. Report exact evidence
-  with short, direct instructions inspired by ASD-STE100.
+  Validate Site Alban changes with exact-HEAD, minimal local tests, and honest L0-L3 evidence.
 ---
+# Local-first quality
 
-# Local-first quality — Site Alban
+Follow `AGENTS.md`. Use concise French reports inspired by ASD-STE100: one action per step, precise verbs and consistent technical terms. Do not claim certification to the English-language standard.
 
-Use this skill for local quality checks, PR work, CI diagnosis, offline tests,
-and reports about validation. Follow `AGENTS.md` first. Do not use the
-`nabla-compose` commands as substitutes for this repository's commands.
+## Route by resources
 
-## Clear communication — inspired by ASD-STE100
+| Capability | Execute | Never claim |
+| --- | --- | --- |
+| Claude Code workstation, full checkout, deps | `just context`, `just preflight`, focused test, `npm run quality:agent:fix`, review, commit, `npm run quality:agent:publish` and `-- --status` | L3 before actual exact-HEAD proof |
+| Git checkout, no deps or only Node22/npm10 | `node scripts/agent-node22-fast.mjs --preflight` then `npm run test:fast:local` (dependency-free L1), syntax checks | build, typecheck, browser, L3 |
+| Remote Codex, connector-only/source snapshot | exact-SHA source/PR/contract inspection (L0); targeted executable tests only if files/imports exist | workstation resources, LAN identity, preview/browser, L3 |
 
-**Mandatory instruction for explanations and reports:**
+L0 = inspection, L1 = focused tests, L2 = deterministic local convergence, L3 = clean committed HEAD publication gate. Missing tools/deps/network are `NOT_RUN` or `BLOCKED`, never `PASS`. No GitHub Actions manual reruns or skip directives.
 
-> Explique cela dans l’esprit de l’ASD-STE100. Utilise des phrases simples et directes. Décris une seule action par étape de procédure. Évite les synonymes inutiles.
+## Local batch
 
-Apply the instruction to chat replies, PR descriptions, change reports,
-diagnostic instructions, and runbooks.
+1. Confirm PR/branch/base/HEAD, `git status --short`, and affected files. Work in an isolated `git worktree`.
+2. Run one nearby test first. Expand only from the first actionable failure; keep full logs outside model context.
+3. Run `npm run quality:agent:fix` after the **last edit**. Inspect the deterministic diff. Stop on `QG_FIX_OSCILLATION` or any security failure.
+4. Commit the cohesive batch. Run `npm run quality:agent:publish` on Node24/npm12 with locked dependencies; check `npm run quality:agent:publish -- --status`. Never use `--no-verify`.
+5. Push once to the PR's non-default branch, verify same HEAD and report checks actually run.
 
-- Write short sentences. Use the active voice.
-- State one idea per sentence.
-- Use a precise verb. Avoid vague instructions such as "handle" or "optimize".
-- Use the same term for the same item. For example, keep `PR`, `HEAD`,
-  `CI`, `quality gate`, and `catalogRevision` consistent.
-- Put **one action in each numbered procedure step**. Split steps that contain
-  two commands or two actions.
-- Identify the object of each action. State a prerequisite separately.
-- Distinguish an observed fact from an assumption.
-- Report failures and tests that did not run. Never claim success without
-  evidence from the exact version tested.
-- Keep code, commands, filenames, API fields, quoted source material, and
-  standard technical identifiers unchanged.
+`QG_AUTOFIX_REQUIRED`: run the fixer; `QG_PRECOMMIT_FAILED`: inspect named hook; `QG_PUBLISH_*`: block publication until repaired. Never change tests just to silence a valid failure.
 
-This is a writing guideline inspired by ASD-STE100. Do not claim that a French
-response is certified or formally compliant with that English-language standard.
+## UI and homelab acceptance
 
-## Evidence levels
+Use `docs/agent-frontend-standards.md` for React, WCAG 2.2 AA, FR/EN, mobile, SEO and theme. On an authorized workstation run matching Playwright/Axe; for OWNER/LAN versus SERVICE/WAN use `just audit-owner` / `just audit-service` only on the real network and never spoof IP headers. Vercel READY is not functional acceptance. Source-only checks do not prove caching/redaction or live service health.
 
-- **L0 — inspection:** Source and configuration checked at a known SHA.
-- **L1 — targeted:** A focused test executed against actual source files.
-- **L2 — convergence:** Relevant local checks and deterministic fixes passed.
-- **L3 — publication:** The complete local publication gate passed on the
-  committed, clean, exact HEAD.
+## Remote and quota
 
-Describe a missing checkout, dependency, runtime, or security tool as
-`NOT_RUN` or `BLOCKED`. Do not present L0, L1, or L2 as L3.
-
-## Local procedure
-
-1. Read the selected PR number.
-2. Verify its current HEAD SHA.
-3. Verify its target branch.
-4. Inspect the changed files.
-5. Run `just context`.
-6. Run `just preflight`.
-7. Run a focused test for each affected contract.
-8. Run `npm run quality:agent:fix` on a complete checkout.
-9. Review the resulting diff.
-10. Commit the intended changes.
-11. Run `npm run quality:agent:publish`.
-12. Verify the publication proof with `npm run quality:agent:publish -- --status`.
-13. Push only to the selected non-default branch.
-14. Verify the published HEAD SHA.
-
-Steps 5–12 require a suitable local checkout and toolchain. When these are
-unavailable, execute the nearest honest targeted validation instead. Report
-each missing check. Do not invent an L3 result.
-
-## Offline source recovery
-
-1. Confirm that repository network access is unavailable.
-2. Check for a trusted exact-HEAD source archive.
-3. Verify the archive's origin.
-4. Verify the archive's checksum.
-5. Otherwise, fetch the minimum source files through the GitHub connector.
-6. Reproduce the focused test in an isolated directory.
-7. Report whether the reproduction used full source or partial fixtures.
-
-Do not repeat blocked network requests without a changed prerequisite.
-Do not treat GitHub API reads, static assertions, or a source archive without
-Git metadata as proof that the full publication gate passed.
-
-## Local fast suite — two supported runtimes
-
-The dependency-free L1 profile accepts **Node 22 >=22.16/npm 10**
-(agent runtime) and **Node 24 >=24.22.1/npm >=12.2**
-(project toolchain). It rejects mismatched version pairs.
-
-1. Run `node scripts/agent-node22-fast.mjs --preflight`.
-2. Run `npm run test:fast:local`.
-3. Inspect the number of passed tests and any failures.
-4. Fix the failing contract in the owning source file.
-5. Rerun the same bounded suite.
-6. Record exact SHA and L1 evidence.
-
-The historical commands `just node22-fast` and
-`npm run test:fast:node22` remain aliases for the same runner.
-Keep `.nvmrc`, `mise.toml` and `package.json` engines on
-Node 24/npm 12; the agent's Node22-only runtime is not a release gate.
-No install, download, Next.js build, hook bypass or paid GitHub CI call
-is performed by this test script.
-
-**Avoid false success:** passing the fast suite under Node24 does not
-prove `npm ci`, `npm run typecheck`, `npm run build`, Playwright or
-an L3 publication gate. When the checkout is incomplete, report BLOCKED.
-See `docs/runbooks/node22-fast-local.md`.
-
-## CI budget and publication
-
-- Keep an agent-owned PR in Draft while work is incomplete.
-- Prefer local diagnostics over a new GitHub Actions run.
-- Do not manually start a paid workflow to debug a local formatting failure.
-- Do not disable mandatory security, lint, test, or pre-commit checks.
-- Do not add `[skip ci]` or another skip directive: Site Alban's
-  `AGENTS.md` prohibits it.
-- Never push directly to `master`.
-- Never merge without the user's explicit request.
-- Before a GitHub API write, confirm the current branch HEAD. Use an
-  expected-SHA guard. Stop if another writer changed that branch.
-
-Report the PR link, final SHA, changed paths, checks actually executed,
-tests not executed, and any remaining risks. Use simple sentences.
-
-## Compose #274 parity — safe local-first agent execution
-
-Source: https://github.com/AlbanAndrieu/nabla-compose/pull/274 .
-These are shared **safety patterns**, not Compose deployment commands.
-Preserve Site Alban's AGENTS.md and package-lock.json as the authorities.
-
-### Safe worktrees and prerequisite isolation
-
-- **Never run strict Bash options in an interactive parent shell.** Use
-  a child Bash script or a quoted heredoc for multi-step instructions.
-  Verify an intermediate failure stops that child without closing the
-  operator's terminal.
-- Pin each agent to the selected PR's exact SHA and an isolated worktree.
-  Worktrees share Git objects, so serialize metadata changes with flock.
-  Never share writable node_modules, .next, .venv or uncommitted output.
-  Treat /tmp as disposable; store persistent Git and validation evidence
-  outside it. Do not use reset --hard, clean -fd or worktree prune
-  against unknown working copies.
-- Check .nvmrc, mise.toml, package.json and package-lock.json first.
-  Use Node 24 LTS and locked npm ci before typecheck/build.
-  A Node 22 or Node 24 fast unit smoke is L1 evidence, **not** a Next.js build or L3.
-  Do not edit lockfiles to work around missing tooling.
-- For Python helpers **only if** a committed pyproject.toml and uv.lock
-  exist, run uv sync --locked in that worktree with its own .venv.
-  Share just the uv download cache (e.g. $HOME/.cache/uv), not the
-  installed packages or VIRTUAL_ENV. Do not create a Python project
-  merely to validate JavaScript.
-- Never source .envrc, allow direnv, install global packages, or load
-  production secrets for a read-only quality check.
-
-### Exact-HEAD validation, publication and preview
-
-1. Check that the user-selected PR is open and Draft. Pin head and base.
-2. Inspect only relevant changed files and the first failing test.
-3. Run just context and just preflight in the isolated checkout.
-4. Reproduce a failure against original code and cover a negative case.
-5. Classify missing prerequisites as MISSING_RUNTIME, MISSING_DEPS or
-   NO_CHECKOUT; classify actual failures as TEST_FAIL or BUILD_FAIL.
-6. Run npm ci, npm run typecheck, npm run build and the canonical
-   npm run quality:agent:publish on Node 24 and a clean committed checkout.
-7. Re-read remote PR HEAD before writing. Use optimistic blob-SHA
-   updates or a normal fast-forward; never write to master.
-8. Report L0/L1/L2/L3, NOT_RUN, exact SHA and remaining blockers.
-
-If shell DNS prevents a clone, do not retry in a loop. Reconstruct
-minimum required exact files through the GitHub connector, or use a
-trusted exact-SHA archive with its checksum validated. A partial fixture,
-or an archive without .git, cannot prove the full publication gate.
-
-**Site-specific CI contract remains unchanged:** no [skip ci],
-no --no-verify, no bypass of SAST/secrets/hooks, no manual paid
-GitHub Actions reruns. A Draft PR does not suppress every push trigger.
-
-For Preview acceptance, verify Vercel project Node 24.x, build logs
-and Git SHA match the **current** PR HEAD. READY is necessary but not
-sufficient. Review FR/EN TrueNAS, local icons and 404 monograms,
-ReactFlow, keyboard access, public SERVICE redaction and OWNER
-diagnostics. Verify privileged LAN probes only from an authorized
-environment; do not invent access evidence. Never promote a Preview
-or claim the production domain has been validated on build status alone.
-
-## External UI skills — manual installation
-
-External skills are optional inputs, not a substitute for this repository's
-local checks. Ask the repository owner to install them manually. Do not run
-remote skill installers without explicit approval.
-
-1. Request installation of Vercel's `web-design-guidelines` skill:
-   `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`.
-2. Request installation of Anthropic's `frontend-design` skill:
-   `npx skills add https://github.com/anthropics/skills --skill frontend-design`.
-3. Review external skill instructions before applying them to the repository.
-4. Keep UI changes in the existing work PR when possible.
-5. Run targeted accessibility and component tests locally.
-6. Mark unavailable visual or browser verification as `NOT_RUN`.
-
-## Zero-credit GitHub Actions mode
-
-- Treat the user's explicit no-CI instruction as a hard constraint.
-- Work in a Draft PR. Do not convert it to Ready without approval.
-- Do not dispatch a GitHub Actions workflow or request a rerun.
-- Do not claim that Draft alone suppresses push-triggered workflows; inspect
-  their event filters before a commit or remote write.
-- Prefer a local checkout with the exact PR HEAD and local checks.
-- State which checks were run and which were not run.
-- Never weaken required security checks to make a future merge pass.
+A verified exact-SHA source snapshot may support L1 checks, but without `.git` it cannot prove L3. If network access fails, use targeted connector reads; no repeated clone/DNS/npm or CI reruns. Keep Draft, recheck HEAD before API write, and disclose missing proof. For full NDA, 404 and hook exceptions read `docs/agent-policy-details.md`. External UI skills must be installed manually with owner approval; do not run `npx skills add` autonomously.

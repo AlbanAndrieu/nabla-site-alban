@@ -422,7 +422,6 @@ export default function HomelabServicesBlock({
 			)}
 
 			<HomelabServiceFilters
-				french={french}
 				healthRefreshing={state.healthRefreshing}
 				healthUnavailable={state.healthUnavailable}
 				healthCounts={healthCounts}

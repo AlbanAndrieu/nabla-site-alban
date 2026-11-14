@@ -199,6 +199,33 @@
 			}
 		},
 		"presentation": {
+			"filters": {
+				"title": "Santé et filtres des services",
+				"refreshing": "Actualisation…",
+				"probesUnverified": "Sondes non vérifiées",
+				"currentSnapshot": "Snapshot courant",
+				"healthSummary": "Résumé santé",
+				"healthLabel": "Santé",
+				"healthAll": "Tous les états",
+				"chips": {
+					"ok": "sains",
+					"warn": "dégradés",
+					"fail": "en échec",
+					"unknown": "inconnus"
+				},
+				"healthOptions": {
+					"ok": "Sain",
+					"warn": "Dégradé",
+					"fail": "En échec",
+					"unknown": "Inconnu"
+				},
+				"environmentLabel": "Environnement",
+				"environmentAll": "Tous les environnements",
+				"environmentNonDev": "Production + Staging (sans Dev)",
+				"environmentDefaulted": "Production par défaut (métadonnées à revoir)",
+				"reset": "Réinitialiser",
+				"resultCount": "{shown} services affichés sur {total}"
+			},
 			"filterLabel": "Vue",
 			"allGroups": "Toutes les vues",
 			"searchLabel": "Rechercher un service",

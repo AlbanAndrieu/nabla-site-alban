@@ -199,6 +199,33 @@
 			}
 		},
 		"presentation": {
+			"filters": {
+				"title": "Service health and filters",
+				"refreshing": "Refreshing…",
+				"probesUnverified": "Probes unverified",
+				"currentSnapshot": "Current snapshot",
+				"healthSummary": "Health summary",
+				"healthLabel": "Health",
+				"healthAll": "All health states",
+				"chips": {
+					"ok": "healthy",
+					"warn": "degraded",
+					"fail": "failed",
+					"unknown": "unknown"
+				},
+				"healthOptions": {
+					"ok": "Healthy",
+					"warn": "Degraded",
+					"fail": "Failed",
+					"unknown": "Unknown"
+				},
+				"environmentLabel": "Environment",
+				"environmentAll": "All environments",
+				"environmentNonDev": "Production + Staging (exclude Dev)",
+				"environmentDefaulted": "Default production (review metadata)",
+				"reset": "Reset filters",
+				"resultCount": "{shown} services shown of {total}"
+			},
 			"filterLabel": "View",
 			"allGroups": "All views",
 			"searchLabel": "Search services",

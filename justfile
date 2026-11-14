@@ -11,6 +11,8 @@ context:
 preflight:
     bash scripts/agent-offline-context.sh preflight
 
+# Capability routing uses only local Git/deps; override with AGENT_EXECUTION_MODE=remote.
+# It does not assert LAN access or run any service probe.
 # Read-only task-specific context; never executes or certifies a quality gate.
 agent-context task="agent":
     node scripts/agent-task-context.mjs --task "{{task}}"
@@ -182,6 +184,13 @@ k8s-build tag="nabla-site-alban:talos":
 
 k8s-smoke tag="nabla-site-alban:talos":
     bash scripts/k8s/smoke-standalone.sh "{{tag}}"
+
+# Single public-target diagnostics: no browser, LAN probe or retry.
+diagnose-site-access:
+    node scripts/diagnose-homelab-429.mjs --site-only
+
+diagnose-fastapi-livez:
+    node scripts/diagnose-homelab-429.mjs --fastapi-only
 
 # Validate the REAL network boundary, never spoof client IP addresses.
 audit-owner:

@@ -15,8 +15,14 @@ const HEALTH_STATES: readonly HomelabHealthState[] = [
   "ok", "warn", "fail", "unknown",
 ];
 
+const HEALTH_CHIP_KEYS = {
+  ok: "presentation.filters.chips.ok",
+  warn: "presentation.filters.chips.warn",
+  fail: "presentation.filters.chips.fail",
+  unknown: "presentation.filters.chips.unknown",
+} as const;
+
 type Props = {
-  french: boolean;
   healthRefreshing: boolean;
   healthUnavailable: boolean;
   healthCounts: Record<HomelabHealthState, number>;
@@ -36,7 +42,6 @@ type Props = {
 
 /** Shared TrueNAS health counters and interactive catalog filters. */
 export default function HomelabServiceFilters({
-  french,
   healthRefreshing,
   healthUnavailable,
   healthCounts,
@@ -67,9 +72,7 @@ export default function HomelabServiceFilters({
 							id="truenas-health-dashboard-title"
 							className={styles.healthDashboardTitle}
 						>
-							{french
-								? "Santé et filtres des services"
-								: "Service health and filters"}
+							{t("presentation.filters.title")}
 						</h3>
 					</div>
 					<span
@@ -78,22 +81,16 @@ export default function HomelabServiceFilters({
 						aria-live="polite"
 					>
 						{healthRefreshing
-							? french
-								? "Actualisation…"
-								: "Refreshing…"
+							? t("presentation.filters.refreshing")
 							: healthUnavailable
-								? french
-									? "Sondes non vérifiées"
-									: "Probes unverified"
-								: french
-									? "Snapshot courant"
-									: "Current snapshot"}
+								? t("presentation.filters.probesUnverified")
+								: t("presentation.filters.currentSnapshot")}
 					</span>
 				</div>
 
 				<div
 					className={styles.healthSummary}
-					aria-label={french ? "Résumé santé" : "Health summary"}
+					aria-label={t("presentation.filters.healthSummary")}
 				>
 					{HEALTH_STATES.map((healthState) => (
 						<button
@@ -109,21 +106,7 @@ export default function HomelabServiceFilters({
 							}
 						>
 							<strong>{healthCounts[healthState]}</strong>{" "}
-							{healthState === "ok"
-								? french
-									? "sains"
-									: "healthy"
-								: healthState === "warn"
-									? french
-										? "dégradés"
-										: "degraded"
-									: healthState === "fail"
-										? french
-											? "en échec"
-											: "failed"
-										: french
-											? "inconnus"
-											: "unknown"}
+							{t(HEALTH_CHIP_KEYS[healthState])}
 						</button>
 					))}
 				</div>
@@ -131,7 +114,7 @@ export default function HomelabServiceFilters({
 				<div className={styles.controls} data-homelab-hierarchy-controls>
 					<label className={styles.filterField}>
 						<span className={styles.filterLabel}>
-							{french ? "Santé" : "Health"}
+							{t("presentation.filters.healthLabel")}
 						</span>
 						<select
 							className={styles.filterSelect}
@@ -142,12 +125,12 @@ export default function HomelabServiceFilters({
 							data-homelab-health-select
 						>
 							<option value="all">
-								{french ? "Tous les états" : "All health states"}
+								{t("presentation.filters.healthAll")}
 							</option>
-							<option value="ok">{french ? "Sain" : "Healthy"}</option>
-							<option value="warn">{french ? "Dégradé" : "Degraded"}</option>
-							<option value="fail">{french ? "En échec" : "Failed"}</option>
-							<option value="unknown">{french ? "Inconnu" : "Unknown"}</option>
+							<option value="ok">{t("presentation.filters.healthOptions.ok")}</option>
+							<option value="warn">{t("presentation.filters.healthOptions.warn")}</option>
+							<option value="fail">{t("presentation.filters.healthOptions.fail")}</option>
+							<option value="unknown">{t("presentation.filters.healthOptions.unknown")}</option>
 						</select>
 					</label>
 					<label className={styles.filterField}>
@@ -165,7 +148,7 @@ export default function HomelabServiceFilters({
 					</label>
 					<label className={styles.filterField}>
 						<span className={styles.filterLabel}>
-							{french ? "Environnement" : "Environment"}
+							{t("presentation.filters.environmentLabel")}
 						</span>
 						<select
 							className={styles.filterSelect}
@@ -178,20 +161,16 @@ export default function HomelabServiceFilters({
 							data-homelab-environment-filter
 						>
 							<option value="all">
-								{french ? "Tous les environnements" : "All environments"}
+								{t("presentation.filters.environmentAll")}
 							</option>
 							<option value="non-dev">
-								{french
-									? "Production + Staging (sans Dev)"
-									: "Production + Staging (exclude Dev)"}
+								{t("presentation.filters.environmentNonDev")}
 							</option>
 							<option value="production">Production</option>
 							<option value="staging">Staging</option>
 							<option value="dev">Dev</option>
 							<option value="defaulted">
-								{french
-									? "Production par défaut (métadonnées à revoir)"
-									: "Default production (review metadata)"}
+								{t("presentation.filters.environmentDefaulted")}
 							</option>
 						</select>
 					</label>
@@ -228,7 +207,7 @@ export default function HomelabServiceFilters({
 								setSearchQuery("");
 							}}
 						>
-							{french ? "Réinitialiser" : "Reset filters"}
+							{t("presentation.filters.reset")}
 						</button>
 						<button
 							type="button"
@@ -248,10 +227,8 @@ export default function HomelabServiceFilters({
 						</button>
 					</div>
 				</div>
-				<p className={styles.matchCount}>
-					{french
-						? `${visibleCount} services affichés sur ${totalCount}`
-						: `${visibleCount} services shown of ${totalCount}`}
+				<p className={styles.matchCount} role="status" aria-live="polite" aria-atomic="true">
+					{t("presentation.filters.resultCount", { shown: visibleCount, total: totalCount })}
 				</p>
 			</section>
 

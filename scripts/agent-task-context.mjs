@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /** Read-only task router. No network, installs, CI, secrets, or publication proof. */
 import { spawnSync } from "node:child_process";
-import { dirname, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -60,6 +61,15 @@ function git(args, cwd = ROOT) {
 	return result.status === 0 ? result.stdout.trim() : null;
 }
 
+/** Profiles describe available evidence, never inferred LAN authorization. */
+export function resolveExecutionProfile(head, dependencies, requested = "auto") {
+	if (!["auto", "workstation", "remote"].includes(requested)) {
+		throw new Error("AGENT_EXECUTION_MODE_INVALID: use auto|workstation|remote");
+	}
+	if (requested === "remote" || head === "UNAVAILABLE") return "REMOTE_SOURCE";
+	return dependencies ? "LOCAL_READY" : "LOCAL_LIMITED";
+}
+
 export function inspectGit(cwd = ROOT) {
 	const head = git(["rev-parse", "--verify", "HEAD"], cwd);
 	const branch = git(["symbolic-ref", "--quiet", "--short", "HEAD"], cwd);
@@ -68,8 +78,11 @@ export function inspectGit(cwd = ROOT) {
 		cwd,
 	);
 	const base = git(["rev-parse", "--verify", "origin/master^{commit}"], cwd);
+	const resolvedHead = head && /^[a-f0-9]{40}$/.test(head) ? head : "UNAVAILABLE";
+	const dependencies = existsSync(join(cwd, "node_modules", ".package-lock.json"));
 	return {
-		head: head && /^[a-f0-9]{40}$/.test(head) ? head : "UNAVAILABLE",
+		profile: resolveExecutionProfile(resolvedHead, dependencies, process.env.AGENT_EXECUTION_MODE ?? "auto"),
+		head: resolvedHead,
 		branch: branch || "DETACHED_OR_NO_GIT",
 		worktree: status === null ? "UNKNOWN" : status === "" ? "CLEAN" : "DIRTY",
 		base: base ? "CACHED_ONLY" : "BASE_MISSING",
@@ -79,12 +92,14 @@ export function inspectGit(cwd = ROOT) {
 export function formatContext(task, snapshot) {
 	const plan = TASKS[task];
 	if (!plan) throw new Error("AGENT_TASK_INVALID");
+	const remote = snapshot.profile === "REMOTE_SOURCE";
+	const limited = snapshot.profile === "LOCAL_LIMITED";
 	return [
 		`Task ${task} | branch ${snapshot.branch} | HEAD ${snapshot.head.slice(0, 12)}`,
-		`Worktree ${snapshot.worktree} | base ${snapshot.base}`,
+		`Worktree ${snapshot.worktree} | base ${snapshot.base} | profile ${snapshot.profile ?? "UNVERIFIED"} | LAN UNVERIFIED`,
 		`Read only: ${plan.guide}`,
-		`First check: ${plan.first}`,
-		`Then: ${plan.next}`,
+		`First check: ${remote ? "inspect exact-SHA code and PR metadata (L0)" : plan.first}`,
+		`Then: ${remote ? "review source contracts; no local/LAN claim" : limited ? "dependency-free L1; install deps only on an authorized workstation" : plan.next}`,
 		"Evidence: NOT_RUN | L3: NOT_RUN (npm run quality:agent:publish)",
 		"Do not publish from source-only checks, or bypass CI/security hooks.",
 	].join("\n");
