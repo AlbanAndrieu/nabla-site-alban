@@ -2,11 +2,14 @@
 
 import { useMemo } from "react";
 import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
-import type { HomelabHealthSnapshot, HomelabHealthState } from "@/lib/homelabHealth";
+import type {
+	HomelabHealthSnapshot,
+	HomelabHealthState,
+} from "@/lib/homelabHealth";
 import {
 	indexOwnerNavigation,
-	observedOwnerServiceNavigation,
 	type OwnerNavigationIndex,
+	observedOwnerServiceNavigation,
 } from "@/lib/homelabOwnerServiceNavigation";
 import type { ResourceSnapshot } from "@/lib/homelabResourceEvidence";
 import {
@@ -17,7 +20,10 @@ import {
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
-import { healthIndex, type ServiceEvidenceIndex } from "./homelabGridPresentation";
+import {
+	healthIndex,
+	type ServiceEvidenceIndex,
+} from "./homelabGridPresentation";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
@@ -52,14 +58,22 @@ export default function HomelabServiceGrid({
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
 	const resourceIndex = useMemo(
-		() => new Map((readOnly || ownerBoundary ? [] : resources?.services ?? []).map((row) => [row.entityRef, row] as const)),
+		() =>
+			new Map(
+				(readOnly || ownerBoundary ? [] : (resources?.services ?? [])).map(
+					(row) => [row.entityRef, row] as const,
+				),
+			),
 		[readOnly, ownerBoundary, resources],
 	);
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
 	const serviceOccurrences = new Map<string, number>();
 	const serviceHealth = useMemo(
-		() => (snapshot ? (ownerHealthIndex ?? healthIndex(snapshot)) : healthIndex(null)),
+		() =>
+			snapshot
+				? (ownerHealthIndex ?? healthIndex(snapshot))
+				: healthIndex(null),
 		[snapshot, ownerHealthIndex],
 	);
 	const safeStatus = useMemo(

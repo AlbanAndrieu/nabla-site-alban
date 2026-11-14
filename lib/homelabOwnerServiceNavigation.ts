@@ -23,7 +23,9 @@ export type OwnerNavigationIndex = {
 };
 
 /** Duplicate row IDs are intentionally omitted rather than arbitrarily selected. */
-function uniqueById<T extends { id?: string }>(entries: readonly T[]): Map<string, T> {
+function uniqueById<T extends { id?: string }>(
+	entries: readonly T[],
+): Map<string, T> {
 	const byId = new Map<string, T>();
 	const ambiguous = new Set<string>();
 	for (const entry of entries) {
@@ -40,7 +42,9 @@ function uniqueById<T extends { id?: string }>(entries: readonly T[]): Map<strin
 }
 
 /** Linear pre-index for all cards in a page; removes repeated snapshot scans. */
-export function indexOwnerNavigation(snapshot: HomelabHealthSnapshot): OwnerNavigationIndex {
+export function indexOwnerNavigation(
+	snapshot: HomelabHealthSnapshot,
+): OwnerNavigationIndex {
 	return {
 		services: uniqueById(snapshot.services),
 		internal: uniqueById(snapshot.internal_services ?? []),

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { indexOwnerNavigation, observedOwnerServiceNavigation } from "../lib/homelabOwnerServiceNavigation.ts";
+import {
+	indexOwnerNavigation,
+	observedOwnerServiceNavigation,
+} from "../lib/homelabOwnerServiceNavigation.ts";
 
 const service = {
 	id: "component:default/gatus",
@@ -291,25 +294,51 @@ test("one indexed OWNER snapshot serves all cards while duplicate identities fai
 	);
 
 	// Duplicate OWNER rows must never yield a public link, regardless of order.
-	const ambiguous = { ...snapshot, services: [entry, { ...entry, url: "https://other.example/" }] };
+	const ambiguous = {
+		...snapshot,
+		services: [entry, { ...entry, url: "https://other.example/" }],
+	};
 	const ambiguousIndex = indexOwnerNavigation(ambiguous);
 	assert.equal(ambiguousIndex.services.has("gatus"), false);
-	assert.equal(observedOwnerServiceNavigation(service, ambiguous, ambiguousIndex).externalUrl, "");
+	assert.equal(
+		observedOwnerServiceNavigation(service, ambiguous, ambiguousIndex)
+			.externalUrl,
+		"",
+	);
 
 	// Duplicate LAN probes are not a basis for choosing a host/port.
 	// A distinct, valid declaration remains visible but is explicitly unprobed.
-	const duplicateInternal = { ...snapshot, internal_services: [...snapshot.internal_services, {
-		...snapshot.internal_services[0], host: "172.17.0.99", port: 5432,
-	}] };
+	const duplicateInternal = {
+		...snapshot,
+		internal_services: [
+			...snapshot.internal_services,
+			{
+				...snapshot.internal_services[0],
+				host: "172.17.0.99",
+				port: 5432,
+			},
+		],
+	};
 	const internalIndex = indexOwnerNavigation(duplicateInternal);
 	assert.equal(internalIndex.internal.has("gatus"), false);
-	const result = observedOwnerServiceNavigation(service, duplicateInternal, internalIndex);
+	const result = observedOwnerServiceNavigation(
+		service,
+		duplicateInternal,
+		internalIndex,
+	);
 	assert.equal(result.service.internalHost, "172.17.0.24");
 	assert.equal(result.service.internalPort, 8085);
 	assert.equal(result.internalTargetSource, "declared");
 
 	// The canonical Backstage entity ref, not a coincident display name, owns the row.
-	const wrongIdentity = { ...service, id: "component:default/other", entityRef: "component:default/other" };
-	assert.equal(observedOwnerServiceNavigation(wrongIdentity, snapshot, indexed).externalUrl, "");
+	const wrongIdentity = {
+		...service,
+		id: "component:default/other",
+		entityRef: "component:default/other",
+	};
+	assert.equal(
+		observedOwnerServiceNavigation(wrongIdentity, snapshot, indexed)
+			.externalUrl,
+		"",
+	);
 });
-

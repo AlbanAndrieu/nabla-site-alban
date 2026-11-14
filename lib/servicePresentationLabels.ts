@@ -1,5 +1,8 @@
 /** Static, pure i18n keys shared by TrueNAS and Architecture views. */
-import type { ServiceMetricsProfile, ServicePresentationGroup } from "./servicePresentation";
+import type {
+	ServiceMetricsProfile,
+	ServicePresentationGroup,
+} from "./servicePresentation";
 
 type GroupTitleKey =
 	| "presentation.groups.services"
@@ -34,4 +37,3 @@ export const METRICS_PROFILE_KEY: Record<
 	"red-use": "presentation.metrics.red-use",
 	support: "presentation.metrics.support",
 };
-

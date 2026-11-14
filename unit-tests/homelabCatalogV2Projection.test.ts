@@ -166,10 +166,12 @@ test("different names that normalize to the same service-card slug are rejected"
 	);
 });
 
-
 test("Backstage v2 card projection retains reviewed lifecycle and criticality without endpoints", () => {
 	const component = {
-		...entity("Component", "default", "auth", { type: "service", lifecycle: "production" }),
+		...entity("Component", "default", "auth", {
+			type: "service",
+			lifecycle: "production",
+		}),
 		metadata: {
 			name: "auth",
 			title: "Authentication",

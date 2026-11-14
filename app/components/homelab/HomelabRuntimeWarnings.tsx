@@ -31,7 +31,8 @@ export default function HomelabRuntimeWarnings({
 	const truenasPublicUp =
 		truenasPublic?.reachable === true && truenasPublic.state !== "fail";
 	const truenasDown = !truenasPublicUp && snapshot?.truenas?.state === "fail";
-	const truenasWarning = !truenasPublicUp && snapshot?.truenas?.state === "warn";
+	const truenasWarning =
+		!truenasPublicUp && snapshot?.truenas?.state === "warn";
 	const truenasRuntimeUnavailable =
 		healthUnavailable ||
 		truenasApi?.reachable === false ||
@@ -67,13 +68,18 @@ export default function HomelabRuntimeWarnings({
 	return (
 		<>
 			{(truenasDown || truenasWarning) && (
-				<div className={`alert ${truenasDown ? "alert-danger" : "alert-warning"}`} role="alert">
+				<div
+					className={`alert ${truenasDown ? "alert-danger" : "alert-warning"}`}
+					role="alert"
+				>
 					<strong>
 						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
 						{truenasDown ? t("truenas.down") : t("truenas.degraded")}
 					</strong>
 					{" — "}
-					{t("truenas.publicProbe", { state: truenasPublic?.state ?? "unknown" })}
+					{t("truenas.publicProbe", {
+						state: truenasPublic?.state ?? "unknown",
+					})}
 					{truenasInternal
 						? `; ${t("truenas.internalProbe", {
 								host: truenasInternal.host,
@@ -85,7 +91,11 @@ export default function HomelabRuntimeWarnings({
 				</div>
 			)}
 			{(truenasRuntimeUnavailable || truenasRuntimeStale) && (
-				<div className="alert alert-warning" role="alert" data-truenas-runtime-warning>
+				<div
+					className="alert alert-warning"
+					role="alert"
+					data-truenas-runtime-warning
+				>
 					<strong>
 						<i className="fas fa-triangle-exclamation" aria-hidden="true" />{" "}
 						{t("truenas.runtimeDataUnavailable")}

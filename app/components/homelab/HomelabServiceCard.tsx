@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import type {
 	HomelabHealthSnapshot,
 	HomelabHealthState,
@@ -15,28 +16,30 @@ import {
 	hasFreshRuntimeInventoryConflict,
 	resolveEffectiveServiceState,
 } from "@/lib/homelabHealthResolver";
-import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
-import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import { homelabIconFallback } from "@/lib/homelabIconFallback";
-import HomelabCatalogMetadata from "./HomelabCatalogMetadata";
+import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
+import type { ServiceResourceMeasurement } from "@/lib/homelabResourceEvidence";
+import {
+	type HomelabService,
+	homelabServiceDisplayName,
+} from "@/lib/homelabServices";
 import EndpointAction from "./EndpointAction";
+import HomelabCatalogMetadata from "./HomelabCatalogMetadata";
+import HomelabServiceResources from "./HomelabServiceResources";
 import styles from "./HomelabServicesBlock.module.css";
 import {
 	EFFECTIVE_HEALTH_ICON_CLASS,
 	EFFECTIVE_HEALTH_LABEL_KEY,
 	endpointUrlHostIsPrivateS3,
-	type ServiceEvidenceIndex,
 	INTERNAL_HEALTH_CLASS,
 	RUNTIME_ICON_CLASS,
 	reconciledHealth,
 	runtimePresentationState,
+	type ServiceEvidenceIndex,
 	serviceHealthEvidence,
 	serviceIconPath,
 } from "./homelabGridPresentation";
 import ServiceHealthReasons from "./ServiceHealthReasons";
-import HomelabServiceResources from "./HomelabServiceResources";
-import type { ServiceResourceMeasurement } from "@/lib/homelabResourceEvidence";
-import { describeServiceProbe } from "@/lib/homelabProbeEvidencePresentation";
 
 type Props = {
 	svc: HomelabService;
@@ -51,8 +54,8 @@ type Props = {
 	truenasRuntimeUnavailable: boolean;
 	truenasRuntimeStale: boolean;
 	readOnly?: boolean;
-  resource?: ServiceResourceMeasurement;
-  resourceStale?: boolean;
+	resource?: ServiceResourceMeasurement;
+	resourceStale?: boolean;
 	externalUrlDerived?: boolean;
 	internalProtocolObserved?: boolean;
 	internalRouteMismatch?: boolean;
@@ -72,19 +75,23 @@ export default function HomelabServiceCard({
 	truenasRuntimeUnavailable,
 	truenasRuntimeStale,
 	readOnly = false,
-  resource,
-  resourceStale = false,
+	resource,
+	resourceStale = false,
 	externalUrlDerived = false,
 	internalProtocolObserved = false,
 	internalRouteMismatch = false,
 }: Props) {
 	const t = useTranslations("homelab");
 	const [failedIconSrc, setFailedIconSrc] = useState<string | null>(null);
-	const iconSrc = serviceIconPath(homelabServiceIconSrc(serviceId, svc.iconSrc));
+	const iconSrc = serviceIconPath(
+		homelabServiceIconSrc(serviceId, svc.iconSrc),
+	);
 	const iconFallback = homelabIconFallback(serviceId, svc.name);
-  const french = useLocale() === "fr";
+	const french = useLocale() === "fr";
 	const hasInternal =
-		!readOnly && typeof svc.internalHost === "string" && Boolean(svc.internalPort);
+		!readOnly &&
+		typeof svc.internalHost === "string" &&
+		Boolean(svc.internalPort);
 	const isExternal = svc.external === true;
 	const isPrivateEndpoint = !isExternal && hasInternal;
 	const privateExposureDebt =
@@ -92,11 +99,13 @@ export default function HomelabServiceCard({
 		endpointUrlHostIsPrivateS3(svc.tunnelUrl) &&
 		isExternal;
 	const endpointEnabled = !readOnly && svc.endpointEnabled !== false;
-	const initialHealth = !healthUnavailable ? reconciledHealth(
-		serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
-		svc,
-		snapshot?.schema_version,
-	) : undefined;
+	const initialHealth = !healthUnavailable
+		? reconciledHealth(
+				serviceHealthEvidence(serviceHealth, svc, endpointUrl, snapshot),
+				svc,
+				snapshot?.schema_version,
+			)
+		: undefined;
 	const resolvedHealth = resolveEffectiveServiceState(initialHealth);
 	const runtimeInventoryConflict =
 		hasFreshRuntimeInventoryConflict(initialHealth);
@@ -110,13 +119,17 @@ export default function HomelabServiceCard({
 		blockerLabels.length > 0 ||
 		resolvedHealth.localState !== resolvedHealth.effectiveState;
 	const dependsOnTrueNas = initialHealth?.runtime_app != null;
-  // Docker RUNNING is not proof of a successful TCP/LAN probe.
-  const lanProbe = snapshot ?
-    describeServiceProbe(initialHealth, snapshot, "internal") : null;
-  const internalState: HomelabHealthState = !lanProbe ||
-    ["disabled", "not-configured", "not-run", "stale"].includes(lanProbe.state) ? "unknown" :
-    lanProbe.state === "failed" ? "fail" :
-    initialHealth?.internal_state ?? "unknown";
+	// Docker RUNNING is not proof of a successful TCP/LAN probe.
+	const lanProbe = snapshot
+		? describeServiceProbe(initialHealth, snapshot, "internal")
+		: null;
+	const internalState: HomelabHealthState =
+		!lanProbe ||
+		["disabled", "not-configured", "not-run", "stale"].includes(lanProbe.state)
+			? "unknown"
+			: lanProbe.state === "failed"
+				? "fail"
+				: (initialHealth?.internal_state ?? "unknown");
 	const internalColor = homelabHealthTextColor(internalState);
 	const runtimeState = runtimePresentationState(
 		initialHealth,
@@ -146,9 +159,9 @@ export default function HomelabServiceCard({
 						})
 					: runtimeState === "unknown"
 						? t("runtime.unknown")
-					: runtimeState === "missing"
-						? t("runtime.missing")
-						: undefined;
+						: runtimeState === "missing"
+							? t("runtime.missing")
+							: undefined;
 
 	return (
 		<div className="col-md-4 p-3" id={anchorId}>
@@ -226,11 +239,15 @@ export default function HomelabServiceCard({
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
 					<HomelabCatalogMetadata service={svc} />
-					{!initialHealth && (siteState === undefined || siteState === "unknown") && (
-						<p className={styles.serviceEvidenceNote} data-catalog-without-fresh-evidence>
-							{t("catalog.noFreshEvidence")}
-						</p>
-					)}
+					{!initialHealth &&
+						(siteState === undefined || siteState === "unknown") && (
+							<p
+								className={styles.serviceEvidenceNote}
+								data-catalog-without-fresh-evidence
+							>
+								{t("catalog.noFreshEvidence")}
+							</p>
+						)}
 
 					<ServiceHealthReasons
 						entry={initialHealth}
@@ -242,13 +259,13 @@ export default function HomelabServiceCard({
 						cloudflareConfigured={snapshot?.cloudflare_configured}
 						runtimeStale={truenasRuntimeStale}
 					/>
-          {!readOnly && resource && (
-            <HomelabServiceResources
-              resource={resource}
-              french={french}
-              stale={resourceStale}
-            />
-          )}
+					{!readOnly && resource && (
+						<HomelabServiceResources
+							resource={resource}
+							french={french}
+							stale={resourceStale}
+						/>
+					)}
 					{dependencyDegraded && (
 						<div
 							className="alert alert-warning py-2 px-2 small text-start mt-3 mb-0"
@@ -301,17 +318,29 @@ export default function HomelabServiceCard({
 							snapshotCheckedAt={snapshot?.checked_at}
 							truenasDown={truenasDown && dependsOnTrueNas}
 						/>
-            {!readOnly && endpointEnabled && endpointUrl && (
-              <small className="text-break text-start" data-owner-external-target>
-                {endpointUrl}
-                {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
-              </small>
-            )}
-            {hasInternal && internalRouteMismatch && (
-              <small className="text-warning text-start" data-owner-lan-route-mismatch>
-                {french ? "Écart détecté : origine Cloudflare différente de la cible déclarée" : "Route drift: Cloudflare origin differs from declared target"}
-              </small>
-            )}
+						{!readOnly && endpointEnabled && endpointUrl && (
+							<small
+								className="text-break text-start"
+								data-owner-external-target
+							>
+								{endpointUrl}
+								{externalUrlDerived
+									? french
+										? " · URL dérivée, à vérifier"
+										: " · derived URL, verify before use"
+									: ""}
+							</small>
+						)}
+						{hasInternal && internalRouteMismatch && (
+							<small
+								className="text-warning text-start"
+								data-owner-lan-route-mismatch
+							>
+								{french
+									? "Écart détecté : origine Cloudflare différente de la cible déclarée"
+									: "Route drift: Cloudflare origin differs from declared target"}
+							</small>
+						)}
 						{hasInternal && (
 							<a
 								href={`${svc.internalSecure ? "https" : "http"}://${svc.internalHost}:${svc.internalPort}`}
@@ -323,10 +352,14 @@ export default function HomelabServiceCard({
 									borderColor: internalColor,
 								}}
 								data-health-state={internalState}
-                data-lan-probe-state={lanProbe?.state ?? "not-run"}
-								title={!internalProtocolObserved
-									? (french ? "Protocole LAN non confirmé · schéma configuré utilisé" : "LAN protocol unconfirmed · configured scheme used")
-									: `FastAPI/TrueNAS: ${internalState}`}
+								data-lan-probe-state={lanProbe?.state ?? "not-run"}
+								title={
+									!internalProtocolObserved
+										? french
+											? "Protocole LAN non confirmé · schéma configuré utilisé"
+											: "LAN protocol unconfirmed · configured scheme used"
+										: `FastAPI/TrueNAS: ${internalState}`
+								}
 							>
 								{svc.internalSecure && (
 									<i

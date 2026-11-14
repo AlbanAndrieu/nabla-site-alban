@@ -1,9 +1,9 @@
+import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import {
 	type HomelabEnvironmentFilter,
 	homelabServiceMatchesEnvironment,
 	resolveHomelabServiceEnvironments,
 } from "@/lib/homelabEnvironments";
-import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
 import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
@@ -13,7 +13,11 @@ import {
 } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import { effectiveState, type HomelabHealthIndex } from "./useHomelabHealth";
-export { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/lib/servicePresentationLabels";
+
+export {
+	GROUP_TITLE_KEY,
+	METRICS_PROFILE_KEY,
+} from "@/lib/servicePresentationLabels";
 
 export const ALL_GROUPS: readonly ServicePresentationGroup[] = [
 	"services",

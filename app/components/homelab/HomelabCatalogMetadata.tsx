@@ -25,19 +25,27 @@ const LIFECYCLE_KEYS = {
 } as const;
 
 /** Only source-declared Backstage attributes; never label these as a live probe. */
-export default function HomelabCatalogMetadata({ service }: Readonly<{ service: HomelabService }>) {
+export default function HomelabCatalogMetadata({
+	service,
+}: Readonly<{ service: HomelabService }>) {
 	const t = useTranslations("homelab");
 	const kind = service.catalogEntityKind;
-	const technicalType = service.kind && service.kind !== kind?.toLowerCase() ? service.kind : null;
+	const technicalType =
+		service.kind && service.kind !== kind?.toLowerCase() ? service.kind : null;
 	const life = service.lifecycle;
 	const business = service.businessCriticality;
 	const operation = service.criticality;
 	if (!kind && !technicalType && !life && !business && !operation) return null;
-	const lifeKey = life && Object.hasOwn(LIFECYCLE_KEYS, life)
-		? LIFECYCLE_KEYS[life as keyof typeof LIFECYCLE_KEYS]
-		: null;
+	const lifeKey =
+		life && Object.hasOwn(LIFECYCLE_KEYS, life)
+			? LIFECYCLE_KEYS[life as keyof typeof LIFECYCLE_KEYS]
+			: null;
 	return (
-		<div className={styles.catalogMetadata} data-backstage-v2-metadata title={t("catalog.declarativeOnly")}>
+		<div
+			className={styles.catalogMetadata}
+			data-backstage-v2-metadata
+			title={t("catalog.declarativeOnly")}
+		>
 			<dl className={styles.catalogMetadataList}>
 				{kind && (
 					<div>

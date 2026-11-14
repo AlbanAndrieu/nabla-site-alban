@@ -1,3 +1,4 @@
+import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
@@ -8,7 +9,6 @@ import {
 	type UniqueHomelabEvidenceIndex,
 	uniqueHomelabEvidenceIndex,
 } from "@/lib/homelabHealthIdentity";
-import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	type HomelabService,

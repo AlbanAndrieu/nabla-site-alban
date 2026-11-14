@@ -19,9 +19,16 @@ const sample: HomelabService = {
 
 test("same search facets work in Architecture and TrueNAS", () => {
 	for (const query of [
-		"identity", "component:default/auth-gateway", "network-gateway",
-		"security", "component", "production", "high", "critical",
-	]) assert.equal(matchesCatalogServiceSearch(sample, query), true, query);
+		"identity",
+		"component:default/auth-gateway",
+		"network-gateway",
+		"security",
+		"component",
+		"production",
+		"high",
+		"critical",
+	])
+		assert.equal(matchesCatalogServiceSearch(sample, query), true, query);
 	assert.equal(matchesCatalogServiceSearch(sample, ""), true);
 	assert.equal(matchesCatalogServiceSearch(sample, "unmatched"), false);
 });

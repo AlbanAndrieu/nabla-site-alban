@@ -430,7 +430,6 @@ test("public SERVICE rejects non-string identifiers before React or localStorage
 	}
 });
 
-
 test("public SERVICE retains only reviewed Backstage v2 presentation metadata", () => {
 	const storage = storageFixture();
 	const payload = catalogFixture();

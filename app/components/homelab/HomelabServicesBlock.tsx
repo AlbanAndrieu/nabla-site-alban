@@ -5,13 +5,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
+import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
 	RESOURCE_SNAPSHOT_KEY,
-	snapshotAgeState,
 	type ResourceSnapshot,
+	snapshotAgeState,
 } from "@/lib/homelabResourceEvidence";
 import { homelabServiceId } from "@/lib/homelabServices";
-import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
