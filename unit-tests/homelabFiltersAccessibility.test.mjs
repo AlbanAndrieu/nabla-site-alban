@@ -7,11 +7,11 @@ const filters = read("app/components/homelab/HomelabServiceFilters.tsx");
 
 test("Backstage V2 filters announce result count and retain accessible controls", () => {
   assert.match(filters, /role="status" aria-live="polite" aria-atomic="true"/);
-  assert.match(filters, /presentation\\.filters\\.resultCount/);
+  assert.match(filters, /presentation\.filters\.resultCount/);
   for (const marker of ["data-homelab-health-select", "data-homelab-environment-filter", "data-homelab-service-search"]) {
     assert.ok(filters.includes(marker), marker);
   }
-  assert.doesNotMatch(filters, /french ?\\? "Réinitialiser"/);
+  assert.doesNotMatch(filters, /\bfrench\b/);
 });
 
 test("FR/EN filter labels share the same non-empty next-intl contract", () => {
@@ -24,6 +24,6 @@ test("FR/EN filter labels share the same non-empty next-intl contract", () => {
     }
     assert.deepEqual(Object.keys(locale.chips).sort(), ["fail", "ok", "unknown", "warn"]);
     assert.deepEqual(Object.keys(locale.healthOptions).sort(), ["fail", "ok", "unknown", "warn"]);
-    assert.match(locale.resultCount, /\\{shown\\}.*\\{total\\}/);
+    assert.match(locale.resultCount, /\{shown\}.*\{total\}/);
   }
 });
