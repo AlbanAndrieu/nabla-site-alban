@@ -13,6 +13,19 @@ The short `AGENTS.md` retains the mandatory safety contract and this page provid
 
 The task router `scripts/agent-task-context.mjs` reports `LOCAL_READY`, `LOCAL_LIMITED` or `REMOTE_SOURCE` without network calls. `AGENT_EXECUTION_MODE=remote` forces conservative routing; `workstation` never upgrades a missing checkout to a valid proof. No diagnostic script must run on a network the agent cannot actually reach. Use explicit `BASE_URL` and `HOMELAB_AUDIT_EXPECT` for real network audits and redact all findings. Keep `CLAUDE.md` as `@AGENTS.md` (no duplicate policy).
 
+## Anti-conflit entre agents et réutilisation des PR (14 novembre 2026)
+
+Le dépôt a déjà plusieurs agents (Claude Code sur workstation, Codex distant) : **un worktree isolé par agent**, **une PR ouverte par lot cohérent**, et aucune modification concurrente aveugle. Les PR fusionnées #305/#306 servent d'historique, pas de branches de travail.
+
+| Étape | Workstation Claude Code | Codex via connecteur |
+| --- | --- | --- |
+| Avant toute édition | `node scripts/agent-pr-guard.mjs --paths AGENTS.md scripts/...` (GitHub CLI `gh` authentifié) | Lire les PR ouvertes et les fichiers modifiés via GitHub |
+| Si chevauchement | Réutiliser l'unique PR compatible ; sinon arrêter et réconcilier les périmètres | Conserver le numéro de PR compatible et son HEAD SHA |
+| Avant push/écriture | `just pr-guard`, `git fetch` si base obsolète ; publication L3 sur le checkout propre | Vérifier une nouvelle fois HEAD et SHA du blob, mise à jour conditionnelle |
+| Absence d'accès | `PR_GUARD_GITHUB_UNAVAILABLE` = **BLOCKED** ; ne jamais présumer la liste vide | `NOT_RUN` et aucune publication sans contrôle d'ownership |
+
+Codes : `PR_GUARD_REUSE` recommande une PR ouverte existante (sortie 4) ; `PR_GUARD_CONFLICT` bloque les collisions ; `PR_GUARD_HEAD_CHANGED`, `PR_GUARD_BASE_STALE`, `PR_GUARD_PR_NOT_OPEN` et `PR_GUARD_HEAD_NOT_PINNED` empêchent une publication basée sur des refs obsolètes. Le contrôle est **lecture seule** ; il ne sérialise pas des machines différentes : le push doit rester en fast-forward et l'API GitHub doit vérifier le SHA attendu. Pas de force-push ni de fermeture/réouverture automatique de PR. Une PR distincte est justifiée **uniquement si aucune PR ouverte ne correspond au périmètre**. Le rapport doit nommer explicitement les limites de cette détection par chemins (les conflits sémantiques restent à examiner).
+
 ## FastAPI → React agent optimizations (30 October 2026)
 
 These are the transferable practices from the FastAPI Sample agent discussions.

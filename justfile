@@ -17,6 +17,11 @@ preflight:
 agent-context task="agent":
     node scripts/agent-task-context.mjs --task "{{task}}"
 
+# Read-only and on-demand, uses authenticated gh. Not a quality or publication gate.
+# Run before editing (with --paths) and again before push (current branch diff).
+pr-guard:
+    node scripts/agent-pr-guard.mjs
+
 # Network-free Node 22/npm 10 targeted L1 tests. Never a publication gate.
 node22-fast:
     node scripts/agent-node22-fast.mjs
@@ -60,7 +65,7 @@ source-check:
     node --test unit-tests/vercelIgnoreBuild.test.mjs
     node --test unit-tests/securityYubiKeyGuide.test.mjs
     node --test unit-tests/siteAcceptanceContracts.test.mjs unit-tests/siteDependencyPosture.test.mjs unit-tests/agentEfficiencySnapshot.test.mjs
-    node --test unit-tests/agentTaskContext.test.mjs
+    node --test unit-tests/agentTaskContext.test.mjs unit-tests/agentPrGuard.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs

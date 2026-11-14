@@ -16,7 +16,7 @@
 
 **Refactorings de la PR #303 (CODED, NOT_MEASURED) :** index OWNER O(N) partagé, index de santé réutilisés, timer de fraîcheur unique, alertes runtime non dupliquées et filtres V2 communs à TrueNAS/Architecture. Les tests ciblés ont été ajoutés mais ne constituent pas une gate L3 exécutée. Voir [la roadmap d’ingénierie](homelab-roadmap.md#optimisations-de-rendu-codées-non-mesurées).
 
-**Publication vérifiée le 14 novembre :** PR #303 fusionnée ; [Vercel `dpl_A3B3CuHJVPjzbZ978CcmpEorX5Fv`](https://vercel.com/albanandrieus-projects/nabla-site-alban/A3B3CuHJVPjzbZ978CcmpEorX5Fv) est `READY` sur `64a203d8d78ad6c438837f32bdcdd79f6c52b32c`. Ce n'est ni L3 ni une recette navigateur. Billing Charges Hobby retourne `costs_not_found` : CPU **NOT_MEASURED**. La PR #305 (Draft) durcit le mode SERVICE et adapte les tests ; non déployée.
+**Publication vérifiée le 14 novembre :** PR #303 fusionnée ; [Vercel `dpl_A3B3CuHJVPjzbZ978CcmpEorX5Fv`](https://vercel.com/albanandrieus-projects/nabla-site-alban/A3B3CuHJVPjzbZ978CcmpEorX5Fv) est `READY` sur `64a203d8d78ad6c438837f32bdcdd79f6c52b32c`. Ce n'est ni L3 ni une recette navigateur. Billing Charges Hobby retourne `costs_not_found` : CPU **NOT_MEASURED**. Les PR #305 et #306 ont été fusionnées le 14/11 ; le durcissement SERVICE et les traductions du catalogue V2 sont intégrés dans Git. Leurs parcours navigateur et la gate L3 restent à réceptionner sur le SHA effectivement déployé.
 
 ## Décision de priorité — choisir la prochaine vague
 
@@ -31,7 +31,7 @@
 | **A7** | **P1** | Mesurer LCP/INP/CLS, réduire CSS/Bootstrap hérité et hydrations coûteuses sans dégrader la compatibilité | [Baseline](performance-baseline.md) |
 | **A8** | **P2** | Refactorisation guidée des scripts, détection de code mort, dette Node/deps, ROI mesuré des agents et outils | [scripts](../scripts/README.md) |
 
-**Ordre décidé le 14/11 : G7 → G6 → G8** — terminer d'abord l'affichage Backstage V2 (filtres, santé, icônes, C4), puis l'accessibilité FR/EN/SEO, enfin le nettoyage des scripts et de la documentation des agents. Les exigences A1/A2/A3 restent des critères de publication, non des tâches implicitement validées. Les textes et tests des filtres sont codés sur une branche Draft ; la recette navigateur et la gate L3 restent ouvertes.
+**Ordre décidé le 14/11 : G7 → G6 → G8** — terminer d'abord l'affichage Backstage V2 (filtres, santé, icônes, C4), puis l'accessibilité FR/EN/SEO, enfin le nettoyage des scripts et de la documentation des agents. Les exigences A1/A2/A3 restent des critères de publication, non des tâches implicitement validées. Les filtres FR/EN ont été fusionnés via #306 ; la recette navigateur et la gate L3 restent ouvertes. La prochaine itération G8 porte la réutilisation des PR et la prévention des chevauchements avant toute mutation.
 
 ## Livrables ouverts et garde-fous
 
