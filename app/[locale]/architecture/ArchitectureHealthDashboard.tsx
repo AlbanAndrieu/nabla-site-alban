@@ -107,16 +107,16 @@ export default function ArchitectureHealthDashboard({
 								? "Actualisation indisponible · dernier snapshot conservé"
 								: "Refresh unavailable · keeping last snapshot"
 							: healthSource === "site-v2"
-							? french
-								? "Statuts publiés"
-								: "Published status"
-						: ageSeconds === null
 								? french
-									? "Snapshot en attente"
-									: "Waiting for snapshot"
-								: french
-									? `Mis à jour il y a ${ageSeconds}s`
-									: `Updated ${ageSeconds}s ago`}
+									? "Statuts publiés"
+									: "Published status"
+								: ageSeconds === null
+									? french
+										? "Snapshot en attente"
+										: "Waiting for snapshot"
+									: french
+										? `Mis à jour il y a ${ageSeconds}s`
+										: `Updated ${ageSeconds}s ago`}
 				</div>
 			</div>
 

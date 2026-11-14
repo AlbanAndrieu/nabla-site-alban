@@ -20,29 +20,41 @@ import {
 	type HealthFilter,
 	indexHealth,
 } from "./architectureTopologyFilters";
+
 // Defer heavy ReactFlow chunks until they are about to be visible.
-const HierarchicalArchitectureExplorer = dynamic(() => import("./HierarchicalArchitectureExplorer"), { ssr: false });
-const C4ArchitectureView = dynamic(() => import("./C4ArchitectureView"), { ssr: false });
+const HierarchicalArchitectureExplorer = dynamic(
+	() => import("./HierarchicalArchitectureExplorer"),
+	{ ssr: false },
+);
+const C4ArchitectureView = dynamic(() => import("./C4ArchitectureView"), {
+	ssr: false,
+});
 
 function useGraphNearViewport(elementId: string): boolean {
-  // The target is part of the committed DOM when the effect executes.
-  // Return only state, never an object containing a ref and a render value.
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (ready) return;
-    const target = document.getElementById(elementId);
-    if (!target) return;
-    if (typeof IntersectionObserver === "undefined") {
-      const timer = window.setTimeout(() => setReady(true), 0);
-      return () => window.clearTimeout(timer);
-    }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) { setReady(true); observer.disconnect(); }
-    }, { rootMargin: "420px" });
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [elementId, ready]);
-  return ready;
+	// The target is part of the committed DOM when the effect executes.
+	// Return only state, never an object containing a ref and a render value.
+	const [ready, setReady] = useState(false);
+	useEffect(() => {
+		if (ready) return;
+		const target = document.getElementById(elementId);
+		if (!target) return;
+		if (typeof IntersectionObserver === "undefined") {
+			const timer = window.setTimeout(() => setReady(true), 0);
+			return () => window.clearTimeout(timer);
+		}
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry?.isIntersecting) {
+					setReady(true);
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: "420px" },
+		);
+		observer.observe(target);
+		return () => observer.disconnect();
+	}, [elementId, ready]);
+	return ready;
 }
 
 import MobileArchitectureHierarchy from "./MobileArchitectureHierarchy";
@@ -168,14 +180,28 @@ export default function ArchitectureTopologyView({
 				siteHealth={siteHealth}
 			/>
 
-			<div id="architecture-c4" className={styles.explorerSection} aria-busy={!c4Ready}>
-				{c4Ready
-					? <C4ArchitectureView locale={locale} topology={topology} readOnly={readOnly} />
-					: <p role="status">{french ? "Diagramme C4 chargé à l’approche de la section" : "C4 diagram loads near the viewport"}</p>}
+			<div
+				id="architecture-c4"
+				className={styles.explorerSection}
+				aria-busy={!c4Ready}
+			>
+				{c4Ready ? (
+					<C4ArchitectureView
+						locale={locale}
+						topology={topology}
+						readOnly={readOnly}
+					/>
+				) : (
+					<p role="status">
+						{french
+							? "Diagramme C4 chargé à l’approche de la section"
+							: "C4 diagram loads near the viewport"}
+					</p>
+				)}
 			</div>
 
 			<section
-								aria-busy={!explorerReady}
+				aria-busy={!explorerReady}
 				id="service-architecture-explorer"
 				className={styles.explorerSection}
 				aria-labelledby="service-architecture-explorer-title"
@@ -187,18 +213,24 @@ export default function ArchitectureTopologyView({
 							: "Interactive service topology"}
 					</h2>
 				</div>
-                {explorerReady ? (
-				<HierarchicalArchitectureExplorer
-					locale={locale}
-					catalog={filteredCatalog}
-					catalogSource={catalogSource}
-					topology={topology}
-					topologySource={topologySource}
-					healthStatus={health}
-					healthSource={healthSource}
-					readOnly={readOnly}
-				/>
-                ) : <p role="status">{french ? "Topologie chargée à l’approche de la section" : "Topology loads near the viewport"}</p>}
+				{explorerReady ? (
+					<HierarchicalArchitectureExplorer
+						locale={locale}
+						catalog={filteredCatalog}
+						catalogSource={catalogSource}
+						topology={topology}
+						topologySource={topologySource}
+						healthStatus={health}
+						healthSource={healthSource}
+						readOnly={readOnly}
+					/>
+				) : (
+					<p role="status">
+						{french
+							? "Topologie chargée à l’approche de la section"
+							: "Topology loads near the viewport"}
+					</p>
+				)}
 			</section>
 		</>
 	);
