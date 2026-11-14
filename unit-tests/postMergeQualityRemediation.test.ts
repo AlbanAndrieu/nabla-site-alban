@@ -89,8 +89,9 @@ test("changes to the post-merge remediation workflow are themselves quality-gate
 
 test("agent policy documents post-merge remediation as recovery-only", async () => {
 	const rules = await readFile(AGENT_RULES, "utf8");
-
+	const procedure = await readFile("docs/agent-policy-details.md", "utf8");
 	assert.match(rules, /Post-merge remediation is recovery only/);
-	assert.match(rules, /workflow file exists on the default branch/);
-	assert.match(rules, /must never rely on this post-merge workflow/);
+	assert.match(rules, /docs\\/agent-policy-details\\.md/);
+	assert.match(procedure, /workflow file exists on the default branch/);
+	assert.match(procedure, /must never rely on this post-merge workflow/);
 });

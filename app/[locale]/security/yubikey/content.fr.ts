@@ -255,7 +255,7 @@ export const GUIDE_COPY_FR: GuideCopy = {
 	nextTitle: "Conditions de clôture",
 	nextSteps: [
 		"Vérifier les deux clés en lecture seule et enregistrer des résultats expurgés datés.",
-		"Enrôler la clé secondaire dans chaque service critique et valider un accès de reprise.",
+		"Enrôler la clé secondaire dans chaque service critique et valider un accès de reprise sans perdre l'accès.",
 		"Réparer la chaîne PIV/les certificats et les deux sauvegardes age indépendantes avant tout changement destructif.",
 		"Tester KeePassXC et conduire un exercice complet de restauration.",
 	],
