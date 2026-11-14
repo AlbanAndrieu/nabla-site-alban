@@ -36,6 +36,14 @@ lighthouse-core:
 lighthouse-full:
     node scripts/measure-site-lighthouse.mjs full
 
+# Read-only local code inventory; no installation, network or quality gate.
+code-footprint:
+    node scripts/code-footprint.mjs
+
+# Compare only if both local Git checkouts are already available.
+code-footprint-compare:
+    node scripts/code-footprint.mjs --compare ../nabla-site-bababou
+
 # Local-only agent measurements; requires a genuine Git checkout.
 agent-efficiency:
     node scripts/agent-efficiency-snapshot.mjs
@@ -65,7 +73,7 @@ source-check:
     node --test unit-tests/vercelIgnoreBuild.test.mjs
     node --test unit-tests/securityYubiKeyGuide.test.mjs
     node --test unit-tests/siteAcceptanceContracts.test.mjs unit-tests/siteDependencyPosture.test.mjs unit-tests/agentEfficiencySnapshot.test.mjs
-    node --test unit-tests/agentTaskContext.test.mjs unit-tests/agentPrGuard.test.mjs
+    node --test unit-tests/agentTaskContext.test.mjs unit-tests/agentPrGuard.test.mjs unit-tests/codeFootprint.test.mjs
     node --test unit-tests/homelabOwnerEvidenceMarkup.test.mjs
     node --test unit-tests/homelabLegacyIsolation.test.mjs
     node --experimental-strip-types --test unit-tests/truenasOwnerNavigation.test.mjs

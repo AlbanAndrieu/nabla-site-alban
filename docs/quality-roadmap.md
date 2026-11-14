@@ -33,6 +33,26 @@
 
 **Ordre décidé le 14/11 : G7 → G6 → G8** — terminer d'abord l'affichage Backstage V2 (filtres, santé, icônes, C4), puis l'accessibilité FR/EN/SEO, enfin le nettoyage des scripts et de la documentation des agents. Les exigences A1/A2/A3 restent des critères de publication, non des tâches implicitement validées. Les filtres FR/EN ont été fusionnés via #306 ; la recette navigateur et la gate L3 restent ouvertes. La prochaine itération G8 porte la réutilisation des PR et la prévention des chevauchements avant toute mutation.
 
+## Taille du code et recommandations — référence du 14 novembre 2026
+
+Comparaison des arbres Git `master` **Site Alban `ee020438bce9`** et **Bababou `f520bba6e70f`** : fichiers sources Git (`ts/tsx/js/mjs/css/sh/py`), hors `public/`, médias, documents, traductions, skills, code généré et dépendances. **Mesures en octets**, pas en lignes de code ni en consommation Vercel. La commande `just code-footprint` duplique localement le *principe* du relevé et ajoute les lignes physiques ; `just code-footprint-compare` nécessite un second checkout adjacent sur la workstation.
+
+| Source | Site Alban : fichiers / octets | Bababou : fichiers / octets |
+| --- | ---: | ---: |
+| `app/` | 257 / 988 515 | 49 / 202 088 |
+| `unit-tests/` | 267 / 891 473 | 180 / 665 856 |
+| `lib/` | 98 / 401 360 | 22 / 178 381 |
+| `scripts/` | 56 / 237 007 | 52 / 229 658 |
+| `tests/` (navigateur) | 35 / 119 038 | 36 / 165 123 |
+| `components/` | 34 / 56 568 | 67 / 168 063 |
+| **Toutes sources retenues** | **760 / 2 715 015** | **419 / 1 632 069** |
+
+**G7 — homelab et graphe** : traiter d'abord `HomelabServicesBlock.tsx` (**566 lignes**) et `useHomelabHealth.ts` (**562**) par extraction de sous-composants ou de sélecteurs purs, sans modifier l'API, les `entityRef`, `catalogRevision`, les règles SERVICE/OWNER ou la cadence de polling. Tests de contrat/cache + recette LAN/WAN avant clôture. **G6 — CSS et accessibilité** : `app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css` (**774 lignes**) à modulariser après captures visuelles FR/EN, clavier, mobile 320/390 px et axe. **G8 — nettoyage** : `scripts/post-deploy-smoke.mjs` (**508 lignes**) et les scripts de diagnostic : garder un point d'entrée canonique et inventorier les usages avant suppression. `security/yubikey/useCases.ts` (**519 lignes**) relève d'une future séparation du contenu/présentation avec parité FR/EN et absence de secret.
+
+**Comparaison Bababou** : `app/[locale]/nre/page.module.css` (**1 082 lignes**), `lib/homeAudienceCopy.mjs` (**599**), `lib/publicPolicies.ts` (**569**) sont suivis dans son propre backlog [BB-09/BB-10](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/278). Les textes juridiques et les archives approuvées ne sont pas à refactorer sans vérification de parité. L'audit documentaire #278 et le retrait CSS historique #279 se chevauchent sur leurs roadmaps : réconcilier avant fusion, sans ouvrir de PR parallèle.
+
+Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, le build L3 et les tests navigateur restent `NOT_RUN` ou `NOT_MEASURED` tant qu'ils ne sont pas mesurés sur un SHA vérifié.
+
 ## Livrables ouverts et garde-fous
 
 ### P0 — Qualité et publication

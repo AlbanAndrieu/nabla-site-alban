@@ -138,11 +138,26 @@ async function fetchCatalog(
 	return { catalog: services, topology };
 }
 
-async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
+type HealthEndpoint = "/api/homelab-health" | "/api/homelab-probes";
+
+/** Shared HTTP envelope; probes keep their explicit no-cache request headers. */
+async function fetchHealthEndpoint(
+	endpoint: HealthEndpoint,
+	signal: AbortSignal,
+	probe: boolean,
+): Promise<HealthFetchResult> {
 	try {
-		const response = await fetch("/api/homelab-health", {
+		const response = await fetch(endpoint, {
 			cache: "no-store",
 			signal: boundedHomelabSignal(signal),
+			...(probe
+				? {
+						headers: {
+							Accept: "application/json",
+							"Cache-Control": "no-cache",
+						},
+					}
+				: {}),
 		});
 		if (!response.ok) {
 			return {
@@ -162,34 +177,14 @@ async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
 	}
 }
 
+async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
+	return fetchHealthEndpoint("/api/homelab-health", signal, false);
+}
+
 async function fetchProbeHealth(
 	signal: AbortSignal,
 ): Promise<HealthFetchResult> {
-	try {
-		const response = await fetch("/api/homelab-probes", {
-			cache: "no-store",
-			signal: boundedHomelabSignal(signal),
-			headers: {
-				Accept: "application/json",
-				"Cache-Control": "no-cache",
-			},
-		});
-		if (!response.ok) {
-			return {
-				snapshot: null,
-				status: response.status,
-				...(response.headers.get("X-Homelab-Health-Reason") === "owner-boundary"
-					? { reason: "owner-boundary" as const }
-					: {}),
-			};
-		}
-		return {
-			snapshot: parseHomelabHealthSnapshot(await response.json()),
-			status: response.status,
-		};
-	} catch {
-		return { snapshot: null, status: null };
-	}
+	return fetchHealthEndpoint("/api/homelab-probes", signal, true);
 }
 
 /** Bounded probes render first, while the aggregate snapshot is still loading. */

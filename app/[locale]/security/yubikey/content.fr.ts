@@ -2,7 +2,8 @@ import type { GuideCopy } from "./content";
 
 export const GUIDE_COPY_FR: GuideCopy = {
 	meta: {
-		title: "YubiKey : comprendre, protéger ses comptes et aller plus loin | Sécurité",
+		title:
+			"YubiKey : comprendre, protéger ses comptes et aller plus loin | Sécurité",
 		description:
 			"Comprendre simplement les YubiKey, leurs avantages et FIDO2, puis découvrir la configuration personnelle, PIV, Vault PKI et Microsoft Entra CBA.",
 	},
