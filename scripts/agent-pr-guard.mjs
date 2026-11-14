@@ -101,7 +101,7 @@ export async function openPullRequests(pages = readPages) {
         throw error("PR_GUARD_GITHUB_RESPONSE_INVALID");
       const files = await pages("repos/" + REPO + "/pulls/" + pr.number + "/files", MAX_FILES);
       const paths = normalizePaths(files.flatMap((file) => [file.filename, file.previous_filename].filter(Boolean)));
-      return { number: pr.number, branch: pr.head.ref, head: pr.head.sha, repo: pr.head.repo?.full_name ?? REPO,
+      return { number: pr.number, branch: pr.head.ref, head: pr.head.sha, repo: pr.head.repo?.full_name ?? "UNVERIFIED",
         base: pr.base.ref, baseSha: pr.base.sha ?? null, paths };
     }));
     result.push(...batch);
@@ -145,6 +145,7 @@ async function main(argv) {
   const origin = git(["remote", "get-url", "origin"]);
   if (origin && !/^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)AlbanAndrieu\/nabla-site-alban(?:\.git)?$/.test(origin))
     throw error("PR_GUARD_WRONG_REPOSITORY");
+  if (branch === "master" && !args.paths.length) throw error("PR_GUARD_PROTECTED_BRANCH");
   const scope = args.paths.length ? normalizePaths(args.paths) : gitScope();
   if (!scope.length) throw error("PR_GUARD_SCOPE_EMPTY");
   const prs = await openPullRequests();

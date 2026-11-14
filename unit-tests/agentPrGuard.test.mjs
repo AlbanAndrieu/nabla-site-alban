@@ -50,6 +50,7 @@ test("conflicting open PRs block parallel writes", () => {
 test("merged PRs and fork PRs cannot silently become writable branches", () => {
   assert.throws(() => decideReuse(["AGENTS.md"], [], { current: 306, expectedHead: A }), /PR_GUARD_PR_NOT_OPEN/);
   assert.equal(decideReuse(["AGENTS.md"], [{ ...pr(307, "fork", ["AGENTS.md"]), repo: "other/fork" }], {}).kind, "CONFLICT");
+  assert.equal(decideReuse(["AGENTS.md"], [{ ...pr(307, "unverified", ["AGENTS.md"]), repo: "UNVERIFIED" }], {}).kind, "CONFLICT");
   assert.throws(() => decideReuse(["AGENTS.md"], [{ ...pr(307, "fork", ["AGENTS.md"]), repo: "other/fork" }], {
     current: 307, expectedHead: A,
   }), /PR_GUARD_EXTERNAL_HEAD/);
