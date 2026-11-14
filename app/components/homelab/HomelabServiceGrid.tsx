@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import {
@@ -9,10 +9,7 @@ import {
 	observedOwnerServiceNavigation,
 	type OwnerNavigationIndex,
 } from "@/lib/homelabOwnerServiceNavigation";
-import {
-	type ResourceSnapshot,
-	snapshotAgeState,
-} from "@/lib/homelabResourceEvidence";
+import type { ResourceSnapshot } from "@/lib/homelabResourceEvidence";
 import {
 	type HomelabService,
 	type HomelabServicesCatalog,
@@ -33,6 +30,7 @@ type Props = {
 	healthHttpStatus?: number | null;
 	ownerBoundary?: boolean;
 	resources?: ResourceSnapshot | null;
+	resourceStale?: boolean;
 	readOnly?: boolean;
 };
 
@@ -46,6 +44,7 @@ export default function HomelabServiceGrid({
 	healthHttpStatus = null,
 	ownerBoundary = false,
 	resources = null,
+	resourceStale = true,
 	readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
@@ -58,22 +57,6 @@ export default function HomelabServiceGrid({
 		() => new Map((readOnly || ownerBoundary ? [] : resources?.services ?? []).map((row) => [row.entityRef, row] as const)),
 		[readOnly, ownerBoundary, resources],
 	);
-	// Render must stay pure: read the clock after mount, then once a minute.
-	const [now, setNow] = useState<number | null>(null);
-	useEffect(() => {
-		if (!resources) return;
-		const initial = window.setTimeout(() => setNow(Date.now()), 0);
-		const interval = window.setInterval(() => setNow(Date.now()), 60_000);
-		return () => {
-			window.clearTimeout(initial);
-			window.clearInterval(interval);
-		};
-	}, [resources]);
-	const resourceStale =
-		resources && now !== null
-			? snapshotAgeState(resources, now, catalog.catalogRevision) !== "fresh"
-			: false;
-
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
 	const serviceOccurrences = new Map<string, number>();
