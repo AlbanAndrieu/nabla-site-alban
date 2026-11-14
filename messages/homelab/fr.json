@@ -35,6 +35,12 @@
 		"loading": "Chargement des services du homelab…",
 		"unavailable": "Les services du homelab sont temporairement indisponibles.",
 		"endpoint": {
+			"privateExposureTitle": "Accès interne souhaité ; exception DNS publique encore déclarée",
+			"privateEndpointTitle": "Accès Internet non souhaité ; disponibilité LAN vérifiée séparément",
+			"exposureToFix": "exposition à corriger",
+			"derivedUrlCheck": "URL dérivée, à vérifier",
+			"cloudflareRouteDrift": "Écart détecté : origine Cloudflare différente de la cible déclarée",
+			"lanProtocolUnconfirmed": "Protocole LAN non confirmé · schéma configuré utilisé",
 			"external": "Service web",
 			"internal": "Interne",
 			"networkError": "erreur réseau",
