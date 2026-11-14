@@ -71,16 +71,25 @@ export default function HomelabServicesBlock({
 	const [resourceClock, setResourceClock] = useState<number | null>(null);
 	useEffect(() => {
 		if (!resourceSnapshot || readOnly || state.ownerBoundary) return;
+		let interval: number | null = null;
 		const refresh = () => {
 			if (!document.hidden) setResourceClock(Date.now());
 		};
-		const initial = window.setTimeout(refresh, 0);
-		const interval = window.setInterval(refresh, 60_000);
-		document.addEventListener("visibilitychange", refresh);
+		const syncVisibility = () => {
+			if (document.hidden) {
+				if (interval !== null) window.clearInterval(interval);
+				interval = null;
+				return;
+			}
+			refresh();
+			if (interval === null) interval = window.setInterval(refresh, 60_000);
+		};
+		const initial = window.setTimeout(syncVisibility, 0);
+		document.addEventListener("visibilitychange", syncVisibility);
 		return () => {
 			window.clearTimeout(initial);
-			window.clearInterval(interval);
-			document.removeEventListener("visibilitychange", refresh);
+			if (interval !== null) window.clearInterval(interval);
+			document.removeEventListener("visibilitychange", syncVisibility);
 		};
 	}, [resourceSnapshot, readOnly, state.ownerBoundary]);
 	const resourceStale = Boolean(

@@ -43,6 +43,8 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 - **Calculs communs :** la carte reçoit les index de santé du parent et conserve la vérification stricte de `catalogRevision` et `boardState=fresh` avant un état SERVICE.
 - **Une horloge par page :** la mesure de fraîcheur des ressources n'est plus répétée par groupe ; elle s'arrête lorsque l'onglet est caché et reprend à la visibilité. OWNER est masqué si accès révoqué.
 - **Une alerte runtime par page :** les groupes ne répètent plus les mêmes avertissements ; les déclarations, preuves et incidents restent séparés.
+- **Durcissement S2 / PR #305 :** `readOnly` traverse `ArchitectureTopologyView` → `ArchitectureServiceHierarchy` → `HomelabServiceGrid` et `HomelabRuntimeWarnings`. Les liens, snapshots et index OWNER sont masqués en SERVICE ; validation navigateur **NOT_RUN**.
+- **Horloge Architecture :** aucun timer sans horodatage OWNER ; `Date.now()` hors rendu initial et suspension si l'onglet est caché. Gain CPU **NOT_MEASURED**.
 - **Recherche et libellés uniques :** `lib/homelabCatalogSearch.ts` et `lib/servicePresentationLabels.ts` alimentent TrueNAS et Architecture ; le regroupement ne recopie plus les tableaux croissants.
 - **Preuve manquante :** aucune mesure comparative réelle CPU/INP/CLS, aucun test L3 exact-SHA ; ne pas appeler ces changements un gain mesuré.
 

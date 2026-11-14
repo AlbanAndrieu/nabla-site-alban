@@ -19,7 +19,6 @@ test("service groups share indexed OWNER evidence instead of scanning per card",
 		assert.match(caller, /ownerNavigationIndex=\{ownerNavigationIndex\}/);
 		assert.match(caller, /ownerHealthIndex=/);
 		assert.match(caller, /siteStatusIndex=/);
-		assert.match(caller, /showRuntimeWarnings=\{index === 0\}/);
 	}
 });
 
@@ -29,7 +28,8 @@ test("only one visibility-aware resource clock exists for all TrueNAS groups", (
 	assert.match(block, /snapshotAgeState\(/);
 	assert.match(block, /resourceStale=\{resourceStale\}/);
 	assert.match(block, /document\.hidden/);
-	assert.match(block, /document\.addEventListener\("visibilitychange", refresh\)/);
+	assert.match(block, /if \(interval !== null\) window\.clearInterval\(interval\)/);
+	assert.match(block, /document\.addEventListener\("visibilitychange", syncVisibility\)/);
 	assert.doesNotMatch(grid, /setInterval|setTimeout|snapshotAgeState\(/);
 	assert.match(grid, /resourceStale = true/);
 });
@@ -48,4 +48,48 @@ test("service group computation does not copy an expanding group for every servi
 	const presentation = source("lib/servicePresentation.ts");
 	assert.match(presentation, /if \(items\) items\.push\(service\)/);
 	assert.doesNotMatch(presentation, /grouped\.set\(group, \[\.\.\.\(grouped\.get/);
+});
+
+
+test("runtime warnings stay visible outside collapsed service groups", () => {
+	const block = source("app/components/homelab/HomelabServicesBlock.tsx");
+	const architecture = source("app/[locale]/architecture/ArchitectureServiceHierarchy.tsx");
+	const overview = source("app/components/homelab/HomelabStatusOverview.tsx");
+	const warnings = source("app/components/homelab/HomelabRuntimeWarnings.tsx");
+	const grid = source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(block, /<HomelabStatusOverview/);
+	assert.match(overview, /data-truenas-runtime-warning/);
+	assert.match(architecture, /<HomelabRuntimeWarnings/);
+	assert.ok(
+		architecture.indexOf("<HomelabRuntimeWarnings") <
+			architecture.indexOf("groups.map"),
+	);
+	assert.match(warnings, /if \(readOnly\) return null/);
+	assert.match(warnings, /ownerBoundary \? null : rawSnapshot/);
+	assert.doesNotMatch(grid, /data-truenas-runtime-warning|showRuntimeWarnings/);
+});
+
+test("Architecture readOnly flows to cards, health joins and runtime warnings", () => {
+	const topology = source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+	const hierarchy = source("app/[locale]/architecture/ArchitectureServiceHierarchy.tsx");
+	const grid = source("app/components/homelab/HomelabServiceGrid.tsx");
+	const warnings = source("app/components/homelab/HomelabRuntimeWarnings.tsx");
+	assert.match(topology, /<ArchitectureServiceHierarchy\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /<HomelabRuntimeWarnings\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /<HomelabServiceGrid[^>]*catalog=\{group\.catalog\}[^>]*readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /indexHealth\(readOnly \? null : snapshot, siteHealth/);
+	assert.match(hierarchy, /!readOnly && snapshot && !healthUnavailable/);
+	assert.match(grid, /const snapshot = readOnly \|\| ownerBoundary \? null : rawSnapshot/);
+	assert.match(warnings, /if \(readOnly\) return null/);
+});
+
+test("Architecture age ticker is hydration-safe and disabled without an OWNER timestamp", () => {
+	const dashboard = source("app/[locale]/architecture/ArchitectureHealthDashboard.tsx");
+	assert.match(dashboard, /useState<number \| null>\(null\)/);
+	assert.match(dashboard, /if \(!checkedAt\) return/);
+	assert.match(dashboard, /if \(!document\.hidden\) setNow\(Date\.now\(\)\)/);
+	assert.match(dashboard, /document\.addEventListener\("visibilitychange", syncVisibility\)/);
+	assert.match(dashboard, /window\.clearInterval\(clockTimer\)/);
+	assert.match(dashboard, /if \(clockTimer !== null\) window\.clearInterval\(clockTimer\)/);
+	assert.doesNotMatch(dashboard, /useState\(\(\) => Date\.now\(\)\)/);
 });
