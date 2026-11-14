@@ -147,6 +147,7 @@ export default function ArchitectureTopologyView({
 				</section>
 
 				<ArchitectureServiceHierarchy
+					readOnly={readOnly}
 					catalog={filteredCatalog}
 					topology={topology}
 					snapshot={health}
