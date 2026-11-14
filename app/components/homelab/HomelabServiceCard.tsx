@@ -25,7 +25,7 @@ import {
 	EFFECTIVE_HEALTH_ICON_CLASS,
 	EFFECTIVE_HEALTH_LABEL_KEY,
 	endpointUrlHostIsPrivateS3,
-	type healthIndex,
+	type ServiceEvidenceIndex,
 	INTERNAL_HEALTH_CLASS,
 	RUNTIME_ICON_CLASS,
 	reconciledHealth,
@@ -45,7 +45,7 @@ type Props = {
 	endpointUrl: string;
 	anchorId?: string;
 	snapshot: HomelabHealthSnapshot | null;
-	serviceHealth: ReturnType<typeof healthIndex>;
+	serviceHealth: ServiceEvidenceIndex;
 	healthUnavailable: boolean;
 	truenasDown: boolean;
 	truenasRuntimeUnavailable: boolean;
