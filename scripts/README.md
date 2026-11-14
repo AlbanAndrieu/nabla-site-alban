@@ -21,6 +21,7 @@
 
 - **Livré :** le site consomme `/api/homelab-catalog-v2` (PR #301), plus de lecteur `/api/homelab-services`/`topology` ni fichier JSON public de secours. Ne pas réintroduire d'adaptateur ou script qui reconstruit la V1.
 - **Livré dans cette PR :** `npm run test:catalog:v2` concentre les tests V2 existants (pas de nouvelle suite concurrente) ; `HomelabCatalogMetadata` est un composant partagé, pas un renderer DOM impératif.
+- **Refactoring React codé :** `indexOwnerNavigation` produit un index OWNER borné au snapshot, `homelabHealthSelectors` mutualise les index par page, `matchesCatalogServiceSearch` et `servicePresentationLabels` suppriment des divergences entre TrueNAS et Architecture. Les ressources utilisent une horloge commune et les alertes runtime ne sont plus répétées par groupe. Sans mesure navigateur, l’amélioration de performance reste `NOT_MEASURED`.
 - **Conservés :** `scripts/sync-homelab-icons.mjs` (source déclarative Compose), `scripts/audit-homelab-access.mjs`, `scripts/finops/*`, `agent-quality-gate.sh` et les vérifications d'accessibilité/SEO. Ils ont des consommateurs et des contrats.
 - **Archivés :** les anciennes instructions d'avant cutover sont sous `docs/archive/` ; un wrapper ou exécutable n'est pas supprimé sur la seule base d'un nom « legacy » ou d'une PR fusionnée.
 - **À évaluer :** scripts en double (`agent-*`, `quality-*`), CLI de budget et anciens adaptateurs HTML ; ne retirer qu'après inventaire `rg` des références, tests locaux, preuve des consommateurs et rollback.
