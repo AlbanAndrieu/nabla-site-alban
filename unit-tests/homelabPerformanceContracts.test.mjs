@@ -28,7 +28,8 @@ test("only one visibility-aware resource clock exists for all TrueNAS groups", (
 	assert.match(block, /snapshotAgeState\(/);
 	assert.match(block, /resourceStale=\{resourceStale\}/);
 	assert.match(block, /document\.hidden/);
-	assert.match(block, /document\.addEventListener\("visibilitychange", refresh\)/);
+	assert.match(block, /if \(interval !== null\) window\.clearInterval\(interval\)/);
+	assert.match(block, /document\.addEventListener\("visibilitychange", syncVisibility\)/);
 	assert.doesNotMatch(grid, /setInterval|setTimeout|snapshotAgeState\(/);
 	assert.match(grid, /resourceStale = true/);
 });
@@ -87,7 +88,8 @@ test("Architecture age ticker is hydration-safe and disabled without an OWNER ti
 	assert.match(dashboard, /useState<number \| null>\(null\)/);
 	assert.match(dashboard, /if \(!checkedAt\) return/);
 	assert.match(dashboard, /if \(!document\.hidden\) setNow\(Date\.now\(\)\)/);
-	assert.match(dashboard, /document\.addEventListener\("visibilitychange", refresh\)/);
+	assert.match(dashboard, /document\.addEventListener\("visibilitychange", syncVisibility\)/);
 	assert.match(dashboard, /window\.clearInterval\(clockTimer\)/);
+	assert.match(dashboard, /if \(clockTimer !== null\) window\.clearInterval\(clockTimer\)/);
 	assert.doesNotMatch(dashboard, /useState\(\(\) => Date\.now\(\)\)/);
 });
