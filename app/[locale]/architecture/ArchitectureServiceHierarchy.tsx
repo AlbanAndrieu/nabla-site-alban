@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
-import { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/app/components/homelab/homelabServiceHierarchy";
+import { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/lib/servicePresentationLabels";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
