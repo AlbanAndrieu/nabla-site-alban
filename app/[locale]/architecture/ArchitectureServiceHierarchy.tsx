@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
 	type HomelabServicesCatalog,
 	homelabServiceId,
@@ -81,6 +82,11 @@ export default function ArchitectureServiceHierarchy({
 		() => groupCatalogByPresentation(catalog, topology),
 		[catalog, topology],
 	);
+	const ownerNavigationIndex = useMemo(
+		() =>
+			snapshot && !healthUnavailable ? indexOwnerNavigation(snapshot) : null,
+		[snapshot, healthUnavailable],
+	);
 	const healthIndex = useMemo(
 		() => indexHealth(snapshot, siteHealth, catalog.catalogRevision),
 		[snapshot, siteHealth, catalog.catalogRevision],
@@ -102,7 +108,7 @@ export default function ArchitectureServiceHierarchy({
 				data-homelab-service-hierarchy
 				data-architecture-services
 			>
-				{groups.map((group) => {
+				{groups.map((group, index) => {
 					const issueCount = group.catalog.services.filter(
 						(service) =>
 							effectiveState(homelabServiceId(service), healthIndex) !== "ok",
@@ -140,6 +146,8 @@ export default function ArchitectureServiceHierarchy({
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
+									ownerNavigationIndex={ownerNavigationIndex}
+									showRuntimeWarnings={index === 0}
 									snapshot={snapshot}
 									siteHealth={siteHealth}
 									healthUnavailable={healthUnavailable && !siteHealth}
