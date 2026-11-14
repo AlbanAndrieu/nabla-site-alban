@@ -62,3 +62,13 @@ test("Claude and Codex read the same canonical agent policy", () => {
 		"AGENTS.md exceeds the shared context budget",
 	);
 });
+
+test("core personal agent skills stay bounded and on-demand", () => {
+	const core = ["nabla-maintenance", "local-first-quality", "nabla-ci-debug", "nabla-service-catalog", "homelab-runtime-status"];
+	const total = core.reduce((size, name) => {
+		const bytes = Buffer.byteLength(readFileSync(join(shared, name, "SKILL.md"), "utf8"));
+		assert.ok(bytes < 5000, `${name}: skill exceeds 5 KB; move details to an on-demand runbook`);
+		return size + bytes;
+	}, 0);
+	assert.ok(total < 15000, "core skills should not duplicate the full operations manual");
+});

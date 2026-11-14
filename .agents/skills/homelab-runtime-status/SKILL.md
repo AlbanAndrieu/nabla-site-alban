@@ -22,4 +22,4 @@ Public observer: `https://fastapi-sample.fastapicloud.dev`. Contracts are implem
 
 `in_sync` proves a supported binding, not a functioning HTTP service. `declared_only` can reflect a migrated standalone Compose workload. `running`, `reachable`, `healthy`, `externally reachable` and `migrated` have different acceptance criteria. Never mark migration complete without functional checks and persistence after restart. Exposure defects go to Compose/FastAPI roadmaps; Site handles rendering only.
 
-For catalog changes load `nabla-service-catalog`. Keep the NPMplus migration gate and TrueNAS platform procedures in the owning `nabla-compose` runbooks, not this frontend consumer skill.
+For catalog changes load `nabla-service-catalog`. NPMplus migration (owned by Compose) must prove admin login, HTTP/HTTPS proxy routing, certificate/config persistence after restart and monitor evidence **before** native proxy shutdown. Full TrueNAS/NPMplus commands belong in the owning `nabla-compose` runbooks, not this frontend consumer skill.

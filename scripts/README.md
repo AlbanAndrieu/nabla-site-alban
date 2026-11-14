@@ -29,7 +29,8 @@
 - **Livré dans cette PR :** `npm run test:catalog:v2` concentre les tests V2 existants (pas de nouvelle suite concurrente) ; `HomelabCatalogMetadata` est un composant partagé, pas un renderer DOM impératif.
 - **Refactoring React codé :** `indexOwnerNavigation` produit un index OWNER borné au snapshot, `homelabHealthSelectors` mutualise les index par page, `matchesCatalogServiceSearch` et `servicePresentationLabels` suppriment des divergences entre TrueNAS et Architecture. Les ressources utilisent une horloge commune et les alertes runtime ne sont plus répétées par groupe. Sans mesure navigateur, l’amélioration de performance reste `NOT_MEASURED`.
 - **Conservés :** `scripts/sync-homelab-icons.mjs` (source déclarative Compose), `scripts/audit-homelab-access.mjs`, `scripts/finops/*`, `agent-quality-gate.sh` et les vérifications d'accessibilité/SEO. Ils ont des consommateurs et des contrats.
-- **Archivés :** les anciennes instructions d'avant cutover sont sous `docs/archive/` ; un wrapper ou exécutable n'est pas supprimé sur la seule base d'un nom « legacy » ou d'une PR fusionnée.
+- **Archivés :** les anciennes instructions d’avant cutover et deux notes de migration sont sous `docs/archive/`.
+- **Retiré :** `scripts/old/generate_fr_locale_html.py` (ancien générateur HTML via `googletrans`, sans consommateur trouvé dans le code et les commandes canoniques). Son historique reste disponible dans Git ; `next-intl` gère les traductions du Site. Aucun script encore utilisé n’est supprimé sur son seul nom « legacy ».
 - **À évaluer :** scripts en double (`agent-*`, `quality-*`), CLI de budget et anciens adaptateurs HTML ; ne retirer qu'après inventaire `rg` des références, tests locaux, preuve des consommateurs et rollback.
 
 ## Vérification minimale avant nouvelle PR
