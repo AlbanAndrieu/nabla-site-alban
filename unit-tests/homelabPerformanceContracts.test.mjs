@@ -67,3 +67,17 @@ test("runtime warnings stay visible outside collapsed service groups", () => {
 	assert.match(warnings, /ownerBoundary \? null : rawSnapshot/);
 	assert.doesNotMatch(grid, /data-truenas-runtime-warning|showRuntimeWarnings/);
 });
+
+test("Architecture readOnly flows to cards, health joins and runtime warnings", () => {
+	const topology = source("app/[locale]/architecture/ArchitectureTopologyView.tsx");
+	const hierarchy = source("app/[locale]/architecture/ArchitectureServiceHierarchy.tsx");
+	const grid = source("app/components/homelab/HomelabServiceGrid.tsx");
+	const warnings = source("app/components/homelab/HomelabRuntimeWarnings.tsx");
+	assert.match(topology, /<ArchitectureServiceHierarchy\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /<HomelabRuntimeWarnings\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /<HomelabServiceGrid\s+catalog=\{group\.catalog\}\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /indexHealth\(readOnly \? null : snapshot, siteHealth/);
+	assert.match(hierarchy, /!readOnly && snapshot && !healthUnavailable/);
+	assert.match(grid, /const snapshot = readOnly \|\| ownerBoundary \? null : rawSnapshot/);
+	assert.match(warnings, /if \(readOnly\) return null/);
+});
