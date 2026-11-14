@@ -109,7 +109,11 @@ export function filterHierarchyGroups(
 		const matchesSearch =
 			query.length === 0 ||
 			service.name.toLowerCase().includes(query) ||
-			homelabServiceId(service).includes(query);
+			homelabServiceId(service).includes(query) ||
+			(service.kind?.toLowerCase().includes(query) ?? false) ||
+			(service.category?.toLowerCase().includes(query) ?? false) ||
+			(service.lifecycle?.toLowerCase().includes(query) ?? false) ||
+			(service.catalogEntityKind?.toLowerCase().includes(query) ?? false);
 		return matchesHealth && matchesEnvironment && matchesSearch;
 	});
 	const filteredCatalog = { ...catalog, services: filteredServices };
