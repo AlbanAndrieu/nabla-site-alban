@@ -1,10 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
-import { observedOwnerServiceNavigation } from "@/lib/homelabOwnerServiceNavigation";
+import {
+	indexOwnerNavigation,
+	observedOwnerServiceNavigation,
+	type OwnerNavigationIndex,
+} from "@/lib/homelabOwnerServiceNavigation";
 import {
 	type ResourceSnapshot,
 	snapshotAgeState,
@@ -22,6 +26,7 @@ import { healthIndex } from "./homelabGridPresentation";
 type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
+	ownerNavigationIndex?: OwnerNavigationIndex | null;
 	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
 	healthHttpStatus?: number | null;
@@ -32,7 +37,8 @@ type Props = {
 
 export default function HomelabServiceGrid({
 	catalog,
-	snapshot,
+	snapshot: rawSnapshot,
+	ownerNavigationIndex = null,
 	siteHealth = null,
 	healthUnavailable = false,
 	healthHttpStatus = null,
@@ -41,10 +47,14 @@ export default function HomelabServiceGrid({
 	readOnly = false,
 }: Props) {
 	const t = useTranslations("homelab");
+	// Enforce the OWNER boundary even if an upstream caller accidentally passes
+	// a private snapshot into the public directory.
+	const snapshot = readOnly ? null : rawSnapshot;
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
-	const resourceIndex = new Map(
-		(resources?.services ?? []).map((row) => [row.entityRef, row] as const),
+	const resourceIndex = useMemo(
+		() => new Map((readOnly ? [] : resources?.services ?? []).map((row) => [row.entityRef, row] as const)),
+		[readOnly, resources],
 	);
 	// Render must stay pure: read the clock after mount, then once a minute.
 	const [now, setNow] = useState<number | null>(null);
@@ -65,8 +75,18 @@ export default function HomelabServiceGrid({
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
 	const serviceOccurrences = new Map<string, number>();
-	const serviceHealth = healthIndex(snapshot);
-	const safeStatus = siteHealthIndex(siteHealth, catalog.catalogRevision);
+	const serviceHealth = useMemo(() => healthIndex(snapshot), [snapshot]);
+	const safeStatus = useMemo(
+		() => siteHealthIndex(siteHealth, catalog.catalogRevision),
+		[siteHealth, catalog.catalogRevision],
+	);
+	const navigationIndex = useMemo(
+		() =>
+			!snapshot || healthUnavailable
+				? null
+				: (ownerNavigationIndex ?? indexOwnerNavigation(snapshot)),
+		[snapshot, healthUnavailable, ownerNavigationIndex],
+	);
 	const truenasPublic = snapshot?.truenas?.public;
 	const truenasInternal = snapshot?.truenas?.internal;
 	const truenasApi = snapshot?.truenas?.api;
@@ -155,6 +175,7 @@ export default function HomelabServiceGrid({
 					const observed = observedOwnerServiceNavigation(
 						svc,
 						readOnly || healthUnavailable ? null : snapshot,
+						navigationIndex ?? undefined,
 					);
 					const displayService = observed.service;
 					// Backstage v2 has no publicly navigable endpoint: only verified OWNER
