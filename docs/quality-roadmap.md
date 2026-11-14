@@ -16,6 +16,8 @@
 
 **Refactorings de la PR #303 (CODED, NOT_MEASURED) :** index OWNER O(N) partagé, index de santé réutilisés, timer de fraîcheur unique, alertes runtime non dupliquées et filtres V2 communs à TrueNAS/Architecture. Les tests ciblés ont été ajoutés mais ne constituent pas une gate L3 exécutée. Voir [la roadmap d’ingénierie](homelab-roadmap.md#optimisations-de-rendu-codées-non-mesurées).
 
+**Publication vérifiée le 14 novembre :** PR #303 fusionnée ; [Vercel `dpl_A3B3CuHJVPjzbZ978CcmpEorX5Fv`](https://vercel.com/albanandrieus-projects/nabla-site-alban/A3B3CuHJVPjzbZ978CcmpEorX5Fv) est `READY` sur `64a203d8d78ad6c438837f32bdcdd79f6c52b32c`. Ce n'est ni L3 ni une recette navigateur. Billing Charges Hobby retourne `costs_not_found` : CPU **NOT_MEASURED**. La PR #305 (Draft) durcit le mode SERVICE et adapte les tests ; non déployée.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |
