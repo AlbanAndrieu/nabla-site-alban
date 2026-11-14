@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
-import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
+import type { HomelabHealthSnapshot, HomelabHealthState } from "@/lib/homelabHealth";
 import {
 	indexOwnerNavigation,
 	observedOwnerServiceNavigation,
@@ -18,12 +18,14 @@ import {
 import { type SiteHealthV2, siteHealthIndex } from "@/lib/siteHealthV2";
 import HomelabServiceCard from "./HomelabServiceCard";
 import HomelabServiceGridLegends from "./HomelabServiceGridLegends";
-import { healthIndex } from "./homelabGridPresentation";
+import { healthIndex, type ServiceEvidenceIndex } from "./homelabGridPresentation";
 
 type Props = {
 	catalog: HomelabServicesCatalog;
 	snapshot: HomelabHealthSnapshot | null;
 	ownerNavigationIndex?: OwnerNavigationIndex | null;
+	ownerHealthIndex?: ServiceEvidenceIndex | null;
+	siteStatusIndex?: Map<string, HomelabHealthState> | null;
 	showRuntimeWarnings?: boolean;
 	siteHealth?: SiteHealthV2 | null;
 	healthUnavailable?: boolean;
@@ -38,6 +40,8 @@ export default function HomelabServiceGrid({
 	catalog,
 	snapshot: rawSnapshot,
 	ownerNavigationIndex = null,
+	ownerHealthIndex = null,
+	siteStatusIndex = null,
 	showRuntimeWarnings = true,
 	siteHealth = null,
 	healthUnavailable = false,
@@ -60,10 +64,18 @@ export default function HomelabServiceGrid({
 	// Keep React identity stable across health/URL refreshes. Changing the URL
 	// must not remount cards or reset their open diagnostics panels.
 	const serviceOccurrences = new Map<string, number>();
-	const serviceHealth = useMemo(() => healthIndex(snapshot), [snapshot]);
+	const serviceHealth = useMemo(
+		() => (snapshot ? (ownerHealthIndex ?? healthIndex(snapshot)) : healthIndex(null)),
+		[snapshot, ownerHealthIndex],
+	);
 	const safeStatus = useMemo(
-		() => siteHealthIndex(siteHealth, catalog.catalogRevision),
-		[siteHealth, catalog.catalogRevision],
+		() =>
+			siteStatusIndex &&
+			siteHealth?.boardState === "fresh" &&
+			siteHealth.catalogRevision === catalog.catalogRevision
+				? siteStatusIndex
+				: siteHealthIndex(siteHealth, catalog.catalogRevision),
+		[siteStatusIndex, siteHealth, catalog.catalogRevision],
 	);
 	const navigationIndex = useMemo(
 		() =>
