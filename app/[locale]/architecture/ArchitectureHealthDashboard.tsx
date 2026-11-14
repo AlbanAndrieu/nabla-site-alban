@@ -48,13 +48,24 @@ export default function ArchitectureHealthDashboard({
 	totalCount,
 }: Readonly<Props>) {
 	const t = useTranslations("homelab");
-	// The age clock lives here so its ticks never re-render the topology graph.
-	const [now, setNow] = useState(() => Date.now());
+	// No timer for SERVICE v2 (which carries no OWNER timestamp). Start
+	// after hydration; pause while hidden to avoid useless background renders.
+	const [now, setNow] = useState<number | null>(null);
 	useEffect(() => {
-		const clockTimer = window.setInterval(() => setNow(Date.now()), 5_000);
-		return () => window.clearInterval(clockTimer);
-	}, []);
-	const ageSeconds = snapshotAgeSeconds(checkedAt, now);
+		if (!checkedAt) return;
+		const refresh = () => {
+			if (!document.hidden) setNow(Date.now());
+		};
+		const initial = window.setTimeout(refresh, 0);
+		const clockTimer = window.setInterval(refresh, 5_000);
+		document.addEventListener("visibilitychange", refresh);
+		return () => {
+			window.clearTimeout(initial);
+			window.clearInterval(clockTimer);
+			document.removeEventListener("visibilitychange", refresh);
+		};
+	}, [checkedAt]);
+	const ageSeconds = now === null ? null : snapshotAgeSeconds(checkedAt, now);
 	const groupLabel = (group: GroupFilter) =>
 		group === "all"
 			? t("presentation.allGroups")
