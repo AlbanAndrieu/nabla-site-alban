@@ -49,12 +49,12 @@ export default function HomelabServiceGrid({
 	const t = useTranslations("homelab");
 	// Enforce the OWNER boundary even if an upstream caller accidentally passes
 	// a private snapshot into the public directory.
-	const snapshot = readOnly ? null : rawSnapshot;
+	const snapshot = readOnly || ownerBoundary ? null : rawSnapshot;
 	// Show UI and APIs separately; public hostname routing is audited independently.
 	const services: HomelabService[] = catalog.services;
 	const resourceIndex = useMemo(
-		() => new Map((readOnly ? [] : resources?.services ?? []).map((row) => [row.entityRef, row] as const)),
-		[readOnly, resources],
+		() => new Map((readOnly || ownerBoundary ? [] : resources?.services ?? []).map((row) => [row.entityRef, row] as const)),
+		[readOnly, ownerBoundary, resources],
 	);
 	// Render must stay pure: read the clock after mount, then once a minute.
 	const [now, setNow] = useState<number | null>(null);
