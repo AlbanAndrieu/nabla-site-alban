@@ -475,6 +475,8 @@ export default function HomelabServicesBlock({
 								<HomelabServiceGrid
 									catalog={group.catalog}
 									ownerNavigationIndex={ownerNavigationIndex}
+									ownerHealthIndex={indexedHealth}
+									siteStatusIndex={indexedHealth.byRef}
 									showRuntimeWarnings={index === 0}
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
