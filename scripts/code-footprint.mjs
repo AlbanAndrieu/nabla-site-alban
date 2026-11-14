@@ -159,12 +159,17 @@ function checkedPaths(root) {
 			timeout: 5000,
 			stdio: ["ignore", "pipe", "ignore"],
 		}).trim();
-		trackedDirty = execFileSync("git", ["-C", root, "status", "--porcelain=v1", "--untracked-files=no"], {
-			encoding: "utf8",
-			timeout: 5000,
-			maxBuffer: 8 * 1024 * 1024,
-			stdio: ["ignore", "pipe", "ignore"],
-		}).trim() !== "";
+		trackedDirty =
+			execFileSync(
+				"git",
+				["-C", root, "status", "--porcelain=v1", "--untracked-files=no"],
+				{
+					encoding: "utf8",
+					timeout: 5000,
+					maxBuffer: 8 * 1024 * 1024,
+					stdio: ["ignore", "pipe", "ignore"],
+				},
+			).trim() !== "";
 		paths = execFileSync("git", ["-C", root, "ls-files", "-z", "--cached"], {
 			encoding: "utf8",
 			timeout: 5000,
