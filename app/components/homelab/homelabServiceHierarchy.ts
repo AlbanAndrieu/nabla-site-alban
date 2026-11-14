@@ -5,10 +5,7 @@ import {
 } from "@/lib/homelabEnvironments";
 import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
-import {
-	type HomelabServicesCatalog,
-	homelabServiceId,
-} from "@/lib/homelabServices";
+import type { HomelabServicesCatalog } from "@/lib/homelabServices";
 import {
 	groupCatalogByPresentation,
 	type ServicePresentationGroup,
