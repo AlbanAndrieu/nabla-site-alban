@@ -18,6 +18,7 @@ import {
 import { homelabServiceDisplayName, type HomelabService } from "@/lib/homelabServices";
 import { homelabServiceIconSrc } from "@/lib/homelabCatalogIcons";
 import { homelabIconFallback } from "@/lib/homelabIconFallback";
+import HomelabCatalogMetadata from "./HomelabCatalogMetadata";
 import EndpointAction from "./EndpointAction";
 import styles from "./HomelabServicesBlock.module.css";
 import {
@@ -224,6 +225,7 @@ export default function HomelabServiceCard({
 						</p>
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
+					<HomelabCatalogMetadata service={svc} />
 
 					<ServiceHealthReasons
 						entry={initialHealth}
