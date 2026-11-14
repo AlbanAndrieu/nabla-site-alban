@@ -429,3 +429,34 @@ test("public SERVICE rejects non-string identifiers before React or localStorage
 		);
 	}
 });
+
+
+test("public SERVICE retains only reviewed Backstage v2 presentation metadata", () => {
+	const storage = storageFixture();
+	const payload = catalogFixture();
+	payload.services[0].catalogEntityKind = "Component";
+	payload.services[0].lifecycle = "production";
+	payload.services[0].criticality = "high";
+	payload.services[0].businessCriticality = "medium";
+	payload.services[0].sourcePath = "/private/source";
+	assert.equal(writePublicCatalogCache(storage, payload, null, 1000), true);
+	const cached = readPublicCatalogCache(storage, 1001)?.catalog.services[0];
+	assert.ok(cached);
+	assert.equal(cached.catalogEntityKind, "Component");
+	assert.equal(cached.lifecycle, "production");
+	assert.equal(cached.criticality, "high");
+	assert.equal(cached.businessCriticality, "medium");
+	assert.equal("sourcePath" in cached, false);
+	assert.equal("internalHost" in cached, false);
+	assert.equal("iconSrc" in cached, false);
+
+	const malformed = catalogFixture();
+	malformed.services[0].catalogEntityKind = "Admin";
+	malformed.services[0].lifecycle = "token=secret";
+	malformed.services[0].businessCriticality = "unknown";
+	const sanitized = parsePublicHomelabCatalogPayload(malformed);
+	assert.ok(sanitized);
+	assert.equal("catalogEntityKind" in sanitized.catalog.services[0], false);
+	assert.equal("lifecycle" in sanitized.catalog.services[0], false);
+	assert.equal("businessCriticality" in sanitized.catalog.services[0], false);
+});
