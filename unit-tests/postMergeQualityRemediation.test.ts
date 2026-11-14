@@ -52,9 +52,18 @@ test("post-merge remediation isolates untrusted auto-fix work from write permiss
 test("post-merge remediation transports only the deterministic patch across the privilege boundary", async () => {
 	const workflow = await readFile(WORKFLOW, "utf8");
 
-	assert.match(workflow, /git diff --cached --binary --full-index >remediation\.patch/);
-	assert.match(workflow, /actions\/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f/);
-	assert.match(workflow, /actions\/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/);
+	assert.match(
+		workflow,
+		/git diff --cached --binary --full-index >remediation\.patch/,
+	);
+	assert.match(
+		workflow,
+		/actions\/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f/,
+	);
+	assert.match(
+		workflow,
+		/actions\/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/,
+	);
 });
 
 test("post-merge remediation opens a PR for stable fixes and otherwise a deduplicated issue", async () => {
@@ -91,7 +100,7 @@ test("agent policy documents post-merge remediation as recovery-only", async () 
 	const rules = await readFile(AGENT_RULES, "utf8");
 	const procedure = await readFile("docs/agent-policy-details.md", "utf8");
 	assert.match(rules, /Post-merge remediation is recovery only/);
-	assert.match(rules, /docs\\/agent-policy-details\\.md/);
+	assert.match(rules, /docs\/agent-policy-details\.md/);
 	assert.match(procedure, /workflow file exists on the default branch/);
 	assert.match(procedure, /must never rely on this post-merge workflow/);
 });
