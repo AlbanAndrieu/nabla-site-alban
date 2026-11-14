@@ -4,6 +4,12 @@
 Full procedures and protected exceptions: `docs/agent-policy-details.md`.
 Next.js 16 / React 19 / TypeScript / next-intl; `package.json` defines Node/npm.
 
+## Execution profile (no capability assumptions)
+
+- **Claude Code on a workstation with a real checkout:** use local Node/npm, cached dependencies, git worktree and focused Playwright/tests. OWNER/LAN probes require separately verified authorization and network access; never spoof headers.
+- **Remote Codex / connector-only agent:** inspect exact-SHA files, PRs, contracts and documentation. Without a complete checkout or LAN, do not run or claim builds, browser tests, host diagnostics or L3. Record `NOT_RUN` and continue source-only work.
+- Route with `node scripts/agent-task-context.mjs --task homelab`; optional `AGENT_EXECUTION_MODE=remote|workstation`. Auto mode checks checkout/dependencies, **not** LAN permission. Details: `docs/agent-policy-details.md`.
+
 ## Efficient local-first loop
 
 1. **OBSERVE:** `just context`, then `just preflight`; pin PR, HEAD and base SHA.

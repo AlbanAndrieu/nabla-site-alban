@@ -2,6 +2,12 @@
 
 **Réconcilié le 14 novembre 2026.** Ce répertoire exécute les contrôles **Next.js, qualité, Vercel et présentation**. Les opérations sur TrueNAS, les sondes et la source du catalogue Backstage appartiennent à `nabla-compose` / `fastapi-sample`. Un script « check » ne doit pas modifier la production.
 
+## Routage par ressources disponibles
+
+- **Workstation Claude Code :** `just context && just preflight`, `just agent-context homelab`, tests ciblés, navigateur et sondes LAN seulement lorsque le réseau/identité sont vérifiés. La gate L3 nécessite Node 24/npm 12, dépendances et checkout complet.
+- **Agent Codex distant :** `AGENT_EXECUTION_MODE=remote node scripts/agent-task-context.mjs --task homelab` (si le script est disponible), sinon fichiers GitHub exact-SHA, review, tests statiques et documentation. Ne pas lancer en boucle les sondes LAN, npm ou DNS inaccessibles. Les vérifications indisponibles restent `NOT_RUN`.
+- Le routeur est **sans réseau**, n'ouvre aucun secret, ne modifie rien et ne certifie jamais un droit OWNER ; `LOCAL_READY` décrit les dépendances locales, pas la qualité du code.
+
 ## Commandes canoniques (préférer celles-ci aux scripts ad hoc)
 
 | Domaine | Commande | Effet |
