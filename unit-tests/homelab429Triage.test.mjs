@@ -13,6 +13,14 @@ test("triage makes one Site and one FastAPI GET without redirects or retries", (
 });
 test("trace of diagnostic cannot pass Site JWT to FastAPI", () => {
   assert.match(source, /auditHeadersForUrl\(url, origin.origin, jwt/);
-  assert.match(source, /const fastapi = await observe\("FASTAPI_LIVEZ",/);
+  assert.match(source, /observe\("FASTAPI_LIVEZ",/);
   assert.match(source, /process.exitCode = 4/);
+});
+
+test("local diagnostic supports bounded single-target mode and independent parallel probes", () => {
+  assert.match(source, /Promise\\.all\\(\\[/);
+  assert.match(source, /--site-only/);
+  assert.match(source, /--fastapi-only/);
+  assert.match(source, /Promise\\.resolve\\("SKIPPED"\\)/);
+  assert.match(source, /process\\.exitCode = 3/);
 });

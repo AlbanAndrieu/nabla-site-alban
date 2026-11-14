@@ -185,6 +185,13 @@ k8s-build tag="nabla-site-alban:talos":
 k8s-smoke tag="nabla-site-alban:talos":
     bash scripts/k8s/smoke-standalone.sh "{{tag}}"
 
+# Single public-target diagnostics: no browser, LAN probe or retry.
+diagnose-site-access:
+    node scripts/diagnose-homelab-429.mjs --site-only
+
+diagnose-fastapi-livez:
+    node scripts/diagnose-homelab-429.mjs --fastapi-only
+
 # Validate the REAL network boundary, never spoof client IP addresses.
 audit-owner:
     HOMELAB_AUDIT_EXPECT=owner node scripts/audit-homelab-access.mjs

@@ -15,7 +15,7 @@
 | **Catalogue Backstage V2 / cartes** | `npm run test:catalog:v2` ou `just catalog-v2-check` | Tests ciblés : v2, clé canonique, projection, cache SERVICE et confidentialité |
 | **Icônes locales** | `just icons-local-check` / `just icons-check` | Vérification locale / comparaison facultative du mapping Compose |
 | **Audit OWNER/SERVICE** | `just audit-owner` / `just audit-service` / `just audit-denied` | Requêtes diagnostics soumises aux politiques serveur ; pas de création de droits |
-| **Audit HTTP et 429** | `npm run audit:homelab` / `npm run diagnose:homelab-429` | Compare les réponses HTTP réellement reçues ; refus d'accès ≠ panne |
+| **Audit HTTP et 429** | `npm run audit:homelab` / `npm run diagnose:homelab-429` | Compare les réponses réellement reçues ; refus ≠ panne. Pour ne sonder qu’un producteur : `just diagnose-site-access` ou `just diagnose-fastapi-livez` |
 | **État SSR/SSG / ISR Vercel** | `node scripts/audit-vercel-runtime.mjs --json` | Lecture des artefacts Next déjà construits ; pas de CPU mesuré |
 | **FinOps et smoke public** | `node scripts/finops/vercel-usage-budget.mjs --help` / `node scripts/finops/vercel-public-smoke.mjs --help` | Consomme des exports CLI explicites / sondes publiques bornées ; ne modifie pas de quota |
 | **Gate ciblée** | `npm run test:unit` · `npm run lint` · `npm run typecheck` | Qualité au checkout courant, résultats datés |

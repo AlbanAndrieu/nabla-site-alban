@@ -33,12 +33,30 @@ async function observe(label, url, jwt = "") {
   }
 }
 
-// No network-header spoofing; an Access JWT, if provided, is Site-origin only.
-const site = await observe("SITE_ACCESS",
-  new URL("/api/homelab-access?diagnose=1", origin).toString(),
-  process.env.HOMELAB_AUDIT_ACCESS_JWT?.trim());
-const fastapi = await observe("FASTAPI_LIVEZ",
-  "https://fastapi-sample.fastapicloud.dev/livez");
+// Bounded independent probes from this machine; no header spoofing or redirects.
+// Target a single upstream to avoid unnecessary requests during local diagnosis.
+const flags = new Set(process.argv.slice(2));
+const allowed = new Set(["--site-only", "--fastapi-only", "--help"]);
+if ([...flags].some((flag) => !allowed.has(flag)) ||
+    (flags.has("--site-only") && flags.has("--fastapi-only")) ||
+    (flags.has("--help") && flags.size !== 1)) {
+  console.error("Usage: diagnose-homelab-429.mjs [--site-only|--fastapi-only|--help]");
+  process.exit(2);
+}
+if (flags.has("--help")) {
+  console.log("Usage: diagnose-homelab-429.mjs [--site-only|--fastapi-only]");
+  console.log("One or two independent GET probes; no retries or private LAN probes.");
+  process.exit(0);
+}
+const onlySite = flags.has("--site-only");
+const onlyFastApi = flags.has("--fastapi-only");
+const [site, fastapi] = await Promise.all([
+  onlyFastApi ? Promise.resolve("SKIPPED") : observe("SITE_ACCESS",
+    new URL("/api/homelab-access?diagnose=1", origin).toString(),
+    process.env.HOMELAB_AUDIT_ACCESS_JWT?.trim()),
+  onlySite ? Promise.resolve("SKIPPED") : observe("FASTAPI_LIVEZ",
+    "https://fastapi-sample.fastapicloud.dev/livez"),
+]);
 console.log("NOTE: FastAPI /livez is an independent liveness signal, not proof of Site OWNER authorization or Backstage v2 health.");
 if (site === 429) {
   console.log("BLOCKED: Site access preflight rate-limited; honor Retry-After and inspect Vercel/edge logs.");
