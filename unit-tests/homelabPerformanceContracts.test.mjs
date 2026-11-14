@@ -75,7 +75,7 @@ test("Architecture readOnly flows to cards, health joins and runtime warnings", 
 	const warnings = source("app/components/homelab/HomelabRuntimeWarnings.tsx");
 	assert.match(topology, /<ArchitectureServiceHierarchy\s+readOnly=\{readOnly\}/);
 	assert.match(hierarchy, /<HomelabRuntimeWarnings\s+readOnly=\{readOnly\}/);
-	assert.match(hierarchy, /<HomelabServiceGrid\s+catalog=\{group\.catalog\}\s+readOnly=\{readOnly\}/);
+	assert.match(hierarchy, /<HomelabServiceGrid[^>]*catalog=\{group\.catalog\}[^>]*readOnly=\{readOnly\}/);
 	assert.match(hierarchy, /indexHealth\(readOnly \? null : snapshot, siteHealth/);
 	assert.match(hierarchy, /!readOnly && snapshot && !healthUnavailable/);
 	assert.match(grid, /const snapshot = readOnly \|\| ownerBoundary \? null : rawSnapshot/);
