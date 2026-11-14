@@ -3,6 +3,7 @@ import {
 	homelabServiceMatchesEnvironment,
 	resolveHomelabServiceEnvironments,
 } from "@/lib/homelabEnvironments";
+import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import type { HomelabHealthState } from "@/lib/homelabHealth";
 import {
 	type HomelabServicesCatalog,
@@ -54,14 +55,7 @@ export function filterHierarchyGroups(
 				resolveHomelabServiceEnvironments(service, topology),
 				environmentFilter,
 			);
-		const matchesSearch =
-			query.length === 0 ||
-			service.name.toLowerCase().includes(query) ||
-			homelabServiceId(service).includes(query) ||
-			(service.kind?.toLowerCase().includes(query) ?? false) ||
-			(service.category?.toLowerCase().includes(query) ?? false) ||
-			(service.lifecycle?.toLowerCase().includes(query) ?? false) ||
-			(service.catalogEntityKind?.toLowerCase().includes(query) ?? false);
+		const matchesSearch = matchesCatalogServiceSearch(service, query);
 		return matchesHealth && matchesEnvironment && matchesSearch;
 	});
 	const filteredCatalog = { ...catalog, services: filteredServices };
