@@ -81,3 +81,13 @@ test("Architecture readOnly flows to cards, health joins and runtime warnings", 
 	assert.match(grid, /const snapshot = readOnly \|\| ownerBoundary \? null : rawSnapshot/);
 	assert.match(warnings, /if \(readOnly\) return null/);
 });
+
+test("Architecture age ticker is hydration-safe and disabled without an OWNER timestamp", () => {
+	const dashboard = source("app/[locale]/architecture/ArchitectureHealthDashboard.tsx");
+	assert.match(dashboard, /useState<number \| null>\(null\)/);
+	assert.match(dashboard, /if \(!checkedAt\) return/);
+	assert.match(dashboard, /if \(!document\.hidden\) setNow\(Date\.now\(\)\)/);
+	assert.match(dashboard, /document\.addEventListener\("visibilitychange", refresh\)/);
+	assert.match(dashboard, /window\.clearInterval\(clockTimer\)/);
+	assert.doesNotMatch(dashboard, /useState\(\(\) => Date\.now\(\)\)/);
+});
