@@ -1,5 +1,29 @@
 {
 	"homelab": {
+		"catalog": {
+			"entityKind": "Type Backstage",
+			"lifecycleLabel": "Cycle",
+			"operationalCriticality": "Criticité opérationnelle",
+			"businessCriticality": "Criticité métier",
+			"declarativeOnly": "Métadonnées déclaratives du catalogue V2 ; ce bloc ne prouve pas la disponibilité.",
+			"kinds": {
+				"component": "Composant",
+				"resource": "Ressource",
+				"api": "API"
+			},
+			"lifecycle": {
+				"production": "Production",
+				"experimental": "Expérimental",
+				"development": "Développement",
+				"deprecated": "Déprécié"
+			},
+			"levels": {
+				"critical": "Critique",
+				"high": "Élevée",
+				"medium": "Moyenne",
+				"low": "Faible"
+			}
+		},
 		"section": {
 			"title": "Services TrueNAS",
 			"lead": "Applications auto-hébergées sur TrueNAS Scale.",
