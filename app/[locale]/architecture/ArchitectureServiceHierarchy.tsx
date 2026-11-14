@@ -117,6 +117,8 @@ export default function ArchitectureServiceHierarchy({
 								<HomelabServiceGrid
 									catalog={group.catalog}
 									ownerNavigationIndex={ownerNavigationIndex}
+									ownerHealthIndex={healthIndex.owner}
+									siteStatusIndex={healthIndex.byRef}
 									showRuntimeWarnings={index === 0}
 									snapshot={snapshot}
 									siteHealth={siteHealth}
