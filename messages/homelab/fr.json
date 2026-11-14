@@ -2,6 +2,7 @@
 	"homelab": {
 		"catalog": {
 			"noFreshEvidence": "Service déclaré dans le catalogue ; aucune preuve de disponibilité récente.",
+			"serviceType": "Type technique",
 			"entityKind": "Type Backstage",
 			"lifecycleLabel": "Cycle",
 			"operationalCriticality": "Criticité opérationnelle",
