@@ -17,6 +17,8 @@ test("service groups share indexed OWNER evidence instead of scanning per card",
 	assert.match(grid, /ownerNavigationIndex \?\? indexOwnerNavigation\(snapshot\)/);
 	for (const caller of [block, architecture]) {
 		assert.match(caller, /ownerNavigationIndex=\{ownerNavigationIndex\}/);
+		assert.match(caller, /ownerHealthIndex=/);
+		assert.match(caller, /siteStatusIndex=/);
 		assert.match(caller, /showRuntimeWarnings=\{index === 0\}/);
 	}
 });
@@ -38,6 +40,8 @@ test("SERVICE mode cannot reuse a caller-provided OWNER snapshot or navigation i
 	assert.match(grid, /readOnly \|\| ownerBoundary \? \[\] : resources\?\.services/);
 	assert.match(grid, /snapshot=\{snapshot\}/);
 	assert.match(grid, /siteHealthIndex\(siteHealth, catalog\.catalogRevision\)/);
+	assert.match(grid, /siteHealth\?\.boardState === "fresh"/);
+	assert.match(grid, /siteHealth\.catalogRevision === catalog\.catalogRevision/);
 });
 
 test("service group computation does not copy an expanding group for every service", () => {
