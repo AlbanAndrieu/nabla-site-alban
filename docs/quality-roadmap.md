@@ -14,6 +14,8 @@
 | Scripts FinOps et smoke | [#295](https://github.com/AlbanAndrieu/nabla-site-alban/pull/295), [#297](https://github.com/AlbanAndrieu/nabla-site-alban/pull/297), [#298](https://github.com/AlbanAndrieu/nabla-site-alban/pull/298) **MERGED** | API Hobby et consommations CPU réelles **NOT_MEASURED** ; scripts ≠ seuil Vercel actif |
 | YubiKey et migrations React | Guide progressif, PIV/Entra, ReactFlow et pages React intégrés par PR antérieures | WCAG/SEO et fonctionnement navigateur sur le dernier SHA non présumés |
 
+**Refactorings de la PR #303 (CODED, NOT_MEASURED) :** index OWNER O(N) partagé, index de santé réutilisés, timer de fraîcheur unique, alertes runtime non dupliquées et filtres V2 communs à TrueNAS/Architecture. Les tests ciblés ont été ajoutés mais ne constituent pas une gate L3 exécutée. Voir [la roadmap d’ingénierie](homelab-roadmap.md#optimisations-de-rendu-codées-non-mesurées).
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |
