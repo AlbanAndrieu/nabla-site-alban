@@ -1,5 +1,4 @@
-import type { HomelabService } from "./homelabServices";
-import { homelabServiceId } from "./homelabServices";
+import { homelabServiceId, type HomelabService } from "./homelabServices";
 
 /**
  * One SERVICE-safe search policy for TrueNAS and Architecture.
