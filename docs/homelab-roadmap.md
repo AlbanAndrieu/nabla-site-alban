@@ -16,6 +16,12 @@
 
 Une entité du catalogue **déclare** un service, une relation et un cycle de vie ; elle ne démontre ni disponibilité, ni déploiement, ni succès du dernier contrôle. Les états `NOT_RUN`, `DENIED` et `STALE` ne deviennent jamais automatiquement `UP` ou `DOWN`.
 
+## Priorités de modularisation — G7 / G6 / G8
+
+- **G7 / S3–S4 :** `HomelabServicesBlock.tsx` (566 lignes) et `useHomelabHealth.ts` (562), fortes concentrations de rendu et d'orchestration des preuves. Découper en fonctions pures/composants spécialisés seulement avec tests : détection de révision, état `unknown` et frontières OWNER/SERVICE inchangés. Pas de changement de fréquence de sondes sans mesure.
+- **G6 / S5–S6 :** CSS Architecture `HierarchicalArchitectureExplorer.module.css` (774 lignes) ; modulariser les styles sans perte de clavier, de lisibilité à 320/390 px ou d'accessibilité FR/EN. Captures et Playwright/Axe exigés avant conclusion.
+- **G8 / S7 :** inventaire du script `post-deploy-smoke.mjs` (508 lignes), suppression des seuls doublons prouvés ; les scripts de `nabla-compose` et `fastapi-sample` ne doivent pas être recopiés ici. Relever le volume avec `just code-footprint` sur workstation ; la comparabilité entre deux dépôts est documentée dans [la roadmap générale](quality-roadmap.md#taille-du-code-et-recommandations--référence-du-14-novembre-2026).
+
 ## Backlog restant — options de priorité
 
 | ID | P | Objectif / critère d'acceptation |

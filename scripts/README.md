@@ -15,6 +15,13 @@
 - Pour l'API GitHub / agent distant : passer `--pr N --expected-head SHA` **si** `gh` est disponible ; sinon consulter les PR ouvertes et leurs fichiers via le connecteur. Aucune exécution locale ou preuve L3 n'est présumée.
 - `REUSE` ou `CONFLICT` : sortie 4, changement de branche ou arbitrage requis. Erreur GitHub, SHA différent, base obsolète et dépassement de budget : sortie 3, **BLOCKED**. Ne jamais convertir une erreur réseau en « aucune PR ouverte ».
 
+## Mesurer le volume de code sans déclencher de CI
+
+- `just code-footprint` : **source Git locale** (lignes physiques/non vides, octets, fichiers au-dessus de 300/600 lignes), exclusions par défaut des médias, archives, générés, documentation, traductions et skills. Ne lit pas les fichiers privés non suivis.
+- `just code-footprint-compare` : compare les deux checkouts voisins sur la workstation uniquement ; `node scripts/code-footprint.mjs --json --top 10` exporte un rapport borné. Sans `.git`/fichiers requis, le diagnostic échoue explicitement, jamais « zéro ligne ».
+- Les résultats sont des tailles de **working tree** : ils ne prouvent ni la complexité, ni une amélioration de performance, ni la qualité L3. `scripts/check_code_size.py` reste l'unique gate 300/600 lignes : ne pas en créer une seconde.
+- Codex distant : inspecter le benchmark Git daté dans `docs/quality-roadmap.md` ; tests et probes de la workstation `NOT_RUN` sans checkout/identité. Ne pas cloner ni relancer npm en boucle.
+
 ## Commandes canoniques (préférer celles-ci aux scripts ad hoc)
 
 | Domaine | Commande | Effet |
