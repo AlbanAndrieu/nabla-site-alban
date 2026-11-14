@@ -30,6 +30,16 @@ Le format accepté est `{ schemaVersion: 2, model: "backstage", catalogRevision:
 - **OWNER :** runtime et endpoints peuvent apparaître uniquement après autorisation serveur, depuis un instantané FastAPI daté ; un lien déclaré sans preuve n'est pas une URL de navigation.
 - **Révisions :** santé, graphe et cache ne se mélangent pas si leur `catalogRevision` diffère. Un HTTP 401/403, une sonde `NOT_RUN` ou une absence de métrique ne prouvent pas la panne du service.
 
+## Présentation et maîtrise du coût client
+
+Les deux pages réutilisent `lib/homelabCatalogSearch.ts` pour la recherche sur les **seules** facettes déclaratives autorisées. Les titres et les groupes sont centralisés dans `lib/servicePresentationLabels.ts`.
+
+Pour les cartes OWNER, `lib/homelabOwnerServiceNavigation.ts` construit un index par snapshot et écarte tout identifiant ambigu ; les deux pages réutilisent cet index et leurs index de santé. La grille n'accède jamais à une observation OWNER après passage en lecture seule ou à une frontière d'accès refusée. Les alertes TrueNAS n'apparaissent qu'une fois dans le répertoire.
+
+La fraîcheur des ressources horodatées est recalculée depuis une seule horloge côté TrueNAS, mise en pause lorsque l'onglet est caché. Un cache ou une réponse `boardState=stale` ne transforme jamais un statut ancien en `ok`.
+
+Ces règles de coût client n'ont **pas** été chronométrées sur un navigateur réel dans cette PR ; elles ne constituent ni une réduction démontrée du CPU Vercel ni une preuve de santé de service.
+
 ## Contrôles et exploitation
 
 ```bash
