@@ -1,7 +1,8 @@
 ---
 name: nabla-maintenance
 description: >-
-  Continue Site Alban roadmap or PR with bounded context, targeted proof and minimal GitHub Actions usage.
+  Continue Site Alban roadmap or PR with bounded context, targeted proof and
+  minimal GitHub Actions usage.
 ---
 # Site Alban maintenance — one batch at a time
 
