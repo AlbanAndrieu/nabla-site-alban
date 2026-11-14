@@ -26,6 +26,25 @@ Le dépôt a déjà plusieurs agents (Claude Code sur workstation, Codex distant
 
 Codes : `PR_GUARD_REUSE` recommande une PR ouverte existante (sortie 4) ; `PR_GUARD_CONFLICT` bloque les collisions ; `PR_GUARD_HEAD_CHANGED`, `PR_GUARD_BASE_STALE`, `PR_GUARD_PR_NOT_OPEN` et `PR_GUARD_HEAD_NOT_PINNED` empêchent une publication basée sur des refs obsolètes. Le contrôle est **lecture seule** ; il ne sérialise pas des machines différentes : le push doit rester en fast-forward et l'API GitHub doit vérifier le SHA attendu. Pas de force-push ni de fermeture/réouverture automatique de PR. Une PR distincte est justifiée **uniquement si aucune PR ouverte ne correspond au périmètre**. Le rapport doit nommer explicitement les limites de cette détection par chemins (les conflits sémantiques restent à examiner).
 
+### Rebase and reconciliation before any new patch
+
+Once the current PR owner is selected, compare its head and `origin/master`.
+On a **clean, dedicated worktree** run `git fetch origin master` and
+`git log --left-right --oneline HEAD...origin/master`. If the base has
+advanced, resolve `git rebase origin/master` one conflict at a time,
+preserving the concurrent changes and the CI/quality contracts. If a
+published branch cannot be safely rewritten, use a reviewed non-force
+merge rather than `git push --force`. In this repository force-push is
+forbidden by `AGENTS.md`; the `agent-pr-guard` and publish gate must
+both see a current HEAD before any push.
+
+Never create a second PR to fix the first PR's conflicts. Group incidental
+formatter/roadmap fixes into one reviewed commit after targeted tests,
+then run L3 once. The only publication exceptions are a production
+stability/security correction needing immediate rollout or a completed
+cross-service migration with dependent consumers updated. Do not use
+`[skip ci]` or auto-merge, and never count a remote CI status as local L3.
+
 ## FastAPI → React agent optimizations (30 October 2026)
 
 These are the transferable practices from the FastAPI Sample agent discussions.
