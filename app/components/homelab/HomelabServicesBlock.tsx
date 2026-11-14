@@ -432,7 +432,7 @@ export default function HomelabServicesBlock({
 			/>
 
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
-				{visibleHierarchyGroups.map((group, index) => {
+				{visibleHierarchyGroups.map((group) => {
 					const issueCount = group.catalog.services.filter(
 						(service) =>
 							effectiveState(
@@ -477,12 +477,10 @@ export default function HomelabServicesBlock({
 									ownerNavigationIndex={ownerNavigationIndex}
 									ownerHealthIndex={indexedHealth}
 									siteStatusIndex={indexedHealth.byRef}
-									showRuntimeWarnings={index === 0}
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
 									ownerBoundary={state.ownerBoundary === true}
-									healthHttpStatus={readOnly ? null : state.healthStatus}
 									readOnly={readOnly}
 									resources={resourceSnapshot}
 									resourceStale={resourceStale}
