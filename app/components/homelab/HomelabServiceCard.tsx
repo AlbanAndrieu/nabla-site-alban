@@ -226,6 +226,11 @@ export default function HomelabServiceCard({
 					)}
 					<p className="card-text text-muted small mb-0">{svc.description}</p>
 					<HomelabCatalogMetadata service={svc} />
+					{!initialHealth && (siteState === undefined || siteState === "unknown") && (
+						<p className={styles.serviceEvidenceNote} data-catalog-without-fresh-evidence>
+							{t("catalog.noFreshEvidence")}
+						</p>
+					)}
 
 					<ServiceHealthReasons
 						entry={initialHealth}
