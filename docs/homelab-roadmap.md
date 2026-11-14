@@ -37,6 +37,15 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 - [ ] **S2 :** consigner une recette LAN OWNER et WAN SERVICE réels, y compris révocation et absence de fuite dans le cache ou les liens.
 - [ ] **S3 :** comparer une preuve FastAPI horodatée, sa révision de catalogue et l'état rendu, sans faux vert ni faux rouge.
 
+## Optimisations de rendu codées (non mesurées)
+
+- **O(N) plutôt que des scans O(N²) pour les cartes OWNER :** index `indexOwnerNavigation` construit une fois par snapshot et partagé dans les deux pages. Les identifiants dupliqués sont rejetés. Un index est une optimisation de recherche, jamais une nouvelle source de vérité.
+- **Calculs communs :** la carte reçoit les index de santé du parent et conserve la vérification stricte de `catalogRevision` et `boardState=fresh` avant un état SERVICE.
+- **Une horloge par page :** la mesure de fraîcheur des ressources n'est plus répétée par groupe ; elle s'arrête lorsque l'onglet est caché et reprend à la visibilité. OWNER est masqué si accès révoqué.
+- **Une alerte runtime par page :** les groupes ne répètent plus les mêmes avertissements ; les déclarations, preuves et incidents restent séparés.
+- **Recherche et libellés uniques :** `lib/homelabCatalogSearch.ts` et `lib/servicePresentationLabels.ts` alimentent TrueNAS et Architecture ; le regroupement ne recopie plus les tableaux croissants.
+- **Preuve manquante :** aucune mesure comparative réelle CPU/INP/CLS, aucun test L3 exact-SHA ; ne pas appeler ces changements un gain mesuré.
+
 ## Vérifications disponibles
 
 ```bash
