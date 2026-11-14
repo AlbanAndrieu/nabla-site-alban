@@ -8,6 +8,13 @@
 - **Agent Codex distant :** `AGENT_EXECUTION_MODE=remote node scripts/agent-task-context.mjs --task homelab` (si le script est disponible), sinon fichiers GitHub exact-SHA, review, tests statiques et documentation. Ne pas lancer en boucle les sondes LAN, npm ou DNS inaccessibles. Les vérifications indisponibles restent `NOT_RUN`.
 - Le routeur est **sans réseau**, n'ouvre aucun secret, ne modifie rien et ne certifie jamais un droit OWNER ; `LOCAL_READY` décrit les dépendances locales, pas la qualité du code.
 
+## Prévention des conflits de PR
+
+- Avant de modifier les fichiers, identifier une PR ouverte réutilisable : `node scripts/agent-pr-guard.mjs --paths AGENTS.md docs/agent-policy-details.md`. Nécessite un `gh` authentifié ; zéro installation et zéro mutation.
+- Depuis une branche de PR avec checkout Git complet, relancer `just pr-guard` juste avant publication. Le script examine `origin/master...HEAD`, le contenu indexé, les changements locaux et les fichiers non suivis ; les renommages couvrent aussi l'ancien chemin.
+- Pour l'API GitHub / agent distant : passer `--pr N --expected-head SHA` **si** `gh` est disponible ; sinon consulter les PR ouvertes et leurs fichiers via le connecteur. Aucune exécution locale ou preuve L3 n'est présumée.
+- `REUSE` ou `CONFLICT` : sortie 4, changement de branche ou arbitrage requis. Erreur GitHub, SHA différent, base obsolète et dépassement de budget : sortie 3, **BLOCKED**. Ne jamais convertir une erreur réseau en « aucune PR ouverte ».
+
 ## Commandes canoniques (préférer celles-ci aux scripts ad hoc)
 
 | Domaine | Commande | Effet |

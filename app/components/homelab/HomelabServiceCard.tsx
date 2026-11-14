@@ -282,13 +282,13 @@ export default function HomelabServiceCard({
 								className={`badge ${styles.internalBadge}`}
 								title={
 									privateExposureDebt
-										? "Accès interne souhaité ; exception DNS publique encore déclarée"
-										: "Accès Internet non souhaité ; disponibilité LAN vérifiée séparément"
+										? t("endpoint.privateExposureTitle")
+										: t("endpoint.privateEndpointTitle")
 								}
 							>
 								<i className="fas fa-lock me-1" aria-hidden="true" />
-								Interne
-								{privateExposureDebt ? " · exposition à corriger" : ""}
+								{t("endpoint.internal")}
+								{privateExposureDebt ? ` · ${t("endpoint.exposureToFix")}` : ""}
 							</span>
 						)}
 						<EndpointAction
@@ -304,12 +304,12 @@ export default function HomelabServiceCard({
             {!readOnly && endpointEnabled && endpointUrl && (
               <small className="text-break text-start" data-owner-external-target>
                 {endpointUrl}
-                {externalUrlDerived ? (french ? " · URL dérivée, à vérifier" : " · derived URL, verify before use") : ""}
+                {externalUrlDerived ? ` · ${t("endpoint.derivedUrlCheck")}` : ""}
               </small>
             )}
             {hasInternal && internalRouteMismatch && (
               <small className="text-warning text-start" data-owner-lan-route-mismatch>
-                {french ? "Écart détecté : origine Cloudflare différente de la cible déclarée" : "Route drift: Cloudflare origin differs from declared target"}
+                {t("endpoint.cloudflareRouteDrift")}
               </small>
             )}
 						{hasInternal && (
@@ -325,7 +325,7 @@ export default function HomelabServiceCard({
 								data-health-state={internalState}
                 data-lan-probe-state={lanProbe?.state ?? "not-run"}
 								title={!internalProtocolObserved
-									? (french ? "Protocole LAN non confirmé · schéma configuré utilisé" : "LAN protocol unconfirmed · configured scheme used")
+									? t("endpoint.lanProtocolUnconfirmed")
 									: `FastAPI/TrueNAS: ${internalState}`}
 							>
 								{svc.internalSecure && (

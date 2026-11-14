@@ -29,7 +29,7 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 | **S7** | **P2** | **Dette technique** : dédoublonner les adaptateurs et scripts réellement redondants, inventorier les références V1 historiques avant tout retrait, garder les tests négatifs |
 | **S8** | **P2** | **Ressources CPU/RAM/GPU/ZFS** : afficher uniquement des mesures producteur horodatées et autorisées ; jamais de CPU inventé depuis le catalogue |
 
-**Ordre confirmé par le propriétaire (14/11) : G7 puis G6 puis G8**. Sur l'interface homelab, traiter S3/S4 (preuves et libellés) puis S5 (FR/EN, WCAG, mobile), avant S7 (suppression des doublons). Les filtres traduits et la région de résultats accessible sont CODED sur une branche Draft ; L3, Playwright OWNER/SERVICE et mesures restent NOT_RUN. La qualité L3 et Vercel restent dans la roadmap générale. L'intégration V2 **S0** est clôturée côté code et ne figure plus parmi les migrations à réaliser.
+**Ordre confirmé par le propriétaire (14/11) : G7 puis G6 puis G8**. Sur l'interface homelab, traiter S3/S4 (preuves et libellés) puis S5 (FR/EN, WCAG, mobile), avant S7 (suppression des doublons). Les filtres traduits et la région de résultats accessible ont été fusionnés via #306 ; L3, Playwright OWNER/SERVICE et mesures restent NOT_RUN. La qualité L3 et Vercel restent dans la roadmap générale. L'intégration V2 **S0** est clôturée côté code et ne figure plus parmi les migrations à réaliser.
 
 ## Critères de clôture
 

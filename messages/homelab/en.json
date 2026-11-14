@@ -35,6 +35,12 @@
 		"loading": "Loading homelab services…",
 		"unavailable": "Homelab services are temporarily unavailable.",
 		"endpoint": {
+			"privateExposureTitle": "Internal-only access expected; a public DNS exception remains declared",
+			"privateEndpointTitle": "Public Internet access not intended; LAN availability is measured separately",
+			"exposureToFix": "exposure to correct",
+			"derivedUrlCheck": "derived URL, verify before use",
+			"cloudflareRouteDrift": "Route drift: Cloudflare origin differs from declared target",
+			"lanProtocolUnconfirmed": "LAN protocol unconfirmed · configured scheme used",
 			"external": "Web service",
 			"internal": "Internal",
 			"networkError": "network error",

@@ -19,11 +19,11 @@ L0 = inspection, L1 = focused tests, L2 = deterministic local convergence, L3 = 
 
 ## Local batch
 
-1. Confirm PR/branch/base/HEAD, `git status --short`, and affected files. Work in an isolated `git worktree`.
+1. Confirm PR/branch/base/HEAD, `git status --short` and affected files. Run the read-only `node scripts/agent-pr-guard.mjs --paths FILE ...` before editing; switch to a matching open PR instead of creating a duplicate. Work in an isolated `git worktree`.
 2. Run one nearby test first. Expand only from the first actionable failure; keep full logs outside model context.
 3. Run `npm run quality:agent:fix` after the **last edit**. Inspect the deterministic diff. Stop on `QG_FIX_OSCILLATION` or any security failure.
 4. Commit the cohesive batch. Run `npm run quality:agent:publish` on Node24/npm12 with locked dependencies; check `npm run quality:agent:publish -- --status`. Never use `--no-verify`.
-5. Push once to the PR's non-default branch, verify same HEAD and report checks actually run.
+5. Re-check `just pr-guard` and exact remote PR HEAD before the push; a non-fast-forward push or unexpected PR overlap blocks publication. Push once to the PR's non-default branch, verify same HEAD and report checks actually run.
 
 `QG_AUTOFIX_REQUIRED`: run the fixer; `QG_PRECOMMIT_FAILED`: inspect named hook; `QG_PUBLISH_*`: block publication until repaired. Never change tests just to silence a valid failure.
 
