@@ -17,6 +17,17 @@ Follow `AGENTS.md`. Use concise French reports inspired by ASD-STE100: one actio
 
 L0 = inspection, L1 = focused tests, L2 = deterministic local convergence, L3 = clean committed HEAD publication gate. Missing tools/deps/network are `NOT_RUN` or `BLOCKED`, never `PASS`. No GitHub Actions manual reruns or skip directives.
 
+## Existing PR first and no micro-push
+
+Before any edit, inspect the matching PR's HEAD/base and
+`agent-pr-guard` result; rebase or reviewed non-force merge its base
+**before** adding new changes. Preserve all concurrent changes, and
+publish only a cohesive validated batch after the strict L3 gate.
+Immediate rollout is reserved for an urgent production security/stability
+fix or a completed migration requiring coordinated dependent updates.
+For conflict recovery read the [conditional procedure](../../../docs/agent-policy-details.md).
+Never auto-merge, force-push or disable CI/security controls.
+
 ## Local batch
 
 1. Confirm PR/branch/base/HEAD, `git status --short` and affected files. Run the read-only `node scripts/agent-pr-guard.mjs --paths FILE ...` before editing; switch to a matching open PR instead of creating a duplicate. Work in an isolated `git worktree`.

@@ -12,7 +12,7 @@ Next.js 16 / React 19 / TypeScript / next-intl. Node/npm versions are pinned in 
 
 1. **OBSERVE:** with checkout run `just context` / `just preflight`; before edits check open PR overlaps via `node scripts/agent-pr-guard.mjs --paths FILE ...` (or GitHub connector). Reuse a matching open PR; pin HEAD/base.
 2. **ROUTE:** read the one relevant `.agents/skills/*/SKILL.md` and the closest contract.
-3. **CHANGE:** one coherent batch; inspect changed paths and first failed test, not full logs.
+3. **CHANGE:** synchronize the selected PR with `master` before editing, resolve real conflicts, then make one coherent batch; inspect changed paths and first failed test, not full logs.
 4. **FIX:** `npm run quality:agent:fix` only on a complete local checkout.
 5. **REVIEW:** verify diff, privacy, security, a11y and regression tests.
 6. **PROVE:** after commit on clean Node 24/npm 12 checkout run `npm run quality:agent:publish` then `npm run quality:agent:publish -- --status`; source-only L0/L1 is not L3.
@@ -21,6 +21,11 @@ Next.js 16 / React 19 / TypeScript / next-intl. Node/npm versions are pinned in 
 ## Security and publication invariants
 
 Never push, delete, merge or write `master`; never merge without explicit approval. Never force-push, use `--no-verify`, `[skip ci]`, weaken security/quality gates or bypass pre-commit. Do not manually run paid GitHub Actions under quota constraints; Draft does not suppress push-triggered CI. API writes require the correct branch, fresh file SHA and PR HEAD; block overlapping open PRs, stale base, conflicting writer, dirty proof or scope creep. Never reuse merged PR branches.
+
+**Batch publication:** do not push minor follow-up changes individually; accumulate
+one validated patch set in the existing PR. Exception: an urgent production
+stability/security fix requiring deployment, or a completed migration with
+all affected services updated. No auto-merge or bypass of any required gate.
 
 Post-merge remediation is recovery only; it never substitutes for the publication quality gate. Never print secrets or OWNER payloads. A denied probe or missing evidence is not a healthy service.
 
