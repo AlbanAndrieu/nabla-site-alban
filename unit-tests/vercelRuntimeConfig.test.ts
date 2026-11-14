@@ -59,7 +59,7 @@ test("dynamic homelab data is isolated behind same-origin APIs", async () => {
 
 	assert.match(source, /^"use client";/);
 	assert.match(source, /fetch\("\/api\/homelab-catalog-v2"/);
-	assert.match(source, /fetch\("\/api\/homelab-health"/);
+	assert.match(source, /fetchHealthEndpoint\("\/api\/homelab-health", signal, false\)/);
 	assert.doesNotMatch(source, /homelab-tunnel-check/);
 });
 
