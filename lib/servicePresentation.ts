@@ -312,7 +312,10 @@ export function groupCatalogByPresentation(
 	for (const service of catalog.services) {
 		const id = homelabServiceId(service);
 		const group = presentation.get(id)?.group ?? "support";
-		grouped.set(group, [...(grouped.get(group) ?? []), service]);
+		// Append in place to avoid copying an ever-growing group for each service.
+		const items = grouped.get(group);
+		if (items) items.push(service);
+		else grouped.set(group, [service]);
 	}
 
 	return PRESENTATION_GROUP_ORDER.flatMap((group) => {
