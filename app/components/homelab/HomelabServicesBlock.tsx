@@ -10,6 +10,7 @@ import {
 	type ResourceSnapshot,
 } from "@/lib/homelabResourceEvidence";
 import { homelabServiceId } from "@/lib/homelabServices";
+import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
@@ -127,6 +128,16 @@ export default function HomelabServicesBlock({
 		return () => observer.disconnect();
 	}, [graphTopology, graphInView]);
 
+	const ownerNavigationIndex = useMemo(
+		() =>
+			!readOnly &&
+			!state.healthUnavailable &&
+			!state.ownerBoundary &&
+			state.snapshot
+				? indexOwnerNavigation(state.snapshot)
+				: null,
+		[readOnly, state.healthUnavailable, state.ownerBoundary, state.snapshot],
+	);
 	const indexedHealth = useMemo(
 		() =>
 			healthIndex(
@@ -393,7 +404,7 @@ export default function HomelabServicesBlock({
 			/>
 
 			<div id="homelab-service-hierarchy" data-homelab-service-hierarchy>
-				{visibleHierarchyGroups.map((group) => {
+				{visibleHierarchyGroups.map((group, index) => {
 					const issueCount = group.catalog.services.filter(
 						(service) =>
 							effectiveState(
@@ -435,6 +446,8 @@ export default function HomelabServicesBlock({
 							<div className={`${styles.groupBody} homelab-service-subgrid`}>
 								<HomelabServiceGrid
 									catalog={group.catalog}
+									ownerNavigationIndex={ownerNavigationIndex}
+									showRuntimeWarnings={index === 0}
 									siteHealth={state.siteHealth}
 									snapshot={state.snapshot}
 									healthUnavailable={readOnly ? false : state.healthUnavailable}
