@@ -13,6 +13,8 @@ import { reconcileHomelabHealth } from "@/lib/homelabHealthReconciliation";
 import { type HomelabService, homelabServiceId } from "@/lib/homelabServices";
 
 type HealthIndex = UniqueHomelabEvidenceIndex<HomelabHealthEntry>;
+/** Card reconciliation only reads the canonical ID map and its ambiguity guard. */
+export type ServiceEvidenceIndex = Pick<HealthIndex, "byId" | "ambiguousIds">;
 
 type RuntimePresentationState = HomelabHealthState | "missing";
 type EffectiveHealthLabelKey =
@@ -81,7 +83,7 @@ export function healthIndex(
 }
 
 export function serviceHealthEvidence(
-	index: HealthIndex,
+	index: ServiceEvidenceIndex,
 	service: HomelabService,
 	_url: string,
 	snapshot: HomelabHealthSnapshot | null,
