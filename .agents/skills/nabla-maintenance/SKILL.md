@@ -1,57 +1,19 @@
 ---
 name: nabla-maintenance
 description: >-
-  Continue the current nabla-site-alban roadmap or PR safely. Use for requests
-  to continue planned improvements, reconcile roadmap work, fix CI/quality
-  failures, or advance the current PR while minimizing GitHub Actions usage.
+  Continue Site Alban roadmap or PR with bounded context, targeted proof and minimal GitHub Actions usage.
 ---
-# Nabla maintenance workflow
+# Site Alban maintenance — one batch at a time
 
-1. Begin with `just context` and `just preflight` (cached Git, no network). Only fetch once if reachable; run `bash scripts/agent-doctor.sh` on a complete checkout before publishing. A source-only archive cannot certify the strict gate.
-2. Read the relevant section of `docs/quality-roadmap.md`; do not scan unrelated generated/vendor files.
-3. Confirm the current branch is not `master` and identify the current PR/HEAD when available.
-4. Create a compact task card: goal, in-scope paths, done evidence, validation, and stop conditions.
-5. Choose one finishable item that matches the current PR theme. Do not broaden a ruleset/quality PR into UI or product work.
-6. Inspect the smallest relevant files and existing contracts before editing.
-7. If hosted CI/Preview is red, load `nabla-ci-debug` and prove the failing layer before editing.
-8. Load `nabla-quality` for every editing batch.
-9. After deterministic fixes, load `nabla-review` once for non-trivial code/config changes; blocking findings return the task to implementation.
-10. If PR metadata or publication is involved, load `nabla-pr`.
-11. Prefer repository scripts over ad-hoc commands. Existing scripts are the source of truth.
-12. Update the roadmap with evidence, not aspirations. Leave an item open when live activation or workstation validation is still pending.
-13. If GitHub Actions quota is constrained, do not manually rerun workflows. Maximize local evidence and make one grouped push.
-
+1. Detect execution mode in `AGENTS.md`. With a checkout: `just context && just preflight`; with connector-only access: inspect current PR HEAD and exact-SHA files.
+2. Read the relevant item in `docs/quality-roadmap.md` or `docs/homelab-roadmap.md` and **one** owning skill. Pin scope, acceptance and blockers.
+3. Inspect only relevant code and nearest test. Fix one coherent change. Do not broaden a quality PR into UI work.
+4. On the workstation, use `npm run quality:agent:fix`, targeted tests, diff review and exact-HEAD `npm run quality:agent:publish`. With remote-only source, record L0, not L3.
+5. Re-read current PR HEAD before API writes; use a non-default Draft branch and expected SHA. Never merge or manually rerun paid CI.
+6. Update only the canonical roadmap item with remaining evidence; put procedures in runbooks and historical state in Git/archive.
 
 ## Remote exact-HEAD snapshot fallback
 
-Use this fallback when the agent runtime can use the GitHub connector but local
-DNS prevents `git clone`, `curl github.com`, codeload or raw GitHub access.
+Only if an existing GitHub artifact `source-snapshot-<HEAD_SHA>` has matching workflow HEAD and SHA256: run `just snapshot-check ZIP HEAD_SHA ARTIFACT_SHA256 DESTINATION` to safely extract it. A **snapshot is not a Git checkout**: it has no `.git`, dependencies or strict publication proof. If no verified artifact exists, fetch minimal exact-ref files with the connector. Do not retry blocked DNS/codeload or trigger CI to create an artifact.
 
-1. Read the current PR HEAD first. Never validate an archive whose provenance
-   does not resolve to that exact SHA.
-2. Prefer the automatically produced Dagger PoC artifact named
-   `source-snapshot-<HEAD_SHA>`. Require its workflow run `head_sha` to equal
-   the PR HEAD and require the artifact to be unexpired.
-3. Download the workflow artifact through the GitHub connector. Verify the
-   connector-reported artifact digest when available, then unzip it in an
-   isolated directory.
-4. Use `just snapshot-check ZIP HEAD_SHA ARTIFACT_SHA256 DESTINATION` to verify the artifact digest, reject unsafe paths and extract without `.git`. Require exactly one inner tarball named
-   `nabla-site-alban-<HEAD_SHA>.tar.gz`. Extract it to a fresh directory;
-   never silently accept a merge-commit SHA or a differently named snapshot.
-5. Run `just source-check` inside the verified archive for dependency-free
-   Bash/Node contracts. Run other targeted tests only when their imports are
-   resolvable; mark unavailable checks `NOT_RUN`, never `PASS`.
-6. Treat the snapshot as source-tree evidence, not as a Git checkout. A
-   `git archive` has no `.git`, so merge-base, changed-file, branch,
-   pre-push and exact publication-proof checks cannot be proven from it.
-   Likewise, tests that require `node_modules` still need a real dependency
-   bootstrap or hosted CI.
-7. If no matching snapshot artifact exists, use connector file reads and the
-   already-running hosted checks. Do not manually rerun a workflow solely to
-   create the artifact when CI quota is constrained, and do not loop on
-   codeload/DNS failures.
-
-This fallback was validated against an exact PR snapshot with 1,175 files and
-the dependency-free tooling contract tests passing directly from the extracted
-archive. Keep the workflow artifact retention short; it is a transport for
-ephemeral validation, not a release artifact.
+Record: `HEAD | changed paths | L0/L1/L2/L3 | NOT_RUN | blocker | next action`. Full fallback procedure and safety contracts: `docs/agent-policy-details.md`.

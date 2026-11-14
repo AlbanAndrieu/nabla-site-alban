@@ -1,80 +1,46 @@
 # Repository agent rules — Site Alban
 
-**Purpose:** a short, enforceable map, not a manual. Load one task-specific skill or runbook.
-Full procedures and protected exceptions: `docs/agent-policy-details.md`.
-Next.js 16 / React 19 / TypeScript / next-intl; `package.json` defines Node/npm.
+Next.js 16 / React 19 / TypeScript / next-intl. Node/npm versions are pinned in `package.json`. This is the short bootstrap; procedures live in `docs/agent-policy-details.md`. Load **one** matching skill, not every guide.
 
-## Execution profile (no capability assumptions)
+## Execution profile
 
-- **Claude Code on a workstation with a real checkout:** use local Node/npm, cached dependencies, git worktree and focused Playwright/tests. OWNER/LAN probes require separately verified authorization and network access; never spoof headers.
-- **Remote Codex / connector-only agent:** inspect exact-SHA files, PRs, contracts and documentation. Without a complete checkout or LAN, do not run or claim builds, browser tests, host diagnostics or L3. Record `NOT_RUN` and continue source-only work.
-- Route with `node scripts/agent-task-context.mjs --task homelab`; optional `AGENT_EXECUTION_MODE=remote|workstation`. Auto mode checks checkout/dependencies, **not** LAN permission. Details: `docs/agent-policy-details.md`.
+- **Workstation (Claude Code):** with a real Git checkout, use local CPUs, cached dependencies, focused Node tests, Playwright FR/EN and the strict publication gate. Run OWNER/LAN probes only when network and identity are actually authorized.
+- **Remote (Codex/connector only):** review exact-SHA source, PR, tests, contracts, scripts and docs. Without `.git`, deps or LAN, mark builds/browser/OWNER/L3 `NOT_RUN`; do not retry blocked DNS, clone, npm or LAN requests.
+- `node scripts/agent-task-context.mjs --task homelab` selects `LOCAL_READY`, `LOCAL_LIMITED` or `REMOTE_SOURCE` from checkout/deps; override with `AGENT_EXECUTION_MODE=remote|workstation`. **Never infer LAN access** from any local profile.
 
-## Efficient local-first loop
+## Efficient work loop
 
-1. **OBSERVE:** `just context`, then `just preflight`; pin PR, HEAD and base SHA.
-   Use `just agent-context ui` (or agent, ci, homelab, security) as a task hint, not proof.
-2. **ROUTE:** open only the matching `.agents/skills/nabla-*/SKILL.md`,
-   `.agents/skills/local-first-quality/SKILL.md`, or frontend standards.
-3. **CHANGE:** one cohesive batch; read only relevant code, first failed test and diff.
-4. **FIX:** `npm run quality:agent:fix` until deterministic convergence.
-5. **REVIEW:** inspect changed paths and the first failing check, not entire logs.
-6. **PROVE:** on a clean committed checkout run `npm run quality:agent:publish`
-   and `npm run quality:agent:publish -- --status` (exact HEAD/base/toolchain).
-7. **PUBLISH:** update one Draft PR on a non-default branch after verification.
-
-Never retry blocked GitHub, DNS, npm or codeload endpoints without changed prerequisites.
-An exact-SHA source-only snapshot lacks `.git` and `node_modules`: not a publication proof.
-Node 22/npm 10: `just node22-fast` gives L1 only; Node 24/npm 12 L3 is mandatory.
-Never claim build, browser, Axe or full quality gate success from source inspection.
+1. **OBSERVE:** `just context`, `just preflight` only if a checkout exists; pin current PR, HEAD/base SHA.
+2. **ROUTE:** read the one relevant `.agents/skills/*/SKILL.md` and the closest contract.
+3. **CHANGE:** one coherent batch; inspect changed paths and first failed test, not full logs.
+4. **FIX:** `npm run quality:agent:fix` only on a complete local checkout.
+5. **REVIEW:** verify diff, privacy, security, a11y and regression tests.
+6. **PROVE:** after commit on clean Node 24/npm 12 checkout run `npm run quality:agent:publish` then `npm run quality:agent:publish -- --status`; source-only L0/L1 is not L3.
+7. **PUBLISH:** one Draft PR on a non-default branch with exact-SHA evidence. If L3 unavailable, explicitly report `NOT_RUN` and keep Draft.
 
 ## Security and publication invariants
 
-Never write, push, delete or merge `master`. Never merge a PR without explicit approval.
-Never force-push, use `--no-verify`, `[skip ci]` or other skip directives,
-weaken SAST/DAST/secrets/tests, or bypass pre-commit. Keep PRs Draft while incomplete.
-Do not manually dispatch paid GitHub Actions during the zero-credit period.
-Draft does **not** guarantee push-triggered workflows are suppressed; inspect filters.
-Remote API edits require explicit branch, current blob SHA and fresh PR HEAD check.
-If no full checkout exists, validate narrowly, mark L3 `NOT_RUN`, keep the PR Draft.
-Stop on stale base, changed HEAD, dirty proof, oscillation or scope creep.
-Post-merge remediation is recovery only: the workflow file exists on the default branch
-before `workflow_run` becomes active. Agents must never rely on this post-merge workflow
-to justify a failed or unexecuted publication gate.
+Never push, delete, merge or write `master`; never merge without explicit approval. Never force-push, use `--no-verify`, `[skip ci]`, weaken security/quality gates or bypass pre-commit. Do not manually run paid GitHub Actions under quota constraints; Draft does not suppress push-triggered CI. API writes require the correct branch, fresh file SHA and PR HEAD; stop on stale base, conflicting writer, dirty proof or scope creep.
+
+Post-merge remediation is recovery only; it never substitutes for the publication quality gate. Never print secrets or OWNER payloads. A denied probe or missing evidence is not a healthy service.
 
 ## React and architecture invariants
 
-Preserve default English (unprefixed), `/fr`, i18n parity, SEO, keyboard WCAG 2.2 AA,
-privacy and OWNER/SERVICE trust boundaries. `Declared` is not `Observed` or `Healthy`.
-Prefer bounded, cache-aware, non-blocking API reads for homelab pages.
-Refactor at **300 lines (warning/review)** and **600 lines (split required)** for code
-and configuration, as enforced by `scripts/check_code_size.py`. Avoid new monoliths; retain public contract tests.
-Keep legacy `public/404.html` as the custom 404 rendering source through
-`app/global-not-found.tsx`; never replace it with native React, remove its styles
-or change HTTP 404/noindex without explicit approval.
+Keep default English URLs unprefixed and French under `/fr`; preserve next-intl parity, SEO, keyboard, WCAG 2.2 AA, 320/390 px, privacy and OWNER/SERVICE boundaries. `Declared` is not `Observed` or `Healthy`. Do not invent catalog edges, healthy probes or links. Keep `entityRef` and `catalogRevision` consistent.
 
-## On-demand routing (do not preload)
+Refactor at **300 lines** (warning/review) and **600 lines** (split required), enforced by `scripts/check_code_size.py`. Preserve the protected `public/404.html` static rendering via `app/global-not-found.tsx` and its HTTP 404/noindex behavior; do not migrate it to native React without approval.
 
-- Full hooks, publication, offline and 404 rules: `docs/agent-policy-details.md`.
-- CI triage and L0–L3 proofs: `.agents/skills/local-first-quality/SKILL.md`.
-- Frontend, a11y, i18n, SEO, responsive: `docs/agent-frontend-standards.md`.
-- NDA: `.agents/skills/nabla-nda-guard/SKILL.md`.
-- Project map / single tests: `docs/agent-developer-guide.md`.
-- Node22 offline L1: `docs/runbooks/node22-fast-local.md`.
-- Roadmaps: `docs/quality-roadmap.md` and `docs/homelab-roadmap.md`.
-- Next.js: only targeted installed `node_modules/next/dist/docs/` guides.
-- OpenCode V1/V2: verify installed version before schema changes.
+## On-demand routing
+
+- Quality/CI: `.agents/skills/local-first-quality/SKILL.md`, `.agents/skills/nabla-ci-debug/SKILL.md`.
+- Site catalog/OWNER: `.agents/skills/nabla-service-catalog/SKILL.md` and `docs/homelab-services-catalog.md`.
+- UI, a11y, SEO: `docs/agent-frontend-standards.md`.
+- Full exceptions/publish/404/NDA: `docs/agent-policy-details.md` and `.agents/skills/nabla-nda-guard/SKILL.md`.
+- Mapping/tests: `docs/agent-developer-guide.md`. Roadmaps: `docs/quality-roadmap.md`, `docs/homelab-roadmap.md`.
+- Next docs only under installed `node_modules/next/dist/docs/`; do not preload vendor docs.
 
 ## Claude and Codex
 
-Both agents share this file and `.agents/skills/` (one source; no per-agent copies).
-Claude loads it via `CLAUDE.md` (`@AGENTS.md`) and skills via `.claude/skills/*` symlinks;
-Codex reads `AGENTS.md` and discovers `.agents/skills/*/SKILL.md` (name + description).
-Use one `git worktree` per agent; never edit, fix or publish a checkout another agent uses.
-Git hooks enforce the gate for both; never rely on an agent-specific hook.
+Both use this file. `CLAUDE.md` remains exactly `@AGENTS.md` and `.claude/skills/*` are symlinks to `.agents/skills/*`; no copied policies. Use one `git worktree` per agent. Do not edit another agent's working tree or share writable build directories.
 
-## Compact evidence report
-
-Report changed paths, PR, exact SHA, L0/L1/L2/L3 checks executed, `NOT_RUN`/`BLOCKED`,
-risks and one next action. Keep full logs private. Roadmap=open; runbook=procedure;
-incident=history; contract=invariant; Git=chronology. Do not duplicate narratives.
+Report only changed paths, PR and exact HEAD, L0/L1/L2/L3 actually executed, `NOT_RUN`/`BLOCKED`, risks and next action. Roadmap=open; runbook=procedure; incident=history; contract=invariant; Git=chronology.

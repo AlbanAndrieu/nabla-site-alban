@@ -44,6 +44,8 @@ compact. Une migration terminée ne garde pas une seconde roadmap permanente.
 - [Historique homelab Site avant réconciliation du 30 octobre](archive/homelab-roadmap-through-2026-10-30.txt)
 - [Historique général avant réconciliation V2 (14/11)](archive/quality-roadmap-before-v2-reconciliation-2026-11-14.txt)
 - [Historique homelab avant réconciliation V2 (14/11)](archive/homelab-roadmap-before-v2-reconciliation-2026-11-14.txt)
+- [Ancien rapprochement de PR (18/10)](archive/roadmap-merge-reconciliation-2026-10-18.md)
+- [Historique de convergence catalogue (24/10)](archive/homelab-catalog-convergence-2026-10-24.md)
 - [Ancien guide de migration V2, remplacé par le contrat courant](archive/homelab-catalog-v2-pre-cutover-guide-2026-11-14.txt)
 - [Index des incidents](incidents/README.md)
 - [Baseline de performance historique](performance-baseline.md)
