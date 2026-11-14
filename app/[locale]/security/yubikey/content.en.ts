@@ -249,7 +249,7 @@ export const GUIDE_COPY_EN: GuideCopy = {
 	nextTitle: "Exit criteria",
 	nextSteps: [
 		"Read-only inventory both keys and record dated, redacted results.",
-		"Enroll the backup separately on every critical service and validate recovery access.",
+		"Enroll the backup separately on every critical service and validate recovery without losing access.",
 		"Repair the PIV trust chain/certificates and independent age backups before destructive changes.",
 		"Test KeePassXC and perform one complete restoration drill.",
 	],

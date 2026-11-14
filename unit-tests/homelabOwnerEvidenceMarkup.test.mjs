@@ -55,8 +55,11 @@ test("LAN navigation labels respect configured HTTP or HTTPS without a real prob
 		),
 		"utf8",
 	);
-	assert.match(card, /Protocole LAN non confirmé · schéma configuré utilisé/);
-	assert.match(card, /LAN protocol unconfirmed · configured scheme used/);
+	assert.match(card, /t\\("endpoint\\.lanProtocolUnconfirmed"\\)/);
+	const en = JSON.parse(readFileSync(new URL("../messages/homelab/en.json", import.meta.url), "utf8")).homelab.endpoint;
+	const fr = JSON.parse(readFileSync(new URL("../messages/homelab/fr.json", import.meta.url), "utf8")).homelab.endpoint;
+	assert.equal(en.lanProtocolUnconfirmed, "LAN protocol unconfirmed · configured scheme used");
+	assert.equal(fr.lanProtocolUnconfirmed, "Protocole LAN non confirmé · schéma configuré utilisé");
 	assert.match(card, /svc\.internalSecure \? "https" : "http"/);
 	assert.doesNotMatch(card, /lien HTTP proposé|HTTP link suggested/);
 	assert.match(card, /title=\{!internalProtocolObserved/);

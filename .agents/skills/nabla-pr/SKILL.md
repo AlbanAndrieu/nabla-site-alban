@@ -7,6 +7,8 @@ description: >-
 ---
 # Nabla PR workflow
 
+Maintain the **current GitHub pull request** with its **exact HEAD SHA** and expected file SHA. **Do not merge** without explicit user approval; merged PRs are never writable destinations.
+
 1. Confirm the branch is non-default. Never mutate, switch to for editing, push to, force-update, or merge `master`.
 2. Always author and commit as `AlbanAndrieu <alban.andrieu@free.fr>`, never with a work identity from the global Git config. Check `git log -1 --format='%an <%ae> | %cn <%ce>'` before push; when it differs, commit with `--author="AlbanAndrieu <alban.andrieu@free.fr>"` and `GIT_COMMITTER_NAME=AlbanAndrieu GIT_COMMITTER_EMAIL=alban.andrieu@free.fr`, or amend unpushed commits the same way.
 3. **PR ownership first.** List current open PRs and their file diffs before editing. Prefer a thematically matching **open** PR (even if its files do not yet overlap). Never append commits to a merged/closed PR branch. If none can be reused, open at most one new Draft PR.

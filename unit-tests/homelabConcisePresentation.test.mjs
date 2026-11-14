@@ -12,7 +12,9 @@ test("TrueNAS cards show actionable health, not redundant LAN configuration pros
   assert.doesNotMatch(card, /internalTargetSource/);
   assert.doesNotMatch(grid, /internalTargetSource=\{/);
   assert.match(card, /data-lan-probe-state=\{lanProbe\?\.state \?\? "not-run"\}/);
-  assert.match(card, /Protocole LAN non confirmé · schéma configuré utilisé/);
+  assert.match(card, /t\\("endpoint\\.lanProtocolUnconfirmed"\\)/);
+  const fr = JSON.parse(read("messages/homelab/fr.json")).homelab.endpoint;
+  assert.equal(fr.lanProtocolUnconfirmed, "Protocole LAN non confirmé · schéma configuré utilisé");
   assert.match(card, /data-owner-lan-route-mismatch/);
 });
 
