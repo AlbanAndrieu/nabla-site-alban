@@ -1,7 +1,8 @@
 ---
 name: local-first-quality
 description: >-
-  Validate Site Alban changes with exact-HEAD, minimal local tests, and honest L0-L3 evidence.
+  Validate Site Alban changes with exact-HEAD, minimal local tests, and honest
+  L0-L3 evidence.
 ---
 # Local-first quality
 
