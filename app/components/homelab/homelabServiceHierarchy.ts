@@ -15,7 +15,7 @@ import {
 } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import { effectiveState, type HomelabHealthIndex } from "./useHomelabHealth";
-export { GROUP_TITLE_KEY, GROUP_DESCRIPTION_KEY, METRICS_PROFILE_KEY } from "@/lib/servicePresentationLabels";
+export { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/lib/servicePresentationLabels";
 
 export const ALL_GROUPS: readonly ServicePresentationGroup[] = [
 	"services",
