@@ -53,7 +53,7 @@
 		"test:performance": "playwright test tests/performance-baseline.spec.ts --project=chromium",
 		"test:fast:local": "node scripts/agent-node22-fast.mjs",
 		"test:fast:node22": "node scripts/agent-node22-fast.mjs",
-		"test:catalog:v2": "node --import tsx --test --test-reporter=dot unit-tests/homelabCatalogV2.test.ts unit-tests/homelabCatalogV2Projection.test.ts unit-tests/homelabPrivateCatalog.test.ts unit-tests/homelabPublicBrowserCache.test.mjs unit-tests/homelabServicesSource.test.ts unit-tests/homelabCatalogCardMetadata.test.mjs",
+		"test:catalog:v2": "node --import tsx --test --test-reporter=dot unit-tests/homelabCatalogV2.test.ts unit-tests/homelabCatalogV2Projection.test.ts unit-tests/homelabPrivateCatalog.test.ts unit-tests/homelabPublicBrowserCache.test.mjs unit-tests/homelabServicesSource.test.ts unit-tests/homelabCatalogCardMetadata.test.mjs unit-tests/homelabCatalogSearch.test.ts unit-tests/truenasOwnerNavigation.test.mjs unit-tests/homelabPerformanceContracts.test.mjs",
 		"test:unit": "node --import tsx --test --test-reporter=dot \"unit-tests/**/*.test.ts\"; ts=$?; node --test --test-reporter=dot unit-tests/*.test.mjs && exit $ts",
 		"test:unit:verbose": "node --import tsx --test \"unit-tests/**/*.test.ts\"; ts=$?; node --test unit-tests/*.test.mjs && exit $ts",
 		"i18n:libretranslate": "node scripts/translate-with-libretranslate.mjs",
