@@ -261,6 +261,12 @@
 	font-size: 0.77rem;
 }
 
+.serviceEvidenceNote {
+	margin: 0.35rem 0 0;
+	font-size: 0.78rem;
+	color: var(--ui-text-secondary);
+}
+
 .catalogMetadataList {
 	display: flex;
 	flex-wrap: wrap;
