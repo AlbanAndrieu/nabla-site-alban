@@ -1,7 +1,8 @@
 # Icônes locales des services homelab
 
 Audit du 24 octobre 2026, source du catalogue : `AlbanAndrieu/nabla-compose`
-(`catalog/homelab-services.json` + `apps/*/catalog-info.yaml`).
+(`catalog/catalog-info.yaml` + `apps/*/catalog-info.yaml`, icônes dans
+`catalog/service-icons.json`).
 
 Les icônes sont servies depuis `/assets/selfh-icons/` : **aucune requête navigateur
 vers les CDNs des fournisseurs d'icônes**. Le site reste consommateur du catalogue

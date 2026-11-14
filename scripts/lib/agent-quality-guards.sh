@@ -35,7 +35,6 @@ check_large_deletions() {
 app/\[locale\]/architecture/page.tsx | \
                 app/components/truenas/HomeLabSection.tsx | \
                 app/components/homelab/HomelabServicesSection.tsx | \
-                public/homelab-services.json | public/service-topology.json | \
                 public/freenas.html | public/locales/fr/freenas.html)
                 continue
                 ;;

@@ -12,57 +12,41 @@ monitoring or presentation metadata.
 
 ## Canonical ownership
 
-The source of truth is the service-local `x-nabla` metadata in
-`AlbanAndrieu/nabla-compose`. Site Alban and FastAPI are consumers. Do not fix a
+The source of truth is the Backstage catalog of `AlbanAndrieu/nabla-compose`:
+`apps/<app>/catalog-info.yaml`, `catalog/catalog-info.yaml` and the Compose
+`x-nabla` route intent. Site Alban and FastAPI are consumers. Do not fix a
 catalog mismatch by inventing a second service definition in this repository.
 
-The canonical producer currently runs:
+The canonical producer runs:
 
 ```bash
-python scripts/generate-service-topology.py
-python scripts/generate-service-topology.py --check
-bash scripts/quality-gate.sh
+python scripts/generate-catalog-v2-artifacts.py
+python scripts/generate-catalog-v2-artifacts.py --check
 ```
 
-It generates `catalog/services.json` and `catalog/service-topology.json` and is
-already enforced by the `nabla-compose` pre-commit and agent quality gate.
+It generates `catalog/generated/{entities,homelab.cdx,identity-map}.json`, all
+sharing one `catalogRevision`, and is enforced by the `nabla-compose` pre-commit
+and agent quality gate.
+
+## Consumption rule
+
+- The Site reads only the sanitized v2 projection served by FastAPI
+  (`/api/site/catalog/v2`, `/api/site/health/v2`) and keys nodes by full entity
+  ref. There is no local catalog fallback.
+- Icons are presentation only: `nabla-compose/catalog/service-icons.json`,
+  synchronized by `scripts/sync-homelab-icons.mjs`.
+- Detect drift between repositories with `catalogRevision`, never with display
+  names.
 
 ## Trigger rule
 
-When any tracked Compose service or `x-nabla` block is added or materially
-modified:
+When a homelab service is added, renamed or materially modified in
+`nabla-compose`:
 
-1. inspect the service-local `x-nabla` declaration;
-2. ensure its stable ID, kind/category, runtime binding, monitoring metadata and
-   evidenced dependency relations remain correct;
-3. regenerate the canonical catalog contracts;
-4. run the generator in `--check` mode;
-5. verify every relation source/target resolves and no duplicate ID was created;
-6. verify the Site fallback and FastAPI contracts do not drift from the generated
-   revision;
-7. run the repository-specific quality gate before publication.
-
-A catalog-worthy Compose service without `x-nabla` must not disappear silently.
-The canonical generator should eventually require either `x-nabla` or an
-explicit documented ignore reason. This missing-component enforcement and the
-third generated compatibility catalog are tracked in `docs/homelab-roadmap.md`.
-
-## `catalog/homelab-services.json`
-
-The target is to extend the existing `nabla-compose` generator so it also emits
-`catalog/homelab-services.json` from the same canonical metadata. Do not create a
-second hand-maintained generator or a manually edited compatibility catalog.
-
-Until that output exists:
-
-- the Site has no local catalog fallback any more: it reads only the Backstage
-  v2 catalog (`/api/site/catalog/v2`) and keys nodes by full entity ref;
-- compare service IDs/topology against the canonical generated contracts after a
-  service change;
-- record any manual synchronization still required as unfinished roadmap work.
-
-After the output exists, require its `--check` validation in pre-commit/CI and
-prefer `catalogRevision`-based drift detection between repositories.
+1. regenerate and `--check` the v2 artifacts there;
+2. verify FastAPI serves the same `catalogRevision`;
+3. verify the Site catalog and health views render the entity by its full ref;
+4. run the repository-specific quality gate before publication.
 
 ## TrueNAS API rule
 
