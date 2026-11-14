@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
+import { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/app/components/homelab/homelabServiceHierarchy";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
@@ -12,7 +13,6 @@ import {
 } from "@/lib/homelabServices";
 import {
 	groupCatalogByPresentation,
-	type ServiceMetricsProfile,
 	type ServicePresentationGroup,
 } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
@@ -29,41 +29,11 @@ type Props = {
 
 type HierarchyGroup = ReturnType<typeof groupCatalogByPresentation>[number];
 
-type GroupTitleKey =
-	| "presentation.groups.services"
-	| "presentation.groups.core-critical"
-	| "presentation.groups.security-controls"
-	| "presentation.groups.shared-core"
-	| "presentation.groups.support";
-
-type MetricsProfileKey =
-	| "presentation.metrics.red"
-	| "presentation.metrics.use"
-	| "presentation.metrics.security"
-	| "presentation.metrics.red-use"
-	| "presentation.metrics.support";
-
 const DEFAULT_OPEN_GROUPS: readonly ServicePresentationGroup[] = [
 	"services",
 	"core-critical",
 	"security-controls",
 ];
-
-const GROUP_TITLE_KEY: Record<ServicePresentationGroup, GroupTitleKey> = {
-	services: "presentation.groups.services",
-	"core-critical": "presentation.groups.core-critical",
-	"security-controls": "presentation.groups.security-controls",
-	"shared-core": "presentation.groups.shared-core",
-	support: "presentation.groups.support",
-};
-
-const METRICS_PROFILE_KEY: Record<ServiceMetricsProfile, MetricsProfileKey> = {
-	red: "presentation.metrics.red",
-	use: "presentation.metrics.use",
-	security: "presentation.metrics.security",
-	"red-use": "presentation.metrics.red-use",
-	support: "presentation.metrics.support",
-};
 
 export default function ArchitectureServiceHierarchy({
 	catalog,
