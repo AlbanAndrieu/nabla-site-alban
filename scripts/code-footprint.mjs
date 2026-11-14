@@ -152,12 +152,19 @@ export function parseArgs(argv) {
 function checkedPaths(root) {
 	let paths;
 	let head;
+	let trackedDirty;
 	try {
 		head = execFileSync("git", ["-C", root, "rev-parse", "--verify", "HEAD"], {
 			encoding: "utf8",
 			timeout: 5000,
 			stdio: ["ignore", "pipe", "ignore"],
 		}).trim();
+		trackedDirty = execFileSync("git", ["-C", root, "status", "--porcelain=v1", "--untracked-files=no"], {
+			encoding: "utf8",
+			timeout: 5000,
+			maxBuffer: 8 * 1024 * 1024,
+			stdio: ["ignore", "pipe", "ignore"],
+		}).trim() !== "";
 		paths = execFileSync("git", ["-C", root, "ls-files", "-z", "--cached"], {
 			encoding: "utf8",
 			timeout: 5000,
@@ -172,12 +179,12 @@ function checkedPaths(root) {
 	if (!/^[a-f0-9]{40}$/.test(head))
 		throw new Error("CODE_FOOTPRINT_HEAD_INVALID");
 	if (paths.length > 20000) throw new Error("CODE_FOOTPRINT_TOO_MANY_FILES");
-	return { paths, head };
+	return { paths, head, trackedDirty };
 }
 
 export function analyzeCheckout(root = DEFAULT_ROOT, top = 10) {
 	const abs = resolve(root);
-	const { paths, head } = checkedPaths(abs);
+	const { paths, head, trackedDirty } = checkedPaths(abs);
 	const sources = [];
 	for (const path of paths) {
 		if (!isSourcePath(path)) continue;
@@ -193,7 +200,8 @@ export function analyzeCheckout(root = DEFAULT_ROOT, top = 10) {
 	return {
 		repo: abs,
 		head,
-		snapshot: "working-tree",
+		trackedDirty,
+		snapshot: trackedDirty ? "dirty-working-tree" : "clean-working-tree",
 		...summarizeSources(sources, top),
 	};
 }
@@ -204,6 +212,8 @@ export function formatSummary(report) {
 		report.repo +
 		" HEAD=" +
 		report.head.slice(0, 12) +
+		" dirty=" +
+		(report.trackedDirty ?? "UNKNOWN") +
 		" files=" +
 		report.files +
 		" lines=" +

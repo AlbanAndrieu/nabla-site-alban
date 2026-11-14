@@ -91,3 +91,13 @@ test("CLI parsing is bounded, explicit and network-free", () => {
 	assert.throws(() => parseArgs(["--compare"]), /CODE_FOOTPRINT_BAD_ARGS/);
 	assert.throws(() => parseArgs(["--unknown"]), /CODE_FOOTPRINT_BAD_ARGS/);
 });
+
+test("working-tree footprint reports tracked changes separately from HEAD", () => {
+	const report = {
+		repo: "nabla-site-alban",
+		head: "a".repeat(40),
+		trackedDirty: true,
+		...summarizeSources([{ path: "app/home.tsx", content: "ok\\n" }]),
+	};
+	assert.match(formatSummary(report), /dirty=true/);
+});
