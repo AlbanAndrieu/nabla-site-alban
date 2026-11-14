@@ -1,91 +1,43 @@
-# Homelab catalog v2 consumer contract
+# Contrat consommateur du catalogue homelab Backstage V2
 
-Status: **consumer parser implemented, production cutover pending**.
+**État au 14 novembre 2026 : implémenté dans Git** ([Site #301](https://github.com/AlbanAndrieu/nabla-site-alban/pull/301) fusionnée le 13/11) ; recette de production OWNER/SERVICE **non vérifiée**. L'ancienne note annonçant « migration V2 future » est [archivée](archive/homelab-catalog-v2-pre-cutover-guide-2026-11-14.txt). Les travaux restants appartiennent exclusivement à [`docs/homelab-roadmap.md`](homelab-roadmap.md).
 
-Site Alban is a presentation consumer. It must not become a second inventory
-authority and must not maintain a long-lived v1/v2 compatibility layer.
+## Responsabilités et flux
 
-## Authority chain
+1. [nabla-compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/service-catalog-v2-normalization.md) produit les entités Backstage `catalog-info.yaml` : `entityRef`, `spec.type`, `spec.lifecycle`, `metadata.tags`, labels de criticité et relations.
+2. [fastapi-sample](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/site-architecture-catalog-handoff.md) vérifie `catalogRevision` et sert la projection authentifiée `GET /api/site/catalog/v2` ; `GET /api/site/health/v2` porte les observations publiques expurgées. Le catalogue de sources et les sondes restent distincts.
+3. Site Alban charge le catalogue via `lib/homelabSiteCatalog.ts` → `GET /api/homelab-catalog-v2`, le sanitise avant de le transmettre au client, et projette cartes et relations avec `lib/homelabCatalogV2Projection.ts`.
+4. `app/components/homelab/HomelabServiceGrid.tsx` et l'Architecture partagent les **mêmes identités complètes** `component:default/name`, `resource:default/name` et `api:default/name`. L'icône reste une ressource locale non issue de FastAPI.
 
-The canonical model is owned upstream:
+Le format accepté est `{ schemaVersion: 2, model: "backstage", catalogRevision: "sha256:<digest>", entities: [...] }`. Une révision absente, des entités dupliquées, une relation ambiguë ou un fallback V1 sont **refusés**, jamais remplacés par un inventaire manuel.
 
-1. Backstage `catalog-info.yaml` owns catalog identity, ownership, system
-   membership and standard relations;
-2. Docker Compose owns runtime image/ports/networks/healthcheck facts;
-3. minimal `x-nabla` owns only Nabla-specific operational/security semantics;
-4. generated views share stable identities and one `catalogRevision`;
-5. FastAPI reconciles declared state with runtime/health/provider evidence;
-6. Site Alban renders that reconciled read model.
+## Champs de présentation et limites
 
-Cartography/Neo4j may enrich graph/security analysis but is not a lifecycle or
-catalog source of truth.
+| Champ public autorisé | Usage dans les cartes | Limite |
+| --- | --- | --- |
+| `entityRef`, titre, `spec.type` | Identité, recherche et regroupement | Jamais un identifiant d'App TrueNAS inventé |
+| `kind` : Component, Resource ou API | Type Backstage ; label traduit | Métadonnée déclarative |
+| `spec.lifecycle` | Cycle de vie indiqué, ex. production/experimental | **Pas** un état RUNNING ni une disponibilité |
+| `albandrieu.com/operational-criticality` | Criticité opérationnelle | Déclarée ; ne remplace pas l'état santé |
+| `albandrieu.com/business-criticality` | Criticité métier | Déclarée ; ne remplace pas le score technique |
+| `metadata.tags` | Catégorie affichable et analyse NIST | Tags filtrés côté serveur |
+| `spec.dependsOn`, `consumesApis`, `providesApis`, `subcomponentOf` | Liens canoniques du graphe | Pas de relation synthétique ou implicite |
+| Santé `/api/site/health/v2` | État `ok/warn/fail/unknown` joint par `entityRef` + révision | Fraîcheur, échec et accès refusé distincts |
 
-## Site v2 schema
+## Frontières de confidentialité
 
-`lib/homelabCatalogV2.ts` already validates the isolated v2 shape:
+- **SERVICE :** `lib/homelabPublicBrowserCache.ts` conserve uniquement les champs allowlistés (type, cycle de vie, niveaux de criticité, nom, catégorie), en excluant toute URL, IP, port, champ arbitraire et valeur de secret. Les icônes sont dérivées du mapping local et ne sont pas persistées. Une ancienne santé `ok` reste **unknown** lorsqu'elle est relue du cache.
+- **OWNER :** runtime et endpoints peuvent apparaître uniquement après autorisation serveur, depuis un instantané FastAPI daté ; un lien déclaré sans preuve n'est pas une URL de navigation.
+- **Révisions :** santé, graphe et cache ne se mélangent pas si leur `catalogRevision` diffère. Un HTTP 401/403, une sonde `NOT_RUN` ou une absence de métrique ne prouvent pas la panne du service.
 
-```json
-{
-  "schemaVersion": 2,
-  "model": "backstage",
-  "catalogRevision": "sha256:<64 lowercase hex>",
-  "entities": []
-}
+## Contrôles et exploitation
+
+```bash
+npm ci
+npm run test:catalog:v2
+just icons-local-check
+npm run typecheck
+npm run build
 ```
 
-The parser requires unique `entityRef` values and accepts Backstage
-`API`, `Component`, `Domain`, `Group`, `Resource` and `System`
-entities.
-
-For service presentation, `CatalogV2ServiceView` derives:
-
-- identity from `entityRef` and `metadata.name`;
-- display name/description from metadata;
-- technical type/lifecycle from `spec`;
-- category and NIST CSF functions from tags;
-- operational/business criticality from qualified labels;
-- provenance from `sourcePath`.
-
-The parser is intentionally **not wired to production loaders yet**. Current
-production catalog/topology readers remain v1 until FastAPI publishes the
-coordinated v2 read model.
-
-## Direct-cutover policy
-
-The site is non-critical, so a short controlled catalog/Architecture interruption
-is preferable to permanent compatibility complexity.
-
-During cutover:
-
-- no parallel v1/v2 reader;
-- no dual write;
-- no old-schema runtime fallback;
-- no permanent translation layer;
-- no independently maintained service inventory in this repository.
-
-If a last-known-good artifact remains useful after cutover, it must be generated
-from v2, carry the matching `catalogRevision`, and act only as cache/resilience
-data. Rollback is performed by reverting the coordinated deployment commits, not
-by reopening a second wire contract.
-
-## Acceptance contract
-
-Before production cutover, prove that:
-
-- stable canonical IDs drive React/graph keys;
-- every relation endpoint resolves;
-- declared and observed state remain distinct;
-- relation type, strength and evidence survive reconciliation;
-- exposure/access intent comes from canonical declarations, not hostname guesses;
-- missing runtime/security evidence renders unknown/unavailable, not false DOWN;
-- any LKG artifact uses v2 and the matching `catalogRevision`;
-- EN/FR Architecture and TrueNAS surfaces build/render correctly;
-- the local quality gate and production build pass on the final cutover tree.
-
-The authoritative upstream design remains in `nabla-compose`:
-
-- `docs/service-catalog-security-graph.md`;
-- `docs/service-catalog-v2-normalization.md`.
-
-The remaining cutover sequence and rollback work is tracked only in
-`docs/homelab-roadmap.md`.
+Contrats techniques : `unit-tests/homelabCatalogV2Projection.test.ts`, `unit-tests/homelabPrivateCatalog.test.ts`, `unit-tests/homelabPublicBrowserCache.test.mjs`. L3 et l'observation browser FR/EN/LAN/WAN restent obligatoires sur le SHA effectivement déployé. Ne pas installer un deuxième transport v1/v2 ou un catalogue de secours local.
