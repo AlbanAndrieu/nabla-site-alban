@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import HomelabServiceGrid from "@/app/components/homelab/HomelabServiceGrid";
+import HomelabRuntimeWarnings from "@/app/components/homelab/HomelabRuntimeWarnings";
 import { GROUP_TITLE_KEY, METRICS_PROFILE_KEY } from "@/lib/servicePresentationLabels";
 import styles from "@/app/components/homelab/HomelabServicesBlock.module.css";
 import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
@@ -73,12 +74,16 @@ export default function ArchitectureServiceHierarchy({
 
 	return (
 		<div id="service-directory">
+			<HomelabRuntimeWarnings
+				snapshot={snapshot}
+				healthUnavailable={healthUnavailable}
+			/>
 			<div
 				id="architecture-services"
 				data-homelab-service-hierarchy
 				data-architecture-services
 			>
-				{groups.map((group, index) => {
+				{groups.map((group) => {
 					const issueCount = group.catalog.services.filter(
 						(service) =>
 							effectiveState(homelabServiceId(service), healthIndex) !== "ok",
@@ -119,11 +124,9 @@ export default function ArchitectureServiceHierarchy({
 									ownerNavigationIndex={ownerNavigationIndex}
 									ownerHealthIndex={healthIndex.owner}
 									siteStatusIndex={healthIndex.byRef}
-									showRuntimeWarnings={index === 0}
 									snapshot={snapshot}
 									siteHealth={siteHealth}
 									healthUnavailable={healthUnavailable && !siteHealth}
-									healthHttpStatus={null}
 								/>
 							</div>
 						</details>
