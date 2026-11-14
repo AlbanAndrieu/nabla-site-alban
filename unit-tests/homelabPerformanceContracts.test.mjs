@@ -19,7 +19,6 @@ test("service groups share indexed OWNER evidence instead of scanning per card",
 		assert.match(caller, /ownerNavigationIndex=\{ownerNavigationIndex\}/);
 		assert.match(caller, /ownerHealthIndex=/);
 		assert.match(caller, /siteStatusIndex=/);
-		assert.match(caller, /showRuntimeWarnings=\{index === 0\}/);
 	}
 });
 
@@ -48,4 +47,23 @@ test("service group computation does not copy an expanding group for every servi
 	const presentation = source("lib/servicePresentation.ts");
 	assert.match(presentation, /if \(items\) items\.push\(service\)/);
 	assert.doesNotMatch(presentation, /grouped\.set\(group, \[\.\.\.\(grouped\.get/);
+});
+
+
+test("runtime warnings stay visible outside collapsed service groups", () => {
+	const block = source("app/components/homelab/HomelabServicesBlock.tsx");
+	const architecture = source("app/[locale]/architecture/ArchitectureServiceHierarchy.tsx");
+	const overview = source("app/components/homelab/HomelabStatusOverview.tsx");
+	const warnings = source("app/components/homelab/HomelabRuntimeWarnings.tsx");
+	const grid = source("app/components/homelab/HomelabServiceGrid.tsx");
+	assert.match(block, /<HomelabStatusOverview/);
+	assert.match(overview, /data-truenas-runtime-warning/);
+	assert.match(architecture, /<HomelabRuntimeWarnings/);
+	assert.ok(
+		architecture.indexOf("<HomelabRuntimeWarnings") <
+			architecture.indexOf("groups.map"),
+	);
+	assert.match(warnings, /if \(readOnly\) return null/);
+	assert.match(warnings, /ownerBoundary \? null : rawSnapshot/);
+	assert.doesNotMatch(grid, /data-truenas-runtime-warning|showRuntimeWarnings/);
 });
