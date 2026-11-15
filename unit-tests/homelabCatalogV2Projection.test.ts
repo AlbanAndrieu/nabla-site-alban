@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { buildDeclaredServiceTopology } from "../app/components/homelab/declaredServiceTopology";
 import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "../lib/homelabCatalogV2Projection";
 
@@ -191,4 +192,44 @@ test("Backstage v2 card projection retains reviewed lifecycle and criticality wi
 	assert.equal(card?.endpointUrl, undefined);
 	assert.equal(card?.internalHost, undefined);
 	assert.equal(output.topology.nodes[0]?.id, card?.entityRef);
+});
+
+test("declared-only fallback retains identity and revision without invented edges", () => {
+	const { services, topology } = project([
+		entity("Component", "default", "api", {
+			dependsOn: ["resource:default/postgres"],
+		}),
+		entity("Resource", "default", "postgres"),
+	]);
+	assert.equal(topology.relations.length, 1);
+	const fallback = buildDeclaredServiceTopology(services);
+	assert.equal(fallback.version, 2);
+	assert.equal(fallback.catalogRevision, services.catalogRevision);
+	assert.equal(fallback.name, "Backstage v2 — declared services only");
+	assert.deepEqual(fallback.relations, []);
+	assert.deepEqual(
+		fallback.nodes.map((node) => node.id),
+		services.services.map((service) => service.entityRef),
+	);
+	assert.ok(
+		fallback.nodes.every((node) => !("url" in node) && !("internalUrl" in node)),
+	);
+});
+
+test("declared-only fallback is conservative for missing optional metadata", () => {
+	const fallback = buildDeclaredServiceTopology({
+		catalogRevision: "v2-sha",
+		services: [
+			{ name: "Private API", entityRef: "api:default/private", endpointUrl: "https://private.example.invalid" },
+		],
+	});
+	assert.equal(fallback.catalogRevision, "v2-sha");
+	assert.deepEqual(fallback.nodes[0], {
+		id: "api:default/private",
+		name: "Private API",
+		kind: "service",
+		category: "other",
+		criticality: undefined,
+	});
+	assert.deepEqual(fallback.relations, []);
 });
