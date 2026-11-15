@@ -45,6 +45,8 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 
 ## Optimisations de rendu codées (non mesurées)
 
+- **G7/S4 — Topologie de secours :** la construction `declared-only` est extraite dans `app/components/homelab/declaredServiceTopology.ts` (branche Draft du 15/11). Quand le graphe est absent, seules les entités du catalogue sont projetées, avec `entityRef`, `catalogRevision` et **zéro relation inventée** ; les URLs internes restent exclues. Deux tests ajoutés à la suite V2, exécution locale/L3 et réception navigateur `NOT_RUN`. Cette extraction n'invente pas de service disponible ni de gain CPU.
+
 - **O(N) plutôt que des scans O(N²) pour les cartes OWNER :** index `indexOwnerNavigation` construit une fois par snapshot et partagé dans les deux pages. Les identifiants dupliqués sont rejetés. Un index est une optimisation de recherche, jamais une nouvelle source de vérité.
 - **Calculs communs :** la carte reçoit les index de santé du parent et conserve la vérification stricte de `catalogRevision` et `boardState=fresh` avant un état SERVICE.
 - **Une horloge par page :** la mesure de fraîcheur des ressources n'est plus répétée par groupe ; elle s'arrête lorsque l'onglet est caché et reprend à la visibilité. OWNER est masqué si accès révoqué.

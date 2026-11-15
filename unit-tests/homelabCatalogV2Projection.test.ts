@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDeclaredServiceTopology } from "../app/components/homelab/declaredServiceTopology";
+import {
+	buildDeclaredServiceTopology,
+} from "../app/components/homelab/declaredServiceTopology";
 import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "../lib/homelabCatalogV2Projection";
 
@@ -220,7 +222,11 @@ test("declared-only fallback is conservative for missing optional metadata", () 
 	const fallback = buildDeclaredServiceTopology({
 		catalogRevision: "v2-sha",
 		services: [
-			{ name: "Private API", entityRef: "api:default/private", endpointUrl: "https://private.example.invalid" },
+			{
+				name: "Private API",
+				entityRef: "api:default/private",
+				endpointUrl: "https://private.example.invalid",
+			},
 		],
 	});
 	assert.equal(fallback.catalogRevision, "v2-sha");

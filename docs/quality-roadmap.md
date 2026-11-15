@@ -53,6 +53,8 @@ Comparaison des arbres Git `master` **Site Alban `ee020438bce9`** et **Bababou `
 
 Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, le build L3 et les tests navigateur restent `NOT_RUN` ou `NOT_MEASURED` tant qu'ils ne sont pas mesurés sur un SHA vérifié.
 
+**Progression G7 au 15/11 (branche Draft) :** fallback ReactFlow sans relations inventées extrait de `HomelabServicesBlock.tsx`, nouveaux tests d'identité/révision et absence de liens privés dans `unit-tests/homelabCatalogV2Projection.test.ts`. Le patch de formatage des trois contrats sur `master@85e5e4b36c9b` est également repris. Ces changements sont `CODED`, non une preuve de publication : Node24, L3, Playwright et mesures CPU `NOT_RUN`.
+
 ## Livrables ouverts et garde-fous
 
 ### P0 — Qualité et publication
