@@ -22,6 +22,10 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 - **G6 / S5–S6 :** CSS Architecture `HierarchicalArchitectureExplorer.module.css` (774 lignes) ; modulariser les styles sans perte de clavier, de lisibilité à 320/390 px ou d'accessibilité FR/EN. Captures et Playwright/Axe exigés avant conclusion.
 - **G8 / S7 :** inventaire du script `post-deploy-smoke.mjs` (508 lignes), suppression des seuls doublons prouvés ; les scripts de `nabla-compose` et `fastapi-sample` ne doivent pas être recopiés ici. Relever le volume avec `just code-footprint` sur workstation ; la comparabilité entre deux dépôts est documentée dans [la roadmap générale](quality-roadmap.md#taille-du-code-et-recommandations--référence-du-14-novembre-2026).
 
+### G7/S3 — Santé publique après suspension de l'onglet (CODED, NOT_RUN)
+
+Lors d'un retour après une suspension d'au moins `PUBLIC_HEALTH_REFRESH_MS` (120 s), la vue **SERVICE** conserve les identités publiques et le catalogue déjà autorisé, mais invalide en mémoire les précédents statuts « ok/warn/fail » en `UNKNOWN` / `boardState=stale` avant la nouvelle réponse. Une sonde qui ne répond pas ne devient pas une panne confirmée. La logique OWNER, les URL internes et le cache persistant restent inchangés ; **aucun nouveau polling ni appel Vercel**. Tests de transformation pure et contrats source ajoutés, recette navigateur et preuve L3 `NOT_RUN`.
+
 ## Backlog restant — options de priorité
 
 | ID | P | Objectif / critère d'acceptation |

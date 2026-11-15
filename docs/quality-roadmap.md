@@ -55,6 +55,8 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 
 **Progression G7 au 15/11 (branche Draft) :** fallback ReactFlow sans relations inventées extrait de `HomelabServicesBlock.tsx`, nouveaux tests d'identité/révision et absence de liens privés dans `unit-tests/homelabCatalogV2Projection.test.ts`. Le patch de formatage des trois contrats sur `master@85e5e4b36c9b` est également repris. Ces changements sont `CODED`, non une preuve de publication : Node24, L3, Playwright et mesures CPU `NOT_RUN`.
 
+**G7/S3 — conservation prudente des dernières preuves (15/11/2026) :** après un onglet SERVICE masqué pendant au moins 120 s, les informations du catalogue restent visibles, mais la santé en mémoire devient `stale/unknown` en attendant une revalidation. Aucun statut « UP/DOWN » n'est inféré ; aucune augmentation du nombre de timers. Le bootstrap des agents a également été raccourci pour respecter le contrat CI de 4 500 octets tout en gardant les garanties de publication. Ces changements sont `CODED`, avec L3, performance et recette FR/EN toujours `NOT_RUN`.
+
 ## Livrables ouverts et garde-fous
 
 ### P0 — Qualité et publication
