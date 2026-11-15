@@ -27,6 +27,7 @@ import HomelabServiceFilters, {
 import HomelabServiceGrid from "./HomelabServiceGrid";
 import styles from "./HomelabServicesBlock.module.css";
 import HomelabStatusOverview from "./HomelabStatusOverview";
+import { buildDeclaredServiceTopology } from "./declaredServiceTopology";
 import {
 	ALL_GROUPS,
 	filterHierarchyGroups,
@@ -125,21 +126,7 @@ export default function HomelabServicesBlock({
 	// declared services. Never invent relations or assert dependency health.
 	const graphTopology = useMemo<ServiceTopology | null>(() => {
 		if (!state.catalog) return null;
-		return (
-			state.topology ?? {
-				version: 2,
-				catalogRevision: state.catalog.catalogRevision,
-				name: "Backstage v2 — declared services only",
-				nodes: state.catalog.services.map((service) => ({
-					id: homelabServiceId(service),
-					name: service.name,
-					kind: service.kind ?? "service",
-					category: service.category ?? "other",
-					criticality: service.criticality,
-				})),
-				relations: [],
-			}
-		);
+		return state.topology ?? buildDeclaredServiceTopology(state.catalog);
 	}, [state.catalog, state.topology]);
 	// Service cards render first; the expensive ReactFlow bundle mounts near viewport.
 	const [graphInView, setGraphInView] = useState(false);

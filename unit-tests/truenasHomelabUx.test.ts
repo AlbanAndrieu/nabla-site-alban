@@ -184,7 +184,10 @@ test("homelab renders bounded probes before aggregate enrichment", async () => {
 	assert.ok(probeStart >= 0);
 	assert.ok(probeRender > probeStart);
 	assert.ok(aggregateRender > probeRender);
-	assert.match(block, /fetchHealthEndpoint\("\/api\/homelab-probes", signal, true\)/);
+	assert.match(
+		block,
+		/fetchHealthEndpoint\("\/api\/homelab-probes", signal, true\)/,
+	);
 	assert.match(block, /"Cache-Control": "no-cache"/);
 	assert.match(probeProxy, /gatedHomelabResponse\(request, \w+Response\)/);
 });
