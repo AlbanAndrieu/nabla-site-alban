@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-	buildDeclaredServiceTopology,
-} from "../app/components/homelab/declaredServiceTopology";
+import { buildDeclaredServiceTopology } from "../app/components/homelab/declaredServiceTopology";
 import { parseHomelabCatalogV2 } from "../lib/homelabCatalogV2";
 import { projectHomelabCatalogV2 } from "../lib/homelabCatalogV2Projection";
 
@@ -169,10 +167,12 @@ test("different names that normalize to the same service-card slug are rejected"
 	);
 });
 
-
 test("Backstage v2 card projection retains reviewed lifecycle and criticality without endpoints", () => {
 	const component = {
-		...entity("Component", "default", "auth", { type: "service", lifecycle: "production" }),
+		...entity("Component", "default", "auth", {
+			type: "service",
+			lifecycle: "production",
+		}),
 		metadata: {
 			name: "auth",
 			title: "Authentication",
@@ -214,7 +214,9 @@ test("declared-only fallback retains identity and revision without invented edge
 		services.services.map((service) => service.entityRef),
 	);
 	assert.ok(
-		fallback.nodes.every((node) => !("url" in node) && !("internalUrl" in node)),
+		fallback.nodes.every(
+			(node) => !("url" in node) && !("internalUrl" in node),
+		),
 	);
 });
 

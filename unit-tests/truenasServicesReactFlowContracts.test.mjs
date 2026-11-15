@@ -15,7 +15,10 @@ test("TrueNAS SERVICE ReactFlow uses the existing Backstage v2 graph", () => {
 		component,
 		/healthStatus=\{readOnly \? null : state\.snapshot\}/,
 	);
-	assert.match(component, /relations: \[\]/);
+	assert.match(component, /buildDeclaredServiceTopology/);
+	const fallback = source("app/components/homelab/declaredServiceTopology.ts");
+	assert.match(fallback, /relations: \[\]/);
+	assert.match(fallback, /catalogRevision: catalog\.catalogRevision/);
 	assert.match(component, /Relations indisponibles/);
 });
 

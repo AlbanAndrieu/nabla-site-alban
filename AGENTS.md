@@ -1,20 +1,20 @@
 # Repository agent rules — Site Alban
 
-Next.js 16 / React 19 / TypeScript / next-intl. Node/npm versions are pinned in `package.json`. This is the short bootstrap; procedures live in `docs/agent-policy-details.md`. Load **one** matching skill, not every guide.
+Next.js 16 / React 19 / next-intl. Toolchain: `package.json`. Procedures: `docs/agent-policy-details.md`. Load one relevant skill.
 
 ## Execution profile
 
-- **Workstation (Claude Code):** with a real Git checkout, use local CPUs, cached dependencies, focused Node tests, Playwright FR/EN and the strict publication gate. Run OWNER/LAN probes only when network and identity are actually authorized.
-- **Remote (Codex/connector only):** review exact-SHA source, PR, tests, contracts, scripts and docs. Without `.git`, deps or LAN, mark builds/browser/OWNER/L3 `NOT_RUN`; do not retry blocked DNS, clone, npm or LAN requests.
-- `node scripts/agent-task-context.mjs --task homelab` selects `LOCAL_READY`, `LOCAL_LIMITED` or `REMOTE_SOURCE` from checkout/deps; override with `AGENT_EXECUTION_MODE=remote|workstation`. **Never infer LAN access** from any local profile.
+- **Workstation (Claude Code):** use checkout, cached deps, focused tests, Playwright FR/EN and strict publication. OWNER/LAN probes require authorized network/identity.
+- **Remote (Codex/connector only):** inspect exact-SHA source/PR/contracts. Without Git, deps or LAN, builds/browser/OWNER/L3 are `NOT_RUN`; do not retry blocked network.
+- `node scripts/agent-task-context.mjs --task homelab` reports `LOCAL_READY`, `LOCAL_LIMITED` or `REMOTE_SOURCE`; override with `AGENT_EXECUTION_MODE=remote|workstation`. Never infer LAN access.
 
 ## Efficient work loop
 
-1. **OBSERVE:** with checkout run `just context` / `just preflight`; before edits check open PR overlaps via `node scripts/agent-pr-guard.mjs --paths FILE ...` (or GitHub connector). Reuse a matching open PR; pin HEAD/base.
-2. **ROUTE:** read the one relevant `.agents/skills/*/SKILL.md` and the closest contract.
+1. **OBSERVE:** run `just context` / `just preflight`; before editing inspect PR overlaps via `node scripts/agent-pr-guard.mjs --paths FILE ...` (or connector). Reuse open PR; pin HEAD/base.
+2. **ROUTE:** load one `.agents/skills/*/SKILL.md` and its nearest contract.
 3. **CHANGE:** synchronize the selected PR with `master` before editing, resolve real conflicts, then make one coherent batch; inspect changed paths and first failed test, not full logs.
 4. **FIX:** `npm run quality:agent:fix` only on a complete local checkout.
-5. **REVIEW:** verify diff, privacy, security, a11y and regression tests.
+5. **REVIEW:** verify diff, privacy, a11y, security and regressions.
 6. **PROVE:** after commit on clean Node 24/npm 12 checkout run `npm run quality:agent:publish` then `npm run quality:agent:publish -- --status`; source-only L0/L1 is not L3.
 7. **PUBLISH:** one Draft PR on a non-default branch with exact-SHA evidence. If L3 unavailable, explicitly report `NOT_RUN` and keep Draft.
 
@@ -42,7 +42,7 @@ Refactor at **300 lines** (warning/review) and **600 lines** (split required), e
 - UI, a11y, SEO: `docs/agent-frontend-standards.md`.
 - Full exceptions/publish/404/NDA: `docs/agent-policy-details.md` and `.agents/skills/nabla-nda-guard/SKILL.md`.
 - Mapping/tests: `docs/agent-developer-guide.md`. Roadmaps: `docs/quality-roadmap.md`, `docs/homelab-roadmap.md`.
-- Next docs only under installed `node_modules/next/dist/docs/`; do not preload vendor docs.
+- Next docs: `node_modules/next/dist/docs/` only; load on demand.
 
 ## Claude and Codex
 
