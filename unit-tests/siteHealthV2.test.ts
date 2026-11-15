@@ -144,7 +144,7 @@ test("different Backstage kinds with the same name cannot inherit each other's p
 	assert.equal(indexed.get("resource:default/redis"), "unknown");
 });
 
-test("stale SERVICE evidence retains only IDs and cannot display old status", () => {
+test("stale SERVICE health preserves IDs, not previous statuses", () => {
 	const current = parseSiteHealthV2(DTO);
 	assert.ok(current);
 	const before = JSON.stringify(current);

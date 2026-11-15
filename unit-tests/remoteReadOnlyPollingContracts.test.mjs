@@ -109,13 +109,22 @@ test("mode transitions mask previously fetched OWNER snapshots synchronously", (
 	assert.match(publicResult, /healthStatus: null,/);
 });
 
-test("returning to a long-hidden SERVICE tab invalidates health without extra polling", () => {
+test("long-hidden SERVICE tab invalidates old health without more polling", () => {
 	const hook = source("app/components/homelab/useHomelabHealth.ts");
-	assert.match(hook, /let hiddenSince: number \| null = document\.hidden \? Date\.now\(\) : null/);
+	assert.match(
+		hook,
+		/let hiddenSince: number \| null = document\.hidden \? Date\.now\(\) : null/,
+	);
 	assert.match(hook, /hiddenSince = Date\.now\(\);\s*return;/);
-	assert.match(hook, /readOnly &&[\s\S]*?hiddenSince !== null &&[\s\S]*?Date\.now\(\) - hiddenSince >= PUBLIC_HEALTH_REFRESH_MS/);
+	assert.match(
+		hook,
+		/readOnly &&[\s\S]*?hiddenSince !== null &&[\s\S]*?Date\.now\(\) - hiddenSince >= PUBLIC_HEALTH_REFRESH_MS/,
+	);
 	assert.match(hook, /markSiteHealthStale\(current\.siteHealth\)/);
 	assert.match(hook, /healthUnavailable: true/);
-	assert.match(hook, /hiddenSince = null;\s*refreshHealth\(\);\s*refreshCatalogIfDue\(\);/);
+	assert.match(
+		hook,
+		/hiddenSince = null;\s*refreshHealth\(\);\s*refreshCatalogIfDue\(\);/,
+	);
 	assert.equal((hook.match(/window\.setInterval\(/g) ?? []).length, 2);
 });
