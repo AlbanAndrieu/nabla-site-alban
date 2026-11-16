@@ -2,6 +2,8 @@
 
 import { Buffer } from "node:buffer";
 import { setTimeout as delay } from "node:timers/promises";
+import { linkHref, metaContent } from "./lib/production-smoke-html.mjs";
+export { decodeHtmlAttributeValue } from "./lib/production-smoke-html.mjs";
 
 const CANONICAL_ORIGIN = "https://www.albanandrieu.com";
 const FETCH_TIMEOUT_MS = 12_000;
@@ -104,54 +106,6 @@ function urlsEquivalent(actual, expected) {
 	}
 }
 
-function attributeValue(tag, name) {
-	const match = tag.match(
-		new RegExp("\\b" + name + "=[\"']([^\"']+)[\"']", "i"),
-	);
-	return match?.[1] ?? null;
-}
-
-const HTML_ATTRIBUTE_ENTITY_PATTERN =
-	/&(amp|quot|#0*(?:34|38)|#x0*(?:22|26));/gi;
-
-export function decodeHtmlAttributeValue(value) {
-	return value.replace(HTML_ATTRIBUTE_ENTITY_PATTERN, (_entity, code) => {
-		const normalized = String(code).toLowerCase();
-		const isAmpersand =
-			normalized === "amp" ||
-			normalized.endsWith("38") ||
-			normalized.endsWith("26");
-		return isAmpersand ? "&" : '"';
-	});
-}
-
-function linkHref(html, rel, hreflang) {
-	const tags = html.match(/<link\b[^>]*>/gi) ?? [];
-	for (const tag of tags) {
-		const relValue = attributeValue(tag, "rel");
-		if (!relValue || !relValue.split(/\s+/).includes(rel)) continue;
-		if (hreflang) {
-			const lang = attributeValue(tag, "hreflang");
-			if (!lang || lang.toLowerCase() !== hreflang.toLowerCase()) continue;
-		}
-		const href = attributeValue(tag, "href");
-		if (href) return decodeHtmlAttributeValue(href);
-	}
-	return null;
-}
-
-function metaContent(html, name) {
-	const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
-	for (const tag of tags) {
-		const metaName =
-			attributeValue(tag, "property") ?? attributeValue(tag, "name");
-		if (!metaName || metaName.toLowerCase() !== name.toLowerCase()) continue;
-		const content = attributeValue(tag, "content");
-		if (content) return decodeHtmlAttributeValue(content);
-	}
-	return null;
-}
-
 async function fetchResponse(
 	baseUrl,
 	pathname,
@@ -183,12 +137,15 @@ async function fetchResponse(
 
 			const mitigated = response.headers.get("x-vercel-mitigated");
 			if (mitigated) {
-				throw new Error(
+				const error = new Error(
 					pathname +
 						" was intercepted by Vercel mitigation (" +
 						mitigated +
 						"); verify Protection Bypass for Automation",
 				);
+				// A confirmed challenge cannot succeed through automatic retries.
+				error.name = "VercelMitigationError";
+				throw error;
 			}
 
 			if (response.ok) {
@@ -223,6 +180,7 @@ async function fetchResponse(
 			}
 		} catch (error) {
 			lastError = error instanceof Error ? error : new Error(String(error));
+			if (lastError.name === "VercelMitigationError") throw lastError;
 		}
 
 		if (attempt < FETCH_ATTEMPTS) await delay(500 * attempt);

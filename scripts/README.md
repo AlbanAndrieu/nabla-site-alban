@@ -15,6 +15,13 @@
 - Pour l'API GitHub / agent distant : passer `--pr N --expected-head SHA` **si** `gh` est disponible ; sinon consulter les PR ouvertes et leurs fichiers via le connecteur. Aucune exécution locale ou preuve L3 n'est présumée.
 - `REUSE` ou `CONFLICT` : sortie 4, changement de branche ou arbitrage requis. Erreur GitHub, SHA différent, base obsolète et dépassement de budget : sortie 3, **BLOCKED**. Ne jamais convertir une erreur réseau en « aucune PR ouverte ».
 
+## Smoke de production — découpage G8
+
+- Entrée unique : `scripts/post-deploy-smoke.mjs`. Le flux reste borné au domaine canonique, vérifie le SHA déployé, la visibilité SEO, les images sociales et le refus des diagnostics privés.
+- Parsing **pur** : `scripts/lib/production-smoke-html.mjs` (extraction de `linkHref`, `metaContent`, `decodeHtmlAttributeValue`). Aucun fetch, cookie, variable secrète ni contournement Vercel dans ce module. Les interceptions Vercel explicites interrompent le smoke dès la première requête (pas de surcharge inutile de retries).
+- Test unitaire ciblé : `node --test unit-tests/productionSmokeHtml.test.mjs`. L'API historique `decodeHtmlAttributeValue` reste exportée par le script original ; le test de smoke complet garde la responsabilité de vérifier la requête Vercel et les réponses de production simulées.
+- Ne pas déclencher un véritable smoke pour une simple modification de code locale : la vérification réelle nécessite l'URL canonique, le SHA exact effectivement déployé et une approbation de publication.
+
 ## Mesurer le volume de code sans déclencher de CI
 
 - `just code-footprint` : **source Git locale** (lignes physiques/non vides, octets, fichiers au-dessus de 300/600 lignes), exclusions par défaut des médias, archives, générés, documentation, traductions et skills. Ne lit pas les fichiers privés non suivis.
