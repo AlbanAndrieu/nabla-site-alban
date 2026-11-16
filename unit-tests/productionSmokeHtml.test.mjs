@@ -5,9 +5,7 @@ import {
 	linkHref,
 	metaContent,
 } from "../scripts/lib/production-smoke-html.mjs";
-import {
-	decodeHtmlAttributeValue as publicDecode,
-} from "../scripts/post-deploy-smoke.mjs";
+import { decodeHtmlAttributeValue as publicDecode } from "../scripts/post-deploy-smoke.mjs";
 
 test("production smoke preserves its public single-pass HTML decoder", () => {
 	for (const source of [decodeHtmlAttributeValue, publicDecode]) {
@@ -43,7 +41,8 @@ test("HTML metadata parser handles order and escaped query strings", () => {
 });
 
 test("HTML parser does not treat missing tags as valid SEO evidence", () => {
-	const html = '<meta name="robots" content="noindex"><link rel="stylesheet" href="/main.css">';
+	const html =
+		'<meta name="robots" content="noindex"><link rel="stylesheet" href="/main.css">';
 	assert.equal(linkHref(html, "canonical"), null);
 	assert.equal(linkHref(html, "alternate", "en"), null);
 	assert.equal(metaContent(html, "og:image"), null);
