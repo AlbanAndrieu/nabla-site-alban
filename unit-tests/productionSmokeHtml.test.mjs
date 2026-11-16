@@ -5,7 +5,9 @@ import {
 	linkHref,
 	metaContent,
 } from "../scripts/lib/production-smoke-html.mjs";
-import { decodeHtmlAttributeValue as publicDecode } from "../scripts/post-deploy-smoke.mjs";
+import {
+	decodeHtmlAttributeValue as publicDecode,
+} from "../scripts/post-deploy-smoke.mjs";
 
 test("production smoke preserves its public single-pass HTML decoder", () => {
 	for (const source of [decodeHtmlAttributeValue, publicDecode]) {
@@ -16,7 +18,7 @@ test("production smoke preserves its public single-pass HTML decoder", () => {
 	}
 });
 
-test("HTML metadata parser handles attribute order and escaped query strings", () => {
+test("HTML metadata parser handles order and escaped query strings", () => {
 	const html = [
 		'<link href="https://www.albanandrieu.com/fr?x=1&amp;y=2" hreflang="fr" rel="alternate">',
 		'<link href="https://www.albanandrieu.com/" rel="canonical">',
@@ -32,7 +34,10 @@ test("HTML metadata parser handles attribute order and escaped query strings", (
 		metaContent(html, "og:image"),
 		"https://www.albanandrieu.com/api/social-card?locale=fr&title=Site",
 	);
-	assert.equal(metaContent(html, "twitter:image"), metaContent(html, "og:image"));
+	assert.equal(
+		metaContent(html, "twitter:image"),
+		metaContent(html, "og:image"),
+	);
 	assert.equal(linkHref(html, "alternate", "de"), null);
 	assert.equal(metaContent(html, "missing"), null);
 });
