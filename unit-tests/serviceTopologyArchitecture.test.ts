@@ -38,7 +38,7 @@ test("architecture route uses a static declared shell with live shared service h
 			),
 			readFile("app/[locale]/architecture/architectureData.ts", "utf8"),
 			readFile(
-				"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+				"app/[locale]/architecture/HierarchicalArchitectureNodes.module.css",
 				"utf8",
 			),
 			readFile("package.json", "utf8"),
@@ -75,6 +75,8 @@ test("architecture route uses a static declared shell with live shared service h
 	assert.match(data, /iconSrc: serviceIconSrc\(service\)/);
 	assert.match(css, /background: #020617/);
 	assert.match(css, /\.nodeIconFrame/);
+	// Node links moved with their styles: keep their keyboard focus ring.
+	assert.match(css, /\.openLink:focus-visible \{[\s\S]*outline:/);
 	assert.match(packageJson, /"@xyflow\/react": "12\.12\.0"/);
 	for (const product of [
 		"Open WebUI",
@@ -92,30 +94,38 @@ test("architecture route uses a static declared shell with live shared service h
 });
 
 test("architecture keeps one standalone compact mobile hierarchy beside the desktop graph", async () => {
-	const [view, explorer, runtimePolling, mobile, mobileCss, explorerCss] =
-		await Promise.all([
-			readFile(
-				"app/[locale]/architecture/ArchitectureTopologyView.tsx",
-				"utf8",
-			),
-			explorerSource(),
-			readFile(
-				"app/[locale]/architecture/useArchitectureRuntimeStatus.ts",
-				"utf8",
-			),
-			readFile(
-				"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
-				"utf8",
-			),
-			readFile(
-				"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
-				"utf8",
-			),
-			readFile(
-				"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
-				"utf8",
-			),
-		]);
+	const [
+		view,
+		explorer,
+		runtimePolling,
+		mobile,
+		mobileCss,
+		explorerCss,
+		nodesCss,
+	] = await Promise.all([
+		readFile("app/[locale]/architecture/ArchitectureTopologyView.tsx", "utf8"),
+		explorerSource(),
+		readFile(
+			"app/[locale]/architecture/useArchitectureRuntimeStatus.ts",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/MobileArchitectureHierarchy.tsx",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/MobileArchitectureHierarchy.module.css",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/HierarchicalArchitectureExplorer.module.css",
+			"utf8",
+		),
+		readFile(
+			"app/[locale]/architecture/HierarchicalArchitectureNodes.module.css",
+			"utf8",
+		),
+	]);
 
 	assert.match(view, /<MobileArchitectureHierarchy/);
 	assert.match(view, /catalog=\{filteredCatalog\}/);
@@ -157,7 +167,7 @@ test("architecture keeps one standalone compact mobile hierarchy beside the desk
 		mobileCss,
 		/@media \(max-width: 700px\)[\s\S]*\.mobileHierarchy\s*\{[\s\S]*display:\s*grid/,
 	);
-	assert.match(explorerCss, /\.node\[data-blast-radius-level="dominant"\]/);
+	assert.match(nodesCss, /\.node\[data-blast-radius-level="dominant"\]/);
 	assert.match(
 		explorerCss,
 		/@media \(max-width: 700px\)[\s\S]*\.flowShell\s*\{[\s\S]*display:\s*none/,

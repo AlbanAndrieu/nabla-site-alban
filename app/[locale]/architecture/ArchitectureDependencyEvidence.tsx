@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { homelabHealthColor } from "@/lib/homelabHealthPresentation";
 import styles from "./HierarchicalArchitectureExplorer.module.css";
+import nodeStyles from "./HierarchicalArchitectureNodes.module.css";
 
 export type DependencyEvidenceState = "blocked" | "degraded" | "unconfirmed";
 
@@ -9,7 +10,6 @@ type Props = {
 	degradedBy?: string[];
 	unconfirmed?: string[];
 	french: boolean;
-	mobile?: boolean;
 };
 
 const STATE_COLOR: Record<DependencyEvidenceState, string> = {
@@ -44,7 +44,6 @@ export function ArchitectureDependencyBadges({
 	degradedBy = [],
 	unconfirmed = [],
 	french,
-	mobile = false,
 }: Readonly<Props>) {
 	const rows: Array<[DependencyEvidenceState, string[]]> = [
 		["blocked", blockedBy],
@@ -55,7 +54,7 @@ export function ArchitectureDependencyBadges({
 		names.length > 0 ? (
 			<span
 				key={state}
-				className={mobile ? styles.mobileBlockedBy : styles.runtimeBadge}
+				className={nodeStyles.runtimeBadge}
 				data-dependency-health={state}
 				style={evidenceStyle(state)}
 			>

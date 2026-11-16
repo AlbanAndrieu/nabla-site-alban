@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
 import {
 	Handle,
 	type NodeProps,
 	type NodeTypes,
 	Position,
 } from "@xyflow/react";
+import { useState } from "react";
 import {
 	homelabHealthColor,
 	isHttpsEndpoint,
@@ -15,7 +14,7 @@ import {
 } from "@/lib/homelabHealthPresentation";
 import { homelabIconFallback } from "@/lib/homelabIconFallback";
 import { ArchitectureDependencyBadges } from "./ArchitectureDependencyEvidence";
-import styles from "./HierarchicalArchitectureExplorer.module.css";
+import styles from "./HierarchicalArchitectureNodes.module.css";
 import type {
 	ArchitectureNodeData,
 	GroupNodeData,
