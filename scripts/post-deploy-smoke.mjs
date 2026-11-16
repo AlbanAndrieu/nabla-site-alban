@@ -137,12 +137,15 @@ async function fetchResponse(
 
 			const mitigated = response.headers.get("x-vercel-mitigated");
 			if (mitigated) {
-				throw new Error(
+				const error = new Error(
 					pathname +
 						" was intercepted by Vercel mitigation (" +
 						mitigated +
 						"); verify Protection Bypass for Automation",
 				);
+				// A confirmed challenge cannot succeed through automatic retries.
+				error.name = "VercelMitigationError";
+				throw error;
 			}
 
 			if (response.ok) {
@@ -177,6 +180,7 @@ async function fetchResponse(
 			}
 		} catch (error) {
 			lastError = error instanceof Error ? error : new Error(String(error));
+			if (lastError.name === "VercelMitigationError") throw lastError;
 		}
 
 		if (attempt < FETCH_ATTEMPTS) await delay(500 * attempt);

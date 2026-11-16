@@ -18,7 +18,7 @@
 ## Smoke de production — découpage G8
 
 - Entrée unique : `scripts/post-deploy-smoke.mjs`. Le flux reste borné au domaine canonique, vérifie le SHA déployé, la visibilité SEO, les images sociales et le refus des diagnostics privés.
-- Parsing **pur** : `scripts/lib/production-smoke-html.mjs` (extraction de `linkHref`, `metaContent`, `decodeHtmlAttributeValue`). Aucun fetch, cookie, variable secrète ni contournement Vercel dans ce module.
+- Parsing **pur** : `scripts/lib/production-smoke-html.mjs` (extraction de `linkHref`, `metaContent`, `decodeHtmlAttributeValue`). Aucun fetch, cookie, variable secrète ni contournement Vercel dans ce module. Les interceptions Vercel explicites interrompent le smoke dès la première requête (pas de surcharge inutile de retries).
 - Test unitaire ciblé : `node --test unit-tests/productionSmokeHtml.test.mjs`. L'API historique `decodeHtmlAttributeValue` reste exportée par le script original ; le test de smoke complet garde la responsabilité de vérifier la requête Vercel et les réponses de production simulées.
 - Ne pas déclencher un véritable smoke pour une simple modification de code locale : la vérification réelle nécessite l'URL canonique, le SHA exact effectivement déployé et une approbation de publication.
 

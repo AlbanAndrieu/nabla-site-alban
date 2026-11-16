@@ -389,17 +389,20 @@ test("production smoke rejects a stale public deployment SHA", async () => {
 
 test("production smoke reports Vercel mitigation explicitly", async () => {
 	const originalFetch = globalThis.fetch;
+	let requestCount = 0;
 	const originalBypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 	process.env.VERCEL_AUTOMATION_BYPASS_SECRET = "test-bypass-secret";
 
-	globalThis.fetch = (async () =>
-		new Response("challenge", {
+	globalThis.fetch = (async () => {
+		requestCount += 1;
+		return new Response("challenge", {
 			status: 429,
 			headers: {
 				"content-type": "text/html",
 				"x-vercel-mitigated": "challenge",
 			},
-		})) as typeof fetch;
+		});
+	}) as typeof fetch;
 
 	try {
 		await assert.rejects(
@@ -414,6 +417,8 @@ test("production smoke reports Vercel mitigation explicitly", async () => {
 			process.env.VERCEL_AUTOMATION_BYPASS_SECRET = originalBypass;
 		}
 	}
+	// Mitigation is explicit: avoid three unnecessary requests and retries.
+	assert.equal(requestCount, 1);
 });
 
 test("production smoke rejects unexpected page content types", async () => {
