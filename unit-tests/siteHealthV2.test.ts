@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseSiteHealthV2, siteHealthIndex } from "../lib/siteHealthV2";
+import {
+	markSiteHealthStale,
+	parseSiteHealthV2,
+	siteHealthIndex,
+} from "../lib/siteHealthV2";
 
 const REVISION = "sha256:" + "a".repeat(64);
 const DTO = {
@@ -138,4 +142,20 @@ test("different Backstage kinds with the same name cannot inherit each other's p
 	const indexed = siteHealthIndex(parsed, REVISION);
 	assert.equal(indexed.get("component:default/redis"), "unknown");
 	assert.equal(indexed.get("resource:default/redis"), "unknown");
+});
+
+test("stale SERVICE health preserves IDs, not previous statuses", () => {
+	const current = parseSiteHealthV2(DTO);
+	assert.ok(current);
+	const before = JSON.stringify(current);
+	const stale = markSiteHealthStale(current);
+	assert.equal(stale.boardState, "stale");
+	assert.equal(stale.catalogRevision, REVISION);
+	assert.deepEqual(
+		stale.services.map((service) => service.entityRef),
+		current.services.map((service) => service.entityRef),
+	);
+	assert.ok(stale.services.every((service) => service.state === "unknown"));
+	assert.equal(siteHealthIndex(stale, REVISION).size, 0);
+	assert.equal(JSON.stringify(current), before);
 });

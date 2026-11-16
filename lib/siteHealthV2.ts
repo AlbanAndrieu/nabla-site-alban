@@ -62,6 +62,20 @@ export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 	};
 }
 
+/** Downgrade a long-idle SERVICE snapshot: retain only known public identities. */
+export function markSiteHealthStale(health: SiteHealthV2): SiteHealthV2 {
+	return {
+		schemaVersion: 2,
+		model: "backstage-health",
+		catalogRevision: health.catalogRevision,
+		boardState: "stale",
+		services: health.services.map(({ entityRef }) => ({
+			entityRef,
+			state: "unknown",
+		})),
+	};
+}
+
 export function siteHealthIndex(
 	health: SiteHealthV2 | null | undefined,
 	catalogRevision: unknown,

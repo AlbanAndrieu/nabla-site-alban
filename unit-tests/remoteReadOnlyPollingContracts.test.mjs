@@ -108,3 +108,42 @@ test("mode transitions mask previously fetched OWNER snapshots synchronously", (
 	assert.match(publicResult, /ownerBoundary: false,/);
 	assert.match(publicResult, /healthStatus: null,/);
 });
+
+test("long-hidden SERVICE tab invalidates old health without more polling", () => {
+	const hook = source("app/components/homelab/useHomelabHealth.ts");
+	assert.match(
+		hook,
+		/let hiddenSince: number \| null = document\.hidden \? Date\.now\(\) : null/,
+	);
+	assert.match(hook, /hiddenSince = Date\.now\(\);\s*return;/);
+	assert.match(
+		hook,
+		/readOnly &&[\s\S]*?hiddenSince !== null &&[\s\S]*?Date\.now\(\) - hiddenSince >= PUBLIC_HEALTH_REFRESH_MS/,
+	);
+	assert.match(hook, /markSiteHealthStale\(current\.siteHealth\)/);
+	assert.match(hook, /healthUnavailable: true/);
+	assert.match(
+		hook,
+		/hiddenSince = null;\s*refreshHealth\(\);\s*refreshCatalogIfDue\(\);/,
+	);
+	assert.equal((hook.match(/window\.setInterval\(/g) ?? []).length, 2);
+});
+
+test("Architecture downgrades old SERVICE evidence on return", () => {
+	const hook = source(
+		"app/[locale]/architecture/useArchitectureHealthPolling.ts",
+	);
+	assert.match(hook, /readOnly \?[\s\S]*?"\/api\/homelab-health-v2"/);
+	assert.match(hook, /hiddenSince = Date\.now\(\)/);
+	assert.match(hook, /Date\.now\(\) - hiddenSince >= PUBLIC_EVIDENCE_STALE_AFTER_MS/);
+	assert.match(hook, /current \? markSiteHealthStale\(current\) : null/);
+	assert.match(hook, /setHealthUnavailable\(true\)/);
+	assert.match(hook, /hiddenSince = null;\s*void loadHealth\(\)/);
+	assert.match(hook, /controller\?\.abort\(\)/);
+	assert.match(hook, /if \(!active \|\| requestController\.signal\.aborted\) return;/);
+	assert.match(
+		hook,
+		/readOnly && current \? markSiteHealthStale\(current\) : null/,
+	);
+	assert.equal((hook.match(/window\.setTimeout\(/g) ?? []).length, 1);
+});

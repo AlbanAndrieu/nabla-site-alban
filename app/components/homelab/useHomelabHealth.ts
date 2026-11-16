@@ -32,7 +32,11 @@ import {
 	homelabRetryDelayMs,
 } from "@/lib/homelabSlowApiPolicy";
 import type { ServiceTopology } from "@/lib/serviceTopology";
-import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
+import {
+	markSiteHealthStale,
+	parseSiteHealthV2,
+	type SiteHealthV2,
+} from "@/lib/siteHealthV2";
 
 export const HEALTH_REFRESH_MS = 30_000;
 // SERVICE projection is not an operator console; reduce Vercel function calls.
@@ -514,11 +518,30 @@ export function useHomelabHealth(readOnly = false): HomelabServicesState {
 			refreshCatalogIfDue,
 			CATALOG_REVALIDATION_MS,
 		);
+		let hiddenSince: number | null = document.hidden ? Date.now() : null;
 		const onVisibilityChange = () => {
-			if (!document.hidden) {
-				refreshHealth();
-				refreshCatalogIfDue();
+			if (document.hidden) {
+				hiddenSince = Date.now();
+				return;
 			}
+			// A long-hidden SERVICE tab must not keep displaying previously green
+			// evidence as fresh while the next bounded request is in flight.
+			if (
+				readOnly &&
+				hiddenSince !== null &&
+				Date.now() - hiddenSince >= PUBLIC_HEALTH_REFRESH_MS
+			) {
+				setState((current) => ({
+					...current,
+					siteHealth: current.siteHealth
+						? markSiteHealthStale(current.siteHealth)
+						: null,
+					healthUnavailable: true,
+				}));
+			}
+			hiddenSince = null;
+			refreshHealth();
+			refreshCatalogIfDue();
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
