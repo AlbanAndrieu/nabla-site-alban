@@ -5,7 +5,11 @@ import {
 	type HomelabHealthSnapshot,
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
-import { parseSiteHealthV2, type SiteHealthV2 } from "@/lib/siteHealthV2";
+import {
+	markSiteHealthStale,
+	parseSiteHealthV2,
+	type SiteHealthV2,
+} from "@/lib/siteHealthV2";
 import { boundedHomelabSignal, homelabRetryDelayMs } from "@/lib/homelabSlowApiPolicy";
 
 export type ArchitectureHealthSource =
@@ -17,6 +21,8 @@ export type ArchitectureHealthSource =
 const HEALTH_POLL_REFRESHING_MS = 30_000;
 const HEALTH_POLL_FRESH_MS = 30_000;
 const HEALTH_POLL_FALLBACK_MS = 60_000;
+// A resumed SERVICE tab must not display green health from hours earlier.
+const PUBLIC_EVIDENCE_STALE_AFTER_MS = 120_000;
 
 export function architectureHealthPollDelay(
 	snapshot: HomelabHealthSnapshot | null,
@@ -41,6 +47,7 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		let latestSnapshot: HomelabHealthSnapshot | null = null;
 		let latestUnavailable = true;
 		let consecutiveFailures = 0;
+		let hiddenSince: number | null = document.hidden ? Date.now() : null;
 
 		const clearRefreshTimer = () => {
 			if (refreshTimer === null) return;
@@ -117,10 +124,23 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 		void loadHealth();
 		const onVisibilityChange = () => {
 			if (document.hidden) {
+				hiddenSince = Date.now();
 				clearRefreshTimer();
 				controller?.abort();
 				return;
 			}
+			// Preserve the authorized SERVICE view while invalidating old evidence.
+			if (
+				readOnly &&
+				hiddenSince !== null &&
+				Date.now() - hiddenSince >= PUBLIC_EVIDENCE_STALE_AFTER_MS
+			) {
+				setSiteHealth((current) =>
+					current ? markSiteHealthStale(current) : null,
+				);
+				setHealthUnavailable(true);
+			}
+			hiddenSince = null;
 			void loadHealth();
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);

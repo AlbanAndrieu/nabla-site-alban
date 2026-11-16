@@ -26,6 +26,8 @@ Une entité du catalogue **déclare** un service, une relation et un cycle de vi
 
 Lors d'un retour après une suspension d'au moins `PUBLIC_HEALTH_REFRESH_MS` (120 s), la vue **SERVICE** conserve les identités publiques et le catalogue déjà autorisé, mais invalide en mémoire les précédents statuts « ok/warn/fail » en `UNKNOWN` / `boardState=stale` avant la nouvelle réponse. Une sonde qui ne répond pas ne devient pas une panne confirmée. La logique OWNER, les URL internes et le cache persistant restent inchangés ; **aucun nouveau polling ni appel Vercel**. Tests de transformation pure et contrats source ajoutés, recette navigateur et preuve L3 `NOT_RUN`.
 
+**Complément G7/S3 Architecture (16/11, CODED / NOT_RUN).** Le hook de santé de la vue Architecture invalide désormais les preuves SERVICE conservées en mémoire après au moins 120 s en arrière-plan, à l'aide du même sélecteur pur `markSiteHealthStale` que TrueNAS. Les cartes peuvent rester affichées mais les anciennes observations deviennent `stale/unknown` avant le chargement suivant. OWNER et `/api/homelab-health` restent isolés ; aucun nouveau timer, intervalle, stockage ou appel réseau. Le contrat source est étendu ; recette navigateur et L3 encore `NOT_RUN`. **Coordination :** [PR #320](https://github.com/AlbanAndrieu/nabla-site-alban/pull/320) traite l'état `scheduled` et touche la roadmap ; réconcilier ce document et `lib/siteHealthV2.ts` avant fusion, sans écraser les évolutions `scheduled`.
+
 ## Backlog restant — options de priorité
 
 | ID | P | Objectif / critère d'acceptation |
