@@ -107,6 +107,21 @@
 	color: var(--ui-text-secondary);
 }
 
+/* Night-window App outside its window: expected stop, not an outage. */
+.scheduled {
+	border-color: color-mix(in srgb, #a78bfa 46%, var(--ui-border));
+	border-left-color: #a78bfa;
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, #a78bfa 9%, var(--ui-surface-card)),
+		var(--ui-surface-card)
+	);
+}
+
+.scheduled > strong:first-child i {
+	color: #a78bfa;
+}
+
 .details {
 	margin-top: 0.7rem;
 	padding-top: 0.65rem;

@@ -60,6 +60,7 @@ export function countHealthStates(
 		warn: 0,
 		fail: 0,
 		unknown: 0,
+		scheduled: 0,
 	};
 	for (const service of services)
 		counts[effectiveState(service, index, healthUnavailable)] += 1;

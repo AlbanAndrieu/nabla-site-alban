@@ -181,7 +181,8 @@
 				"ok": "Sain",
 				"warn": "Dégradé",
 				"fail": "En échec",
-				"unknown": "Inconnu"
+				"unknown": "Inconnu",
+				"scheduled": "Fenêtre de nuit"
 			},
 			"stale": "Preuve obsolète — dernière observation conservée",
 			"semantics": "Rouge = service indisponible. Orange = service joignable mais en erreur, dépendance dégradée ou configuration d’exposition incomplète. Gris = preuve insuffisante.",
@@ -217,7 +218,8 @@
 					"ok": "sains",
 					"warn": "dégradés",
 					"fail": "en échec",
-					"unknown": "inconnus"
+					"unknown": "inconnus",
+					"scheduled": "en fenêtre de nuit"
 				},
 				"healthOptions": {
 					"ok": "Sain",

@@ -49,7 +49,8 @@ const HEALTH_RANK: Record<HomelabHealthState, number> = {
 	fail: 0,
 	warn: 1,
 	unknown: 2,
-	ok: 3,
+	scheduled: 3,
+	ok: 4,
 };
 
 function stateOf(entry: HomelabHealthEntry | undefined): HomelabHealthState {
@@ -86,6 +87,7 @@ function stateLabel(state: HomelabHealthState, french: boolean): string {
 		warn: ["degraded", "dégradé"],
 		fail: ["failed", "en échec"],
 		unknown: ["unknown", "inconnu"],
+		scheduled: ["night window", "fenêtre de nuit"],
 	};
 	return labels[state][french ? 1 : 0];
 }

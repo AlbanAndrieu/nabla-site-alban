@@ -13,6 +13,7 @@ const STATUS_CLASS: Record<HomelabHealthState, string> = {
 	warn: statusStyles.warn,
 	fail: statusStyles.fail,
 	unknown: statusStyles.unknown,
+	scheduled: statusStyles.scheduled,
 };
 
 const ICON_CLASS: Record<HomelabHealthState, string> = {
@@ -20,6 +21,7 @@ const ICON_CLASS: Record<HomelabHealthState, string> = {
 	warn: "fas fa-triangle-exclamation",
 	fail: "fas fa-circle-xmark",
 	unknown: "fas fa-circle-question",
+	scheduled: "fas fa-moon",
 };
 
 type Props = {

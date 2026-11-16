@@ -91,8 +91,9 @@ test("endpoint and internal links share health button classes", () => {
 		warn: "btn-outline-warning",
 		fail: "btn-outline-danger",
 		unknown: "btn-outline-secondary",
+		scheduled: "btn-outline-secondary",
 	});
-	for (const state of ["ok", "warn", "fail", "unknown"] as const) {
+	for (const state of ["ok", "warn", "fail", "unknown", "scheduled"] as const) {
 		assert.equal(ENDPOINT_HEALTH_CLASS[state], INTERNAL_HEALTH_CLASS[state]);
 	}
 });
@@ -103,9 +104,10 @@ test("runtime icons reuse effective health icons and add a missing marker", () =
 		warn: "fas fa-triangle-exclamation",
 		fail: "fas fa-circle-xmark",
 		unknown: "fas fa-circle-question",
+		scheduled: "fas fa-moon",
 		missing: "fas fa-skull-crossbones",
 	});
-	for (const state of ["ok", "warn", "fail", "unknown"] as const) {
+	for (const state of ["ok", "warn", "fail", "unknown", "scheduled"] as const) {
 		assert.equal(RUNTIME_ICON_CLASS[state], EFFECTIVE_HEALTH_ICON_CLASS[state]);
 	}
 });

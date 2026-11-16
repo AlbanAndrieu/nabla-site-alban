@@ -1,5 +1,9 @@
 export type VerifiedHomelabHealthState = "ok" | "warn" | "fail";
-export type HomelabHealthState = VerifiedHomelabHealthState | "unknown";
+// "scheduled": a night-window App outside its window, an expected stop (purple).
+export type HomelabHealthState =
+	| VerifiedHomelabHealthState
+	| "unknown"
+	| "scheduled";
 export type HomelabProbeSource = "origin" | "memory" | "deadline";
 
 export type HomelabDependencyEvidence = {
@@ -49,21 +53,21 @@ export type HomelabScopedProbeEvidence = {
  * Never copy this DTO into the public SERVICE v2 cache or the Backstage projection.
  */
 export type HomelabOwnerExposure = {
-  declared?: {
-    external?: boolean;
-    endpoint_enabled?: boolean | null;
-    internal_host?: string | null;
-    internal_port?: number | null;
-  };
-  observed?: {
-    cloudflare_origin_service?: string | null;
-    cloudflare_origin_matches_topology?: boolean | null;
-    topology_internal_host?: string | null;
-    topology_internal_port?: number | null;
-  };
-  provider_status_confirmed?: boolean;
-  state?: string;
-  reasons?: string[];
+	declared?: {
+		external?: boolean;
+		endpoint_enabled?: boolean | null;
+		internal_host?: string | null;
+		internal_port?: number | null;
+	};
+	observed?: {
+		cloudflare_origin_service?: string | null;
+		cloudflare_origin_matches_topology?: boolean | null;
+		topology_internal_host?: string | null;
+		topology_internal_port?: number | null;
+	};
+	provider_status_confirmed?: boolean;
+	state?: string;
+	reasons?: string[];
 };
 
 export type HomelabHealthEntry = HomelabRollingProbeEvidence &
@@ -72,11 +76,17 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		name: string;
 		url: string;
 		url_derived?: boolean;
-        exposure_intent?: "public" | "internal";
-        exposure?: HomelabOwnerExposure;
-        internal_probe_execution?: "disabled" | "not-configured" | "not-executed" | "stale" | "failed" | "observed";
-        runtime_primary_container_state?: string | null;
-        runtime_primary_container_issue?: boolean;
+		exposure_intent?: "public" | "internal";
+		exposure?: HomelabOwnerExposure;
+		internal_probe_execution?:
+			| "disabled"
+			| "not-configured"
+			| "not-executed"
+			| "stale"
+			| "failed"
+			| "observed";
+		runtime_primary_container_state?: string | null;
+		runtime_primary_container_issue?: boolean;
 		reachable: boolean | null;
 		http_status: number;
 		state: HomelabHealthState;
@@ -98,7 +108,10 @@ export type HomelabHealthEntry = HomelabRollingProbeEvidence &
 		application_error?: string | null;
 		cloudflare_access_secondary_probe_eligible?: boolean;
 		cloudflare_access_secondary_probe_attempted?: boolean;
-		public_probe_verification?: "access_protected_origin_unverified" | "authenticated_origin_observed" | "authenticated_origin_unverified";
+		public_probe_verification?:
+			| "access_protected_origin_unverified"
+			| "authenticated_origin_observed"
+			| "authenticated_origin_unverified";
 		cloudflare_access_signal?: boolean;
 		cloudflare_default_deny?: boolean;
 		cloudflare_service_auth_attempted?: boolean;
@@ -131,15 +144,15 @@ export type HomelabInternalHealthEntry = HomelabRollingProbeEvidence & {
 };
 
 export type TrueNasRuntimeContainer = {
-  service_name?: string | null;
-  state?: string | null;
+	service_name?: string | null;
+	state?: string | null;
 };
 
 export type TrueNasRuntimeApp = {
-  id: string;
-  name: string;
-  state: string;
-  active_workloads?: { container_details?: TrueNasRuntimeContainer[] };
+	id: string;
+	name: string;
+	state: string;
+	active_workloads?: { container_details?: TrueNasRuntimeContainer[] };
 };
 
 export type TrueNasApiHealth = {

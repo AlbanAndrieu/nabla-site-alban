@@ -1,3 +1,4 @@
+import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import type {
 	HomelabHealthEntry,
 	HomelabHealthSnapshot,
@@ -8,7 +9,6 @@ import {
 	type UniqueHomelabEvidenceIndex,
 	uniqueHomelabEvidenceIndex,
 } from "@/lib/homelabHealthIdentity";
-import { matchesCatalogServiceSearch } from "@/lib/homelabCatalogSearch";
 import { resolveEffectiveServiceState } from "@/lib/homelabHealthResolver";
 import {
 	type HomelabService,
@@ -39,6 +39,7 @@ export const HEALTH_STATES: readonly HomelabHealthState[] = [
 	"warn",
 	"fail",
 	"unknown",
+	"scheduled",
 ];
 export const GROUP_FILTERS: readonly GroupFilter[] = [
 	"all",
@@ -101,6 +102,7 @@ export function countHealthStates(
 		warn: 0,
 		fail: 0,
 		unknown: 0,
+		scheduled: 0,
 	};
 	for (const service of services) {
 		const state = effectiveState(homelabServiceId(service), healthIndex);

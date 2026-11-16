@@ -21,7 +21,8 @@ type EffectiveHealthLabelKey =
 	| "health.states.ok"
 	| "health.states.warn"
 	| "health.states.fail"
-	| "health.states.unknown";
+	| "health.states.unknown"
+	| "health.states.scheduled";
 
 export const EFFECTIVE_HEALTH_LABEL_KEY: Record<
 	HomelabHealthState,
@@ -31,6 +32,7 @@ export const EFFECTIVE_HEALTH_LABEL_KEY: Record<
 	warn: "health.states.warn",
 	fail: "health.states.fail",
 	unknown: "health.states.unknown",
+	scheduled: "health.states.scheduled",
 };
 
 export const EFFECTIVE_HEALTH_ICON_CLASS: Record<HomelabHealthState, string> = {
@@ -38,6 +40,7 @@ export const EFFECTIVE_HEALTH_ICON_CLASS: Record<HomelabHealthState, string> = {
 	warn: "fas fa-triangle-exclamation",
 	fail: "fas fa-circle-xmark",
 	unknown: "fas fa-circle-question",
+	scheduled: "fas fa-moon",
 };
 
 export const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
@@ -45,6 +48,7 @@ export const INTERNAL_HEALTH_CLASS: Record<HomelabHealthState, string> = {
 	warn: "btn-outline-warning",
 	fail: "btn-outline-danger",
 	unknown: "btn-outline-secondary",
+	scheduled: "btn-outline-secondary",
 };
 
 /** Endpoint links add a browser-probe "pending" state to the shared health button classes. */

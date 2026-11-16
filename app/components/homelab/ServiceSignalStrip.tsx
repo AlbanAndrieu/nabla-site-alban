@@ -31,6 +31,7 @@ const STATE_ICON: Record<HomelabHealthState, string> = {
 	warn: "fas fa-triangle-exclamation",
 	fail: "fas fa-circle-xmark",
 	unknown: "fas fa-circle-question",
+	scheduled: "fas fa-moon",
 };
 
 const LABELS: Record<HomelabServiceSignalId, [string, string]> = {
