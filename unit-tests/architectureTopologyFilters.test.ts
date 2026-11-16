@@ -101,6 +101,7 @@ test("countHealthStates counts every declared service once", () => {
 		warn: 1,
 		fail: 1,
 		unknown: 1,
+		scheduled: 0,
 	});
 });
 
@@ -148,7 +149,13 @@ test("filterArchitectureCatalog combines health, group and search filters", () =
 });
 
 test("filter option constants keep their rendered order and i18n keys", () => {
-	assert.deepEqual(HEALTH_STATES, ["ok", "warn", "fail", "unknown"]);
+	assert.deepEqual(HEALTH_STATES, [
+		"ok",
+		"warn",
+		"fail",
+		"unknown",
+		"scheduled",
+	]);
 	assert.deepEqual(GROUP_FILTERS, [
 		"all",
 		"services",
@@ -198,6 +205,7 @@ test("external Backstage v2 health maps by entityRef only at matching fresh revi
 		warn: 0,
 		fail: 0,
 		unknown: 1,
+		scheduled: 0,
 	});
 	const staleRevision = indexHealth(
 		null,
@@ -211,6 +219,7 @@ test("external Backstage v2 health maps by entityRef only at matching fresh revi
 			warn: 0,
 			fail: 0,
 			unknown: 2,
+			scheduled: 0,
 		},
 	);
 	const stale = indexHealth(

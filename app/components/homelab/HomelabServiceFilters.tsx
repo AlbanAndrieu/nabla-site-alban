@@ -12,55 +12,60 @@ export type HealthFilter = "all" | HomelabHealthState;
 export type GroupFilter = "all" | ServicePresentationGroup;
 
 const HEALTH_STATES: readonly HomelabHealthState[] = [
-  "ok", "warn", "fail", "unknown",
+	"ok",
+	"warn",
+	"fail",
+	"unknown",
+	"scheduled",
 ];
 
 const HEALTH_CHIP_KEYS = {
-  ok: "presentation.filters.chips.ok",
-  warn: "presentation.filters.chips.warn",
-  fail: "presentation.filters.chips.fail",
-  unknown: "presentation.filters.chips.unknown",
+	ok: "presentation.filters.chips.ok",
+	warn: "presentation.filters.chips.warn",
+	fail: "presentation.filters.chips.fail",
+	unknown: "presentation.filters.chips.unknown",
+	scheduled: "presentation.filters.chips.scheduled",
 } as const;
 
 type Props = {
-  healthRefreshing: boolean;
-  healthUnavailable: boolean;
-  healthCounts: Record<HomelabHealthState, number>;
-  healthFilter: HealthFilter;
-  setHealthFilter: Dispatch<SetStateAction<HealthFilter>>;
-  environmentFilter: HomelabEnvironmentFilter;
-  setEnvironmentFilter: Dispatch<SetStateAction<HomelabEnvironmentFilter>>;
-  groupFilter: GroupFilter;
-  setGroupFilter: Dispatch<SetStateAction<GroupFilter>>;
-  setGroupExpanded: (group: ServicePresentationGroup, open: boolean) => void;
-  searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
-  setExpandedGroups: Dispatch<SetStateAction<Set<ServicePresentationGroup>>>;
-  visibleCount: number;
-  totalCount: number;
+	healthRefreshing: boolean;
+	healthUnavailable: boolean;
+	healthCounts: Record<HomelabHealthState, number>;
+	healthFilter: HealthFilter;
+	setHealthFilter: Dispatch<SetStateAction<HealthFilter>>;
+	environmentFilter: HomelabEnvironmentFilter;
+	setEnvironmentFilter: Dispatch<SetStateAction<HomelabEnvironmentFilter>>;
+	groupFilter: GroupFilter;
+	setGroupFilter: Dispatch<SetStateAction<GroupFilter>>;
+	setGroupExpanded: (group: ServicePresentationGroup, open: boolean) => void;
+	searchQuery: string;
+	setSearchQuery: Dispatch<SetStateAction<string>>;
+	setExpandedGroups: Dispatch<SetStateAction<Set<ServicePresentationGroup>>>;
+	visibleCount: number;
+	totalCount: number;
 };
 
 /** Shared TrueNAS health counters and interactive catalog filters. */
 export default function HomelabServiceFilters({
-  healthRefreshing,
-  healthUnavailable,
-  healthCounts,
-  healthFilter,
-  setHealthFilter,
-  environmentFilter,
-  setEnvironmentFilter,
-  groupFilter,
-  setGroupFilter,
-  setGroupExpanded,
-  searchQuery,
-  setSearchQuery,
-  setExpandedGroups,
-  visibleCount,
-  totalCount,
+	healthRefreshing,
+	healthUnavailable,
+	healthCounts,
+	healthFilter,
+	setHealthFilter,
+	environmentFilter,
+	setEnvironmentFilter,
+	groupFilter,
+	setGroupFilter,
+	setGroupExpanded,
+	searchQuery,
+	setSearchQuery,
+	setExpandedGroups,
+	visibleCount,
+	totalCount,
 }: Readonly<Props>) {
-  const t = useTranslations("homelab");
-  return (
-    <>
+	const t = useTranslations("homelab");
+	return (
+		<>
 			<section
 				id="truenas-health-dashboard"
 				className={styles.healthDashboard}
@@ -124,13 +129,19 @@ export default function HomelabServiceFilters({
 							}
 							data-homelab-health-select
 						>
-							<option value="all">
-								{t("presentation.filters.healthAll")}
+							<option value="all">{t("presentation.filters.healthAll")}</option>
+							<option value="ok">
+								{t("presentation.filters.healthOptions.ok")}
 							</option>
-							<option value="ok">{t("presentation.filters.healthOptions.ok")}</option>
-							<option value="warn">{t("presentation.filters.healthOptions.warn")}</option>
-							<option value="fail">{t("presentation.filters.healthOptions.fail")}</option>
-							<option value="unknown">{t("presentation.filters.healthOptions.unknown")}</option>
+							<option value="warn">
+								{t("presentation.filters.healthOptions.warn")}
+							</option>
+							<option value="fail">
+								{t("presentation.filters.healthOptions.fail")}
+							</option>
+							<option value="unknown">
+								{t("presentation.filters.healthOptions.unknown")}
+							</option>
 						</select>
 					</label>
 					<label className={styles.filterField}>
@@ -227,11 +238,18 @@ export default function HomelabServiceFilters({
 						</button>
 					</div>
 				</div>
-				<p className={styles.matchCount} role="status" aria-live="polite" aria-atomic="true">
-					{t("presentation.filters.resultCount", { shown: visibleCount, total: totalCount })}
+				<p
+					className={styles.matchCount}
+					role="status"
+					aria-live="polite"
+					aria-atomic="true"
+				>
+					{t("presentation.filters.resultCount", {
+						shown: visibleCount,
+						total: totalCount,
+					})}
 				</p>
 			</section>
-
-    </>
-  );
+		</>
+	);
 }

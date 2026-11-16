@@ -14,7 +14,7 @@ const REVISION = /^sha256:[0-9a-f]{64}$/;
 // Bound segment lengths and reject paths and whitespace.
 const REF =
 	/^(component|resource|api):[a-z0-9][a-z0-9._-]{0,62}\/[a-z0-9][a-z0-9._-]{0,62}$/;
-const STATES = new Set(["ok", "warn", "fail", "unknown"]);
+const STATES = new Set(["ok", "warn", "fail", "unknown", "scheduled"]);
 
 export function parseSiteHealthV2(value: unknown): SiteHealthV2 | null {
 	if (!value || typeof value !== "object" || Array.isArray(value)) return null;

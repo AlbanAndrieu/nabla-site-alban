@@ -40,6 +40,7 @@ Lors d'un retour après une suspension d'au moins `PUBLIC_HEALTH_REFRESH_MS` (12
 | **S6** | **P1** | **C4 et navigation** : arêtes canoniques uniquement, liens OWNER basés sur les observations autorisées, revisiter les icônes après synchronisation Compose |
 | **S7** | **P2** | **Dette technique** : dédoublonner les adaptateurs et scripts réellement redondants, inventorier les références V1 historiques avant tout retrait, garder les tests négatifs |
 | **S8** | **P2** | **Ressources CPU/RAM/GPU/ZFS** : afficher uniquement des mesures producteur horodatées et autorisées ; jamais de CPU inventé depuis le catalogue |
+| **S9** | **P1** | **Fenêtre nocturne** : état `scheduled` (violet, icône lune) pour une App étiquetée `albandrieu.com/operational-schedule: night` et arrêtée hors de 01:00-07:00 ; **CODED**, tests unitaires. Recette après déploiement de FastAPI Sample : bitcoind et paperless violets de jour, état normal la nuit |
 
 **Ordre confirmé par le propriétaire (14/11) : G7 puis G6 puis G8**. Sur l'interface homelab, traiter S3/S4 (preuves et libellés) puis S5 (FR/EN, WCAG, mobile), avant S7 (suppression des doublons). Les filtres traduits et la région de résultats accessible ont été fusionnés via #306 ; L3, Playwright OWNER/SERVICE et mesures restent NOT_RUN. La qualité L3 et Vercel restent dans la roadmap générale. L'intégration V2 **S0** est clôturée côté code et ne figure plus parmi les migrations à réaliser.
 

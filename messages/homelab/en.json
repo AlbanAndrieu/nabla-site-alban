@@ -181,7 +181,8 @@
 				"ok": "Healthy",
 				"warn": "Degraded",
 				"fail": "Failed",
-				"unknown": "Unknown"
+				"unknown": "Unknown",
+				"scheduled": "Night window"
 			},
 			"stale": "Stale evidence — last observation retained",
 			"semantics": "Red = service unavailable. Orange = service reachable but unhealthy, dependency-degraded, or exposure configuration incomplete. Gray = insufficient evidence.",
@@ -217,7 +218,8 @@
 					"ok": "healthy",
 					"warn": "degraded",
 					"fail": "failed",
-					"unknown": "unknown"
+					"unknown": "unknown",
+					"scheduled": "night window"
 				},
 				"healthOptions": {
 					"ok": "Healthy",

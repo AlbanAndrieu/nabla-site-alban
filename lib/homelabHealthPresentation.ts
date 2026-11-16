@@ -9,6 +9,7 @@ const HEALTH_COLORS: Record<HomelabPresentationState, string> = {
 	warn: "#f59e0b",
 	fail: "#ef4444",
 	unknown: "#94a3b8",
+	scheduled: "#a78bfa",
 };
 
 const HEALTH_TEXT_COLORS: Record<HomelabPresentationState, string> = {
@@ -17,6 +18,7 @@ const HEALTH_TEXT_COLORS: Record<HomelabPresentationState, string> = {
 	warn: "#92400e",
 	fail: "#b91c1c",
 	unknown: "#475569",
+	scheduled: "#5b21b6",
 };
 
 export function homelabHealthColor(state: HomelabPresentationState): string {
