@@ -6,11 +6,14 @@ import {
 	parseHomelabHealthSnapshot,
 } from "@/lib/homelabHealth";
 import {
+	boundedHomelabSignal,
+	homelabRetryDelayMs,
+} from "@/lib/homelabSlowApiPolicy";
+import {
 	markSiteHealthStale,
 	parseSiteHealthV2,
 	type SiteHealthV2,
 } from "@/lib/siteHealthV2";
-import { boundedHomelabSignal, homelabRetryDelayMs } from "@/lib/homelabSlowApiPolicy";
 
 export type ArchitectureHealthSource =
 	| "loading"

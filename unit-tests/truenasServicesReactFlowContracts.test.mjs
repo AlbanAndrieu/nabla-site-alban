@@ -47,8 +47,13 @@ test("canonical Backstage entity references are typed rather than unknown", () =
 
 test("TrueNAS SERVICE view defaults to all declared graph nodes, not only critical paths", () => {
 	const block = source("app/components/homelab/HomelabServicesBlock.tsx");
-	const graph = source("app/[locale]/architecture/useHierarchicalArchitectureGraph.ts");
+	const graph = source(
+		"app/[locale]/architecture/useHierarchicalArchitectureGraph.ts",
+	);
 	assert.match(block, /initialMode="services"/);
 	assert.match(graph, /initialMode === "services" \? "all" : "critical"/);
-	assert.match(graph, /if \(mode !== "services" \|\| scope === "all" \|\| query\.trim\(\)\)/);
+	assert.match(
+		graph,
+		/if \(mode !== "services" \|\| scope === "all" \|\| query\.trim\(\)\)/,
+	);
 });

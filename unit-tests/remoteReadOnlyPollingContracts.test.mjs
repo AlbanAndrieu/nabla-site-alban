@@ -135,12 +135,18 @@ test("Architecture downgrades old SERVICE evidence on return", () => {
 	);
 	assert.match(hook, /readOnly \?[\s\S]*?"\/api\/homelab-health-v2"/);
 	assert.match(hook, /hiddenSince = Date\.now\(\)/);
-	assert.match(hook, /Date\.now\(\) - hiddenSince >= PUBLIC_EVIDENCE_STALE_AFTER_MS/);
+	assert.match(
+		hook,
+		/Date\.now\(\) - hiddenSince >= PUBLIC_EVIDENCE_STALE_AFTER_MS/,
+	);
 	assert.match(hook, /current \? markSiteHealthStale\(current\) : null/);
 	assert.match(hook, /setHealthUnavailable\(true\)/);
 	assert.match(hook, /hiddenSince = null;\s*void loadHealth\(\)/);
 	assert.match(hook, /controller\?\.abort\(\)/);
-	assert.match(hook, /if \(!active \|\| requestController\.signal\.aborted\) return;/);
+	assert.match(
+		hook,
+		/if \(!active \|\| requestController\.signal\.aborted\) return;/,
+	);
 	assert.match(
 		hook,
 		/readOnly && current \? markSiteHealthStale\(current\) : null/,
