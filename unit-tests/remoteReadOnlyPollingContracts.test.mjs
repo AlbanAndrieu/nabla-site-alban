@@ -129,9 +129,10 @@ test("long-hidden SERVICE tab invalidates old health without more polling", () =
 	assert.equal((hook.match(/window\.setInterval\(/g) ?? []).length, 2);
 });
 
-test("Architecture resumes stale SERVICE evidence without fetching OWNER diagnostics", () => {
-	const sourcePath = "app/[locale]/architecture/useArchitectureHealthPolling.ts";
-	const hook = source(sourcePath);
+test("Architecture downgrades old SERVICE evidence on return", () => {
+	const hook = source(
+		"app/[locale]/architecture/useArchitectureHealthPolling.ts",
+	);
 	assert.match(hook, /readOnly \?[\s\S]*?"\/api\/homelab-health-v2"/);
 	assert.match(hook, /hiddenSince = Date\.now\(\)/);
 	assert.match(hook, /Date\.now\(\) - hiddenSince >= PUBLIC_EVIDENCE_STALE_AFTER_MS/);
@@ -139,5 +140,6 @@ test("Architecture resumes stale SERVICE evidence without fetching OWNER diagnos
 	assert.match(hook, /setHealthUnavailable\(true\)/);
 	assert.match(hook, /hiddenSince = null;\s*void loadHealth\(\)/);
 	assert.match(hook, /controller\?\.abort\(\)/);
+	assert.match(hook, /if \(!active \|\| requestController\.signal\.aborted\) return;/);
 	assert.equal((hook.match(/window\.setTimeout\(/g) ?? []).length, 1);
 });

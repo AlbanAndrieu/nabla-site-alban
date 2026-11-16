@@ -81,11 +81,13 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 						headers: { Accept: "application/json" },
 					},
 				);
+				if (!active || requestController.signal.aborted) return;
 				if (!response.ok) throw new Error(`health HTTP ${response.status}`);
-				consecutiveFailures = 0;
 				if (readOnly) {
 					const projected = parseSiteHealthV2(await response.json());
+					if (!active || requestController.signal.aborted) return;
 					if (!projected) throw new Error("invalid v2 health projection");
+					consecutiveFailures = 0;
 					latestSnapshot = null;
 					latestUnavailable = projected.boardState !== "fresh";
 					if (active) {
@@ -95,7 +97,9 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 					}
 				} else {
 					const parsed = parseHomelabHealthSnapshot(await response.json());
+					if (!active || requestController.signal.aborted) return;
 					if (!parsed) throw new Error("invalid health payload");
+					consecutiveFailures = 0;
 					latestSnapshot = parsed;
 					latestUnavailable = false;
 					if (active) {
