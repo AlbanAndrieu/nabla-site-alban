@@ -21,7 +21,7 @@ export function decodeHtmlAttributeValue(value) {
 	});
 }
 
-function linkHref(html, rel, hreflang) {
+export function linkHref(html, rel, hreflang) {
 	const tags = html.match(/<link\b[^>]*>/gi) ?? [];
 	for (const tag of tags) {
 		const relValue = attributeValue(tag, "rel");
@@ -36,7 +36,7 @@ function linkHref(html, rel, hreflang) {
 	return null;
 }
 
-function metaContent(html, name) {
+export function metaContent(html, name) {
 	const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
 	for (const tag of tags) {
 		const metaName =
