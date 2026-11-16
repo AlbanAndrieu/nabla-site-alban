@@ -112,9 +112,12 @@ export default function useArchitectureHealthPolling(readOnly = false) {
 				if (active && !requestController.signal.aborted) {
 					latestUnavailable = true;
 					consecutiveFailures += 1;
-					// Stale successful probes must not continue to show healthy.
+					// Keep only the last PUBLIC identities, never old healthy
+					// evidence; OWNER diagnostics are cleared on every failure.
 					setHealth(null);
-					setSiteHealth(null);
+					setSiteHealth((current) =>
+						readOnly && current ? markSiteHealthStale(current) : null,
+					);
 					setHealthUnavailable(true);
 				}
 			} finally {
