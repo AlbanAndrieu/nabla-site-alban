@@ -27,11 +27,14 @@
 	--ui-chrome-muted: var(--ui-text-secondary);
 
 	/* Shared geometry and interaction tokens. */
+	--ui-focus-width: 3px;
+	--ui-focus-offset: 3px;
 	--ui-control-min-height: 2.75rem;
 	--ui-action-min-width: 13.75rem;
 	--ui-radius-sm: 0.375rem;
 	--ui-radius-control: 0.5rem;
 	--ui-radius-card: 0.75rem;
+	--ui-radius-md: var(--ui-radius-control);
 	--ui-space-2xs: 0.25rem;
 	--ui-space-xs: 0.5rem;
 	--ui-space-sm: 0.75rem;
@@ -40,19 +43,12 @@
 	--ui-space-xl: 2rem;
 	--ui-space-2xl: 3rem;
 	--ui-shadow-sm: 0 4px 12px rgb(0 0 0 / 15%);
+	--ui-shadow-md: var(--ui-shadow-sm);
 	--ui-font-size-sm: 0.875rem;
 	--ui-font-size-md: 1rem;
 	--ui-font-size-lg: 1.25rem;
-	--ui-font-size-section-title: clamp(
-		1.5rem,
-		calc(1.3rem + 0.6vw),
-		1.75rem
-	);
-	--ui-font-size-display: clamp(
-		2.25rem,
-		calc(1.475rem + 2.7vw),
-		3.5rem
-	);
+	--ui-font-size-section-title: clamp(1.5rem, calc(1.3rem + 0.6vw), 1.75rem);
+	--ui-font-size-display: clamp(2.25rem, calc(1.475rem + 2.7vw), 3.5rem);
 	--ui-font-weight-light: 300;
 	--ui-line-height-heading: 1.2;
 	--ui-font-weight-action: 600;
