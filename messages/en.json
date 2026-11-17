@@ -1113,5 +1113,141 @@
 			"backHome": "Back to home",
 			"another": "Send another message"
 		}
+	},
+	"pfsensePage": {
+		"meta": {
+			"title": "Replacing the pfSense firewall: analysis and choice | Alban Andrieu",
+			"description": "Repeated freezes of a Netgate 1100: diagnosis, criteria, comparison of replacements and the choice of a Netgate 4200 MAX for a homelab."
+		},
+		"eyebrow": "Homelab · Firewall",
+		"title": "Replacing the pfSense firewall",
+		"lead": "My Netgate 1100 kept freezing. Here are the diagnosis, the criteria, the comparison of replacements and the final choice.",
+		"updated": "Analysis written on 17 November 2026.",
+		"incident": {
+			"title": "The incident, in short",
+			"paragraphs": [
+				"The Netgate 1100 (8 GB eMMC from 2018, 1 GB of RAM) freezes repeatedly. During a burst of writes (boot, WAN coming back, package restarts), the eMMC times out and ZFS suspends the pool.",
+				"The symptom is misleading: the web interface, SSH, syslog and then DHCP stop, while routing and DNS keep working. The network looks half alive."
+			],
+			"methodTitle": "Method",
+			"method": [
+				"a recorder started over SSH in the window right after boot, to capture errors before the freeze;",
+				"external probes (logs in Loki, metrics in Prometheus) to timestamp freezes without relying on the box;",
+				"a backup copy of the configuration before any change."
+			]
+		},
+		"criteria": {
+			"title": "The criteria",
+			"items": [
+				"No eMMC as the system disk: an SSD is needed to absorb write bursts.",
+				"Stay on pfSense Plus: a Plus 26.03 configuration does not restore safely on pfSense CE, and the infrastructure-as-code tooling relies on the pfSense PHP API.",
+				"4 GB of RAM minimum, 8 GB to be comfortable."
+			]
+		},
+		"comparison": {
+			"title": "The comparison",
+			"intro": "Observed prices in US dollars, or in euros where stated. They are not reliably dated: check them before buying.",
+			"caption": "Comparison of Netgate 1100 replacements",
+			"scrollLabel": "Comparison table, horizontally scrollable",
+			"columns": {
+				"model": "Model",
+				"price": "Observed price",
+				"specs": "Specifications",
+				"verdict": "Verdict"
+			},
+			"rows": [
+				{
+					"model": "Netgate 4200 MAX",
+					"price": "$649 at launch and on Amazon (April 2026); $829 on the Netgate store",
+					"specs": "4-core Atom C1110, 4 GB, 128 GB NVMe, 4 × 2.5 Gb ports, fanless, pfSense Plus included",
+					"verdict": "Recommended"
+				},
+				{
+					"model": "Netgate 6100 MAX",
+					"price": "~$949",
+					"specs": "8 GB, 128 GB NVMe",
+					"verdict": "Option for more RAM headroom"
+				},
+				{
+					"model": "Netgate 2100 MAX",
+					"price": "$392",
+					"specs": "Same ARM platform and same switch as the 1100",
+					"verdict": "Rejected"
+				},
+				{
+					"model": "BASE versions",
+					"price": "—",
+					"specs": "8 GB eMMC",
+					"verdict": "Rejected"
+				},
+				{
+					"model": "Protectli VP2440e",
+					"price": "~$499 to $529 or €479",
+					"specs": "Intel N150",
+					"verdict": "x86 alternative, not chosen"
+				},
+				{
+					"model": "Generic N150 mini PCs",
+					"price": "$120 to $290",
+					"specs": "Intel N150; pfSense Plus by subscription (~$129/year per a third-party source, unconfirmed)",
+					"verdict": "Not chosen"
+				},
+				{
+					"model": "OPNsense DEC740/750",
+					"price": "€749 to €899",
+					"specs": "OPNsense appliance",
+					"verdict": "Rejected: tooling and configuration would have to be rewritten"
+				}
+			]
+		},
+		"rejected": {
+			"title": "Rejected options and why",
+			"items": [
+				"A NAS as the firewall: maximum blast radius, a single network card and a network outage at every update.",
+				"Palo Alto: excellent, but the subscriptions are out of proportion for a homelab."
+			],
+			"marketTitle": "Market landmarks",
+			"market": [
+				"Fortinet claims the largest market share in units (about 55%, vendor figure).",
+				"Palo Alto remains the reference for next-generation firewalls (NGFW).",
+				"pfSense and OPNsense lead open source."
+			]
+		},
+		"choice": {
+			"title": "The choice: Netgate 4200 MAX",
+			"lead": "The 4200 MAX meets every criterion: NVMe instead of eMMC, 4 GB of RAM, pfSense Plus included and no fan.",
+			"stepsTitle": "The migration",
+			"steps": [
+				"restore the saved configuration;",
+				"reassign the interfaces to the new box's ports;",
+				"replay the convergence scripts to check that the live state matches the code."
+			],
+			"bonus": "Bonus: independent ports remove the LAN/WAN bridge at cold boot, a flaw specific to the 1100's built-in switch."
+		},
+		"security": {
+			"title": "Security lessons",
+			"items": [
+				"Segment the network into VLANs to limit the blast radius.",
+				"Administer the firewall only through the VPN.",
+				"Protect administrative access with FIDO2 keys.",
+				"No inbound port forwarding: published services go through a Cloudflare tunnel.",
+				"Ship logs off the machine, to keep a trail even when it freezes."
+			]
+		},
+		"sources": {
+			"title": "Sources",
+			"links": {
+				"netgate4200Shop": "Netgate store: 4200 MAX",
+				"netgate4200Launch": "Netgate blog: 4200 MAX launch",
+				"netgate2100Shop": "Netgate store: 2100 MAX",
+				"netgate6100Shop": "Netgate store: 6100 MAX",
+				"protectliVp2440": "Protectli: VP2440",
+				"opnsenseDec750": "OPNsense store: DEC750",
+				"pfsenseRestore": "pfSense documentation: backup and restore",
+				"diskLifetime": "Netgate documentation: disk lifetime",
+				"diskWrites": "Netgate documentation: disk writes",
+				"fortinetShare": "Placera (Avanza): Fortinet news item"
+			}
+		}
 	}
 }

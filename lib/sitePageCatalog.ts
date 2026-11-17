@@ -74,6 +74,7 @@ export const SITE_PAGES = {
 	},
 	ctid: { category: "editorialShowcase" },
 	freenas: { category: "editorialShowcase" },
+	pfsense: { category: "editorialShowcase" },
 	nabla: {
 		category: "editorialShowcase",
 		seo: { priority: 0.7, changeFrequency: "monthly" },

@@ -57,6 +57,7 @@ const localizedSeoSlugs = [
 const nonIndexablePages = [
 	"/ctid.html",
 	"/freenas.html",
+	"/fr/pfsense",
 	"/workstation.html",
 	"/jm/4-years-review-aandrieu",
 	"/startup.html",

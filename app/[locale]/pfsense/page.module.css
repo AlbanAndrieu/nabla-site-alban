@@ -1,0 +1,88 @@
+/* The global reset removes list markers; this write-up relies on them. */
+.content ul {
+	padding-inline-start: var(--ui-space-lg);
+	list-style: disc;
+}
+
+.content ol {
+	padding-inline-start: var(--ui-space-lg);
+	list-style: decimal;
+}
+
+.content li + li {
+	margin-top: var(--ui-space-xs);
+}
+
+.eyebrow {
+	margin: 0 0 var(--ui-space-sm);
+	color: var(--ui-text-muted);
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+}
+
+.updated {
+	margin: var(--ui-space-sm) 0 0;
+	color: var(--ui-text-muted);
+	font-size: 0.9rem;
+}
+
+.subTitle {
+	margin: var(--ui-space-md) 0 var(--ui-space-sm);
+	font-size: 1.1rem;
+}
+
+.tableScroll {
+	overflow-x: auto;
+	border: 1px solid var(--ui-border);
+	border-radius: var(--ui-radius-card);
+	background: var(--ui-surface-card);
+}
+
+.table {
+	width: 100%;
+	min-width: 40rem;
+	border-collapse: collapse;
+	color: var(--ui-text-primary);
+}
+
+.table th,
+.table td {
+	padding: var(--ui-space-sm) var(--ui-space-md);
+	border-bottom: 1px solid var(--ui-border);
+	text-align: start;
+	vertical-align: top;
+	line-height: 1.5;
+}
+
+.table thead th {
+	color: var(--ui-text-muted);
+	font-size: 0.85rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.callout {
+	max-width: 80ch;
+	padding: var(--ui-space-sm) var(--ui-space-md);
+	border-inline-start: 4px solid var(--ui-link);
+	border-radius: var(--ui-radius-sm);
+	background: color-mix(in srgb, var(--ui-link) 10%, transparent);
+}
+
+.tableScroll:focus-visible,
+.sources a:focus-visible {
+	outline: 3px solid var(--ui-focus-ring);
+	outline-offset: 3px;
+	border-radius: var(--ui-radius-sm);
+}
+
+.sources {
+	overflow-wrap: anywhere;
+}

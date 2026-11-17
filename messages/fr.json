@@ -1113,5 +1113,141 @@
 			"backHome": "Retour à l’accueil",
 			"another": "Envoyer un autre message"
 		}
+	},
+	"pfsensePage": {
+		"meta": {
+			"title": "Remplacer le pare-feu pfSense : analyse et choix | Alban Andrieu",
+			"description": "Gels répétés d'un Netgate 1100 : diagnostic, critères, comparatif des remplaçants et choix du Netgate 4200 MAX pour un homelab."
+		},
+		"eyebrow": "Homelab · Pare-feu",
+		"title": "Remplacer le pare-feu pfSense",
+		"lead": "Mon Netgate 1100 se figeait à répétition. Voici le diagnostic, les critères retenus, le comparatif des remplaçants et le choix final.",
+		"updated": "Analyse rédigée le 17 novembre 2026.",
+		"incident": {
+			"title": "L'incident, en résumé",
+			"paragraphs": [
+				"Le Netgate 1100 (eMMC de 8 Go datant de 2018, 1 Go de RAM) se fige à répétition. Pendant une rafale d'écritures (démarrage, retour du WAN, redémarrage de paquets), l'eMMC tombe en timeout et ZFS suspend le pool.",
+				"Le symptôme est trompeur : l'interface web, SSH, le syslog puis le DHCP s'arrêtent, alors que le routage et le DNS continuent de fonctionner. Le réseau paraît à moitié vivant."
+			],
+			"methodTitle": "Méthode",
+			"method": [
+				"un enregistreur lancé en SSH dans la fenêtre qui suit le démarrage, pour capturer les erreurs avant le gel ;",
+				"des sondes externes (journaux dans Loki, métriques dans Prometheus) pour dater les gels sans dépendre du boîtier ;",
+				"une copie de secours de la configuration avant toute intervention."
+			]
+		},
+		"criteria": {
+			"title": "Les critères",
+			"items": [
+				"Pas d'eMMC comme disque système : il faut un SSD qui encaisse les rafales d'écriture.",
+				"Rester sur pfSense Plus : la configuration Plus 26.03 ne se restaure pas de façon sûre sur pfSense CE, et l'outillage d'infrastructure as code repose sur l'API PHP de pfSense.",
+				"4 Go de RAM au minimum, 8 Go pour être à l'aise."
+			]
+		},
+		"comparison": {
+			"title": "Le comparatif",
+			"intro": "Prix constatés en dollars US, ou en euros quand c'est indiqué. Ils ne sont pas datés de façon fiable : à vérifier avant tout achat.",
+			"caption": "Comparatif des remplaçants du Netgate 1100",
+			"scrollLabel": "Tableau comparatif, défilable horizontalement",
+			"columns": {
+				"model": "Modèle",
+				"price": "Prix constaté",
+				"specs": "Caractéristiques",
+				"verdict": "Verdict"
+			},
+			"rows": [
+				{
+					"model": "Netgate 4200 MAX",
+					"price": "649 $ au lancement et sur Amazon (avril 2026) ; 829 $ sur la boutique Netgate",
+					"specs": "Atom C1110 4 cœurs, 4 Go, NVMe 128 Go, 4 ports 2,5 Gb, sans ventilateur, pfSense Plus inclus",
+					"verdict": "Recommandé"
+				},
+				{
+					"model": "Netgate 6100 MAX",
+					"price": "~949 $",
+					"specs": "8 Go, NVMe 128 Go",
+					"verdict": "Option si l'on veut de la marge en RAM"
+				},
+				{
+					"model": "Netgate 2100 MAX",
+					"price": "392 $",
+					"specs": "Même plateforme ARM et même switch que le 1100",
+					"verdict": "Écarté"
+				},
+				{
+					"model": "Versions BASE",
+					"price": "—",
+					"specs": "eMMC 8 Go",
+					"verdict": "Écartées"
+				},
+				{
+					"model": "Protectli VP2440e",
+					"price": "~499 à 529 $ ou 479 €",
+					"specs": "Intel N150",
+					"verdict": "Alternative x86, non retenue"
+				},
+				{
+					"model": "Mini-PC N150 génériques",
+					"price": "120 à 290 $",
+					"specs": "Intel N150 ; pfSense Plus par abonnement (~129 $/an selon une source tierce, non confirmé)",
+					"verdict": "Non retenus"
+				},
+				{
+					"model": "OPNsense DEC740/750",
+					"price": "749 à 899 €",
+					"specs": "Appliance OPNsense",
+					"verdict": "Écarté : il faudrait réécrire l'outillage et la configuration"
+				}
+			]
+		},
+		"rejected": {
+			"title": "Options écartées et pourquoi",
+			"items": [
+				"Un NAS comme pare-feu : rayon d'impact maximal, une seule carte réseau et une coupure du réseau à chaque mise à jour.",
+				"Palo Alto : excellent, mais les abonnements sont disproportionnés pour un homelab."
+			],
+			"marketTitle": "Repères de marché",
+			"market": [
+				"Fortinet revendique la première part de marché en unités (environ 55 %, chiffre de l'éditeur).",
+				"Palo Alto reste la référence des pare-feux de nouvelle génération (NGFW).",
+				"pfSense et OPNsense dominent l'open source."
+			]
+		},
+		"choice": {
+			"title": "Le choix : Netgate 4200 MAX",
+			"lead": "Le 4200 MAX coche tous les critères : NVMe au lieu d'eMMC, 4 Go de RAM, pfSense Plus inclus et aucun ventilateur.",
+			"stepsTitle": "La migration",
+			"steps": [
+				"restaurer la configuration sauvegardée ;",
+				"réassigner les interfaces aux ports du nouveau boîtier ;",
+				"rejouer les scripts de convergence pour vérifier que l'état réel correspond au code."
+			],
+			"bonus": "Bonus : avec des ports indépendants, plus de pont LAN/WAN au démarrage à froid, un défaut propre au switch intégré du 1100."
+		},
+		"security": {
+			"title": "Les leçons de sécurité",
+			"items": [
+				"Segmenter le réseau en VLAN pour limiter le rayon d'impact.",
+				"N'administrer le pare-feu que par le VPN.",
+				"Protéger les accès d'administration par des clés FIDO2.",
+				"Aucune redirection de port entrante : les services publiés passent par un tunnel Cloudflare.",
+				"Envoyer les journaux hors de la machine, pour garder une trace même quand elle se fige."
+			]
+		},
+		"sources": {
+			"title": "Sources",
+			"links": {
+				"netgate4200Shop": "Netgate, boutique : 4200 MAX",
+				"netgate4200Launch": "Netgate, blog : lancement du 4200 MAX",
+				"netgate2100Shop": "Netgate, boutique : 2100 MAX",
+				"netgate6100Shop": "Netgate, boutique : 6100 MAX",
+				"protectliVp2440": "Protectli : VP2440",
+				"opnsenseDec750": "OPNsense, boutique : DEC750",
+				"pfsenseRestore": "Documentation pfSense : sauvegarde et restauration",
+				"diskLifetime": "Documentation Netgate : durée de vie des disques",
+				"diskWrites": "Documentation Netgate : écritures disque",
+				"fortinetShare": "Placera (Avanza) : dépêche sur Fortinet"
+			}
+		}
 	}
 }

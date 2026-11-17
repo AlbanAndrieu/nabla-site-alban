@@ -16,6 +16,7 @@ const pageOwnedSkipPaths = [
 	"../app/[locale]/link/page.tsx",
 	"../app/[locale]/login/page.tsx",
 	"../app/[locale]/nabla/page.tsx",
+	"../app/[locale]/pfsense/page.tsx",
 	"../app/[locale]/policy/page.tsx",
 	"../app/[locale]/policy/[policy]/page.tsx",
 	"../app/[locale]/pricing/page.tsx",

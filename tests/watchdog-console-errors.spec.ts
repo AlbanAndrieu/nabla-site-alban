@@ -5,6 +5,7 @@ const pagesToTest = [
 	"/",
 	"/ctid",
 	"/freenas",
+	"/pfsense",
 	"/truenas",
 	"/workstation",
 	"/test",
