@@ -6,7 +6,7 @@
 
 1. [nabla-compose](https://github.com/AlbanAndrieu/nabla-compose/blob/master/docs/service-catalog-v2-normalization.md) produit les entités Backstage `catalog-info.yaml` : `entityRef`, `spec.type`, `spec.lifecycle`, `metadata.tags`, labels de criticité et relations.
 2. [fastapi-sample](https://github.com/AlbanAndrieu/fastapi-sample/blob/master/docs/site-architecture-catalog-handoff.md) vérifie `catalogRevision` et sert la projection authentifiée `GET /api/site/catalog/v2` ; `GET /api/site/health/v2` porte les observations publiques expurgées. Le catalogue de sources et les sondes restent distincts.
-3. Site Alban charge le catalogue via `lib/homelabSiteCatalog.ts` → `GET /api/homelab-catalog-v2`, le sanitise avant de le transmettre au client, et projette cartes et relations avec `lib/homelabCatalogV2Projection.ts`.
+3. Site Alban charge le catalogue via `lib/homelabSiteCatalog.ts` → `GET /api/homelab-catalog-v2`, le sanitise avant de le transmettre au client, et projette cartes et relations avec `lib/homelabCatalogV2Projection.ts`. Les clients v2 (catalogue et santé) partagent `FASTAPI_SITE_V2_BASE_URL` afin d’éviter deux configurations d’origine divergentes.
 4. `app/components/homelab/HomelabServiceGrid.tsx` et l'Architecture partagent les **mêmes identités complètes** `component:default/name`, `resource:default/name` et `api:default/name`. L'icône reste une ressource locale non issue de FastAPI.
 
 Le format accepté est `{ schemaVersion: 2, model: "backstage", catalogRevision: "sha256:<digest>", entities: [...] }`. Une révision absente, des entités dupliquées, une relation ambiguë ou un fallback V1 sont **refusés**, jamais remplacés par un inventaire manuel.
