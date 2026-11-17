@@ -13,6 +13,7 @@ import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
 import styles from "./page.module.css";
 import PivEntraGuide from "./PivEntraGuide";
+import TerraformYubiKeyApproval from "./TerraformYubiKeyApproval";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
 import YubiKeyEvidence from "./YubiKeyEvidence";
 import YubiKeyIntroduction from "./YubiKeyIntroduction";
@@ -132,6 +133,9 @@ export default async function YubiKeySecurityPage({
 							<a href="#yubikey-graph-title">{copy.diagramTitle}</a>
 							<a href="#yubikey-vault-pki">Vault PKI</a>
 							<a href="#yubikey-piv-entra">PIV / Entra CBA</a>
+                <a href="#yubikey-terraform-approval">
+                  {locale === "fr" ? "Signature Terraform" : "Terraform approval"}
+                </a>
 							<a href="#yubikey-workflow">{copy.workflowTitle}</a>
 							<a href="#yubikey-use-cases">
 								{locale === "fr" ? "Exemples" : "Examples"}
@@ -146,6 +150,7 @@ export default async function YubiKeySecurityPage({
 					<YubiKeyGraph copy={copy} />
 					<VaultPkiArchitecture locale={locale} />
 					<PivEntraGuide locale={locale} />
+          <TerraformYubiKeyApproval locale={locale as AppLocale} />
 					<section id="yubikey-workflow" className={styles.section}>
 						<h2>{copy.workflowTitle}</h2>
 						<div className={styles.stepGrid}>
