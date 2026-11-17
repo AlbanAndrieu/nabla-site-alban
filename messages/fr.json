@@ -1122,11 +1122,11 @@
 		"eyebrow": "Homelab · Pare-feu",
 		"title": "Remplacer le pare-feu pfSense",
 		"lead": "Mon Netgate 1100 se figeait à répétition. Voici le diagnostic, les critères retenus, le comparatif des remplaçants et le choix final.",
-		"updated": "Analyse rédigée le 17 novembre 2026.",
+		"updated": "Analyse rédigée le 17 novembre 2026, complétée le même jour par les mesures du matériel.",
 		"incident": {
 			"title": "L'incident, en résumé",
 			"paragraphs": [
-				"Le Netgate 1100 (eMMC de 8 Go datant de 2018, 1 Go de RAM) se fige à répétition. Pendant une rafale d'écritures (démarrage, retour du WAN, redémarrage de paquets), l'eMMC tombe en timeout et ZFS suspend le pool.",
+				"Le Netgate 1100 (eMMC de 8 Go datant de 2018, 1 Go de RAM) se fige à répétition. Lors du gel capturé, une rafale d'écritures (démarrage, retour du WAN, redémarrage de paquets) a fait tomber l'eMMC en timeout, et ZFS a suspendu le pool.",
 				"Le symptôme est trompeur : l'interface web, SSH, le syslog puis le DHCP s'arrêtent, alors que le routage et le DNS continuent de fonctionner. Le réseau paraît à moitié vivant."
 			],
 			"methodTitle": "Méthode",
@@ -1134,6 +1134,34 @@
 				"un enregistreur lancé en SSH dans la fenêtre qui suit le démarrage, pour capturer les erreurs avant le gel ;",
 				"des sondes externes (journaux dans Loki, métriques dans Prometheus) pour dater les gels sans dépendre du boîtier ;",
 				"une copie de secours de la configuration avant toute intervention."
+			]
+		},
+		"hardware": {
+			"title": "Le matériel en cause",
+			"intro": "Une eMMC est une mémoire flash soudée sur la carte avec son contrôleur : un petit SSD qu'on ne peut pas remplacer. Quand elle s'use, tout le boîtier s'use avec elle.",
+			"configTitle": "Le Netgate 1100 (relevé du 17 novembre 2026)",
+			"config": [
+				"Processeur ARM Cortex-A53 à 2 cœurs.",
+				"1 Go de RAM, dont 940 Mo disponibles, sans swap.",
+				"Un seul contrôleur réseau derrière un switch Marvell 88E6341 : le WAN et le LAN sont deux VLAN du même switch, d'où le pont LAN/WAN pendant les démarrages à froid.",
+				"Stockage : eMMC soudée de 8 Go (partitions EFI de 200 Mo, FAT32 de 64 Mo et FreeBSD de 7 Go), avec un pool ZFS à 5,17 Go utilisés et 1,61 Go libres.",
+				"pfSense Plus 26.03."
+			],
+			"wearTitle": "L'usure de l'eMMC (lue le 17 novembre 2026)",
+			"wearIntro": "Lue avec mmc-utils dans le registre EXT_CSD de la puce :",
+			"wear": [
+				"Durée de vie estimée (types A et B) : 0x0b, soit 100 à 110 % de la durée nominale déjà consommée.",
+				"Réserve de blocs (PRE_EOL_INFO) : 0x01, normale.",
+				"Maintenance interne (BKOPS_STATUS) : 0x03, critique. La puce est en retard sur le ramasse-miettes et le nivellement d'usure : une rafale d'écritures peut la bloquer."
+			],
+			"linkTitle": "Le lien avec les gels",
+			"link": [
+				"Prouvé pour le gel capturé : le contrôleur de l'eMMC tombe en timeout, puis ZFS suspend le pool ; l'interface web, SSH, le syslog et le DHCP s'arrêtent alors que le routage continue.",
+				"Probable pour les autres gels : même signature, mais sans trace noyau pour chacun.",
+				"Déclencheur : une hausse des écritures (journalisation du pare-feu, redémarrage de paquets au démarrage).",
+				"Après une cure d'écritures le 17 novembre (journalisation des règles par défaut et graphes RRD coupés, pfBlockerNG et CrowdSec démarrés à la main), le boîtier a tenu 29 minutes sans erreur eMMC, contre environ 4 minutes avant.",
+				"Non exclu : un facteur lié au pilote ou au contrôleur.",
+				"Confirmation attendue : une stabilité sur 24 à 48 heures, puis le remplacement."
 			]
 		},
 		"criteria": {
@@ -1215,14 +1243,14 @@
 		},
 		"choice": {
 			"title": "Le choix : Netgate 4200 MAX",
-			"lead": "Le 4200 MAX coche tous les critères : NVMe au lieu d'eMMC, 4 Go de RAM, pfSense Plus inclus et aucun ventilateur.",
+			"lead": "Cible décidée le 17 novembre 2026. Le 4200 MAX coche tous les critères : processeur Atom C1110, 4 Go de RAM, SSD NVMe de 128 Go à la place de l'eMMC, pfSense Plus inclus et aucun ventilateur.",
 			"stepsTitle": "La migration",
 			"steps": [
 				"restaurer la configuration sauvegardée ;",
 				"réassigner les interfaces aux ports du nouveau boîtier ;",
 				"rejouer les scripts de convergence pour vérifier que l'état réel correspond au code."
 			],
-			"bonus": "Bonus : avec des ports indépendants, plus de pont LAN/WAN au démarrage à froid, un défaut propre au switch intégré du 1100."
+			"bonus": "Bonus : ses 4 ports 2,5 Gb sont indépendants. Sans switch partagé entre WAN et LAN, le pont LAN/WAN au démarrage à froid du 1100 disparaît."
 		},
 		"security": {
 			"title": "Les leçons de sécurité",
