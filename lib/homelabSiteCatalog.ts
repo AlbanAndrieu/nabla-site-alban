@@ -6,8 +6,9 @@ import {
 	parseHomelabCatalogV2,
 } from "./homelabCatalogV2";
 
-export const SITE_CATALOG_V2_URL =
-	"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2";
+export const FASTAPI_SITE_V2_BASE_URL =
+	"https://fastapi-sample.fastapicloud.dev/api/site";
+export const SITE_CATALOG_V2_URL = `${FASTAPI_SITE_V2_BASE_URL}/catalog/v2`;
 const TIMEOUT_MS = 7000;
 const SAFE_RELATIONS = [
 	"dependsOn",

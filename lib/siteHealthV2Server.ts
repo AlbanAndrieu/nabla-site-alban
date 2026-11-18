@@ -1,10 +1,10 @@
-import { SiteCatalogV2Error } from "./homelabSiteCatalog";
+import { FASTAPI_SITE_V2_BASE_URL, SiteCatalogV2Error } from "./homelabSiteCatalog";
 import { catalogHttpFailureStage, catalogTransportFailureStage } from "./homelabCatalogFailureStage";
 import { validHomelabTraceparent } from "./homelabTraceContext";
 import { parseSiteHealthV2, type SiteHealthV2 } from "./siteHealthV2";
 
 /** Bound to the same SERVICE machine identity as Backstage v2 catalog. */
-const URL = "https://fastapi-sample.fastapicloud.dev/api/site/health/v2";
+export const SITE_HEALTH_V2_URL = `${FASTAPI_SITE_V2_BASE_URL}/health/v2`;
 const TIMEOUT_MS = 5000;
 
 export async function loadSiteHealthV2(
@@ -16,7 +16,7 @@ export async function loadSiteHealthV2(
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 	try {
-		const response = await fetch(URL, {
+		const response = await fetch(SITE_HEALTH_V2_URL, {
 			headers: { Accept: "application/json", "X-Diagnostics-Key": key,
 				...(validHomelabTraceparent(traceparent) ? { traceparent } : {}),
 			},
