@@ -86,6 +86,32 @@ export default async function PfsensePage({
 						</ul>
 					</section>
 
+					<section className={layout.section} aria-labelledby="hardware">
+						<h2 id="hardware" className={layout.sectionTitle}>
+							{t("hardware.title")}
+						</h2>
+						<p>{t("hardware.intro")}</p>
+						<h3 className={styles.subTitle}>{t("hardware.configTitle")}</h3>
+						<ul>
+							{list("hardware.config").map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+						<h3 className={styles.subTitle}>{t("hardware.wearTitle")}</h3>
+						<p>{t("hardware.wearIntro")}</p>
+						<ul>
+							{list("hardware.wear").map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+						<h3 className={styles.subTitle}>{t("hardware.linkTitle")}</h3>
+						<ul>
+							{list("hardware.link").map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+					</section>
+
 					<section className={layout.section} aria-labelledby="criteria">
 						<h2 id="criteria" className={layout.sectionTitle}>
 							{t("criteria.title")}

@@ -1122,11 +1122,11 @@
 		"eyebrow": "Homelab · Firewall",
 		"title": "Replacing the pfSense firewall",
 		"lead": "My Netgate 1100 kept freezing. Here are the diagnosis, the criteria, the comparison of replacements and the final choice.",
-		"updated": "Analysis written on 17 November 2026.",
+		"updated": "Analysis written on 17 November 2026, completed the same day with the hardware measurements.",
 		"incident": {
 			"title": "The incident, in short",
 			"paragraphs": [
-				"The Netgate 1100 (8 GB eMMC from 2018, 1 GB of RAM) freezes repeatedly. During a burst of writes (boot, WAN coming back, package restarts), the eMMC times out and ZFS suspends the pool.",
+				"The Netgate 1100 (8 GB eMMC from 2018, 1 GB of RAM) freezes repeatedly. In the captured freeze, a burst of writes (boot, WAN coming back, package restarts) made the eMMC time out, and ZFS suspended the pool.",
 				"The symptom is misleading: the web interface, SSH, syslog and then DHCP stop, while routing and DNS keep working. The network looks half alive."
 			],
 			"methodTitle": "Method",
@@ -1134,6 +1134,34 @@
 				"a recorder started over SSH in the window right after boot, to capture errors before the freeze;",
 				"external probes (logs in Loki, metrics in Prometheus) to timestamp freezes without relying on the box;",
 				"a backup copy of the configuration before any change."
+			]
+		},
+		"hardware": {
+			"title": "The hardware at fault",
+			"intro": "An eMMC is flash memory soldered to the board together with its controller: a small SSD that cannot be replaced. When it wears out, the whole box wears out with it.",
+			"configTitle": "The Netgate 1100 (snapshot of 17 November 2026)",
+			"config": [
+				"ARM Cortex-A53 CPU, 2 cores.",
+				"1 GB of RAM, 940 MB of it available, no swap.",
+				"A single network controller behind a Marvell 88E6341 switch: WAN and LAN are two VLANs on the same switch, hence the LAN/WAN bridge during cold boots.",
+				"Storage: 8 GB soldered eMMC (200 MB EFI, 64 MB FAT32 and 7 GB FreeBSD partitions), with a ZFS pool at 5.17 GB used and 1.61 GB free.",
+				"pfSense Plus 26.03."
+			],
+			"wearTitle": "eMMC wear (read on 17 November 2026)",
+			"wearIntro": "Read with mmc-utils from the chip's EXT_CSD register:",
+			"wear": [
+				"Estimated lifetime (types A and B): 0x0b, meaning 100 to 110% of the rated lifetime already used.",
+				"Spare block reserve (PRE_EOL_INFO): 0x01, normal.",
+				"Background operations (BKOPS_STATUS): 0x03, critical. The chip is behind on garbage collection and wear levelling, so a burst of writes can stall it."
+			],
+			"linkTitle": "How this ties to the freezes",
+			"link": [
+				"Proven for the captured freeze: the eMMC controller times out, then ZFS suspends the pool; the web UI, SSH, syslog and DHCP stop while routing keeps working.",
+				"Likely for the other freezes: same signature, but no kernel trace for each one.",
+				"Trigger: a rise in writes (firewall logging, package restarts at boot).",
+				"After a write diet on 17 November (default rule logging and RRD graphs turned off, pfBlockerNG and CrowdSec started by hand), the box ran 29 minutes without an eMMC error, against about 4 minutes before.",
+				"Not ruled out: a driver or controller factor.",
+				"Still to confirm: 24 to 48 hours of stability, then the replacement."
 			]
 		},
 		"criteria": {
@@ -1215,14 +1243,14 @@
 		},
 		"choice": {
 			"title": "The choice: Netgate 4200 MAX",
-			"lead": "The 4200 MAX meets every criterion: NVMe instead of eMMC, 4 GB of RAM, pfSense Plus included and no fan.",
+			"lead": "Target chosen on 17 November 2026. The 4200 MAX meets every criterion: Atom C1110 CPU, 4 GB of RAM, a 128 GB NVMe SSD instead of the eMMC, pfSense Plus included and no fan.",
 			"stepsTitle": "The migration",
 			"steps": [
 				"restore the saved configuration;",
 				"reassign the interfaces to the new box's ports;",
 				"replay the convergence scripts to check that the live state matches the code."
 			],
-			"bonus": "Bonus: independent ports remove the LAN/WAN bridge at cold boot, a flaw specific to the 1100's built-in switch."
+			"bonus": "Bonus: its 4 × 2.5 Gb ports are independent. With no switch shared between WAN and LAN, the 1100's LAN/WAN bridge at cold boot goes away."
 		},
 		"security": {
 			"title": "Security lessons",
