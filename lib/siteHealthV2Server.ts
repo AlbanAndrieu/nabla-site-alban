@@ -1,5 +1,11 @@
-import { FASTAPI_SITE_V2_BASE_URL, SiteCatalogV2Error } from "./homelabSiteCatalog";
-import { catalogHttpFailureStage, catalogTransportFailureStage } from "./homelabCatalogFailureStage";
+import {
+	catalogHttpFailureStage,
+	catalogTransportFailureStage,
+} from "./homelabCatalogFailureStage";
+import {
+	FASTAPI_SITE_V2_BASE_URL,
+	SiteCatalogV2Error,
+} from "./homelabSiteCatalog";
 import { validHomelabTraceparent } from "./homelabTraceContext";
 import { parseSiteHealthV2, type SiteHealthV2 } from "./siteHealthV2";
 
@@ -17,7 +23,9 @@ export async function loadSiteHealthV2(
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 	try {
 		const response = await fetch(SITE_HEALTH_V2_URL, {
-			headers: { Accept: "application/json", "X-Diagnostics-Key": key,
+			headers: {
+				Accept: "application/json",
+				"X-Diagnostics-Key": key,
 				...(validHomelabTraceparent(traceparent) ? { traceparent } : {}),
 			},
 			method: "GET",
@@ -27,19 +35,31 @@ export async function loadSiteHealthV2(
 		});
 		// FastAPI must echo exactly the Site-generated trace; header injection never confirms a trace.
 		if (validHomelabTraceparent(traceparent)) {
-			onVerifiedEcho?.(response.headers.get("X-Nabla-Trace-ID") === traceparent.split("-")[1]);
+			onVerifiedEcho?.(
+				response.headers.get("X-Nabla-Trace-ID") === traceparent.split("-")[1],
+			);
 		}
 		if (response.status === 401 || response.status === 403) {
 			throw new SiteCatalogV2Error("access-denied", "upstream_auth");
 		}
-		if (!response.ok) throw new SiteCatalogV2Error("unavailable",
-				catalogHttpFailureStage(response.status, response.headers.get("X-Nabla-Diagnostic-Stage")));
+		if (!response.ok)
+			throw new SiteCatalogV2Error(
+				"unavailable",
+				catalogHttpFailureStage(
+					response.status,
+					response.headers.get("X-Nabla-Diagnostic-Stage"),
+				),
+			);
 		const data = parseSiteHealthV2(await response.json());
-		if (!data) throw new SiteCatalogV2Error("unavailable", "catalog_validation");
+		if (!data)
+			throw new SiteCatalogV2Error("unavailable", "catalog_validation");
 		return data;
 	} catch (error) {
 		if (error instanceof SiteCatalogV2Error) throw error;
-		throw new SiteCatalogV2Error("unavailable", catalogTransportFailureStage(error));
+		throw new SiteCatalogV2Error(
+			"unavailable",
+			catalogTransportFailureStage(error),
+		);
 	} finally {
 		clearTimeout(timeout);
 	}

@@ -1,4 +1,8 @@
-import { catalogHttpFailureStage, catalogTransportFailureStage, type CatalogFailureStage } from "./homelabCatalogFailureStage";
+import {
+	type CatalogFailureStage,
+	catalogHttpFailureStage,
+	catalogTransportFailureStage,
+} from "./homelabCatalogFailureStage";
 import {
 	type CatalogV2Entity,
 	catalogV2ServiceViews,
@@ -36,7 +40,10 @@ export type SiteCatalogV2ErrorReason =
 	| "unavailable";
 
 export class SiteCatalogV2Error extends Error {
-	constructor(public readonly reason: SiteCatalogV2ErrorReason, public readonly stage: CatalogFailureStage = "unknown") {
+	constructor(
+		public readonly reason: SiteCatalogV2ErrorReason,
+		public readonly stage: CatalogFailureStage = "unknown",
+	) {
 		super("Backstage v2 catalog unavailable");
 		this.name = "SiteCatalogV2Error";
 	}
@@ -183,8 +190,14 @@ async function fetchSiteCatalogV2Uncached(
 		if (response.status === 401 || response.status === 403) {
 			throw new SiteCatalogV2Error("access-denied", "upstream_auth");
 		}
-		if (!response.ok) throw new SiteCatalogV2Error("unavailable",
-			catalogHttpFailureStage(response.status, response.headers.get("X-Nabla-Diagnostic-Stage")));
+		if (!response.ok)
+			throw new SiteCatalogV2Error(
+				"unavailable",
+				catalogHttpFailureStage(
+					response.status,
+					response.headers.get("X-Nabla-Diagnostic-Stage"),
+				),
+			);
 		const parsed = parseHomelabCatalogV2(await response.json());
 		const safe = parsed && sanitizeSiteCatalogV2(parsed);
 		if (!safe || catalogV2ServiceViews(safe).length === 0) {
@@ -193,7 +206,10 @@ async function fetchSiteCatalogV2Uncached(
 		return safe;
 	} catch (error) {
 		if (error instanceof SiteCatalogV2Error) throw error;
-		throw new SiteCatalogV2Error("unavailable", catalogTransportFailureStage(error));
+		throw new SiteCatalogV2Error(
+			"unavailable",
+			catalogTransportFailureStage(error),
+		);
 	} finally {
 		clearTimeout(timeout);
 	}

@@ -13,8 +13,14 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
-	assert.equal(SITE_CATALOG_V2_URL, "https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2");
-	assert.equal(SITE_HEALTH_V2_URL, "https://fastapi-sample.fastapicloud.dev/api/site/health/v2");
+	assert.equal(
+		SITE_CATALOG_V2_URL,
+		"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2",
+	);
+	assert.equal(
+		SITE_HEALTH_V2_URL,
+		"https://fastapi-sample.fastapicloud.dev/api/site/health/v2",
+	);
 });
 
 test("legacy catalog routes, loaders and static fallbacks are removed", () => {
