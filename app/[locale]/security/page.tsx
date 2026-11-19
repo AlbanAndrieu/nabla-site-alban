@@ -33,6 +33,7 @@ export default async function SecurityPage({
 	if (!hasLocale(routing.locales, locale)) notFound();
 
 	setRequestLocale(locale);
+	const ctem = await getTranslations({ locale, namespace: "ctemPage" });
 	const contactHref = canonicalPagePath("contact", locale);
 
 	return (
@@ -40,6 +41,11 @@ export default async function SecurityPage({
 			<TopAnchor />
 			<SecurityHero locale={locale} contactHref={contactHref} />
 			<main id="main-content" className="security-resources">
+				<section className="resource-card" aria-labelledby="ctem-heading">
+					<h2 id="ctem-heading">{ctem("title")}</h2>
+					<p>{ctem("lead")}</p>
+					<a href={canonicalPagePath("security/ctem", locale)}>{ctem("discover")}</a>
+				</section>
 				<SecurityCoreSections locale={locale} />
 				<SecurityVisualizations locale={locale} />
 			</main>
