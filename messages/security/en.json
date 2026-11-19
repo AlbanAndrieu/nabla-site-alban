@@ -773,5 +773,37 @@
 				}
 			}
 		}
+	},
+	"ctemPage": {
+		"title": "CTEM — Continuous Threat Exposure Management",
+		"description": "Open architecture for continuous exposure monitoring, cloud posture and attack-path analysis.",
+		"lead": "Continuously discover, prioritize, validate and reduce exposures against an authorized inventory and evidence.",
+		"discover": "Explore the CTEM approach",
+		"back": "Back to security",
+		"cycleTitle": "Operating cycle",
+		"steps": [
+			"Define authorized scope and criticality",
+			"Discover assets and exposures",
+			"Prioritize risk and attack paths",
+			"Validate observations and false positives",
+			"Remediate, measure and verify again"
+		],
+		"toolsTitle": "Tools and responsibilities",
+		"tools": {
+			"oasm": "External attack surface discovery and inventory (isolated proof of concept).",
+			"prowler": "Cloud, Kubernetes and Microsoft 365 posture and compliance for authorized providers.",
+			"cartography": "Asset relationships and attack-path analysis in Neo4j.",
+			"nuclei": "HTTP misconfiguration and exposure detection requiring validation.",
+			"nmap": "Bounded network inventory of authorized ports.",
+			"tls": "Certificates, protocols and ciphers; independent SSL Labs checks.",
+			"mail": "SPF, DKIM, DMARC, MX, MTA-STS and TLS-RPT; provider-confirmed selectors.",
+			"backstage": "Canonical inventory and declared exposure policy.",
+			"defectdojo": "Triage, deduplication and remediation tracking.",
+			"fastapi": "Aggregate indicators and evidence provenance without revealing private details."
+		},
+		"policyTitle": "Exposure policy",
+		"policy": "Secrets, technical files, administrative interfaces and metrics are private by default. LiteLLM and Ollama are LAN-only. Scanners operate within authorized scope.",
+		"evidenceTitle": "Evidence status",
+		"evidence": "This page describes a target architecture, not a security attestation or verified deployment. Missing, expired or incomplete reports never prove zero vulnerabilities. Detailed findings remain private."
 	}
 }

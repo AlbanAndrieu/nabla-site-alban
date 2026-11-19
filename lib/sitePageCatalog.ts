@@ -44,6 +44,10 @@ export const SITE_PAGES = {
 		category: "editorialShowcase",
 		seo: { priority: 0.74, changeFrequency: "monthly" },
 	},
+	"security/ctem": {
+		category: "editorialShowcase",
+		seo: { priority: 0.73, changeFrequency: "monthly" },
+	},
 	"security/yubikey": {
 		category: "editorialShowcase",
 		seo: { priority: 0.72, changeFrequency: "monthly" },

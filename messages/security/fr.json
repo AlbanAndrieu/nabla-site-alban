@@ -773,5 +773,37 @@
 				}
 			}
 		}
+	},
+	"ctemPage": {
+		"title": "CTEM — gestion continue de l’exposition aux menaces",
+		"description": "Architecture ouverte de surveillance des expositions, de la posture cloud et des chemins d’attaque.",
+		"lead": "Découvrir, prioriser, valider et réduire les expositions de manière continue, à partir de preuves et d’un inventaire autorisé.",
+		"discover": "Découvrir la démarche CTEM",
+		"back": "Retour à la sécurité",
+		"cycleTitle": "Cycle de traitement",
+		"steps": [
+			"Définir le périmètre autorisé et la criticité",
+			"Découvrir les actifs et les expositions",
+			"Prioriser selon le risque et les chemins d’attaque",
+			"Valider les observations et les faux positifs",
+			"Remédier, mesurer et vérifier de nouveau"
+		],
+		"toolsTitle": "Outils et responsabilités",
+		"tools": {
+			"oasm": "Découverte et inventaire de la surface d’attaque externe (POC isolé).",
+			"prowler": "Posture et conformité cloud, Kubernetes et Microsoft 365 selon les fournisseurs autorisés.",
+			"cartography": "Relations entre actifs et analyse de chemins d’attaque dans Neo4j.",
+			"nuclei": "Détection de configurations et expositions HTTP à confirmer.",
+			"nmap": "Inventaire réseau borné des ports autorisés.",
+			"tls": "Certificats, protocoles et chiffrements ; contrôle complémentaire SSL Labs.",
+			"mail": "SPF, DKIM, DMARC, MX, MTA-STS et TLS-RPT ; validation des sélecteurs auprès des fournisseurs.",
+			"backstage": "Inventaire de référence et politique d’exposition déclarée.",
+			"defectdojo": "Qualification, déduplication et suivi des corrections.",
+			"fastapi": "Indicateurs agrégés et provenance des preuves, sans divulgation des détails privés."
+		},
+		"policyTitle": "Politique d’exposition",
+		"policy": "Les secrets, fichiers techniques, interfaces administratives et métriques ne sont pas publics par défaut. LiteLLM et Ollama sont réservés au LAN. Les scanners restent limités au périmètre autorisé.",
+		"evidenceTitle": "État des preuves",
+		"evidence": "Cette page décrit une architecture cible, pas une attestation de sécurité ni un déploiement confirmé. Les rapports absents, expirés ou incomplets ne prouvent jamais zéro vulnérabilité. Les findings détaillés restent privés."
 	}
 }
