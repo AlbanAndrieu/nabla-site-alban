@@ -13,16 +13,48 @@ import styles from "./page.module.css";
 export const dynamic = "force-static";
 
 const tools = [
-	{ id: "oasm", label: "OASM", href: "https://github.com/oasm-platform/open-asm" },
-	{ id: "prowler", label: "Prowler", href: "https://github.com/prowler-cloud/prowler" },
-	{ id: "cartography", label: "Cartography", href: "https://github.com/cartography-cncf/cartography" },
-	{ id: "nuclei", label: "Nuclei", href: "https://github.com/projectdiscovery/nuclei" },
+	{
+		id: "oasm",
+		label: "OASM",
+		href: "https://github.com/oasm-platform/open-asm",
+	},
+	{
+		id: "prowler",
+		label: "Prowler",
+		href: "https://github.com/prowler-cloud/prowler",
+	},
+	{
+		id: "cartography",
+		label: "Cartography",
+		href: "https://github.com/cartography-cncf/cartography",
+	},
+	{
+		id: "nuclei",
+		label: "Nuclei",
+		href: "https://github.com/projectdiscovery/nuclei",
+	},
 	{ id: "nmap", label: "Nmap", href: "https://nmap.org/" },
-	{ id: "tls", label: "testssl.sh", href: "https://github.com/testssl/testssl.sh" },
-	{ id: "mail", label: "checkdmarc", href: "https://github.com/domainaware/checkdmarc" },
+	{
+		id: "tls",
+		label: "testssl.sh",
+		href: "https://github.com/testssl/testssl.sh",
+	},
+	{
+		id: "mail",
+		label: "checkdmarc",
+		href: "https://github.com/domainaware/checkdmarc",
+	},
 	{ id: "backstage", label: "Backstage", href: "https://backstage.io/" },
-	{ id: "defectdojo", label: "DefectDojo", href: "https://github.com/DefectDojo/django-DefectDojo" },
-	{ id: "fastapi", label: "FastAPI Sample", href: "https://github.com/AlbanAndrieu/fastapi-sample" },
+	{
+		id: "defectdojo",
+		label: "DefectDojo",
+		href: "https://github.com/DefectDojo/django-DefectDojo",
+	},
+	{
+		id: "fastapi",
+		label: "FastAPI Sample",
+		href: "https://github.com/AlbanAndrieu/fastapi-sample",
+	},
 ] as const;
 
 export async function generateMetadata({
@@ -58,14 +90,20 @@ export default async function CtemPage({
 					<p>{t("lead")}</p>
 					<section aria-labelledby="ctem-cycle">
 						<h2 id="ctem-cycle">{t("cycleTitle")}</h2>
-						<ol>{steps.map((step) => <li key={step}>{step}</li>)}</ol>
+						<ol>
+							{steps.map((step) => (
+								<li key={step}>{step}</li>
+							))}
+						</ol>
 					</section>
 					<section aria-labelledby="ctem-tools">
 						<h2 id="ctem-tools">{t("toolsTitle")}</h2>
 						<div className={styles.grid}>
 							{tools.map((tool) => (
 								<article className={styles.tool} key={tool.id}>
-									<h3><ExternalLink href={tool.href}>{tool.label}</ExternalLink></h3>
+									<h3>
+										<ExternalLink href={tool.href}>{tool.label}</ExternalLink>
+									</h3>
 									<p>{t(`tools.${tool.id}`)}</p>
 								</article>
 							))}
