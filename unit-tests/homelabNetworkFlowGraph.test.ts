@@ -35,7 +35,7 @@ test("static topology has unique node and edge ids with resolvable endpoints", (
 
 test("all paths build one group per failure domain plus every network node", () => {
 	const nodes = buildNodes(NODES, ALL, false);
-	assert.equal(NODES.length, 22);
+	assert.equal(NODES.length, 19);
 	assert.equal(nodes.length, NODES.length + DOMAIN_ORDER.length);
 	const groups = nodes.filter((node) => node.type === "networkGroup");
 	assert.deepEqual(
@@ -49,7 +49,7 @@ test("all paths build one group per failure domain plus every network node", () 
 	);
 	assert.deepEqual(
 		groups.map((node) => node.data.count),
-		[5, 3, 4, 10],
+		[4, 2, 3, 10],
 	);
 	assert.equal(groups[3]?.data.label, "4 · TrueNAS failure domain");
 	assert.equal(
@@ -116,7 +116,7 @@ test("path filters drop hidden domains and edges with hidden endpoints", () => {
 	}
 	assert.ok(tunnelEdges.some((edge) => edge.id === "cloudflared-openwebui"));
 	assert.equal(
-		tunnelEdges.some((edge) => edge.id === "pfsense-unbound"),
+		tunnelEdges.some((edge) => edge.id === "r7000-pihole"),
 		false,
 	);
 });
@@ -139,11 +139,13 @@ test("link kinds map to stroke colour, dash pattern and animation", () => {
 	assert.equal(lan?.style?.stroke, "#4ade80");
 	assert.equal(lan?.style?.strokeDasharray, undefined);
 	assert.equal(lan?.label, "Ethernet");
-	assert.equal(edges.get("pfsense-unbound")?.style?.strokeDasharray, "4 6");
+	assert.equal(edges.get("r7000-pihole")?.style?.strokeDasharray, "4 6");
 });
 
 test("focused paths reuse fixed ids while all follows the fetched graph", () => {
 	assert.equal(ALL.size, NODES.length);
+	// The pfSense-era direct ingress mode is gone: no inbound forward since 18/11/2026.
+	assert.deepEqual(Object.keys(PATH_NODE_IDS), ["tunnel", "dns", "lan"]);
 	assert.equal(visibleNodeIds(NODES, "dns"), PATH_NODE_IDS.dns);
 	assert.equal(visibleNodeIds([], "all").size, 0);
 });

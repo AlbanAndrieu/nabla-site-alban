@@ -52,13 +52,13 @@ export function ArchitectureExposureContract({ french }: Readonly<Props>) {
 				</span>
 			</div>
 			<div className={styles.exposurePathGrid}>
-				<div data-exposure-path="direct">
+				<div data-exposure-path="direct" data-exposure-path-retired>
 					<strong>HAProxy direct</strong>
 					<code>Internet → pfSense:7000 → HAProxy → TrueNAS:7000</code>
 					<small>
 						{french
-							? "Chemin public direct explicitement distinct du Tunnel Cloudflare."
-							: "Public direct path explicitly separate from Cloudflare Tunnel."}
+							? "Retiré le 18/11/2026 avec le pfSense : aucun chemin public direct n’est actif tant qu’aucun pare-feu de remplacement n’est en service."
+							: "Retired on 18/11/2026 with the pfSense: no direct public path is active until a replacement firewall is in service."}
 					</small>
 				</div>
 				<div data-exposure-path="cloudflare">
@@ -72,7 +72,7 @@ export function ArchitectureExposureContract({ french }: Readonly<Props>) {
 				</div>
 				<div data-exposure-path="lan-vpn">
 					<strong>LAN / VPN only</strong>
-					<code>pfSense admin 10443/tcp · TrueNAS SSH 9922/tcp</code>
+					<code>TrueNAS SSH 9922/tcp</code>
 					<small>
 						{french
 							? "Ces ports d’administration ne sont pas des endpoints Internet attendus."

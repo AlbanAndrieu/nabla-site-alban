@@ -12,19 +12,34 @@ test("Node 24.22.1 LTS is the single Docker, Dagger and local runtime", () => {
 	assert.equal(source(".nvmrc").trim(), "24.22.1");
 	assert.equal(pkg.engines.node, ">=24.22.1 <25");
 	assert.equal(pkg.devEngines.runtime.version, "24.22.1");
-	assert.match(source(".envrc"), /NODE_VERSIONS=\$\{NODE_VERSIONS:-"v24\.22\.1"\}/);
-	assert.match(source("Dockerfile"), /ARG NODE_IMAGE=node:24\.22\.1-alpine3\.24/);
-	assert.match(source(".dagger/src/index.ts"), /const NODE_DEVELOPMENT = "24\.22\.1"/);
-	assert.match(source(".dagger/src/index.ts"), /const NODE_VERCEL = "24\.22\.1"/);
+	assert.match(
+		source(".envrc"),
+		/NODE_VERSIONS=\$\{NODE_VERSIONS:-"v24\.22\.1"\}/,
+	);
+	assert.match(
+		source("Dockerfile"),
+		/ARG NODE_IMAGE=node:24\.22\.1-alpine3\.24/,
+	);
+	assert.match(
+		source(".dagger/src/index.ts"),
+		/const NODE_DEVELOPMENT = "24\.22\.1"/,
+	);
+	assert.match(
+		source(".dagger/src/index.ts"),
+		/const NODE_VERCEL = "24\.22\.1"/,
+	);
 	assert.match(source("justfile"), /dagger call check-node-lts --source=\./);
 });
 
-test("Next.js 16.4.2 Active LTS and runtime lock metadata remain coherent", () => {
-	assert.equal(pkg.dependencies.next, "16.4.2");
+test("Next.js 16.4.6 Active LTS and runtime lock metadata remain coherent", () => {
+	assert.equal(pkg.dependencies.next, "16.4.6");
 	assert.equal(packages[""].dependencies.next, pkg.dependencies.next);
 	assert.deepEqual(packages[""].engines, pkg.engines);
 	assert.equal(packages["node_modules/next"].version, pkg.dependencies.next);
-	assert.equal(packages["node_modules/@next/env"].version, pkg.dependencies.next);
+	assert.equal(
+		packages["node_modules/@next/env"].version,
+		pkg.dependencies.next,
+	);
 	for (const path of ["node_modules/next", "node_modules/@next/env"]) {
 		const entry = packages[path];
 		assert.match(entry.integrity, /^sha512-/);

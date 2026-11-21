@@ -69,6 +69,9 @@ export default async function PfsensePage({
 						<h1 className={layout.title}>{t("title")}</h1>
 						<p className={layout.lead}>{t("lead")}</p>
 						<p className={styles.updated}>{t("updated")}</p>
+						<p className={styles.callout} role="note">
+							{t("retired")}
+						</p>
 					</header>
 
 					<section className={layout.section} aria-labelledby="incident">

@@ -29,6 +29,8 @@ La clé `pk_` est publiable et peut être exposée au navigateur. Une clé secr�
 | `STRIPE_PRICE_ID` ou `PRICE_ID` | prix du Checkout hébergé |
 | `DOMAIN` | origine de confiance des URLs de retour |
 | `VERCEL_URL` | fallback fourni par Vercel |
+| `STRIPE_WEBHOOK_SECRET` | secret `whsec_` de l'endpoint `/api/stripe/webhook` |
+| `DATABASE_URL` | registre des événements webhook (Neon, injecté par l'intégration Marketplace) ; absent = événements de paiement refusés en 503 |
 
 Préférer une clé Stripe restreinte avec les permissions minimales lorsque le
 cas d’usage le permet. Les environnements test et production doivent utiliser

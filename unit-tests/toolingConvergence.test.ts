@@ -93,8 +93,8 @@ test("Node and Next toolchain stay aligned with the reviewed targets", async () 
 		version: "24.22.1",
 		onFail: "warn",
 	});
-	assert.equal(packageJson.dependencies?.next, "16.4.2");
-	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.4.2");
+	assert.equal(packageJson.dependencies?.next, "16.4.6");
+	assert.equal(packageJson.devDependencies?.["eslint-config-next"], "16.4.6");
 	assert.equal(
 		packageJson.devDependencies?.["eslint-config-next"],
 		packageJson.dependencies?.next,
@@ -141,6 +141,7 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		"@opentelemetry/sdk-logs",
 		"@vercel/otel",
 		"stripe",
+		"@neondatabase/serverless",
 		"@xyflow/react",
 	]) {
 		assert.ok(

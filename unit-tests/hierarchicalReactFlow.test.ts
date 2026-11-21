@@ -161,7 +161,13 @@ test("exposure contract keeps direct, tunnel, LAN VPN and internal paths causall
 	assert.match(explorer, /data-exposure-path="lan-vpn"/);
 	assert.match(explorer, /data-exposure-path="internal"/);
 	assert.match(explorer, /pfSense:7000 → HAProxy → TrueNAS:7000/);
-	assert.match(explorer, /10443\/tcp/);
+	// pfSense retired on 18/11/2026: the direct path is shown as history, never as live.
+	assert.match(
+		explorer,
+		/data-exposure-path="direct" data-exposure-path-retired/,
+	);
+	assert.match(explorer, /Retired on 18\/11\/2026 with the pfSense/);
+	assert.doesNotMatch(explorer, /pfSense admin 10443\/tcp/);
 	assert.match(explorer, /9922\/tcp/);
 	assert.match(explorer, /data-cloudflare-direct-isolation/);
 	assert.match(explorer, /Tunnel\/Access evidence never proves/);

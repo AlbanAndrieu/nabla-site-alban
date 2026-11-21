@@ -18,6 +18,19 @@ Backstage v2 et ne conserve pas un second inventaire opérationnel.
   `wazuh.svg`, `elasticsearch.svg`, `hermes-agent.svg`,
   `grafana-pyroscope.svg` : **selfh.st Icons**, licence CC BY 4.0,
   https://github.com/selfhst/icons et https://creativecommons.org/licenses/by/4.0/.
+- `bazarr.png`, `bitcoin.png`, `gluetun.png`, `jellyfin.png`,
+  `qbittorrent.png`, `recyclarr.png`, `seerr.png` (ajout du 21 novembre 2026) :
+  **selfh.st Icons**, licence CC BY 4.0, PNG 512 px de `selfhst/icons@990e151`
+  (miroir jsDelivr ; blob Git vérifié contre l'API GitHub). Le format suit le
+  nom imposé par `webAssets` du catalogue.
+- `apisix.svg` : logo officiel **Apache APISIX**
+  (`apache/apisix-website@b1882a5`, `website/static/img/logo1.svg`, dépôt sous
+  licence Apache 2.0) ; selfh.st n'a pas d'icône APISIX. Apache APISIX est une
+  marque de l'Apache Software Foundation, utilisée ici pour désigner le projet.
+- `honeypot.svg` : copie de `generic-app.svg`, le repli générique du site.
+  selfh.st n'a pas d'icône Project Honey Pot et aucun logo sous licence libre
+  n'a été identifié ; la clé reste ainsi conforme au catalogue sans emprunter
+  une marque.
 - `dependency-track.svg`, `dockhand.svg`, `docling.svg`,
   `visual-studio-code.svg` : **Homarr Dashboard Icons**, dépôt sous licence
   Apache 2.0, https://github.com/homarr-labs/dashboard-icons.
