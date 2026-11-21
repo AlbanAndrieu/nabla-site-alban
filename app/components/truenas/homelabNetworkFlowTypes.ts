@@ -7,7 +7,7 @@ export type NetworkZone =
 	| "proxy"
 	| "container"
 	| "app";
-export type PathMode = "all" | "direct" | "tunnel" | "dns" | "lan";
+export type PathMode = "all" | "tunnel" | "dns" | "lan";
 export type LinkKind = "wan" | "lan" | "wifi" | "direct" | "tunnel" | "dns";
 export type FailureDomain = "external" | "gateway" | "lan" | "truenas";
 

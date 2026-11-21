@@ -44,22 +44,11 @@ export const DOMAIN_ORDER: readonly FailureDomain[] = [
  * must never be imported by a client module.
  */
 export const PATH_NODE_IDS: Record<Exclude<PathMode, "all">, Set<string>> = {
-	direct: new Set([
-		"internet",
-		"cloudflare-dns",
-		"wan-switch",
-		"pfsense",
-		"haproxy",
-		"switch",
-		"truenas",
-		"traefik",
-		"garage",
-	]),
 	tunnel: new Set([
 		"cloudflare-dns",
 		"cloudflare-tunnel",
-		"wan-switch",
-		"pfsense",
+		"freebox",
+		"r7000",
 		"switch",
 		"truenas",
 		"cloudflared",
@@ -68,28 +57,23 @@ export const PATH_NODE_IDS: Record<Exclude<PathMode, "all">, Set<string>> = {
 		"openwebui",
 	]),
 	dns: new Set([
-		"internet",
 		"public-dns",
 		"cloudflare-dns",
-		"wan-switch",
-		"pfsense",
-		"unbound",
+		"freebox",
+		"r7000",
 		"switch",
 		"truenas",
 		"workstation",
-		"r7000",
 		"s24",
 		"traefik",
 		"pihole",
 		"pihole-dns-sync",
 	]),
 	lan: new Set([
-		"pfsense",
-		"unbound",
+		"r7000",
 		"switch",
 		"truenas",
 		"workstation",
-		"r7000",
 		"s24",
 		"homarr",
 		"traefik",
@@ -119,15 +103,15 @@ export function domainCopy(
 	const en: Record<FailureDomain, [string, string]> = {
 		external: [
 			"1 · External / WAN",
-			"Public Internet, WAN transit, public DNS and the managed Cloudflare edge.",
+			"Public Internet, public DNS and the managed Cloudflare edge: public traffic only enters through the tunnel.",
 		],
 		gateway: [
-			"2 · Gateway, ingress & DNS",
-			"pfSense, HAProxy and Unbound were retired on 18/11/2026: the Freebox routes Internet access and the R7000 is the LAN router.",
+			"2 · Gateway & DNS relay",
+			"Freebox WAN router (no DMZ, no port forward), then the R7000 LAN router: double NAT, DHCP, Wi-Fi and DNS relay to Pi-hole. pfSense, HAProxy and Unbound were retired on 18/11/2026.",
 		],
 		lan: [
 			"3 · LAN access",
-			"Ethernet/Wi-Fi fabric carrying direct, tunnel-origin and resolver traffic.",
+			"Ethernet/Wi-Fi clients behind the R7000, carrying LAN, tunnel-origin and resolver traffic.",
 		],
 		truenas: [
 			"4 · TrueNAS failure domain",
@@ -137,15 +121,15 @@ export function domainCopy(
 	const fr: Record<FailureDomain, [string, string]> = {
 		external: [
 			"1 · Externe / WAN",
-			"Internet public, transit WAN, DNS public et edge Cloudflare managé.",
+			"Internet public, DNS public et edge Cloudflare managé : le trafic public n’entre que par le tunnel.",
 		],
 		gateway: [
-			"2 · Gateway, ingress & DNS",
-			"pfSense, HAProxy et Unbound sont retirés depuis le 18/11/2026 : la Freebox route l’accès Internet et le R7000 sert de routeur LAN.",
+			"2 · Passerelle & relais DNS",
+			"Freebox en routeur WAN (sans DMZ ni redirection de port), puis le R7000 en routeur LAN : double NAT, DHCP, Wi-Fi et relais DNS vers Pi-hole. pfSense, HAProxy et Unbound sont retirés depuis le 18/11/2026.",
 		],
 		lan: [
 			"3 · Accès LAN",
-			"Réseau Ethernet/Wi-Fi transportant ingress direct, origine tunnel et résolution DNS.",
+			"Clients Ethernet/Wi-Fi derrière le R7000, transportant trafic LAN, origine tunnel et résolution DNS.",
 		],
 		truenas: [
 			"4 · Domaine de panne TrueNAS",

@@ -94,14 +94,12 @@ export default function HierarchicalHomeLabNetworkFlow({
 	const labels: Record<PathMode, string> = french
 		? {
 				all: "Tout",
-				direct: "Ingress direct",
 				tunnel: "Tunnel",
 				dns: "DNS / DNS scindé",
 				lan: "LAN / Wi-Fi",
 			}
 		: {
 				all: "All paths",
-				direct: "Direct ingress",
 				tunnel: "Tunnel",
 				dns: "DNS / split DNS",
 				lan: "LAN / Wi-Fi",
@@ -123,7 +121,7 @@ export default function HierarchicalHomeLabNetworkFlow({
 					role="group"
 					aria-label="Network path filter"
 				>
-					{(["all", "direct", "tunnel", "dns", "lan"] as const).map((mode) => (
+					{(["all", "tunnel", "dns", "lan"] as const).map((mode) => (
 						<button
 							key={mode}
 							type="button"
@@ -171,7 +169,7 @@ export default function HierarchicalHomeLabNetworkFlow({
 					</span>
 					<span>
 						<i className={styles.haproxyDot} />
-						Direct reverse proxy (HAProxy / Traefik)
+						LAN reverse proxy (Traefik)
 					</span>
 					<span>
 						<i className={styles.tunnelDot} />
