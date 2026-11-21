@@ -18,6 +18,12 @@
 
 **Publication vérifiée le 14 novembre :** PR #303 fusionnée ; [Vercel `dpl_A3B3CuHJVPjzbZ978CcmpEorX5Fv`](https://vercel.com/albanandrieus-projects/nabla-site-alban/A3B3CuHJVPjzbZ978CcmpEorX5Fv) est `READY` sur `64a203d8d78ad6c438837f32bdcdd79f6c52b32c`. Ce n'est ni L3 ni une recette navigateur. Billing Charges Hobby retourne `costs_not_found` : CPU **NOT_MEASURED**. Les PR #305 et #306 ont été fusionnées le 14/11 ; le durcissement SERVICE et les traductions du catalogue V2 sont intégrés dans Git. Leurs parcours navigateur et la gate L3 restent à réceptionner sur le SHA effectivement déployé.
 
+### Contrôles de publication — audit du 21 novembre 2026
+
+- **A1 / PR [#338](https://github.com/AlbanAndrieu/nabla-site-alban/pull/338) (Draft, L0)** : corriger `setup-python` (Python 3.12.10 indisponible sur Ubuntu 26.04), le smoke production (helper HTML absent du sparse checkout), les tests de contrat des versions et la remédiation post-merge. La CI `skipped` ne vaut pas L3.
+- **A3 / dérive GitHub** : [Protect master](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27355874) et [Code quality](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27677122) sont actifs, mais `quality` et `CI policy guard` ne sont pas requis ; l'intégration `4676280` bénéficie d'un bypass `always`. La [politique cible](github-master-ruleset.md) nécessite une réconciliation administrative, sans ajout de règles concurrentes à l'aveugle.
+- **Preuves** : CodeQL et GitGuardian au HEAD initial de #338 ont réussi ; qualité complète, navigateur OWNER/SERVICE et métriques Vercel restent `NOT_RUN` / `NOT_MEASURED`.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |

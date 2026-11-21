@@ -79,9 +79,14 @@ npm run quality:agent:publish -- --status
 Ce bypass ne remplace pas la quality gate et n'autorise jamais un push direct sur
 `master`.
 
-## État live
+## État live — audit GitHub du 21 novembre 2026
 
-Audit GitHub du **30 septembre 2026** : aucun ruleset n'est installé sur le dépôt.
-Le prochain geste P0 est donc uniquement l'application depuis une workstation
-autorisée, puis la preuve `RULESET_OK`. Le backlog correspondant reste dans
-`docs/quality-roadmap.md`.
+Deux rulesets sont actifs sur `~DEFAULT_BRANCH` (lecture API GitHub, sans modification) :
+
+- [Protect master](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27355874) (ID 27355874) : bloque suppression et non-fast-forward, impose PR et historique linéaire, mais n'exige que `GitGuardian Security Checks`, **pas** `quality` ni `CI policy guard`.
+- [Code quality](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27677122) (ID 27677122) : règle `code_quality` à sévérité `errors`. Elle ne remplace pas la qualité L3.
+- Les deux rulesets autorisent `bypass_mode=always` pour l'intégration `4676280`. Son identité et sa justification doivent être vérifiées ; ce n'est pas le bypass propriétaire `pull_request` décrit dans la politique cible.
+
+**Écart P0 :** aucun ruleset live ne porte le nom `master-quality-and-pr-safety`, et les règles actives ne correspondent pas au JSON versionné. **`RULESET_OK` non prouvé ; cible absente et dérive constatée.** Ne pas appeler `--apply` sans inventorier les règles existantes : créer une troisième règle pourrait laisser des protections concurrentes ou des bypass imprévus. Préparer une migration contrôlée avec permission `Administration: write`, vérifier les required checks réellement produits, puis relire avec `--check`.
+
+Le [master@1259c593](https://github.com/AlbanAndrieu/nabla-site-alban/commit/1259c593927ed99aa7c2f68691ce1829480f0dfe) échoue également sur la préparation Python et le smoke production. Correctif : [PR #338](https://github.com/AlbanAndrieu/nabla-site-alban/pull/338). Une PR Draft ou un check `skipped` ne constitue pas une qualité L3 validée.

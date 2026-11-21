@@ -39,10 +39,11 @@ export default function LoginClient() {
 					<main id="main-content">
 						<div className="row">
 							<section className="form-signin" aria-labelledby="login-heading">
-								<form method="POST" action="/handler" autoComplete="off">
+								<div role="group" aria-labelledby="login-heading">
 									<h1 id="login-heading" className="h3 mb-3 fw-normal">
-										Turnstile – Login
+										Turnstile – Login (simulation)
 									</h1>
+									<p>Cette démonstration ne vérifie aucun compte. Ne saisissez aucun identifiant réel.</p>
 									<div className="form-floating">
 										<input type="text" id="user" className="form-control" />
 										<label htmlFor="user">User name</label>
@@ -66,13 +67,14 @@ export default function LoginClient() {
 											data-theme="light"
 										/>
 									</div>
-									<button
+									<a
 										className="w-100 btn btn-lg btn-primary"
-										type="submit"
+										href="https://login.albandrieu.com/login"
+										rel="nofollow noreferrer"
 									>
-										Sign in
-									</button>
-								</form>
+										Ouvrir la simulation de connexion (honeypot)
+									</a>
+								</div>
 							</section>
 						</div>
 						<div className="row">
