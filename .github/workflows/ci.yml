@@ -257,7 +257,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version-file: ".python-version"
+          python-version: "3.12"
 
       - name: Restore pre-commit environments
         id: pre-commit-cache
