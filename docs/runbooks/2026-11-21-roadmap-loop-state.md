@@ -4,7 +4,7 @@ Mode sprint homelab validé par le propriétaire le 21/11/2026. Une seule PR Dra
 
 ## Compteur
 
-- Passe : **1** (pas de réconciliation avant la passe 3).
+- Passe : **2** (réconciliation à la passe 3).
 - Périmètre : `docs/homelab-roadmap.md`, `docs/quality-roadmap.md`, `docs/stripe-hardening-roadmap.md` et la part Site de la ligne H17 du portefeuille nabla-compose.
 
 ## Passe 1
@@ -18,8 +18,19 @@ Mode sprint homelab validé par le propriétaire le 21/11/2026. Une seule PR Dra
 
 Aucun de ces items n'est `DEPLOYED` ni `ACCEPTED` : pas d'observation navigateur ni runtime.
 
+## Passe 2
+
+Les trois questions parquées en passe 1 sont tranchées par le propriétaire le 21/11/2026 (icônes selfh.st, registre Postgres Neon pour A5, recâblage du graphe OWNER).
+
+| Item | État | Preuve |
+| --- | --- | --- |
+| S6 : 9 icônes du catalogue Compose (7 selfh.st, `apisix.svg` logo officiel, `honeypot.svg` repli générique), mapping régénéré | CODED, TESTED (L1) | `sync-homelab-icons.mjs --check` PASS ; `homelabIconSync`, `homelabCatalogIconAssets`, `homelabIconCoverage` |
+| Graphe OWNER : Freebox → R7000 `172.17.0.1` → Pi-hole, sans pfSense/Unbound/HAProxy ni mode « direct » | CODED, TESTED (L1) | `homelabNetworkFlow`, `homelabNetworkFlowGraph`, `publicHomelabPrivacy` |
+| A5 Stripe : registre `stripe_webhook_events` (clé primaire `evt_…`), insertion idempotente, 503 sans `DATABASE_URL` | CODED, TESTED (L1) | `stripeEventLedger` (5), `stripe-webhook` |
+| A5 : provisionnement Neon, création de la table, recette sandbox | NOT_RUN | étapes dans `docs/stripe-hardening-roadmap.md#runbook`, à faire par le propriétaire |
+
+`npm run test:unit` PASS. Rien n'est `DEPLOYED` ni `ACCEPTED` : ni observation navigateur des icônes et du graphe OWNER, ni base Neon.
+
 ## Questions parquées
 
-1. **Icônes S6.** Le contrôle `node scripts/sync-homelab-icons.mjs --source <nabla-compose>/catalog/service-icons.json --check` échoue : 9 fichiers manquent dans `public/assets/selfh-icons/` (apisix, bazarr, bitcoin, gluetun, honeypot, jellyfin, qbittorrent, recyclarr, seerr). Autoriser leur téléchargement depuis selfh.st, ou les faire pointer sur `generic-app.svg` dans nabla-compose ?
-2. **A5 Stripe.** Quelle persistance pour les événements webhook (Vercel Marketplace Postgres/Redis, ou autre) ? Sans ce choix, les événements de paiement restent refusés en 503.
-3. **Graphe réseau OWNER.** Recâbler la topologie sur Freebox → R7000 (double NAT, sans DMZ) et Pi-hole `172.17.0.24` comme DNS des clients, et retirer le mode de chemin « direct » ? Confirmer qu'aucun chemin public direct ne reviendra avant un nouveau pare-feu.
+Aucune.
