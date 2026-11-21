@@ -28,6 +28,15 @@ Lors d'un retour après une suspension d'au moins `PUBLIC_HEALTH_REFRESH_MS` (12
 
 **Complément G7/S3 Architecture (16/11, CODED / NOT_RUN).** Le hook de santé de la vue Architecture invalide désormais les preuves SERVICE conservées en mémoire après au moins 120 s en arrière-plan, à l'aide du même sélecteur pur `markSiteHealthStale` que TrueNAS. Les cartes peuvent rester affichées mais les anciennes observations deviennent `stale/unknown` avant le chargement suivant ; **une erreur réseau conserve aussi les seules identités publiques, sans recycler des statuts observés**. OWNER et `/api/homelab-health` restent isolés ; aucun nouveau timer, intervalle, stockage ou appel réseau. Le contrat source est étendu ; recette navigateur et L3 encore `NOT_RUN`. **Coordination :** [PR #320](https://github.com/AlbanAndrieu/nabla-site-alban/pull/320) traite l'état `scheduled` et touche la roadmap ; réconcilier ce document et `lib/siteHealthV2.ts` avant fusion, sans écraser les évolutions `scheduled`.
 
+## Passe roadmap du 21 novembre 2026
+
+Branche `feat/roadmap-20261121`, base `master@6d76870`. État de la boucle et questions : [runbook de la passe](runbooks/2026-11-21-roadmap-loop-state.md).
+
+- **pfSense retiré le 18/11 — CODED, TESTED (L1).** La page `/pfsense` affiche l'avis de retrait FR/EN (la Freebox assure l'accès Internet, le Netgear R7000 sert de routeur LAN, aucun remplaçant en service). Le contrat d'exposition de l'Architecture marque le chemin direct `pfSense:7000 → HAProxy` comme retiré et ne présente plus l'administration pfSense. Le graphe réseau OWNER badge pfSense, Unbound et HAProxy `RETIRED` et montre le R7000 en routeur LAN `172.17.0.1`. Reste ouvert : recâbler le graphe (Freebox → R7000, DNS des clients vers Pi-hole, sort du mode « direct »).
+- **H17, part Site — CODED, TESTED (L1).** Le site ne lit que `/api/site/catalog/v2` et `/api/site/health/v2` (bascule #301, contrat #329). Le garde `unit-tests/homelabNoLegacyCatalogReaders.test.mjs` vérifie qu'aucun code de `app/`, `lib/`, `components/` ou `scripts/` ne lit une route V1 ou un export legacy de nabla-compose (`catalog/generated/`, `operator-inventory`, JSON de secours). Côté Site, rien n'empêche donc Compose de supprimer ses exports legacy ; la parité `entityRef`/`catalogRevision` sur le SHA déployé reste `NOT_VERIFIED`.
+- **S1 (L1).** `npm run test:catalog:v2` : 88 tests PASS le 21/11. Recette navigateur FR/EN `NOT_RUN`.
+- **S6 icônes — BLOQUÉ.** `node scripts/sync-homelab-icons.mjs --source <nabla-compose>/catalog/service-icons.json --check` échoue sur `nabla-compose@origin/master` : 22 nouvelles correspondances, 4 retirées (aistor, elasticsearch, kibana, wordpress) et 9 fichiers absents de `public/assets/selfh-icons/` (apisix, bazarr, bitcoin, gluetun, honeypot, jellyfin, qbittorrent, recyclarr, seerr). Le téléchargement des icônes attend l'accord du propriétaire.
+
 ## Backlog restant — options de priorité
 
 | ID | P | Objectif / critère d'acceptation |

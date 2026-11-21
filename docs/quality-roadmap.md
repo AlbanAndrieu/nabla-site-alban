@@ -61,6 +61,8 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 
 **G8 — lot en cours (16/11) :** extraction du décodeur d'attributs HTML et des fonctions `linkHref`/`metaContent` de `scripts/post-deploy-smoke.mjs` vers `scripts/lib/production-smoke-html.mjs`, avec maintien de l'export historique `decodeHtmlAttributeValue`. Aucun ajout de requête HTTP, de sonde ou de secret ; tests Node purs pour SEO/canonical/hreflang/social card. **FinOps smoke :** une réponse explicitement interceptée par Vercel (`x-vercel-mitigated`) arrête désormais immédiatement les tentatives ; les erreurs transitoires sans mitigation restent réessayées. Test de non-régression à **une requête** ajouté dans `postDeploySmoke.test.ts`. La réduction des lignes de code est une mesure de maintenabilité, **pas une économie Vercel mesurée**. Tests Node 24, CI/L3, déploiement et navigateur restent `NOT_RUN` tant que non exécutés.
 
+**Passe roadmap du 21/11 (branche `feat/roadmap-20261121`) :** retrait du pfSense (18/11) reflété sur `/pfsense`, l'Architecture et le graphe OWNER, garde H17 contre tout lecteur V1/legacy et tests Stripe exécutés (**A5** reste bloqué par le choix de persistance). Détail dans [la roadmap homelab](homelab-roadmap.md#passe-roadmap-du-21-novembre-2026) ; résultat L3 exact-SHA dans la PR Draft. Déploiement et recette navigateur `NOT_RUN`.
+
 ## Livrables ouverts et garde-fous
 
 ### P0 — Qualité et publication
