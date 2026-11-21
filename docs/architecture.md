@@ -2,7 +2,7 @@
 
 ## Runtime principal
 
-Le site est une application Next.js 16.4.2 App Router avec React 19, TypeScript et
+Le site est une application Next.js 16.4.6 App Router avec React 19, TypeScript et
 `next-intl`. Vercel est l'unique cible de déploiement du runtime web principal.
 Les anciens runtimes Wrangler, Express et Vercel Functions sous `api/` ont été
 retirés : les endpoints applicatifs vivent sous `app/api/**`.

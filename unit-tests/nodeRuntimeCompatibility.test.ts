@@ -49,10 +49,10 @@ test("Node 24.22.1 LTS is the single development and production runtime", async 
 	);
 	assert.match(envrc, /NODE_VERSIONS=\$\{NODE_VERSIONS:-"v24\.22\.1"\}/);
 	assert.equal(packageJson.devEngines?.runtime?.version, "24.22.1");
-	assert.equal(packageJson.dependencies?.next, "16.4.2");
-	assert.equal(lock.packages?.[""]?.dependencies?.next, "16.4.2");
-	assert.equal(lock.packages?.["node_modules/next"]?.version, "16.4.2");
-	assert.equal(lock.packages?.["node_modules/@next/env"]?.version, "16.4.2");
+	assert.equal(packageJson.dependencies?.next, "16.4.6");
+	assert.equal(lock.packages?.[""]?.dependencies?.next, "16.4.6");
+	assert.equal(lock.packages?.["node_modules/next"]?.version, "16.4.6");
+	assert.equal(lock.packages?.["node_modules/@next/env"]?.version, "16.4.6");
 	assert.equal(packageJson.devDependencies?.["@types/node"], "^24.13.3");
 	assert.equal(lock.packages?.["node_modules/@types/node"]?.version, "24.13.3");
 	const [dockerfile, dagger] = await Promise.all([
