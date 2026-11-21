@@ -46,7 +46,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version-file: ".python-version"
+          # Keep CI on a supported 3.12 patch when Ubuntu runner images rotate.
+          python-version: "3.12"
 
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
