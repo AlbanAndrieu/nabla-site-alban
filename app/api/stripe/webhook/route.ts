@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
+import { recordStripeEvent } from "@/lib/stripeEventLedger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,11 +13,11 @@ export const PAYMENT_EVENTS = new Set([
 ]);
 
 /**
- * Authentication boundary only. Payment fulfillment must be durable, idempotent
- * and transactional before acknowledging payment events.
+ * Authentication boundary plus the A5 event ledger. A payment event is
+ * acknowledged only once durably recorded (or already recorded) in Postgres.
  *
- * Stripe retries 503 responses. Never return 2xx for paid events until a
- * persistent event ledger and business handler have been configured.
+ * Stripe retries 503 responses: without DATABASE_URL, or when the insert
+ * fails, payment events stay refused so none is silently lost.
  */
 export async function POST(request: Request) {
 	const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -63,11 +64,13 @@ export async function POST(request: Request) {
 		return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
 	}
 
-	if (PAYMENT_EVENTS.has(event.type)) {
-		// Do not acknowledge until durable, idempotent fulfillment is implemented.
-		// No customer data, signatures, raw events or keys are logged.
+	// No customer data, signatures, raw events or keys are logged.
+	if (
+		PAYMENT_EVENTS.has(event.type) &&
+		(await recordStripeEvent(event)) === "unavailable"
+	) {
 		return NextResponse.json(
-			{ error: "Fulfillment not configured" },
+			{ error: "Event ledger unavailable" },
 			{ status: 503 },
 		);
 	}
