@@ -3,6 +3,32 @@
 **Périmètre :** runtime Next.js/App Router sur Vercel, routes API, pages EN/FR, Checkout Stripe et lecture du catalogue/snapshot homelab.  
 **Méthode :** STRIDE simplifié, revue statique du code et des frontières documentées sur `master` au 10 octobre 2026. Il s'agit d'une **analyse de conception**, non d'un audit dynamique ni d'une preuve d'exploitation.
 
+## Handoff de démonstration Login → Honeypot (21/11/2026)
+
+Le site possède déjà une page Next.js `/[locale]/login` qui illustre
+Cloudflare Turnstile. La PR en cours remplace l'ancien formulaire
+`POST /handler` par un **lien explicite** vers le honeypot séparé
+`https://login.albandrieu.com/login` :
+
+- une navigation navigateur **GET** (aucun `fetch` serveur ou proxy) ;
+- aucun champ `name` ni formulaire de soumission sur cette page ;
+- aucun secret, cookie, JWT ou jeton Turnstile transmis dans l'URL ;
+- aucun déclenchement automatique de CrowdSec sur ce simple GET ;
+- texte visible signalant la simulation et demandant de ne pas saisir
+  d'identifiant réel ; `rel="nofollow noreferrer"` pour le lien.
+
+Le hostname du honeypot **n'était pas résolu au DNS public** au dernier
+relevé opérateur. Le lien doit être réceptionné **après** le CNAME
+proxifié et le Tunnel TrueNAS. Le seul fait de fusionner cette PR ne
+déploie ni la page `/login` sur TrueNAS ni le backend Traefik/CrowdSec :
+ceux-ci sont versionnés séparément dans `nabla-compose #436`.
+L'ancien formulaire HTML `public/login.html` reste un artefact
+historique ; ne pas en faire une seconde connexion active.
+
+La télémétrie CTEM sur TrueNAS conserve uniquement des agrégats
+anonymisés pour les rapports publics, et des journaux privés pour le
+triage des tentatives. Une IP ne constitue pas une identité civile.
+
 ## Actifs et frontières de confiance
 
 | Frontière | Entrées | Actifs à préserver | Principe |
