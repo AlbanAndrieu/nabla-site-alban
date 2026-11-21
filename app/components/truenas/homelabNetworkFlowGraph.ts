@@ -123,7 +123,7 @@ export function domainCopy(
 		],
 		gateway: [
 			"2 · Gateway, ingress & DNS",
-			"pfSense owns the LAN boundary; HAProxy handles direct HTTPS and Unbound handles recursive/split DNS.",
+			"pfSense, HAProxy and Unbound were retired on 18/11/2026: the Freebox routes Internet access and the R7000 is the LAN router.",
 		],
 		lan: [
 			"3 · LAN access",
@@ -141,7 +141,7 @@ export function domainCopy(
 		],
 		gateway: [
 			"2 · Gateway, ingress & DNS",
-			"pfSense porte la frontière LAN ; HAProxy gère HTTPS direct et Unbound le DNS récursif/scindé.",
+			"pfSense, HAProxy et Unbound sont retirés depuis le 18/11/2026 : la Freebox route l’accès Internet et le R7000 sert de routeur LAN.",
 		],
 		lan: [
 			"3 · Accès LAN",

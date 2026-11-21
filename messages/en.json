@@ -1123,6 +1123,7 @@
 		"title": "Replacing the pfSense firewall",
 		"lead": "My Netgate 1100 kept freezing. Here are the diagnosis, the criteria, the comparison of replacements and the final choice.",
 		"updated": "Analysis written on 17 November 2026, completed the same day with the hardware measurements.",
+		"retired": "Update, 18 November 2026: after another freeze, the Netgate 1100 was retired, with no replacement so far. The Freebox now provides Internet access and the Netgear R7000 acts as the LAN router. No pfSense is in service; this analysis remains the reference for choosing a future firewall.",
 		"incident": {
 			"title": "The incident, in short",
 			"paragraphs": [

@@ -1123,6 +1123,7 @@
 		"title": "Remplacer le pare-feu pfSense",
 		"lead": "Mon Netgate 1100 se figeait à répétition. Voici le diagnostic, les critères retenus, le comparatif des remplaçants et le choix final.",
 		"updated": "Analyse rédigée le 17 novembre 2026, complétée le même jour par les mesures du matériel.",
+		"retired": "Mise à jour du 18 novembre 2026 : après un nouveau gel, le Netgate 1100 a été retiré, sans remplaçant à ce jour. La Freebox assure désormais l'accès Internet et le Netgear R7000 sert de routeur LAN. Aucun pfSense n'est en service ; cette analyse reste la référence pour choisir un futur pare-feu.",
 		"incident": {
 			"title": "L'incident, en résumé",
 			"paragraphs": [

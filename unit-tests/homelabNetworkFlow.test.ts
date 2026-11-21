@@ -35,8 +35,11 @@ test("shared homelab React Flow documents WAN, DNS, direct and tunnel paths", as
 	assert.match(flow, /172\.17\.0\.24:80 \/ :443/);
 	assert.match(flow, /traefik_network · Let's Encrypt/);
 	assert.match(flow, /name: "Unbound"/);
-	assert.match(flow, /172\.17\.0\.1:53/);
-	assert.match(flow, /OUTGOING ALL · FORWARDING OFF/);
+	// pfSense and its Unbound/HAProxy were retired on 18/11/2026; the R7000 now routes the LAN.
+	assert.match(flow, /badge: "RETIRED"/);
+	assert.match(flow, /Retired 18\/11\/2026 · no replacement in service/);
+	assert.match(flow, /LAN router · DHCP · Wi-Fi/);
+	assert.doesNotMatch(flow, /OUTGOING ALL · FORWARDING OFF/);
 	assert.match(flow, /name: "Pi-hole"/);
 	assert.match(flow, /172\.17\.0\.24:53/);
 	assert.match(flow, /name: "Pi-hole DNS Sync"/);
