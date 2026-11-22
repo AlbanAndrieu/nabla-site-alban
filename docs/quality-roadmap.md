@@ -30,6 +30,12 @@
 - ZAP : hook réseau de **1 req/s**, précontrôle `429/challenge`, arrêt si le scan rencontre une mitigation, sans publication de logs bruts ni augmentation des tests actifs. Preuves sur images ZAP, L3 et DAST runtime **NOT_RUN**.
 - Terraform WAF demeure dans [Compose #433](https://github.com/AlbanAndrieu/nabla-compose/pull/433) (module Bababou) ; l'import/apply et une éventuelle extension au projet Site Alban nécessitent une revue distincte. [Runbook Site](runbooks/vercel-waf-zap-acceptance.md). Les quatre alertes historiques de Bababou ne sont pas reprises comme findings Alban.
 
+### Rétablissement CI exact-SHA — 22 novembre 2026 (A1, CODED)
+
+- [PR #338](https://github.com/AlbanAndrieu/nabla-site-alban/pull/338) : le run Quality [44966524705](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44966524705) est bloqué par le **statut historique du smoke de `master@1259c593927ed99aa7c2f68691ce1829480f0dfe`**, causé par l'absence du helper ESM dans le sparse checkout. Le run Node 24 [44966524650](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44966524650) échoue sur deux assertions WAF/ZAP devenues obsolètes.
+- Voie de réparation **auto-expirante et non générale** : seul l'échec smoke de cet exact SHA/run, avec Vercel vert et aucun autre statut de production en erreur, permet de poursuivre vers une **revalidation HTTP réelle obligatoire du smoke original et de son helper issus du SHA déployé**. La CI doit vérifier que la PR corrige uniquement l'empaquetage du smoke, et échouer si le smoke réel échoue. Aucun statut de `master` n'est réécrit, aucun bypass WAF/DAST n'est autorisé.
+- Sont encore **NOT_RUN** sur le prochain HEAD : revalidation HTTP, quality/SAST, tests Node 24 et recette WAF/ZAP. Les métriques Vercel et l'éligibilité OWASP restent `NOT_MEASURED` / `UNVERIFIED`.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |

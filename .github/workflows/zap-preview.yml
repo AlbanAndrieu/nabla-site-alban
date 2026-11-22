@@ -140,7 +140,7 @@ jobs:
             echo "mitigated=${mitigated:-none}" >> "$GITHUB_OUTPUT"
 
             if [[ "$status" == "429" || "${mitigated,,}" == "challenge" ]]; then
-              echo "::error::ZAP_WAF_PREFLIGHT_BLOCK: Vercel challenge/rate limit (HTTP $status); scan will not run."
+              echo "::error::ZAP_WAF_PREFLIGHT_BLOCK: Vercel Security Checkpoint / rate limit (HTTP $status); scan will not run."
               exit 1
               rm -f "$headers"
               return 1

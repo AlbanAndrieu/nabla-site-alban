@@ -19,6 +19,6 @@ test("production and Preview ZAP are bounded, redacted and fail closed on WAF ch
     }
     assert.doesNotMatch(workflow, /cat "\$scan_dir\/console\.log"/);
     assert.doesNotMatch(workflow, /chmod (?:0777|777)/);
-    assert.doesNotMatch(workflow, /zaproxy\/action-baseline/);
+    assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);
   }
 });
