@@ -24,6 +24,12 @@
 - **A3 / dérive GitHub** : [Protect master](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27355874) et [Code quality](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27677122) sont actifs, mais `quality` et `CI policy guard` ne sont pas requis ; l'intégration `4676280` bénéficie d'un bypass `always`. La [politique cible](github-master-ruleset.md) nécessite une réconciliation administrative, sans ajout de règles concurrentes à l'aveugle.
 - **Preuves** : CodeQL et GitGuardian au HEAD initial de #338 ont réussi ; qualité complète, navigateur OWNER/SERVICE et métriques Vercel restent `NOT_RUN` / `NOT_MEASURED`.
 
+### Transfert WAF et ZAP — 22 novembre 2026 (A3, CODED / NOT_APPLIED)
+
+- Adaptation de [Bababou #286](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/286) : `vercel-waf-snapshot-audit.mjs` et tests offline ; `log` n'est jamais considéré comme `deny`. Aucune règle Vercel modifiée et aucune consommation/éligibilité OWASP constatée.
+- ZAP : hook réseau de **1 req/s**, précontrôle `429/challenge`, arrêt si le scan rencontre une mitigation, sans publication de logs bruts ni augmentation des tests actifs. Preuves sur images ZAP, L3 et DAST runtime **NOT_RUN**.
+- Terraform WAF demeure dans [Compose #433](https://github.com/AlbanAndrieu/nabla-compose/pull/433) (module Bababou) ; l'import/apply et une éventuelle extension au projet Site Alban nécessitent une revue distincte. [Runbook Site](runbooks/vercel-waf-zap-acceptance.md). Les quatre alertes historiques de Bababou ne sont pas reprises comme findings Alban.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |

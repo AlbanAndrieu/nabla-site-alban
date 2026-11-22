@@ -51,6 +51,7 @@ jobs:
           sparse-checkout: |
             .zap/rules.tsv
             scripts/security/minimize-zap-report.mjs
+            scripts/security/zap-rate-limit-hook.py
           sparse-checkout-cone-mode: false
 
       - name: Verify production DAST can reach the application
@@ -74,7 +75,12 @@ jobs:
             echo "::error::VERCEL_DAST_HTTP_402: Vercel returned HTTP 402 (account/quota deployment pause likely). OWASP ZAP was not executed; review Vercel team Usage and fair-use status."
             exit 1
           fi
-          if [[ "$status" != "200" || "${mitigated,,}" == "challenge" ]]; then
+          if [[ "$status" == "429" || -n "${mitigated:-}" ]]; then
+            echo "DAST_BLOCKER=vercel-waf-checkpoint" >> "$GITHUB_ENV"
+            echo "::error::ZAP_WAF_PREFLIGHT_BLOCK: Vercel rate limit/challenge; no scan started."
+            exit 1
+          fi
+          if [[ "$status" != "200" ]]; then
             echo "::error::Production DAST preflight did not reach the application (HTTP $status, x-vercel-mitigated=${mitigated:-none})."
             exit 1
           fi
@@ -94,6 +100,8 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-production.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
+          cp scripts/security/zap-rate-limit-hook.py "$scan_dir/rate-limit-hook.py"
+          chmod 0644 "$scan_dir/rules.tsv" "$scan_dir/rate-limit-hook.py"
           # Runner-group access only; setgid keeps raw scanner evidence group-private.
           chmod 2770 "$scan_dir"
           # No raw ZAP stdout, JSON, HTML, cookies or request/response bodies
@@ -109,9 +117,16 @@ jobs:
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py --autooff -t "$BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -m 2 -a -s \
+              --hook=/zap/wrk/rate-limit-hook.py \
             > "$scan_dir/console.log" 2>&1
           scan_rc=$?
           set -e
+          # A checkpoint invalidates scan coverage; do not claim PASS or publish evidence.
+          if grep -Eiq 'too many requests|security checkpoint|x-vercel-mitigated|HTTP[ /]+429|response[^[:cntrl:]]{0,30}429|status[^[:cntrl:]]{0,30}429' "$scan_dir/console.log"; then
+            echo "DAST_BLOCKER=vercel-waf-checkpoint" >> "$GITHUB_ENV"
+            echo "::error::ZAP_WAF_RATE_LIMIT_OR_CHALLENGE: incomplete coverage (private log withheld)."
+            exit 1
+          fi
           # ZAP baseline exit 1 denotes a blocking finding, not a broken scanner.
           # Retain HIGH rule identities for human review, while still failing CI
           # *after* sanitized artifact upload. Any other scanner error fails closed.
