@@ -111,11 +111,7 @@ while :; do
         # The PR quality workflow MUST independently rerun the deployed SHA's
         # original smoke+helper against the real canonical production origin.
         # All other failures remain fatal, including DAST and Vercel failures.
-        if [[ "${REPOSITORY}" == "AlbanAndrieu/nabla-site-alban" &&
-              "${candidate}" == "1259c593927ed99aa7c2f68691ce1829480f0dfe" &&
-              "${#failed[@]}" -eq 1 &&
-              "${failed[0]}" == "Production Post-deploy Smoke=failure" &&
-              "${vercel_state}" == "success" ]]; then
+        if [[ "${REPOSITORY}" == "AlbanAndrieu/nabla-site-alban" && "${candidate}" == "1259c593927ed99aa7c2f68691ce1829480f0dfe" && "${#failed[@]}" -eq 1 && "${failed[0]}" == "Production Post-deploy Smoke=failure" && "${vercel_state}" == "success" ]]; then
             smoke_status="$(latest_status "${json}" "Production Post-deploy Smoke")"
             smoke_run_url="$(jq -r '.target_url // ""' <<<"${smoke_status}")"
             if [[ "${smoke_run_url}" == "https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44905557576" ]]; then
