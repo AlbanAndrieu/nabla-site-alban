@@ -52,6 +52,7 @@ jobs:
             .zap/rules.tsv
             scripts/security/minimize-zap-report.mjs
             scripts/security/zap-rate-limit-hook.py
+            scripts/security/render-zap-safe-report.mjs
           sparse-checkout-cone-mode: false
 
       - name: Verify production DAST can reach the application
@@ -143,15 +144,32 @@ jobs:
             "$scan_dir/report_json.json" "$scan_dir/report_json.safe.json"
           mkdir -p zap-production-safe
           mv "$scan_dir/report_json.safe.json" zap-production-safe/report_json.json
+          node scripts/security/render-zap-safe-report.mjs \
+            zap-production-safe/report_json.json zap-production-safe
 
       - name: Upload only sanitized production ZAP findings
+        id: safe-zap-artifact
         if: steps.production-zap.outcome == 'success'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: zap-production-report
-          path: zap-production-safe/report_json.json
+          path: |
+            zap-production-safe/report_json.json
+            zap-production-safe/report.html
+            zap-production-safe/report.sarif
+            zap-production-safe/summary.md
           retention-days: 3
           if-no-files-found: error
+
+      - name: Present sanitized ZAP HTML / SARIF evidence
+        if: steps.production-zap.outcome == 'success'
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.safe-zap-artifact.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          cat zap-production-safe/summary.md >> "$GITHUB_STEP_SUMMARY"
+          echo "[Download HTML / SARIF / JSON](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts/${ARTIFACT_ID})" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Clean ZAP production workspace
         if: always()
@@ -181,7 +199,7 @@ jobs:
             echo "- Preflight blocker: ${DAST_BLOCKER:-none}"
             echo "- Associated SHA: $DEPLOYED_SHA"
             echo "- Scan: OWASP ZAP Baseline (passive, blocking only explicit FAIL rules)"
-            echo "- Report artifact: **zap-production-report**"
+            echo "- Sanitized report: **zap-production-report** (HTML + SARIF + JSON; 3 days)"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish production DAST status

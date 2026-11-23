@@ -28,3 +28,10 @@ Un passage à l'action exige : audit des règles existantes, événements WAF et
 - Les alertes de Bababou (10038 CSP, 10098 CORS, 10099 code source, 90003 SRI) ne sont pas des findings de Site Alban : reproduire et qualifier **les occurrences du site Alban**. Ne pas ajouter d'ignore ZAP et ne pas inventer d'absence de faille.
 
 **Validation restant à fournir :** tests unitaires sur HEAD exact, YAML, hook dans l'image ZAP épinglée, Preview authentifiée et événements WAF réels. Aucun scan ni mutation Vercel exécuté par ce transfert.
+
+
+### Rapport ZAP lisible (intégration préparée le 23 novembre 2026)
+
+Le workflow Production DAST produit dorénavant, **après** `minimize-zap-report.mjs`, les fichiers `report_json.json`, `report.html`, `report.sarif` et `summary.md` dans le même artefact `zap-production-report` (rétention 3 jours). Le résumé GitHub Actions référence l'artefact. Le rendu refuse les champs inconnus, les chemins d'URL et toute information HTTP non expurgée ; le rapport HTML natif ZAP reste interdit.
+
+Le SARIF est uniquement **téléchargeable comme artefact** : aucune écriture automatique dans GitHub Code Scanning sans localisation de code source attestée. Les alertes WARN et LOW ne figurent pas dans cette projection HIGH. Le run historique [45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) conserve son seul JSON expurgé : zéro identité HIGH, sans preuve de couverture complète.

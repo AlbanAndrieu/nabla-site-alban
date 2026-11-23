@@ -141,9 +141,8 @@ jobs:
 
             if [[ "$status" == "429" || "${mitigated,,}" == "challenge" ]]; then
               echo "::error::ZAP_WAF_PREFLIGHT_BLOCK: Vercel Security Checkpoint / rate limit (HTTP $status); scan will not run."
-              exit 1
               rm -f "$headers"
-              return 1
+              exit 1
             fi
             if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$headers" || \
               [[ "$status" == "401" || "$status" == "403" ]]; then

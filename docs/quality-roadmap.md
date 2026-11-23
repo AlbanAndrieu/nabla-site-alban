@@ -36,6 +36,13 @@
 - Voie de réparation **auto-expirante et non générale** : seul l'échec smoke de cet exact SHA/run, avec Vercel vert et aucun autre statut de production en erreur, permet de poursuivre vers une **revalidation HTTP réelle obligatoire du smoke original et de son helper issus du SHA déployé**. La CI doit vérifier que la PR corrige uniquement l'empaquetage du smoke, et échouer si le smoke réel échoue. Aucun statut de `master` n'est réécrit, aucun bypass WAF/DAST n'est autorisé.
 - Sont encore **NOT_RUN** sur le prochain HEAD : revalidation HTTP, quality/SAST, tests Node 24 et recette WAF/ZAP. Les métriques Vercel et l'éligibilité OWASP restent `NOT_MEASURED` / `UNVERIFIED`.
 
+### Corrections CI et publication ZAP — 23 novembre 2026 (A1/A3, CODED)
+
+- CI #338 : [Quality 45245584135](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45245584135) et [Node 24 45245584005](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45245584005) échouaient à cause du bit Git non exécutable de `verify-master-baseline.sh` ; `actionlint` signalait aussi SC2317 dans ZAP Preview. Correctifs appliqués sans supprimer les gates.
+- Le smoke de production réel (SHA `1259c593`) a été **PASS** le 23/11 pendant la CI, indépendamment du statut historique rouge. Aucun statut de production n'est réécrit.
+- Run ZAP Production [45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) : JSON expurgé, **0 HIGH conservé**, WARN/LOW non retenus, artefact expirant le 25/11. Le rapport HTML et SARIF expurgé est désormais prévu dans le prochain workflow, sans trafic ZAP supplémentaire ; **exécution future NOT_RUN**.
+- Prochaine preuve : tests exact-SHA, gate L3, vérification que le nouveau workflow génère les artefacts HTML/SARIF dans GitHub Actions, puis audit Nuclei et règles WAF réel.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |
