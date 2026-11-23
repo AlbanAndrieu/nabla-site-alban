@@ -43,3 +43,12 @@ test("Documentation describes actual scan cadence and incomplete result semantic
 		/aucun scan sur push|n'entraînent pas de scan sur push/,
 	);
 });
+
+test("Nuclei template bootstrap fails closed on empty corpora and authenticates update", () => {
+	assert.match(workflow, /GITHUB_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+	assert.match(workflow, /"\$\{RUNNER_TEMP\}\/nuclei" -ut/);
+	assert.match(workflow, /find "\$templates_dir" -type f/);
+	assert.match(workflow, /NUCLEI_TEMPLATES_UNAVAILABLE/);
+	assert.match(workflow, /-t "\$NUCLEI_TEMPLATE_DIR"/);
+	assert.doesNotMatch(workflow, /-rl [3-9]|-c [2-9]/);
+});

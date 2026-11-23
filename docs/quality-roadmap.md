@@ -43,6 +43,12 @@
 - Run ZAP Production [45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) : JSON expurgé, **0 HIGH conservé**, WARN/LOW non retenus, artefact expirant le 25/11. Le rapport HTML et SARIF expurgé est désormais prévu dans le prochain workflow, sans trafic ZAP supplémentaire ; **exécution future NOT_RUN**.
 - Prochaine preuve : tests exact-SHA, gate L3, vérification que le nouveau workflow génère les artefacts HTML/SARIF dans GitHub Actions, puis audit Nuclei et règles WAF réel.
 
+### Réconciliation du 23 novembre — CI et Nuclei
+
+- [Quality #45254555914](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45254555914) : les tests Node 24, Copilot et `actionlint` sont verts ; le seul changement demandé par le hook pre-commit était une ligne vide Ruff dans `scripts/security/zap-rate-limit-hook.py`, corrigée sur #338. Publication L3 complète à reconfirmer.
+- [Nuclei #45198659596](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45198659596) : aucune donnée de scan (pas de YAML installé, `INCOMPLETE`). Correction du bootstrap authentifié et garde fail-closed sur l'existence de templates `.yaml` ; aucun nouveau scan déclenché et règles de débit inchangées.
+- Rapport ZAP HTML/SARIF : génération depuis le JSON expurgé préparée dans #338 ; le rapport historique du [run #45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) comporte uniquement `0 HIGH` **conservé**, non une attestation sans vulnérabilités.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |

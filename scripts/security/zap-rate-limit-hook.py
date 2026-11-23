@@ -4,6 +4,7 @@ The ZAP Network add-on is required. Fail closed when rate limiting cannot be
 enabled, rather than accidentally flooding Vercel or masking WAF challenges.
 Never log URLs, cookies, request bodies, tokens or full scan evidence.
 """
+
 from urllib.parse import urlsplit
 
 MAX_RPS = "1"

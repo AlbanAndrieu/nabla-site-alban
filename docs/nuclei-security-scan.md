@@ -127,3 +127,10 @@ sur l'édition DefectDojo effectivement installée, interdiction de rejouer
 un ancien succès après un nouveau scan échoué, compte import seul,
 engagement explicitement choisi et test de déduplication. Aucun de ces
 points **runtime** ne devient PASS par la seule présence des scripts.
+
+
+## Incident du 23 novembre 2026 — templates absents
+
+Le run [45198659596](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45198659596) a échoué **avant un scan effectif** : Nuclei v3.11.1 a annoncé l'installation du corpus, puis `no templates provided for scan`. Le test `test -d ~/nuclei-templates` était insuffisant, car le dossier existait sans YAML. Il n'existe donc **aucune preuve d'absence de findings** pour ce run.
+
+Correctif dans la PR #338 : jeton GitHub Actions éphémère en lecture seule pour l'API de mise à jour, vérification de l'existence d'au moins un fichier YAML, refus `NUCLEI_TEMPLATES_UNAVAILABLE` avant toute requête applicative et utilisation explicite de `-t "$NUCLEI_TEMPLATE_DIR"`. La limite actuelle `-rl 2 -c 1`, les filtres HTTP et les exclusions restent inchangés. **Recette runtime sur un run hebdomadaire futur NOT_RUN.**
