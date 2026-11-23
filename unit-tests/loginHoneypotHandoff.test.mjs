@@ -18,6 +18,6 @@ test("no credentials or Turnstile tokens are ever submitted to the honeypot", ()
 	assert.doesNotMatch(login, /<form\b/i);
 	assert.doesNotMatch(login, /action="\/handler"/);
 	assert.doesNotMatch(login, /window\.location|fetch\("https:\/\/login\./);
-	assert.match(login, /Ne saisissez aucun identifiant réel/);
+	assert.match(login, /Ne saisissez\s+aucun identifiant réel/);
 	assert.match(login, /readOnly/);
 });
