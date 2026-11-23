@@ -7,17 +7,21 @@ const login = readFileSync(
 	path.join(process.cwd(), "app/[locale]/login/LoginClient.tsx"),
 	"utf8",
 );
+const form = login.match(/<form\b[\s\S]*?<\/form>/)?.[0] ?? "";
 
-test("login demo links to the approved honeypot with a fixed HTTPS GET", () => {
-	assert.match(login, /href="https:\/\/login\.albandrieu\.com\/login"/);
-	assert.match(login, /rel="nofollow noreferrer"/);
-	assert.match(login, /<a[\s\S]+?Ouvrir la simulation de connexion/);
+test("login form posts directly to the HTTPS honeypot, never to this site", () => {
+	assert.match(form, /method="post"/);
+	assert.match(form, /action="https:\/\/login\.albandrieu\.com\/login"/);
+	assert.equal(login.match(/<form\b/g)?.length, 1);
+	assert.doesNotMatch(login, /action="\/handler"/);
+	// No proxy: the site itself must never receive or forward what bots type.
+	assert.doesNotMatch(login, /fetch\("https:\/\/login\.|window\.location/);
 });
 
-test("no credentials or Turnstile tokens are ever submitted to the honeypot", () => {
-	assert.doesNotMatch(login, /<form\b/i);
-	assert.doesNotMatch(login, /action="\/handler"/);
-	assert.doesNotMatch(login, /window\.location|fetch\("https:\/\/login\./);
-	assert.match(login, /Ne saisissez\s+aucun identifiant réel/);
-	assert.match(login, /readOnly/);
+test("trap fields are fillable behind the Turnstile challenge", () => {
+	assert.match(form, /name="username"/);
+	assert.match(form, /name="password"/);
+	assert.doesNotMatch(form, /readOnly/);
+	assert.match(form, /className="cf-turnstile"/);
+	assert.match(form, /type="submit"/);
 });
