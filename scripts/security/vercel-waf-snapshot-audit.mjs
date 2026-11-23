@@ -26,27 +26,36 @@ function rateLimitRule(rule) {
 	if (!isObject(action) || action.action !== "rate_limit") return false;
 	const limit = action.rate_limit;
 	if (
-		!isObject(limit) || limit.limit !== 300 || limit.window !== 60 ||
-		limit.algo !== "fixed_window" || limit.action !== "deny" ||
-		!Array.isArray(limit.keys) || limit.keys.length !== 1 || limit.keys[0] !== "ip"
-	) return false;
+		!isObject(limit) ||
+		limit.limit !== 300 ||
+		limit.window !== 60 ||
+		limit.algo !== "fixed_window" ||
+		limit.action !== "deny" ||
+		!Array.isArray(limit.keys) ||
+		limit.keys.length !== 1 ||
+		limit.keys[0] !== "ip"
+	)
+		return false;
 	if (action.action_duration !== "1m") return false;
 	const groups = rule.condition_group;
-	if (!Array.isArray(groups) || groups.length !== desiredHosts.length) return false;
+	if (!Array.isArray(groups) || groups.length !== desiredHosts.length)
+		return false;
 	const hosts = [];
 	for (const group of groups) {
 		if (
 			!isObject(group) ||
 			!Array.isArray(group.conditions) ||
 			group.conditions.length !== 1
-		) return false;
+		)
+			return false;
 		const condition = group.conditions[0];
 		if (
 			!isObject(condition) ||
 			condition.type !== "host" ||
 			condition.op !== "eq" ||
 			typeof condition.value !== "string"
-		) return false;
+		)
+			return false;
 		hosts.push(condition.value);
 	}
 	return hosts.sort().every((host, index) => host === desiredHosts[index]);
@@ -56,23 +65,37 @@ export function auditVercelWafSnapshot(payload) {
 	if (!isObject(payload)) throw new TypeError("WAF_SNAPSHOT_INVALID");
 	const config = Object.hasOwn(payload, "result") ? payload.result : payload;
 	if (
-		!isObject(config) || typeof config.firewallEnabled !== "boolean" ||
-		!isObject(config.managedRules) || !isObject(config.crs) || !Array.isArray(config.rules)
-	) throw new TypeError("WAF_SNAPSHOT_INVALID");
+		!isObject(config) ||
+		typeof config.firewallEnabled !== "boolean" ||
+		!isObject(config.managedRules) ||
+		!isObject(config.crs) ||
+		!Array.isArray(config.rules)
+	)
+		throw new TypeError("WAF_SNAPSHOT_INVALID");
 
 	const checks = {
 		firewall: config.firewallEnabled === true,
-		botChallenge: managedRule(config.managedRules, "bot_protection", "challenge"),
+		botChallenge: managedRule(
+			config.managedRules,
+			"bot_protection",
+			"challenge",
+		),
 		genericLog: managedRule(config.crs, "gen", "log"),
 		sqliDeny: managedRule(config.crs, "sqli", "deny"),
 		xssDeny: managedRule(config.crs, "xss", "deny"),
 		rceDeny: managedRule(config.crs, "rce", "deny"),
 		rateLimit: config.rules.length === 1 && rateLimitRule(config.rules[0]),
 	};
-	const logOnly = attackRules.every((name) => managedRule(config.crs, name, "log"));
+	const logOnly = attackRules.every((name) =>
+		managedRule(config.crs, name, "log"),
+	);
 	const ready = Object.values(checks).every(Boolean);
 	return {
-		status: ready ? "ENFORCED" : logOnly ? "LOG_ONLY_NOT_ENFORCED" : "NOT_VERIFIED",
+		status: ready
+			? "ENFORCED"
+			: logOnly
+				? "LOG_ONLY_NOT_ENFORCED"
+				: "NOT_VERIFIED",
 		checks,
 		customRuleCount: config.rules.length,
 	};
@@ -87,7 +110,8 @@ function printSummary(result, mode) {
 	}
 	console.log(`WAF_CUSTOM_RULE_COUNT=${result.customRuleCount}`);
 	console.log(`WAF_POSTURE=${result.status}`);
-	if (mode === "inventory") console.log("WAF_INVENTORY_ONLY=NOT_A_SECURITY_GATE");
+	if (mode === "inventory")
+		console.log("WAF_INVENTORY_ONLY=NOT_A_SECURITY_GATE");
 }
 
 async function main(args) {
@@ -104,11 +128,16 @@ async function main(args) {
 		printSummary(summary, mode);
 		return mode === "enforce" && summary.status !== "ENFORCED" ? 2 : 0;
 	} catch {
-		console.error("WAF_SNAPSHOT_INVALID_OR_UNREADABLE (snapshot content withheld)");
+		console.error(
+			"WAF_SNAPSHOT_INVALID_OR_UNREADABLE (snapshot content withheld)",
+		);
 		return 1;
 	}
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (
+	process.argv[1] &&
+	resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
 	process.exitCode = await main(process.argv.slice(2));
 }

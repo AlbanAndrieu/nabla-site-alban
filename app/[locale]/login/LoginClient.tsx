@@ -43,7 +43,10 @@ export default function LoginClient() {
 									<h1 id="login-heading" className="h3 mb-3 fw-normal">
 										Turnstile – Login (simulation)
 									</h1>
-									<p>Cette démonstration ne vérifie aucun compte. Ne saisissez aucun identifiant réel.</p>
+									<p>
+										Cette démonstration ne vérifie aucun compte. Ne saisissez
+										aucun identifiant réel.
+									</p>
 									<div className="form-floating">
 										<input type="text" id="user" className="form-control" />
 										<label htmlFor="user">User name</label>

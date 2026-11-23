@@ -4,12 +4,19 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { parseMinimizedZap, renderMinimizedZap } from "../scripts/security/render-zap-safe-report.mjs";
+import {
+	parseMinimizedZap,
+	renderMinimizedZap,
+} from "../scripts/security/render-zap-safe-report.mjs";
 
-const site = (alerts = [], origin = "https://www.albanandrieu.com") =>
-	({ "@name": origin, alerts });
+const site = (alerts = [], origin = "https://www.albanandrieu.com") => ({
+	"@name": origin,
+	alerts,
+});
 const alert = (pluginid = "10020") => ({
-	pluginid, riskcode: "3", alert: "ZAP passive rule " + pluginid,
+	pluginid,
+	riskcode: "3",
+	alert: "ZAP passive rule " + pluginid,
 });
 
 test("no HIGH alerts yields valid empty SARIF without claiming full coverage", () => {
@@ -23,13 +30,18 @@ test("no HIGH alerts yields valid empty SARIF without claiming full coverage", (
 });
 
 test("HIGH alerts become SARIF rule IDs, not HTTP request evidence", () => {
-	const output = renderMinimizedZap({ site: [site([alert(), alert("10021")])] });
+	const output = renderMinimizedZap({
+		site: [site([alert(), alert("10021")])],
+	});
 	assert.deepEqual(
 		JSON.parse(output.sarif).runs[0].results.map((r) => r.ruleId),
 		["ZAP-10020", "ZAP-10021"],
 	);
 	assert.match(output.html, /ZAP-10021/);
-	assert.doesNotMatch(output.html + output.sarif, /Authorization|requestHeader|responseBody|instance/);
+	assert.doesNotMatch(
+		output.html + output.sarif,
+		/Authorization|requestHeader|responseBody|instance/,
+	);
 });
 
 test("unknown fields, non-HIGH data, duplicate IDs and private hosts are rejected", () => {
@@ -42,16 +54,23 @@ test("unknown fields, non-HIGH data, duplicate IDs and private hosts are rejecte
 		{ site: [site([{ ...alert(), riskcode: "2" }])] },
 		{ site: [site([{ ...alert(), alert: "secret" }])] },
 		{ site: [site([alert(), alert()])] },
-	]) assert.throws(() => renderMinimizedZap(input));
+	])
+		assert.throws(() => renderMinimizedZap(input));
 });
 
 test("CLI writes only redacted files, rejects repeat writes", () => {
 	const dir = mkdtempSync(join(tmpdir(), "zap-safe-"));
 	try {
 		const input = join(dir, "sanitized.json");
-		writeFileSync(input, JSON.stringify({ site: [site([alert()])] }), { mode: 0o600 });
-		const program = new URL("../scripts/security/render-zap-safe-report.mjs", import.meta.url).pathname;
-		const execute = () => spawnSync(process.execPath, [program, input, dir], { encoding: "utf8" });
+		writeFileSync(input, JSON.stringify({ site: [site([alert()])] }), {
+			mode: 0o600,
+		});
+		const program = new URL(
+			"../scripts/security/render-zap-safe-report.mjs",
+			import.meta.url,
+		).pathname;
+		const execute = () =>
+			spawnSync(process.execPath, [program, input, dir], { encoding: "utf8" });
 		assert.equal(execute().status, 0);
 		for (const name of ["report.html", "report.sarif", "summary.md"]) {
 			assert.ok(readFileSync(join(dir, name), "utf8").length > 40);
@@ -64,8 +83,17 @@ test("CLI writes only redacted files, rejects repeat writes", () => {
 
 test("production workflow publishes only sanitized HTML, SARIF and JSON", async () => {
 	const { readFile } = await import("node:fs/promises");
-	const workflow = await readFile(new URL("../.github/workflows/master-dast.yml", import.meta.url), "utf8");
-	for (const name of ["render-zap-safe-report.mjs", "report.html", "report.sarif", "summary.md", "retention-days: 3"]) {
+	const workflow = await readFile(
+		new URL("../.github/workflows/master-dast.yml", import.meta.url),
+		"utf8",
+	);
+	for (const name of [
+		"render-zap-safe-report.mjs",
+		"report.html",
+		"report.sarif",
+		"summary.md",
+		"retention-days: 3",
+	]) {
 		assert.ok(workflow.includes(name), name);
 	}
 	assert.doesNotMatch(workflow, /uses:\s*zaproxy\/action-baseline/);

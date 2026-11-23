@@ -6,7 +6,10 @@ import { join } from "node:path";
 import test from "node:test";
 import { auditVercelWafSnapshot } from "../scripts/security/vercel-waf-snapshot-audit.mjs";
 
-const script = new URL("../scripts/security/vercel-waf-snapshot-audit.mjs", import.meta.url);
+const script = new URL(
+	"../scripts/security/vercel-waf-snapshot-audit.mjs",
+	import.meta.url,
+);
 const hosts = ["www.albanandrieu.com", "albanandrieu.com"];
 
 function desiredRule() {
@@ -61,21 +64,39 @@ test("deny alone is insufficient until the public rate limit is verified", () =>
 });
 
 test("only the exact desired rules and two public hosts pass", () => {
-	assert.equal(auditVercelWafSnapshot(snapshot("deny", [desiredRule()])).status, "ENFORCED");
+	assert.equal(
+		auditVercelWafSnapshot(snapshot("deny", [desiredRule()])).status,
+		"ENFORCED",
+	);
 	const extra = desiredRule();
-	extra.condition_group.push({ conditions: [{ type: "host", op: "eq", value: "preview.vercel.app" }] });
-	assert.equal(auditVercelWafSnapshot(snapshot("deny", [extra])).checks.rateLimit, false);
+	extra.condition_group.push({
+		conditions: [{ type: "host", op: "eq", value: "preview.vercel.app" }],
+	});
+	assert.equal(
+		auditVercelWafSnapshot(snapshot("deny", [extra])).checks.rateLimit,
+		false,
+	);
 	const duplicate = snapshot("deny", [desiredRule(), desiredRule()]);
 	assert.equal(auditVercelWafSnapshot(duplicate).checks.rateLimit, false);
 });
 
 test("changes to bot protection, generic detection, or limits fail closed", () => {
 	for (const change of [
-		(s) => { s.result.managedRules.bot_protection.action = "log"; },
-		(s) => { s.result.crs.gen.active = false; },
-		(s) => { s.result.rules[0].action.rate_limit.limit = 600; },
-		(s) => { s.result.rules[0].action.rate_limit.action = "log"; },
-		(s) => { s.result.rules[0].active = false; },
+		(s) => {
+			s.result.managedRules.bot_protection.action = "log";
+		},
+		(s) => {
+			s.result.crs.gen.active = false;
+		},
+		(s) => {
+			s.result.rules[0].action.rate_limit.limit = 600;
+		},
+		(s) => {
+			s.result.rules[0].action.rate_limit.action = "log";
+		},
+		(s) => {
+			s.result.rules[0].active = false;
+		},
 	]) {
 		const s = snapshot("deny", [desiredRule()]);
 		change(s);
@@ -90,7 +111,10 @@ test("malformed or partial responses never pass", () => {
 		{ result: {} },
 		{ result: { firewallEnabled: true, managedRules: {}, crs: {}, rules: {} } },
 	]) {
-		assert.throws(() => auditVercelWafSnapshot(payload), /WAF_SNAPSHOT_INVALID/);
+		assert.throws(
+			() => auditVercelWafSnapshot(payload),
+			/WAF_SNAPSHOT_INVALID/,
+		);
 	}
 });
 
@@ -101,17 +125,28 @@ test("CLI is read-only, redacts snapshot fields and enforces distinct exit codes
 		const raw = snapshot();
 		raw.result.internalSecret = "DO_NOT_PRINT";
 		writeFileSync(path, JSON.stringify(raw), { mode: 0o600 });
-		const inv = spawnSync(process.execPath, [script.pathname, "inventory", path], {
-			encoding: "utf8",
-		});
-		const strict = spawnSync(process.execPath, [script.pathname, "enforce", path], {
-			encoding: "utf8",
-		});
+		const inv = spawnSync(
+			process.execPath,
+			[script.pathname, "inventory", path],
+			{
+				encoding: "utf8",
+			},
+		);
+		const strict = spawnSync(
+			process.execPath,
+			[script.pathname, "enforce", path],
+			{
+				encoding: "utf8",
+			},
+		);
 		assert.equal(inv.status, 0);
 		assert.equal(strict.status, 2);
 		assert.match(inv.stdout, /WAF_POSTURE=LOG_ONLY_NOT_ENFORCED/);
 		assert.match(inv.stdout, /WAF_INVENTORY_ONLY=NOT_A_SECURITY_GATE/);
-		assert.doesNotMatch(inv.stdout + inv.stderr + strict.stdout + strict.stderr, /DO_NOT_PRINT/);
+		assert.doesNotMatch(
+			inv.stdout + inv.stderr + strict.stdout + strict.stderr,
+			/DO_NOT_PRINT/,
+		);
 	} finally {
 		rmSync(dir, { force: true, recursive: true });
 	}

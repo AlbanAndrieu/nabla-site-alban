@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
 	chmodSync,
-	mkdtempSync,
 	mkdirSync,
+	mkdtempSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
@@ -12,11 +12,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-const SCRIPT = new URL("../scripts/verify-master-baseline.sh", import.meta.url).pathname;
+const SCRIPT = new URL("../scripts/verify-master-baseline.sh", import.meta.url)
+	.pathname;
 const RECOVERY_SHA = "1259c593927ed99aa7c2f68691ce1829480f0dfe";
-const RUN_URL = "https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44905557576";
+const RUN_URL =
+	"https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44905557576";
 
-function run(statuses, sha = RECOVERY_SHA, repo = "AlbanAndrieu/nabla-site-alban") {
+function run(
+	statuses,
+	sha = RECOVERY_SHA,
+	repo = "AlbanAndrieu/nabla-site-alban",
+) {
 	const dir = mkdtempSync(join(tmpdir(), "smoke-baseline-recovery-"));
 	const bin = join(dir, "bin");
 	const curl = join(bin, "curl");
@@ -25,7 +31,12 @@ function run(statuses, sha = RECOVERY_SHA, repo = "AlbanAndrieu/nabla-site-alban
 		mkdirSync(bin);
 		const init = spawnSync("git", ["init", "-q", dir], { encoding: "utf8" });
 		assert.equal(init.status, 0, init.stderr);
-		writeFileSync(curl, '#!/bin/sh\ncat <<\'STATUSES\'\n' + JSON.stringify({ statuses }) + '\nSTATUSES\n');
+		writeFileSync(
+			curl,
+			"#!/bin/sh\ncat <<'STATUSES'\n" +
+				JSON.stringify({ statuses }) +
+				"\nSTATUSES\n",
+		);
 		chmodSync(curl, 0o755);
 		const result = spawnSync("bash", [SCRIPT], {
 			cwd: dir,
@@ -52,7 +63,10 @@ function run(statuses, sha = RECOVERY_SHA, repo = "AlbanAndrieu/nabla-site-alban
 }
 
 const status = (context, state, target_url = "") => ({
-	context, state, target_url, created_at: "2026-11-21T12:46:37Z",
+	context,
+	state,
+	target_url,
+	created_at: "2026-11-21T12:46:37Z",
 });
 const vercel = status("Vercel", "success");
 const smoke = status("Production Post-deploy Smoke", "failure", RUN_URL);
@@ -69,7 +83,10 @@ test("known master ESM checkout incident requires independent production recheck
 test("smoke recovery refuses unknown incidents, other repositories and DAST failures", () => {
 	const cases = [
 		[
-			[vercel, status("Production Post-deploy Smoke", "failure", RUN_URL + "-other")],
+			[
+				vercel,
+				status("Production Post-deploy Smoke", "failure", RUN_URL + "-other"),
+			],
 			RECOVERY_SHA,
 			"AlbanAndrieu/nabla-site-alban",
 		],
@@ -96,16 +113,26 @@ test("smoke recovery refuses unknown incidents, other repositories and DAST fail
 
 test("CI repair must independently execute deployed smoke logic, never re-label an old status", async () => {
 	const { readFile } = await import("node:fs/promises");
-	const ci = await readFile(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
-	const baseline = await readFile(new URL("../scripts/verify-master-baseline.sh", import.meta.url), "utf8");
+	const ci = await readFile(
+		new URL("../.github/workflows/ci.yml", import.meta.url),
+		"utf8",
+	);
+	const baseline = await readFile(
+		new URL("../scripts/verify-master-baseline.sh", import.meta.url),
+		"utf8",
+	);
 	for (const needle of [
 		'git show "${PRODUCTION_SHA}:scripts/post-deploy-smoke.mjs"',
 		'git show "${PRODUCTION_SHA}:scripts/lib/production-smoke-html.mjs"',
 		'DEPLOYED_SHA="$PRODUCTION_SHA" node "$baseline_smoke" "$BASE_URL"',
-		'PROD_BASE_SMOKE_RECHECK_FAILED',
+		"PROD_BASE_SMOKE_RECHECK_FAILED",
 		'git diff --quiet "$PRODUCTION_SHA" "$HEAD_SHA" -- scripts/post-deploy-smoke.mjs scripts/lib/production-smoke-html.mjs',
-		'scripts/lib/production-smoke-html.mjs',
-	]) assert.ok(ci.includes(needle), "missing recheck: " + needle);
+		"scripts/lib/production-smoke-html.mjs",
+	])
+		assert.ok(ci.includes(needle), "missing recheck: " + needle);
 	assert.match(baseline, /PROD_BASE_SMOKE_REPAIR_REQUIRED/);
-	assert.doesNotMatch(ci, /continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/);
+	assert.doesNotMatch(
+		ci,
+		/continue-on-error:\s*true[\s\S]{0,300}Revalidate canonical production smoke before PR build/,
+	);
 });
