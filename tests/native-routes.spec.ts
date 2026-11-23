@@ -74,9 +74,13 @@ test.describe("native security route", () => {
 
 		expect(response?.ok()).toBeTruthy();
 		await expect(page).toHaveURL(/\/security$/);
-		await expect(page.locator("main#main-content .resource-card")).toHaveCount(
-			RESOURCE_SECTIONS.length,
-		);
+		// Directory cards carry their section id; the CTEM entry card (#334) has none.
+		await expect(
+			page.locator("main#main-content .resource-card[id]"),
+		).toHaveCount(RESOURCE_SECTIONS.length);
+		await expect(
+			page.locator('main#main-content [aria-labelledby="ctem-heading"]'),
+		).toBeVisible();
 		for (const section of RESOURCE_SECTIONS) {
 			await expect(page.locator(`#${section.id}`)).toBeVisible();
 		}

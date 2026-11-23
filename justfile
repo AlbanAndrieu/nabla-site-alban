@@ -214,3 +214,13 @@ audit-service:
 
 audit-denied:
     HOMELAB_AUDIT_EXPECT=denied node scripts/audit-homelab-access.mjs
+
+# Read-only Vercel WAF snapshot, never mutates the firewall.
+waf-snapshot-test:
+    node --test unit-tests/vercelWafSnapshotAudit.test.mjs unit-tests/zapWafContract.test.mjs
+
+waf-snapshot-inventory file:
+    node scripts/security/vercel-waf-snapshot-audit.mjs inventory "{{file}}"
+
+waf-snapshot-verify file:
+    node scripts/security/vercel-waf-snapshot-audit.mjs enforce "{{file}}"

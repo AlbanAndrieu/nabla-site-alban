@@ -88,6 +88,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .zap/rules.tsv
+            scripts/security/zap-rate-limit-hook.py
           sparse-checkout-cone-mode: false
 
       - name: Request GitHub OIDC token for Vercel
@@ -139,9 +140,9 @@ jobs:
             echo "mitigated=${mitigated:-none}" >> "$GITHUB_OUTPUT"
 
             if [[ "$status" == "429" || "${mitigated,,}" == "challenge" ]]; then
-              echo "::warning::$auth_name reached the Vercel Security Checkpoint (HTTP $status, x-vercel-mitigated=${mitigated:-unknown})."
+              echo "::error::ZAP_WAF_PREFLIGHT_BLOCK: Vercel Security Checkpoint / rate limit (HTTP $status); scan will not run."
               rm -f "$headers"
-              return 1
+              exit 1
             fi
             if grep -Eiq '^location: https://vercel\.com/(login|sso-api)' "$headers" || \
               [[ "$status" == "401" || "$status" == "403" ]]; then
@@ -200,6 +201,8 @@ jobs:
           scan_dir="$(mktemp -d "${RUNNER_TEMP}/zap-preview.XXXXXX")"
           echo "ZAP_SCAN_DIR=$scan_dir" >> "$GITHUB_ENV"
           cp .zap/rules.tsv "$scan_dir/rules.tsv"
+          cp scripts/security/zap-rate-limit-hook.py "$scan_dir/rate-limit-hook.py"
+          chmod 0644 "$scan_dir/rules.tsv" "$scan_dir/rate-limit-hook.py"
           # Runner-group access only; setgid keeps raw scanner evidence group-private.
           chmod 2770 "$scan_dir"
           # Raw HTTP traffic and console output remain runner-local only.
@@ -215,8 +218,14 @@ jobs:
             ghcr.io/zaproxy/zaproxy:2.17.0 \
             zap-baseline.py --autooff -t "$PREVIEW_BASE_URL" -c rules.tsv \
               -J report_json.json -I -T 5 -s \
+              -m 2 --hook=/zap/wrk/rate-limit-hook.py \
             > "$scan_dir/console.log" 2>&1 || zap_exit=$?
           echo "ZAP_SCAN_EXIT_CODE=$zap_exit" >> "$GITHUB_ENV"
+          if grep -Eiq 'too many requests|security checkpoint|x-vercel-mitigated|HTTP[ /]+429|response[^[:cntrl:]]{0,30}429|status[^[:cntrl:]]{0,30}429' "$scan_dir/console.log"; then
+            echo "ZAP_WAF_BLOCKED=true" >> "$GITHUB_ENV"
+            echo "::error::ZAP_WAF_RATE_LIMIT_OR_CHALLENGE: incomplete coverage (private log withheld)."
+            exit 1
+          fi
           if [[ ! -s "$scan_dir/report_json.json" ]]; then
             category=unknown
             if grep -Eiq 'permission denied|read-only file system' "$scan_dir/console.log"; then

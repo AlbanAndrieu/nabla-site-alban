@@ -3,6 +3,39 @@
 **Périmètre :** runtime Next.js/App Router sur Vercel, routes API, pages EN/FR, Checkout Stripe et lecture du catalogue/snapshot homelab.  
 **Méthode :** STRIDE simplifié, revue statique du code et des frontières documentées sur `master` au 10 octobre 2026. Il s'agit d'une **analyse de conception**, non d'un audit dynamique ni d'une preuve d'exploitation.
 
+## Formulaire Login → piège à bots du honeypot (23/11/2026)
+
+Le site n'a aucun espace protégé : aucun visiteur légitime n'a de raison
+de se connecter. La page Next.js `/[locale]/login` sert donc d'appât. Son
+formulaire poste directement vers le honeypot séparé
+`https://login.albandrieu.com/login` (`apps/honeypot` dans
+`nabla-compose`) :
+
+- soumission HTML **POST** cross-origin, sans `fetch`, proxy ni route
+  Vercel : le site ne reçoit ni ne relaie jamais ce que les bots tapent ;
+- champs `username` et `password` remplissables, derrière le widget
+  Turnstile, gardé exprès : il mesure si des bots capables de le résoudre
+  atteignent le piège. Le honeypot ne lisant pas le corps, il ne sait pas
+  si un POST portait un jeton valide : comparer les résolutions dans
+  l'analytique Turnstile de Cloudflare aux POST journalisés ;
+- le honeypot refuse le `POST /login` avant de lire le corps
+  (`LimitExcept GET HEAD`) et ne journalise que IP, méthode, chemin et
+  statut : aucun mot de passe n'est reçu ni stocké ;
+- CrowdSec (`nabla/honeypot-login-burst`) ne bannit qu'au-delà de 5 POST
+  en rafale : un essai isolé ne déclenche aucune remédiation.
+
+Relevé du 23/11 : `login.albandrieu.com` résout vers Cloudflare mais
+`GET /login` répond 404. Le formulaire ne piège rien tant que le Tunnel
+et le routeur Traefik `honeypot-login-attempt` ne servent pas le
+honeypot ; réceptionner ce service avant de fusionner. Les anciennes
+pages statiques `public/login.html` et `public/locales/fr/login.html`
+postent toujours vers `/handler`, qui n'existe pas ; ne pas en faire une
+seconde connexion active.
+
+La télémétrie CTEM sur TrueNAS conserve uniquement des agrégats
+anonymisés pour les rapports publics, et des journaux privés pour le
+triage des tentatives. Une IP ne constitue pas une identité civile.
+
 ## Actifs et frontières de confiance
 
 | Frontière | Entrées | Actifs à préserver | Principe |

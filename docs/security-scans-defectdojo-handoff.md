@@ -30,6 +30,10 @@ producteur ; vérifier séparément leur confidentialité avant acceptation.
 
 Date : 2026-10-19. Cette documentation ne déploie ni DefectDojo ni un collecteur.
 
+**Transfert des protections ZAP/WAF (22/11/2026) :** ajout du hook de limitation ZAP 1 req/s et de l'audit hors ligne WAF depuis [Bababou #286](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/286). Les résultats ZAP Bababou ne sont pas des résultats Site Alban. La configuration Vercel reste sous l'autorité de Compose, avec statut réel `NOT_VERIFIED`. Procédure : [recette WAF/ZAP](runbooks/vercel-waf-zap-acceptance.md).
+
+**ZAP HTML/SARIF expurgé (23/11)** : les rapports visualisables sont dérivés exclusivement de `report_json.json` **après** minimisation (IDs HIGH, origines publiques) ; pas de transfert du HTML natif ou des instances HTTP. Leur accès est assuré par le lien d'artefact dans GitHub Actions et la PR #338. Le SARIF est téléchargeable, non importé automatiquement en Code Scanning (pas de `physicalLocation` source sûre). Le collecteur privé DefectDojo continue à utiliser le JSON existant.
+
 ## Matrice exécution / budget
 
 | Contrôle | PR | Master / manuel | Bloquant | Preuve |

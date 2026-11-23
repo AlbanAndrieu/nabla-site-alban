@@ -187,6 +187,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PRODUCTION_SHA: ${{ steps.verified-production-baseline.outputs.baseline_sha }}
+          SMOKE_RECOVERY: ${{ steps.verified-production-baseline.outputs.smoke_recovery }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           BASE_URL: "https://www.albanandrieu.com"
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
@@ -201,14 +202,47 @@ jobs:
           baseline_smoke="${RUNNER_TEMP}/post-deploy-smoke.baseline.mjs"
           baseline_log="${RUNNER_TEMP}/post-deploy-smoke.baseline.log"
           candidate_smoke="${GITHUB_WORKSPACE}/scripts/post-deploy-smoke.mjs"
+          # Reconstruct the exact deployed Git smoke module graph. The old
+          # pre-merge runner used to copy only the entrypoint to RUNNER_TEMP,
+          # which made its relative ESM import fail even on a healthy site.
+          mkdir -p "${RUNNER_TEMP}/lib"
           git show "${PRODUCTION_SHA}:scripts/post-deploy-smoke.mjs" > "$baseline_smoke"
+          git show "${PRODUCTION_SHA}:scripts/lib/production-smoke-html.mjs" > "${RUNNER_TEMP}/lib/production-smoke-html.mjs"
+
+          if [[ "${SMOKE_RECOVERY:-}" == "module-import" ]]; then
+            # The known failing status is not relabeled as success. Prove the
+            # branch fixes checkout packaging without changing deployed logic.
+            if [[ "$(git rev-parse HEAD)" != "$HEAD_SHA" ]]; then
+              echo "::error::Production smoke repair requires exact PR HEAD."
+              exit 1
+            fi
+            if git diff --quiet "$PRODUCTION_SHA" "$HEAD_SHA" -- .github/workflows/master-smoke.yml; then
+              echo "::error::Production smoke repair does not modify the broken sparse checkout."
+              exit 1
+            fi
+            if ! grep -Fxq '            scripts/lib/production-smoke-html.mjs' .github/workflows/master-smoke.yml; then
+              echo "::error::Production smoke repair must include the missing ESM dependency in sparse checkout."
+              exit 1
+            fi
+            if ! git diff --quiet "$PRODUCTION_SHA" "$HEAD_SHA" -- scripts/post-deploy-smoke.mjs scripts/lib/production-smoke-html.mjs; then
+              echo "::error::Production smoke repair must recheck unchanged deployed smoke logic."
+              exit 1
+            fi
+          fi
 
           set +e
           DEPLOYED_SHA="$PRODUCTION_SHA" node "$baseline_smoke" "$BASE_URL" 2>&1 | tee "$baseline_log"
           baseline_status="${PIPESTATUS[0]}"
           set -e
           if [[ "$baseline_status" -eq 0 ]]; then
+            if [[ "${SMOKE_RECOVERY:-}" == "module-import" ]]; then
+              echo "::warning::PROD_BASE_SMOKE_RECHECK_PASSED: real production smoke passed using the unchanged deployed source; historic GitHub status remains failed until post-merge."
+            fi
             exit 0
+          fi
+          if [[ "${SMOKE_RECOVERY:-}" == "module-import" ]]; then
+            echo "::error::PROD_BASE_SMOKE_RECHECK_FAILED: independent production smoke did not pass. Historic status cannot be repaired by a source-only assertion."
+            exit "$baseline_status"
           fi
 
           expected_failure="Production post-deploy smoke failed: Error: /api/homelab-status returned HTTP 503"
@@ -257,7 +291,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version-file: ".python-version"
+          python-version: "3.12"
 
       - name: Restore pre-commit environments
         id: pre-commit-cache

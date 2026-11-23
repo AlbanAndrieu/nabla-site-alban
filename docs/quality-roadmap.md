@@ -18,6 +18,37 @@
 
 **Publication vérifiée le 14 novembre :** PR #303 fusionnée ; [Vercel `dpl_A3B3CuHJVPjzbZ978CcmpEorX5Fv`](https://vercel.com/albanandrieus-projects/nabla-site-alban/A3B3CuHJVPjzbZ978CcmpEorX5Fv) est `READY` sur `64a203d8d78ad6c438837f32bdcdd79f6c52b32c`. Ce n'est ni L3 ni une recette navigateur. Billing Charges Hobby retourne `costs_not_found` : CPU **NOT_MEASURED**. Les PR #305 et #306 ont été fusionnées le 14/11 ; le durcissement SERVICE et les traductions du catalogue V2 sont intégrés dans Git. Leurs parcours navigateur et la gate L3 restent à réceptionner sur le SHA effectivement déployé.
 
+### Contrôles de publication — audit du 21 novembre 2026
+
+- **A1 / PR [#338](https://github.com/AlbanAndrieu/nabla-site-alban/pull/338) (Draft, L0)** : corriger `setup-python` (Python 3.12.10 indisponible sur Ubuntu 26.04), le smoke production (helper HTML absent du sparse checkout), les tests de contrat des versions et la remédiation post-merge. La CI `skipped` ne vaut pas L3.
+- **A3 / dérive GitHub** : [Protect master](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27355874) et [Code quality](https://github.com/AlbanAndrieu/nabla-site-alban/rules/27677122) sont actifs, mais `quality` et `CI policy guard` ne sont pas requis ; l'intégration `4676280` bénéficie d'un bypass `always`. La [politique cible](github-master-ruleset.md) nécessite une réconciliation administrative, sans ajout de règles concurrentes à l'aveugle.
+- **Preuves** : CodeQL et GitGuardian au HEAD initial de #338 ont réussi ; qualité complète, navigateur OWNER/SERVICE et métriques Vercel restent `NOT_RUN` / `NOT_MEASURED`.
+
+### Transfert WAF et ZAP — 22 novembre 2026 (A3, CODED / NOT_APPLIED)
+
+- Adaptation de [Bababou #286](https://github.com/AlbanAndrieu/nabla-site-bababou/pull/286) : `vercel-waf-snapshot-audit.mjs` et tests offline ; `log` n'est jamais considéré comme `deny`. Aucune règle Vercel modifiée et aucune consommation/éligibilité OWASP constatée.
+- ZAP : hook réseau de **1 req/s**, précontrôle `429/challenge`, arrêt si le scan rencontre une mitigation, sans publication de logs bruts ni augmentation des tests actifs. Preuves sur images ZAP, L3 et DAST runtime **NOT_RUN**.
+- Terraform WAF demeure dans [Compose #433](https://github.com/AlbanAndrieu/nabla-compose/pull/433) (module Bababou) ; l'import/apply et une éventuelle extension au projet Site Alban nécessitent une revue distincte. [Runbook Site](runbooks/vercel-waf-zap-acceptance.md). Les quatre alertes historiques de Bababou ne sont pas reprises comme findings Alban.
+
+### Rétablissement CI exact-SHA — 22 novembre 2026 (A1, CODED)
+
+- [PR #338](https://github.com/AlbanAndrieu/nabla-site-alban/pull/338) : le run Quality [44966524705](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44966524705) est bloqué par le **statut historique du smoke de `master@1259c593927ed99aa7c2f68691ce1829480f0dfe`**, causé par l'absence du helper ESM dans le sparse checkout. Le run Node 24 [44966524650](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/44966524650) échoue sur deux assertions WAF/ZAP devenues obsolètes.
+- Voie de réparation **auto-expirante et non générale** : seul l'échec smoke de cet exact SHA/run, avec Vercel vert et aucun autre statut de production en erreur, permet de poursuivre vers une **revalidation HTTP réelle obligatoire du smoke original et de son helper issus du SHA déployé**. La CI doit vérifier que la PR corrige uniquement l'empaquetage du smoke, et échouer si le smoke réel échoue. Aucun statut de `master` n'est réécrit, aucun bypass WAF/DAST n'est autorisé.
+- Sont encore **NOT_RUN** sur le prochain HEAD : revalidation HTTP, quality/SAST, tests Node 24 et recette WAF/ZAP. Les métriques Vercel et l'éligibilité OWASP restent `NOT_MEASURED` / `UNVERIFIED`.
+
+### Corrections CI et publication ZAP — 23 novembre 2026 (A1/A3, CODED)
+
+- CI #338 : [Quality 45245584135](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45245584135) et [Node 24 45245584005](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45245584005) échouaient à cause du bit Git non exécutable de `verify-master-baseline.sh` ; `actionlint` signalait aussi SC2317 dans ZAP Preview. Correctifs appliqués sans supprimer les gates.
+- Le smoke de production réel (SHA `1259c593`) a été **PASS** le 23/11 pendant la CI, indépendamment du statut historique rouge. Aucun statut de production n'est réécrit.
+- Run ZAP Production [45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) : JSON expurgé, **0 HIGH conservé**, WARN/LOW non retenus, artefact expirant le 25/11. Le rapport HTML et SARIF expurgé est désormais prévu dans le prochain workflow, sans trafic ZAP supplémentaire ; **exécution future NOT_RUN**.
+- Prochaine preuve : tests exact-SHA, gate L3, vérification que le nouveau workflow génère les artefacts HTML/SARIF dans GitHub Actions, puis audit Nuclei et règles WAF réel.
+
+### Réconciliation du 23 novembre — CI et Nuclei
+
+- [Quality #45254555914](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45254555914) : les tests Node 24, Copilot et `actionlint` sont verts ; le seul changement demandé par le hook pre-commit était une ligne vide Ruff dans `scripts/security/zap-rate-limit-hook.py`, corrigée sur #338. Publication L3 complète à reconfirmer.
+- [Nuclei #45198659596](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45198659596) : aucune donnée de scan (pas de YAML installé, `INCOMPLETE`). Correction du bootstrap authentifié et garde fail-closed sur l'existence de templates `.yaml` ; aucun nouveau scan déclenché et règles de débit inchangées.
+- Rapport ZAP HTML/SARIF : génération depuis le JSON expurgé préparée dans #338 ; le rapport historique du [run #45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) comporte uniquement `0 HIGH` **conservé**, non une attestation sans vulnérabilités.
+
 ## Décision de priorité — choisir la prochaine vague
 
 | ID | Priorité suggérée | Résultat vérifiable | Source d'exécution |

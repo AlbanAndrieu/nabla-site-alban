@@ -48,6 +48,8 @@ test("owner cards render from the Backstage v2 catalog alone", async ({
 	);
 	await page.goto("/fr/truenas");
 	await expect(page.locator("[data-homelab-private-view]").first()).toBeVisible();
+	// Lower-priority groups (here "support") start collapsed by design.
+	await page.getByRole("button", { name: "Tout déplier" }).click();
 	await expect(page.locator("#homelab-service-postgresql")).toBeVisible();
 	await expect(page.locator("#service-postgresql")).toHaveCount(1);
 	await expect(page.locator("#homelab-service-prometheus")).toBeVisible();

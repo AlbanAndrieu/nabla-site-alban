@@ -25,6 +25,10 @@ jobs:
 
       - name: Install pinned Nuclei with checksum verification
         shell: bash
+        env:
+          # Authenticated template release discovery avoids the shared CI runner
+          # GitHub API 403 quota; no API token is passed to scan templates.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           archive="${RUNNER_TEMP}/nuclei.zip"
@@ -37,12 +41,20 @@ jobs:
           unzip -p "$archive" nuclei > "${RUNNER_TEMP}/nuclei"
           chmod 700 "${RUNNER_TEMP}/nuclei"
           "${RUNNER_TEMP}/nuclei" -version
-          # Template update is separate from the binary release and is mandatory.
+          # An unauthed -ut can leave an empty directory while returning zero.
+          # Stop before the scan rather than misreporting 0 security findings.
+          templates_dir="${HOME}/nuclei-templates"
           "${RUNNER_TEMP}/nuclei" -ut
-          test -d "${HOME}/nuclei-templates" || {
-            echo "::error::Nuclei templates missing after bootstrap."
+          if [[ ! -d "$templates_dir" ]]; then
+            echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: no template directory after update."
             exit 1
-          }
+          fi
+          first_template="$(find "$templates_dir" -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)"
+          if [[ -z "$first_template" ]]; then
+            echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: update completed without any YAML template. Scan not executed."
+            exit 1
+          fi
+          echo "NUCLEI_TEMPLATE_DIR=$templates_dir" >> "$GITHUB_ENV"
 
       - name: Scan public website (bounded HTTP templates)
         id: nuclei
@@ -73,6 +85,7 @@ jobs:
           fi
           "${RUNNER_TEMP}/nuclei" \
             -u https://albanandrieu.com \
+            -t "$NUCLEI_TEMPLATE_DIR" \
             -pt http -ni \
             -tags cve,misconfig,exposure \
             -severity medium,high,critical \

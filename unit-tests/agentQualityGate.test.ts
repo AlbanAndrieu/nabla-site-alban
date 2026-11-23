@@ -290,8 +290,10 @@ test("local agent toolchain matches CI bootstrap pins", async () => {
 	assert.ok(mise.includes('idiomatic_version_file_enable_tools = ["node"]'));
 	assert.ok(mise.includes("default='3.12.10'"));
 	assert.ok(mise.includes('pre-commit = "4.6.2"'));
+	const pythonMinor = pythonVersion.trim().split(".").slice(0, 2).join(".");
 	for (const workflow of [ci, setup]) {
-		assert.ok(workflow.includes('python-version-file: ".python-version"'));
+		assert.ok(workflow.includes(`python-version: "${pythonMinor}"`));
+		assert.ok(!workflow.includes("python-version-file:"));
 		assert.ok(!workflow.includes('python-version: "3.12.10"'));
 		assert.ok(workflow.includes("pre-commit==4.6.2"));
 		assert.ok(

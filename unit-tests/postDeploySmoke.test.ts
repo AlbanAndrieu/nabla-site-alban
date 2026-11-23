@@ -129,6 +129,7 @@ test("production smoke stays lightweight and production-only", async () => {
 	);
 	assert.match(workflow, /persist-credentials: false/);
 	assert.match(workflow, /node scripts\/post-deploy-smoke\.mjs/);
+	assert.match(workflow, /scripts\/lib\/production-smoke-html\.mjs/);
 	assert.match(workflow, /Production Post-deploy Smoke/);
 	assert.doesNotMatch(workflow, /inputs\.base_url/);
 	assert.match(

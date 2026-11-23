@@ -58,6 +58,7 @@ jobs:
           sparse-checkout: |
             .nvmrc
             scripts/post-deploy-smoke.mjs
+            scripts/lib/production-smoke-html.mjs
           sparse-checkout-cone-mode: false
 
       - name: Setup Node.js

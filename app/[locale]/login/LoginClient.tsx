@@ -39,25 +39,35 @@ export default function LoginClient() {
 					<main id="main-content">
 						<div className="row">
 							<section className="form-signin" aria-labelledby="login-heading">
-								<form method="POST" action="/handler" autoComplete="off">
+								{/* Bot trap: plain cross-origin POST to the honeypot, which denies it
+								    before reading the body and only logs IP, method, path and status. */}
+								<form
+									method="post"
+									action="https://login.albandrieu.com/login"
+									autoComplete="off"
+								>
 									<h1 id="login-heading" className="h3 mb-3 fw-normal">
-										Turnstile – Login
+										Login
 									</h1>
 									<div className="form-floating">
-										<input type="text" id="user" className="form-control" />
+										<input
+											type="text"
+											id="user"
+											name="username"
+											className="form-control"
+										/>
 										<label htmlFor="user">User name</label>
 									</div>
 									<div className="form-floating">
 										<input
 											type="password"
 											id="pass"
+											name="password"
 											className="form-control"
-											autoComplete="off"
-											readOnly
-											value="CorrectHorseBatteryStaple"
 										/>
-										<label htmlFor="pass">Password (dummy)</label>
+										<label htmlFor="pass">Password</label>
 									</div>
+									{/* Kept on purpose: tests whether bots that solve Turnstile reach the trap. */}
 									<div className="checkbox mb-3">
 										<div
 											className="cf-turnstile"
