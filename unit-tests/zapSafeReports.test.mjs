@@ -107,7 +107,7 @@ test("production DAST keeps the TrueNAS JSON-only ZIP contract", async () => {
 	);
 	const collector =
 		workflow
-			.split("name: zap-production-report\\n")[1]
+			.split("name: zap-production-report\n")[1]
 			?.split("- name: Upload sanitized ZAP visual evidence")[0] ?? "";
 	assert.ok(collector, "must publish the collector artifact");
 	assert.ok(collector.includes("path: zap-production-safe/report_json.json"));
@@ -119,7 +119,7 @@ test("production DAST keeps the TrueNAS JSON-only ZIP contract", async () => {
 	}
 	const visual =
 		workflow
-			.split("name: zap-production-visual-report\\n")[1]
+			.split("name: zap-production-visual-report\n")[1]
 			?.split("- name: Present sanitized ZAP HTML")[0] ?? "";
 	for (const name of ["report.html", "report.sarif", "summary.md"]) {
 		assert.ok(
