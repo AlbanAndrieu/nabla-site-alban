@@ -101,18 +101,36 @@ test("production workflow publishes only sanitized HTML, SARIF and JSON", async 
 
 test("production DAST keeps the TrueNAS JSON-only ZIP contract", async () => {
 	const { readFile } = await import("node:fs/promises");
-	const workflow = await readFile(new URL("../.github/workflows/master-dast.yml", import.meta.url), "utf8");
-	const collector = workflow.split("name: zap-production-report\n")[1]?.split("- name: Upload sanitized ZAP visual evidence")[0] ?? "";
+	const workflow = await readFile(
+		new URL("../.github/workflows/master-dast.yml", import.meta.url),
+		"utf8",
+	);
+	const collector =
+		workflow
+			.split("name: zap-production-report\\n")[1]
+			?.split("- name: Upload sanitized ZAP visual evidence")[0] ?? "";
 	assert.ok(collector, "must publish the collector artifact");
 	assert.ok(collector.includes("path: zap-production-safe/report_json.json"));
 	for (const forbidden of ["report.html", "report.sarif", "summary.md"]) {
-		assert.ok(!collector.includes(forbidden), "collector ZIP must not contain " + forbidden);
+		assert.ok(
+			!collector.includes(forbidden),
+			"collector ZIP must not contain " + forbidden,
+		);
 	}
-	const visual = workflow.split("name: zap-production-visual-report\n")[1]?.split("- name: Present sanitized ZAP HTML")[0] ?? "";
+	const visual =
+		workflow
+			.split("name: zap-production-visual-report\\n")[1]
+			?.split("- name: Present sanitized ZAP HTML")[0] ?? "";
 	for (const name of ["report.html", "report.sarif", "summary.md"]) {
-		assert.ok(visual.includes("zap-production-safe/" + name), name + " must be in the visual artifact");
+		assert.ok(
+			visual.includes("zap-production-safe/" + name),
+			name + " must be in the visual artifact",
+		);
 	}
-	assert.ok(!visual.includes("report_json.json"), "do not duplicate collector payload");
+	assert.ok(
+		!visual.includes("report_json.json"),
+		"do not duplicate collector payload",
+	);
 	assert.match(workflow, /steps\.safe-zap-artifact\.outputs\.artifact-id/);
 	assert.match(workflow, /steps\.visual-zap-artifact\.outputs\.artifact-id/);
 });
