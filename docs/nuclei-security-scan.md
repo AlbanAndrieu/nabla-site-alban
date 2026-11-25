@@ -19,14 +19,14 @@
 
 Le workflow [Nuclei public DAST](../.github/workflows/nuclei-public.yml) cible exclusivement `https://albanandrieu.com` depuis GitHub Actions chaque lundi à 04:19 UTC, ou manuellement via `workflow_dispatch`. **Ce n'est pas un scan de l'homelab**. Il ne suit pas une URL fournie par l'utilisateur, n'injecte pas de Service Token et ne sonde aucune adresse privée. Le trafic de production est limité à 2 requêtes/s et une seule concurrence ; les modèles DoS, fuzzing, brute force et les tests OAST (`-ni`) sont exclus. Le rapport JSONL reste un artefact GitHub à conservation de trois jours.
 
-Nuclei est épinglé à `v3.11.1`, archive Linux amd64 vérifiée par SHA-256 `ea63d4ae232808cd7c6bc00d0142428e231fab59dae01042246097d195835ab6`. La provenance des templates distants n'est **pas** verrouillée par SHA : il s'agit d'une dette P1, ne pas prétendre à la reproductibilité intégrale avant épinglage du corpus de templates.
+Nuclei est épinglé à `v3.11.1`, archive Linux amd64 vérifiée par SHA-256 `ea63d4ae232808cd7c6bc00d0142428e231fab59dae01042246097d195835ab6`. Le corpus upstream `projectdiscovery/nuclei-templates` est téléchargé via `actions/checkout` à la révision immuable `573b82acea30711be3ecfbbb472ec8ad7734c895` (GitHub, 25/11/2026). Le job vérifie le commit réellement extrait et la présence d'au moins 1 000 fichiers YAML avant toute requête HTTP de scan. Le binaire ne lance plus `nuclei -ut` : sa réussite apparente ne garantissait pas l'installation des templates. Épingler le corpus apporte la reproductibilité du contenu, mais un run GitHub Actions réel sur `master` reste indispensable pour confirmer l'exécution.
 
-Le workflow écrit un résumé par sévérité et ID de modèle. Un résultat Nuclei est un **signal à confirmer**, pas automatiquement une vulnérabilité avérée. Le job est plafonné à 15 minutes ; un scan interrompu, annulé ou échoué est **INCOMPLETE / NOT_RUN**, même si un fichier JSONL partiel existe. Aucun import DefectDojo ni lecture en retour n'est autorisé après un échec de scan. Une absence de rapport est une erreur de scan, jamais « zéro alerte ». Le workflow ne remplace pas ZAP Preview, Semgrep, BetterLeaks ni les validations de publication.
+Le workflow écrit un résumé par sévérité et ID de modèle. Un résultat Nuclei est un **signal à confirmer**, pas automatiquement une vulnérabilité avérée. Le job est plafonné à 45 minutes ; un scan interrompu, annulé ou échoué est **INCOMPLETE / NOT_RUN**, même si un fichier JSONL partiel existe. Aucun import DefectDojo ni lecture en retour n'est autorisé après un échec de scan. Une absence de rapport est une erreur de scan, jamais « zéro alerte ». Le workflow ne remplace pas ZAP Preview, Semgrep, BetterLeaks ni les validations de publication.
 
 ## DefectDojo : récupération privée, pas d'import par GitHub Actions
 
 Le workflow Nuclei de `master` conserve un profil de scan non intrusif,
-plafonné à **2 requêtes/s**, une concurrence et 15 minutes. Aucun scan DAST
+plafonné à **2 requêtes/s**, une concurrence et 45 minutes. Aucun scan DAST
 supplémentaire n'est déclenché à chaque PR.
 
 En cas de succès complet, le job crée `nuclei-public-<run-id>` contenant
@@ -133,4 +133,4 @@ points **runtime** ne devient PASS par la seule présence des scripts.
 
 Le run [45198659596](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45198659596) a échoué **avant un scan effectif** : Nuclei v3.11.1 a annoncé l'installation du corpus, puis `no templates provided for scan`. Le test `test -d ~/nuclei-templates` était insuffisant, car le dossier existait sans YAML. Il n'existe donc **aucune preuve d'absence de findings** pour ce run.
 
-Correctif dans la PR #338 : jeton GitHub Actions éphémère en lecture seule pour l'API de mise à jour, vérification de l'existence d'au moins un fichier YAML, refus `NUCLEI_TEMPLATES_UNAVAILABLE` avant toute requête applicative et utilisation explicite de `-t "$NUCLEI_TEMPLATE_DIR"`. La limite actuelle `-rl 2 -c 1`, les filtres HTTP et les exclusions restent inchangés. **Recette runtime sur un run hebdomadaire futur NOT_RUN.**
+Le premier correctif de la PR #338 vérifiait un fichier YAML après `-ut` mais conservait une dépendance fragile à l'updater et à la disponibilité de l'API GitHub. La PR #339 remplace cette étape par un checkout SHA-pinné (`573b82acea30711be3ecfbbb472ec8ad7734c895`), une vérification du commit et du volume du corpus, puis utilise explicitement `-t "$NUCLEI_TEMPLATE_DIR"`. Aucun jeton DefectDojo n'est introduit. La limite actuelle `-rl 2 -c 1`, les filtres HTTP et les exclusions restent inchangés. **Recette runtime sur un run hebdomadaire futur NOT_RUN.**
