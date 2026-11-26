@@ -18,7 +18,8 @@
 		},
 		"switchLanguage": "Changer de langue",
 		"rssFeedAria": "Flux RSS de ce site",
-		"copyright": "© {year} Alban Andrieu. Professionnel DevSecOps indépendant."
+		"copyright": "© {year} Alban Andrieu. Professionnel DevSecOps indépendant.",
+		"support": "Support"
 	},
 	"checkout": {
 		"sessionCreateError": "Impossible de créer la session de paiement.",
@@ -1277,6 +1278,36 @@
 				"diskWrites": "Documentation Netgate : écritures disque",
 				"fortinetShare": "Placera (Avanza) : dépêche sur Fortinet"
 			}
+		}
+	},
+	"supportPage": {
+		"meta": {
+			"title": "Assistant de support du site | Alban Andrieu",
+			"description": "Posez vos questions à l’assistant de support du site sur les prestations, les tarifs, le paiement et les pages homelab, ou écrivez à un humain."
+		},
+		"title": "Support",
+		"intro": "Posez une question sur les prestations, les tarifs, le paiement Stripe, les moyens de contact ou les pages homelab et sécurité. L’assistant répond à partir du contenu public du site ; pour le reste, écrivez à un humain.",
+		"privacy": "Confidentialité : les messages sont traités sur le serveur auto-hébergé du propriétaire du site et ne sont pas conservés par ce site. Ne partagez ni données personnelles, ni mot de passe, ni données de paiement.",
+		"chat": {
+			"logLabel": "Conversation avec l’assistant de support",
+			"empty": "Aucun message pour l’instant. Posez votre première question ci-dessous.",
+			"you": "Vous",
+			"assistant": "Assistant",
+			"inputLabel": "Votre question",
+			"inputHint": "Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 2 000 caractères maximum.",
+			"send": "Envoyer",
+			"sending": "Réponse en cours…",
+			"verifying": "Vérification anti-robot…",
+			"unavailable": "L’assistant est indisponible pour le moment. Vous pouvez écrire à un humain ci-dessous.",
+			"verifyFailed": "La vérification anti-robot a échoué. Réessayez, ou écrivez à un humain ci-dessous.",
+			"humanTitle": "Parler à un humain",
+			"humanIntro": "Votre message et les derniers échanges de cette conversation sont transmis au propriétaire du site.",
+			"messageLabel": "Votre message",
+			"emailLabel": "Votre e-mail (facultatif, pour recevoir une réponse)",
+			"humanSend": "Envoyer à un humain",
+			"humanSending": "Envoi…",
+			"humanSent": "Merci, votre message a été transmis au propriétaire du site.",
+			"humanFailed": "L’envoi a échoué. Écrivez directement à"
 		}
 	}
 }

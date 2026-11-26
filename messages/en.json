@@ -18,7 +18,8 @@
 		},
 		"switchLanguage": "Switch language",
 		"rssFeedAria": "RSS feed for this site",
-		"copyright": "© {year} Alban Andrieu. Independent DevSecOps Professional."
+		"copyright": "© {year} Alban Andrieu. Independent DevSecOps Professional.",
+		"support": "Support"
 	},
 	"checkout": {
 		"sessionCreateError": "Could not create checkout session.",
@@ -1277,6 +1278,36 @@
 				"diskWrites": "Netgate documentation: disk writes",
 				"fortinetShare": "Placera (Avanza): Fortinet news item"
 			}
+		}
+	},
+	"supportPage": {
+		"meta": {
+			"title": "Site support assistant | Alban Andrieu",
+			"description": "Ask the site support assistant about services, pricing, payment and the homelab pages, or write to a human."
+		},
+		"title": "Support",
+		"intro": "Ask a question about services, pricing, Stripe payment, contact options or the homelab and security pages. The assistant answers from the site's public content; for anything else, write to a human.",
+		"privacy": "Privacy: messages are processed on the site owner's self-hosted server and are not kept by this site. Do not share personal data, passwords or payment details.",
+		"chat": {
+			"logLabel": "Conversation with the support assistant",
+			"empty": "No messages yet. Ask your first question below.",
+			"you": "You",
+			"assistant": "Assistant",
+			"inputLabel": "Your question",
+			"inputHint": "Enter to send, Shift+Enter for a new line. 2,000 characters maximum.",
+			"send": "Send",
+			"sending": "Answering…",
+			"verifying": "Checking that you are human…",
+			"unavailable": "The assistant is unavailable right now. You can write to a human below.",
+			"verifyFailed": "The anti-bot check failed. Try again, or write to a human below.",
+			"humanTitle": "Talk to a human",
+			"humanIntro": "Your message and the last turns of this conversation are forwarded to the site owner.",
+			"messageLabel": "Your message",
+			"emailLabel": "Your email (optional, to receive a reply)",
+			"humanSend": "Send to a human",
+			"humanSending": "Sending…",
+			"humanSent": "Thank you, your message was forwarded to the site owner.",
+			"humanFailed": "Sending failed. Please write directly to"
 		}
 	}
 }

@@ -39,6 +39,7 @@ type FooterProps = {
 	locale: string;
 	rssFeedAria: string;
 	copyright: string;
+	support: string;
 };
 
 export default function Footer({
@@ -49,9 +50,11 @@ export default function Footer({
 	locale,
 	rssFeedAria,
 	copyright,
+	support,
 }: FooterProps) {
 	const homeHref = locale === "fr" ? "/fr" : "/";
 	const legalHref = locale === "fr" ? "/fr/policy/legal" : "/policy/legal";
+	const supportHref = locale === "fr" ? "/fr/support" : "/support";
 
 	return (
 		<footer className={`${styles.root} footer`} role="contentinfo">
@@ -76,6 +79,7 @@ export default function Footer({
 			</div>
 			<div className={`${styles.links} footer-links`}>
 				<a href={legalHref}>{legalNotices}</a>
+				<a href={supportHref}>{support}</a>
 			</div>
 			<nav
 				className={styles.actions}

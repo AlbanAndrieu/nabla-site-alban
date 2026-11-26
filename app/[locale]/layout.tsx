@@ -78,6 +78,7 @@ export default async function LocaleLayout({
 		copyright: string;
 		legalNotices: string;
 		rssFeedAria: string;
+		support: string;
 	};
 	const copyright = site.copyright.replace(
 		"{year}",
@@ -130,6 +131,7 @@ export default async function LocaleLayout({
 						locale={locale}
 						rssFeedAria={site.rssFeedAria}
 						copyright={copyright}
+						support={site.support}
 					/>
 				</NextIntlClientProvider>
 				<Script
