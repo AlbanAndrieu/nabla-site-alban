@@ -109,6 +109,8 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 - [ ] Valider canonical, `hreflang`, sitemap, redirections et indexabilité sur `www.albanandrieu.com` ; mesurer Lighthouse/P75 sur une période comparable.
 - [ ] Analyser les coûts du SSR, les dépendances et les styles historiques avant refactor ; ne jamais activer de cache partagé pour OWNER.
 
+- [ ] Chatbot de support : [étude du 26/11](support-chatbot-study.md). Recommandation : widget du site + modèle `site-support` d'OpenWebUI via un jeton de service Cloudflare Access, sans nouvelle exposition, avec repli vers un formulaire. Escalade vers OpenClaw. **Décision du propriétaire attendue** (A ou B, modèle, budget).
+
 ### P2 — Efficacité des outils
 
 - [ ] Conserver les points d'entrée canoniques, supprimer un wrapper **uniquement si aucun consommateur ne l'utilise** et si le rollback est documenté.
