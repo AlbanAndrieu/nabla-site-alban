@@ -109,7 +109,7 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 - [ ] Valider canonical, `hreflang`, sitemap, redirections et indexabilité sur `www.albanandrieu.com` ; mesurer Lighthouse/P75 sur une période comparable.
 - [ ] Analyser les coûts du SSR, les dépendances et les styles historiques avant refactor ; ne jamais activer de cache partagé pour OWNER.
 
-- [ ] Chatbot de support : [étude du 26/11](support-chatbot-study.md). Recommandation : widget du site + modèle `site-support` d'OpenWebUI via un jeton de service Cloudflare Access, sans nouvelle exposition, avec repli vers un formulaire. Escalade vers OpenClaw. **Décision du propriétaire attendue** (A ou B, modèle, budget).
+- [ ] Chatbot de support : option A retenue le 26/11 ([étude et exploitation](support-chatbot-study.md)). Côté site **CODED** (page `/support`, routes `/api/support-chat` et `/api/support-contact`, tests unitaires, FAQ `support/knowledge/`) ; non déployé ni accepté. Reste, porté par nabla-compose : secrets dans Vercel, modèle `site-support` et base de connaissance OpenWebUI (import de la FAQ), politique Cloudflare Access *Service Auth*, widget Turnstile et webhook Slack ; puis test Playwright du repli et règle de limitation de débit Vercel.
 
 ### P2 — Efficacité des outils
 

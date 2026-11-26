@@ -1,6 +1,6 @@
 # Chatbot de support du site — étude (26/11/2026)
 
-**Statut : étude, rien n'est implémenté.** Objectif : envoyer le support du site
+**Statut : Option A retenue le 26/11 par le propriétaire — implémentation** (côté site : CODED, voir [Exploitation](#exploitation)). Objectif : envoyer le support du site
 (prestations, TJM et paiement Stripe, pages homelab, contact) vers un assistant
 conversationnel. Quand l'assistant ne sait pas répondre, il passe la main au
 propriétaire.
@@ -63,3 +63,58 @@ propriétaire.
 - Choisir A (homelab, données gardées chez toi) ou B (disponibilité, coût au jeton).
 - Choisir le modèle de base et le budget mensuel de LiteLLM pour `site-support`.
 - Décider si les transcriptions sont conservées (et combien de temps) ou seulement transmises lors de l'escalade.
+
+## Exploitation
+
+Implémentation de l'option A côté site (26/11) :
+
+- page `app/[locale]/support/page.tsx` (`/support`, `/fr/support`, non indexée) et
+  widget `components/support/SupportChat.tsx`, lien discret dans le pied de page ;
+- routes `app/api/support-chat/route.ts` et `app/api/support-contact/route.ts` ;
+- validation, analyse SSE et texte Slack dans `lib/supportChat.ts`, appels réseau
+  dans `lib/server/supportChat.ts` ; tests dans `unit-tests/supportChat*.test.ts` ;
+- FAQ de départ pour la base de connaissance : `support/knowledge/site-faq.fr.md`
+  et `support/knowledge/site-faq.en.md` (import dans OpenWebUI par un script
+  nabla-compose).
+
+### Variables d'environnement (Vercel)
+
+| Variable | Portée | Rôle |
+| --- | --- | --- |
+| `SUPPORT_OPENWEBUI_URL` | serveur | Facultative, défaut `https://openwebui.albandrieu.com` |
+| `SUPPORT_OPENWEBUI_API_KEY` | serveur, secret | Clé d'API du compte `site-support` |
+| `SUPPORT_CF_ACCESS_CLIENT_ID` | serveur, secret | Jeton de service Cloudflare Access |
+| `SUPPORT_CF_ACCESS_CLIENT_SECRET` | serveur, secret | Jeton de service Cloudflare Access |
+| `SUPPORT_OPENWEBUI_MODEL` | serveur | Facultative, défaut `site-support` |
+| `SUPPORT_TURNSTILE_SECRET_KEY` | serveur, secret | Active la vérification Turnstile ; absente = pas de vérification (previews) |
+| `SUPPORT_SLACK_WEBHOOK_URL` | serveur, secret | Webhook Slack de l'escalade |
+| `NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY` | public (build) | Affiche le widget Turnstile |
+
+Aucune variable serveur n'est préfixée `NEXT_PUBLIC_`. Les deux clés Turnstile
+vont ensemble : un secret sans clé de site refuse toutes les requêtes (403).
+
+### Comportement et repli
+
+- `/api/support-chat` n'accepte que les rôles `user`/`assistant` (le prompt
+  système et la base vivent dans le modèle OpenWebUI), 20 messages, 2 000
+  caractères par message, 12 000 au total ; 400/413 sinon, 403 si Turnstile
+  échoue. Appel `POST /api/chat/completions` (`stream: true`, `max_tokens: 600`),
+  réponse retransmise en texte brut, plafonnée à environ 6 000 caractères.
+- Variables absentes, erreur ou redirection d'Access, ou en-têtes non reçus en
+  8 s : **503 `support_unavailable`**, et le widget ouvre « Parler à un humain ».
+- `/api/support-contact` poste un message Slack court (langue, e-mail
+  facultatif, message, 6 derniers échanges tronqués à 300 caractères, `<>&`
+  échappés) et répond 202 ; 503 si le webhook manque ou échoue, et le widget
+  affiche alors `openclaw@albandrieu.com`.
+- Journaux : code HTTP et durée uniquement, jamais le contenu ni les secrets.
+
+### Écarts assumés par rapport à l'étude
+
+- Pas d'AI SDK (`useChat`) : lecture du flux avec `fetch` et `TextDecoder`, sans
+  nouvelle dépendance.
+- Délai de 8 s pour recevoir les en-têtes (au lieu de 5 s) et jeton Turnstile
+  frais à chaque requête.
+- Les `features` (recherche web, outils, mémoire) se coupent dans le modèle
+  OpenWebUI, pas dans la requête.
+- Escalade par Slack uniquement ; l'envoi par mail depuis
+  `no-reply@albandrieu.com` reste à décider.
