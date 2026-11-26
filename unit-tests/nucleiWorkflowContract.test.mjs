@@ -45,14 +45,14 @@ test("Documentation describes actual scan cadence and incomplete result semantic
 });
 
 test("Nuclei template corpus is SHA-pinned, validated before production scanning", () => {
-	assert.match(workflow, /repository: projectdiscovery\\/nuclei-templates/);
-	assert.match(workflow, /ref: 573b82acea30711be3ecfbbb472ec8ad7734c895/);
-	assert.match(workflow, /NUCLEI_TEMPLATES_REVISION_MISMATCH/);
-	assert.match(workflow, /NUCLEI_TEMPLATES_UNAVAILABLE/);
-	assert.match(workflow, /count < 1000/);
-	assert.match(workflow, /-t "\\$NUCLEI_TEMPLATE_DIR"/);
-	assert.doesNotMatch(workflow, /"\\$\\{RUNNER_TEMP\\}\\/nuclei" -ut/);
-	assert.doesNotMatch(workflow, /GITHUB_TOKEN:\\s*\\$\\{\\{ secrets\\.GITHUB_TOKEN \\}\\}/);
-	assert.match(workflow, /-rl 2 -c 1 -timeout 5 -retries 0/);
-	assert.doesNotMatch(workflow, /-rl [3-9]|-c [2-9]/);
+  assert.ok(workflow.includes("repository: projectdiscovery/nuclei-templates"));
+  assert.ok(workflow.includes("ref: 573b82acea30711be3ecfbbb472ec8ad7734c895"));
+  assert.ok(workflow.includes("NUCLEI_TEMPLATES_REVISION_MISMATCH"));
+  assert.ok(workflow.includes("NUCLEI_TEMPLATES_UNAVAILABLE"));
+  assert.ok(workflow.includes("count < 1000"));
+  assert.ok(workflow.includes("-t \"$NUCLEI_TEMPLATE_DIR\""));
+  assert.ok(!workflow.includes(" -ut"));
+  assert.ok(!workflow.includes("GITHUB_TOKEN:"));
+  assert.match(workflow, /-rl 2 -c 1 -timeout 5 -retries 0/);
+  assert.doesNotMatch(workflow, /-rl [3-9]|-c [2-9]/);
 });

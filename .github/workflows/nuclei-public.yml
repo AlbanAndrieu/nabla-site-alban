@@ -60,7 +60,7 @@ jobs:
             echo "::error::NUCLEI_TEMPLATES_REVISION_MISMATCH: refuse unpinned templates"
             exit 1
           fi
-          count="$(find "$templates_dir" -type f \\( -name '*.yaml' -o -name '*.yml' \\) | wc -l)"
+          count="$(find "$templates_dir" -type f \( -name '*.yaml' -o -name '*.yml' \) | wc -l)"
           if (( count < 1000 )); then
             echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: incomplete template checkout; scan not executed"
             exit 1
