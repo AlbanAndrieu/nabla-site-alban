@@ -26,7 +26,7 @@ export type FastApiHealthBoardLoadResult = {
 	error: string | null;
 };
 
-export const FASTAPI_HEALTH_BOARD_DEFAULT_API_URL =
+const FASTAPI_HEALTH_BOARD_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/health-board";
 
 const HEALTH_BOARD_TIMEOUT_MS = 8_000;

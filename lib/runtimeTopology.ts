@@ -64,7 +64,7 @@ export type RuntimeTopologySnapshot = {
 	redis?: RuntimeRedisEvidence;
 };
 
-export const RUNTIME_TOPOLOGY_DEFAULT_API_URL =
+const RUNTIME_TOPOLOGY_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/runtime/topology";
 
 const PRIMARY_TIMEOUT_MS = 5_000;

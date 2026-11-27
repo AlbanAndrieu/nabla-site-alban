@@ -26,7 +26,7 @@ function fail(message: string): never {
 	throw new Error(`Invalid DSOMM French translation: ${message}`);
 }
 
-export function validateDsommFrenchCatalog(
+function validateDsommFrenchCatalog(
 	value: DsommFrenchCatalog,
 	snapshot: DsommSnapshot = DSOMM_SNAPSHOT,
 ): DsommFrenchCatalog {

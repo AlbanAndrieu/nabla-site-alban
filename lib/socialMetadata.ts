@@ -6,7 +6,7 @@ import {
 	type SeoPageSlug,
 } from "@/lib/sitePageCatalog";
 
-export const SITE_NAME = "Alban Andrieu";
+const SITE_NAME = "Alban Andrieu";
 export const SITE_ORIGIN = "https://www.albanandrieu.com";
 export const SOCIAL_CARD_WIDTH = 1200;
 export const SOCIAL_CARD_HEIGHT = 630;
@@ -41,7 +41,7 @@ function metadataDescription(metadata: Metadata) {
 		: undefined;
 }
 
-export function socialCardPath({
+function socialCardPath({
 	title,
 	description,
 	locale,

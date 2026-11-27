@@ -1,5 +1,5 @@
 /** Declared criticality levels shared by the catalog, topology and cards. */
-export const SERVICE_CRITICALITY_LEVELS = [
+const SERVICE_CRITICALITY_LEVELS = [
 	"critical",
 	"high",
 	"medium",

@@ -1,7 +1,7 @@
 import { DSOMM_SNAPSHOT, type DsommSnapshot } from "@/lib/dsommSnapshot";
 import assessment from "@/nabla-dsomm-assessment.json";
 
-export const DSOMM_ASSESSMENT_CONTRACT =
+const DSOMM_ASSESSMENT_CONTRACT =
 	"nabla.dsomm.repository-assessment/v1" as const;
 
 export type DsommProgress =

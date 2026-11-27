@@ -105,7 +105,7 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 
 ### P1 — Produit et expérience
 
-- [ ] Tester FR/EN, défilement, clavier, thème, navigation et contraste ; inspecter les 320/390 px, ReactFlow et pages YubiKey.
+- [ ] Tester FR/EN, défilement, clavier, thème, navigation et contraste ; inspecter les 320/390 px, ReactFlow et pages YubiKey. **27/11 — TESTED (L2 local, Chromium, serveur de dev)** : Axe, clavier, responsive, SEO/indexation, YubiKey, ReactFlow, catalogue privé et repli support, **84/84 PASS**. Restent WebKit/Firefox pour cette suite, la production `www.albanandrieu.com` et le contrôle visuel humain.
 - [ ] Valider canonical, `hreflang`, sitemap, redirections et indexabilité sur `www.albanandrieu.com` ; mesurer Lighthouse/P75 sur une période comparable.
 - [ ] Analyser les coûts du SSR, les dépendances et les styles historiques avant refactor ; ne jamais activer de cache partagé pour OWNER.
 
@@ -113,7 +113,7 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 
 ### P2 — Efficacité des outils
 
-- [ ] Conserver les points d'entrée canoniques, supprimer un wrapper **uniquement si aucun consommateur ne l'utilise** et si le rollback est documenté.
+- [ ] Conserver les points d'entrée canoniques, supprimer un wrapper **uniquement si aucun consommateur ne l'utilise** et si le rollback est documenté. **27/11 (A8, CODED, TESTED L1)** : `npm run audit:dead-code` passe de 24 à 9 exports inutilisés ; `export` retiré des symboles utilisés seulement dans leur fichier, `removeLegacyElementsById` (sans appelant) supprimé, réexports `SITE_NAME`/`TWITTER_HANDLE` retirés de `lib/siteMetadata.ts`. Les 9 restants sont lus par des contrats de test ou sont des points d'entrée CLI ; rollback = revert du commit.
 - [ ] Mesurer gains d'exécution et temps agent avant de multiplier les runners, outils ou quality gates.
 
 ## Contrat entre dépôts

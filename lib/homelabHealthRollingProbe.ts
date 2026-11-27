@@ -154,7 +154,7 @@ function rawRowsByKey(value: unknown): Map<string, Record<string, unknown>> {
 	return rows;
 }
 
-export function enrichPublicRollingEvidence(
+function enrichPublicRollingEvidence(
 	entries: HomelabHealthEntry[],
 	raw: unknown,
 ): HomelabHealthEntry[] {
@@ -173,7 +173,7 @@ export function enrichPublicRollingEvidence(
 	});
 }
 
-export function enrichInternalRollingEvidence(
+function enrichInternalRollingEvidence(
 	entries: HomelabInternalHealthEntry[] | undefined,
 	raw: unknown,
 ): HomelabInternalHealthEntry[] | undefined {
@@ -193,7 +193,7 @@ export function enrichInternalRollingEvidence(
 	});
 }
 
-export function enrichTrueNasRollingEvidence(
+function enrichTrueNasRollingEvidence(
 	truenas: TrueNasHealth | null | undefined,
 	raw: unknown,
 ): TrueNasHealth | null | undefined {

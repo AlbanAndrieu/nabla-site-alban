@@ -108,7 +108,7 @@ export type HomelabDiagnosticsSnapshot = {
 	exposure_by_service: Record<string, HomelabExposureEvidence>;
 };
 
-export const HOMELAB_DIAGNOSTICS_DEFAULT_API_URL =
+const HOMELAB_DIAGNOSTICS_DEFAULT_API_URL =
 	"https://fastapi-sample.fastapicloud.dev/api/homelab/health";
 
 const PRIMARY_TIMEOUT_MS = 8_000;
