@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = readFileSync(
-	new URL("../app/components/homelab/useHomelabHealth.ts", import.meta.url),
+	new URL(
+		"../app/components/homelab/homelabHealthFetchers.ts",
+		import.meta.url,
+	),
 	"utf8",
 );
 

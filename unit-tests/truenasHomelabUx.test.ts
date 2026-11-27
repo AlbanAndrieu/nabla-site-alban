@@ -9,13 +9,14 @@ async function source(path: string) {
 // The block delegates health polling to useHomelabHealth.ts and service
 // filtering/grouping to homelabServiceHierarchy.ts.
 async function blockSource() {
-	const [block, filters, health, hierarchy] = await Promise.all([
+	const [block, filters, health, fetchers, hierarchy] = await Promise.all([
 		source("app/components/homelab/HomelabServicesBlock.tsx"),
 		source("app/components/homelab/HomelabServiceFilters.tsx"),
 		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabHealthFetchers.ts"),
 		source("app/components/homelab/homelabServiceHierarchy.ts"),
 	]);
-	return `${block}\n${filters}\n${health}\n${hierarchy}`;
+	return `${block}\n${filters}\n${health}\n${fetchers}\n${hierarchy}`;
 }
 
 test("TrueNAS keeps homelab topology before services and moves Nabla project near the footer", async () => {

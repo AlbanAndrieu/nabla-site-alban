@@ -1,26 +1,16 @@
 import { useEffect, useState } from "react";
 import { reconcileCatalogFailure } from "@/lib/homelabCatalogFailureReconciliation";
-import {
-	type CatalogFailureStage,
-	parseOwnerCatalogIncident,
-} from "@/lib/homelabCatalogFailureStage";
-import { parseHomelabCatalogV2 } from "@/lib/homelabCatalogV2";
-import { projectHomelabCatalogV2 } from "@/lib/homelabCatalogV2Projection";
+import type { CatalogFailureStage } from "@/lib/homelabCatalogFailureStage";
 import {
 	type CatalogScope,
 	catalogScopeMatches,
-	classifyCatalogFailure,
 } from "@/lib/homelabClientAccessBoundary";
-import {
-	type HomelabHealthSnapshot,
-	parseHomelabHealthSnapshot,
-} from "@/lib/homelabHealth";
+import type { HomelabHealthSnapshot } from "@/lib/homelabHealth";
 import { mergeHomelabProbeDiagnostics } from "@/lib/homelabProbeMerge";
 import {
 	CATALOG_REVALIDATION_MS,
 	catalogRevalidationDue,
 	clearPublicHomelabBrowserCache,
-	parsePublicHomelabCatalogPayload,
 	readPublicCatalogCache,
 	readStalePublicHealthCache,
 	writePublicCatalogCache,
@@ -37,17 +27,20 @@ import {
 	parseSiteHealthV2,
 	type SiteHealthV2,
 } from "@/lib/siteHealthV2";
+import {
+	CatalogV2Unavailable,
+	fetchCatalog,
+	fetchHealth,
+	fetchProbeHealth,
+	type HealthFetchResult,
+} from "./homelabHealthFetchers";
+
+export type { HealthFetchResult } from "./homelabHealthFetchers";
 
 export const HEALTH_REFRESH_MS = 30_000;
 // SERVICE projection is not an operator console; reduce Vercel function calls.
 export const PUBLIC_HEALTH_REFRESH_MS = 120_000;
 const MIN_REFRESH_GAP_MS = 5_000;
-
-export type HealthFetchResult = {
-	snapshot: HomelabHealthSnapshot | null;
-	status: number | null;
-	reason?: "owner-boundary";
-};
 
 export type HomelabServicesState = {
 	catalog: HomelabServicesCatalog | null;
@@ -87,109 +80,6 @@ export const INITIAL_HOMELAB_SERVICES_STATE: HomelabServicesState = {
 	healthRefreshing: true,
 	ownerBoundary: false,
 };
-
-class CatalogV2Unavailable extends Error {
-	constructor(
-		readonly reason: "key-missing" | "access-denied" | "unavailable",
-		readonly revokePublicCache = false,
-		readonly incident: {
-			stage: CatalogFailureStage;
-			requestId: string;
-		} | null = null,
-	) {
-		super("Backstage v2 catalog unavailable");
-	}
-}
-
-async function fetchCatalog(
-	signal: AbortSignal,
-	readOnly: boolean,
-): Promise<{
-	catalog: HomelabServicesCatalog;
-	topology: ServiceTopology | null;
-}> {
-	const response = await fetch("/api/homelab-catalog-v2", {
-		cache: "no-store",
-		signal: boundedHomelabSignal(signal),
-	});
-	if (!response.ok) {
-		const body: unknown = await response.json().catch(() => null);
-		const policy = classifyCatalogFailure(response.status, body);
-		const incident = readOnly
-			? null
-			: parseOwnerCatalogIncident(
-					response.headers.get("X-Nabla-Diagnostic-Stage"),
-					response.headers.get("X-Nabla-Request-ID"),
-				);
-		throw new CatalogV2Unavailable(
-			policy.reason,
-			policy.revokePublicCache,
-			incident,
-		);
-	}
-	const parsed = parseHomelabCatalogV2(await response.json());
-	if (!parsed || parsed.entities.length === 0) {
-		throw new CatalogV2Unavailable("unavailable");
-	}
-	const { services, topology } = projectHomelabCatalogV2(parsed);
-	if (readOnly) {
-		// Never render unvalidated JSON or retain OWNER-only catalog fields
-		// merely because the same-origin gateway returned HTTP 200.
-		const safe = parsePublicHomelabCatalogPayload({ ...services, topology });
-		if (!safe) throw new CatalogV2Unavailable("unavailable");
-		return safe;
-	}
-	return { catalog: services, topology };
-}
-
-type HealthEndpoint = "/api/homelab-health" | "/api/homelab-probes";
-
-/** Shared HTTP envelope; probes keep their explicit no-cache request headers. */
-async function fetchHealthEndpoint(
-	endpoint: HealthEndpoint,
-	signal: AbortSignal,
-	probe: boolean,
-): Promise<HealthFetchResult> {
-	try {
-		const response = await fetch(endpoint, {
-			cache: "no-store",
-			signal: boundedHomelabSignal(signal),
-			...(probe
-				? {
-						headers: {
-							Accept: "application/json",
-							"Cache-Control": "no-cache",
-						},
-					}
-				: {}),
-		});
-		if (!response.ok) {
-			return {
-				snapshot: null,
-				status: response.status,
-				...(response.headers.get("X-Homelab-Health-Reason") === "owner-boundary"
-					? { reason: "owner-boundary" as const }
-					: {}),
-			};
-		}
-		return {
-			snapshot: parseHomelabHealthSnapshot(await response.json()),
-			status: response.status,
-		};
-	} catch {
-		return { snapshot: null, status: null };
-	}
-}
-
-async function fetchHealth(signal: AbortSignal): Promise<HealthFetchResult> {
-	return fetchHealthEndpoint("/api/homelab-health", signal, false);
-}
-
-async function fetchProbeHealth(
-	signal: AbortSignal,
-): Promise<HealthFetchResult> {
-	return fetchHealthEndpoint("/api/homelab-probes", signal, true);
-}
 
 /** Bounded probes render first, while the aggregate snapshot is still loading. */
 export function applyProbeSnapshot(

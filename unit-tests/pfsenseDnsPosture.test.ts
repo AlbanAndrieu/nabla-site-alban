@@ -69,12 +69,13 @@ async function source(path: string) {
 // The block delegates health polling to useHomelabHealth.ts and service
 // filtering/grouping to homelabServiceHierarchy.ts.
 async function blockSource() {
-	const [block, health, hierarchy] = await Promise.all([
+	const [block, health, fetchers, hierarchy] = await Promise.all([
 		source("app/components/homelab/HomelabServicesBlock.tsx"),
 		source("app/components/homelab/useHomelabHealth.ts"),
+		source("app/components/homelab/homelabHealthFetchers.ts"),
 		source("app/components/homelab/homelabServiceHierarchy.ts"),
 	]);
-	return `${block}\n${health}\n${hierarchy}`;
+	return `${block}\n${health}\n${fetchers}\n${hierarchy}`;
 }
 
 test("DNS resilience is rendered by unified operational evidence instead of a standalone service-grid panel", async () => {

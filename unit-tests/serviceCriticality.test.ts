@@ -349,14 +349,16 @@ async function topologyViewSource() {
 // The block delegates health polling to useHomelabHealth.ts and service
 // filtering/grouping to homelabServiceHierarchy.ts.
 async function blockSource() {
-	const [block, filters, health, selectors, hierarchy] = await Promise.all([
-		source("app/components/homelab/HomelabServicesBlock.tsx"),
-		source("app/components/homelab/HomelabServiceFilters.tsx"),
-		source("app/components/homelab/useHomelabHealth.ts"),
-		source("app/components/homelab/homelabHealthSelectors.ts"),
-		source("app/components/homelab/homelabServiceHierarchy.ts"),
-	]);
-	return `${block}\n${filters}\n${health}\n${selectors}\n${hierarchy}`;
+	const [block, filters, health, fetchers, selectors, hierarchy] =
+		await Promise.all([
+			source("app/components/homelab/HomelabServicesBlock.tsx"),
+			source("app/components/homelab/HomelabServiceFilters.tsx"),
+			source("app/components/homelab/useHomelabHealth.ts"),
+			source("app/components/homelab/homelabHealthFetchers.ts"),
+			source("app/components/homelab/homelabHealthSelectors.ts"),
+			source("app/components/homelab/homelabServiceHierarchy.ts"),
+		]);
+	return `${block}\n${filters}\n${health}\n${fetchers}\n${selectors}\n${hierarchy}`;
 }
 
 test("TrueNAS cards use service-first groups while technical criticality remains separate", async () => {
