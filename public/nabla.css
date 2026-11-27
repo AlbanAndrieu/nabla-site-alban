@@ -219,7 +219,8 @@ html[data-theme="dark"] .page-nabla-best-practices .ai-oss-logo--invert {
 }
 
 .page-nabla-best-practices .intro-section__heading {
-	color: var(--primary-color);
+	/* #007bff on --bg-secondary is 3.77:1; --link-color is AA in both themes. */
+	color: var(--link-color);
 	margin-bottom: 1rem;
 }
 

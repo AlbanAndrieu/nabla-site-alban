@@ -4,7 +4,7 @@ Skill [`nabla-roadmap-loop`](../../.agents/skills/nabla-roadmap-loop/SKILL.md), 
 
 ## Compteur
 
-- Passe : **1** (réconciliation à la passe 3).
+- Passe : **2** (réconciliation à la passe 3).
 - Périmètre : `docs/quality-roadmap.md`, `docs/homelab-roadmap.md`, `docs/stripe-hardening-roadmap.md`, `docs/support-chatbot-study.md`.
 - Ignoré sur décision du propriétaire (27/11) : FinOps A4.
 
@@ -20,6 +20,15 @@ Skill [`nabla-roadmap-loop`](../../.agents/skills/nabla-roadmap-loop/SKILL.md), 
 | A6/S5 : suite navigateur FR/EN (Axe, clavier, 320/390, SEO, YubiKey, ReactFlow) | TESTED (L2 local, Chromium) | 84/84 PASS |
 | A8 : exports morts (knip) 24 → 9 | CODED, TESTED (L1) | `audit:dead-code`, `test:unit`, `tsc` PASS |
 | G8 : `post-deploy-smoke.mjs` (465 lignes) | Rien à faire | sous le seuil de 600, parseur déjà extrait (#324), aucun doublon prouvé |
+
+## Passe 2
+
+| Item | État | Preuve |
+| --- | --- | --- |
+| G7 : liens profonds et état « catalogue indisponible » extraits de `HomelabServicesBlock.tsx` (503 → 447) | CODED, TESTED (L1) | `useServiceDeepLink`, `HomelabCatalogUnavailable.tsx`, `test:unit` PASS |
+| A8 : 62 types exportés non importés | Laissé en l'état | formes de données publiques des modules, aucun gain à l'exécution |
+| A6/S5 : défauts Axe mobiles (zones défilantes `/truenas` et DSOMM, contraste `/ai`) et attente du défilement doux dans le test clavier | CODED, TESTED (L2 local) | Axe + clavier 100/100, 80/80 sur 5 projets |
+| S4 : libellés déclaré / sans sonde / périmé / indisponible | Déjà couvert | `ServiceOwnerEvidenceSummary`, `ArchitectureDependencyEvidence` ; pas de spec pour aller plus loin |
 
 Rien n'est `DEPLOYED` ni `ACCEPTED` : la fusion et le déploiement Vercel appartiennent au propriétaire.
 
