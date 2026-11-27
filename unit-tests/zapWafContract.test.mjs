@@ -28,6 +28,8 @@ test("production and Preview ZAP are bounded, redacted and fail closed on WAF ch
 		for (const pattern of [
 			/scripts\/security\/zap-rate-limit-hook\.py/,
 			/--hook=\/zap\/wrk\/rate-limit-hook\.py/,
+			// A UID 1000 hook __pycache__ made the runner's workspace cleanup fail.
+			/--env PYTHONDONTWRITEBYTECODE=1/,
 			/-m 2/,
 			/-T 5/,
 			/ZAP_WAF_PREFLIGHT_BLOCK/,
