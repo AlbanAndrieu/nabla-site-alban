@@ -97,7 +97,9 @@ YAML_V8R_FILE_NAMES_REGEX:
 EXCLUDED_DIRECTORIES:
   [".github", ".gitlab-ci", "node_modules", ".venv", ".direnv", ".mypy_cache"]
 SHOW_ELAPSED_TIME: true
-EMAIL_REPORTER_EMAIL: aa@albandrieu.com
+# Robot mail convention (26/11/2026): sent from no-reply@, read by OpenClaw.
+EMAIL_REPORTER_EMAIL: openclaw@albandrieu.com
+EMAIL_REPORTER_SENDER: no-reply@albandrieu.com
 JSON_REPORTER: true
 SARIF_REPORTER: true
 FILEIO_REPORTER: false

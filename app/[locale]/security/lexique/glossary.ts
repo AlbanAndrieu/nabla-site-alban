@@ -193,6 +193,10 @@ export const GLOSSARY_CATEGORIES = [
 						label: "GDPR — Regulation (EU) 2016/679",
 						href: "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
 					},
+					{
+						label: "CNIL — Analyse d’impact (AIPD)",
+						href: "https://www.cnil.fr/fr/definition/analyse-dimpact-aipd",
+					},
 				],
 			},
 		],
@@ -216,6 +220,15 @@ export const GLOSSARY_CATEGORIES = [
 					{
 						label: "Bank of England — PRA",
 						href: "https://www.bankofengland.co.uk/prudential-regulation",
+					},
+				],
+			},
+			{
+				id: "acpr",
+				sources: [
+					{
+						label: "ACPR — Missions (Banque de France)",
+						href: "https://acpr.banque-france.fr/fr/nos-missions",
 					},
 				],
 			},

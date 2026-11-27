@@ -189,6 +189,7 @@ export const RESOURCE_SECTIONS: readonly ResourceSectionDefinition[] = [
 			{ href: "https://www.iso.org/standard/42001" },
 			{ href: "https://www.pcisecuritystandards.org/" },
 			{ href: "https://gdpr.eu/" },
+			{ page: "security/lexique", hash: "term-dpia", icon: "book" },
 			{ href: "https://drata.com/" },
 			{ href: "https://www.vanta.com/" },
 		],

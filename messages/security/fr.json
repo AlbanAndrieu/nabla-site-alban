@@ -120,6 +120,7 @@
 					"ISO/IEC 42001 — système de management de l’intelligence artificielle",
 					"PCI DSS — norme de sécurité des données de paiement",
 					"RGPD — règlement général sur la protection des données",
+					"DPIA / AIPD — analyse d’impact relative à la protection des données (RGPD, art. 35)",
 					"Drata — automatisation continue de la conformité (SOC 2, ISO 27001 et plus)",
 					"Vanta — conformité automatisée, collecte de preuves et gestion de la confiance"
 				]
@@ -769,6 +770,15 @@
 							"Autorité de régulation prudentielle du Royaume-Uni, rattachée à la Banque d’Angleterre. Elle assure la supervision prudentielle des banques, assureurs et autres institutions financières concernées."
 						],
 						"note": "À ne pas confondre avec le PRA français, Plan de Reprise d’Activité, équivalent du DRP."
+					},
+					"acpr": {
+						"acronym": "ACPR",
+						"expansion": "Autorité de contrôle prudentiel et de résolution",
+						"question": "Quelle autorité française supervise les banques et les assurances et participe à la résolution des crises ?",
+						"definition": [
+							"Autorité administrative française adossée à la Banque de France, chargée de la surveillance prudentielle des établissements bancaires, des organismes d’assurance et des intermédiaires relevant de son périmètre. Elle contribue à la protection de la clientèle, à la stabilité financière et à la prévention et à la résolution des crises."
+						],
+						"note": "L’ACPR est l’autorité française ; la PRA est l’autorité de supervision prudentielle britannique intégrée à la Bank of England. Leurs missions et compétences ne sont pas strictement identiques."
 					}
 				}
 			}

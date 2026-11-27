@@ -147,14 +147,24 @@ jobs:
           node scripts/security/render-zap-safe-report.mjs \
             zap-production-safe/report_json.json zap-production-safe
 
-      - name: Upload only sanitized production ZAP findings
+      # The private TrueNAS collector requires exactly report_json.json in this ZIP.
+      - name: Upload collector-compatible sanitized ZAP JSON
         id: safe-zap-artifact
         if: steps.production-zap.outcome == 'success'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: zap-production-report
+          path: zap-production-safe/report_json.json
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Upload sanitized ZAP visual evidence (HTML / SARIF)
+        id: visual-zap-artifact
+        if: steps.production-zap.outcome == 'success'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: zap-production-visual-report
           path: |
-            zap-production-safe/report_json.json
             zap-production-safe/report.html
             zap-production-safe/report.sarif
             zap-production-safe/summary.md
@@ -165,11 +175,12 @@ jobs:
         if: steps.production-zap.outcome == 'success'
         shell: bash
         env:
-          ARTIFACT_ID: ${{ steps.safe-zap-artifact.outputs.artifact-id }}
+          COLLECTOR_ARTIFACT_ID: ${{ steps.safe-zap-artifact.outputs.artifact-id }}
+          VISUAL_ARTIFACT_ID: ${{ steps.visual-zap-artifact.outputs.artifact-id }}
         run: |
           set -euo pipefail
           cat zap-production-safe/summary.md >> "$GITHUB_STEP_SUMMARY"
-          echo "[Download HTML / SARIF / JSON](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts/${ARTIFACT_ID})" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Collector JSON](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts/${COLLECTOR_ARTIFACT_ID}) · [HTML / SARIF](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts/${VISUAL_ARTIFACT_ID})" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Clean ZAP production workspace
         if: always()
@@ -199,7 +210,7 @@ jobs:
             echo "- Preflight blocker: ${DAST_BLOCKER:-none}"
             echo "- Associated SHA: $DEPLOYED_SHA"
             echo "- Scan: OWASP ZAP Baseline (passive, blocking only explicit FAIL rules)"
-            echo "- Sanitized report: **zap-production-report** (HTML + SARIF + JSON; 3 days)"
+            echo "- Sanitized reports: **zap-production-report** (collector JSON) and **zap-production-visual-report** (HTML/SARIF); 3 days"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish production DAST status

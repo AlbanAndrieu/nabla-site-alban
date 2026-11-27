@@ -120,6 +120,7 @@
 					"ISO/IEC 42001 — Artificial Intelligence Management System",
 					"PCI DSS — Payment Card Industry Data Security Standard",
 					"GDPR — General Data Protection Regulation",
+					"DPIA — Data Protection Impact Assessment (GDPR, Article 35)",
 					"Drata — continuous compliance automation (SOC 2, ISO 27001 and more)",
 					"Vanta — automated compliance, evidence collection and trust management"
 				]
@@ -769,6 +770,15 @@
 							"The UK prudential regulator, part of the Bank of England. It carries out the prudential supervision of banks, insurers and other financial institutions in scope."
 						],
 						"note": "Not to be confused with the French PRA, Plan de Reprise d’Activité, the equivalent of a DRP."
+					},
+					"acpr": {
+						"acronym": "ACPR",
+						"expansion": "Autorité de contrôle prudentiel et de résolution",
+						"question": "Which authority supervises banks and insurers in France and contributes to crisis resolution?",
+						"definition": [
+							"The French prudential supervision and resolution authority, attached to the Banque de France. It oversees banks, insurers and intermediaries within its remit, helps protect their customers and contributes to financial stability and crisis resolution."
+						],
+						"note": "The ACPR is the French supervisory authority; the PRA is the UK prudential supervisor within the Bank of England. Their legal mandates and powers are not identical."
 					}
 				}
 			}

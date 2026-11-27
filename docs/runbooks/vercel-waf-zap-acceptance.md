@@ -32,6 +32,6 @@ Un passage à l'action exige : audit des règles existantes, événements WAF et
 
 ### Rapport ZAP lisible (intégration préparée le 23 novembre 2026)
 
-Le workflow Production DAST produit dorénavant, **après** `minimize-zap-report.mjs`, les fichiers `report_json.json`, `report.html`, `report.sarif` et `summary.md` dans le même artefact `zap-production-report` (rétention 3 jours). Le résumé GitHub Actions référence l'artefact. Le rendu refuse les champs inconnus, les chemins d'URL et toute information HTTP non expurgée ; le rapport HTML natif ZAP reste interdit.
+Le workflow Production DAST produit **deux** artefacts expurgés après `minimize-zap-report.mjs` : `zap-production-report` (uniquement `report_json.json`, conforme au collecteur TrueNAS) et `zap-production-visual-report` (`report.html`, `report.sarif`, `summary.md` pour GitHub Actions), tous deux conservés trois jours. Le rendu refuse les champs inconnus, les chemins d'URL et toute preuve HTTP ; le rapport HTML natif ZAP reste interdit.
 
 Le SARIF est uniquement **téléchargeable comme artefact** : aucune écriture automatique dans GitHub Code Scanning sans localisation de code source attestée. Les alertes WARN et LOW ne figurent pas dans cette projection HIGH. Le run historique [45018370872](https://github.com/AlbanAndrieu/nabla-site-alban/actions/runs/45018370872) conserve son seul JSON expurgé : zéro identité HIGH, sans preuve de couverture complète.

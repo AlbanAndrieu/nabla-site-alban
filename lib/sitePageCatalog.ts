@@ -101,6 +101,7 @@ export const SITE_PAGES = {
 	checkout: { category: "technicalFlow" },
 	"checkout-tjm": { category: "technicalFlow" },
 	login: { category: "technicalFlow" },
+	support: { category: "technicalFlow" },
 	test: { category: "technicalFlow" },
 } as const satisfies Record<string, SitePageDefinition>;
 

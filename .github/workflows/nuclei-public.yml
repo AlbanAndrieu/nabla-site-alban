@@ -15,7 +15,7 @@ concurrency:
 jobs:
   public-dast:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - name: Checkout exact PR head
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -23,12 +23,18 @@ jobs:
           persist-credentials: false
           ref: ${{ github.sha }}
 
+      # Template files are untrusted scan inputs: pin their exact upstream Git
+      # commit, and never execute scripts or GitHub Actions from that checkout.
+      - name: Checkout immutable Nuclei template corpus
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          repository: projectdiscovery/nuclei-templates
+          ref: 573b82acea30711be3ecfbbb472ec8ad7734c895
+          path: .security-scanners/nuclei-templates
+          persist-credentials: false
+
       - name: Install pinned Nuclei with checksum verification
         shell: bash
-        env:
-          # Authenticated template release discovery avoids the shared CI runner
-          # GitHub API 403 quota; no API token is passed to scan templates.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           archive="${RUNNER_TEMP}/nuclei.zip"
@@ -41,20 +47,26 @@ jobs:
           unzip -p "$archive" nuclei > "${RUNNER_TEMP}/nuclei"
           chmod 700 "${RUNNER_TEMP}/nuclei"
           "${RUNNER_TEMP}/nuclei" -version
-          # An unauthed -ut can leave an empty directory while returning zero.
-          # Stop before the scan rather than misreporting 0 security findings.
-          templates_dir="${HOME}/nuclei-templates"
-          "${RUNNER_TEMP}/nuclei" -ut
-          if [[ ! -d "$templates_dir" ]]; then
-            echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: no template directory after update."
+
+      - name: Verify pinned template corpus before scanning
+        id: templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          templates_dir="${GITHUB_WORKSPACE}/.security-scanners/nuclei-templates"
+          expected="573b82acea30711be3ecfbbb472ec8ad7734c895"
+          actual="$(git -C "$templates_dir" rev-parse HEAD)"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "::error::NUCLEI_TEMPLATES_REVISION_MISMATCH: refuse unpinned templates"
             exit 1
           fi
-          first_template="$(find "$templates_dir" -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)"
-          if [[ -z "$first_template" ]]; then
-            echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: update completed without any YAML template. Scan not executed."
+          count="$(find "$templates_dir" -type f \( -name '*.yaml' -o -name '*.yml' \) | wc -l)"
+          if (( count < 1000 )); then
+            echo "::error::NUCLEI_TEMPLATES_UNAVAILABLE: incomplete template checkout; scan not executed"
             exit 1
           fi
           echo "NUCLEI_TEMPLATE_DIR=$templates_dir" >> "$GITHUB_ENV"
+          echo "Templates commit: $actual (YAML files: $count)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Scan public website (bounded HTTP templates)
         id: nuclei

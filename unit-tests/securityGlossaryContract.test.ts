@@ -100,3 +100,56 @@ test("public glossary contains no employer-internal references", async () => {
 		[],
 	);
 });
+
+test("DPIA and PRA/ACPR entries are available in French and English", async () => {
+	for (const locale of ["fr", "en"] as const) {
+		const copy = await loadGlossary(locale);
+		assert.equal(copy.categories.privacy.terms.dpia.acronym, "DPIA");
+		assert.equal(
+			copy.categories.privacy.terms.dpia.expansion,
+			"Data Protection Impact Assessment",
+		);
+		assert.equal(
+			copy.categories.regulation.terms.pra.expansion,
+			"Prudential Regulation Authority",
+		);
+		assert.equal(
+			copy.categories.regulation.terms.acpr.expansion,
+			"Autorité de contrôle prudentiel et de résolution",
+		);
+	}
+});
+
+test("the security compliance section links directly to the DPIA glossary entry", async () => {
+	const { RESOURCE_SECTIONS } = await import(
+		"../app/[locale]/security/securityResources"
+	);
+	const compliance = RESOURCE_SECTIONS.find(
+		(section) => section.key === "compliance",
+	);
+	assert.ok(compliance);
+	assert.ok(
+		compliance.links.some(
+			(link) =>
+				"page" in link &&
+				link.page === "security/lexique" &&
+				link.hash === "term-dpia",
+		),
+	);
+	for (const locale of ["fr", "en"] as const) {
+		const contents = JSON.parse(
+			await readFile(
+				new URL(`../messages/security/${locale}.json`, import.meta.url),
+				"utf8",
+			),
+		);
+		const labels = contents.securityPage.nativeSections.compliance
+			.links as string[];
+		assert.equal(
+			labels.length,
+			compliance.links.length,
+			`${locale}: compliance link alignment`,
+		);
+		assert.ok(labels.some((label) => label.includes("DPIA")));
+	}
+});
