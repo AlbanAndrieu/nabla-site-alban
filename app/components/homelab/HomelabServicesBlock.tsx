@@ -9,7 +9,6 @@ import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
 	RESOURCE_SNAPSHOT_KEY,
 	type ResourceSnapshot,
-	snapshotAgeState,
 } from "@/lib/homelabResourceEvidence";
 import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
@@ -34,6 +33,10 @@ import {
 	GROUP_TITLE_KEY,
 	METRICS_PROFILE_KEY,
 } from "./homelabServiceHierarchy";
+import {
+	useGraphNearViewport,
+	useResourceStale,
+} from "./homelabServicesBlockEffects";
 import {
 	countHealthStates,
 	effectiveState,
@@ -67,40 +70,10 @@ export default function HomelabServicesBlock({
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const [resourceSnapshot, setResourceSnapshot] =
 		useState<ResourceSnapshot | null>(null);
-	// A single clock feeds all service groups. Hidden tabs do not tick until
-	// visible again, and stale/foreign-revision resources are never "fresh".
-	const [resourceClock, setResourceClock] = useState<number | null>(null);
-	useEffect(() => {
-		if (!resourceSnapshot || readOnly || state.ownerBoundary) return;
-		let interval: number | null = null;
-		const refresh = () => {
-			if (!document.hidden) setResourceClock(Date.now());
-		};
-		const syncVisibility = () => {
-			if (document.hidden) {
-				if (interval !== null) window.clearInterval(interval);
-				interval = null;
-				return;
-			}
-			refresh();
-			if (interval === null) interval = window.setInterval(refresh, 60_000);
-		};
-		const initial = window.setTimeout(syncVisibility, 0);
-		document.addEventListener("visibilitychange", syncVisibility);
-		return () => {
-			window.clearTimeout(initial);
-			if (interval !== null) window.clearInterval(interval);
-			document.removeEventListener("visibilitychange", syncVisibility);
-		};
-	}, [resourceSnapshot, readOnly, state.ownerBoundary]);
-	const resourceStale = Boolean(
-		resourceSnapshot &&
-			(resourceClock === null ||
-				snapshotAgeState(
-					resourceSnapshot,
-					resourceClock,
-					state.catalog?.catalogRevision,
-				) !== "fresh"),
+	const resourceStale = useResourceStale(
+		resourceSnapshot,
+		!readOnly && !state.ownerBoundary,
+		state.catalog?.catalogRevision,
 	);
 
 	// SERVICE admission must not preserve an earlier OWNER resource snapshot
@@ -128,29 +101,7 @@ export default function HomelabServicesBlock({
 		if (!state.catalog) return null;
 		return state.topology ?? buildDeclaredServiceTopology(state.catalog);
 	}, [state.catalog, state.topology]);
-	// Service cards render first; the expensive ReactFlow bundle mounts near viewport.
-	const [graphInView, setGraphInView] = useState(false);
-	const graphRef = useRef<HTMLElement | null>(null);
-	useEffect(() => {
-		if (!graphTopology || graphInView) return;
-		const target = graphRef.current;
-		if (!target) return;
-		if (typeof IntersectionObserver === "undefined") {
-			const timer = window.setTimeout(() => setGraphInView(true), 0);
-			return () => window.clearTimeout(timer);
-		}
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					setGraphInView(true);
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: "360px" },
-		);
-		observer.observe(target);
-		return () => observer.disconnect();
-	}, [graphTopology, graphInView]);
+	const [graphRef, graphInView] = useGraphNearViewport(Boolean(graphTopology));
 
 	const ownerNavigationIndex = useMemo(
 		() =>
