@@ -141,7 +141,6 @@ test("active Alban-specific runtime dependencies remain explicit", async () => {
 		"@opentelemetry/sdk-logs",
 		"@vercel/otel",
 		"stripe",
-		"@neondatabase/serverless",
 		"@xyflow/react",
 	]) {
 		assert.ok(

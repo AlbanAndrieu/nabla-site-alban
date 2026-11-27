@@ -14,9 +14,9 @@ export const PAYMENT_EVENTS = new Set([
 
 /**
  * Authentication boundary plus the A5 event ledger. A payment event is
- * acknowledged only once durably recorded (or already recorded) in Postgres.
+ * acknowledged only once durably recorded (or already recorded) in Supabase Postgres.
  *
- * Stripe retries 503 responses: without DATABASE_URL, or when the insert
+ * Stripe retries 503 responses: without the Supabase ledger env, or when the insert
  * fails, payment events stay refused so none is silently lost.
  */
 export async function POST(request: Request) {

@@ -38,6 +38,14 @@ Rien n'est `DEPLOYED` ni `ACCEPTED` : la fusion et le déploiement Vercel appart
 - A5 Stripe : provisionnement Neon ; utilité à confirmer (question posée le 27/11).
 - S2/S3 : recette OWNER/LAN et SERVICE/WAN réelle.
 
+## Passe 4 (28/11)
+
+| Item | État | Preuve |
+| --- | --- | --- |
+| Chatbot testé en réel (OpenWebUI LAN, `site-support`) ; délai 15 s, langue, marqueurs `[n]` | CODED, TESTED (L1 + navigateur réel 4/4) | `supportChat*.test.ts`, test live Chromium/WebKit |
+| Chatbot : connaissance en mode « document entier » dans OpenWebUI | BLOCKED (garde-fou d'exécution) | à faire par le propriétaire |
+| A5 : registre Stripe sur Supabase (REST, RLS), Neon retiré | CODED, TESTED (L1) | `stripeEventLedger` 6 tests, `stripe-webhook` |
+
 ## Questions parquées
 
-- A5 : le site encaisse-t-il réellement en ligne (pages `/pricing`, `/checkout`, `/checkout-tjm`) ? Sinon, retirer ou masquer le parcours plutôt que provisionner Neon.
+- A5 : tranché le 28/11, Supabase à la place de Neon ; provisionnement par le propriétaire.
