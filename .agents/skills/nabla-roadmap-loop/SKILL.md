@@ -73,6 +73,13 @@ duplication with tests.
 - Playwright on WebKit: a `fill` before hydration never reaches React state,
   and refilling the same value fires no change; clear, then retry with
   `expect(...).toPass()`.
+- One `next dev` per checkout: a second Playwright run fails to start its
+  web server. Parallel cold compiles also fail `request.get` checks (seen on
+  Firefox SEO); rerun with `--workers=1` before calling it a site defect.
+- Unit contracts also read Playwright specs (`accessibilityKeyboardContract`):
+  run `npm run test:unit` after editing a spec, before the publish gate.
+- Run the a11y suite on the mobile projects too: Chromium desktop was green
+  while mobile Axe found scroll-region and contrast defects.
 
 ## State outside the context
 

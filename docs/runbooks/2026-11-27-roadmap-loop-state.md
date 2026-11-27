@@ -4,7 +4,7 @@ Skill [`nabla-roadmap-loop`](../../.agents/skills/nabla-roadmap-loop/SKILL.md), 
 
 ## Compteur
 
-- Passe : **2** (réconciliation à la passe 3).
+- Passe : **3** (réconciliation faite : leçons versées au skill, roadmaps à jour, PR #340 HEAD `c6944f5`).
 - Périmètre : `docs/quality-roadmap.md`, `docs/homelab-roadmap.md`, `docs/stripe-hardening-roadmap.md`, `docs/support-chatbot-study.md`.
 - Ignoré sur décision du propriétaire (27/11) : FinOps A4.
 
