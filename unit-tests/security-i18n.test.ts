@@ -24,7 +24,7 @@ const EXPECTED_LINK_COUNTS = {
 	zeroTrustKubernetes: 9,
 	ssh: 7,
 	openclaw: 3,
-	compliance: 8,
+	compliance: 9,
 	vulnerability: 8,
 	ciScanning: 2,
 	pentest: 1,
