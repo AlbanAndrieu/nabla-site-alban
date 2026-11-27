@@ -58,6 +58,19 @@ function parseToken(value: unknown): SupportResult<string | undefined> {
 	return { ok: true, value };
 }
 
+/**
+ * Server-owned system hint: without it the model answered an English page in
+ * French. Open WebUI prepends the model's own system prompt to it.
+ */
+export function supportLanguageHint(locale: SupportLocale): string {
+	return `Always reply in the language the visitor wrote their latest message in, even if it differs from the page language (${locale === "fr" ? "French" : "English"}).`;
+}
+
+/** Open WebUI RAG answers cite sources as "[1]"; the widget shows no sources. */
+export function stripCitationMarkers(text: string): string {
+	return text.replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "");
+}
+
 /** Only `user` and `assistant` roles pass: a client `system` prompt is refused. */
 function parseMessages(
 	raw: unknown,

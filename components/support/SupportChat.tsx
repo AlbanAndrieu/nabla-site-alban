@@ -15,6 +15,7 @@ import {
 	SUPPORT_LIMITS,
 	type SupportLocale,
 	type SupportMessage,
+	stripCitationMarkers,
 } from "@/lib/supportChat";
 import styles from "./SupportChat.module.css";
 import SupportHumanForm from "./SupportHumanForm";
@@ -199,7 +200,9 @@ export default function SupportChat({
 				{turns.map((item) => (
 					<li key={item.id} className={styles.turn}>
 						<strong>{item.role === "user" ? copy.you : copy.assistant}</strong>
-						<p className={styles.text}>{item.content || copy.sending}</p>
+						<p className={styles.text}>
+							{stripCitationMarkers(item.content) || copy.sending}
+						</p>
 					</li>
 				))}
 			</ol>

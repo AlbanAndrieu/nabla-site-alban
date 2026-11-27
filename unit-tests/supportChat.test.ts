@@ -10,6 +10,8 @@ import {
 	parseSseBuffer,
 	SUPPORT_LIMITS,
 	type SupportMessage,
+	stripCitationMarkers,
+	supportLanguageHint,
 } from "../lib/supportChat";
 
 const user = (content: string): SupportMessage => ({ role: "user", content });
@@ -216,4 +218,21 @@ test("Slack text escapes mrkdwn control characters and trims the transcript", ()
 		buildSlackText({ message: "m", transcript: [], locale: "en" }),
 		/Email:\* not provided/,
 	);
+});
+
+test("citation markers from Open WebUI RAG are hidden, other brackets stay", () => {
+	assert.equal(
+		stripCitationMarkers("Pay by SEPA transfer [1]. See [2, 3] and [4,5]."),
+		"Pay by SEPA transfer. See and.",
+	);
+	assert.equal(
+		stripCitationMarkers("Use `[x]` or [link]"),
+		"Use `[x]` or [link]",
+	);
+});
+
+test("the language hint names the page locale and defers to the visitor", () => {
+	assert.match(supportLanguageHint("fr"), /page language \(French\)/);
+	assert.match(supportLanguageHint("en"), /page language \(English\)/);
+	assert.match(supportLanguageHint("en"), /latest message/);
 });

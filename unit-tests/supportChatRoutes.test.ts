@@ -94,7 +94,7 @@ test("chat answers 503 without calling anything when backend env is missing", as
 	assert.equal(calls.length, 0);
 });
 
-test("chat streams plain text with the Access service token and no system role", async () => {
+test("chat streams plain text with the Access service token and only the server language hint", async () => {
 	setBackendEnv();
 	process.env.SUPPORT_OPENWEBUI_URL = "https://openwebui.example.test/";
 	stubFetch(async () => sse("750–790 € ", "per day."));
@@ -117,7 +117,14 @@ test("chat streams plain text with the Access service token and no system role",
 	const body = JSON.parse(String(init.body));
 	assert.deepEqual(body, {
 		model: "site-support",
-		messages: [{ role: "user", content: "What is the daily rate?" }],
+		messages: [
+			{
+				role: "system",
+				content:
+					"Always reply in the language the visitor wrote their latest message in, even if it differs from the page language (English).",
+			},
+			{ role: "user", content: "What is the daily rate?" },
+		],
 		stream: true,
 		max_tokens: 600,
 	});
@@ -164,7 +171,7 @@ test("chat answers 503 when the backend fails or redirects", async () => {
 	assert.equal((await chat(chatRequest())).status, 503);
 });
 
-test("chat answers 503 when response headers take longer than 8 s", async () => {
+test("chat answers 503 when response headers take longer than 15 s", async () => {
 	setBackendEnv();
 	mock.timers.enable({ apis: ["setTimeout"] });
 	let fetchStarted: () => void = () => undefined;
@@ -182,7 +189,7 @@ test("chat answers 503 when response headers take longer than 8 s", async () => 
 	);
 	const pending = chat(chatRequest());
 	await started;
-	mock.timers.tick(7999);
+	mock.timers.tick(14_999);
 	mock.timers.tick(1);
 	assert.equal((await pending).status, 503);
 });

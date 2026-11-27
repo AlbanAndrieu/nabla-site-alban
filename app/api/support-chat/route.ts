@@ -5,20 +5,22 @@ import {
 	supportBackendConfig,
 	supportUnavailable,
 } from "@/lib/server/supportChat";
-import { parseChatRequest } from "@/lib/supportChat";
+import { parseChatRequest, supportLanguageHint } from "@/lib/supportChat";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const ROUTE = "support-chat";
-const HEADERS_TIMEOUT_MS = 8000;
+// Measured on the LAN (27/11): 1–7.4 s to first byte warm, over 8 s cold.
+const HEADERS_TIMEOUT_MS = 15_000;
 // Upper bound for the whole streamed answer once headers have arrived.
 const STREAM_TIMEOUT_MS = 45_000;
 
 /**
  * Server-side proxy to the Open WebUI `site-support` model behind Cloudflare
- * Access. The system prompt and knowledge base live in Open WebUI; only
- * `user`/`assistant` turns are forwarded. Any backend problem is a 503 so the
+ * Access. The system prompt and knowledge base live in Open WebUI; the visitor's
+ * `user`/`assistant` turns are forwarded after one fixed, server-owned
+ * language hint (a client `system` role is still refused). Any backend problem is a 503 so the
  * widget can offer the human contact form.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -42,7 +44,13 @@ export async function POST(request: Request): Promise<Response> {
 			headers: backend.headers,
 			body: JSON.stringify({
 				model: backend.model,
-				messages: guarded.value.messages,
+				messages: [
+					{
+						role: "system",
+						content: supportLanguageHint(guarded.value.locale),
+					},
+					...guarded.value.messages,
+				],
 				stream: true,
 				max_tokens: 600,
 			}),
