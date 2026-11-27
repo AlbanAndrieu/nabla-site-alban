@@ -109,7 +109,10 @@ test("DPIA and PRA/ACPR entries are available in French and English", async () =
 			copy.categories.privacy.terms.dpia.expansion,
 			"Data Protection Impact Assessment",
 		);
-		assert.equal(copy.categories.regulation.terms.pra.expansion, "Prudential Regulation Authority");
+		assert.equal(
+			copy.categories.regulation.terms.pra.expansion,
+			"Prudential Regulation Authority",
+		);
 		assert.equal(
 			copy.categories.regulation.terms.acpr.expansion,
 			"Autorité de contrôle prudentiel et de résolution",
@@ -121,7 +124,9 @@ test("the security compliance section links directly to the DPIA glossary entry"
 	const { RESOURCE_SECTIONS } = await import(
 		"../app/[locale]/security/securityResources"
 	);
-	const compliance = RESOURCE_SECTIONS.find((section) => section.key === "compliance");
+	const compliance = RESOURCE_SECTIONS.find(
+		(section) => section.key === "compliance",
+	);
 	assert.ok(compliance);
 	assert.ok(
 		compliance.links.some(
@@ -138,8 +143,13 @@ test("the security compliance section links directly to the DPIA glossary entry"
 				"utf8",
 			),
 		);
-		const labels = contents.securityPage.nativeSections.compliance.links as string[];
-		assert.equal(labels.length, compliance.links.length, `${locale}: compliance link alignment`);
+		const labels = contents.securityPage.nativeSections.compliance
+			.links as string[];
+		assert.equal(
+			labels.length,
+			compliance.links.length,
+			`${locale}: compliance link alignment`,
+		);
 		assert.ok(labels.some((label) => label.includes("DPIA")));
 	}
 });
