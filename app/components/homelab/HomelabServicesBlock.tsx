@@ -2,21 +2,20 @@
 
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
 	RESOURCE_SNAPSHOT_KEY,
 	type ResourceSnapshot,
 } from "@/lib/homelabResourceEvidence";
-import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
 import { buildDeclaredServiceTopology } from "./declaredServiceTopology";
+import HomelabCatalogUnavailable from "./HomelabCatalogUnavailable";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
@@ -36,6 +35,7 @@ import {
 import {
 	useGraphNearViewport,
 	useResourceStale,
+	useServiceDeepLink,
 } from "./homelabServicesBlockEffects";
 import {
 	countHealthStates,
@@ -93,7 +93,6 @@ export default function HomelabServicesBlock({
 			cancelled = true;
 		};
 	}, [readOnly]);
-	const handledAnchor = useRef<string | null>(null);
 
 	// If FastAPI provides cards but no matching relation graph, still show the
 	// declared services. Never invent relations or assert dependency health.
@@ -170,37 +169,11 @@ export default function HomelabServicesBlock({
 		0,
 	);
 
-	// Cards mount asynchronously only after owner access. The browser's initial
-	// fragment jump happens before that mount, so restore historical deep links.
-	useEffect(() => {
-		if (!state.catalog) return;
-		const hash = window.location.hash;
-		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
-		if (!match || handledAnchor.current === hash) return;
-		const serviceId = match[1];
-		const group = hierarchyGroups.find((item) =>
-			item.catalog.services.some(
-				(service) => catalogEntitySlug(homelabServiceId(service)) === serviceId,
-			),
-		);
-		if (!group) return;
-		handledAnchor.current = hash;
-		let secondFrame = 0;
-		const firstFrame = window.requestAnimationFrame(() => {
-			setExpandedGroups((current) =>
-				current.has(group.group) ? current : new Set([...current, group.group]),
-			);
-			secondFrame = window.requestAnimationFrame(() => {
-				document
-					.getElementById(hash.slice(1))
-					?.scrollIntoView({ block: "center" });
-			});
-		});
-		return () => {
-			window.cancelAnimationFrame(firstFrame);
-			window.cancelAnimationFrame(secondFrame);
-		};
-	}, [state.catalog, hierarchyGroups]);
+	useServiceDeepLink(
+		Boolean(state.catalog),
+		hierarchyGroups,
+		setExpandedGroups,
+	);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {
@@ -221,37 +194,12 @@ export default function HomelabServicesBlock({
 	};
 
 	if (!state.catalog) {
-		const catalogError = state.catalogFailure;
 		return (
-			<div
-				className="text-center py-4"
-				role={state.error ? "alert" : "status"}
-				data-homelab-inventory-unavailable={state.error ? true : undefined}
-			>
-				{!state.error
-					? t("loading")
-					: catalogError === "access-denied"
-						? french
-							? "Clé de diagnostic refusée par FastAPI : le catalogue Backstage v2 reste privé."
-							: "FastAPI rejected the diagnostics key: the Backstage v2 catalog remains private."
-						: catalogError === "key-missing"
-							? french
-								? "Clé serveur manquante : catalogue Backstage v2 indisponible."
-								: "Missing server key: Backstage v2 catalog unavailable."
-							: t("unavailable")}
-				{!readOnly && state.error && state.catalogIncident && (
-					<p
-						className="small text-muted mt-2"
-						data-catalog-failure-stage={state.catalogIncident.stage}
-					>
-						{french ? "Phase du diagnostic" : "Diagnostic stage"}:{" "}
-						<code>{state.catalogIncident.stage}</code>
-						{" · "}
-						{french ? "Référence support" : "Support reference"}:{" "}
-						<code>{state.catalogIncident.requestId}</code>
-					</p>
-				)}
-			</div>
+			<HomelabCatalogUnavailable
+				error={state.error}
+				failure={state.catalogFailure}
+				incident={readOnly ? null : state.catalogIncident}
+			/>
 		);
 	}
 

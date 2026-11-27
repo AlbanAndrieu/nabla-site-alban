@@ -1,8 +1,19 @@
-import { type RefObject, useEffect, useRef, useState } from "react";
+import {
+	type Dispatch,
+	type RefObject,
+	type SetStateAction,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
 import {
 	type ResourceSnapshot,
 	snapshotAgeState,
 } from "@/lib/homelabResourceEvidence";
+import { homelabServiceId } from "@/lib/homelabServices";
+import type { ServicePresentationGroup } from "@/lib/servicePresentation";
+import type { filterHierarchyGroups } from "./homelabServiceHierarchy";
 
 /**
  * A single clock feeds all service groups. Hidden tabs do not tick until
@@ -73,4 +84,45 @@ export function useGraphNearViewport(
 		return () => observer.disconnect();
 	}, [hasGraph, graphInView]);
 	return [graphRef, graphInView];
+}
+
+/**
+ * Cards mount asynchronously only after owner access. The browser's initial
+ * fragment jump happens before that mount, so restore historical deep links.
+ */
+export function useServiceDeepLink(
+	hasCatalog: boolean,
+	hierarchyGroups: ReturnType<typeof filterHierarchyGroups>,
+	setExpandedGroups: Dispatch<SetStateAction<Set<ServicePresentationGroup>>>,
+): void {
+	const handledAnchor = useRef<string | null>(null);
+	useEffect(() => {
+		if (!hasCatalog) return;
+		const hash = window.location.hash;
+		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
+		if (!match || handledAnchor.current === hash) return;
+		const serviceId = match[1];
+		const group = hierarchyGroups.find((item) =>
+			item.catalog.services.some(
+				(service) => catalogEntitySlug(homelabServiceId(service)) === serviceId,
+			),
+		);
+		if (!group) return;
+		handledAnchor.current = hash;
+		let secondFrame = 0;
+		const firstFrame = window.requestAnimationFrame(() => {
+			setExpandedGroups((current) =>
+				current.has(group.group) ? current : new Set([...current, group.group]),
+			);
+			secondFrame = window.requestAnimationFrame(() => {
+				document
+					.getElementById(hash.slice(1))
+					?.scrollIntoView({ block: "center" });
+			});
+		});
+		return () => {
+			window.cancelAnimationFrame(firstFrame);
+			window.cancelAnimationFrame(secondFrame);
+		};
+	}, [hasCatalog, hierarchyGroups, setExpandedGroups]);
 }
