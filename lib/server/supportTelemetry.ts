@@ -35,6 +35,7 @@ export function verifyFeedbackToken(traceId: unknown, token: unknown): traceId i
   if (!key || typeof traceId !== "string" || !HEX_ID.test(traceId)) return false;
   if (typeof token !== "string" || !/^[0-9a-z]{6,9}\.[a-f0-9]{64}$/.test(token)) return false;
   const [when, actual] = token.split(".");
+  if (!when || !actual) return false;
   const issued = Number.parseInt(when, 36);
   const now = Math.floor(Date.now() / 1000);
   if (!Number.isSafeInteger(issued) || issued > now + 60 || issued < now - FEEDBACK_LIFETIME_SECONDS) return false;
