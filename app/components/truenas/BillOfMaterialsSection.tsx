@@ -9,6 +9,7 @@ import {
 	REUSED_COMPONENT_ICONS,
 } from "./hardwarePlan";
 import InferenceModelSummary from "./InferenceModelSummary";
+import MemoryUpgradePlan from "./MemoryUpgradePlan";
 
 function ItemIcon({ name }: { name: string }) {
 	return (
@@ -98,6 +99,7 @@ export default async function BillOfMaterialsSection() {
 					>
 						{t("futureTitle")}
 					</AnchoredHeading>
+					<MemoryUpgradePlan />
 					<FastPoolPlan />
 					<GpuUpgradePlan />
 					<InferenceModelSummary />
