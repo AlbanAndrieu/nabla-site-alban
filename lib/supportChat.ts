@@ -83,7 +83,7 @@ export function supportCitationSegments(raw: string): SupportCitationSegment[] {
 	const markdown = /\[([^\]\n]{1,120})\]\((https:\/\/[^\s)\n]{1,800})\)/g;
 	let offset = 0;
 	for (const match of text.matchAll(markdown)) {
-		const at = match.index;
+		const at = match.index ?? offset;
 		if (at > offset) segments.push({ text: text.slice(offset, at) });
 		const [, label, rawUrl] = match;
 		let href: string | undefined;
