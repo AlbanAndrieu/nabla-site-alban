@@ -277,7 +277,7 @@ export default function SupportChat({
 						{item.role === "assistant" && item.feedbackToken && item.traceId && !(
 							streaming && turns.at(-1)?.id === item.id
 						) ? (
-							<div className={styles.rating} aria-label={copy.ratingHelpful}>
+							<div className={styles.rating}>
 								<button
 									type="button"
 									aria-label={copy.ratingHelpful}
