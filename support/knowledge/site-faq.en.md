@@ -100,8 +100,10 @@ openclaw@albandrieu.com.
 
 ## What happens to my support messages?
 
-They are processed on the site owner's self-hosted server and are not kept by
-the site. Do not share sensitive personal data, passwords or payment details.
+They are processed on the site owner's self-hosted server.
+When Langfuse telemetry is enabled, questions and replies are also recorded
+there to evaluate response quality and the prompt and FAQ versions.
+Do not share sensitive personal data, passwords or payment details.
 For data questions, see the privacy policy (`/policy/privacy_policy`) or write
 to contact@albandrieu.com.
 
