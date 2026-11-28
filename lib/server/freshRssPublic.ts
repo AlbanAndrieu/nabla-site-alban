@@ -1,10 +1,13 @@
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
+import { createHash } from "node:crypto";
+import { fetchClassifiedFeed, joinClassifiedArticles } from "./rssRelevancePublic";
 import approvedSources from "../../public/ciso-rss-feeds.json";
 
 const FRESHRSS_ORIGIN = "https://freshrss.albandrieu.com";
 const CONTENT_LIMIT = 1_500_000;
 
 type GReaderEntry = {
+	id?: string;
 	title?: string;
 	canonical?: Array<{ href?: string }>;
 	alternate?: Array<{ href?: string }>;
@@ -112,6 +115,24 @@ export async function fetchFreshRssPublicArticles(): Promise<
 					: undefined,
 			summary: entry.summary?.content ?? entry.content?.content,
 		});
-		return article ? [article] : [];
+		if (!article || typeof entry.id !== "string" || !entry.id || entry.id.length > 1024) return [];
+		const rssId = createHash("sha256")
+			.update(entry.origin.streamId + "\0" + entry.id, "utf8")
+			.digest("hex");
+		return [{ ...article, rssId }];
 	});
+}
+
+/** Distinguish an AI-curated batch from FreshRSS's existing lexical fallback. */
+export async function fetchFreshRssPublicSelection(): Promise<{
+	items: FeedItem[];
+	mode: "freshrss" | "ai-filtered";
+} | null> {
+	const items = await fetchFreshRssPublicArticles();
+	if (!items) return null;
+	const classified = await fetchClassifiedFeed();
+	if (classified) {
+		return { items: joinClassifiedArticles(items, classified), mode: "ai-filtered" };
+	}
+	return { items, mode: "freshrss" };
 }

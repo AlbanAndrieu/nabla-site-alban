@@ -1,5 +1,5 @@
 import { rankArticles } from "@/lib/cisoThreatFeed";
-import { fetchFreshRssPublicArticles } from "@/lib/server/freshRssPublic";
+import { fetchFreshRssPublicSelection } from "@/lib/server/freshRssPublic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,13 +21,13 @@ function xml(value: string): string {
 /** Public RSS digest: at most ten actual, date-stamped security headlines. */
 export async function GET() {
 	try {
-		const articles = await fetchFreshRssPublicArticles();
-		if (!articles)
+		const selection = await fetchFreshRssPublicSelection();
+		if (!selection)
 			return new Response("Security RSS not configured", {
 				status: 503,
 				headers: { "Cache-Control": "no-store" },
 			});
-		const top = rankArticles(articles).slice(0, 10);
+		const top = rankArticles(selection.items).slice(0, 10);
 		const xmlItems = top
 			.map(
 				(article) => `

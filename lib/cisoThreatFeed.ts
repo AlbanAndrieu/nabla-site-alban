@@ -35,6 +35,10 @@ export type FeedItem = {
 	source: string;
 	pubDate?: string;
 	summary?: string;
+	/** SHA-256 of FreshRSS streamId + NUL + article id; no credentials. */
+	rssId?: string;
+	/** Trusted, versioned Langfuse/LiteLLM tags joined server-side. */
+	aiTechnologies?: string[];
 };
 
 export type RankedFeedItem = FeedItem & {
@@ -106,6 +110,13 @@ export function normalizeArticle(input: Partial<FeedItem>): FeedItem | null {
 	if (!link || !title) return null;
 	const source = plainText(input.source, 90) || new URL(link).hostname;
 	const summary = plainText(input.summary, 260);
+	const aiTechnologies = Array.isArray(input.aiTechnologies)
+		? input.aiTechnologies.filter(
+				(value) =>
+					typeof value === "string" &&
+					/^[a-z0-9][a-z0-9-]{1,63}$/.test(value),
+			).slice(0, 8)
+		: undefined;
 	const time =
 		typeof input.pubDate === "string" ? Date.parse(input.pubDate) : NaN;
 	return {
@@ -114,6 +125,7 @@ export function normalizeArticle(input: Partial<FeedItem>): FeedItem | null {
 		source,
 		...(Number.isFinite(time) ? { pubDate: new Date(time).toISOString() } : {}),
 		...(summary ? { summary } : {}),
+		...(aiTechnologies ? { aiTechnologies } : {}),
 	};
 }
 
@@ -133,11 +145,12 @@ export function rankArticles(input: FeedItem[]): RankedFeedItem[] {
 		seen.add(identity);
 		if (titleKey.length > 40) seen.add("title:" + titleKey);
 		const corpus = item.title + " " + (item.summary ?? "");
-		const technologies = signals
-			.filter((signal) =>
-				signal.patterns.some((pattern) => pattern.test(corpus)),
-			)
-			.map((signal) => signal.name);
+		const technologies = item.aiTechnologies ??
+			signals
+				.filter((signal) =>
+					signal.patterns.some((pattern) => pattern.test(corpus)),
+				)
+				.map((signal) => signal.name);
 		const urgent = urgency.test(corpus);
 		ranked.push({
 			...item,
