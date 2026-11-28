@@ -1307,7 +1307,13 @@
 			"humanSend": "Send to a human",
 			"humanSending": "Sending…",
 			"humanSent": "Thank you, your message was forwarded to the site owner.",
-			"humanFailed": "Sending failed. Please write directly to"
+			"humanFailed": "Sending failed. Please write directly to",
+			"paused": "The chatbot is temporarily disabled. You can still contact a human.",
+			"rateLimited": "Too many questions from your connection. Try again in a few minutes or contact a human.",
+			"ratingHelpful": "Helpful answer",
+			"ratingNotHelpful": "Unhelpful answer",
+			"ratingRecorded": "Thank you for your feedback.",
+			"ratingFailed": "Could not save your rating. Please retry."
 		}
 	}
 }

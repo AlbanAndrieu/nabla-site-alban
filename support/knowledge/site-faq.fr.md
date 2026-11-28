@@ -156,3 +156,20 @@ Toujours pour : devis, disponibilité, négociation, contrat, facture,
 remboursement, vérification de paiement, données personnelles, signalement de
 sécurité, ou toute question dont la réponse n'est pas dans cette FAQ ou sur le
 site.
+
+## Sources publiques pour les citations du chatbot (liens vérifiables)
+
+Pour chaque réponse, citer la page exacte pertinente, sans inventer d'URL.
+La citation doit être un lien Markdown lisible, par exemple
+[Tarifs](https://www.albanandrieu.com/fr/pricing).
+Les repères non cliquables du moteur RAG ([1], [2]) ne suffisent pas.
+
+- Prestations : https://www.albanandrieu.com/fr/expertise
+- Tarifs et TJM : https://www.albanandrieu.com/fr/pricing
+- Paiements : https://www.albanandrieu.com/fr/payment
+- Contact : https://www.albanandrieu.com/fr/contact
+- Rendez-vous : https://calendly.com/alban-andrieu
+- Homelab : https://www.albanandrieu.com/fr/truenas
+- Sécurité : https://www.albanandrieu.com/fr/security
+- Lexique : https://www.albanandrieu.com/fr/security/lexique
+- Politique de confidentialité : https://www.albanandrieu.com/fr/policy/privacy_policy

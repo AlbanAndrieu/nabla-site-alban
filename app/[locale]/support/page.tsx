@@ -42,6 +42,7 @@ export default async function SupportPage({
 				<SupportChat
 					copy={t.raw("chat") as SupportChatCopy}
 					locale={locale}
+					enabled={process.env.SUPPORT_CHAT_ENABLED !== "false"}
 					turnstileSiteKey={
 						process.env.NEXT_PUBLIC_SUPPORT_TURNSTILE_SITE_KEY || undefined
 					}

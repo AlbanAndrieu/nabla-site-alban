@@ -1307,7 +1307,13 @@
 			"humanSend": "Envoyer à un humain",
 			"humanSending": "Envoi…",
 			"humanSent": "Merci, votre message a été transmis au propriétaire du site.",
-			"humanFailed": "L’envoi a échoué. Écrivez directement à"
+			"humanFailed": "L’envoi a échoué. Écrivez directement à",
+			"paused": "Le chatbot est désactivé temporairement. Vous pouvez toujours contacter une personne.",
+			"rateLimited": "Trop de questions depuis votre connexion. Réessayez dans quelques minutes ou contactez une personne.",
+			"ratingHelpful": "Réponse pertinente",
+			"ratingNotHelpful": "Réponse non pertinente",
+			"ratingRecorded": "Merci pour votre avis.",
+			"ratingFailed": "Impossible de transmettre votre avis. Réessayez."
 		}
 	}
 }

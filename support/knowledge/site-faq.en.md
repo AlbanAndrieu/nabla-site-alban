@@ -148,3 +148,19 @@ cookie policy, accessibility statement.
 Always for: quotes, availability, negotiation, contracts, invoices, refunds,
 payment verification, personal data, security reports, or any question whose
 answer is not in this FAQ or on the site.
+
+## Public citation sources (verifiable links)
+
+Every factual answer should include a clickable Markdown citation to the exact
+relevant public page. Do not invent URLs. Bare RAG markers ([1], [2]) do not
+count as accessible citations.
+
+- Services: https://www.albanandrieu.com/expertise
+- Pricing: https://www.albanandrieu.com/pricing
+- Payment: https://www.albanandrieu.com/payment
+- Contact: https://www.albanandrieu.com/contact
+- Appointment: https://calendly.com/alban-andrieu
+- Homelab: https://www.albanandrieu.com/truenas
+- Security: https://www.albanandrieu.com/security
+- Glossary: https://www.albanandrieu.com/security/lexique
+- Privacy policy: https://www.albanandrieu.com/policy/privacy_policy
