@@ -15,7 +15,7 @@ import {
 	SUPPORT_LIMITS,
 	type SupportLocale,
 	type SupportMessage,
-	stripCitationMarkers,
+	supportCitationSegments,
 } from "@/lib/supportChat";
 import styles from "./SupportChat.module.css";
 import SupportHumanForm from "./SupportHumanForm";
@@ -40,6 +40,12 @@ export type SupportChatCopy = {
 	humanSending: string;
 	humanSent: string;
 	humanFailed: string;
+	paused: string;
+	rateLimited: string;
+	ratingHelpful: string;
+	ratingNotHelpful: string;
+	ratingRecorded: string;
+	ratingFailed: string;
 };
 
 type TurnstileApi = {
@@ -54,25 +60,35 @@ declare global {
 	}
 }
 
-type Turn = SupportMessage & { id: number };
+type Turn = SupportMessage & {
+	id: number;
+	traceId?: string;
+	feedbackToken?: string;
+};
 
 export default function SupportChat({
 	copy,
 	locale,
 	turnstileSiteKey,
+	enabled = true,
 }: {
 	copy: SupportChatCopy;
 	locale: SupportLocale;
 	turnstileSiteKey?: string;
+	enabled?: boolean;
 }) {
 	const id = useId();
 	const [turns, setTurns] = useState<Turn[]>([]);
 	const [draft, setDraft] = useState("");
 	const [streaming, setStreaming] = useState(false);
-	const [error, setError] = useState<"unavailable" | "verifyFailed" | null>(
-		null,
-	);
-	const [humanOpen, setHumanOpen] = useState(false);
+	const [error, setError] = useState<
+		"unavailable" | "verifyFailed" | "rateLimited" | null
+	>(null);
+	const [ratings, setRatings] = useState<
+		Record<number, "up" | "down" | "sending">
+	>({});
+	const [ratingErrors, setRatingErrors] = useState<Record<number, boolean>>({});
+	const [humanOpen, setHumanOpen] = useState(!enabled);
 	const [token, setToken] = useState<string | null>(null);
 	const nextId = useRef(0);
 	const widgetElement = useRef<HTMLDivElement>(null);
@@ -116,9 +132,10 @@ export default function SupportChat({
 
 	async function send() {
 		const content = draft.trim();
-		if (!content || streaming || waitingForToken) return;
+		if (!enabled || !content || streaming || waitingForToken) return;
 		const shown = [...turns, turn("user", content)];
 		const answerTurn = turn("assistant", "");
+		let annotatedAnswer = answerTurn;
 		setTurns([...shown, answerTurn]);
 		setDraft("");
 		setError(null);
@@ -136,8 +153,17 @@ export default function SupportChat({
 			});
 			if (!response.ok || !response.body) {
 				throw new Error(
-					response.status === 403 ? "verifyFailed" : "unavailable",
+					response.status === 403
+						? "verifyFailed"
+						: response.status === 429
+							? "rateLimited"
+							: "unavailable",
 				);
+			}
+			const traceId = response.headers.get("X-Support-Trace-Id");
+			const feedbackToken = response.headers.get("X-Support-Feedback-Token");
+			if (traceId && feedbackToken) {
+				annotatedAnswer = { ...answerTurn, traceId, feedbackToken };
 			}
 			const reader = response.body.getReader();
 			const decoder = new TextDecoder();
@@ -145,24 +171,57 @@ export default function SupportChat({
 				const { value, done } = await reader.read();
 				if (done) break;
 				answer += decoder.decode(value, { stream: true });
-				setTurns([...shown, { ...answerTurn, content: answer }]);
+				setTurns([...shown, { ...annotatedAnswer, content: answer }]);
 			}
 			answer += decoder.decode();
 			if (!answer.trim()) throw new Error("unavailable");
-			setTurns([...shown, { ...answerTurn, content: answer }]);
+			setTurns([...shown, { ...annotatedAnswer, content: answer }]);
 		} catch (caught) {
 			// Keep a partial answer; drop the empty placeholder.
 			setTurns(
-				answer.trim() ? [...shown, { ...answerTurn, content: answer }] : shown,
+				answer.trim()
+					? [...shown, { ...annotatedAnswer, content: answer }]
+					: shown,
 			);
 			setError(
 				caught instanceof Error && caught.message === "verifyFailed"
 					? "verifyFailed"
-					: "unavailable",
+					: caught instanceof Error && caught.message === "rateLimited"
+						? "rateLimited"
+						: "unavailable",
 			);
 			setHumanOpen(true);
 		} finally {
 			setStreaming(false);
+		}
+	}
+
+	async function rate(item: Turn, relevant: boolean) {
+		if (!item.traceId || !item.feedbackToken || ratings[item.id]) return;
+		setRatings((current) => ({ ...current, [item.id]: "sending" }));
+		setRatingErrors((current) => ({ ...current, [item.id]: false }));
+		try {
+			const response = await fetch("/api/support-feedback", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					traceId: item.traceId,
+					token: item.feedbackToken,
+					relevant,
+				}),
+			});
+			if (response.status !== 202) throw new Error("rating_unavailable");
+			setRatings((current) => ({
+				...current,
+				[item.id]: relevant ? "up" : "down",
+			}));
+		} catch {
+			setRatings((current) => {
+				const next = { ...current };
+				delete next[item.id];
+				return next;
+			});
+			setRatingErrors((current) => ({ ...current, [item.id]: true }));
 		}
 	}
 
@@ -186,6 +245,11 @@ export default function SupportChat({
 					onReady={renderWidget}
 				/>
 			) : null}
+			{!enabled ? (
+				<p role="status" className="alert alert-warning">
+					{copy.paused}
+				</p>
+			) : null}
 			{turns.length === 0 ? (
 				<p className="text-secondary">{copy.empty}</p>
 			) : null}
@@ -201,8 +265,54 @@ export default function SupportChat({
 					<li key={item.id} className={styles.turn}>
 						<strong>{item.role === "user" ? copy.you : copy.assistant}</strong>
 						<p className={styles.text}>
-							{stripCitationMarkers(item.content) || copy.sending}
+							{item.content
+								? supportCitationSegments(item.content).map((part, index) =>
+										part.href ? (
+											<a
+												key={index}
+												href={part.href}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{part.text}
+											</a>
+										) : (
+											<span key={index}>{part.text}</span>
+										),
+									)
+								: copy.sending}
 						</p>
+						{item.role === "assistant" &&
+						item.feedbackToken &&
+						item.traceId &&
+						!(streaming && turns.at(-1)?.id === item.id) ? (
+							<div className={styles.rating}>
+								<button
+									type="button"
+									aria-label={copy.ratingHelpful}
+									aria-pressed={ratings[item.id] === "up"}
+									disabled={Boolean(ratings[item.id])}
+									onClick={() => void rate(item, true)}
+								>
+									👍
+								</button>
+								<button
+									type="button"
+									aria-label={copy.ratingNotHelpful}
+									aria-pressed={ratings[item.id] === "down"}
+									disabled={Boolean(ratings[item.id])}
+									onClick={() => void rate(item, false)}
+								>
+									👎
+								</button>
+								{ratings[item.id] === "up" || ratings[item.id] === "down" ? (
+									<span role="status">{copy.ratingRecorded}</span>
+								) : null}
+								{ratingErrors[item.id] ? (
+									<span role="alert">{copy.ratingFailed}</span>
+								) : null}
+							</div>
+						) : null}
 					</li>
 				))}
 			</ol>
@@ -234,7 +344,7 @@ export default function SupportChat({
 				<div className={styles.actions}>
 					<Button
 						type="submit"
-						disabled={streaming || waitingForToken || !draft.trim()}
+						disabled={!enabled || streaming || waitingForToken || !draft.trim()}
 					>
 						{streaming
 							? copy.sending

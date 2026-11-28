@@ -92,3 +92,10 @@ Aucun test sur la workstation ou sur TrueNAS n'est présumé exécuté par cette
 ## Propriété
 
 **Site :** cartes, filtres, métadonnées, accessibilité, C4 et sélecteurs. **FastAPI :** états et diagnostics (producteur). **Compose :** catalogue source, policy d'exposition, déploiements, probes et métriques. L'ancienne roadmap au 30/10 est archivée, sans rouvrir les points déjà livrés.
+
+
+### S8 — Publication FreshRSS filtrée IA (28/11/2026)
+
+**CODED — PR dédiée** : le serveur Next.js rapproche les identifiants GReader publics approuvés des décisions LiteLLM publiées par `fastapi-sample`, sans passer titre/résumé au Cloud. Le mode `ai-filtered` est exposé dans la page CISO, le RSS public et `/api/ciso/threat-feed`; fallback lexical conservé si décision indisponible. `FRESHRSS_AI_SELECTION_ENABLED` est un coupe-circuit opt-in. Tests hermétiques d'identité/hash, de schéma et de jointure ajoutés.
+
+**VALIDATION NON EFFECTUÉE SUR TRUE NAS / VERCEL** : provisionner le compte public FreshRSS et les secrets, publier le prompt Langfuse, faire ingérer au moins un lot signé par FastAPI Cloud avec Redis, activer le flag sur Vercel, comparer preview/prod et vérifier la confidentialité des articles et l'absence de refresh/CPU excessif. CI L2/L3 et navigateur FR/EN sur SHA final requis.

@@ -90,3 +90,14 @@ Le serveur récupère aussi `subscription/list` et vérifie, avant toute publica
 - DefectDojo reçoit les scans via l'API **privée** depuis les jobs internes ; aucun accès public, port ouvert sur Internet ou service token Cloudflare n'est nécessaire pour cette voie.
 
 Ne pas activer `FRESHRSS_PUBLICATION_ENABLED` tant que l'identité, les dix sources, la confidentialité et les réponses RSS ne sont pas acceptées sur l'instance réelle.
+
+
+## Filtrage IA FreshRSS partagé avec FastAPI (28 novembre 2026)
+
+Le service Next.js continue de récupérer directement depuis le compte technique FreshRSS public et de n'accepter **que** les abonnements de `public/ciso-rss-feeds.json`. Lorsque `FRESHRSS_AI_SELECTION_ENABLED=true`, il demande au serveur FastAPI Cloud la projection `GET https://fastapi-sample.fastapicloud.dev/api/site/rss/v1` (sans clé ni privilège OWNER). Celle-ci ne contient que des SHA-256 d'identifiants d'articles, des tags de technologies, la révision du catalogue et la version du prompt Langfuse. Le serveur Next.js recalcule SHA-256 sur `streamId + NUL + id` pour faire la jointure; une décision d'article extérieur à la liste autorisée ne peut jamais publier son titre, lien ou contenu.
+
+- Si le lot IA valide est disponible, `/api/ciso/threat-feed` retourne `mode=ai-filtered` avec **uniquement** les correspondances; une sélection vide est légitime et ne déclenche pas la récupération du fournisseur tiers `rss2json`. La sélection influence aussi `/security-feed.xml`.
+- Sinon le classement lexical `mode=freshrss` existant reste disponible. Si FreshRSS échoue, l'ancien mode secours public s'applique.
+- Le classement IA propose des technologies en fonction des tags publics du catalogue et du modèle privé TrueNAS. Il ne prouve ni version installée, ni exposition réelle, ni vulnérabilité; ne pas mélanger ses étiquettes avec les constatations des sondes.
+- L'appel supplémentaire FastAPI est limité à 2,5 s et à 40 Kio, toujours HTTPS fixe, sans transfert du secret FreshRSS et sans redirection. Démarrage **désactivé par défaut** jusqu'à recette FreshRSS/Langfuse/LiteLLM/Redis et à l'activation du relais côté TrueNAS et Cloud.
+- Commandes : `node --import tsx --test unit-tests/rssRelevancePublic.test.ts`, `npm run typecheck`, `npm run test:unit`; puis tester les modes `ai-filtered`, `freshrss` et fallback en preview Vercel. Voir le runbook `fastapi-sample/docs/runbooks/freshrss-ai-publication.md`.

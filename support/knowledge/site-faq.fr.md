@@ -104,9 +104,11 @@ avec l'assistant sont transmis au propriétaire du site. Si l'envoi échoue,
 
 ## Que deviennent mes messages au support ?
 
-Ils sont traités sur le serveur auto-hébergé du propriétaire du site et ne sont
-pas conservés par le site. Ne partagez ni données personnelles sensibles, ni mot
-de passe, ni données de paiement. Pour toute question sur vos données, voir la
+Ils sont traités sur le serveur auto-hébergé du propriétaire du site.
+Lorsque la télémétrie Langfuse est activée, les questions et réponses y sont
+également enregistrées afin d'évaluer la pertinence du support et les versions
+du prompt et de la FAQ. Ne partagez ni données personnelles sensibles,
+ni mot de passe, ni données de paiement. Pour toute question sur vos données, voir la
 politique de confidentialité (`/fr/policy/privacy_policy`) ou écrire à
 contact@albandrieu.com.
 
@@ -156,3 +158,20 @@ Toujours pour : devis, disponibilité, négociation, contrat, facture,
 remboursement, vérification de paiement, données personnelles, signalement de
 sécurité, ou toute question dont la réponse n'est pas dans cette FAQ ou sur le
 site.
+
+## Sources publiques pour les citations du chatbot (liens vérifiables)
+
+Pour chaque réponse, citer la page exacte pertinente, sans inventer d'URL.
+La citation doit être un lien Markdown lisible, par exemple
+[Tarifs](https://www.albanandrieu.com/fr/pricing).
+Les repères non cliquables du moteur RAG ([1], [2]) ne suffisent pas.
+
+- Prestations : https://www.albanandrieu.com/fr/expertise
+- Tarifs et TJM : https://www.albanandrieu.com/fr/pricing
+- Paiements : https://www.albanandrieu.com/fr/payment
+- Contact : https://www.albanandrieu.com/fr/contact
+- Rendez-vous : https://calendly.com/alban-andrieu
+- Homelab : https://www.albanandrieu.com/fr/truenas
+- Sécurité : https://www.albanandrieu.com/fr/security
+- Lexique : https://www.albanandrieu.com/fr/security/lexique
+- Politique de confidentialité : https://www.albanandrieu.com/fr/policy/privacy_policy

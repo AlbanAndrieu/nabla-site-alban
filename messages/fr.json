@@ -1287,7 +1287,7 @@
 		},
 		"title": "Support",
 		"intro": "Posez une question sur les prestations, les tarifs, le paiement Stripe, les moyens de contact ou les pages homelab et sécurité. L’assistant répond à partir du contenu public du site ; pour le reste, écrivez à un humain.",
-		"privacy": "Confidentialité : les messages sont traités sur le serveur auto-hébergé du propriétaire du site et ne sont pas conservés par ce site. Ne partagez ni données personnelles, ni mot de passe, ni données de paiement.",
+		"privacy": "Confidentialité : les échanges passent par le serveur auto-hébergé et, si la télémétrie Langfuse est activée, les questions et réponses y sont enregistrées pour analyser la qualité du support. Ne partagez ni données personnelles sensibles, ni mot de passe, ni données de paiement.",
 		"chat": {
 			"logLabel": "Conversation avec l’assistant de support",
 			"empty": "Aucun message pour l’instant. Posez votre première question ci-dessous.",
@@ -1307,7 +1307,13 @@
 			"humanSend": "Envoyer à un humain",
 			"humanSending": "Envoi…",
 			"humanSent": "Merci, votre message a été transmis au propriétaire du site.",
-			"humanFailed": "L’envoi a échoué. Écrivez directement à"
+			"humanFailed": "L’envoi a échoué. Écrivez directement à",
+			"paused": "Le chatbot est désactivé temporairement. Vous pouvez toujours contacter une personne.",
+			"rateLimited": "Trop de questions depuis votre connexion. Réessayez dans quelques minutes ou contactez une personne.",
+			"ratingHelpful": "Réponse pertinente",
+			"ratingNotHelpful": "Réponse non pertinente",
+			"ratingRecorded": "Merci pour votre avis.",
+			"ratingFailed": "Impossible de transmettre votre avis. Réessayez."
 		}
 	}
 }
