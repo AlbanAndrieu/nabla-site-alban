@@ -78,23 +78,30 @@
 		"upgrades": {
 			"fastPool": {
 				"badge": "Planned",
-				"title": "Fast SSD pool for services",
-				"purchase": "2 × WD Red SN700 1 TB NVMe SSD",
-				"unitPrice": "each",
-				"totalPrice": "total",
+				"title": "Priority 2 — Fast SSD pool for services",
 				"architectureLabel": "Target storage architecture",
 				"system": "SYSTEM",
 				"systemDevice": "Kingston SKC600MS 256 GB via USB",
 				"systemRole": "TrueNAS OS",
 				"fast": "FAST",
-				"fastDevice": "2 × WD Red SN700 1 TB",
+				"fastDevice": "2 × 2 TB NVMe SSDs",
 				"fastRole": "Mirror → fastpool",
-				"fastUsage": "Apps, application datasets and VMs",
+				"fastUsage": "Applications, databases and VMs",
 				"data": "DATA",
 				"dataDevice": "4 × WD Red 3 TB",
-				"dataRole": "RAIDZ → cpool",
+				"dataRole": "RAIDZ2 → cpool",
 				"dataUsage": "Documents, media and backups",
-				"note": "Existing application datasets will be migrated selectively to the SSD pool. For example, /mnt/cpool/openwebui can become /mnt/fastpool/appdata/openwebui, while bulk data remains on cpool."
+				"note": "Migrate applications, databases and VMs selectively after backups and a capacity check (including snapshots). Keep media and cold data on the hard-disk pool; replicate important data to independent storage.",
+				"selection": "The MSI board has two M.2 2280 PCIe 4.0 x4 slots. Check that they are free and that both SSDs, particularly the rear one, are adequately cooled. Use a ZFS mirror, not BIOS RAID.",
+				"capacity": "2 TB usable in the mirror (about 1.82 TiB before ZFS overhead); target around 1.45 TiB maximum, excluding overhead, to keep 20% free.",
+				"optionsLabel": "2 TB SSDs to compare",
+				"kioxia": "Kioxia EXCERIA PLUS G3 — 1,200 TBW; first choice if cheaper.",
+				"lexar": "Lexar NM790 — 1,500 TBW; alternative if similarly priced.",
+				"priceNote": "Compare the cost and warranties of two identical drives. Prices vary; no fixed retailer price.",
+				"caution": "Do not use these consumer SSDs as SLOG without power-loss protection (PLP). Defer L2ARC until there is enough RAM; do not add a special vdev with less redundancy than RAIDZ2. Verify the existing log device before changing it.",
+				"sources": "Documentation:",
+				"poolGuide": "TrueNAS pools",
+				"slogGuide": "TrueNAS SLOG"
 			},
 			"gpu": {
 				"title": "GPU options for local AI inference",
@@ -113,7 +120,7 @@
 				"recommended": "Preferred option",
 				"source": "Price source",
 				"ramTitle": "System memory",
-				"ram": "Upgrading from 64 to 128 GB DDR5 is supported. The Ryzen 7 7700 officially supports 128 GB of dual-channel DDR5 UDIMM and DDR5-5200 with two DIMMs; the MSI board can run faster memory profiles, but 5200 MT/s is the conservative CPU specification. The target is a second compatible 64 GB UDIMM, ideally matching the existing module.",
+				"ram": "System RAM is shared by ZFS, VMs, containers and AI. See the memory priority above; GPU inference is a separate upgrade.",
 				"fit": [
 					"Best fit for the existing compact chassis and 500 W PSU. Its 70 W board power, low-profile dual-slot format and 24 GB ECC VRAM make it the preferred inference upgrade.",
 					"Doubles VRAM to 48 GB and greatly expands fully-GPU model capacity, but its 300 W power draw and full-height 267 mm format likely require a larger chassis and stronger PSU.",
@@ -146,6 +153,17 @@
 					"Large multilingual general-purpose model; dense CPU/GPU offload",
 					"Agentic reasoning, RAG and long-context experimentation; quantized community runtimes"
 				]
+			},
+			"memory": {
+				"title": "Priority 1 — 128 GB system memory",
+				"badge": "Planned",
+				"current": "Current: 1 × 64 GB Crucial CT64G56C46U5 DDR5; one free DIMM slot.",
+				"target": "Add an identical 64 GB module if available (part number, revision and ranks). Otherwise prefer a compatible matched 2 × 64 GB kit. Check BIOS and the MSI memory compatibility list before buying.",
+				"validation": "Start at DDR5-5200 MT/s (Ryzen 7 7700 specification with two modules), without EXPO; test stability and verify detected capacity before restoring application workloads.",
+				"reason": "RAM takes priority for containers, VMs and the ZFS ARC. Right-size limits using measured peaks and memory pressure events; a lower Docker limit does not itself free memory.",
+				"budget": "Compare a single module with a complete kit; no current price is guaranteed.",
+				"board": "MSI specifications and memory compatibility",
+				"cpu": "AMD Ryzen 7 7700 specifications"
 			}
 		}
 	}

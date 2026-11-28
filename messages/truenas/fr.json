@@ -78,23 +78,30 @@
 		"upgrades": {
 			"fastPool": {
 				"badge": "Planifié",
-				"title": "Pool SSD rapide pour les services",
-				"purchase": "2 × WD Red SN700 1 To NVMe SSD",
-				"unitPrice": "l’unité",
-				"totalPrice": "au total",
+				"title": "Priorité 2 — Pool SSD rapide pour les services",
 				"architectureLabel": "Architecture de stockage cible",
 				"system": "SYSTEM",
 				"systemDevice": "Kingston SKC600MS 256 Go via USB",
 				"systemRole": "Système TrueNAS",
 				"fast": "FAST",
-				"fastDevice": "2 × WD Red SN700 1 To",
+				"fastDevice": "2 × SSD NVMe 2 To",
 				"fastRole": "Miroir → fastpool",
-				"fastUsage": "Apps, datasets applicatifs et VM",
+				"fastUsage": "Applications, bases de données et VM",
 				"data": "DATA",
 				"dataDevice": "4 × WD Red 3 To",
-				"dataRole": "RAIDZ → cpool",
+				"dataRole": "RAIDZ2 → cpool",
 				"dataUsage": "Documents, médias et sauvegardes",
-				"note": "Les datasets applicatifs existants seront migrés sélectivement vers le pool SSD. Par exemple, /mnt/cpool/openwebui pourra devenir /mnt/fastpool/appdata/openwebui, tandis que les données volumineuses resteront sur cpool."
+				"note": "Migrer sélectivement les applications, bases de données et VM après sauvegarde et vérification de la capacité requise (snapshots compris). Conserver les médias et données froides sur le pool de disques durs ; répliquer les données importantes vers un stockage indépendant.",
+				"selection": "La carte MSI dispose de deux emplacements M.2 2280 PCIe 4.0 x4. Vérifier qu’ils sont libres et que les SSD, notamment celui à l’arrière, sont correctement refroidis. Utiliser un miroir ZFS, pas un RAID BIOS.",
+				"capacity": "2 To utiles en miroir (environ 1,82 Tio avant overhead ZFS) ; viser environ 1,45 Tio maximum, overhead non compris, pour garder 20 % libres.",
+				"optionsLabel": "SSD 2 To à comparer",
+				"kioxia": "Kioxia EXCERIA PLUS G3 — 1 200 TBW ; premier choix si moins cher.",
+				"lexar": "Lexar NM790 — 1 500 TBW ; alternative si le prix est proche.",
+				"priceNote": "Comparer le coût de deux SSD identiques et leurs garanties. Les prix varient ; aucun tarif marchand figé.",
+				"caution": "Ne pas utiliser ces SSD grand public comme SLOG sans protection contre les pertes électriques (PLP). Reporter le L2ARC tant que la RAM manque ; ne pas ajouter de special vdev moins redondé que le RAIDZ2. Vérifier le périphérique de journal existant avant toute modification.",
+				"sources": "Documentation :",
+				"poolGuide": "Pools TrueNAS",
+				"slogGuide": "SLOG TrueNAS"
 			},
 			"gpu": {
 				"title": "GPU pour l’inférence IA locale",
@@ -113,7 +120,7 @@
 				"recommended": "Choix privilégié",
 				"source": "Source du prix",
 				"ramTitle": "Mémoire système",
-				"ram": "Le passage de 64 à 128 Go de DDR5 est supporté. Le Ryzen 7 7700 supporte officiellement 128 Go de DDR5 UDIMM en double canal et DDR5-5200 avec deux DIMM ; la carte MSI accepte des profils mémoire plus rapides, mais 5200 MT/s est la spécification CPU conservatrice. L’objectif est d’ajouter un second module UDIMM de 64 Go compatible, idéalement identique au module existant.",
+				"ram": "La RAM système est une ressource partagée par ZFS, les VM, les conteneurs et l’IA. Voir la priorité mémoire ci-dessus ; l’inférence GPU reste une évolution distincte.",
 				"fit": [
 					"Meilleur choix pour le châssis compact actuel et l’alimentation 500 W. Ses 70 W, son format low-profile double-slot et ses 24 Go de VRAM ECC en font l’évolution privilégiée pour l’inférence.",
 					"Double la VRAM à 48 Go et élargit fortement les modèles exécutables entièrement sur GPU, mais ses 300 W et son format pleine hauteur de 267 mm imposeront probablement un boîtier plus grand et une alimentation plus puissante.",
@@ -146,6 +153,17 @@
 					"Grand modèle généraliste multilingue ; offload dense CPU/GPU",
 					"Raisonnement agentique, RAG et expérimentation long contexte ; runtimes quantifiés communautaires"
 				]
+			},
+			"memory": {
+				"title": "Priorité 1 — 128 Go de mémoire système",
+				"badge": "Planifié",
+				"current": "Actuellement : 1 × 64 Go DDR5 Crucial CT64G56C46U5 ; un emplacement DIMM libre.",
+				"target": "Ajouter un module identique de 64 Go si disponible (référence, révision et rangs). Sinon, privilégier un kit appairé 2 × 64 Go compatible. Vérifier le BIOS et la liste de compatibilité mémoire MSI avant achat.",
+				"validation": "Démarrer à DDR5-5200 MT/s (spécification du Ryzen 7 7700 avec deux modules), sans EXPO ; tester la stabilité et vérifier la capacité détectée avant de remettre les applications en charge.",
+				"reason": "La RAM est prioritaire pour les conteneurs, les VM et le cache ARC de ZFS. Ajuster les limites selon les pics mesurés et les événements de pression mémoire ; une limite Docker plus basse ne libère pas à elle seule de la mémoire.",
+				"budget": "Comparer le prix du module seul à celui du kit complet ; aucun prix actuel garanti.",
+				"board": "Spécifications MSI et compatibilité mémoire",
+				"cpu": "Spécifications AMD Ryzen 7 7700"
 			}
 		}
 	}
