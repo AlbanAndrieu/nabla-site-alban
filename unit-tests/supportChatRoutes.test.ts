@@ -119,7 +119,7 @@ test("chat streams plain text with the Access service token and only the server 
 	assert.deepEqual(body.metadata, {
 		trace_id: body.metadata.trace_id,
 		source: "albanandrieu-support",
-		prompt: "site-support-v2",
+		prompt: "site-support-v8",
 		skill: "site-faq-v1",
 	});
 	delete body.metadata;
