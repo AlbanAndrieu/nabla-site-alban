@@ -115,7 +115,9 @@ export async function fetchFreshRssPublicArticles(): Promise<
 					: undefined,
 			summary: entry.summary?.content ?? entry.content?.content,
 		});
-		if (!article || typeof entry.id !== "string" || !entry.id || entry.id.length > 1024) return [];
+		if (!article) return [];
+		// The legacy GReader reader remains usable when an item lacks an ID.
+		if (typeof entry.id !== "string" || !entry.id || entry.id.length > 1024) return [article];
 		const rssId = createHash("sha256")
 			.update(entry.origin.streamId + "\0" + entry.id, "utf8")
 			.digest("hex");
