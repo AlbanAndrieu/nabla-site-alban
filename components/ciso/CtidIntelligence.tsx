@@ -14,9 +14,15 @@ async function fetchNews(
 	try {
 		const response = await fetch("/api/ciso/threat-feed", { signal });
 		if (!response.ok) throw new Error("FreshRSS unavailable");
-		const data = (await response.json()) as { items?: FeedItem[] };
+		const data = (await response.json()) as {
+			items?: FeedItem[];
+			mode?: string;
+		};
 		if (!Array.isArray(data.items)) throw new Error("Malformed feed response");
-		return { items: data.items, mode: "FreshRSS" };
+		return {
+			items: data.items,
+			mode: data.mode === "ai-filtered" ? "FreshRSS · Langfuse / LiteLLM" : "FreshRSS",
+		};
 	} catch {
 		if (signal.aborted) throw new Error("Aborted");
 		const configResponse = await fetch("/ciso-security-sources.json", {
@@ -213,7 +219,7 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 			if (signal.aborted) return;
 			setItems(next.items);
 			setMode(next.mode);
-			setStatus(next.items.length ? "ready" : "error");
+			setStatus(next.items.length || next.mode.includes("Langfuse") ? "ready" : "error");
 		} catch {
 			if (!signal.aborted) setStatus("error");
 		}
