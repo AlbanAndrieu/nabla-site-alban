@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import SecurityNav from "@/components/security/SecurityNav";
 import TopAnchor from "@/components/TopAnchor";
 import Container from "@/components/ui/Container";
 import { type AppLocale, routing } from "@/i18n/routing";
@@ -67,6 +68,7 @@ export default async function YubiKeySecurityPage({
 				</Container>
 			</header>
 			<main id="main-content">
+				<SecurityNav locale={locale} active="yubikey" />
 				<Container>
 					<YubiKeyIntroduction locale={locale as AppLocale} />
 					<p className={styles.disclaimer} role="note">

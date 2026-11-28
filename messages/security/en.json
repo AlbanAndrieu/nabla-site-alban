@@ -153,13 +153,17 @@
 				"badge": "Penetration Testing",
 				"title": "Pentest-Tools.com",
 				"description": "Online penetration testing and vulnerability scanning platform.",
-				"links": ["Pentest-Tools.com App — network and web security testing"]
+				"links": [
+					"Pentest-Tools.com App — network and web security testing"
+				]
 			},
 			"siem": {
 				"badge": "SIEM / Malware Detection",
 				"title": "SIEM / Malware Detection",
 				"description": "Security monitoring and malware detection resources.",
-				"links": ["Wazuh — ClamAV malware detection logs"]
+				"links": [
+					"Wazuh — ClamAV malware detection logs"
+				]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -196,7 +200,9 @@
 				"badge": "App & Infrastructure Security",
 				"title": "App & Infrastructure Security",
 				"description": "Best practices for securing applications and infrastructure platforms.",
-				"links": ["TrueNAS — securing applications"]
+				"links": [
+					"TrueNAS — securing applications"
+				]
 			},
 			"cloud": {
 				"badge": "Cloud Security",
@@ -815,5 +821,170 @@
 		"policy": "Secrets, technical files, administrative interfaces and metrics are private by default. LiteLLM and Ollama are LAN-only. Scanners operate within authorized scope.",
 		"evidenceTitle": "Evidence status",
 		"evidence": "This page describes a target architecture, not a security attestation or verified deployment. Missing, expired or incomplete reports never prove zero vulnerabilities. Detailed findings remain private."
+	},
+	"securityNav": {
+		"label": "Security navigation",
+		"overview": "Overview",
+		"ciso": "CISO",
+		"ctem": "CTEM",
+		"ctid": "CTID intelligence",
+		"compliance": "Standards and compliance",
+		"glossary": "Glossary",
+		"dsomm": "DevSecOps",
+		"yubikey": "YubiKey"
+	},
+	"ctidView": {
+		"filters": {
+			"query": "Search",
+			"category": "Category",
+			"severity": "Editorial severity",
+			"period": "Period",
+			"sort": "Sort by",
+			"all": "All",
+			"risk": "Severity",
+			"date": "Date",
+			"results": "results",
+			"original": "Original source text (translation unavailable).",
+			"refreshed": "Last retrieved",
+			"reset": "Reset",
+			"categories": {
+				"api": "API / APIM",
+				"identity": "Identity / Entra ID",
+				"cloud": "Cloud and infrastructure",
+				"app": "Application security",
+				"threat": "Threats and incidents",
+				"other": "Other"
+			}
+		}
+	},
+	"compliancePage": {
+		"title": "Standards and compliance",
+		"lead": "Reference for CISOs, security and privacy officers. Check applicability in official sources.",
+		"groups": [
+			{
+				"id": "regulation",
+				"title": "European regulations",
+				"items": [
+					{
+						"name": "DORA",
+						"url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+						"description": "Digital operational resilience in the financial sector."
+					},
+					{
+						"name": "RGPD / GDPR",
+						"url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+						"description": "Personal data protection."
+					},
+					{
+						"name": "NIS2",
+						"url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+						"description": "Cyber risk management and incident reporting."
+					},
+					{
+						"name": "AI Act",
+						"url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+						"description": "Governance of artificial intelligence systems."
+					},
+					{
+						"name": "CRA",
+						"url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+						"description": "Cybersecurity of products with digital elements."
+					}
+				]
+			},
+			{
+				"id": "iso",
+				"title": "International standards",
+				"items": [
+					{
+						"name": "ISO/IEC 27001 · 27002 · 27005",
+						"url": "https://www.iso.org/isoiec-27001-information-security.html",
+						"description": "ISMS, controls and risk management."
+					},
+					{
+						"name": "ISO/IEC 27701 · 27017 · 27018",
+						"url": "https://www.iso.org/",
+						"description": "Privacy, cloud controls and data protection."
+					},
+					{
+						"name": "ISO 22301 · ISO/IEC 27035",
+						"url": "https://www.iso.org/",
+						"description": "Business continuity and incident management."
+					},
+					{
+						"name": "ISO/IEC 42001 · 23894",
+						"url": "https://www.iso.org/",
+						"description": "AI management and AI risk management."
+					}
+				]
+			},
+			{
+				"id": "framework",
+				"title": "Technical frameworks and assurance",
+				"items": [
+					{
+						"name": "NIST CSF / AI RMF / SSDF",
+						"url": "https://www.nist.gov/cyberframework",
+						"description": "Cyber governance, AI risk and secure development."
+					},
+					{
+						"name": "CIS Controls",
+						"url": "https://www.cisecurity.org/controls",
+						"description": "Prioritized security safeguards."
+					},
+					{
+						"name": "OWASP SAMM / ASVS",
+						"url": "https://owasp.org/",
+						"description": "Application security maturity and verification."
+					},
+					{
+						"name": "MITRE ATT&CK / ATLAS",
+						"url": "https://attack.mitre.org/",
+						"description": "Adversary tactics and techniques."
+					},
+					{
+						"name": "PCI DSS",
+						"url": "https://www.pcisecuritystandards.org/",
+						"description": "Payment data security."
+					},
+					{
+						"name": "SOC 2",
+						"url": "https://www.aicpa-cima.com/",
+						"description": "Assurance reports on controls."
+					}
+				]
+			},
+			{
+				"id": "authorities",
+				"title": "Authorities and supervision",
+				"items": [
+					{
+						"name": "CNIL / AIPD",
+						"url": "https://www.cnil.fr/",
+						"description": "Data protection and impact assessments."
+					},
+					{
+						"name": "ANSSI / SecNumCloud",
+						"url": "https://cyber.gouv.fr/",
+						"description": "Information system security and qualification."
+					},
+					{
+						"name": "ACPR",
+						"url": "https://acpr.banque-france.fr/",
+						"description": "French banking and insurance supervision."
+					},
+					{
+						"name": "PRA",
+						"url": "https://www.bankofengland.co.uk/prudential-regulation",
+						"description": "UK prudential supervision."
+					},
+					{
+						"name": "EIOPA",
+						"url": "https://www.eiopa.europa.eu/",
+						"description": "European insurance and occupational pensions supervision."
+					}
+				]
+			}
+		]
 	}
 }

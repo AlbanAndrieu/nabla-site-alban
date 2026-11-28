@@ -23,9 +23,9 @@
 			"scope": "homelab"
 		},
 		{
-			"title": "CNCF",
-			"url": "https://www.cncf.io/feed/",
-			"scope": "homelab"
+			"title": "Microsoft Security",
+			"url": "https://www.microsoft.com/en-us/security/blog/feed/",
+			"scope": "global"
 		},
 		{
 			"title": "OpenSSF",

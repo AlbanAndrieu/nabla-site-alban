@@ -111,7 +111,7 @@ export async function SecurityHero({
 					</a>
 				</p>
 				<p>
-					<a className={styles.heroLink} href="#security-standards-compliance">
+					<a className={styles.heroLink} href={canonicalPagePath("security/compliance", locale)}>
 						{t("hero.standards")}
 					</a>{" "}
 					— {t("hero.standardsLead")}

@@ -3,10 +3,9 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import TopAnchor from "@/components/TopAnchor";
-import Container from "@/components/ui/Container";
+import SecurityNav from "@/components/security/SecurityNav";
 import ExternalLink from "@/components/ui/ExternalLink";
 import { routing } from "@/i18n/routing";
-import { canonicalPagePath } from "@/lib/sitePageCatalog";
 import { buildPageMetadata } from "@/lib/socialMetadata";
 import styles from "./page.module.css";
 
@@ -49,18 +48,33 @@ export default async function CtemPage({
 	const steps = t.raw("steps") as string[];
 
 	return (
-		<div className="site-content-page page-security page-dark">
+		<>
 			<TopAnchor />
-			<main id="main-content" className={styles.content}>
-				<Container>
-					<a href={canonicalPagePath("security", locale)}>{t("back")}</a>
-					<h1>{t("title")}</h1>
-					<p>{t("lead")}</p>
-					<section aria-labelledby="ctem-cycle">
-						<h2 id="ctem-cycle">{t("cycleTitle")}</h2>
-						<ol>{steps.map((step) => <li key={step}>{step}</li>)}</ol>
+			<main id="main-content" className="site-content-page page-ciso page-dark">
+				<section className="hero-section ciso-hero" aria-labelledby="ctem-title">
+					<div className="hero-content">
+						<h1 id="ctem-title" className="hero-title">{t("title")}</h1>
+						<p className="hero-subtitle">{t("lead")}</p>
+					</div>
+				</section>
+				<SecurityNav locale={locale} active="ctem" />
+				<div className="ciso-content">
+					<section className="ciso-card ciso-card--wide" aria-labelledby="ctem-evidence">
+						<h2 id="ctem-evidence">{t("evidenceTitle")}</h2>
+						<p>{t("evidence")}</p>
 					</section>
-					<section aria-labelledby="ctem-tools">
+					<section className="ciso-card ciso-card--wide" aria-labelledby="ctem-cycle">
+						<h2 id="ctem-cycle">{t("cycleTitle")}</h2>
+						<ol className={styles.cycle}>
+							{steps.map((step, index) => (
+								<li key={step}>
+									<span aria-hidden="true" className={styles.step}>{index + 1}</span>
+									<span>{step}</span>
+								</li>
+							))}
+						</ol>
+					</section>
+					<section className="ciso-card ciso-card--wide" aria-labelledby="ctem-tools">
 						<h2 id="ctem-tools">{t("toolsTitle")}</h2>
 						<div className={styles.grid}>
 							{tools.map((tool) => (
@@ -71,16 +85,12 @@ export default async function CtemPage({
 							))}
 						</div>
 					</section>
-					<section aria-labelledby="ctem-policy">
+					<section className="ciso-card ciso-card--wide" aria-labelledby="ctem-policy">
 						<h2 id="ctem-policy">{t("policyTitle")}</h2>
 						<p>{t("policy")}</p>
 					</section>
-					<section aria-labelledby="ctem-evidence">
-						<h2 id="ctem-evidence">{t("evidenceTitle")}</h2>
-						<p>{t("evidence")}</p>
-					</section>
-				</Container>
+				</div>
 			</main>
-		</div>
+		</>
 	);
 }
