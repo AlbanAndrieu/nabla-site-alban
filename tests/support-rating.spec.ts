@@ -44,7 +44,10 @@ for (const [pathname, copy] of cases) {
 		);
 		await expect(chatLog.getByRole("link", { name: "X" })).toHaveCount(0);
 		await expect(chatLog).toContainText("[X](https://evil.example)");
-		const thumbsUp = page.getByRole("button", { name: copy.ratingHelpful });
+		const thumbsUp = chatLog.getByRole("button", {
+			name: copy.ratingHelpful,
+			exact: true,
+		});
 		await expect(thumbsUp).toBeEnabled();
 		await thumbsUp.click();
 		await expect(page.getByRole("status").filter({ hasText: copy.ratingRecorded })).toBeVisible();

@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
-import { fetchFreshRssPublicSelection } from "@/lib/server/freshRssPublic";
+import {
+	fetchFreshRssPublicArticles,
+	fetchFreshRssPublicSelection,
+} from "@/lib/server/freshRssPublic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
 	try {
-		const selection = await fetchFreshRssPublicSelection();
+		const allSources = new URL(request.url).searchParams.get("view") === "ctid";
+		const articles = allSources ? await fetchFreshRssPublicArticles() : null;
+		const selection = allSources
+			? articles && { items: articles, mode: "freshrss" }
+			: await fetchFreshRssPublicSelection();
 		if (
 			!selection ||
 			(selection.items.length === 0 && selection.mode !== "ai-filtered")

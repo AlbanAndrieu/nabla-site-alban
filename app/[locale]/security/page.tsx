@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SecurityNav from "@/components/security/SecurityNav";
 import TopAnchor from "@/components/TopAnchor";
 import { routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -41,10 +42,13 @@ export default async function SecurityPage({
 			<TopAnchor />
 			<SecurityHero locale={locale} contactHref={contactHref} />
 			<main id="main-content" className="security-resources">
+				<SecurityNav locale={locale} active="overview" />
 				<section className="resource-card" aria-labelledby="ctem-heading">
 					<h2 id="ctem-heading">{ctem("title")}</h2>
 					<p>{ctem("lead")}</p>
-					<a href={canonicalPagePath("security/ctem", locale)}>{ctem("discover")}</a>
+					<a href={canonicalPagePath("security/ctem", locale)}>
+						{ctem("discover")}
+					</a>
 				</section>
 				<SecurityCoreSections locale={locale} />
 				<SecurityVisualizations locale={locale} />

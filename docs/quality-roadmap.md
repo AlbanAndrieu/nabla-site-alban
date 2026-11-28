@@ -124,3 +124,13 @@ Le volume n'est pas un score de dette ou un gain de CPU. Les temps Node/Vercel, 
 - **Bababou et OpenClaw :** leurs propres roadmaps ; aucune checklist dupliquée ici.
 
 Le détail des décisions du 30/10 au 13/11, les métriques historiques et les explications de PR sont conservés dans [l'archive datée](archive/quality-roadmap-before-v2-reconciliation-2026-11-14.txt).
+
+## Portail cyber — lot validé le 28 novembre 2026
+
+- [ ] SEC-01 : vérifier en Preview la navigation commune Security, CISO, CTEM, CTID et références ; thème, clavier et petits écrans FR/EN.
+- [ ] SEC-02 : routes canoniques CISO/CTID sous `/security/`, redirections directes, catalogue SEO et tests legacy implémentés dans #343 ; validation HTTP et Preview restante.
+- [ ] SEC-03 : valider le cycle CTEM et la présentation CISO ; aucun KPI privé ou fictif.
+- [ ] SEC-04 : valider la page de conformité et compléter filtres par rôle, domaine et juridiction.
+- [ ] SEC-05 : valider le tri global CTID, les compteurs 24 h, les filtres par source/catégorie/criticité, les sources Microsoft et la distinction criticité éditoriale / CVSS vérifié.
+- [ ] SEC-06 : dans fastapi-sample, enrichir le flux public avec avis MSRC, KEV/EPSS et résumés FR mis en cache ; conserver les preuves et la source originale. Contrat versionné, traduction LiteLLM tracée dans Langfuse, aucun appel LLM par visite ; respecter la publication publique par liste d’autorisation. Le site ne doit afficher aucune traduction non fournie ni aucune note CVSS supposée.
+- [ ] SEC-07 : vérifier le rafraîchissement et la consommation Vercel avant activation ; cible 15 minutes côté collecteur, sans poll agressif côté navigateur.

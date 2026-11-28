@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ThreatFeed from "@/components/ciso/ThreatFeed";
+import SecurityNav from "@/components/security/SecurityNav";
 import TopAnchor from "@/components/TopAnchor";
 import { type AppLocale, routing } from "@/i18n/routing";
 import { canonicalPagePath } from "@/lib/sitePageCatalog";
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	return buildPageMetadata({
 		title: `${t("title")} — Alban Andrieu`,
 		description: t("subtitle"),
-		slug: "ciso",
+		slug: "security/ciso",
 		locale,
 	});
 }
@@ -55,11 +56,13 @@ export default async function CisoPage({ params }: Props) {
 						</h1>
 						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">
-							{t("curatedBy")} <a href={`/${locale}/contact`}>Alban Andrieu</a>
+							{t("curatedBy")}{" "}
+							<a href={canonicalPagePath("contact", locale)}>Alban Andrieu</a>
 						</p>
 					</div>
 				</section>
 
+				<SecurityNav locale={locale} active="ciso" />
 				<div className="ciso-content">
 					<section
 						className="ciso-card ciso-card--wide ciso-card--centered"
@@ -163,11 +166,11 @@ export default async function CisoPage({ params }: Props) {
 						<p>
 							<a
 								className="resource-link"
-								href={locale === "fr" ? "/fr/ctid" : "/ctid"}
+								href={locale === "fr" ? "/fr/security/ctid" : "/security/ctid"}
 							>
 								{locale === "fr"
-									? "Dix signaux prioritaires, homelab et global — CTID"
-									: "Top ten homelab and global signals — CTID"}
+									? "Veille priorisée — CTID"
+									: "Prioritized intelligence — CTID"}
 							</a>
 							{" · "}
 							<a className="resource-link" href="/security-feed.xml">

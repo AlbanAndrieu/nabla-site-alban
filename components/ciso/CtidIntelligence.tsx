@@ -4,7 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AppLocale } from "@/i18n/routing";
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
 import { type CtidItem, selectCtidDigest } from "@/lib/ctidDigest";
+import { filterNews, type NewsFilters, newsCategory } from "@/lib/ctidView";
+import CtidFilters, {
+	type CtidCopy,
+	initialFilters,
+	signalLabels,
+} from "./CtidFilters";
 import styles from "./CtidIntelligence.module.css";
+import CtidOverview from "./CtidOverview";
 
 type Language = AppLocale;
 
@@ -12,7 +19,7 @@ async function fetchNews(
 	signal: AbortSignal,
 ): Promise<{ items: FeedItem[]; mode: string }> {
 	try {
-		const response = await fetch("/api/ciso/threat-feed", { signal });
+		const response = await fetch("/api/ciso/threat-feed?view=ctid", { signal });
 		if (!response.ok) throw new Error("FreshRSS unavailable");
 		const data = (await response.json()) as {
 			items?: FeedItem[];
@@ -83,9 +90,6 @@ async function fetchNews(
 
 const titleLabels = {
 	fr: {
-		homelab: "Signaux concernant la stack Nabla",
-		global: "Cybermenaces et actualités mondiales",
-		other: "Autres vulnérabilités et actualités",
 		analysis: "Résumé",
 		details: "Plus de détails",
 		evidence:
@@ -99,9 +103,6 @@ const titleLabels = {
 		tech: "Technologies mentionnées",
 	},
 	en: {
-		homelab: "Signals relevant to the Nabla stack",
-		global: "Global cybersecurity intelligence",
-		other: "Other vulnerabilities and security news",
 		analysis: "Summary",
 		details: "More details",
 		evidence:
@@ -116,29 +117,16 @@ const titleLabels = {
 	},
 } as const;
 
-const signalLabels = {
-	fr: {
-		critical: "Signal critique",
-		high: "Signal élevé",
-		medium: "Signal modéré",
-		informational: "Information",
-	},
-	en: {
-		critical: "Critical signal",
-		high: "High signal",
-		medium: "Medium signal",
-		informational: "Information",
-	},
-} as const;
-
 function CtidCard({
 	item,
 	locale,
 	featured,
+	copy,
 }: {
 	item: CtidItem;
 	locale: Language;
 	featured: boolean;
+	copy: CtidCopy;
 }) {
 	const t = titleLabels[locale];
 	return (
@@ -148,6 +136,7 @@ function CtidCard({
 					{signalLabels[locale][item.severity]}
 				</span>
 				<span>{item.source}</span>
+				<span>{copy.categories[newsCategory(item)]}</span>
 				{item.pubDate && (
 					<time dateTime={item.pubDate}>
 						{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
@@ -161,6 +150,7 @@ function CtidCard({
 					{item.title} ↗
 				</a>
 			</h3>
+			{locale === "fr" && <p className={styles.notice}>{copy.original}</p>}
 			{featured && (
 				<p className={styles.summary}>
 					{item.summary ||
@@ -209,7 +199,16 @@ function CtidCard({
 	);
 }
 
-export default function CtidIntelligence({ locale }: { locale: Language }) {
+export default function CtidIntelligence({
+	locale,
+	copy,
+}: {
+	locale: Language;
+	copy: CtidCopy;
+}) {
+	const [filters, setFilters] = useState<NewsFilters>(initialFilters);
+	const [fetchedAt, setFetchedAt] = useState(0);
+	const [attempt, setAttempt] = useState(0);
 	const [items, setItems] = useState<FeedItem[]>([]);
 	const [mode, setMode] = useState("");
 	const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -221,6 +220,7 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 			const next = await fetchNews(signal);
 			if (signal.aborted) return;
 			setItems(next.items);
+			setFetchedAt(Date.now());
 			setMode(next.mode);
 			setStatus(
 				next.items.length || next.mode.includes("Langfuse") ? "ready" : "error",
@@ -236,21 +236,30 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 			controller.abort();
 			window.clearTimeout(initial);
 		};
-	}, [reload]);
+	}, [reload, attempt]);
 	const digest = useMemo(() => selectCtidDigest(items), [items]);
+	const all = useMemo(
+		() => [...digest.homelab, ...digest.global, ...digest.other],
+		[digest],
+	);
+	const sources = useMemo(
+		() => [...new Set(all.map((item) => item.source))].sort(),
+		[all],
+	);
+	const visible = useMemo(
+		() => filterNews(all, filters, fetchedAt),
+		[all, filters, fetchedAt],
+	);
+	function refresh() {
+		setStatus("loading");
+		setAttempt((value) => value + 1);
+	}
 	if (status === "loading") return <p role="status">{t.load}</p>;
 	if (status === "error")
 		return (
 			<div role="alert">
 				<p>{t.empty}</p>
-				<button
-					type="button"
-					onClick={() => {
-						const controller = new AbortController();
-						setStatus("loading");
-						void reload(controller.signal);
-					}}
-				>
+				<button type="button" onClick={refresh}>
 					{t.retry}
 				</button>
 			</div>
@@ -258,43 +267,44 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 	return (
 		<div className={styles.digest}>
 			<p className={styles.notice}>
-				{t.evidence} · {mode}
+				{t.evidence} · {mode} · {copy.refreshed}{" "}
+				{new Intl.DateTimeFormat(locale, {
+					dateStyle: "medium",
+					timeStyle: "short",
+				}).format(fetchedAt)}
 			</p>
-			<section aria-labelledby="ctid-homelab-heading">
-				<h3 id="ctid-homelab-heading">
-					{t.homelab} ({digest.homelab.length})
-				</h3>
-				<div className={styles.grid}>
-					{digest.homelab.map((item) => (
-						<CtidCard key={item.link} item={item} locale={locale} featured />
-					))}
-				</div>
-			</section>
-			<section aria-labelledby="ctid-global-heading">
-				<h3 id="ctid-global-heading">
-					{t.global} ({digest.global.length})
-				</h3>
-				<div className={styles.grid}>
-					{digest.global.map((item) => (
-						<CtidCard key={item.link} item={item} locale={locale} featured />
-					))}
-				</div>
-			</section>
-			<section aria-labelledby="ctid-other-heading">
-				<h3 id="ctid-other-heading">
-					{t.other} ({digest.other.length})
-				</h3>
-				<div className={styles.grid}>
-					{digest.other.map((item) => (
-						<CtidCard
-							key={item.link}
-							item={item}
-							locale={locale}
-							featured={false}
-						/>
-					))}
-				</div>
-			</section>
+			<CtidOverview
+				items={all}
+				now={fetchedAt}
+				locale={locale}
+				copy={copy}
+				onSelect={setFilters}
+			/>
+			<CtidFilters
+				locale={locale}
+				copy={copy}
+				filters={filters}
+				setFilters={setFilters}
+				sources={sources}
+			/>
+			<button type="button" className={styles.refresh} onClick={refresh}>
+				{copy.refresh}
+			</button>
+			<p role="status">
+				{visible.length} {copy.results}
+			</p>
+			{visible.length === 0 && <p>{t.empty}</p>}
+			<div className={styles.grid}>
+				{visible.map((item, index) => (
+					<CtidCard
+						key={item.link}
+						item={item}
+						locale={locale}
+						featured={index < 10}
+						copy={copy}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }
