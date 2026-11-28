@@ -46,7 +46,9 @@ export default async function SecurityPage({
 				<section className="resource-card" aria-labelledby="ctem-heading">
 					<h2 id="ctem-heading">{ctem("title")}</h2>
 					<p>{ctem("lead")}</p>
-					<a href={canonicalPagePath("security/ctem", locale)}>{ctem("discover")}</a>
+					<a href={canonicalPagePath("security/ctem", locale)}>
+						{ctem("discover")}
+					</a>
 				</section>
 				<SecurityCoreSections locale={locale} />
 				<SecurityVisualizations locale={locale} />

@@ -64,7 +64,7 @@ export const SITE_PAGES = {
 		category: "editorialShowcase",
 		seo: { priority: 0.78, changeFrequency: "monthly" },
 	},
-	ciso: {
+	"security/ciso": {
 		category: "editorialShowcase",
 		seo: { priority: 0.8, changeFrequency: "weekly" },
 	},
@@ -80,7 +80,7 @@ export const SITE_PAGES = {
 		category: "discoverability",
 		seo: { priority: 0.65, changeFrequency: "monthly" },
 	},
-	ctid: { category: "editorialShowcase" },
+	"security/ctid": { category: "editorialShowcase" },
 	freenas: { category: "editorialShowcase" },
 	pfsense: { category: "editorialShowcase" },
 	nabla: {

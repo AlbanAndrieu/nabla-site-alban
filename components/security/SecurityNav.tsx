@@ -4,9 +4,9 @@ import styles from "./SecurityNav.module.css";
 
 const links = [
 	["overview", "/security"],
-	["ciso", "/ciso"],
+	["ciso", "/security/ciso"],
 	["ctem", "/security/ctem"],
-	["ctid", "/ctid.html"],
+	["ctid", "/security/ctid"],
 	["compliance", "/security/compliance"],
 	["glossary", "/security/lexique"],
 	["dsomm", "/security/dsomm"],

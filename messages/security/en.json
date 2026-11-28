@@ -153,17 +153,13 @@
 				"badge": "Penetration Testing",
 				"title": "Pentest-Tools.com",
 				"description": "Online penetration testing and vulnerability scanning platform.",
-				"links": [
-					"Pentest-Tools.com App — network and web security testing"
-				]
+				"links": ["Pentest-Tools.com App — network and web security testing"]
 			},
 			"siem": {
 				"badge": "SIEM / Malware Detection",
 				"title": "SIEM / Malware Detection",
 				"description": "Security monitoring and malware detection resources.",
-				"links": [
-					"Wazuh — ClamAV malware detection logs"
-				]
+				"links": ["Wazuh — ClamAV malware detection logs"]
 			},
 			"devsecops": {
 				"badge": "DevSecOps",
@@ -200,9 +196,7 @@
 				"badge": "App & Infrastructure Security",
 				"title": "App & Infrastructure Security",
 				"description": "Best practices for securing applications and infrastructure platforms.",
-				"links": [
-					"TrueNAS — securing applications"
-				]
+				"links": ["TrueNAS — securing applications"]
 			},
 			"cloud": {
 				"badge": "Cloud Security",
@@ -854,7 +848,14 @@
 				"app": "Application security",
 				"threat": "Threats and incidents",
 				"other": "Other"
-			}
+			},
+			"source": "Source",
+			"recent": "Signals published in the past 24 hours (retrieved sources)",
+			"critical24h": "Critical · 24 h",
+			"high24h": "High · 24 h",
+			"api24h": "API / APIM · 24 h",
+			"identity24h": "Identity / Entra ID · 24 h",
+			"refresh": "Refresh intelligence"
 		}
 	},
 	"compliancePage": {

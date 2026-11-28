@@ -50,7 +50,11 @@ export default async function CompliancePage({ params }: Props) {
 				<SecurityNav locale={locale} active="compliance" />
 				<Container>
 					{groups.map((group) => (
-						<section key={group.id} className="resource-card" aria-labelledby={group.id}>
+						<section
+							key={group.id}
+							className="resource-card"
+							aria-labelledby={group.id}
+						>
 							<h2 id={group.id}>{group.title}</h2>
 							<ul className="resource-list">
 								{group.items.map((item) => (

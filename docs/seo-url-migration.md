@@ -17,8 +17,14 @@ complète de la migration reste dans Git.
   directement les URLs sans extension.
 
 Les slugs migrés incluent `expertise`, `contact`, `security`, `ai`,
-`ciso`, `truenas`, `link`, `email` et `nabla`. Les CV et autres pages
+`security/ciso`, `truenas`, `link`, `email` et `nabla`. Les CV et autres pages
 legacy non indexables suivent leur propre contrat tant qu'ils ne sont pas migrés.
+
+CISO et CTID sont regroupés sous `/security/ciso` et `/security/ctid`.
+Les anciennes URL extensionless et `.html`, y compris `/en` et `/fr`, redirigent
+en un seul saut permanent. CISO conserve son indexabilité ; CTID reste
+`noindex, nofollow` et hors sitemap. Les liens RSS existants sont conservés ;
+le GUID historique de l’article CISO dans le RSS statique reste stable.
 
 ## Invariants
 

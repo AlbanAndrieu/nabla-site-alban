@@ -4,9 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AppLocale } from "@/i18n/routing";
 import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
 import { type CtidItem, selectCtidDigest } from "@/lib/ctidDigest";
-import { type NewsFilters, filterNews, newsCategory } from "@/lib/ctidView";
-import CtidFilters, { type CtidCopy, initialFilters, signalLabels } from "./CtidFilters";
+import { filterNews, type NewsFilters, newsCategory } from "@/lib/ctidView";
+import CtidFilters, {
+	type CtidCopy,
+	initialFilters,
+	signalLabels,
+} from "./CtidFilters";
 import styles from "./CtidIntelligence.module.css";
+import CtidOverview from "./CtidOverview";
 
 type Language = AppLocale;
 
@@ -85,9 +90,6 @@ async function fetchNews(
 
 const titleLabels = {
 	fr: {
-		homelab: "Signaux concernant la stack Nabla",
-		global: "Cybermenaces et actualités mondiales",
-		other: "Autres vulnérabilités et actualités",
 		analysis: "Résumé",
 		details: "Plus de détails",
 		evidence:
@@ -101,9 +103,6 @@ const titleLabels = {
 		tech: "Technologies mentionnées",
 	},
 	en: {
-		homelab: "Signals relevant to the Nabla stack",
-		global: "Global cybersecurity intelligence",
-		other: "Other vulnerabilities and security news",
 		analysis: "Summary",
 		details: "More details",
 		evidence:
@@ -117,7 +116,6 @@ const titleLabels = {
 		tech: "Technologies mentioned",
 	},
 } as const;
-
 
 function CtidCard({
 	item,
@@ -201,9 +199,16 @@ function CtidCard({
 	);
 }
 
-export default function CtidIntelligence({ locale, copy }: { locale: Language; copy: CtidCopy }) {
+export default function CtidIntelligence({
+	locale,
+	copy,
+}: {
+	locale: Language;
+	copy: CtidCopy;
+}) {
 	const [filters, setFilters] = useState<NewsFilters>(initialFilters);
 	const [fetchedAt, setFetchedAt] = useState(0);
+	const [attempt, setAttempt] = useState(0);
 	const [items, setItems] = useState<FeedItem[]>([]);
 	const [mode, setMode] = useState("");
 	const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -231,22 +236,30 @@ export default function CtidIntelligence({ locale, copy }: { locale: Language; c
 			controller.abort();
 			window.clearTimeout(initial);
 		};
-	}, [reload]);
+	}, [reload, attempt]);
 	const digest = useMemo(() => selectCtidDigest(items), [items]);
-	const visible = useMemo(() => filterNews([...digest.homelab, ...digest.global, ...digest.other], filters, fetchedAt), [digest, filters, fetchedAt]);
+	const all = useMemo(
+		() => [...digest.homelab, ...digest.global, ...digest.other],
+		[digest],
+	);
+	const sources = useMemo(
+		() => [...new Set(all.map((item) => item.source))].sort(),
+		[all],
+	);
+	const visible = useMemo(
+		() => filterNews(all, filters, fetchedAt),
+		[all, filters, fetchedAt],
+	);
+	function refresh() {
+		setStatus("loading");
+		setAttempt((value) => value + 1);
+	}
 	if (status === "loading") return <p role="status">{t.load}</p>;
 	if (status === "error")
 		return (
 			<div role="alert">
 				<p>{t.empty}</p>
-				<button
-					type="button"
-					onClick={() => {
-						const controller = new AbortController();
-						setStatus("loading");
-						void reload(controller.signal);
-					}}
-				>
+				<button type="button" onClick={refresh}>
 					{t.retry}
 				</button>
 			</div>
@@ -255,14 +268,41 @@ export default function CtidIntelligence({ locale, copy }: { locale: Language; c
 		<div className={styles.digest}>
 			<p className={styles.notice}>
 				{t.evidence} · {mode} · {copy.refreshed}{" "}
-				{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(fetchedAt)}
+				{new Intl.DateTimeFormat(locale, {
+					dateStyle: "medium",
+					timeStyle: "short",
+				}).format(fetchedAt)}
 			</p>
-			<CtidFilters locale={locale} copy={copy} filters={filters} setFilters={setFilters} />
-			<p role="status">{visible.length} {copy.results}</p>
+			<CtidOverview
+				items={all}
+				now={fetchedAt}
+				locale={locale}
+				copy={copy}
+				onSelect={setFilters}
+			/>
+			<CtidFilters
+				locale={locale}
+				copy={copy}
+				filters={filters}
+				setFilters={setFilters}
+				sources={sources}
+			/>
+			<button type="button" className={styles.refresh} onClick={refresh}>
+				{copy.refresh}
+			</button>
+			<p role="status">
+				{visible.length} {copy.results}
+			</p>
 			{visible.length === 0 && <p>{t.empty}</p>}
 			<div className={styles.grid}>
 				{visible.map((item, index) => (
-					<CtidCard key={item.link} item={item} locale={locale} featured={index < 10} copy={copy} />
+					<CtidCard
+						key={item.link}
+						item={item}
+						locale={locale}
+						featured={index < 10}
+						copy={copy}
+					/>
 				))}
 			</div>
 		</div>

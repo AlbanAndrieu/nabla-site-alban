@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	return buildPageMetadata({
 		title: `${t("title")} — Alban Andrieu`,
 		description: t("subtitle"),
-		slug: "ciso",
+		slug: "security/ciso",
 		locale,
 	});
 }
@@ -56,7 +56,8 @@ export default async function CisoPage({ params }: Props) {
 						</h1>
 						<p className="hero-subtitle">{t("subtitle")}</p>
 						<p className="hero-description">
-							{t("curatedBy")} <a href={canonicalPagePath("contact", locale)}>Alban Andrieu</a>
+							{t("curatedBy")}{" "}
+							<a href={canonicalPagePath("contact", locale)}>Alban Andrieu</a>
 						</p>
 					</div>
 				</section>
@@ -165,7 +166,7 @@ export default async function CisoPage({ params }: Props) {
 						<p>
 							<a
 								className="resource-link"
-								href={locale === "fr" ? "/fr/ctid.html" : "/ctid.html"}
+								href={locale === "fr" ? "/fr/security/ctid" : "/security/ctid"}
 							>
 								{locale === "fr"
 									? "Veille priorisée — CTID"

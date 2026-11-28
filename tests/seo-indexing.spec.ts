@@ -23,7 +23,7 @@ const expectedSitemapUrls = [
 	`${canonicalOrigin}/security/yubikey`,
 	`${canonicalOrigin}/ai`,
 	`${canonicalOrigin}/architecture`,
-	`${canonicalOrigin}/ciso`,
+	`${canonicalOrigin}/security/ciso`,
 	`${canonicalOrigin}/truenas`,
 	`${canonicalOrigin}/link`,
 	`${canonicalOrigin}/email`,
@@ -39,7 +39,6 @@ const migratedSeoSlugs = [
 	"contact",
 	"security",
 	"ai",
-	"ciso",
 	"truenas",
 	"link",
 	"email",
@@ -52,6 +51,7 @@ const localizedSeoSlugs = [
 	"security/lexique",
 	"security/compliance",
 	"security/ctem",
+	"security/ciso",
 	"security/yubikey",
 	"architecture",
 	"cv",
@@ -59,7 +59,8 @@ const localizedSeoSlugs = [
 ] as const;
 
 const nonIndexablePages = [
-	"/ctid.html",
+	"/security/ctid",
+	"/fr/security/ctid",
 	"/freenas.html",
 	"/fr/pfsense",
 	"/workstation.html",
@@ -158,6 +159,20 @@ test.describe("SEO indexing policy", () => {
 			}
 		} finally {
 			await redirectRequest.dispose();
+		}
+	});
+
+	test("former CISO and CTID routes permanently redirect in one hop", async ({ request }) => {
+		for (const slug of ["ciso", "ctid"]) {
+			for (const prefix of ["", "/en", "/fr"]) {
+				for (const suffix of ["", ".html"]) {
+					const oldPath = `${prefix}/${slug}${suffix}`;
+					const destination = `${prefix === "/fr" ? "/fr" : ""}/security/${slug}`;
+					const response = await request.get(oldPath, { maxRedirects: 0 });
+					expect([301, 308], oldPath).toContain(response.status());
+					expect(response.headers().location).toBe(destination);
+				}
+			}
 		}
 	});
 

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { fetchFreshRssPublicArticles, fetchFreshRssPublicSelection } from "@/lib/server/freshRssPublic";
+import {
+	fetchFreshRssPublicArticles,
+	fetchFreshRssPublicSelection,
+} from "@/lib/server/freshRssPublic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

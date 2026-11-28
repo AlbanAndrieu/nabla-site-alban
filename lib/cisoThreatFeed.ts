@@ -1,7 +1,10 @@
 /** Name-only stack hints from nabla-compose catalog. NOT a runtime inventory or a vulnerability assessment. */
 const STACK_SIGNALS = [
 	{ name: "Azure API Management", terms: ["azure api management", "apim"] },
-	{ name: "Microsoft Entra ID", terms: ["entra id", "entra-id", "azure active directory", "azure ad"] },
+	{
+		name: "Microsoft Entra ID",
+		terms: ["entra id", "entra-id", "azure active directory", "azure ad"],
+	},
 	{ name: "Kubernetes", terms: ["kubernetes", "k8s"] },
 	{ name: "Talos", terms: ["talos linux", "talos os"] },
 	{ name: "Docker", terms: ["docker", "containerd"] },
@@ -149,15 +152,16 @@ export function rankArticles(input: FeedItem[]): RankedFeedItem[] {
 		seen.add(identity);
 		if (titleKey.length > 40) seen.add("title:" + titleKey);
 		const corpus = item.title + " " + (item.summary ?? "");
-		const technologies =
-			Array.from(new Set([
+		const technologies = Array.from(
+			new Set([
 				...(item.aiTechnologies ?? []),
 				...signals
-				.filter((signal) =>
-					signal.patterns.some((pattern) => pattern.test(corpus)),
-				)
-				.map((signal) => signal.name),
-			]));
+					.filter((signal) =>
+						signal.patterns.some((pattern) => pattern.test(corpus)),
+					)
+					.map((signal) => signal.name),
+			]),
+		);
 		const urgent = urgency.test(corpus);
 		ranked.push({
 			...item,
