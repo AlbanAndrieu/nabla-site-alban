@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
 	buildSupportOtelPayload,
+	recordSupportFeedback,
+	recordSupportTrace,
 	makeFeedbackToken,
 	newSupportTraceId,
 	SUPPORT_PROMPT,
@@ -109,5 +111,62 @@ test("feedback API rejects forged IDs without contacting Langfuse", async () => 
 		assert.equal(response.status, 403);
 	} finally {
 		if (old !== undefined) process.env.SUPPORT_CHAT_ENABLED = old;
+	}
+});
+
+test("Langfuse v4 OTLP and BOOLEAN scores have correct wire-format", async () => {
+	const saved = {
+		pk: process.env.SUPPORT_LANGFUSE_PUBLIC_KEY,
+		sk: process.env.SUPPORT_LANGFUSE_SECRET_KEY,
+		id: process.env.SUPPORT_CF_ACCESS_CLIENT_ID,
+		secret: process.env.SUPPORT_CF_ACCESS_CLIENT_SECRET,
+	};
+	const original = globalThis.fetch;
+	const requests: Array<{ url: string; headers: Headers; body: Record<string, unknown> }> = [];
+	process.env.SUPPORT_LANGFUSE_PUBLIC_KEY = "pk_test";
+	process.env.SUPPORT_LANGFUSE_SECRET_KEY = "sk_test";
+	process.env.SUPPORT_CF_ACCESS_CLIENT_ID = "test-service-id";
+	process.env.SUPPORT_CF_ACCESS_CLIENT_SECRET = "test-service-secret";
+	globalThis.fetch = async (input, init) => {
+		requests.push({
+			url: String(input),
+			headers: new Headers(init?.headers),
+			body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+		});
+		return Response.json({ accepted: true }, { status: 200 });
+	};
+	try {
+		const traceId = newSupportTraceId();
+		const traceOk = await recordSupportTrace({
+			traceId,
+			startedAt: 1_000,
+			completedAt: 2_000,
+			locale: "en",
+			messages: [{ role: "user", content: "Hi" }],
+			output: "Hello",
+			result: "complete",
+		});
+		assert.equal(traceOk, true);
+		assert.equal(requests[0].url, "https://langfuse.albandrieu.com/api/public/otel/v1/traces");
+		assert.equal(requests[0].headers.get("x-langfuse-ingestion-version"), "4");
+		assert.ok(requests[0].body.resourceSpans);
+		assert.equal(await recordSupportFeedback(traceId, true), true);
+		assert.equal(requests[1].url, "https://langfuse.albandrieu.com/api/public/scores");
+		assert.equal(requests[1].body.value, 1);
+		assert.equal(requests[1].body.dataType, "BOOLEAN");
+		assert.equal(requests[1].body.traceId, traceId);
+		assert.equal(await recordSupportFeedback(traceId, false), true);
+		assert.equal(requests[2].body.value, 0);
+	} finally {
+		globalThis.fetch = original;
+		for (const [key, value] of [
+			["SUPPORT_LANGFUSE_PUBLIC_KEY", saved.pk],
+			["SUPPORT_LANGFUSE_SECRET_KEY", saved.sk],
+			["SUPPORT_CF_ACCESS_CLIENT_ID", saved.id],
+			["SUPPORT_CF_ACCESS_CLIENT_SECRET", saved.secret],
+		] as const) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
 	}
 });
