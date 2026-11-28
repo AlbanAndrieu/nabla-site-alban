@@ -67,7 +67,7 @@ async function langfusePost(path: string, data: unknown): Promise<boolean> {
   try {
     const response = await fetch(LANGFUSE_ORIGIN + path, {
       method: "POST",
-      headers,
+      headers: path.includes("/otel/") ? { ...headers, "x-langfuse-ingestion-version": "4" } : headers,
       body: JSON.stringify(data),
       cache: "no-store",
       redirect: "error",
@@ -120,11 +120,14 @@ export function buildSupportOtelPayload(args: {
             attr("langfuse.trace.metadata.model", SUPPORT_MODEL),
             attr("langfuse.trace.metadata.locale", locale),
             attr("langfuse.observation.type", "span"),
+            attr("langfuse.observation.model.name", SUPPORT_MODEL),
+            attr("langfuse.observation.metadata.prompt", SUPPORT_PROMPT),
+            attr("langfuse.observation.metadata.skill", SUPPORT_SKILL),
             attr("langfuse.observation.input", JSON.stringify(messages)),
             attr("langfuse.observation.output", JSON.stringify(output)),
             attr("langfuse.observation.metadata.status", result),
             attr("langfuse.version", SUPPORT_PROMPT),
-            attr("langfuse.environment", "production"),
+            attr("langfuse.environment", process.env.VERCEL_ENV || "development"),
           ],
           status: { code: result === "complete" ? 1 : 2 },
         }],
@@ -143,7 +146,7 @@ export async function recordSupportFeedback(traceId: string, relevant: boolean):
     traceId,
     name: "support_relevance",
     dataType: "BOOLEAN",
-    value: relevant,
+    value: relevant ? 1 : 0,
     source: "API",
     comment: "Website visitor feedback; prompt=" + SUPPORT_PROMPT + "; skill=" + SUPPORT_SKILL,
   });
