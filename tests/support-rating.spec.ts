@@ -38,10 +38,12 @@ for (const [pathname, copy] of cases) {
 			await expect(page.getByRole("button", { name: copy.send })).toBeEnabled({ timeout: 1_000 });
 		}).toPass();
 		await question.press("Enter");
-		await expect(page.getByRole("link", { name: "Pricing" })).toHaveAttribute(
+		const chatLog = page.getByRole("list", { name: copy.logLabel });
+		await expect(chatLog.getByRole("link", { name: "Pricing" })).toHaveAttribute(
 			"href", "https://www.albanandrieu.com/fr/pricing",
 		);
-		await expect(page.getByRole("link", { name: "X" })).toHaveCount(0);
+		await expect(chatLog.getByRole("link", { name: "X" })).toHaveCount(0);
+		await expect(chatLog).toContainText("[X](https://evil.example)");
 		const thumbsUp = page.getByRole("button", { name: copy.ratingHelpful });
 		await expect(thumbsUp).toBeEnabled();
 		await thumbsUp.click();
