@@ -5,6 +5,7 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import {
 	HTML_ROUTE_SLUGS,
+	SECURITY_MOVED_SLUGS,
 	SEO_HTML_MIGRATION_SLUGS,
 } from "@/lib/htmlRoutes.config.mjs";
 
@@ -12,6 +13,7 @@ const intlMiddleware = createMiddleware(routing);
 const defaultLocalePrefix = `/${routing.defaultLocale}`;
 const knownTopLevelHtmlPaths = new Set([
 	...HTML_ROUTE_SLUGS.map((slug) => `/${slug}.html`),
+	...SECURITY_MOVED_SLUGS.map((slug) => `/${slug}.html`),
 	...SEO_HTML_MIGRATION_SLUGS.map((slug) => `/${slug}.html`),
 	"/index.html",
 	"/checkout.html",

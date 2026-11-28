@@ -3,13 +3,13 @@ import { expect, test } from "@playwright/test";
 // Liste des pages migrées à tester (ajoute/complète selon ton site)
 const pagesToTest = [
 	"/",
-	"/ctid",
+	"/security/ctid",
 	"/freenas",
 	"/pfsense",
 	"/truenas",
 	"/workstation",
 	"/test",
-	"/ciso",
+	"/security/ciso",
 	"/nabla",
 	"/login",
 	"/ai",

@@ -4,7 +4,7 @@
   <outline text="CERT-FR" title="CERT-FR" type="rss" xmlUrl="https://www.cert.ssi.gouv.fr/feed/" />
   <outline text="CERT/CC" title="CERT/CC" type="rss" xmlUrl="https://www.kb.cert.org/vulfeed/" />
   <outline text="Kubernetes" title="Kubernetes" type="rss" xmlUrl="https://kubernetes.io/feed.xml" />
-  <outline text="CNCF" title="CNCF" type="rss" xmlUrl="https://www.cncf.io/feed/" />
+  <outline text="Microsoft Security" title="Microsoft Security" type="rss" xmlUrl="https://www.microsoft.com/en-us/security/blog/feed/" />
   <outline text="OpenSSF" title="OpenSSF" type="rss" xmlUrl="https://openssf.org/feed/" />
   <outline text="Snyk" title="Snyk" type="rss" xmlUrl="https://snyk.io/blog/feed/" />
   <outline text="GitHub Security" title="GitHub Security" type="rss" xmlUrl="https://github.blog/tag/security/feed/" />

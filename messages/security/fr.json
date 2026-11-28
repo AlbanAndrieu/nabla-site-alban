@@ -815,5 +815,177 @@
 		"policy": "Les secrets, fichiers techniques, interfaces administratives et métriques ne sont pas publics par défaut. LiteLLM et Ollama sont réservés au LAN. Les scanners restent limités au périmètre autorisé.",
 		"evidenceTitle": "État des preuves",
 		"evidence": "Cette page décrit une architecture cible, pas une attestation de sécurité ni un déploiement confirmé. Les rapports absents, expirés ou incomplets ne prouvent jamais zéro vulnérabilité. Les findings détaillés restent privés."
+	},
+	"securityNav": {
+		"label": "Navigation sécurité",
+		"overview": "Vue générale",
+		"ciso": "CISO / RSSI",
+		"ctem": "CTEM",
+		"ctid": "Veille CTID",
+		"compliance": "Normes et conformité",
+		"glossary": "Lexique",
+		"dsomm": "DevSecOps",
+		"yubikey": "YubiKey"
+	},
+	"ctidView": {
+		"filters": {
+			"query": "Rechercher",
+			"category": "Catégorie",
+			"severity": "Criticité indicative",
+			"period": "Période",
+			"sort": "Trier par",
+			"all": "Toutes",
+			"risk": "Criticité",
+			"date": "Date",
+			"results": "résultat(s)",
+			"original": "Texte de la source originale (traduction non disponible).",
+			"refreshed": "Dernière récupération",
+			"reset": "Réinitialiser",
+			"categories": {
+				"api": "API / APIM",
+				"identity": "Identité / Entra ID",
+				"cloud": "Cloud et infrastructure",
+				"app": "Sécurité applicative",
+				"threat": "Menaces et incidents",
+				"other": "Autres"
+			},
+			"source": "Source",
+			"recent": "Signaux publiés sur les dernières 24 h (sources récupérées)",
+			"critical24h": "Critiques · 24 h",
+			"high24h": "Élevés · 24 h",
+			"api24h": "API / APIM · 24 h",
+			"identity24h": "Identité / Entra ID · 24 h",
+			"refresh": "Actualiser la veille"
+		}
+	},
+	"compliancePage": {
+		"title": "Normes et conformité",
+		"lead": "Référentiel de travail pour CISO, RSSI et DPO. Vérifier le périmètre applicable dans les sources officielles.",
+		"groups": [
+			{
+				"id": "regulation",
+				"title": "Réglementations européennes",
+				"items": [
+					{
+						"name": "DORA",
+						"url": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj",
+						"description": "Résilience opérationnelle numérique du secteur financier."
+					},
+					{
+						"name": "RGPD / GDPR",
+						"url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+						"description": "Protection des données à caractère personnel."
+					},
+					{
+						"name": "NIS2",
+						"url": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj",
+						"description": "Gestion du risque cyber et notification des incidents."
+					},
+					{
+						"name": "AI Act",
+						"url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+						"description": "Gouvernance des systèmes d’intelligence artificielle."
+					},
+					{
+						"name": "CRA",
+						"url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj",
+						"description": "Cybersécurité des produits comportant des éléments numériques."
+					}
+				]
+			},
+			{
+				"id": "iso",
+				"title": "Normes internationales",
+				"items": [
+					{
+						"name": "ISO/IEC 27001 · 27002 · 27005",
+						"url": "https://www.iso.org/isoiec-27001-information-security.html",
+						"description": "Management de la SSI, contrôles et gestion du risque."
+					},
+					{
+						"name": "ISO/IEC 27701 · 27017 · 27018",
+						"url": "https://www.iso.org/",
+						"description": "Vie privée, contrôles cloud et protection des données."
+					},
+					{
+						"name": "ISO 22301 · ISO/IEC 27035",
+						"url": "https://www.iso.org/",
+						"description": "Continuité d’activité et gestion des incidents."
+					},
+					{
+						"name": "ISO/IEC 42001 · 23894",
+						"url": "https://www.iso.org/",
+						"description": "Management de l’IA et gestion des risques IA."
+					}
+				]
+			},
+			{
+				"id": "framework",
+				"title": "Référentiels techniques et assurance",
+				"items": [
+					{
+						"name": "NIST CSF / AI RMF / SSDF",
+						"url": "https://www.nist.gov/cyberframework",
+						"description": "Gouvernance cyber, risques IA et développement sécurisé."
+					},
+					{
+						"name": "CIS Controls",
+						"url": "https://www.cisecurity.org/controls",
+						"description": "Mesures de sécurité prioritaires."
+					},
+					{
+						"name": "OWASP SAMM / ASVS",
+						"url": "https://owasp.org/",
+						"description": "Maturité et vérification de la sécurité applicative."
+					},
+					{
+						"name": "MITRE ATT&CK / ATLAS",
+						"url": "https://attack.mitre.org/",
+						"description": "Tactiques et techniques adverses."
+					},
+					{
+						"name": "PCI DSS",
+						"url": "https://www.pcisecuritystandards.org/",
+						"description": "Sécurité des données de paiement."
+					},
+					{
+						"name": "SOC 2",
+						"url": "https://www.aicpa-cima.com/",
+						"description": "Rapports d’assurance sur les contrôles."
+					}
+				]
+			},
+			{
+				"id": "authorities",
+				"title": "Autorités et supervision",
+				"items": [
+					{
+						"name": "CNIL / AIPD",
+						"url": "https://www.cnil.fr/",
+						"description": "Protection des données et analyses d’impact."
+					},
+					{
+						"name": "ANSSI / SecNumCloud",
+						"url": "https://cyber.gouv.fr/",
+						"description": "Sécurité des systèmes d’information et qualification."
+					},
+					{
+						"name": "ACPR",
+						"url": "https://acpr.banque-france.fr/",
+						"description": "Supervision bancaire et assurantielle en France."
+					},
+					{
+						"name": "PRA",
+						"url": "https://www.bankofengland.co.uk/prudential-regulation",
+						"description": "Supervision prudentielle britannique."
+					},
+					{
+						"name": "EIOPA",
+						"url": "https://www.eiopa.europa.eu/",
+						"description": "Supervision européenne des assurances et retraites professionnelles."
+					}
+				]
+			}
+		]
 	}
 }

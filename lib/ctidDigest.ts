@@ -26,19 +26,19 @@ const SERVICE_IDS: Record<string, string> = {
 export function editorialSeverity(article: RankedFeedItem): PrioritySignal {
 	const text = (article.title + " " + (article.summary ?? "")).toLowerCase();
 	if (
-		/\b(actively exploited|exploited in the wild|zero.day|cisa kev|critical rce)\b/.test(
+		/\b(actively exploited|exploited in the wild|zero.day|cisa kev|critical rce|critical vulnerability|vulnérabilité critique|exploitation active|activement exploitée?s?)\b/.test(
 			text,
 		)
 	)
 		return "critical";
 	if (
-		/\b(cve-\d{4}-\d{4,}|ransomware|remote code execution|critical vulnerability|supply.chain attack)\b/.test(
+		/\b(cve-\d{4}-\d{4,}|ransomware|remote code execution|supply.chain attack|vulnérabilité élevée|exécution de code à distance)\b/.test(
 			text,
 		)
 	)
 		return "high";
 	if (
-		/\b(vulnerability|patch|advisory|security update|exploit|incident|breach)\b/.test(
+		/\b(vulnerability|patch|advisory|security update|exploit|incident|breach|vulnérabilité|correctif|alerte)\b/.test(
 			text,
 		)
 	)

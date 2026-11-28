@@ -5,6 +5,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 import {
 	HTML_ROUTE_SLUGS,
+	SECURITY_ROUTE_REDIRECTS,
 	SEO_HTML_MIGRATION_SLUGS,
 } from "./lib/htmlRoutes.config.mjs";
 
@@ -107,6 +108,7 @@ const nextConfig = {
 	},
 	async redirects() {
 		return [
+			...SECURITY_ROUTE_REDIRECTS,
 			...seoHtmlRedirects,
 			...seoIndexRedirects,
 			...canonicalHtmlRedirects,

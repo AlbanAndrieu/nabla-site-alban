@@ -36,6 +36,7 @@ function localizedPath(locale: string, parts: string[]) {
 
 function parentLabel(segment: string, locale: string) {
 	const labels: Record<string, { en: string; fr: string }> = {
+		security: { en: "Security", fr: "Sécurité" },
 		cv: { en: "CV", fr: "CV" },
 		jm: { en: "Jus Mundi", fr: "Jus Mundi" },
 	};

@@ -45,10 +45,10 @@ export async function GET() {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
 <title>Nabla — sélection de veille cybersécurité</title>
-<link>https://albanandrieu.com/ctid</link>
+<link>https://www.albanandrieu.com/security/ctid</link>
 <description>Dix articles de veille sélectionnés, classés selon leur pertinence; aucune vulnérabilité confirmée.</description>
 <language>fr</language>
-<atom:link href="https://albanandrieu.com/security-feed.xml" rel="self" type="application/rss+xml"/>
+<atom:link href="https://www.albanandrieu.com/security-feed.xml" rel="self" type="application/rss+xml"/>
 <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${xmlItems}
 </channel></rss>`;

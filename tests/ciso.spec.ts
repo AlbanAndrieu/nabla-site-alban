@@ -5,12 +5,12 @@ import { expect, test } from "@playwright/test";
 test.describe("CISO Dashboard", () => {
 	const cases = [
 		{
-			pathname: "/ciso",
+			pathname: "/security/ciso",
 			heading: "CISO Dashboard",
 			status: "In progress",
 		},
 		{
-			pathname: "/fr/ciso",
+			pathname: "/fr/security/ciso",
 			heading: "Tableau de bord RSSI",
 			status: "En cours",
 		},
@@ -54,7 +54,7 @@ test("CISO feed correlates public headlines with stack hints, without declaring 
       }),
     });
   });
-  await page.goto("/fr/ciso");
+  await page.goto("/fr/security/ciso");
   await expect(page.locator(".ciso-feed-item")).toHaveCount(1);
   await expect(page.locator(".ciso-feed-tag")).toContainText(["Kubernetes"]);
   await expect(page.locator(".ciso-feed-disclaimer")).toContainText("non preuve");
@@ -66,8 +66,8 @@ test("CISO feed correlates public headlines with stack hints, without declaring 
 });
 
 
-test("CTID displays a priority digest with collapsible detail and service links", async ({ page }) => {
-	await page.route("**/api/ciso/threat-feed", async (route) => {
+test("CTID displays a filtered priority digest and service links", async ({ page }) => {
+	await page.route("**/api/ciso/threat-feed?view=ctid", async (route) => {
 		await route.fulfill({
 			status: 200,
 			contentType: "application/json",
@@ -76,25 +76,34 @@ test("CTID displays a priority digest with collapsible detail and service links"
 				items: Array.from({ length: 12 }, (_, index) => ({
 					title: index % 2 === 0 ? `PostgreSQL CVE-2026-${2000 + index}` : `Global threat research note ${index}`,
 					link: `https://example.org/advisory/${index}`,
-					source: "CERT",
+					source: index % 2 === 0 ? "CERT" : "News",
 					summary: `Article context for signal ${index}`,
+					pubDate: new Date().toISOString(),
 				})),
 			}),
 		});
 	});
-	await page.goto("/fr/ctid");
-	await expect(page.getByRole("heading", { name: /Signaux concernant la stack Nabla/ })).toBeVisible();
-	await expect(page.getByRole("heading", { name: /Cybermenaces et actualités mondiales/ })).toBeVisible();
-	await expect(page.getByRole("heading", { name: /Autres vulnérabilités et actualités/ })).toBeVisible();
+	await page.goto("/fr/security/ctid");
+	await expect(page.getByRole("searchbox", { name: "Rechercher" })).toBeVisible();
+	await expect(page.locator("article")).toHaveCount(12);
+	await page.getByRole("button", { name: /Élevés · 24 h/ }).click();
+	await expect(page.locator("article")).toHaveCount(6);
+	await page.getByRole("button", { name: "Réinitialiser" }).click();
+	await expect(page.locator("article")).toHaveCount(12);
+	await page.getByRole("combobox", { name: "Source" }).selectOption("CERT");
+	await expect(page.locator("article")).toHaveCount(6);
+	await page.getByRole("combobox", { name: "Source" }).selectOption("");
 	await expect(page.locator("article")).toHaveCount(12);
 	await expect(page.getByRole("link", { name: /S'abonner au RSS sécurité/ })).toHaveAttribute("href", "/security-feed.xml");
+	await page.getByRole("searchbox", { name: "Rechercher" }).fill("PostgreSQL");
+	await expect(page.locator("article")).toHaveCount(6);
 	await page.locator("article details").first().locator("summary").click();
 	await expect(page.getByRole("link", { name: /Voir le service dans TrueNAS/ }).first()).toHaveAttribute("href", "/fr/truenas#homelab-service-postgresql");
 });
 
 test("CISO shows DORA scope disclaimer and CTID navigation", async ({ page }) => {
-	await page.goto("/fr/ciso");
+	await page.goto("/fr/security/ciso");
 	await expect(page.getByRole("heading", { name: /DORA/ })).toBeVisible();
-	await expect(page.getByRole("link", { name: /Dix signaux prioritaires/ })).toHaveAttribute("href", "/fr/ctid");
+	await expect(page.getByRole("link", { name: /Veille priorisée/ })).toHaveAttribute("href", "/fr/security/ctid");
 	await expect(page.getByRole("link", { name: "Flux RSS sécurité" })).toHaveAttribute("href", "/security-feed.xml");
 });

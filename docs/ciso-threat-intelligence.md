@@ -2,7 +2,7 @@
 
 ## Périmètre
 
-La PR #220 ajoute des cartes RSS accessibles, la recherche, le filtrage par technologie, le tri, les aperçus et la provenance des flux sur `/fr/ciso` et `/ciso`. **Une mention textuelle d'une technologie ou d'un CVE ne prouve ni une exposition ni une vulnérabilité** ; le rapprochement n'est pas un scanner et ne connaît pas les versions.
+La PR #220 ajoute des cartes RSS accessibles, la recherche, le filtrage par technologie, le tri, les aperçus et la provenance des flux sur `/fr/security/ciso` et `/security/ciso`. **Une mention textuelle d'une technologie ou d'un CVE ne prouve ni une exposition ni une vulnérabilité** ; le rapprochement n'est pas un scanner et ne connaît pas les versions.
 
 Les tags dans `lib/cisoThreatFeed.ts` sont un sous-ensemble **public et volontairement limité** des technologies du catalogue `nabla-compose/catalog/services.json` ; aucune IP, version ou adresse interne n'est exportée. Certains services du catalogue sont `planned` : aucune déclaration de déploiement réel n'est déduite de leur présence.
 
@@ -54,7 +54,7 @@ Les pages CISO et CTID sont déjà servies par **Next.js App Router** ; la page 
 
 La liste allowlistée des sources est dans `public/ciso-security-sources.json`, exportable en `public/security-sources.opml`, avec : CISA, CERT-FR, CERT/CC, Kubernetes, CNCF, OpenSSF, Snyk, GitHub Security, Unit42 et Google Project Zero. Vérifier la disponibilité réelle des URL et leur fréquence de mise à jour après import.
 
-- **Ancien flux** `/feed.xml` inchangé (actualités du site).
+- **Ancien flux** `/feed.xml` conservé (actualités du site, lien CTID canonique migré ; GUID inchangé).
 - **Nouveau flux** `/security-feed.xml` : jusqu'aux 10 articles les mieux classés des abonnements publics du compte dédié ; RSS2 XML, publication dynamique et cache de 10 minutes. Retourne **503** en l'absence de source validée (ne génère aucun article fictif).
 - La liste de secours du CTID essaie ces dix sources via rss2json côté navigateur si l'API privée FreshRSS n'est pas opérationnelle. Elle ne remplace ni la confidentialité ni la fiabilité de FreshRSS.
 
@@ -101,3 +101,15 @@ Le service Next.js continue de récupérer directement depuis le compte techniqu
 - Le classement IA propose des technologies en fonction des tags publics du catalogue et du modèle privé TrueNAS. Il ne prouve ni version installée, ni exposition réelle, ni vulnérabilité; ne pas mélanger ses étiquettes avec les constatations des sondes.
 - L'appel supplémentaire FastAPI est limité à 2,5 s et à 40 Kio, toujours HTTPS fixe, sans transfert du secret FreshRSS et sans redirection. Démarrage **désactivé par défaut** jusqu'à recette FreshRSS/Langfuse/LiteLLM/Redis et à l'activation du relais côté TrueNAS et Cloud.
 - Commandes : `node --import tsx --test unit-tests/rssRelevancePublic.test.ts`, `npm run typecheck`, `npm run test:unit`; puis tester les modes `ai-filtered`, `freshrss` et fallback en preview Vercel. Voir le runbook `fastapi-sample/docs/runbooks/freshrss-ai-publication.md`.
+
+## Portail sécurité et CTID — 28 novembre 2026
+
+- Routes canoniques : `/security/ciso` et `/security/ctid` (préfixe `/fr` en français). Les anciennes variantes clean, `.html` et `/en` redirigent en un seul saut. CTID reste non indexable.
+- CTID utilise `GET /api/ciso/threat-feed?view=ctid` : **tous** les articles FreshRSS publics autorisés (au plus 100), indépendamment de la sélection IA destinée à CISO. Le classement éditorial et la recherche s'appliquent au lot réellement reçu, sans quota stack/global qui pourrait masquer un signal critique. Les compteurs des dernières 24 h sont des nombres observés dans ce lot (ils ne sont pas exhaustifs).
+- Les filtres (période, catégorie, criticité, source, recherche, tri) continuent à fonctionner sans IA. Le bouton d'actualisation relit l'API ; un cache CDN peut encore servir une réponse pendant son TTL.
+
+### Contrat cible de traduction française — à implémenter côté FastAPI
+
+Conserver `/api/site/rss/v1` compatible et séparer le futur enrichissement bilingue de la sélection de pertinence. FastAPI/TrueNAS ne transmettra au service LiteLLM que les titres et extraits **déjà autorisés à la publication**. Le prompt Langfuse devra traduire sans ajouter de CVE, de score, d'impact, de lien ou de recommandation non présent dans la source ; l'entrée RSS est une donnée non fiable, jamais une instruction. Sortie JSON validée, langue explicite, texte brut borné (titre 240 caractères, résumé 600), identifiants d'article SHA-256 et version du prompt, sans données des comptes privés. Mettre en cache hors requête utilisateur par identifiant, empreinte du texte original, langue et version du prompt ; aucune traduction synchrone par visiteur.
+
+Le futur endpoint versionné exposera uniquement ce lot traduit, avec horodatage et provenance. Next.js fera une jointure sur `rssId` **et** sur l'empreinte du texte original ; aucun article supplémentaire, URL provenant du modèle ou HTML généré ne sera publié. Une traduction manquante, périmée ou invalide conserve l'original signalé comme tel. Une traduction ne modifie ni la criticité, ni le classement, ni les dates et liens sources. La page anglaise conserve la source originale. Tests de confidentialité, refus des identifiants non appariés, textes malformés, cache, indisponibilité et revue de traductions APIM/Entra ID sont requis avant activation. Ce contrat documente une cible et non une traduction déjà opérationnelle.

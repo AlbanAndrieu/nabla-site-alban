@@ -55,5 +55,8 @@ test("all security resource anchors are owned by React", () => {
 
 	assert.match(sectionSource, /RESOURCE_SECTIONS\.map/);
 	assert.match(sectionSource, /id="hero"/);
-	assert.match(sectionSource, /security-standards-compliance/);
+	assert.match(
+		sectionSource,
+		/canonicalPagePath\("security\/compliance", locale\)/,
+	);
 });
