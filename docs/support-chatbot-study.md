@@ -140,3 +140,104 @@ Parcours navigateur réel (Chromium et WebKit) : réponse en flux, aucun marqueu
 `[n]`, 4/4. La modification du modèle OpenWebUI n'a pas été appliquée par l'agent
 (refusée par le garde-fou d'exécution) ; une sauvegarde du modèle est conservée
 hors Git dans `~/w/nabla-ops/nabla-site-alban/`.
+
+## Contrôles de budget, quotas, arrêt et traçabilité (28/11/2026)
+
+**CODED dans nabla-site-alban PR #341 et nabla-compose PR #455 ; NOT DEPLOYED /
+NOT VERIFIED en production à cette date.** La page support fonctionne
+actuellement, mais son fonctionnement antérieur ne prouve pas l'activation
+des nouveaux contrôles.
+
+### Budget LiteLLM
+
+Le compte OpenWebUI qui porte le bot est
+`site-support@albanandrieu.com`. La clé virtuelle
+`openwebui` est partagée avec d'autres utilisateurs et dispose déjà d'un
+budget maximal de **10 USD / 30 jours**. Le nouveau contrôle séparé s'appuie
+sur l'en-tête `X-OpenWebUI-User-Email`, interprété par LiteLLM comme
+`customer` ; le client `site-support` reçoit un plafond de **3 USD /
+30 jours**, sans enlever le plafond général de la clé.
+
+Sur TrueNAS, vérifier la DB LiteLLM active, la version de son API customer,
+l'identité effective transmise par OpenWebUI, puis exécuter :
+
+```bash
+python3 scripts/truenas/reconcile-site-support-budget.py --check
+sudo python3 scripts/truenas/reconcile-site-support-budget.py --apply
+sudo python3 scripts/truenas/reconcile-site-support-budget.py
+```
+
+La commande ne doit pas créer de second compte à la place du compte existant,
+ni modifier un budget non conforme : elle s'arrête pour contrôle. **Un plafond
+en configuration n'est pas la preuve que les dépenses sont réellement bloquées.**
+Exécuter un appel contrôlé sous l'identité `site-support` et confirmer
+son attribution dans la table de dépenses (et son comportement une fois un
+plafond de test atteint) avant de déclarer l'application du budget.
+
+### Quota IP et kill switch
+
+Dans `nabla-compose/terraform/vercel-waf/alban.tf` : **une règle
+Hobby** pour la route `/api/support-chat` des domaines publics du site,
+avec **6 questions sur 300 secondes par IP**, fenêtre fixe, dépassement refusé.
+Le formulaire de contact humain `/api/support-contact` reste accessible.
+
+- Kill switch Vercel : appliquer la valeur
+  `alban_support_kill_switch=true` sur la même règle WAF, qui
+  devient un **deny** immédiat des questions sans toucher à la messagerie ;
+  réappliquer `false` pour rétablir les quotas.
+- Kill switch applicatif : configurer `SUPPORT_CHAT_ENABLED=false`
+  pour les fonctions Vercel et redéployer. La page affiche alors un message
+  explicite et laisse la conversation humaine disponible.
+- La première activation du WAF exige d'abord d'inspecter l'état OpenTofu
+  Garage, puis `plan`, puis `apply`, sans double import.
+
+### Langfuse v4 et pertinence
+
+Ajouter dans **Vercel Production** les secrets serveur
+`SUPPORT_LANGFUSE_PUBLIC_KEY` et
+`SUPPORT_LANGFUSE_SECRET_KEY` du projet Langfuse autorisé pour le
+support, idéalement avec `SUPPORT_FEEDBACK_SIGNING_KEY` distinct.
+Ne jamais utiliser `NEXT_PUBLIC_` pour ces clés. Le jeton Cloudflare
+Access déjà en place pour OpenWebUI est autorisé vers Langfuse après
+application de `terraform/cloudflare/access-routes.tofu`.
+
+Pour chaque réponse aboutie, le serveur envoie **un span OTLP v4**
+(`POST /api/public/otel/v1/traces`) avec identifiant W3C,
+question(s) et réponse, version de prompt `site-support-v2`,
+skill/FAQ `site-faq-v1` et modèle. Le widget associe le même
+identifiant de trace au vote 👍/👎 ; la route
+`/api/support-feedback` enregistre un score
+`support_relevance` (BOOLEAN = 1/0) via l'API Langfuse.
+Le jeton de vote est signé, expire après 24 h et n'expose aucun secret au navigateur.
+L'import de la FAQ et du prompt dans OpenWebUI n'est **pas** automatique
+lorsqu'une PR fusionne : appliquer `reconcile-site-support.py` et
+confirmer que son modèle utilise réellement les versions annoncées.
+
+**Limite de corrélation** : le span de l'application et le score partagent
+leur trace W3C. La génération interne LiteLLM/OpenWebUI peut encore apparaître
+dans une autre trace Langfuse ; une propagation W3C de bout en bout doit être
+vérifiée avant de prétendre disposer d'une seule arborescence.
+
+### Citations
+
+Le prompt de support demande une citation Markdown vers une page publique
+vérifiable. Les fichiers `support/knowledge/site-faq.fr.md` et
+`site-faq.en.md` listent les URL de référence. Le widget transforme
+uniquement les liens HTTPS autorisés en ancres cliquables et n'exécute jamais
+le HTML généré. Les marqueurs RAG nus de type `[1]` sont supprimés
+car ils ne correspondent pas seuls à une URL.
+Le comportement des liens doit être vérifié lors d'une vraie réponse du modèle ;
+la présence d'un prompt n'est pas une garantie de citation.
+
+### Tests de recette
+
+1. Activer les variables Langfuse et la nouvelle configuration OpenWebUI.
+2. En FR et en EN : poser une question et vérifier une citation cliquable.
+3. Noter une réponse et vérifier dans Langfuse le score et le span du même
+   `traceId`, les tags/version du prompt et du skill.
+4. Sur une IP de test : envoyer sept requêtes en moins de cinq minutes, confirmer
+   le refus WAF de la septième (ne pas tester à travers un NAT partagé).
+5. Activer le kill switch : aucune inférence ne doit partir ; le contact
+   humain continue de fonctionner. Tester le retour arrière.
+6. Revoir la politique de rétention des questions et réponses dans Langfuse et
+   l'information de confidentialité avant d'activer la télémétrie en production.

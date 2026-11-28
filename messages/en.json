@@ -1287,7 +1287,7 @@
 		},
 		"title": "Support",
 		"intro": "Ask a question about services, pricing, Stripe payment, contact options or the homelab and security pages. The assistant answers from the site's public content; for anything else, write to a human.",
-		"privacy": "Privacy: messages are processed on the site owner's self-hosted server and are not kept by this site. Do not share personal data, passwords or payment details.",
+		"privacy": "Privacy: messages go through the self-hosted server. When Langfuse telemetry is enabled, questions and replies are also recorded there to evaluate support quality. Do not share sensitive personal data, passwords or payment details.",
 		"chat": {
 			"logLabel": "Conversation with the support assistant",
 			"empty": "No messages yet. Ask your first question below.",
