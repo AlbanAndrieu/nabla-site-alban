@@ -74,7 +74,7 @@ Page : `/fr/payment`.
 
 ## Factures, TVA, bons de commande
 
-Écrire à invoice@albanandrieu.com pour toute question de facturation, de
+Écrire à invoice@albandrieu.com pour toute question de facturation, de
 paiement, de TVA ou de bon de commande. Ne pas envoyer les factures aux adresses
 job ou contact.
 
@@ -84,7 +84,7 @@ Pages : `/fr/contact` et `/fr/email`.
 
 - Missions et travail : job@albandrieu.com.
 - Sécurité du site (signalement de vulnérabilité) : security@albandrieu.com.
-- Factures : invoice@albanandrieu.com.
+- Factures : invoice@albandrieu.com.
 - Autres sujets : contact@albandrieu.com.
 - Rendez-vous de 30 minutes : <https://calendly.com/alban-andrieu>.
 - Brief de projet : formulaire de la page `/fr/startup`.
