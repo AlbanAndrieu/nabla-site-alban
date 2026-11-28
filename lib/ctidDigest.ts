@@ -11,17 +11,16 @@ export type CtidItem = RankedFeedItem & {
 };
 
 const SERVICE_IDS: Record<string, string> = {
-	pfSense: "pfsense",
-	TrueNAS: "truenas",
-	PostgreSQL: "postgresql",
-	Grafana: "grafana",
-	Prometheus: "prometheus",
-	LiteLLM: "litellm",
-	Ollama: "ollama",
-	Langfuse: "langfuse",
-	Vaultwarden: "vaultwarden",
-	FreshRSS: "freshrss",
-	ClickHouse: "clickhouse",
+	truenas: "truenas",
+	postgresql: "postgresql",
+	grafana: "grafana",
+	prometheus: "prometheus",
+	litellm: "litellm",
+	ollama: "ollama",
+	langfuse: "langfuse",
+	vaultwarden: "vaultwarden",
+	freshrss: "freshrss",
+	clickhouse: "clickhouse",
 };
 
 export function editorialSeverity(article: RankedFeedItem): PrioritySignal {
@@ -65,7 +64,9 @@ export function selectCtidDigest(feed: FeedItem[]): {
 		serviceIds: Array.from(
 			new Set(
 				article.technologies.flatMap((name) =>
-					SERVICE_IDS[name] ? [SERVICE_IDS[name]] : [],
+					SERVICE_IDS[name.toLowerCase()]
+						? [SERVICE_IDS[name.toLowerCase()]]
+						: [],
 				),
 			),
 		),
