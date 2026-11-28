@@ -43,7 +43,8 @@ Rien n'est `DEPLOYED` ni `ACCEPTED` : la fusion et le déploiement Vercel appart
 | Item | État | Preuve |
 | --- | --- | --- |
 | Chatbot testé en réel (OpenWebUI LAN, `site-support`) ; délai 15 s, langue, marqueurs `[n]` | CODED, TESTED (L1 + navigateur réel 4/4) | `supportChat*.test.ts`, test live Chromium/WebKit |
-| Chatbot : connaissance en mode « document entier » dans OpenWebUI | BLOCKED (garde-fou d'exécution) | à faire par le propriétaire |
+| Chatbot : connaissance en mode « document entier » dans OpenWebUI | DEPLOYED par le propriétaire, vérifié par API | 6 questions de référence justes, 1,2–2,5 s |
+| A5 : table `stripe_webhook_events` créée dans Supabase | DEPLOYED (28/11) | RLS actif, `anon` refusé (401) ; variables Vercel `SUPABASE_*` absentes |
 | A5 : registre Stripe sur Supabase (REST, RLS), Neon retiré | CODED, TESTED (L1) | `stripeEventLedger` 6 tests, `stripe-webhook` |
 
 ## Questions parquées
