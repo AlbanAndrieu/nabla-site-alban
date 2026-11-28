@@ -67,11 +67,20 @@ test("catalog routes and OWNER UI share the diagnostic contract", async () => {
 		),
 		"utf8",
 	);
+	const unavailable = readFileSync(
+		new URL(
+			"../app/components/homelab/HomelabCatalogUnavailable.tsx",
+			import.meta.url,
+		),
+		"utf8",
+	);
 	assert.match(canonical, /catalogUnavailableResponse\(/);
+	// SERVICE never receives the support reference: the block strips it.
 	assert.match(
 		component,
-		/!readOnly && state\.error && state\.catalogIncident/,
+		/incident=\{readOnly \? null : state\.catalogIncident\}/,
 	);
+	assert.match(unavailable, /\{error && incident && \(/);
 });
 
 test("Architecture and TrueNAS share failure reasons, while only OWNER may receive incident details", async () => {

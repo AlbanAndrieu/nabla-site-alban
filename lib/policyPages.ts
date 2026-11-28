@@ -3,7 +3,7 @@ export type PolicyPageDefinition = Readonly<{
 	siteName: string;
 }>;
 
-export const POLICY_PAGES = {
+const POLICY_PAGES = {
 	accessibility_statement: {
 		canonicalPath: "/policy/accessibility_statement",
 		siteName: "Alban Andrieu",

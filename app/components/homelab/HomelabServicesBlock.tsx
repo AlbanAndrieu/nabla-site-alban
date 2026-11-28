@@ -2,22 +2,20 @@
 
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { catalogEntitySlug } from "@/lib/homelabCatalogV2Names";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { HomelabEnvironmentFilter } from "@/lib/homelabEnvironments";
 import { indexOwnerNavigation } from "@/lib/homelabOwnerServiceNavigation";
 import {
 	RESOURCE_SNAPSHOT_KEY,
 	type ResourceSnapshot,
-	snapshotAgeState,
 } from "@/lib/homelabResourceEvidence";
-import { homelabServiceId } from "@/lib/homelabServices";
 import type { ServicePresentationGroup } from "@/lib/servicePresentation";
 import type { ServiceTopology } from "@/lib/serviceTopology";
 import CriticalDependencyHierarchy, {
 	CRITICAL_DEPENDENCY_HIERARCHY_ID,
 } from "./CriticalDependencyHierarchy";
 import { buildDeclaredServiceTopology } from "./declaredServiceTopology";
+import HomelabCatalogUnavailable from "./HomelabCatalogUnavailable";
 import HomelabObservationCoverage from "./HomelabObservationCoverage";
 import HomelabProbeDiagnostics from "./HomelabProbeDiagnostics";
 import HomelabResourceSnapshotImport from "./HomelabResourceSnapshotImport";
@@ -34,6 +32,11 @@ import {
 	GROUP_TITLE_KEY,
 	METRICS_PROFILE_KEY,
 } from "./homelabServiceHierarchy";
+import {
+	useGraphNearViewport,
+	useResourceStale,
+	useServiceDeepLink,
+} from "./homelabServicesBlockEffects";
 import {
 	countHealthStates,
 	effectiveState,
@@ -67,40 +70,10 @@ export default function HomelabServicesBlock({
 	const [criticalityOpen, setCriticalityOpen] = useState(false);
 	const [resourceSnapshot, setResourceSnapshot] =
 		useState<ResourceSnapshot | null>(null);
-	// A single clock feeds all service groups. Hidden tabs do not tick until
-	// visible again, and stale/foreign-revision resources are never "fresh".
-	const [resourceClock, setResourceClock] = useState<number | null>(null);
-	useEffect(() => {
-		if (!resourceSnapshot || readOnly || state.ownerBoundary) return;
-		let interval: number | null = null;
-		const refresh = () => {
-			if (!document.hidden) setResourceClock(Date.now());
-		};
-		const syncVisibility = () => {
-			if (document.hidden) {
-				if (interval !== null) window.clearInterval(interval);
-				interval = null;
-				return;
-			}
-			refresh();
-			if (interval === null) interval = window.setInterval(refresh, 60_000);
-		};
-		const initial = window.setTimeout(syncVisibility, 0);
-		document.addEventListener("visibilitychange", syncVisibility);
-		return () => {
-			window.clearTimeout(initial);
-			if (interval !== null) window.clearInterval(interval);
-			document.removeEventListener("visibilitychange", syncVisibility);
-		};
-	}, [resourceSnapshot, readOnly, state.ownerBoundary]);
-	const resourceStale = Boolean(
-		resourceSnapshot &&
-			(resourceClock === null ||
-				snapshotAgeState(
-					resourceSnapshot,
-					resourceClock,
-					state.catalog?.catalogRevision,
-				) !== "fresh"),
+	const resourceStale = useResourceStale(
+		resourceSnapshot,
+		!readOnly && !state.ownerBoundary,
+		state.catalog?.catalogRevision,
 	);
 
 	// SERVICE admission must not preserve an earlier OWNER resource snapshot
@@ -120,7 +93,6 @@ export default function HomelabServicesBlock({
 			cancelled = true;
 		};
 	}, [readOnly]);
-	const handledAnchor = useRef<string | null>(null);
 
 	// If FastAPI provides cards but no matching relation graph, still show the
 	// declared services. Never invent relations or assert dependency health.
@@ -128,29 +100,7 @@ export default function HomelabServicesBlock({
 		if (!state.catalog) return null;
 		return state.topology ?? buildDeclaredServiceTopology(state.catalog);
 	}, [state.catalog, state.topology]);
-	// Service cards render first; the expensive ReactFlow bundle mounts near viewport.
-	const [graphInView, setGraphInView] = useState(false);
-	const graphRef = useRef<HTMLElement | null>(null);
-	useEffect(() => {
-		if (!graphTopology || graphInView) return;
-		const target = graphRef.current;
-		if (!target) return;
-		if (typeof IntersectionObserver === "undefined") {
-			const timer = window.setTimeout(() => setGraphInView(true), 0);
-			return () => window.clearTimeout(timer);
-		}
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					setGraphInView(true);
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: "360px" },
-		);
-		observer.observe(target);
-		return () => observer.disconnect();
-	}, [graphTopology, graphInView]);
+	const [graphRef, graphInView] = useGraphNearViewport(Boolean(graphTopology));
 
 	const ownerNavigationIndex = useMemo(
 		() =>
@@ -219,37 +169,11 @@ export default function HomelabServicesBlock({
 		0,
 	);
 
-	// Cards mount asynchronously only after owner access. The browser's initial
-	// fragment jump happens before that mount, so restore historical deep links.
-	useEffect(() => {
-		if (!state.catalog) return;
-		const hash = window.location.hash;
-		const match = /^#(?:homelab-)?service-([a-z0-9-]+)$/.exec(hash);
-		if (!match || handledAnchor.current === hash) return;
-		const serviceId = match[1];
-		const group = hierarchyGroups.find((item) =>
-			item.catalog.services.some(
-				(service) => catalogEntitySlug(homelabServiceId(service)) === serviceId,
-			),
-		);
-		if (!group) return;
-		handledAnchor.current = hash;
-		let secondFrame = 0;
-		const firstFrame = window.requestAnimationFrame(() => {
-			setExpandedGroups((current) =>
-				current.has(group.group) ? current : new Set([...current, group.group]),
-			);
-			secondFrame = window.requestAnimationFrame(() => {
-				document
-					.getElementById(hash.slice(1))
-					?.scrollIntoView({ block: "center" });
-			});
-		});
-		return () => {
-			window.cancelAnimationFrame(firstFrame);
-			window.cancelAnimationFrame(secondFrame);
-		};
-	}, [state.catalog, hierarchyGroups]);
+	useServiceDeepLink(
+		Boolean(state.catalog),
+		hierarchyGroups,
+		setExpandedGroups,
+	);
 
 	const setGroupExpanded = (group: ServicePresentationGroup, open: boolean) => {
 		setExpandedGroups((current) => {
@@ -270,37 +194,12 @@ export default function HomelabServicesBlock({
 	};
 
 	if (!state.catalog) {
-		const catalogError = state.catalogFailure;
 		return (
-			<div
-				className="text-center py-4"
-				role={state.error ? "alert" : "status"}
-				data-homelab-inventory-unavailable={state.error ? true : undefined}
-			>
-				{!state.error
-					? t("loading")
-					: catalogError === "access-denied"
-						? french
-							? "Clé de diagnostic refusée par FastAPI : le catalogue Backstage v2 reste privé."
-							: "FastAPI rejected the diagnostics key: the Backstage v2 catalog remains private."
-						: catalogError === "key-missing"
-							? french
-								? "Clé serveur manquante : catalogue Backstage v2 indisponible."
-								: "Missing server key: Backstage v2 catalog unavailable."
-							: t("unavailable")}
-				{!readOnly && state.error && state.catalogIncident && (
-					<p
-						className="small text-muted mt-2"
-						data-catalog-failure-stage={state.catalogIncident.stage}
-					>
-						{french ? "Phase du diagnostic" : "Diagnostic stage"}:{" "}
-						<code>{state.catalogIncident.stage}</code>
-						{" · "}
-						{french ? "Référence support" : "Support reference"}:{" "}
-						<code>{state.catalogIncident.requestId}</code>
-					</p>
-				)}
-			</div>
+			<HomelabCatalogUnavailable
+				error={state.error}
+				failure={state.catalogFailure}
+				incident={readOnly ? null : state.catalogIncident}
+			/>
 		);
 	}
 

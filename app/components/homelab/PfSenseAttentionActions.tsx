@@ -19,7 +19,7 @@ type Props = {
 	onInspectEvidence?: () => void;
 };
 
-export function pfsenseNeedsAttention(
+function pfsenseNeedsAttention(
 	component: OperationalComponentEvidence | undefined,
 	focus: TroubleshootingFocus,
 ): boolean {

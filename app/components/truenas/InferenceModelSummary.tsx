@@ -17,16 +17,24 @@ type TableLabels = {
 };
 
 function ModelTable({
+	title,
 	rows,
 	uses,
 	labels,
 }: {
+	title: string;
 	rows: ReadonlyArray<InferenceModelRow>;
 	uses: string[];
 	labels: TableLabels;
 }) {
 	return (
-		<div className="table-responsive">
+		// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
+		<div
+			className="table-responsive"
+			role="region"
+			aria-label={title}
+			tabIndex={0}
+		>
 			<table className="table table-sm align-middle mb-0">
 				<thead>
 					<tr>
@@ -84,10 +92,20 @@ export default async function InferenceModelSummary() {
 				<p className="small text-muted">{t("lead")}</p>
 
 				<h6 className="small fw-bold mt-3">{t("gpuTierTitle")}</h6>
-				<ModelTable rows={GPU_MODELS} uses={gpuUses} labels={labels} />
+				<ModelTable
+					title={t("gpuTierTitle")}
+					rows={GPU_MODELS}
+					uses={gpuUses}
+					labels={labels}
+				/>
 
 				<h6 className="small fw-bold mt-4">{t("ramTierTitle")}</h6>
-				<ModelTable rows={RAM_MODELS} uses={ramUses} labels={labels} />
+				<ModelTable
+					title={t("ramTierTitle")}
+					rows={RAM_MODELS}
+					uses={ramUses}
+					labels={labels}
+				/>
 
 				<p className="small mt-3 mb-1">
 					<a

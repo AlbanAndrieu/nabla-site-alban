@@ -96,10 +96,7 @@ export function visibleNodeIds(
 		: PATH_NODE_IDS[mode];
 }
 
-export function domainCopy(
-	domain: FailureDomain,
-	french: boolean,
-): [string, string] {
+function domainCopy(domain: FailureDomain, french: boolean): [string, string] {
 	const en: Record<FailureDomain, [string, string]> = {
 		external: [
 			"1 · External / WAN",

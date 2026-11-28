@@ -167,7 +167,13 @@ export default function DsommAssessmentHeatmap({
 							<dd>{data.notApplicable}</dd>
 						</div>
 					</dl>
-					<div className={styles.tableScroll}>
+					{/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable */}
+					<div
+						className={styles.tableScroll}
+						role="region"
+						aria-labelledby="dsomm-assessment-heading"
+						tabIndex={0}
+					>
 						<table className={styles.table}>
 							<thead>
 								<tr>

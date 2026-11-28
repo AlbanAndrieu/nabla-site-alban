@@ -13,8 +13,14 @@ const read = (path: string) =>
 	readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("canonical homelab SERVICE upstream is Backstage v2, never legacy services", () => {
-	assert.equal(SITE_CATALOG_V2_URL, "https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2");
-	assert.equal(SITE_HEALTH_V2_URL, "https://fastapi-sample.fastapicloud.dev/api/site/health/v2");
+	assert.equal(
+		SITE_CATALOG_V2_URL,
+		"https://fastapi-sample.fastapicloud.dev/api/site/catalog/v2",
+	);
+	assert.equal(
+		SITE_HEALTH_V2_URL,
+		"https://fastapi-sample.fastapicloud.dev/api/site/health/v2",
+	);
 });
 
 test("legacy catalog routes, loaders and static fallbacks are removed", () => {
@@ -40,7 +46,7 @@ test("every catalog-driven view reads only the Backstage v2 route", async () => 
 		[
 			"app/[locale]/architecture/ArchitecturePrivateViews.tsx",
 			"app/[locale]/architecture/useArchitectureLiveData.ts",
-			"app/components/homelab/useHomelabHealth.ts",
+			"app/components/homelab/homelabHealthFetchers.ts",
 			"app/components/homelab/HomelabOperationsDisclosure.tsx",
 			"lib/homelabTroubleshootingClient.ts",
 		].map(read),

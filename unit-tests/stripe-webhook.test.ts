@@ -36,10 +36,10 @@ function webhookRequest(
 test("webhook rejects unsigned or tampered payloads, acknowledges harmless events and refuses payment events without the event ledger", async () => {
 	const previousKey = process.env.STRIPE_SECRET_KEY;
 	const previousSecret = process.env.STRIPE_WEBHOOK_SECRET;
-	const previousDatabase = process.env.DATABASE_URL;
+	const previousLedgerUrl = process.env.SUPABASE_URL;
 	try {
-		// No Neon ledger configured: payment events must stay refused (503) so Stripe retries.
-		delete process.env.DATABASE_URL;
+		// No Supabase ledger configured: payment events must stay refused (503) so Stripe retries.
+		delete process.env.SUPABASE_URL;
 		process.env.STRIPE_SECRET_KEY =
 			"sk_test_placeholder_key_not_valid_for_real_requests";
 		process.env.STRIPE_WEBHOOK_SECRET = secret;
@@ -122,7 +122,7 @@ test("webhook rejects unsigned or tampered payloads, acknowledges harmless event
 		else process.env.STRIPE_SECRET_KEY = previousKey;
 		if (previousSecret === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
 		else process.env.STRIPE_WEBHOOK_SECRET = previousSecret;
-		if (previousDatabase !== undefined)
-			process.env.DATABASE_URL = previousDatabase;
+		if (previousLedgerUrl !== undefined)
+			process.env.SUPABASE_URL = previousLedgerUrl;
 	}
 });

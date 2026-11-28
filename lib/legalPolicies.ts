@@ -1,7 +1,7 @@
 import type { AppLocale } from "@/i18n/routing";
 
 export const LEGAL_POLICY_EMAIL = "job@albandrieu.com";
-export const LEGAL_POLICY_LAST_UPDATED = "2026-09-03";
+const LEGAL_POLICY_LAST_UPDATED = "2026-09-03";
 
 export type LegalPolicySlug = "legal" | "impressum";
 
@@ -39,7 +39,11 @@ const LEGAL_POLICY_COPY = {
 			intro: [
 				"This page identifies the parties responsible for albanandrieu.com and summarises how personal data and intellectual property are treated. It is intended to meet applicable transparency requirements, including French law no. 2004-575 of 21 June 2004 on confidence in the digital economy where applicable.",
 			],
-			links: { privacy: "Privacy Policy", terms: "Terms of Service", home: "homepage" },
+			links: {
+				privacy: "Privacy Policy",
+				terms: "Terms of Service",
+				home: "homepage",
+			},
 			sections: [
 				{
 					heading: "Site publisher",
@@ -95,7 +99,11 @@ const LEGAL_POLICY_COPY = {
 			intro: [
 				"Cette page identifie les responsables d’albanandrieu.com et résume le traitement des données personnelles et de la propriété intellectuelle. Elle vise à satisfaire les obligations de transparence applicables, notamment celles issues de la loi française n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique lorsqu’elles s’appliquent.",
 			],
-			links: { privacy: "Politique de confidentialité", terms: "Conditions d’utilisation", home: "page d’accueil" },
+			links: {
+				privacy: "Politique de confidentialité",
+				terms: "Conditions d’utilisation",
+				home: "page d’accueil",
+			},
 			sections: [
 				{
 					heading: "Éditeur du site",
@@ -153,7 +161,11 @@ const LEGAL_POLICY_COPY = {
 			intro: [
 				"For Germany, {ddg} sets general information duties for certain digital services where its statutory scope applies. This page provides publisher and contact information for albanandrieu.com and also serves as an equivalent legal notice for visitors; it does not claim that one national regime applies universally to every visitor.",
 			],
-			links: { privacy: "Privacy Policy", terms: "Terms of Service", home: "homepage" },
+			links: {
+				privacy: "Privacy Policy",
+				terms: "Terms of Service",
+				home: "homepage",
+			},
 			sections: [
 				{
 					heading: "Publisher and responsible for content",
@@ -191,7 +203,11 @@ const LEGAL_POLICY_COPY = {
 			intro: [
 				"En Allemagne, le {ddg} prévoit des obligations générales d’information pour certains services numériques lorsque son champ d’application légal est rempli. Cette page fournit les informations d’éditeur et de contact d’albanandrieu.com et sert également de notice légale équivalente pour les visiteurs ; elle ne prétend pas qu’un régime national unique s’applique universellement.",
 			],
-			links: { privacy: "Politique de confidentialité", terms: "Conditions d’utilisation", home: "page d’accueil" },
+			links: {
+				privacy: "Politique de confidentialité",
+				terms: "Conditions d’utilisation",
+				home: "page d’accueil",
+			},
 			sections: [
 				{
 					heading: "Éditeur et responsable du contenu",
@@ -220,7 +236,10 @@ const LEGAL_POLICY_COPY = {
 			],
 		},
 	},
-} as const satisfies Record<LegalPolicySlug, Record<AppLocale, LegalPolicyCopy>>;
+} as const satisfies Record<
+	LegalPolicySlug,
+	Record<AppLocale, LegalPolicyCopy>
+>;
 
 export function getLegalPolicyCopy(policy: LegalPolicySlug, locale: AppLocale) {
 	return LEGAL_POLICY_COPY[policy][locale];

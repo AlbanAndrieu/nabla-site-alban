@@ -21,7 +21,7 @@ export function isHealthState(value: unknown): value is HomelabHealthState {
 	);
 }
 
-export function isVerifiedHealthState(
+function isVerifiedHealthState(
 	value: unknown,
 ): value is VerifiedHomelabHealthState {
 	return value === "ok" || value === "warn" || value === "fail";
@@ -52,7 +52,7 @@ export function validOptionalNumber(value: unknown): boolean {
 	);
 }
 
-export function validOptionalNullableNumber(value: unknown): boolean {
+function validOptionalNullableNumber(value: unknown): boolean {
 	return value === null || validOptionalNumber(value);
 }
 
@@ -60,11 +60,11 @@ export function validOptionalString(value: unknown): boolean {
 	return value === undefined || value === null || typeof value === "string";
 }
 
-export function validOptionalHealthState(value: unknown): boolean {
+function validOptionalHealthState(value: unknown): boolean {
 	return value === undefined || value === null || isHealthState(value);
 }
 
-export function validOptionalStringArray(value: unknown): boolean {
+function validOptionalStringArray(value: unknown): boolean {
 	return (
 		value === undefined ||
 		(Array.isArray(value) &&

@@ -24,24 +24,30 @@ async function tabUntilFocused(
 async function expectVisibleFocus(target: Locator): Promise<void> {
 	const evidence = await target.evaluate((element) => {
 		const styles = window.getComputedStyle(element);
-		const rect = element.getBoundingClientRect();
 		const outlineWidth = Number.parseFloat(styles.outlineWidth) || 0;
 		const hasBoxShadow = styles.boxShadow !== "none";
 
 		return {
 			focusVisible: element.matches(":focus-visible"),
 			hasVisibleRing: outlineWidth > 0 || hasBoxShadow,
-			inViewport:
-				rect.bottom > 0 &&
-				rect.right > 0 &&
-				rect.top < window.innerHeight &&
-				rect.left < window.innerWidth,
 		};
 	});
 
 	expect(evidence.focusVisible).toBe(true);
 	expect(evidence.hasVisibleRing).toBe(true);
-	expect(evidence.inViewport).toBe(true);
+	// theme.css uses smooth scrolling: the focus scroll is animated, so wait
+	// for it to land instead of sampling mid-animation (seen on mobile /fr/contact).
+	const inViewport = () =>
+		target.evaluate((element) => {
+				const rect = element.getBoundingClientRect();
+				return (
+					rect.bottom > 0 &&
+					rect.right > 0 &&
+					rect.top < window.innerHeight &&
+					rect.left < window.innerWidth
+				);
+			});
+	await expect.poll(inViewport).toBe(true);
 }
 
 test.describe("Keyboard focus visibility", () => {

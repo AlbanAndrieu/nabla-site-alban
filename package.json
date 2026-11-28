@@ -68,7 +68,6 @@
 		"audit:homelab": "node scripts/audit-homelab-access.mjs"
 	},
 	"dependencies": {
-		"@neondatabase/serverless": "^1.2.1",
 		"@opentelemetry/api": "^1.9.1",
 		"@opentelemetry/api-logs": "^0.223.0",
 		"@opentelemetry/instrumentation": "^0.223.0",

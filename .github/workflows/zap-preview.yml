@@ -210,9 +210,11 @@ jobs:
           zap_exit=0
           # Use the image's existing unprivileged zap account (UID 1000), with
           # only the runner's group added to access the mounted private workspace.
+          # No hook __pycache__: UID 1000 would own it and break workspace cleanup.
           docker run --rm \
             --user 1000:1000 \
             --group-add "$(id -g)" \
+            --env PYTHONDONTWRITEBYTECODE=1 \
             --env ZAP_AUTH_HEADER --env ZAP_AUTH_HEADER_VALUE --env ZAP_AUTH_HEADER_SITE \
             --volume "$scan_dir:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:2.17.0 \

@@ -305,26 +305,6 @@ export function preserveCanonicalProductNames(
 	return out;
 }
 
-/** Escape a literal for use inside a dynamically-created regular expression. */
-function escapeRegExpLiteral(value: string): string {
-	return value.replace(/[.*+?^${}()|[\]\\]/g, (character) => `\\${character}`);
-}
-/** Remove top-level legacy section/article blocks that have been migrated to React. */
-export function removeLegacyElementsById(
-	fragment: string,
-	ids: readonly string[],
-): string {
-	let out = fragment;
-	for (const id of ids) {
-		const escaped = escapeRegExpLiteral(id);
-		const pattern = new RegExp(
-			`<((?:section|article))\\b(?=[^>]*\\bid=["']${escaped}["'])[^>]*>[\\s\\S]*?<\\/\\1>`,
-			"gi",
-		);
-		out = out.replace(pattern, "");
-	}
-	return out;
-}
 async function resolvePublicFilePath(
 	file: string,
 	locale?: string,

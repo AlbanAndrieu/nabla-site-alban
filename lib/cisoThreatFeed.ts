@@ -1,5 +1,5 @@
 /** Name-only stack hints from nabla-compose catalog. NOT a runtime inventory or a vulnerability assessment. */
-export const STACK_SIGNALS = [
+const STACK_SIGNALS = [
 	{ name: "Kubernetes", terms: ["kubernetes", "k8s"] },
 	{ name: "Talos", terms: ["talos linux", "talos os"] },
 	{ name: "Docker", terms: ["docker", "containerd"] },

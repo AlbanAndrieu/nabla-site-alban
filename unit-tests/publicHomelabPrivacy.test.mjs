@@ -139,7 +139,7 @@ test("gates ask the server first and dynamically import the private views", () =
 
 test("owner cards preserve the historical #service-* link after async access", () => {
 	const card = read("app/components/homelab/HomelabServiceCard.tsx");
-	const block = read("app/components/homelab/HomelabServicesBlock.tsx");
+	const block = read("app/components/homelab/homelabServicesBlockEffects.ts");
 	const gate = read("app/components/homelab/HomelabPrivateServices.tsx");
 	assert.match(card, /anchorId\.replace\(\/\^homelab-service-\//);
 	assert.match(block, /getElementById\(hash\.slice\(1\)\)/);

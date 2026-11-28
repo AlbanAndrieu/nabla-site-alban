@@ -101,7 +101,7 @@ vont ensemble : un secret sans clé de site refuse toutes les requêtes (403).
   échoue. Appel `POST /api/chat/completions` (`stream: true`, `max_tokens: 600`),
   réponse retransmise en texte brut, plafonnée à environ 6 000 caractères.
 - Variables absentes, erreur ou redirection d'Access, ou en-têtes non reçus en
-  8 s : **503 `support_unavailable`**, et le widget ouvre « Parler à un humain ».
+  15 s : **503 `support_unavailable`**, et le widget ouvre « Parler à un humain ».
 - `/api/support-contact` poste un message Slack court (langue, e-mail
   facultatif, message, 6 derniers échanges tronqués à 300 caractères, `<>&`
   échappés) et répond 202 ; 503 si le webhook manque ou échoue, et le widget
@@ -112,9 +112,31 @@ vont ensemble : un secret sans clé de site refuse toutes les requêtes (403).
 
 - Pas d'AI SDK (`useChat`) : lecture du flux avec `fetch` et `TextDecoder`, sans
   nouvelle dépendance.
-- Délai de 8 s pour recevoir les en-têtes (au lieu de 5 s) et jeton Turnstile
-  frais à chaque requête.
+- Délai de 15 s pour recevoir les en-têtes (au lieu de 5 s ; 8 s jusqu'au 28/11) et
+  jeton Turnstile frais à chaque requête.
+- Un seul message `system` fixe, émis par le serveur : répondre dans la langue du
+  dernier message du visiteur. Un rôle `system` envoyé par le client reste refusé.
+- Les marqueurs de citation RAG (`[1]`) sont masqués à l'affichage.
 - Les `features` (recherche web, outils, mémoire) se coupent dans le modèle
   OpenWebUI, pas dans la requête.
 - Escalade par Slack uniquement ; l'envoi par mail depuis
   `no-reply@albandrieu.com` reste à décider.
+
+### Test réel depuis la workstation — 28/11/2026
+
+Site local (`next dev`) pointé sur OpenWebUI en LAN (`172.17.0.24:31028`, v0.11.0),
+clé de la workstation, modèle `site-support` (base `gpt-4.1-mini`, connaissance
+`support-site` contenant les deux FAQ à jour). En WAN, OpenWebUI répond par la
+connexion Cloudflare Access (302) : jeton de service toujours requis.
+
+| Constat | Correction |
+| --- | --- |
+| 1re question à froid : 503 après 8,1 s ; à chaud, premier octet entre 1 et 7,4 s | délai d'en-têtes porté à 15 s (site) |
+| Réponse en français à une question anglaise (prompt du modèle surtout en français) | indication de langue côté serveur (site) ; page FR + question EN reste en français |
+| Marqueur `[1]` affiché | masqué à l'affichage (site) |
+| Tarifs ou services « non mentionnés » une fois sur deux : `TOP_K = 3` extraits de 1 000 caractères sur ~14 Ko bilingues | **à faire dans OpenWebUI** : connaissance du modèle en mode « document entier » (`context: "full"`), vérifié par requête : bonnes réponses en ~2,5 s |
+
+Parcours navigateur réel (Chromium et WebKit) : réponse en flux, aucun marqueur
+`[n]`, 4/4. La modification du modèle OpenWebUI n'a pas été appliquée par l'agent
+(refusée par le garde-fou d'exécution) ; une sauvegarde du modèle est conservée
+hors Git dans `~/w/nabla-ops/nabla-site-alban/`.
