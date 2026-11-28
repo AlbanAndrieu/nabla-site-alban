@@ -7,7 +7,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { SupportMessage } from "@/lib/supportChat";
 
 const LANGFUSE_ORIGIN = "https://langfuse.albandrieu.com";
-export const SUPPORT_PROMPT = "site-support-v2";
+export const SUPPORT_PROMPT = "site-support-v8";
 export const SUPPORT_SKILL = "site-faq-v1";
 export const SUPPORT_MODEL = "site-support";
 const FEEDBACK_LIFETIME_SECONDS = 24 * 60 * 60;

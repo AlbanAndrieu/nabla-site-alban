@@ -203,7 +203,7 @@ application de `terraform/cloudflare/access-routes.tofu`.
 
 Pour chaque réponse aboutie, le serveur envoie **un span OTLP v4**
 (`POST /api/public/otel/v1/traces`) avec identifiant W3C,
-question(s) et réponse, version de prompt `site-support-v2`,
+question(s) et réponse, version de prompt `site-support-v8`,
 skill/FAQ `site-faq-v1` et modèle. Le widget associe le même
 identifiant de trace au vote 👍/👎 ; la route
 `/api/support-feedback` enregistre un score
@@ -241,3 +241,22 @@ la présence d'un prompt n'est pas une garantie de citation.
    humain continue de fonctionner. Tester le retour arrière.
 6. Revoir la politique de rétention des questions et réponses dans Langfuse et
    l'information de confidentialité avant d'activer la télémétrie en production.
+
+Le même jour, après réglage par le propriétaire (connaissance `support-site` en
+mode `full`), contrôle via l'API OpenWebUI : services,
+tarifs EN/FR et SEPA justes en 1,2 à 2,5 s, réponse dans la langue de la
+question. Variables Vercel du chatbot présentes (`SUPPORT_OPENWEBUI_API_KEY`,
+`SUPPORT_CF_ACCESS_CLIENT_ID/SECRET`, Slack ; Turnstile en production seulement),
+URL et modèle par défaut. Production : page servie, Turnstile bloque à juste titre
+le navigateur automatisé ; réponse en production non observée par l'agent.
+
+### Prompt v8 et éval live (28/11/2026)
+
+Prompt `site-support-v8` appliqué via l'API OpenWebUI, source de vérité
+`nabla-compose/scripts/openwebui/reconcile-site-support.py` (PR #461) : réponses
+limitées au métier, aux compétences, aux missions et aux technologies d'Alban,
+refus dans la langue du visiteur, instructions confidentielles. Éval de
+20 questions (hors sujet, injection, code, remise, FR/EN) : **20/20**, p50
+0,94 s, 0 erreur Langfuse. **Citations encore faibles** (1 réponse factuelle
+sur 10 avec lien) : le gabarit RAG d'OpenWebUI impose des marqueurs `[1]`,
+supprimés par le widget. À traiter par `RAG_TEMPLATE` ou côté site.

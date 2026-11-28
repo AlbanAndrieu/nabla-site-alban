@@ -72,7 +72,7 @@ Page: `/payment`.
 
 ## Invoices, VAT, purchase orders
 
-Write to invoice@albanandrieu.com for billing, payment, VAT or purchase-order
+Write to invoice@albandrieu.com for billing, payment, VAT or purchase-order
 questions. Do not send invoices to the job or contact addresses.
 
 ## How do I contact Alban Andrieu?
@@ -81,7 +81,7 @@ Pages: `/contact` and `/email`.
 
 - Work and engagements: job@albandrieu.com.
 - Website security (vulnerability reports): security@albandrieu.com.
-- Invoices: invoice@albanandrieu.com.
+- Invoices: invoice@albandrieu.com.
 - Other topics: contact@albandrieu.com.
 - 30-minute meeting: <https://calendly.com/alban-andrieu>.
 - Project brief: the form on the `/startup` page.
