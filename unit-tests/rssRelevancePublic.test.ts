@@ -21,7 +21,7 @@ const article = (title: string, id: string): FeedItem => ({
 
 test("opaque GReader identity uses Python-compatible SHA-256(streamId NUL id)", () => {
   const identity = hash("feed/public", "article-1");
-  assert.match(identity, /^[0-9a-f]{64}$/);
+  assert.equal(identity, "4f2ef13fa83e697df1c19e8e56090c20021d254462553d7367c18fca6a37463d");
   assert.notEqual(identity, hash("feed/private", "article-1"));
   assert.notEqual(identity, hash("feed/public", "article-2"));
 });
