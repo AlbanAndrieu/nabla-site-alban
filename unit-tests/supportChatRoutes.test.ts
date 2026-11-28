@@ -115,6 +115,14 @@ test("chat streams plain text with the Access service token and only the server 
 	assert.equal(headers["CF-Access-Client-Secret"], "fixture-access-secret");
 	assert.equal(init.redirect, "error");
 	const body = JSON.parse(String(init.body));
+	assert.match(body.metadata.trace_id, /^[a-f0-9]{32}$/);
+	assert.deepEqual(body.metadata, {
+		trace_id: body.metadata.trace_id,
+		source: "albanandrieu-support",
+		prompt: "site-support-v2",
+		skill: "site-faq-v1",
+	});
+	delete body.metadata;
 	assert.deepEqual(body, {
 		model: "site-support",
 		messages: [
