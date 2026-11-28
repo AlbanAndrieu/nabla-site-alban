@@ -81,6 +81,7 @@ test("migrated pages no longer consume legacy TrueNAS namespaces", async () => {
 test("TrueNAS presentation components do not embed locale dictionaries", async () => {
 	for (const component of [
 		"FastPoolPlan.tsx",
+		"MemoryUpgradePlan.tsx",
 		"GpuUpgradePlan.tsx",
 		"HardwareSection.tsx",
 		"HeroSection.tsx",

@@ -122,7 +122,7 @@ test.describe("editorial page localization", () => {
 	test("CTID description and image label are localized in French", async ({
 		page,
 	}) => {
-		await page.goto("/fr/ctid.html");
+		await page.goto("/fr/security/ctid");
 		await expect(
 			page.getByText(
 				"Une sélection automatisée multi-sources pour la veille et la cyberdéfense.",

@@ -1,9 +1,12 @@
 export const CURRENT_BUILD_TOTAL_EUR = 1184.31;
 
-export const FAST_POOL_PRODUCT = {
-	href: "https://www.amazon.fr/dp/B09H1CKTFP",
-	unitPriceEur: 299.99,
-	quantity: 2,
+export const HARDWARE_UPGRADE_SOURCES = {
+	msi: "https://www.msi.com/Motherboard/MPG-B650I-EDGE-WIFI/Specification",
+	amd: "https://www.amd.com/en/products/processors/desktops/ryzen/7000-series/amd-ryzen-7-7700.html",
+	kioxia: "https://europe.kioxia.com/fr-fr/personal/ssd/exceria-plus-g3-nvme-ssd.html",
+	lexar: "https://resources.lexar.com/download/1048/documents/13165/lexar-productsheet-ssd-nm790-en-202410.pdf",
+	pools: "https://www.truenas.com/docs/scale/storage/pools/poolcreationwizardscreen/",
+	slog: "https://www.truenas.com/docs/references/slog/",
 } as const;
 
 export const REUSED_COMPONENT_ICONS = [

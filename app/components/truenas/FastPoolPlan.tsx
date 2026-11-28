@@ -1,16 +1,10 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import { formatEuro } from "./formatters";
-import { FAST_POOL_PRODUCT } from "./hardwarePlan";
+import { getTranslations } from "next-intl/server";
+import { HARDWARE_UPGRADE_SOURCES } from "./hardwarePlan";
 
 const failureTone = { color: "var(--ui-danger-text)" } as const;
 
 export default async function FastPoolPlan() {
-	const [locale, t] = await Promise.all([
-		getLocale(),
-		getTranslations("truenas.upgrades.fastPool"),
-	]);
-	const totalPrice =
-		FAST_POOL_PRODUCT.unitPriceEur * FAST_POOL_PRODUCT.quantity;
+	const t = await getTranslations("truenas.upgrades.fastPool");
 
 	return (
 		<div className="card box-shadow mt-3">
@@ -19,17 +13,17 @@ export default async function FastPoolPlan() {
 					<h5 className="h6 mb-0">{t("title")}</h5>
 					<span className="badge text-bg-warning">{t("badge")}</span>
 				</div>
-				<p className="mb-3">
-					<a
-						href={FAST_POOL_PRODUCT.href}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{t("purchase")}
-					</a>{" "}
-					— {formatEuro(locale, FAST_POOL_PRODUCT.unitPriceEur)}{" "}
-					{t("unitPrice")}, {formatEuro(locale, totalPrice)} {t("totalPrice")}.
-				</p>
+				<p className="mb-2">{t("selection")}</p>
+				<p className="fw-semibold mb-2">{t("capacity")}</p>
+				<ul className="small mb-2" aria-label={t("optionsLabel")}>
+					<li>
+						<a href={HARDWARE_UPGRADE_SOURCES.kioxia}>{t("kioxia")}</a>
+					</li>
+					<li>
+						<a href={HARDWARE_UPGRADE_SOURCES.lexar}>{t("lexar")}</a>
+					</li>
+				</ul>
+				<p className="small text-muted mb-3">{t("priceNote")}</p>
 
 				<div
 					className="row g-3"
@@ -74,7 +68,14 @@ export default async function FastPoolPlan() {
 					</div>
 				</div>
 
-				<p className="small text-muted mt-3 mb-0">{t("note")}</p>
+				<p className="small text-muted mt-3 mb-2">{t("note")}</p>
+				<p className="small mb-2">{t("caution")}</p>
+				<p className="small mb-0">
+					{t("sources")}{" "}
+					<a href={HARDWARE_UPGRADE_SOURCES.pools}>{t("poolGuide")}</a>
+					{" · "}
+					<a href={HARDWARE_UPGRADE_SOURCES.slog}>{t("slogGuide")}</a>
+				</p>
 			</div>
 		</div>
 	);

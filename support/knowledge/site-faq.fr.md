@@ -127,7 +127,7 @@ identifiants, ni adresses internes.
 ## Les guides sécurité et YubiKey
 
 Pages : `/fr/security`, `/fr/security/yubikey`, `/fr/security/dsomm`,
-`/fr/security/lexique`, `/fr/security/ctem`, `/fr/ciso`, `/fr/ai`.
+`/fr/security/lexique`, `/fr/security/ctem`, `/fr/security/ciso`, `/fr/security/ctid`, `/fr/security/compliance`, `/fr/ai`.
 
 - Le guide YubiKey explique ce qu'est une clé de sécurité, l'intérêt de
   FIDO2 / WebAuthn, une configuration à deux clés, la récupération, puis PIV,

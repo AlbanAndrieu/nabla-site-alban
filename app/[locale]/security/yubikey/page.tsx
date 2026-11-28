@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import SecurityNav from "@/components/security/SecurityNav";
 import TopAnchor from "@/components/TopAnchor";
 import Container from "@/components/ui/Container";
 import { type AppLocale, routing } from "@/i18n/routing";
@@ -11,12 +12,12 @@ import {
 } from "@/lib/sitePageCatalog";
 import { enrichPageMetadata } from "@/lib/socialMetadata";
 import { GUIDE_COPY } from "./content";
-import styles from "./page.module.css";
 import PivEntraGuide from "./PivEntraGuide";
+import styles from "./page.module.css";
 import VaultPkiArchitecture from "./VaultPkiArchitecture";
 import YubiKeyEvidence from "./YubiKeyEvidence";
-import YubiKeyIntroduction from "./YubiKeyIntroduction";
 import YubiKeyGraph from "./YubiKeyGraph";
+import YubiKeyIntroduction from "./YubiKeyIntroduction";
 import YubiKeyPocketManual from "./YubiKeyPocketManual";
 import YubiKeyUseCases from "./YubiKeyUseCases";
 
@@ -67,6 +68,7 @@ export default async function YubiKeySecurityPage({
 				</Container>
 			</header>
 			<main id="main-content">
+				<SecurityNav locale={locale} active="yubikey" />
 				<Container>
 					<YubiKeyIntroduction locale={locale as AppLocale} />
 					<p className={styles.disclaimer} role="note">
@@ -122,7 +124,9 @@ export default async function YubiKeySecurityPage({
 							className={styles.toc}
 							aria-label={locale === "fr" ? "Sommaire" : "On this page"}
 						>
-							<a href="#yubikey-introduction">{locale === "fr" ? "Découvrir la YubiKey" : "YubiKey basics"}</a>
+							<a href="#yubikey-introduction">
+								{locale === "fr" ? "Découvrir la YubiKey" : "YubiKey basics"}
+							</a>
 							<a href="#yubikey-manual">
 								{locale === "fr" ? "Mémo des clés" : "Key quick reference"}
 							</a>

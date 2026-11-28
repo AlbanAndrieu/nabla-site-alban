@@ -121,7 +121,7 @@ credentials or internal addresses.
 ## Security and YubiKey guides
 
 Pages: `/security`, `/security/yubikey`, `/security/dsomm`,
-`/security/lexique`, `/security/ctem`, `/ciso`, `/ai`.
+`/security/lexique`, `/security/ctem`, `/security/ciso`, `/security/ctid`, `/security/compliance`, `/ai`.
 
 - The YubiKey guide explains what a security key is, why FIDO2 / WebAuthn
   matters, a two-key setup, recovery, then PIV, Vault PKI and Microsoft Entra

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import SecurityNav from "@/components/security/SecurityNav";
 import TopAnchor from "@/components/TopAnchor";
 import Container from "@/components/ui/Container";
 import ExternalLink from "@/components/ui/ExternalLink";
@@ -76,6 +77,7 @@ export default async function DsommPage({
 			</header>
 
 			<main id="main-content">
+				<SecurityNav locale={locale} active="dsomm" />
 				<section
 					className={styles.summarySection}
 					aria-labelledby="dsomm-summary-heading"

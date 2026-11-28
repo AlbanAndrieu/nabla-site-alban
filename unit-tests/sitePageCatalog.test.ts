@@ -19,11 +19,12 @@ const expectedSeoSlugs = [
 	"security",
 	"security/dsomm",
 	"security/lexique",
+	"security/compliance",
 	"security/ctem",
 	"security/yubikey",
 	"ai",
 	"architecture",
-	"ciso",
+	"security/ciso",
 	"truenas",
 	"link",
 	"email",
@@ -38,6 +39,15 @@ test("SEO allowlist contains the intended site pages plus native policy index an
 		sitemap().length,
 		expectedSeoSlugs.length + 1 + POLICY_PAGE_SLUGS.length,
 	);
+});
+
+test("security canonical CISO is indexed and CTID stays outside the sitemap", () => {
+	assert.equal(canonicalPagePath("security/ciso", "en"), "/security/ciso");
+	assert.equal(canonicalPagePath("security/ciso", "fr"), "/fr/security/ciso");
+	assert.ok(!("ciso" in SITE_PAGES));
+	assert.ok(!("ctid" in SITE_PAGES));
+	assert.ok("security/ctid" in SITE_PAGES);
+	assert.ok(!SEO_PAGE_SLUGS.some((slug) => String(slug) === "security/ctid"));
 });
 
 test("technical pages stay outside the sitemap", () => {
