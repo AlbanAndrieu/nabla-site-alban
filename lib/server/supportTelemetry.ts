@@ -141,8 +141,8 @@ export function buildSupportOtelPayload(args: {
 								spanId,
 								name: "site-support-chat",
 								kind: 2,
-								startTimeUnixNano: String(BigInt(startedAt) * 1_000_000n),
-								endTimeUnixNano: String(BigInt(completedAt) * 1_000_000n),
+								startTimeUnixNano: String(BigInt(startedAt) * BigInt(1_000_000)),
+								endTimeUnixNano: String(BigInt(completedAt) * BigInt(1_000_000)),
 								attributes: [
 									attr("langfuse.trace.name", "site-support-chat"),
 									attr(
