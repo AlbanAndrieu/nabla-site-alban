@@ -71,6 +71,43 @@ export function stripCitationMarkers(text: string): string {
 	return text.replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "");
 }
 
+export type SupportCitationSegment = { text: string; href?: string };
+
+/**
+ * Render only explicit, verified HTTPS citations from the public support FAQ.
+ * Untrusted chatbot Markdown is NOT inserted as HTML or arbitrary hyperlinks.
+ */
+export function supportCitationSegments(raw: string): SupportCitationSegment[] {
+	const text = stripCitationMarkers(raw);
+	const segments: SupportCitationSegment[] = [];
+	const markdown = /\[([^\]\n]{1,120})\]\((https:\/\/[^\s)\n]{1,800})\)/g;
+	let offset = 0;
+	for (const match of text.matchAll(markdown)) {
+		const at = match.index;
+		if (at > offset) segments.push({ text: text.slice(offset, at) });
+		const [, label, rawUrl] = match;
+		let href: string | undefined;
+		try {
+			const url = new URL(rawUrl);
+			if (
+				url.protocol === "https:" &&
+				url.username === "" &&
+				url.password === "" &&
+				["www.albanandrieu.com", "albanandrieu.com", "calendly.com", "www.cnil.fr"].includes(url.hostname)
+			) {
+				href = url.href;
+			}
+		} catch {
+			// Untrusted references remain plain text, never clickable.
+		}
+		if (href) segments.push({ text: label, href });
+		else segments.push({ text: match[0] });
+		offset = at + match[0].length;
+	}
+	if (offset < text.length) segments.push({ text: text.slice(offset) });
+	return segments.length ? segments : [{ text }];
+}
+
 /** Only `user` and `assistant` roles pass: a client `system` prompt is refused. */
 function parseMessages(
 	raw: unknown,
