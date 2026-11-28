@@ -104,9 +104,11 @@ avec l'assistant sont transmis au propriétaire du site. Si l'envoi échoue,
 
 ## Que deviennent mes messages au support ?
 
-Ils sont traités sur le serveur auto-hébergé du propriétaire du site et ne sont
-pas conservés par le site. Ne partagez ni données personnelles sensibles, ni mot
-de passe, ni données de paiement. Pour toute question sur vos données, voir la
+Ils sont traités sur le serveur auto-hébergé du propriétaire du site.
+Lorsque la télémétrie Langfuse est activée, les questions et réponses y sont
+également enregistrées afin d'évaluer la pertinence du support et les versions
+du prompt et de la FAQ. Ne partagez ni données personnelles sensibles,
+ni mot de passe, ni données de paiement. Pour toute question sur vos données, voir la
 politique de confidentialité (`/fr/policy/privacy_policy`) ou écrire à
 contact@albandrieu.com.
 
