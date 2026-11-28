@@ -1,18 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { POST as chatPost } from "../app/api/support-chat/route";
+import { POST as feedbackPost } from "../app/api/support-feedback/route";
 import {
 	buildSupportOtelPayload,
-	recordSupportFeedback,
-	recordSupportTrace,
 	makeFeedbackToken,
 	newSupportTraceId,
+	recordSupportFeedback,
+	recordSupportTrace,
 	SUPPORT_PROMPT,
 	SUPPORT_SKILL,
 	verifyFeedbackToken,
 } from "../lib/server/supportTelemetry";
 import { supportCitationSegments } from "../lib/supportChat";
-import { POST as feedbackPost } from "../app/api/support-feedback/route";
-import { POST as chatPost } from "../app/api/support-chat/route";
 
 test("support traces use 32-char W3C IDs and label prompt, skill and model", () => {
 	const traceId = newSupportTraceId();
@@ -33,7 +33,10 @@ test("support traces use 32-char W3C IDs and label prompt, skill and model", () 
 	const attributes = new Map(
 		span.attributes.map(({ key, value }) => [key, value.stringValue]),
 	);
-	assert.equal(attributes.get("langfuse.trace.metadata.prompt"), SUPPORT_PROMPT);
+	assert.equal(
+		attributes.get("langfuse.trace.metadata.prompt"),
+		SUPPORT_PROMPT,
+	);
 	assert.equal(attributes.get("langfuse.trace.metadata.skill"), SUPPORT_SKILL);
 	assert.equal(attributes.get("langfuse.observation.type"), "span");
 	assert.match(attributes.get("langfuse.observation.output") ?? "", /contact/);
@@ -78,17 +81,25 @@ test("kill switch stops inference before Turnstile, OpenWebUI or Langfuse", asyn
 	const old = process.env.SUPPORT_CHAT_ENABLED;
 	process.env.SUPPORT_CHAT_ENABLED = "false";
 	try {
-		const request = new Request("https://www.albanandrieu.com/api/support-chat", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ locale: "fr", messages: [{ role: "user", content: "Salut" }] }),
-		});
+		const request = new Request(
+			"https://www.albanandrieu.com/api/support-chat",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					locale: "fr",
+					messages: [{ role: "user", content: "Salut" }],
+				}),
+			},
+		);
 		const blocked = await chatPost(request);
 		assert.equal(blocked.status, 503);
 		assert.deepEqual(await blocked.json(), { error: "support_disabled" });
-		const feedback = await feedbackPost(new Request(
-			"https://www.albanandrieu.com/api/support-feedback", { method: "POST" },
-		));
+		const feedback = await feedbackPost(
+			new Request("https://www.albanandrieu.com/api/support-feedback", {
+				method: "POST",
+			}),
+		);
 		assert.equal(feedback.status, 503);
 	} finally {
 		if (old === undefined) delete process.env.SUPPORT_CHAT_ENABLED;
@@ -100,14 +111,17 @@ test("feedback API rejects forged IDs without contacting Langfuse", async () => 
 	const old = process.env.SUPPORT_CHAT_ENABLED;
 	delete process.env.SUPPORT_CHAT_ENABLED;
 	try {
-		const response = await feedbackPost(new Request(
-			"https://www.albanandrieu.com/api/support-feedback",
-			{
+		const response = await feedbackPost(
+			new Request("https://www.albanandrieu.com/api/support-feedback", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ traceId: newSupportTraceId(), token: "fake", relevant: true }),
-			},
-		));
+				body: JSON.stringify({
+					traceId: newSupportTraceId(),
+					token: "fake",
+					relevant: true,
+				}),
+			}),
+		);
 		assert.equal(response.status, 403);
 	} finally {
 		if (old !== undefined) process.env.SUPPORT_CHAT_ENABLED = old;
@@ -122,7 +136,11 @@ test("Langfuse v4 OTLP and BOOLEAN scores have correct wire-format", async () =>
 		secret: process.env.SUPPORT_CF_ACCESS_CLIENT_SECRET,
 	};
 	const original = globalThis.fetch;
-	const requests: Array<{ url: string; headers: Headers; body: Record<string, unknown> }> = [];
+	const requests: Array<{
+		url: string;
+		headers: Headers;
+		body: Record<string, unknown>;
+	}> = [];
 	process.env.SUPPORT_LANGFUSE_PUBLIC_KEY = "pk_test";
 	process.env.SUPPORT_LANGFUSE_SECRET_KEY = "sk_test";
 	process.env.SUPPORT_CF_ACCESS_CLIENT_ID = "test-service-id";
@@ -147,11 +165,17 @@ test("Langfuse v4 OTLP and BOOLEAN scores have correct wire-format", async () =>
 			result: "complete",
 		});
 		assert.equal(traceOk, true);
-		assert.equal(requests[0].url, "https://langfuse.albandrieu.com/api/public/otel/v1/traces");
+		assert.equal(
+			requests[0].url,
+			"https://langfuse.albandrieu.com/api/public/otel/v1/traces",
+		);
 		assert.equal(requests[0].headers.get("x-langfuse-ingestion-version"), "4");
 		assert.ok(requests[0].body.resourceSpans);
 		assert.equal(await recordSupportFeedback(traceId, true), true);
-		assert.equal(requests[1].url, "https://langfuse.albandrieu.com/api/public/scores");
+		assert.equal(
+			requests[1].url,
+			"https://langfuse.albandrieu.com/api/public/scores",
+		);
 		assert.equal(requests[1].body.value, 1);
 		assert.equal(requests[1].body.dataType, "BOOLEAN");
 		assert.equal(requests[1].body.traceId, traceId);

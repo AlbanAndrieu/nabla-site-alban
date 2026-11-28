@@ -93,7 +93,12 @@ export function supportCitationSegments(raw: string): SupportCitationSegment[] {
 				url.protocol === "https:" &&
 				url.username === "" &&
 				url.password === "" &&
-				["www.albanandrieu.com", "albanandrieu.com", "calendly.com", "www.cnil.fr"].includes(url.hostname)
+				[
+					"www.albanandrieu.com",
+					"albanandrieu.com",
+					"calendly.com",
+					"www.cnil.fr",
+				].includes(url.hostname)
 			) {
 				href = url.href;
 			}

@@ -81,10 +81,12 @@ export default function SupportChat({
 	const [turns, setTurns] = useState<Turn[]>([]);
 	const [draft, setDraft] = useState("");
 	const [streaming, setStreaming] = useState(false);
-	const [error, setError] = useState<"unavailable" | "verifyFailed" | "rateLimited" | null>(
-		null,
-	);
-	const [ratings, setRatings] = useState<Record<number, "up" | "down" | "sending">>({});
+	const [error, setError] = useState<
+		"unavailable" | "verifyFailed" | "rateLimited" | null
+	>(null);
+	const [ratings, setRatings] = useState<
+		Record<number, "up" | "down" | "sending">
+	>({});
 	const [ratingErrors, setRatingErrors] = useState<Record<number, boolean>>({});
 	const [humanOpen, setHumanOpen] = useState(!enabled);
 	const [token, setToken] = useState<string | null>(null);
@@ -177,7 +179,9 @@ export default function SupportChat({
 		} catch (caught) {
 			// Keep a partial answer; drop the empty placeholder.
 			setTurns(
-				answer.trim() ? [...shown, { ...annotatedAnswer, content: answer }] : shown,
+				answer.trim()
+					? [...shown, { ...annotatedAnswer, content: answer }]
+					: shown,
 			);
 			setError(
 				caught instanceof Error && caught.message === "verifyFailed"
@@ -241,7 +245,11 @@ export default function SupportChat({
 					onReady={renderWidget}
 				/>
 			) : null}
-			{!enabled ? <p role="status" className="alert alert-warning">{copy.paused}</p> : null}
+			{!enabled ? (
+				<p role="status" className="alert alert-warning">
+					{copy.paused}
+				</p>
+			) : null}
 			{turns.length === 0 ? (
 				<p className="text-secondary">{copy.empty}</p>
 			) : null}
@@ -274,9 +282,10 @@ export default function SupportChat({
 									)
 								: copy.sending}
 						</p>
-						{item.role === "assistant" && item.feedbackToken && item.traceId && !(
-							streaming && turns.at(-1)?.id === item.id
-						) ? (
+						{item.role === "assistant" &&
+						item.feedbackToken &&
+						item.traceId &&
+						!(streaming && turns.at(-1)?.id === item.id) ? (
 							<div className={styles.rating}>
 								<button
 									type="button"
@@ -284,14 +293,18 @@ export default function SupportChat({
 									aria-pressed={ratings[item.id] === "up"}
 									disabled={Boolean(ratings[item.id])}
 									onClick={() => void rate(item, true)}
-								>👍</button>
+								>
+									👍
+								</button>
 								<button
 									type="button"
 									aria-label={copy.ratingNotHelpful}
 									aria-pressed={ratings[item.id] === "down"}
 									disabled={Boolean(ratings[item.id])}
 									onClick={() => void rate(item, false)}
-								>👎</button>
+								>
+									👎
+								</button>
 								{ratings[item.id] === "up" || ratings[item.id] === "down" ? (
 									<span role="status">{copy.ratingRecorded}</span>
 								) : null}

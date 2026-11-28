@@ -111,11 +111,13 @@ export function normalizeArticle(input: Partial<FeedItem>): FeedItem | null {
 	const source = plainText(input.source, 90) || new URL(link).hostname;
 	const summary = plainText(input.summary, 260);
 	const aiTechnologies = Array.isArray(input.aiTechnologies)
-		? input.aiTechnologies.filter(
-				(value) =>
-					typeof value === "string" &&
-					/^[a-z0-9][a-z0-9-]{1,63}$/.test(value),
-			).slice(0, 8)
+		? input.aiTechnologies
+				.filter(
+					(value) =>
+						typeof value === "string" &&
+						/^[a-z0-9][a-z0-9-]{1,63}$/.test(value),
+				)
+				.slice(0, 8)
 		: undefined;
 	const time =
 		typeof input.pubDate === "string" ? Date.parse(input.pubDate) : NaN;
@@ -145,7 +147,8 @@ export function rankArticles(input: FeedItem[]): RankedFeedItem[] {
 		seen.add(identity);
 		if (titleKey.length > 40) seen.add("title:" + titleKey);
 		const corpus = item.title + " " + (item.summary ?? "");
-		const technologies = item.aiTechnologies ??
+		const technologies =
+			item.aiTechnologies ??
 			signals
 				.filter((signal) =>
 					signal.patterns.some((pattern) => pattern.test(corpus)),

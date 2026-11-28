@@ -52,15 +52,14 @@ test("CTID assigns service links only for known public TrueNAS anchors", () => {
 	assert.deepEqual(digest.homelab[0].serviceIds, ["postgresql"]);
 });
 
-
 test("CTID resolves verified lowercase AI technologies and excludes retired pfSense links", () => {
-    const article = {
-        link: "https://example.com/security-1",
-        title: "Security advisory for the home stack",
-        source: "CERT",
-        aiTechnologies: ["truenas", "litellm", "traefik"],
-    };
-    const digest = selectCtidDigest([article]);
-    assert.deepEqual(digest.homelab[0].serviceIds.sort(), ["litellm", "truenas"]);
-    assert.ok(!digest.homelab[0].serviceIds.includes("pfsense"));
+	const article = {
+		link: "https://example.com/security-1",
+		title: "Security advisory for the home stack",
+		source: "CERT",
+		aiTechnologies: ["truenas", "litellm", "traefik"],
+	};
+	const digest = selectCtidDigest([article]);
+	assert.deepEqual(digest.homelab[0].serviceIds.sort(), ["litellm", "truenas"]);
+	assert.ok(!digest.homelab[0].serviceIds.includes("pfsense"));
 });

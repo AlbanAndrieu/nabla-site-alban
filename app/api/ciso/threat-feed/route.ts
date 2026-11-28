@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
 	try {
 		const selection = await fetchFreshRssPublicSelection();
-		if (!selection || (selection.items.length === 0 && selection.mode !== "ai-filtered")) {
+		if (
+			!selection ||
+			(selection.items.length === 0 && selection.mode !== "ai-filtered")
+		) {
 			return NextResponse.json(
 				{ items: [], mode: selection ? "warming-up" : "unconfigured" },
 				{ status: 503, headers: { "Cache-Control": "no-store" } },

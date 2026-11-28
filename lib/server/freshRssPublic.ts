@@ -1,7 +1,10 @@
-import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
 import { createHash } from "node:crypto";
-import { fetchClassifiedFeed, joinClassifiedArticles } from "./rssRelevancePublic";
+import { type FeedItem, normalizeArticle } from "@/lib/cisoThreatFeed";
 import approvedSources from "../../public/ciso-rss-feeds.json";
+import {
+	fetchClassifiedFeed,
+	joinClassifiedArticles,
+} from "./rssRelevancePublic";
 
 const FRESHRSS_ORIGIN = "https://freshrss.albandrieu.com";
 const CONTENT_LIMIT = 1_500_000;
@@ -117,7 +120,8 @@ export async function fetchFreshRssPublicArticles(): Promise<
 		});
 		if (!article) return [];
 		// The legacy GReader reader remains usable when an item lacks an ID.
-		if (typeof entry.id !== "string" || !entry.id || entry.id.length > 1024) return [article];
+		if (typeof entry.id !== "string" || !entry.id || entry.id.length > 1024)
+			return [article];
 		const rssId = createHash("sha256")
 			.update(entry.origin.streamId + "\0" + entry.id, "utf8")
 			.digest("hex");
@@ -134,7 +138,10 @@ export async function fetchFreshRssPublicSelection(): Promise<{
 	if (!items) return null;
 	const classified = await fetchClassifiedFeed();
 	if (classified) {
-		return { items: joinClassifiedArticles(items, classified), mode: "ai-filtered" };
+		return {
+			items: joinClassifiedArticles(items, classified),
+			mode: "ai-filtered",
+		};
 	}
 	return { items, mode: "freshrss" };
 }

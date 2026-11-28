@@ -21,7 +21,10 @@ async function fetchNews(
 		if (!Array.isArray(data.items)) throw new Error("Malformed feed response");
 		return {
 			items: data.items,
-			mode: data.mode === "ai-filtered" ? "FreshRSS · Langfuse / LiteLLM" : "FreshRSS",
+			mode:
+				data.mode === "ai-filtered"
+					? "FreshRSS · Langfuse / LiteLLM"
+					: "FreshRSS",
 		};
 	} catch {
 		if (signal.aborted) throw new Error("Aborted");
@@ -219,7 +222,9 @@ export default function CtidIntelligence({ locale }: { locale: Language }) {
 			if (signal.aborted) return;
 			setItems(next.items);
 			setMode(next.mode);
-			setStatus(next.items.length || next.mode.includes("Langfuse") ? "ready" : "error");
+			setStatus(
+				next.items.length || next.mode.includes("Langfuse") ? "ready" : "error",
+			);
 		} catch {
 			if (!signal.aborted) setStatus("error");
 		}

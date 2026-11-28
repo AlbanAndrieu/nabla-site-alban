@@ -114,7 +114,9 @@ export default function ThreatFeed({
 	const [status, setStatus] = useState<"loading" | "ready" | "error">(
 		"loading",
 	);
-	const [mode, setMode] = useState<"freshrss" | "ai-filtered" | "fallback">("fallback");
+	const [mode, setMode] = useState<"freshrss" | "ai-filtered" | "fallback">(
+		"fallback",
+	);
 	const [query, setQuery] = useState("");
 	const [technology, setTechnology] = useState("");
 	const [scope, setScope] = useState<"stack" | "all">("stack");
@@ -154,7 +156,9 @@ export default function ThreatFeed({
 			? "Sources publiques de secours · couverture limitée"
 			: "Public-feed fallback · limited coverage",
 		freshrss: "FreshRSS · Google Reader API",
-		ai: fr ? "FreshRSS · filtrage Langfuse / LiteLLM" : "FreshRSS · Langfuse / LiteLLM filtering",
+		ai: fr
+			? "FreshRSS · filtrage Langfuse / LiteLLM"
+			: "FreshRSS · Langfuse / LiteLLM filtering",
 		reset: fr ? "Effacer les filtres" : "Clear filters",
 		results: fr ? "articles affichés" : "articles shown",
 	};
@@ -173,7 +177,8 @@ export default function ThreatFeed({
 				if (
 					!Array.isArray(payload.items) ||
 					(payload.items.length === 0 && payload.mode !== "ai-filtered")
-				) throw new Error("FreshRSS response empty or invalid");
+				)
+					throw new Error("FreshRSS response empty or invalid");
 				nextItems = payload.items;
 				nextMode = payload.mode === "ai-filtered" ? "ai-filtered" : "freshrss";
 			} catch {
@@ -183,7 +188,9 @@ export default function ThreatFeed({
 			if (signal?.aborted) return;
 			setItems(nextItems);
 			setMode(nextMode);
-			setStatus(nextItems.length || nextMode === "ai-filtered" ? "ready" : "error");
+			setStatus(
+				nextItems.length || nextMode === "ai-filtered" ? "ready" : "error",
+			);
 		} catch {
 			if (!signal?.aborted) setStatus("error");
 		}
@@ -331,7 +338,13 @@ export default function ThreatFeed({
 					<strong>{displayed.length}</strong> {strings.results} /{" "}
 					{ranked.length}
 				</span>
-				<span>{mode === "ai-filtered" ? strings.ai : mode === "freshrss" ? strings.freshrss : strings.fallback}</span>
+				<span>
+					{mode === "ai-filtered"
+						? strings.ai
+						: mode === "freshrss"
+							? strings.freshrss
+							: strings.fallback}
+				</span>
 			</div>
 			<p className="ciso-feed-disclaimer">
 				{mode === "ai-filtered"

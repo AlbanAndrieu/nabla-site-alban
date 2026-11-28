@@ -5,7 +5,6 @@ import {
 	supportBackendConfig,
 	supportUnavailable,
 } from "@/lib/server/supportChat";
-import { parseChatRequest, supportLanguageHint } from "@/lib/supportChat";
 import {
 	makeFeedbackToken,
 	newSupportTraceId,
@@ -13,6 +12,7 @@ import {
 	SUPPORT_PROMPT,
 	SUPPORT_SKILL,
 } from "@/lib/server/supportTelemetry";
+import { parseChatRequest, supportLanguageHint } from "@/lib/supportChat";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,10 +39,12 @@ export async function POST(request: Request): Promise<Response> {
 
 	// Server-side kill switch: fails before authentication, proxy I/O or model cost.
 	if (process.env.SUPPORT_CHAT_ENABLED === "false") {
-		return done(Response.json(
-			{ error: "support_disabled" },
-			{ status: 503, headers: { "Cache-Control": "no-store" } },
-		));
+		return done(
+			Response.json(
+				{ error: "support_disabled" },
+				{ status: 503, headers: { "Cache-Control": "no-store" } },
+			),
+		);
 	}
 	const guarded = await readSupportRequest(request, parseChatRequest);
 	if (!guarded.ok) return done(guarded.response);
@@ -135,7 +137,11 @@ export async function POST(request: Request): Promise<Response> {
 		"X-Content-Type-Options": "nosniff",
 		"X-Support-Trace-Id": traceId,
 	};
-	if (token && process.env.SUPPORT_LANGFUSE_PUBLIC_KEY && process.env.SUPPORT_LANGFUSE_SECRET_KEY) {
+	if (
+		token &&
+		process.env.SUPPORT_LANGFUSE_PUBLIC_KEY &&
+		process.env.SUPPORT_LANGFUSE_SECRET_KEY
+	) {
 		headers["X-Support-Feedback-Token"] = token;
 	}
 	return done(new Response(tracedStream, { headers }));
